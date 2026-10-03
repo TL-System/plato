@@ -1,0 +1,349 @@
+{
+  "observed_date": "2026-10-02",
+  "baseline_commit": "5b8359bd40bbe65c7753e71f6627c490f9aa144f",
+  "packages": [
+    {
+      "name": "accelerate",
+      "latest": "1.15.0",
+      "requires_python": ">=3.10.0",
+      "source": "https://pypi.org/pypi/accelerate/json",
+      "installed_baseline": "1.15.0"
+    },
+    {
+      "name": "aiohttp",
+      "latest": "3.14.3",
+      "requires_python": ">=3.10",
+      "source": "https://pypi.org/pypi/aiohttp/json",
+      "installed_baseline": "3.14.3"
+    },
+    {
+      "name": "boto3",
+      "latest": "1.43.107",
+      "requires_python": ">=3.10",
+      "source": "https://pypi.org/pypi/boto3/json",
+      "installed_baseline": "1.43.106"
+    },
+    {
+      "name": "catboost",
+      "latest": "1.2.10",
+      "requires_python": null,
+      "source": "https://pypi.org/pypi/catboost/json",
+      "installed_baseline": null
+    },
+    {
+      "name": "cvxopt",
+      "latest": "1.3.3",
+      "requires_python": "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,!=3.5.*,!=3.6.*,!=3.7.*,>=3",
+      "source": "https://pypi.org/pypi/cvxopt/json",
+      "installed_baseline": null
+    },
+    {
+      "name": "datasets",
+      "latest": "5.0.1",
+      "requires_python": ">=3.10.0",
+      "source": "https://pypi.org/pypi/datasets/json",
+      "installed_baseline": "5.0.1"
+    },
+    {
+      "name": "einops",
+      "latest": "0.8.2",
+      "requires_python": ">=3.9",
+      "source": "https://pypi.org/pypi/einops/json",
+      "installed_baseline": null
+    },
+    {
+      "name": "evaluate",
+      "latest": "0.4.6",
+      "requires_python": ">=3.8.0",
+      "source": "https://pypi.org/pypi/evaluate/json",
+      "installed_baseline": "0.4.6"
+    },
+    {
+      "name": "gdown",
+      "latest": "6.4.1",
+      "requires_python": ">=3.10",
+      "source": "https://pypi.org/pypi/gdown/json",
+      "installed_baseline": "6.4.1"
+    },
+    {
+      "name": "gymnasium",
+      "latest": "1.3.0",
+      "requires_python": ">=3.10",
+      "source": "https://pypi.org/pypi/gymnasium/json",
+      "installed_baseline": "1.3.0"
+    },
+    {
+      "name": "hatchling",
+      "latest": "1.32.4",
+      "requires_python": ">=3.10",
+      "source": "https://pypi.org/pypi/hatchling/json",
+      "installed_baseline": null
+    },
+    {
+      "name": "jinja2",
+      "latest": "3.1.6",
+      "requires_python": ">=3.7",
+      "source": "https://pypi.org/pypi/jinja2/json",
+      "installed_baseline": "3.1.6"
+    },
+    {
+      "name": "kazoo",
+      "latest": "2.11.0",
+      "requires_python": null,
+      "source": "https://pypi.org/pypi/kazoo/json",
+      "installed_baseline": "2.11.0"
+    },
+    {
+      "name": "langdetect",
+      "latest": "1.0.9",
+      "requires_python": "",
+      "source": "https://pypi.org/pypi/langdetect/json",
+      "installed_baseline": null
+    },
+    {
+      "name": "lighteval",
+      "latest": "0.13.0",
+      "requires_python": ">=3.10",
+      "source": "https://pypi.org/pypi/lighteval/json",
+      "installed_baseline": null
+    },
+    {
+      "name": "lpips",
+      "latest": "0.1.4",
+      "requires_python": "",
+      "source": "https://pypi.org/pypi/lpips/json",
+      "installed_baseline": null
+    },
+    {
+      "name": "matplotlib",
+      "latest": "3.11.2",
+      "requires_python": ">=3.11",
+      "source": "https://pypi.org/pypi/matplotlib/json",
+      "installed_baseline": null
+    },
+    {
+      "name": "mkdocs-material",
+      "latest": "9.7.7",
+      "requires_python": ">=3.8",
+      "source": "https://pypi.org/pypi/mkdocs-material/json",
+      "installed_baseline": null
+    },
+    {
+      "name": "mlx",
+      "latest": "0.32.3",
+      "requires_python": ">=3.10",
+      "source": "https://pypi.org/pypi/mlx/json",
+      "installed_baseline": null
+    },
+    {
+      "name": "mosek",
+      "latest": "11.2.5",
+      "requires_python": "<3.15,>=3.9",
+      "source": "https://pypi.org/pypi/mosek/json",
+      "installed_baseline": null
+    },
+    {
+      "name": "munch",
+      "latest": "4.0.0",
+      "requires_python": ">=3.6",
+      "source": "https://pypi.org/pypi/munch/json",
+      "installed_baseline": "4.0.0"
+    },
+    {
+      "name": "nltk",
+      "latest": "3.10.3",
+      "requires_python": ">=3.10",
+      "source": "https://pypi.org/pypi/nltk/json",
+      "installed_baseline": null
+    },
+    {
+      "name": "numpy",
+      "latest": "2.5.3",
+      "requires_python": ">=3.12",
+      "source": "https://pypi.org/pypi/numpy/json",
+      "installed_baseline": "2.5.3"
+    },
+    {
+      "name": "opacus",
+      "latest": "1.6.0",
+      "requires_python": ">=3.7.5",
+      "source": "https://pypi.org/pypi/opacus/json",
+      "installed_baseline": "1.6.0"
+    },
+    {
+      "name": "peft",
+      "latest": "0.21.2",
+      "requires_python": ">=3.10.0",
+      "source": "https://pypi.org/pypi/peft/json",
+      "installed_baseline": "0.21.2"
+    },
+    {
+      "name": "psutil",
+      "latest": "7.2.2",
+      "requires_python": ">=3.6",
+      "source": "https://pypi.org/pypi/psutil/json",
+      "installed_baseline": "7.2.2"
+    },
+    {
+      "name": "ptflops",
+      "latest": "0.7.5",
+      "requires_python": ">=3.9",
+      "source": "https://pypi.org/pypi/ptflops/json",
+      "installed_baseline": null
+    },
+    {
+      "name": "pytest",
+      "latest": "9.1.1",
+      "requires_python": ">=3.10",
+      "source": "https://pypi.org/pypi/pytest/json",
+      "installed_baseline": "9.1.1"
+    },
+    {
+      "name": "python-socketio",
+      "latest": "5.17.0",
+      "requires_python": ">=3.8",
+      "source": "https://pypi.org/pypi/python-socketio/json",
+      "installed_baseline": "5.17.0"
+    },
+    {
+      "name": "PyYAML",
+      "latest": "6.0.3",
+      "requires_python": ">=3.8",
+      "source": "https://pypi.org/pypi/PyYAML/json",
+      "installed_baseline": "6.0.3"
+    },
+    {
+      "name": "regex",
+      "latest": "2026.9.29",
+      "requires_python": ">=3.10",
+      "source": "https://pypi.org/pypi/regex/json",
+      "installed_baseline": "2026.9.29"
+    },
+    {
+      "name": "requests",
+      "latest": "2.34.2",
+      "requires_python": ">=3.10",
+      "source": "https://pypi.org/pypi/requests/json",
+      "installed_baseline": "2.34.2"
+    },
+    {
+      "name": "ruff",
+      "latest": "0.16.10",
+      "requires_python": ">=3.7",
+      "source": "https://pypi.org/pypi/ruff/json",
+      "installed_baseline": "0.16.10"
+    },
+    {
+      "name": "safetensors",
+      "latest": "0.8.0",
+      "requires_python": ">=3.10",
+      "source": "https://pypi.org/pypi/safetensors/json",
+      "installed_baseline": "0.8.0"
+    },
+    {
+      "name": "scikit-learn",
+      "latest": "1.9.1",
+      "requires_python": ">=3.11",
+      "source": "https://pypi.org/pypi/scikit-learn/json",
+      "installed_baseline": null
+    },
+    {
+      "name": "scipy",
+      "latest": "1.18.1",
+      "requires_python": ">=3.12",
+      "source": "https://pypi.org/pypi/scipy/json",
+      "installed_baseline": "1.18.1"
+    },
+    {
+      "name": "tenseal",
+      "latest": "0.3.18",
+      "requires_python": ">=3.11",
+      "source": "https://pypi.org/pypi/tenseal/json",
+      "installed_baseline": "0.3.18"
+    },
+    {
+      "name": "tiktoken",
+      "latest": "0.14.0",
+      "requires_python": ">=3.9",
+      "source": "https://pypi.org/pypi/tiktoken/json",
+      "installed_baseline": "0.14.0"
+    },
+    {
+      "name": "timm",
+      "latest": "1.0.30",
+      "requires_python": ">=3.8",
+      "source": "https://pypi.org/pypi/timm/json",
+      "installed_baseline": "1.0.30"
+    },
+    {
+      "name": "tokenizers",
+      "latest": "0.23.2",
+      "requires_python": ">=3.10",
+      "source": "https://pypi.org/pypi/tokenizers/json",
+      "installed_baseline": "0.23.2"
+    },
+    {
+      "name": "torch",
+      "latest": "2.14.1",
+      "requires_python": ">=3.10",
+      "source": "https://pypi.org/pypi/torch/json",
+      "installed_baseline": "2.14.1"
+    },
+    {
+      "name": "torch-optimizer",
+      "latest": "0.3.0",
+      "requires_python": ">=3.6.0",
+      "source": "https://pypi.org/pypi/torch-optimizer/json",
+      "installed_baseline": "0.3.0"
+    },
+    {
+      "name": "torchvision",
+      "latest": "0.29.1",
+      "requires_python": "!=3.14.1,>=3.10",
+      "source": "https://pypi.org/pypi/torchvision/json",
+      "installed_baseline": "0.29.1"
+    },
+    {
+      "name": "transformers",
+      "latest": "5.18.0",
+      "requires_python": ">=3.10.0",
+      "source": "https://pypi.org/pypi/transformers/json",
+      "installed_baseline": "5.18.0"
+    },
+    {
+      "name": "ty",
+      "latest": "0.0.84",
+      "requires_python": ">=3.8",
+      "source": "https://pypi.org/pypi/ty/json",
+      "installed_baseline": "0.0.84"
+    },
+    {
+      "name": "uv",
+      "latest": "0.12.22",
+      "requires_python": ">=3.8",
+      "source": "https://pypi.org/pypi/uv/json",
+      "installed_baseline": null
+    },
+    {
+      "name": "wandb",
+      "latest": "0.30.0",
+      "requires_python": ">=3.10",
+      "source": "https://pypi.org/pypi/wandb/json",
+      "installed_baseline": "0.30.0"
+    },
+    {
+      "name": "yacs",
+      "latest": "0.1.8",
+      "requires_python": "",
+      "source": "https://pypi.org/pypi/yacs/json",
+      "installed_baseline": null
+    },
+    {
+      "name": "zstd",
+      "latest": "1.5.7.2",
+      "requires_python": null,
+      "source": "https://pypi.org/pypi/zstd/json",
+      "installed_baseline": "1.5.7.2"
+    }
+  ]
+}

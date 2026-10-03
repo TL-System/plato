@@ -1,0 +1,2647 @@
+{
+  "schema_version": 1,
+  "task": "2D: payloads, serialization, shared utilities, HE/MPC and cleanup",
+  "validation_date_local": "2026-10-02",
+  "worktree": "/private/tmp/plato-refresh-worktrees/payloads",
+  "branch": "maintenance/2026-phase2-payloads",
+  "commit_identity": {
+    "baseline": "fda60becedfa6236c11d415b87a868b52789a41e",
+    "final_tested_implementation_commit": "65e71329da1b4e1aa4f445991f4aaa38db119d3e",
+    "implementation_commits": [
+      "af695c0f0dea3032116522b0c7131393e724f30d",
+      "264b422d8b96420ff3c361e69f888a656fe8f512",
+      "939d93cc289c0fb12a1c4084a1bc3dd72df293a7",
+      "dba6f85b8140d0159d593ad14b371ecb2caa9ee2",
+      "e7c0d59571d88efd7eb1fdbf4fc63ac2a7b81395",
+      "639ca69bf4eaeff868462d0b30a5fcc72218f061",
+      "15c79d0c81ffd0e5e4873db869a2863f97fe8279",
+      "926346bf342f11e85b6258adc4cb407b449669b7",
+      "53aa72c3c578b1a32d8f83d64a98d6a543cdfb9a",
+      "65e71329da1b4e1aa4f445991f4aaa38db119d3e"
+    ],
+    "evidence_carrier": "A following documentation-only commit updates this sole evidence file. Its exact identity is reported in the root handoff, avoiding a self-hash; runtime and test source are unchanged from the tested implementation commit above.",
+    "source_status_before_evidence": "Clean tracked tree at 65e71329. Both locked profiles execute all 13 existing affected cases plus eight effective-profile regressions on both interpreters, and clean base collection passes. Only the two owned test modules change; production/S3/lifecycle sources remain identical. Prior 60-case combined and 557-case base results remain at 53aa72c3, not reattributed or mechanically rerun.",
+    "previous_reviewed_candidate_commit": "a4a4733e96cf248a73db76e6b2182536b9f592ea",
+    "retained_full_matrix_commit": "e7c0d59571d88efd7eb1fdbf4fc63ac2a7b81395",
+    "final_tested_implementation_tree": "046c05979e92a07e72f7bd4231cca1c81abcb773",
+    "root_base_probe_candidate_commit": "aa232791f04d93eb9de09ed6c596ac714db5b605",
+    "premerge_d_candidate": "f8aa0e9815b702f9d414ebe85a85eb48f9a982a1",
+    "accepted_b_dependency": "00eeb9dcdd2b513e64db9408969356037e09bb8e",
+    "provisional_combined_merge_commit": "ccb310177273f5cfa2ce7f1c0203f55ddaa68397",
+    "review2_candidate": "09b9b941bc4a816b62d8ed33ad993455f6f05da5"
+  },
+  "scope": {
+    "owned": [
+      "plato/processors/** except nanochat_tokenizer.py",
+      "plato/serialization/**",
+      "plato/mpc/**",
+      "plato/utils/** except third_party.py and reserved new archive.py",
+      "cleanup.py",
+      "plato/servers/fedavg_he.py",
+      "plato/servers/fedavg_mpc_additive.py",
+      "plato/servers/fedavg_mpc_shamir.py",
+      "plato/servers/strategies/mpc.py",
+      "plato/servers/strategies/aggregation/he.py",
+      "plato/clients/mpc.py",
+      "plato/clients/strategies/mpc.py",
+      "focused tests",
+      "accepted legacy_rl_env archive"
+    ],
+    "untouched": [
+      "pyproject.toml",
+      "uv.lock",
+      "CI",
+      "general client/server orchestration",
+      "trainers/algorithms",
+      "MLX implementations",
+      "shared conftest",
+      "Nanochat tokenizer",
+      "third_party.py",
+      "archive.py",
+      "active FEI example source"
+    ],
+    "coordination": "No nested agents, questions, cloud credentials, pushes, merges or PR edits. Extra findings use 2D IDs; F21-F24 remain reserved for trainer findings.",
+    "accepted_addendum_sha256": "5b51b0fb7ed6f68d9fce7176335b3e7be5e5f178a2788590912aa2396a487709"
+  },
+  "environment": {
+    "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+    "uv": "0.12.22",
+    "python_default_and_minimum": "3.13, unchanged",
+    "python_version_file_sha256": "02e735b3dfe1c32833eb550b7ff8ffa17f5f2bc3fa1e7bae61a8f5a3883ce398",
+    "uv_lock_sha256": "573b10c2ba1a2317e02f9e40c6181359cafab6f6e0a0f9be12bb256cb276fe1d",
+    "isolated_locked_dev_environments": [
+      {
+        "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+        "installed_distribution_count": 110,
+        "installed_distributions_sha256": "0b59b1f36606c868d7e4989bd134178b134795c3b859a33061115285131e2ea9",
+        "path": "/tmp/plato-phase2d.G3jkGH/venv313",
+        "provision_command": "UV_PROJECT_ENVIRONMENT=/tmp/plato-phase2d.G3jkGH/venv313 uv sync --locked --group dev --python 3.13",
+        "provision_log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/sync313.log",
+          "sha256": "174d445a9f7f9ec60c70ad35ab8901ec93af1747b0200192ef88eac052b0aae3"
+        }
+      },
+      {
+        "python": "3.14.8 (main, Sep 30 2026, 17:55:09) [Clang 21.0.0 (clang-2100.3.34.2)]",
+        "installed_distribution_count": 110,
+        "installed_distributions_sha256": "0b59b1f36606c868d7e4989bd134178b134795c3b859a33061115285131e2ea9",
+        "path": "/tmp/plato-phase2d.G3jkGH/venv314",
+        "provision_command": "UV_PROJECT_ENVIRONMENT=/tmp/plato-phase2d.G3jkGH/venv314 uv sync --locked --group dev --python 3.14",
+        "provision_log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/sync314.log",
+          "sha256": "3bd77836a43f140bc2cd9678c5a1b2c88fbe39c880b26c9b8cd41b1db2d7e326"
+        }
+      }
+    ],
+    "relevant_versions_shared_by_both": {
+      "torch": "2.14.1",
+      "numpy": "2.5.3",
+      "safetensors": "0.8.0",
+      "boto3": "1.43.106",
+      "botocore": "1.43.106",
+      "requests": "2.34.2",
+      "urllib3": "2.8.0",
+      "tenseal": "0.3.18",
+      "kazoo": "2.11.0",
+      "gymnasium": "1.3.0",
+      "zstd": "1.5.7.2",
+      "pytest": "9.1.1",
+      "ruff": "0.16.10",
+      "ty": "0.0.84"
+    },
+    "thread_limits_for_tests_and_probes": {
+      "OMP_NUM_THREADS": "1",
+      "OPENBLAS_NUM_THREADS": "1",
+      "MKL_NUM_THREADS": "1",
+      "VECLIB_MAXIMUM_THREADS": "1"
+    },
+    "shell": "zsh -lc for every shell invocation; commands below are normalized inner argv, with cwd and thread environment shared here.",
+    "pinned_submodule": {
+      "path": "external/nanochat",
+      "commit": "c75fe54aa7c1fa881701c246f9427bcbe4eee5a4",
+      "command": "git submodule update --init external/nanochat",
+      "result": "Initialized pinned revision only. DViT/T2TViT remain uninitialized and untouched."
+    },
+    "locked_base_profile_environments": [
+      {
+        "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+        "optional_presence": {
+          "kazoo": false,
+          "gymnasium": false,
+          "opacus": false,
+          "tiktoken": false
+        },
+        "installed_distribution_count": 85,
+        "installed_distributions_sha256": "103fbe203bb4e9e7314eab0605262b61aef583e9a9027be7cb984df85063db6b",
+        "path": "/tmp/plato-phase2-root/base-313",
+        "ownership": "Root-owned; explicitly authorized read-only reuse. Never synced, removed or reconfigured by this author; package bytecode writes disabled.",
+        "provision_command": "uv sync --project /tmp/plato-refresh-worktrees/payloads --locked --python 3.13 --no-default-groups --group test-base",
+        "provision_source": "Root report environment.profile; provisioned by root before this correction."
+      },
+      {
+        "python": "3.14.8 (main, Sep 30 2026, 17:55:09) [Clang 21.0.0 (clang-2100.3.34.2)]",
+        "optional_presence": {
+          "kazoo": false,
+          "gymnasium": false,
+          "opacus": false,
+          "tiktoken": false
+        },
+        "installed_distribution_count": 85,
+        "installed_distributions_sha256": "103fbe203bb4e9e7314eab0605262b61aef583e9a9027be7cb984df85063db6b",
+        "path": "/tmp/plato-phase2d.G3jkGH/base314",
+        "ownership": "Task-owned isolated environment retained in owned scratch.",
+        "provision_command": "UV_PROJECT_ENVIRONMENT=/tmp/plato-phase2d.G3jkGH/base314 uv sync --locked --python 3.14 --no-default-groups --group test-base",
+        "provision_log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/base-sync314.log",
+          "sha256": "a35e2bf4f2d8fa0f057f89c223588366e218129d01eb283f74382bc31694aaa6"
+        }
+      }
+    ]
+  },
+  "mandatory_findings": [
+    {
+      "id": "F02",
+      "status": "fixed",
+      "before": "Configured prefixes were absent or applied inconsistently to storage operations.",
+      "after": "put/send/receive/delete/list share one namespace helper, including physical keys returned by list; nested/trailing-slash prefixes applied exactly once.",
+      "tests": "tests/utils/test_s3.py::test_put_send_receive_list_delete_use_one_namespace"
+    },
+    {
+      "id": "F03",
+      "status": "fixed",
+      "before": "An empty successful listing without Contents raised an error.",
+      "after": "Empty successful pages produce []; real service failures still propagate.",
+      "tests": "tests/utils/test_s3.py::test_empty_listing_succeeds_without_contents"
+    },
+    {
+      "id": "F04",
+      "status": "fixed",
+      "before": "Only a page was returned, without the configured namespace constraint.",
+      "after": "ListObjectsV2 paginator consumes every page with Prefix namespace/; five matching objects over three pages and two unrelated objects independently checked.",
+      "tests": "tests/utils/test_s3.py::test_all_pages_stay_in_namespace"
+    },
+    {
+      "id": "F05",
+      "status": "fixed",
+      "before": "Stalled real HTTP transfers exceeded the regression deadline; some errors were hidden.",
+      "after": "Botocore connect/read 5/30 seconds, standard total_max_attempts=3; presigned GET/PUT use the same timeouts and at most three attempts, bounded backoff and disabled Retry-After delays. Error/timeout propagation and transient recovery verified on actual network paths.",
+      "tests": "tests/utils/test_s3.py: ten stalled/error probes across PUT, GET, list, delete and initialization; successful GET/PUT/list recovery; 403, missing object and truncated pickle negatives",
+      "probe_limits": "Tests reduce timeouts to 0.1/0.1 seconds and attempts to two, impose a 2.5-second public-method deadline and check actual HTTP request counts."
+    },
+    {
+      "id": "F12",
+      "status": "fixed",
+      "before": "Flattened dotted/bracketed paths and reserved _tree_metadata could silently overwrite data.",
+      "after": "Actual duplicate metadata paths and reserved tensor path rejected before Safetensors save. Literal dotted PyTorch state_dict names remain supported; existing wire layout preserved.",
+      "tests": "tests/utils/test_safetensor_serialization.py: both collision insertion orders, bracket/nested collisions, empty keys, string-coerced duplicate keys, reserved tensor path; independent valid dotted/nested/dtype roundtrips"
+    }
+  ],
+  "additional_findings": [
+    {
+      "id": "2D-01",
+      "status": "fixed",
+      "finding": "Strided Safetensors leaves serialized storage order with the original logical shape; native scalar metadata returned zero-dimensional arrays.",
+      "outcome": "C-contiguous leaf serialization and native scalar restoration preserve transpose values and HE indices metadata."
+    },
+    {
+      "id": "2D-02",
+      "status": "fixed",
+      "finding": "Quantization changed integer/bool buffers; QSGD mishandled empty tensors, reset caller RNG and accepted invalid levels/trailing bytes.",
+      "outcome": "Exact buffer dtype/value preservation, finite/shape/header validation, seeded stochastic rounding and explicit levels 2..128; independent error bound max(abs(x))/(levels-1)+1e-6."
+    },
+    {
+      "id": "2D-03",
+      "status": "fixed",
+      "finding": "Feature compression failed empty batches/noncontiguous arrays and lost empty target dtype; shared headers could corrupt heterogeneous batches.",
+      "outcome": "Empty/strided/homogeneous arrays roundtrip exactly; incompatible feature shapes/dtypes fail explicitly before compression while retaining the existing shared-header wire."
+    },
+    {
+      "id": "2D-04",
+      "status": "fixed",
+      "finding": "CPU torch.device detection converted float32 feature tensors to float16 unnecessarily; randomized response mutated source tensors through a NumPy view.",
+      "outcome": "Zero-noise CPU precision and targets preserved; randomized response works on a copy."
+    },
+    {
+      "id": "2D-05",
+      "status": "fixed",
+      "finding": "Unstructured pruning reused inferred modules after trainer.model was replaced.",
+      "outcome": "Infer current model targets for each call; independent magnitude reference zeros 1..4 and retains 5..8 after replacement."
+    },
+    {
+      "id": "2D-06",
+      "status": "fixed",
+      "finding": "cleanup runtime fallback could follow a directory symlink and delete external checkpoints.",
+      "outcome": "External resolved runtime and directory symlinks excluded; clean_directory refuses symlink targets; ordinary owned runtime/cache cleanup still executes."
+    },
+    {
+      "id": "2D-07",
+      "status": "fixed",
+      "finding": "Importing count_parameters executed model downloads; empty compound loaders failed; unary epsilon=2000 overflowed.",
+      "outcome": "Demos guarded by main, loaders terminate with len=0, stable negative-exponent probabilities with finite nonnegative epsilon checks."
+    },
+    {
+      "id": "2D-08",
+      "status": "fixed",
+      "finding": "TOML Unicode keys and nested array-table paths produced invalid or misplaced output.",
+      "outcome": "Independent stdlib tomllib roundtrip validates Unicode/literal dotted keys and nested array tables; historical mixed-type-array wrapper convention retained."
+    },
+    {
+      "id": "2D-09",
+      "status": "fixed",
+      "finding": "HE accepted invalid sample accounting/masks/vector lengths, reordered caller masks and replaced model state before successful reconstruction.",
+      "outcome": "Cardinality/finite nonnegative counts, positive total, mask and vector contracts checked; zero-sample rounds return baseline, failed decode leaves encrypted_model intact; native CKKS matches independent plaintext at abs 2e-5."
+    },
+    {
+      "id": "2D-10",
+      "status": "fixed",
+      "finding": "Shamir reconstructed the wrong peer polynomial and single-client output retained sample scaling; floating polynomial arithmetic lost accuracy.",
+      "outcome": "Correct sender/target share orientation, uniform normalization, integer coefficients/float64 exact-range checks and Fraction interpolation; thresholds 1/2/4 match independent weighted sums at abs 2e-6."
+    },
+    {
+      "id": "2D-11",
+      "status": "fixed",
+      "finding": "Incomplete additive participants and inconsistent reports/shares could bias aggregates; stale writers could contaminate a later round; zero sample counts were dropped.",
+      "outcome": "Participant/contributor accounting, sample/key/shape/finiteness checks and round fences under the store lock; asynchronous training captures expected round and persists zero counts; failures leave baseline/next round untouched."
+    },
+    {
+      "id": "2D-12",
+      "status": "fixed",
+      "finding": "Interrupted local state saves destroyed the previous round; remote errors were misreported as missing rounds; failed/unbounded ZooKeeper lock acquisition leaked clients or allowed unlocked writes.",
+      "outcome": "Atomic temporary-file replacement, missing-object-only fallback, finite start/lock waits and unconditional client stop; acquire false or errors prevent writes."
+    },
+    {
+      "id": "2D-13",
+      "status": "fixed",
+      "finding": "Active DDPG/SAC/TD3 replay dimensions broadcast incorrectly; SAC Box shape construction failed; loaded target networks remained stale.",
+      "outcome": "Finite parameter-changing updates for DDPG, SAC stochastic/deterministic, TD3 plain/recurrent; detached SAC alpha, deterministic alpha zero and loaded target snapshots synchronized."
+    },
+    {
+      "id": "2D-14",
+      "status": "fixed",
+      "finding": "TD3 reused one transition target action and normalized across samples; asynchronous recurrent batch=1 failed and padding/source mutation coupled transitions.",
+      "outcome": "Every target row used; per-transition normalization, length masking and masked critic averages preserve batch isolation and source sequences."
+    },
+    {
+      "id": "2D-15",
+      "status": "handoff_phase4",
+      "location": "examples/reinforcement_learning/fei/fei_server.py::RLServer.normalize_state",
+      "finding": "Actual normalize_state([0.0, 0.0]) returns [NaN, NaN] on Python 3.13 and 3.14.",
+      "outcome": "Concrete FEI probe retained; active example unchanged per root instruction."
+    },
+    {
+      "id": "2D-16",
+      "status": "handoff_phase4",
+      "location": "examples/reinforcement_learning/fei/fei_server.py::RLServer.__init__",
+      "finding": "Actual subclass constructor forwards algorithm as datasource and trainer as algorithm; superclass trainer receives None.",
+      "outcome": "Only superclass constructor capture instrumented, explicit agent/model/algorithm/trainer objects forwarded through actual subclass on both interpreters; active example unchanged."
+    },
+    {
+      "id": "2D-17",
+      "status": "corrected_by_accepted_b_and_tracked_combined_regression",
+      "location": "2B candidate plato/clients/transport.py::receive_s3_payload",
+      "finding": "Combining fixed S3 with exact 2B candidate succeeds for nonempty/nested/trailing-slash prefixes; with empty prefix, utility writes client_payload_7_ABC123 but bounded reader requests /client_payload_7_ABC123 and gets 404.",
+      "outcome": "Historical empty-prefix 404 reproduction retained. Accepted B 00eeb9dc normalizes the supported namespace consistently with unchanged D S3. Tracked current actual writer/presigner-to-reader cases pass for all four prefixes on both interpreters at 53aa72c3; final root phase qualification remains separate."
+    }
+  ],
+  "audit_inventory": [
+    {
+      "files": "processors/{base,model,pipeline,registry,model_deepcopy,safetensor_encode,safetensor_decode}.py",
+      "outcome": "Production pipelines/registry order exercised, deep copies preserve dtype without aliasing, Safetensors encode/decode preserves nested metadata and default HE wire; initialization/export modules reviewed."
+    },
+    {
+      "files": "processors/{compress,decompress,model_compress,model_decompress,model_quantize,model_dequantize,model_quantize_qsgd,model_dequantize_qsgd}.py; utils/zstd_helpers.py",
+      "outcome": "Exact lossless and bounded lossy roundtrips, buffer dtype preservation and invalid QSGD wire/level negatives. Locked zstd backend exercised; trusted pickle boundary inventoried. No stdlib compression.zstd change: it would retain the 3.13 dependency/wire burden without demonstrated reduction."
+    },
+    {
+      "files": "processors/{feature,feature_additive_noise,model_randomized_response,structured_pruning,unstructured_pruning}.py; utils/unary_encoding.py",
+      "outcome": "CPU zero-noise precision, source immutability, zero/half pruning references, replacement-model pruning, probability stability and existing seeded unary stochastic expectations executed."
+    },
+    {
+      "files": "serialization/safetensor.py; utils/tree.py",
+      "outcome": "F12 adversarial rejection, ordinary dotted state_dict compatibility, independent NumPy/Torch bool/int/float64/bfloat16/scalar/strided/empty nested roundtrips, historical wire intact. Native MLX restoration remains outside this task qualification."
+    },
+    {
+      "files": "processors/{model_encrypt,model_decrypt}.py; utils/homo_enc.py; servers/fedavg_he.py; servers/strategies/aggregation/he.py",
+      "outcome": "Actual native CKKS partial/all/no-mask weighted aggregation and default registry Safetensors wire roundtrip; malformed/mutating masks, sample counts, lengths, zero total and model publication negatives; bitmap exact roundtrips."
+    },
+    {
+      "files": "mpc/{__init__,round_store}.py; processors/mpc_model_encrypt_{additive,shamir}.py; servers/strategies/mpc.py",
+      "outcome": "Real isolated local store, processors and aggregators independently weighted numerics, higher thresholds, single participant, zero samples, reversed reports, missing/duplicate/stale/malformed round contracts, race and atomic save failures. Kazoo startup/acquire/release cleanup and remote error contracts mocked at service boundary."
+    },
+    {
+      "files": "servers/fedavg_mpc_{additive,shamir}.py; clients/mpc.py; clients/strategies/mpc.py",
+      "outcome": "Wrapper/store/debug/threshold wiring reviewed; actual train strategy, zero samples and delayed-round fencing exercised; existing lifecycle and synthetic training smoke now use real persisted round state. Full distributed HE/MPC deployments remain Phase 4."
+    },
+    {
+      "files": "utils/s3.py; cleanup.py",
+      "outcome": "Public methods on real credential-free local HTTP service cover F02-F05, namespace ownership, all pages, stalls/status errors, successful transfers and retries; missing vs service failure distinction. Owned ordinary runtime/cache cleanup and external symlink preservation tested."
+    },
+    {
+      "files": "utils/{count_parameters,data_loaders,trainer_utils,decorators,fonts,csv_processor,toml_writer}.py",
+      "outcome": "Offline import, known trainable count=6, named-layer freeze/activate, wrapped timeit result/name, empty and normal compound loaders, invalid font selection, CSV schema growth/quoted newlines and stdlib-parsed TOML structure executed. Count table formatter alone stubbed in standalone probe."
+    },
+    {
+      "files": "utils/reinforcement_learning/{rl_agent,rl_server}.py; policies/{base,registry,ddpg,sac,td3}.py",
+      "outcome": "Actual registry FEI agent creates four variable-length replay transitions and trains; parameter-changing finite policy updates/save/load and numerical TD3 isolation references. Actual agent action event and server aggregate_deltas produce independent [4,6.5], total samples=8; action event consumed. FEI server defects 2D-15/16 deferred. Package exports reviewed."
+    },
+    {
+      "files": "former utils/rl_env.py",
+      "outcome": "No active tracked import/config closure; only this accepted unused placeholder archived unchanged, with provenance/license/local README. Active RL family and FEI retained."
+    }
+  ],
+  "validation": {
+    "cwd": "/private/tmp/plato-refresh-worktrees/payloads",
+    "red_command_note": "Normalized test invocations for captured red stages. Initial regressions were added uncommitted before their behavior fixes; snapshot invocations reproduce the exact baseline individual module against final tests. Red aggregate counts include explicitly identified early fixture/expectation issues and are not all claimed as confirmed defects.",
+    "red": [
+      {
+        "command": [
+          "/tmp/plato-phase2d.G3jkGH/venv313/bin/python",
+          "-m",
+          "pytest",
+          "tests/utils/test_s3.py",
+          "tests/utils/test_safetensor_serialization.py",
+          "-q"
+        ],
+        "stage": "Baseline S3/tree implementation before repairs",
+        "result": "24 failed, 10 passed; 43.62s",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/red-s3-tree313.log",
+          "sha256": "3ae4388d1a4ec933a8046396db67f5d3323d4b13f758a350ebe70d7c3fb1b197"
+        },
+        "interpretation": "Includes namespace, empty listing, actual stalls/errors, collision and strided tensor failures. Pagination was separated afterward."
+      },
+      {
+        "command": [
+          "/tmp/plato-phase2d.G3jkGH/venv313/bin/python",
+          "-m",
+          "pytest",
+          "tests/utils/test_s3.py::test_all_pages_stay_in_namespace",
+          "-q"
+        ],
+        "stage": "Baseline list implementation before paginator repair",
+        "result": "1 failed; 0.59s",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/red-pagination313.log",
+          "sha256": "8fb4f808efc998b5f2680b8bc93a37f2b1511afe904eae87fe6f6e90c37588da"
+        }
+      },
+      {
+        "command": [
+          "/tmp/plato-phase2d.G3jkGH/venv313/bin/python",
+          "-m",
+          "pytest",
+          "tests/processors/test_payload_regressions.py",
+          "tests/utils/test_cleanup.py",
+          "-q"
+        ],
+        "stage": "Baseline processors/cleanup before repairs",
+        "result": "15 failed, 3 passed; 0.14s",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/red-processors-cleanup313.log",
+          "sha256": "fc62be58bab32c83b5916dc53ac90b1741a7c57c583adebad51b5da7039a171e"
+        },
+        "interpretation": "Initial randomized-response fixture lacked Config.algorithm; corrected fixture reproduced actual mutation separately. Some malformed QSGD cases already raised struct.error; explicit ValueError is a contract improvement, not proof of prior unbounded allocation."
+      },
+      {
+        "command": [
+          "/tmp/plato-phase2d.G3jkGH/venv313/bin/python",
+          "/tmp/plato-phase2d.G3jkGH/run_baseline.py",
+          "plato.processors.model_randomized_response",
+          "/tmp/plato-phase2d.G3jkGH/baseline_randomized_response.py",
+          "tests/processors/test_payload_regressions.py::test_randomized_response_does_not_modify_source_model",
+          "-q"
+        ],
+        "stage": "Exact baseline randomized-response module",
+        "result": "1 failed; 0.09s",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/red-randomized313.log",
+          "sha256": "c398f1948e03c17a578356d33e7d0ab76939ab0ee8cc5752e7d2da8e502c6847"
+        },
+        "interpretation": "Observed source [-2,0.2,4] become [0,1,1].",
+        "baseline_snapshot": {
+          "source": "plato.processors.model_randomized_response",
+          "baseline": "fda60becedfa6236c11d415b87a868b52789a41e",
+          "sha256": "b07e5003dc1cd926d4dc47bab23e73c3d3f47cd92fa45442995c522633d9d3d6"
+        }
+      },
+      {
+        "command": [
+          "/tmp/plato-phase2d.G3jkGH/venv313/bin/python",
+          "-m",
+          "pytest",
+          "tests/processors/test_payload_regressions.py::test_zero_noise_feature_processor_keeps_cpu_precision_and_targets",
+          "tests/utils/test_shared_payload_utilities.py::test_toml_nested_array_tables_and_literal_keys_keep_structure",
+          "-q"
+        ],
+        "stage": "Feature CPU fix not yet applied; TOML before Unicode/nested-array repair",
+        "result": "2 failed; 0.09s",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/red-feature-toml313.log",
+          "sha256": "c138db0670c36316cd3f5582d40613d979a4482c58bba2bb7a888b2a5a6448f1"
+        }
+      },
+      {
+        "command": [
+          "/tmp/plato-phase2d.G3jkGH/venv313/bin/python",
+          "/tmp/plato-phase2d.G3jkGH/run_baseline.py",
+          "plato.utils.toml_writer",
+          "/tmp/plato-phase2d.G3jkGH/baseline_toml_writer.py",
+          "tests/utils/test_shared_payload_utilities.py::test_toml_nested_array_tables_and_literal_keys_keep_structure",
+          "-q"
+        ],
+        "stage": "Exact baseline TOML module",
+        "result": "1 failed; 0.08s",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/red-toml-baseline313.log",
+          "sha256": "bfaee4147f9c5f4e77838392a4f8a1c97c2aebaa95c8da547f8013df204b4ed4"
+        },
+        "baseline_snapshot": {
+          "source": "plato.utils.toml_writer",
+          "baseline": "fda60becedfa6236c11d415b87a868b52789a41e",
+          "sha256": "973211f1e9eb1264b00387bef6b77103122f82ba92d390a27d7c80204ea516fc"
+        }
+      },
+      {
+        "command": [
+          "/tmp/plato-phase2d.G3jkGH/venv313/bin/python",
+          "-m",
+          "pytest",
+          "tests/utils/test_shared_payload_utilities.py",
+          "-q"
+        ],
+        "stage": "Shared utility implementation before repairs",
+        "result": "5 failed, 3 passed; 0.11s",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/red-shared313.log",
+          "sha256": "eab8477cd8f1917dbce6348ff99af870091ddca4b11338a60a71840c24ea998b"
+        }
+      },
+      {
+        "command": [
+          "/tmp/plato-phase2d.G3jkGH/venv313/bin/python",
+          "-m",
+          "pytest",
+          "tests/servers/test_he_payload_regressions.py",
+          "-q"
+        ],
+        "stage": "Baseline HE before repairs",
+        "result": "13 failed, 2 passed; 0.30s",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/red-he313.log",
+          "sha256": "1f31ad0660f820728c7b1dea45863a977b43ef961a2ff6204c2312ff421c5399"
+        },
+        "interpretation": "One plain valid test initially compared different floating dtypes; corrected to double and not counted as a numerical defect. Confirmed failures are invalid counts/masks/lengths, zero-total behavior and caller mask mutation."
+      },
+      {
+        "command": [
+          "/tmp/plato-phase2d.G3jkGH/venv313/bin/python",
+          "-m",
+          "pytest",
+          "tests/utils/test_safetensor_serialization.py::test_native_scalar_types_roundtrip_in_hybrid_payload_metadata",
+          "tests/servers/test_he_payload_regressions.py::test_default_he_processor_wire_pipeline_roundtrip",
+          "-q"
+        ],
+        "stage": "Intermediate stricter HE validation exposed historical native scalar restoration",
+        "result": "2 failed; 0.12s",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/red-he-wire313.log",
+          "sha256": "70504e6bd38f3fdda7656c589e8159a76aa5dd62c05cd7c93d06d593cc33ca55"
+        },
+        "interpretation": "Compatibility probe prompted native scalar restoration; not an additional baseline HE defect."
+      },
+      {
+        "command": [
+          "/tmp/plato-phase2d.G3jkGH/venv313/bin/python",
+          "-m",
+          "pytest",
+          "tests/mpc/test_mpc_regressions.py",
+          "-q"
+        ],
+        "stage": "Baseline MPC before repairs",
+        "result": "21 failed, 3 passed; 0.28s",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/red-mpc313.log",
+          "sha256": "79820dcbfa022323dff778005bf7e4eb172366bf873b59f2ad95c090ef364208"
+        },
+        "interpretation": "Initial stale-round test used an unsupported expected-round keyword, so it was replaced by the captured real public-processor race below."
+      },
+      {
+        "command": [
+          "/tmp/plato-phase2d.G3jkGH/venv313/bin/python",
+          "-m",
+          "pytest",
+          "tests/mpc/test_mpc_regressions.py::test_stale_round_writer_cannot_contaminate_next_round",
+          "-q"
+        ],
+        "stage": "Store already repaired; processor still lacked round fence",
+        "result": "1 failed; 0.10s",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/red-mpc-race313.log",
+          "sha256": "287c7c2a157c26aceaf3adfc23aad7981c591a627baddc55f39e8c6d4d65633a"
+        },
+        "interpretation": "A real round advance during split accepted stale shares instead of raising."
+      },
+      {
+        "command": [
+          "/tmp/plato-phase2d.G3jkGH/venv313/bin/python",
+          "/tmp/plato-phase2d.G3jkGH/run_baseline.py",
+          "plato.mpc.round_store",
+          "/tmp/plato-phase2d.G3jkGH/baseline_round_store.py",
+          "tests/mpc/test_mpc_regressions.py::test_failed_state_save_keeps_last_complete_round",
+          "-q"
+        ],
+        "stage": "Exact baseline round_store",
+        "result": "1 failed; 0.08s",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/red-atomic313.log",
+          "sha256": "f50acd7e59c1347c007578b18596a61b83f2d74e2011c4d266e0875a67077f5d"
+        },
+        "interpretation": "Injected partial write destroyed prior complete state; subsequent public load raised UnpicklingError.",
+        "baseline_snapshot": {
+          "source": "plato.mpc.round_store",
+          "baseline": "fda60becedfa6236c11d415b87a868b52789a41e",
+          "sha256": "0899013e94db80ceb5f50a3965c1b56e618e8d678e5796c14e5afd7a8298ec4a"
+        }
+      },
+      {
+        "command": [
+          "/tmp/plato-phase2d.G3jkGH/venv313/bin/python",
+          "-m",
+          "pytest",
+          "tests/mpc/test_round_store_contracts.py",
+          "-q"
+        ],
+        "stage": "Before finite lock waits/cleanup; remote read already repaired",
+        "result": "2 failed, 1 passed; 0.10s",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/red-zk313.log",
+          "sha256": "71a96f27674d2c6a4a541e91e33fdcbb264585d921e0cd2a8458f42cadf07499"
+        }
+      },
+      {
+        "command": [
+          "/tmp/plato-phase2d.G3jkGH/venv313/bin/python",
+          "/tmp/plato-phase2d.G3jkGH/run_baseline.py",
+          "plato.mpc.round_store",
+          "/tmp/plato-phase2d.G3jkGH/baseline_round_store.py",
+          "tests/mpc/test_round_store_contracts.py::test_s3_read_error_is_not_reported_as_an_uninitialized_round",
+          "-q"
+        ],
+        "stage": "Exact baseline round_store",
+        "result": "1 failed; 0.09s",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/red-remote-errors313.log",
+          "sha256": "79d91ab02cfc141b414b7e2d50f5f564f0a8597aaab78f4309b3a40361df6464"
+        },
+        "interpretation": "Injected service failure swallowed and converted to uninitialized-round error.",
+        "baseline_snapshot": {
+          "source": "plato.mpc.round_store",
+          "baseline": "fda60becedfa6236c11d415b87a868b52789a41e",
+          "sha256": "0899013e94db80ceb5f50a3965c1b56e618e8d678e5796c14e5afd7a8298ec4a"
+        }
+      },
+      {
+        "command": [
+          "/tmp/plato-phase2d.G3jkGH/venv313/bin/python",
+          "-m",
+          "pytest",
+          "tests/utils/test_rl_payload_utilities.py",
+          "-q"
+        ],
+        "stage": "Baseline active RL before repairs",
+        "result": "7 failed, 1 passed, 1 broadcast warning; 0.33s",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/red-rl313.log",
+          "sha256": "9004e7642c25e9928488cf9eed26e18f52afb52f9b413b4e474c91a7e54137b6"
+        }
+      },
+      {
+        "command": [
+          "/tmp/plato-phase2d.G3jkGH/venv313/bin/python",
+          "/tmp/plato-phase2d.G3jkGH/run_baseline.py",
+          "plato.utils.reinforcement_learning.policies.td3",
+          "/tmp/plato-phase2d.G3jkGH/baseline_td3.py",
+          "tests/utils/test_rl_payload_utilities.py::test_td3_target_actions_use_every_transition",
+          "tests/utils/test_rl_payload_utilities.py::test_async_actor_ignores_padding_and_other_transitions",
+          "-q"
+        ],
+        "stage": "Exact baseline TD3",
+        "result": "2 failed; 0.12s",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/red-rl-numerical313.log",
+          "sha256": "9fd4cb63a6dd12c7c7683ec04f42af2ce6f928eb4e874490db05e887b97da66b"
+        },
+        "interpretation": "Independent per-transition action references and padding checks.",
+        "baseline_snapshot": {
+          "source": "plato.utils.reinforcement_learning.policies.td3",
+          "baseline": "fda60becedfa6236c11d415b87a868b52789a41e",
+          "sha256": "b27d984593fa30c2d03ec131d0644987315d8f73004c5dd767a0088f82bcfdfe"
+        }
+      }
+    ],
+    "focused_green": {
+      "command": [
+        "/tmp/plato-phase2d.G3jkGH/venv313/bin/python",
+        "-m",
+        "pytest",
+        "tests/utils",
+        "tests/processors",
+        "tests/mpc",
+        "tests/servers/test_he_payload_regressions.py",
+        "tests/servers/test_fedavg_he_aggregation_strategy.py",
+        "tests/datasources/test_data_loaders.py",
+        "tests/integration/test_smoke_configs.py::test_mpc_training_smoke",
+        "-q",
+        "-W",
+        "error::UserWarning"
+      ],
+      "result": "133 passed in 17.07s; no skips; user warnings treated as errors",
+      "log": {
+        "path": "/tmp/plato-phase2d.G3jkGH/green-owned313.log",
+        "sha256": "01de6a165708b9a292161935edd6af66bec6fd142f65867806727d57513b4831"
+      },
+      "source_identity_note": "Retained original delivery focused run; not rerun at the review-correction commit."
+    },
+    "initial_full_results": {
+      "commit": "dba6f85b8140d0159d593ad14b371ecb2caa9ee2",
+      "python313": {
+        "command": [
+          "/tmp/plato-phase2d.G3jkGH/venv313/bin/python",
+          "-m",
+          "pytest",
+          "tests",
+          "--test-profile",
+          "mandatory",
+          "-q",
+          "--basetemp=/tmp/plato-phase2d.G3jkGH/pytest-full313",
+          "--junitxml=/tmp/plato-phase2d.G3jkGH/full313.xml",
+          "--cov=plato.processors",
+          "--cov=plato.serialization",
+          "--cov=plato.mpc",
+          "--cov=plato.utils",
+          "--cov-report=json:/tmp/plato-phase2d.G3jkGH/coverage313.json",
+          "--cov-report=term:skip-covered"
+        ],
+        "exit_code": 1,
+        "elapsed_seconds": 474.97,
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/full313.log",
+          "sha256": "e2cc69112baae11e2921ea865c740ee85b5c42d15462984639b0ecd0ffeb3a84"
+        },
+        "junit": {
+          "tests": 413,
+          "failures": 1,
+          "errors": 0,
+          "skipped": 1,
+          "skips": [
+            {
+              "test": "test_nanochat_tokenizer_processor_round_trip",
+              "reason": "optional native nanochat tokenizer: callable rustbpe.Tokenizer absent"
+            }
+          ],
+          "passed": 411
+        }
+      },
+      "python314": {
+        "command": [
+          "/private/tmp/plato-phase2d.G3jkGH/venv314/bin/python",
+          "-m",
+          "pytest",
+          "tests",
+          "--test-profile",
+          "mandatory",
+          "-q",
+          "--basetemp=/tmp/plato-phase2d.G3jkGH/pytest-full314",
+          "--junitxml=/tmp/plato-phase2d.G3jkGH/full314.xml"
+        ],
+        "exit_code": 1,
+        "elapsed_seconds": 544.89,
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/full314.log",
+          "sha256": "a7adf0ba4fa5a39eada1befc8b9378c20fb57a8bc5ea1035a21f6be395fa9cca"
+        },
+        "junit": {
+          "tests": 413,
+          "failures": 1,
+          "errors": 0,
+          "skipped": 1,
+          "skips": [
+            {
+              "test": "test_nanochat_tokenizer_processor_round_trip",
+              "reason": "optional native nanochat tokenizer: callable rustbpe.Tokenizer absent"
+            }
+          ],
+          "passed": 411
+        }
+      },
+      "explanation": "Both 411 passed / 1 failed / 1 allowed skip. Sole failure: old DummyRoundStore lacked load_state in existing MPC client lifecycle test. Historical e7c0d595 commit replaces only that MPC fixture with a real initialized isolated store and asserts persisted samples; runtime source unchanged. Focused correction passes both versions; justified retained full reruns at e7c0d595."
+    },
+    "lifecycle_correction": [
+      {
+        "command": [
+          "/tmp/plato-phase2d.G3jkGH/venv313/bin/python",
+          "-m",
+          "pytest",
+          "tests/clients/test_client_lifecycle_variants.py::test_mpc_training_strategy_records_samples",
+          "-q",
+          "--basetemp=/tmp/plato-phase2d.G3jkGH/pytest-lifecycle313"
+        ],
+        "exit_code": 0,
+        "elapsed_seconds": 4.9,
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/lifecycle-fix313.log",
+          "sha256": "f4c77b58e2280613a49ba18da1c4a02d440e862c49a6c8fe5daaf277333ff99d"
+        }
+      },
+      {
+        "command": [
+          "/private/tmp/plato-phase2d.G3jkGH/venv314/bin/python",
+          "-m",
+          "pytest",
+          "tests/clients/test_client_lifecycle_variants.py::test_mpc_training_strategy_records_samples",
+          "-q",
+          "--basetemp=/tmp/plato-phase2d.G3jkGH/pytest-lifecycle314"
+        ],
+        "exit_code": 0,
+        "elapsed_seconds": 5.24,
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/lifecycle-fix314.log",
+          "sha256": "f4c77b58e2280613a49ba18da1c4a02d440e862c49a6c8fe5daaf277333ff99d"
+        }
+      }
+    ],
+    "standalone_probes": [
+      {
+        "script": {
+          "path": "/tmp/plato-phase2d.G3jkGH/probe_utilities.py",
+          "sha256": "903835ccc39974462e94e03503555f30af46e424e7d3c87a334577b79fc43aed"
+        },
+        "commands": [
+          "/tmp/plato-phase2d.G3jkGH/venv313/bin/python /tmp/plato-phase2d.G3jkGH/probe_utilities.py",
+          "/tmp/plato-phase2d.G3jkGH/venv314/bin/python /tmp/plato-phase2d.G3jkGH/probe_utilities.py"
+        ],
+        "results": "Both passed: count=6, freeze/activate, deepcopy alias/dtype, timeit, HE bitmap, actual RL agent/server weighted delta/event behavior; formatter alone stubbed.",
+        "logs": [
+          {
+            "path": "/tmp/plato-phase2d.G3jkGH/utilities313.log",
+            "sha256": "d6afe248e8bc616b852173b6e1f115783dec9a6b791a4a2a13ec3f3f1a1d344b"
+          },
+          {
+            "path": "/tmp/plato-phase2d.G3jkGH/utilities314.log",
+            "sha256": "d6afe248e8bc616b852173b6e1f115783dec9a6b791a4a2a13ec3f3f1a1d344b"
+          }
+        ]
+      },
+      {
+        "script": {
+          "path": "/tmp/plato-phase2d.G3jkGH/probe_fei.py",
+          "sha256": "d866e8573b188d2b84621b7ca75607362b2a06fa230dc0fb80a20e793c4ce32f"
+        },
+        "commands": [
+          "/tmp/plato-phase2d.G3jkGH/venv313/bin/python /tmp/plato-phase2d.G3jkGH/probe_fei.py",
+          "/tmp/plato-phase2d.G3jkGH/venv314/bin/python /tmp/plato-phase2d.G3jkGH/probe_fei.py"
+        ],
+        "results": {
+          "replay_transitions": 4,
+          "finite_policy_update_both_versions": true,
+          "losses_both_versions": [
+            0.23115581274032593,
+            0.23115581274032593
+          ],
+          "zero_norm_output_both_versions": [
+            "NaN",
+            "NaN"
+          ],
+          "constructor_algorithm_received_as_datasource": true,
+          "constructor_trainer_received_as_algorithm": true,
+          "constructor_trainer_received_as_none": true
+        },
+        "logs": [
+          {
+            "path": "/tmp/plato-phase2d.G3jkGH/fei313.log",
+            "sha256": "26919a5a1ec8f12399cd19e5656a37d294f481962a4491a4e7db190b6ed9649e"
+          },
+          {
+            "path": "/tmp/plato-phase2d.G3jkGH/fei314.log",
+            "sha256": "d0a0e9089c3c7541648f6f7f024c6ad03af4ca2f5fe554a518fa28dcd8a6e501"
+          }
+        ],
+        "limitation": "Actual FEI agent/policy and actual subclass normalization/constructor methods; superclass constructor instrumented solely to observe argument forwarding. No datasource downloads, sockets or example edits."
+      },
+      {
+        "script": {
+          "path": "/tmp/plato-phase2d.G3jkGH/probe_runtime_s3.py",
+          "sha256": "c18663d5adb12aa585f211705db84e6191b7b769bcaf38387964b8b8d4c271e7"
+        },
+        "commands": [
+          "/tmp/plato-phase2d.G3jkGH/venv313/bin/python /tmp/plato-phase2d.G3jkGH/probe_runtime_s3.py",
+          "/tmp/plato-phase2d.G3jkGH/venv314/bin/python /tmp/plato-phase2d.G3jkGH/probe_runtime_s3.py"
+        ],
+        "results": "Both probes completed with expected mismatch: nonempty/nested/trailing-slash prefixes transfer successfully, 44 bytes reserved by actual 2B reader; empty prefix requests an extra leading slash and receives 404. Utility send and standalone receive succeed in all four cases.",
+        "logs": [
+          {
+            "path": "/tmp/plato-phase2d.G3jkGH/runtime-s3-integration313.log",
+            "sha256": "90903e284487e3a7b1cc50556c66aede71c68b068048570304646e2c55a6d469"
+          },
+          {
+            "path": "/tmp/plato-phase2d.G3jkGH/runtime-s3-integration314.log",
+            "sha256": "90903e284487e3a7b1cc50556c66aede71c68b068048570304646e2c55a6d469"
+          }
+        ],
+        "runtime_snapshot": {
+          "path": "/tmp/plato-phase2d.G3jkGH/phase2b_transport_b3b038e.py",
+          "sha256": "631ff16e76913156fa1ad764fcd5b6b6cc375a81c777397321ddf101e874e4ad"
+        },
+        "runtime_candidate": "b3b038efa376b060e1c01f1da39173240768a019",
+        "limitation": "Pinned actual 2B source loaded read-only from scratch with the fixed utility and existing realistic local HTTP contract. No runtime worktree edits. Root integration change remains pending."
+      }
+    ],
+    "static_checks": [
+      {
+        "command": "/tmp/plato-phase2d.G3jkGH/venv313/bin/ruff check plato/processors plato/serialization plato/mpc plato/utils plato/servers/fedavg_he.py plato/servers/fedavg_mpc_additive.py plato/servers/fedavg_mpc_shamir.py plato/servers/strategies/mpc.py plato/servers/strategies/aggregation/he.py plato/clients/mpc.py plato/clients/strategies/mpc.py cleanup.py tests/utils tests/processors tests/mpc tests/servers/test_he_payload_regressions.py tests/clients/test_client_lifecycle_variants.py tests/integration/test_smoke_configs.py --select I",
+        "result": "All checks passed",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/ruff-final.log",
+          "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+        }
+      },
+      {
+        "command": "/tmp/plato-phase2d.G3jkGH/venv313/bin/ty check --python /tmp/plato-phase2d.G3jkGH/venv313/bin/python plato/processors plato/serialization plato/mpc plato/utils/s3.py plato/utils/tree.py plato/utils/homo_enc.py plato/utils/reinforcement_learning plato/servers/fedavg_he.py plato/servers/strategies/mpc.py plato/servers/strategies/aggregation/he.py plato/clients/strategies/mpc.py cleanup.py",
+        "result": "All checks passed",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/ty-final.log",
+          "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+        }
+      },
+      {
+        "command": "git diff --check fda60becedfa6236c11d415b87a868b52789a41e e7c0d59571d88efd7eb1fdbf4fc63ac2a7b81395",
+        "result": "Passed"
+      }
+    ],
+    "coverage": {
+      "source_commit": "dba6f85b8140d0159d593ad14b371ecb2caa9ee2",
+      "result": "1909/2413 executable lines (79.11%) at dba6f85b across processors/serialization/mpc/utils. Includes reserved third_party and Nanochat; not an owned-only or acceptance percentage. Runtime was identical to e7c0d595; the review correction changes four runtime files and three tests, without rerunning this historical coverage measurement. Standalone utility/FEI probes are not part of measured pytest coverage.",
+      "artifact": {
+        "path": "/tmp/plato-phase2d.G3jkGH/coverage313.json",
+        "sha256": "bb8b1966c5f533e9ce8d6ea015c4847d569a309c1d3f7427600ead21dba0bf26"
+      }
+    },
+    "retained_full_runtime_matrix": {
+      "source_commit": "e7c0d59571d88efd7eb1fdbf4fc63ac2a7b81395",
+      "python313": {
+        "command": [
+          "/tmp/plato-phase2d.G3jkGH/venv313/bin/python",
+          "-m",
+          "pytest",
+          "tests",
+          "--test-profile",
+          "mandatory",
+          "-q",
+          "--basetemp=/tmp/plato-phase2d.G3jkGH/pytest-final313",
+          "--junitxml=/tmp/plato-phase2d.G3jkGH/final-full313.xml"
+        ],
+        "exit_code": 0,
+        "elapsed_seconds": 449.13,
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/final-full313.log",
+          "sha256": "534930d61cd5a0aae98b2f52526a639352d29cc96342fb2f1393fa5c5fee0a8e"
+        },
+        "junit": {
+          "tests": 413,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 1,
+          "skips": [
+            {
+              "test": "test_nanochat_tokenizer_processor_round_trip",
+              "reason": "optional native nanochat tokenizer: callable rustbpe.Tokenizer absent"
+            }
+          ],
+          "passed": 412
+        }
+      },
+      "python314": {
+        "command": [
+          "/private/tmp/plato-phase2d.G3jkGH/venv314/bin/python",
+          "-m",
+          "pytest",
+          "tests",
+          "--test-profile",
+          "mandatory",
+          "-q",
+          "--basetemp=/tmp/plato-phase2d.G3jkGH/pytest-final314",
+          "--junitxml=/tmp/plato-phase2d.G3jkGH/final-full314.xml"
+        ],
+        "exit_code": 0,
+        "elapsed_seconds": 502.4,
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/final-full314.log",
+          "sha256": "df7678ebb6e4e74452fec8b1b2936a8ed722d2350f2d3dcc3ebb20754cc3a80f"
+        },
+        "junit": {
+          "tests": 413,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 1,
+          "skips": [
+            {
+              "test": "test_nanochat_tokenizer_processor_round_trip",
+              "reason": "optional native nanochat tokenizer: callable rustbpe.Tokenizer absent"
+            }
+          ],
+          "passed": 412
+        }
+      },
+      "retention_basis": "Four bounded corrections touch MPC lifecycle protocol kwargs, QSGD, Shamir coefficient selection and TOML; general socket/event-loop/transport/startup source is unchanged. The changed MPC wiring is broadened through actual lifecycle/registry/store/server reconstruction, all client lifecycle variants and all existing config smokes below. User explicitly permits retaining the unchanged full runtime matrix. No full suite, real socket matrix, HE/RL matrix or coverage rerun at 639ca69b."
+    }
+  },
+  "archive": {
+    "selection": "Only unused plato/utils/rl_env.py -> archives/legacy_rl_env/rl_env.py",
+    "original_code_sha256": "557fec876520d089a69c18484bcc73465eb1f52ac332442acc35427d57c7a40c",
+    "license_sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+    "baseline_provenance": "fda60becedfa6236c11d415b87a868b52789a41e",
+    "last_source_modification": "da8869512e417002975a16f818bcad7e91224279",
+    "closure_search": "rg -n \"rl_env|from plato.utils import.*env|plato.utils.rl_env\" plato examples configs tests pyproject.toml; tracked source/config review found no active imports/entrypoints. Only original module internal reset reference.",
+    "preserved_limitations": [
+      "Historical four-value Gym step",
+      "Extra state dimension",
+      "Synchronous event-loop driving",
+      "Infinite episode-limit wait"
+    ],
+    "documentation": "Local README records provenance, exact source/license hashes and historical checkout instructions. Active reinforcement_learning and FEI kept; shared archive index remains root-owned."
+  },
+  "trusted_pickle_inventory": {
+    "owned_reads": [
+      "utils/s3.py receive_from_s3: pickle.loads on fetched object bytes",
+      "processors/model_decompress.py: pickle.loads after zstd",
+      "utils/homo_enc.py bitmap_to_indices: pickle.loads after zlib",
+      "mpc/round_store.py: local pickle.load and S3 round-state pickle"
+    ],
+    "owned_writes": [
+      "S3.put_to_s3",
+      "model_compress",
+      "model.Processor size accounting",
+      "HE bitmap encoding",
+      "round_store state"
+    ],
+    "local_torch_checkpoints": "Active RL policy base load_model loads locally saved model/optimizer state_dict checkpoints using the locked PyTorch default; save/load roundtrips tested. No blanket torch.load modernization.",
+    "cross_component": "General server/client socket report/payload and checkpoint pickle paths remain in servers/base.py and clients/strategies/defaults.py (2B/general ownership); Nanochat tokenizer local pickle belongs to its assigned owner. Factual inventory only; no changes outside ownership.",
+    "boundary": "Pickles require trusted participating peers, storage writers and local files. Safetensors inside an outer pickle, compression and payload limits do not establish arbitrary untrusted-input safety. No new authentication/protocol design or questionnaire."
+  },
+  "primary_documentation_consulted": [
+    "https://docs.aws.amazon.com/botocore/latest/reference/config.html",
+    "https://docs.aws.amazon.com/AmazonS3/latest/API/API_ListObjectsV2.html",
+    "https://requests.readthedocs.io/en/latest/user/advanced/#timeouts",
+    "https://kazoo.readthedocs.io/en/latest/api/recipe/lock.html",
+    "https://kazoo.readthedocs.io/en/latest/api/client.html"
+  ],
+  "limitations": [
+    "S3 tested through actual botocore/Requests against a local S3-compatible HTTP contract, without live cloud credentials. Timeout/retry tests shorten constants; defaults are finite 5/30 seconds and three attempts. Read timeouts bound inactivity, not an absolute deadline for indefinitely trickling bodies.",
+    "ZooKeeper tests exercise real RoundInfoStore code with mocked Kazoo service contracts; no live distributed ZooKeeper or cloud deployment. HE uses native TenSEAL CKKS CPU with ephemeral n_threads=1 context; full federated HE/MPC sockets/deployments belong to later qualification.",
+    "Existing Shamir prototype uses real-valued scaled model shares, not a newly designed finite-field protocol. Exact integer interpolation inputs limited to abs <=2**53 and thresholds <=min(participants,1000), with explicit errors instead of inaccurate results. No cryptographic protocol redesign or broader security claim. Coefficient requests must also fit the distinct 1..999 pool excluding the scaled constant; impossible capacity now fails promptly. Bounded sampling preserves that prototype distribution, with a different RNG draw sequence from rejection sampling.",
+    "Native MLX behavior is not qualified by these PyTorch/NumPy payload tests; leave platform/backend qualification to its owner.",
+    "Shared feature compression header continues to require homogeneous feature shapes/dtypes. Heterogeneous inputs now fail explicitly; no wire format redesign.",
+    "Parameter counting numerical probe stubs only optional table formatting. CLI demo downloads were not executed; runtime import is offline.",
+    "FEI agent replay/update and inherited adaptive aggregation run in isolation; complete FEI example remains Phase 4, with concrete zero-norm and constructor findings retained. Archived placeholder is historical unsupported code."
+  ],
+  "root_followups": [
+    {
+      "id": "2D-17 / T2B-S3-PREFIX",
+      "owner": "root final phase integration",
+      "action": "The accepted B fix and unchanged D utility now pass tracked actual localhost combined regressions at 53aa72c3 on both interpreters, including empty prefix and minimal adapters. Preparation obligation is fulfilled; root still qualifies the final phase merge. Historical malformed double-prefixed objects are not migrated.",
+      "coordination_update": "Exact accepted B dependency 00eeb9dc merged at ccb31017 from clean D f8aa0e98. No B/D production edits; all identities and outcomes are in combined_b_d_validation. Root owns fresh D review and final integration."
+    },
+    {
+      "id": "2D-15",
+      "owner": "Phase 4 FEI",
+      "action": "Bounded zero-norm normalization regression/fix; concrete [NaN,NaN] evidence retained."
+    },
+    {
+      "id": "2D-16",
+      "owner": "Phase 4 FEI",
+      "action": "Constructor keyword/dependency handoff regression/fix; concrete argument capture retained."
+    },
+    {
+      "owner": "root",
+      "action": "Fresh independent review of the corrected exact evidence-carrier commit, root-owned archive index update, and root merged validation including corrected B transport."
+    }
+  ],
+  "owned_temporary_resources": {
+    "root": "/tmp/plato-phase2d.G3jkGH",
+    "contents": [
+      "venv313 and venv314 locked dev environments",
+      "raw validation/probe/red logs with hashes above",
+      "pytest basetemp runtime trees and XML/JSON/coverage artifacts",
+      "exact baseline module snapshots and bounded probe/validation/evidence builder scripts",
+      "FEI scratch runtime",
+      "Task-owned base314 locked test-base environment and provisioning log",
+      "Source-attributed base red/green collection, full base non-runtime and mandatory affected logs/run records/JUnit artifacts; profile runner and evidence updater",
+      "combined/ contains merge/prod-preservation manifests and messages, test promotion/evidence scripts, bounded pytest trees; combined-* raw source-attributed run JSON/log/XML artifacts retained in the owned scratch root.",
+      "profile-review/ contains unchanged-fixture red AST identity/snapshots, correction/evidence scripts and messages, scoped pytest trees and Ruff log; profile-* source-attributed red/green/collection JSON/log/XML retained in owned scratch."
+    ],
+    "worktree_resources": [
+      "Pinned external/nanochat checkout initialized",
+      "Ignored pytest/Python/coverage cache files owned in this worktree"
+    ],
+    "retention": "Retained until root acceptance; no scratch/evidence/workspace cleanup, no root .venv or other agents environments mutated.",
+    "borrowed_read_only_resources": [
+      {
+        "path": "/tmp/plato-phase2-root/base-313",
+        "owner": "Root",
+        "handling": "Explicitly authorized read-only reuse; never synced or removed; package bytecode writes disabled."
+      },
+      {
+        "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2d-root-base-probe.json",
+        "owner": "Root",
+        "handling": "Read-only report reference."
+      }
+    ]
+  },
+  "review_corrections": {
+    "corrected_at_utc": "2026-10-03T02:52:32.985660+00:00",
+    "review": {
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2d-review.json",
+      "sha256": "89392d0c32f73a44abb7deba7c9bdc98f407d4a3c10fb2e38647aee07f7fa5a9"
+    },
+    "reviewed_candidate": "a4a4733e96cf248a73db76e6b2182536b9f592ea",
+    "implementation_commit": "639ca69bf4eaeff868462d0b30a5fcc72218f061",
+    "status": "All four findings corrected and green locally; fresh independent review and root merged acceptance remain pending.",
+    "findings": [
+      {
+        "id": "2D-R01",
+        "correction": "MPCLifecycleStrategy.configure binds Shamir threshold from server.mpc_shamir_threshold before DefaultLifecycleStrategy instantiates the registry pipeline. Server protocol kwargs override explicit per-processor threshold entries, including None for the existing max(n-2,1) default; unrelated processor kwargs preserved. Direct processor/strategy constructors still retain their explicit threshold API.",
+        "red": "Configured 1 and 2 with five clients produced independent weighted-reference errors 0.00393 and 0.00101157; explicit conflicting threshold 4 produced error 0.02264186. Default/no-override control passed. Fourth red case checks the newly defined default-authoritative kwargs policy rather than a separate numerical defect.",
+        "green": "Five actual config-driven cases use fractional counts [0.5,0,2.5,1,3], a real configured RoundInfoStore, actual MPCLifecycleStrategy.configure -> default lifecycle -> registry -> Shamir/Safetensors pipeline, actual server wrapper and weighted strategy, reversed report order and independent plaintext sums; abs tolerance 2e-6.",
+        "test": "tests/mpc/test_mpc_regressions.py::test_configured_shamir_client_lifecycle_matches_server_reconstruction",
+        "limit": "Only general FedAvg parent server initialization is replaced with the existing round-lock field to isolate startup; MPC wrapper construction, from_config store, client lifecycle/registry and aggregation execute unchanged actual methods. No sockets or distributed MPC deployment claim."
+      },
+      {
+        "id": "2D-R02",
+        "correction": "Divide bounded QSGD codes by tuning_param before multiplying the finite header scale. Existing max-norm equation, sign/magnitude wire and float32 result preserved.",
+        "red": "Finite +/-1e38 and +/-3e38 endpoints reconstructed as infinities at levels 16/64/128 on both interpreters. Ordinary scale 3.75 and level-2 controls passed.",
+        "green": "Twelve cases cover scales 3.75/1e38/3e38 and levels 2/16/64/128, finite endpoints against independent source float64 reference and max-norm error bound with two float32 eps of scale tolerance. Existing seeded ordinary/empty/zero/malformed tests also pass.",
+        "test": "tests/processors/test_payload_regressions.py::test_qsgd_finite_endpoints_and_error_bound_at_large_scales"
+      },
+      {
+        "id": "2D-R03",
+        "correction": "Quoted keys/string values emit supplementary characters intact using ensure_ascii=False; DEL explicitly remains escaped. Existing mixed-array/null/comment conventions retained.",
+        "red": "Stdlib tomllib rejected surrogate escapes for non-BMP key, string value, nested array-table key/value, and a DEL-plus-emoji value. Pure DEL control passed.",
+        "green": "Five cases roundtrip through actual dumps and UTF-8 dump files with stdlib tomllib.loads/load; rocket/supplementary CJK/lightbulb, dotted nested names, comment text and DEL all preserved. Existing BMP/nested/mixed-array tests remain green.",
+        "test": "tests/utils/test_shared_payload_utilities.py::test_toml_supplementary_unicode_and_control_escapes_roundtrip"
+      },
+      {
+        "id": "2D-R04",
+        "correction": "Check pool capacity after excluding the scaled secret and sample without replacement; no rejection-sampling loop. Existing 1..999 distinct coefficient pool, real-valued polynomial scaling, coordinate wire and declared/default threshold retained.",
+        "red": "Public process with 1000 selected clients, threshold 1000 and scalar 0.000010 entered processing but exceeded a contained 12-second subprocess deadline on both interpreters. Scaled constant 10 consumes one of 999 pool entries, leaving 998 for 999 requested coefficients.",
+        "green": "Same public call raises useful coefficient-pool ValueError within the enforced two-second processing bound; real persisted round_info bytes and directory contents unchanged. Parent subprocess deadline remains 12 seconds and contains the historical loop. Matched ordinary/default/higher-threshold reconstruction stays green.",
+        "test": "tests/mpc/test_mpc_regressions.py::test_impossible_shamir_coefficient_pool_is_bounded_before_persistence"
+      }
+    ],
+    "red_source_identity": "Production source exactly a4a4733e. New regression tests were uncommitted before runtime fixes; the pool harness was refined only to assert its entered marker, then rerun independently before fixes. Reviewer scratch/scripts were read-only references and remain untouched.",
+    "red": {
+      "python313": {
+        "command": [
+          "/tmp/plato-phase2d.G3jkGH/venv313/bin/python",
+          "-m",
+          "pytest",
+          "tests/mpc/test_mpc_regressions.py::test_configured_shamir_client_lifecycle_matches_server_reconstruction",
+          "tests/mpc/test_mpc_regressions.py::test_impossible_shamir_coefficient_pool_is_bounded_before_persistence",
+          "tests/processors/test_payload_regressions.py::test_qsgd_finite_endpoints_and_error_bound_at_large_scales",
+          "tests/utils/test_shared_payload_utilities.py::test_toml_supplementary_unicode_and_control_escapes_roundtrip",
+          "-q",
+          "--basetemp=/tmp/plato-phase2d.G3jkGH/pytest-review-red313",
+          "--junitxml=/tmp/plato-phase2d.G3jkGH/review-red313.xml"
+        ],
+        "exit_code": 1,
+        "elapsed_seconds": 19.87,
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/review-red313.log",
+          "sha256": "f6a6454557142f794cd69404e1033bbdafaf6f177622f3fb48d963939ca9dcaf"
+        },
+        "junit": {
+          "tests": 23,
+          "failures": 15,
+          "errors": 0,
+          "skipped": 0,
+          "passed": 8
+        }
+      },
+      "python314": {
+        "command": [
+          "/private/tmp/plato-phase2d.G3jkGH/venv314/bin/python",
+          "-m",
+          "pytest",
+          "tests/mpc/test_mpc_regressions.py::test_configured_shamir_client_lifecycle_matches_server_reconstruction",
+          "tests/mpc/test_mpc_regressions.py::test_impossible_shamir_coefficient_pool_is_bounded_before_persistence",
+          "tests/processors/test_payload_regressions.py::test_qsgd_finite_endpoints_and_error_bound_at_large_scales",
+          "tests/utils/test_shared_payload_utilities.py::test_toml_supplementary_unicode_and_control_escapes_roundtrip",
+          "-q",
+          "--basetemp=/tmp/plato-phase2d.G3jkGH/pytest-review-red314",
+          "--junitxml=/tmp/plato-phase2d.G3jkGH/review-red314.xml"
+        ],
+        "exit_code": 1,
+        "elapsed_seconds": 20.45,
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/review-red314.log",
+          "sha256": "fefad6a90e231a253e5e3017e76511edba2823df5ec13ba9d1d52832c0c302e4"
+        },
+        "junit": {
+          "tests": 23,
+          "failures": 15,
+          "errors": 0,
+          "skipped": 0,
+          "passed": 8
+        }
+      },
+      "result_both": "15 failed, 8 passed; all four concrete findings reproduced, with passing controls and one explicit-kwargs policy expectation identified above."
+    },
+    "refined_pool_red": {
+      "python313": {
+        "command": [
+          "/tmp/plato-phase2d.G3jkGH/venv313/bin/python",
+          "-m",
+          "pytest",
+          "tests/mpc/test_mpc_regressions.py::test_impossible_shamir_coefficient_pool_is_bounded_before_persistence",
+          "-q",
+          "--basetemp=/tmp/plato-phase2d.G3jkGH/pytest-review-red-bound313"
+        ],
+        "exit_code": 1,
+        "elapsed_seconds": 19.57,
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/review-red-bound313.log",
+          "sha256": "a9e11f7638f56bd513abc3a18dbb81b6c9404f65e1bf8edd12cbaed205f24276"
+        }
+      },
+      "python314": {
+        "command": [
+          "/private/tmp/plato-phase2d.G3jkGH/venv314/bin/python",
+          "-m",
+          "pytest",
+          "tests/mpc/test_mpc_regressions.py::test_impossible_shamir_coefficient_pool_is_bounded_before_persistence",
+          "-q",
+          "--basetemp=/tmp/plato-phase2d.G3jkGH/pytest-review-red-bound314"
+        ],
+        "exit_code": 1,
+        "elapsed_seconds": 20.11,
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/review-red-bound314.log",
+          "sha256": "97abee36d87b9a2be275826a0fc9c257bb5cadb3bbcd7faa03c39a1383b73097"
+        }
+      },
+      "result_both": "1 failed: public process entered, then exceeded 12-second deadline; subprocess.run killed/waited the owned worker."
+    },
+    "green": {
+      "python313": {
+        "command": [
+          "/tmp/plato-phase2d.G3jkGH/venv313/bin/python",
+          "-m",
+          "pytest",
+          "tests/mpc",
+          "tests/processors",
+          "tests/utils/test_shared_payload_utilities.py",
+          "tests/clients/test_client_lifecycle_variants.py",
+          "tests/integration/test_smoke_configs.py",
+          "--test-profile",
+          "mandatory",
+          "-q",
+          "-W",
+          "error::UserWarning",
+          "--basetemp=/tmp/plato-phase2d.G3jkGH/pytest-review-green313",
+          "--junitxml=/tmp/plato-phase2d.G3jkGH/review-green313.xml"
+        ],
+        "exit_code": 0,
+        "elapsed_seconds": 8.71,
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/review-green313.log",
+          "sha256": "9c810ceb1d048fa630f7269cefb6cb898fd877e7b422e3116059808bcc104ec4"
+        },
+        "junit": {
+          "tests": 95,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "passed": 95
+        }
+      },
+      "python314": {
+        "command": [
+          "/private/tmp/plato-phase2d.G3jkGH/venv314/bin/python",
+          "-m",
+          "pytest",
+          "tests/mpc",
+          "tests/processors",
+          "tests/utils/test_shared_payload_utilities.py",
+          "tests/clients/test_client_lifecycle_variants.py",
+          "tests/integration/test_smoke_configs.py",
+          "--test-profile",
+          "mandatory",
+          "-q",
+          "-W",
+          "error::UserWarning",
+          "--basetemp=/tmp/plato-phase2d.G3jkGH/pytest-review-green314",
+          "--junitxml=/tmp/plato-phase2d.G3jkGH/review-green314.xml"
+        ],
+        "exit_code": 0,
+        "elapsed_seconds": 9.17,
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/review-green314.log",
+          "sha256": "1e1a631460e0cf1b744509ed1ddfdf2fb289f66a8acd1b6830eed9d0803b2688"
+        },
+        "junit": {
+          "tests": 95,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "passed": 95
+        }
+      },
+      "result_both": "95 passed, zero failures/errors/skips; UserWarning treated as errors. Python 3.13 reported 2.22s, 3.14 reported 2.23s (wrapper wall timings recorded separately)."
+    },
+    "source_test_files_executed_at_implementation_commit": [
+      "tests/mpc/test_mpc.py",
+      "tests/mpc/test_mpc_regressions.py",
+      "tests/mpc/test_round_store_contracts.py",
+      "tests/processors/test_processing_pipeline.py",
+      "tests/processors/test_payload_regressions.py",
+      "tests/utils/test_shared_payload_utilities.py",
+      "tests/clients/test_client_lifecycle_variants.py",
+      "tests/integration/test_smoke_configs.py"
+    ],
+    "source_identity_manifest": [
+      {
+        "path": "plato/clients/strategies/mpc.py",
+        "git_blob": "77be221cc26905bba34e0345157092a355cab821",
+        "sha256": "82632304b4b4b88bd26fe4ecdb3a512b75a638be1d9c0a2a18b3f6d8855510a4"
+      },
+      {
+        "path": "plato/processors/model_dequantize_qsgd.py",
+        "git_blob": "50006f73508e47f1e3ee030c1e0c4baa82ed22a6",
+        "sha256": "a973d4e5c1bf714c89cb9e1418070e970608a50d3d6332593921cbde7973902a"
+      },
+      {
+        "path": "plato/processors/mpc_model_encrypt_shamir.py",
+        "git_blob": "f7d96befb3cdbaa0f923c475e25dd6b4341c1967",
+        "sha256": "d405bd36d96a03545c6ded97f79d7d857c9d7d6a60a04a7efa05a124a4398a9f"
+      },
+      {
+        "path": "plato/utils/toml_writer.py",
+        "git_blob": "8873aef7058307b0866e9322c4bf5e56ecff9330",
+        "sha256": "6b65ff992d6c5440e24cd7b94de640d9d050f6139681ef581938f631202cb74e"
+      },
+      {
+        "path": "tests/mpc/test_mpc.py",
+        "git_blob": "0677f8f0cef16425d00eb1119a2dee5ccdefe00a",
+        "sha256": "e2867f361df82c75962739f769d79f0fb5aff4053f2e0eebd4a9e0e2fd635616"
+      },
+      {
+        "path": "tests/mpc/test_mpc_regressions.py",
+        "git_blob": "d53851874cdf8db7e1856db0df45fbec96800391",
+        "sha256": "8c173bb57621fa7ef861a8959b2220f7aa3f09a59da9660346f2d888136e8edf"
+      },
+      {
+        "path": "tests/mpc/test_round_store_contracts.py",
+        "git_blob": "feb97ba40948bd0335a989dda7f6d199f90bf7d5",
+        "sha256": "ccaa7a6e3e977712323371d9271872d00c570666ca3b1c1e2d3273c6e0584c9c"
+      },
+      {
+        "path": "tests/processors/test_processing_pipeline.py",
+        "git_blob": "8cac13498caba03eff8b9c147b1278945416e9c2",
+        "sha256": "07f6869035ade9e24cf50567390303a05acb9afb4c46fd77819a374ab9a3e713"
+      },
+      {
+        "path": "tests/processors/test_payload_regressions.py",
+        "git_blob": "11b329d48ce2be370b22c6c8d06b6ed958dd09a5",
+        "sha256": "63422666dbadc332d8a1783ed82416b56dddc73bbaea91bab2af1312bad64082"
+      },
+      {
+        "path": "tests/utils/test_shared_payload_utilities.py",
+        "git_blob": "00f3c0e44bd4d2dae2cfcc4e0fe9e2311f498887",
+        "sha256": "0b7f12f3409e29c997af16f574ad8ece736688a8248de5e8e98b653398c4adfb"
+      },
+      {
+        "path": "tests/clients/test_client_lifecycle_variants.py",
+        "git_blob": "9e002fa26ea96b966c3672f5c135a912c8a76b40",
+        "sha256": "42503432ed3f2ac4ee52cb20212342cba222a582c1108ded4654428b3bebb649"
+      },
+      {
+        "path": "tests/integration/test_smoke_configs.py",
+        "git_blob": "387dd353e1a10a35117077031449e6cb98716d55",
+        "sha256": "7c7a0f4956211d9bb07ecb4ae653cd9f7992fde7e3e34a5480bed20e9e3c5dc4"
+      }
+    ],
+    "static_checks": [
+      {
+        "command": "/tmp/plato-phase2d.G3jkGH/venv313/bin/ruff check plato/clients/strategies/mpc.py plato/processors/model_dequantize_qsgd.py plato/processors/mpc_model_encrypt_shamir.py plato/utils/toml_writer.py tests/mpc/test_mpc_regressions.py tests/processors/test_payload_regressions.py tests/utils/test_shared_payload_utilities.py --select I",
+        "result": "All checks passed",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/review-ruff.log",
+          "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+        }
+      },
+      {
+        "command": "/tmp/plato-phase2d.G3jkGH/venv313/bin/ty check --python /tmp/plato-phase2d.G3jkGH/venv313/bin/python plato/clients/strategies/mpc.py plato/processors/model_dequantize_qsgd.py plato/processors/mpc_model_encrypt_shamir.py plato/utils/toml_writer.py",
+        "result": "All checks passed",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/review-ty.log",
+          "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+        }
+      },
+      {
+        "command": "git diff --check a4a4733e96cf248a73db76e6b2182536b9f592ea 639ca69bf4eaeff868462d0b30a5fcc72218f061",
+        "result": "Passed"
+      }
+    ],
+    "environment": "Reused only the existing owned locked venv313/venv314; package versions and four thread limits match original evidence. No provisioning/upgrades, other-worktree/environment writes, metadata/CI edits or shared-overlap test edits in this correction.",
+    "retained_unchanged_boundaries": {
+      "S3_git_blob_both_candidates": "926ce3af7973d0f93f2442886e457d36d7612414",
+      "runtime_transport": "B-owned runtime/transport untouched. B original author is correcting historical 2D-17/T2B-S3-PREFIX concurrently; latest combined root integration was not rerun here.",
+      "general_runtime_matrix": "Retained only at e7c0d595 as identified above. Fresh independent exact-candidate review and root merged gate required; no new phase-wide/full-suite PASS claimed."
+    },
+    "primary_documentation": [
+      "https://toml.io/en/v1.0.0#string",
+      "https://docs.python.org/3.13/library/random.html#random.sample"
+    ],
+    "resources": "All review-fix logs/XML/JSON, pytest runtimes, commit messages and this evidence updater retained within original owned scratch. No reviewer scratch changes or cleanup."
+  },
+  "base_profile_correction": {
+    "id": "ROOT-2D-01",
+    "recorded_at_utc": "2026-10-03T03:57:28.852414+00:00",
+    "root_report": {
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2d-root-base-probe.json",
+      "sha256": "298b647370bba7ec38865f11c43755b49c8f4d9ca6f2c5b93aee615d0693d25d"
+    },
+    "root_report_handling": "Read-only reference; root report and root raw log were not edited.",
+    "reviewed_candidate": "aa232791f04d93eb9de09ed6c596ac714db5b605",
+    "implementation_commit": "15c79d0c81ffd0e5e4873db869a2863f97fe8279",
+    "status": "Corrected and source-attributed red/green validated; fresh independent review pending.",
+    "finding": "Two new optional-library imports blocked clean test-base collection. Removing only the Kazoo exception import would also leave RoundInfoStore construction blocked because KazooClient and Lock are both None without Kazoo.",
+    "correction": [
+      "Patch both fake KazooClient and fake acquired Lock before constructing the remote RoundInfoStore; retain the failed-lock, finite-wait, stop/release and no-write/service-error assertions.",
+      "Use TimeoutError as the fake timeout contract in base and import actual kazoo.exceptions.LockTimeout inside the mandatory fixture.",
+      "Use the numeric shape/float32 bounds action-space contract in base and actual gymnasium.spaces.Box in mandatory. Preserve all five active policy finite-update/checkpoint variants and every other RL assertion.",
+      "No production code, metadata, shared conftest, new skips or optional-package prerequisites changed."
+    ],
+    "source_identity_manifest": [
+      {
+        "path": "tests/mpc/test_round_store_contracts.py",
+        "git_blob": "04822893530c7338c0c0e868313b609e6fec961c",
+        "sha256": "ea4bd59d56c388ad4bf71a6af86d1d26bf2f187788c41a3e447e486b4c364878",
+        "red_git_blob": "feb97ba40948bd0335a989dda7f6d199f90bf7d5"
+      },
+      {
+        "path": "tests/utils/test_rl_payload_utilities.py",
+        "git_blob": "de5e5f3614e028d03d3cc1d7396b9ee79d7949ec",
+        "sha256": "d79abc30a10ae515a6c3231f9356cf8427c2c8de74371ac3021e8b21ee28a6df",
+        "red_git_blob": "3749717c97260a2164421ef28014b23f3b3dda5b"
+      }
+    ],
+    "red": [
+      {
+        "source_commit": "aa232791f04d93eb9de09ed6c596ac714db5b605",
+        "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+        "command": [
+          "/tmp/plato-phase2-root/base-313/bin/python",
+          "-m",
+          "pytest",
+          "tests",
+          "--collect-only",
+          "--test-profile=base",
+          "-m",
+          "not runtime",
+          "-q"
+        ],
+        "exit_code": 2,
+        "result": "373/421 tests collected, 48 runtime cases deselected; two collection errors from top-level Kazoo/Gymnasium imports. Neither test body ran.",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/base-red-collection313.log",
+          "sha256": "8ecf845c1c6f6b94f11e446dd9cebd302dcad564f231b87fbc935d7fef93b8f6"
+        }
+      },
+      {
+        "source_commit": "aa232791f04d93eb9de09ed6c596ac714db5b605",
+        "python": "3.14.8 (main, Sep 30 2026, 17:55:09) [Clang 21.0.0 (clang-2100.3.34.2)]",
+        "command": [
+          "/tmp/plato-phase2d.G3jkGH/base314/bin/python",
+          "-m",
+          "pytest",
+          "tests",
+          "--collect-only",
+          "--test-profile=base",
+          "-m",
+          "not runtime",
+          "-q"
+        ],
+        "exit_code": 2,
+        "result": "373/421 tests collected, 48 runtime cases deselected; two collection errors from top-level Kazoo/Gymnasium imports. Neither test body ran.",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/base-red-collection314.log",
+          "sha256": "1ae525d72dfc1c3110a399f620752b314aff445cdf6cd354def21e889b95cfe7"
+        }
+      }
+    ],
+    "green_collection": [
+      {
+        "source_commit": "15c79d0c81ffd0e5e4873db869a2863f97fe8279",
+        "command": [
+          "/tmp/plato-phase2-root/base-313/bin/python",
+          "-m",
+          "pytest",
+          "tests",
+          "--collect-only",
+          "--test-profile=base",
+          "-m",
+          "not runtime",
+          "-q"
+        ],
+        "exit_code": 0,
+        "elapsed_seconds": 5.97,
+        "result": "386/434 tests collected, 48 runtime cases deselected; no collection errors.",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/base-green-collection313.log",
+          "sha256": "b75e8095e638e5ad2f9364388fd8e8b9c174c5118a2eb65b8f2e3c69af00c8ef"
+        },
+        "run_record": {
+          "path": "/tmp/plato-phase2d.G3jkGH/base-green-collection313.json",
+          "sha256": "91e43a8d2b986b068fca3447bdc9dae0005017229712d0e689cddb548bae77b7"
+        }
+      },
+      {
+        "source_commit": "15c79d0c81ffd0e5e4873db869a2863f97fe8279",
+        "command": [
+          "/private/tmp/plato-phase2d.G3jkGH/base314/bin/python",
+          "-m",
+          "pytest",
+          "tests",
+          "--collect-only",
+          "--test-profile=base",
+          "-m",
+          "not runtime",
+          "-q"
+        ],
+        "exit_code": 0,
+        "elapsed_seconds": 12.22,
+        "result": "386/434 tests collected, 48 runtime cases deselected; no collection errors.",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/base-green-collection314.log",
+          "sha256": "84f031e7a9f30567efe437f86186040c8f7643ea8ee505624347c4651feb4c5c"
+        },
+        "run_record": {
+          "path": "/tmp/plato-phase2d.G3jkGH/base-green-collection314.json",
+          "sha256": "d53a840142ffe47cdba7dc3f00638a902ea48bebc069481bd0a613bd5f15e21e"
+        }
+      }
+    ],
+    "green_base_non_runtime": [
+      {
+        "source_commit": "15c79d0c81ffd0e5e4873db869a2863f97fe8279",
+        "command": [
+          "/tmp/plato-phase2-root/base-313/bin/python",
+          "-m",
+          "pytest",
+          "tests",
+          "--test-profile=base",
+          "-m",
+          "not runtime",
+          "-q",
+          "--basetemp=/tmp/plato-phase2d.G3jkGH/pytest-base-green313",
+          "--junitxml=/tmp/plato-phase2d.G3jkGH/base-green-suite313.xml"
+        ],
+        "exit_code": 0,
+        "elapsed_seconds": 24.48,
+        "result": "383 passed, four existing allowed profile skips, 48 runtime cases deselected; no new failures or skips.",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/base-green-suite313.log",
+          "sha256": "68b9c0421f32977d45cb69dabe0c37497ccb2032a32896cb2a15292d93771a0c"
+        },
+        "run_record": {
+          "path": "/tmp/plato-phase2d.G3jkGH/base-green-suite313.json",
+          "sha256": "ee6b7ffa55725783b2804aff15a2ce3d3d91dc74a7da4d4ee3caa89dea32610e"
+        },
+        "junit": {
+          "tests": 387,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 4,
+          "passed": 383
+        },
+        "junit_artifact": {
+          "path": "/tmp/plato-phase2d.G3jkGH/base-green-suite313.xml",
+          "sha256": "6d2847f8a0b8961d0b09b2440e36e75ce4b862e74e02017067b3696a3dc8568f"
+        }
+      },
+      {
+        "source_commit": "15c79d0c81ffd0e5e4873db869a2863f97fe8279",
+        "command": [
+          "/private/tmp/plato-phase2d.G3jkGH/base314/bin/python",
+          "-m",
+          "pytest",
+          "tests",
+          "--test-profile=base",
+          "-m",
+          "not runtime",
+          "-q",
+          "--basetemp=/tmp/plato-phase2d.G3jkGH/pytest-base-green314",
+          "--junitxml=/tmp/plato-phase2d.G3jkGH/base-green-suite314.xml"
+        ],
+        "exit_code": 0,
+        "elapsed_seconds": 68.58,
+        "result": "383 passed, four existing allowed profile skips, 48 runtime cases deselected; no new failures or skips.",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/base-green-suite314.log",
+          "sha256": "d331386d9b999d46eed8101e8c9356cc8eb0b9359aeb7f5c9e0646664d241fc9"
+        },
+        "run_record": {
+          "path": "/tmp/plato-phase2d.G3jkGH/base-green-suite314.json",
+          "sha256": "c741f3df7750c7b0ef37ad87adab6e00a75563a95f11079b6a17c0584cb5d027"
+        },
+        "junit": {
+          "tests": 387,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 4,
+          "passed": 383
+        },
+        "junit_artifact": {
+          "path": "/tmp/plato-phase2d.G3jkGH/base-green-suite314.xml",
+          "sha256": "e6e296884360da62017644d5abf84f52054d4ff3770e47c3aaeb4125cb80421b"
+        }
+      }
+    ],
+    "green_mandatory_affected": [
+      {
+        "source_commit": "15c79d0c81ffd0e5e4873db869a2863f97fe8279",
+        "command": [
+          "/tmp/plato-phase2d.G3jkGH/venv313/bin/python",
+          "-m",
+          "pytest",
+          "tests/mpc/test_round_store_contracts.py",
+          "tests/utils/test_rl_payload_utilities.py",
+          "--test-profile=mandatory",
+          "-q",
+          "-W",
+          "error::UserWarning",
+          "--basetemp=/tmp/plato-phase2d.G3jkGH/pytest-base-correction-mandatory313",
+          "--junitxml=/tmp/plato-phase2d.G3jkGH/base-correction-mandatory313.xml"
+        ],
+        "exit_code": 0,
+        "elapsed_seconds": 9.73,
+        "result": "13 passed, no skips; actual Kazoo LockTimeout and Gymnasium Box used, UserWarning treated as error.",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/base-correction-mandatory313.log",
+          "sha256": "ff90ce0bd08b81e966536a9f4f6592d5ecd5603799d9d5ddb430e0323d06da5c"
+        },
+        "run_record": {
+          "path": "/tmp/plato-phase2d.G3jkGH/base-correction-mandatory313.json",
+          "sha256": "85a4110695884e18d46dcb6302580ec2b53c8c1da9b7d4e8c8da6fd92f76363e"
+        },
+        "junit": {
+          "tests": 13,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "passed": 13
+        },
+        "junit_artifact": {
+          "path": "/tmp/plato-phase2d.G3jkGH/base-correction-mandatory313.xml",
+          "sha256": "cde21825cec40b2672e32160320821c50d29acc2bdb87930d0e9025a1ba1819e"
+        }
+      },
+      {
+        "source_commit": "15c79d0c81ffd0e5e4873db869a2863f97fe8279",
+        "command": [
+          "/private/tmp/plato-phase2d.G3jkGH/venv314/bin/python",
+          "-m",
+          "pytest",
+          "tests/mpc/test_round_store_contracts.py",
+          "tests/utils/test_rl_payload_utilities.py",
+          "--test-profile=mandatory",
+          "-q",
+          "-W",
+          "error::UserWarning",
+          "--basetemp=/tmp/plato-phase2d.G3jkGH/pytest-base-correction-mandatory314",
+          "--junitxml=/tmp/plato-phase2d.G3jkGH/base-correction-mandatory314.xml"
+        ],
+        "exit_code": 0,
+        "elapsed_seconds": 10.48,
+        "result": "13 passed, no skips; actual Kazoo LockTimeout and Gymnasium Box used, UserWarning treated as error.",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/base-correction-mandatory314.log",
+          "sha256": "78e83ede06547bd34008b3039a1a9c0d68fd76c480e48245c406ef7179591989"
+        },
+        "run_record": {
+          "path": "/tmp/plato-phase2d.G3jkGH/base-correction-mandatory314.json",
+          "sha256": "b4475d4cb9df3044873afe000cc40801d025d7ad497603a5401ecf7021bed9de"
+        },
+        "junit": {
+          "tests": 13,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "passed": 13
+        },
+        "junit_artifact": {
+          "path": "/tmp/plato-phase2d.G3jkGH/base-correction-mandatory314.xml",
+          "sha256": "b6d1dfb2abc8df1a41af71cb599705df6a7d0ae3097b42d13568d1e10f94da29"
+        }
+      }
+    ],
+    "source_tests_ran": {
+      "base_both_interpreters": "pytest tests --test-profile=base -m \"not runtime\" at 15c79d0c: entire selected non-runtime test tree, including all unchanged 2D-R01..R04 regressions, MPC lifecycle/registry/store/weighted reconstruction, processors, Unicode TOML, HE, active RL, S3 and existing config smokes. Hashed JUnit artifacts identify every executed case.",
+      "mandatory_both_interpreters": [
+        "tests/mpc/test_round_store_contracts.py",
+        "tests/utils/test_rl_payload_utilities.py"
+      ],
+      "mandatory_actual_library_contracts": "Real Kazoo 2.11.0 LockTimeout propagation via fake service lock; real Gymnasium 1.3.0 Box passed through actual SAC stochastic/deterministic updates and checkpoints. All 13 cases execute, no profile-based skips.",
+      "existing_base_skips_both_interpreters": [
+        {
+          "test": "tests.trainers.test_dp_data_loader_strategy",
+          "reason": "('/private/tmp/plato-refresh-worktrees/payloads/tests/trainers/test_dp_data_loader_strategy.py', 8, 'Skipped: base profile optional dp: opacus not installed')"
+        },
+        {
+          "test": "tests.test_nanochat_integration.test_nanochat_tokenizer_processor_round_trip",
+          "reason": "/private/tmp/plato-refresh-worktrees/payloads/tests/test_nanochat_integration.py:14: base profile omits optional nanochat integration"
+        },
+        {
+          "test": "tests.test_nanochat_integration.test_nanochat_trainer_smoke",
+          "reason": "/private/tmp/plato-refresh-worktrees/payloads/tests/test_nanochat_integration.py:33: base profile omits optional nanochat integration"
+        },
+        {
+          "test": "tests.test_nanochat_integration.test_nanochat_trainer_selects_core_eval_strategy",
+          "reason": "/private/tmp/plato-refresh-worktrees/payloads/tests/test_nanochat_integration.py:88: base profile omits optional nanochat integration"
+        }
+      ]
+    },
+    "execution_environment": {
+      "cwd": "/private/tmp/plato-refresh-worktrees/payloads",
+      "shell": "zsh -lc for every shell invocation.",
+      "thread_limits": {
+        "OMP_NUM_THREADS": "1",
+        "OPENBLAS_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "VECLIB_MAXIMUM_THREADS": "1"
+      },
+      "additional_environment": {
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "HF_HUB_OFFLINE": "1",
+        "HF_DATASETS_OFFLINE": "1",
+        "TOKENIZERS_PARALLELISM": "false"
+      },
+      "command_note": "Commands are exact normalized child argv; bounded runner used for green runs, with source HEAD asserted identical before/after. Raw runner JSON/logs retained. Red collection ran before any correction at aa232791.",
+      "uv_lock_sha256": "573b10c2ba1a2317e02f9e40c6181359cafab6f6e0a0f9be12bb256cb276fe1d",
+      "base_environments": "environment.locked_base_profile_environments records fingerprints, optional-library absence and ownership.",
+      "mandatory_environments": "Existing task-owned locked dev venv313/venv314; fingerprints unchanged from environment.isolated_locked_dev_environments. Both contain actual Kazoo/Gymnasium.",
+      "runner": {
+        "path": "/tmp/plato-phase2d.G3jkGH/run_profile_validation.py",
+        "sha256": "7dfdd44095448a9c5544924ef483eb729ef17021ee7bbedc7fcd4f71eb4af7b5"
+      }
+    },
+    "static_checks": [
+      {
+        "command": [
+          "/tmp/plato-phase2d.G3jkGH/venv313/bin/ruff",
+          "check",
+          "tests/mpc/test_round_store_contracts.py",
+          "tests/utils/test_rl_payload_utilities.py",
+          "--select",
+          "I"
+        ],
+        "result": "All checks passed.",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/base-correction-ruff.log",
+          "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+        }
+      },
+      {
+        "command": "git diff --check aa232791f04d93eb9de09ed6c596ac714db5b605 15c79d0c81ffd0e5e4873db869a2863f97fe8279",
+        "result": "Passed."
+      },
+      {
+        "command": "git diff --exit-code aa232791f04d93eb9de09ed6c596ac714db5b605 15c79d0c81ffd0e5e4873db869a2863f97fe8279 -- plato cleanup.py",
+        "result": "Passed; all production implementation source, including the four prior accepted corrections and S3 interface, is byte-identical."
+      }
+    ],
+    "limitations": [
+      "Base clean collection and full non-runtime execution were newly run on both interpreters. The 48 runtime/startup cases were explicitly deselected as authorized for test-only changes; retained historical full mandatory results remain at e7c0d595, not claimed at this candidate.",
+      "Mandatory execution here covers the two corrected modules only; prior 95-case review-correction checks remain attributed to 639ca69b. No new full mandatory or type-check rerun is claimed.",
+      "Kazoo behavior remains a realistic fake backend plus the real exception type, with no live ZooKeeper deployment. Gymnasium qualification uses real Box, with no complete Gym/FEI example deployment.",
+      "B-owned S3 transport normalization is untouched. Root still verifies the accepted combined utility/runtime candidate and orchestrates fresh independent review."
+    ]
+  },
+  "combined_b_d_validation": {
+    "recorded_at_utc": "2026-10-03T04:20:01.987731+00:00",
+    "status": "Tracked actual B+D regressions and both profile matrices pass at exact provisional combined source. Fresh independent D review and final root phase integration remain pending.",
+    "authority": "Root explicitly authorized merging exact accepted B into the clean D branch and narrow integration-only ownership of the existing S3 test module/helper. No production resolution or checkpoint changes authorized or performed.",
+    "identities": {
+      "premerge_d_candidate": "f8aa0e9815b702f9d414ebe85a85eb48f9a982a1",
+      "accepted_b_candidate": "00eeb9dcdd2b513e64db9408969356037e09bb8e",
+      "merge_commit": "ccb310177273f5cfa2ce7f1c0203f55ddaa68397",
+      "merge_parents": [
+        "f8aa0e9815b702f9d414ebe85a85eb48f9a982a1",
+        "00eeb9dcdd2b513e64db9408969356037e09bb8e"
+      ],
+      "tracked_promotion_commit": "926346bf342f11e85b6258adc4cb407b449669b7",
+      "client_cleanup_commit_and_tested_source": "53aa72c3c578b1a32d8f83d64a98d6a543cdfb9a"
+    },
+    "accepted_b_reports": [
+      {
+        "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2b-acceptance.json",
+        "sha256": "3be220078302a05189c07c32220a86e966ff919bc4ef11e5d342a6c39135396d"
+      },
+      {
+        "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2b-review-3.json",
+        "sha256": "83eaf2c44ffb1316e9d6643e23c3ea9b977d5b083bf4427e86a75dcac7720fd6"
+      }
+    ],
+    "merge_resolution": {
+      "d_premerge": "f8aa0e9815b702f9d414ebe85a85eb48f9a982a1",
+      "b_accepted": "00eeb9dcdd2b513e64db9408969356037e09bb8e",
+      "only_overlap": "tests/clients/test_client_lifecycle_variants.py",
+      "resolution": "Automatic three-way merge; every function/class AST matches its owning candidate. B oversized simulated payload regression and D real MPC sample persistence both preserved.",
+      "merged_blob": "30b79b9cb59e679ae460e4ea345fdb508179d750",
+      "functions_and_classes_verified": 12,
+      "production_blobs_verified": {
+        "d_premerge": 29,
+        "b_accepted": 11
+      }
+    },
+    "production_preservation": {
+      "result": "Every 29 changed D and 11 changed B production blobs matches its owning exact candidate; entire D processors/serialization/mpc/utils Git trees also match premerge D. No production differences after the provisional merge. B validation file remains byte-identical.",
+      "premerge_manifest": {
+        "path": "/tmp/plato-phase2d.G3jkGH/combined/premerge-production-blobs.json",
+        "sha256": "8bf2b92be5f72093a870f8999ec230af12dffd9b6de93e70ce46fa89d2f626fe"
+      },
+      "verification": {
+        "path": "/tmp/plato-phase2d.G3jkGH/combined/final-production-preservation.json",
+        "sha256": "cdce2d8a7e339c4f4d6b96333fddaabb89bab14f706d9309a1365bf2d0a4d885"
+      }
+    },
+    "tracked_regression": {
+      "path": "tests/servers/test_runtime_s3_contract.py",
+      "provenance": {
+        "path": "/tmp/plato-phase2b-runtime/review-fixes/test_s3_combined.py",
+        "sha256": "f11bc92cc5c013146962d68e3eb8d45100be9aaf7b7072ec7a88b4103d711222"
+      },
+      "provenance_handling": "Read-only original author reference. No immutable production copies, scratch module imports, temporary paths or substituted writer appear in the tracked test.",
+      "actual_dependencies": [
+        "plato.utils.s3.S3",
+        "plato.clients.transport.receive_s3_payload",
+        "plato.clients.strategies.defaults.DefaultPayloadStrategy"
+      ],
+      "direct_cases": "24: four prefixes (empty, ordinary, nested, trailing) x native S3/minimal adapter x valid/oversize/total deadline.",
+      "owner_cleanup_cases": "Four: native/minimal adapter x oversize/deadline through the real client strategy. State/timer/buffer cleanup asserted before test teardown.",
+      "preserved_cases": "All ten original B S3 tests and all nine automatically merged client lifecycle tests execute unchanged. S3 fixture adds controlled trickling and handler completion while preserving ordinary contracts.",
+      "observations": "Actual constructor HEAD, unused-key HEAD, HTTP PUT and presigned GET use the same recorded physical key. Valid decoding equals the input payload and counts every stored byte. Oversize rejects advertised length with zero reserved bytes. Deadline expires with multiple bytes already received; transfer timers, buffers and isolated event-loop tasks are released, and local GET handlers complete.",
+      "timing": "Total payload deadline one second, continuing response bytes every 50 ms, five-second independent outer watchdog (expiry fails); deadline must finish within two seconds. Handler completion and server-thread joins have separate two-second bounds. No 40 ms deadline margin retained.",
+      "red_scope": "This is promotion/strengthening of coverage for already corrected B+D behavior, with no newly discovered production defect or new red claim. Historical 2D-17/B S3 reproductions retain their original sources below."
+    },
+    "source_identity_manifest": [
+      {
+        "path": "tests/servers/test_runtime_s3_contract.py",
+        "git_blob": "3be64f9ed0e20a00b9cba83cb65a2b7a830b1520",
+        "sha256": "e09c7ed694713815463b3be34939b9f4873b2b1b5930600f9c8f47b85d84c3e0"
+      },
+      {
+        "path": "tests/clients/test_client_lifecycle_variants.py",
+        "git_blob": "30b79b9cb59e679ae460e4ea345fdb508179d750",
+        "sha256": "3562b5d448de387536462321b3157db7e701947147e961ea942f36418f5f6cf2"
+      },
+      {
+        "path": "tests/mpc/test_round_store_contracts.py",
+        "git_blob": "04822893530c7338c0c0e868313b609e6fec961c",
+        "sha256": "ea4bd59d56c388ad4bf71a6af86d1d26bf2f187788c41a3e447e486b4c364878"
+      },
+      {
+        "path": "tests/utils/test_rl_payload_utilities.py",
+        "git_blob": "de5e5f3614e028d03d3cc1d7396b9ee79d7949ec",
+        "sha256": "d79abc30a10ae515a6c3231f9356cf8427c2c8de74371ac3021e8b21ee28a6df"
+      },
+      {
+        "path": "plato/utils/s3.py",
+        "git_blob": "926ce3af7973d0f93f2442886e457d36d7612414",
+        "sha256": "a26d306daa6a4accd4d67c9f26dea9f9ad153e74353fe8698643987cb6f25c03"
+      },
+      {
+        "path": "plato/clients/transport.py",
+        "git_blob": "9685239d6dfd5e7ca881e4c863496dd01fc9155a",
+        "sha256": "c6c482ae5557641f03fb9419253c92b6c8c6dc5e028a6a6ea1525e061799df57"
+      }
+    ],
+    "green_clean_base_collection": [
+      {
+        "source_commit": "53aa72c3c578b1a32d8f83d64a98d6a543cdfb9a",
+        "command": [
+          "/tmp/plato-phase2-root/base-313/bin/python",
+          "-m",
+          "pytest",
+          "tests",
+          "--collect-only",
+          "--test-profile=base",
+          "-m",
+          "not runtime",
+          "-q"
+        ],
+        "exit_code": 0,
+        "elapsed_seconds": 4.79,
+        "result": "560/608 tests collected (48 deselected) in 0.32s",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/combined-final-collection313.log",
+          "sha256": "9bd91f86266510e894aa6b84b4badf98c9e6ae483fae23543db74eb532a0356a"
+        },
+        "run_record": {
+          "path": "/tmp/plato-phase2d.G3jkGH/combined-final-collection313.json",
+          "sha256": "b7dc22e2514b23d188bf1ce3ac66b7ae568fc48cd4595e067e090a937a40be88"
+        }
+      },
+      {
+        "source_commit": "53aa72c3c578b1a32d8f83d64a98d6a543cdfb9a",
+        "command": [
+          "/private/tmp/plato-phase2d.G3jkGH/base314/bin/python",
+          "-m",
+          "pytest",
+          "tests",
+          "--collect-only",
+          "--test-profile=base",
+          "-m",
+          "not runtime",
+          "-q"
+        ],
+        "exit_code": 0,
+        "elapsed_seconds": 11.51,
+        "result": "560/608 tests collected (48 deselected) in 0.38s",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/combined-final-collection314.log",
+          "sha256": "41d99d8fe7fdec6eb80cd28ae91983eecb99f7d33123ba836ac369b2e7306d6d"
+        },
+        "run_record": {
+          "path": "/tmp/plato-phase2d.G3jkGH/combined-final-collection314.json",
+          "sha256": "e2e4e3cc51e285b6a33476fff71c0c430c76a1d92b1515d76762e08c2d0fe515"
+        }
+      }
+    ],
+    "green_full_base_non_runtime": [
+      {
+        "source_commit": "53aa72c3c578b1a32d8f83d64a98d6a543cdfb9a",
+        "command": [
+          "/tmp/plato-phase2-root/base-313/bin/python",
+          "-m",
+          "pytest",
+          "tests",
+          "--test-profile=base",
+          "-m",
+          "not runtime",
+          "-q",
+          "--basetemp=/tmp/plato-phase2d.G3jkGH/combined/pytest-final-base313",
+          "--junitxml=/tmp/plato-phase2d.G3jkGH/combined-final-base313.xml"
+        ],
+        "exit_code": 0,
+        "elapsed_seconds": 50.98,
+        "result": "557 passed, 4 skipped, 48 deselected in 46.74s",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/combined-final-base313.log",
+          "sha256": "b9880f625d3d5b3282ca4617caf0d6f2a2ffdae4439b8d2f6269ab9245f86276"
+        },
+        "run_record": {
+          "path": "/tmp/plato-phase2d.G3jkGH/combined-final-base313.json",
+          "sha256": "83d5e8b6787d5fd69057360e240e055cfb933c5d6910ff666a5cb66be962a854"
+        },
+        "junit": {
+          "tests": 561,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 4,
+          "passed": 557
+        },
+        "affected_module_pass_counts": {
+          "tests.clients.test_client_lifecycle_variants": 9,
+          "tests.mpc.test_round_store_contracts": 3,
+          "tests.servers.test_runtime_s3_contract": 38,
+          "tests.utils.test_rl_payload_utilities": 10
+        },
+        "junit_artifact": {
+          "path": "/tmp/plato-phase2d.G3jkGH/combined-final-base313.xml",
+          "sha256": "2e31d83e7c7d8cc56fcec29f6becb76d8b41223f942d5c39e37fc1a3db287ea4"
+        }
+      },
+      {
+        "source_commit": "53aa72c3c578b1a32d8f83d64a98d6a543cdfb9a",
+        "command": [
+          "/private/tmp/plato-phase2d.G3jkGH/base314/bin/python",
+          "-m",
+          "pytest",
+          "tests",
+          "--test-profile=base",
+          "-m",
+          "not runtime",
+          "-q",
+          "--basetemp=/tmp/plato-phase2d.G3jkGH/combined/pytest-final-base314",
+          "--junitxml=/tmp/plato-phase2d.G3jkGH/combined-final-base314.xml"
+        ],
+        "exit_code": 0,
+        "elapsed_seconds": 93.17,
+        "result": "557 passed, 4 skipped, 48 deselected in 82.04s (0:01:22)",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/combined-final-base314.log",
+          "sha256": "02e3f3bd02ee1869ab7db731d9dc1f442979a5afc16005928b50caa582cb8b32"
+        },
+        "run_record": {
+          "path": "/tmp/plato-phase2d.G3jkGH/combined-final-base314.json",
+          "sha256": "cd7e7325dda9382bb602f24528cd86eeee99d5ca31c68e49a4d185be095878a2"
+        },
+        "junit": {
+          "tests": 561,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 4,
+          "passed": 557
+        },
+        "affected_module_pass_counts": {
+          "tests.clients.test_client_lifecycle_variants": 9,
+          "tests.mpc.test_round_store_contracts": 3,
+          "tests.servers.test_runtime_s3_contract": 38,
+          "tests.utils.test_rl_payload_utilities": 10
+        },
+        "junit_artifact": {
+          "path": "/tmp/plato-phase2d.G3jkGH/combined-final-base314.xml",
+          "sha256": "3603b612659eb0a93cf270c7d12f3cf54c8b43b4080d47fcb6783ec6fe8f9124"
+        }
+      }
+    ],
+    "green_mandatory_affected": [
+      {
+        "source_commit": "53aa72c3c578b1a32d8f83d64a98d6a543cdfb9a",
+        "command": [
+          "/tmp/plato-phase2d.G3jkGH/venv313/bin/python",
+          "-m",
+          "pytest",
+          "tests/servers/test_runtime_s3_contract.py",
+          "tests/clients/test_client_lifecycle_variants.py",
+          "tests/mpc/test_round_store_contracts.py",
+          "tests/utils/test_rl_payload_utilities.py",
+          "--test-profile=mandatory",
+          "-q",
+          "-W",
+          "error::UserWarning",
+          "-W",
+          "error::ResourceWarning",
+          "--basetemp=/tmp/plato-phase2d.G3jkGH/combined/pytest-final-mandatory313",
+          "--junitxml=/tmp/plato-phase2d.G3jkGH/combined-final-mandatory313.xml"
+        ],
+        "exit_code": 0,
+        "elapsed_seconds": 36.54,
+        "result": "60 passed in 30.24s",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/combined-final-mandatory313.log",
+          "sha256": "d9e5edbc40c834ee1428ee2b15e16745389ad6c66a68562146fe3f07678a1b75"
+        },
+        "run_record": {
+          "path": "/tmp/plato-phase2d.G3jkGH/combined-final-mandatory313.json",
+          "sha256": "99682c6963ae421d583b66d3fbe579ea531454535af4c475c26b9774e3764558"
+        },
+        "junit": {
+          "tests": 60,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "passed": 60
+        },
+        "affected_module_pass_counts": {
+          "tests.servers.test_runtime_s3_contract": 38,
+          "tests.clients.test_client_lifecycle_variants": 9,
+          "tests.mpc.test_round_store_contracts": 3,
+          "tests.utils.test_rl_payload_utilities": 10
+        },
+        "junit_artifact": {
+          "path": "/tmp/plato-phase2d.G3jkGH/combined-final-mandatory313.xml",
+          "sha256": "421345f25e5a791b0392a642a64b840f173f011243310d57e3683628fe2ffb15"
+        }
+      },
+      {
+        "source_commit": "53aa72c3c578b1a32d8f83d64a98d6a543cdfb9a",
+        "command": [
+          "/private/tmp/plato-phase2d.G3jkGH/venv314/bin/python",
+          "-m",
+          "pytest",
+          "tests/servers/test_runtime_s3_contract.py",
+          "tests/clients/test_client_lifecycle_variants.py",
+          "tests/mpc/test_round_store_contracts.py",
+          "tests/utils/test_rl_payload_utilities.py",
+          "--test-profile=mandatory",
+          "-q",
+          "-W",
+          "error::UserWarning",
+          "-W",
+          "error::ResourceWarning",
+          "--basetemp=/tmp/plato-phase2d.G3jkGH/combined/pytest-final-mandatory314",
+          "--junitxml=/tmp/plato-phase2d.G3jkGH/combined-final-mandatory314.xml"
+        ],
+        "exit_code": 0,
+        "elapsed_seconds": 71.53,
+        "result": "60 passed in 64.68s (0:01:04)",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/combined-final-mandatory314.log",
+          "sha256": "db162fc05ee5f31b6ada842563bcc04a4a817c2617c6c97d6e0aa048dcb16a16"
+        },
+        "run_record": {
+          "path": "/tmp/plato-phase2d.G3jkGH/combined-final-mandatory314.json",
+          "sha256": "f38705b2a2c93ebe06fd60109ecd17a3bc8b98ef3c72285418c6f9d3be7e8326"
+        },
+        "junit": {
+          "tests": 60,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "passed": 60
+        },
+        "affected_module_pass_counts": {
+          "tests.servers.test_runtime_s3_contract": 38,
+          "tests.clients.test_client_lifecycle_variants": 9,
+          "tests.mpc.test_round_store_contracts": 3,
+          "tests.utils.test_rl_payload_utilities": 10
+        },
+        "junit_artifact": {
+          "path": "/tmp/plato-phase2d.G3jkGH/combined-final-mandatory314.xml",
+          "sha256": "b8686951eeaf0b90cce609ec25eb1e0b28ea3f109da2cf4d02093fdbcec906ec"
+        }
+      }
+    ],
+    "source_tests_ran": {
+      "base_both": "Entire tests tree selected with --test-profile=base -m \"not runtime\" at 53aa72c3. 560/608 nodes collected, 48 startup cases deselected; JUnit adds the allowed DP module collection skip. Exactly 557 passed/four existing allowed skips; includes all original D correction regressions and merged B non-runtime cases.",
+      "mandatory_both": [
+        "tests/servers/test_runtime_s3_contract.py",
+        "tests/clients/test_client_lifecycle_variants.py",
+        "tests/mpc/test_round_store_contracts.py",
+        "tests/utils/test_rl_payload_utilities.py"
+      ],
+      "mandatory_counts_each": {
+        "s3_contract": 38,
+        "merged_client_lifecycle": 9,
+        "actual_kazoo_round_store": 3,
+        "active_rl_actual_gymnasium": 10
+      },
+      "exact_case_ids": "Hashed JUnit artifacts enumerate each executed case; the same case selections and outcomes hold on both interpreters.",
+      "existing_base_omissions": "Unchanged opacus-absent DP module plus the three specifically allowed base Nanochat cases. No new skips or profile prerequisites."
+    },
+    "initial_combined_runs": {
+      "source_commit": "926346bf342f11e85b6258adc4cb407b449669b7",
+      "result": "Before adding the four actual-owner cleanup cases, all 56 mandatory affected cases and clean base collection (556/604 nodes, 48 deselected) passed on both interpreters.",
+      "run_records": [
+        {
+          "path": "/tmp/plato-phase2d.G3jkGH/combined-mandatory313.json",
+          "sha256": "86856d3b373f7722de411ec4704176646364b603d3b799c1bced799f0dc1bea3"
+        },
+        {
+          "path": "/tmp/plato-phase2d.G3jkGH/combined-mandatory314.json",
+          "sha256": "4cda23383d8a15d317c01e5eccbd7091276f55e5d8adf0b7a7565d671cf8c193"
+        },
+        {
+          "path": "/tmp/plato-phase2d.G3jkGH/combined-base-collection313.json",
+          "sha256": "9a696d48d4d5e36294c1a49f30aeef165df0c710795a12c19c9acad1b124e985"
+        },
+        {
+          "path": "/tmp/plato-phase2d.G3jkGH/combined-base-collection314.json",
+          "sha256": "a7f7739a157d2b3df9b2b0cc5e1f054b6e96b1001981185b55f1e4e4b4b47cec"
+        }
+      ]
+    },
+    "environment": {
+      "cwd": "/private/tmp/plato-refresh-worktrees/payloads",
+      "shell": "zsh -lc for every shell command.",
+      "uv_lock_sha256": "573b10c2ba1a2317e02f9e40c6181359cafab6f6e0a0f9be12bb256cb276fe1d",
+      "thread_limits": {
+        "OMP_NUM_THREADS": "1",
+        "OPENBLAS_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "VECLIB_MAXIMUM_THREADS": "1"
+      },
+      "additional_environment": {
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "HF_HUB_OFFLINE": "1",
+        "HF_DATASETS_OFFLINE": "1",
+        "TOKENIZERS_PARALLELISM": "false"
+      },
+      "base": "Unchanged fingerprints and confirmed Kazoo/Gymnasium/opacus/tiktoken absence in both locked base environments recorded above. Root-owned base313 reused read-only; own base314 reused without sync.",
+      "mandatory": "Unchanged own locked dev venv313/venv314 fingerprints; actual Kazoo 2.11.0/Gymnasium 1.3.0 tests rerun in this combination. UserWarning and ResourceWarning treated as errors.",
+      "runner": {
+        "path": "/tmp/plato-phase2d.G3jkGH/run_profile_validation.py",
+        "sha256": "7dfdd44095448a9c5544924ef483eb729ef17021ee7bbedc7fcd4f71eb4af7b5"
+      }
+    },
+    "static_checks": [
+      {
+        "command": "/tmp/plato-phase2d.G3jkGH/venv313/bin/ruff check tests/servers/test_runtime_s3_contract.py tests/clients/test_client_lifecycle_variants.py --select I",
+        "result": "All checks passed.",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/combined/ruff-final.log",
+          "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+        }
+      },
+      {
+        "command": "git diff --check fda60becedfa6236c11d415b87a868b52789a41e 53aa72c3c578b1a32d8f83d64a98d6a543cdfb9a",
+        "result": "Passed.",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/combined/diff-check-final.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    ],
+    "validation_lineage": {
+      "initial_full_mandatory": "e7c0d59571d88efd7eb1fdbf4fc63ac2a7b81395: 412 passed/one allowed native-tokenizer skip each; historical D full suite.",
+      "four_production_review_corrections": "639ca69bf4eaeff868462d0b30a5fcc72218f061: 95 scoped cases passed each; retained red/green and numerical references.",
+      "base_profile_correction": "15c79d0c81ffd0e5e4873db869a2863f97fe8279: 383 base passed/four existing skips each, 13 actual-library mandatory cases each.",
+      "new_combined_source": "53aa72c3c578b1a32d8f83d64a98d6a543cdfb9a: 557 base passed/four existing skips each, 60 mandatory affected passed each; clean base collection both.",
+      "accepted_b_runtime": "00eeb9dcdd2b513e64db9408969356037e09bb8e: root accepted fresh review3 PASS, current full 48 startup evidence remains attributed to exact B; not rerun or reattributed here."
+    },
+    "limitations": [
+      "This local provisional B+D candidate is not final root phase integration. Root repeats final merged qualification and owns publication/gate decisions.",
+      "The unchanged 48 startup cases were explicitly deselected in both base runs; no combined full mandatory/startup or new type-check/coverage run claimed.",
+      "Actual botocore/Requests/aiohttp work against a localhost S3-compatible service, using explicit fake credentials and no live cloud. The minimal adapter retains the real botocore presigner and supported fields only.",
+      "Payloads remain trusted-writer pickles; these correctness/resource tests do not claim arbitrary untrusted-input safety. Kazoo qualification remains a fake service with real exception class; no live ZooKeeper or full FEI deployment.",
+      "C checkpoint, metadata/lock/CI, shared conftest and root reports remain untouched. Root-owned original scratch and all task-owned resources are retained."
+    ]
+  },
+  "review2_test_policy_correction": {
+    "id": "2D-R05",
+    "recorded_at_utc": "2026-10-03T05:00:18.702342+00:00",
+    "review": {
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2d-review-2.json",
+      "sha256": "3870a624db39120121f601d915e29361cb57e67a18eb41ae01517ddfbe7c4243"
+    },
+    "reviewer_probe": {
+      "path": "/tmp/plato-phase2d-review-2/probe_default_profile.py",
+      "sha256": "706ebf3e37daf17a867cc55d99aed1f54e4e85f0df5d3c78d0e0712992ec10ce"
+    },
+    "references_handling": "Root report, reviewer probe/logs and reviewer scratch remain read-only; no reviewer environments used or mutated.",
+    "reviewed_candidate": "09b9b941bc4a816b62d8ed33ad993455f6f05da5",
+    "implementation_commit": "65e71329da1b4e1aa4f445991f4aaa38db119d3e",
+    "status": "Corrected with actual configured policy and both-profile red/green on 3.13/3.14; fresh independent review3 pending.",
+    "finding": "Raw --test-profile is None for plain unfiltered pytest tests, but the existing registered policy treats that entrypoint as mandatory. Original fixture branches returned optional stand-ins, silently losing actual-library qualification.",
+    "correction": "Both fixtures read the registered plato-profile-checks plugin and select real libraries when its qualify state is true and base is false. The existing hook computes scope/selection policy; no raw-option policy is copied, no shared conftest or prerequisite changed.",
+    "scoped_optional_behavior": "Unprofiled scoped configurations remain unqualified and use the existing independent contracts, whether extras are installed or absent. Explicit base also stays independent.",
+    "regressions": {
+      "source_test_files": [
+        "tests/mpc/test_round_store_contracts.py",
+        "tests/utils/test_rl_payload_utilities.py"
+      ],
+      "new_cases": "Eight: implicit full mandatory, explicit mandatory, explicit base and unprofiled scoped for each fixture.",
+      "method": "Real pytest.Config.fromdictargs configurations plus the existing tests.conftest.pytest_configure registration hook; actual fixture bodies run with each parsed config. No full implicit suite or startup cases are collected/executed by the focused probe.",
+      "mandatory_assertions": "Actual Kazoo LockTimeout identity and Gymnasium Box type when present. In clean base environments, either implicit or explicit mandatory fixture selection raises ModuleNotFoundError for the required library, with no fallback.",
+      "optional_assertions": "TimeoutError and SimpleNamespace contracts, independent float32 bounds/shape checks; all original 13 behavioral tests retained unchanged.",
+      "config_lifetime": "Parsed configurations are unconfigured in finally using the same pinned-pytest cleanup mechanism as the reviewer probe."
+    },
+    "red_source": {
+      "path": "/tmp/plato-phase2d.G3jkGH/profile-review/red-source-identity.json",
+      "sha256": "d6614b8cf2e2bc74fdcabb05c056a85d9d97c01d229ffc95cac3418cf53390a7"
+    },
+    "red_source_note": "At exact reviewed candidate HEAD, eight regression cases were added uncommitted before changing either fixture. AST identity with both original fixture bodies verified and exact red source snapshots retained; those snapshots differ from final source only by the later selection/docstring fix and formatting.",
+    "red": [
+      {
+        "source_commit": "09b9b941bc4a816b62d8ed33ad993455f6f05da5",
+        "command": [
+          "/tmp/plato-phase2d.G3jkGH/venv313/bin/python",
+          "-m",
+          "pytest",
+          "tests/mpc/test_round_store_contracts.py",
+          "tests/utils/test_rl_payload_utilities.py",
+          "--test-profile=mandatory",
+          "-q",
+          "-W",
+          "error::UserWarning",
+          "--basetemp=/tmp/plato-phase2d.G3jkGH/profile-review/pytest-profile-red-clean313",
+          "--junitxml=/tmp/plato-phase2d.G3jkGH/profile-red-clean313.xml"
+        ],
+        "exit_code": 1,
+        "elapsed_seconds": 8.36,
+        "result": "2 failed, 19 passed in 0.37s",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/profile-red-clean313.log",
+          "sha256": "281bb92754bc78da0157cadc62af44bc26327e8255b567a25c62cd93ccc6776d"
+        },
+        "run_record": {
+          "path": "/tmp/plato-phase2d.G3jkGH/profile-red-clean313.json",
+          "sha256": "a6ef240d0a5a35e1d1808eaf958982a3226eb5b22ac715c734c445e7e61691f8"
+        },
+        "junit": {
+          "tests": 21,
+          "failures": 2,
+          "errors": 0,
+          "skipped": 0,
+          "passed": 19
+        },
+        "failures": [
+          "tests.mpc.test_round_store_contracts::test_lock_timeout_follows_effective_pytest_profile[implicit-mandatory]",
+          "tests.utils.test_rl_payload_utilities::test_action_space_follows_effective_pytest_profile[implicit-mandatory]"
+        ],
+        "junit_artifact": {
+          "path": "/tmp/plato-phase2d.G3jkGH/profile-red-clean313.xml",
+          "sha256": "620c71a5bcf0a7b41a01e72d8a46406a101ea14374c69bda16cbf2c940a48c3e"
+        }
+      },
+      {
+        "source_commit": "09b9b941bc4a816b62d8ed33ad993455f6f05da5",
+        "command": [
+          "/private/tmp/plato-phase2d.G3jkGH/venv314/bin/python",
+          "-m",
+          "pytest",
+          "tests/mpc/test_round_store_contracts.py",
+          "tests/utils/test_rl_payload_utilities.py",
+          "--test-profile=mandatory",
+          "-q",
+          "-W",
+          "error::UserWarning",
+          "--basetemp=/tmp/plato-phase2d.G3jkGH/profile-review/pytest-profile-red-clean314",
+          "--junitxml=/tmp/plato-phase2d.G3jkGH/profile-red-clean314.xml"
+        ],
+        "exit_code": 1,
+        "elapsed_seconds": 8.78,
+        "result": "2 failed, 19 passed in 0.37s",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/profile-red-clean314.log",
+          "sha256": "b4abdb69112c95bd3c95e6439141113a3f6debc74279dd8d1a4a5b77a4515e6c"
+        },
+        "run_record": {
+          "path": "/tmp/plato-phase2d.G3jkGH/profile-red-clean314.json",
+          "sha256": "a289e5baca351fadf0ad07bf366bf95866cdd22cb01b84776f0402720caad86c"
+        },
+        "junit": {
+          "tests": 21,
+          "failures": 2,
+          "errors": 0,
+          "skipped": 0,
+          "passed": 19
+        },
+        "failures": [
+          "tests.mpc.test_round_store_contracts::test_lock_timeout_follows_effective_pytest_profile[implicit-mandatory]",
+          "tests.utils.test_rl_payload_utilities::test_action_space_follows_effective_pytest_profile[implicit-mandatory]"
+        ],
+        "junit_artifact": {
+          "path": "/tmp/plato-phase2d.G3jkGH/profile-red-clean314.xml",
+          "sha256": "ec5a2dec5ac7ea08015882e1218437e4c43231c9d0d1a2763974802c7175fffa"
+        }
+      },
+      {
+        "source_commit": "09b9b941bc4a816b62d8ed33ad993455f6f05da5",
+        "command": [
+          "/tmp/plato-phase2-root/base-313/bin/python",
+          "-m",
+          "pytest",
+          "tests/mpc/test_round_store_contracts.py",
+          "tests/utils/test_rl_payload_utilities.py",
+          "--test-profile=base",
+          "-q",
+          "-W",
+          "error::UserWarning",
+          "--basetemp=/tmp/plato-phase2d.G3jkGH/profile-review/pytest-profile-base-red-clean313",
+          "--junitxml=/tmp/plato-phase2d.G3jkGH/profile-base-red-clean313.xml"
+        ],
+        "exit_code": 1,
+        "elapsed_seconds": 6.21,
+        "result": "2 failed, 19 passed in 0.37s",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/profile-base-red-clean313.log",
+          "sha256": "4e04f8358ba030e2ace8a1e2dac58ae22adbd006f7a6d5cc78c76b31ea16227d"
+        },
+        "run_record": {
+          "path": "/tmp/plato-phase2d.G3jkGH/profile-base-red-clean313.json",
+          "sha256": "cdc95dd516eb5dc176607459ab30ad958ba67fb9acb0b3eeb9397c7271b224f0"
+        },
+        "junit": {
+          "tests": 21,
+          "failures": 2,
+          "errors": 0,
+          "skipped": 0,
+          "passed": 19
+        },
+        "failures": [
+          "tests.mpc.test_round_store_contracts::test_lock_timeout_follows_effective_pytest_profile[implicit-mandatory]",
+          "tests.utils.test_rl_payload_utilities::test_action_space_follows_effective_pytest_profile[implicit-mandatory]"
+        ],
+        "junit_artifact": {
+          "path": "/tmp/plato-phase2d.G3jkGH/profile-base-red-clean313.xml",
+          "sha256": "93b9e5d40190420628fca2cc993509a14b3343f61e07554ef2f12ee2391a5f78"
+        }
+      },
+      {
+        "source_commit": "09b9b941bc4a816b62d8ed33ad993455f6f05da5",
+        "command": [
+          "/private/tmp/plato-phase2d.G3jkGH/base314/bin/python",
+          "-m",
+          "pytest",
+          "tests/mpc/test_round_store_contracts.py",
+          "tests/utils/test_rl_payload_utilities.py",
+          "--test-profile=base",
+          "-q",
+          "-W",
+          "error::UserWarning",
+          "--basetemp=/tmp/plato-phase2d.G3jkGH/profile-review/pytest-profile-base-red-clean314",
+          "--junitxml=/tmp/plato-phase2d.G3jkGH/profile-base-red-clean314.xml"
+        ],
+        "exit_code": 1,
+        "elapsed_seconds": 14.63,
+        "result": "2 failed, 19 passed in 0.35s",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/profile-base-red-clean314.log",
+          "sha256": "80dca246eb538d6d03713ccfbd5b7f4219efdba122ebc0b0f0804f454182f72e"
+        },
+        "run_record": {
+          "path": "/tmp/plato-phase2d.G3jkGH/profile-base-red-clean314.json",
+          "sha256": "769192ed8972572a6b09d52e8c61b4ad5d08b4080ac25473c16870c4e7ba5c6d"
+        },
+        "junit": {
+          "tests": 21,
+          "failures": 2,
+          "errors": 0,
+          "skipped": 0,
+          "passed": 19
+        },
+        "failures": [
+          "tests.mpc.test_round_store_contracts::test_lock_timeout_follows_effective_pytest_profile[implicit-mandatory]",
+          "tests.utils.test_rl_payload_utilities::test_action_space_follows_effective_pytest_profile[implicit-mandatory]"
+        ],
+        "junit_artifact": {
+          "path": "/tmp/plato-phase2d.G3jkGH/profile-base-red-clean314.xml",
+          "sha256": "7084eb07c69182fee2967d1146ee64eb082c0b3e2d7d56b3214ccd4182be68b9"
+        }
+      }
+    ],
+    "green_affected_with_new_regressions": [
+      {
+        "source_commit": "65e71329da1b4e1aa4f445991f4aaa38db119d3e",
+        "command": [
+          "/tmp/plato-phase2d.G3jkGH/venv313/bin/python",
+          "-m",
+          "pytest",
+          "tests/mpc/test_round_store_contracts.py",
+          "tests/utils/test_rl_payload_utilities.py",
+          "--test-profile=mandatory",
+          "-q",
+          "-W",
+          "error::UserWarning",
+          "--basetemp=/tmp/plato-phase2d.G3jkGH/profile-review/pytest-profile-green-mandatory313",
+          "--junitxml=/tmp/plato-phase2d.G3jkGH/profile-green-mandatory313.xml"
+        ],
+        "exit_code": 0,
+        "elapsed_seconds": 7.01,
+        "result": "21 passed in 0.29s",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/profile-green-mandatory313.log",
+          "sha256": "de5ec4364a16eb4ddb788788ac7adbb564d3d85586292341d986c31a21c94b86"
+        },
+        "run_record": {
+          "path": "/tmp/plato-phase2d.G3jkGH/profile-green-mandatory313.json",
+          "sha256": "0b554d187f65691234fcb2f9ef6d1b614839e6c7344ddbe13667fccca58adde3"
+        },
+        "junit": {
+          "tests": 21,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "passed": 21
+        },
+        "junit_artifact": {
+          "path": "/tmp/plato-phase2d.G3jkGH/profile-green-mandatory313.xml",
+          "sha256": "c722cf8f0558d22e2ffd4ee85a1229c3efbc4819c1186468f547d7ccc256d5db"
+        }
+      },
+      {
+        "source_commit": "65e71329da1b4e1aa4f445991f4aaa38db119d3e",
+        "command": [
+          "/private/tmp/plato-phase2d.G3jkGH/venv314/bin/python",
+          "-m",
+          "pytest",
+          "tests/mpc/test_round_store_contracts.py",
+          "tests/utils/test_rl_payload_utilities.py",
+          "--test-profile=mandatory",
+          "-q",
+          "-W",
+          "error::UserWarning",
+          "--basetemp=/tmp/plato-phase2d.G3jkGH/profile-review/pytest-profile-green-mandatory314",
+          "--junitxml=/tmp/plato-phase2d.G3jkGH/profile-green-mandatory314.xml"
+        ],
+        "exit_code": 0,
+        "elapsed_seconds": 7.49,
+        "result": "21 passed in 0.30s",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/profile-green-mandatory314.log",
+          "sha256": "67485aefd50a75e8c2153d8d24dc87cfae1b3f08f7e7c4d00aa226834dc9e447"
+        },
+        "run_record": {
+          "path": "/tmp/plato-phase2d.G3jkGH/profile-green-mandatory314.json",
+          "sha256": "0be1192c74bd2ef5a2fc5b1f85955a4e917743c097f030303bba7c1f164e4203"
+        },
+        "junit": {
+          "tests": 21,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "passed": 21
+        },
+        "junit_artifact": {
+          "path": "/tmp/plato-phase2d.G3jkGH/profile-green-mandatory314.xml",
+          "sha256": "a96d2d0232770325fc82f5854606f956a38b695e76387e0f26694b3ec5b46cc9"
+        }
+      },
+      {
+        "source_commit": "65e71329da1b4e1aa4f445991f4aaa38db119d3e",
+        "command": [
+          "/tmp/plato-phase2-root/base-313/bin/python",
+          "-m",
+          "pytest",
+          "tests/mpc/test_round_store_contracts.py",
+          "tests/utils/test_rl_payload_utilities.py",
+          "--test-profile=base",
+          "-q",
+          "-W",
+          "error::UserWarning",
+          "--basetemp=/tmp/plato-phase2d.G3jkGH/profile-review/pytest-profile-green-base313",
+          "--junitxml=/tmp/plato-phase2d.G3jkGH/profile-green-base313.xml"
+        ],
+        "exit_code": 0,
+        "elapsed_seconds": 4.87,
+        "result": "21 passed in 0.26s",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/profile-green-base313.log",
+          "sha256": "bdea51565d9356e22eb3ca38d329eef64b8b15db85f746a6ab6594456f14a415"
+        },
+        "run_record": {
+          "path": "/tmp/plato-phase2d.G3jkGH/profile-green-base313.json",
+          "sha256": "d5589142f1fe9483ad043ea9d3398033adc40252066d33f09ade95924c6a1f72"
+        },
+        "junit": {
+          "tests": 21,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "passed": 21
+        },
+        "junit_artifact": {
+          "path": "/tmp/plato-phase2d.G3jkGH/profile-green-base313.xml",
+          "sha256": "5617dbacee92592094eec10122509d0ba0fdd1b0fb38b1a04ef23e38160368d2"
+        }
+      },
+      {
+        "source_commit": "65e71329da1b4e1aa4f445991f4aaa38db119d3e",
+        "command": [
+          "/private/tmp/plato-phase2d.G3jkGH/base314/bin/python",
+          "-m",
+          "pytest",
+          "tests/mpc/test_round_store_contracts.py",
+          "tests/utils/test_rl_payload_utilities.py",
+          "--test-profile=base",
+          "-q",
+          "-W",
+          "error::UserWarning",
+          "--basetemp=/tmp/plato-phase2d.G3jkGH/profile-review/pytest-profile-green-base314",
+          "--junitxml=/tmp/plato-phase2d.G3jkGH/profile-green-base314.xml"
+        ],
+        "exit_code": 0,
+        "elapsed_seconds": 11.59,
+        "result": "21 passed in 0.24s",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/profile-green-base314.log",
+          "sha256": "5b659ff4aec67a30b01248b8729fe2d4d43bafdf7e75345eba783dab5a173ac0"
+        },
+        "run_record": {
+          "path": "/tmp/plato-phase2d.G3jkGH/profile-green-base314.json",
+          "sha256": "040ce9b5b9d4363c75a1bbc222e92f6ada49bd6e5a6c11ae2be192ab23d3e5fc"
+        },
+        "junit": {
+          "tests": 21,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "passed": 21
+        },
+        "junit_artifact": {
+          "path": "/tmp/plato-phase2d.G3jkGH/profile-green-base314.xml",
+          "sha256": "6fc68c5b1f7eefaeb9b50a08e2642ecaad3486b2c50b76067bd29fa03808c52d"
+        }
+      }
+    ],
+    "green_clean_base_collection": [
+      {
+        "source_commit": "65e71329da1b4e1aa4f445991f4aaa38db119d3e",
+        "command": [
+          "/tmp/plato-phase2-root/base-313/bin/python",
+          "-m",
+          "pytest",
+          "tests",
+          "--collect-only",
+          "--test-profile=base",
+          "-m",
+          "not runtime",
+          "-q"
+        ],
+        "exit_code": 0,
+        "elapsed_seconds": 4.56,
+        "result": "568/616 tests collected (48 deselected) in 0.36s",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/profile-green-collection313.log",
+          "sha256": "04831d445936680e7a6809138ef58c6e18263848253308cb4e8848aac9f39ca5"
+        },
+        "run_record": {
+          "path": "/tmp/plato-phase2d.G3jkGH/profile-green-collection313.json",
+          "sha256": "f0607a1c8db36c0fa4a737b33654e97fc7f5dca6becfca69c91298a7d85a3f84"
+        }
+      },
+      {
+        "source_commit": "65e71329da1b4e1aa4f445991f4aaa38db119d3e",
+        "command": [
+          "/private/tmp/plato-phase2d.G3jkGH/base314/bin/python",
+          "-m",
+          "pytest",
+          "tests",
+          "--collect-only",
+          "--test-profile=base",
+          "-m",
+          "not runtime",
+          "-q"
+        ],
+        "exit_code": 0,
+        "elapsed_seconds": 11.27,
+        "result": "568/616 tests collected (48 deselected) in 0.40s",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/profile-green-collection314.log",
+          "sha256": "f6c840bfb824a86713de39b57f214eed391c28db57ee3cea4cab54a27e6a7cc1"
+        },
+        "run_record": {
+          "path": "/tmp/plato-phase2d.G3jkGH/profile-green-collection314.json",
+          "sha256": "8cb19f41e409065872ed128bdb2947f4881e0437be8be1a2a88e6f37f25f70a3"
+        }
+      }
+    ],
+    "source_identity_manifest": [
+      {
+        "path": "tests/mpc/test_round_store_contracts.py",
+        "git_blob": "aecae718d67bd62f3cebce4c02a92a3e830bb889",
+        "sha256": "3f443669807fd3ebe6e6d6224ae7d6d1ccf0b7d8696cc29b6c5e496ae5eb23cb"
+      },
+      {
+        "path": "tests/utils/test_rl_payload_utilities.py",
+        "git_blob": "6979685f775e806fda50e401459116f3eddf7cf0",
+        "sha256": "c7542d050edcb30ea370241b13b4efb676988530677d16c192451bbcef415388"
+      }
+    ],
+    "retained_combined_validation": {
+      "source_commit": "53aa72c3c578b1a32d8f83d64a98d6a543cdfb9a",
+      "result_each_interpreter": "60 explicit mandatory combined cases and 557 full base non-runtime cases/four allowed skips passed; historical source/results/artifacts remain unchanged in combined_b_d_validation.",
+      "basis": "All production, actual S3 regression/helper and merged client lifecycle code is byte-identical. Current targeted 21-case mandatory/base runs requalify the changed fixture selection and all 13 previous affected behaviors. User explicitly authorizes source identity plus targeted checks instead of mechanically repeating the expensive combined cases.",
+      "historical_attribution": "Initial full412 stays at e7c0d595; production-correction95 at 639ca69b; base-correction383 at 15c79d0c; combined60/base557 at 53aa72c3. Current21 checks/collection are solely at 65e71329."
+    },
+    "static_checks": [
+      {
+        "command": "/tmp/plato-phase2d.G3jkGH/venv313/bin/ruff check tests/mpc/test_round_store_contracts.py tests/utils/test_rl_payload_utilities.py --select I",
+        "result": "All checks passed.",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/profile-review/ruff.log",
+          "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+        }
+      },
+      {
+        "command": "git diff --check 09b9b941bc4a816b62d8ed33ad993455f6f05da5 65e71329da1b4e1aa4f445991f4aaa38db119d3e",
+        "result": "Passed; new lines at most88 characters."
+      },
+      {
+        "command": "git diff --exit-code 09b9b941bc4a816b62d8ed33ad993455f6f05da5 65e71329da1b4e1aa4f445991f4aaa38db119d3e -- plato examples cleanup.py tests/servers/test_runtime_s3_contract.py tests/clients/test_client_lifecycle_variants.py tests/conftest.py pyproject.toml uv.lock",
+        "result": "Passed; production, accepted S3/lifecycle tests, shared fixture policy and metadata unchanged."
+      }
+    ],
+    "environment": {
+      "cwd": "/private/tmp/plato-refresh-worktrees/payloads",
+      "shell": "zsh -lc for every shell invocation.",
+      "uv_lock_sha256": "573b10c2ba1a2317e02f9e40c6181359cafab6f6e0a0f9be12bb256cb276fe1d",
+      "fingerprints": "Same locked dev/base Python3.13.16 and3.14.8 environments and installed-distribution digests recorded above. Root base313 reused read-only; own other environments reused without sync.",
+      "optional_presence": "Kazoo/Gymnasium/opacus/tiktoken all present in both mandatory environments and all absent in both base environments; runner records verify each.",
+      "thread_limits": {
+        "OMP_NUM_THREADS": "1",
+        "OPENBLAS_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "VECLIB_MAXIMUM_THREADS": "1"
+      },
+      "additional_environment": "PYTHONDONTWRITEBYTECODE=1, HF_HUB_OFFLINE=1, HF_DATASETS_OFFLINE=1, TOKENIZERS_PARALLELISM=false; UserWarning treated as error in all clean affected runs.",
+      "runner": {
+        "path": "/tmp/plato-phase2d.G3jkGH/run_profile_validation.py",
+        "sha256": "7dfdd44095448a9c5544924ef483eb729ef17021ee7bbedc7fcd4f71eb4af7b5"
+      }
+    },
+    "primary_documentation": [
+      {
+        "url": "https://docs.pytest.org/en/latest/how-to/writing_plugins.html#accessing-another-plugin-by-name",
+        "use": "Retrieve the authoritative registered plugin through config.pluginmanager.get_plugin."
+      },
+      {
+        "url": "https://docs.pytest.org/en/latest/reference/reference.html",
+        "use": "Current Config.fromdictargs and plugin registration API; locked pytest9.1.1 also exercised directly."
+      },
+      {
+        "url": "https://pluggy.readthedocs.io/en/latest/api_reference.html",
+        "use": "get_plugin returns the registered plugin object by its name."
+      }
+    ],
+    "limitations": [
+      "Implicit mandatory selection is verified through real parsed/registered configuration and actual fixture bodies, not a repeated complete default suite or 48-startup matrix.",
+      "Only the two affected modules and clean base collection were newly run. Prior full base557, combined60, full412, production95 and platform/service limits retain exact historical attribution; no full/type/coverage rerun claimed.",
+      "Initial exploratory red invocations used -k with explicit profiles, causing existing deselection-policy violations. These raw profile-red/profile-base-red logs remain in scratch but are not used as the accepted red evidence; four clean unfiltered module invocations above prove only the implicit selection failures.",
+      "Root owns fresh review3 and final whole-phase qualification. No production/S3, checkpoint, security, shared fixture policy, metadata or dependency redesign."
+    ]
+  }
+}

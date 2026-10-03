@@ -9,6 +9,7 @@ from plato.config import Config
 from plato.trainers import (
     basic,
     composable,
+    fedprox,
     gan,
     pfedgraph,
     split_learning,
@@ -23,6 +24,7 @@ from plato.trainers import (
 registered_trainers = {
     "composable": composable.ComposableTrainer,
     "basic": basic.Trainer,
+    "fedprox": fedprox.Trainer,
     "timm_basic": basic.TrainerWithTimmScheduler,
     "gan": gan.Trainer,
     "pfedgraph": pfedgraph.Trainer,

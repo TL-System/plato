@@ -1,0 +1,18 @@
+{
+  "finding": "2C-11",
+  "decision": "DESIGN ACCEPTED FOR IMPLEMENTATION; finding remains open",
+  "date": "2026-10-03T07:33:27.129051+00:00",
+  "design": "phase2c-feddyn-design.json",
+  "design_sha256": "62c5d61805c49ccc06f99776d0da820c5b27cffeb5916754ddb16bb3135c1d5b",
+  "review": "phase2c-feddyn-design-review-2.json",
+  "review_sha256": "454aa4b5d6503e2d3fbdc572719620983bab13cd7fbd5e59df8a3dc254e0f0e1",
+  "review_result": "PASS, no material or low findings",
+  "authority": "User-authorized necessary fixes; independently reviewed bounded design for retained FedDyn example.",
+  "implementation_owner": "Original Phase2C Sol author plato-phase2-training wZ",
+  "starting_candidate": "f9772f61d52dfe0f4a3281252d23b8303ec237d2",
+  "accepted_sampler_dependency": "79da1f97d8a12fe97402750cc32c7b3e8f5cdf6e",
+  "scope": "Exact owned paths and all FD-A01..15 in accepted design; merge accepted A at clean boundary; no generic base/transport/shared loop edits. B F28 supplement separately owned and later integrated after review.",
+  "writing_owner": "Astra writer after implementation, serialized with SCAFFOLD section; fresh writing review before closure.",
+  "test_handoff": "Also authorize FedDyn-only branch of new test_review_training_boundaries.py to use explicit read-only legacy reader, preserving actual historical writer behavior and avoiding reliance on unavailable git history in shallow CI/source distributions.",
+  "closure": "Requires independent implementation/prose reviews, root integration qualification and phasegate. Not production acceptance."
+}

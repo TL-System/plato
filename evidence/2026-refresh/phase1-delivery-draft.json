@@ -1,0 +1,158 @@
+{
+  "title": "Fix workspace installation and Python 3.14 startup; qualify Phase 1 on macOS and Linux.",
+  "body": "Example-targeted installs could omit or remove Plato, and fresh Python 3.14 startup failed without a current event loop. This change makes workspace installs reproducible and client/server startup execute scheduled work with explicit loop ownership and failure propagation.\n\n- Track `uv.lock`, refresh tested dependency bounds, and link all 15 workspace examples to local Plato. Separate base, test/dev, build/docs/audit and optional profiles; SSL and Lighteval require separate environments.\n- Keep Python 3.13 as default/minimum, with tested core 3.14 forward compatibility.\n- Enforce test prerequisites and exact omissions, restore fixture state after exceptions, and preserve focused pytest selections. Run bounded Ubuntu CPU jobs with separate environments and retained logs.\n\nPhase 1 validation and publication are complete: independent reviews, the [phase gate](https://github.com/TL-System/plato/blob/maintenance/2026-refresh-audit/evidence/2026-refresh/phase1-gate.json), [root macOS validation](https://github.com/TL-System/plato/blob/maintenance/2026-refresh-audit/evidence/2026-refresh/phase1-integration-validation.json) and both [Ubuntu jobs](https://github.com/TL-System/plato/actions/runs/37082986642) passed. The [Linux evidence](https://github.com/TL-System/plato/blob/maintenance/2026-refresh-audit/evidence/2026-refresh/phase1-linux-validation.json) confirms the CI merge tree equals pushed head `beee985b`.\n\n| Platform / Python | Base | Mandatory |\n| --- | --- | --- |\n| macOS 3.13.16 / 3.14.8, each | 246 passed; 4 skip reports | 298 passed; 1 skip |\n| Ubuntu 3.13.15 / 3.14.7, each | 246 passed; 4 skip reports | 250 core + 48 runtime passed; 1 skip |\n\nAll 48 startup cases execute without skips. Mandatory runs DP/MPC and initialized Nanochat training; only the absent native tokenizer skips. Base omissions represent two DP and three Nanochat nodes. Actual CPU socket rounds train separate clients on 2/6 samples; independently recomputed weighted references match received payloads and aggregates. Clients exit naturally; five expected containment cases per interpreter leave no survivors. Cooperative finalization is tested separately from watchdog termination.\n\nLocked installs, Ruff and typing classification checks pass; local wheel/sdist builds pass and wheel runtime sources match. Typing retains 404 classified diagnostics. Focused-selection and clean-output checker corrections are resolved.\n\nThe authorized uv NLTK 3.10.3 override retains Lighteval's metadata conflict and unsuppressed PYSEC-2026-3740 / CVE-2026-81726 advisory. Tested BLEU/ROUGE pass; ordinary wheel/sdist resolution selects 3.9.1 without that override.\n\nCore bug fixes, MLX, example/backend qualification, archives and docs remain later phases. ViT archival replaces repair; legacy archival is authorized. No files have moved.",
+  "current_validation": {
+    "accepted_commits": {
+      "dependencies": "7304703905189baf771032f1cd923a37f66ed97f",
+      "startup": "213b321c3cfb31d0f82c0b315efe50dcbf7dee20",
+      "test_ci": "80539c3f5bfd3f56acfd67d61fba291ea3315f3b"
+    },
+    "integrated_commit": "80539c3f5bfd3f56acfd67d61fba291ea3315f3b",
+    "integrated_tree": "2eaa46049fc0929938117f70c405adaabac1d6b5",
+    "lock_sha256": "573b10c2ba1a2317e02f9e40c6181359cafab6f6e0a0f9be12bb256cb276fe1d",
+    "delivery_summary": "Phase 1 is complete: accepted 1A/1B/1C, independent phase gate, root integration/full validation, PR publication and both Ubuntu jobs passed. PR #417 is open; later phases remain pending. Root will apply this factual description update to the PR.",
+    "evidence": [
+      "evidence/2026-refresh/phase1a-acceptance.json",
+      "evidence/2026-refresh/phase1b-acceptance.json",
+      "evidence/2026-refresh/phase1c-acceptance.json",
+      "evidence/2026-refresh/phase1c-review2.json",
+      "evidence/2026-refresh/phase1-gate.json",
+      "evidence/2026-refresh/phase1-integration-validation.json",
+      "evidence/2026-refresh/phase1-linux-validation.json"
+    ],
+    "environment": "Apple Silicon macOS 27.0: Python 3.13.16 and 3.14.8. Published Ubuntu 24.04 x86_64 CPU jobs: Python 3.13.15 and 3.14.7, uv 0.12.22. Python default/minimum remains 3.13; qualified 3.14 scope is core forward compatibility.",
+    "root_suites": [
+      {
+        "profile": "mandatory-313",
+        "passed": 298,
+        "skip_reports": 1,
+        "seconds": 433.938,
+        "deselected_runtime": 0
+      },
+      {
+        "profile": "mandatory-314",
+        "passed": 298,
+        "skip_reports": 1,
+        "seconds": 449.378,
+        "deselected_runtime": 0
+      },
+      {
+        "profile": "base-313",
+        "passed": 246,
+        "skip_reports": 4,
+        "seconds": 1.054,
+        "deselected_runtime": 48
+      },
+      {
+        "profile": "base-314",
+        "passed": 246,
+        "skip_reports": 4,
+        "seconds": 1.369,
+        "deselected_runtime": 48
+      }
+    ],
+    "warnings": "Zero pytest warnings in each fresh mandatory/base run; no fork-warning suppression.",
+    "skip_contract": "Mandatory permits only absent callable rustbpe.Tokenizer for its named round-trip test; DP/MPC and both initialized Nanochat trainer tests execute. Four base skip reports represent two DP nodes in one module plus three Nanochat nodes. Base partitions out 48 startup cases; full mandatory executes them all.",
+    "runtime": "macOS and Linux each execute 48 runtime cases per interpreter. Actual socket rounds train separate clients on 2/6 samples; independently recomputed weighted aggregates match received tensors. Both clients return naturally; five expected watchdog containments per interpreter, no live owned survivors. Linux upload aliases are deduplicated to 48 unique result records.",
+    "lifecycle_boundary": "Production success retains os._exit; separate cooperative tests cover finalization. Forced containment does not prove graceful cleanup or original-error delivery from noncooperative extension code.",
+    "static_and_artifacts": "Locked sync/lock checks, Ruff and workflow typing classification pass locally and in both Ubuntu jobs. Local wheel/sdist build and diff check pass; wheel plato/client.py and plato/servers/base.py match integrated runtime sources. Typing remains nonzero with 404 classified messages on both platforms.",
+    "typing": {
+      "diagnostics": 404,
+      "baseline": 384,
+      "accepted_startup_helpers": 20,
+      "raw_exit_code": 1,
+      "workflow_classification_gate_exit_code": 0
+    },
+    "review_corrections": "P1C-R01 and P1C-R02 independently resolved: ordinary focused selections retain pytest behavior while explicit profiles enforce qualification; typing checker accepts verified clean output and classified nonzero output while rejecting malformed/tool-failure/unexpected-owned diagnostics.",
+    "coverage": "Not recollected by root. Retained 1C mandatory-core coverage is about 43.30% on each interpreter, excluding startup subprocesses. Comparable 219 unchanged files improved from 44.175% to 44.965%; raw baseline/final denominators differ.",
+    "dependency_exception": "Authorized workspace uv override uses NLTK 3.10.3 against Lighteval 3.9.1 metadata. Expected metadata-check failure and PYSEC-2026-3740 / CVE-2026-81726 remain visible; no published fix in retained audit. Tested metrics do not qualify arbitrary tasks. Ordinary wheel/sdist resolution selects 3.9.1 without the override; optional artifact contents depend on submodule initialization.",
+    "evidence_boundary": "Fresh root full suites establish macOS results. Published Ubuntu jobs establish Linux results on the recorded patch versions; merge checkout tree exactly matches published beee985b head. Phase 1 is complete, while optional-backend/research-family qualification and later-phase repairs remain pending. PR remains open; merge is not claimed.",
+    "publication": {
+      "pull_request": "https://github.com/TL-System/plato/pull/417",
+      "pull_request_status": "open",
+      "workflow_run": "https://github.com/TL-System/plato/actions/runs/37082986642",
+      "workflow_conclusion": "success",
+      "published_head": "beee985b9690b7a14d7a01801d5d9bc2e4e63f5e",
+      "ci_merge_commit": "37cc87138c1f06aa111ec8e14b5527d1ae152a46",
+      "ci_merge_tree": "838b4c8af2ec819542c6f2447fb8db973d437482",
+      "head_tree_matches_merge": true,
+      "jobs": [
+        {
+          "name": "Python 3.13 / supported-default",
+          "conclusion": "success",
+          "url": "https://github.com/TL-System/plato/actions/runs/37082986642/job/111087341656"
+        },
+        {
+          "name": "Python 3.14 / core-forward-compatibility",
+          "conclusion": "success",
+          "url": "https://github.com/TL-System/plato/actions/runs/37082986642/job/111087341910"
+        }
+      ]
+    },
+    "linux_profiles": [
+      {
+        "python": "Python 3.13.15",
+        "suites": [
+          {
+            "name": "base",
+            "passed": 246,
+            "skipped": 4,
+            "seconds": 1.221
+          },
+          {
+            "name": "mandatory",
+            "passed": 250,
+            "skipped": 1,
+            "seconds": 22.787
+          },
+          {
+            "name": "runtime",
+            "passed": 48,
+            "skipped": 0,
+            "seconds": 482.976
+          }
+        ],
+        "runtime": {
+          "cases": 48,
+          "expected_watchdog_timeouts": 5,
+          "survivors": 0,
+          "socket_natural_client_returns": 2
+        },
+        "typing": "Found 404 diagnostics"
+      },
+      {
+        "python": "Python 3.14.7",
+        "suites": [
+          {
+            "name": "base",
+            "passed": 246,
+            "skipped": 4,
+            "seconds": 1.855
+          },
+          {
+            "name": "mandatory",
+            "passed": 250,
+            "skipped": 1,
+            "seconds": 29.783
+          },
+          {
+            "name": "runtime",
+            "passed": 48,
+            "skipped": 0,
+            "seconds": 566.476
+          }
+        ],
+        "runtime": {
+          "cases": 48,
+          "expected_watchdog_timeouts": 5,
+          "survivors": 0,
+          "socket_natural_client_returns": 2
+        },
+        "typing": "Found 404 diagnostics"
+      }
+    ],
+    "later_phases": "Core correctness fixes, MLX, research example/backend qualification, coherent ViT/legacy archives and documentation remain pending. No archive moves have occurred."
+  },
+  "pending_final_inputs": [],
+  "status": "phase1_complete_later_phases_pending"
+}

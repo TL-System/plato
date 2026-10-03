@@ -1,0 +1,133 @@
+{
+  "candidate": "ae3d066664d1eb5715cd20e5792b9e9c3e605240",
+  "archive": "reproductions/phase2-ci-correction-review.tar.gz",
+  "sha256": "12a8bccba1a0e5a394b67bd26a08736794120c308f7d489479c591d256cec18c",
+  "files": [
+    {
+      "path": "author/artifact-selection-proof.json",
+      "bytes": 2930,
+      "sha256": "7632d614c89efaa4b0079e2846ccb831a5bc481a3de5301dfd022d7a1f125921"
+    },
+    {
+      "path": "author/audit_staging_failure_receipts.py",
+      "bytes": 1427,
+      "sha256": "9c10719725ccbb464cf04eda89ee0aef0e019e3404745879dc44cbffbe0e3ff3"
+    },
+    {
+      "path": "author/baseline-stage-ci-artifacts.py",
+      "bytes": 9531,
+      "sha256": "a1d29b5666f0d9e3e6b1286ebe07464c9de47a4a65e96c6a307a09fc0a7c9078"
+    },
+    {
+      "path": "author/ci-review-before-failure-correction.json",
+      "bytes": 11777,
+      "sha256": "8f9b342e3228c65f5a1bb01080be93b8cdd501292c62874df5b93de74d9164e9"
+    },
+    {
+      "path": "author/staging-failure-contract-green.json",
+      "bytes": 8650,
+      "sha256": "0c053f4e933db85f0c7895209fbb087c2043f8356bbf46b37b3b8e45eb53d675"
+    },
+    {
+      "path": "author/staging-failure-contract-red.json",
+      "bytes": 2572,
+      "sha256": "03d2a28cbd242292b9179f9bd777dcec24e045cc60ff92f4bb70cca6538b82c4"
+    },
+    {
+      "path": "author/staging-failure-delivery.json",
+      "bytes": 2889,
+      "sha256": "2f34f749b88dfd2d48e90cc0e6208d1c3a39ccc45c878d2c859259953c51bc45"
+    },
+    {
+      "path": "author/staging-failure-static-proof.json",
+      "bytes": 2113,
+      "sha256": "ec1653ca9a499046d77e897938d543dfa8764591a9d0dcb08e0d64af5fd9ebe6"
+    },
+    {
+      "path": "author/test_artifact_selection.py",
+      "bytes": 9866,
+      "sha256": "fe6fe14f897f260fdacc7a72c82bd185afac87cc2d030c3c9bfb26d4d8e14b34"
+    },
+    {
+      "path": "author/test_staging_failure_contract.py",
+      "bytes": 10734,
+      "sha256": "b4b880d84bafe5116d814db9b4654fdf6e82f8b8e52ba7dba1f6ac55308b3b64"
+    },
+    {
+      "path": "author/update_staging_failure_evidence.py",
+      "bytes": 8658,
+      "sha256": "9ecb1f7ab5b0385184fc06f8a7e530b91f453adf683f5747be7eef3ace8c65e2"
+    },
+    {
+      "path": "author/validate.py",
+      "bytes": 16081,
+      "sha256": "11da02a53c7f9563ec3d1cd0fee26eddb2569fb387d13be93c109f642efa9a04"
+    },
+    {
+      "path": "author/validate_linux_adjustment.py",
+      "bytes": 23157,
+      "sha256": "f6ddb0fd1deaeb36b5eba46c140857ff34423ee040b3e3872ac53a89f5b04bc3"
+    },
+    {
+      "path": "author/validate_staging_failure_correction.py",
+      "bytes": 7176,
+      "sha256": "984c4a7020d757f598a11cca83d810079dd899b151e431b0a10485f8654845aa"
+    },
+    {
+      "path": "review1/outside-secret.txt",
+      "bytes": 7,
+      "sha256": "31207a2065f46a5b948fce6fe5c13e85abaf5631e2f894b47dcd4fce14f6c57b"
+    },
+    {
+      "path": "review1/probe-results.json",
+      "bytes": 2357,
+      "sha256": "ea242b2387d82e07ec91928af4afeda932b3928a2fc9ff3e81a210a5721a4d54"
+    },
+    {
+      "path": "review1/review.json",
+      "bytes": 11777,
+      "sha256": "8f9b342e3228c65f5a1bb01080be93b8cdd501292c62874df5b93de74d9164e9"
+    },
+    {
+      "path": "review1/review_probe.py",
+      "bytes": 7227,
+      "sha256": "78fbade4899592b55bf5c2f524da7e7ec94add2a4b7611e1d09b8adad2e73872"
+    },
+    {
+      "path": "review1/static-results.json",
+      "bytes": 2348,
+      "sha256": "ee6dcc57eca84e92aa37fd78e34ed2f591ed876d1792075c3111a78d95ac48c4"
+    },
+    {
+      "path": "review1/static_review.py",
+      "bytes": 5105,
+      "sha256": "a6338f3938ca8040d4974f050b22f60c779972e332a14eb145d429ba1e6f19b6"
+    },
+    {
+      "path": "review1/write_review.py",
+      "bytes": 5721,
+      "sha256": "2a7c7203bdea10e4f31a4e92443a9a90bad26850bddc230d6523091e04acbe2c"
+    },
+    {
+      "path": "review2/independent-results.json",
+      "bytes": 24090,
+      "sha256": "98f6f706933ef56a2af24c7fc5e4015bbf41dc1a6f533ccbffb564a48b378b67"
+    },
+    {
+      "path": "review2/independent_review.py",
+      "bytes": 17752,
+      "sha256": "802e57a0480f8bf1b75abdcd9c5dc98813e351e79e58ad7750688d0b2ac7a6c3"
+    },
+    {
+      "path": "review2/inject_eio.py",
+      "bytes": 368,
+      "sha256": "9816c768778f64f78a50eb6d686779bcd78dac2fc93f115b72486aed62b54865"
+    },
+    {
+      "path": "review2/review.json",
+      "bytes": 25916,
+      "sha256": "67b0c8a17f7a929994ed7eac2cfa72f2551c6b3a9aa5c16c1a041c173469391b"
+    }
+  ],
+  "limits": "Preserves scripts/reports/logs. Actual runtime records used by staging probes are retained in the earlier Phase2 final local qualification archive; no new Linux pass is claimed."
+}

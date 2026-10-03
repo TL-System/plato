@@ -1,0 +1,252 @@
+{
+  "identities": {
+    "C": {
+      "commit": "8b01bf47ca8bdf9232bffeb4e50f78d4f00c9e3b",
+      "tree": "1cb086b9db386128ba6a965c198e8c07400ab9be",
+      "matches": true,
+      "head": "8b01bf47ca8bdf9232bffeb4e50f78d4f00c9e3b",
+      "tracked_diff": ""
+    },
+    "docs": {
+      "commit": "c199ebe02831a47351a10026e64721f77c9dfe9b",
+      "tree": "98bb9b178c65d39618e057a5cc5079f7ac7fe62e",
+      "matches": true,
+      "head": "c199ebe02831a47351a10026e64721f77c9dfe9b",
+      "tracked_diff": ""
+    },
+    "CI": {
+      "commit": "8d27c5c7a205299537a2835358f1d5e91a7b51c3",
+      "tree": "fa85f0b6ddc104e4fd1a2bd11a17c32619a1cc8a",
+      "matches": true
+    }
+  },
+  "acceptance_hashes": [
+    {
+      "acceptance": "phase2b-acceptance.json",
+      "review": "phase2b-review-3.json",
+      "sha256": "83eaf2c44ffb1316e9d6643e23c3ea9b977d5b083bf4427e86a75dcac7720fd6",
+      "matches": true
+    },
+    {
+      "acceptance": "phase2b-resume-acceptance.json",
+      "review": "phase2b-resume-review.json",
+      "sha256": "5e612f69922328c6c2e692af80577e0df3250ff303ddabe8c8fc4a3eacf5cd65",
+      "matches": true
+    },
+    {
+      "acceptance": "phase2c-scaffold-implementation-acceptance.json",
+      "review": "phase2c-scaffold-code-review-4.json",
+      "sha256": "ecded9d6b645910a5c2b1149181593ab131fd0e404c4bc59a03db18c75cb8d42",
+      "matches": true
+    },
+    {
+      "acceptance": "phase2c-algorithm-docs-acceptance.json",
+      "review": "phase2c-algorithm-docs-final-review.json",
+      "sha256": "9e6b8770a9fdd46841ec4a3168dc93446ad8736ded9334866632b9f2c6d4df6d",
+      "matches": true
+    },
+    {
+      "acceptance": "phase2d-acceptance.json",
+      "review": "phase2d-review-3.json",
+      "sha256": "ea5c8a01719582167ae2a78b7a9cca11384679b71c5933379bcbfbf284533186",
+      "matches": true
+    },
+    {
+      "acceptance": "phase2c-general-acceptance.json",
+      "review": "phase2c-training-review-2.json",
+      "sha256": "2712a8b892cf3a65b684dfb4470ab293b1d3c4ceedeb0ba7e4613c372e6c8ca1",
+      "matches": true
+    },
+    {
+      "acceptance": "phase2c-feddyn-implementation-acceptance.json",
+      "review": "phase2c-feddyn-code-review-2.json",
+      "sha256": "233d8051b2737a9b83cacdefe6cc92da0b48006436de933615cea842d49caa64",
+      "matches": true
+    },
+    {
+      "acceptance": "phase2a-acceptance.json",
+      "review": "phase2a-review-5.json",
+      "sha256": "ee3714ab192257e5c5896351c05b81101de654778da92927ed75b046f84fc488",
+      "matches": true
+    },
+    {
+      "acceptance": "phase2-ci-budget-acceptance.json",
+      "review": "phase2-ci-budget-review.json",
+      "sha256": "2f5e3fc368f84c7ddec47cfa342b8c125fc3cdcbc92af26d2e241f6bde28f964",
+      "matches": true
+    }
+  ],
+  "preservation": {
+    "A": {
+      "unchanged": 47,
+      "reviewed_changed": 0
+    },
+    "B": {
+      "unchanged": 16,
+      "reviewed_changed": 7
+    },
+    "D": {
+      "unchanged": 44,
+      "reviewed_changed": 0
+    }
+  },
+  "tracked_test_names": [
+    {
+      "criterion": "FD-A01",
+      "test": "tests/trainers/test_feddyn_strategy.py::test_loss_matches_independent_scalar_equation"
+    },
+    {
+      "criterion": "FD-A01",
+      "test": "tests/trainers/test_feddyn_strategy.py::test_zero_alpha_is_exact_task_loss"
+    },
+    {
+      "criterion": "FD-A02",
+      "test": "tests/integration/test_feddyn_round_flow.py::test_three_round_actual_partial_participation"
+    },
+    {
+      "criterion": "FD-A03",
+      "test": "tests/integration/test_feddyn_round_flow.py::test_three_round_actual_partial_participation"
+    },
+    {
+      "criterion": "FD-A04",
+      "test": "tests/integration/test_feddyn_round_flow.py::test_multiple_participants_preserve_inactive_history_population_mean"
+    },
+    {
+      "criterion": "FD-A04",
+      "test": "tests/integration/test_feddyn_round_flow.py::test_actual_full_participation_first_cloud"
+    },
+    {
+      "criterion": "FD-A05",
+      "test": "tests/trainers/test_feddyn_strategy.py::test_sample_alpha_uses_population_counts_never_labels"
+    },
+    {
+      "criterion": "FD-A05",
+      "test": "tests/trainers/test_feddyn_strategy.py::test_classification_permutation_preserves_full_objective_gradient"
+    },
+    {
+      "criterion": "FD-A05",
+      "test": "tests/integration/test_feddyn_round_flow.py::test_realized_partition_count_uses_sampler_not_global_backing_data"
+    },
+    {
+      "criterion": "FD-A05",
+      "test": "tests/integration/test_feddyn_round_flow.py::test_actual_local_schema_buffer_and_count_mutation_rolls_back"
+    },
+    {
+      "criterion": "FD-A06",
+      "test": "tests/trainers/test_feddyn_strategy.py::test_full_example_rejects_invalid_configuration"
+    },
+    {
+      "criterion": "FD-A06",
+      "test": "tests/trainers/test_feddyn_strategy.py::test_full_sample_vector_is_required_and_finite"
+    },
+    {
+      "criterion": "FD-A06",
+      "test": "tests/trainers/test_feddyn_strategy.py::test_optimizer_configuration_is_not_silently_coerced"
+    },
+    {
+      "criterion": "FD-A06",
+      "test": "tests/trainers/test_feddyn_strategy.py::test_effective_alpha_overflow_and_underflow_are_rejected"
+    },
+    {
+      "criterion": "FD-A07",
+      "test": "tests/integration/test_feddyn_round_flow.py::test_optimizer_parameter_identity_and_static_full_state"
+    },
+    {
+      "criterion": "FD-A07",
+      "test": "tests/integration/test_feddyn_round_flow.py::test_actual_local_schema_buffer_and_count_mutation_rolls_back"
+    },
+    {
+      "criterion": "FD-A08",
+      "test": "tests/integration/test_feddyn_round_flow.py::test_accumulated_tail_and_skips_count_only_real_updates"
+    },
+    {
+      "criterion": "FD-A08",
+      "test": "tests/integration/test_feddyn_round_flow.py::test_empty_or_all_skipped_attempt_refuses_outbound_and_valid_retry"
+    },
+    {
+      "criterion": "FD-A09",
+      "test": "tests/integration/test_feddyn_round_flow.py::test_actual_spawn_reused_client_matches_partial_oracle"
+    },
+    {
+      "criterion": "FD-A09",
+      "test": "tests/integration/test_feddyn_round_flow.py::test_consecutive_same_client_uses_current_cloud_and_dispatched_history"
+    },
+    {
+      "criterion": "FD-A09",
+      "test": "tests/trainers/test_personalized_state_ownership.py::test_actual_spawn_returns_personal_state_and_optimizer_across_rounds"
+    },
+    {
+      "criterion": "FD-A10",
+      "test": "tests/integration/test_feddyn_round_flow.py::test_actual_spawned_rejection_retry_and_logical_reuse"
+    },
+    {
+      "criterion": "FD-A11",
+      "test": "tests/integration/test_feddyn_round_flow.py::test_whole_batch_rejection_preserves_every_history_and_retry_identity"
+    },
+    {
+      "criterion": "FD-A11",
+      "test": "tests/integration/test_feddyn_round_flow.py::test_callback_and_partial_load_boundary"
+    },
+    {
+      "criterion": "FD-A11",
+      "test": "tests/integration/test_feddyn_round_flow.py::test_actual_inbound_whole_dispatch_validation_before_mutation"
+    },
+    {
+      "criterion": "FD-A12",
+      "test": "tests/integration/test_feddyn_round_flow.py::test_complete_bundle_round_two_to_three_matches_rational_reference"
+    },
+    {
+      "criterion": "FD-A12",
+      "test": "tests/integration/test_feddyn_round_flow.py::test_rejected_bundle_preserves_model_history_live_rng_and_previous_pending"
+    },
+    {
+      "criterion": "FD-A12",
+      "test": "tests/integration/test_feddyn_round_flow.py::test_failed_bundle_serialization_preserves_previous_canonical_bytes"
+    },
+    {
+      "criterion": "FD-A12",
+      "test": "tests/integration/test_feddyn_round_flow.py::test_pending_resume_handoff_is_atomic_and_consumed_once"
+    },
+    {
+      "criterion": "FD-A12",
+      "test": "tests/integration/test_feddyn_entrypoint.py::test_actual_shipped_run_resume_matches_four_round_control_and_rng"
+    },
+    {
+      "criterion": "FD-A13",
+      "test": "tests/integration/test_feddyn_entrypoint.py::test_shipped_mnist_shaped_lenet_spawn_and_real_socket_cloud"
+    },
+    {
+      "criterion": "FD-A13",
+      "test": "tests/integration/test_feddyn_entrypoint.py::test_actual_shipped_run_resume_matches_four_round_control_and_rng"
+    },
+    {
+      "criterion": "FD-A15",
+      "test": "tests/trainers/test_review_training_boundaries.py::test_actual_accepted_b_feddyn_writer_migration"
+    },
+    {
+      "criterion": "FD-A15",
+      "test": "tests/trainers/test_feddyn_strategy.py::test_legacy_actual_writer_weight_bias_and_corruption_are_inspection_only"
+    },
+    {
+      "criterion": "FD-A15",
+      "test": "tests/trainers/test_personalized_state_ownership.py::test_feddyn_exact_legacy_prefix_load_is_same_client_and_canonical_wins"
+    }
+  ],
+  "problems": [],
+  "root_branch_ref": "fda60becedfa6236c11d415b87a868b52789a41e",
+  "combination_type": "tree",
+  "combination_diff": [
+    ".github/workflows/pytorch_tests.yml",
+    "docs/docs/examples/algorithms/5. Algorithms with Customized Client Training Loops.md",
+    "evidence/2026-refresh/phase2-ci-budget-validation.json",
+    "evidence/2026-refresh/phase2c-algorithm-docs-count-reconciliation.json",
+    "evidence/2026-refresh/phase2c-algorithm-docs-validation.json",
+    "evidence/2026-refresh/phase2c-scaffold-docs-validation.json",
+    "examples/customized_client_training/feddyn/README.md",
+    "examples/customized_client_training/scaffold/README.md"
+  ],
+  "permitted_changed_blobs_match_reviewed_sources": true,
+  "post_scaffold_scope_matches": true,
+  "lock_sha256": "573b10c2ba1a2317e02f9e40c6181359cafab6f6e0a0f9be12bb256cb276fe1d",
+  "python_default": "3.13"
+}

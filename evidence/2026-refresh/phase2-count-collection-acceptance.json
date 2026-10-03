@@ -1,0 +1,20 @@
+{
+  "status": "ROOT_ACCEPTED_BOUNDED_TEST_CORRECTION",
+  "finding": "ROOT-2C-COLLECTION-01",
+  "candidate": "0fbc1162994c05041105b1860fc8cb02582d21f3",
+  "tree": "55caefff33db4c0f41c3ac35d5ff661424f1fb88",
+  "review_sha256": "221c87950448d1d42b17334d9fc75fdfc6128a0ca396ea8452acdc7e0488c44c",
+  "validation": "Independent full collection of1303tests followed by36selectedpasses eachinterpreter, includingall20countcases;18originalassertions preserved;realparent/childpartition trace, no tracked survivors, DP correction and production/CI unchanged.",
+  "verified_review_receipts": [
+    "/private/tmp/plato-phase2-count-collection-review/preparation.json",
+    "/private/tmp/plato-phase2-count-collection-review/source-preservation.json",
+    "/private/tmp/plato-phase2-count-collection-review/harness-isolation-audit.json",
+    "/private/tmp/plato-phase2-count-collection-review/author-evidence-audit.json",
+    "/private/tmp/plato-phase2-count-collection-review/baseline-full-suite-carry-forward.json",
+    "/private/tmp/plato-phase2-count-collection-review/root-dp-evidence-preservation-before.json",
+    "/private/tmp/plato-phase2-count-collection-review/green-interpreters.json",
+    "/private/tmp/plato-phase2-count-collection-review/run_selected.py",
+    "/private/tmp/plato-phase2-count-collection-review/build_final_report.py"
+  ],
+  "remaining": "Gate addendum, correction integration, four new full qualification profiles and exact-source LinuxCI remain required. Initial2633fullrun remains FAIL."
+}

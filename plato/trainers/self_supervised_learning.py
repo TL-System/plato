@@ -14,8 +14,10 @@ The accuracy obtained by KNN during the regular federated training rounds may
 not be used to compare with the accuracy in supervised learning methods.
 """
 
+import copy
 import importlib
 import logging
+import os
 from collections import UserList
 from collections.abc import Callable
 
@@ -24,17 +26,20 @@ import torch
 from plato.callbacks.trainer import TrainerCallback
 from plato.config import Config
 from plato.models import registry as models_registry
+from plato.serialization.safetensor import deserialize_tree, serialize_tree
 from plato.trainers import loss_criterion, lr_schedulers, optimizers
 from plato.trainers.basic import Trainer as BasicTrainer
 from plato.trainers.strategies.base import (
     DataLoaderStrategy,
     LossCriterionStrategy,
     LRSchedulerStrategy,
+    ModelUpdateStrategy,
     OptimizerStrategy,
     TestingStrategy,
     TrainingContext,
     TrainingStepStrategy,
 )
+from plato.utils.checkpoint_paths import checkpoint_name, checkpoint_path
 
 
 class SSLSamples(UserList):
@@ -134,7 +139,8 @@ class SSLDataLoaderStrategy(DataLoaderStrategy):
         # Personalization phase: use simple data loader
         if current_round > Config().trainer.rounds:
             dataset = (
-                self.personalized_trainset if self.personalized_trainset else trainset
+                self.personalized_trainset
+                if self.personalized_trainset is not None else trainset
             )
             return torch.utils.data.DataLoader(
                 dataset=dataset,
@@ -300,6 +306,57 @@ class SSLLRSchedulerStrategy(LRSchedulerStrategy):
             return lr_schedulers.get(optimizer, num_batches, **config)
 
 
+class SSLLocalStateStrategy(ModelUpdateStrategy):
+    """Own each logical client's private head and return successful worker state.
+
+    The encoder remains the exchanged model. Private heads use separate tree
+    checkpoints under the model root, with no historical head format to infer.
+    New clients start from the construction template; same-client rounds retain
+    their trained head. Optimizers are recreated each run as before.
+    """
+
+    def __init__(self, local_layers: torch.nn.Module):
+        self.local_layers = local_layers
+        self._initial_state = copy.deepcopy(local_layers.state_dict())
+
+    def _state_path(self, context: TrainingContext) -> str:
+        return checkpoint_path(
+            Config.params["model_path"], checkpoint_name(
+                Config().trainer.model_name, context.client_id, "ssl_local_layers",
+                suffix=".safetensors",
+            ),
+        )
+
+    def on_client_id_changed(self, context: TrainingContext) -> None:
+        self.local_layers.load_state_dict(self._initial_state, strict=True)
+        path = self._state_path(context)
+        if os.path.isfile(path):
+            with open(path, "rb") as checkpoint:
+                self.load_worker_state(deserialize_tree(checkpoint.read()), context)
+        self.local_layers.zero_grad(set_to_none=True)
+
+    def on_train_end(self, context: TrainingContext) -> None:
+        path = self._state_path(context)
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, "wb") as checkpoint:
+            checkpoint.write(serialize_tree(self.get_worker_state(context)))
+
+    @property
+    def requires_worker_state(self) -> bool:
+        return True
+
+    def get_worker_state(self, context: TrainingContext) -> dict[str, torch.Tensor]:
+        return {
+            name: value.detach().cpu().clone()
+            for name, value in self.local_layers.state_dict().items()
+        }
+
+    def load_worker_state(self, state, context: TrainingContext) -> None:
+        if not isinstance(state, dict):
+            raise ValueError("SSL worker private head state is missing.")
+        self.local_layers.load_state_dict(state, strict=True)
+
+
 class SSLTrainingStepStrategy(TrainingStepStrategy):
     """
     Training step strategy for SSL with dual-phase support.
@@ -329,7 +386,18 @@ class SSLTrainingStepStrategy(TrainingStepStrategy):
             optimizer.zero_grad()
 
             # Extract features using frozen encoder
-            features = model.encoder(examples)
+            encoder = model.encoder
+            encoder.zero_grad(set_to_none=True)
+            modes = [(module, module.training) for module in encoder.modules()]
+            encoder.eval()
+            try:
+                # These tensors reenter autograd through the private head;
+                # no_grad preserves that use while freezing encoder buffers.
+                with torch.no_grad():
+                    features = encoder(examples)
+            finally:
+                for module, training in modes:
+                    module.training = training
             # Train local layers
             if self.local_layers is None:
                 raise RuntimeError("Local personalization layers are not initialised.")
@@ -469,7 +537,7 @@ class SSLTestingStrategy(TestingStrategy):
                 total += labels.size(0)
                 correct += (predicted == labels).sum().item()
 
-        accuracy = correct / total
+        accuracy = correct / total if total else 0.0
         return accuracy
 
     def _test_with_knn(self, model, testset, sampler, batch_size, context):
@@ -486,7 +554,6 @@ class SSLTestingStrategy(TestingStrategy):
             dataset=self.personalized_trainset,
             shuffle=False,
             batch_size=batch_size,
-            sampler=sampler_obj,
         )
         test_loader = torch.utils.data.DataLoader(
             testset, batch_size=batch_size, shuffle=False, sampler=sampler_obj
@@ -499,6 +566,10 @@ class SSLTestingStrategy(TestingStrategy):
         test_encodings, test_labels = self._collect_encodings(
             model, test_loader, context
         )
+        if test_labels is None:
+            return 0.0
+        if train_labels is None:
+            raise ValueError("KNN requires a nonempty reference dataset")
 
         # Build KNN and perform prediction
         distances = torch.cdist(test_encodings, train_encodings, p=2)
@@ -583,6 +654,8 @@ class Trainer(BasicTrainer):
         # Initialize model first if needed to access encoder
         if model is None:
             temp_model = models_registry.get()
+        elif isinstance(model, torch.nn.Module):
+            temp_model = model
         elif callable(model):
             temp_model = model()
         else:
@@ -633,7 +706,7 @@ class Trainer(BasicTrainer):
             optimizer_strategy=ssl_optimizer_strategy,
             training_step_strategy=ssl_training_step_strategy,
             lr_scheduler_strategy=ssl_lr_scheduler_strategy,
-            model_update_strategy=None,
+            model_update_strategy=SSLLocalStateStrategy(self.local_layers),
             data_loader_strategy=ssl_data_loader_strategy,
             testing_strategy=ssl_testing_strategy,
         )

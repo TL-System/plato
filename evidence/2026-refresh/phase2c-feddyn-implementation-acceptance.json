@@ -1,0 +1,40 @@
+{
+  "status": "ROOT_ACCEPTED_BOUNDED_COMPONENT",
+  "candidate": "8b01bf47ca8bdf9232bffeb4e50f78d4f00c9e3b",
+  "review": "phase2c-feddyn-code-review-2.json",
+  "review_sha256": "233d8051b2737a9b83cacdefe6cc92da0b48006436de933615cea842d49caa64",
+  "material_findings_remaining": 0,
+  "scope": {
+    "criteria": [
+      "FD-A01",
+      "FD-A02",
+      "FD-A03",
+      "FD-A04",
+      "FD-A05",
+      "FD-A06",
+      "FD-A07",
+      "FD-A08",
+      "FD-A09",
+      "FD-A10",
+      "FD-A11",
+      "FD-A12",
+      "FD-A13",
+      "FD-A14",
+      "FD-A15"
+    ],
+    "closed_findings": [
+      "FD-C-R01",
+      "FD-C-R02",
+      "FD-C-R03",
+      "FD-C-L01"
+    ],
+    "qualification": "Independent reviewer:63 affected pytest cases plus21 independent checks per interpreter; overlapping author evidence not summed. Actual seven entrypoint process groups per interpreter, native production codec, numerical reference and CPU resume checked.",
+    "limits": [
+      "Bounded corrected CPU implementation and final source-bound prose PASS only; root integration, merged profiles, hosted CI and whole phase/production acceptance remain separate.",
+      "Checkpoint coherence covers nonzero histories; zero-history prior participation cannot be inferred without an unauthorized new ledger.",
+      "Callback rollback covers existing FedDyn-owned state, not arbitrary external callback side effects.",
+      "No GPU/inflight replay, convergence, downloads/benchmark accuracy, Linux/new provisioning, complete optional stack or unrelated CI timeout review."
+    ]
+  },
+  "next": "Phase gate, root integration, fresh combined qualification, exact-source Linux CI and delivery remain required."
+}

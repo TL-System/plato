@@ -1,0 +1,77 @@
+{
+  "status": "CORRECTED_SOURCE_INTEGRATED_PENDING_FRESH_FULL_QUALIFICATION",
+  "reviewed_source": {
+    "integrated_base_commit": "2633f8394c142ec04db13743b54a427e04c2aed7",
+    "integrated_base_tree": "b68556b4fc2170c7e84c533645e76a5f7ab2685c",
+    "DP_correction_commit": "f342a5a6021cee938e0b880eca5919e09ace1981",
+    "DP_correction_tree": "3d0aebd30e1d4adfcdf835bad758eb72d3179c1e",
+    "corrected_component_commit": "0fbc1162994c05041105b1860fc8cb02582d21f3",
+    "corrected_component_tree": "55caefff33db4c0f41c3ac35d5ff661424f1fb88",
+    "proposed_corrected_merge_tree": "d01f51fbf01ceaed78339e10bc3b39aa5ed1724b",
+    "permitted_changed_paths": [
+      "evidence/2026-refresh/phase2c-count-collection-validation.json",
+      "evidence/2026-refresh/phase2c-dp-typing-gate-validation.json",
+      "tests/integration/feddyn_partition_worker.py",
+      "tests/integration/test_feddyn_count_boundaries.py",
+      "tests/trainers/test_dp_data_loader_strategy.py"
+    ],
+    "changed_source_hashes": [
+      {
+        "path": "evidence/2026-refresh/phase2c-count-collection-validation.json",
+        "blob": "987c8615196de5475826ad56fb64714e834083b6",
+        "sha256": "cabff482713fdc55ecd8cafc839321104a1c316d32ee494d1bc796076c62fe8a"
+      },
+      {
+        "path": "evidence/2026-refresh/phase2c-dp-typing-gate-validation.json",
+        "blob": "de3bffad65b1bd5dc8c52a2a472dd448ee5e01de",
+        "sha256": "a03c9f0baa584c1544ad095d145294c1e12e8632719dfd2cf441bf0cb130619d"
+      },
+      {
+        "path": "tests/integration/feddyn_partition_worker.py",
+        "blob": "cb6112fa950fea94e33e1571b9d9671aeeee1c90",
+        "sha256": "38d2d552d87826410cfd79a9ffceaba83d3023fc028554337b7838865ee9f1ac"
+      },
+      {
+        "path": "tests/integration/test_feddyn_count_boundaries.py",
+        "blob": "6bc519193cbace7108844167f65ecd13be9e5f2e",
+        "sha256": "17f1fab24a9d0f7dd2d23c2b03a0c7329c8476d6e385cb24deec38880b204790"
+      },
+      {
+        "path": "tests/trainers/test_dp_data_loader_strategy.py",
+        "blob": "73eed9161913f7edaa271e7271007448231ad4c7",
+        "sha256": "3f95d8d7942f173290852ab6c3f803b41c01831f4e008b285b473d7962df93bc"
+      }
+    ],
+    "preservation": "Independently verified proposed tree differs from2633 in exactly five paths, with all five blobs matching the reviewed candidate. DP test and author receipt are identical to accepted f342. Production, docs, configs, dependency metadata, CI, shared fixtures and all other tests are unchanged from integrated2633.",
+    "component_branch_caution": "The component candidate inherits older docs/CI than2633; it must not replace root history wholesale. This authorization is for proposed d01f51f tree, whose docs/CI are byte-identical to2633. Apparent candidate-versus2633 docs/CI differences in component reviews are inherited ancestry differences, not authorized regressions.",
+    "root_evidence_overlay": "Root review/acceptance/reproduction/execution evidence is a separate overlay under evidence/2026-refresh. Record eventual corrected commit/tree and exact overlay diff; non-evidence source must match the proposed corrected merge tree."
+  },
+  "gate_sha256": "501270b4cd3bc505d16e1bcbb7cba295eec04b18c3aa252af0649cd071fff2b2",
+  "non_evidence_diff": [],
+  "root_evidence_overlay": [
+    "evidence/2026-refresh/execution-state.json",
+    "evidence/2026-refresh/phase2-count-collection-acceptance.json",
+    "evidence/2026-refresh/phase2-count-collection-review.json",
+    "evidence/2026-refresh/phase2-dp-typing-acceptance.json",
+    "evidence/2026-refresh/phase2-dp-typing-review.json",
+    "evidence/2026-refresh/phase2-gate-corrections.json",
+    "evidence/2026-refresh/reproductions/phase2-count-collection-author-evidence-manifest.json",
+    "evidence/2026-refresh/reproductions/phase2-count-collection-author-evidence.tar.gz",
+    "evidence/2026-refresh/reproductions/phase2-count-collection-review-evidence-manifest.json",
+    "evidence/2026-refresh/reproductions/phase2-count-collection-review-evidence.tar.gz",
+    "evidence/2026-refresh/reproductions/phase2-dp-typing-author-evidence-manifest.json",
+    "evidence/2026-refresh/reproductions/phase2-dp-typing-author-evidence.tar.gz",
+    "evidence/2026-refresh/reproductions/phase2-dp-typing-review-evidence-manifest.json",
+    "evidence/2026-refresh/reproductions/phase2-dp-typing-review-evidence.tar.gz",
+    "evidence/2026-refresh/reproductions/phase2-final-integration/audit_source.py",
+    "evidence/2026-refresh/reproductions/phase2-final-integration/final-correction-combination.json",
+    "evidence/2026-refresh/reproductions/phase2-final-integration/initial-archive-verification.json",
+    "evidence/2026-refresh/reproductions/phase2-final-integration/integration-plan.json",
+    "evidence/2026-refresh/reproductions/phase2-final-integration/run_integration_profile.py",
+    "evidence/2026-refresh/reproductions/phase2-final-integration/verification.json",
+    "evidence/2026-refresh/reproductions/phase2-final-integration/wheel-vendor-assets-phase4.json",
+    "evidence/2026-refresh/reproductions/phase2-initial-integration-2633-evidence-manifest.json",
+    "evidence/2026-refresh/reproductions/phase2-initial-integration-2633-evidence.tar.gz"
+  ],
+  "initial_run": "FAIL remains historical; allfourprofiles rerun on correctedsource."
+}

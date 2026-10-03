@@ -1,0 +1,166 @@
+{
+  "schema_version": 1,
+  "status": "CANDIDATE_DELIVERED_FOR_FRESH_INDEPENDENT_REVIEW",
+  "evidence_body": {
+    "commit": "4ffadd82a79797786986bf061d7456472224d348",
+    "tree": "259c530572ee993d83624af36c3d6d0f3be45336",
+    "parents": [
+      "7d310b90d698a7be4aa9a184dc415f7dbb401e5b"
+    ]
+  },
+  "implementation": {
+    "commit": "7d310b90d698a7be4aa9a184dc415f7dbb401e5b",
+    "tree": "019018a41c14b76ca974e148373d9aa8a66bb827",
+    "parents": [
+      "05a9f00b8a4d54c233c1a9c00ef9ce2c4467480c"
+    ]
+  },
+  "production": {
+    "commit": "05a9f00b8a4d54c233c1a9c00ef9ce2c4467480c",
+    "tree": "314e5b70f82639a646e032d75b65ca371f9b5f91",
+    "parents": [
+      "f25530b1dc2d92d1a7a64ace89c18bdfcfe4e1e8"
+    ]
+  },
+  "scaffold_cleanup_correction": {
+    "commit": "e33adcba7b5ca9fdee6fadfda395ab4d13d22e0a",
+    "tree": "11b1d78ed40b3952e3a7794582a6ccd4b0a1ea67",
+    "parents": [
+      "1fe8b63940c21eca23b91e9f79281171e80f0cbc"
+    ]
+  },
+  "checkpoint_rng_test_reconciliation": {
+    "commit": "0d032de7ad92a1cb73d859cbd0e855893fa07d1f",
+    "tree": "eb5807101c1bf4cd45523e66f19ff0add12ed74e",
+    "parents": [
+      "e33adcba7b5ca9fdee6fadfda395ab4d13d22e0a"
+    ]
+  },
+  "dependency_merges": {
+    "A": {
+      "commit": "abf27a34db3e40fc743f329d40bed5dae4dc70f7",
+      "tree": "4a57c4e2993a51ef5040a2a5a54550f51ef0b5c0",
+      "parents": [
+        "f9772f61d52dfe0f4a3281252d23b8303ec237d2",
+        "79da1f97d8a12fe97402750cc32c7b3e8f5cdf6e"
+      ]
+    },
+    "B": {
+      "commit": "1fe8b63940c21eca23b91e9f79281171e80f0cbc",
+      "tree": "af6317a3b438f4ef99e8a7bac6ac3a434850eabc",
+      "parents": [
+        "15e0cebd78ec6752b9aae1e922b33e22e168387f",
+        "a058a2ef8d230ca2e34dbf1c91e6eaac0b0205ac"
+      ]
+    },
+    "D": {
+      "commit": "f25530b1dc2d92d1a7a64ace89c18bdfcfe4e1e8",
+      "tree": "71358cbf03c0d6110ed2654c2a646cb7aef2932d",
+      "parents": [
+        "8a43d96aa093021fd4677ba3bbd2193d8a744221",
+        "96323afa094a37584844275cc04bf1e1eedfaa0d"
+      ]
+    }
+  },
+  "evidence_files": {
+    "phase2c-feddyn-validation.json": {
+      "bytes": 56795,
+      "sha256": "1beca9f0465a6afa30c7aaf2ddb1334bfdcc1beccc09feb2656456c8a727e440",
+      "git_blob": "fc184a1f4c43577bdfeeabaf6d67eaa379a69d24"
+    },
+    "phase2c-feddyn-facts.json": {
+      "bytes": 7711,
+      "sha256": "31e724a60a09d548f66621ff8d2b384670ddd22b8ff9c97cc2ebd9975cafbd7e",
+      "git_blob": "1cc36b701a77eb5f2f1259ce44e1a246810985b1"
+    },
+    "phase2c-validation.json": {
+      "bytes": 680887,
+      "sha256": "529428b8eb7ec8dbf884f8361ea1617532a155695db9fca231200778333818ca",
+      "git_blob": "676ab484d8c8c774d143063746d4d6e1f449b8a9"
+    }
+  },
+  "verified": {
+    "clean_evidence_body_checkout": true,
+    "accepted_A_B_D_ancestors": true,
+    "passing_profile_and_runtime_log_and_junit_hashes": true,
+    "main_report_file_receipt_hashes": true
+  },
+  "qualification_each_python_version": {
+    "versions": [
+      "3.13.16",
+      "3.14.8"
+    ],
+    "non_runtime_base": {
+      "passed": 1229,
+      "allowed_skips": 3,
+      "visible_warnings": 17
+    },
+    "non_runtime_mandatory": {
+      "passed": 1231,
+      "allowed_skips": 1,
+      "visible_warnings": 17
+    },
+    "runtime": {
+      "passed": 51,
+      "existing_startup_cases": 48,
+      "actual_feddyn_entrypoint_cases": 3
+    }
+  },
+  "runtime_execution_identity": {
+    "executed_commit": "05a9f00b8a4d54c233c1a9c00ef9ce2c4467480c",
+    "final_implementation_commit": "7d310b90d698a7be4aa9a184dc415f7dbb401e5b",
+    "only_intervening_source_change": "FedDyn-only test branch in tests/trainers/test_personalized_state_ownership.py isolates its import namespace via guarded subprocess; no production/runtime test/harness/config difference.",
+    "diff": "tests/trainers/test_personalized_state_ownership.py | 18 ++++++++++++++++--\n 1 file changed, 16 insertions(+), 2 deletions(-)",
+    "no_repeat_reason": "All51 runtime cases passed; unrelated test-only import isolation is fully covered by rerun base/mandatory non-runtime profiles. No extra startup rerun solely for evidence commits.",
+    "verified_production_and_integration_blobs": 238,
+    "differences": []
+  },
+  "weighted_socket": {
+    "313": {
+      "result": {
+        "path": "/tmp/plato-phase2c-feddyn-implementation/combined-mandatory-runtime-313/test_real_two_client_cpu_socke0/round/result.json",
+        "bytes": 16464,
+        "sha256": "9c7733d972d0b432fb4e2e31c001395c9181fb83570768ef34dec1637d2dc844"
+      },
+      "samples": [
+        2,
+        6
+      ],
+      "max_error": 1.4901161193847656e-08,
+      "parameter_errors": {
+        "linear.weight": 1.4901161193847656e-08,
+        "linear.bias": 2.9103830456733704e-10
+      },
+      "natural_success": true,
+      "survivors": []
+    },
+    "314": {
+      "result": {
+        "path": "/tmp/plato-phase2c-feddyn-implementation/combined-mandatory-runtime-314/test_real_two_client_cpu_socke0/round/result.json",
+        "bytes": 16508,
+        "sha256": "fd879aee2f73d0d609c76397faa03be813540ab699f22551993bb5b109957e94"
+      },
+      "samples": [
+        2,
+        6
+      ],
+      "max_error": 1.4901161193847656e-08,
+      "parameter_errors": {
+        "linear.weight": 1.4901161193847656e-08,
+        "linear.bias": 2.9103830456733704e-10
+      },
+      "natural_success": true,
+      "survivors": []
+    }
+  },
+  "warnings_and_limits": "Exact visible Opacus warnings, CPU/synthetic numerical qualifications, and allowed optional skips are classified in the evidence body. No CUDA/native-GPU or global privacy accounting claim.",
+  "public_documentation_handoff": "FedDyn facts include changed equations, full-population server-owned histories, bounded supported configurations, explicit read-only migration and full RNG bundle resume. SCAFFOLD successful cleanup precedes final direct acceptance; equations/control paths and server callback/evaluation boundary remain unchanged.",
+  "remaining_gates": [
+    "Fresh FedDyn implementation review",
+    "Fresh SCAFFOLD correction review",
+    "Fresh Astra standalone prose and reconciliation review",
+    "Root combined acceptance and phase gate"
+  ],
+  "whole_phase_acceptance_claimed": false,
+  "receipt_identity_note": "This commit records the preceding evidence body identity. The clean final receipt commit and tree are supplied in the delivery message and owned scratch receipt, avoiding self-reference."
+}

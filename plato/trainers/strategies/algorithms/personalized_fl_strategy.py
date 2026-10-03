@@ -29,7 +29,28 @@ from plato.config import Config
 from plato.trainers.strategies.base import ModelUpdateStrategy, TrainingContext
 
 
-class FedPerUpdateStrategy(ModelUpdateStrategy):
+class _LayerTrainingState:
+    """Restore model-owned trainability after temporary personalization freezes."""
+
+    _original_requires_grad: dict[str, bool]
+
+    def _capture_trainability(self, context: TrainingContext) -> None:
+        if context.model is None:
+            raise ValueError("Personalization requires a model in the training context.")
+        self._original_requires_grad = {
+            name: parameter.requires_grad
+            for name, parameter in context.model.named_parameters()
+        }
+
+    def on_train_cleanup(self, context: TrainingContext, successful: bool) -> None:
+        if context.model is not None:
+            for name, parameter in context.model.named_parameters():
+                if name in self._original_requires_grad:
+                    parameter.requires_grad_(self._original_requires_grad[name])
+        self._original_requires_grad.clear()
+
+
+class FedPerUpdateStrategy(_LayerTrainingState, ModelUpdateStrategy):
     """
     FedPer personalization strategy.
 
@@ -84,6 +105,7 @@ class FedPerUpdateStrategy(ModelUpdateStrategy):
         self.global_layer_names = global_layer_names
         self.personalization_rounds = personalization_rounds
         self.is_personalizing = False
+        self._original_requires_grad = {}
 
     def on_train_start(self, context: TrainingContext) -> None:
         """
@@ -92,6 +114,7 @@ class FedPerUpdateStrategy(ModelUpdateStrategy):
         Args:
             context: Training context with current_round
         """
+        self._capture_trainability(context)
         # Determine total rounds
         total_rounds = (
             Config().trainer.rounds
@@ -147,7 +170,7 @@ class FedPerUpdateStrategy(ModelUpdateStrategy):
             )
         for name, param in model.named_parameters():
             if any(layer_name in name for layer_name in self.global_layer_names):
-                param.requires_grad = True
+                param.requires_grad = self._original_requires_grad.get(name, True)
 
 
 class FedPerUpdateStrategyFromConfig(FedPerUpdateStrategy):
@@ -192,7 +215,7 @@ class FedPerUpdateStrategyFromConfig(FedPerUpdateStrategy):
         super().__init__(global_layer_names=global_layer_names)
 
 
-class FedRepUpdateStrategy(ModelUpdateStrategy):
+class FedRepUpdateStrategy(_LayerTrainingState, ModelUpdateStrategy):
     """
     FedRep personalization strategy.
 
@@ -262,6 +285,7 @@ class FedRepUpdateStrategy(ModelUpdateStrategy):
         self.is_personalizing = False
         self.original_epochs = None
         self._last_processed_epoch = None
+        self._original_requires_grad = {}
 
     def on_train_start(self, context: TrainingContext) -> None:
         """
@@ -270,6 +294,7 @@ class FedRepUpdateStrategy(ModelUpdateStrategy):
         Args:
             context: Training context
         """
+        self._capture_trainability(context)
         # Reset epoch tracking
         self._last_processed_epoch = None
 
@@ -353,7 +378,7 @@ class FedRepUpdateStrategy(ModelUpdateStrategy):
             )
         for name, param in model.named_parameters():
             if any(layer_name in name for layer_name in self.global_layer_names):
-                param.requires_grad = True
+                param.requires_grad = self._original_requires_grad.get(name, True)
 
     def _freeze_local_layers(self, context: TrainingContext) -> None:
         """Freeze local layers."""
@@ -375,7 +400,7 @@ class FedRepUpdateStrategy(ModelUpdateStrategy):
             )
         for name, param in model.named_parameters():
             if any(layer_name in name for layer_name in self.local_layer_names):
-                param.requires_grad = True
+                param.requires_grad = self._original_requires_grad.get(name, True)
 
 
 class FedRepUpdateStrategyFromConfig(FedRepUpdateStrategy):

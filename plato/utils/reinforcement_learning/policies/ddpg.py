@@ -25,11 +25,11 @@ class Policy(base.Policy):
         for _ in range(Config().algorithm.update_iteration):
             # Sample replay buffer
             state, action, reward, next_state, done = self.replay_buffer.sample()
-            state = torch.FloatTensor(state).to(self.device).unsqueeze(1)
-            action = torch.FloatTensor(action).to(self.device).unsqueeze(1)
-            reward = torch.FloatTensor(reward).to(self.device).unsqueeze(1)
-            next_state = torch.FloatTensor(next_state).to(self.device).unsqueeze(1)
-            done = torch.FloatTensor(done).to(self.device).unsqueeze(1)
+            state = torch.FloatTensor(state).to(self.device)
+            action = torch.FloatTensor(action).to(self.device)
+            reward = torch.FloatTensor(reward).to(self.device)
+            next_state = torch.FloatTensor(next_state).to(self.device)
+            done = torch.FloatTensor(done).to(self.device)
 
             # Compute the target Q value
             target_Q = self.critic_target(next_state, self.actor_target(next_state))

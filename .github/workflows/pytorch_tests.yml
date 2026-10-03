@@ -1,36 +1,181 @@
 name: PyTorch CI Tests
 permissions:
   contents: read
-  pull-requests: read
 
 on:
   push:
     branches: [main]
   pull_request:
     branches: [main]
-  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
 jobs:
   PyTorch-Tests:
-    runs-on: ubuntu-latest
+    name: Python ${{ matrix.python }} / ${{ matrix.profile }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 110
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        include:
+          - python: "3.13"
+            profile: supported-default
+    defaults:
+      run:
+        shell: zsh -lc ". {0}"
+    env:
+      CUDA_VISIBLE_DEVICES: ""
+      OMP_NUM_THREADS: "1"
+      MKL_NUM_THREADS: "1"
+      TOKENIZERS_PARALLELISM: "false"
+      UV_PROJECT_ENVIRONMENT: ${{ github.workspace }}/.venv-mandatory
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v5
+      - name: Checkout pinned submodules
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           submodules: recursive
+          persist-credentials: false
 
-      - name: Install uv
-        uses: astral-sh/setup-uv@v4
-
-      - name: Training workloads
-        shell: bash -l {0}
+      - name: Provision zsh
+        shell: python {0}
+        timeout-minutes: 3
         run: |
-          uv sync --all-extras
-          uv run pytest tests
-          uv run plato.py -c configs/MNIST/fedavg_lenet5.toml
-          uv run plato.py -c configs/MNIST/fedavg_cross_silo_lenet5.toml
-          uv run plato.py -c configs/HuggingFace/fedavg_opt_lora.toml
-          uv run plato.py -c configs/MNIST/fedavg_async_lenet5.toml
-          uv run plato.py -c configs/MNIST/fedavg_lenet5_noniid.toml
+          import subprocess
+          subprocess.run(["sudo", "apt-get", "update"], check=True)
+          subprocess.run(["sudo", "apt-get", "install", "-y", "zsh"], check=True)
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+        with:
+          version: "0.12.22"
+
+      - name: Record provenance and check lock
+        timeout-minutes: 2
+        run: |
+          set -eu
+          mkdir -p ci-artifacts
+          git rev-parse HEAD > ci-artifacts/commit.txt
+          git submodule status --recursive > ci-artifacts/submodules.txt
+          sha256sum uv.lock > ci-artifacts/lock.txt
+          python --version > ci-artifacts/python.txt
+          uv --version > ci-artifacts/uv.txt
+          uv lock --check
+
+      - name: Sync fresh base profile
+        timeout-minutes: 10
+        env:
+          UV_PROJECT_ENVIRONMENT: ${{ runner.temp }}/plato-base
+        run: |
+          set -eu
+          uv sync --locked --python "${{ matrix.python }}" --no-default-groups --group test-base
+          uv pip freeze --python "$UV_PROJECT_ENVIRONMENT/bin/python" > ci-artifacts/base-packages.txt
+
+      - name: Base collection, suite and missing-extra probe
+        timeout-minutes: 25
+        env:
+          UV_PROJECT_ENVIRONMENT: ${{ runner.temp }}/plato-base
+          HF_HUB_OFFLINE: "1"
+          HF_DATASETS_OFFLINE: "1"
+        run: |
+          set -eu
+          uv run --no-sync --python "${{ matrix.python }}" python -m pytest tests --collect-only --test-profile=base -m "not runtime" -ra > ci-artifacts/base-collection.log 2>&1
+          uv run --no-sync --python "${{ matrix.python }}" python -m pytest tests --test-profile=base -m "not runtime" -ra --basetemp=ci-artifacts/base-tmp --junitxml=ci-artifacts/base.xml > ci-artifacts/base.log 2>&1
+          if uv run --no-sync --python "${{ matrix.python }}" python -m pytest tests --collect-only --test-profile=mandatory > ci-artifacts/missing-extra.log 2>&1; then
+            exit 1
+          fi
+          python - <<'PY'
+          from pathlib import Path
+          log = Path("ci-artifacts/missing-extra.log").read_text()
+          assert "mandatory prerequisite failed: No module named 'opacus'" in log, log
+          PY
+
+      - name: Sync fresh mandatory profile
+        timeout-minutes: 10
+        run: |
+          set -eu
+          uv sync --locked --python "${{ matrix.python }}" --no-default-groups --group dev
+          uv pip freeze --python "$UV_PROJECT_ENVIRONMENT/bin/python" > ci-artifacts/mandatory-packages.txt
+
+      - name: Mandatory initialized core suite
+        timeout-minutes: 30
+        env:
+          HF_HUB_OFFLINE: "1"
+          HF_DATASETS_OFFLINE: "1"
+        run: |
+          set -eu
+          uv run --no-sync --python "${{ matrix.python }}" python -m pytest tests --test-profile=mandatory -m "not runtime" -ra --basetemp=ci-artifacts/mandatory-tmp --junitxml=ci-artifacts/mandatory.xml --cov=plato --cov-report=term --cov-report=json:ci-artifacts/coverage.json > ci-artifacts/mandatory.log 2>&1
+
+      - name: Fresh startup, real CPU socket round and failure containment
+        timeout-minutes: 16
+        env:
+          HF_HUB_OFFLINE: "1"
+          HF_DATASETS_OFFLINE: "1"
+        run: |
+          set -eu
+          uv run --no-sync --python "${{ matrix.python }}" python -m pytest tests --test-profile=mandatory -m runtime -ra --basetemp=ci-artifacts/runtime-tmp --junitxml=ci-artifacts/runtime.xml > ci-artifacts/runtime.log 2>&1
+
+      - name: Ruff and classified typing baseline
+        timeout-minutes: 3
+        run: |
+          set -eu
+          uv run --no-sync --python "${{ matrix.python }}" ruff check . --select I > ci-artifacts/ruff.log 2>&1
+          ty_status=0
+          uv run --no-sync --python "${{ matrix.python }}" ty check --output-format concise > ci-artifacts/ty.log 2>&1 || ty_status=$?
+          python - "$ty_status" <<'PY'
+          import re
+          import sys
+          from pathlib import Path
+          owned = {
+              "tests/conftest.py", "tests/integration/utils.py",
+              "tests/test_nanochat_integration.py",
+              "tests/trainers/test_dp_data_loader_strategy.py",
+              "tests/clients/test_feddf_strategy.py",
+              "tests/servers/test_feddf_server_strategy.py",
+              "tests/datasources/test_huggingface_datasource.py",
+              "tests/integration/test_event_loop_startup.py",
+          }
+          allowed = {
+              ("tests/datasources/test_huggingface_datasource.py", "99", "5", "invalid-assignment"),
+              ("tests/datasources/test_huggingface_datasource.py", "100", "5", "invalid-assignment"),
+          }
+          log = Path("ci-artifacts/ty.log").read_text()
+          status = int(sys.argv[1])
+          assert status in (0, 1), f"ty exited with status {status}: {log}"
+          matches = list(re.finditer(r"^(.+?):(\d+):(\d+): (?:error|warning)\[([^]]+)\]", log, re.M))
+          if status == 0:
+              assert log.strip() == "All checks passed!" and not matches, log
+          else:
+              report = re.search(r"^Found ([1-9][0-9]*) diagnostics?$", log, re.M)
+              assert report is not None and len(matches) == int(report[1]), log
+          for match in matches:
+              assert match[1] not in owned or match.groups() in allowed, match[0]
+          PY
+
+      - name: Stage qualification outputs without pytest aliases
+        if: always()
+        timeout-minutes: 2
+        env:
+          QUALIFICATION_STATUS: ${{ job.status }}
+        run: |
+          set -eu
+          staging_flags=()
+          if [[ "$QUALIFICATION_STATUS" == "success" ]]; then
+            staging_flags+=(--require-complete)
+          fi
+          python .github/scripts/stage_ci_artifacts.py "${staging_flags[@]}"
+
+      - name: Upload qualification outputs
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: pytorch-${{ matrix.python }}-${{ github.run_attempt }}
+          path: ci-artifacts-upload/
+          retention-days: 14
+          if-no-files-found: warn

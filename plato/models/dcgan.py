@@ -78,10 +78,11 @@ class Discriminator(nn.Module):
         return self.main(input_data)
 
 
-class Model:
+class Model(nn.Module):
     """A wrapper class to hold the Generator and Discriminator models of DCGAN."""
 
     def __init__(self) -> None:
+        super().__init__()
         self.generator = Generator()
         self.discriminator = Discriminator()
         self.loss_criterion = nn.BCELoss()
@@ -98,19 +99,3 @@ class Model:
         elif classname.find("BatchNorm") != -1:
             nn.init.normal_(model.weight.data, 1.0, 0.02)
             nn.init.constant_(model.bias.data, 0)
-
-    def cpu(self):
-        self.generator.cpu()
-        self.discriminator.cpu()
-
-    def to(self, device):
-        self.generator.to(device)
-        self.discriminator.to(device)
-
-    def train(self):
-        self.generator.train()
-        self.discriminator.train()
-
-    def eval(self):
-        self.generator.eval()
-        self.discriminator.eval()

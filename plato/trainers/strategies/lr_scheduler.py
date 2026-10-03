@@ -568,13 +568,20 @@ class TimmLRSchedulerStrategy(LRSchedulerStrategy):
 
         scheduler = lr_schedulers.get(optimizer, len(train_loader))
 
+        self.past_epochs = 0
+        self.num_updates = 0
+        updates_per_epoch = context.state.get(
+            "optimizer_updates_per_epoch", len(train_loader)
+        )
+
         # Initialize for global lr scheduler if needed
         if config.get("global_lr_scheduler", False):
-            past_epochs = (context.current_round - 1) * config.get("epochs", 1)
+            past_epochs = max(context.current_round - 1, 0) * config.get("epochs", 1)
             self.past_epochs = past_epochs
             if scheduler is not None:
                 scheduler.step(past_epochs)
-                scheduler.step_update(past_epochs * len(train_loader))
+                self.num_updates = past_epochs * updates_per_epoch
+                scheduler.step_update(self.num_updates)
 
         return scheduler
 
@@ -593,9 +600,9 @@ class TimmLRSchedulerStrategy(LRSchedulerStrategy):
         if scheduler is not None:
             config = context.config
             if config.get("global_lr_scheduler", False):
-                scheduler.step(self.past_epochs + context.current_epoch + 1)
+                scheduler.step(self.past_epochs + context.current_epoch)
             else:
-                scheduler.step(context.current_epoch + 1)
+                scheduler.step(context.current_epoch)
 
     def on_epoch_start(self, scheduler, context: TrainingContext) -> None:
         """
@@ -608,15 +615,9 @@ class TimmLRSchedulerStrategy(LRSchedulerStrategy):
             scheduler: The scheduler (unused in this method)
             context: Training context
         """
-        train_loader = context.state.get("train_loader")
-        if train_loader is None:
-            return
-
-        self.num_updates = context.current_epoch * len(train_loader)
-
-        config = context.config
-        if config.get("global_lr_scheduler", False):
-            self.num_updates += self.past_epochs * len(train_loader)
+        # create_scheduler sets the round/resume offset. Carry actual update
+        # counts across epochs; microbatch counts include skipped/tail steps.
+        return
 
     def on_step(self, scheduler, context: TrainingContext) -> None:
         """

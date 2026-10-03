@@ -35,6 +35,7 @@ import torch.utils.data
 
 from plato.config import Config
 from plato.trainers.strategies.base import ModelUpdateStrategy, TrainingContext
+from plato.utils.checkpoint_paths import checkpoint_name, checkpoint_path
 
 LOGGER = logging.getLogger(__name__)
 
@@ -114,6 +115,11 @@ class FedALAUpdateStrategy(ModelUpdateStrategy):
         self._local_model_path: str | None = None
         self._ala_state_path: str | None = None
         self._cached_client_id: int | None = None
+        self._client_states: dict[int, dict[str, Any]] = {}
+
+    def on_client_id_changed(self, context: TrainingContext) -> None:
+        self._ala_applied = False
+        self._resolve_state_paths(context)
 
     def on_train_start(self, context: TrainingContext) -> None:
         """Prepare FedALA state for this training round."""
@@ -161,6 +167,20 @@ class FedALAUpdateStrategy(ModelUpdateStrategy):
     def _resolve_state_paths(self, context: TrainingContext) -> None:
         if self._cached_client_id == context.client_id and self._local_model_path:
             return
+        if self._cached_client_id is not None and self._cached_client_id != context.client_id:
+            self._client_states[self._cached_client_id] = self.get_worker_state(context)
+
+        saved = self._client_states.get(context.client_id)
+        if saved is None:
+            self.weights = None
+            self.start_phase = True
+            self.local_model_state = None
+            self._rng = random.Random()
+        else:
+            self.local_model_state = copy.deepcopy(saved["local_model"])
+            self.weights = copy.deepcopy(saved["weights"])
+            self.start_phase = saved["start_phase"]
+            self._rng.setstate(saved["rng"])
 
         model_name = (
             Config().trainer.model_name
@@ -169,13 +189,30 @@ class FedALAUpdateStrategy(ModelUpdateStrategy):
         )
         base_path = Config().params.get("model_path", ".")
 
-        self._local_model_path = (
-            f"{base_path}/{model_name}_{context.client_id}_fedala_local.pth"
+        self._local_model_path = checkpoint_path(
+            base_path, checkpoint_name(model_name, context.client_id, "fedala_local", suffix=".pth")
         )
-        self._ala_state_path = (
-            f"{base_path}/{model_name}_{context.client_id}_fedala_state.pth"
+        self._ala_state_path = checkpoint_path(
+            base_path, checkpoint_name(model_name, context.client_id, "fedala_state", suffix=".pth")
         )
         self._cached_client_id = context.client_id
+
+    @property
+    def requires_worker_state(self) -> bool:
+        return True
+
+    def get_worker_state(self, context: TrainingContext) -> dict[str, Any]:
+        return copy.deepcopy({"local_model": self.local_model_state,
+                              "weights": self.weights, "start_phase": self.start_phase,
+                              "rng": self._rng.getstate()})
+
+    def load_worker_state(self, state: Any, context: TrainingContext) -> None:
+        if not isinstance(state, dict) or not isinstance(state.get("local_model"), dict):
+            raise ValueError("FedALA worker local state is missing.")
+        self.local_model_state = copy.deepcopy(state["local_model"])
+        self.weights = copy.deepcopy(state["weights"])
+        self.start_phase = state["start_phase"]
+        self._rng.setstate(state["rng"])
 
     def _load_state(self, context: TrainingContext) -> None:
         if self.save_state:
@@ -214,7 +251,7 @@ class FedALAUpdateStrategy(ModelUpdateStrategy):
             state = torch.load(
                 self._ala_state_path,
                 map_location=torch.device("cpu"),
-                weights_only=False,
+                weights_only=True,
             )
             self.weights = state.get("weights")
             self.start_phase = state.get("start_phase", True)

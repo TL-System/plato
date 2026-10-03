@@ -1,0 +1,15 @@
+{
+  "status": "PROPOSED_PENDING_COUNT_REVIEW_AND_GATE_ADDENDUM",
+  "base": "2633f8394c142ec04db13743b54a427e04c2aed7",
+  "candidate": "0fbc1162994c05041105b1860fc8cb02582d21f3",
+  "merged_tree": "d01f51fbf01ceaed78339e10bc3b39aa5ed1724b",
+  "conflicts": false,
+  "changed_paths": [
+    "evidence/2026-refresh/phase2c-count-collection-validation.json",
+    "evidence/2026-refresh/phase2c-dp-typing-gate-validation.json",
+    "tests/integration/feddyn_partition_worker.py",
+    "tests/integration/test_feddyn_count_boundaries.py",
+    "tests/trainers/test_dp_data_loader_strategy.py"
+  ],
+  "production_docs_configs_dependencies_CI": "Byte-identical to integrated2633;onlytest/evidence corrections."
+}

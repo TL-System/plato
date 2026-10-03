@@ -1,0 +1,321 @@
+{
+  "status": "READY_PREPARATION_ONLY",
+  "prepared_at_utc": "2026-10-03T09:51:52.700489+00:00",
+  "gate_decision": null,
+  "scope": "Evidence and prepared-runner inspection only. No author working-tree/source inspection, numerical implementation review, suite execution, install, repository edit, commit, external message or nested agent. Writes confined to /tmp/plato-phase2-gate; evidence snapshots retained there.",
+  "authority": "Current user instructions and plan-addendum supersede historical plan wording: Python 3.13 default/minimum, 3.14 core qualification, necessary fixes/archives authorized, no security questionnaire; root alone orchestrates. Accepted numerical designs are bounded authorized corrections; F20 remains legacy unsquared L2. No Phase 3 started.",
+  "source_policy": "Hashes below identify bytes actually inspected; large review reports inspected through contract/disposition/limitation sections, not every raw execution log. Historical reviewer execution is attributed, not independently rerun. All eight available acceptance-to-review/design hash links checked and matched. SCAFFOLD original design-review hash is accepted via its acceptance receipt; that unrequested report was not independently read. Workflow URL was unnecessary given explicit user instructions and repository workflow text.",
+  "gate_checklist": [
+    {
+      "id": "G1",
+      "owner": "root",
+      "stage": "preintegration gate",
+      "requirement": "Supply immutable final C and prose commits/trees, exact proposed component combination and reconciliation of accepted A/B/B-supplement/D/general-C blobs. Identify changed shared paths and fresh affected reviews. Component ancestry alone is insufficient if later edits changed accepted behavior."
+    },
+    {
+      "id": "G2",
+      "owner": "original C author; independent FedDyn/SCAFFOLD reviewers; root acceptance",
+      "stage": "preintegration gate",
+      "requirement": "Final reviews explicitly dispose SCAFFOLD A01-A10, FedDyn FD-A01..15 and current findings against the same completed C source. Preserve accepted general-training corrections. Give criterion-to-test/command/receipt mapping, including actual worker, wire and entrypoint checks, with exact environment/source and honest numerical tolerances."
+    },
+    {
+      "id": "G3",
+      "owner": "Astra writer; independent writing reviewer",
+      "stage": "preintegration gate",
+      "requirement": "Final FedDyn prose plus SCAFFOLD final-source reconciliation after C; exact docs commit/hashes and fresh writing review. Provisional eed prose PASS is not final acceptance and must not weaken intended cleanup guarantees."
+    },
+    {
+      "id": "G4",
+      "owner": "root",
+      "stage": "preintegration gate",
+      "requirement": "Freeze final qualification plan and coverage mapping, including any new C tests. This gate may authorize integration only; it cannot attest to unexecuted merged profiles, publication or Linux completion."
+    },
+    {
+      "id": "G5",
+      "owner": "root",
+      "stage": "postintegration local qualification",
+      "requirement": "Execute all four locked base/mandatory profiles on 3.13/3.14. Mandatory includes all 48 unchanged startup cases per interpreter, real natural two-client 2/6 CPU socket weighting and bounded negative-path cleanup/no survivors. Base intentionally deselects those 48; execute new C numerical/worker/entrypoint cases in appropriate supported profiles."
+    },
+    {
+      "id": "G6",
+      "owner": "root",
+      "stage": "postintegration local qualification",
+      "requirement": "On exact combined source execute A recovery/containment/sampler regressions, B ingress/lifecycle/PORT/resume, C retained trainer plus final algorithm contracts, D serialization/processor/HE/MPC/utilities, actual D writer/presigner -> B bounded-reader S3 success/size/deadline/failure cleanup and production C+D metadata wire. Track exact node IDs rather than infer coverage from a green total."
+    },
+    {
+      "id": "G7",
+      "owner": "root",
+      "stage": "postintegration local qualification",
+      "requirement": "Retain final no-Git source-archive fixture checks, wheel/sdist build and isolated artifact import/install evidence, lock check, diff check, Ruff import policy, scoped/new typing and classified residual diagnostics. Bind source/tree/lock/artifact hashes, interpreter/packages, commands, raw logs/JUnit and actual warnings/skips to results."
+    },
+    {
+      "id": "G8",
+      "owner": "root",
+      "stage": "postintegration delivery/platform",
+      "requirement": "Audit local execution receipts, push exact qualified source, retain Linux CI run URL/SHA/profile results and prove source correspondence if evidence-only commits differ. Root combined acceptance and phase delivery remain separate from permission to integrate; retain artifacts/implementers until delivery. No Phase 3 completion inferred."
+    }
+  ],
+  "dependency_reconciliation": [
+    {
+      "component": "A",
+      "accepted_commit": "79da1f97d8a12fe97402750cc32c7b3e8f5cdf6e",
+      "evidence": [
+        "phase2a-acceptance.json",
+        "phase2a-review-5.json"
+      ],
+      "owner": "A accepted; C consumes; root integrates",
+      "contracts": "F13/F15/F16, datasource recovery/cache/readiness, containment and byte-preserved datalib archive accepted locally on both interpreters. FedDyn consumes actual realized sampler counts; final suites retain these regressions. No full corpus/SSL/platform claim."
+    },
+    {
+      "component": "B",
+      "accepted_commit": "00eeb9dcdd2b513e64db9408969356037e09bb8e",
+      "evidence": [
+        "phase2b-acceptance.json",
+        "phase2b-review-3.json"
+      ],
+      "owner": "B accepted; C owns handed-off F07/F26; root integrates",
+      "contracts": "F10/F11/F18 and lifecycle/session/buffer/worker-loss contracts accepted. C shared-path changes preserve ownership cleanup, PORT actual hook-to-reader numerical flow and urgent snapshot decoding/order; all startup/runtime regressions remain mandatory."
+    },
+    {
+      "component": "B supplement",
+      "accepted_commit": "a058a2ef8d230ca2e34dbf1c91e6eaac0b0205ac",
+      "evidence": [
+        "phase2b-resume-acceptance.json",
+        "phase2b-resume-review.json",
+        "phase2bc-root-resume-validation.json"
+      ],
+      "owner": "B accepted; C test reconciliation; root final integration",
+      "contracts": "F28/B-RESUME-01 preserve selection-owned tuple and both startup branches. ROOT-2BC-01 must retain independent actual continued-selection assertions while replacing obsolete unrelated-global-RNG expectation. C codec + ordinary/slash/underscore/long names and real writers/readers/run must pass together. Generic B does not promise independent global Python RNG continuation; FedDyn full bundle separately does."
+    },
+    {
+      "component": "D",
+      "accepted_commit": "96323afa094a37584844275cc04bf1e1eedfaa0d",
+      "evidence": [
+        "phase2d-acceptance.json",
+        "phase2d-review-3.json",
+        "phase2cd-wire-dependency-handoff.json"
+      ],
+      "owner": "D accepted; C consumes; root final integration",
+      "contracts": "F02-F05/F12, processor/HE/MPC/utility corrections and mandatory native fixtures accepted. Durable real localhost S3 writer/presigner-reader coverage already tracked; rerun final combination. D scalar type restoration is required by C metadata; verify exact D merge and remove test-only scalar coercion. Live cloud S3/cluster/cryptographic/native MLX qualification is not implied."
+    },
+    {
+      "component": "C general",
+      "accepted_commit": "f9772f61d52dfe0f4a3281252d23b8303ec237d2",
+      "evidence": [
+        "phase2c-general-acceptance.json",
+        "phase2c-training-review-2.json"
+      ],
+      "owner": "C; final affected independent reviews; root",
+      "contracts": "Bounded acceptance closes ROOT-2C-01 and TRAINING-2C-01/02/03 only. Preserve AMP unscale-before-clip/skipped-step flags, complete-suffix cleanup, actual historical writer coverage and FedALA returning-client state. Retain F07/F08/F14/F20, DP, GAN, SSL, split/personalization/APFL and F26 evidence; whole C is not accepted."
+    },
+    {
+      "component": "SCAFFOLD F27",
+      "evidence": [
+        "phase2c-scaffold-acceptance.json",
+        "phase2c-scaffold-design.json",
+        "phase2c-scaffold-code-review-3.json",
+        "phase2c-scaffold-docs-review-2.json"
+      ],
+      "owner": "C implementation; independent SCAFFOLD review; Astra prose/review; root",
+      "contracts": "A01-A04 equations/actual LR/parameter identity/completed updates; A05-A06 logical identity/persistence/direct and real spawn acceptance; A07-A09 multiround independent oracle, server population denominator/batch rejection and optimizer-extension boundary; A10 exact reviewed integration. tests/trainers/test_scaffold_strategy.py and tests/integration/test_scaffold_round_flow.py plus lifecycle/worker regressions. Final mapping must close cleanup failure after otherwise successful direct train_model."
+    },
+    {
+      "component": "FedDyn 2C-11",
+      "evidence": [
+        "phase2c-feddyn-acceptance.json",
+        "phase2c-feddyn-design.json",
+        "phase2c-feddyn-design-review-2.json"
+      ],
+      "owner": "C implementation; independent FedDyn review; Astra prose/review; root",
+      "contracts": "FD-A01..08 independent local/multiround/weighting/count/parameter/step references; A09..11 actual spawn reuse, rejected handoff rollback and whole-batch validation; A12..13 full round-boundary bundle/atomic refusal, actual shipped run/--resume later rounds, separate global/selection/context/NumPy/Torch CPU RNG restoration, real socket and spawn on both versions; A14 exact source/prose; A15 explicit read-only historical writer migration without Git history. Planned tests/trainers/test_feddyn_strategy.py and tests/integration/test_feddyn_round_flow.py plus preserved general tests; final test identities may differ but each criterion needs receipts. Designs alone do not close implementation."
+    }
+  ],
+  "current_vs_historical": {
+    "current_required": [
+      "Final C is not supplied; 1fe8b63940c21eca23b91e9f79281171e80f0cbc is only the last-known committed intermediate, including A and B supplement. D merge is authorized, not yet verified here.",
+      "F27-R3-01 remains medium: direct successful cleanup can fail after canonical/control acceptance; fresh final correction review required. F27-R3-L01 duplicate rejection cleanup is low, not a separate material corruption blocker.",
+      "ROOT-2BC-01 remains an integration-test contract mismatch, not evidence that accepted B selection behavior should be reverted.",
+      "FedDyn all 15 implementation criteria, production D wire dependency, final source reconciliation and final prose are pending."
+    ],
+    "superseded_or_bounded": [
+      "A review5, B review3/supplement and D review3 close earlier component findings within their exact scopes; older execution-state entries do not reopen them.",
+      "SCAFFOLD review3 closes server callback F27-R2-01 and original end-hook reproducer F27-R2-02, with remaining cleanup boundary tracked as F27-R3-01; earlier raw-model/worker failures are corrected within that report.",
+      "ROOT-2C-02 portable historical fixture passes review3 on both versions; preserve and revalidate explicit FedDyn reader adaptation, rather than treating old f977 Git-history failures as current production failure.",
+      "f977 archive 574-pass result exited 1 under exclusion guard and is not full-profile PASS. Intermediate 15e archive has 797 passed/4 allowed skips/48 runtime deselections on 3.13 only, without B supplement/final FedDyn/D/prose; neither substitutes for final source qualification.",
+      "Retained red probes and corrected harness import/mkdir/config assumptions are historical evidence, not unresolved product findings. Overlapping invocation counts must not be summed as distinct cases."
+    ]
+  },
+  "qualification_plan_assessment": {
+    "status": "Prepared plan is directionally consistent; no execution acceptance issued.",
+    "covered": "Four explicit locked profiles; implicit mandatory 3.13 and explicit mandatory 3.14; base non-runtime both versions; unique run artifacts; exact startup, S3, C/worker, lint/typing/build/lock and Linux handoffs are named.",
+    "substantive_evidence_handoffs": [
+      {
+        "id": "PREP-01",
+        "owner": "root",
+        "topic": "Exact-source attribution beyond HEAD/lock",
+        "observation": "Runner checks tracked implementation dirtiness only before execution; it never checks untracked importable files and finally compares only HEAD and lock. A same-HEAD source edit during execution would escape its final SOURCE_CHANGED check.",
+        "required": "For final receipts, root must establish immutable executed source and before/after relevant source identity, including imported parent/worker paths and absence of untracked shadowing. Existing exact archive/blob-verification practice can satisfy this; no runner rewrite or new framework required."
+      },
+      {
+        "id": "PREP-02",
+        "owner": "root",
+        "topic": "Mechanical execution versus audited acceptance",
+        "observation": "Runner accepts any JSON-object gate and does not verify authorization/schema/source binding. EXECUTION_PASS_REQUIRES_ROOT_AUDIT is deliberately narrower than acceptance. It also does not itself enforce required node IDs, inspect all warning reasons, or run archive/build/lock/lint/typing/Linux checks.",
+        "required": "Root supplies the actual gate authorizing this reviewed combination, maps candidate to integrated commit, and audits all required cases/skip-warning dispositions plus separate checks before combined acceptance. Do not use this READY preparation or a runner exit code as gate approval. Retain runner hash and effective invocation/environment controls with evidence."
+      },
+      {
+        "id": "PREP-03",
+        "owner": "root with C reviewers",
+        "topic": "Source-specific coverage mapping",
+        "observation": "Current plan describes final C coverage generically because the final source is unavailable; all tests alone does not prove every accepted criterion is collected or actually runs.",
+        "required": "At final gate supply the C criterion-to-test mapping and concrete additional entrypoint/socket/resume/archive commands, if outside normal collection. Confirm A counts + B resume + D native scalar metadata meet actual FedDyn flow without test-only conversion. Existing planned work addresses this; no additional product feature requested."
+      }
+    ],
+    "warnings_and_skips": "Audit actual final results, not historical totals. Base allows one Opacus module and three Nanochat omissions; mandatory permits only specifically absent native Nanochat tokenizer. Preserve profile guard/real Kazoo and Gymnasium fixtures. Expected supported Opacus RNG/accountant/backward-hook/repeated-budget and dataset-identity notices may legitimately remain with classification; no zero-warning, tight-epsilon or blanket security claim. Unexpected skips/xfails/deselections need disposition, not suppression."
+  },
+  "final_inputs_needed": [
+    "Exact completed C and docs commits/trees, root intended combination/base and accepted-component preservation/diff receipts, including D merge identity.",
+    "Fresh final FedDyn and SCAFFOLD implementation reviews and root acceptance; explicit closure of F27-R3-01, ROOT-2BC-01, portable legacy-reader adaptation and production C+D wire handoff; affected general/B regression preservation.",
+    "Final FedDyn prose and SCAFFOLD corrected-source reconciliation with fresh writing review, exact hashes and no provisional status hidden.",
+    "Concise C A01-A10/FD-A01..15 matrix with test IDs, source-bound author/reviewer logs, commands, environment/lock, numerical references/tolerances and honest execution/skip/warning limits. Share one receipt for genuinely shared A12/A13 execution rather than double-counting.",
+    "Final qualification plan/runner hashes and exact-source audit approach. Four full merged profile results and Linux/publication are postintegration inputs, not prerequisites that would make this preintegration gate circular.",
+    "Root-owned remaining-inventory/disposition ledger with explicit Phase 3/4/5 owners; any newly discovered material in-scope issue must have a concrete disposition before permission to integrate."
+  ],
+  "later_followups_not_phase2_blockers": [
+    "Phase 3: bounded selected MLX/F17, native serialization/ingress, HF/F09, LeRobot/F06 separate compatible environment, Nanochat tokenizer/build/CORE/evaluator containment and optional integration qualification.",
+    "Phase 4: coherent ViT/F19 archive with preserved MobileNet shared NAS; retained-family smokes, FEI 2D-15/16 and broader example inventory. Phase 2-owned FedDyn/SCAFFOLD/PORT repairs remain Phase 2 obligations, not deferred by this boundary.",
+    "Phase 5: consolidated docs/archive index, deployment trusted-peer boundaries, known links, container execution and final release tooling. Retain NLTK advisory/override versus ordinary artifact-resolution limits; no blanket clean security/typing/full-optional support claim."
+  ],
+  "sources": [
+    {
+      "name": "phase2a-acceptance.json",
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2a-acceptance.json",
+      "sha256": "21fc799903097a0424106e3792ddcdb71f6ae0c8b5f361a9276a89e6d8c973da"
+    },
+    {
+      "name": "phase2a-review-5.json",
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2a-review-5.json",
+      "sha256": "ee3714ab192257e5c5896351c05b81101de654778da92927ed75b046f84fc488"
+    },
+    {
+      "name": "phase2b-acceptance.json",
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2b-acceptance.json",
+      "sha256": "3be220078302a05189c07c32220a86e966ff919bc4ef11e5d342a6c39135396d"
+    },
+    {
+      "name": "phase2b-review-3.json",
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2b-review-3.json",
+      "sha256": "83eaf2c44ffb1316e9d6643e23c3ea9b977d5b083bf4427e86a75dcac7720fd6"
+    },
+    {
+      "name": "phase2b-resume-acceptance.json",
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2b-resume-acceptance.json",
+      "sha256": "53bfc5b628762ffb1e3c95a4309701f0a5beea364c0df28fc788171b12279219"
+    },
+    {
+      "name": "phase2b-resume-review.json",
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2b-resume-review.json",
+      "sha256": "5e612f69922328c6c2e692af80577e0df3250ff303ddabe8c8fc4a3eacf5cd65"
+    },
+    {
+      "name": "phase2d-acceptance.json",
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2d-acceptance.json",
+      "sha256": "611b8b8fef34fd90e1f25da4ce2cf6c05c2e94979afafdaf190c3155f4a3cff2"
+    },
+    {
+      "name": "phase2d-review-3.json",
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2d-review-3.json",
+      "sha256": "ea5c8a01719582167ae2a78b7a9cca11384679b71c5933379bcbfbf284533186"
+    },
+    {
+      "name": "phase2c-general-acceptance.json",
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2c-general-acceptance.json",
+      "sha256": "3fb81f4f332e1a4665e0af22e99989dba19daa8fc140db99a8cab1dd78cfef2d"
+    },
+    {
+      "name": "phase2c-training-review-2.json",
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2c-training-review-2.json",
+      "sha256": "2712a8b892cf3a65b684dfb4470ab293b1d3c4ceedeb0ba7e4613c372e6c8ca1"
+    },
+    {
+      "name": "phase2c-scaffold-acceptance.json",
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2c-scaffold-acceptance.json",
+      "sha256": "40b202708a4cfdbe6f299e75249c1a19921e410ec4ab7b5e3c6323f536ca8d37"
+    },
+    {
+      "name": "phase2c-scaffold-design.json",
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2c-scaffold-design.json",
+      "sha256": "f323f3aa9d824df44a1043b2d6aff9c8a963c42964f6e6685108c59b25fc3a89"
+    },
+    {
+      "name": "phase2c-feddyn-acceptance.json",
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2c-feddyn-acceptance.json",
+      "sha256": "7ceed23ecbdcb73119863bb5ab9b1c0372d3f7dfb9101ace6a1100bcbcbca6c0"
+    },
+    {
+      "name": "phase2c-feddyn-design.json",
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2c-feddyn-design.json",
+      "sha256": "62c5d61805c49ccc06f99776d0da820c5b27cffeb5916754ddb16bb3135c1d5b"
+    },
+    {
+      "name": "phase2c-feddyn-design-review-2.json",
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2c-feddyn-design-review-2.json",
+      "sha256": "454aa4b5d6503e2d3fbdc572719620983bab13cd7fbd5e59df8a3dc254e0f0e1"
+    },
+    {
+      "name": "phase2c-scaffold-code-review-3.json",
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2c-scaffold-code-review-3.json",
+      "sha256": "63d4969b6bff08e51bde979eb3d8ac61289ca539e1332b3ac96a8ceeda6010dd"
+    },
+    {
+      "name": "phase2bc-root-resume-validation.json",
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2bc-root-resume-validation.json",
+      "sha256": "a5083318f489852bce152ad66037c771cde75247bc15c83e87e9dd00164826ee"
+    },
+    {
+      "name": "phase2cd-wire-dependency-handoff.json",
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2cd-wire-dependency-handoff.json",
+      "sha256": "511ce0cbc2ca5a846127d330802cb72a886fa5902adc0e447a0bfb6286878ac9"
+    },
+    {
+      "name": "phase2c-scaffold-docs-review-2.json",
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2c-scaffold-docs-review-2.json",
+      "sha256": "08d9c5f6a8f895a4213c7656a20bfda8c80c0b61289212d210d2712f2d88950f"
+    },
+    {
+      "name": "phase2c-root-intermediate-base-validation.json",
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2c-root-intermediate-base-validation.json",
+      "sha256": "5a0b6c2e9a761e08dd8daecd32118b1e058f44fc12037280b2a3643a4b234f98"
+    },
+    {
+      "name": "AGENTS.md",
+      "path": "/Users/bli/Playground/plato/AGENTS.md",
+      "sha256": "b50f87f31ea3d87076952d8b7d2d8af067132fbf877d80f8780c208fb45527ec"
+    },
+    {
+      "name": "plan.md",
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/plan.md",
+      "sha256": "edb9a58cc7915a940854f16d5029fe97434703bf2f75eca0dcb96de2d0f0eb15"
+    },
+    {
+      "name": "plan-addendum.json",
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/plan-addendum.json",
+      "sha256": "5b51b0fb7ed6f68d9fce7176335b3e7be5e5f178a2788590912aa2396a487709"
+    },
+    {
+      "name": "integration-plan.json",
+      "path": "/tmp/plato-phase2-root/integration-plan.json",
+      "sha256": "32a5b9398a936df9af8d295b4e7aef0f0f61c9531217aa33f4ff76e6191b3222"
+    },
+    {
+      "name": "run_integration_profile.py",
+      "path": "/tmp/plato-phase2-root/run_integration_profile.py",
+      "sha256": "dbbc736a95fa5c0346bd125b73e26f50404f1b6208d9948b64fbfd6334c17806"
+    },
+    {
+      "name": "orchestration-state.json",
+      "path": "/tmp/plato-phase2-root/orchestration-state.json",
+      "sha256": "ee4de62b6ea25226b2900f1791df9c353d11d74c0350d13abca45a922364d8a6"
+    }
+  ]
+}

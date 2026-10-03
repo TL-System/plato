@@ -1,0 +1,22 @@
+{
+  "decision": "ACCEPTED_BOUNDED_SCAFFOLD_IMPLEMENTATION_AND_SHARED_PRESERVATION",
+  "candidate": "13e38dafce476286db7e673e7f21343d54416b56",
+  "tree": "9fe8cfb039d0d97fc5b2c95a459de4c73c6d1b51",
+  "review": "phase2c-scaffold-code-review-4.json",
+  "review_sha256": "ecded9d6b645910a5c2b1149181593ab131fd0e404c4bc59a03db18c75cb8d42",
+  "closed_material_finding": "F27-R3-01",
+  "validation": "Both Python 3.13.16 and 3.14.8: 24 independent lifecycle cases, 26 supplementary checks and green evidence for all 186 selected affected test IDs. Distinct categories and overlapping invocations are not summed as a unique test total.",
+  "preserved": "SCAFFOLD A01-A10, server callback commit boundary, accepted general training corrections, explicit portable historical writer inspection and selection-owned RNG test reconciliation within reviewed scope.",
+  "low_disposition": {
+    "id": "F27-R4-L01",
+    "decision": "Optional low recommendation retained; no additional correction required for acceptance.",
+    "reason": "Duplicate idempotent rejection cleanup after canonical replace failure has no observed state corruption, accepted failed run, lost original exception or incorrect retry. Avoid another implementation cycle for harmless repetition."
+  },
+  "harness_limits": "Cold installed-library bytecode redirection caused an isolated spawn timeout; normal read-only library caches pass unchanged deadline and assertions. Frozen exception collector limitation reconciled through public ExceptionGroup tracebacks. Raw attempts retained.",
+  "not_claimed": [
+    "FedDyn numerical implementation acceptance",
+    "Final documentation acceptance",
+    "Whole C or Phase 2 integration acceptance",
+    "Fresh base provisioning, Linux, GPU or whole optional stack qualification"
+  ]
+}

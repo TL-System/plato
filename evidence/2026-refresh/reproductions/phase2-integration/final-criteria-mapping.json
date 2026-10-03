@@ -1,0 +1,341 @@
+{
+  "source_commit": "8b01bf47ca8bdf9232bffeb4e50f78d4f00c9e3b",
+  "phase": "Prepared final qualification mapping; fresh FD review pending",
+  "feddyn": {
+    "FD-A01": {
+      "author_mapping": {
+        "tests": [
+          "test_loss_matches_independent_scalar_equation",
+          "test_zero_alpha_is_exact_task_loss"
+        ],
+        "status": "IMPLEMENTED_DUAL_VERSION_QUALIFIED_REVIEW_PENDING"
+      },
+      "resolved_test_files": {
+        "test_loss_matches_independent_scalar_equation": [
+          "tests/trainers/test_feddyn_strategy.py"
+        ],
+        "test_zero_alpha_is_exact_task_loss": [
+          "tests/trainers/test_feddyn_strategy.py"
+        ]
+      }
+    },
+    "FD-A02": {
+      "author_mapping": {
+        "tests": [
+          "test_three_round_actual_partial_participation"
+        ],
+        "status": "IMPLEMENTED_DUAL_VERSION_QUALIFIED_REVIEW_PENDING"
+      },
+      "resolved_test_files": {
+        "test_three_round_actual_partial_participation": [
+          "tests/integration/test_feddyn_round_flow.py"
+        ]
+      }
+    },
+    "FD-A03": {
+      "author_mapping": {
+        "tests": [
+          "test_three_round_actual_partial_participation"
+        ],
+        "status": "IMPLEMENTED_DUAL_VERSION_QUALIFIED_REVIEW_PENDING"
+      },
+      "resolved_test_files": {
+        "test_three_round_actual_partial_participation": [
+          "tests/integration/test_feddyn_round_flow.py"
+        ]
+      }
+    },
+    "FD-A04": {
+      "author_mapping": {
+        "tests": [
+          "test_multiple_participants_preserve_inactive_history_population_mean",
+          "test_actual_full_participation_first_cloud"
+        ],
+        "status": "IMPLEMENTED_DUAL_VERSION_QUALIFIED_REVIEW_PENDING"
+      },
+      "resolved_test_files": {
+        "test_multiple_participants_preserve_inactive_history_population_mean": [
+          "tests/integration/test_feddyn_round_flow.py"
+        ],
+        "test_actual_full_participation_first_cloud": [
+          "tests/integration/test_feddyn_round_flow.py"
+        ]
+      }
+    },
+    "FD-A05": {
+      "author_mapping": {
+        "tests": [
+          "test_sample_alpha_uses_population_counts_never_labels",
+          "test_classification_permutation_preserves_full_objective_gradient",
+          "test_realized_partition_count_uses_sampler_not_global_backing_data",
+          "test_actual_local_schema_buffer_and_count_mutation_rolls_back"
+        ],
+        "status": "IMPLEMENTED_DUAL_VERSION_QUALIFIED_REVIEW_PENDING"
+      },
+      "resolved_test_files": {
+        "test_sample_alpha_uses_population_counts_never_labels": [
+          "tests/trainers/test_feddyn_strategy.py"
+        ],
+        "test_classification_permutation_preserves_full_objective_gradient": [
+          "tests/trainers/test_feddyn_strategy.py"
+        ],
+        "test_realized_partition_count_uses_sampler_not_global_backing_data": [
+          "tests/integration/test_feddyn_round_flow.py"
+        ],
+        "test_actual_local_schema_buffer_and_count_mutation_rolls_back": [
+          "tests/integration/test_feddyn_round_flow.py"
+        ]
+      }
+    },
+    "FD-A06": {
+      "author_mapping": {
+        "tests": [
+          "test_full_example_rejects_invalid_configuration",
+          "test_full_sample_vector_is_required_and_finite",
+          "test_optimizer_configuration_is_not_silently_coerced",
+          "test_effective_alpha_overflow_and_underflow_are_rejected"
+        ],
+        "status": "IMPLEMENTED_DUAL_VERSION_QUALIFIED_REVIEW_PENDING"
+      },
+      "resolved_test_files": {
+        "test_full_example_rejects_invalid_configuration": [
+          "tests/trainers/test_feddyn_strategy.py"
+        ],
+        "test_full_sample_vector_is_required_and_finite": [
+          "tests/trainers/test_feddyn_strategy.py"
+        ],
+        "test_optimizer_configuration_is_not_silently_coerced": [
+          "tests/trainers/test_feddyn_strategy.py"
+        ],
+        "test_effective_alpha_overflow_and_underflow_are_rejected": [
+          "tests/trainers/test_feddyn_strategy.py"
+        ]
+      }
+    },
+    "FD-A07": {
+      "author_mapping": {
+        "tests": [
+          "test_optimizer_parameter_identity_and_static_full_state",
+          "test_actual_local_schema_buffer_and_count_mutation_rolls_back"
+        ],
+        "status": "IMPLEMENTED_DUAL_VERSION_QUALIFIED_REVIEW_PENDING"
+      },
+      "resolved_test_files": {
+        "test_optimizer_parameter_identity_and_static_full_state": [
+          "tests/integration/test_feddyn_round_flow.py"
+        ],
+        "test_actual_local_schema_buffer_and_count_mutation_rolls_back": [
+          "tests/integration/test_feddyn_round_flow.py"
+        ]
+      }
+    },
+    "FD-A08": {
+      "author_mapping": {
+        "tests": [
+          "test_accumulated_tail_and_skips_count_only_real_updates",
+          "test_empty_or_all_skipped_attempt_refuses_outbound_and_valid_retry"
+        ],
+        "status": "IMPLEMENTED_DUAL_VERSION_QUALIFIED_REVIEW_PENDING"
+      },
+      "resolved_test_files": {
+        "test_accumulated_tail_and_skips_count_only_real_updates": [
+          "tests/integration/test_feddyn_round_flow.py"
+        ],
+        "test_empty_or_all_skipped_attempt_refuses_outbound_and_valid_retry": [
+          "tests/integration/test_feddyn_round_flow.py"
+        ]
+      }
+    },
+    "FD-A09": {
+      "author_mapping": {
+        "tests": [
+          "test_actual_spawn_reused_client_matches_partial_oracle",
+          "test_consecutive_same_client_uses_current_cloud_and_dispatched_history",
+          "test_actual_spawn_returns_personal_state_and_optimizer_across_rounds"
+        ],
+        "status": "IMPLEMENTED_DUAL_VERSION_QUALIFIED_REVIEW_PENDING"
+      },
+      "resolved_test_files": {
+        "test_actual_spawn_reused_client_matches_partial_oracle": [
+          "tests/integration/test_feddyn_round_flow.py"
+        ],
+        "test_consecutive_same_client_uses_current_cloud_and_dispatched_history": [
+          "tests/integration/test_feddyn_round_flow.py"
+        ],
+        "test_actual_spawn_returns_personal_state_and_optimizer_across_rounds": [
+          "tests/trainers/test_personalized_state_ownership.py"
+        ]
+      }
+    },
+    "FD-A10": {
+      "author_mapping": {
+        "tests": [
+          "test_actual_spawned_rejection_retry_and_logical_reuse"
+        ],
+        "status": "IMPLEMENTED_DUAL_VERSION_QUALIFIED_REVIEW_PENDING"
+      },
+      "resolved_test_files": {
+        "test_actual_spawned_rejection_retry_and_logical_reuse": [
+          "tests/integration/test_feddyn_round_flow.py"
+        ]
+      }
+    },
+    "FD-A11": {
+      "author_mapping": {
+        "tests": [
+          "test_whole_batch_rejection_preserves_every_history_and_retry_identity",
+          "test_callback_and_partial_load_boundary",
+          "test_actual_inbound_whole_dispatch_validation_before_mutation"
+        ],
+        "status": "IMPLEMENTED_DUAL_VERSION_QUALIFIED_REVIEW_PENDING"
+      },
+      "resolved_test_files": {
+        "test_whole_batch_rejection_preserves_every_history_and_retry_identity": [
+          "tests/integration/test_feddyn_round_flow.py"
+        ],
+        "test_callback_and_partial_load_boundary": [
+          "tests/integration/test_feddyn_round_flow.py"
+        ],
+        "test_actual_inbound_whole_dispatch_validation_before_mutation": [
+          "tests/integration/test_feddyn_round_flow.py"
+        ]
+      }
+    },
+    "FD-A12": {
+      "author_mapping": {
+        "tests": [
+          "test_complete_bundle_round_two_to_three_matches_rational_reference",
+          "test_rejected_bundle_preserves_model_history_live_rng_and_previous_pending",
+          "test_failed_bundle_serialization_preserves_previous_canonical_bytes",
+          "test_pending_resume_handoff_is_atomic_and_consumed_once",
+          "test_actual_shipped_run_resume_matches_four_round_control_and_rng"
+        ],
+        "status": "IMPLEMENTED_DUAL_VERSION_QUALIFIED_REVIEW_PENDING"
+      },
+      "resolved_test_files": {
+        "test_complete_bundle_round_two_to_three_matches_rational_reference": [
+          "tests/integration/test_feddyn_round_flow.py"
+        ],
+        "test_rejected_bundle_preserves_model_history_live_rng_and_previous_pending": [
+          "tests/integration/test_feddyn_round_flow.py"
+        ],
+        "test_failed_bundle_serialization_preserves_previous_canonical_bytes": [
+          "tests/integration/test_feddyn_round_flow.py"
+        ],
+        "test_pending_resume_handoff_is_atomic_and_consumed_once": [
+          "tests/integration/test_feddyn_round_flow.py"
+        ],
+        "test_actual_shipped_run_resume_matches_four_round_control_and_rng": [
+          "tests/integration/test_feddyn_entrypoint.py"
+        ]
+      }
+    },
+    "FD-A13": {
+      "author_mapping": {
+        "tests": [
+          "test_shipped_mnist_shaped_lenet_spawn_and_real_socket_cloud",
+          "test_actual_shipped_run_resume_matches_four_round_control_and_rng"
+        ],
+        "status": "IMPLEMENTED_DUAL_VERSION_QUALIFIED_REVIEW_PENDING"
+      },
+      "resolved_test_files": {
+        "test_shipped_mnist_shaped_lenet_spawn_and_real_socket_cloud": [
+          "tests/integration/test_feddyn_entrypoint.py"
+        ],
+        "test_actual_shipped_run_resume_matches_four_round_control_and_rng": [
+          "tests/integration/test_feddyn_entrypoint.py"
+        ]
+      }
+    },
+    "FD-A14": {
+      "author_mapping": {
+        "tests": [
+          "Fresh independent FD/SCAFFOLD implementation and Astra prose reviews remain root-owned gates."
+        ],
+        "status": "ROOT_CODE_PROSE_GATE_PENDING"
+      },
+      "resolved_test_files": {
+        "Fresh independent FD/SCAFFOLD implementation and Astra prose reviews remain root-owned gates.": []
+      }
+    },
+    "FD-A15": {
+      "author_mapping": {
+        "tests": [
+          "test_actual_accepted_b_feddyn_writer_migration",
+          "test_legacy_actual_writer_weight_bias_and_corruption_are_inspection_only",
+          "test_feddyn_exact_legacy_prefix_load_is_same_client_and_canonical_wins"
+        ],
+        "status": "IMPLEMENTED_DUAL_VERSION_QUALIFIED_REVIEW_PENDING"
+      },
+      "resolved_test_files": {
+        "test_actual_accepted_b_feddyn_writer_migration": [
+          "tests/trainers/test_review_training_boundaries.py"
+        ],
+        "test_legacy_actual_writer_weight_bias_and_corruption_are_inspection_only": [
+          "tests/trainers/test_feddyn_strategy.py"
+        ],
+        "test_feddyn_exact_legacy_prefix_load_is_same_client_and_canonical_wins": [
+          "tests/trainers/test_personalized_state_ownership.py"
+        ]
+      }
+    }
+  },
+  "scaffold_review4": [
+    {
+      "id": "A01",
+      "status": "PRESERVED_AND_AFFECTED_CHECKS_PASS",
+      "evidence": "Preserved corrected core/V2 source plus four new independent float64 real-SGD Fraction checks per version: g=0 gives y=.9, ci=0, delta=-1; g=[3,1] gives y=.4, ci=2, delta=1. Existing equation regressions pass. Baseline15e already has corrected math; its new red control is the cleanup acceptance boundary, not the pre-correction equation source."
+    },
+    {
+      "id": "A02",
+      "status": "PRESERVED_AND_AFFECTED_CHECKS_PASS",
+      "evidence": "Actual shipped Config/optimizer factory tests at .1/.025, next-round LR, invalid rates/groups, scheduler boundaries and captured executed LR pass; unchanged SCAFFOLD rate-validation source reconciled with accepted review3."
+    },
+    {
+      "id": "A03",
+      "status": "PRESERVED_AND_AFFECTED_CHECKS_PASS",
+      "evidence": "Parameter/buffer/frozen/excluded ownership, schema and finite-value tests pass; exact accepted SCAFFOLD strategy blob preserved. No source helper supplies the independent numeric expected values."
+    },
+    {
+      "id": "A04",
+      "status": "PRESERVED_AND_AFFECTED_CHECKS_PASS",
+      "evidence": "Accumulation tails, real completed/skipped updates, empty rounds and V2 pass. Real CPU GradScaler success/overflow and clipping boundary tests pass; unscale-before-clip source preserved. No GPU qualification claimed."
+    },
+    {
+      "id": "A05",
+      "status": "PRESERVED_AND_AFFECTED_CHECKS_PASS",
+      "evidence": "Independent canonical-present/absent end/cleanup and atomic replace failures retain prior bytes or absence and ci ownership; ordinary1->2->1 and fresh reconstruction remain correct. Ten additional cases per version execute successful retries on both reconstructed and reused trainers against .62/.9/-.1. Existing two-round ownership, path, historical-control and failure tests pass."
+    },
+    {
+      "id": "A06",
+      "status": "PRESERVED_AND_AFFECTED_CHECKS_PASS",
+      "evidence": "Real inbound/train/outbound paths and actual multiprocessing spawn pass. Source orders end and successful cleanup before model save/export; child retains provisional controls, exports current token, parent validates token/client ID, loads model and controls, then accepts. Existing actual missing/stale/model-save/parent-commit failure subprocess tests pass and refuse stale outbound deltas. Frozen successful spawn event traces prove save/export/load/parent-accept order."
+    },
+    {
+      "id": "A07",
+      "status": "PRESERVED_AND_AFFECTED_CHECKS_PASS",
+      "evidence": "Existing shipped public TOML two-round unequal/equal-count rational-oracle tests and actual processor/server wiring pass, including the same unchanged 60-second spawn test on3.14 after ordinary read-only installed-library cache use. Exact accepted SCAFFOLD model/client/server/oracle behavior preserved; independent additional scalar retry reference uses Fraction arithmetic."
+    },
+    {
+      "id": "A08",
+      "status": "PRESERVED_AND_AFFECTED_CHECKS_PASS",
+      "evidence": "Fixed server raw/post-callback checks are byte-identical to15e. Existing malformed payload/sample/buffer/callback tests pass. Four new independent server cases each version reject raw NaN and post-receive NaN, restore known x=1/c=2 on aggregation callback failure, and retain committed x=8/c=13/3 on postcommit evaluation failure. Input tensors and staging/handler ownership checked."
+    },
+    {
+      "id": "A09",
+      "status": "PRESERVED_AND_AFFECTED_CHECKS_PASS",
+      "evidence": "Existing real raw-optimizer momentum/Adam and V2 composition tests pass; source and shipped momentum=.9 TOML preserved. No optimizer-specific mean-gradient or convergence claim added."
+    },
+    {
+      "id": "A10",
+      "status": "PRESERVED_AND_AFFECTED_CHECKS_PASS",
+      "evidence": "Exact commit/tree, actual imports, main/submodule hashes, preserved-source diffs, raw commands/versions/durations/configuration and focused JUnit inventories retained.186 distinct selected affected IDs have passing evidence each version;3.14 is185 original passes plus one unchanged passing retry. Scoped source Ruff import policy passes. Prior design/docs acceptance carried by source reconciliation; final prose/root acceptance remains root-owned."
+    }
+  ],
+  "full_suite_policy": "Both mandatory profiles execute all tracked tests, including all mapped cases and 51 runtime cases. Base profiles omit only runtime and enforce optional-library skip policy.",
+  "count_fix_files": [
+    "tests/integration/test_feddyn_count_boundaries.py",
+    "tests/integration/feddyn_count_worker.py"
+  ],
+  "extra_reviewer_probes": "Fresh FD review2 and SCAFFOLD review4 receipt/node inventories qualify independent probes beyond the full tracked suite; retain raw evidence and source correspondence rather than invent duplicate tests."
+}

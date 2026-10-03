@@ -1,0 +1,522 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-02",
+  "review_role": "Fresh independent bounded F27 design reviewer; no nested agents.",
+  "review_type": "Design review, not implementation acceptance.",
+  "decision": "PASS",
+  "acceptance": "PASS",
+  "finding": "F27",
+  "summary": "No material critical/high/medium findings. The exact design closes the advertised SCAFFOLD equation and necessary integration defects with explicit compatibility limits, bounded acceptance and narrow ownership. Root may authorize the 2C implementation; F27 remains open until implemented, independently reviewed and integrated acceptance passes.",
+  "findings": [],
+  "finding_counts": {
+    "critical": 0,
+    "high": 0,
+    "medium": 0,
+    "low": 0
+  },
+  "reviewed_design": {
+    "path": "evidence/2026-refresh/phase2c-scaffold-design.json",
+    "expected_sha256": "f323f3aa9d824df44a1043b2d6aff9c8a963c42964f6e6685108c59b25fc3a89",
+    "sha256_at_start": "f323f3aa9d824df44a1043b2d6aff9c8a963c42964f6e6685108c59b25fc3a89",
+    "sha256_at_end": "f323f3aa9d824df44a1043b2d6aff9c8a963c42964f6e6685108c59b25fc3a89",
+    "identity_matches": true
+  },
+  "production_baseline": {
+    "commit_at_start": "fda60becedfa6236c11d415b87a868b52789a41e",
+    "commit_at_end": "fda60becedfa6236c11d415b87a868b52789a41e",
+    "unchanged_production_examples_docs_tests": true,
+    "inspection_method": "git show of exact baseline objects; current root bytes additionally matched for inspected files. No moving C worktree inspected."
+  },
+  "inputs": [
+    {
+      "path": "AGENTS.md",
+      "sha256": "b50f87f31ea3d87076952d8b7d2d8af067132fbf877d80f8780c208fb45527ec"
+    },
+    {
+      "path": "evidence/2026-refresh/plan.md",
+      "sha256": "edb9a58cc7915a940854f16d5029fe97434703bf2f75eca0dcb96de2d0f0eb15"
+    },
+    {
+      "path": "evidence/2026-refresh/plan-review-3.json",
+      "sha256": "a1bc8bd69f43ea3280872a4c8259b431c4a9c27776ebd42fde658d6d48bd41b6"
+    },
+    {
+      "path": "evidence/2026-refresh/plan-addendum.json",
+      "sha256": "5b51b0fb7ed6f68d9fce7176335b3e7be5e5f178a2788590912aa2396a487709"
+    },
+    {
+      "path": "evidence/2026-refresh/plan-addendum-acceptance.json",
+      "sha256": "5f5d5a8e22e14072b5d031c19a27be14bda9bdbc2a157d14af78845daac6c56b"
+    },
+    {
+      "path": "evidence/2026-refresh/scaffold-equation-probe.json",
+      "sha256": "834fa629fd914b97273b0cacb60e91a2e9917bc558af07fa0b27636ea77e9164"
+    },
+    {
+      "path": "evidence/2026-refresh/trainer-lifecycle-probes.json",
+      "sha256": "7e236a1156d139e64ce93f260f6d7968c96b4b604ad85678f4de5ef94777b82b"
+    },
+    {
+      "path": "evidence/2026-refresh/phase2c-scaffold-design.json",
+      "sha256": "f323f3aa9d824df44a1043b2d6aff9c8a963c42964f6e6685108c59b25fc3a89"
+    }
+  ],
+  "baseline_interface_identity": [
+    {
+      "path": "plato/trainers/strategies/algorithms/scaffold_strategy.py",
+      "git_revision": "fda60becedfa6236c11d415b87a868b52789a41e",
+      "sha256": "194fdf4fa50882b5c8bbe2c27d550b61c76a5e48063b7874ba9cdded0836b04d",
+      "read_scope": "Full strategy including setup, after_step, train end, persistence and V2."
+    },
+    {
+      "path": "plato/trainers/composable.py",
+      "git_revision": "fda60becedfa6236c11d415b87a868b52789a41e",
+      "sha256": "6f515dc078295b571552e34afde369168fded499a5ebe26083863a02320ba331",
+      "read_scope": "Constructor/setup/client identity; save/load; train_model hook ordering; normal/final steps; train worker/parent return; obtain_model_update."
+    },
+    {
+      "path": "plato/trainers/base.py",
+      "git_revision": "fda60becedfa6236c11d415b87a868b52789a41e",
+      "sha256": "ce94af40221f6b62781b9cfb4aa280f74f1584410cd3c2754259538de00cc640",
+      "read_scope": "Client identity and checkpoint/pause interfaces only."
+    },
+    {
+      "path": "plato/trainers/strategies/base.py",
+      "git_revision": "fda60becedfa6236c11d415b87a868b52789a41e",
+      "sha256": "f74fefc541f3fd24750ae4b8aaa7768cb1ab3b3907f01c899dcc0e9b9fb7dea7",
+      "read_scope": "TrainingContext and model-update/training-step/optimizer hooks only."
+    },
+    {
+      "path": "plato/trainers/strategies/training_step.py",
+      "git_revision": "fda60becedfa6236c11d415b87a868b52789a41e",
+      "sha256": "c23c3344570c42a8a20c482b574259c88ce66de1edae30b7d79faf169de43604",
+      "read_scope": "Default step and accumulation implementation; no other algorithm audit."
+    },
+    {
+      "path": "plato/trainers/strategies/optimizer.py",
+      "git_revision": "fda60becedfa6236c11d415b87a868b52789a41e",
+      "sha256": "48febb0061a2c4b97fe50757ac7acc47eb7250cef2f560f40ee21249197dd8ed",
+      "read_scope": "DefaultOptimizerStrategy and optimizer hook interfaces."
+    },
+    {
+      "path": "plato/trainers/optimizers.py",
+      "git_revision": "fda60becedfa6236c11d415b87a868b52789a41e",
+      "sha256": "da613c5d2975a7cf124619233645ba8b02e6ad32218f08dd508b9b410da06e34",
+      "read_scope": "Actual registry configuration provenance and factory."
+    },
+    {
+      "path": "plato/trainers/strategies/data_loader.py",
+      "git_revision": "fda60becedfa6236c11d415b87a868b52789a41e",
+      "sha256": "aefaf38c4bbd40c6796969fb638f04fea4e69de4520ecb073721e768668df23f",
+      "read_scope": "Default loader supports a real bounded one-minibatch-per-epoch oracle."
+    },
+    {
+      "path": "plato/clients/strategies/defaults.py",
+      "git_revision": "fda60becedfa6236c11d415b87a868b52789a41e",
+      "sha256": "6052a9c70180752fc1c1f07329ecbc9d2af8d9b0faa512c35754f6706913b144",
+      "read_scope": "Configure/set_client_id, inbound/train/outbound ordering and reporting sample counts."
+    },
+    {
+      "path": "plato/servers/fedavg.py",
+      "git_revision": "fda60becedfa6236c11d415b87a868b52789a41e",
+      "sha256": "610005f1648e1aac8c57763ae2a2876350ac78a2d65a76a5a49aba16d399c016",
+      "read_scope": "_process_reports, model load before weights_aggregated, aggregation dispatch."
+    },
+    {
+      "path": "plato/servers/strategies/aggregation/fedavg.py",
+      "git_revision": "fda60becedfa6236c11d415b87a868b52789a41e",
+      "sha256": "8ea8d4dda63bd3070220613bda7fcadec5adcc785a8ee587acc7447d8517fbf0",
+      "read_scope": "Eligible updates and retained sample-weighted direct/delta aggregation."
+    },
+    {
+      "path": "examples/customized_client_training/scaffold/scaffold.py",
+      "git_revision": "fda60becedfa6236c11d415b87a868b52789a41e",
+      "sha256": "37587214941e1532d5552b7477249b18b5fadf905739ac94735d17df9886ac3a",
+      "read_scope": "Full entrypoint wiring."
+    },
+    {
+      "path": "examples/customized_client_training/scaffold/scaffold_callback.py",
+      "git_revision": "fda60becedfa6236c11d415b87a868b52789a41e",
+      "sha256": "2e69ce6b17faa1d08e87a8ed2bee592d50663f3945e9bdd6a5ffd8b4198914e0",
+      "read_scope": "Full inbound/outbound processors and callback reuse."
+    },
+    {
+      "path": "examples/customized_client_training/scaffold/scaffold_client.py",
+      "git_revision": "fda60becedfa6236c11d415b87a868b52789a41e",
+      "sha256": "08b7180f15531a5379ab4d245c63281b02920b65c96ece717077bca3e5efea6f",
+      "read_scope": "Full example lifecycle and legacy control-file loader."
+    },
+    {
+      "path": "examples/customized_client_training/scaffold/scaffold_trainer.py",
+      "git_revision": "fda60becedfa6236c11d415b87a868b52789a41e",
+      "sha256": "2d78d76f5d0e5164cac365853a093a3d03dc2bc9fdeb1add7be79944afbc589f",
+      "read_scope": "Full example trainer and delta property."
+    },
+    {
+      "path": "examples/customized_client_training/scaffold/scaffold_server.py",
+      "git_revision": "fda60becedfa6236c11d415b87a868b52789a41e",
+      "sha256": "384df5a5b7dda54bd8f60c5d89f17c97fb3e664126b6955a11de8c6d7ac96a33",
+      "read_scope": "Full payload split, population control update and initialization."
+    },
+    {
+      "path": "examples/customized_client_training/scaffold/scaffold_MNIST_lenet5.toml",
+      "git_revision": "fda60becedfa6236c11d415b87a868b52789a41e",
+      "sha256": "0c5048c3be4fbf06c55689037beabf29e1425efa3f9b4e090ae6ea82a7412f6f",
+      "read_scope": "Full shipped config, including max_concurrency=2 and SGD momentum=.9."
+    },
+    {
+      "path": "docs/docs/examples/algorithms/5. Algorithms with Customized Client Training Loops.md",
+      "git_revision": "fda60becedfa6236c11d415b87a868b52789a41e",
+      "sha256": "aaf8cc3b4ef22a19356c2e0d6f2e1ef1fee2a741ab195959754b0c18e76b1d60",
+      "read_scope": "SCAFFOLD claims and adjacent FedProx section boundary; other algorithms not audited."
+    },
+    {
+      "path": "tests/integration/utils.py",
+      "git_revision": "fda60becedfa6236c11d415b87a868b52789a41e",
+      "sha256": "7a4af3c5bece78c256f268fb47ee31e384f14cca098d1690ebe2c05f79b21634",
+      "read_scope": "Read fixture interfaces only; not used to execute a runtime suite."
+    },
+    {
+      "path": "examples/customized_client_training/scaffold/scaffold_trainer.py",
+      "git_revision": "df1d763b487634ab3708f75f8f055af6f2789941",
+      "sha256": "482273923be3713bbb2fbafbaf44fa10c26faf9e74c1548800f1fb36df67302f",
+      "read_scope": "Historical get_optimizer/train_step_end/train_run_end; verifies legacy origin of both wrong equations."
+    }
+  ],
+  "primary_source_verification": {
+    "title": "SCAFFOLD: Stochastic Controlled Averaging for Federated Learning",
+    "url": "https://arxiv.org/pdf/1910.06378v4",
+    "revision": "v4, 9 April 2021",
+    "method": "Opened the primary PDF directly; independently read Algorithm 1 and equations 3-5 from extracted text. Retained exact downloaded PDF bytes. No secondary source or appendix equation 19 used as the oracle.",
+    "locations": [
+      "Algorithm 1, PDF page 4, lines 10/12/16-17",
+      "Eq 3, PDF page 4",
+      "Eq 4 and Eq 5, PDF page 5",
+      "Appendix E Eq 19, PDF page 26, checked only as a counterexample"
+    ],
+    "verified_equations": {
+      "local": "y_next=y-eta*(g-ci+c)",
+      "option_II": "ci_new=ci-c+(x-y)/(K*eta)",
+      "server_control": "c_new=c+sum(delta_ci)/N",
+      "paper_model": "x_new=x+eta_global*sum(y_i-x)/len(S)"
+    },
+    "independent_inference": "Telescoping the local updates gives ci_new=mean of used gradients for constant-rate vanilla SGD. Appendix 19 reverses c/ci in the displacement expression; g=0,c=2,ci=1,eta=.1 gives 2 rather than 0. This is independently disproved, not adopted.",
+    "retained_pdf": "/tmp/plato-phase2c-scaffold-design-review/primary-paper-1910.06378v4.pdf",
+    "retained_pdf_sha256": "efe06c86acc7a06116e372a7ab6386c300f4d0dc9c7ba2dd5c82e95111a1d694"
+  },
+  "bounded_design_checks": [
+    {
+      "id": "R01",
+      "status": "PASS",
+      "concerns": [
+        "C01"
+      ],
+      "acceptance": [
+        "A01",
+        "A07"
+      ],
+      "subject": "Explicit F27 semantic fix and independent reference",
+      "rationale": "Both legacy numerical defects are explicitly repaired, with detached round snapshots and delta computed against old ci. The exact zero/nonzero SGD cases discriminate the wrong sign and wrong control formula. Independent exact arithmetic matches every supplied two-round value.",
+      "baseline_evidence": "scaffold_strategy.py:261,347; historical trainer:86,115; independent_checks.json exact_baseline_reproduction."
+    },
+    {
+      "id": "R02",
+      "status": "PASS",
+      "concerns": [
+        "C02"
+      ],
+      "acceptance": [
+        "A02",
+        "A04"
+      ],
+      "subject": "Actual optimizer LR, constant equal-rate groups and real update timing",
+      "rationale": "The real optimizer is the authority, with no .01/trainer.lr fallback. The fixed positive finite scalar boundary, equal groups mapped by parameter identity, round reset and pre-update rejection of a changed rate are specific. Normal and final updates must capture the executed rate before post-step hooks/schedulers can change it.",
+      "baseline_evidence": "optimizers.py:45-62 reads parameters.optimizer; composable.py:447 precedes optimizer creation at 481; before_step at 530 is only a microbatch hook; finalization at 605 has no before_step; post-optimizer hook at 564 precedes correction at 569.",
+      "feasibility": "Publishing context.state[optimizer] after creation is reachable without reordering on_train_start. The installed actual optimizer supports step pre-hooks, independently exercised once. The final-path pre-update capture remains mandatory implementation work under C02/A02/A04, not a defect deferred to variable-rate support."
+    },
+    {
+      "id": "R03",
+      "status": "PASS",
+      "concerns": [
+        "C04"
+      ],
+      "acceptance": [
+        "A03",
+        "A08"
+      ],
+      "subject": "Parameter ownership, custom names, buffers and historical controls",
+      "rationale": "Removing name filtering and using optimizer-owned requires_grad parameters fixes theta and reordered groups. Missing gradients receive zero-gradient additive correction. Frozen/excluded parameters avoid corrections; excluded trainable controls remain unchanged with zero delta. Known historical buffer/frozen extras are projected, unknown/missing/shape/nonfinite controls fail, and inbound tensors are detached rather than mutated.",
+      "baseline_evidence": "scaffold_strategy.py:235-239 versus 332; scaffold_server.py:80-89 creates controls from the full state_dict and 66-68 assumes delta keys for every entry."
+    },
+    {
+      "id": "R04",
+      "status": "PASS",
+      "concerns": [
+        "C05"
+      ],
+      "acceptance": [
+        "A02",
+        "A04"
+      ],
+      "subject": "Completed-update K, final accumulation, K=0 and zero LR",
+      "rationale": "F08 supplies the actual completed-step contract. Windows 2 with 1/3/4 microbatches test K=1/2/2 and normalized tails, skipped steps and no duplicate finalize. A later empty round must retain ci and emit fresh zero delta. Zero/negative/nonfinite LR fails before an attempted update; max(1,K) is removed.",
+      "baseline_evidence": "training_step.py:118-130; composable.py:558-575,603-616; scaffold_strategy.py:277,311."
+    },
+    {
+      "id": "R05",
+      "status": "PASS",
+      "concerns": [
+        "C06"
+      ],
+      "acceptance": [
+        "A05",
+        "A06"
+      ],
+      "subject": "Logical-client controls, migration and successful worker return",
+      "rationale": "One strategy owns ci. F23 logical identity and F07 contained paths are explicit prerequisites. Canonical state wins; only exact same-client legacy paths can be imported, never client 0 for another ID. Reuse 1->2->1 and reconstruction are compared over multiple rounds. Parent ci and delta must come from the current successful child; missing/failed handoff or load/save cannot yield a stale successful outbound result.",
+      "baseline_evidence": "composable.py:149,267-270,385-391,722-777; scaffold_strategy.py:117-137,366-382; scaffold_client.py:31-53; retained additional_F23_control_state_confirmation.",
+      "compatibility": "Legacy dictionaries/files remain structurally loadable and original files retained. Corrected continuation intentionally differs numerically. Consistent fresh initialization is documented without a one-client reset or a full-restart promise."
+    },
+    {
+      "id": "R06",
+      "status": "PASS",
+      "concerns": [
+        "C07"
+      ],
+      "acceptance": [
+        "A06",
+        "A07"
+      ],
+      "subject": "Late payload context handoff and reused processor binding",
+      "rationale": "Each inbound extraction installs current detached server c directly in the active trainer context. Reused processors rebind to the current trainer/client; omitted or malformed example c clears stale data and fails. The optional standalone zero-control fallback does not excuse missing controls in the federated example. A06 tests the actual order and consumed/emitted state, in both direct and shipped spawn paths.",
+      "baseline_evidence": "defaults.py:98 then245-255; scaffold_callback.py:26-43,87-90,119-120; scaffold_trainer.py:49-61."
+    },
+    {
+      "id": "R07",
+      "status": "PASS",
+      "concerns": [
+        "C08"
+      ],
+      "acceptance": [
+        "A07",
+        "A08"
+      ],
+      "subject": "Population denominator, model weighting and validation before commit",
+      "rationale": "Controls retain the 1/N population update while model aggregation retains existing sample weights. Unequal-count behavior is labeled a SCAFFOLD-derived extension, with no weighted-objective/convergence claim. The oracle distinguishes x=1.19 from uniform x=1 and gives c=2/3. Required deltas and all control keys must validate before either model/control commit; malformed payloads cannot be silently dropped.",
+      "baseline_evidence": "scaffold_server.py:38-68; fedavg.py:179 then209/235 then239; aggregation/fedavg.py:97-107.",
+      "feasibility": "The example weights_received hook runs before model mutation and can validate/stage the complete control update. Checking only weights_aggregated is insufficient; existing C08/A08 already require early rejection. No general server-base redesign is necessary for this bounded contract."
+    },
+    {
+      "id": "R08",
+      "status": "PASS",
+      "concerns": [
+        "C03",
+        "C09"
+      ],
+      "acceptance": [
+        "A04",
+        "A09"
+      ],
+      "subject": "Honest SGD reference, momentum/Adam extension and V2 compatibility",
+      "rationale": "The shipped momentum=.9/config values are preserved. Plain fixed-rate SGD with momentum/weight_decay=0 and maximize=false supplies the strict gradient reference. Other retained optimizers use the explicitly defined post-optimizer subtractive extension and warn once per run; A09 checks raw-optimizer composition instead of falsely claiming mean-gradient equivalence. Exported V2/constructor remain as corrected Option II compatibility, including the accumulation tail. True Option I is a feature deferral rather than a reason to keep the broken implementation.",
+      "baseline_evidence": "shipped TOML:38,58-61; scaffold_strategy.py:414-559; composable.py:562-569."
+    },
+    {
+      "id": "R09",
+      "status": "PASS",
+      "concerns": [
+        "C10"
+      ],
+      "acceptance": [
+        "A10"
+      ],
+      "subject": "Mandatory public docs, phase ownership and F20 exception",
+      "rationale": "Corrected formulas, actual delta transport, fixed-rate limits, optimizer/model-weighting limits, legacy numerical discontinuity and removal of blanket convergence claims are mandatory before Phase 2C/Phase 2 closure. Exact SCAFFOLD example/docs paths are reserved from Phase 4/5. F20 legacy unsquared-L2 default and l1 behavior remain independently preserved; no squared-FedProx migration is inferred.",
+      "baseline_evidence": "Public SCAFFOLD section lines12-17; plan-addendum.json F20 policy; design decision.preserve, C10 and implementation_handoff.",
+      "user_model_policy": "Overall 2C ownership names the phase task. C owns code/tests/docstrings. A fresh root-assigned Astra writing agent authors standalone README/public prose from C implementation facts, followed by independent review. This user-authorized handoff satisfies the ownership contract and must occur before Phase 2 closure, not be deferred to later docs phases."
+    },
+    {
+      "id": "R10",
+      "status": "PASS",
+      "concerns": [
+        "C01",
+        "C02",
+        "C06",
+        "C07",
+        "C08",
+        "C10"
+      ],
+      "acceptance": [
+        "A01",
+        "A02",
+        "A03",
+        "A04",
+        "A05",
+        "A06",
+        "A07",
+        "A08",
+        "A09",
+        "A10"
+      ],
+      "subject": "Finite acceptance, dependencies and unnecessary scope",
+      "rationale": "A01-A10 are behavior-specific and discriminating, not helper-derived or parse-only checks. The deterministic synthetic config-based smoke produces real client gradients/deltas with actual counts 2/6/4 and K=2; one batch per epoch is reachable through the baseline loader. Direct/spawn qualification and F07/F08/F23 integrated review are mandatory. Deferred variable rates, true Option I, new model weighting, full restart, GPU and benchmarks do not excuse known supported-path defects. Authentication, transport, unrelated algorithms and general framework redesign are excluded.",
+      "ownership": "Root accepts the exact design, serializes any necessary shared handoff, authorizes the original 2C implementer, assigns the prose handoff and records the Phase 4 receipt. No extra user-permission detour is required. A10 uses supported locked 3.13 and focused available 3.14 evidence without claiming whole-stack support."
+    }
+  ],
+  "executed_checks": {
+    "command": "zsh -lc 'PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=. OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 .venv/bin/python /tmp/plato-phase2c-scaffold-design-review/independent_checks.py'",
+    "exit_code": 0,
+    "results": {
+      "baseline_commit": "fda60becedfa6236c11d415b87a868b52789a41e",
+      "design_sha256": "f323f3aa9d824df44a1043b2d6aff9c8a963c42964f6e6685108c59b25fc3a89",
+      "python": "3.13.16",
+      "torch": "2.14.1",
+      "device": "cpu",
+      "dtype": "float64",
+      "independent_torch_sgd": [
+        {
+          "gradients": [
+            0.0
+          ],
+          "y": 0.9,
+          "ci_new": -2.220446049250313e-16,
+          "delta_ci": -1.0000000000000002
+        },
+        {
+          "gradients": [
+            3.0,
+            1.0
+          ],
+          "y": 0.4,
+          "ci_new": 1.9999999999999996,
+          "delta_ci": 0.9999999999999996
+        }
+      ],
+      "independent_exact_multiround": [
+        {
+          "selected": [
+            1,
+            2
+          ],
+          "starting_x": "1",
+          "local_y": [
+            "31/50",
+            "69/50"
+          ],
+          "ci_new": [
+            "9/10",
+            "-9/10"
+          ],
+          "delta_ci": [
+            "-1/10",
+            "-39/10"
+          ],
+          "gradients": [
+            [
+              "1",
+              "4/5"
+            ],
+            [
+              "-1",
+              "-4/5"
+            ]
+          ],
+          "sample_weighted_x": "119/100",
+          "c_new": "2/3",
+          "all_ci_after_round": [
+            "9/10",
+            "-9/10",
+            "2"
+          ],
+          "uniform_x": "1"
+        },
+        {
+          "selected": [
+            1,
+            3
+          ],
+          "starting_x": "119/100",
+          "local_y": [
+            "30247/30000",
+            "30817/30000"
+          ],
+          "ci_new": [
+            "6853/6000",
+            "12883/6000"
+          ],
+          "delta_ci": [
+            "1453/6000",
+            "883/6000"
+          ],
+          "gradients": [
+            [
+              "119/100",
+              "3283/3000"
+            ],
+            [
+              "219/100",
+              "6313/3000"
+            ]
+          ],
+          "sample_weighted_x": "10209/10000",
+          "c_new": "896/1125",
+          "all_ci_after_round": [
+            "6853/6000",
+            "-9/10",
+            "12883/6000"
+          ],
+          "uniform_x_for_these_local_models": "7633/7500"
+        }
+      ],
+      "all_advertised_rational_values_match": true,
+      "appendix_eq19_counterexample": {
+        "reversed_displacement_expression": "2",
+        "mean_gradient": "0"
+      },
+      "exact_baseline_reproduction": {
+        "source_sha256": "194fdf4fa50882b5c8bbe2c27d550b61c76a5e48063b7874ba9cdded0836b04d",
+        "y": 1.1,
+        "ci_new": 0.9999999999999991,
+        "delta_ci": -8.881784197001252e-16,
+        "retained_state_path": "/tmp/plato-phase2c-scaffold-design-review/baseline-1790996575951757000_scaffold_cv_1.pkl",
+        "expected_correct": {
+          "y": 0.9,
+          "ci_new": 0,
+          "delta_ci": -1
+        }
+      },
+      "optimizer_pre_hook_feasibility": {
+        "observed_executed_group_rates": [
+          [
+            0.1
+          ]
+        ]
+      },
+      "duration_seconds": 0.0357
+    },
+    "source_path": "/tmp/plato-phase2c-scaffold-design-review/independent_checks.py",
+    "source_sha256": "1939446d999f8974f8ac2e6174645e79e680fdce5abd59f6c9aacb13834d25be",
+    "results_path": "/tmp/plato-phase2c-scaffold-design-review/independent_checks.json",
+    "results_sha256": "9d11e027dfba39328b238f25f2e0004222da1c85ee5a857fb4c8c103c429604b",
+    "baseline_probe_isolation": "Compiled the exact git object and patched only its Config accessor in the probe process; the pickle output stayed in owned scratch. No root fixture or candidate code used.",
+    "limits": "Small CPU float64 SGD/reference and exact rational oracle only. Optimizer hook feasibility was exercised once. No implementation green claim, distributed/convergence result, broad runtime suite, GPU qualification, spawned candidate check or unrelated algorithm audit."
+  },
+  "implementation_acceptance_still_required": {
+    "design_criteria": "All A01-A10, including normal/final executed-LR capture, no stale worker/processor state, legacy path precedence, early delta validation, buffers, momentum/Adam and V2 tests.",
+    "docs_deadline": "Fresh root-assigned Astra prose from C facts with independent review before Phase 2 closure; C code/tests/docstrings stay with C.",
+    "closure": "Independent implementation review and root integration on F07/F08/F23/F27, required profiles, exact candidate/diff identity and retained commands/results. PASS authorizes design disposition only and does not close F27."
+  },
+  "write_and_resource_scope": {
+    "shell": "zsh -lc",
+    "agents_spawned": 0,
+    "production_or_design_edits": 0,
+    "commits": 0,
+    "pushes": 0,
+    "pr_edits": 0,
+    "questions": 0,
+    "sole_root_write": "evidence/2026-refresh/phase2c-scaffold-design-review.json",
+    "owned_scratch": "/tmp/plato-phase2c-scaffold-design-review",
+    "resources_retained": true,
+    "other_worktree_or_persistent_environment_changes": 0
+  }
+}

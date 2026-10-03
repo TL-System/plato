@@ -270,6 +270,8 @@ def test_huggingface_corpus_mode_keeps_legacy_default_block_size(
     cfg.data.dataset_name = "dummy"
     cfg.data.text_field = "text"
     cfg.data.preprocessing_mode = "corpus_lm"
+    # Datasets 5 uses a process pool even for num_proc=1; None maps in-process.
+    cfg.data.preprocessing_num_proc = None
     cfg.data.train_split = "train"
     cfg.data.validation_split = "validation"
     if "block_size" in cfg.data:

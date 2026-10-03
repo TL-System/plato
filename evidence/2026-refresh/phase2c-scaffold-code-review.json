@@ -1,0 +1,4681 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-03T06:11:42.122541+00:00",
+  "role": "Fresh independent SCAFFOLD F27 implementation/integration reviewer; no nested agents or source edits.",
+  "decision": "CHANGES_REQUIRED",
+  "acceptance": "FAIL",
+  "finding": "F27",
+  "summary": "The corrected research equations and successful direct/spawn/configured round paths check out, but server model-half validation and durable client controls after failed worker handoff do not satisfy the accepted contracts. One high and one medium issue are independently reproduced on Python 3.13.16 and 3.14.8. Passing delivered tests do not close these issues.",
+  "finding_counts": {
+    "critical": 0,
+    "high": 1,
+    "medium": 1,
+    "low": 0
+  },
+  "findings": [
+    {
+      "id": "F27-R01",
+      "severity": "high",
+      "status": "OPEN",
+      "title": "SCAFFOLD validates control halves but commits malformed model halves.",
+      "acceptance_contracts": [
+        "A08",
+        "A10"
+      ],
+      "primary_location": {
+        "file": "examples/customized_client_training/scaffold/scaffold_server.py",
+        "line": 68
+      },
+      "supporting_locations": [
+        {
+          "file": "examples/customized_client_training/scaffold/scaffold_server.py",
+          "line": 75
+        },
+        {
+          "file": "examples/customized_client_training/scaffold/scaffold_server.py",
+          "line": 85
+        },
+        {
+          "file": "plato/servers/fedavg.py",
+          "line": 203
+        },
+        {
+          "file": "plato/servers/fedavg.py",
+          "line": 217
+        }
+      ],
+      "cause": "weights_received validates only payload[1], appends payload[0] without checking required model keys, per-client shapes or finiteness, then stages controls. The inherited aggregator can broadcast malformed shapes or omit a client key, and load_weights accepts NaN. The final aggregated shape cannot validate each original client model.",
+      "concrete_reproducer": {
+        "source": {
+          "path": "/tmp/plato-phase2c-scaffold-code-review/server_reproducer.py",
+          "bytes": 2687,
+          "sha256": "71b6721b821e6634c6a45fdd45bbe59481702cc99ba0088b93023912ad244735"
+        },
+        "command_records": [
+          {
+            "label": "server313",
+            "command": "/tmp/plato-phase2c-313/bin/python /tmp/plato-phase2c-scaffold-code-review/server_reproducer.py",
+            "shell": [
+              "zsh",
+              "-lc"
+            ],
+            "cwd": "/private/tmp/plato-refresh-worktrees/training",
+            "env_overrides": {
+              "PYTHONDONTWRITEBYTECODE": "1",
+              "PYTHONPATH": "/private/tmp/plato-refresh-worktrees/training",
+              "OMP_NUM_THREADS": "1",
+              "MKL_NUM_THREADS": "1",
+              "PYTEST_ADDOPTS": "",
+              "RUFF_CACHE_DIR": "/tmp/plato-phase2c-scaffold-code-review/ruff-cache"
+            },
+            "exit_code": 0,
+            "deadline_seconds": 240,
+            "duration_seconds": 4.53088903427124,
+            "raw_log": "/tmp/plato-phase2c-scaffold-code-review/server313.log",
+            "raw_bytes": 8133,
+            "raw_sha256": "1a44dd4e54931ee956db754574adf29867fe1914843574dd251e3a91618250cd"
+          },
+          {
+            "label": "server314",
+            "command": "/private/tmp/plato-phase2c-314/bin/python /tmp/plato-phase2c-scaffold-code-review/server_reproducer.py",
+            "shell": [
+              "zsh",
+              "-lc"
+            ],
+            "cwd": "/private/tmp/plato-refresh-worktrees/training",
+            "env_overrides": {
+              "PYTHONDONTWRITEBYTECODE": "1",
+              "PYTHONPATH": "/private/tmp/plato-refresh-worktrees/training",
+              "OMP_NUM_THREADS": "1",
+              "MKL_NUM_THREADS": "1",
+              "PYTEST_ADDOPTS": "",
+              "RUFF_CACHE_DIR": "/tmp/plato-phase2c-scaffold-code-review/ruff-cache"
+            },
+            "exit_code": 0,
+            "deadline_seconds": 240,
+            "duration_seconds": 4.904169797897339,
+            "raw_log": "/tmp/plato-phase2c-scaffold-code-review/server314.log",
+            "raw_bytes": 8151,
+            "raw_sha256": "7552ed34d061dc03eb2a01d70c97fd297e250e9b267b03188dcc992cdb720041"
+          }
+        ],
+        "steps": [
+          "Use the actual shipped TOML with explicit CPU/scalar/quadratic/SGD overrides, N=3.",
+          "Obtain a full valid report through actual example configure, inbound processing, training and outbound processing; num_samples=2.",
+          "Initial server x=1,c=2. Supply two reports: first model theta=[7], delta theta=[3]; second delta theta=[4] with model theta=[NaN], missing theta={}, or scalar theta=9 instead of shape [1].",
+          "Call actual server._process_reports(), including its inherited aggregate_weights, load_weights and weights_aggregated hooks."
+        ],
+        "expected": "Reject the entire batch before arithmetic/commit; model x=1 and control c=2 remain unchanged.",
+        "actual": "All three cases finish report processing without an exception. Global x becomes NaN, 3.5, or 8 respectively; c commits 13/3 in every case.",
+        "python_versions": [
+          "3.13.16",
+          "3.14.8"
+        ],
+        "results": {
+          "313": {
+            "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+            "torch": "2.14.1",
+            "reproductions": [
+              {
+                "case": "nan",
+                "before": {
+                  "x": 1.0,
+                  "c": 2.0
+                },
+                "model_half": "OrderedDict({'theta': tensor([nan], dtype=torch.float64)})",
+                "controls": "finite theta deltas 3 and 4, N=3",
+                "expected": "SCAFFOLD validation failure before model/control mutation: x=1,c=2",
+                "actual_x": "NaN",
+                "actual_c": 4.333333333333334,
+                "exception": null,
+                "pending_controls": false,
+                "report_fields": [
+                  "accuracy",
+                  "client_id",
+                  "comm_time",
+                  "num_samples",
+                  "processing_time",
+                  "train_loss",
+                  "training_time",
+                  "update_response"
+                ]
+              },
+              {
+                "case": "missing",
+                "before": {
+                  "x": 1.0,
+                  "c": 2.0
+                },
+                "model_half": "{}",
+                "controls": "finite theta deltas 3 and 4, N=3",
+                "expected": "SCAFFOLD validation failure before model/control mutation: x=1,c=2",
+                "actual_x": 3.5,
+                "actual_c": 4.333333333333334,
+                "exception": null,
+                "pending_controls": false,
+                "report_fields": [
+                  "accuracy",
+                  "client_id",
+                  "comm_time",
+                  "num_samples",
+                  "processing_time",
+                  "train_loss",
+                  "training_time",
+                  "update_response"
+                ]
+              },
+              {
+                "case": "broadcast",
+                "before": {
+                  "x": 1.0,
+                  "c": 2.0
+                },
+                "model_half": "OrderedDict({'theta': tensor(9., dtype=torch.float64)})",
+                "controls": "finite theta deltas 3 and 4, N=3",
+                "expected": "SCAFFOLD validation failure before model/control mutation: x=1,c=2",
+                "actual_x": 8.0,
+                "actual_c": 4.333333333333334,
+                "exception": null,
+                "pending_controls": false,
+                "report_fields": [
+                  "accuracy",
+                  "client_id",
+                  "comm_time",
+                  "num_samples",
+                  "processing_time",
+                  "train_loss",
+                  "training_time",
+                  "update_response"
+                ]
+              }
+            ],
+            "interpretation": "Reproducer exited zero after asserting the defect; not an acceptance pass."
+          },
+          "314": {
+            "python": "3.14.8 (main, Sep 30 2026, 17:55:09) [Clang 21.0.0 (clang-2100.3.34.2)]",
+            "torch": "2.14.1",
+            "reproductions": [
+              {
+                "case": "nan",
+                "before": {
+                  "x": 1.0,
+                  "c": 2.0
+                },
+                "model_half": "OrderedDict({'theta': tensor([nan], dtype=torch.float64)})",
+                "controls": "finite theta deltas 3 and 4, N=3",
+                "expected": "SCAFFOLD validation failure before model/control mutation: x=1,c=2",
+                "actual_x": "NaN",
+                "actual_c": 4.333333333333334,
+                "exception": null,
+                "pending_controls": false,
+                "report_fields": [
+                  "accuracy",
+                  "client_id",
+                  "comm_time",
+                  "num_samples",
+                  "processing_time",
+                  "train_loss",
+                  "training_time",
+                  "update_response"
+                ]
+              },
+              {
+                "case": "missing",
+                "before": {
+                  "x": 1.0,
+                  "c": 2.0
+                },
+                "model_half": "{}",
+                "controls": "finite theta deltas 3 and 4, N=3",
+                "expected": "SCAFFOLD validation failure before model/control mutation: x=1,c=2",
+                "actual_x": 3.5,
+                "actual_c": 4.333333333333334,
+                "exception": null,
+                "pending_controls": false,
+                "report_fields": [
+                  "accuracy",
+                  "client_id",
+                  "comm_time",
+                  "num_samples",
+                  "processing_time",
+                  "train_loss",
+                  "training_time",
+                  "update_response"
+                ]
+              },
+              {
+                "case": "broadcast",
+                "before": {
+                  "x": 1.0,
+                  "c": 2.0
+                },
+                "model_half": "OrderedDict({'theta': tensor(9., dtype=torch.float64)})",
+                "controls": "finite theta deltas 3 and 4, N=3",
+                "expected": "SCAFFOLD validation failure before model/control mutation: x=1,c=2",
+                "actual_x": 8.0,
+                "actual_c": 4.333333333333334,
+                "exception": null,
+                "pending_controls": false,
+                "report_fields": [
+                  "accuracy",
+                  "client_id",
+                  "comm_time",
+                  "num_samples",
+                  "processing_time",
+                  "train_loss",
+                  "training_time",
+                  "update_response"
+                ]
+              }
+            ],
+            "interpretation": "Reproducer exited zero after asserting the defect; not an acceptance pass."
+          }
+        }
+      },
+      "impact": "A malformed model paired with valid controls can corrupt the global model and advance population controls. The selected whole-batch atomic model/control contract is not satisfied.",
+      "provenance": "This does not assert a newly introduced generic B aggregation regression. It is an unclosed F27 implementation obligation in the SCAFFOLD subclass; generic B FedAvg and its adapter payload policies are unchanged.",
+      "bounded_correction": "Validate each SCAFFOLD model half against the applicable model payload schema before staging either half, preserving existing model-buffer aggregation and accepted B adapter semantics. Add the failing raw-model cases and atomicity assertions to the SCAFFOLD integration tests."
+    },
+    {
+      "id": "F27-R02",
+      "severity": "medium",
+      "status": "OPEN",
+      "title": "A failed worker handoff advances canonical client controls that routine reuse later adopts.",
+      "acceptance_contracts": [
+        "A05",
+        "A06",
+        "A10"
+      ],
+      "primary_location": {
+        "file": "plato/trainers/strategies/algorithms/scaffold_strategy.py",
+        "line": 304
+      },
+      "supporting_locations": [
+        {
+          "file": "plato/trainers/strategies/algorithms/scaffold_strategy.py",
+          "line": 315
+        },
+        {
+          "file": "plato/trainers/strategies/algorithms/scaffold_strategy.py",
+          "line": 133
+        },
+        {
+          "file": "plato/trainers/composable.py",
+          "line": 416
+        },
+        {
+          "file": "plato/trainers/composable.py",
+          "line": 423
+        },
+        {
+          "file": "plato/trainers/composable.py",
+          "line": 849
+        }
+      ],
+      "cause": "The child overwrites the canonical ci checkpoint in on_train_end before model saving/current-token state handoff is complete. A failed handoff correctly refuses outbound processing and retains old parent ci, but unsuccessful cleanup only clears transient delta. The advanced canonical ci is then loaded by normal identity reassignment or reconstruction.",
+      "concrete_reproducer": {
+        "source": {
+          "path": "/tmp/plato-phase2c-scaffold-code-review/worker_failure_reproducer.py",
+          "bytes": 3397,
+          "sha256": "8622f9502c53784d9d31175b5d387c7301b4bf94f70bd0543ecb844fb5f72465"
+        },
+        "command_records": [
+          {
+            "label": "workerfailure313-v2",
+            "command": "/tmp/plato-phase2c-313/bin/python /tmp/plato-phase2c-scaffold-code-review/worker_failure_reproducer.py",
+            "shell": [
+              "zsh",
+              "-lc"
+            ],
+            "cwd": "/private/tmp/plato-refresh-worktrees/training",
+            "env_overrides": {
+              "PYTHONDONTWRITEBYTECODE": "1",
+              "PYTHONPATH": "/private/tmp/plato-refresh-worktrees/training",
+              "OMP_NUM_THREADS": "1",
+              "MKL_NUM_THREADS": "1",
+              "PYTEST_ADDOPTS": "",
+              "RUFF_CACHE_DIR": "/tmp/plato-phase2c-scaffold-code-review/ruff-cache"
+            },
+            "exit_code": 0,
+            "deadline_seconds": 240,
+            "duration_seconds": 13.757294178009033,
+            "raw_log": "/tmp/plato-phase2c-scaffold-code-review/workerfailure313-v2.log",
+            "raw_bytes": 4481,
+            "raw_sha256": "a74552b40df89c1050034a69a9919fefd503776320c07f1f25d68b0e808f5253"
+          },
+          {
+            "label": "workerfailure314-v2",
+            "command": "/private/tmp/plato-phase2c-314/bin/python /tmp/plato-phase2c-scaffold-code-review/worker_failure_reproducer.py",
+            "shell": [
+              "zsh",
+              "-lc"
+            ],
+            "cwd": "/private/tmp/plato-refresh-worktrees/training",
+            "env_overrides": {
+              "PYTHONDONTWRITEBYTECODE": "1",
+              "PYTHONPATH": "/private/tmp/plato-refresh-worktrees/training",
+              "OMP_NUM_THREADS": "1",
+              "MKL_NUM_THREADS": "1",
+              "PYTEST_ADDOPTS": "",
+              "RUFF_CACHE_DIR": "/tmp/plato-phase2c-scaffold-code-review/ruff-cache"
+            },
+            "exit_code": 0,
+            "deadline_seconds": 240,
+            "duration_seconds": 14.647494077682495,
+            "raw_log": "/tmp/plato-phase2c-scaffold-code-review/workerfailure314-v2.log",
+            "raw_bytes": 4499,
+            "raw_sha256": "05f36ab1c8de922eec54ce6848241599fbbb96de0e96d614a6e2513c703e8cd5"
+          }
+        ],
+        "steps": [
+          "Real shipped max_concurrency spawn path, CPU quadratic target 0, sample_count=2, epochs=2, eta=.1. Initial x=1,c=2,ci=1; a real pre-existing canonical checkpoint stores ci=1 and fresh construction verifies it.",
+          "A scratch-only trainer subclass calls the unchanged actual worker then removes its required current training-state handoff file. This is the same missing-state failure class exercised by the delivered worker negative test.",
+          "Actual outbound refuses the failed handoff; parent ci remains 1 and no delta is emitted.",
+          "Run ordinary configure-based logical identity reuse 1->2->1 and reconstruct client 1. Both read ci=.9 from the failed attempt.",
+          "Restore the ordinary trainer and retry the same x=1,c=2. Inspect the real successful spawned model, ci and outbound delta."
+        ],
+        "expected": "Preserve the last successful canonical ci=1 across the rejected handoff and ordinary client reuse; successful retry yields y=.62,ci=.9,delta=-.1.",
+        "actual": "Rejected attempt leaves parent ci=1 but persisted/reloaded ci=.9. Successful retry yields y=.601,ci=.895,delta=-.005, permanently omitting the failed attempt delta=-.1.",
+        "numerical_consequence": "For inactive ci=(3,2), applying only the successfully emitted retry delta to c=2 gives c=1.9983333333333335 while mean retained ci is 1.965. This consequence is independently calculated, not a convergence claim.",
+        "python_versions": [
+          "3.13.16",
+          "3.14.8"
+        ],
+        "results": {
+          "313": {
+            "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+            "failed_handoff_error": "SCAFFOLD has no successful current-round control delta.",
+            "training_error": "Training on client 1 failed.",
+            "parent_ci_after_failure": 1.0,
+            "ci_after_1_to_2_to_1": 0.8999999999999995,
+            "reconstructed_ci": 0.8999999999999995,
+            "expected": "Failed handoff has no outbound delta; normal reuse must retain the pre-attempt ci=1. Retry should yield y=.62,ci=.9,delta=-.1.",
+            "actual_retry": {
+              "y": 0.6009999999999999,
+              "ci": 0.895,
+              "delta": -0.004999999999999449
+            },
+            "next_server_c_if_retry_only_delivered": 1.9983333333333335,
+            "mean_retained_ci_after_retry": 1.9649999999999999,
+            "interpretation": "Exit zero asserts the defect, not acceptance success."
+          },
+          "314": {
+            "python": "3.14.8 (main, Sep 30 2026, 17:55:09) [Clang 21.0.0 (clang-2100.3.34.2)]",
+            "failed_handoff_error": "SCAFFOLD has no successful current-round control delta.",
+            "training_error": "Training on client 1 failed.",
+            "parent_ci_after_failure": 1.0,
+            "ci_after_1_to_2_to_1": 0.8999999999999995,
+            "reconstructed_ci": 0.8999999999999995,
+            "expected": "Failed handoff has no outbound delta; normal reuse must retain the pre-attempt ci=1. Retry should yield y=.62,ci=.9,delta=-.1.",
+            "actual_retry": {
+              "y": 0.6009999999999999,
+              "ci": 0.895,
+              "delta": -0.004999999999999449
+            },
+            "next_server_c_if_retry_only_delivered": 1.9983333333333335,
+            "mean_retained_ci_after_retry": 1.9649999999999999,
+            "interpretation": "Exit zero asserts the defect, not acceptance success."
+          }
+        }
+      },
+      "impact": "A detected worker failure is followed by a successful numerically stale control update after normal logical-client reuse. The parent and durable state disagree, and server/client population controls lose their invariant.",
+      "scope_boundary": "This uses normal 1->2->1 configure reuse and fresh client reconstruction in the existing process/config, with a seeded canonical last-successful checkpoint. It does not require a full server/optimizer/RNG restart protocol.",
+      "bounded_correction": "Stage worker controls until the parent accepts the current successful model/control handoff, or reliably restore the prior canonical controls on rejected attempts. Extend the current failed-worker test through normal client reuse and a successful retry."
+    }
+  ],
+  "low_findings": [],
+  "low_findings_note": "No additional concrete low-severity issue recorded; stylistic recommendations are not presented as bugs.",
+  "immutable_candidate": {
+    "path": "/private/tmp/plato-refresh-worktrees/training",
+    "commit": "62d7b7d8ef75be779149a96f567779c86699edb4",
+    "implementation": "0dc34dd1d79d90071a0babfa6aa89f33d72a976f",
+    "accepted_b": "00eeb9dcdd2b513e64db9408969356037e09bb8e",
+    "initial_status": "",
+    "final_status": "",
+    "final_head": "62d7b7d8ef75be779149a96f567779c86699edb4",
+    "identity_receipt": {
+      "path": "/tmp/plato-phase2c-scaffold-code-review/identities.json",
+      "bytes": 60401,
+      "sha256": "374790b3d7e9ceeea23dd80c0c53b3f2e0ef1d22e0a1df0a436064718f57a418"
+    },
+    "candidate_vs_b": {
+      "path": "/tmp/plato-phase2c-scaffold-code-review/candidate-vs-B.diff",
+      "bytes": 519528,
+      "sha256": "e8a0d88a9b1346e307516209d552d8af9919298b1874b4e81a1a767743da8b40"
+    },
+    "implementation_vs_b": {
+      "path": "/tmp/plato-phase2c-scaffold-code-review/implementation-vs-B.diff",
+      "bytes": 333244,
+      "sha256": "93c0a4975a8323c94d2f41065340e0d3ef30cc1f281ffa784d05532d7483322c"
+    },
+    "only_post_implementation_files": "A\tevidence/2026-refresh/phase2c-feddyn-disposition.json\nA\tevidence/2026-refresh/phase2c-scaffold-facts.json\nA\tevidence/2026-refresh/phase2c-validation.json\n",
+    "b_is_ancestor": true
+  },
+  "authorization_inputs": [
+    {
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/plan.md",
+      "bytes": 50719,
+      "sha256": "edb9a58cc7915a940854f16d5029fe97434703bf2f75eca0dcb96de2d0f0eb15"
+    },
+    {
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/plan-addendum.json",
+      "bytes": 28579,
+      "sha256": "5b51b0fb7ed6f68d9fce7176335b3e7be5e5f178a2788590912aa2396a487709"
+    },
+    {
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2c-scaffold-design.json",
+      "bytes": 30634,
+      "sha256": "f323f3aa9d824df44a1043b2d6aff9c8a963c42964f6e6685108c59b25fc3a89"
+    },
+    {
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2c-scaffold-design-review.json",
+      "bytes": 25854,
+      "sha256": "8eb83f21091827d03534db1b8c4e23a6f239b5df4f82363b4c9ead5a60b3258d"
+    },
+    {
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2c-scaffold-acceptance.json",
+      "bytes": 1194,
+      "sha256": "40b202708a4cfdbe6f299e75249c1a19921e410ec4ab7b5e3c6323f536ca8d37"
+    },
+    {
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/scaffold-equation-probe.json",
+      "bytes": 4690,
+      "sha256": "834fa629fd914b97273b0cacb60e91a2e9917bc558af07fa0b27636ea77e9164"
+    },
+    {
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/trainer-lifecycle-probes.json",
+      "bytes": 18544,
+      "sha256": "7e236a1156d139e64ce93f260f6d7968c96b4b604ad85678f4de5ef94777b82b"
+    },
+    {
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2b-acceptance.json",
+      "bytes": 2182,
+      "sha256": "3be220078302a05189c07c32220a86e966ff919bc4ef11e5d342a6c39135396d"
+    }
+  ],
+  "reviewed_source_identities": [
+    {
+      "path": "AGENTS.md",
+      "bytes": 3119,
+      "candidate_sha256": "b50f87f31ea3d87076952d8b7d2d8af067132fbf877d80f8780c208fb45527ec",
+      "B_sha256": "b50f87f31ea3d87076952d8b7d2d8af067132fbf877d80f8780c208fb45527ec",
+      "unchanged_from_b": true
+    },
+    {
+      "path": "plato/trainers/strategies/algorithms/scaffold_strategy.py",
+      "bytes": 16394,
+      "candidate_sha256": "2b6e2953f8b93f7919d95d70f598c2f4d33c9cbaff129352387f248c004d4ff6",
+      "B_sha256": "194fdf4fa50882b5c8bbe2c27d550b61c76a5e48063b7874ba9cdded0836b04d",
+      "unchanged_from_b": false
+    },
+    {
+      "path": "plato/trainers/composable.py",
+      "bytes": 41822,
+      "candidate_sha256": "6bc4dab135cd7249346ac3ca23b0e24ea638961cda7806558ab81338dc0496a8",
+      "B_sha256": "6f515dc078295b571552e34afde369168fded499a5ebe26083863a02320ba331",
+      "unchanged_from_b": false
+    },
+    {
+      "path": "plato/trainers/base.py",
+      "bytes": 3883,
+      "candidate_sha256": "2fb5e25983d1f737acf7b05d7324130458caab187b34d3e835a92d574adb1ec8",
+      "B_sha256": "ce94af40221f6b62781b9cfb4aa280f74f1584410cd3c2754259538de00cc640",
+      "unchanged_from_b": false
+    },
+    {
+      "path": "plato/trainers/strategies/base.py",
+      "bytes": 18248,
+      "candidate_sha256": "905261bbaf05f8024110f9b0be2c29886bdc39a91c6be18aa9e83bb4868ec0d3",
+      "B_sha256": "f74fefc541f3fd24750ae4b8aaa7768cb1ab3b3907f01c899dcc0e9b9fb7dea7",
+      "unchanged_from_b": false
+    },
+    {
+      "path": "plato/trainers/strategies/training_step.py",
+      "bytes": 19781,
+      "candidate_sha256": "ba912ceea97a1fe592d690cb06c9827cd988d37320a92f1dc72bbb42feea2983",
+      "B_sha256": "c23c3344570c42a8a20c482b574259c88ce66de1edae30b7d79faf169de43604",
+      "unchanged_from_b": false
+    },
+    {
+      "path": "plato/trainers/strategies/optimizer.py",
+      "bytes": 14695,
+      "candidate_sha256": "ffbeab17d1a2455013871d32f4e82402f5422a6c14fc629d334b2d93c59e7957",
+      "B_sha256": "48febb0061a2c4b97fe50757ac7acc47eb7250cef2f560f40ee21249197dd8ed",
+      "unchanged_from_b": false
+    },
+    {
+      "path": "plato/trainers/optimizers.py",
+      "bytes": 2080,
+      "candidate_sha256": "da613c5d2975a7cf124619233645ba8b02e6ad32218f08dd508b9b410da06e34",
+      "B_sha256": "da613c5d2975a7cf124619233645ba8b02e6ad32218f08dd508b9b410da06e34",
+      "unchanged_from_b": true
+    },
+    {
+      "path": "plato/utils/checkpoint_paths.py",
+      "bytes": 4057,
+      "candidate_sha256": "7f530a13e9dac30d4c8a6bb7c05de2ff242d12f203dbf3e4c45495442c789dfd"
+    },
+    {
+      "path": "plato/clients/strategies/defaults.py",
+      "bytes": 21145,
+      "candidate_sha256": "6a41108b7878113ed4b7c9555d818b1f59862f55c487524b26052a0f12c3feca",
+      "B_sha256": "7d30f52b05df63c706a3dea20b40a02affa811c508d03ebb43b3b88b09d57c4f",
+      "unchanged_from_b": false
+    },
+    {
+      "path": "plato/clients/composable.py",
+      "bytes": 15444,
+      "candidate_sha256": "25de844fe9f9b2c2b7d8e9a633c3ed1fb9831c10fae2a14404dadd5d7670fe53",
+      "B_sha256": "25de844fe9f9b2c2b7d8e9a633c3ed1fb9831c10fae2a14404dadd5d7670fe53",
+      "unchanged_from_b": true
+    },
+    {
+      "path": "plato/algorithms/fedavg.py",
+      "bytes": 12558,
+      "candidate_sha256": "512006d85daa070cd7a7a595b849a96ba70805bc88aa41d329b340dc4edc0258",
+      "B_sha256": "512006d85daa070cd7a7a595b849a96ba70805bc88aa41d329b340dc4edc0258",
+      "unchanged_from_b": true
+    },
+    {
+      "path": "plato/servers/fedavg.py",
+      "bytes": 15905,
+      "candidate_sha256": "f184068a11c5be9e523f08b95e1cce76dff2e20e2fdb4e6426caf95dac0bcee5",
+      "B_sha256": "f184068a11c5be9e523f08b95e1cce76dff2e20e2fdb4e6426caf95dac0bcee5",
+      "unchanged_from_b": true
+    },
+    {
+      "path": "plato/servers/strategies/aggregation/fedavg.py",
+      "bytes": 11663,
+      "candidate_sha256": "fa1e2a6bbbc8e3829b72cd0cdd47f10b0a8fffbdabdaa2dfb3efed81872877c1",
+      "B_sha256": "fa1e2a6bbbc8e3829b72cd0cdd47f10b0a8fffbdabdaa2dfb3efed81872877c1",
+      "unchanged_from_b": true
+    },
+    {
+      "path": "plato/trainers/strategies/algorithms/fedprox_strategy.py",
+      "bytes": 10142,
+      "candidate_sha256": "6041f84186d710a48740a39eac0bf93562562554168991e347a7e71a81216221",
+      "B_sha256": "d68b05a468010b72ff6eedd051e4ebccd1db7fad649d3432ea06566b8fdaa7a6",
+      "unchanged_from_b": false
+    },
+    {
+      "path": "examples/customized_client_training/scaffold/scaffold.py",
+      "bytes": 753,
+      "candidate_sha256": "37587214941e1532d5552b7477249b18b5fadf905739ac94735d17df9886ac3a",
+      "B_sha256": "37587214941e1532d5552b7477249b18b5fadf905739ac94735d17df9886ac3a",
+      "unchanged_from_b": true
+    },
+    {
+      "path": "examples/customized_client_training/scaffold/scaffold_client.py",
+      "bytes": 1684,
+      "candidate_sha256": "01a08e2001ba4f9e4e61c2ff520e3d1b3fcff5d44168a3d5ac002c45b4c48a8b",
+      "B_sha256": "08b7180f15531a5379ab4d245c63281b02920b65c96ece717077bca3e5efea6f",
+      "unchanged_from_b": false
+    },
+    {
+      "path": "examples/customized_client_training/scaffold/scaffold_trainer.py",
+      "bytes": 2112,
+      "candidate_sha256": "405c0d270a4362ab0cc2569899ef1deb9b03a5a235ef44c75261b43fdbaf00de",
+      "B_sha256": "2d78d76f5d0e5164cac365853a093a3d03dc2bc9fdeb1add7be79944afbc589f",
+      "unchanged_from_b": false
+    },
+    {
+      "path": "examples/customized_client_training/scaffold/scaffold_callback.py",
+      "bytes": 4777,
+      "candidate_sha256": "159a2adbbae5c7982c30896af596c546e601669b0230b841656ee464ee66d39f",
+      "B_sha256": "2e69ce6b17faa1d08e87a8ed2bee592d50663f3945e9bdd6a5ffd8b4198914e0",
+      "unchanged_from_b": false
+    },
+    {
+      "path": "examples/customized_client_training/scaffold/scaffold_server.py",
+      "bytes": 3849,
+      "candidate_sha256": "e2325ee39337489f15711c4073aeb10335e2b47ecc0cc9aefd0406bbbb18c78a",
+      "B_sha256": "384df5a5b7dda54bd8f60c5d89f17c97fb3e664126b6955a11de8c6d7ac96a33",
+      "unchanged_from_b": false
+    },
+    {
+      "path": "examples/customized_client_training/scaffold/scaffold_MNIST_lenet5.toml",
+      "bytes": 1177,
+      "candidate_sha256": "43110532d391896d4080782a4dbace3fbe2bc7813ac9e7baa662074f044f290c",
+      "B_sha256": "0c5048c3be4fbf06c55689037beabf29e1425efa3f9b4e090ae6ea82a7412f6f",
+      "unchanged_from_b": false
+    },
+    {
+      "path": "tests/trainers/test_scaffold_strategy.py",
+      "bytes": 19567,
+      "candidate_sha256": "7419ab4ea2088f7825bc8008be99c2d99a18f139dab50188a3c06a6eefd9c02e"
+    },
+    {
+      "path": "tests/integration/test_scaffold_round_flow.py",
+      "bytes": 24984,
+      "candidate_sha256": "5477fbc57455ebbc3ded0a10181fa9b6433edf1b0c1bf200710e51995b21f128"
+    }
+  ],
+  "author_evidence_receipts": {
+    "checked_count": 74,
+    "all_match": true,
+    "records": [
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/training/configs/MNIST/fedprox_lenet5.toml",
+        "bytes": 939,
+        "sha256": "45da742c8daa0b616341edb5d03ecd19f9c4d5af1fc3436e1282dc2b9ddab2e8",
+        "expected_sha256": "45da742c8daa0b616341edb5d03ecd19f9c4d5af1fc3436e1282dc2b9ddab2e8",
+        "matches": true
+      },
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/training/examples/async/port/port_server.py",
+        "bytes": 1168,
+        "sha256": "e369f280d9c704411cf85ba752c2e7fb5cd790d50e5ff313151b2852bc2efdea",
+        "expected_sha256": "e369f280d9c704411cf85ba752c2e7fb5cd790d50e5ff313151b2852bc2efdea",
+        "matches": true
+      },
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/training/examples/customized_client_training/fedprox/fedprox_trainer.py",
+        "bytes": 1526,
+        "sha256": "266e14da78843bfd1130d25d25d306a45817d57baf08e13433c0a9e7941dc7a3",
+        "expected_sha256": "266e14da78843bfd1130d25d25d306a45817d57baf08e13433c0a9e7941dc7a3",
+        "matches": true
+      },
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/training/examples/customized_client_training/scaffold/scaffold_MNIST_lenet5.toml",
+        "bytes": 1177,
+        "sha256": "43110532d391896d4080782a4dbace3fbe2bc7813ac9e7baa662074f044f290c",
+        "expected_sha256": "43110532d391896d4080782a4dbace3fbe2bc7813ac9e7baa662074f044f290c",
+        "matches": true
+      },
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/training/examples/customized_client_training/scaffold/scaffold_callback.py",
+        "bytes": 4777,
+        "sha256": "159a2adbbae5c7982c30896af596c546e601669b0230b841656ee464ee66d39f",
+        "expected_sha256": "159a2adbbae5c7982c30896af596c546e601669b0230b841656ee464ee66d39f",
+        "matches": true
+      },
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/training/examples/customized_client_training/scaffold/scaffold_client.py",
+        "bytes": 1684,
+        "sha256": "01a08e2001ba4f9e4e61c2ff520e3d1b3fcff5d44168a3d5ac002c45b4c48a8b",
+        "expected_sha256": "01a08e2001ba4f9e4e61c2ff520e3d1b3fcff5d44168a3d5ac002c45b4c48a8b",
+        "matches": true
+      },
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/training/examples/customized_client_training/scaffold/scaffold_server.py",
+        "bytes": 3849,
+        "sha256": "e2325ee39337489f15711c4073aeb10335e2b47ecc0cc9aefd0406bbbb18c78a",
+        "expected_sha256": "e2325ee39337489f15711c4073aeb10335e2b47ecc0cc9aefd0406bbbb18c78a",
+        "matches": true
+      },
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/training/examples/customized_client_training/scaffold/scaffold_trainer.py",
+        "bytes": 2112,
+        "sha256": "405c0d270a4362ab0cc2569899ef1deb9b03a5a235ef44c75261b43fdbaf00de",
+        "expected_sha256": "405c0d270a4362ab0cc2569899ef1deb9b03a5a235ef44c75261b43fdbaf00de",
+        "matches": true
+      },
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/training/plato/algorithms/fedavg_gan.py",
+        "bytes": 3275,
+        "sha256": "fc892e85dbb4f5f9f86d966d98366f638e10853e7585b1b2d4c9b1ccdec5284d",
+        "expected_sha256": "fc892e85dbb4f5f9f86d966d98366f638e10853e7585b1b2d4c9b1ccdec5284d",
+        "matches": true
+      },
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/training/plato/algorithms/fedavg_personalized.py",
+        "bytes": 3537,
+        "sha256": "00fc6afc3f81851f10df3f59a00945801c9b7992d5aec551493c6507ac8cce88",
+        "expected_sha256": "00fc6afc3f81851f10df3f59a00945801c9b7992d5aec551493c6507ac8cce88",
+        "matches": true
+      },
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/training/plato/clients/base.py",
+        "bytes": 13884,
+        "sha256": "ed510a35fbe31ec89ee4234bbb849ebeb14a51115ac9b7ede6a58a0635a1626e",
+        "expected_sha256": "ed510a35fbe31ec89ee4234bbb849ebeb14a51115ac9b7ede6a58a0635a1626e",
+        "matches": true
+      },
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/training/plato/clients/strategies/defaults.py",
+        "bytes": 21145,
+        "sha256": "6a41108b7878113ed4b7c9555d818b1f59862f55c487524b26052a0f12c3feca",
+        "expected_sha256": "6a41108b7878113ed4b7c9555d818b1f59862f55c487524b26052a0f12c3feca",
+        "matches": true
+      },
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/training/plato/models/dcgan.py",
+        "bytes": 3081,
+        "sha256": "8d01709791ac0d4201bf99f53e5c8a86155b14858965ea23a22a26f4db08d48d",
+        "expected_sha256": "8d01709791ac0d4201bf99f53e5c8a86155b14858965ea23a22a26f4db08d48d",
+        "matches": true
+      },
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/training/plato/servers/base.py",
+        "bytes": 73482,
+        "sha256": "79355c0184680eaac2ad8646a23ff79d5ef70e5797cea1e313db7948a96488db",
+        "expected_sha256": "79355c0184680eaac2ad8646a23ff79d5ef70e5797cea1e313db7948a96488db",
+        "matches": true
+      },
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/training/plato/servers/strategies/aggregation/port.py",
+        "bytes": 6018,
+        "sha256": "c7e553bede3413780046915c5736b99266b33931ad24ddf85376cf9e754c978f",
+        "expected_sha256": "c7e553bede3413780046915c5736b99266b33931ad24ddf85376cf9e754c978f",
+        "matches": true
+      },
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/training/plato/trainers/base.py",
+        "bytes": 3883,
+        "sha256": "2fb5e25983d1f737acf7b05d7324130458caab187b34d3e835a92d574adb1ec8",
+        "expected_sha256": "2fb5e25983d1f737acf7b05d7324130458caab187b34d3e835a92d574adb1ec8",
+        "matches": true
+      },
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/training/plato/trainers/composable.py",
+        "bytes": 41822,
+        "sha256": "6bc4dab135cd7249346ac3ca23b0e24ea638961cda7806558ab81338dc0496a8",
+        "expected_sha256": "6bc4dab135cd7249346ac3ca23b0e24ea638961cda7806558ab81338dc0496a8",
+        "matches": true
+      },
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/training/plato/trainers/diff_privacy.py",
+        "bytes": 24183,
+        "sha256": "7ef0ba5978fbe30947cefe106923ba2d90e138fb4d788f909893dd9c440ff74a",
+        "expected_sha256": "7ef0ba5978fbe30947cefe106923ba2d90e138fb4d788f909893dd9c440ff74a",
+        "matches": true
+      },
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/training/plato/trainers/fedprox.py",
+        "bytes": 555,
+        "sha256": "ce299648690455362b601e8fbd009a419b4c5c2317206f9588257899ebc4fb5d",
+        "expected_sha256": "ce299648690455362b601e8fbd009a419b4c5c2317206f9588257899ebc4fb5d",
+        "matches": true
+      },
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/training/plato/trainers/gan.py",
+        "bytes": 23047,
+        "sha256": "236c8c51be9797d97d9b63fdd1bb870c8a7c64d266dc25e8c44b9f9c3558fdc7",
+        "expected_sha256": "236c8c51be9797d97d9b63fdd1bb870c8a7c64d266dc25e8c44b9f9c3558fdc7",
+        "matches": true
+      },
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/training/plato/trainers/registry.py",
+        "bytes": 2420,
+        "sha256": "dc17cf3bd8e1c168213173e7d16e5d4e4f12282c41d33a67f241b294afb64fa1",
+        "expected_sha256": "dc17cf3bd8e1c168213173e7d16e5d4e4f12282c41d33a67f241b294afb64fa1",
+        "matches": true
+      },
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/training/plato/trainers/self_supervised_learning.py",
+        "bytes": 27457,
+        "sha256": "7b9727b6e0a840048f3f8c0d38fec16116e659ecf25fcd352360f3047adaf071",
+        "expected_sha256": "7b9727b6e0a840048f3f8c0d38fec16116e659ecf25fcd352360f3047adaf071",
+        "matches": true
+      },
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/training/plato/trainers/split_learning.py",
+        "bytes": 15655,
+        "sha256": "b5256e53be61767362d463437e903439bcea65579e4a68378b27ec225e6eaf72",
+        "expected_sha256": "b5256e53be61767362d463437e903439bcea65579e4a68378b27ec225e6eaf72",
+        "matches": true
+      },
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/training/plato/trainers/strategies/algorithms/apfl_strategy.py",
+        "bytes": 22270,
+        "sha256": "cc56941235907603583c16d8388b2566ef3ceb2001f3028accf19f01fd4ea0a5",
+        "expected_sha256": "cc56941235907603583c16d8388b2566ef3ceb2001f3028accf19f01fd4ea0a5",
+        "matches": true
+      },
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/training/plato/trainers/strategies/algorithms/ditto_strategy.py",
+        "bytes": 16809,
+        "sha256": "55f3f863d428cd845b8141b43d60642646ccc49dfd28bbfce464deb383bc11c6",
+        "expected_sha256": "55f3f863d428cd845b8141b43d60642646ccc49dfd28bbfce464deb383bc11c6",
+        "matches": true
+      },
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/training/plato/trainers/strategies/algorithms/fedala_strategy.py",
+        "bytes": 22388,
+        "sha256": "588d0ac13e23bf21fadc8e60be399afd25e76a26fb1c008d4fe4a3f7eb3ebc4e",
+        "expected_sha256": "588d0ac13e23bf21fadc8e60be399afd25e76a26fb1c008d4fe4a3f7eb3ebc4e",
+        "matches": true
+      },
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/training/plato/trainers/strategies/algorithms/feddyn_strategy.py",
+        "bytes": 22469,
+        "sha256": "93abaa09f8f31018ba8cfe1e6de9f507d4ec4e6abe8170d5919b41c054597d8c",
+        "expected_sha256": "93abaa09f8f31018ba8cfe1e6de9f507d4ec4e6abe8170d5919b41c054597d8c",
+        "matches": true
+      },
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/training/plato/trainers/strategies/algorithms/fedmos_strategy.py",
+        "bytes": 19349,
+        "sha256": "a4da28637abdf2b15a374283e9df83db190ec0a1e9b9fbb4745fac3f5d3cb521",
+        "expected_sha256": "a4da28637abdf2b15a374283e9df83db190ec0a1e9b9fbb4745fac3f5d3cb521",
+        "matches": true
+      },
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/training/plato/trainers/strategies/algorithms/fedprox_strategy.py",
+        "bytes": 10142,
+        "sha256": "6041f84186d710a48740a39eac0bf93562562554168991e347a7e71a81216221",
+        "expected_sha256": "6041f84186d710a48740a39eac0bf93562562554168991e347a7e71a81216221",
+        "matches": true
+      },
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/training/plato/trainers/strategies/algorithms/lgfedavg_strategy.py",
+        "bytes": 15495,
+        "sha256": "2bf3ab77a930e2f8f6eced3a110278a6f63cd506adb749605387f1ff5901638a",
+        "expected_sha256": "2bf3ab77a930e2f8f6eced3a110278a6f63cd506adb749605387f1ff5901638a",
+        "matches": true
+      },
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/training/plato/trainers/strategies/algorithms/personalized_fl_strategy.py",
+        "bytes": 17117,
+        "sha256": "f4a55389650c7e050ad773a0a3beb5d81382e783a454c37341ee14f8586cd32c",
+        "expected_sha256": "f4a55389650c7e050ad773a0a3beb5d81382e783a454c37341ee14f8586cd32c",
+        "matches": true
+      },
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/training/plato/trainers/strategies/algorithms/scaffold_strategy.py",
+        "bytes": 16394,
+        "sha256": "2b6e2953f8b93f7919d95d70f598c2f4d33c9cbaff129352387f248c004d4ff6",
+        "expected_sha256": "2b6e2953f8b93f7919d95d70f598c2f4d33c9cbaff129352387f248c004d4ff6",
+        "matches": true
+      },
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/training/plato/trainers/strategies/base.py",
+        "bytes": 18248,
+        "sha256": "905261bbaf05f8024110f9b0be2c29886bdc39a91c6be18aa9e83bb4868ec0d3",
+        "expected_sha256": "905261bbaf05f8024110f9b0be2c29886bdc39a91c6be18aa9e83bb4868ec0d3",
+        "matches": true
+      },
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/training/plato/trainers/strategies/loss_criterion.py",
+        "bytes": 12305,
+        "sha256": "189ed60fc473d149ac54de8472e36d311d309f3827453b23882c7d91f7c8c2c2",
+        "expected_sha256": "189ed60fc473d149ac54de8472e36d311d309f3827453b23882c7d91f7c8c2c2",
+        "matches": true
+      },
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/training/plato/trainers/strategies/lr_scheduler.py",
+        "bytes": 20777,
+        "sha256": "4b9118641555640083fce2417774fe7cd2e96ec9975885cfaf8023b1d92f8a41",
+        "expected_sha256": "4b9118641555640083fce2417774fe7cd2e96ec9975885cfaf8023b1d92f8a41",
+        "matches": true
+      },
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/training/plato/trainers/strategies/model_update.py",
+        "bytes": 6047,
+        "sha256": "3a16a643de9d9b531bc1b2bab9e7c5606cb0c4e6b38e079f204d9ce9976fa782",
+        "expected_sha256": "3a16a643de9d9b531bc1b2bab9e7c5606cb0c4e6b38e079f204d9ce9976fa782",
+        "matches": true
+      },
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/training/plato/trainers/strategies/optimizer.py",
+        "bytes": 14695,
+        "sha256": "ffbeab17d1a2455013871d32f4e82402f5422a6c14fc629d334b2d93c59e7957",
+        "expected_sha256": "ffbeab17d1a2455013871d32f4e82402f5422a6c14fc629d334b2d93c59e7957",
+        "matches": true
+      },
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/training/plato/trainers/strategies/training_step.py",
+        "bytes": 19781,
+        "sha256": "ba912ceea97a1fe592d690cb06c9827cd988d37320a92f1dc72bbb42feea2983",
+        "expected_sha256": "ba912ceea97a1fe592d690cb06c9827cd988d37320a92f1dc72bbb42feea2983",
+        "matches": true
+      },
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/training/plato/trainers/tracking.py",
+        "bytes": 3374,
+        "sha256": "ca52a12d7c181e2c03d2fb67f5d788aabed0c5dbae8797e80280ed8c2f360332",
+        "expected_sha256": "ca52a12d7c181e2c03d2fb67f5d788aabed0c5dbae8797e80280ed8c2f360332",
+        "matches": true
+      },
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/training/plato/utils/checkpoint_paths.py",
+        "bytes": 4057,
+        "sha256": "7f530a13e9dac30d4c8a6bb7c05de2ff242d12f203dbf3e4c45495442c789dfd",
+        "expected_sha256": "7f530a13e9dac30d4c8a6bb7c05de2ff242d12f203dbf3e4c45495442c789dfd",
+        "matches": true
+      },
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/training/tests/integration/scaffold_round_worker.py",
+        "bytes": 574,
+        "sha256": "5bf3ca3c59f0b28d76528ebf7ffb5410eb11b05269b962b6080977e97e64c64e",
+        "expected_sha256": "5bf3ca3c59f0b28d76528ebf7ffb5410eb11b05269b962b6080977e97e64c64e",
+        "matches": true
+      },
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/training/tests/integration/test_checkpoint_runtime_agreement.py",
+        "bytes": 8719,
+        "sha256": "6414ef651d44042616c8bce772333584643b3c2e6b0596d69f3b04ff849b9e3e",
+        "expected_sha256": "6414ef651d44042616c8bce772333584643b3c2e6b0596d69f3b04ff849b9e3e",
+        "matches": true
+      },
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/training/tests/integration/test_scaffold_round_flow.py",
+        "bytes": 24984,
+        "sha256": "5477fbc57455ebbc3ded0a10181fa9b6433edf1b0c1bf200710e51995b21f128",
+        "expected_sha256": "5477fbc57455ebbc3ded0a10181fa9b6433edf1b0c1bf200710e51995b21f128",
+        "matches": true
+      },
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/training/tests/trainers/test_apfl_optimizer_ownership.py",
+        "bytes": 2847,
+        "sha256": "a42b571b4542d408f523ca5ae0b0cba157309380e1484856c8538312b03b113c",
+        "expected_sha256": "a42b571b4542d408f523ca5ae0b0cba157309380e1484856c8538312b03b113c",
+        "matches": true
+      },
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/training/tests/trainers/test_checkpoint_path_contract.py",
+        "bytes": 8711,
+        "sha256": "92bdf6b20221139ae3c0e3e8c64cdc884ed473ae212710bcbf90a12ad33831cf",
+        "expected_sha256": "92bdf6b20221139ae3c0e3e8c64cdc884ed473ae212710bcbf90a12ad33831cf",
+        "matches": true
+      },
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/training/tests/trainers/test_dp_data_loader_strategy.py",
+        "bytes": 12346,
+        "sha256": "97245aa7f8318d7875cafcc3c7c93e2e30047d61684a836efc1ea5e6c47e3c42",
+        "expected_sha256": "97245aa7f8318d7875cafcc3c7c93e2e30047d61684a836efc1ea5e6c47e3c42",
+        "matches": true
+      },
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/training/tests/trainers/test_gan_runtime.py",
+        "bytes": 10935,
+        "sha256": "3d16413dabb7d8eeda56f0444d66e445fb0356d47bd2db7a64a5b49ade876d43",
+        "expected_sha256": "3d16413dabb7d8eeda56f0444d66e445fb0356d47bd2db7a64a5b49ade876d43",
+        "matches": true
+      },
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/training/tests/trainers/test_personalized_state_ownership.py",
+        "bytes": 12934,
+        "sha256": "f2a808dd1c6763164283f02b8801bee7b211327570d152a91b32fb74c9d9f233",
+        "expected_sha256": "f2a808dd1c6763164283f02b8801bee7b211327570d152a91b32fb74c9d9f233",
+        "matches": true
+      },
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/training/tests/trainers/test_scaffold_strategy.py",
+        "bytes": 19567,
+        "sha256": "7419ab4ea2088f7825bc8008be99c2d99a18f139dab50188a3c06a6eefd9c02e",
+        "expected_sha256": "7419ab4ea2088f7825bc8008be99c2d99a18f139dab50188a3c06a6eefd9c02e",
+        "matches": true
+      },
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/training/tests/trainers/test_split_learning_testing_strategy.py",
+        "bytes": 2243,
+        "sha256": "54d2da6ba1574873736ab7aa6278e7f341cf53bf0a63350e6a34e0a0a6ce3943",
+        "expected_sha256": "54d2da6ba1574873736ab7aa6278e7f341cf53bf0a63350e6a34e0a0a6ce3943",
+        "matches": true
+      },
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/training/tests/trainers/test_ssl_personalized_state.py",
+        "bytes": 5602,
+        "sha256": "887c7e100ca3fc69e5a26c399fd4990ed9ad15df74ef52041953dea6c17e706a",
+        "expected_sha256": "887c7e100ca3fc69e5a26c399fd4990ed9ad15df74ef52041953dea6c17e706a",
+        "matches": true
+      },
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/training/tests/trainers/test_ssl_training_contract.py",
+        "bytes": 4036,
+        "sha256": "66f1f40fcfbe86b3abe2a983fd281e364f080c98718e2b0e42c26e369bb5cd9e",
+        "expected_sha256": "66f1f40fcfbe86b3abe2a983fd281e364f080c98718e2b0e42c26e369bb5cd9e",
+        "matches": true
+      },
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/training/tests/trainers/test_training_update_contract.py",
+        "bytes": 24186,
+        "sha256": "87059fc3f336d6a9e319d372577d30ed7066fd9e1bd1f7fe3d0efb6fda92f676",
+        "expected_sha256": "87059fc3f336d6a9e319d372577d30ed7066fd9e1bd1f7fe3d0efb6fda92f676",
+        "matches": true
+      },
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/training/evidence/2026-refresh/plan.md",
+        "bytes": 50719,
+        "sha256": "edb9a58cc7915a940854f16d5029fe97434703bf2f75eca0dcb96de2d0f0eb15",
+        "expected_sha256": "edb9a58cc7915a940854f16d5029fe97434703bf2f75eca0dcb96de2d0f0eb15",
+        "matches": true
+      },
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/training/evidence/2026-refresh/plan-addendum.json",
+        "bytes": 28579,
+        "sha256": "5b51b0fb7ed6f68d9fce7176335b3e7be5e5f178a2788590912aa2396a487709",
+        "expected_sha256": "5b51b0fb7ed6f68d9fce7176335b3e7be5e5f178a2788590912aa2396a487709",
+        "matches": true
+      },
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/training/evidence/2026-refresh/plan-addendum-acceptance.json",
+        "bytes": 474,
+        "sha256": "5f5d5a8e22e14072b5d031c19a27be14bda9bdbc2a157d14af78845daac6c56b",
+        "expected_sha256": "5f5d5a8e22e14072b5d031c19a27be14bda9bdbc2a157d14af78845daac6c56b",
+        "matches": true
+      },
+      {
+        "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2b-acceptance.json",
+        "bytes": 2182,
+        "sha256": "3be220078302a05189c07c32220a86e966ff919bc4ef11e5d342a6c39135396d",
+        "expected_sha256": "3be220078302a05189c07c32220a86e966ff919bc4ef11e5d342a6c39135396d",
+        "matches": true
+      },
+      {
+        "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2b-review-3.json",
+        "bytes": 106191,
+        "sha256": "83eaf2c44ffb1316e9d6643e23c3ea9b977d5b083bf4427e86a75dcac7720fd6",
+        "expected_sha256": "83eaf2c44ffb1316e9d6643e23c3ea9b977d5b083bf4427e86a75dcac7720fd6",
+        "matches": true
+      },
+      {
+        "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2c-scaffold-design.json",
+        "bytes": 30634,
+        "sha256": "f323f3aa9d824df44a1043b2d6aff9c8a963c42964f6e6685108c59b25fc3a89",
+        "expected_sha256": "f323f3aa9d824df44a1043b2d6aff9c8a963c42964f6e6685108c59b25fc3a89",
+        "matches": true
+      },
+      {
+        "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2c-scaffold-design-review.json",
+        "bytes": 25854,
+        "sha256": "8eb83f21091827d03534db1b8c4e23a6f239b5df4f82363b4c9ead5a60b3258d",
+        "expected_sha256": "8eb83f21091827d03534db1b8c4e23a6f239b5df4f82363b4c9ead5a60b3258d",
+        "matches": true
+      },
+      {
+        "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2c-scaffold-acceptance.json",
+        "bytes": 1194,
+        "sha256": "40b202708a4cfdbe6f299e75249c1a19921e410ec4ab7b5e3c6323f536ca8d37",
+        "expected_sha256": "40b202708a4cfdbe6f299e75249c1a19921e410ec4ab7b5e3c6323f536ca8d37",
+        "matches": true
+      },
+      {
+        "path": "/tmp/plato-phase2c-scratch/qualified-validation-313.log",
+        "bytes": 5868,
+        "sha256": "b798f791851a3751c34b67fdb1805c221b8155a1f16bafdef417ed9b47b04c4d",
+        "expected_sha256": "b798f791851a3751c34b67fdb1805c221b8155a1f16bafdef417ed9b47b04c4d",
+        "matches": true
+      },
+      {
+        "path": "/tmp/plato-phase2c-scratch/qualified-validation-314.log",
+        "bytes": 5916,
+        "sha256": "c5c9b29d6f4d500839bd29eb52ff93002891b578de3a26ec94231f248261f91f",
+        "expected_sha256": "c5c9b29d6f4d500839bd29eb52ff93002891b578de3a26ec94231f248261f91f",
+        "matches": true
+      },
+      {
+        "path": "/tmp/plato-phase2c-scratch/qualified-imports-313.log",
+        "bytes": 19,
+        "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+        "expected_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+        "matches": true
+      },
+      {
+        "path": "/tmp/plato-phase2c-scratch/qualified-types-313.log",
+        "bytes": 2,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "expected_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "matches": true
+      },
+      {
+        "path": "/tmp/plato-phase2c-scratch/qualified-numerical-313.log",
+        "bytes": 3613,
+        "sha256": "a07f2fb17002ed0d9220908920f08f38e294b9b3f25af2258a1afdd0197c44ae",
+        "expected_sha256": "a07f2fb17002ed0d9220908920f08f38e294b9b3f25af2258a1afdd0197c44ae",
+        "matches": true
+      },
+      {
+        "path": "/tmp/plato-phase2c-scratch/qualified-ssl-313.log",
+        "bytes": 240,
+        "sha256": "8c53851dd3b63b12b8e9f846991b980e4f951fed0c67e2da73b340545b61484e",
+        "expected_sha256": "8c53851dd3b63b12b8e9f846991b980e4f951fed0c67e2da73b340545b61484e",
+        "matches": true
+      },
+      {
+        "path": "/tmp/plato-phase2c-scratch/qualified-imports-314.log",
+        "bytes": 19,
+        "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+        "expected_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+        "matches": true
+      },
+      {
+        "path": "/tmp/plato-phase2c-scratch/qualified-types-314.log",
+        "bytes": 2,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "expected_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "matches": true
+      },
+      {
+        "path": "/tmp/plato-phase2c-scratch/qualified-numerical-314.log",
+        "bytes": 3631,
+        "sha256": "445a37fc205a27ee003531da7adf9cf5d424e685784acd297a92c8112be3192b",
+        "expected_sha256": "445a37fc205a27ee003531da7adf9cf5d424e685784acd297a92c8112be3192b",
+        "matches": true
+      },
+      {
+        "path": "/tmp/plato-phase2c-scratch/qualified-ssl-314.log",
+        "bytes": 258,
+        "sha256": "a98560395b81a6a542b8dd745c7b38d83a4c1a54df5430ba53bc338e7cc9001f",
+        "expected_sha256": "a98560395b81a6a542b8dd745c7b38d83a4c1a54df5430ba53bc338e7cc9001f",
+        "matches": true
+      },
+      {
+        "path": "/tmp/plato-phase2c-qualified-313/test_real_two_client_cpu_socke0/round/result.json",
+        "bytes": 16223,
+        "sha256": "c3deb0d7f2ec15b69bbc1cd6e3582cb65f0e7c1acb1e26670041bb0c9bccfb47",
+        "expected_sha256": "c3deb0d7f2ec15b69bbc1cd6e3582cb65f0e7c1acb1e26670041bb0c9bccfb47",
+        "matches": true
+      },
+      {
+        "path": "/tmp/plato-phase2c-qualified-314/test_real_two_client_cpu_socke0/round/result.json",
+        "bytes": 16273,
+        "sha256": "2ceec7b086467e24bf0cd8a21d7d8fb94b3f8a34f6d7c88e1e4e0e002f494426",
+        "expected_sha256": "2ceec7b086467e24bf0cd8a21d7d8fb94b3f8a34f6d7c88e1e4e0e002f494426",
+        "matches": true
+      },
+      {
+        "path": "/tmp/plato-phase2c-scratch/implementation-owned.diff",
+        "bytes": 346932,
+        "sha256": "355fabd6d2ee026b59cf2104ad7e1c12e3334bdcf1cd5148c66612441576e67e",
+        "expected_sha256": "355fabd6d2ee026b59cf2104ad7e1c12e3334bdcf1cd5148c66612441576e67e",
+        "matches": true
+      }
+    ],
+    "final_combined": [
+      {
+        "implementation_commit": "0dc34dd1d79d90071a0babfa6aa89f33d72a976f",
+        "python_environment": "/tmp/plato-phase2c-313",
+        "command": "OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2c-313/bin/python -m pytest tests/trainers tests/algorithms tests/models tests/clients tests/servers tests/callbacks tests/integration/test_smoke_configs.py tests/integration/test_event_loop_startup.py tests/integration/test_scaffold_round_flow.py tests/integration/test_checkpoint_runtime_agreement.py --ignore=tests/trainers/test_huggingface_trainer.py --ignore=tests/trainers/test_lerobot_trainer.py --ignore=tests/trainers/test_nanochat_trainer.py --ignore=tests/models/test_smolvla_model.py -q --basetemp /tmp/plato-phase2c-qualified-313",
+        "shell": "zsh -lc",
+        "exit_code": 0,
+        "seconds": 566.9423520839773,
+        "log": "/tmp/plato-phase2c-scratch/qualified-validation-313.log",
+        "sha256": "b798f791851a3751c34b67fdb1805c221b8155a1f16bafdef417ed9b47b04c4d",
+        "summary": "468 passed, 19 warnings in 561.83s (0:09:21)",
+        "counts": {
+          "passed": 468,
+          "warnings": 19
+        }
+      },
+      {
+        "implementation_commit": "0dc34dd1d79d90071a0babfa6aa89f33d72a976f",
+        "python_environment": "/tmp/plato-phase2c-314",
+        "command": "OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2c-314/bin/python -m pytest tests/trainers tests/algorithms tests/models tests/clients tests/servers tests/callbacks tests/integration/test_smoke_configs.py tests/integration/test_event_loop_startup.py tests/integration/test_scaffold_round_flow.py tests/integration/test_checkpoint_runtime_agreement.py --ignore=tests/trainers/test_huggingface_trainer.py --ignore=tests/trainers/test_lerobot_trainer.py --ignore=tests/trainers/test_nanochat_trainer.py --ignore=tests/models/test_smolvla_model.py -q --basetemp /tmp/plato-phase2c-qualified-314",
+        "shell": "zsh -lc",
+        "exit_code": 0,
+        "seconds": 622.7091606671456,
+        "log": "/tmp/plato-phase2c-scratch/qualified-validation-314.log",
+        "sha256": "c5c9b29d6f4d500839bd29eb52ff93002891b578de3a26ec94231f248261f91f",
+        "summary": "468 passed, 19 warnings in 617.34s (0:10:17)",
+        "counts": {
+          "passed": 468,
+          "warnings": 19
+        }
+      }
+    ],
+    "startup_sources": [
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/training/tests/integration/test_event_loop_startup.py",
+        "bytes": 15872,
+        "sha256": "a92c9ee2347e2113cd65b7949c922ac5bbf1846f4caeca30a128db580c79751e",
+        "accepted_b_sha256": "a92c9ee2347e2113cd65b7949c922ac5bbf1846f4caeca30a128db580c79751e",
+        "matches_b": true
+      },
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/training/tests/integration/startup_harness.py",
+        "bytes": 7402,
+        "sha256": "988f216f9367b1e9e8156bad62d3c03a813e26d32f919981ae227f5d8754642e",
+        "accepted_b_sha256": "988f216f9367b1e9e8156bad62d3c03a813e26d32f919981ae227f5d8754642e",
+        "matches_b": true
+      },
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/training/tests/integration/startup_probe.py",
+        "bytes": 15388,
+        "sha256": "e6c9bb2bf39616fe3a6745da528690a578e7416837e0914578ec688d2851b34f",
+        "accepted_b_sha256": "e6c9bb2bf39616fe3a6745da528690a578e7416837e0914578ec688d2851b34f",
+        "matches_b": true
+      }
+    ],
+    "startup_results": {
+      "313": {
+        "actual_cases": 48,
+        "natural_cases": 43,
+        "expected_forced_containment_cases": 5,
+        "survivors": [],
+        "all_source_unchanged_from_accepted_b": true,
+        "socket": {
+          "path": "/tmp/plato-phase2c-qualified-313/test_real_two_client_cpu_socke0/round/result.json",
+          "bytes": 16223,
+          "sha256": "c3deb0d7f2ec15b69bbc1cd6e3582cb65f0e7c1acb1e26670041bb0c9bccfb47",
+          "actual_client_ids": [
+            1,
+            2
+          ],
+          "samples": [
+            2,
+            6
+          ],
+          "trainer_processes": [
+            63192,
+            63193
+          ],
+          "devices": [
+            "cpu",
+            "cpu"
+          ],
+          "independent_sample_weighted_max_abs_error": 1.4901161193847656e-08,
+          "uniform_client_weights_not_used": true,
+          "natural_returncode": 0,
+          "forced": [],
+          "elapsed_seconds": 14.154679291183129
+        },
+        "results": [
+          {
+            "path": "/tmp/plato-phase2c-qualified-313/test_active_edge_failure_unwin0/edge/result.json",
+            "bytes": 5265,
+            "sha256": "bb91976bd5589cde7d02f69147fe63e9142a7dd8d6384670b076cd3deada1db6"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-313/test_active_failure_reaches_sy0/client_custom/result.json",
+            "bytes": 2802,
+            "sha256": "8cefd02fac583dd3b56f831680f50401fc26a2b032d676fac35b0d37af04380c"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-313/test_active_failure_reaches_sy1/ordinary/result.json",
+            "bytes": 4353,
+            "sha256": "3cff8a5484b8e39323c7c9a926e0bf8d17c908e18a911edf80a249d4da53d228"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-313/test_active_failure_reaches_sy2/central/result.json",
+            "bytes": 4420,
+            "sha256": "209fc911b2197b1d0c5318533408e7e37d4967b84d37e3fec2371b7541c7d996"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-313/test_active_failure_reaches_sy3/edge_custom/result.json",
+            "bytes": 4670,
+            "sha256": "e4a36af6fdd0da4f0473bd0ceb447891804902f6a19d8c9dfe43a9f168de9719"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-313/test_cancellation_already_fina0/cancelling/result.json",
+            "bytes": 2257,
+            "sha256": "f5db27f132e69d763c5b20f128e28420ae58e66986afe2998deb4c17828ab05f"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-313/test_client_control_flow_keeps0/interrupt/result.json",
+            "bytes": 4427,
+            "sha256": "4b54227b3143041484745200a306e8896f39c208b85f38d99befba392df857b6"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-313/test_client_control_flow_keeps1/exit/result.json",
+            "bytes": 2336,
+            "sha256": "c0a91c45041876d0e25dc8a028d15d5254909dddb4141ef519f1fed4458a07ec"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-313/test_closed_current_client_loo0/closed/result.json",
+            "bytes": 1344,
+            "sha256": "f6426d31eb0c68b6afe07ec6f5ac682f90e320646620d8a6219e7bbbcdf28e35"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-313/test_configure_failure_is_pres0/configure/result.json",
+            "bytes": 2538,
+            "sha256": "1c5487c52f4b6c46afa83b6358bac780e673b54f8192cc261b470401d0aa3f10"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-313/test_delegating_server_consume0/delegated/result.json",
+            "bytes": 2273,
+            "sha256": "c2f4cefade780f02387783bf0495e800f4e8a024351de00489359ebc4cb42ae0"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-313/test_edge_cancellation_error_k0/edge/result.json",
+            "bytes": 11199,
+            "sha256": "cc29b0aa3e14971a811067500e246c47e54a8869527ff3137b38222253f0ef5e"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-313/test_explicitly_absent_loop_on0/ordinary/result.json",
+            "bytes": 1989,
+            "sha256": "b7d9fc2369dd58d35159263a7bf8d827d23bcd200adc1bbc2646398b695f1af1"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-313/test_explicitly_absent_loop_on1/central/result.json",
+            "bytes": 2056,
+            "sha256": "59588a55a4f36fdbc691c3a91313b914a13f54cb3c277a65b82af51d9c965bb8"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-313/test_explicitly_absent_loop_on2/edge_default/result.json",
+            "bytes": 2136,
+            "sha256": "6696e8deb90b4b9b5be0586cb285fbf17750554b06973195991fbb7decdee930"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-313/test_explicitly_absent_loop_on3/edge_custom/result.json",
+            "bytes": 2162,
+            "sha256": "4bfd6dab2d80081ab5d4bd9e4f49756e0cbbb2c028cc67a3cc710a7df09dffbc"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-313/test_fresh_entrypoint_executes0/client_default/result.json",
+            "bytes": 1325,
+            "sha256": "e143b249453c8788a7bd4949519c7adb43a41b5cb15c4694510430415c4a9dd5"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-313/test_fresh_entrypoint_executes1/client_custom/result.json",
+            "bytes": 1324,
+            "sha256": "3ac31dc433e7fb8ce711e01d682a95ea51048eb97ee64cdd36470a8554c8a76f"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-313/test_fresh_entrypoint_executes2/ordinary/result.json",
+            "bytes": 1968,
+            "sha256": "77186711062b56ae9d3eb9dc9a1fdf8e71e50a48ccdb938bee3e52b5b9914898"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-313/test_fresh_entrypoint_executes3/central/result.json",
+            "bytes": 2036,
+            "sha256": "596b53267ed6f4d8a3f07364902cbeeee63bdf33ba4ec10bcf54f65426cd3897"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-313/test_fresh_entrypoint_executes4/direct/result.json",
+            "bytes": 1562,
+            "sha256": "c337254530ba4ebcc0730ba0745cb29193ea4056f15795989743655a288fa054"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-313/test_fresh_entrypoint_executes5/edge_default/result.json",
+            "bytes": 2115,
+            "sha256": "d223fcfa26f7f8123239fd51d72e34bf68062f11e1f15f3a6d1b66537658ce16"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-313/test_fresh_entrypoint_executes6/edge_custom/result.json",
+            "bytes": 2141,
+            "sha256": "1ad1d22d1662d73063701525255c2d2f2eaf4df26b2cc7765c88c45819251ee3"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-313/test_independent_runtime_error0/independent/result.json",
+            "bytes": 4386,
+            "sha256": "adeda82e999324ce47c2585cc7e1c2ea1c7359f1f0c03b710bc255180d29b35d"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-313/test_missing_external_edge_cli0/edge/result.json",
+            "bytes": 2279,
+            "sha256": "8d53004ae6b04eebafe2da223e004541590385cb5315c7c3f99cd6915823ed17"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-313/test_noncooperative_teardown_i0/task/result.json",
+            "bytes": 1772,
+            "sha256": "1a46309689f274beb30c0773be8cc51ece869260f6e519281435bdbcb5a3317a"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-313/test_noncooperative_teardown_i1/generator/result.json",
+            "bytes": 2032,
+            "sha256": "f17a2a538efbb89740576bd6809f4e71f14602514f394c828f21642bd13714b6"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-313/test_noncooperative_teardown_i2/executor/result.json",
+            "bytes": 2035,
+            "sha256": "de5ecaec0f181ffef125851ba71309a29c1104387c5223f261b9ea028911ab35"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-313/test_noncooperative_teardown_i3/aiohttp_task/result.json",
+            "bytes": 4476,
+            "sha256": "54d155788869a2fd542432c7b3c25ba4942511a535ffb3ca41803b15d46d704d"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-313/test_owned_client_finalizes_ta0/client/result.json",
+            "bytes": 2195,
+            "sha256": "091b5061f5f41555edb3e3dccacd9cafc29f1d011fd26364457febe17efbeccb"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-313/test_owned_client_finalizes_ta1/client/result.json",
+            "bytes": 4198,
+            "sha256": "bf50b0560767e70923cceb62d99eaee2ea0e323c609106d6c94fd9a06e10fd27"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-313/test_owned_server_fallback_fin0/fallback/result.json",
+            "bytes": 2790,
+            "sha256": "17383b3611ef204cf44a7a0933de7d1e8dec3b857845336d17e47febae5ae6b8"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-313/test_owned_server_fallback_fin1/fallback/result.json",
+            "bytes": 3869,
+            "sha256": "a5623375ffac37dc007cd71059d12a473b21565bc50e058174656f81f4b9cafc"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-313/test_post_launch_failure_keeps0/failure/result.json",
+            "bytes": 12300,
+            "sha256": "4a783bf4c7346460be14698148250b466a94bf6081b560ed1dd92bb7131edbbb"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-313/test_preconstructed_borrowed_l0/client_lifecycle/result.json",
+            "bytes": 2318,
+            "sha256": "a66cac7abb1a31cbb8d729387eece89d055b8177de9a15f4b37c9bda2fce086b"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-313/test_preconstructed_borrowed_l1/client_lifecycle/result.json",
+            "bytes": 4036,
+            "sha256": "550562da3ddb7306cf46c43612cdd644f3ed4df1ae94378eda6fe8a419ef3b37"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-313/test_preconstructed_borrowed_l2/ordinary/result.json",
+            "bytes": 2137,
+            "sha256": "71a77d72f30d29499f0b3db6debbc2fc77c1938cf3d66e993bcc8ea5dfa23fa6"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-313/test_preconstructed_borrowed_l3/ordinary/result.json",
+            "bytes": 3369,
+            "sha256": "79651c9c8446fe15708fbec5178be041278eafbae2c49f22bc823a4fece20e8f"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-313/test_real_two_client_cpu_socke0/round/result.json",
+            "bytes": 16223,
+            "sha256": "c3deb0d7f2ec15b69bbc1cd6e3582cb65f0e7c1acb1e26670041bb0c9bccfb47"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-313/test_repeated_owned_client_ent0/client/result.json",
+            "bytes": 3531,
+            "sha256": "f7bc93dad052c85ef3f228c5313f835ca66c7c1d7526071f9038c66911cc6ef9"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-313/test_runner_cleanup_error_keep0/cleanup/result.json",
+            "bytes": 6216,
+            "sha256": "07c131d153ef6661b063889bc8900af6ccd25829406f458a0faef0b8450314fa"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-313/test_running_loop_rejected_bef0/running/result.json",
+            "bytes": 1356,
+            "sha256": "21e3260cde560a8c13de11cb74c7d6a101cc4ae42015ee596c92b0e59f6c7d3d"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-313/test_server_error_precedence_a0/server/result.json",
+            "bytes": 10818,
+            "sha256": "80f23b8fd349265a1c06e11c254ebfc7e4c4b7ce0b77a0af99ef6112c03d09e0"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-313/test_server_error_precedence_a1/server/result.json",
+            "bytes": 9982,
+            "sha256": "d8093a17bf0327911313a8d940a73f4f4d0d3bf2808c012bfd010060f49ae7c0"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-313/test_server_error_precedence_a2/server/result.json",
+            "bytes": 4947,
+            "sha256": "bafa518ba2a5d33162cfbe3c51f5d7aba75945da39aaef659a9ab7cf3974241a"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-313/test_server_error_precedence_a3/server/result.json",
+            "bytes": 4252,
+            "sha256": "e85694cca6faff6d332f019b6d876f2659bd8e450e171c6140d4afc8a2aab3ce"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-313/test_server_error_precedence_a4/server/result.json",
+            "bytes": 5841,
+            "sha256": "7bffaf79c2a851d4d60b099e75bc9e889dcb815adbfd7bf781f97beb13fd914c"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-313/test_stalled_real_client_is_co0/stalled/result.json",
+            "bytes": 14330,
+            "sha256": "4e740668818b0bfc77b221343a2aebd7dcee32668189b8edb271628c23fb9371"
+          }
+        ]
+      },
+      "314": {
+        "actual_cases": 48,
+        "natural_cases": 43,
+        "expected_forced_containment_cases": 5,
+        "survivors": [],
+        "all_source_unchanged_from_accepted_b": true,
+        "socket": {
+          "path": "/tmp/plato-phase2c-qualified-314/test_real_two_client_cpu_socke0/round/result.json",
+          "bytes": 16273,
+          "sha256": "2ceec7b086467e24bf0cd8a21d7d8fb94b3f8a34f6d7c88e1e4e0e002f494426",
+          "actual_client_ids": [
+            1,
+            2
+          ],
+          "samples": [
+            2,
+            6
+          ],
+          "trainer_processes": [
+            63221,
+            63222
+          ],
+          "devices": [
+            "cpu",
+            "cpu"
+          ],
+          "independent_sample_weighted_max_abs_error": 1.4901161193847656e-08,
+          "uniform_client_weights_not_used": true,
+          "natural_returncode": 0,
+          "forced": [],
+          "elapsed_seconds": 14.69209620798938
+        },
+        "results": [
+          {
+            "path": "/tmp/plato-phase2c-qualified-314/test_active_edge_failure_unwin0/edge/result.json",
+            "bytes": 5343,
+            "sha256": "d70a884fb85cee4d665ab929a18f58212e2e8cc6deacb6a28f4dbef957e1615d"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-314/test_active_failure_reaches_sy0/client_custom/result.json",
+            "bytes": 3155,
+            "sha256": "81a8a04e30a478706ce4a4be4d1f93513f57c7b3e6a794f3d4729b50ce6ceb28"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-314/test_active_failure_reaches_sy1/ordinary/result.json",
+            "bytes": 4421,
+            "sha256": "0f89fbe8961f3025dd76df8ec8c6d13f95b8db4ab5be81ff7016c6f69eff35b5"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-314/test_active_failure_reaches_sy2/central/result.json",
+            "bytes": 4488,
+            "sha256": "7c27c10f40e6e5b802bee513cc89d287d29fcb3e1444cfcf5ce0ce195bd2a7f3"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-314/test_active_failure_reaches_sy3/edge_custom/result.json",
+            "bytes": 4740,
+            "sha256": "8204de28d080fc875d5fc988f3b3cda0ebf0b735e54469efb580c692e89e1e64"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-314/test_cancellation_already_fina0/cancelling/result.json",
+            "bytes": 2302,
+            "sha256": "3173365864bc844f2f414f420b4951de0310eeeaee22b9f80e71b6c447a30cae"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-314/test_client_control_flow_keeps0/interrupt/result.json",
+            "bytes": 4536,
+            "sha256": "2ebe4155a71642b536b4cfea8f15be082ca50826f277b0e2a48a028966681445"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-314/test_client_control_flow_keeps1/exit/result.json",
+            "bytes": 2380,
+            "sha256": "a9e2dfc70fbf97222b92312bfe498334cb58c6192077be1d7eaa39c9343a7bd0"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-314/test_closed_current_client_loo0/closed/result.json",
+            "bytes": 1389,
+            "sha256": "811778acb1391ce9663f49ef27e0a5cb0c26316ce263f753a30f06017fc01b36"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-314/test_configure_failure_is_pres0/configure/result.json",
+            "bytes": 2581,
+            "sha256": "4c8dc2654e9d9441190d3c1465a96176e0d1c02148698f834cac9f9e44fe2e37"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-314/test_delegating_server_consume0/delegated/result.json",
+            "bytes": 2316,
+            "sha256": "47e9bb806c076b15746d3f2aa935c7c7317e15b017fb2779ad92208aabbccaf0"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-314/test_edge_cancellation_error_k0/edge/result.json",
+            "bytes": 11425,
+            "sha256": "5ea50e1130b084d3ab0fafcad22c3603696cbb88bbb9081c8330e6162b325482"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-314/test_explicitly_absent_loop_on0/ordinary/result.json",
+            "bytes": 2032,
+            "sha256": "25caebdde71a512d549f007729a4f8fd27e1ce74f22062751848a5cd618ad661"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-314/test_explicitly_absent_loop_on1/central/result.json",
+            "bytes": 2100,
+            "sha256": "cf75a40b84851cf4c3ca04262a3dda06e089b6c97d3bcf27660ead4ea19ccf5f"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-314/test_explicitly_absent_loop_on2/edge_default/result.json",
+            "bytes": 2179,
+            "sha256": "de107df232cf14e14436f6941bfcfe6c78e5e0bc94cccb6aeccdf50bbf1a01d3"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-314/test_explicitly_absent_loop_on3/edge_custom/result.json",
+            "bytes": 2207,
+            "sha256": "81ededc97c46a2e49c78b77ed8828ff7a2639beb6cf0104e43a6f9b0e05efadc"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-314/test_fresh_entrypoint_executes0/client_default/result.json",
+            "bytes": 1367,
+            "sha256": "093e77664b9294d5e79cda5638cd4864dd6928433c3944daff61e29ab7d5cdca"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-314/test_fresh_entrypoint_executes1/client_custom/result.json",
+            "bytes": 1366,
+            "sha256": "e944eafd20b10a5b51aa4b9d00307b87ab5efa842c431aaafa2b89ac0a6b0e51"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-314/test_fresh_entrypoint_executes2/ordinary/result.json",
+            "bytes": 2008,
+            "sha256": "50548813cfec1f321354ecf93a170a2d401642d516069675296fa69de7ce32e9"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-314/test_fresh_entrypoint_executes3/central/result.json",
+            "bytes": 2078,
+            "sha256": "6292860a6f38b0c54ccf1e65bd668f0c9f5daa30badbad88ad23af924280f41f"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-314/test_fresh_entrypoint_executes4/direct/result.json",
+            "bytes": 1606,
+            "sha256": "9617538a62205bbeed87413ec4601d3acbaf1a774a4e98db6b94866329774720"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-314/test_fresh_entrypoint_executes5/edge_default/result.json",
+            "bytes": 2157,
+            "sha256": "fb67559001b76b035dd456af2d86c0f5b3f277d6e8e5a3e21b64653e8614181d"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-314/test_fresh_entrypoint_executes6/edge_custom/result.json",
+            "bytes": 2184,
+            "sha256": "1aba7abd960cf9383b2fb43beb3da44db78687293cfefe9537355e2468837afc"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-314/test_independent_runtime_error0/independent/result.json",
+            "bytes": 4444,
+            "sha256": "b1aba74ce081b98d444c1f7f2468cbd00ce3cde4ff9467f2254b68a21004e7c0"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-314/test_missing_external_edge_cli0/edge/result.json",
+            "bytes": 2321,
+            "sha256": "99d9880211b3795c6bc63c1aa12c42cb0e936ffd0ee7e7d2da2fab41a05adfb7"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-314/test_noncooperative_teardown_i0/task/result.json",
+            "bytes": 1817,
+            "sha256": "435ca0dd9b01d0c917a730d6dd47b307e95a9b5132ac8647dce6d6e4a57b62ad"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-314/test_noncooperative_teardown_i1/generator/result.json",
+            "bytes": 2076,
+            "sha256": "092e4fcb59908d344760d484fe9b818859c3777c864425237a061304999c64c4"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-314/test_noncooperative_teardown_i2/executor/result.json",
+            "bytes": 2080,
+            "sha256": "8837c23c6d9dc54427b1d55b0fab5effcb0a19bdd5c8a8abd7d611a65eec4df8"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-314/test_noncooperative_teardown_i3/aiohttp_task/result.json",
+            "bytes": 4581,
+            "sha256": "2994aef7a73bb44e99494fbb4f59cd273061e2d54d1450fa114216844acf1386"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-314/test_owned_client_finalizes_ta0/client/result.json",
+            "bytes": 2239,
+            "sha256": "0891c7a729cb6f276af783037cfd70fcbfb26bc7df98266e8ae2ceb430336771"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-314/test_owned_client_finalizes_ta1/client/result.json",
+            "bytes": 4268,
+            "sha256": "b10ac500b2095d991d810532df96eacfb9f0b3fd1537c76c6d081c311c0c0a43"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-314/test_owned_server_fallback_fin0/fallback/result.json",
+            "bytes": 2835,
+            "sha256": "60e707304c9fd29ed76d7e44d39726c1f736f8de223f6846f4e2ce5aebe784ec"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-314/test_owned_server_fallback_fin1/fallback/result.json",
+            "bytes": 3913,
+            "sha256": "48a208adf5c11c8d9fabbbe62afc8ef0ff56c486619274acfb0e09fbff7b8e96"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-314/test_post_launch_failure_keeps0/failure/result.json",
+            "bytes": 13116,
+            "sha256": "f7bc8f73c4c6e4f296bcbc3aa6ccfb8dbb3eb3d47fffc003a8e175879d27e872"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-314/test_preconstructed_borrowed_l0/client_lifecycle/result.json",
+            "bytes": 2362,
+            "sha256": "8217f4ac36d32dfee431ca0fb1d2abed701ea4b4d4dc9ec5c2d590ace31efd01"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-314/test_preconstructed_borrowed_l1/client_lifecycle/result.json",
+            "bytes": 4094,
+            "sha256": "e16089855d4f7daafdc9457510a8fce7fda84e6dc862c51ca2e2838f10f0a09d"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-314/test_preconstructed_borrowed_l2/ordinary/result.json",
+            "bytes": 2180,
+            "sha256": "c55f68d937e8944e1281e55be244e4d8b55e8dbe7b5e881c100c0d642a7f4af7"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-314/test_preconstructed_borrowed_l3/ordinary/result.json",
+            "bytes": 3414,
+            "sha256": "9cbb40f946069326e70cb0836e6b1811031ff71036c99b0c7e0af854cc2011cb"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-314/test_real_two_client_cpu_socke0/round/result.json",
+            "bytes": 16273,
+            "sha256": "2ceec7b086467e24bf0cd8a21d7d8fb94b3f8a34f6d7c88e1e4e0e002f494426"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-314/test_repeated_owned_client_ent0/client/result.json",
+            "bytes": 3575,
+            "sha256": "e8b22b3128733a54ca9444dfaa57b6f9ec61dbe44847ec1dc9e3df98466ee577"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-314/test_runner_cleanup_error_keep0/cleanup/result.json",
+            "bytes": 6339,
+            "sha256": "8879a1ce0ec2b0dca8b487114c115f601920520c373d3c572700c6b867f149cc"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-314/test_running_loop_rejected_bef0/running/result.json",
+            "bytes": 1400,
+            "sha256": "574a429ebcc7115b07b4227317d4b0851b01ba0819a67fdb44f35db7761f2822"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-314/test_server_error_precedence_a0/server/result.json",
+            "bytes": 11045,
+            "sha256": "5f88116b1c5ef06cb7287041b2c833882e85c804e150f7607109fcbc4ae2f6b0"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-314/test_server_error_precedence_a1/server/result.json",
+            "bytes": 10176,
+            "sha256": "bb43e6ee91abacd35db6ce91210795290acd90529e28ece665562fc7c775d652"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-314/test_server_error_precedence_a2/server/result.json",
+            "bytes": 5025,
+            "sha256": "65b7538121fba5a0cd976509c82e7080d3a5003ca9b0f40b7c6b2b59972da2ca"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-314/test_server_error_precedence_a3/server/result.json",
+            "bytes": 4309,
+            "sha256": "8940c922770db5387cd06840fd765ba4fe61a9f08953916d2238b20a4d071154"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-314/test_server_error_precedence_a4/server/result.json",
+            "bytes": 5899,
+            "sha256": "50b52bcbf1ad851aa255939171889bc013635e490aa7e518ea68b5ecf431113e"
+          },
+          {
+            "path": "/tmp/plato-phase2c-qualified-314/test_stalled_real_client_is_co0/stalled/result.json",
+            "bytes": 14375,
+            "sha256": "c5454464c0f632478a90f03d39377372c1974577464097ce94cfc41672686d01"
+          }
+        ]
+      }
+    },
+    "reason_no_full_startup_rerun": "All retained B startup test/harness identities and final 468-case raw logs/socket results match their receipts. C SCAFFOLD changes do not modify the startup implementation/test contract; complementary runtime review owns broader shared checkpoint/base-runtime behavior. No all-suite pass is inferred from retained author evidence."
+  },
+  "primary_source": {
+    "url": "https://arxiv.org/pdf/1910.06378v4",
+    "revision": "v4, 9 April 2021",
+    "independent_read": "Opened and inspected Algorithm 1 and Eq 3-5 in the versioned primary PDF through web; independently downloaded exact bytes into owned scratch.",
+    "retained": {
+      "path": "/tmp/plato-phase2c-scaffold-code-review/primary-paper-1910.06378v4.pdf",
+      "bytes": 4381988,
+      "sha256": "efe06c86acc7a06116e372a7ab6386c300f4d0dc9c7ba2dd5c82e95111a1d694"
+    },
+    "matches_accepted_design_review_hash": true,
+    "authoritative_locations": [
+      "PDF page 4: Algorithm 1 lines 10/12/16-17, Eq 3",
+      "PDF page 5: Eq 4-5"
+    ],
+    "equations": {
+      "local": "y -= eta*(g-ci+c)",
+      "option_II": "ci_new=ci-c+(x-y)/(K*eta)",
+      "population_control": "c += sum(delta_ci)/N"
+    },
+    "independent_derivation": "Summing constant-rate vanilla SGD local updates yields (x-y)/(K*eta)=mean(g)-ci+c; substituting gives ci_new=mean(g). Appendix Eq19 has the apparent reversed c/ci sign and fails the independent g=0,c=2,ci=1 displacement counterexample; main equations take priority.",
+    "limits": "No paper convergence or mean-gradient claim for sample-weighted unequal-count global models or nonvanilla optimizers."
+  },
+  "accepted_contract_review": [
+    {
+      "contract": {
+        "id": "A01",
+        "check": "Independent equation regressions",
+        "criteria": "Run float64 CPU real SGD and actual strategy hooks with x=1,c=2,ci=1,eta=.1,g=0: y=.9,ci_new=0,delta=-1. Repeat nonzero gradients [3,1]: y=.4,ci_new=2,delta=1. Independently record gradients and prove ci_new=their mean within atol=1e-12; do not compute expected values using strategy helpers. Baseline must fail the first case."
+      },
+      "review": {
+        "status": "PASS",
+        "evidence": [
+          "baseline313-v2",
+          "baseline314-v2",
+          "independent313-v5",
+          "independent314-v5"
+        ],
+        "source": "scaffold_strategy.py:254-308",
+        "checks": "Exact B git-object real zero-gradient SGD fails at y=1.1,ci~=1,delta~=0. Candidate real float64 SGD gives (.9,0,-1) and (.4,2,1) for gradients [0] and [3,1]; ci equals independently recorded mean gradients within 1e-12. V2 also matches."
+      }
+    },
+    {
+      "contract": {
+        "id": "A02",
+        "check": "Actual configured optimizer/rate boundaries",
+        "criteria": "Load the real shipped TOML through Config; use the real optimizer factory and trainer with parameters.optimizer.lr overridden to .1 and .025, no trainer.lr or manually injected learning_rate. Verify correction and denominator, including a different LR next round and equal-rate reordered parameter groups. Missing optimizer, unequal group rates, nonfinite/zero rate and within-round scheduler changes give useful failures before the affected update, no control save/outbound success. Confirm captured executed LR is not replaced by a post-step hook's new LR."
+      },
+      "review": {
+        "status": "PASS",
+        "evidence": [
+          "focused313",
+          "focused314",
+          "independent313-v5",
+          "spawn313-v4",
+          "spawn314-v4"
+        ],
+        "source": "scaffold_strategy.py:182-252; composable.py:548-551,599-600,698-699",
+        "checks": "Inspected optimizer publication and actual public prehook capture at normal/tail steps. Executed shipped TOML Config+real optimizer-factory tests at .1/.025 and next-round .05; absent optimizer, unequal/reordered equal groups, zero/negative/NaN/Inf rates, and within-round change rejection. Post-step .025 cannot replace executed .1 correction or denominator. Failure clears outbound success and hooks."
+      }
+    },
+    {
+      "contract": {
+        "id": "A03",
+        "check": "Parameters and buffers",
+        "criteria": "Use a model with a trainable parameter named theta, ordinary weight/bias, a frozen parameter, an optimizer-excluded parameter and floating/integer buffers. Verify theta is corrected, excluded/frozen values are unchanged by SCAFFOLD, and no buffer gets a parameter/control update. Known historical buffer extras are tolerated; missing/unknown/mismatched/nonfinite control values fail before parameter correction. Input control tensors remain unchanged."
+      },
+      "review": {
+        "status": "PASS",
+        "evidence": [
+          "focused313",
+          "focused314"
+        ],
+        "source": "scaffold_strategy.py:31-67,154-179,207-252,268-297",
+        "checks": "Reviewed validation/projection/clones by parameter name and optimizer object identity, no substring filters. Executed theta/weight/bias/missing-gradient unused parameter, frozen/excluded parameters, floating/integer buffers and reordered equal-rate groups. Missing/unknown/shape/nonfinite control failures precede correction; inbound tensors remain unchanged; excluded ci unchanged and delta zero."
+      }
+    },
+    {
+      "contract": {
+        "id": "A04",
+        "check": "Completed steps, accumulation and empty rounds",
+        "criteria": "Through ComposableTrainer, exercise accumulation windows 2 with 1,3,4 microbatches and independently normalized gradients: K=1,2,2, one correction per real update including the tail and no duplicate finalize. Verify skipped-step flags suppress corrections. After a nonempty round, an empty/zero-update round retains ci and emits zero delta rather than stale data, with no divide-by-zero. Include the V2 compatibility subclass."
+      },
+      "review": {
+        "status": "PASS",
+        "evidence": [
+          "focused313",
+          "focused314",
+          "independent313-v5",
+          "independent314-v5",
+          "boundary313",
+          "boundary314"
+        ],
+        "source": "scaffold_strategy.py:254-299; composable.py:684-715; training_step.py:125-186,242-258",
+        "checks": "Separate sequential-data Fraction oracle uses accumulation 2 with 1/3/4 microbatches and real gradients: K=1/2/2, normalized tail exactly once, V2 same. Subsequent empty rounds retain ci and publish zero delta. Independently executed real CPU GradScaler overflow: K=0, y=1,ci=1,delta=0; subsequent successful step K=1,y=.8. CUDA autocast is disabled; no CUDA claim."
+      }
+    },
+    {
+      "contract": {
+        "id": "A05",
+        "check": "Client ownership and persistence",
+        "criteria": "Exercise one reused trainer for logical IDs 1->2->1 and fresh reconstruction for each ID; compare ci and resumed local updates with dedicated-trainer references over at least two rounds. Distinct nonzero controls survive same-client reload and never come from client 0 or another client. Test canonical precedence and each exact supported legacy dictionary/path, known buffer projection, custom save_path and slash model-name containment under F07. A deliberate save/load failure cannot produce a successful stale update."
+      },
+      "review": {
+        "status": "FAIL",
+        "finding": "F27-R02",
+        "evidence": [
+          "focused313",
+          "focused314",
+          "workerfailure313-v2",
+          "workerfailure314-v2"
+        ],
+        "source": "scaffold_strategy.py:101-145,300-319; composable.py:273-285",
+        "passed": "Normal successful 1->2->1/2 multi-round reuse matches dedicated references; fresh reconstruction and canonical precedence, exact example and prefix legacy imports, client-0 exclusion, custom root/slash containment, historical buffer projection and immediate save/load error surfacing all exercised.",
+        "failed": "Canonical checkpoint advances despite failed handoff and contaminates subsequent ordinary identity reuse/retry."
+      }
+    },
+    {
+      "contract": {
+        "id": "A06",
+        "check": "Actual inbound/outbound dataflow and worker return",
+        "criteria": "Run real example configure/set_client_id first, then actual inbound callback/processor with nonzero c, real train(), outbound callback/processor and server payload extraction. Repeat with a changed c next round and processor reuse. Inspect strategy-consumed c and emitted delta, not merely additional_data. Execute both direct training and the shipped max_concurrency spawn path; parent ci/delta/model match the child result and direct reference. Failed/missing worker state cannot send None or prior-round delta. Use a bounded subprocess deadline."
+      },
+      "review": {
+        "status": "FAIL",
+        "finding": "F27-R02",
+        "evidence": [
+          "focused313",
+          "focused314",
+          "spawn313-v4",
+          "spawn314-v4",
+          "workerfailure313-v2",
+          "workerfailure314-v2"
+        ],
+        "source": "scaffold_callback.py:27-39,54-61,70-129; composable.py:408-434,806-881",
+        "passed": "Real configure-before-inbound pipeline runs with detached c refresh, changed c, reused processor rebinding, malformed/missing inbound c invalidation, actual direct training/outbound and successful current-token spawn return. Independent child gradient/ci/delta/K/rate traces match parent model/ci/delta. Delivered actual missing/stale handoff subprocess tests refuse immediate outbound and preserve absent delta.",
+        "failed": "After that immediate refusal, failed child canonical controls are later adopted by normal client reassignment. Successful independent spawn probes took <26s under 240s subprocess deadlines; delivered worker harness has a 60s deadline."
+      }
+    },
+    {
+      "contract": {
+        "id": "A07",
+        "check": "Deterministic public-configuration multiround smoke",
+        "criteria": "Load the shipped TOML and instantiate its actual example components with local synthetic quadratic data, real optimizer, processors and server aggregation. Retain raw config plus explicit test overrides: CPU, fixed seed, temporary paths, scalar float64 model and quadratic loss, plain SGD momentum=0, eta=.1,N=3,selected (1,2) then (1,3), actual sample counts (2,6,4), batch_size=6,epochs=2. Each client's samples repeat its own target, so one real minibatch per epoch gives K=2 for every client without falsifying sample counts. Match every local model/ci/delta and sample-weighted global model/population c to the retained rational oracle. Data gradients must come from real independent client training; do not fabricate payload deltas. Verify inactive ci unchanged and c=mean(all ci). Add equal-count case matching uniform paper aggregation. No dataset download or convergence benchmark required; an in-process real pipeline plus A06 spawn qualification suffices."
+      },
+      "review": {
+        "status": "PASS",
+        "evidence": [
+          "independent313-v5",
+          "independent314-v5",
+          "spawn313-v4",
+          "spawn314-v4",
+          "baseline313-v2",
+          "baseline314-v2"
+        ],
+        "source": "scaffold.py real component wiring; scaffold_client/scaffold_callback/scaffold_trainer/scaffold_server",
+        "checks": "Read the real committed TOML, recorded raw values and explicit synthetic CPU overrides. Actual sample counts 2/6/4, batch 6, two epochs, K=2, N=3, selected (1,2) then (1,3). Independent rational arithmetic and recorded actual autograd gradients match every local y/ci/delta, weighted x and population c. Real _process_reports used. Round 1 weighted x=1.19 vs uniform x=1, c=2/3; round 2 x=10209/10000,c=896/1125. Inactive ci retained and c equals mean all ci. Equal-count 2/2/2 two-round control reduces to uniform model reference."
+      }
+    },
+    {
+      "contract": {
+        "id": "A08",
+        "check": "Server denominator, payload validity and buffers",
+        "criteria": "Use partial participation N>len(S), unequal sample counts and nonzero controls through actual weights_received/aggregation/weights_aggregated/customize_server_payload. Control update is sum(delta)/N, never sum(delta)/len(S) or sample weighting; next payload contains that c. Reject missing/malformed required deltas before committing either model/control state. Full model buffers remain under inherited aggregation behavior, without control keys/KeyError. A failed round leaves server state unchanged."
+      },
+      "review": {
+        "status": "FAIL",
+        "finding": "F27-R01",
+        "evidence": [
+          "focused313",
+          "focused314",
+          "independent313-v5",
+          "spawn313-v4",
+          "server313",
+          "server314"
+        ],
+        "source": "scaffold_server.py:53-96",
+        "passed": "Partial N=3>selected=2 and unequal sample model weights preserve unsampleweighted control sum/N; next payload carries cloned controls. All delivered missing/malformed required control delta cases reject before model/control commit; full floating/integer model buffers follow inherited aggregation with parameter-only controls.",
+        "failed": "Each model half must also be validated before arithmetic/commit. NaN, missing model key and broadcast-compatible rank mismatch currently commit both model/control state."
+      }
+    },
+    {
+      "contract": {
+        "id": "A09",
+        "check": "Generic optimizer compatibility and V2",
+        "criteria": "Exercise the unmodified shipped momentum=.9 optimizer and constant-rate Adam on at least two real steps with nonzero c/ci. Compare against independently stepped raw optimizers followed by -eta*(c-ci), then ci_old-c+(x-y)/(K*eta); verify warning/documented boundary, not mean-gradient equivalence. V2 gives the same results as corrected Option II and has no Option I claim."
+      },
+      "review": {
+        "status": "PASS",
+        "evidence": [
+          "focused313",
+          "focused314",
+          "boundary313",
+          "boundary314"
+        ],
+        "source": "scaffold_strategy.py:195-205,373-379",
+        "checks": "Unchanged shipped momentum=.9 and constant-rate Adam compose two actual raw optimizer updates with subtractive correction; independent raw optimizers and displacement Option II agree. Once-per-run extension warnings verified. Example momentum .9 uses .01 unchanged; independent constant gradients [3,1] give y=.913,ci=3.35, visibly not mean gradient 2. V2 is a compatibility subclass and no longer claims Option I."
+      }
+    },
+    {
+      "contract": {
+        "id": "A10",
+        "check": "Review and integration evidence",
+        "criteria": "Run focused new tests and the existing affected F07/F08/F23/F20 trainer regressions on the locked supported Python 3.13 profile; run focused equation/worker checks on available Python 3.14 profile. Retain exact commands, versions, durations, configuration overrides, results and diff hash for independent review. Check imports with the repo Ruff policy and JSON/docs links as applicable. Confirm TOML values and F20 objective unchanged; corrected public docs contain no blanket convergence guarantee. Report any failure honestly; no known internal defect is an external prerequisite."
+      },
+      "review": {
+        "status": "FAIL_FOR_IMPLEMENTATION_ACCEPTANCE",
+        "findings": [
+          "F27-R01",
+          "F27-R02"
+        ],
+        "evidence": [
+          "identities",
+          "focused313",
+          "focused314",
+          "ruff",
+          "boundary313",
+          "boundary314"
+        ],
+        "passed": "106 focused delivered tests pass on each supported available interpreter, no skips/xfails/assertion weakening; includes affected F07/F08/F23/F20 regressions. Independent source identities, exact B ancestry, implementation-only snapshot and raw evidence hashes checked. Ruff . --select I --no-cache passes. TOML values identical to B. FedProx independently retains unsquared L2 and l1 gradients with finite zero-distance/mu=0 behavior.",
+        "limitation": "Author retained 468-case C+B suites and all 48 startup cases are hash-verified, not independently rerun wholesale. Separate prose review on 95c7218fc9801099cd7ffa3afc1be227384d8500 is outside this worktree/code verdict; absent prose here is not a failure. Two demonstrated code defects prevent independent implementation acceptance."
+      }
+    }
+  ],
+  "independently_executed": {
+    "focused_suites": {
+      "python313": {
+        "passed": 106,
+        "warnings": 2,
+        "skipped": 0,
+        "command": {
+          "label": "focused313",
+          "command": "/tmp/plato-phase2c-313/bin/python -m pytest tests/trainers/test_scaffold_strategy.py tests/integration/test_scaffold_round_flow.py tests/trainers/test_training_update_contract.py tests/trainers/test_personalized_state_ownership.py tests/trainers/test_checkpoint_path_contract.py -p no:cacheprovider --basetemp=/tmp/plato-phase2c-scaffold-code-review/pytest313 -ra",
+          "shell": [
+            "zsh",
+            "-lc"
+          ],
+          "cwd": "/private/tmp/plato-refresh-worktrees/training",
+          "env_overrides": {
+            "PYTHONDONTWRITEBYTECODE": "1",
+            "PYTHONPATH": "/private/tmp/plato-refresh-worktrees/training",
+            "OMP_NUM_THREADS": "1",
+            "MKL_NUM_THREADS": "1",
+            "PYTEST_ADDOPTS": "",
+            "RUFF_CACHE_DIR": "/tmp/plato-phase2c-scaffold-code-review/ruff-cache"
+          },
+          "exit_code": 0,
+          "duration_seconds": 110.14207410812378,
+          "raw_log": "/tmp/plato-phase2c-scaffold-code-review/focused313.log",
+          "raw_bytes": 1473,
+          "raw_sha256": "841166117ca1be2c60f310486e40fd0376696c30fac4b60e96a4742078fa6538"
+        }
+      },
+      "python314": {
+        "passed": 106,
+        "warnings": 2,
+        "skipped": 0,
+        "command": {
+          "label": "focused314",
+          "command": "/private/tmp/plato-phase2c-314/bin/python -m pytest tests/trainers/test_scaffold_strategy.py tests/integration/test_scaffold_round_flow.py tests/trainers/test_training_update_contract.py tests/trainers/test_personalized_state_ownership.py tests/trainers/test_checkpoint_path_contract.py -p no:cacheprovider --basetemp=/tmp/plato-phase2c-scaffold-code-review/pytest314 -ra",
+          "shell": [
+            "zsh",
+            "-lc"
+          ],
+          "cwd": "/private/tmp/plato-refresh-worktrees/training",
+          "env_overrides": {
+            "PYTHONDONTWRITEBYTECODE": "1",
+            "PYTHONPATH": "/private/tmp/plato-refresh-worktrees/training",
+            "OMP_NUM_THREADS": "1",
+            "MKL_NUM_THREADS": "1",
+            "PYTEST_ADDOPTS": "",
+            "RUFF_CACHE_DIR": "/tmp/plato-phase2c-scaffold-code-review/ruff-cache"
+          },
+          "exit_code": 0,
+          "duration_seconds": 116.65135884284973,
+          "raw_log": "/tmp/plato-phase2c-scaffold-code-review/focused314.log",
+          "raw_bytes": 1472,
+          "raw_sha256": "b18a36d63f98345e1c4e71b401ddf085b9a32ceeb44f594555086ed2898f7b7b"
+        }
+      }
+    },
+    "numerical_and_live_results": {
+      "313": {
+        "equations": [
+          {
+            "strategy": "SCAFFOLDUpdateStrategy",
+            "gradients": [
+              0.0
+            ],
+            "y": 0.9,
+            "ci": -2.220446049250313e-16,
+            "delta": -1.0000000000000002
+          },
+          {
+            "strategy": "SCAFFOLDUpdateStrategy",
+            "gradients": [
+              3.0,
+              1.0
+            ],
+            "y": 0.4,
+            "ci": 1.9999999999999996,
+            "delta": 0.9999999999999996
+          },
+          {
+            "strategy": "SCAFFOLDUpdateStrategyV2",
+            "gradients": [
+              0.0
+            ],
+            "y": 0.9,
+            "ci": -2.220446049250313e-16,
+            "delta": -1.0000000000000002
+          },
+          {
+            "strategy": "SCAFFOLDUpdateStrategyV2",
+            "gradients": [
+              3.0,
+              1.0
+            ],
+            "y": 0.4,
+            "ci": 1.9999999999999996,
+            "delta": 0.9999999999999996
+          }
+        ],
+        "accumulation": [
+          {
+            "strategy": "SCAFFOLDUpdateStrategy",
+            "microbatches": 1,
+            "expected_y": "4/5",
+            "updates": 1,
+            "mean_used_gradient": "1",
+            "empty_delta": 0
+          },
+          {
+            "strategy": "SCAFFOLDUpdateStrategy",
+            "microbatches": 3,
+            "expected_y": "173/200",
+            "updates": 2,
+            "mean_used_gradient": "-13/40",
+            "empty_delta": 0
+          },
+          {
+            "strategy": "SCAFFOLDUpdateStrategy",
+            "microbatches": 4,
+            "expected_y": "183/200",
+            "updates": 2,
+            "mean_used_gradient": "-23/40",
+            "empty_delta": 0
+          },
+          {
+            "strategy": "SCAFFOLDUpdateStrategyV2",
+            "microbatches": 1,
+            "expected_y": "4/5",
+            "updates": 1,
+            "mean_used_gradient": "1",
+            "empty_delta": 0
+          },
+          {
+            "strategy": "SCAFFOLDUpdateStrategyV2",
+            "microbatches": 3,
+            "expected_y": "173/200",
+            "updates": 2,
+            "mean_used_gradient": "-13/40",
+            "empty_delta": 0
+          },
+          {
+            "strategy": "SCAFFOLDUpdateStrategyV2",
+            "microbatches": 4,
+            "expected_y": "183/200",
+            "updates": 2,
+            "mean_used_gradient": "-23/40",
+            "empty_delta": 0
+          }
+        ],
+        "live": {
+          "spawn": false,
+          "equal_counts": false,
+          "overrides": {
+            "clients": {
+              "total_clients": 3,
+              "per_round": 2,
+              "do_test": false
+            },
+            "server": {
+              "address": "127.0.0.1",
+              "port": 8000,
+              "do_test": false,
+              "checkpoint_path": "results/test/checkpoint",
+              "model_path": "results/test/model",
+              "random_seed": 29
+            },
+            "data": {
+              "datasource": "Torchvision",
+              "dataset_name": "MNIST",
+              "download": true,
+              "partition_size": 1000,
+              "sampler": "iid"
+            },
+            "trainer": {
+              "rounds": 5,
+              "target_accuracy": 0.98,
+              "epochs": 2,
+              "batch_size": 6,
+              "optimizer": "SGD",
+              "model_name": "org/model"
+            },
+            "algorithm": {
+              "type": "fedavg"
+            },
+            "parameters": {
+              "optimizer": {
+                "lr": 0.1,
+                "momentum": 0.0,
+                "weight_decay": 0.0
+              }
+            }
+          },
+          "rounds": [
+            {
+              "round": 1,
+              "locals": [
+                {
+                  "client": 1,
+                  "samples": 2,
+                  "y": 0.6200000000000001,
+                  "ci": 0.8999999999999995,
+                  "delta": -0.10000000000000053,
+                  "trace": {
+                    "gradients": [
+                      1.0,
+                      0.8
+                    ],
+                    "worker_token": null,
+                    "ci": 0.8999999999999995,
+                    "delta": -0.10000000000000053,
+                    "K": 2,
+                    "eta": 0.1,
+                    "y": 0.6200000000000001
+                  }
+                },
+                {
+                  "client": 2,
+                  "samples": 6,
+                  "y": 1.3800000000000003,
+                  "ci": -0.9000000000000017,
+                  "delta": -3.9000000000000017,
+                  "trace": {
+                    "gradients": [
+                      -1.0,
+                      -0.7999999999999998
+                    ],
+                    "worker_token": null,
+                    "ci": -0.9000000000000017,
+                    "delta": -3.9000000000000017,
+                    "K": 2,
+                    "eta": 0.1,
+                    "y": 1.3800000000000003
+                  }
+                }
+              ],
+              "x": 1.1900000000000002,
+              "c": 0.6666666666666661,
+              "all_ci": [
+                0.8999999999999995,
+                -0.9000000000000017,
+                2.0
+              ],
+              "uniform_for_local_models": "1"
+            },
+            {
+              "round": 2,
+              "locals": [
+                {
+                  "client": 1,
+                  "samples": 2,
+                  "y": 1.0082333333333335,
+                  "ci": 1.1421666666666666,
+                  "delta": 0.24216666666666709,
+                  "trace": {
+                    "gradients": [
+                      1.1900000000000002,
+                      1.0943333333333336
+                    ],
+                    "worker_token": null,
+                    "ci": 1.1421666666666666,
+                    "delta": 0.24216666666666709,
+                    "K": 2,
+                    "eta": 0.1,
+                    "y": 1.0082333333333335
+                  }
+                },
+                {
+                  "client": 3,
+                  "samples": 4,
+                  "y": 1.0272333333333334,
+                  "ci": 2.1471666666666676,
+                  "delta": 0.14716666666666756,
+                  "trace": {
+                    "gradients": [
+                      2.1900000000000004,
+                      2.1043333333333334
+                    ],
+                    "worker_token": null,
+                    "ci": 2.1471666666666676,
+                    "delta": 0.14716666666666756,
+                    "K": 2,
+                    "eta": 0.1,
+                    "y": 1.0272333333333334
+                  }
+                }
+              ],
+              "x": 1.0209000000000001,
+              "c": 0.7964444444444443,
+              "all_ci": [
+                1.1421666666666666,
+                -0.9000000000000017,
+                2.1471666666666676
+              ],
+              "uniform_for_local_models": "7633/7500"
+            }
+          ]
+        },
+        "equal": {
+          "spawn": false,
+          "equal_counts": true,
+          "overrides": {
+            "clients": {
+              "total_clients": 3,
+              "per_round": 2,
+              "do_test": false
+            },
+            "server": {
+              "address": "127.0.0.1",
+              "port": 8000,
+              "do_test": false,
+              "checkpoint_path": "results/test/checkpoint",
+              "model_path": "results/test/model",
+              "random_seed": 29
+            },
+            "data": {
+              "datasource": "Torchvision",
+              "dataset_name": "MNIST",
+              "download": true,
+              "partition_size": 1000,
+              "sampler": "iid"
+            },
+            "trainer": {
+              "rounds": 5,
+              "target_accuracy": 0.98,
+              "epochs": 2,
+              "batch_size": 6,
+              "optimizer": "SGD",
+              "model_name": "org/model"
+            },
+            "algorithm": {
+              "type": "fedavg"
+            },
+            "parameters": {
+              "optimizer": {
+                "lr": 0.1,
+                "momentum": 0.0,
+                "weight_decay": 0.0
+              }
+            }
+          },
+          "rounds": [
+            {
+              "round": 1,
+              "locals": [
+                {
+                  "client": 1,
+                  "samples": 2,
+                  "y": 0.6200000000000001,
+                  "ci": 0.8999999999999995,
+                  "delta": -0.10000000000000053,
+                  "trace": {
+                    "gradients": [
+                      1.0,
+                      0.8
+                    ],
+                    "worker_token": null,
+                    "ci": 0.8999999999999995,
+                    "delta": -0.10000000000000053,
+                    "K": 2,
+                    "eta": 0.1,
+                    "y": 0.6200000000000001
+                  }
+                },
+                {
+                  "client": 2,
+                  "samples": 2,
+                  "y": 1.3800000000000003,
+                  "ci": -0.9000000000000017,
+                  "delta": -3.9000000000000017,
+                  "trace": {
+                    "gradients": [
+                      -1.0,
+                      -0.7999999999999998
+                    ],
+                    "worker_token": null,
+                    "ci": -0.9000000000000017,
+                    "delta": -3.9000000000000017,
+                    "K": 2,
+                    "eta": 0.1,
+                    "y": 1.3800000000000003
+                  }
+                }
+              ],
+              "x": 1.0000000000000002,
+              "c": 0.6666666666666661,
+              "all_ci": [
+                0.8999999999999995,
+                -0.9000000000000017,
+                2.0
+              ],
+              "uniform_for_local_models": "1"
+            },
+            {
+              "round": 2,
+              "locals": [
+                {
+                  "client": 1,
+                  "samples": 2,
+                  "y": 0.8543333333333335,
+                  "ci": 0.961666666666667,
+                  "delta": 0.061666666666667536,
+                  "trace": {
+                    "gradients": [
+                      1.0000000000000002,
+                      0.9233333333333336
+                    ],
+                    "worker_token": null,
+                    "ci": 0.961666666666667,
+                    "delta": 0.061666666666667536,
+                    "K": 2,
+                    "eta": 0.1,
+                    "y": 0.8543333333333335
+                  }
+                },
+                {
+                  "client": 3,
+                  "samples": 2,
+                  "y": 0.8733333333333337,
+                  "ci": 1.9666666666666663,
+                  "delta": -0.03333333333333366,
+                  "trace": {
+                    "gradients": [
+                      2.0,
+                      1.9333333333333336
+                    ],
+                    "worker_token": null,
+                    "ci": 1.9666666666666663,
+                    "delta": -0.03333333333333366,
+                    "K": 2,
+                    "eta": 0.1,
+                    "y": 0.8733333333333337
+                  }
+                }
+              ],
+              "x": 0.8638333333333337,
+              "c": 0.6761111111111107,
+              "all_ci": [
+                0.961666666666667,
+                -0.9000000000000017,
+                1.9666666666666663
+              ],
+              "uniform_for_local_models": "5183/6000"
+            }
+          ]
+        },
+        "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+        "torch": "2.14.1",
+        "source_files": {
+          "scaffold_callback": "/private/tmp/plato-refresh-worktrees/training/examples/customized_client_training/scaffold/scaffold_callback.py",
+          "scaffold_client": "/private/tmp/plato-refresh-worktrees/training/examples/customized_client_training/scaffold/scaffold_client.py",
+          "scaffold_trainer": "/private/tmp/plato-refresh-worktrees/training/examples/customized_client_training/scaffold/scaffold_trainer.py",
+          "scaffold_server": "/private/tmp/plato-refresh-worktrees/training/examples/customized_client_training/scaffold/scaffold_server.py"
+        }
+      },
+      "314": {
+        "equations": [
+          {
+            "strategy": "SCAFFOLDUpdateStrategy",
+            "gradients": [
+              0.0
+            ],
+            "y": 0.9,
+            "ci": -2.220446049250313e-16,
+            "delta": -1.0000000000000002
+          },
+          {
+            "strategy": "SCAFFOLDUpdateStrategy",
+            "gradients": [
+              3.0,
+              1.0
+            ],
+            "y": 0.4,
+            "ci": 1.9999999999999996,
+            "delta": 0.9999999999999996
+          },
+          {
+            "strategy": "SCAFFOLDUpdateStrategyV2",
+            "gradients": [
+              0.0
+            ],
+            "y": 0.9,
+            "ci": -2.220446049250313e-16,
+            "delta": -1.0000000000000002
+          },
+          {
+            "strategy": "SCAFFOLDUpdateStrategyV2",
+            "gradients": [
+              3.0,
+              1.0
+            ],
+            "y": 0.4,
+            "ci": 1.9999999999999996,
+            "delta": 0.9999999999999996
+          }
+        ],
+        "accumulation": [
+          {
+            "strategy": "SCAFFOLDUpdateStrategy",
+            "microbatches": 1,
+            "expected_y": "4/5",
+            "updates": 1,
+            "mean_used_gradient": "1",
+            "empty_delta": 0
+          },
+          {
+            "strategy": "SCAFFOLDUpdateStrategy",
+            "microbatches": 3,
+            "expected_y": "173/200",
+            "updates": 2,
+            "mean_used_gradient": "-13/40",
+            "empty_delta": 0
+          },
+          {
+            "strategy": "SCAFFOLDUpdateStrategy",
+            "microbatches": 4,
+            "expected_y": "183/200",
+            "updates": 2,
+            "mean_used_gradient": "-23/40",
+            "empty_delta": 0
+          },
+          {
+            "strategy": "SCAFFOLDUpdateStrategyV2",
+            "microbatches": 1,
+            "expected_y": "4/5",
+            "updates": 1,
+            "mean_used_gradient": "1",
+            "empty_delta": 0
+          },
+          {
+            "strategy": "SCAFFOLDUpdateStrategyV2",
+            "microbatches": 3,
+            "expected_y": "173/200",
+            "updates": 2,
+            "mean_used_gradient": "-13/40",
+            "empty_delta": 0
+          },
+          {
+            "strategy": "SCAFFOLDUpdateStrategyV2",
+            "microbatches": 4,
+            "expected_y": "183/200",
+            "updates": 2,
+            "mean_used_gradient": "-23/40",
+            "empty_delta": 0
+          }
+        ],
+        "live": {
+          "spawn": false,
+          "equal_counts": false,
+          "overrides": {
+            "clients": {
+              "total_clients": 3,
+              "per_round": 2,
+              "do_test": false
+            },
+            "server": {
+              "address": "127.0.0.1",
+              "port": 8000,
+              "do_test": false,
+              "checkpoint_path": "results/test/checkpoint",
+              "model_path": "results/test/model",
+              "random_seed": 29
+            },
+            "data": {
+              "datasource": "Torchvision",
+              "dataset_name": "MNIST",
+              "download": true,
+              "partition_size": 1000,
+              "sampler": "iid"
+            },
+            "trainer": {
+              "rounds": 5,
+              "target_accuracy": 0.98,
+              "epochs": 2,
+              "batch_size": 6,
+              "optimizer": "SGD",
+              "model_name": "org/model"
+            },
+            "algorithm": {
+              "type": "fedavg"
+            },
+            "parameters": {
+              "optimizer": {
+                "lr": 0.1,
+                "momentum": 0.0,
+                "weight_decay": 0.0
+              }
+            }
+          },
+          "rounds": [
+            {
+              "round": 1,
+              "locals": [
+                {
+                  "client": 1,
+                  "samples": 2,
+                  "y": 0.6200000000000001,
+                  "ci": 0.8999999999999995,
+                  "delta": -0.10000000000000053,
+                  "trace": {
+                    "gradients": [
+                      1.0,
+                      0.8
+                    ],
+                    "worker_token": null,
+                    "ci": 0.8999999999999995,
+                    "delta": -0.10000000000000053,
+                    "K": 2,
+                    "eta": 0.1,
+                    "y": 0.6200000000000001
+                  }
+                },
+                {
+                  "client": 2,
+                  "samples": 6,
+                  "y": 1.3800000000000003,
+                  "ci": -0.9000000000000017,
+                  "delta": -3.9000000000000017,
+                  "trace": {
+                    "gradients": [
+                      -1.0,
+                      -0.7999999999999998
+                    ],
+                    "worker_token": null,
+                    "ci": -0.9000000000000017,
+                    "delta": -3.9000000000000017,
+                    "K": 2,
+                    "eta": 0.1,
+                    "y": 1.3800000000000003
+                  }
+                }
+              ],
+              "x": 1.1900000000000002,
+              "c": 0.6666666666666661,
+              "all_ci": [
+                0.8999999999999995,
+                -0.9000000000000017,
+                2.0
+              ],
+              "uniform_for_local_models": "1"
+            },
+            {
+              "round": 2,
+              "locals": [
+                {
+                  "client": 1,
+                  "samples": 2,
+                  "y": 1.0082333333333335,
+                  "ci": 1.1421666666666666,
+                  "delta": 0.24216666666666709,
+                  "trace": {
+                    "gradients": [
+                      1.1900000000000002,
+                      1.0943333333333336
+                    ],
+                    "worker_token": null,
+                    "ci": 1.1421666666666666,
+                    "delta": 0.24216666666666709,
+                    "K": 2,
+                    "eta": 0.1,
+                    "y": 1.0082333333333335
+                  }
+                },
+                {
+                  "client": 3,
+                  "samples": 4,
+                  "y": 1.0272333333333334,
+                  "ci": 2.1471666666666676,
+                  "delta": 0.14716666666666756,
+                  "trace": {
+                    "gradients": [
+                      2.1900000000000004,
+                      2.1043333333333334
+                    ],
+                    "worker_token": null,
+                    "ci": 2.1471666666666676,
+                    "delta": 0.14716666666666756,
+                    "K": 2,
+                    "eta": 0.1,
+                    "y": 1.0272333333333334
+                  }
+                }
+              ],
+              "x": 1.0209000000000001,
+              "c": 0.7964444444444443,
+              "all_ci": [
+                1.1421666666666666,
+                -0.9000000000000017,
+                2.1471666666666676
+              ],
+              "uniform_for_local_models": "7633/7500"
+            }
+          ]
+        },
+        "equal": {
+          "spawn": false,
+          "equal_counts": true,
+          "overrides": {
+            "clients": {
+              "total_clients": 3,
+              "per_round": 2,
+              "do_test": false
+            },
+            "server": {
+              "address": "127.0.0.1",
+              "port": 8000,
+              "do_test": false,
+              "checkpoint_path": "results/test/checkpoint",
+              "model_path": "results/test/model",
+              "random_seed": 29
+            },
+            "data": {
+              "datasource": "Torchvision",
+              "dataset_name": "MNIST",
+              "download": true,
+              "partition_size": 1000,
+              "sampler": "iid"
+            },
+            "trainer": {
+              "rounds": 5,
+              "target_accuracy": 0.98,
+              "epochs": 2,
+              "batch_size": 6,
+              "optimizer": "SGD",
+              "model_name": "org/model"
+            },
+            "algorithm": {
+              "type": "fedavg"
+            },
+            "parameters": {
+              "optimizer": {
+                "lr": 0.1,
+                "momentum": 0.0,
+                "weight_decay": 0.0
+              }
+            }
+          },
+          "rounds": [
+            {
+              "round": 1,
+              "locals": [
+                {
+                  "client": 1,
+                  "samples": 2,
+                  "y": 0.6200000000000001,
+                  "ci": 0.8999999999999995,
+                  "delta": -0.10000000000000053,
+                  "trace": {
+                    "gradients": [
+                      1.0,
+                      0.8
+                    ],
+                    "worker_token": null,
+                    "ci": 0.8999999999999995,
+                    "delta": -0.10000000000000053,
+                    "K": 2,
+                    "eta": 0.1,
+                    "y": 0.6200000000000001
+                  }
+                },
+                {
+                  "client": 2,
+                  "samples": 2,
+                  "y": 1.3800000000000003,
+                  "ci": -0.9000000000000017,
+                  "delta": -3.9000000000000017,
+                  "trace": {
+                    "gradients": [
+                      -1.0,
+                      -0.7999999999999998
+                    ],
+                    "worker_token": null,
+                    "ci": -0.9000000000000017,
+                    "delta": -3.9000000000000017,
+                    "K": 2,
+                    "eta": 0.1,
+                    "y": 1.3800000000000003
+                  }
+                }
+              ],
+              "x": 1.0000000000000002,
+              "c": 0.6666666666666661,
+              "all_ci": [
+                0.8999999999999995,
+                -0.9000000000000017,
+                2.0
+              ],
+              "uniform_for_local_models": "1"
+            },
+            {
+              "round": 2,
+              "locals": [
+                {
+                  "client": 1,
+                  "samples": 2,
+                  "y": 0.8543333333333335,
+                  "ci": 0.961666666666667,
+                  "delta": 0.061666666666667536,
+                  "trace": {
+                    "gradients": [
+                      1.0000000000000002,
+                      0.9233333333333336
+                    ],
+                    "worker_token": null,
+                    "ci": 0.961666666666667,
+                    "delta": 0.061666666666667536,
+                    "K": 2,
+                    "eta": 0.1,
+                    "y": 0.8543333333333335
+                  }
+                },
+                {
+                  "client": 3,
+                  "samples": 2,
+                  "y": 0.8733333333333337,
+                  "ci": 1.9666666666666663,
+                  "delta": -0.03333333333333366,
+                  "trace": {
+                    "gradients": [
+                      2.0,
+                      1.9333333333333336
+                    ],
+                    "worker_token": null,
+                    "ci": 1.9666666666666663,
+                    "delta": -0.03333333333333366,
+                    "K": 2,
+                    "eta": 0.1,
+                    "y": 0.8733333333333337
+                  }
+                }
+              ],
+              "x": 0.8638333333333337,
+              "c": 0.6761111111111107,
+              "all_ci": [
+                0.961666666666667,
+                -0.9000000000000017,
+                1.9666666666666663
+              ],
+              "uniform_for_local_models": "5183/6000"
+            }
+          ]
+        },
+        "python": "3.14.8 (main, Sep 30 2026, 17:55:09) [Clang 21.0.0 (clang-2100.3.34.2)]",
+        "torch": "2.14.1",
+        "source_files": {
+          "scaffold_callback": "/private/tmp/plato-refresh-worktrees/training/examples/customized_client_training/scaffold/scaffold_callback.py",
+          "scaffold_client": "/private/tmp/plato-refresh-worktrees/training/examples/customized_client_training/scaffold/scaffold_client.py",
+          "scaffold_trainer": "/private/tmp/plato-refresh-worktrees/training/examples/customized_client_training/scaffold/scaffold_trainer.py",
+          "scaffold_server": "/private/tmp/plato-refresh-worktrees/training/examples/customized_client_training/scaffold/scaffold_server.py"
+        }
+      }
+    },
+    "actual_spawn_results": {
+      "313": {
+        "live": {
+          "spawn": true,
+          "equal_counts": false,
+          "overrides": {
+            "clients": {
+              "total_clients": 3,
+              "per_round": 2,
+              "do_test": false
+            },
+            "server": {
+              "address": "127.0.0.1",
+              "port": 8000,
+              "do_test": false,
+              "checkpoint_path": "results/test/checkpoint",
+              "model_path": "results/test/model",
+              "random_seed": 29
+            },
+            "data": {
+              "datasource": "Torchvision",
+              "dataset_name": "MNIST",
+              "download": true,
+              "partition_size": 1000,
+              "sampler": "iid"
+            },
+            "trainer": {
+              "rounds": 5,
+              "max_concurrency": 2,
+              "target_accuracy": 0.98,
+              "epochs": 2,
+              "batch_size": 6,
+              "optimizer": "SGD",
+              "model_name": "org/model"
+            },
+            "algorithm": {
+              "type": "fedavg"
+            },
+            "parameters": {
+              "optimizer": {
+                "lr": 0.1,
+                "momentum": 0.0,
+                "weight_decay": 0.0
+              }
+            }
+          },
+          "rounds": [
+            {
+              "round": 1,
+              "locals": [
+                {
+                  "client": 1,
+                  "samples": 2,
+                  "y": 0.6200000000000001,
+                  "ci": 0.8999999999999995,
+                  "delta": -0.10000000000000053,
+                  "trace": {
+                    "gradients": [
+                      1.0,
+                      0.8
+                    ],
+                    "worker_token": "8e03f9df56424c7a956cb504c8e4c7c0",
+                    "ci": 0.8999999999999995,
+                    "delta": -0.10000000000000053,
+                    "K": 2,
+                    "eta": 0.1,
+                    "y": 0.6200000000000001
+                  }
+                },
+                {
+                  "client": 2,
+                  "samples": 6,
+                  "y": 1.3800000000000003,
+                  "ci": -0.9000000000000017,
+                  "delta": -3.9000000000000017,
+                  "trace": {
+                    "gradients": [
+                      -1.0,
+                      -0.7999999999999998
+                    ],
+                    "worker_token": "41018b5423ce430185c72df81b978e3d",
+                    "ci": -0.9000000000000017,
+                    "delta": -3.9000000000000017,
+                    "K": 2,
+                    "eta": 0.1,
+                    "y": 1.3800000000000003
+                  }
+                }
+              ],
+              "x": 1.1900000000000002,
+              "c": 0.6666666666666661,
+              "all_ci": [
+                0.8999999999999995,
+                -0.9000000000000017,
+                2.0
+              ],
+              "uniform_for_local_models": "1"
+            },
+            {
+              "round": 2,
+              "locals": [
+                {
+                  "client": 1,
+                  "samples": 2,
+                  "y": 1.0082333333333335,
+                  "ci": 1.1421666666666666,
+                  "delta": 0.24216666666666709,
+                  "trace": {
+                    "gradients": [
+                      1.1900000000000002,
+                      1.0943333333333336
+                    ],
+                    "worker_token": "6d64edb296434f75be831c232c528c43",
+                    "ci": 1.1421666666666666,
+                    "delta": 0.24216666666666709,
+                    "K": 2,
+                    "eta": 0.1,
+                    "y": 1.0082333333333335
+                  }
+                },
+                {
+                  "client": 3,
+                  "samples": 4,
+                  "y": 1.0272333333333334,
+                  "ci": 2.1471666666666676,
+                  "delta": 0.14716666666666756,
+                  "trace": {
+                    "gradients": [
+                      2.1900000000000004,
+                      2.1043333333333334
+                    ],
+                    "worker_token": "266f4807c951449186cb9caddf308863",
+                    "ci": 2.1471666666666676,
+                    "delta": 0.14716666666666756,
+                    "K": 2,
+                    "eta": 0.1,
+                    "y": 1.0272333333333334
+                  }
+                }
+              ],
+              "x": 1.0209000000000001,
+              "c": 0.7964444444444443,
+              "all_ci": [
+                1.1421666666666666,
+                -0.9000000000000017,
+                2.1471666666666676
+              ],
+              "uniform_for_local_models": "7633/7500"
+            }
+          ]
+        },
+        "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+        "torch": "2.14.1",
+        "source_files": {
+          "scaffold_callback": "/private/tmp/plato-refresh-worktrees/training/examples/customized_client_training/scaffold/scaffold_callback.py",
+          "scaffold_client": "/private/tmp/plato-refresh-worktrees/training/examples/customized_client_training/scaffold/scaffold_client.py",
+          "scaffold_trainer": "/private/tmp/plato-refresh-worktrees/training/examples/customized_client_training/scaffold/scaffold_trainer.py",
+          "scaffold_server": "/private/tmp/plato-refresh-worktrees/training/examples/customized_client_training/scaffold/scaffold_server.py"
+        }
+      },
+      "314": {
+        "live": {
+          "spawn": true,
+          "equal_counts": false,
+          "overrides": {
+            "clients": {
+              "total_clients": 3,
+              "per_round": 2,
+              "do_test": false
+            },
+            "server": {
+              "address": "127.0.0.1",
+              "port": 8000,
+              "do_test": false,
+              "checkpoint_path": "results/test/checkpoint",
+              "model_path": "results/test/model",
+              "random_seed": 29
+            },
+            "data": {
+              "datasource": "Torchvision",
+              "dataset_name": "MNIST",
+              "download": true,
+              "partition_size": 1000,
+              "sampler": "iid"
+            },
+            "trainer": {
+              "rounds": 5,
+              "max_concurrency": 2,
+              "target_accuracy": 0.98,
+              "epochs": 2,
+              "batch_size": 6,
+              "optimizer": "SGD",
+              "model_name": "org/model"
+            },
+            "algorithm": {
+              "type": "fedavg"
+            },
+            "parameters": {
+              "optimizer": {
+                "lr": 0.1,
+                "momentum": 0.0,
+                "weight_decay": 0.0
+              }
+            }
+          },
+          "rounds": [
+            {
+              "round": 1,
+              "locals": [
+                {
+                  "client": 1,
+                  "samples": 2,
+                  "y": 0.6200000000000001,
+                  "ci": 0.8999999999999995,
+                  "delta": -0.10000000000000053,
+                  "trace": {
+                    "gradients": [
+                      1.0,
+                      0.8
+                    ],
+                    "worker_token": "4f74b8e7b207499d859439346daf14a0",
+                    "ci": 0.8999999999999995,
+                    "delta": -0.10000000000000053,
+                    "K": 2,
+                    "eta": 0.1,
+                    "y": 0.6200000000000001
+                  }
+                },
+                {
+                  "client": 2,
+                  "samples": 6,
+                  "y": 1.3800000000000003,
+                  "ci": -0.9000000000000017,
+                  "delta": -3.9000000000000017,
+                  "trace": {
+                    "gradients": [
+                      -1.0,
+                      -0.7999999999999998
+                    ],
+                    "worker_token": "39a61b6321cc4d5f9d5a1d4211847375",
+                    "ci": -0.9000000000000017,
+                    "delta": -3.9000000000000017,
+                    "K": 2,
+                    "eta": 0.1,
+                    "y": 1.3800000000000003
+                  }
+                }
+              ],
+              "x": 1.1900000000000002,
+              "c": 0.6666666666666661,
+              "all_ci": [
+                0.8999999999999995,
+                -0.9000000000000017,
+                2.0
+              ],
+              "uniform_for_local_models": "1"
+            },
+            {
+              "round": 2,
+              "locals": [
+                {
+                  "client": 1,
+                  "samples": 2,
+                  "y": 1.0082333333333335,
+                  "ci": 1.1421666666666666,
+                  "delta": 0.24216666666666709,
+                  "trace": {
+                    "gradients": [
+                      1.1900000000000002,
+                      1.0943333333333336
+                    ],
+                    "worker_token": "efc2b774c2a64558bf626c01c7c6206f",
+                    "ci": 1.1421666666666666,
+                    "delta": 0.24216666666666709,
+                    "K": 2,
+                    "eta": 0.1,
+                    "y": 1.0082333333333335
+                  }
+                },
+                {
+                  "client": 3,
+                  "samples": 4,
+                  "y": 1.0272333333333334,
+                  "ci": 2.1471666666666676,
+                  "delta": 0.14716666666666756,
+                  "trace": {
+                    "gradients": [
+                      2.1900000000000004,
+                      2.1043333333333334
+                    ],
+                    "worker_token": "522f695720ff47d4b184677655cd520e",
+                    "ci": 2.1471666666666676,
+                    "delta": 0.14716666666666756,
+                    "K": 2,
+                    "eta": 0.1,
+                    "y": 1.0272333333333334
+                  }
+                }
+              ],
+              "x": 1.0209000000000001,
+              "c": 0.7964444444444443,
+              "all_ci": [
+                1.1421666666666666,
+                -0.9000000000000017,
+                2.1471666666666676
+              ],
+              "uniform_for_local_models": "7633/7500"
+            }
+          ]
+        },
+        "python": "3.14.8 (main, Sep 30 2026, 17:55:09) [Clang 21.0.0 (clang-2100.3.34.2)]",
+        "torch": "2.14.1",
+        "source_files": {
+          "scaffold_callback": "/private/tmp/plato-refresh-worktrees/training/examples/customized_client_training/scaffold/scaffold_callback.py",
+          "scaffold_client": "/private/tmp/plato-refresh-worktrees/training/examples/customized_client_training/scaffold/scaffold_client.py",
+          "scaffold_trainer": "/private/tmp/plato-refresh-worktrees/training/examples/customized_client_training/scaffold/scaffold_trainer.py",
+          "scaffold_server": "/private/tmp/plato-refresh-worktrees/training/examples/customized_client_training/scaffold/scaffold_server.py"
+        }
+      }
+    },
+    "extensions_skipped_steps_fedprox_and_environment": {
+      "313": {
+        "extensions": [
+          {
+            "optimizer": "SGD",
+            "parameters": {
+              "lr": 0.01,
+              "momentum": 0.9,
+              "weight_decay": 0.0
+            },
+            "y": 0.9129999999999999,
+            "raw_plus_correction": 0.9129999999999999,
+            "ci": 3.350000000000004,
+            "reference_ci": 3.350000000000004,
+            "warning_count": 1,
+            "warning": "SCAFFOLD uses an additive-control optimizer extension for this run; only vanilla fixed-rate SGD has the paper gradient-average identity."
+          },
+          {
+            "optimizer": "Adam",
+            "parameters": {
+              "lr": 0.01
+            },
+            "y": 0.9612893605650529,
+            "raw_plus_correction": 0.9612893605650529,
+            "ci": 0.9355319717473563,
+            "reference_ci": 0.9355319717473563,
+            "warning_count": 1,
+            "warning": "SCAFFOLD uses an additive-control optimizer extension for this run; only vanilla fixed-rate SGD has the paper gradient-average identity."
+          }
+        ],
+        "real_skipped_steps": {
+          "overflow": {
+            "y": 1,
+            "K": 0,
+            "ci": 1,
+            "delta": 0
+          },
+          "subsequent_success": {
+            "y": 0.8,
+            "K": 1,
+            "ci": 0.9999999999999996
+          },
+          "hardware": "CPU GradScaler; CUDA autocast disabled because no GPU"
+        },
+        "fedprox_legacy_semantics": [
+          {
+            "norm": "l2",
+            "mu": 2.0,
+            "loss": 5.0,
+            "actual_gradient": [
+              0.6,
+              0.8
+            ],
+            "analytical_legacy_gradient": [
+              0.6,
+              0.8
+            ]
+          },
+          {
+            "norm": "l1",
+            "mu": 2.0,
+            "loss": 14.0,
+            "actual_gradient": [
+              2.0,
+              2.0
+            ],
+            "analytical_legacy_gradient": [
+              2.0,
+              2.0
+            ]
+          },
+          {
+            "norm": "l2",
+            "mu": 0.0,
+            "loss": 0.0,
+            "actual_gradient": [
+              0.0,
+              0.0
+            ],
+            "analytical_legacy_gradient": [
+              0.0,
+              0.0
+            ]
+          }
+        ],
+        "environment": {
+          "torch": "2.14.1",
+          "torchvision": "0.29.1",
+          "numpy": "2.5.3",
+          "pytest": "9.1.1",
+          "ruff": "0.16.10",
+          "opacus": "1.6.0",
+          "safetensors": "0.8.0",
+          "timm": "1.0.30"
+        },
+        "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+        "executable": "/tmp/plato-phase2c-313/bin/python"
+      },
+      "314": {
+        "extensions": [
+          {
+            "optimizer": "SGD",
+            "parameters": {
+              "lr": 0.01,
+              "momentum": 0.9,
+              "weight_decay": 0.0
+            },
+            "y": 0.9129999999999999,
+            "raw_plus_correction": 0.9129999999999999,
+            "ci": 3.350000000000004,
+            "reference_ci": 3.350000000000004,
+            "warning_count": 1,
+            "warning": "SCAFFOLD uses an additive-control optimizer extension for this run; only vanilla fixed-rate SGD has the paper gradient-average identity."
+          },
+          {
+            "optimizer": "Adam",
+            "parameters": {
+              "lr": 0.01
+            },
+            "y": 0.9612893605650529,
+            "raw_plus_correction": 0.9612893605650529,
+            "ci": 0.9355319717473563,
+            "reference_ci": 0.9355319717473563,
+            "warning_count": 1,
+            "warning": "SCAFFOLD uses an additive-control optimizer extension for this run; only vanilla fixed-rate SGD has the paper gradient-average identity."
+          }
+        ],
+        "real_skipped_steps": {
+          "overflow": {
+            "y": 1,
+            "K": 0,
+            "ci": 1,
+            "delta": 0
+          },
+          "subsequent_success": {
+            "y": 0.8,
+            "K": 1,
+            "ci": 0.9999999999999996
+          },
+          "hardware": "CPU GradScaler; CUDA autocast disabled because no GPU"
+        },
+        "fedprox_legacy_semantics": [
+          {
+            "norm": "l2",
+            "mu": 2.0,
+            "loss": 5.0,
+            "actual_gradient": [
+              0.6,
+              0.8
+            ],
+            "analytical_legacy_gradient": [
+              0.6,
+              0.8
+            ]
+          },
+          {
+            "norm": "l1",
+            "mu": 2.0,
+            "loss": 14.0,
+            "actual_gradient": [
+              2.0,
+              2.0
+            ],
+            "analytical_legacy_gradient": [
+              2.0,
+              2.0
+            ]
+          },
+          {
+            "norm": "l2",
+            "mu": 0.0,
+            "loss": 0.0,
+            "actual_gradient": [
+              0.0,
+              0.0
+            ],
+            "analytical_legacy_gradient": [
+              0.0,
+              0.0
+            ]
+          }
+        ],
+        "environment": {
+          "torch": "2.14.1",
+          "torchvision": "0.29.1",
+          "numpy": "2.5.3",
+          "pytest": "9.1.1",
+          "ruff": "0.16.10",
+          "opacus": "1.6.0",
+          "safetensors": "0.8.0",
+          "timm": "1.0.30"
+        },
+        "python": "3.14.8 (main, Sep 30 2026, 17:55:09) [Clang 21.0.0 (clang-2100.3.34.2)]",
+        "executable": "/private/tmp/plato-phase2c-314/bin/python"
+      }
+    },
+    "baseline_and_exact_oracle": {
+      "313": {
+        "base": "00eeb9dcdd2b513e64db9408969356037e09bb8e",
+        "baseline_source_sha256": "194fdf4fa50882b5c8bbe2c27d550b61c76a5e48063b7874ba9cdded0836b04d",
+        "observed_baseline": {
+          "y": 1.1,
+          "ci": 0.9999999999999991,
+          "delta": -8.881784197001252e-16
+        },
+        "expected_correct": {
+          "y": 0.9,
+          "ci": 0,
+          "delta": -1
+        },
+        "unequal_oracle": [
+          {
+            "selected": [
+              1,
+              2
+            ],
+            "locals": {
+              "1": {
+                "y": "31/50",
+                "ci": "9/10",
+                "delta": "-1/10",
+                "gradients": [
+                  "1",
+                  "4/5"
+                ]
+              },
+              "2": {
+                "y": "69/50",
+                "ci": "-9/10",
+                "delta": "-39/10",
+                "gradients": [
+                  "-1",
+                  "-4/5"
+                ]
+              }
+            },
+            "x": "119/100",
+            "c": "2/3",
+            "uniform": "1",
+            "all_ci": {
+              "1": "9/10",
+              "2": "-9/10",
+              "3": "2"
+            }
+          },
+          {
+            "selected": [
+              1,
+              3
+            ],
+            "locals": {
+              "1": {
+                "y": "30247/30000",
+                "ci": "6853/6000",
+                "delta": "1453/6000",
+                "gradients": [
+                  "119/100",
+                  "3283/3000"
+                ]
+              },
+              "3": {
+                "y": "30817/30000",
+                "ci": "12883/6000",
+                "delta": "883/6000",
+                "gradients": [
+                  "219/100",
+                  "6313/3000"
+                ]
+              }
+            },
+            "x": "10209/10000",
+            "c": "896/1125",
+            "uniform": "7633/7500",
+            "all_ci": {
+              "1": "6853/6000",
+              "2": "-9/10",
+              "3": "12883/6000"
+            }
+          }
+        ],
+        "equal_oracle": [
+          {
+            "selected": [
+              1,
+              2
+            ],
+            "locals": {
+              "1": {
+                "y": "31/50",
+                "ci": "9/10",
+                "delta": "-1/10",
+                "gradients": [
+                  "1",
+                  "4/5"
+                ]
+              },
+              "2": {
+                "y": "69/50",
+                "ci": "-9/10",
+                "delta": "-39/10",
+                "gradients": [
+                  "-1",
+                  "-4/5"
+                ]
+              }
+            },
+            "x": "1",
+            "c": "2/3",
+            "uniform": "1",
+            "all_ci": {
+              "1": "9/10",
+              "2": "-9/10",
+              "3": "2"
+            }
+          },
+          {
+            "selected": [
+              1,
+              3
+            ],
+            "locals": {
+              "1": {
+                "y": "2563/3000",
+                "ci": "577/600",
+                "delta": "37/600",
+                "gradients": [
+                  "1",
+                  "277/300"
+                ]
+              },
+              "3": {
+                "y": "131/150",
+                "ci": "59/30",
+                "delta": "-1/30",
+                "gradients": [
+                  "2",
+                  "29/15"
+                ]
+              }
+            },
+            "x": "5183/6000",
+            "c": "1217/1800",
+            "uniform": "5183/6000",
+            "all_ci": {
+              "1": "577/600",
+              "2": "-9/10",
+              "3": "59/30"
+            }
+          }
+        ],
+        "appendix19_sign_counterexample": {
+          "g": 0,
+          "c": 2,
+          "ci": 1,
+          "eta": 0.1,
+          "displacement": 0.1,
+          "correct_ci": 0,
+          "reversed_expression": 2
+        }
+      },
+      "314": {
+        "base": "00eeb9dcdd2b513e64db9408969356037e09bb8e",
+        "baseline_source_sha256": "194fdf4fa50882b5c8bbe2c27d550b61c76a5e48063b7874ba9cdded0836b04d",
+        "observed_baseline": {
+          "y": 1.1,
+          "ci": 0.9999999999999991,
+          "delta": -8.881784197001252e-16
+        },
+        "expected_correct": {
+          "y": 0.9,
+          "ci": 0,
+          "delta": -1
+        },
+        "unequal_oracle": [
+          {
+            "selected": [
+              1,
+              2
+            ],
+            "locals": {
+              "1": {
+                "y": "31/50",
+                "ci": "9/10",
+                "delta": "-1/10",
+                "gradients": [
+                  "1",
+                  "4/5"
+                ]
+              },
+              "2": {
+                "y": "69/50",
+                "ci": "-9/10",
+                "delta": "-39/10",
+                "gradients": [
+                  "-1",
+                  "-4/5"
+                ]
+              }
+            },
+            "x": "119/100",
+            "c": "2/3",
+            "uniform": "1",
+            "all_ci": {
+              "1": "9/10",
+              "2": "-9/10",
+              "3": "2"
+            }
+          },
+          {
+            "selected": [
+              1,
+              3
+            ],
+            "locals": {
+              "1": {
+                "y": "30247/30000",
+                "ci": "6853/6000",
+                "delta": "1453/6000",
+                "gradients": [
+                  "119/100",
+                  "3283/3000"
+                ]
+              },
+              "3": {
+                "y": "30817/30000",
+                "ci": "12883/6000",
+                "delta": "883/6000",
+                "gradients": [
+                  "219/100",
+                  "6313/3000"
+                ]
+              }
+            },
+            "x": "10209/10000",
+            "c": "896/1125",
+            "uniform": "7633/7500",
+            "all_ci": {
+              "1": "6853/6000",
+              "2": "-9/10",
+              "3": "12883/6000"
+            }
+          }
+        ],
+        "equal_oracle": [
+          {
+            "selected": [
+              1,
+              2
+            ],
+            "locals": {
+              "1": {
+                "y": "31/50",
+                "ci": "9/10",
+                "delta": "-1/10",
+                "gradients": [
+                  "1",
+                  "4/5"
+                ]
+              },
+              "2": {
+                "y": "69/50",
+                "ci": "-9/10",
+                "delta": "-39/10",
+                "gradients": [
+                  "-1",
+                  "-4/5"
+                ]
+              }
+            },
+            "x": "1",
+            "c": "2/3",
+            "uniform": "1",
+            "all_ci": {
+              "1": "9/10",
+              "2": "-9/10",
+              "3": "2"
+            }
+          },
+          {
+            "selected": [
+              1,
+              3
+            ],
+            "locals": {
+              "1": {
+                "y": "2563/3000",
+                "ci": "577/600",
+                "delta": "37/600",
+                "gradients": [
+                  "1",
+                  "277/300"
+                ]
+              },
+              "3": {
+                "y": "131/150",
+                "ci": "59/30",
+                "delta": "-1/30",
+                "gradients": [
+                  "2",
+                  "29/15"
+                ]
+              }
+            },
+            "x": "5183/6000",
+            "c": "1217/1800",
+            "uniform": "5183/6000",
+            "all_ci": {
+              "1": "577/600",
+              "2": "-9/10",
+              "3": "59/30"
+            }
+          }
+        ],
+        "appendix19_sign_counterexample": {
+          "g": 0,
+          "c": 2,
+          "ci": 1,
+          "eta": 0.1,
+          "displacement": 0.1,
+          "correct_ci": 0,
+          "reversed_expression": 2
+        }
+      }
+    }
+  },
+  "command_records": [
+    {
+      "label": "baseline313-v2",
+      "command": "/tmp/plato-phase2c-313/bin/python /tmp/plato-phase2c-scaffold-code-review/baseline_and_oracle.py",
+      "shell": [
+        "zsh",
+        "-lc"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/training",
+      "env_overrides": {
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONPATH": "/private/tmp/plato-refresh-worktrees/training",
+        "OMP_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "PYTEST_ADDOPTS": "",
+        "RUFF_CACHE_DIR": "/tmp/plato-phase2c-scaffold-code-review/ruff-cache"
+      },
+      "exit_code": 0,
+      "deadline_seconds": 240,
+      "duration_seconds": 4.6371259689331055,
+      "raw_log": "/tmp/plato-phase2c-scaffold-code-review/baseline313-v2.log",
+      "raw_bytes": 3335,
+      "raw_sha256": "18dffcb7fcf748b1a25cf2524e36809358d71520ea3af2cfe4eebc0b98ce9d5a"
+    },
+    {
+      "label": "baseline313",
+      "command": "/tmp/plato-phase2c-313/bin/python /tmp/plato-phase2c-scaffold-code-review/baseline_and_oracle.py",
+      "shell": [
+        "zsh",
+        "-lc"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/training",
+      "env_overrides": {
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONPATH": "/private/tmp/plato-refresh-worktrees/training",
+        "OMP_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "PYTEST_ADDOPTS": "",
+        "RUFF_CACHE_DIR": "/tmp/plato-phase2c-scaffold-code-review/ruff-cache"
+      },
+      "exit_code": 1,
+      "deadline_seconds": 240,
+      "duration_seconds": 4.839604139328003,
+      "raw_log": "/tmp/plato-phase2c-scaffold-code-review/baseline313.log",
+      "raw_bytes": 366,
+      "raw_sha256": "5db24c020f501efde4441e8afda15ea7c1388dc1186289e8c206375b07e80929"
+    },
+    {
+      "label": "baseline314-v2",
+      "command": "/private/tmp/plato-phase2c-314/bin/python /tmp/plato-phase2c-scaffold-code-review/baseline_and_oracle.py",
+      "shell": [
+        "zsh",
+        "-lc"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/training",
+      "env_overrides": {
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONPATH": "/private/tmp/plato-refresh-worktrees/training",
+        "OMP_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "PYTEST_ADDOPTS": "",
+        "RUFF_CACHE_DIR": "/tmp/plato-phase2c-scaffold-code-review/ruff-cache"
+      },
+      "exit_code": 0,
+      "deadline_seconds": 240,
+      "duration_seconds": 4.976675987243652,
+      "raw_log": "/tmp/plato-phase2c-scaffold-code-review/baseline314-v2.log",
+      "raw_bytes": 3335,
+      "raw_sha256": "f93d93c4c61421a3e1f6e15b2e99273d40e00cad65922575c2053e1bbe7e97a6"
+    },
+    {
+      "label": "baseline314",
+      "command": "/private/tmp/plato-phase2c-314/bin/python /tmp/plato-phase2c-scaffold-code-review/baseline_and_oracle.py",
+      "shell": [
+        "zsh",
+        "-lc"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/training",
+      "env_overrides": {
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONPATH": "/private/tmp/plato-refresh-worktrees/training",
+        "OMP_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "PYTEST_ADDOPTS": "",
+        "RUFF_CACHE_DIR": "/tmp/plato-phase2c-scaffold-code-review/ruff-cache"
+      },
+      "exit_code": 1,
+      "deadline_seconds": 240,
+      "duration_seconds": 5.113558769226074,
+      "raw_log": "/tmp/plato-phase2c-scaffold-code-review/baseline314.log",
+      "raw_bytes": 366,
+      "raw_sha256": "cd38bfac7772e1907463f87d73ef7e9415a4e7ced5229e2352be8f031972152f"
+    },
+    {
+      "label": "boundary313",
+      "command": "/tmp/plato-phase2c-313/bin/python /tmp/plato-phase2c-scaffold-code-review/boundary_checks.py",
+      "shell": [
+        "zsh",
+        "-lc"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/training",
+      "env_overrides": {
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONPATH": "/private/tmp/plato-refresh-worktrees/training",
+        "OMP_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "PYTEST_ADDOPTS": "",
+        "RUFF_CACHE_DIR": "/tmp/plato-phase2c-scaffold-code-review/ruff-cache"
+      },
+      "exit_code": 0,
+      "deadline_seconds": 240,
+      "duration_seconds": 4.345691919326782,
+      "raw_log": "/tmp/plato-phase2c-scaffold-code-review/boundary313.log",
+      "raw_bytes": 3043,
+      "raw_sha256": "6e7c3424fc3e487cd29c56417e01992c43105da72a884b1d7822d51c35c97cae"
+    },
+    {
+      "label": "boundary314",
+      "command": "/private/tmp/plato-phase2c-314/bin/python /tmp/plato-phase2c-scaffold-code-review/boundary_checks.py",
+      "shell": [
+        "zsh",
+        "-lc"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/training",
+      "env_overrides": {
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONPATH": "/private/tmp/plato-refresh-worktrees/training",
+        "OMP_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "PYTEST_ADDOPTS": "",
+        "RUFF_CACHE_DIR": "/tmp/plato-phase2c-scaffold-code-review/ruff-cache"
+      },
+      "exit_code": 0,
+      "deadline_seconds": 240,
+      "duration_seconds": 4.65424108505249,
+      "raw_log": "/tmp/plato-phase2c-scaffold-code-review/boundary314.log",
+      "raw_bytes": 3069,
+      "raw_sha256": "50d7a210073ee550b67fee64d316a0ea77fd3ae1c5632af1082908217ee341d0"
+    },
+    {
+      "label": "focused313",
+      "command": "/tmp/plato-phase2c-313/bin/python -m pytest tests/trainers/test_scaffold_strategy.py tests/integration/test_scaffold_round_flow.py tests/trainers/test_training_update_contract.py tests/trainers/test_personalized_state_ownership.py tests/trainers/test_checkpoint_path_contract.py -p no:cacheprovider --basetemp=/tmp/plato-phase2c-scaffold-code-review/pytest313 -ra",
+      "shell": [
+        "zsh",
+        "-lc"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/training",
+      "env_overrides": {
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONPATH": "/private/tmp/plato-refresh-worktrees/training",
+        "OMP_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "PYTEST_ADDOPTS": "",
+        "RUFF_CACHE_DIR": "/tmp/plato-phase2c-scaffold-code-review/ruff-cache"
+      },
+      "exit_code": 0,
+      "duration_seconds": 110.14207410812378,
+      "raw_log": "/tmp/plato-phase2c-scaffold-code-review/focused313.log",
+      "raw_bytes": 1473,
+      "raw_sha256": "841166117ca1be2c60f310486e40fd0376696c30fac4b60e96a4742078fa6538"
+    },
+    {
+      "label": "focused314",
+      "command": "/private/tmp/plato-phase2c-314/bin/python -m pytest tests/trainers/test_scaffold_strategy.py tests/integration/test_scaffold_round_flow.py tests/trainers/test_training_update_contract.py tests/trainers/test_personalized_state_ownership.py tests/trainers/test_checkpoint_path_contract.py -p no:cacheprovider --basetemp=/tmp/plato-phase2c-scaffold-code-review/pytest314 -ra",
+      "shell": [
+        "zsh",
+        "-lc"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/training",
+      "env_overrides": {
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONPATH": "/private/tmp/plato-refresh-worktrees/training",
+        "OMP_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "PYTEST_ADDOPTS": "",
+        "RUFF_CACHE_DIR": "/tmp/plato-phase2c-scaffold-code-review/ruff-cache"
+      },
+      "exit_code": 0,
+      "duration_seconds": 116.65135884284973,
+      "raw_log": "/tmp/plato-phase2c-scaffold-code-review/focused314.log",
+      "raw_bytes": 1472,
+      "raw_sha256": "b18a36d63f98345e1c4e71b401ddf085b9a32ceeb44f594555086ed2898f7b7b"
+    },
+    {
+      "label": "identities",
+      "command": "/tmp/plato-phase2c-313/bin/python /tmp/plato-phase2c-scaffold-code-review/audit_identities.py",
+      "shell": [
+        "zsh",
+        "-lc"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/training",
+      "env_overrides": {
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONPATH": "/private/tmp/plato-refresh-worktrees/training",
+        "OMP_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "PYTEST_ADDOPTS": "",
+        "RUFF_CACHE_DIR": "/tmp/plato-phase2c-scaffold-code-review/ruff-cache"
+      },
+      "exit_code": 0,
+      "duration_seconds": 0.27527403831481934,
+      "raw_log": "/tmp/plato-phase2c-scaffold-code-review/identities.log",
+      "raw_bytes": 396,
+      "raw_sha256": "d6445c54a06c062f4a90939038f63594fb90bfdf300a68c12dd4edf7d808550c"
+    },
+    {
+      "label": "independent313-v2",
+      "command": "/tmp/plato-phase2c-313/bin/python /tmp/plato-phase2c-scaffold-code-review/independent_checks.py normal",
+      "shell": [
+        "zsh",
+        "-lc"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/training",
+      "env_overrides": {
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONPATH": "/private/tmp/plato-refresh-worktrees/training",
+        "OMP_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "PYTEST_ADDOPTS": "",
+        "RUFF_CACHE_DIR": "/tmp/plato-phase2c-scaffold-code-review/ruff-cache"
+      },
+      "exit_code": 1,
+      "deadline_seconds": 240,
+      "duration_seconds": 4.39107608795166,
+      "raw_log": "/tmp/plato-phase2c-scaffold-code-review/independent313-v2.log",
+      "raw_bytes": 248,
+      "raw_sha256": "a4a79320ecd3c5d3b6882cb5222d7e6bc6d548c907cc5886a8c80823234a8ed7"
+    },
+    {
+      "label": "independent313-v3",
+      "command": "/tmp/plato-phase2c-313/bin/python /tmp/plato-phase2c-scaffold-code-review/independent_checks.py normal",
+      "shell": [
+        "zsh",
+        "-lc"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/training",
+      "env_overrides": {
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONPATH": "/private/tmp/plato-refresh-worktrees/training",
+        "OMP_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "PYTEST_ADDOPTS": "",
+        "RUFF_CACHE_DIR": "/tmp/plato-phase2c-scaffold-code-review/ruff-cache"
+      },
+      "exit_code": 1,
+      "deadline_seconds": 240,
+      "duration_seconds": 4.843384027481079,
+      "raw_log": "/tmp/plato-phase2c-scaffold-code-review/independent313-v3.log",
+      "raw_bytes": 2077,
+      "raw_sha256": "46d96f6e8fa1c6361dfc951268a558d3bc5ad07dafb145b7cfbbc5b7e10dd81a"
+    },
+    {
+      "label": "independent313-v4",
+      "command": "/tmp/plato-phase2c-313/bin/python /tmp/plato-phase2c-scaffold-code-review/independent_checks.py normal",
+      "shell": [
+        "zsh",
+        "-lc"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/training",
+      "env_overrides": {
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONPATH": "/private/tmp/plato-refresh-worktrees/training",
+        "OMP_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "PYTEST_ADDOPTS": "",
+        "RUFF_CACHE_DIR": "/tmp/plato-phase2c-scaffold-code-review/ruff-cache"
+      },
+      "exit_code": 1,
+      "deadline_seconds": 240,
+      "duration_seconds": 4.89986777305603,
+      "raw_log": "/tmp/plato-phase2c-scaffold-code-review/independent313-v4.log",
+      "raw_bytes": 1111,
+      "raw_sha256": "53c07926a94054451d8ddea05b27a83c3b34cee9ea57a336bb956cb1b120a400"
+    },
+    {
+      "label": "independent313-v5",
+      "command": "/tmp/plato-phase2c-313/bin/python /tmp/plato-phase2c-scaffold-code-review/independent_checks.py normal",
+      "shell": [
+        "zsh",
+        "-lc"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/training",
+      "env_overrides": {
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONPATH": "/private/tmp/plato-refresh-worktrees/training",
+        "OMP_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "PYTEST_ADDOPTS": "",
+        "RUFF_CACHE_DIR": "/tmp/plato-phase2c-scaffold-code-review/ruff-cache"
+      },
+      "exit_code": 0,
+      "deadline_seconds": 240,
+      "duration_seconds": 4.950832843780518,
+      "raw_log": "/tmp/plato-phase2c-scaffold-code-review/independent313-v5.log",
+      "raw_bytes": 26444,
+      "raw_sha256": "c5c1412ddb8f4374fe831990736d0060b4765d62206202bd2cf4ddc00648722a"
+    },
+    {
+      "label": "independent313",
+      "command": "/tmp/plato-phase2c-313/bin/python /tmp/plato-phase2c-scaffold-code-review/independent_checks.py normal",
+      "shell": [
+        "zsh",
+        "-lc"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/training",
+      "env_overrides": {
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONPATH": "/private/tmp/plato-refresh-worktrees/training",
+        "OMP_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "PYTEST_ADDOPTS": "",
+        "RUFF_CACHE_DIR": "/tmp/plato-phase2c-scaffold-code-review/ruff-cache"
+      },
+      "exit_code": 2,
+      "duration_seconds": 4.390330791473389,
+      "raw_log": "/tmp/plato-phase2c-scaffold-code-review/independent313.log",
+      "raw_bytes": 257,
+      "raw_sha256": "035d26bdb31bcb8c0c93289429fedfcbb64db876fd731f38c895dd18cb68dc47"
+    },
+    {
+      "label": "independent314-v2",
+      "command": "/private/tmp/plato-phase2c-314/bin/python /tmp/plato-phase2c-scaffold-code-review/independent_checks.py normal",
+      "shell": [
+        "zsh",
+        "-lc"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/training",
+      "env_overrides": {
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONPATH": "/private/tmp/plato-refresh-worktrees/training",
+        "OMP_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "PYTEST_ADDOPTS": "",
+        "RUFF_CACHE_DIR": "/tmp/plato-phase2c-scaffold-code-review/ruff-cache"
+      },
+      "exit_code": 1,
+      "deadline_seconds": 240,
+      "duration_seconds": 4.748421907424927,
+      "raw_log": "/tmp/plato-phase2c-scaffold-code-review/independent314-v2.log",
+      "raw_bytes": 248,
+      "raw_sha256": "a4a79320ecd3c5d3b6882cb5222d7e6bc6d548c907cc5886a8c80823234a8ed7"
+    },
+    {
+      "label": "independent314-v3",
+      "command": "/private/tmp/plato-phase2c-314/bin/python /tmp/plato-phase2c-scaffold-code-review/independent_checks.py normal",
+      "shell": [
+        "zsh",
+        "-lc"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/training",
+      "env_overrides": {
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONPATH": "/private/tmp/plato-refresh-worktrees/training",
+        "OMP_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "PYTEST_ADDOPTS": "",
+        "RUFF_CACHE_DIR": "/tmp/plato-phase2c-scaffold-code-review/ruff-cache"
+      },
+      "exit_code": 1,
+      "deadline_seconds": 240,
+      "duration_seconds": 5.133193016052246,
+      "raw_log": "/tmp/plato-phase2c-scaffold-code-review/independent314-v3.log",
+      "raw_bytes": 1846,
+      "raw_sha256": "4e28017861df03f067c254094efae9782ea50ebfac122b91895dda44c2467ce2"
+    },
+    {
+      "label": "independent314-v4",
+      "command": "/private/tmp/plato-phase2c-314/bin/python /tmp/plato-phase2c-scaffold-code-review/independent_checks.py normal",
+      "shell": [
+        "zsh",
+        "-lc"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/training",
+      "env_overrides": {
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONPATH": "/private/tmp/plato-refresh-worktrees/training",
+        "OMP_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "PYTEST_ADDOPTS": "",
+        "RUFF_CACHE_DIR": "/tmp/plato-phase2c-scaffold-code-review/ruff-cache"
+      },
+      "exit_code": 1,
+      "deadline_seconds": 240,
+      "duration_seconds": 5.229804992675781,
+      "raw_log": "/tmp/plato-phase2c-scaffold-code-review/independent314-v4.log",
+      "raw_bytes": 1111,
+      "raw_sha256": "53c07926a94054451d8ddea05b27a83c3b34cee9ea57a336bb956cb1b120a400"
+    },
+    {
+      "label": "independent314-v5",
+      "command": "/private/tmp/plato-phase2c-314/bin/python /tmp/plato-phase2c-scaffold-code-review/independent_checks.py normal",
+      "shell": [
+        "zsh",
+        "-lc"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/training",
+      "env_overrides": {
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONPATH": "/private/tmp/plato-refresh-worktrees/training",
+        "OMP_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "PYTEST_ADDOPTS": "",
+        "RUFF_CACHE_DIR": "/tmp/plato-phase2c-scaffold-code-review/ruff-cache"
+      },
+      "exit_code": 0,
+      "deadline_seconds": 240,
+      "duration_seconds": 5.227725982666016,
+      "raw_log": "/tmp/plato-phase2c-scaffold-code-review/independent314-v5.log",
+      "raw_bytes": 26462,
+      "raw_sha256": "39642867a16495dd99e5e9bf5dcb6f8ac299c90c63fea87a0eeb3c3eb80c2fd0"
+    },
+    {
+      "label": "independent314",
+      "command": "/private/tmp/plato-phase2c-314/bin/python /tmp/plato-phase2c-scaffold-code-review/independent_checks.py normal",
+      "shell": [
+        "zsh",
+        "-lc"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/training",
+      "env_overrides": {
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONPATH": "/private/tmp/plato-refresh-worktrees/training",
+        "OMP_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "PYTEST_ADDOPTS": "",
+        "RUFF_CACHE_DIR": "/tmp/plato-phase2c-scaffold-code-review/ruff-cache"
+      },
+      "exit_code": 2,
+      "duration_seconds": 4.655589818954468,
+      "raw_log": "/tmp/plato-phase2c-scaffold-code-review/independent314.log",
+      "raw_bytes": 257,
+      "raw_sha256": "035d26bdb31bcb8c0c93289429fedfcbb64db876fd731f38c895dd18cb68dc47"
+    },
+    {
+      "label": "paper",
+      "command": "curl --max-time 45 -fsSL https://arxiv.org/pdf/1910.06378v4 -o /tmp/plato-phase2c-scaffold-code-review/primary-paper-1910.06378v4.pdf",
+      "shell": [
+        "zsh",
+        "-lc"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/training",
+      "env_overrides": {
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONPATH": "/private/tmp/plato-refresh-worktrees/training",
+        "OMP_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "PYTEST_ADDOPTS": "",
+        "RUFF_CACHE_DIR": "/tmp/plato-phase2c-scaffold-code-review/ruff-cache"
+      },
+      "exit_code": 0,
+      "deadline_seconds": 240,
+      "duration_seconds": 0.09046578407287598,
+      "raw_log": "/tmp/plato-phase2c-scaffold-code-review/paper.log",
+      "raw_bytes": 0,
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "ruff",
+      "command": "/tmp/plato-phase2c-313/bin/ruff check . --select I --no-cache",
+      "shell": [
+        "zsh",
+        "-lc"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/training",
+      "env_overrides": {
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONPATH": "/private/tmp/plato-refresh-worktrees/training",
+        "OMP_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "PYTEST_ADDOPTS": "",
+        "RUFF_CACHE_DIR": "/tmp/plato-phase2c-scaffold-code-review/ruff-cache"
+      },
+      "exit_code": 0,
+      "deadline_seconds": 240,
+      "duration_seconds": 0.14734888076782227,
+      "raw_log": "/tmp/plato-phase2c-scaffold-code-review/ruff.log",
+      "raw_bytes": 19,
+      "raw_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "label": "server313",
+      "command": "/tmp/plato-phase2c-313/bin/python /tmp/plato-phase2c-scaffold-code-review/server_reproducer.py",
+      "shell": [
+        "zsh",
+        "-lc"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/training",
+      "env_overrides": {
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONPATH": "/private/tmp/plato-refresh-worktrees/training",
+        "OMP_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "PYTEST_ADDOPTS": "",
+        "RUFF_CACHE_DIR": "/tmp/plato-phase2c-scaffold-code-review/ruff-cache"
+      },
+      "exit_code": 0,
+      "deadline_seconds": 240,
+      "duration_seconds": 4.53088903427124,
+      "raw_log": "/tmp/plato-phase2c-scaffold-code-review/server313.log",
+      "raw_bytes": 8133,
+      "raw_sha256": "1a44dd4e54931ee956db754574adf29867fe1914843574dd251e3a91618250cd"
+    },
+    {
+      "label": "server314",
+      "command": "/private/tmp/plato-phase2c-314/bin/python /tmp/plato-phase2c-scaffold-code-review/server_reproducer.py",
+      "shell": [
+        "zsh",
+        "-lc"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/training",
+      "env_overrides": {
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONPATH": "/private/tmp/plato-refresh-worktrees/training",
+        "OMP_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "PYTEST_ADDOPTS": "",
+        "RUFF_CACHE_DIR": "/tmp/plato-phase2c-scaffold-code-review/ruff-cache"
+      },
+      "exit_code": 0,
+      "deadline_seconds": 240,
+      "duration_seconds": 4.904169797897339,
+      "raw_log": "/tmp/plato-phase2c-scaffold-code-review/server314.log",
+      "raw_bytes": 8151,
+      "raw_sha256": "7552ed34d061dc03eb2a01d70c97fd297e250e9b267b03188dcc992cdb720041"
+    },
+    {
+      "label": "spawn313-v2",
+      "command": "/tmp/plato-phase2c-313/bin/python /tmp/plato-phase2c-scaffold-code-review/independent_checks.py spawn",
+      "shell": [
+        "zsh",
+        "-lc"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/training",
+      "env_overrides": {
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONPATH": "/private/tmp/plato-refresh-worktrees/training",
+        "OMP_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "PYTEST_ADDOPTS": "",
+        "RUFF_CACHE_DIR": "/tmp/plato-phase2c-scaffold-code-review/ruff-cache"
+      },
+      "exit_code": 1,
+      "deadline_seconds": 240,
+      "duration_seconds": 9.743671178817749,
+      "raw_log": "/tmp/plato-phase2c-scaffold-code-review/spawn313-v2.log",
+      "raw_bytes": 4930,
+      "raw_sha256": "8791e75f7aad1a43c4d54eb46b032abd69ce2d6bd5115ff719d46ce3b79a5e5e"
+    },
+    {
+      "label": "spawn313-v3",
+      "command": "/tmp/plato-phase2c-313/bin/python /tmp/plato-phase2c-scaffold-code-review/independent_checks.py spawn",
+      "shell": [
+        "zsh",
+        "-lc"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/training",
+      "env_overrides": {
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONPATH": "/private/tmp/plato-refresh-worktrees/training",
+        "OMP_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "PYTEST_ADDOPTS": "",
+        "RUFF_CACHE_DIR": "/tmp/plato-phase2c-scaffold-code-review/ruff-cache"
+      },
+      "exit_code": 1,
+      "deadline_seconds": 240,
+      "duration_seconds": 14.28699803352356,
+      "raw_log": "/tmp/plato-phase2c-scaffold-code-review/spawn313-v3.log",
+      "raw_bytes": 4118,
+      "raw_sha256": "ca2edad97a9c7ce00014085b71eb913ccda3926e1424ab8cd5dcf590b92abf12"
+    },
+    {
+      "label": "spawn313-v4",
+      "command": "/tmp/plato-phase2c-313/bin/python /tmp/plato-phase2c-scaffold-code-review/independent_checks.py spawn",
+      "shell": [
+        "zsh",
+        "-lc"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/training",
+      "env_overrides": {
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONPATH": "/private/tmp/plato-refresh-worktrees/training",
+        "OMP_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "PYTEST_ADDOPTS": "",
+        "RUFF_CACHE_DIR": "/tmp/plato-phase2c-scaffold-code-review/ruff-cache"
+      },
+      "exit_code": 0,
+      "deadline_seconds": 240,
+      "duration_seconds": 23.58208179473877,
+      "raw_log": "/tmp/plato-phase2c-scaffold-code-review/spawn313-v4.log",
+      "raw_bytes": 11212,
+      "raw_sha256": "0579b10964ffd9d541f091a992ebb11c476eb030d709a1792907483ae8a3050a"
+    },
+    {
+      "label": "spawn313",
+      "command": "/tmp/plato-phase2c-313/bin/python /tmp/plato-phase2c-scaffold-code-review/independent_checks.py spawn",
+      "shell": [
+        "zsh",
+        "-lc"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/training",
+      "env_overrides": {
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONPATH": "/private/tmp/plato-refresh-worktrees/training",
+        "OMP_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "PYTEST_ADDOPTS": "",
+        "RUFF_CACHE_DIR": "/tmp/plato-phase2c-scaffold-code-review/ruff-cache"
+      },
+      "exit_code": 2,
+      "deadline_seconds": 240,
+      "duration_seconds": 4.417553901672363,
+      "raw_log": "/tmp/plato-phase2c-scaffold-code-review/spawn313.log",
+      "raw_bytes": 256,
+      "raw_sha256": "ed9f96a3296d2621ce1757cbd82b9a4378a78d5565bca54851dc9a058ff23703"
+    },
+    {
+      "label": "spawn314-v2",
+      "command": "/private/tmp/plato-phase2c-314/bin/python /tmp/plato-phase2c-scaffold-code-review/independent_checks.py spawn",
+      "shell": [
+        "zsh",
+        "-lc"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/training",
+      "env_overrides": {
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONPATH": "/private/tmp/plato-refresh-worktrees/training",
+        "OMP_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "PYTEST_ADDOPTS": "",
+        "RUFF_CACHE_DIR": "/tmp/plato-phase2c-scaffold-code-review/ruff-cache"
+      },
+      "exit_code": 1,
+      "deadline_seconds": 240,
+      "duration_seconds": 10.268798112869263,
+      "raw_log": "/tmp/plato-phase2c-scaffold-code-review/spawn314-v2.log",
+      "raw_bytes": 4969,
+      "raw_sha256": "a5c6fb1370250b2e408c1fddd1e59ade01576c6ec3dcc8262f0adcb47dc57cd0"
+    },
+    {
+      "label": "spawn314-v3",
+      "command": "/private/tmp/plato-phase2c-314/bin/python /tmp/plato-phase2c-scaffold-code-review/independent_checks.py spawn",
+      "shell": [
+        "zsh",
+        "-lc"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/training",
+      "env_overrides": {
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONPATH": "/private/tmp/plato-refresh-worktrees/training",
+        "OMP_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "PYTEST_ADDOPTS": "",
+        "RUFF_CACHE_DIR": "/tmp/plato-phase2c-scaffold-code-review/ruff-cache"
+      },
+      "exit_code": 1,
+      "deadline_seconds": 240,
+      "duration_seconds": 15.247851133346558,
+      "raw_log": "/tmp/plato-phase2c-scaffold-code-review/spawn314-v3.log",
+      "raw_bytes": 4118,
+      "raw_sha256": "6da399d5d2e289ac904986ecd7b6de2701921850dec041df19ef38b565a913d6"
+    },
+    {
+      "label": "spawn314-v4",
+      "command": "/private/tmp/plato-phase2c-314/bin/python /tmp/plato-phase2c-scaffold-code-review/independent_checks.py spawn",
+      "shell": [
+        "zsh",
+        "-lc"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/training",
+      "env_overrides": {
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONPATH": "/private/tmp/plato-refresh-worktrees/training",
+        "OMP_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "PYTEST_ADDOPTS": "",
+        "RUFF_CACHE_DIR": "/tmp/plato-phase2c-scaffold-code-review/ruff-cache"
+      },
+      "exit_code": 0,
+      "deadline_seconds": 240,
+      "duration_seconds": 25.107511043548584,
+      "raw_log": "/tmp/plato-phase2c-scaffold-code-review/spawn314-v4.log",
+      "raw_bytes": 11230,
+      "raw_sha256": "9d110e8b2edb5b8bb8dfb718fb973d08b587c1847b0319f721840dd931325058"
+    },
+    {
+      "label": "spawn314",
+      "command": "/private/tmp/plato-phase2c-314/bin/python /tmp/plato-phase2c-scaffold-code-review/independent_checks.py spawn",
+      "shell": [
+        "zsh",
+        "-lc"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/training",
+      "env_overrides": {
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONPATH": "/private/tmp/plato-refresh-worktrees/training",
+        "OMP_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "PYTEST_ADDOPTS": "",
+        "RUFF_CACHE_DIR": "/tmp/plato-phase2c-scaffold-code-review/ruff-cache"
+      },
+      "exit_code": 2,
+      "deadline_seconds": 240,
+      "duration_seconds": 4.696157217025757,
+      "raw_log": "/tmp/plato-phase2c-scaffold-code-review/spawn314.log",
+      "raw_bytes": 256,
+      "raw_sha256": "ed9f96a3296d2621ce1757cbd82b9a4378a78d5565bca54851dc9a058ff23703"
+    },
+    {
+      "label": "workerfailure313-v2",
+      "command": "/tmp/plato-phase2c-313/bin/python /tmp/plato-phase2c-scaffold-code-review/worker_failure_reproducer.py",
+      "shell": [
+        "zsh",
+        "-lc"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/training",
+      "env_overrides": {
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONPATH": "/private/tmp/plato-refresh-worktrees/training",
+        "OMP_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "PYTEST_ADDOPTS": "",
+        "RUFF_CACHE_DIR": "/tmp/plato-phase2c-scaffold-code-review/ruff-cache"
+      },
+      "exit_code": 0,
+      "deadline_seconds": 240,
+      "duration_seconds": 13.757294178009033,
+      "raw_log": "/tmp/plato-phase2c-scaffold-code-review/workerfailure313-v2.log",
+      "raw_bytes": 4481,
+      "raw_sha256": "a74552b40df89c1050034a69a9919fefd503776320c07f1f25d68b0e808f5253"
+    },
+    {
+      "label": "workerfailure313",
+      "command": "/tmp/plato-phase2c-313/bin/python /tmp/plato-phase2c-scaffold-code-review/worker_failure_reproducer.py",
+      "shell": [
+        "zsh",
+        "-lc"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/training",
+      "env_overrides": {
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONPATH": "/private/tmp/plato-refresh-worktrees/training",
+        "OMP_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "PYTEST_ADDOPTS": "",
+        "RUFF_CACHE_DIR": "/tmp/plato-phase2c-scaffold-code-review/ruff-cache"
+      },
+      "exit_code": 0,
+      "deadline_seconds": 240,
+      "duration_seconds": 13.809983968734741,
+      "raw_log": "/tmp/plato-phase2c-scaffold-code-review/workerfailure313.log",
+      "raw_bytes": 4281,
+      "raw_sha256": "2641e67de6d21b4882c4263bdd64af5aedf77b043108380f5c16435e27abbb76"
+    },
+    {
+      "label": "workerfailure314-v2",
+      "command": "/private/tmp/plato-phase2c-314/bin/python /tmp/plato-phase2c-scaffold-code-review/worker_failure_reproducer.py",
+      "shell": [
+        "zsh",
+        "-lc"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/training",
+      "env_overrides": {
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONPATH": "/private/tmp/plato-refresh-worktrees/training",
+        "OMP_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "PYTEST_ADDOPTS": "",
+        "RUFF_CACHE_DIR": "/tmp/plato-phase2c-scaffold-code-review/ruff-cache"
+      },
+      "exit_code": 0,
+      "deadline_seconds": 240,
+      "duration_seconds": 14.647494077682495,
+      "raw_log": "/tmp/plato-phase2c-scaffold-code-review/workerfailure314-v2.log",
+      "raw_bytes": 4499,
+      "raw_sha256": "05f36ab1c8de922eec54ce6848241599fbbb96de0e96d614a6e2513c703e8cd5"
+    },
+    {
+      "label": "workerfailure314",
+      "command": "/private/tmp/plato-phase2c-314/bin/python /tmp/plato-phase2c-scaffold-code-review/worker_failure_reproducer.py",
+      "shell": [
+        "zsh",
+        "-lc"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/training",
+      "env_overrides": {
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONPATH": "/private/tmp/plato-refresh-worktrees/training",
+        "OMP_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "PYTEST_ADDOPTS": "",
+        "RUFF_CACHE_DIR": "/tmp/plato-phase2c-scaffold-code-review/ruff-cache"
+      },
+      "exit_code": 0,
+      "deadline_seconds": 240,
+      "duration_seconds": 14.679914951324463,
+      "raw_log": "/tmp/plato-phase2c-scaffold-code-review/workerfailure314.log",
+      "raw_bytes": 4299,
+      "raw_sha256": "a635c366a17e099cd92bbb26e9cf488e40c577a489b4ba3b2597be8477ed07bd"
+    }
+  ],
+  "reviewer_probe_attempts": {
+    "retained": true,
+    "initial_failures": "Early scratch-only attempts had CLI/bootstrap/root-directory errors. A list sampler randomized the first accumulation oracle and was replaced with an explicit SequentialSampler; initial client 2 was mistakenly seeded 2 instead of oracle ci=3 and corrected. An initial baseline theta name exercised the legacy name-filter defect; the final requested sign reproduction uses weight. These are reviewer harness corrections, not candidate findings. Raw failed attempt logs and exit statuses remain alongside final passing commands.",
+    "preliminary_negative_probe": "The first malformed-model probe used a short synthetic report and encountered an unrelated processing_time error after committing. The authoritative server_reproducer instead obtains an actual successful complete report and verifies full report processing returns without an exception in all three malformed-model cases.",
+    "final_labels": [
+      "independent313-v5",
+      "independent314-v5",
+      "spawn313-v4",
+      "spawn314-v4",
+      "boundary313",
+      "boundary314",
+      "server313",
+      "server314",
+      "workerfailure313-v2",
+      "workerfailure314-v2",
+      "baseline313-v2",
+      "baseline314-v2"
+    ]
+  },
+  "preservation_of_b": {
+    "model_sample_weights": "Real uneven 2/6 and 2/4 rounds preserve inherited B sample-weighted aggregation. Population control remains unsampleweighted sum/N.",
+    "source_boundaries": "FedAvg algorithm/server/aggregation and optimizer factory, client composable bridge and SCAFFOLD entrypoint bytes remain exactly B. Shared C changes consumed for optimizer/state/path handoff were inspected within SCAFFOLD boundaries; no general B validation was weakened.",
+    "shipped_config_values_unchanged": true,
+    "fedprox": "Independent nonzero legacy unsquared L2 example d=(3,4),mu=2 gives loss=5,gradient=(.6,.8), l1 gives loss=14,gradient=(2,2); zero-distance gradients finite and mu=0 unmodified base gradient. No squared-norm migration."
+  },
+  "exact_scope": {
+    "in_scope": "SCAFFOLD F27 strategy/V2, example client/trainer/callback/processor/server/config integration, optimizer LR/update accounting, logical client control persistence and current worker handoff at their shared trainer/checkpoint boundaries.",
+    "out_of_scope": [
+      "Root FedDyn 2C-11 primary-source design disposition remains OPEN; not duplicated or accepted here.",
+      "Independent prose review on branch commit 95c7218fc9801099cd7ffa3afc1be227384d8500; no failure for absent README/public prose in this immutable training worktree.",
+      "Complementary broad trainer/DP/GAN/personalization/scheduler/runtime/transport/security/metadata/backend reviews and phase gate.",
+      "Full mandatory suite, all 48 startup cases rerun, dataset downloads, actual network SCAFFOLD sockets, GPU/CUDA/MPS training, complete server/optimizer/RNG restart and convergence benchmarks."
+    ],
+    "actual_boundary": "CPU float64 independent calculations and in-process real default client/server payload pipeline; actual max_concurrency multiprocessing spawn workers and default server._process_reports. No external network or hardware claim."
+  },
+  "workflow": {
+    "herdr": {
+      "workspace_id": "w1C",
+      "pane_id": "w1C:p1",
+      "label": "plato-scaffold-review",
+      "check": "HERDR_ENV=1 and herdr pane current --current/workspace list verified; existing root-assigned workspace retained."
+    },
+    "agents_spawned": 0,
+    "shell": "Every shell invocation uses zsh -lc.",
+    "edits": "Only owned scratch scripts/logs and this explicitly assigned root evidence JSON. No source, tests, commits, other worktrees or environments modified. Existing author interpreters executed with PYTHONPATH and cwd pinned to immutable candidate and bytecode writes disabled.",
+    "cleanup": 0,
+    "pushes": 0,
+    "root_writes": [
+      "/Users/bli/Playground/plato/evidence/2026-refresh/phase2c-scaffold-code-review.json"
+    ],
+    "owned_scratch": "/tmp/plato-phase2c-scaffold-code-review",
+    "resources_retained": true
+  },
+  "retained_artifacts": [
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review/identities.json",
+      "bytes": 60401,
+      "sha256": "374790b3d7e9ceeea23dd80c0c53b3f2e0ef1d22e0a1df0a436064718f57a418"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review/candidate-vs-B.diff",
+      "bytes": 519528,
+      "sha256": "e8a0d88a9b1346e307516209d552d8af9919298b1874b4e81a1a767743da8b40"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review/implementation-vs-B.diff",
+      "bytes": 333244,
+      "sha256": "93c0a4975a8323c94d2f41065340e0d3ef30cc1f281ffa784d05532d7483322c"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review/primary-paper-1910.06378v4.pdf",
+      "bytes": 4381988,
+      "sha256": "efe06c86acc7a06116e372a7ab6386c300f4d0dc9c7ba2dd5c82e95111a1d694"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review/run_command.py",
+      "bytes": 1542,
+      "sha256": "769705c4b756be323c30e746c69251ae2fbe3e88882cec7d0c9cd0d5b37b1884"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review/audit_identities.py",
+      "bytes": 3852,
+      "sha256": "af89c99ed14ad23a1769656c3a9c427166de211d20c0bdab0486b7e4987b8eee"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review/independent_checks.py",
+      "bytes": 14063,
+      "sha256": "51aa579ac5662e16c631d13e8b861984fb5f8aad2a3af4c0f46bf2d94ab7a3f9"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review/boundary_checks.py",
+      "bytes": 6529,
+      "sha256": "1796ed21e367fc5bb8a2fa5bedb467116a8b72b94ad85a3dfaaaff53ff20b9b6"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review/server_reproducer.py",
+      "bytes": 2687,
+      "sha256": "71b6721b821e6634c6a45fdd45bbe59481702cc99ba0088b93023912ad244735"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review/worker_failure_reproducer.py",
+      "bytes": 3397,
+      "sha256": "8622f9502c53784d9d31175b5d387c7301b4bf94f70bd0543ecb844fb5f72465"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review/baseline_and_oracle.py",
+      "bytes": 2058,
+      "sha256": "f1af97721a30cacb7ae6142d14f6871efe2c1b27d1ad12a765e307b15a71f52c"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review/scaffold_strategy_at_B.py",
+      "bytes": 21087,
+      "sha256": "194fdf4fa50882b5c8bbe2c27d550b61c76a5e48063b7874ba9cdded0836b04d"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review/independent-313-normal.json",
+      "bytes": 11068,
+      "sha256": "55739bff349511caed74edf8eab1e0f05a02d76fec00187ca08858e508f46383"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review/independent-313-spawn.json",
+      "bytes": 4581,
+      "sha256": "68aed326d8d3cccea26f493717748aa8818d62836dd011c9b73e9434a4492bd3"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review/boundary-313.json",
+      "bytes": 2190,
+      "sha256": "22a08cf454e58d3346e2cf5e588fa1b6a9ffbe68d7990bdf925abc73155f9b6a"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review/server-reproducer-313.json",
+      "bytes": 2137,
+      "sha256": "16fc98a9749624dd6da94f7c7c94be8db4b0c30370b21aeadedef6f451ba888c"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review/failed-worker-reuse-313.json",
+      "bytes": 775,
+      "sha256": "2c2cd374398585771d33a3fdc9384f3ccc0221b653f617b7e9e1b45f87a50fdc"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review/baseline-and-oracle-313.json",
+      "bytes": 3023,
+      "sha256": "00412a12b9078140ad725e0741b90edd466e1f2a26fb8459f619ed0b03e1e2d8"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review/independent-314-normal.json",
+      "bytes": 11086,
+      "sha256": "84b92a8d51116318ef371502c0f06d9fa0ed6686925f1c29a26461d3b6a6189c"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review/independent-314-spawn.json",
+      "bytes": 4599,
+      "sha256": "92f335096e9648c4d4196478cec9f64ff8ba1aead8e0cf076de07b9917007fb6"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review/boundary-314.json",
+      "bytes": 2216,
+      "sha256": "a4ea1536f50beb096deb441924873f78317a71262d9d904beadf19417bcc61af"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review/server-reproducer-314.json",
+      "bytes": 2155,
+      "sha256": "94d948c0abbf8fe4a51ae500aaaebfff8ec862773362d5433dfecc41cb574198"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review/failed-worker-reuse-314.json",
+      "bytes": 793,
+      "sha256": "081670d8ab97a8a1df9624dcb17569af9018f2d73fe20b685ccad681d6e064b4"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review/baseline-and-oracle-314.json",
+      "bytes": 3023,
+      "sha256": "00412a12b9078140ad725e0741b90edd466e1f2a26fb8459f619ed0b03e1e2d8"
+    }
+  ]
+}

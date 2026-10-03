@@ -1,0 +1,23 @@
+{
+  "decision": "ACCEPTED bounded four production corrections; whole Phase2C remains open",
+  "candidate": "f9772f61d52dfe0f4a3281252d23b8303ec237d2",
+  "tree": "bf326217a40916013091145a73cba040535dcab4",
+  "implementation": "e65241c19448b74dcb57fc48bfe388152f3a3e58",
+  "review": "phase2c-training-review-2.json",
+  "review_sha256": "2712a8b892cf3a65b684dfb4470ab293b1d3c4ceedeb0ba7e4613c372e6c8ca1",
+  "closed_findings": [
+    "ROOT-2C-01",
+    "TRAINING-2C-01",
+    "TRAINING-2C-02",
+    "TRAINING-2C-03"
+  ],
+  "evidence": "Fresh independent review:389-test subset,5original regressions,17newboundarychecks each3.13/3.14; counts are separate executions, not summed uniqueness. Source clean and receipts verified.",
+  "external_open_findings": [
+    "F27-R2-01",
+    "F27-R2-02",
+    "ROOT-2C-02",
+    "2C-11 FedDyn implementation",
+    "F28/B-RESUME-01 final reviewed integration"
+  ],
+  "final_handoff": "FedDyn explicit migration API must preserve historical underscore writer coverage through portable fixture; shared lifecycle correction must preserve these four fixes; final source reconciliation, fresh affected review and full integrated profiles remain required."
+}

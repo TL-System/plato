@@ -6,8 +6,8 @@ from __future__ import annotations
 import argparse
 import os
 import shutil
-from pathlib import Path
 from collections.abc import Iterable
+from pathlib import Path
 
 RUNTIME_NAME = "runtime"
 PYCACHE_NAME = "__pycache__"
@@ -26,7 +26,12 @@ def find_runtime_roots(root: Path) -> list[Path]:
             resolved = candidate.resolve()
         except OSError:
             return
-        if resolved in seen_runtime or not candidate.is_dir():
+        if (
+            candidate.is_symlink()
+            or not resolved.is_relative_to(root)
+            or resolved in seen_runtime
+            or not candidate.is_dir()
+        ):
             return
         seen_runtime.add(resolved)
         runtime_roots.append(candidate)
@@ -65,6 +70,8 @@ def iter_pycache_directories(root: Path) -> Iterable[Path]:
                 continue
             if dirname == PYCACHE_NAME:
                 candidate = Path(current) / dirname
+                if candidate.is_symlink():
+                    continue
                 resolved_candidate = candidate.resolve()
                 if resolved_candidate in seen_pycache:
                     continue
@@ -77,6 +84,8 @@ def iter_pycache_directories(root: Path) -> Iterable[Path]:
 
 def clean_directory(path: Path) -> int:
     """Remove all contents of the directory at ``path``. Returns items deleted."""
+    if path.is_symlink():
+        return 0
     removed = 0
     for child in path.iterdir():
         try:

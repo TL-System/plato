@@ -3,12 +3,13 @@ Customize the list of inbound and outbound processors for scaffold clients throu
 """
 
 import logging
-import os
-import pickle
 from typing import Any, List, Optional
 
 from plato.callbacks.client import ClientCallback
 from plato.processors import base
+from plato.trainers.strategies.algorithms.scaffold_strategy import (
+    validate_control_variates,
+)
 
 
 class ExtractControlVariatesProcessor(base.Processor):
@@ -24,23 +25,18 @@ class ExtractControlVariatesProcessor(base.Processor):
         self.trainer: Optional[Any] = trainer
 
     def process(self, data: Any) -> Any:
-        if not isinstance(data, list):
-            if self.trainer is not None:
-                setattr(self.trainer, "additional_data", None)
-            return data
-
-        if len(data) > 1 and self.trainer is not None:
-            setattr(self.trainer, "additional_data", data[1])
-
-            logging.info(
-                "[Client #%d] Control variates extracted from the payload.",
-                self.client_id,
-            )
-            return data[0]
-
-        if self.trainer is not None:
-            setattr(self.trainer, "additional_data", None)
-        return data[0] if data else None
+        trainer = self.trainer
+        if trainer is None:
+            raise ValueError("SCAFFOLD inbound processor requires the active trainer.")
+        trainer.additional_data = None
+        trainer.context.state.pop("server_control_variate", None)
+        trainer.context.state.pop("client_control_variate_delta", None)
+        if not isinstance(data, (list, tuple)) or len(data) != 2:
+            raise ValueError("SCAFFOLD requires a current [weights, server_controls] payload.")
+        controls = validate_control_variates(trainer.model, data[1])
+        trainer.context.state["server_control_variate"] = controls
+        trainer.additional_data = controls
+        return data[0]
 
 
 class SendControlVariateProcessor(base.Processor):
@@ -56,21 +52,13 @@ class SendControlVariateProcessor(base.Processor):
         self.trainer = trainer
 
     def process(self, data: Any) -> List[Any]:
-        delta = getattr(self.trainer, "client_control_variate_delta", None)
-        data = [data, delta]
-
-        if delta is not None:
-            logging.info(
-                "[Client #%d] Control variate deltas were attached to the payload.",
-                self.client_id,
-            )
-        else:
-            logging.info(
-                "[Client #%d] No control variate deltas available; sending None.",
-                self.client_id,
-            )
-
-        return data
+        trainer = self.trainer
+        if trainer is None:
+            raise ValueError("SCAFFOLD outbound processor requires the active trainer.")
+        delta = trainer.model_update_strategy.get_update_payload(
+            trainer.context
+        )["control_variate_delta"]
+        return [data, validate_control_variates(trainer.model, delta)]
 
 
 class ScaffoldCallback(ClientCallback):
@@ -84,10 +72,11 @@ class ScaffoldCallback(ClientCallback):
         Insert an ExtractPayloadProcessor to the list of inbound processors.
         """
         processors = inbound_processor.processors
-        if any(
-            isinstance(proc, ExtractControlVariatesProcessor) for proc in processors
-        ):
-            return
+        for processor in processors:
+            if isinstance(processor, ExtractControlVariatesProcessor):
+                processor.client_id = client.client_id
+                processor.trainer = client.trainer
+                return
 
         extract_payload_processor = ExtractControlVariatesProcessor(
             client_id=client.client_id,
@@ -116,8 +105,11 @@ class ScaffoldCallback(ClientCallback):
         Insert a SendControlVariateProcessor to the list of outbound processors.
         """
         processors = outbound_processor.processors
-        if any(isinstance(proc, SendControlVariateProcessor) for proc in processors):
-            return
+        for processor in processors:
+            if isinstance(processor, SendControlVariateProcessor):
+                processor.client_id = client.client_id
+                processor.trainer = client.trainer
+                return
 
         send_payload_processor = SendControlVariateProcessor(
             client_id=client.client_id,

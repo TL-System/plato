@@ -1,0 +1,646 @@
+{
+  "source_commit": "8b01bf47ca8bdf9232bffeb4e50f78d4f00c9e3b",
+  "report_sha256": "0352d54214cfdb32d7790f35a3071579a6bc75e1781b79d1af41bde6ca673458",
+  "verified_receipts": 78,
+  "retained_files": [
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/affected-313/test_actual_shipped_run_resume0/control/run/result.json",
+      "member": "affected-313/test_actual_shipped_run_resume0/control/run/result.json",
+      "sha256": "98c31ea9a72ebf3fc050ed4fe66f82ca810d66eda6de1ca46e2ee31cd74eaba8",
+      "bytes": 24218
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/affected-313/test_actual_shipped_run_resume0/split/first/result.json",
+      "member": "affected-313/test_actual_shipped_run_resume0/split/first/result.json",
+      "sha256": "37a6b68daa3f8acca35766631e1131e2c94d3ea809a275b5a2f1abcd35a04fe2",
+      "bytes": 14396
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/affected-313/test_actual_shipped_run_resume0/split/resumed/result.json",
+      "member": "affected-313/test_actual_shipped_run_resume0/split/resumed/result.json",
+      "sha256": "feaba6d0891a8031d8d4c20b53b2cbc6d82ca12c55bde7201a33d17bb8f51100",
+      "bytes": 14343
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/affected-313/test_actual_shipped_run_resume1/control/run/result.json",
+      "member": "affected-313/test_actual_shipped_run_resume1/control/run/result.json",
+      "sha256": "b973539020ce8031ec94ebf180b1b65c4d42177559018ed4d82e4ac965dd5ddf",
+      "bytes": 24215
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/affected-313/test_actual_shipped_run_resume1/split/first/result.json",
+      "member": "affected-313/test_actual_shipped_run_resume1/split/first/result.json",
+      "sha256": "79f9aa0d94d4509c45d192bba24ae1d3fa563969fdf1aadd77ee8c3839325404",
+      "bytes": 14400
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/affected-313/test_actual_shipped_run_resume1/split/resumed/result.json",
+      "member": "affected-313/test_actual_shipped_run_resume1/split/resumed/result.json",
+      "sha256": "0c6f3dfee0cd4a1e6070c413873adcdd54bb1ac2038845edf877403a92189d9a",
+      "bytes": 14342
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/affected-313/test_actual_spawn_returns_pers2/feddyn-result.json",
+      "member": "affected-313/test_actual_spawn_returns_pers2/feddyn-result.json",
+      "sha256": "c0b96f8cd76387bf4f49157995a000a901063ec44ff2685563bb43bf198fc2d2",
+      "bytes": 362
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/affected-313/test_actual_spawn_reused_clien0/result.json",
+      "member": "affected-313/test_actual_spawn_reused_clien0/result.json",
+      "sha256": "c0b96f8cd76387bf4f49157995a000a901063ec44ff2685563bb43bf198fc2d2",
+      "bytes": 362
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/affected-313/test_actual_spawn_reused_clien1/result.json",
+      "member": "affected-313/test_actual_spawn_reused_clien1/result.json",
+      "sha256": "05c93b2a1cc8c22b2a86ea305733af32fe6b7ffea04d033c39baaa74b8444c14",
+      "bytes": 396
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/affected-313/test_actual_spawn_wrong_first_0/result.json",
+      "member": "affected-313/test_actual_spawn_wrong_first_0/result.json",
+      "sha256": "3a385436813fcc4b96428c1dec58961ffd05dfad8af0765bbe3f30bc28c42c75",
+      "bytes": 233
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/affected-313/test_actual_spawn_wrong_first_1/result.json",
+      "member": "affected-313/test_actual_spawn_wrong_first_1/result.json",
+      "sha256": "3a385436813fcc4b96428c1dec58961ffd05dfad8af0765bbe3f30bc28c42c75",
+      "bytes": 233
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/affected-313/test_actual_spawned_rejection_0/result.json",
+      "member": "affected-313/test_actual_spawned_rejection_0/result.json",
+      "sha256": "3ba8ba5fe6f1834e281a25983947db7125f121baa01ddf4f1b996b54bb0feb70",
+      "bytes": 33
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/affected-313/test_actual_spawned_rejection_1/result.json",
+      "member": "affected-313/test_actual_spawned_rejection_1/result.json",
+      "sha256": "3ba8ba5fe6f1834e281a25983947db7125f121baa01ddf4f1b996b54bb0feb70",
+      "bytes": 33
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/affected-313/test_actual_spawned_rejection_10/result.json",
+      "member": "affected-313/test_actual_spawned_rejection_10/result.json",
+      "sha256": "3ba8ba5fe6f1834e281a25983947db7125f121baa01ddf4f1b996b54bb0feb70",
+      "bytes": 33
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/affected-313/test_actual_spawned_rejection_11/result.json",
+      "member": "affected-313/test_actual_spawned_rejection_11/result.json",
+      "sha256": "3ba8ba5fe6f1834e281a25983947db7125f121baa01ddf4f1b996b54bb0feb70",
+      "bytes": 33
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/affected-313/test_actual_spawned_rejection_12/result.json",
+      "member": "affected-313/test_actual_spawned_rejection_12/result.json",
+      "sha256": "3ba8ba5fe6f1834e281a25983947db7125f121baa01ddf4f1b996b54bb0feb70",
+      "bytes": 33
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/affected-313/test_actual_spawned_rejection_2/result.json",
+      "member": "affected-313/test_actual_spawned_rejection_2/result.json",
+      "sha256": "3ba8ba5fe6f1834e281a25983947db7125f121baa01ddf4f1b996b54bb0feb70",
+      "bytes": 33
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/affected-313/test_actual_spawned_rejection_3/result.json",
+      "member": "affected-313/test_actual_spawned_rejection_3/result.json",
+      "sha256": "3ba8ba5fe6f1834e281a25983947db7125f121baa01ddf4f1b996b54bb0feb70",
+      "bytes": 33
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/affected-313/test_actual_spawned_rejection_4/result.json",
+      "member": "affected-313/test_actual_spawned_rejection_4/result.json",
+      "sha256": "3ba8ba5fe6f1834e281a25983947db7125f121baa01ddf4f1b996b54bb0feb70",
+      "bytes": 33
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/affected-313/test_actual_spawned_rejection_5/result.json",
+      "member": "affected-313/test_actual_spawned_rejection_5/result.json",
+      "sha256": "3ba8ba5fe6f1834e281a25983947db7125f121baa01ddf4f1b996b54bb0feb70",
+      "bytes": 33
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/affected-313/test_actual_spawned_rejection_6/result.json",
+      "member": "affected-313/test_actual_spawned_rejection_6/result.json",
+      "sha256": "3ba8ba5fe6f1834e281a25983947db7125f121baa01ddf4f1b996b54bb0feb70",
+      "bytes": 33
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/affected-313/test_actual_spawned_rejection_7/result.json",
+      "member": "affected-313/test_actual_spawned_rejection_7/result.json",
+      "sha256": "3ba8ba5fe6f1834e281a25983947db7125f121baa01ddf4f1b996b54bb0feb70",
+      "bytes": 33
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/affected-313/test_actual_spawned_rejection_8/result.json",
+      "member": "affected-313/test_actual_spawned_rejection_8/result.json",
+      "sha256": "3ba8ba5fe6f1834e281a25983947db7125f121baa01ddf4f1b996b54bb0feb70",
+      "bytes": 33
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/affected-313/test_actual_spawned_rejection_9/result.json",
+      "member": "affected-313/test_actual_spawned_rejection_9/result.json",
+      "sha256": "3ba8ba5fe6f1834e281a25983947db7125f121baa01ddf4f1b996b54bb0feb70",
+      "bytes": 33
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/affected-313/test_consecutive_same_client_u2/result.json",
+      "member": "affected-313/test_consecutive_same_client_u2/result.json",
+      "sha256": "dc9d0dbf2629d92556dcd78dfcc082c43411e44e91c6aeff3db2fcf3e082adc3",
+      "bytes": 508
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/affected-313/test_consecutive_same_client_u3/result.json",
+      "member": "affected-313/test_consecutive_same_client_u3/result.json",
+      "sha256": "fcbab8f4cada27d253de6556d502526a5141e556385ea362eee1750b5f439554",
+      "bytes": 529
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/affected-313/test_shipped_mnist_shaped_lene0/lenet-run/result.json",
+      "member": "affected-313/test_shipped_mnist_shaped_lene0/lenet-run/result.json",
+      "sha256": "1b0ef1fe7b49baf6a57fae00486ae2ec7e7894e53beba7cdc4d418d10a587f55",
+      "bytes": 10835
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/affected-313.json",
+      "member": "affected-313.json",
+      "sha256": "592b5459ad6794ddf703b5434b95b1d2f29986393e80e39fce7b38220dbac48e",
+      "bytes": 1035
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/affected-313.log",
+      "member": "affected-313.log",
+      "sha256": "e23c3f93b05e15f1ad78d3e5bc88e91081a537c48f95d1aa64b7fbff8302a1cf",
+      "bytes": 432
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/affected-313.xml",
+      "member": "affected-313.xml",
+      "sha256": "cb5c872654cb8393ea8956e2052422f650ed506e09fc3b42fc188cdaebecadd9",
+      "bytes": 49614
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/affected-314/test_actual_shipped_run_resume0/control/run/result.json",
+      "member": "affected-314/test_actual_shipped_run_resume0/control/run/result.json",
+      "sha256": "53e27c6eaa4672627cc2d0cbf4abc9884f06d0c6e932100f105128e9ca0759ba",
+      "bytes": 24226
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/affected-314/test_actual_shipped_run_resume0/split/first/result.json",
+      "member": "affected-314/test_actual_shipped_run_resume0/split/first/result.json",
+      "sha256": "e90b3613c4919b387e79a0037fdbefa7d891ceabf6e88fb129579906afe8c2b8",
+      "bytes": 14405
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/affected-314/test_actual_shipped_run_resume0/split/resumed/result.json",
+      "member": "affected-314/test_actual_shipped_run_resume0/split/resumed/result.json",
+      "sha256": "dd0ce0069147bc044d91b11b704a5d653930ff46431cf6b9cb1465a9db9814de",
+      "bytes": 14349
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/affected-314/test_actual_shipped_run_resume1/control/run/result.json",
+      "member": "affected-314/test_actual_shipped_run_resume1/control/run/result.json",
+      "sha256": "5bb610ad6c29185a0a032d45b994d9c78ad475b5bb5a5de5975e2050346d209c",
+      "bytes": 24223
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/affected-314/test_actual_shipped_run_resume1/split/first/result.json",
+      "member": "affected-314/test_actual_shipped_run_resume1/split/first/result.json",
+      "sha256": "a6be374126bb6922c1153a7b8cbdb2228efc98268b799676012734b9fade70d9",
+      "bytes": 14403
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/affected-314/test_actual_shipped_run_resume1/split/resumed/result.json",
+      "member": "affected-314/test_actual_shipped_run_resume1/split/resumed/result.json",
+      "sha256": "451e4f8ea5e47d1e3efc349d9ff9b338d8bff631bb8c48f05138046f44f31fa4",
+      "bytes": 14350
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/affected-314/test_actual_spawn_returns_pers2/feddyn-result.json",
+      "member": "affected-314/test_actual_spawn_returns_pers2/feddyn-result.json",
+      "sha256": "c0b96f8cd76387bf4f49157995a000a901063ec44ff2685563bb43bf198fc2d2",
+      "bytes": 362
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/affected-314/test_actual_spawn_reused_clien0/result.json",
+      "member": "affected-314/test_actual_spawn_reused_clien0/result.json",
+      "sha256": "c0b96f8cd76387bf4f49157995a000a901063ec44ff2685563bb43bf198fc2d2",
+      "bytes": 362
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/affected-314/test_actual_spawn_reused_clien1/result.json",
+      "member": "affected-314/test_actual_spawn_reused_clien1/result.json",
+      "sha256": "05c93b2a1cc8c22b2a86ea305733af32fe6b7ffea04d033c39baaa74b8444c14",
+      "bytes": 396
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/affected-314/test_actual_spawn_wrong_first_0/result.json",
+      "member": "affected-314/test_actual_spawn_wrong_first_0/result.json",
+      "sha256": "3a385436813fcc4b96428c1dec58961ffd05dfad8af0765bbe3f30bc28c42c75",
+      "bytes": 233
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/affected-314/test_actual_spawn_wrong_first_1/result.json",
+      "member": "affected-314/test_actual_spawn_wrong_first_1/result.json",
+      "sha256": "3a385436813fcc4b96428c1dec58961ffd05dfad8af0765bbe3f30bc28c42c75",
+      "bytes": 233
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/affected-314/test_actual_spawned_rejection_0/result.json",
+      "member": "affected-314/test_actual_spawned_rejection_0/result.json",
+      "sha256": "3ba8ba5fe6f1834e281a25983947db7125f121baa01ddf4f1b996b54bb0feb70",
+      "bytes": 33
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/affected-314/test_actual_spawned_rejection_1/result.json",
+      "member": "affected-314/test_actual_spawned_rejection_1/result.json",
+      "sha256": "3ba8ba5fe6f1834e281a25983947db7125f121baa01ddf4f1b996b54bb0feb70",
+      "bytes": 33
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/affected-314/test_actual_spawned_rejection_10/result.json",
+      "member": "affected-314/test_actual_spawned_rejection_10/result.json",
+      "sha256": "3ba8ba5fe6f1834e281a25983947db7125f121baa01ddf4f1b996b54bb0feb70",
+      "bytes": 33
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/affected-314/test_actual_spawned_rejection_11/result.json",
+      "member": "affected-314/test_actual_spawned_rejection_11/result.json",
+      "sha256": "3ba8ba5fe6f1834e281a25983947db7125f121baa01ddf4f1b996b54bb0feb70",
+      "bytes": 33
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/affected-314/test_actual_spawned_rejection_12/result.json",
+      "member": "affected-314/test_actual_spawned_rejection_12/result.json",
+      "sha256": "3ba8ba5fe6f1834e281a25983947db7125f121baa01ddf4f1b996b54bb0feb70",
+      "bytes": 33
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/affected-314/test_actual_spawned_rejection_2/result.json",
+      "member": "affected-314/test_actual_spawned_rejection_2/result.json",
+      "sha256": "3ba8ba5fe6f1834e281a25983947db7125f121baa01ddf4f1b996b54bb0feb70",
+      "bytes": 33
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/affected-314/test_actual_spawned_rejection_3/result.json",
+      "member": "affected-314/test_actual_spawned_rejection_3/result.json",
+      "sha256": "3ba8ba5fe6f1834e281a25983947db7125f121baa01ddf4f1b996b54bb0feb70",
+      "bytes": 33
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/affected-314/test_actual_spawned_rejection_4/result.json",
+      "member": "affected-314/test_actual_spawned_rejection_4/result.json",
+      "sha256": "3ba8ba5fe6f1834e281a25983947db7125f121baa01ddf4f1b996b54bb0feb70",
+      "bytes": 33
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/affected-314/test_actual_spawned_rejection_5/result.json",
+      "member": "affected-314/test_actual_spawned_rejection_5/result.json",
+      "sha256": "3ba8ba5fe6f1834e281a25983947db7125f121baa01ddf4f1b996b54bb0feb70",
+      "bytes": 33
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/affected-314/test_actual_spawned_rejection_6/result.json",
+      "member": "affected-314/test_actual_spawned_rejection_6/result.json",
+      "sha256": "3ba8ba5fe6f1834e281a25983947db7125f121baa01ddf4f1b996b54bb0feb70",
+      "bytes": 33
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/affected-314/test_actual_spawned_rejection_7/result.json",
+      "member": "affected-314/test_actual_spawned_rejection_7/result.json",
+      "sha256": "3ba8ba5fe6f1834e281a25983947db7125f121baa01ddf4f1b996b54bb0feb70",
+      "bytes": 33
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/affected-314/test_actual_spawned_rejection_8/result.json",
+      "member": "affected-314/test_actual_spawned_rejection_8/result.json",
+      "sha256": "3ba8ba5fe6f1834e281a25983947db7125f121baa01ddf4f1b996b54bb0feb70",
+      "bytes": 33
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/affected-314/test_actual_spawned_rejection_9/result.json",
+      "member": "affected-314/test_actual_spawned_rejection_9/result.json",
+      "sha256": "3ba8ba5fe6f1834e281a25983947db7125f121baa01ddf4f1b996b54bb0feb70",
+      "bytes": 33
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/affected-314/test_consecutive_same_client_u2/result.json",
+      "member": "affected-314/test_consecutive_same_client_u2/result.json",
+      "sha256": "dc9d0dbf2629d92556dcd78dfcc082c43411e44e91c6aeff3db2fcf3e082adc3",
+      "bytes": 508
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/affected-314/test_consecutive_same_client_u3/result.json",
+      "member": "affected-314/test_consecutive_same_client_u3/result.json",
+      "sha256": "fcbab8f4cada27d253de6556d502526a5141e556385ea362eee1750b5f439554",
+      "bytes": 529
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/affected-314/test_shipped_mnist_shaped_lene0/lenet-run/result.json",
+      "member": "affected-314/test_shipped_mnist_shaped_lene0/lenet-run/result.json",
+      "sha256": "3885d4d98725849ff3b0ac883edebecfcd7114908cf1496e71fb0ba2a79a69c2",
+      "bytes": 10845
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/affected-314.json",
+      "member": "affected-314.json",
+      "sha256": "6e2c0a11251ff5aa38e1ec304d46d0c6416cdf5eea090cafd3f40cdf2332027b",
+      "bytes": 1035
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/affected-314.log",
+      "member": "affected-314.log",
+      "sha256": "ed9d144b72df7ede4b68c77550afdd1a57761d0e799f8c604fd87203621fc7b7",
+      "bytes": 432
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/affected-314.xml",
+      "member": "affected-314.xml",
+      "sha256": "8c9e28a2ca10a7d69eb525ef84188b6c0cf6935d72617a36684918d04bb2f2b5",
+      "bytes": 49614
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/build_evidence.py",
+      "member": "build_evidence.py",
+      "sha256": "1d24ea1a7e1c9419973bca8ee477f9ed2ccbe9ea8456aefb40d671704262047c",
+      "bytes": 14241
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/committed-ty-313.json",
+      "member": "committed-ty-313.json",
+      "sha256": "cfa181adc5bc8e854663ad53a98ab2023f1990d4140935ce3fb17808cd55810e",
+      "bytes": 723
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/committed-ty-313.log",
+      "member": "committed-ty-313.log",
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "bytes": 19
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/committed-ty-314.json",
+      "member": "committed-ty-314.json",
+      "sha256": "d9ae0c72cbe1bf78f29a557d114b956d922b1aca0b487b78c49ef8a75ba56e16",
+      "bytes": 723
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/committed-ty-314.log",
+      "member": "committed-ty-314.log",
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "bytes": 19
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/corrected-reviewer-callback-313.json",
+      "member": "corrected-reviewer-callback-313.json",
+      "sha256": "7271cad64fd39d2c87799902e9ba50ee1200286cc4f7e4c9e3f5404345c122ed",
+      "bytes": 748
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/corrected-reviewer-callback-313.log",
+      "member": "corrected-reviewer-callback-313.log",
+      "sha256": "9d44f3ef224b98b729888d67cfbd36411a215ae210670780b0ac7ca79a8ae2a4",
+      "bytes": 3306
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/corrected-reviewer-callback-314.json",
+      "member": "corrected-reviewer-callback-314.json",
+      "sha256": "7e202d7586765e9398d2cec738641b847a52afbd2974a90cfa1df9e29d731257",
+      "bytes": 750
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/corrected-reviewer-callback-314.log",
+      "member": "corrected-reviewer-callback-314.log",
+      "sha256": "69757f668815608896343da9906347e165646465d19539cc3dd8c450b8e9f758",
+      "bytes": 3306
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/corrected-reviewer-count-313.json",
+      "member": "corrected-reviewer-count-313.json",
+      "sha256": "9b9d295b1dfafe7be08e92837e02ec52886377d28880f858defd93922c8e80d9",
+      "bytes": 743
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/corrected-reviewer-count-313.log",
+      "member": "corrected-reviewer-count-313.log",
+      "sha256": "90b82672aa0e56dd64d71c7994b1a23ce23e0139d3ead46c6a99818905f06f70",
+      "bytes": 7405
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/corrected-reviewer-count-314.json",
+      "member": "corrected-reviewer-count-314.json",
+      "sha256": "0809bb1b1be4897bf18ed902c9791bc77ab7e0a47b3a4c9f7c9c54bf8250ca94",
+      "bytes": 742
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/corrected-reviewer-count-314.log",
+      "member": "corrected-reviewer-count-314.log",
+      "sha256": "cbd147bdecfd9580f47b137b495cb1127de7cdb2787e4a5f25de5bbd1ca861bd",
+      "bytes": 7405
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/corrected_callback_count_probe.py",
+      "member": "corrected_callback_count_probe.py",
+      "sha256": "17c2bf91396f5e89052f7986af3f72daa90aefd1fb6ae66c470b57f7e8720ea5",
+      "bytes": 2449
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/corrected_candidate_count_probes.py",
+      "member": "corrected_candidate_count_probes.py",
+      "sha256": "553d79df9baf9e7b8fb036eb240f6c01787f61e52dadef9b4add6f35d826abfa",
+      "bytes": 10229
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/environment-313.json",
+      "member": "environment-313.json",
+      "sha256": "a3f62973c970037d4667ff1686f0dc2ba527f3e60215a100153670b8f105b5c4",
+      "bytes": 638
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/environment-314.json",
+      "member": "environment-314.json",
+      "sha256": "c7526e565c1855bda1a0c14523fa7023004a165879dfd8498cd2edf5245bc6e7",
+      "bytes": 664
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/final-candidate.json",
+      "member": "final-candidate.json",
+      "sha256": "8fee19cb954ef09e27736b4a1d6f7c22407bb75bf6623bd27bce1af9838d25f8",
+      "bytes": 710
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/green-new-313.json",
+      "member": "green-new-313.json",
+      "sha256": "48c1a3519a198d9396f7499f1dfe572f971472595f5b8a91f03889ff6f197cf5",
+      "bytes": 707
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/green-new-313.log",
+      "member": "green-new-313.log",
+      "sha256": "4e8485a1f20312ae031e507a968497f8522a662da97259ea2e186a691dce9c84",
+      "bytes": 100
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/green-new-313.xml",
+      "member": "green-new-313.xml",
+      "sha256": "16a098a875f13adabe2b53a46429ba5c7adec0c792dd6e44948b240e5d596de4",
+      "bytes": 3617
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/green-new-314.json",
+      "member": "green-new-314.json",
+      "sha256": "6854f9bd57f3babc881b5c9c54cdc23029356257b80ac4734b59009d4a860611",
+      "bytes": 707
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/green-new-314.log",
+      "member": "green-new-314.log",
+      "sha256": "c85bb59194fdda231b32ed3bb439150ed2935a3900b36a2b983900df58bd0de9",
+      "bytes": 100
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/green-new-314.xml",
+      "member": "green-new-314.xml",
+      "sha256": "d0dcad94c161fcb90e96c79069f8d031a6eaa6352bba7e2d9b8190a4b5d89691",
+      "bytes": 3617
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/green-ty-313.json",
+      "member": "green-ty-313.json",
+      "sha256": "4f25baef42ed007fee560321e46a67750c07a8edcdfbdc8fc83cd156573d2c2f",
+      "bytes": 658
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/green-ty-313.log",
+      "member": "green-ty-313.log",
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "bytes": 19
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/green-ty-314.json",
+      "member": "green-ty-314.json",
+      "sha256": "29b93b1e97d71542cd382fd218468d57f2084e6c0deddadb58e9629727b47caa",
+      "bytes": 658
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/green-ty-314.log",
+      "member": "green-ty-314.log",
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "bytes": 19
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/original-reviewer_callback_count_probe.py",
+      "member": "original-reviewer_callback_count_probe.py",
+      "sha256": "a03b65efc9b1c79e7f814a4b52403449ff88ab93b53107f661891ea87b817674",
+      "bytes": 2090
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/original-reviewer_candidate_probes.py",
+      "member": "original-reviewer_candidate_probes.py",
+      "sha256": "b7411dcf85f86fabf413bcdc314f5999193a4034f0d590853ff114252a1e65fc",
+      "bytes": 10606
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/red-313.json",
+      "member": "red-313.json",
+      "sha256": "1de1be3757ce6fdfc56ecd4a7a102d95f70507e5bc8ced1fb4b704c90d60cf1f",
+      "bytes": 683
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/red-313.log",
+      "member": "red-313.log",
+      "sha256": "f77dc931eb2cf61ad0d873d567f2487da3d7f0ececc4fdc13a883950ef54232c",
+      "bytes": 122184
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/red-313.xml",
+      "member": "red-313.xml",
+      "sha256": "5aaace064a81a56e09e10ba1ca6e8ee2448adaa014fa61ef36b51b0541ae93ca",
+      "bytes": 50671
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/red-314.json",
+      "member": "red-314.json",
+      "sha256": "3c7efb62f70bddbe95069ae780ebbee02dc8bf91728bd65f0227ef2e722ea40e",
+      "bytes": 683
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/red-314.log",
+      "member": "red-314.log",
+      "sha256": "ffdf63a43db44e2950aafdd2ba2718a1159b750294a6694936c0f6ff8bc3a56c",
+      "bytes": 122288
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/red-314.xml",
+      "member": "red-314.xml",
+      "sha256": "bb7cc10d474428ecc06c0682f9647a57e20793e4d29603d857d1551d4c072ecd",
+      "bytes": 50749
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/red-feddyn_count_worker.py",
+      "member": "red-feddyn_count_worker.py",
+      "sha256": "ad0dcb7acc45af04857ac0847966cbc67f83267cb72e7ce8759a2ddf43821602",
+      "bytes": 4144
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/red-source-identity.json",
+      "member": "red-source-identity.json",
+      "sha256": "672b4062534bf5192eb2aec0ab4a52d18ebc91554a8467d36c13ec668da133f0",
+      "bytes": 300
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/red-test_feddyn_count_boundaries.py",
+      "member": "red-test_feddyn_count_boundaries.py",
+      "sha256": "f04544d42b00663a9c76eef795ac06f365724c534f73b443e490745205291fef",
+      "bytes": 6953
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/red-ty-313.json",
+      "member": "red-ty-313.json",
+      "sha256": "728a849019c6f30ed5d8764374e78caed4fdc86875eec24597bb34489fcc4f36",
+      "bytes": 654
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/red-ty-313.log",
+      "member": "red-ty-313.log",
+      "sha256": "34fe0a33c3be616c77f6fb7a8fff2f66730688f9540d24d1f23a5e175cafc7a8",
+      "bytes": 3238
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/red-ty-314.json",
+      "member": "red-ty-314.json",
+      "sha256": "c1af7ab4d86b38457878565811c568424ba6a20deadc62b26d5ca14c9f395427",
+      "bytes": 654
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/red-ty-314.log",
+      "member": "red-ty-314.log",
+      "sha256": "34fe0a33c3be616c77f6fb7a8fff2f66730688f9540d24d1f23a5e175cafc7a8",
+      "bytes": 3238
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/ruff-imports.log",
+      "member": "ruff-imports.log",
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "bytes": 19
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/run_checks.py",
+      "member": "run_checks.py",
+      "sha256": "21695c7e217e26c45544da44a715883c652d8001ff9c9402c3ad470326fa6bcc",
+      "bytes": 2150
+    },
+    {
+      "original": "/private/tmp/plato-phase2c-feddyn-count-fixes/source-preservation.json",
+      "member": "source-preservation.json",
+      "sha256": "41eb3fc1baf4c27d86b994c0e41fb7ed679cf4f0cfb051ab557de9dcbaddae31",
+      "bytes": 6548
+    }
+  ],
+  "archive_sha256": "ebe6fbfdf19f65fa15491cafddb5183245bd6e066e5d0edcba0c7bd683635070",
+  "archive_bytes": 77597,
+  "scope": "Byte-exact author count-fix raw receipts, probes and actual entrypoint results; independent review and combined acceptance remain pending."
+}

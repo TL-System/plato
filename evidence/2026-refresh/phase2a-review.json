@@ -1,0 +1,472 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-02",
+  "task": "Independent exact-commit Phase 2A review",
+  "verdict": "CHANGES_REQUESTED",
+  "severity_counts": {
+    "critical": 0,
+    "high": 0,
+    "medium": 4,
+    "low": 0
+  },
+  "summary": "F13/F15/F16, ordinary sampler compatibility, local native dataset selection, extraction containment and datalib preservation pass the scoped checks. Four material gaps remain: valid edge evaluation IDs, concurrent/interrupted NPZ publication, unlabeled Tiny ImageNet layout classification, and stale completion-marker recovery.",
+  "identity": {
+    "candidate": "a7bfd3dcdf7aaf3ec3ca466a1b5f27efa58054eb",
+    "base": "fda60becedfa6236c11d415b87a868b52789a41e",
+    "implementation": "53a60a7514b71e8098fe8c0f335547725d1e269e",
+    "candidate_tree": "67b6e4b17342c7b9bf77c1a6c0d2ebb2dae79a8c",
+    "implementation_tree": "3b85e0835066742ba0c145d8657708a8064b7721",
+    "candidate_binary_diff_sha256": "f7eb3723d6230d99d5332e39a21476572d96e7ced7c93082c316343f9127d95a",
+    "implementation_binary_diff_sha256": "7a85d21a4c6dd9a106f5c4c3b228d68b0789513b18199bf24e3c664428c1cbd1",
+    "evidence_only_child": [
+      "evidence/2026-refresh/phase2a-validation.json"
+    ]
+  },
+  "inputs_read": [
+    "/Users/bli/Playground/plato/AGENTS.md",
+    "/private/tmp/plato-refresh-worktrees/data/AGENTS.md",
+    "/private/tmp/plato-refresh-worktrees/data/evidence/2026-refresh/plan.md",
+    "/private/tmp/plato-refresh-worktrees/data/evidence/2026-refresh/plan-addendum.json",
+    "/private/tmp/plato-refresh-worktrees/data/evidence/2026-refresh/phase2a-validation.json"
+  ],
+  "input_hashes": {
+    "AGENTS.md": "b50f87f31ea3d87076952d8b7d2d8af067132fbf877d80f8780c208fb45527ec",
+    "evidence/2026-refresh/plan.md": "edb9a58cc7915a940854f16d5029fe97434703bf2f75eca0dcb96de2d0f0eb15",
+    "evidence/2026-refresh/plan-addendum.json": "5b51b0fb7ed6f68d9fce7176335b3e7be5e5f178a2788590912aa2396a487709",
+    "evidence/2026-refresh/phase2a-validation.json": "b3b83408a9bca12209cc4ead3b936b078e0cb1d7dd71f6cd47fd8c828e5fa628"
+  },
+  "scope": {
+    "reviewed": "Entire base-to-candidate implementation/test/archive diff, config include/CLI lifecycle and sampler/dataset callers relevant to the changes.",
+    "candidate_read_only": true,
+    "candidate_status_before": "",
+    "candidate_status_after": "",
+    "nested_agents": 0,
+    "commits_pushes_pr_edits": 0,
+    "authorized_writes": "Owned /tmp/plato-phase2a-review plus this root review JSON only.",
+    "excluded": "Accepted Phase 1 package/design choices; future MLX/HuggingFace/robotics/ViT work; combined full validation and the unrelated socket matrix; authentication/protocol redesign."
+  },
+  "environment": {
+    "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+    "python": {
+      "3.13": "3.13.16 (uv managed)",
+      "3.14": "3.14.8 (Homebrew)"
+    },
+    "independent_environments": [
+      "/tmp/plato-phase2a-review/venv-3.13",
+      "/tmp/plato-phase2a-review/venv-3.14"
+    ],
+    "provision_command": "zsh -lc 'UV_PROJECT_ENVIRONMENT=/tmp/plato-phase2a-review/venv-{python} uv sync --locked --group dev --extra ssl --python {python} --project /tmp/plato-phase2a-review/candidate'",
+    "source_copy": "git archive of the exact candidate into owned scratch; original worktree and author environments were read only.",
+    "versions": {
+      "numpy": "2.5.3",
+      "torch": "2.14.1",
+      "torchvision": "0.29.1",
+      "scipy": "1.18.1",
+      "requests": "2.34.2",
+      "pytest": "9.1.1",
+      "lightly": "1.5.26"
+    },
+    "metadata_sha256": {
+      "pyproject.toml": "799bd7ba1865b097fdc8ca84a7b70337794e338de4aa9a6a13f6a4c1b9156246",
+      "uv.lock": "573b10c2ba1a2317e02f9e40c6181359cafab6f6e0a0f9be12bb256cb276fe1d",
+      ".python-version": "02e735b3dfe1c32833eb550b7ff8ffa17f5f2bc3fa1e7bae61a8f5a3883ce398"
+    },
+    "cpu_environment": "OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=.",
+    "shell": "Every shell command used zsh -lc."
+  },
+  "findings": [
+    {
+      "id": "R2A-01",
+      "severity": "medium",
+      "status": "open",
+      "title": "Valid cross-silo edge evaluation IDs are rejected by the new base sampler check.",
+      "locations": [
+        {
+          "path": "plato/samplers/base.py",
+          "line_start": 17,
+          "line_end": 21
+        },
+        {
+          "path": "plato/samplers/dirichlet.py",
+          "line_start": 18,
+          "line_end": 18
+        },
+        {
+          "path": "plato/servers/fedavg_cs.py",
+          "line_start": 129,
+          "line_end": 140
+        }
+      ],
+      "trigger": "An existing cross-silo edge server enables server.edge_do_test and data.testset_sampler=\"noniid\". Its ID is total_clients + silo_number, as assigned by the existing runtime.",
+      "actual": "The candidate raises ValueError: client_id must be between 1 and 3 for the valid first edge ID 4. The exact baseline Dirichlet implementation configures and emits 600 test indices through the same fedavg_cs.Server.configure branch.",
+      "impact": "The new shared ID validation disables an existing edge-evaluation path before training starts. Tests currently classify every total_clients+1 ID as invalid without checking the cross-silo role.",
+      "reproduction": {
+        "command": "zsh -lc 'cd /tmp/plato-phase2a-review/candidate && OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=. /tmp/plato-phase2a-review/venv-{python}/bin/python /tmp/plato-phase2a-review/edge_sampler_probe.py /tmp/plato-phase2a-review/repro-edge-{python}'",
+        "interpreters": [
+          "3.13.16",
+          "3.14.8"
+        ],
+        "method": "Load the real configs/MNIST/fedavg_cross_silo_lenet5.toml with --id 4 --port 8101 and an owned base path; enable edge_do_test and noniid evaluation. Invoke the actual edge configure branch with 1000 local labeled examples and inert trainer/processor setup. Swap only the registered Dirichlet class for a base/candidate comparison.",
+        "qualification": "This exercises actual configure and sampler behavior with injected setup dependencies; it is not a socket round or training qualification.",
+        "logs": [
+          "/tmp/plato-phase2a-review/edge_sampler-3.13.json",
+          "/tmp/plato-phase2a-review/edge_sampler-3.14.json"
+        ]
+      },
+      "requested_fix": "Make validation aware of the existing edge-evaluation ID contract, or coordinate a narrow caller-to-sampler ID mapping that preserves existing evaluation semantics. Retain rejection of truly invalid ordinary client IDs and add a focused real-branch regression. Do not broadly permit every out-of-range ID."
+    },
+    {
+      "id": "R2A-02",
+      "severity": "medium",
+      "status": "open",
+      "title": "Purchase/Texas cache readers bypass a live writer lock and permanently trust interrupted NPZ writes.",
+      "locations": [
+        {
+          "path": "plato/datasources/purchase.py",
+          "line_start": 26,
+          "line_end": 29
+        },
+        {
+          "path": "plato/datasources/purchase.py",
+          "line_start": 41,
+          "line_end": 55
+        },
+        {
+          "path": "plato/datasources/texas.py",
+          "line_start": 27,
+          "line_end": 30
+        },
+        {
+          "path": "plato/datasources/texas.py",
+          "line_start": 42,
+          "line_end": 53
+        }
+      ],
+      "trigger": "One client builds the NPZ cache while another client initializes against the same data root, or the writer dies after opening the final cache filename.",
+      "actual": "The constructor sees the final cache pathname, skips download_dataset and its lock, then np.load raises BadZipFile while the real writer still holds flock. Killing the writer at that point leaves the same failure on the next initialization despite complete local raw data. After allowing the live writer to finish, the same reader loads the two examples successfully.",
+      "impact": "The new download lock does not serialize consumers of the cache being produced. Concurrent startup can fail, and an interrupted cache cannot recover through the existing raw-data preprocessing path.",
+      "reproduction": {
+        "command": "zsh -lc 'cd /tmp/plato-phase2a-review/candidate && OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=. /tmp/plato-phase2a-review/venv-{python}/bin/python /tmp/plato-phase2a-review/cache_writer_probe.py /tmp/plato-phase2a-review/repro-cache-{python}'",
+        "interpreters": [
+          "3.13.16",
+          "3.14.8"
+        ],
+        "method": "A child calls the actual Purchase/Texas constructor with complete two-row raw files. A file wrapper pauses the real np.savez after its first ZIP header write while production holds the download lock. The parent initializes another actual datasource, then either releases or kills the child. No production source is patched.",
+        "logs": [
+          "/tmp/plato-phase2a-review/cache_writer-3.13.json",
+          "/tmp/plato-phase2a-review/cache_writer-3.14.json"
+        ]
+      },
+      "requested_fix": "Publish NPZ caches atomically after successful construction and ensure initialization waits for preparation or validates/rebuilds an incomplete existing cache under the existing guard. Preserve valid cache-only and raw-only offline reuse. Add concurrent-reader and killed-writer regressions for both datasets."
+    },
+    {
+      "id": "R2A-03",
+      "severity": "medium",
+      "status": "open",
+      "title": "An incomplete native Tiny ImageNet tree is silently interpreted as a prepared labeled test tree.",
+      "locations": [
+        {
+          "path": "plato/datasources/tiny_imagenet.py",
+          "line_start": 62,
+          "line_end": 68
+        },
+        {
+          "path": "plato/datasources/tiny_imagenet.py",
+          "line_start": 81,
+          "line_end": 85
+        },
+        {
+          "path": "plato/datasources/tiny_imagenet.py",
+          "line_start": 109,
+          "line_end": 112
+        }
+      ],
+      "trigger": "A direct native Tiny ImageNet root has train/<wnid>/images and the official unlabeled test/images directory, but its val_annotations.txt is missing, as in an incomplete local tree.",
+      "actual": "prepared becomes true solely because train and test directories exist. No recovery is attempted. ImageFolder(test) creates the class [\"images\"] and targets [0], while training classes are [\"n001\", \"n002\"].",
+      "impact": "Evaluation silently uses fabricated class-zero labels for unlabeled official test images. The new native/prepared selection does not reliably distinguish the two supported layouts.",
+      "reproduction": {
+        "command": "zsh -lc 'cd /tmp/plato-phase2a-review/candidate && OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=. /tmp/plato-phase2a-review/venv-{python}/bin/python /tmp/plato-phase2a-review/risk_probes.py /tmp/plato-phase2a-review/repro-risks-{python}'",
+        "interpreters": [
+          "3.13.16",
+          "3.14.8"
+        ],
+        "case": "native_tiny_missing_annotations",
+        "method": "Create local PNGs under train/n001/images, train/n002/images and test/images, omit validation annotations, then invoke the actual Tiny ImageNet datasource.",
+        "logs": [
+          "/tmp/plato-phase2a-review/risks-3.13.json",
+          "/tmp/plato-phase2a-review/risks-3.14.json"
+        ],
+        "log_format": "These raw outputs include the base downloader progress lines before the JSON array."
+      },
+      "requested_fix": "Validate that a prepared test tree contains labeled class directories compatible with training classes. Recognize the official unlabeled test/images layout even when validation annotations are absent; recover missing native data or reject the incomplete layout clearly. Retain correctly prepared labeled train/test support and add the missing-annotation regression."
+    },
+    {
+      "id": "R2A-04",
+      "severity": "medium",
+      "status": "open",
+      "title": "Completion-marker fast paths prevent recovery after extracted dataset artifacts become incomplete.",
+      "locations": [
+        {
+          "path": "plato/datasources/base.py",
+          "line_start": 80,
+          "line_end": 85
+        },
+        {
+          "path": "plato/datasources/cinic10.py",
+          "line_start": 25,
+          "line_end": 36
+        },
+        {
+          "path": "plato/datasources/tiny_imagenet.py",
+          "line_start": 68,
+          "line_end": 85
+        }
+      ],
+      "trigger": "A root contains a previous successful download marker but is missing required extracted data, such as CINIC test/ or Tiny ImageNet val_annotations.txt.",
+      "actual": "The changed constructors detect the missing root artifacts and call download, but both completion-marker checks return without restoring them. CINIC raises FileNotFoundError for test/; Tiny ImageNet raises FileNotFoundError for val_annotations.txt. Both markers remain present.",
+      "impact": "Incomplete-root recovery only works before a marker has been written. An inconsistent existing cache remains unusable even when the configured archive is available locally or over a working server.",
+      "reproduction": {
+        "command": "zsh -lc 'cd /tmp/plato-phase2a-review/candidate && OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=. /tmp/plato-phase2a-review/venv-{python}/bin/python /tmp/plato-phase2a-review/risk_probes.py /tmp/plato-phase2a-review/repro-risks-{python}'",
+        "interpreters": [
+          "3.13.16",
+          "3.14.8"
+        ],
+        "case": "incomplete_extracted_tree_with_completion_marker",
+        "method": "Use an actual localhost ZIP download to produce each complete dataset and its marker. Remove the CINIC test directory or Tiny ImageNet validation annotation, keep the server available, and instantiate the actual datasource.",
+        "logs": [
+          "/tmp/plato-phase2a-review/risks-3.13.json",
+          "/tmp/plato-phase2a-review/risks-3.14.json"
+        ],
+        "log_format": "Raw downloader progress precedes the JSON array."
+      },
+      "requested_fix": "Allow callers that have established incomplete extracted data to invalidate/bypass the completion marker under the existing lock and retry extraction/download. A valid completed dataset must still skip network access. Add actual-download recovery regressions with stale markers; do not simply weaken the completeness checks.",
+      "baseline_disposition": "The generic marker shortcut predates this candidate; it remains a demonstrated in-scope gap in the candidate incomplete-root repair rather than a claim that the shortcut itself was newly introduced."
+    }
+  ],
+  "independent_validation": [
+    {
+      "check": "Focused author suite in independently provisioned exact-candidate environments",
+      "command": "zsh -lc 'cd /tmp/plato-phase2a-review/candidate && OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=. /tmp/plato-phase2a-review/venv-{python}/bin/python -m pytest tests/test_config_loader.py tests/samplers tests/datasources/test_registry.py tests/datasources/test_torchvision_datasource.py tests/datasources/test_feature_dataset.py tests/datasources/test_feature_datasource.py tests/datasources/test_data_loaders.py tests/datasources/test_download_contracts.py tests/datasources/test_local_datasets.py tests/utils/test_archive.py -q -o cache_dir=/tmp/plato-phase2a-review/pytest-cache-{python} --basetemp=/tmp/plato-phase2a-review/pytest-{python}'",
+      "results": {
+        "3.13": {
+          "passed": 150,
+          "failed": 0,
+          "skipped": 0,
+          "warnings": 0,
+          "seconds": 4.19
+        },
+        "3.14": {
+          "passed": 150,
+          "failed": 0,
+          "skipped": 0,
+          "warnings": 0,
+          "seconds": 39.73
+        }
+      },
+      "logs": [
+        "/tmp/plato-phase2a-review/focused-3.13.log",
+        "/tmp/plato-phase2a-review/focused-3.14.log"
+      ]
+    },
+    {
+      "check": "F13 fixture-free repeated actual Config loads with relative includes and CLI overrides",
+      "command": "zsh -lc 'cd /tmp/plato-phase2a-review/candidate && OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=. /tmp/plato-phase2a-review/venv-{python}/bin/python /tmp/plato-phase2a-review/config_probe.py /tmp/plato-phase2a-review/repro-config-{python}'",
+      "result": "16 transitions per interpreter pass: public/legacy resets, present/absent/repeated optional sections, base path, client ID, server/port overrides and result defaults. No pytest fixture runs between loads.",
+      "logs": [
+        "/tmp/plato-phase2a-review/config-3.13.json",
+        "/tmp/plato-phase2a-review/config-3.14.json"
+      ]
+    },
+    {
+      "check": "F15 realized partition counts, private/caller RNG and actual DataLoader membership",
+      "command": "zsh -lc 'cd /tmp/plato-phase2a-review/candidate && OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=. /tmp/plato-phase2a-review/venv-{python}/bin/python /tmp/plato-phase2a-review/dirichlet_probe.py unused'",
+      "result": "Four cases per interpreter (uniform/normal, clients 1/2) match independently computed first-draw sizes 9/14/14/11. 100 count queries per case preserve private/global NumPy and Torch state; loader/order/reconstruction agree.",
+      "logs": [
+        "/tmp/plato-phase2a-review/dirichlet-3.13.json",
+        "/tmp/plato-phase2a-review/dirichlet-3.14.json"
+      ]
+    },
+    {
+      "check": "F16 actual empty IID in a bounded fresh subprocess",
+      "command": "zsh -lc 'cd /tmp/plato-phase2a-review/candidate && OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=. /tmp/plato-phase2a-review/venv-{python}/bin/python /tmp/plato-phase2a-review/iid_probe.py unused'",
+      "result": "Both interpreters return useful ValueError within the five-second deadline. The focused suite additionally exercises padded nonempty golden membership.",
+      "logs": [
+        "/tmp/plato-phase2a-review/iid-3.13.json",
+        "/tmp/plato-phase2a-review/iid-3.14.json"
+      ]
+    },
+    {
+      "check": "All 11 registered sampler count/membership/determinism and caller RNG contracts",
+      "command": "zsh -lc 'cd /tmp/plato-phase2a-review/candidate && OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=. /tmp/plato-phase2a-review/venv-{python}/bin/python /tmp/plato-phase2a-review/sampler_probe.py candidate'",
+      "baseline_comparison_command": "zsh -lc 'cd /tmp/plato-phase2a-review/candidate && OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=. /tmp/plato-phase2a-review/venv-{python}/bin/python /tmp/plato-phase2a-review/sampler_probe.py base'",
+      "results": {
+        "3.13": {
+          "cases": 66,
+          "unchanged_seeded_cases": 54,
+          "fixed_base_failures": 6,
+          "intentional_anchor_pool_changes": 6
+        },
+        "3.14": {
+          "cases": 66,
+          "unchanged_seeded_cases": 54,
+          "fixed_base_failures": 6,
+          "intentional_anchor_pool_changes": 6
+        }
+      },
+      "qualification": "Each interpreter executes all 11 samplers for train/test and clients 1/2/3. Sample samplers match actual DataLoader counts/order and bounds; modality masks match modality_size and allowed names. All candidate construction and iteration preserve NumPy/Python/Torch caller RNG and reconstruct deterministically. 54 ordinary cases have identical base/candidate indices; six no-anchor baseline failures are repaired and six mixed-anchor cases change as required by the demonstrated pool bug. Baseline all-inclusive comparison explicitly seeds ambient Python RNG to the configured seed; its previous ambient-RNG dependence is intentionally repaired.",
+      "logs": [
+        "/tmp/plato-phase2a-review/samplers-candidate-3.13.json",
+        "/tmp/plato-phase2a-review/samplers-candidate-3.14.json",
+        "/tmp/plato-phase2a-review/samplers-base-3.13.json",
+        "/tmp/plato-phase2a-review/samplers-base-3.14.json"
+      ]
+    },
+    {
+      "check": "Native local MNIST/FashionMNIST/EMNIST and Tiny ImageNet selection",
+      "result": "Focused suite independently executes real raw IDX datasets with distinct train/test and variant labels; EMNIST balanced/digits train flags, labels and counts pass. Native Tiny ImageNet nested/direct validation annotations map to training class IDs; normal prepared labeled directories pass. R2A-03 covers the additional incomplete-layout gap.",
+      "qualification": "Locally synthesized dataset files read by actual torchvision/datasource code, not full downloaded corpora or training evidence."
+    },
+    {
+      "check": "Actual TAR/ZIP extraction containment and lock ownership",
+      "result": "Both interpreters pass actual localhost base TAR/ZIP and local Purchase/Texas archive entrypoint tests for traversal, absolute names, TAR symlink/hardlink escapes, preexisting directory/file symlinks, archive/artifact symlinks, safe extraction, safe internal TAR links, manifest preflight and no completion/cache after rejection. Additional normalized nested/./link TAR/ZIP probes reject before the first write and preserve outside content. Dead-owner recovery, live-owner exclusion, interrupted HTTP response cleanup and bounded failures pass.",
+      "logs": [
+        "/tmp/plato-phase2a-review/focused-3.13.log",
+        "/tmp/plato-phase2a-review/focused-3.14.log",
+        "/tmp/plato-phase2a-review/risks-3.13.json",
+        "/tmp/plato-phase2a-review/risks-3.14.json"
+      ],
+      "qualification": "macOS POSIX flock only; the destination is not concurrently modified by an unrelated writer. NPZ consumers are separately covered by R2A-02."
+    },
+    {
+      "check": "Eight actual SSL config transform probes per interpreter",
+      "command": "zsh -lc 'cd /tmp/plato-phase2a-review/candidate && OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=. LIGHTLY_DID_VERSION_CHECK=True /tmp/plato-phase2a-review/venv-{python}/bin/python /tmp/plato-phase2a-review/ssl_probe.py /tmp/plato-phase2a-review/repro-ssl-{python}'",
+      "result": "8/8 independently pass on both interpreters: simclr, simsiam, byol, fedema, mocov2, smog, swav and calibre. SwaV has eight finite (3,32,32) tensors; each other config has two.",
+      "logs": [
+        "/tmp/plato-phase2a-review/ssl-3.13.json",
+        "/tmp/plato-phase2a-review/ssl-3.14.json"
+      ],
+      "qualification": "Actual constructors and tensor transforms on local images; no SSL training, accelerator or full-dataset claim. Only the background Lightly version check is disabled."
+    }
+  ],
+  "author_evidence_review": {
+    "raw_root": "/tmp/plato-phase2a-lZqbqj",
+    "inspected": "Validation JSON, raw initial and corrected red failures, staged additional red log summaries, final 150-test green logs, SSL probe code and both eight-config outputs, archive preservation/closure/provenance and REFER defect records.",
+    "verified_counts": "Final author green logs report 150 passed / zero failures or skips on each interpreter (2.43s / 37.68s). Actual SSL logs contain all eight finite-output config probes per interpreter.",
+    "red_qualification": "Initial 43-failure red includes an invalid IID object() harness, and is not accepted as actual hang evidence. Corrected red-iid logs use object.__new__(Config) and show real five-second timeouts on both interpreters. Initial F13/F15 red shows stale sections and changing counts; EMNIST red shows reused training labels. Additional red logs explicitly represent intermediate owned source states, not one pristine baseline run.",
+    "independence_limit": "Raw staged source states were not all separately reconstructed; the final exact candidate was independently executed. Recorded source hashes/trees and the implementation binary diff hash match independent Git inspection.",
+    "raw_log_hash_inventory": "/tmp/plato-phase2a-review/audit-evidence.json"
+  },
+  "archive_review": {
+    "result": "PASS",
+    "original_files": 14,
+    "byte_for_byte_preserved": true,
+    "old_to_new": "plato/datasources/datalib/<relative-path> -> archives/legacy_datalib/<relative-path>",
+    "license": "Apache-2.0 LICENSE exactly matches the baseline repository license.",
+    "license_sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+    "provenance": "README records the full baseline SHA, path reconstruction, git history/authors, historical dependency/data limits and preserved REFER failures; inspected Git history supports named authors.",
+    "closure": "Independent rg scan of active plato/examples/configs/tests/docs/pyproject/.github found no old datalib or new archive imports/callers. Wheel package selection remains packages=[\"plato\"], so the archive is outside the active package. Shared archive index/build/typing disposition stays with later root owners.",
+    "manifest": [
+      {
+        "old": "plato/datasources/datalib/__init__.py",
+        "new": "archives/legacy_datalib/__init__.py",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      {
+        "old": "plato/datasources/datalib/audio_extraction_tools.py",
+        "new": "archives/legacy_datalib/audio_extraction_tools.py",
+        "sha256": "afa61fd9f87becda3bee4791d5dd18dcbe3557405d0c49a9a0731bb8f7f5c3f3",
+        "bytes": 5042
+      },
+      {
+        "old": "plato/datasources/datalib/data_utils.py",
+        "new": "archives/legacy_datalib/data_utils.py",
+        "sha256": "53d83b9734a7d0a036393062daafbb0191bab8abfc061397f876559f1a4962fd",
+        "bytes": 4065
+      },
+      {
+        "old": "plato/datasources/datalib/flickr30kE_utils.py",
+        "new": "archives/legacy_datalib/flickr30kE_utils.py",
+        "sha256": "545540ef26d363c1cea0b7a4c6881be99593a67e2ae70f42db30d0187ccf36ff",
+        "bytes": 13530
+      },
+      {
+        "old": "plato/datasources/datalib/frames_extraction_tools.py",
+        "new": "archives/legacy_datalib/frames_extraction_tools.py",
+        "sha256": "6eab47d5ef3dbbb5d129b16868f10a60851c968b96b990c1a8aa2d9c2f394553",
+        "bytes": 8766
+      },
+      {
+        "old": "plato/datasources/datalib/gym_utils/__init__.py",
+        "new": "archives/legacy_datalib/gym_utils/__init__.py",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      {
+        "old": "plato/datasources/datalib/gym_utils/gym_trim.py",
+        "new": "archives/legacy_datalib/gym_utils/gym_trim.py",
+        "sha256": "7dca933a707d78ae9e9d25cd754396030e5a7d0f5f9e8ba9ad7347669a716165",
+        "bytes": 6717
+      },
+      {
+        "old": "plato/datasources/datalib/modality_data_anntation_tools.py",
+        "new": "archives/legacy_datalib/modality_data_anntation_tools.py",
+        "sha256": "7ab25ac2b0983da3f9b50cc9a18ad061eab3049311e61c88a3c1ff81aa768624",
+        "bytes": 7812
+      },
+      {
+        "old": "plato/datasources/datalib/modality_extraction_base.py",
+        "new": "archives/legacy_datalib/modality_extraction_base.py",
+        "sha256": "192d092044cf982a0354cfd4235b3e64ace1f6cb4f902ad8452c2e3cbc0a9041",
+        "bytes": 2093
+      },
+      {
+        "old": "plato/datasources/datalib/parse_datasets.py",
+        "new": "archives/legacy_datalib/parse_datasets.py",
+        "sha256": "79883cead5983b3cdbc119bd479c8c4503e6cb6674ff54e54ab8255051c3a017",
+        "bytes": 8254
+      },
+      {
+        "old": "plato/datasources/datalib/refer_utils/__init__.py",
+        "new": "archives/legacy_datalib/refer_utils/__init__.py",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      {
+        "old": "plato/datasources/datalib/refer_utils/referitgame_utils.py",
+        "new": "archives/legacy_datalib/refer_utils/referitgame_utils.py",
+        "sha256": "636ddd92f2ae09a9d17708226daeb672a6356f2e183edb5d2e487027a70d4f6a",
+        "bytes": 9963
+      },
+      {
+        "old": "plato/datasources/datalib/tiny_data_tools.py",
+        "new": "archives/legacy_datalib/tiny_data_tools.py",
+        "sha256": "33d8ec92496c510632d906d1c838a5e788a6c7f482017cf477cabd2ced80b793",
+        "bytes": 3113
+      },
+      {
+        "old": "plato/datasources/datalib/video_transform.py",
+        "new": "archives/legacy_datalib/video_transform.py",
+        "sha256": "354dd8ad20a605bfa421f423fdab793ce601ed46e27eb2dcb5291c24d8b83db2",
+        "bytes": 2308
+      }
+    ],
+    "historical_status": "REFER filtering defects remain explicitly archived and unfixed; no historical multimodal support claim."
+  },
+  "limitations": [
+    "macOS ARM64 CPU only. Linux and combined full validation remain root acceptance work; Windows flock behavior is unqualified.",
+    "No external dataset download or end-to-end training was performed. Archive HTTP probes use localhost and local artifacts; IDX/PNG/vector tests use bounded synthesized fixtures.",
+    "The cross-silo regression probe invokes the actual configure branch with inert setup dependencies. It establishes the sampler regression, not full edge orchestration support.",
+    "No unrelated eight-minute socket matrix, accepted Phase 1 package/design re-review, future adapter/MLX/robotics/ViT campaign, or auth/protocol redesign was performed.",
+    "Archive containment retains the implementation assumption of no unrelated concurrent destination mutation and does not promise rollback after corrupt-data/filesystem errors.",
+    "An initial owned edge probe imported runtime modules before setting Config argv and failed argument parsing. Corrected results use the real config before imports; the initial harness failure is retained in edge-3.13.stderr and edge-3.14.stderr and is not a finding."
+  ],
+  "retained_resources": {
+    "scratch_root": "/tmp/plato-phase2a-review",
+    "retain_until": "Root acceptance",
+    "contents": "Exact candidate snapshot, baseline sampler sources, two independent locked SSL/dev environments, raw outputs, probe scripts, archive/content hashes and review writer.",
+    "owned_processes": "All launched child processes, HTTP workers and command sessions completed or were explicitly joined/killed. No intentionally retained running process.",
+    "review_output": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2a-review.json"
+  },
+  "acceptance": "Resolve the four medium findings with production fixes and focused regressions, then obtain exact-commit re-review. Current candidate cannot receive PASS."
+}

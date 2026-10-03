@@ -1,0 +1,1327 @@
+{
+  "schema_version": 1,
+  "evidence_type": "read_only_baseline_audit",
+  "baseline": {
+    "sha": "5b8359bd40bbe65c7753e71f6627c490f9aa144f",
+    "short_sha": "5b8359bd",
+    "branch": "maintenance/2026-refresh-audit",
+    "commit_subject": "Implemented the FedDF server aggregation algorithm (#411).",
+    "repository": "/Users/bli/Playground/plato",
+    "head_verified_at_audit_start_and_end": true,
+    "tracked_worktree_clean_at_audit_end": true,
+    "head_verified_before_evidence_write": true
+  },
+  "authorization": {
+    "original_scope": "Read-only baseline/audit agent. No nested agents. Read AGENTS.md and use zsh -lc for shell commands. Inventory core components, tests, configs, examples, CI/setup, concrete bugs and coverage gaps. Do not modify tracked files, install dependencies, commit, push, or start training downloads.",
+    "evidence_write": "User subsequently authorized evidence/2026-refresh/baseline-findings.json as the sole allowed file write.",
+    "agents_spawned": 0,
+    "tracked_files_modified_by_auditor": 0,
+    "dependencies_installed_by_auditor": 0,
+    "commits_or_pushes_by_auditor": 0,
+    "training_downloads_started_by_auditor": 0,
+    "probe_scope": "Static checks, dependency import/metadata inspection, and small in-memory production-method probes with recording-only optimizer, filesystem, configuration, and HTTP doubles. No training workloads or real network/storage operations were performed by the auditor.",
+    "guidance_read": "AGENTS.md",
+    "shell": "zsh -lc"
+  },
+  "inventory": {
+    "tracked_python_files": 633,
+    "tracked_toml_files": 177,
+    "python_by_top_level": {
+      "plato": 226,
+      "examples": 346,
+      "tests": 59,
+      "plato.py": 1,
+      "cleanup.py": 1
+    },
+    "toml_by_top_level": {
+      "configs": 57,
+      "examples": 117,
+      "tests": 1,
+      "pyproject.toml": 1,
+      "netlify.toml": 1
+    },
+    "core_modules": {
+      "algorithms": 10,
+      "callbacks": 5,
+      "clients": 18,
+      "servers": 30,
+      "trainers": 38,
+      "datasources": 30,
+      "samplers": 15,
+      "processors": 26,
+      "models": 16,
+      "evaluators": 7,
+      "mpc": 2,
+      "serialization": 2,
+      "utils": 24,
+      "top_level_init_client_config": 3
+    },
+    "test_python_modules_by_area": {
+      "algorithms": 1,
+      "callbacks": 1,
+      "clients": 5,
+      "datasources": 8,
+      "evaluators": 2,
+      "integration": 4,
+      "models": 3,
+      "mpc": 1,
+      "processors": 1,
+      "samplers": 3,
+      "servers": 8,
+      "trainers": 13,
+      "utils": 2,
+      "test_utils": 3,
+      "top_level_init_conftest_config_nanochat": 4
+    },
+    "test_function_definitions": 250,
+    "test_function_definitions_by_area": {
+      "algorithms": 5,
+      "callbacks": 2,
+      "clients": 13,
+      "datasources": 38,
+      "evaluators": 21,
+      "integration": 5,
+      "models": 11,
+      "mpc": 3,
+      "processors": 3,
+      "samplers": 9,
+      "servers": 20,
+      "trainers": 100,
+      "utils": 7,
+      "test_config_loader": 10,
+      "test_nanochat_integration": 3
+    },
+    "test_count_note": "AST function definitions differ from collected/parameterized pytest case counts. Root reported 248 passed and 3 skipped.",
+    "config_families": {
+      "CIFAR10": 8,
+      "CIFAR100": 1,
+      "CINIC10": 1,
+      "CelebA": 2,
+      "EMNIST": 5,
+      "FEMNIST": 1,
+      "FashionMNIST": 1,
+      "HuggingFace": 5,
+      "LeRobot": 4,
+      "MNIST": 14,
+      "Nanochat": 2,
+      "Purchase100": 3,
+      "Texas100": 1,
+      "TinyImageNet": 5,
+      "ViT": 4
+    },
+    "config_family_count": 15,
+    "example_toml_families": {
+      "async": 4,
+      "basic": 1,
+      "client_selection": 6,
+      "customized": 2,
+      "customized_client_training": 9,
+      "detector": 4,
+      "gradient_leakage_attacks": 12,
+      "model_pruning": 3,
+      "model_search": 20,
+      "nanochat": 1,
+      "outdated": 4,
+      "personalized_fl": 13,
+      "reinforcement_learning": 2,
+      "secure_aggregation": 2,
+      "server_aggregation": 6,
+      "split_learning": 6,
+      "ssl": 13,
+      "three_layer_fl": 2,
+      "unlearning": 7
+    },
+    "example_family_count": 19,
+    "ci_setup_inspected": [
+      ".github/workflows/pytorch_tests.yml",
+      ".github/workflows/pypi_publish.yml",
+      ".github/workflows/delete_workflow_runs.yml",
+      "pyproject.toml",
+      ".python-version",
+      ".gitignore",
+      ".gitmodules",
+      "Dockerfile",
+      "dockerrun.sh",
+      "dockerrun_gpu.sh",
+      "README.md",
+      "docs/requirements.txt",
+      "docs/mkdocs.yml",
+      "docs/docs/development.md",
+      "docs/docs/deployment.md",
+      "netlify.toml"
+    ],
+    "scope_limit": "Every tracked Python/TOML file received syntax/inventory checks. Targeted source tracing and probe depth varied by component; the inventory is not a claim that every runtime branch or example was executed."
+  },
+  "validation": {
+    "auditor_checks": [
+      {
+        "check": "AST parse of all tracked Python files",
+        "files": 633,
+        "result": "pass",
+        "failures": []
+      },
+      {
+        "check": "tomllib parse of all tracked TOML files",
+        "files": 177,
+        "result": "pass",
+        "failures": []
+      },
+      {
+        "check": "TOML include target existence",
+        "result": "pass",
+        "missing_targets": []
+      },
+      {
+        "check": "Ruff import ordering",
+        "command": ".venv/bin/ruff check . --select I --no-cache --output-format concise",
+        "result": "pass"
+      },
+      {
+        "check": "Supplementary Ruff F diagnostics",
+        "command": ".venv/bin/ruff check plato tests examples --select F --statistics",
+        "result": "diagnostics",
+        "counts": {
+          "F401": 305,
+          "F541": 45,
+          "F841": 36,
+          "F821": 11,
+          "F405": 6,
+          "F403": 3
+        },
+        "total": 406,
+        "interpretation": "Diagnostic counts are not a count of independently confirmed runtime bugs. Concrete runtime findings were prioritized over style."
+      },
+      {
+        "check": "Core ty diagnostics",
+        "command": ".venv/bin/ty check plato --output-format concise",
+        "result": "diagnostics",
+        "diagnostic_count": 38,
+        "error_kinds": {
+          "call-non-callable": 2,
+          "invalid-type-form": 1,
+          "invalid-argument-type": 22,
+          "invalid-assignment": 2,
+          "unresolved-attribute": 2
+        },
+        "interpretation": "No blanket runtime-failure claim. In particular referitgame self.data inference diagnostics may be false positives, as root noted."
+      },
+      {
+        "check": "Installed dependency imports",
+        "result": "pass",
+        "modules": [
+          "torch",
+          "torchvision",
+          "tenseal"
+        ],
+        "observation": "These imports succeeded in the auditor's existing environment."
+      },
+      {
+        "check": "Git status and baseline verification",
+        "result": "pass",
+        "observation": "Tracked worktree clean; HEAD stayed at the baseline. Before evidence creation, evidence/ was untracked and owned by the root workflow."
+      }
+    ],
+    "root_supplied_results": [
+      {
+        "check": "Full pytest suite",
+        "provenance": "Root user supplied; not rerun by the auditor",
+        "python_versions": [
+          "3.13.16",
+          "3.14.8"
+        ],
+        "result": {
+          "passed": 248,
+          "skipped": 3
+        },
+        "extras_exercised": [
+          "dp",
+          "mpc",
+          "rl",
+          "nanochat"
+        ],
+        "limitation": "The passing cases never run true entrypoints."
+      },
+      {
+        "check": "Full ty diagnostics",
+        "provenance": "Root user supplied",
+        "diagnostic_count": 59,
+        "caveat": "referitgame self.data inference may be a false positive"
+      },
+      {
+        "check": "MLX Metal probe",
+        "provenance": "Root user supplied",
+        "environment": "/tmp/plato-python314-env",
+        "mlx_version": "0.32.3",
+        "result": "Tiny NHWC LeNet train/test/save and algorithm delta extraction run on Metal.",
+        "interpretation": "This rules out a blanket MLX platform failure; it does not establish full federated transport/entrypoint coverage."
+      },
+      {
+        "check": "pip-audit",
+        "provenance": "Root supplied artifact, read by auditor",
+        "artifact": "/tmp/plato-baseline-vulnerabilities.json",
+        "dependencies_reported": 110,
+        "known_vulnerabilities_reported": 0,
+        "interpretation": "No known vulnerabilities were reported for the installed dependencies. This is not a proof of application security."
+      },
+      {
+        "check": "Strict MkDocs",
+        "provenance": "Root user supplied; broken link source locations inspected by auditor",
+        "result": "fails",
+        "broken_relative_links": 2
+      },
+      {
+        "check": "Python 3.14 fresh-process startup",
+        "provenance": "Root user supplied; matching production source inspected by auditor",
+        "result": "client and server startup regression confirmed"
+      }
+    ]
+  },
+  "coverage": {
+    "provenance": "Root-generated artifact read by auditor",
+    "artifact": "/tmp/plato-baseline-coverage.json",
+    "totals": {
+      "covered_lines": 7257,
+      "num_statements": 16935,
+      "missing_lines": 9678,
+      "excluded_lines": 192,
+      "percent_covered": 42.852081488042515,
+      "displayed_percent": 43
+    },
+    "selected_modules": [
+      {
+        "path": "plato/client.py",
+        "covered_lines": 9,
+        "num_statements": 49,
+        "missing_lines": 40,
+        "percent_covered": 18.367346938775512,
+        "displayed_percent": 18
+      },
+      {
+        "path": "plato/servers/base.py",
+        "covered_lines": 159,
+        "num_statements": 613,
+        "missing_lines": 454,
+        "excluded_lines": 3,
+        "percent_covered": 25.938009787928223,
+        "displayed_percent": 26
+      },
+      {
+        "path": "plato/utils/s3.py",
+        "covered_lines": 13,
+        "num_statements": 72,
+        "missing_lines": 59,
+        "percent_covered": 18.055555555555557,
+        "displayed_percent": 18
+      },
+      {
+        "path": "plato/trainers/strategies/training_step.py",
+        "covered_lines": 45,
+        "num_statements": 151,
+        "missing_lines": 106,
+        "excluded_lines": 1,
+        "percent_covered": 29.801324503311257,
+        "displayed_percent": 30
+      },
+      {
+        "path": "plato/trainers/mlx.py",
+        "covered_lines": 119,
+        "num_statements": 642,
+        "missing_lines": 523,
+        "excluded_lines": 17,
+        "percent_covered": 18.53582554517134,
+        "displayed_percent": 19
+      }
+    ],
+    "observed_integration_tests": {
+      "tests/integration/test_huggingface_smollm_smoke.py": [
+        "test_smollm_smoltalk_config_smoke"
+      ],
+      "tests/integration/test_lerobot_smolvla_smoke.py": [
+        "test_lerobot_smolvla_end_to_end_smoke"
+      ],
+      "tests/integration/test_smoke_configs.py": [
+        "test_fedavg_lenet5_smoke",
+        "test_split_learning_smoke",
+        "test_mpc_training_smoke"
+      ],
+      "tests/test_nanochat_integration.py": [
+        "test_nanochat_tokenizer_processor_round_trip",
+        "test_nanochat_trainer_smoke",
+        "test_nanochat_trainer_selects_core_eval_strategy"
+      ]
+    },
+    "demonstrated_gaps": [
+      "Unit/integration tests invoke private methods and asyncio.run helpers rather than true synchronous client/server entrypoints.",
+      "FedAvg and Hugging Face smoke tests construct server updates directly and bypass real clients/socket transport.",
+      "Several smoke tests replace processor_registry.get with (None, None), excluding real processor composition and serialization.",
+      "LeRobot smoke constructs a synthetic config with partition_size instead of loading shipped LeRobot TOMLs unchanged.",
+      "Split-learning smoke invokes trainer callbacks; it does not execute a complete prompt/features/gradient/weights exchange.",
+      "MPC smoke patches DefaultTrainingStrategy.train and checks sample registration; it does not execute a full federated lifecycle.",
+      "No test source directly references FedAsyncAggregationStrategy, FedBuffAggregationStrategy, FedNovaAggregationStrategy, or PortAggregationStrategy.",
+      "Checkpoint tests cover tiny local names and trainer save/load, not Hugging Face names containing slash, server resume, Port retrieval, or multi-client disconnect cleanup."
+    ],
+    "aggregation_strategy_test_reference_scan": {
+      "plato/servers/strategies/aggregation/fedasync.py": [],
+      "plato/servers/strategies/aggregation/fedbuff.py": [],
+      "plato/servers/strategies/aggregation/fednova.py": [],
+      "plato/servers/strategies/aggregation/port.py": []
+    },
+    "stub_pollution_audit": {
+      "permanent_fake_sys_modules_replacement_found": false,
+      "lighteval_fake_modules": "tests/evaluators/test_lighteval.py uses restoring monkeypatch.setitem(sys.modules, ...) operations.",
+      "confirmed_import_path_leak": {
+        "description": "FedDF tests permanently prepend the example directory to sys.path during collection.",
+        "locations": [
+          {
+            "path": "tests/servers/test_feddf_server_strategy.py",
+            "absolute_path": "/Users/bli/Playground/plato/tests/servers/test_feddf_server_strategy.py",
+            "line": 22
+          },
+          {
+            "path": "tests/clients/test_feddf_strategy.py",
+            "absolute_path": "/Users/bli/Playground/plato/tests/clients/test_feddf_strategy.py",
+            "line": 21
+          }
+        ]
+      },
+      "confirmed_config_leak": "Optional Config class sections persist across singleton resets; reproduced by B09.",
+      "distinction": "Dependency fakes establish local adapter contracts, not real backend or true-entrypoint correctness."
+    }
+  },
+  "confirmed_bugs": [
+    {
+      "id": "B01",
+      "priority": "P1",
+      "summary": "Python 3.14 startup fails on both core paths.",
+      "description": "Client startup and server startup call asyncio.get_event_loop() synchronously without establishing a loop. Server lines 372 and 407 repeat this. Root confirmed the fresh-process regression.",
+      "locations": [
+        {
+          "path": "plato/client.py",
+          "absolute_path": "/Users/bli/Playground/plato/plato/client.py",
+          "line": 89
+        },
+        {
+          "path": "plato/servers/base.py",
+          "absolute_path": "/Users/bli/Playground/plato/plato/servers/base.py",
+          "line": 358
+        },
+        {
+          "path": "plato/servers/base.py",
+          "absolute_path": "/Users/bli/Playground/plato/plato/servers/base.py",
+          "line": 372
+        },
+        {
+          "path": "plato/servers/base.py",
+          "absolute_path": "/Users/bli/Playground/plato/plato/servers/base.py",
+          "line": 407
+        }
+      ],
+      "confirmation": {
+        "method": "Root fresh-process runtime reproduction plus auditor source tracing",
+        "root_runtime_verified": true,
+        "auditor_runtime_verified": false
+      },
+      "observed": "RuntimeError: no current event loop in synchronous startup on Python 3.14.",
+      "regression": {
+        "red": "Actual synchronous client/server startup fails in a fresh Python 3.14 process without a precreated loop.",
+        "green": "Actual client and server entrypoints in fresh Python 3.13 and 3.14 processes, with synthetic components and bounded execution, both reach startup successfully without the test precreating an event loop."
+      }
+    },
+    {
+      "id": "B02",
+      "priority": "P1",
+      "summary": "S3 uploads and downloads use different keys.",
+      "description": "send_to_s3 prefixes the key, then put_to_s3 prefixes it again. A fake-transport probe observed head /weights, put //weights, get /weights, even without a configured prefix.",
+      "locations": [
+        {
+          "path": "plato/utils/s3.py",
+          "absolute_path": "/Users/bli/Playground/plato/plato/utils/s3.py",
+          "line": 80
+        },
+        {
+          "path": "plato/utils/s3.py",
+          "absolute_path": "/Users/bli/Playground/plato/plato/utils/s3.py",
+          "line": 98
+        },
+        {
+          "path": "plato/utils/s3.py",
+          "absolute_path": "/Users/bli/Playground/plato/plato/utils/s3.py",
+          "line": 113
+        }
+      ],
+      "confirmation": {
+        "method": "Auditor in-memory production-method probe with fake client/HTTP, plus root source observation",
+        "auditor_runtime_verified": true,
+        "real_s3_exercised": false
+      },
+      "probe_observation": [
+        [
+          "head",
+          "/weights"
+        ],
+        [
+          "put_object",
+          "//weights"
+        ],
+        [
+          "get_object",
+          "/weights"
+        ]
+      ],
+      "related_confirmed_defects": [
+        {
+          "description": "Empty S3 listing indexes response['Contents'] and raises KeyError.",
+          "location": {
+            "path": "plato/utils/s3.py",
+            "absolute_path": "/Users/bli/Playground/plato/plato/utils/s3.py",
+            "line": 144
+          },
+          "probe_observation": "KeyError: 'Contents'"
+        },
+        {
+          "description": "lists performs one list_objects_v2 request without continuation handling, so it misses later pages beyond 1,000 objects.",
+          "location": {
+            "path": "plato/utils/s3.py",
+            "absolute_path": "/Users/bli/Playground/plato/plato/utils/s3.py",
+            "line": 142
+          },
+          "confirmation_method": "Static source trace; multi-page runtime not exercised."
+        },
+        {
+          "description": "requests.get and requests.put omit timeouts.",
+          "locations": [
+            {
+              "path": "plato/utils/s3.py",
+              "absolute_path": "/Users/bli/Playground/plato/plato/utils/s3.py",
+              "line": 104
+            },
+            {
+              "path": "plato/utils/s3.py",
+              "absolute_path": "/Users/bli/Playground/plato/plato/utils/s3.py",
+              "line": 123
+            }
+          ],
+          "confirmation_method": "Static source trace; stalled network runtime not exercised."
+        }
+      ],
+      "regression": {
+        "red": "Head/upload/download keys differ; empty listings raise; subsequent pages are ignored; transport has no bounded timeout.",
+        "green": "Payload round-trips with empty/nonempty prefixes use identical head, put, and get keys. Empty listing returns [], listings collect all pages, and both HTTP operations use bounded timeouts."
+      }
+    },
+    {
+      "id": "B03",
+      "priority": "P1",
+      "summary": "All three shipped SmolVLA experiment configs omit a required sampler field.",
+      "description": "The shared LeRobot data config selects iid without partition_size; IID construction requires it. The integration test supplies its own partition_size, concealing the failure.",
+      "locations": [
+        {
+          "path": "configs/LeRobot/lerobot_datasource_base.toml",
+          "absolute_path": "/Users/bli/Playground/plato/configs/LeRobot/lerobot_datasource_base.toml"
+        },
+        {
+          "path": "plato/samplers/iid.py",
+          "absolute_path": "/Users/bli/Playground/plato/plato/samplers/iid.py",
+          "line": 30
+        },
+        {
+          "path": "plato/clients/strategies/defaults.py",
+          "absolute_path": "/Users/bli/Playground/plato/plato/clients/strategies/defaults.py",
+          "line": 121
+        },
+        {
+          "path": "tests/integration/test_lerobot_smolvla_smoke.py",
+          "absolute_path": "/Users/bli/Playground/plato/tests/integration/test_lerobot_smolvla_smoke.py"
+        }
+      ],
+      "confirmation": {
+        "method": "Actual TomlConfigLoader reads without Config initialization, plus static lifecycle trace",
+        "actual_configs_loaded": true,
+        "real_lerobot_backend_exercised": false
+      },
+      "probe_observation": [
+        {
+          "path": "configs/LeRobot/smolvla_fedavg_two_client_smoke.toml",
+          "sampler": "iid",
+          "partition_size": null
+        },
+        {
+          "path": "configs/LeRobot/smolvla_full_finetune.toml",
+          "sampler": "iid",
+          "partition_size": null
+        },
+        {
+          "path": "configs/LeRobot/smolvla_single_client_smoke.toml",
+          "sampler": "iid",
+          "partition_size": null
+        }
+      ],
+      "regression": {
+        "red": "Unchanged shipped LeRobot configuration reaches IID construction without partition_size.",
+        "green": "Load each shipped TOML unchanged, substitute only download boundaries, and successfully run client configuration and data allocation."
+      }
+    },
+    {
+      "id": "B04",
+      "priority": "P1",
+      "summary": "Hugging Face names containing slash break checkpoint paths.",
+      "description": "Worker checkpoint naming, default model saving, and test artifact naming interpolate the raw model name into filenames without creating intermediate directories. Server resume also differs from save: save sanitizes slash, resume does not.",
+      "locations": [
+        {
+          "path": "plato/trainers/composable.py",
+          "absolute_path": "/Users/bli/Playground/plato/plato/trainers/composable.py",
+          "line": 189
+        },
+        {
+          "path": "plato/trainers/composable.py",
+          "absolute_path": "/Users/bli/Playground/plato/plato/trainers/composable.py",
+          "line": 291
+        },
+        {
+          "path": "plato/trainers/composable.py",
+          "absolute_path": "/Users/bli/Playground/plato/plato/trainers/composable.py",
+          "line": 389
+        },
+        {
+          "path": "plato/trainers/composable.py",
+          "absolute_path": "/Users/bli/Playground/plato/plato/trainers/composable.py",
+          "line": 749
+        },
+        {
+          "path": "plato/servers/base.py",
+          "absolute_path": "/Users/bli/Playground/plato/plato/servers/base.py",
+          "line": 1364
+        },
+        {
+          "path": "plato/servers/base.py",
+          "absolute_path": "/Users/bli/Playground/plato/plato/servers/base.py",
+          "line": 1397
+        }
+      ],
+      "confirmation": {
+        "method": "Static cross-path filename/dataflow trace",
+        "auditor_runtime_verified": false
+      },
+      "concrete_trigger": "trainer.model_name = 'facebook/opt-125m' or another namespaced Hugging Face model name.",
+      "observed_filename_mismatch": {
+        "save": "checkpoint_facebook_opt-125m_<round>.safetensors",
+        "resume": "checkpoint_facebook/opt-125m_<round>.safetensors"
+      },
+      "regression": {
+        "red": "Namespaced model names cause nested artifact paths or a server save/resume filename mismatch.",
+        "green": "A tiny local model named facebook/opt-125m completes worker artifact exchange, default save/load, test artifact persistence, and server checkpoint/resume using consistent safe filenames."
+      }
+    },
+    {
+      "id": "B05",
+      "priority": "P1",
+      "summary": "Generic gradient accumulation drops partial groups.",
+      "description": "GradientAccumulationStepStrategy neither flushes leftovers nor sets optimizer_step_completed. The trainer consequently also invokes optimizer-completion hooks on microbatches that performed no update.",
+      "locations": [
+        {
+          "path": "plato/trainers/strategies/training_step.py",
+          "absolute_path": "/Users/bli/Playground/plato/plato/trainers/strategies/training_step.py",
+          "line": 102
+        },
+        {
+          "path": "plato/trainers/strategies/training_step.py",
+          "absolute_path": "/Users/bli/Playground/plato/plato/trainers/strategies/training_step.py",
+          "line": 128
+        },
+        {
+          "path": "plato/trainers/composable.py",
+          "absolute_path": "/Users/bli/Playground/plato/plato/trainers/composable.py",
+          "line": 558
+        },
+        {
+          "path": "plato/trainers/composable.py",
+          "absolute_path": "/Users/bli/Playground/plato/plato/trainers/composable.py",
+          "line": 603
+        }
+      ],
+      "confirmation": {
+        "method": "Auditor production-class AST extraction and recording-only optimizer probe, plus source protocol trace",
+        "auditor_runtime_verified": true,
+        "real_optimizer_updates_performed": false
+      },
+      "probe_observation": [
+        {
+          "microbatches": 2,
+          "accumulation_steps": 4,
+          "optimizer_steps": 0,
+          "gradient_at_steps": [],
+          "pending_gradient": 0.5,
+          "optimizer_step_flag": null
+        },
+        {
+          "microbatches": 4,
+          "accumulation_steps": 4,
+          "optimizer_steps": 1,
+          "gradient_at_steps": [
+            1
+          ],
+          "pending_gradient": null,
+          "optimizer_step_flag": null
+        },
+        {
+          "microbatches": 5,
+          "accumulation_steps": 4,
+          "optimizer_steps": 1,
+          "gradient_at_steps": [
+            1
+          ],
+          "pending_gradient": 0.25,
+          "optimizer_step_flag": null
+        }
+      ],
+      "regression": {
+        "red": "Two batches / accumulation four yields zero optimizer steps; five batches yields one and leaves pending gradients. Completion hooks are not gated by actual updates.",
+        "green": "Expect one and two steps respectively, no pending gradients, callback counts matching actual optimizer updates, and clean state across consecutive training runs."
+      }
+    },
+    {
+      "id": "B06",
+      "priority": "P1",
+      "summary": "Client disconnect cleanup deletes other clients' checkpoints.",
+      "description": "Cleanup matches every client ID in the shared directory. A filesystem-spy probe confirmed client 1 removes client 2's checkpoint.",
+      "locations": [
+        {
+          "path": "plato/clients/base.py",
+          "absolute_path": "/Users/bli/Playground/plato/plato/clients/base.py",
+          "line": 321
+        },
+        {
+          "path": "plato/clients/composable.py",
+          "absolute_path": "/Users/bli/Playground/plato/plato/clients/composable.py",
+          "line": 72
+        }
+      ],
+      "confirmation": {
+        "method": "Auditor production-method AST extraction with filesystem spy",
+        "auditor_runtime_verified": true,
+        "actual_files_deleted": false
+      },
+      "probe_observation": {
+        "disconnecting_client_id": 1,
+        "directory_entries": [
+          "1_1_0.123.safetensors",
+          "2_1_0.456.safetensors",
+          "1_1_0.123.safetensors.pkl"
+        ],
+        "removal_requests": [
+          "/fake/model/1_1_0.123.safetensors",
+          "/fake/model/2_1_0.456.safetensors",
+          "/fake/model/1_1_0.123.safetensors.pkl"
+        ]
+      },
+      "regression": {
+        "red": "Disconnecting client 1 requests deletion of client 2's checkpoint.",
+        "green": "Populate checkpoints for two clients; disconnect one and preserve the other client's model and sidecar files while cleaning only the disconnecting client's artifacts."
+      }
+    },
+    {
+      "id": "B07",
+      "priority": "P1",
+      "summary": "Port still uses the incompatible checkpoint format.",
+      "description": "Port's aggregation hook requests .pth, while the trainer rejects every extension except .safetensors. Port retrieval still expects .pth and torch.load.",
+      "locations": [
+        {
+          "path": "examples/async/port/port_server.py",
+          "absolute_path": "/Users/bli/Playground/plato/examples/async/port/port_server.py",
+          "line": 39
+        },
+        {
+          "path": "plato/trainers/composable.py",
+          "absolute_path": "/Users/bli/Playground/plato/plato/trainers/composable.py",
+          "line": 302
+        },
+        {
+          "path": "plato/servers/strategies/aggregation/port.py",
+          "absolute_path": "/Users/bli/Playground/plato/plato/servers/strategies/aggregation/port.py",
+          "line": 119
+        },
+        {
+          "path": "plato/servers/strategies/aggregation/port.py",
+          "absolute_path": "/Users/bli/Playground/plato/plato/servers/strategies/aggregation/port.py",
+          "line": 130
+        }
+      ],
+      "confirmation": {
+        "method": "Static caller/callee and persistence-format trace",
+        "auditor_runtime_verified": false
+      },
+      "regression": {
+        "red": "The real Port weights_aggregated hook calls trainer.save_model('model_<round>.pth') and encounters the extension guard.",
+        "green": "Exercise the real aggregation hook and subsequent stale-update similarity calculation with a tiny model; both use the supported format and matching loader."
+      }
+    },
+    {
+      "id": "B08",
+      "priority": "P2",
+      "summary": "Serialization corrupts colliding dictionary paths.",
+      "description": "Tree flattening maps both 'a.b' and nested a -> b to the same leaf. A round-trip changed the first value from 1 to 2. A root _tree_metadata key fails restoration.",
+      "locations": [
+        {
+          "path": "plato/utils/tree.py",
+          "absolute_path": "/Users/bli/Playground/plato/plato/utils/tree.py",
+          "line": 179
+        },
+        {
+          "path": "plato/serialization/safetensor.py",
+          "absolute_path": "/Users/bli/Playground/plato/plato/serialization/safetensor.py",
+          "line": 52
+        }
+      ],
+      "confirmation": {
+        "method": "Auditor actual serializer/deserializer in-memory round-trip",
+        "auditor_runtime_verified": true
+      },
+      "probe_observation": [
+        {
+          "input": {
+            "a.b": 1,
+            "a": {
+              "b": 2
+            }
+          },
+          "output": {
+            "a.b": 2,
+            "a": {
+              "b": 2
+            }
+          },
+          "leaf_types": "numpy scalar arrays"
+        },
+        {
+          "input": {
+            "_tree_metadata": [
+              1,
+              2,
+              3
+            ]
+          },
+          "error": "KeyError: Missing tensor data for leaf '_tree_metadata'.",
+          "leaf_types": "numpy array"
+        }
+      ],
+      "regression": {
+        "red": "Colliding nested/dotted keys silently overwrite data; the reserved root key cannot round-trip.",
+        "green": "Add collision and reserved-key round-trips that preserve each leaf, or reject unsupported keys explicitly before serialization."
+      }
+    },
+    {
+      "id": "B09",
+      "priority": "P2",
+      "summary": "Config resets retain optional sections.",
+      "description": "Config initialization assigns evaluation, parameters, results, and general only when present. An in-memory two-load probe retained the first config's evaluator and optimizer settings in the second.",
+      "locations": [
+        {
+          "path": "plato/config.py",
+          "absolute_path": "/Users/bli/Playground/plato/plato/config.py",
+          "line": 329
+        },
+        {
+          "path": "plato/config.py",
+          "absolute_path": "/Users/bli/Playground/plato/plato/config.py",
+          "line": 349
+        },
+        {
+          "path": "plato/config.py",
+          "absolute_path": "/Users/bli/Playground/plato/plato/config.py",
+          "line": 384
+        },
+        {
+          "path": "plato/config.py",
+          "absolute_path": "/Users/bli/Playground/plato/plato/config.py",
+          "line": 410
+        },
+        {
+          "path": "tests/conftest.py",
+          "absolute_path": "/Users/bli/Playground/plato/tests/conftest.py"
+        }
+      ],
+      "confirmation": {
+        "method": "Auditor actual Config constructor with in-memory loader responses and mocked directory creation",
+        "auditor_runtime_verified": true,
+        "actual_config_files_written": false
+      },
+      "probe_observation": {
+        "config_a_optional_sections": {
+          "evaluation": {
+            "type": "lighteval"
+          },
+          "parameters": {
+            "optimizer": {
+              "lr": 0.5
+            }
+          }
+        },
+        "config_b_optional_sections_in_loader_response": {},
+        "config_b_unexpected_evaluation": {
+          "type": "lighteval"
+        },
+        "config_b_unexpected_parameters": {
+          "optimizer": {
+            "lr": 0.5
+          }
+        },
+        "reset_operation": "Config._instance = None"
+      },
+      "regression": {
+        "red": "Load with an optional section, reset the singleton, and load without it; the previous section remains accessible.",
+        "green": "Load-with-section -> reset -> load-without-section removes all stale optional sections and associated derived settings."
+      }
+    },
+    {
+      "id": "B10",
+      "priority": "P2",
+      "summary": "Timm scheduling starts one epoch ahead.",
+      "description": "The scheduler hook uses one-based current_epoch as a completed-epoch count. With ten batches, the first batch receives update index 11, rather than 1.",
+      "locations": [
+        {
+          "path": "plato/trainers/strategies/lr_scheduler.py",
+          "absolute_path": "/Users/bli/Playground/plato/plato/trainers/strategies/lr_scheduler.py",
+          "line": 615
+        },
+        {
+          "path": "plato/trainers/strategies/lr_scheduler.py",
+          "absolute_path": "/Users/bli/Playground/plato/plato/trainers/strategies/lr_scheduler.py",
+          "line": 596
+        },
+        {
+          "path": "plato/trainers/composable.py",
+          "absolute_path": "/Users/bli/Playground/plato/plato/trainers/composable.py",
+          "line": 502
+        }
+      ],
+      "confirmation": {
+        "method": "Auditor production hook AST extraction and source epoch-number trace",
+        "auditor_runtime_verified": true,
+        "actual_scheduler_updates_performed": false
+      },
+      "probe_observation": {
+        "current_epoch": 1,
+        "batches_per_epoch": 10,
+        "first_batch_step_update": 11,
+        "expected_first_batch_step_update": 1
+      },
+      "regression": {
+        "red": "First-epoch per-batch scheduler indices begin at batches_per_epoch + 1, and epoch step uses an additional +1.",
+        "green": "Record scheduler indices and learning rates across local/global rounds; the first batch uses index 1 and epoch boundaries align with completed epochs."
+      }
+    },
+    {
+      "id": "B11",
+      "priority": "P2",
+      "summary": "Dirichlet sample counts change on every query.",
+      "description": "num_samples redraws partition size. A seeded probe returned 119, 78, 72, 105, 121; loader membership and aggregation reports can disagree.",
+      "locations": [
+        {
+          "path": "plato/samplers/dirichlet.py",
+          "absolute_path": "/Users/bli/Playground/plato/plato/samplers/dirichlet.py",
+          "line": 60
+        },
+        {
+          "path": "plato/samplers/dirichlet.py",
+          "absolute_path": "/Users/bli/Playground/plato/plato/samplers/dirichlet.py",
+          "line": 87
+        }
+      ],
+      "confirmation": {
+        "method": "Auditor production-method AST extraction with deterministic numpy seed",
+        "auditor_runtime_verified": true
+      },
+      "probe_observation": {
+        "random_seed": 123,
+        "partition_size": 100,
+        "partition_distribution": {
+          "distribution": "uniform",
+          "low": 0.5,
+          "high": 1.5
+        },
+        "successive_num_samples": [
+          119,
+          78,
+          72,
+          105,
+          121
+        ]
+      },
+      "regression": {
+        "red": "Repeated num_samples calls on one sampler produce different counts.",
+        "green": "Cache the chosen partition size and assert repeated queries remain stable and reported sample count equals actual sampled count."
+      }
+    },
+    {
+      "id": "B12",
+      "priority": "P2",
+      "summary": "Empty IID datasets hang indefinitely.",
+      "description": "The extension loop repeatedly adds an empty slice without progress.",
+      "locations": [
+        {
+          "path": "plato/samplers/iid.py",
+          "absolute_path": "/Users/bli/Playground/plato/plato/samplers/iid.py",
+          "line": 35
+        },
+        {
+          "path": "plato/samplers/sampler_utils.py",
+          "absolute_path": "/Users/bli/Playground/plato/plato/samplers/sampler_utils.py",
+          "line": 13
+        }
+      ],
+      "confirmation": {
+        "method": "Static loop trace plus one-iteration non-progress demonstration; the infinite loop was not run",
+        "auditor_runtime_verified": false
+      },
+      "probe_observation": {
+        "initial_indices": [],
+        "required_total_size": 4,
+        "indices_after_one_iteration": [],
+        "operation": "indices += indices[:total_size - len(indices)]"
+      },
+      "regression": {
+        "red": "An empty dataset with positive requested partition size never exits the extension loop.",
+        "green": "A bounded subprocess regression observes prompt rejection or an empty partition without hanging."
+      }
+    },
+    {
+      "id": "B13",
+      "priority": "P2",
+      "summary": "Hugging Face partial groups flush, but are undernormalized.",
+      "description": "Loss scaling always divides by the configured accumulation count. Two unit-gradient batches with accumulation four produced 0.5, versus the group mean 1.0, through both final-batch and finalize paths.",
+      "locations": [
+        {
+          "path": "plato/trainers/huggingface.py",
+          "absolute_path": "/Users/bli/Playground/plato/plato/trainers/huggingface.py",
+          "line": 289
+        },
+        {
+          "path": "plato/trainers/huggingface.py",
+          "absolute_path": "/Users/bli/Playground/plato/plato/trainers/huggingface.py",
+          "line": 303
+        },
+        {
+          "path": "plato/trainers/huggingface.py",
+          "absolute_path": "/Users/bli/Playground/plato/plato/trainers/huggingface.py",
+          "line": 334
+        }
+      ],
+      "confirmation": {
+        "method": "Auditor production-class AST extraction with recording-only optimizer and unit-gradient model",
+        "auditor_runtime_verified": true,
+        "real_optimizer_updates_performed": false
+      },
+      "probe_observation": [
+        {
+          "microbatches": 2,
+          "accumulation_steps": 4,
+          "known_last_batch": true,
+          "step_gradients": [
+            0.5
+          ],
+          "expected_mean_gradient": 1
+        },
+        {
+          "microbatches": 2,
+          "accumulation_steps": 4,
+          "known_last_batch": false,
+          "step_gradients": [
+            0.5
+          ],
+          "expected_mean_gradient": 1
+        },
+        {
+          "microbatches": 4,
+          "accumulation_steps": 4,
+          "known_last_batch": true,
+          "step_gradients": [
+            1
+          ],
+          "expected_mean_gradient": 1
+        }
+      ],
+      "regression": {
+        "red": "Partial accumulation windows use the full-window divisor and shrink the mean gradient.",
+        "green": "Both known-last-batch and finalize paths normalize partial groups by the effective group size; full groups preserve their existing scale."
+      },
+      "distinction": "Hugging Face does flush leftovers. The unflushed-leftover bug is in the generic strategy B05, not the Hugging Face strategy."
+    },
+    {
+      "id": "B14",
+      "priority": "P2",
+      "category": "documentation",
+      "summary": "Strict MkDocs fails on two broken Nanochat relative links.",
+      "description": "Both links point to examples/case-studies from a sibling documentation directory and omit the required ../.",
+      "locations": [
+        {
+          "path": "docs/docs/configurations/evaluation.md",
+          "absolute_path": "/Users/bli/Playground/plato/docs/docs/configurations/evaluation.md",
+          "line": 176
+        },
+        {
+          "path": "docs/docs/references/evaluators.md",
+          "absolute_path": "/Users/bli/Playground/plato/docs/docs/references/evaluators.md",
+          "line": 89
+        }
+      ],
+      "confirmation": {
+        "method": "Root strict MkDocs result plus auditor source inspection",
+        "root_runtime_verified": true,
+        "auditor_runtime_verified": false
+      },
+      "observed_target": "examples/case-studies/5. Nanochat in Plato.md",
+      "expected_relative_target": "../examples/case-studies/5. Nanochat in Plato.md",
+      "regression": {
+        "red": "Strict documentation build reports exactly these two broken relative links.",
+        "green": "The strict documentation build resolves both links and completes."
+      }
+    }
+  ],
+  "setup_observations_and_platform_limits": [
+    {
+      "observation": "The initial checkout's three submodules were uninitialized.",
+      "confirmation": "git submodule status",
+      "submodules": [
+        {
+          "path": "external/nanochat",
+          "sha": "c75fe54aa7c1fa881701c246f9427bcbe4eee5a4"
+        },
+        {
+          "path": "plato/models/dvit",
+          "sha": "1ccb152cea43fcbc3cd517a45c12c65734f8ace3"
+        },
+        {
+          "path": "plato/models/t2tvit",
+          "sha": "0f63dc9558f4d192de926504dbddfa1b3f5db6ca"
+        }
+      ],
+      "classification": "Initial setup limitation, not evidence of a runtime defect in these unavailable dependencies."
+    },
+    {
+      "observation": "tools/ is referenced as a uv workspace member but does not exist.",
+      "location": {
+        "path": "pyproject.toml",
+        "absolute_path": "/Users/bli/Playground/plato/pyproject.toml",
+        "line": 106
+      },
+      "classification": "Confirmed filesystem/manifest mismatch; uv resolution behavior was not exercised by the auditor."
+    },
+    {
+      "observation": "uv.lock is ignored and is not tracked.",
+      "location": {
+        "path": ".gitignore",
+        "absolute_path": "/Users/bli/Playground/plato/.gitignore",
+        "line": 163
+      },
+      "classification": "Confirmed reproducibility/setup observation; no dependency-resolution failure is asserted."
+    },
+    {
+      "observation": "The initial auditor environment lacked mlx, kazoo, opacus, lerobot, and gymnasium metadata.",
+      "classification": "Initial environment snapshot only. Root subsequently supplied successful dp/mpc/rl/nanochat suite and MLX Metal probes; absence in the initial environment is not a code bug."
+    },
+    {
+      "observation": "Torch, torchvision, and tenseal imports succeeded in the auditor's environment.",
+      "classification": "No blanket macOS/TenSEAL failure is asserted."
+    },
+    {
+      "observation": "Root's MLX 0.32.3 Metal probe succeeded.",
+      "classification": "No blanket MLX platform failure is asserted."
+    },
+    {
+      "observation": "CI has one Ubuntu training job using uv sync --all-extras and uv run pytest tests, followed by five configured training workloads; it has no explicit Python 3.13/3.14 matrix.",
+      "location": {
+        "path": ".github/workflows/pytorch_tests.yml",
+        "absolute_path": "/Users/bli/Playground/plato/.github/workflows/pytorch_tests.yml"
+      },
+      "classification": "Confirmed workflow structure, not a tested CI execution result."
+    }
+  ],
+  "untested_risks": [
+    {
+      "id": "R01",
+      "summary": "Real LeRobot/SmolVLA upstream compatibility is not established by synthetic tests.",
+      "locations": [
+        {
+          "path": "tests/test_utils/lerobot_stubs.py",
+          "absolute_path": "/Users/bli/Playground/plato/tests/test_utils/lerobot_stubs.py"
+        },
+        {
+          "path": "tests/integration/test_lerobot_smolvla_smoke.py",
+          "absolute_path": "/Users/bli/Playground/plato/tests/integration/test_lerobot_smolvla_smoke.py"
+        },
+        {
+          "path": "plato/models/smolvla.py",
+          "absolute_path": "/Users/bli/Playground/plato/plato/models/smolvla.py"
+        },
+        {
+          "path": "plato/datasources/lerobot.py",
+          "absolute_path": "/Users/bli/Playground/plato/plato/datasources/lerobot.py"
+        },
+        {
+          "path": "plato/trainers/lerobot.py",
+          "absolute_path": "/Users/bli/Playground/plato/plato/trainers/lerobot.py"
+        }
+      ],
+      "evidence": "Tests replace policy/dataset imports and preprocessing factories with synthetic implementations.",
+      "not_claimed": "No upstream API break or real-model runtime failure is claimed; real model/dataset downloads were deliberately not started.",
+      "suggested_validation": "Use a separately authorized cached or offline real backend integration run after fixing B03."
+    },
+    {
+      "id": "R02",
+      "summary": "FedAsync/FedBuff/FedNova/Port and real transport boundaries lack direct suite coverage.",
+      "evidence": "No direct aggregation-strategy test references were found; smoke tests bypass processor and transport boundaries.",
+      "not_claimed": "Except for B07, no blanket failure of these algorithms is asserted.",
+      "suggested_validation": "Add deterministic strategy-specific cases and synthetic entrypoint/processor/socket integration cases."
+    },
+    {
+      "id": "R03",
+      "summary": "CI/workspace/platform resolution was not run by the auditor.",
+      "evidence": "Missing tools/ workspace member, untracked lockfile, one Ubuntu job, and all-extras synchronization are present in baseline sources.",
+      "not_claimed": "No platform-wide mlx incompatibility or definite uv sync failure is asserted without execution evidence.",
+      "suggested_validation": "Exercise workspace resolution and supported extras on an explicit Python/platform matrix."
+    },
+    {
+      "id": "R04",
+      "summary": "Static undefined-name diagnostics in example code need call-path validation.",
+      "evidence": "Ruff F821 reports 11 locations: seven NASViT locations and four explicitly outdated FL-MAML locations.",
+      "diagnostic_locations": [
+        {
+          "path": "examples/model_search/pfedrlnas/VIT/nasvit_wrapper/NASViT/loss_ops.py",
+          "absolute_path": "/Users/bli/Playground/plato/examples/model_search/pfedrlnas/VIT/nasvit_wrapper/NASViT/loss_ops.py",
+          "line": 85
+        },
+        {
+          "path": "examples/model_search/pfedrlnas/VIT/nasvit_wrapper/NASViT/main.py",
+          "absolute_path": "/Users/bli/Playground/plato/examples/model_search/pfedrlnas/VIT/nasvit_wrapper/NASViT/main.py",
+          "line": 207
+        },
+        {
+          "path": "examples/model_search/pfedrlnas/VIT/nasvit_wrapper/NASViT/misc/comm.py",
+          "absolute_path": "/Users/bli/Playground/plato/examples/model_search/pfedrlnas/VIT/nasvit_wrapper/NASViT/misc/comm.py",
+          "line": 28
+        },
+        {
+          "path": "examples/model_search/pfedrlnas/VIT/nasvit_wrapper/NASViT/misc/loss_ops.py",
+          "absolute_path": "/Users/bli/Playground/plato/examples/model_search/pfedrlnas/VIT/nasvit_wrapper/NASViT/misc/loss_ops.py",
+          "line": 60
+        },
+        {
+          "path": "examples/model_search/pfedrlnas/VIT/nasvit_wrapper/NASViT/models/modules/transformer.py",
+          "absolute_path": "/Users/bli/Playground/plato/examples/model_search/pfedrlnas/VIT/nasvit_wrapper/NASViT/models/modules/transformer.py",
+          "line": 74
+        },
+        {
+          "path": "examples/model_search/pfedrlnas/VIT/nasvit_wrapper/NASViT/models/modules/transformer.py",
+          "absolute_path": "/Users/bli/Playground/plato/examples/model_search/pfedrlnas/VIT/nasvit_wrapper/NASViT/models/modules/transformer.py",
+          "line": 83
+        },
+        {
+          "path": "examples/model_search/pfedrlnas/VIT/nasvit_wrapper/NASViT/models/modules/transformer.py",
+          "absolute_path": "/Users/bli/Playground/plato/examples/model_search/pfedrlnas/VIT/nasvit_wrapper/NASViT/models/modules/transformer.py",
+          "line": 475
+        },
+        {
+          "path": "examples/outdated/fl_maml/fl_maml_trainer.py",
+          "absolute_path": "/Users/bli/Playground/plato/examples/outdated/fl_maml/fl_maml_trainer.py",
+          "line": 67
+        },
+        {
+          "path": "examples/outdated/fl_maml/fl_maml_trainer.py",
+          "absolute_path": "/Users/bli/Playground/plato/examples/outdated/fl_maml/fl_maml_trainer.py",
+          "line": 94
+        },
+        {
+          "path": "examples/outdated/fl_maml/fl_maml_trainer.py",
+          "absolute_path": "/Users/bli/Playground/plato/examples/outdated/fl_maml/fl_maml_trainer.py",
+          "line": 164
+        },
+        {
+          "path": "examples/outdated/fl_maml/fl_maml_trainer.py",
+          "absolute_path": "/Users/bli/Playground/plato/examples/outdated/fl_maml/fl_maml_trainer.py",
+          "line": 189
+        }
+      ],
+      "not_claimed": "These static diagnostics were not presented as independently executed runtime failures.",
+      "suggested_validation": "Prioritize reachable active-example code; keep explicitly outdated examples distinct."
+    },
+    {
+      "id": "R05",
+      "summary": "Low MLX/orchestration coverage leaves complete federated lifecycle behavior unverified.",
+      "evidence": "MLX coverage is 19%; successful root probe covers a tiny local model and delta extraction, not the full federation.",
+      "not_claimed": "The demonstrated Metal success is preserved; lack of coverage alone is not a confirmed bug.",
+      "suggested_validation": "Add bounded synthetic federation and checkpoint/resume validation on Metal."
+    }
+  ],
+  "additional_probe_observations_not_promoted_to_bugs": [
+    {
+      "probe": "LeRobot insufficient-episode partition fallback",
+      "method": "Production functions extracted from AST; no backend imports/downloads",
+      "input": {
+        "episodes": [
+          0,
+          1
+        ],
+        "total_clients": 3,
+        "client_ids": [
+          1,
+          2,
+          3
+        ],
+        "seed": 1,
+        "task_aware": false
+      },
+      "output_partitions": [
+        [
+          1
+        ],
+        [
+          0
+        ],
+        [
+          0
+        ]
+      ],
+      "pairwise_overlaps": [
+        [],
+        [],
+        [
+          0
+        ]
+      ],
+      "interpretation": "The fallback duplicates an episode when clients outnumber episodes. This observation was not promoted to a final bug because intended fallback semantics were not established."
+    },
+    {
+      "probe": "QSGD small zero/mixed/integer tensors",
+      "method": "Actual processor _process_layer in memory",
+      "observations": [
+        {
+          "input": "torch.zeros(3)",
+          "result": "encode succeeded",
+          "byte_length": 15
+        },
+        {
+          "input": "torch.tensor(0.)",
+          "result": "encode succeeded",
+          "byte_length": 11
+        },
+        {
+          "input": "torch.tensor([-1., 0., 1.])",
+          "result": "encode succeeded",
+          "byte_length": 15
+        },
+        {
+          "input": "torch.tensor(0, dtype=torch.int64)",
+          "result": "encode succeeded",
+          "byte_length": 11
+        }
+      ],
+      "interpretation": "A suspected zero-tensor encode failure was not reproduced and was not reported as a bug. These observations do not establish every QSGD round-trip or shape."
+    }
+  ],
+  "final_audit_assessment": {
+    "conclusion": "The passing suite misses concrete runtime failures; prioritize B01-B07 and add their red/green regressions.",
+    "broad_coverage_statement": "Audited 226 core Python modules, 59 test/helper modules with 250 test definitions, 57 configs across 15 families, 346 example Python files and 117 example TOMLs across 19 families, plus CI/setup and documentation. All tracked Python/TOML syntax and TOML include targets passed.",
+    "key_evidence": "Root reports 248 passed / 3 skipped on Python 3.13.16 and 3.14.8. Coverage is 43% overall, with client startup 18%, server orchestration 26%, S3 18%, training-step strategies 30%, and MLX 19%.",
+    "source_distinction": "Confirmed findings retain their evidence method. Static proven dataflow/contract defects are distinct from runtime-probed findings and from untested risks. Root-supplied results are identified separately from auditor-run checks."
+  }
+}

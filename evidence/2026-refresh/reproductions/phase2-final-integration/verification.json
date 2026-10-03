@@ -1,0 +1,143 @@
+{
+  "candidate": "0fbc1162994c05041105b1860fc8cb02582d21f3",
+  "candidate_tree": "55caefff33db4c0f41c3ac35d5ff661424f1fb88",
+  "immutable_head": "0fbc1162994c05041105b1860fc8cb02582d21f3",
+  "tracked_diff": "",
+  "base": "2633f8394c142ec04db13743b54a427e04c2aed7",
+  "base_tree": "b68556b4fc2170c7e84c533645e76a5f7ab2685c",
+  "proposed_tree": "d01f51fbf01ceaed78339e10bc3b39aa5ed1724b",
+  "changes": [
+    "evidence/2026-refresh/phase2c-count-collection-validation.json",
+    "evidence/2026-refresh/phase2c-dp-typing-gate-validation.json",
+    "tests/integration/feddyn_partition_worker.py",
+    "tests/integration/test_feddyn_count_boundaries.py",
+    "tests/trainers/test_dp_data_loader_strategy.py"
+  ],
+  "changed_blob_receipts": [
+    {
+      "path": "evidence/2026-refresh/phase2c-count-collection-validation.json",
+      "blob": "987c8615196de5475826ad56fb64714e834083b6",
+      "sha256": "cabff482713fdc55ecd8cafc839321104a1c316d32ee494d1bc796076c62fe8a"
+    },
+    {
+      "path": "evidence/2026-refresh/phase2c-dp-typing-gate-validation.json",
+      "blob": "de3bffad65b1bd5dc8c52a2a472dd448ee5e01de",
+      "sha256": "a03c9f0baa584c1544ad095d145294c1e12e8632719dfd2cf441bf0cb130619d"
+    },
+    {
+      "path": "tests/integration/feddyn_partition_worker.py",
+      "blob": "cb6112fa950fea94e33e1571b9d9671aeeee1c90",
+      "sha256": "38d2d552d87826410cfd79a9ffceaba83d3023fc028554337b7838865ee9f1ac"
+    },
+    {
+      "path": "tests/integration/test_feddyn_count_boundaries.py",
+      "blob": "6bc519193cbace7108844167f65ecd13be9e5f2e",
+      "sha256": "17f1fab24a9d0f7dd2d23c2b03a0c7329c8476d6e385cb24deec38880b204790"
+    },
+    {
+      "path": "tests/trainers/test_dp_data_loader_strategy.py",
+      "blob": "73eed9161913f7edaa271e7271007448231ad4c7",
+      "sha256": "3f95d8d7942f173290852ab6c3f803b41c01831f4e008b285b473d7962df93bc"
+    }
+  ],
+  "DP_correction_preserved": true,
+  "unchanged_protected_trees": {
+    "plato": "5ecf74149d8028a1f34ab085e911ef73610b3aa5",
+    "examples": "133cd0c831caeb158dc020e4ee4bc1690deb1397",
+    "docs": "993a47d492c4bfb7ba32474067e1c7d33787c2e2",
+    "configs": "3f40196521834cbaa60eeb008500fc3d4365c874",
+    ".github": "ffca0d79b56c12b3518b9898eea689e69c20986d",
+    "pyproject.toml": "28803a3d78188ee508c9e572bd8ac7eff406fedc",
+    "uv.lock": "31729888535c7f0eae277b2fe0133ad9814cc4d4",
+    "tests/conftest.py": "bfe33dfa0df0fbd679ccda29474a9400d8f6b1d6"
+  },
+  "original_gate_sha256": "fcb6d70a71a425eeba0a30444da42b49a1fa5b69cca38354efff6a48baa4101a",
+  "acceptance_hash_checks": {
+    "phase2-dp-typing": "d1c06f792fb68b1c81a45f56f01cd39702d1eeb7e73bc584c206d25b062e6393",
+    "phase2-count-collection": "221c87950448d1d42b17334d9fc75fdfc6128a0ca396ea8452acdc7e0488c44c"
+  },
+  "runner_and_auditor_unchanged": true,
+  "retained_receipts_verified": [
+    {
+      "path": "/tmp/plato-phase2-dp-typing-review/preparation-receipt.json",
+      "sha256": "71685b9568236f436d75424003b8609640df8a5c2f429e9a12f780dfbaab6e32"
+    },
+    {
+      "path": "/tmp/plato-phase2-dp-typing-review/source-audit-receipt.json",
+      "sha256": "dd5e657aa048cef82d2ff07f35c7e450cbfc0dbdbd28efb2794c47575e002c85"
+    },
+    {
+      "path": "/tmp/plato-phase2-dp-typing-review/scoped-execution-receipt.json",
+      "sha256": "e5903ca4dfecca7f2c6ae792c80c43e076a3121eded1a9d75c8a2afb1fc9cc6c"
+    },
+    {
+      "path": "/tmp/plato-phase2-dp-typing-review/ci-gate-receipt.json",
+      "sha256": "ef17aeff1ff81776f01500f10e7265b2a81dc6df3ecde4a7206e91c5f897cd67"
+    },
+    {
+      "path": "/tmp/plato-phase2-dp-typing-review/run_scoped_review.py",
+      "sha256": "716d7063008384ac373ee209bdb82089f69c4d719dacd734df76df9179fda276"
+    },
+    {
+      "path": "/tmp/plato-phase2-dp-typing-review/audit_source.py",
+      "sha256": "4f4394621c312429b381231b578a0d769b9ff7df934f7dc7e048f03f6fbd1f60"
+    },
+    {
+      "path": "/tmp/plato-phase2-dp-typing-review/unchanged-ci-owned-typing-gate.py",
+      "sha256": "41648b30bf4127eb394e4b80c53e699ea21b8454a10ff3a61b0ad19c12d7fe8b"
+    },
+    {
+      "path": "/private/tmp/plato-phase2-count-collection-review/preparation.json",
+      "sha256": "5d12a1e026e17f684fdba66578549c58dcb70f7276ddb5fa9d47452a181e300b"
+    },
+    {
+      "path": "/private/tmp/plato-phase2-count-collection-review/source-preservation.json",
+      "sha256": "06045a870211f61d5adc056b7970ed7881787728c5e98a6580173603068f7acc"
+    },
+    {
+      "path": "/private/tmp/plato-phase2-count-collection-review/harness-isolation-audit.json",
+      "sha256": "0cf59755262ca762d8d0686cb76f077ab2e154448156ecb64baba13988a4e5e6"
+    },
+    {
+      "path": "/private/tmp/plato-phase2-count-collection-review/author-evidence-audit.json",
+      "sha256": "4f6af8dedf323bac45ad3d031b9ab9428ff34bd0bdea971e76dd554d834612c3"
+    },
+    {
+      "path": "/private/tmp/plato-phase2-count-collection-review/baseline-full-suite-carry-forward.json",
+      "sha256": "3cdb888bb1b2a4c45d60c87b8b6cb520aa7d4f7189615780210faa5cfc959e5c"
+    },
+    {
+      "path": "/private/tmp/plato-phase2-count-collection-review/root-dp-evidence-preservation-before.json",
+      "sha256": "d504d2789d8251d28f63bb13b03a843f601cd386355ddd9ea2bd6c32ac4e2472"
+    },
+    {
+      "path": "/private/tmp/plato-phase2-count-collection-review/green-interpreters.json",
+      "sha256": "786ee105e32a1385526104db5aa607194b1bbb3f7949985efe384fe478308dbd"
+    },
+    {
+      "path": "/private/tmp/plato-phase2-count-collection-review/run_selected.py",
+      "sha256": "01a130ff56d60b2844be68f46140ed60d97e2ab6be1ff01ccaa9bdbbb1dc513e"
+    },
+    {
+      "path": "/private/tmp/plato-phase2-count-collection-review/build_final_report.py",
+      "sha256": "40a0436b12d5a089ef09a99e99398334ffa046bf9006ac355820b6265f9225e2"
+    },
+    {
+      "path": "/private/tmp/plato-phase2-count-collection-review/runs/green-313/pytest-temp/test_parent_realizes_partition1/partition-result.json",
+      "sha256": "4331243847f419bd3dbc8f383e093c8b59688b113d441408b25ed41fe49c7183"
+    },
+    {
+      "path": "/private/tmp/plato-phase2-count-collection-review/runs/green-313/pytest-temp/test_parent_realizes_partition1/run/worker-partition.json",
+      "sha256": "7015d8951f1aa77953191b5dd33646eb8e43d691044fcc2aa4331d0ce8782e09"
+    },
+    {
+      "path": "/private/tmp/plato-phase2-count-collection-review/runs/green-314/pytest-temp/test_parent_realizes_partition1/partition-result.json",
+      "sha256": "4331243847f419bd3dbc8f383e093c8b59688b113d441408b25ed41fe49c7183"
+    },
+    {
+      "path": "/private/tmp/plato-phase2-count-collection-review/runs/green-314/pytest-temp/test_parent_realizes_partition1/run/worker-partition.json",
+      "sha256": "4b69320aa153980c55c313516a738fc405fa1eeff360c147d0fbd5d152fc6501"
+    }
+  ],
+  "status": "PASS_EXACT_SCOPE_AND_EVIDENCE_IDENTITY"
+}

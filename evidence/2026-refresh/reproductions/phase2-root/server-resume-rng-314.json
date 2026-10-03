@@ -1,0 +1,33 @@
+{
+  "prior_selections": [
+    [
+      9,
+      7
+    ],
+    [
+      5,
+      6
+    ]
+  ],
+  "expected_next": [
+    5,
+    3
+  ],
+  "actual": {
+    "actual_next": [
+      9,
+      7
+    ],
+    "resumed": true,
+    "current_round": 2,
+    "numpy_restored": true,
+    "weights_restored": true
+  },
+  "checkpoint_files": [
+    "numpy_prng_state_2.pkl",
+    "prng_state_2.pkl",
+    "checkpoint_lenet5_2.safetensors",
+    "checkpoint_lenet5_2.safetensors.pkl",
+    "current_round.pkl"
+  ]
+}

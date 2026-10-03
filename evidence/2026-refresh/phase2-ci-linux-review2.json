@@ -1,0 +1,676 @@
+{
+  "schema_version": 1,
+  "written_at_utc": "2026-10-03T16:39:58.391667+00:00",
+  "status": "PASS",
+  "review_role": "Fresh independent read-only CI correction review; no source edits, new commits, PR actions, nested agents, herdr processes or full suites.",
+  "source": {
+    "head": "ae3d066664d1eb5715cd20e5792b9e9c3e605240",
+    "tree": "ad96807bf04ee9b04f6973266e61fff36f20455e",
+    "parent": "0ada82cca599310c40d4a6691aaa16a0e737f2fd",
+    "review_base": "9ee92c52307cd3ecdce0c7416708c504bdb52137",
+    "clean_status": ""
+  },
+  "source_evidence": [
+    {
+      "path": "/tmp/plato-refresh-worktrees/phase2-ci-budget/.github/scripts/stage_ci_artifacts.py",
+      "bytes": 9859,
+      "sha256": "df7030fd29802baa0fd4858deb2f4047e02a305a2862a3432d9a63764a8671c2",
+      "git_blob": "1f80805875c75d44e09785b85322c0577ec7d1f0"
+    },
+    {
+      "path": "/tmp/plato-refresh-worktrees/phase2-ci-budget/.github/workflows/pytorch_tests.yml",
+      "bytes": 7314,
+      "sha256": "189540511b706245a3592972bcd47728b125f47442d752f0227857d16b046b64",
+      "git_blob": "e2ed15ee887164cf8d22de030b7240689d295089"
+    },
+    {
+      "path": "/tmp/plato-refresh-worktrees/phase2-ci-budget/evidence/2026-refresh/phase2-ci-budget-validation.json",
+      "bytes": 66126,
+      "sha256": "0bd86dca4bb2e236056c14ff8b04296cdb4a66806443e1fb3d8625bd46c37f69",
+      "git_blob": "9b5b0f893ea2d1cc5105696f041be2a6db72de45"
+    }
+  ],
+  "findings": [],
+  "resolved_findings": [
+    {
+      "id": "CI-ARTIFACT-FAILURE-01",
+      "original_severity": "P2",
+      "original_review": {
+        "path": "/tmp/plato-ci-internal-review/review.json",
+        "bytes": 11777,
+        "sha256": "8f9b342e3228c65f5a1bb01080be93b8cdd501292c62874df5b93de74d9164e9"
+      },
+      "status": "RESOLVED",
+      "source": [
+        {
+          "path": ".github/scripts/stage_ci_artifacts.py",
+          "line": 235
+        },
+        {
+          "path": ".github/scripts/stage_ci_artifacts.py",
+          "line": 262
+        },
+        {
+          "path": ".github/scripts/stage_ci_artifacts.py",
+          "line": 269
+        },
+        {
+          "path": ".github/workflows/pytorch_tests.yml",
+          "line": 161
+        },
+        {
+          "path": ".github/workflows/pytorch_tests.yml",
+          "line": 175
+        }
+      ],
+      "reason": "main() returns integer status; the real __main__ path raises SystemExit(main()). Read issues always return 1. Successful preceding qualification supplies --require-complete and fails on missing expected records. Already failed/cancelled qualification allows expected gaps, while the staging manifest and upload always() condition remain available.",
+      "independent_validation": {
+        "actual_cli_process_exit_codes": {
+          "small-complete-required": 0,
+          "small-complete-optional": 0,
+          "missing-required": 1,
+          "expected-partial": 0,
+          "eio-false": 1,
+          "absent-source-false": 1,
+          "eio-true": 1,
+          "absent-source-true": 1,
+          "real-runtime-complete": 0,
+          "downloaded-linux-partial": 0
+        },
+        "injected_selected_coverage_eio": "Exit 1 with and without --require-complete; manifest retained, coverage.json absent, errno 5 recorded.",
+        "absent_source": "Exit 1 with and without --require-complete; manifest retained, source_missing true, zero included records, errno 2 recorded.",
+        "missing_required_record": "Existing partial source missing coverage.json exits 1 with --require-complete and 0 without it; both retain readable files and manifest.",
+        "exact_workflow_shell_execution": {
+          "success-small-complete-source": {
+            "prior_status": "success",
+            "staging_exit_code": 0,
+            "manifest_retained": true,
+            "manifest": {
+              "path": "/tmp/plato-ci-internal-review2/workflow-success-small-complete-source/ci-artifacts-upload/artifact-selection.json",
+              "bytes": 3681,
+              "sha256": "22863f3a1df121a53d66d5b5e0379a7568864a34e7627c2e328e75a1573344bb"
+            },
+            "upload_if_always": "always()"
+          },
+          "success-small-partial-source": {
+            "prior_status": "success",
+            "staging_exit_code": 1,
+            "manifest_retained": true,
+            "manifest": {
+              "path": "/tmp/plato-ci-internal-review2/workflow-success-small-partial-source/ci-artifacts-upload/artifact-selection.json",
+              "bytes": 3557,
+              "sha256": "afaf862f0252553352fba859097ed276c9237ed4f1eb7bbf9cf7a020143f4aa3"
+            },
+            "upload_if_always": "always()"
+          },
+          "failure-small-partial-source": {
+            "prior_status": "failure",
+            "staging_exit_code": 0,
+            "manifest_retained": true,
+            "manifest": {
+              "path": "/tmp/plato-ci-internal-review2/workflow-failure-small-partial-source/ci-artifacts-upload/artifact-selection.json",
+              "bytes": 3557,
+              "sha256": "49daa85caf839a1b4af5fd97cacd921c618bff6c8092895fcabfc3f0b62f3ea6"
+            },
+            "upload_if_always": "always()"
+          },
+          "cancelled-small-partial-source": {
+            "prior_status": "cancelled",
+            "staging_exit_code": 0,
+            "manifest_retained": true,
+            "manifest": {
+              "path": "/tmp/plato-ci-internal-review2/workflow-cancelled-small-partial-source/ci-artifacts-upload/artifact-selection.json",
+              "bytes": 3559,
+              "sha256": "7d75fb1dfff8a55bde014bfa2e8cef36a8eb475a449afe2c334f310152323982"
+            },
+            "upload_if_always": "always()"
+          }
+        },
+        "prior_pytest_failure_not_masked": "All prior test commands and set -eu failure propagation are preserved; no job/step continue-on-error exists. A later successful staging step cannot clear a previous failed step under the documented GitHub job semantics.",
+        "upload": "Pinned upload step retains always(), ci-artifacts-upload/, retention14 and existing options; no hosted upload performed."
+      }
+    }
+  ],
+  "accepted_checks": {
+    "scope": "Exact 9ee92c52..ae3d0666 diff touches only workflow, artifact helper and author evidence; production/tests/config/lock/submodules unchanged.",
+    "workflow": {
+      "duplicate_yaml_keys_and_triggers": "PASS",
+      "full_diff_preserves_all_test_commands_assertions_profiles_pins_permissions_env": "PASS",
+      "correction_diff_preserves_every_preceding_step": "PASS",
+      "source_selection_function_imports_constants_unchanged_from_parent": "PASS",
+      "no_job_or_step_continue_on_error": true,
+      "budget_minutes": {
+        "base": 25,
+        "mandatory": 30,
+        "runtime": 16,
+        "staging": 2,
+        "explicit_steps_total": 101,
+        "job": 110
+      },
+      "setup_upload_reserve_minutes": 6,
+      "zsh_python_syntax_checked_steps": [
+        "Provision zsh",
+        "Record provenance and check lock",
+        "Sync fresh base profile",
+        "Base collection, suite and missing-extra probe",
+        "Sync fresh mandatory profile",
+        "Mandatory initialized core suite",
+        "Fresh startup, real CPU socket round and failure containment",
+        "Ruff and classified typing baseline",
+        "Stage qualification outputs without pytest aliases"
+      ],
+      "exact_staging_shell_cases": {
+        "success-small-complete-source": {
+          "prior_status": "success",
+          "staging_exit_code": 0,
+          "manifest_retained": true,
+          "manifest": {
+            "path": "/tmp/plato-ci-internal-review2/workflow-success-small-complete-source/ci-artifacts-upload/artifact-selection.json",
+            "bytes": 3681,
+            "sha256": "22863f3a1df121a53d66d5b5e0379a7568864a34e7627c2e328e75a1573344bb"
+          },
+          "upload_if_always": "always()"
+        },
+        "success-small-partial-source": {
+          "prior_status": "success",
+          "staging_exit_code": 1,
+          "manifest_retained": true,
+          "manifest": {
+            "path": "/tmp/plato-ci-internal-review2/workflow-success-small-partial-source/ci-artifacts-upload/artifact-selection.json",
+            "bytes": 3557,
+            "sha256": "afaf862f0252553352fba859097ed276c9237ed4f1eb7bbf9cf7a020143f4aa3"
+          },
+          "upload_if_always": "always()"
+        },
+        "failure-small-partial-source": {
+          "prior_status": "failure",
+          "staging_exit_code": 0,
+          "manifest_retained": true,
+          "manifest": {
+            "path": "/tmp/plato-ci-internal-review2/workflow-failure-small-partial-source/ci-artifacts-upload/artifact-selection.json",
+            "bytes": 3557,
+            "sha256": "49daa85caf839a1b4af5fd97cacd921c618bff6c8092895fcabfc3f0b62f3ea6"
+          },
+          "upload_if_always": "always()"
+        },
+        "cancelled-small-partial-source": {
+          "prior_status": "cancelled",
+          "staging_exit_code": 0,
+          "manifest_retained": true,
+          "manifest": {
+            "path": "/tmp/plato-ci-internal-review2/workflow-cancelled-small-partial-source/ci-artifacts-upload/artifact-selection.json",
+            "bytes": 3559,
+            "sha256": "7d75fb1dfff8a55bde014bfa2e8cef36a8eb475a449afe2c334f310152323982"
+          },
+          "upload_if_always": "always()"
+        }
+      }
+    },
+    "quality": {
+      "ruff_import_order": {
+        "exit_code": 0,
+        "stdout": "All checks passed!\n",
+        "stderr": ""
+      },
+      "ruff_format": {
+        "exit_code": 0,
+        "stdout": "1 file already formatted\n",
+        "stderr": ""
+      },
+      "ty_helper": {
+        "exit_code": 0,
+        "stdout": "All checks passed!\n",
+        "stderr": ""
+      },
+      "git_diff_check": {
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": ""
+      }
+    },
+    "cli_cases": {
+      "small-complete-required": {
+        "exit_code": 0,
+        "expected_exit_code": 0,
+        "require_complete": true,
+        "manifest_retained": true,
+        "collection_status": "STAGED",
+        "source_missing": false,
+        "missing_expected_records": [],
+        "read_issues": [],
+        "summary": {
+          "included_files": 18,
+          "included_bytes": 682,
+          "omitted_entries": 0,
+          "omitted_regular_bytes": 0,
+          "omitted_reasons": {}
+        },
+        "manifest": {
+          "path": "/tmp/plato-ci-internal-review2/small-complete-required-staged/artifact-selection.json",
+          "bytes": 3643,
+          "sha256": "8ec4d3fc309cd88fcce48ea15da091e9d0ba4b36397327a6861c4bd7e52c2480"
+        },
+        "seconds": 0.031099708983674645,
+        "included_hashes_and_sizes_verified": true
+      },
+      "small-complete-optional": {
+        "exit_code": 0,
+        "expected_exit_code": 0,
+        "require_complete": false,
+        "manifest_retained": true,
+        "collection_status": "STAGED",
+        "source_missing": false,
+        "missing_expected_records": [],
+        "read_issues": [],
+        "summary": {
+          "included_files": 18,
+          "included_bytes": 682,
+          "omitted_entries": 0,
+          "omitted_regular_bytes": 0,
+          "omitted_reasons": {}
+        },
+        "manifest": {
+          "path": "/tmp/plato-ci-internal-review2/small-complete-optional-staged/artifact-selection.json",
+          "bytes": 3643,
+          "sha256": "8ec4d3fc309cd88fcce48ea15da091e9d0ba4b36397327a6861c4bd7e52c2480"
+        },
+        "seconds": 0.030280667124316096,
+        "included_hashes_and_sizes_verified": true
+      },
+      "missing-required": {
+        "exit_code": 1,
+        "expected_exit_code": 1,
+        "require_complete": true,
+        "manifest_retained": true,
+        "collection_status": "STAGED",
+        "source_missing": false,
+        "missing_expected_records": [
+          "coverage.json"
+        ],
+        "read_issues": [],
+        "summary": {
+          "included_files": 17,
+          "included_bytes": 643,
+          "omitted_entries": 0,
+          "omitted_regular_bytes": 0,
+          "omitted_reasons": {}
+        },
+        "manifest": {
+          "path": "/tmp/plato-ci-internal-review2/missing-required-staged/artifact-selection.json",
+          "bytes": 3519,
+          "sha256": "e8597c2e1696d0ac9a0f68fb3fa211043b72512f4b4e33749f4599395f896290"
+        },
+        "seconds": 0.029675083002075553,
+        "included_hashes_and_sizes_verified": true
+      },
+      "expected-partial": {
+        "exit_code": 0,
+        "expected_exit_code": 0,
+        "require_complete": false,
+        "manifest_retained": true,
+        "collection_status": "STAGED",
+        "source_missing": false,
+        "missing_expected_records": [
+          "coverage.json"
+        ],
+        "read_issues": [],
+        "summary": {
+          "included_files": 17,
+          "included_bytes": 643,
+          "omitted_entries": 0,
+          "omitted_regular_bytes": 0,
+          "omitted_reasons": {}
+        },
+        "manifest": {
+          "path": "/tmp/plato-ci-internal-review2/expected-partial-staged/artifact-selection.json",
+          "bytes": 3519,
+          "sha256": "e8597c2e1696d0ac9a0f68fb3fa211043b72512f4b4e33749f4599395f896290"
+        },
+        "seconds": 0.02852316596545279,
+        "included_hashes_and_sizes_verified": true
+      },
+      "eio-false": {
+        "exit_code": 1,
+        "expected_exit_code": 1,
+        "require_complete": false,
+        "manifest_retained": true,
+        "collection_status": "STAGED_WITH_READ_ISSUES",
+        "source_missing": false,
+        "missing_expected_records": [
+          "coverage.json"
+        ],
+        "read_issues": [
+          {
+            "path": "coverage.json",
+            "operation": "open_file_without_following_links",
+            "errno": 5,
+            "error": "Independent reviewer evidence I/O failure"
+          }
+        ],
+        "summary": {
+          "included_files": 17,
+          "included_bytes": 643,
+          "omitted_entries": 1,
+          "omitted_regular_bytes": 0,
+          "omitted_reasons": {
+            "file_unavailable_or_replaced_before_copy": 1
+          }
+        },
+        "manifest": {
+          "path": "/tmp/plato-ci-internal-review2/eio-false-staged/artifact-selection.json",
+          "bytes": 3878,
+          "sha256": "38fdf2059b0a6c906987efd6ea31e8eb06af37ddbbf1196ba97844002d3ed158"
+        },
+        "seconds": 0.03220145800150931,
+        "included_hashes_and_sizes_verified": true
+      },
+      "absent-source-false": {
+        "exit_code": 1,
+        "expected_exit_code": 1,
+        "require_complete": false,
+        "manifest_retained": true,
+        "collection_status": "STAGED_WITH_READ_ISSUES",
+        "source_missing": true,
+        "missing_expected_records": [
+          "commit.txt",
+          "submodules.txt",
+          "lock.txt",
+          "python.txt",
+          "uv.txt",
+          "base-packages.txt",
+          "mandatory-packages.txt",
+          "base-collection.log",
+          "base.log",
+          "base.xml",
+          "missing-extra.log",
+          "mandatory.log",
+          "mandatory.xml",
+          "coverage.json",
+          "runtime.log",
+          "runtime.xml",
+          "ruff.log",
+          "ty.log"
+        ],
+        "read_issues": [
+          {
+            "path": ".",
+            "operation": "open_source_without_following_links",
+            "errno": 2,
+            "error": "No such file or directory"
+          }
+        ],
+        "summary": {
+          "included_files": 0,
+          "included_bytes": 0,
+          "omitted_entries": 0,
+          "omitted_regular_bytes": 0,
+          "omitted_reasons": {}
+        },
+        "manifest": {
+          "path": "/tmp/plato-ci-internal-review2/absent-source-false-staged/artifact-selection.json",
+          "bytes": 1551,
+          "sha256": "135f154279798e8046277be53c8ac663c1b34e4b7abd5fcaf5384ad7ba1c525e"
+        },
+        "seconds": 0.027054666075855494,
+        "included_hashes_and_sizes_verified": true
+      },
+      "eio-true": {
+        "exit_code": 1,
+        "expected_exit_code": 1,
+        "require_complete": true,
+        "manifest_retained": true,
+        "collection_status": "STAGED_WITH_READ_ISSUES",
+        "source_missing": false,
+        "missing_expected_records": [
+          "coverage.json"
+        ],
+        "read_issues": [
+          {
+            "path": "coverage.json",
+            "operation": "open_file_without_following_links",
+            "errno": 5,
+            "error": "Independent reviewer evidence I/O failure"
+          }
+        ],
+        "summary": {
+          "included_files": 17,
+          "included_bytes": 643,
+          "omitted_entries": 1,
+          "omitted_regular_bytes": 0,
+          "omitted_reasons": {
+            "file_unavailable_or_replaced_before_copy": 1
+          }
+        },
+        "manifest": {
+          "path": "/tmp/plato-ci-internal-review2/eio-true-staged/artifact-selection.json",
+          "bytes": 3878,
+          "sha256": "38fdf2059b0a6c906987efd6ea31e8eb06af37ddbbf1196ba97844002d3ed158"
+        },
+        "seconds": 0.03241420886479318,
+        "included_hashes_and_sizes_verified": true
+      },
+      "absent-source-true": {
+        "exit_code": 1,
+        "expected_exit_code": 1,
+        "require_complete": true,
+        "manifest_retained": true,
+        "collection_status": "STAGED_WITH_READ_ISSUES",
+        "source_missing": true,
+        "missing_expected_records": [
+          "commit.txt",
+          "submodules.txt",
+          "lock.txt",
+          "python.txt",
+          "uv.txt",
+          "base-packages.txt",
+          "mandatory-packages.txt",
+          "base-collection.log",
+          "base.log",
+          "base.xml",
+          "missing-extra.log",
+          "mandatory.log",
+          "mandatory.xml",
+          "coverage.json",
+          "runtime.log",
+          "runtime.xml",
+          "ruff.log",
+          "ty.log"
+        ],
+        "read_issues": [
+          {
+            "path": ".",
+            "operation": "open_source_without_following_links",
+            "errno": 2,
+            "error": "No such file or directory"
+          }
+        ],
+        "summary": {
+          "included_files": 0,
+          "included_bytes": 0,
+          "omitted_entries": 0,
+          "omitted_regular_bytes": 0,
+          "omitted_reasons": {}
+        },
+        "manifest": {
+          "path": "/tmp/plato-ci-internal-review2/absent-source-true-staged/artifact-selection.json",
+          "bytes": 1551,
+          "sha256": "135f154279798e8046277be53c8ac663c1b34e4b7abd5fcaf5384ad7ba1c525e"
+        },
+        "seconds": 0.02646912494674325,
+        "included_hashes_and_sizes_verified": true
+      },
+      "real-runtime-complete": {
+        "exit_code": 0,
+        "expected_exit_code": 0,
+        "require_complete": true,
+        "manifest_retained": true,
+        "collection_status": "STAGED",
+        "source_missing": false,
+        "missing_expected_records": [],
+        "read_issues": [],
+        "summary": {
+          "included_files": 296,
+          "included_bytes": 8412708,
+          "omitted_entries": 6,
+          "omitted_regular_bytes": 1049077,
+          "omitted_reasons": {
+            "not_a_regular_file": 1,
+            "symlink_not_followed": 3,
+            "unit_diagnostic_exceeds_size_limit": 1,
+            "reproducible_unit_fixture": 1
+          }
+        },
+        "manifest": {
+          "path": "/tmp/plato-ci-internal-review2/real-runtime-complete-staged/artifact-selection.json",
+          "bytes": 61904,
+          "sha256": "20f1675aba6faf69e7ea56124fc6f7135bb9ceb6b7903bd02c6a58c18bfc7d47"
+        },
+        "seconds": 0.11392350005917251,
+        "included_hashes_and_sizes_verified": true
+      },
+      "downloaded-linux-partial": {
+        "exit_code": 0,
+        "expected_exit_code": 0,
+        "require_complete": false,
+        "manifest_retained": true,
+        "collection_status": "STAGED",
+        "source_missing": false,
+        "missing_expected_records": [
+          "mandatory.xml",
+          "coverage.json",
+          "runtime.log",
+          "runtime.xml",
+          "ruff.log",
+          "ty.log"
+        ],
+        "read_issues": [],
+        "summary": {
+          "included_files": 3650,
+          "included_bytes": 1931284,
+          "omitted_entries": 3708,
+          "omitted_regular_bytes": 968770723,
+          "omitted_reasons": {
+            "reproducible_unit_fixture": 3708
+          }
+        },
+        "manifest": {
+          "path": "/tmp/plato-ci-internal-review2/downloaded-linux-partial-staged/artifact-selection.json",
+          "bytes": 1458157,
+          "sha256": "54c6aa866311b7bfd323e3f30b76fab3b1f12aff228a0f217f843e6fc3654656"
+        },
+        "seconds": 0.964900666847825,
+        "included_hashes_and_sizes_verified": true
+      }
+    },
+    "runtime_retention": {
+      "actual_source": "/tmp/plato-phase2c-feddyn-implementation/combined-mandatory-runtime-313",
+      "independent_fixture_source": "/tmp/plato-ci-internal-review/complete-source",
+      "actual_regular_files_verified": 271,
+      "large_checkpoint_and_binary_payload_start_received_committed_preserved": true,
+      "aliases_fifo_unit_bulk_and_oversized_diagnostics_excluded_non_failing": true
+    },
+    "downloaded_failed_linux_evidence": {
+      "original_top_level_records_retained": [
+        "base-collection.log",
+        "base-packages.txt",
+        "base.log",
+        "base.xml",
+        "commit.txt",
+        "lock.txt",
+        "mandatory-packages.txt",
+        "mandatory.log",
+        "missing-extra.log",
+        "python.txt",
+        "submodules.txt",
+        "uv.txt"
+      ],
+      "all_3650_hashes_and_sizes_verified": true,
+      "summary": {
+        "included_files": 3650,
+        "included_bytes": 1931284,
+        "omitted_entries": 3708,
+        "omitted_regular_bytes": 968770723,
+        "omitted_reasons": {
+          "reproducible_unit_fixture": 3708
+        }
+      }
+    },
+    "author_receipt_integrity": {
+      "verified_receipts": 35,
+      "unique_files_verified": 24,
+      "red_contract": "Expected FAIL; both original negative cases returned 0.",
+      "green_contract": "PASS; reported exits, manifests and all referenced hashes independently checked.",
+      "delivery": "Exact candidate head/tree/parent and evidence hash match.",
+      "details": {
+        "path": "/tmp/plato-ci-internal-review2/independent-results.json",
+        "bytes": 24090,
+        "sha256": "98f6f706933ef56a2af24c7fc5e4015bbf41dc1a6f533ccbffb564a48b378b67"
+      }
+    },
+    "budget_review": "Python3.13-only is authorized. Base25, mandatory30, runtime16 and job110 remain finite. Explicit steps total101 minutes, with6 minutes reserved for setup/upload and3 minutes remaining. Actual hosted completion remains to be demonstrated.",
+    "source_selection_preservation": "Imports, constants and complete stage_artifacts() function are byte-identical to accepted parent0ada82cc. Expected aliases/FIFO/unit bulk and oversized unit diagnostics stay non-failing exclusions."
+  },
+  "github_documentation": [
+    {
+      "url": "https://docs.github.com/en/actions/reference/workflows-and-actions/contexts",
+      "supports": "job.status is current job status: success, failure, cancelled."
+    },
+    {
+      "url": "https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax",
+      "supports": "continue-on-error is the explicit mechanism permitting failed steps to pass the job; it is absent."
+    },
+    {
+      "url": "https://docs.github.com/en/actions/reference/workflows-and-actions/expressions",
+      "supports": "always() runs despite failed/cancelled prior steps; failure() reflects any prior failed step."
+    }
+  ],
+  "review_evidence": [
+    {
+      "path": "/tmp/plato-ci-internal-review2/independent_review.py",
+      "bytes": 17752,
+      "sha256": "802e57a0480f8bf1b75abdcd9c5dc98813e351e79e58ad7750688d0b2ac7a6c3"
+    },
+    {
+      "path": "/tmp/plato-ci-internal-review2/independent-results.json",
+      "bytes": 24090,
+      "sha256": "98f6f706933ef56a2af24c7fc5e4015bbf41dc1a6f533ccbffb564a48b378b67"
+    },
+    {
+      "path": "/tmp/plato-ci-internal-review2/inject_eio.py",
+      "bytes": 368,
+      "sha256": "9816c768778f64f78a50eb6d686779bcd78dac2fc93f115b72486aed62b54865"
+    },
+    {
+      "path": "/tmp/plato-ci-internal-review/probe-results.json",
+      "bytes": 2357,
+      "sha256": "ea242b2387d82e07ec91928af4afeda932b3928a2fc9ff3e81a210a5721a4d54"
+    },
+    {
+      "path": "/tmp/plato-phase2-ci-budget-validation/staging-failure-contract-red.json",
+      "bytes": 2572,
+      "sha256": "03d2a28cbd242292b9179f9bd777dcec24e045cc60ff92f4bb70cca6538b82c4"
+    },
+    {
+      "path": "/tmp/plato-phase2-ci-budget-validation/staging-failure-contract-green.json",
+      "bytes": 8650,
+      "sha256": "0c053f4e933db85f0c7895209fbb087c2043f8356bbf46b37b3b8e45eb53d675"
+    },
+    {
+      "path": "/tmp/plato-phase2-ci-budget-validation/staging-failure-static-proof.json",
+      "bytes": 2113,
+      "sha256": "ec1653ca9a499046d77e897938d543dfa8764591a9d0dcb08e0d64af5fd9ebe6"
+    },
+    {
+      "path": "/tmp/plato-phase2-ci-budget-validation/staging-failure-delivery.json",
+      "bytes": 2889,
+      "sha256": "2f34f749b88dfd2d48e90cc0e6208d1c3a39ccc45c878d2c859259953c51bc45"
+    }
+  ],
+  "limits": [
+    "This is PASS for the bounded CI correction, not a hosted Linux qualification or merge approval.",
+    "Exact-source Python3.13 hosted base/mandatory/runtime/quality completion is still required.",
+    "No new full suite, hosted upload/cancellation, Linux runner execution, push, PR change or merge performed.",
+    "271 runtime records prove artifact retention of prior execution; they do not claim a fresh runtime pass.",
+    "Initial hosted run37129360804 remains failed; its downloaded partial evidence is a staging regression fixture only."
+  ]
+}

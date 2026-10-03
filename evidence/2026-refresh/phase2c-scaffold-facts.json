@@ -1,0 +1,541 @@
+{
+  "schema_version": 1,
+  "finding": "F27",
+  "role": "Implementation facts for root-assigned fresh Astra standalone documentation writer",
+  "implementation_commit": "e65241c19448b74dcb57fc48bfe388152f3a3e58",
+  "accepted_design_sha256": "f323f3aa9d824df44a1043b2d6aff9c8a963c42964f6e6685108c59b25fc3a89",
+  "writing_scope": [
+    "examples/customized_client_training/scaffold/README.md",
+    "docs/docs/examples/algorithms/5. Algorithms with Customized Client Training Loops.md: SCAFFOLD section only"
+  ],
+  "unchanged_sections": "FedProx remains accepted legacy unsquared norm; do not alter its prose/equation or any TOML values.",
+  "primary_source": "https://arxiv.org/pdf/1910.06378v4 (Algorithm1 andEq4)",
+  "code_paths": [
+    "examples/customized_client_training/scaffold/scaffold_MNIST_lenet5.toml",
+    "examples/customized_client_training/scaffold/scaffold_callback.py",
+    "examples/customized_client_training/scaffold/scaffold_client.py",
+    "examples/customized_client_training/scaffold/scaffold_server.py",
+    "examples/customized_client_training/scaffold/scaffold_trainer.py",
+    "plato/trainers/strategies/algorithms/scaffold_strategy.py",
+    "tests/integration/scaffold_round_worker.py",
+    "tests/integration/test_scaffold_round_flow.py",
+    "tests/trainers/test_scaffold_strategy.py"
+  ],
+  "equations": {
+    "local_plain_SGD": "y_next=y-eta*(g-ci+c)",
+    "implemented_correction_after_raw_optimizer": "y=raw_optimizer_result-eta*(c-ci)",
+    "option_II": "ci_new=ci_old-c+(x-y)/(K*eta)",
+    "delta": "ci_new-ci_old",
+    "server_control": "c_new=c_old+sum(participating delta_ci)/N",
+    "shipped_model": "x_new=sum(n_i*y_i)/sum(n_i), eta_global=1",
+    "paper_model_for_comparison": "x_new=x+eta_global*sum(y_i-x)/len(S)"
+  },
+  "rates": "Public optimizer step prehook captures actual parameter-group LR before normal/tailstep, by parameter identity. Positive finite equal scalar participating-group LR, constant across completed updates in localrun; can change next round. Reordered equal-rate groups supported. Unequal/zero/negative/nonfinite/missingoptimizer/withinrun ratechange fails before affectedstep; no trainer.lr or fallbackrate.",
+  "parameters": "Trainable parametercontrols, not suffix-basedweight/bias heuristics. Includedno-gradient param gets additivecorrection; optimizer-excluded/frozen param notcorrected, excludedci unchanged/zero delta. Known historicalbuffer/frozen extras projected; missingrequired/unknown/wrongshape/nonfinite controls reject. Floating/integerbuffers go through inherited model payload/aggregation only. Inboundcontrol tensors detached/cloned.",
+  "completed_updates": "K counts actual successful optimizer updates only, accumulationtail exactlyonce. K0 retainsci and emits freshzerodelta with nodivision/staledelta. V2 exportedconstructor is compatibilitysubclass ofcorrectedOptionII; doesnotimplementpaperOptionI gradientpass.",
+  "actual_dataflow": "Realexample configure assignsID beforeprocessors; each lateinbound [weights,c] immediately installs detachedcurrent c in activetrainercontext. Reusedprocessorstrainer/id rebound. Missingmalformedexamplec clearsstalec andfails. Successfulcurrent childreturnsci/delta/K/rate beforeparentoutbound; UUIDtoken/clientownership preventsstaleorabsentresult. Outboundrequirescurrent successfuldelta, refusesNone/priorround. Standalonecoremissingc warns andinitializeszero onlyoutsidefederatedexamplecontract. Controls on_train_end are provisional until on_train_result_accepted. Directrun commits afterallcallbacks; directtrain_process after model/state saves. Spawnedchild never writescanonicalci; parent validates UUID/client, loads current model/controlstate, then atomically commitscanonicalci. Failedmissing/stalehandoff,modelsave,parentpersistence or callback restores preattemptci and clearsoutbounddelta. get_update_payload requiresaccepted currentresult. Lowlevel callers simulateacceptance explicitly; genericstrategies defaultacceptancehook isno-op.",
+  "server_mutation": "All participatingmodel andcontrol payloads validated before staging or model/control commit, includingzero-weight. Model keys follow actualtransport schema; exactmodelstateshape/finite/dtypecast checks and detachedCPUclones; frozen/buffer structure distinguished, rawbuffer aggregationpolicy inherited. AcceptedB samplemetadata validator executes before weights_received. Badmodel/control/metadata at eitherposition leavesmodel/control unchanged; no input mutation.",
+  "generic_optimizers": "Warning once/run for momentum/decay/maximize/Adam composition. Rawoptimizer followed by subtractiveeta*(c-ci), correctedOptionIIdisplacement equation; notmean-usedgradients or provedpaperoptimizer guarantee. Actualshipped momentum=.9 remains unchanged and isqualified; constantLRAdam composition alsotested.",
+  "fixed_rate_default": "RealTOMLoptimizer.lr=.01 andmomentum=.9; actualdefaultreadfromcommittedTOML below. Only explanatorycommentsadded.",
+  "actual_shipped_config": {
+    "clients": {
+      "total_clients": 5,
+      "per_round": 2,
+      "do_test": false
+    },
+    "server": {
+      "address": "127.0.0.1",
+      "port": 8000,
+      "do_test": true,
+      "checkpoint_path": "results/test/checkpoint",
+      "model_path": "results/test/model"
+    },
+    "data": {
+      "datasource": "Torchvision",
+      "dataset_name": "MNIST",
+      "download": true,
+      "partition_size": 1000,
+      "sampler": "iid"
+    },
+    "trainer": {
+      "rounds": 5,
+      "max_concurrency": 2,
+      "target_accuracy": 0.98,
+      "epochs": 3,
+      "batch_size": 10,
+      "optimizer": "SGD",
+      "model_name": "lenet5"
+    },
+    "algorithm": {
+      "type": "fedavg"
+    },
+    "parameters": {
+      "optimizer": {
+        "lr": 0.01,
+        "momentum": 0.9,
+        "weight_decay": 0.0
+      }
+    }
+  },
+  "legacy_and_restart": "Canonicalper-clientcontainedcontrolfile wins; exactmatching legacy strategyroot-prefix .pth or examplemodel_ID_control_variate.pth imported onlyifabsentcanonical, client0neverforotherID. Originalfilesretained. Pre-fixcontrols structurallyloadbutcorrectednumericalcontinuation differs; newexperimentwithallserver/clientcontrolstate consistentlyinitialized recommended. No fullserveroptimizerRNGrestart support claim, no silentoneclientreset. Canonicalpath unchanged in corrections. Persistence timing changes to successfulparent/directacceptance; atomicsiblingtempfile replaced viaos.replace andalwaysremovedonfailure. No fullserveroptimizerrestartprotocol or wholefederatedround rollback introduced.",
+  "numerical_oracles": {
+    "scalar_float64": "x1,c2,ci1,eta.1,g0 -> y.9,ci~0,delta~-1; gradients3,1 -> y.4,ci2,delta1 (atol1e-12)",
+    "two_round_partial_unequal_samples": "N3,selected(1,2) then(1,3),samples(2,6,4),eta.1,2epochs/batchsize6 actualK2. Round1localy(.62,1.38),ci(.9,-.9),delta(-.1,-3.9),weightedx1.19,populationc2/3; uniformclientpaperx1.0 distinct. Round2weightedx10209/10000,c896/1125; inactiveci unchanged,cmeanallci. Equalcountcase reducesuniformreference.",
+    "actual_successful_spawn_results": {
+      "313": {
+        "artifact": {
+          "path": "/tmp/plato-phase2c-reviewfix-313/test_shipped_spawn_pipeline_pa0/result.json",
+          "bytes": 2315,
+          "sha256": "3374bd55c23aa8d9c1b09579844a4e25c3110fa7e45dbdcd9a471eafaefb2ac2"
+        },
+        "actual_spawn_result": {
+          "spawn": true,
+          "config_source": "/private/tmp/plato-refresh-worktrees/training/examples/customized_client_training/scaffold/scaffold_MNIST_lenet5.toml",
+          "explicit_overrides": {
+            "clients": {
+              "total_clients": 3,
+              "per_round": 2,
+              "do_test": false
+            },
+            "server": {
+              "address": "127.0.0.1",
+              "port": 8000,
+              "do_test": false,
+              "checkpoint_path": "results/test/checkpoint",
+              "model_path": "results/test/model",
+              "random_seed": 29
+            },
+            "data": {
+              "datasource": "Torchvision",
+              "dataset_name": "MNIST",
+              "download": true,
+              "partition_size": 1000,
+              "sampler": "iid"
+            },
+            "trainer": {
+              "rounds": 5,
+              "max_concurrency": 2,
+              "target_accuracy": 0.98,
+              "epochs": 2,
+              "batch_size": 6,
+              "optimizer": "SGD",
+              "model_name": "org/model"
+            },
+            "algorithm": {
+              "type": "fedavg"
+            },
+            "parameters": {
+              "optimizer": {
+                "lr": 0.1,
+                "momentum": 0.0,
+                "weight_decay": 0.0
+              }
+            }
+          },
+          "rounds": [
+            {
+              "round": 1,
+              "locals": [
+                {
+                  "client": 1,
+                  "y_ci_delta": [
+                    0.6200000000000001,
+                    0.8999999999999995,
+                    -0.10000000000000053
+                  ],
+                  "samples": 2
+                },
+                {
+                  "client": 2,
+                  "y_ci_delta": [
+                    1.3800000000000003,
+                    -0.9000000000000017,
+                    -3.9000000000000017
+                  ],
+                  "samples": 6
+                }
+              ],
+              "global_x": 1.19,
+              "global_c": 0.6666666666666666,
+              "all_ci": [
+                0.8999999999999995,
+                -0.9000000000000017,
+                2.0
+              ]
+            },
+            {
+              "round": 2,
+              "locals": [
+                {
+                  "client": 1,
+                  "y_ci_delta": [
+                    1.0082333333333335,
+                    1.1421666666666666,
+                    0.24216666666666709
+                  ],
+                  "samples": 2
+                },
+                {
+                  "client": 3,
+                  "y_ci_delta": [
+                    1.0272333333333334,
+                    2.1471666666666676,
+                    0.14716666666666756
+                  ],
+                  "samples": 4
+                }
+              ],
+              "global_x": 1.0209,
+              "global_c": 0.7964444444444444,
+              "all_ci": [
+                1.1421666666666666,
+                -0.9000000000000017,
+                2.1471666666666676
+              ]
+            }
+          ]
+        }
+      },
+      "314": {
+        "artifact": {
+          "path": "/tmp/plato-phase2c-reviewfix-314/test_shipped_spawn_pipeline_pa0/result.json",
+          "bytes": 2315,
+          "sha256": "3374bd55c23aa8d9c1b09579844a4e25c3110fa7e45dbdcd9a471eafaefb2ac2"
+        },
+        "actual_spawn_result": {
+          "spawn": true,
+          "config_source": "/private/tmp/plato-refresh-worktrees/training/examples/customized_client_training/scaffold/scaffold_MNIST_lenet5.toml",
+          "explicit_overrides": {
+            "clients": {
+              "total_clients": 3,
+              "per_round": 2,
+              "do_test": false
+            },
+            "server": {
+              "address": "127.0.0.1",
+              "port": 8000,
+              "do_test": false,
+              "checkpoint_path": "results/test/checkpoint",
+              "model_path": "results/test/model",
+              "random_seed": 29
+            },
+            "data": {
+              "datasource": "Torchvision",
+              "dataset_name": "MNIST",
+              "download": true,
+              "partition_size": 1000,
+              "sampler": "iid"
+            },
+            "trainer": {
+              "rounds": 5,
+              "max_concurrency": 2,
+              "target_accuracy": 0.98,
+              "epochs": 2,
+              "batch_size": 6,
+              "optimizer": "SGD",
+              "model_name": "org/model"
+            },
+            "algorithm": {
+              "type": "fedavg"
+            },
+            "parameters": {
+              "optimizer": {
+                "lr": 0.1,
+                "momentum": 0.0,
+                "weight_decay": 0.0
+              }
+            }
+          },
+          "rounds": [
+            {
+              "round": 1,
+              "locals": [
+                {
+                  "client": 1,
+                  "y_ci_delta": [
+                    0.6200000000000001,
+                    0.8999999999999995,
+                    -0.10000000000000053
+                  ],
+                  "samples": 2
+                },
+                {
+                  "client": 2,
+                  "y_ci_delta": [
+                    1.3800000000000003,
+                    -0.9000000000000017,
+                    -3.9000000000000017
+                  ],
+                  "samples": 6
+                }
+              ],
+              "global_x": 1.19,
+              "global_c": 0.6666666666666666,
+              "all_ci": [
+                0.8999999999999995,
+                -0.9000000000000017,
+                2.0
+              ]
+            },
+            {
+              "round": 2,
+              "locals": [
+                {
+                  "client": 1,
+                  "y_ci_delta": [
+                    1.0082333333333335,
+                    1.1421666666666666,
+                    0.24216666666666709
+                  ],
+                  "samples": 2
+                },
+                {
+                  "client": 3,
+                  "y_ci_delta": [
+                    1.0272333333333334,
+                    2.1471666666666676,
+                    0.14716666666666756
+                  ],
+                  "samples": 4
+                }
+              ],
+              "global_x": 1.0209,
+              "global_c": 0.7964444444444444,
+              "all_ci": [
+                1.1421666666666666,
+                -0.9000000000000017,
+                2.1471666666666676
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "failed_spawn_reuse_retry": {
+      "313": {
+        "server_model_atomicity": {
+          "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+          "torch": "2.14.1",
+          "reproductions": [
+            {
+              "case": "nan",
+              "before": {
+                "x": 1.0,
+                "c": 2.0
+              },
+              "model_half": "OrderedDict({'theta': tensor([nan], dtype=torch.float64)})",
+              "controls": "finite theta deltas 3 and 4, N=3",
+              "expected": "SCAFFOLD validation failure before model/control mutation: x=1,c=2",
+              "actual_x": 1.0,
+              "actual_c": 2.0,
+              "exception": "ValueError: SCAFFOLD model tensor theta must be finite with its exact shape.",
+              "pending_controls": false,
+              "report_fields": [
+                "accuracy",
+                "client_id",
+                "comm_time",
+                "num_samples",
+                "processing_time",
+                "train_loss",
+                "training_time",
+                "update_response"
+              ]
+            },
+            {
+              "case": "missing",
+              "before": {
+                "x": 1.0,
+                "c": 2.0
+              },
+              "model_half": "{}",
+              "controls": "finite theta deltas 3 and 4, N=3",
+              "expected": "SCAFFOLD validation failure before model/control mutation: x=1,c=2",
+              "actual_x": 1.0,
+              "actual_c": 2.0,
+              "exception": "ValueError: SCAFFOLD model keys must match the transport state.",
+              "pending_controls": false,
+              "report_fields": [
+                "accuracy",
+                "client_id",
+                "comm_time",
+                "num_samples",
+                "processing_time",
+                "train_loss",
+                "training_time",
+                "update_response"
+              ]
+            },
+            {
+              "case": "broadcast",
+              "before": {
+                "x": 1.0,
+                "c": 2.0
+              },
+              "model_half": "OrderedDict({'theta': tensor(9., dtype=torch.float64)})",
+              "controls": "finite theta deltas 3 and 4, N=3",
+              "expected": "SCAFFOLD validation failure before model/control mutation: x=1,c=2",
+              "actual_x": 1.0,
+              "actual_c": 2.0,
+              "exception": "ValueError: SCAFFOLD model tensor theta must be finite with its exact shape.",
+              "pending_controls": false,
+              "report_fields": [
+                "accuracy",
+                "client_id",
+                "comm_time",
+                "num_samples",
+                "processing_time",
+                "train_loss",
+                "training_time",
+                "update_response"
+              ]
+            }
+          ],
+          "interpretation": "Reproducer exited zero after asserting model/control atomicity; not independent acceptance."
+        },
+        "failed_worker_reuse_and_retry": {
+          "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+          "failed_handoff_error": "SCAFFOLD has no successful current-round control delta.",
+          "training_error": "Training on client 1 failed.",
+          "parent_ci_after_failure": 1.0,
+          "ci_after_1_to_2_to_1": 1.0,
+          "reconstructed_ci": 1.0,
+          "expected": "Failed handoff has no outbound delta; normal reuse must retain the pre-attempt ci=1. Retry should yield y=.62,ci=.9,delta=-.1.",
+          "actual_retry": {
+            "y": 0.6200000000000001,
+            "ci": 0.8999999999999995,
+            "delta": -0.10000000000000053
+          },
+          "next_server_c_if_retry_only_delivered": 1.9666666666666666,
+          "mean_retained_ci_after_retry": 1.9666666666666666,
+          "interpretation": "Exit zero asserts corrected failure/reuse/retry behavior; not independent acceptance."
+        }
+      },
+      "314": {
+        "server_model_atomicity": {
+          "python": "3.14.8 (main, Sep 30 2026, 17:55:09) [Clang 21.0.0 (clang-2100.3.34.2)]",
+          "torch": "2.14.1",
+          "reproductions": [
+            {
+              "case": "nan",
+              "before": {
+                "x": 1.0,
+                "c": 2.0
+              },
+              "model_half": "OrderedDict({'theta': tensor([nan], dtype=torch.float64)})",
+              "controls": "finite theta deltas 3 and 4, N=3",
+              "expected": "SCAFFOLD validation failure before model/control mutation: x=1,c=2",
+              "actual_x": 1.0,
+              "actual_c": 2.0,
+              "exception": "ValueError: SCAFFOLD model tensor theta must be finite with its exact shape.",
+              "pending_controls": false,
+              "report_fields": [
+                "accuracy",
+                "client_id",
+                "comm_time",
+                "num_samples",
+                "processing_time",
+                "train_loss",
+                "training_time",
+                "update_response"
+              ]
+            },
+            {
+              "case": "missing",
+              "before": {
+                "x": 1.0,
+                "c": 2.0
+              },
+              "model_half": "{}",
+              "controls": "finite theta deltas 3 and 4, N=3",
+              "expected": "SCAFFOLD validation failure before model/control mutation: x=1,c=2",
+              "actual_x": 1.0,
+              "actual_c": 2.0,
+              "exception": "ValueError: SCAFFOLD model keys must match the transport state.",
+              "pending_controls": false,
+              "report_fields": [
+                "accuracy",
+                "client_id",
+                "comm_time",
+                "num_samples",
+                "processing_time",
+                "train_loss",
+                "training_time",
+                "update_response"
+              ]
+            },
+            {
+              "case": "broadcast",
+              "before": {
+                "x": 1.0,
+                "c": 2.0
+              },
+              "model_half": "OrderedDict({'theta': tensor(9., dtype=torch.float64)})",
+              "controls": "finite theta deltas 3 and 4, N=3",
+              "expected": "SCAFFOLD validation failure before model/control mutation: x=1,c=2",
+              "actual_x": 1.0,
+              "actual_c": 2.0,
+              "exception": "ValueError: SCAFFOLD model tensor theta must be finite with its exact shape.",
+              "pending_controls": false,
+              "report_fields": [
+                "accuracy",
+                "client_id",
+                "comm_time",
+                "num_samples",
+                "processing_time",
+                "train_loss",
+                "training_time",
+                "update_response"
+              ]
+            }
+          ],
+          "interpretation": "Reproducer exited zero after asserting model/control atomicity; not independent acceptance."
+        },
+        "failed_worker_reuse_and_retry": {
+          "python": "3.14.8 (main, Sep 30 2026, 17:55:09) [Clang 21.0.0 (clang-2100.3.34.2)]",
+          "failed_handoff_error": "SCAFFOLD has no successful current-round control delta.",
+          "training_error": "Training on client 1 failed.",
+          "parent_ci_after_failure": 1.0,
+          "ci_after_1_to_2_to_1": 1.0,
+          "reconstructed_ci": 1.0,
+          "expected": "Failed handoff has no outbound delta; normal reuse must retain the pre-attempt ci=1. Retry should yield y=.62,ci=.9,delta=-.1.",
+          "actual_retry": {
+            "y": 0.6200000000000001,
+            "ci": 0.8999999999999995,
+            "delta": -0.10000000000000053
+          },
+          "next_server_c_if_retry_only_delivered": 1.9666666666666666,
+          "mean_retained_ci_after_retry": 1.9666666666666666,
+          "interpretation": "Exit zero asserts corrected failure/reuse/retry behavior; not independent acceptance."
+        }
+      }
+    }
+  },
+  "acceptance_code_test_contracts": {
+    "A01": "test_independent_main_equations",
+    "A02": "test_actual_shipped_optimizer_lr_and_next_round_rate; test_invalid_executed_rate_fails_before_update; test_missing_optimizer_and_post_step_rate_capture_then_tail_rejection; test_final_tail_denominator_uses_executed_rate_before_post_hook",
+    "A03": "test_parameter_identity_reordered_equal_groups_buffers_and_exclusions; test_invalid_controls_fail_before_mutation",
+    "A04": "test_real_accumulation_updates_tail_and_empty_round; test_skipped_update_is_not_corrected; parametrizedV2",
+    "A05": "test_reused_and_reconstructed_clients_match_dedicated_two_round_controls; test_exact_legacy_load_canonical_precedence_and_client_zero_isolation; test_persistence_and_worker_state_failures_cannot_emit_old_delta; direct callbackfailure with/without priorcanonical preserves preattemptci",
+    "A06": "test_shipped_spawn_pipeline_parent_control_return_with_deadline; test_actual_failed_worker_handoff_refuses_previous_delta; test_reused_processors_rebind_and_missing_inbound_c_clears_previous_round; four actualspawn failuremodes extendedthroughreuse/freshconstruction/successfulretry andcanonicalbytecheck",
+    "A07": "test_shipped_configuration_two_round_independent_rational_oracle; test_equal_count_model_update_reduces_to_uniform_reference",
+    "A08": "test_all_server_deltas_validated_before_model_or_control_commit; test_server_buffer_payloads_keep_inherited_aggregation_policy; 28malformedmodel and6malformedmetadata actualreport-path atomicity cases, eitherposition/zeroweight, frozen/buffer structure, noinputmutation",
+    "A09": "test_generic_optimizer_composition_matches_independent_raw_updates; test_unmodified_shipped_momentum_optimizer_composition",
+    "A10": "Post-fix exacte652:523passes/17visibleOpacusnotices each onPython3.13.16/3.14.8, zero skips in fullrelevantC+Bselection; all48startupcases incltrue2/6CPUround/no survivors. RuffI/scopedty38pass; configuredtwo-round andactualspawnoracles pass. Freshgeneral/SCAFFOLD/prose acceptance outstanding; noPhase2closureclaim."
+  },
+  "validation_reference": "evidence/2026-refresh/phase2c-validation.json",
+  "do_not_claim": [
+    "Uniform-clientpaperaggregation for unequal samplecounts",
+    "Mean-gradientidentity orconvergence proof for momentum/Adam",
+    "TruepaperOptionI in V2",
+    "VariableLR/unequalLRgroups supported",
+    "Numericallyequivalentcontinuation of pre-fixruns",
+    "Fullserveroptimizerrestart",
+    "Freshindependent acceptance orPhase2closure alreadyachieved"
+  ],
+  "public_contract_changes_since_writer_snapshot0dc": {
+    "model_validation": "Incomingmodel half nowvalidated against actualtransport keys/exactshape/finite/dtypecast beforecontrolstaging, allclients inclzero-weight; samplemetadata validation inherited.",
+    "control_persistence": "Samecanonicalpath; provisionallocalci is persisted onlyafter directcallbacks/saves or successfulcurrentparent model+control handoff. Childexportsprovisionalstate andnevercommitscanonical. Failedattempts retainpreviousci/disk andrequireacceptedresult foroutbound.",
+    "equations_and_config": "A01-A10 mathematicalequations, K/LR restrictions, serverNdenominator, sampleweightedmodel policy andallTOMLvalues unchanged. F20legacyunsquaredFedProx unchanged.",
+    "docs_ownership": "RootAstra95c standaloneREADME/public-doc branch untouched. These updatedfacts require rootreconciliation andfreshreview against finalacceptedcode."
+  }
+}

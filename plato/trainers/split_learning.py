@@ -29,6 +29,7 @@ from plato.trainers.strategies.base import (
     TrainingContext,
     TrainingStepStrategy,
 )
+from plato.utils.checkpoint_paths import checkpoint_name, checkpoint_path
 
 
 class SplitLearningCallback(TrainerCallback):
@@ -176,11 +177,6 @@ class SplitLearningTestingStrategy(TestingStrategy):
         Returns:
             Test accuracy as float
         """
-        # Get trainer reference from context
-        trainer = context.state.get("trainer")
-        if trainer is None:
-            raise ValueError("Trainer must be stored in context.state['trainer']")
-
         batch_size = config["batch_size"]
         sampler_obj = None
         if sampler is not None:
@@ -211,7 +207,7 @@ class SplitLearningTestingStrategy(TestingStrategy):
                 total += labels.size(0)
                 correct += (predicted == labels).sum().item()
 
-        accuracy = correct / total
+        accuracy = correct / total if total else 0.0
         return accuracy
 
 
@@ -324,10 +320,9 @@ class Trainer(ComposableTrainer):
         if not os.path.exists(model_path):
             os.makedirs(model_path)
 
-        if "/" in model_name:
-            model_name = model_name.replace("/", "_")
-
-        model_gradients_path = f"{model_path}/{model_name}_gradients.pth"
+        model_gradients_path = checkpoint_path(
+            model_path, checkpoint_name(model_name, "gradients", suffix=".pth")
+        )
         torch.save(self.cut_layer_grad, model_gradients_path)
 
         logging.info(
@@ -344,15 +339,14 @@ class Trainer(ComposableTrainer):
         model_path = Config().params["model_path"]
         model_name = Config().trainer.model_name
 
-        if "/" in model_name:
-            model_name = model_name.replace("/", "_")
-
-        model_gradients_path = f"{model_path}/{model_name}_gradients.pth"
+        model_gradients_path = checkpoint_path(
+            model_path, checkpoint_name(model_name, "gradients", suffix=".pth")
+        )
         logging.info(
             "[Server #%d] Loading gradients from %s.", os.getpid(), model_gradients_path
         )
 
-        return torch.load(model_gradients_path)
+        return torch.load(model_gradients_path, map_location="cpu", weights_only=True)
 
     # API functions for split learning - can be overridden by subclasses
 

@@ -27,7 +27,9 @@ The update rules:
 3. Update α using gradient descent on the mixing objective
 """
 
+import copy
 import logging
+import math
 import os
 from collections.abc import Callable
 from typing import Any, Dict, Optional
@@ -35,6 +37,7 @@ from typing import Any, Dict, Optional
 import numpy as np
 import torch
 import torch.nn as nn
+from numpy._core.multiarray import scalar as numpy_pickle_scalar
 
 from plato.config import Config
 from plato.models import registry as models_registry
@@ -44,6 +47,7 @@ from plato.trainers.strategies.base import (
     TrainingContext,
     TrainingStepStrategy,
 )
+from plato.utils.checkpoint_paths import checkpoint_name, checkpoint_path
 
 
 class APFLUpdateStrategy(ModelUpdateStrategy):
@@ -57,7 +61,7 @@ class APFLUpdateStrategy(ModelUpdateStrategy):
 
     Args:
         alpha: Initial mixing parameter (default: 0.5).
-               0 = fully personalized, 1 = fully global
+               0 = fully global, 1 = fully personalized
         adaptive_alpha: If True, learns α adaptively (default: True)
         model_fn: Optional callable to create personalized model.
                   If None, uses models_registry.get()
@@ -111,11 +115,14 @@ class APFLUpdateStrategy(ModelUpdateStrategy):
             raise ValueError(f"alpha must be in [0, 1], got {alpha}")
 
         self.alpha = alpha
+        self._initial_alpha = alpha
         self.adaptive_alpha = adaptive_alpha
         self.model_fn = model_fn
         self.save_path = save_path
         self.personalized_model: nn.Module | None = None
         self.personalized_optimizer: torch.optim.Optimizer | None = None
+        self._optimizer_client_id = 0
+        self._client_optimizer_states: dict[int, Any] = {}
 
     def setup(self, context: TrainingContext) -> None:
         """
@@ -124,6 +131,7 @@ class APFLUpdateStrategy(ModelUpdateStrategy):
         Args:
             context: Training context with model and device
         """
+        self._optimizer_client_id = context.client_id
         # Create personalized model
         if self.model_fn is None:
             self.personalized_model = models_registry.get()
@@ -142,10 +150,28 @@ class APFLUpdateStrategy(ModelUpdateStrategy):
             else "model"
         )
 
-        self.personalized_model_path = (
-            f"{base_path}/{model_name}_{context.client_id}_personalized_model.pth"
+        self.personalized_model_path = checkpoint_path(
+            base_path, checkpoint_name(
+                model_name, context.client_id, "personalized_model", suffix=".pth"
+            )
         )
-        self.alpha_path = f"{base_path}/client_{context.client_id}_alpha.pth"
+        self.alpha_path = checkpoint_path(
+            base_path, checkpoint_name("client", context.client_id, "alpha", suffix=".pth")
+        )
+        os.makedirs(base_path, exist_ok=True)
+
+    def on_client_id_changed(self, context: TrainingContext) -> None:
+        old_optimizer = context.state.get("apfl_personalized_optimizer")
+        if isinstance(old_optimizer, torch.optim.Optimizer):
+            self._client_optimizer_states[self._optimizer_client_id] = (
+                copy.deepcopy(old_optimizer.state_dict())
+            )
+        self.alpha = self._initial_alpha
+        self.personalized_optimizer = None
+        for key in ("apfl_personalized_optimizer", "apfl_personalized_model",
+                    "apfl_alpha", "apfl_adaptive_alpha"):
+            context.state.pop(key, None)
+        self.setup(context)
 
     def on_train_start(self, context: TrainingContext) -> None:
         """
@@ -157,11 +183,18 @@ class APFLUpdateStrategy(ModelUpdateStrategy):
         # Load alpha if it exists
         if os.path.exists(self.alpha_path):
             try:
-                self.alpha = torch.load(
-                    self.alpha_path,
-                    map_location=torch.device("cpu"),
-                    weights_only=False,
-                )
+                # Earlier adaptive updates saved numpy.float64. Admit only its
+                # scalar/dtype reconstruction, including the NumPy 1.x spelling.
+                with torch.serialization.safe_globals([
+                    numpy_pickle_scalar,
+                    (numpy_pickle_scalar, "numpy.core.multiarray.scalar"),
+                    np.dtype, type(np.dtype(np.float64)),
+                ]):
+                    self.alpha = float(torch.load(
+                        self.alpha_path, map_location="cpu", weights_only=True,
+                    ))
+                if not math.isfinite(self.alpha) or not 0 <= self.alpha <= 1:
+                    raise ValueError("APFL saved alpha must be finite and in [0, 1].")
                 logging.info(
                     "[Client #%d] Loaded APFL alpha: %.4f",
                     context.client_id,
@@ -182,6 +215,7 @@ class APFLUpdateStrategy(ModelUpdateStrategy):
                     torch.load(
                         self.personalized_model_path,
                         map_location=torch.device("cpu"),
+                        weights_only=True,
                     ),
                     strict=True,
                 )
@@ -199,6 +233,23 @@ class APFLUpdateStrategy(ModelUpdateStrategy):
         # Move personalized model to device and set to training mode
         personalized_model.to(context.device)
         personalized_model.train()
+        # A spawned result is loaded on the parent CPU model. Recast retained
+        # optimizer tensors after moving its parameters to this run's device.
+        personal_optimizer = context.state.get("apfl_personalized_optimizer")
+        if (
+            personal_optimizer is None
+            and context.client_id in self._client_optimizer_states
+        ):
+            # Returning clients retain the same private momentum as a dedicated
+            # trainer. Rebind copied state to this client's new model object.
+            personal_optimizer = optimizer_registry.get(personalized_model)
+            personal_optimizer.load_state_dict(
+                self._client_optimizer_states[context.client_id]
+            )
+            self.personalized_optimizer = personal_optimizer
+            context.state["apfl_personalized_optimizer"] = personal_optimizer
+        if isinstance(personal_optimizer, torch.optim.Optimizer):
+            personal_optimizer.load_state_dict(personal_optimizer.state_dict())
 
         # Store in context for APFLStepStrategy
         context.state["apfl_personalized_model"] = self.personalized_model
@@ -214,7 +265,9 @@ class APFLUpdateStrategy(ModelUpdateStrategy):
         """
         # Retrieve potentially updated alpha from context
         if "apfl_alpha" in context.state:
-            self.alpha = context.state["apfl_alpha"]
+            self.alpha = float(context.state["apfl_alpha"])
+        if not math.isfinite(self.alpha) or not 0 <= self.alpha <= 1:
+            raise ValueError("APFL alpha must be finite and in [0, 1].")
 
         # Save alpha
         try:
@@ -250,6 +303,39 @@ class APFLUpdateStrategy(ModelUpdateStrategy):
 
         # Move to CPU to free GPU memory
         personalized_model.to(torch.device("cpu"))
+
+    @property
+    def requires_worker_state(self) -> bool:
+        return True
+
+    def get_worker_state(self, context: TrainingContext) -> dict[str, Any]:
+        if self.personalized_model is None:
+            raise RuntimeError("APFL worker has no personalized model.")
+        optimizer = context.state.get("apfl_personalized_optimizer")
+        return copy.deepcopy({
+            "model": self.personalized_model.state_dict(), "alpha": self.alpha,
+            "optimizer": optimizer.state_dict() if optimizer is not None else None,
+        })
+
+    def load_worker_state(self, state: Any, context: TrainingContext) -> None:
+        if not isinstance(state, dict) or self.personalized_model is None:
+            raise ValueError("APFL worker personalized state is missing.")
+        alpha = float(state["alpha"])
+        if not math.isfinite(alpha) or not 0 <= alpha <= 1:
+            raise ValueError("APFL worker alpha must be finite and in [0, 1].")
+        self.personalized_model.load_state_dict(state["model"], strict=True)
+        self.alpha = alpha
+        context.state["apfl_alpha"] = alpha
+        context.state["apfl_personalized_model"] = self.personalized_model
+        context.state["apfl_adaptive_alpha"] = self.adaptive_alpha
+        if state["optimizer"] is not None:
+            optimizer = optimizer_registry.get(self.personalized_model)
+            optimizer.load_state_dict(state["optimizer"])
+            self.personalized_optimizer = optimizer
+            context.state["apfl_personalized_optimizer"] = optimizer
+        else:
+            self.personalized_optimizer = None
+            context.state.pop("apfl_personalized_optimizer", None)
 
     def get_update_payload(self, context: TrainingContext) -> dict[str, Any]:
         """

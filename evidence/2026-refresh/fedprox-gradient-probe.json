@@ -1,0 +1,31 @@
+{
+  "finding_id": "F20",
+  "baseline": "5b8359bd40bbe65c7753e71f6627c490f9aa144f",
+  "owner": "2C FedProx strategy, coordinated with 4A reference config and 5 documentation",
+  "probe": "Actual FedProxLossStrategy at its initial global-weights snapshot, real two-class linear model and cross entropy, no mocks.",
+  "results": [
+    {
+      "mu": 0.0,
+      "loss": 1.0759069919586182,
+      "finite_loss": true,
+      "finite_gradients": false
+    },
+    {
+      "mu": 0.1,
+      "loss": 1.0759069919586182,
+      "finite_loss": true,
+      "finite_gradients": false
+    }
+  ],
+  "status": "Confirmed nonfinite gradients at zero distance even with mu=0.",
+  "related_inspection": [
+    "The current implementation intentionally uses unsquared L2 for historical compatibility, while documentation falsely claims the squared-norm paper objective and identical gradients.",
+    "configs/MNIST/fedprox_lenet5.toml selects optimizer FedProx, which the core registry does not provide. The customized FedProx example uses a loss strategy instead."
+  ],
+  "acceptance": "Finite zero-distance gradients; mu=0 must reproduce base loss gradients; nonzero-distance gradient checked against an independent numerical reference. Correct documentation and stale config. Any paper-faithful versus legacy-norm policy must be explicit, preserving named compatibility behavior rather than silently relabeling a different objective.",
+  "primary_sources": [
+    "https://arxiv.org/abs/1812.06127",
+    "https://raw.githubusercontent.com/litian96/FedProx/master/flearn/optimizer/pgd.py"
+  ],
+  "source_verification": "Authors reference optimizer applies grad + mu * (var - vstar), the derivative of a squared L2 proximal penalty. Current Plato unsquared L2 derivative is different away from zero."
+}

@@ -1,0 +1,49 @@
+{
+  "date": "2026-10-02",
+  "baseline": "5b8359bd40bbe65c7753e71f6627c490f9aa144f",
+  "owner": "Phase 2A active datasource extraction, with 2D security contract and 3B Nanochat evaluator handoff",
+  "scope": "Actual DataSource.download using a localhost HTTP server and inert archives. Every escaped file stays inside a task-owned TemporaryDirectory; workers joined and temporary files removed.",
+  "observations": [
+    {
+      "python": "3.13.16",
+      "cases": [
+        {
+          "case": "tar_traversal",
+          "wrote_outside_extraction_root": true,
+          "exception": null,
+          "sentinel_written": true,
+          "http_thread_joined": true
+        },
+        {
+          "case": "zip_symlink_destination",
+          "wrote_outside_extraction_root": true,
+          "exception": null,
+          "sentinel_written": true,
+          "http_thread_joined": true
+        }
+      ]
+    },
+    {
+      "python": "3.14.8",
+      "cases": [
+        {
+          "case": "tar_traversal",
+          "wrote_outside_extraction_root": false,
+          "exception": "OutsideDestinationError",
+          "sentinel_written": false,
+          "http_thread_joined": true
+        },
+        {
+          "case": "zip_symlink_destination",
+          "wrote_outside_extraction_root": true,
+          "exception": null,
+          "sentinel_written": true,
+          "http_thread_joined": true
+        }
+      ]
+    }
+  ],
+  "conclusion": "Python 3.13 permits the TAR traversal; both interpreters follow a pre-existing directory symlink during ZIP extraction and write a completion marker. An interpreter upgrade alone does not meet containment acceptance.",
+  "acceptance": "Existing plan already requires traversal, absolute paths, TAR links and pre-existing symlink destination rejection on both interpreters, plus normal safe extraction. Reuse this reproduction in the owned regression suite.",
+  "reproducer": "import contextlib\nimport http.server\nimport io\nimport json\nimport sys\nimport tarfile\nimport tempfile\nimport threading\nimport zipfile\nfrom pathlib import Path\n\nsys.path.insert(0, str(Path.cwd()))\nfrom plato.datasources.base import DataSource\n\nresults=[]\nfor kind in ('tar_traversal', 'zip_symlink_destination'):\n    with tempfile.TemporaryDirectory(prefix='plato-archive-probe-') as root:\n        root=Path(root)\n        target=root/'download'\n        target.mkdir()\n        if kind=='tar_traversal':\n            filename='fixture.tar.gz'\n            stream=io.BytesIO()\n            with tarfile.open(fileobj=stream, mode='w:gz') as archive:\n                entry=tarfile.TarInfo('../escaped.txt')\n                entry.size=5\n                archive.addfile(entry, io.BytesIO(b'probe'))\n            escaped=root/'escaped.txt'\n        else:\n            filename='fixture.zip'\n            outside=root/'outside'\n            outside.mkdir()\n            (target/'link').symlink_to(outside, target_is_directory=True)\n            stream=io.BytesIO()\n            with zipfile.ZipFile(stream, 'w') as archive:\n                archive.writestr('link/escaped.txt', 'probe')\n            escaped=outside/'escaped.txt'\n        payload=stream.getvalue()\n        class Handler(http.server.BaseHTTPRequestHandler):\n            def do_GET(self):\n                self.send_response(200)\n                self.send_header('Content-Length', str(len(payload)))\n                self.end_headers()\n                self.wfile.write(payload)\n            def log_message(self, *args):\n                pass\n        server=http.server.HTTPServer(('127.0.0.1',0), Handler)\n        worker=threading.Thread(target=server.serve_forever)\n        worker.start()\n        error=None\n        try:\n            with contextlib.redirect_stdout(io.StringIO()):\n                DataSource.download(f'http://127.0.0.1:{server.server_port}/{filename}', str(target))\n        except Exception as exc:\n            error=type(exc).__name__\n        finally:\n            server.shutdown()\n            worker.join(3)\n            server.server_close()\n        results.append({'case':kind,'wrote_outside_extraction_root':escaped.exists(),'exception':error,'sentinel_written':(target/(filename+'.complete')).exists(),'http_thread_joined':not worker.is_alive()})\nprint(json.dumps({'python':sys.version.split()[0],'cases':results}))\n"
+}

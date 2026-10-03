@@ -92,6 +92,9 @@ class Strategy(ABC):
         """
         pass
 
+    def on_client_id_changed(self, context: TrainingContext) -> None:
+        """Release cached state when a worker takes ownership of another client."""
+
     def teardown(self, context: TrainingContext) -> None:
         """
         Called when all training is complete.
@@ -132,6 +135,9 @@ class LossCriterionStrategy(Strategy):
         ...         reg_term = self.weight * torch.norm(outputs)
         ...         return base_loss + reg_term
     """
+
+    def on_train_start(self, context: TrainingContext) -> None:
+        """Refresh loss state that belongs to the received model for this run."""
 
     @abstractmethod
     def compute_loss(
@@ -240,6 +246,16 @@ class TrainingStepStrategy(Strategy):
         ...         optimizer.step()
         ...         return loss
     """
+
+    def on_train_start(self, context: TrainingContext) -> None:
+        """Initialize transient gradients and counters for a local run."""
+
+    def on_train_end(self, context: TrainingContext) -> None:
+        """Release transient state, including when a local run raises."""
+
+    def optimizer_steps_per_epoch(self, batches: int) -> int:
+        """Return the expected number of updates for a complete epoch."""
+        return batches
 
     @abstractmethod
     def training_step(
@@ -405,6 +421,28 @@ class ModelUpdateStrategy(Strategy):
             context: Training context
         """
         pass
+
+    def on_train_cleanup(self, context: TrainingContext, successful: bool) -> None:
+        """Release run hooks, including after an interrupted training run."""
+
+    def on_train_result_accepted(self, context: TrainingContext) -> None:
+        """Commit staged state after the complete local result is accepted.
+
+        Direct training calls this after run-end callbacks. Spawned training
+        calls it in the parent after the current model and strategy handoff load.
+        """
+
+    def get_worker_state(self, context: TrainingContext) -> Any:
+        """Return state that must accompany a successful spawned training result."""
+        return None
+
+    def load_worker_state(self, state: Any, context: TrainingContext) -> None:
+        """Install state returned by the current successful training worker."""
+
+    @property
+    def requires_worker_state(self) -> bool:
+        """Whether a model-only worker result is insufficient."""
+        return False
 
     def before_step(self, context: TrainingContext) -> None:
         """

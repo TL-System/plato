@@ -1,0 +1,388 @@
+{
+  "schema_version": 1,
+  "scope": "Intermediate original-author SCAFFOLD review-2 fixes and portable historical writer; not whole Phase2C acceptance.",
+  "status": "IMPLEMENTED_AND_DUAL_VERSION_QUALIFIED_PENDING_FRESH_SCAFFOLD_REVIEW_3",
+  "identities": {
+    "reviewed_base": "f9772f61d52dfe0f4a3281252d23b8303ec237d2",
+    "initial_base": "fda60becedfa6236c11d415b87a868b52789a41e",
+    "branch": "maintenance/2026-phase2-training",
+    "accepted_b": "00eeb9dcdd2b513e64db9408969356037e09bb8e",
+    "pre_a_merge": "f9772f61d52dfe0f4a3281252d23b8303ec237d2",
+    "accepted_a": "79da1f97d8a12fe97402750cc32c7b3e8f5cdf6e",
+    "a_merge": "abf27a34db3e40fc743f329d40bed5dae4dc70f7",
+    "a_merge_parents": [
+      "f9772f61d52dfe0f4a3281252d23b8303ec237d2",
+      "79da1f97d8a12fe97402750cc32c7b3e8f5cdf6e"
+    ],
+    "a_merge_tree": "4a57c4e2993a51ef5040a2a5a54550f51ef0b5c0",
+    "accepted_a_blobs_verified_unchanged": 48,
+    "portable_fixture_commit": "79a42ab4cfb3cb087fe64de9e4e2778cae52b969",
+    "implementation": "0f17708afefde13eeba1fd71578258b68c5911ee",
+    "implementation_tree": "77ad0245765227716f6fca5335bba6b67a6c0fbb",
+    "implementation_parent": "79a42ab4cfb3cb087fe64de9e4e2778cae52b969",
+    "evidence_commit_contract": "A subsequent receipt commit records the exact evidence-body commit and its SHA256; final head/tree are reported externally to avoid self-reference.",
+    "servers_base_blob_unchanged_from_f977": "8cb7fed130c22d9963cb171c37d7ee63d31fa237",
+    "accepted_b_resume_supplement_queued_after_intermediate": {
+      "commit": "a058a2ef8d230ca2e34dbf1c91e6eaac0b0205ac",
+      "tree": "35098e6ba5f5792052ed6b24a771aec7b2cad9bb",
+      "integration": "Explicitly queued for the following FedDyn turn; not merged into this intermediate SCAFFOLD candidate."
+    }
+  },
+  "reviews": [
+    {
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2c-scaffold-code-review-2.json",
+      "bytes": 232060,
+      "sha256": "aa00c76f5e3fbe3eb2f419ed277620c32f382b8dabb99f4a3e5c190308162eb1"
+    },
+    {
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2c-training-review-2.json",
+      "bytes": 296049,
+      "sha256": "2712a8b892cf3a65b684dfb4470ab293b1d3c4ceedeb0ba7e4613c372e6c8ca1"
+    },
+    {
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2c-general-acceptance.json",
+      "bytes": 1178,
+      "sha256": "3fb81f4f332e1a4665e0af22e99989dba19daa8fc140db99a8cab1dd78cfef2d"
+    },
+    {
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2c-root-source-archive-probe.json",
+      "bytes": 1473,
+      "sha256": "f8f8e36f7c01acdcd3efe603b8b63ed9becd10165b993738b5b38ae785c218e5"
+    },
+    {
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2a-acceptance.json",
+      "bytes": 2974,
+      "sha256": "21fc799903097a0424106e3792ddcdb71f6ae0c8b5f361a9276a89e6d8c973da"
+    },
+    {
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2b-resume-acceptance.json",
+      "bytes": 1644,
+      "sha256": "53bfc5b628762ffb1e3c95a4309701f0a5beea364c0df28fc788171b12279219"
+    },
+    {
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2b-resume-review.json",
+      "bytes": 165243,
+      "sha256": "5e612f69922328c6c2e692af80577e0df3250ff303ddabe8c8fc4a3eacf5cd65"
+    }
+  ],
+  "source_and_test_identities": [
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/training/examples/customized_client_training/scaffold/scaffold_server.py",
+      "bytes": 9162,
+      "sha256": "259e738c6408f91b43e0d195b5c4e0e609cae33499fe04ea7c22059b83b3caf8"
+    },
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/training/plato/trainers/composable.py",
+      "bytes": 42684,
+      "sha256": "e844500f270b51d7dc72e6f927b667bb0fa7aa441e32f50d92a571533517acd3"
+    },
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/training/tests/integration/test_scaffold_callback_lifecycle.py",
+      "bytes": 9340,
+      "sha256": "816499d3c791e5cc197d7a5a66e13359a6325b5843fefc9ec5a8ed28505b881c"
+    }
+  ],
+  "findings": [
+    {
+      "id": "F27-R2-01",
+      "disposition": "Corrected, pending fresh review 3",
+      "change": "Example-local report boundary clears controls on every abort, validates actual post-receive-callback models/control state, restores known model/control tensors if arithmetic, partial model load, or aggregation callbacks fail. Callback handler restored in finally.",
+      "oracle": "x=1,c=2 must survive rejected y=7/9,delta=3/4,counts=2/2 batch; successful retry x=8,c=13/3. Raw inbound tensors unchanged.",
+      "boundary": "Commit after on_weights_aggregated callbacks succeed and resulting model/control validation passes; later evaluation/reporting failures retain committed state. External callback side effects are outside the bounded rollback."
+    },
+    {
+      "id": "F27-R2-02",
+      "disposition": "Corrected, pending fresh review 3",
+      "change": "Shared ComposableTrainer executes the fallible training-step end hook exactly once before direct acceptance. Nested finally guarantees model-update cleanup and context hook removal even when end or cleanup hooks raise. Deferred worker acceptance preserved.",
+      "oracle": "Failed end hook retains prior ci=1 and canonical bytes/absence, refuses outbound delta and leaves no optimizer pre-hook. Same-client reuse and reconstruction preserve accepted state. Explicit ci=1 retry y=.62,ci=.9,delta=-.1."
+    },
+    {
+      "id": "ROOT-2C-02",
+      "disposition": "Portable fixture implemented; final FedDyn explicit read-only migration API remains pending",
+      "change": "Historical accepted-B source and license retained byte-for-byte with provenance. Four default/custom root/trailing-slash migration cases execute the actual old writer without Git at runtime.",
+      "archive_result": "4 passed, 13 deselected each Python version from exact0f177 source archive without .git."
+    }
+  ],
+  "qualification": {
+    "environments": [
+      {
+        "root": "/tmp/plato-phase2c-313",
+        "command": "/tmp/plato-phase2c-313/bin/python -c \"import json,sys,importlib.metadata;print(json.dumps({'python':sys.version,'packages':{k:importlib.metadata.version(k) for k in ['torch','opacus','pytest','ruff','ty']}}))\"",
+        "shell": "zsh -lc",
+        "metadata": {
+          "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+          "packages": {
+            "torch": "2.14.1",
+            "opacus": "1.6.0",
+            "pytest": "9.1.1",
+            "ruff": "0.16.10",
+            "ty": "0.0.84"
+          }
+        }
+      },
+      {
+        "root": "/tmp/plato-phase2c-314",
+        "command": "/tmp/plato-phase2c-314/bin/python -c \"import json,sys,importlib.metadata;print(json.dumps({'python':sys.version,'packages':{k:importlib.metadata.version(k) for k in ['torch','opacus','pytest','ruff','ty']}}))\"",
+        "shell": "zsh -lc",
+        "metadata": {
+          "python": "3.14.8 (main, Sep 30 2026, 17:55:09) [Clang 21.0.0 (clang-2100.3.34.2)]",
+          "packages": {
+            "torch": "2.14.1",
+            "opacus": "1.6.0",
+            "pytest": "9.1.1",
+            "ruff": "0.16.10",
+            "ty": "0.0.84"
+          }
+        }
+      }
+    ],
+    "commands": [
+      {
+        "source_commit": "f9772f61d52dfe0f4a3281252d23b8303ec237d2",
+        "mode": "red-final",
+        "command": "config_file=/tmp/plato-refresh-worktrees/training-review2/examples/customized_client_training/scaffold/scaffold_MNIST_lenet5.toml PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=/tmp/plato-refresh-worktrees/training-review2 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 /tmp/plato-phase2c-313/bin/python -c 'import pytest,plato.trainers.composable;import tests.integration.test_scaffold_round_flow as reference;assert plato.trainers.composable.__file__.startswith('\"'\"'/tmp/plato-refresh-worktrees/training-review2'\"'\"');assert reference.__file__.startswith('\"'\"'/tmp/plato-refresh-worktrees/training-review2'\"'\"');raise SystemExit(pytest.main(['\"'\"'/tmp/plato-phase2c-feddyn-implementation/test_scaffold_callback_lifecycle.py'\"'\"', '\"'\"'--import-mode=importlib'\"'\"','\"'\"'-p'\"'\"','\"'\"'no:cacheprovider'\"'\"','\"'\"'-q'\"'\"','\"'\"'--confcutdir'\"'\"','\"'\"'/tmp/plato-phase2c-feddyn-implementation'\"'\"','\"'\"'--basetemp'\"'\"','\"'\"'/tmp/plato-phase2c-feddyn-implementation/scaffold-exact-f977-red313'\"'\"']))'",
+        "cwd": "/tmp/plato-phase2c-feddyn-implementation",
+        "shell": "zsh -lc",
+        "seconds": 5.365026416955516,
+        "exit_code": 1,
+        "summary": "16 failed, 4 passed, 1 warning in 0.38s",
+        "log": "/tmp/plato-phase2c-feddyn-implementation/scaffold-review2-red-final-313.log",
+        "sha256": "a4f437fc953afa60c7ac5c9f24b138a1a9368a44b98876d62264b6267e63ac12",
+        "log_summary": "16 failed, 4 passed, 1 warning in 0.38s"
+      },
+      {
+        "source_commit": "0f17708afefde13eeba1fd71578258b68c5911ee",
+        "mode": "committed-green",
+        "command": "OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 /tmp/plato-phase2c-313/bin/python -m pytest tests/trainers/test_scaffold_strategy.py tests/trainers/test_training_update_contract.py tests/trainers/test_dp_data_loader_strategy.py tests/trainers/test_personalized_state_ownership.py tests/trainers/test_review_training_boundaries.py tests/integration/test_scaffold_round_flow.py tests/integration/test_scaffold_callback_lifecycle.py -q --basetemp /tmp/plato-phase2c-feddyn-implementation/scaffold-review2-green313",
+        "cwd": "/private/tmp/plato-refresh-worktrees/training",
+        "shell": "zsh -lc",
+        "seconds": 191.19953599991277,
+        "exit_code": 0,
+        "summary": "174 passed, 17 warnings in 186.19s (0:03:06)",
+        "log": "/tmp/plato-phase2c-feddyn-implementation/scaffold-review2-committed-green-313.log",
+        "sha256": "179d0a62aa80b52dd11c251bc7dd0b4aba645a61eb27cdff6c0f1fe9addae1e3",
+        "log_summary": "174 passed, 17 warnings in 186.19s (0:03:06)"
+      },
+      {
+        "source_commit": "0f17708afefde13eeba1fd71578258b68c5911ee",
+        "label": "probe-clean",
+        "version": "313",
+        "command": "OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=/private/tmp/plato-refresh-worktrees/training /tmp/plato-phase2c-313/bin/python /tmp/plato-phase2c-feddyn-implementation/scaffold-review2-committed-probes/corrected_callback_lifecycle_probe.py",
+        "cwd": "/private/tmp/plato-refresh-worktrees/training",
+        "shell": "zsh -lc",
+        "seconds": 4.918403791030869,
+        "exit_code": 0,
+        "log": "/tmp/plato-phase2c-feddyn-implementation/scaffold-review2-committed-probe-clean-313.log",
+        "sha256": "3d04f000706118f28036fa22e05322a94d39703340dbf3912d3cd19770b384a2",
+        "log_summary": "}"
+      },
+      {
+        "source_commit": "0f17708afefde13eeba1fd71578258b68c5911ee",
+        "label": "checks",
+        "version": "313",
+        "command": "/tmp/plato-phase2c-313/bin/ruff check . --select I && /tmp/plato-phase2c-313/bin/ty check plato/trainers/composable.py examples/customized_client_training/scaffold/scaffold_server.py --output-format concise && git diff --check",
+        "cwd": "/private/tmp/plato-refresh-worktrees/training",
+        "shell": "zsh -lc",
+        "seconds": 0.24573833402246237,
+        "exit_code": 0,
+        "log": "/tmp/plato-phase2c-feddyn-implementation/scaffold-review2-committed-checks-313.log",
+        "sha256": "d63ab3df51a50c66f9c57056288c7d4faf9dce413552d89215714320ac2b748e",
+        "log_summary": "All checks passed!"
+      },
+      {
+        "source_commit": "0f17708afefde13eeba1fd71578258b68c5911ee",
+        "label": "archive-qualified",
+        "version": "313",
+        "command": "OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 /tmp/plato-phase2c-313/bin/python -m pytest tests/trainers/test_review_training_boundaries.py -k actual_accepted_b_feddyn_writer_migration -q --basetemp /tmp/plato-phase2c-feddyn-implementation/archive-temp-313",
+        "cwd": "/tmp/plato-phase2c-feddyn-implementation/source-archive-0f177",
+        "shell": "zsh -lc",
+        "seconds": 5.305630666902289,
+        "exit_code": 0,
+        "log": "/tmp/plato-phase2c-feddyn-implementation/scaffold-review2-committed-archive-qualified-313.log",
+        "sha256": "a020c6b2837a6fb6e4e87f8f1e4c21e68c35fc749c60929f2699a50b8c9026f4",
+        "log_summary": "4 passed, 13 deselected in 0.04s"
+      },
+      {
+        "source_commit": "f9772f61d52dfe0f4a3281252d23b8303ec237d2",
+        "mode": "red-final",
+        "command": "config_file=/tmp/plato-refresh-worktrees/training-review2/examples/customized_client_training/scaffold/scaffold_MNIST_lenet5.toml PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=/tmp/plato-refresh-worktrees/training-review2 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 /tmp/plato-phase2c-314/bin/python -c 'import pytest,plato.trainers.composable;import tests.integration.test_scaffold_round_flow as reference;assert plato.trainers.composable.__file__.startswith('\"'\"'/tmp/plato-refresh-worktrees/training-review2'\"'\"');assert reference.__file__.startswith('\"'\"'/tmp/plato-refresh-worktrees/training-review2'\"'\"');raise SystemExit(pytest.main(['\"'\"'/tmp/plato-phase2c-feddyn-implementation/test_scaffold_callback_lifecycle.py'\"'\"', '\"'\"'--import-mode=importlib'\"'\"','\"'\"'-p'\"'\"','\"'\"'no:cacheprovider'\"'\"','\"'\"'-q'\"'\"','\"'\"'--confcutdir'\"'\"','\"'\"'/tmp/plato-phase2c-feddyn-implementation'\"'\"','\"'\"'--basetemp'\"'\"','\"'\"'/tmp/plato-phase2c-feddyn-implementation/scaffold-exact-f977-red314'\"'\"']))'",
+        "cwd": "/tmp/plato-phase2c-feddyn-implementation",
+        "shell": "zsh -lc",
+        "seconds": 5.535032375017181,
+        "exit_code": 1,
+        "summary": "16 failed, 4 passed, 1 warning in 0.36s",
+        "log": "/tmp/plato-phase2c-feddyn-implementation/scaffold-review2-red-final-314.log",
+        "sha256": "3caae847f4b15711f98cea8da155fdcf6a14ef4336bc3326ddef9ee540d62cf8",
+        "log_summary": "16 failed, 4 passed, 1 warning in 0.36s"
+      },
+      {
+        "source_commit": "0f17708afefde13eeba1fd71578258b68c5911ee",
+        "mode": "committed-green",
+        "command": "OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 /tmp/plato-phase2c-314/bin/python -m pytest tests/trainers/test_scaffold_strategy.py tests/trainers/test_training_update_contract.py tests/trainers/test_dp_data_loader_strategy.py tests/trainers/test_personalized_state_ownership.py tests/trainers/test_review_training_boundaries.py tests/integration/test_scaffold_round_flow.py tests/integration/test_scaffold_callback_lifecycle.py -q --basetemp /tmp/plato-phase2c-feddyn-implementation/scaffold-review2-green314",
+        "cwd": "/private/tmp/plato-refresh-worktrees/training",
+        "shell": "zsh -lc",
+        "seconds": 201.87491216603667,
+        "exit_code": 0,
+        "summary": "174 passed, 17 warnings in 196.62s (0:03:16)",
+        "log": "/tmp/plato-phase2c-feddyn-implementation/scaffold-review2-committed-green-314.log",
+        "sha256": "c9c026d9373b16271073c690ada9335b59d4d1858647a869bf74c89e2802bdea",
+        "log_summary": "174 passed, 17 warnings in 196.62s (0:03:16)"
+      },
+      {
+        "source_commit": "0f17708afefde13eeba1fd71578258b68c5911ee",
+        "label": "probe-clean",
+        "version": "314",
+        "command": "OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=/private/tmp/plato-refresh-worktrees/training /tmp/plato-phase2c-314/bin/python /tmp/plato-phase2c-feddyn-implementation/scaffold-review2-committed-probes/corrected_callback_lifecycle_probe.py",
+        "cwd": "/private/tmp/plato-refresh-worktrees/training",
+        "shell": "zsh -lc",
+        "seconds": 5.234826750122011,
+        "exit_code": 0,
+        "log": "/tmp/plato-phase2c-feddyn-implementation/scaffold-review2-committed-probe-clean-314.log",
+        "sha256": "fe569b700b95f9328ebfa14eadf5bbcda9cddd1e6b510f93950b64535da07215",
+        "log_summary": "}"
+      },
+      {
+        "source_commit": "0f17708afefde13eeba1fd71578258b68c5911ee",
+        "label": "checks",
+        "version": "314",
+        "command": "/tmp/plato-phase2c-314/bin/ruff check . --select I && /tmp/plato-phase2c-314/bin/ty check plato/trainers/composable.py examples/customized_client_training/scaffold/scaffold_server.py --output-format concise && git diff --check",
+        "cwd": "/private/tmp/plato-refresh-worktrees/training",
+        "shell": "zsh -lc",
+        "seconds": 0.29926358303055167,
+        "exit_code": 0,
+        "log": "/tmp/plato-phase2c-feddyn-implementation/scaffold-review2-committed-checks-314.log",
+        "sha256": "d63ab3df51a50c66f9c57056288c7d4faf9dce413552d89215714320ac2b748e",
+        "log_summary": "All checks passed!"
+      },
+      {
+        "source_commit": "0f17708afefde13eeba1fd71578258b68c5911ee",
+        "label": "archive-qualified",
+        "version": "314",
+        "command": "OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 /tmp/plato-phase2c-314/bin/python -m pytest tests/trainers/test_review_training_boundaries.py -k actual_accepted_b_feddyn_writer_migration -q --basetemp /tmp/plato-phase2c-feddyn-implementation/archive-temp-314",
+        "cwd": "/tmp/plato-phase2c-feddyn-implementation/source-archive-0f177",
+        "shell": "zsh -lc",
+        "seconds": 5.484900791896507,
+        "exit_code": 0,
+        "log": "/tmp/plato-phase2c-feddyn-implementation/scaffold-review2-committed-archive-qualified-314.log",
+        "sha256": "8af95d79bad1277bf0fa4a4733b4e16c28874d81a275970c93ed51043b96bc36",
+        "log_summary": "4 passed, 13 deselected in 0.05s"
+      }
+    ],
+    "red": "20 tracked boundary cases:16 fail,4 pass on immutablef977 each Python version. Red wrapper records actual pytest exit1 despite outer intentional wrapper exit0.",
+    "green": "174 affected tests passed each Python version, zero skips, including all20 new regressions, shipped configuration two-round rational oracles, actual spawned SCAFFOLD success and failed-worker retries. Separate4 archive migration cases and adapted original-author probe replays are distinct executions, not additional unique cases.",
+    "warnings": {
+      "green_total_each": 17,
+      "policy": "Visible and unsuppressed; no blanket filters or global warning policy changes.",
+      "categories": {
+        "Opacus experimental nonsecure RNG": 5,
+        "RDP largest-order notice": 3,
+        "PyTorch full backward hook for inputs without gradients": 4,
+        "Repeated make_private_with_epsilon spent-budget notice": 2,
+        "New subset dataset object accounting notice": 3
+      },
+      "privacy_scope": "Retained accounting lifecycle is checked; no global privacy accounting guarantee.",
+      "red_notice": "One PytestAssertRewriteWarning from preloading immutable production/helper before pytest in the isolated red harness, each version; harness import-order notice, not hidden."
+    },
+    "tooling": "Repository Ruff I and scoped ty on both changed production modules pass using each owned environment. Global404-classified baseline not represented as globally clean.",
+    "not_rerun_here": "48 runtime startup/socket cases are intentionally not rerun solely for this intermediate boundary; final combined qualification still requires them."
+  },
+  "original_reviewer_probe": {
+    "original": {
+      "path": "/tmp/plato-phase2c-feddyn-implementation/scaffold-review2-probes/original_callback_lifecycle_probe.py",
+      "bytes": 7848,
+      "sha256": "3f2f01caced400601f6b5f717bf7e721aac8d883df01821f236364355b3f9e05"
+    },
+    "original_helper": {
+      "path": "/tmp/plato-phase2c-feddyn-implementation/scaffold-review2-probes/original_independent_checks.py",
+      "bytes": 14073,
+      "sha256": "87ee03fa2c8c565a4e0d8cde28f5a243c2f0335540e5c3eb6d12769c446ef43b"
+    },
+    "corrected_owned_copy": {
+      "path": "/tmp/plato-phase2c-feddyn-implementation/scaffold-review2-committed-probes/corrected_callback_lifecycle_probe.py",
+      "bytes": 7796,
+      "sha256": "4eebb69691bc1ae2721297d7b075147a13ddc2ada3dc6dddfeb3ebde71507858"
+    },
+    "owned_helper": {
+      "path": "/tmp/plato-phase2c-feddyn-implementation/scaffold-review2-committed-probes/independent_checks.py",
+      "bytes": 14098,
+      "sha256": "e39bfa7a95c5fa2b598f8ac17112e47659531c04a2c3770cbb6fe8cad396f9cc"
+    },
+    "adaptation": "Only candidate/scratch location and explicit corrected outcome assertions changed. Original defect-asserting source retained untouched. Replay is original-author evidence, not fresh independent acceptance.",
+    "absence_case": "Original probe reconstructs with no accepted canonical file, so fresh ci is unset and later zero-initialized retry gives y=.43,ci=.85,delta=.85. Tracked regression explicitly restores manual caller ci=1 before independent .62/.9/-.1 retry."
+  },
+  "retained_failed_harness_attempts": {
+    "receipts": [
+      {
+        "source_commit": "0f17708afefde13eeba1fd71578258b68c5911ee",
+        "label": "probe",
+        "version": "313",
+        "command": "OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=/private/tmp/plato-refresh-worktrees/training /tmp/plato-phase2c-313/bin/python /tmp/plato-phase2c-feddyn-implementation/scaffold-review2-probes/corrected_callback_lifecycle_probe.py",
+        "cwd": "/private/tmp/plato-refresh-worktrees/training",
+        "shell": "zsh -lc",
+        "seconds": 4.835347708081827,
+        "exit_code": 1,
+        "log": "/tmp/plato-phase2c-feddyn-implementation/scaffold-review2-committed-probe-313.log",
+        "sha256": "2eb8d6364ad188dfa5757d4df1ffa3fecc1416ce67fb700bdade04c31b8200f6"
+      },
+      {
+        "source_commit": "0f17708afefde13eeba1fd71578258b68c5911ee",
+        "label": "probe",
+        "version": "314",
+        "command": "OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=/private/tmp/plato-refresh-worktrees/training /tmp/plato-phase2c-314/bin/python /tmp/plato-phase2c-feddyn-implementation/scaffold-review2-probes/corrected_callback_lifecycle_probe.py",
+        "cwd": "/private/tmp/plato-refresh-worktrees/training",
+        "shell": "zsh -lc",
+        "seconds": 5.160746542038396,
+        "exit_code": 1,
+        "log": "/tmp/plato-phase2c-feddyn-implementation/scaffold-review2-committed-probe-314.log",
+        "sha256": "31697e54f9670e4985649700d0d9bc0360d903fb19451567c9157f857f10e1e5"
+      },
+      {
+        "source_commit": "0f17708afefde13eeba1fd71578258b68c5911ee",
+        "label": "archive",
+        "version": "313",
+        "command": "OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 /tmp/plato-phase2c-313/bin/python -m pytest tests/trainers/test_review_training_boundaries.py -k accepted_runtime_writer -q --basetemp /tmp/plato-phase2c-feddyn-implementation/archive-temp-313",
+        "cwd": "/tmp/plato-phase2c-feddyn-implementation/source-archive-0f177",
+        "shell": "zsh -lc",
+        "seconds": 5.035099792061374,
+        "exit_code": 5,
+        "log": "/tmp/plato-phase2c-feddyn-implementation/scaffold-review2-committed-archive-313.log",
+        "sha256": "2028ba6db36217caa7fef84beb95d2dc85a351046b3f0bba11abbd701d70c1b7"
+      }
+    ],
+    "explanation": "Initial committed probe rerun reused old owned scratch canonical files; assertion for absent prior canonical correctly failed. Corrected replay uses a new owned scratch root and unchanged success assertions. Initial source-archive selector matched no tests (17 deselected, exit5); corrected exact test name runs4 cases. An initial ty --output-format json invocation was rejected by installed CLI (exit2); supported concise output reruns pass. Earlier draft fault-injection and source-binding red attempts remain in raw scratch; only exact final red and committed green receipts qualify this candidate."
+  },
+  "public_facts_for_astra_reconciliation": {
+    "math_config_paths": "No SCAFFOLD equations, TOML values, control-state filenames, learning-rate accounting, supported optimizer constraints, or F20 unsquared FedProx equations changed.",
+    "changed_semantics": [
+      "Direct result acceptance now follows successful training-step end hook.",
+      "Failed report batches discard staging and preserve committed model/control through aggregation callbacks.",
+      "Successful aggregation callback boundary defines commit; postcommit evaluation/reporting failure keeps it."
+    ],
+    "standalone_prose": "Astra/root-owned standalone SCAFFOLD/FedDyn prose untouched; root should reconcile these lifecycle facts before final prose review."
+  },
+  "preserved_feddyn_work": {
+    "original_path": "tests/trainers/test_feddyn_strategy.py",
+    "preserved_path": "/tmp/plato-phase2c-feddyn-implementation/preserved-feddyn-test-draft.py",
+    "sha256": "d7595d180ec24be5ec1e1c754af48b5f29686b7484813f7c2bcfad95f01f72c9",
+    "bytes": 3904,
+    "status": "Untracked independent FedDyn red test draft; no FedDyn production edits; restore on next turn."
+  },
+  "dependencies_and_limits": [
+    "General review2 accepts only four earlier production corrections on immutablef977; preserved here.",
+    "FedDyn accepted revised design remains authorized future implementation work; this intermediate candidate does not implement/close2C-11 or claim its full acceptance criteria.",
+    "B resume supplement a058 is now independently reviewed/root accepted and queued for the following FedDyn turn after this intermediate boundary; no merge or servers/base.py edits here.",
+    "Fresh SCAFFOLD review3, accepted FedDyn implementation plus fresh code/prose reviews, eventual B integration, final combined C/runtime qualification and root acceptance remain.",
+    "CPU fixtures only for this boundary; no new CUDA/native GPU execution or convergence claim."
+  ],
+  "historical_evidence": "Existing phase2c-validation/facts evidence is retained as historical f977 qualification, not retroactively claimed as post-fix results.",
+  "owned_scratch": {
+    "root": "/tmp/plato-phase2c-feddyn-implementation",
+    "inventory": {
+      "path": "/tmp/plato-phase2c-feddyn-implementation/scaffold-intermediate-scratch-inventory.json",
+      "bytes": 907139,
+      "sha256": "4d0f66ae6227b717679dc78285bbf5c7d353ae7d86bccedda15b74148a0c64e8"
+    },
+    "files": 3435,
+    "keep_raw": "All original logs/probes, generated owned partitions, archive and preserved FedDyn draft retained for review/resume; no cleanup."
+  }
+}

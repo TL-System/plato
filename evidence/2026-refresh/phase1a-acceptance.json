@@ -1,0 +1,14 @@
+{
+  "phase": "1A",
+  "decision": "accepted by orchestrator after independent review",
+  "candidate_commit": "7304703905189baf771032f1cd923a37f66ed97f",
+  "review": "phase1a-review.json",
+  "review_sha256": "4a27a339a3bc174ca378bba80c8214f9dc5ac536417d7f64f38eff3eb58a26f1",
+  "scope": "Dependency manifests, locked uv profiles and installed artifact checks as recorded; runtime, platform and optional-service limitations remain explicit.",
+  "policies": [
+    "Retain Python 3.13 default; 3.14 core qualification is forward-compatibility evidence.",
+    "Retain tested NLTK 3.10.3 override and the unsuppressed advisory/metadata exception.",
+    "User authorizes archival, specifically prefers archiving ViT rather than repairing it."
+  ],
+  "next": "Phase 1B based on the accepted candidate. Complete 1C and Astra phase gate before integration/push/PR; keep original implementer available."
+}

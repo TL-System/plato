@@ -2,12 +2,11 @@
 Samples data from a dataset in an independent and identically distributed fashion.
 """
 
-import numpy as np
 import torch
 from torch.utils.data import SubsetRandomSampler
 
 from plato.config import Config
-from plato.samplers import base
+from plato.samplers import base, sampler_utils
 
 
 class Sampler(base.Sampler):
@@ -15,7 +14,7 @@ class Sampler(base.Sampler):
     dataset."""
 
     def __init__(self, datasource, client_id, testing):
-        super().__init__()
+        super().__init__(client_id)
 
         if testing:
             dataset = datasource.get_test_set()
@@ -23,21 +22,23 @@ class Sampler(base.Sampler):
             dataset = datasource.get_train_set()
 
         self.dataset_size = len(dataset)
+        if self.dataset_size == 0:
+            raise ValueError(
+                "IID sampling requires a nonempty dataset; got empty data."
+            )
         indices = list(range(self.dataset_size))
-        np.random.seed(self.random_seed)
-        np.random.shuffle(indices)
+        self.rng.shuffle(indices)
 
         partition_size = Config().data.partition_size
         total_clients = Config().clients.total_clients
         total_size = partition_size * total_clients
+        if partition_size < 0 or total_clients <= 0:
+            raise ValueError(
+                "partition_size must be nonnegative and total_clients positive."
+            )
 
         # add extra samples to make it evenly divisible, if needed
-        if len(indices) < total_size:
-            while len(indices) < total_size:
-                indices += indices[: (total_size - len(indices))]
-        else:
-            indices = indices[:total_size]
-        assert len(indices) == total_size
+        indices = sampler_utils.extend_indices(indices, total_size)
 
         # Compute the indices of data in the subset for this client
         self.subset_indices = indices[(int(client_id) - 1) : total_size : total_clients]

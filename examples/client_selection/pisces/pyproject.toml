@@ -2,8 +2,11 @@
 name = "pisces"
 version = "0.1.0"
 description = "Pisces - an asynchronous client selection and server aggregation algorithm"
-readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
-    "scikit-learn",
+    "plato-learn>=1.4.3",
+    "scikit-learn>=1.9.1",
 ]
+
+[tool.uv.sources]
+plato-learn = { workspace = true }

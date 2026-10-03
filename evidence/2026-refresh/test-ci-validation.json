@@ -1,0 +1,1066 @@
+{
+  "phase": "1C",
+  "date": "2026-10-02",
+  "status": "Two bounded review fixes locally validated on macOS 3.13/3.14; revised candidate awaits another fresh root-created exact-commit review and GitHub Linux execution. Startup execution evidence retained from 845255, not rerun or relabeled.",
+  "source": {
+    "accepted_dependency_commit": "7304703905189baf771032f1cd923a37f66ed97f",
+    "accepted_startup_commit": "213b321c3cfb31d0f82c0b315efe50dcbf7dee20",
+    "integrated_parent_commit": "1178afe954d6df2cc74eed54b1813b6a299f70dc",
+    "identity": "Revised source = candidate 845255 plus the final file SHA256 values below. Only tests/conftest.py and the workflow changed; runtime/helpers/startup markers/dependencies/default interpreter are byte-identical to 845255. New core qualification and startup collection use revised source; complete runtime execution remains evidence from 845255.",
+    "files_sha256": {
+      "tests/conftest.py": "3eb55a1fa7c0fd5428c296c1bcd7300b23b0ade3d276f5c687af3b9bd78304c7",
+      "tests/integration/utils.py": "7a4af3c5bece78c256f268fb47ee31e384f14cca098d1690ebe2c05f79b21634",
+      "tests/trainers/test_dp_data_loader_strategy.py": "ab2ed2a9664d1986dcb2cdebd815cdaa052f25efe1b38be63c3f412bd64c2d8f",
+      "tests/test_nanochat_integration.py": "07d59c06105cc5d3767f3899ac0b07f4a3692f679edeef34765e8ac43e04013c",
+      "tests/clients/test_feddf_strategy.py": "00dfde39c13bfbbe7a842266ada0e77419c609ba2d3bf82008d5985f5d08a930",
+      "tests/servers/test_feddf_server_strategy.py": "41d065daf85092ecb46bdea3a6fe3526d5daeabfcc920e8b63edd035b9408b62",
+      "tests/datasources/test_huggingface_datasource.py": "938341526e228318590d8f5591232d1653a9e33a99f0a3c48780a4ffbc583137",
+      "pyproject.toml": "799bd7ba1865b097fdc8ca84a7b70337794e338de4aa9a6a13f6a4c1b9156246",
+      "uv.lock": "573b10c2ba1a2317e02f9e40c6181359cafab6f6e0a0f9be12bb256cb276fe1d",
+      ".github/workflows/pytorch_tests.yml": "699c768a6fdb27bc75a0bae7ba7d333ddd39570bb2070bbb800fad020fc5f42e",
+      "tests/integration/test_event_loop_startup.py": "a92c9ee2347e2113cd65b7949c922ac5bbf1846f4caeca30a128db580c79751e",
+      "plato/client.py": "81395fb7c485a23e875bd160fff466674badc833a9fbec6d441a5937c421fa3f",
+      "plato/servers/base.py": "51d2353b0c928e04416c73c08fc24ac926bc8ed81ae7d95e9ee1181b377973fb",
+      "tests/integration/startup_harness.py": "988f216f9367b1e9e8156bad62d3c03a813e26d32f919981ae227f5d8754642e",
+      "tests/integration/startup_probe.py": "e6c9bb2bf39616fe3a6745da528690a578e7416837e0914578ec688d2851b34f",
+      "tests/integration/startup_socket.py": "64d04c2ab0e041f35f5e5aca88aa46a436507cb76f54ef4ca3c3df702666720f",
+      ".python-version": "02e735b3dfe1c32833eb550b7ff8ffa17f5f2bc3fa1e7bae61a8f5a3883ce398"
+    },
+    "sorted_source_manifest_sha256": "96732dd9adef9142d858a2d3d5f0c2d3a74bcb91c132fa66c0c48751f22143d7",
+    "input_sha256": {
+      "test-ci-design.json": "13f3d272e921d05afd2b3457ff977374528ea4653ff1ca8c238b5b945f5b9ef2",
+      "design-revision-review.json": "0535b3ccbac91a264317bd8fb9314465a0379155bc7113de99a27a9b66b7be39",
+      "plan-addendum.json": "5b51b0fb7ed6f68d9fce7176335b3e7be5e5f178a2788590912aa2396a487709",
+      "plan.md": "edb9a58cc7915a940854f16d5029fe97434703bf2f75eca0dcb96de2d0f0eb15",
+      "phase1b-review.json": "f02507a3be88f1438143c24bf7921af907400d370d4bf7ccba6378ec4756ec2b",
+      "phase1b-acceptance.json": "b6f1a35ed1b54499d2e3c1a8d5ab3bee5a3e47a2c967b73a6b909ba1e09d0444",
+      "baseline-coverage.json": "9f82f36144f849c3b23f7575843234394f8fa3cee59923a230b58d5e632daea1",
+      "phase1c-review.json": "cf24369733c0d2270854998356ec1bca39d53ab8faa19517fe6b1c4bd8cc5d4d"
+    },
+    "submodules": [
+      "c75fe54aa7c1fa881701c246f9427bcbe4eee5a4 external/nanochat (c75fe54)",
+      " 1ccb152cea43fcbc3cd517a45c12c65734f8ace3 plato/models/dvit (heads/master)",
+      " 0f63dc9558f4d192de926504dbddfa1b3f5db6ca plato/models/t2tvit (main-28-g0f63dc9)"
+    ],
+    "default_python": "3.13 unchanged; 3.14 core forward compatibility",
+    "revision_parent_commit": "845255cdf358869d260699a9ef0786e37514e9f4"
+  },
+  "lock": {
+    "sha256": "573b10c2ba1a2317e02f9e40c6181359cafab6f6e0a0f9be12bb256cb276fe1d",
+    "packages": 278,
+    "comparison": "Every accepted dependency package record is identical after removing only two added test-base metadata arrays; eight metadata lines added. No dependency selection churn or necessary conflicts.",
+    "check": {
+      "path": "/tmp/plato-phase1c-test-ci/final/lock.log",
+      "sha256": "03d94a2abcb8f0d49637582669845317c0b5cacf55d6c5ef64231dca55e7937d"
+    }
+  },
+  "environment": {
+    "uv": "uv 0.12.22 (70fe1196a 2026-10-01 aarch64-apple-darwin)",
+    "shell": "zsh -lc for all local shell commands",
+    "profiles": [
+      {
+        "name": "base-313",
+        "path": "/tmp/plato-phase1c-test-ci/base-313",
+        "python": "3.13.16",
+        "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+        "versions": {
+          "torch": "2.14.1",
+          "datasets": "5.0.1",
+          "pytest": "9.1.1",
+          "pytest-cov": "7.1.0",
+          "coverage": "7.16.2"
+        },
+        "optional_imports": {
+          "opacus": false,
+          "kazoo": false,
+          "gymnasium": false,
+          "tiktoken": false
+        },
+        "freeze": {
+          "path": "/tmp/plato-phase1c-test-ci/final/freeze-base-313.txt",
+          "sha256": "a32b48fedd19d747e4d90fae435d56e2210072a9c79a070a439169b25c1ddb4b"
+        },
+        "sync": {
+          "path": "/tmp/plato-phase1c-test-ci/final/sync-base-313.log",
+          "sha256": "15ef5fa2e3d7dc5f2a186b4104a2c73f1b8ada04a049519a69c54412122152e2"
+        }
+      },
+      {
+        "name": "mandatory-313",
+        "path": "/tmp/plato-phase1c-test-ci/mandatory-313",
+        "python": "3.13.16",
+        "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+        "versions": {
+          "torch": "2.14.1",
+          "datasets": "5.0.1",
+          "pytest": "9.1.1",
+          "pytest-cov": "7.1.0",
+          "coverage": "7.16.2"
+        },
+        "optional_imports": {
+          "opacus": true,
+          "kazoo": true,
+          "gymnasium": true,
+          "tiktoken": true
+        },
+        "freeze": {
+          "path": "/tmp/plato-phase1c-test-ci/final/freeze-mandatory-313.txt",
+          "sha256": "a035ff61bca8ef720e425afe5bc5872c648eccb4fac591467df15b52ef742556"
+        },
+        "sync": {
+          "path": "/tmp/plato-phase1c-test-ci/final/sync-mandatory-313.log",
+          "sha256": "53b8f4f77253c53fe44028c7673b3ede0f708330d9aab0aa330fdb5f6190b2b3"
+        }
+      },
+      {
+        "name": "base-314",
+        "path": "/tmp/plato-phase1c-test-ci/base-314",
+        "python": "3.14.8",
+        "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+        "versions": {
+          "torch": "2.14.1",
+          "datasets": "5.0.1",
+          "pytest": "9.1.1",
+          "pytest-cov": "7.1.0",
+          "coverage": "7.16.2"
+        },
+        "optional_imports": {
+          "opacus": false,
+          "kazoo": false,
+          "gymnasium": false,
+          "tiktoken": false
+        },
+        "freeze": {
+          "path": "/tmp/plato-phase1c-test-ci/final/freeze-base-314.txt",
+          "sha256": "a32b48fedd19d747e4d90fae435d56e2210072a9c79a070a439169b25c1ddb4b"
+        },
+        "sync": {
+          "path": "/tmp/plato-phase1c-test-ci/final/sync-base-314.log",
+          "sha256": "e6ff28a18f789e18e7fd1c2e529ad0d02a70e90f004580a1c53f3228251da102"
+        }
+      },
+      {
+        "name": "mandatory-314",
+        "path": "/tmp/plato-phase1c-test-ci/mandatory-314",
+        "python": "3.14.8",
+        "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+        "versions": {
+          "torch": "2.14.1",
+          "datasets": "5.0.1",
+          "pytest": "9.1.1",
+          "pytest-cov": "7.1.0",
+          "coverage": "7.16.2"
+        },
+        "optional_imports": {
+          "opacus": true,
+          "kazoo": true,
+          "gymnasium": true,
+          "tiktoken": true
+        },
+        "freeze": {
+          "path": "/tmp/plato-phase1c-test-ci/final/freeze-mandatory-314.txt",
+          "sha256": "a035ff61bca8ef720e425afe5bc5872c648eccb4fac591467df15b52ef742556"
+        },
+        "sync": {
+          "path": "/tmp/plato-phase1c-test-ci/final/sync-mandatory-314.log",
+          "sha256": "7c6b4184ba366c7683b0750837ae271b122f60353df79d0d3db49c3be7dc3687"
+        }
+      }
+    ],
+    "scratch_root": "/tmp/plato-phase1c-test-ci",
+    "retention": "Own four environments, probes, full raw logs and startup process/event results remain intact for root review.",
+    "qualification_env": {
+      "CUDA_VISIBLE_DEVICES": "",
+      "OMP_NUM_THREADS": "1",
+      "MKL_NUM_THREADS": "1",
+      "TOKENIZERS_PARALLELISM": "false",
+      "HF_HUB_OFFLINE": "1",
+      "HF_DATASETS_OFFLINE": "1",
+      "COVERAGE_FILE": "/tmp/plato-phase1c-test-ci/final/.coverage-{313,314}"
+    }
+  },
+  "runs": [
+    {
+      "name": "base",
+      "python": "3.13",
+      "environment": "/tmp/plato-phase1c-test-ci/base-313",
+      "command": "uv run --no-sync --python 3.13 python -B -m pytest tests --test-profile=base -m 'not runtime' -ra -p no:cacheprovider --basetemp=/tmp/plato-phase1c-test-ci/review-fixes/core-base-313-tmp --junitxml=/tmp/plato-phase1c-test-ci/review-fixes/core-base-313.xml",
+      "exit": 0,
+      "wall_seconds": 5.683,
+      "log": {
+        "path": "/tmp/plato-phase1c-test-ci/review-fixes/core-base-313.log",
+        "sha256": "f429e52e4b1742ec171db7d79142daa9dcedba2de7acd5dc46f78369cd5042bf"
+      },
+      "source_identity": "revision_parent_commit plus files_sha256",
+      "passed": 246,
+      "skip_reports": 4,
+      "failed": 0,
+      "pytest_warning_count": 0,
+      "summary": "246 passed, 4 skipped, 48 deselected in 1.08s",
+      "junit": {
+        "path": "/tmp/plato-phase1c-test-ci/review-fixes/core-base-313.xml",
+        "sha256": "7d941e3ade0f066c620b08a9a781953065064faf1f07d9d81a0177924ddcf3a0"
+      }
+    },
+    {
+      "name": "mandatory",
+      "python": "3.13",
+      "environment": "/tmp/plato-phase1c-test-ci/mandatory-313",
+      "command": "uv run --no-sync --python 3.13 python -B -m pytest tests --test-profile=mandatory -m 'not runtime' -ra -p no:cacheprovider --basetemp=/tmp/plato-phase1c-test-ci/review-fixes/core-mandatory-313-tmp --junitxml=/tmp/plato-phase1c-test-ci/review-fixes/core-mandatory-313.xml",
+      "exit": 0,
+      "wall_seconds": 8.931,
+      "log": {
+        "path": "/tmp/plato-phase1c-test-ci/review-fixes/core-mandatory-313.log",
+        "sha256": "fd9d315e5e82fcfd29c7254693a2626ee9efdfe2bc3875d122f60148ac5cb3f3"
+      },
+      "source_identity": "revision_parent_commit plus files_sha256",
+      "passed": 250,
+      "skip_reports": 1,
+      "failed": 0,
+      "pytest_warning_count": 0,
+      "summary": "250 passed, 1 skipped, 48 deselected in 2.40s",
+      "junit": {
+        "path": "/tmp/plato-phase1c-test-ci/review-fixes/core-mandatory-313.xml",
+        "sha256": "a3fc28d503b8ae7218fad788fe8fd78d1fb86b2111a354e78497586645fa5d27"
+      }
+    },
+    {
+      "name": "base",
+      "python": "3.14",
+      "environment": "/tmp/plato-phase1c-test-ci/base-314",
+      "command": "uv run --no-sync --python 3.14 python -B -m pytest tests --test-profile=base -m 'not runtime' -ra -p no:cacheprovider --basetemp=/tmp/plato-phase1c-test-ci/review-fixes/core-base-314-tmp --junitxml=/tmp/plato-phase1c-test-ci/review-fixes/core-base-314.xml",
+      "exit": 0,
+      "wall_seconds": 5.967,
+      "log": {
+        "path": "/tmp/plato-phase1c-test-ci/review-fixes/core-base-314.log",
+        "sha256": "b82d3e2606bf2980633c8dc891b36eb5705419d46d6677c1e209aef42e120943"
+      },
+      "source_identity": "revision_parent_commit plus files_sha256",
+      "passed": 246,
+      "skip_reports": 4,
+      "failed": 0,
+      "pytest_warning_count": 0,
+      "summary": "246 passed, 4 skipped, 48 deselected in 1.10s",
+      "junit": {
+        "path": "/tmp/plato-phase1c-test-ci/review-fixes/core-base-314.xml",
+        "sha256": "faecc26d5fa60b0e4c877d7f446b8895628cd75cf851ff58444a6c2590a2e3e5"
+      }
+    },
+    {
+      "name": "mandatory",
+      "python": "3.14",
+      "environment": "/tmp/plato-phase1c-test-ci/mandatory-314",
+      "command": "uv run --no-sync --python 3.14 python -B -m pytest tests --test-profile=mandatory -m 'not runtime' -ra -p no:cacheprovider --basetemp=/tmp/plato-phase1c-test-ci/review-fixes/core-mandatory-314-tmp --junitxml=/tmp/plato-phase1c-test-ci/review-fixes/core-mandatory-314.xml",
+      "exit": 0,
+      "wall_seconds": 9.353,
+      "log": {
+        "path": "/tmp/plato-phase1c-test-ci/review-fixes/core-mandatory-314.log",
+        "sha256": "5eea413de20ebb946e9f2e2155d69f6e3bcf9df1a7bde3498b72ec69a8069efd"
+      },
+      "source_identity": "revision_parent_commit plus files_sha256",
+      "passed": 250,
+      "skip_reports": 1,
+      "failed": 0,
+      "pytest_warning_count": 0,
+      "summary": "250 passed, 1 skipped, 48 deselected in 2.24s",
+      "junit": {
+        "path": "/tmp/plato-phase1c-test-ci/review-fixes/core-mandatory-314.xml",
+        "sha256": "02872d6fabaf6dda7871934eb8bf36f13c76c125520d80d44d75b7ec8e93ed52"
+      }
+    },
+    {
+      "name": "runtime",
+      "python": "3.13",
+      "environment": "/tmp/plato-phase1c-test-ci/mandatory-313",
+      "command": "uv run --no-sync --python 3.13 python -m pytest tests --test-profile=mandatory -m runtime -ra --basetemp=/tmp/plato-phase1c-test-ci/final/runtime-tmp-313 --junitxml=/tmp/plato-phase1c-test-ci/final/runtime-313.xml",
+      "exit": 0,
+      "wall_seconds": 435.424,
+      "passed": 48,
+      "skip_reports": 0,
+      "failed": 0,
+      "pytest_warning_count": 0,
+      "summary": "48 passed, 251 deselected in 429.60s (0:07:09)",
+      "log": {
+        "path": "/tmp/plato-phase1c-test-ci/final/runtime-313.log",
+        "sha256": "fecd42b46d2d481974496ea44213362d1b4eda531df4d8c0c86907cd5c3f89d3"
+      },
+      "junit": {
+        "path": "/tmp/plato-phase1c-test-ci/final/runtime-313.xml",
+        "sha256": "ded6ff7fb8e36a5f5e12af51ac6281be870f72933939e421613ca50522d40b34"
+      },
+      "source_commit": "845255cdf358869d260699a9ef0786e37514e9f4",
+      "retained_without_rerun": true
+    },
+    {
+      "name": "runtime",
+      "python": "3.14",
+      "environment": "/tmp/plato-phase1c-test-ci/mandatory-314",
+      "command": "uv run --no-sync --python 3.14 python -m pytest tests --test-profile=mandatory -m runtime -ra --basetemp=/tmp/plato-phase1c-test-ci/final/runtime-tmp-314 --junitxml=/tmp/plato-phase1c-test-ci/final/runtime-314.xml",
+      "exit": 0,
+      "wall_seconds": 448.504,
+      "passed": 48,
+      "skip_reports": 0,
+      "failed": 0,
+      "pytest_warning_count": 0,
+      "summary": "48 passed, 251 deselected in 442.08s (0:07:22)",
+      "log": {
+        "path": "/tmp/plato-phase1c-test-ci/final/runtime-314.log",
+        "sha256": "f9a593674b68dbad1c3457cef2a6f4becf2493369f8c362c871eeac8cb223993"
+      },
+      "junit": {
+        "path": "/tmp/plato-phase1c-test-ci/final/runtime-314.xml",
+        "sha256": "878d8e1aa6bae626dbf1f889dd6ff2e129488e35202167a94f8dff5355b8a05b"
+      },
+      "source_commit": "845255cdf358869d260699a9ef0786e37514e9f4",
+      "retained_without_rerun": true
+    }
+  ],
+  "collection": {
+    "313": {
+      "base": {
+        "path": "/tmp/plato-phase1c-test-ci/final/collect-base-313.log",
+        "sha256": "4410d4b0f15ded4aea4390def2c6ead7079c295fb133a3d3ba0aa4abea7e5318"
+      },
+      "mandatory": {
+        "path": "/tmp/plato-phase1c-test-ci/final/collect-mandatory-313.log",
+        "sha256": "550ef66bb05407e0a000758ae2e9fa1fd76849a2e93796106911101cb2a9b319"
+      },
+      "runtime": {
+        "path": "/tmp/plato-phase1c-test-ci/final/collect-runtime-313.log",
+        "sha256": "beb5e0c8a1b282021311f73a1aa933fd3b00d8795fbc0f41e37c753cb8898a51"
+      }
+    },
+    "314": {
+      "base": {
+        "path": "/tmp/plato-phase1c-test-ci/final/collect-base-314.log",
+        "sha256": "58dc22eb44ca2e3fbd79a1d1cb26ceb834e72cf05a895d456a6277639cec80e1"
+      },
+      "mandatory": {
+        "path": "/tmp/plato-phase1c-test-ci/final/collect-mandatory-314.log",
+        "sha256": "0fcdfabb425180ef5262a983b91fac4417815a357078a90020093d6193bf836e"
+      },
+      "runtime": {
+        "path": "/tmp/plato-phase1c-test-ci/final/collect-runtime-314.log",
+        "sha256": "35ebb2d345d249b95a3db3254bf13cd01decdb49c037c6db0f46a06ddc195bf5"
+      }
+    },
+    "review_fix_startup": {
+      "313": {
+        "name": "startup-collection",
+        "python": "3.13",
+        "environment": "/tmp/plato-phase1c-test-ci/mandatory-313",
+        "command": "uv run --no-sync --python 3.13 python -B -m pytest tests --test-profile=mandatory -m runtime --collect-only -ra -p no:cacheprovider --basetemp=/tmp/plato-phase1c-test-ci/review-fixes/startup-collection-313-tmp",
+        "exit": 0,
+        "wall_seconds": 6.496,
+        "log": {
+          "path": "/tmp/plato-phase1c-test-ci/review-fixes/startup-collection-313.log",
+          "sha256": "fef4d5271a0e7d661e8e7521591cda4b1dd17393abfd490c7db68ace74b1acd5"
+        },
+        "cases": 48,
+        "node_manifest_sha256": "fa18784425bb2590fdce455b39c6c78c9b27c6e939c298ea95f840e53ce952aa"
+      },
+      "314": {
+        "name": "startup-collection",
+        "python": "3.14",
+        "environment": "/tmp/plato-phase1c-test-ci/mandatory-314",
+        "command": "uv run --no-sync --python 3.14 python -B -m pytest tests --test-profile=mandatory -m runtime --collect-only -ra -p no:cacheprovider --basetemp=/tmp/plato-phase1c-test-ci/review-fixes/startup-collection-314-tmp",
+        "exit": 0,
+        "wall_seconds": 7.01,
+        "log": {
+          "path": "/tmp/plato-phase1c-test-ci/review-fixes/startup-collection-314.log",
+          "sha256": "b28894aefb7cd9c1341b0d9bed1d14693c973283825076251fc7c0b803cd19ba"
+        },
+        "cases": 48,
+        "node_manifest_sha256": "fa18784425bb2590fdce455b39c6c78c9b27c6e939c298ea95f840e53ce952aa"
+      }
+    }
+  },
+  "required_counts": {
+    "base": "249 core test items, 246 passed, three named Nanochat test skips; one missing-Opacus module skip represents two optional DP nodes. Four skip reports represent five omitted core nodes. All 48 startup cases deliberately partitioned out.",
+    "mandatory": "251 core test items, 250 passed, one permitted native tokenizer node skip. Both DP sampler tests, all three MPC tests, MPC training smoke and both initialized real Nanochat trainer tests pass.",
+    "runtime": "All 48 accepted startup cases pass once per interpreter, including three real socket cases and all five watchdog cases. Zero required runtime skips or xfails. 251 core items deliberately partitioned out.",
+    "native": "Only callable rustbpe.Tokenizer availability permits the exact tokenizer round-trip skip; initialized pinned Nanochat source/model/trainer remain mandatory. CORE strategy-selection test is not real CORE evaluation qualification.",
+    "policy": "Unfiltered root/full-suite runs without a profile remain mandatory. Ordinary implicit -k/-m/--deselect selections and file-scoped commands retain pytest behavior. Every explicit profile still qualifies and enforces prerequisite, exact omission/skip/xfail and deselection checks, including full runtime inventory for the explicit runtime partition."
+  },
+  "startup_results": {
+    "313": {
+      "cases": 48,
+      "watchdog_timeouts": 5,
+      "forced_containment_results": 5,
+      "survivors": [],
+      "subprocess_warning_lines": {},
+      "retained_results": "/tmp/plato-phase1c-test-ci/final/runtime-tmp-313",
+      "result_manifest_sha256": "3606f66c6bd4a55a93a4980ca4236a4d8ca3215b678bd23517ab90e1f826e188"
+    },
+    "314": {
+      "cases": 48,
+      "watchdog_timeouts": 5,
+      "forced_containment_results": 5,
+      "survivors": [],
+      "subprocess_warning_lines": {},
+      "retained_results": "/tmp/plato-phase1c-test-ci/final/runtime-tmp-314",
+      "result_manifest_sha256": "9706bb22be6ca67344916a02a447309ed320cdc855257bfe760c01908424149a"
+    }
+  },
+  "red_green": {
+    "fixtures": "Accepted dependency baseline: 5 failed, 1 passed; candidate: 6 passed on each interpreter. Real Config construction, nested body/setup exceptions, six temporary runtime paths, optional section removal and Python/NumPy/CPU Torch RNG restoration.",
+    "feddf": "Baseline loaders leak sys.path for both client/server; candidate path/error probes: 4 passed. Real importlib loader failure and Nanochat body exception restore paths.",
+    "collection": "Accepted dependency base collection errors on absent Opacus; final locked base core collection succeeds with the exact named omission. Mandatory missing-extra collection fails before tests.",
+    "focused_boundary": "Prior WIP rejected ordinary focused base commands for absent Opacus; final source passes focused files and -k selection on both interpreters without mandatory preflight. The AGENTS example tests/test_strategies_simple.py does not exist in this checkout; exercised existing tests/servers/test_fedavg_strategy.py and tests/mpc/test_mpc.py instead.",
+    "negative_probes": {
+      "count": 21,
+      "expected_nonzero_failures": 21,
+      "cases": [
+        "missing mandatory extras in base (both interpreters)",
+        "each absent opacus/kazoo/gymnasium/tiktoken (both interpreters)",
+        "absent initialized Nanochat source (both interpreters)",
+        "unexpected setup/call/teardown/collection skips",
+        "xfail/xpass",
+        "ignored required DP module",
+        "unexpected explicit-profile deselection",
+        "omitted entire 48-case startup partition"
+      ],
+      "exact_arguments_and_expected_messages": {
+        "path": "/tmp/plato-phase1c-test-ci/negative-results.json",
+        "sha256": "4c9bfce9bcf32ca9d56264335678f34504ed9979698ef72cf8e154e0e0c186e3"
+      },
+      "log_sha256": {
+        "mandatory-in-base-313": "faa6bbe6f535ed8dc7eff6f1f581fb33f9be69a0d20218c379ea0e6f6f88be74",
+        "missing-opacus-313": "faa6bbe6f535ed8dc7eff6f1f581fb33f9be69a0d20218c379ea0e6f6f88be74",
+        "missing-kazoo-313": "b3b903fe30f4f618701aa0da5537fb8478207a65cb4c6159320a28de72f7f6c0",
+        "missing-gymnasium-313": "03554da49ee8bccdcea32f4772bc1fe114f646730b4f25b68bda3b86ac0eb3e8",
+        "missing-tiktoken-313": "ce2547fab5a778d05b861f252d87a90e86097b8c26f4eee856f92e2904a2314b",
+        "mandatory-in-base-314": "faa6bbe6f535ed8dc7eff6f1f581fb33f9be69a0d20218c379ea0e6f6f88be74",
+        "missing-opacus-314": "faa6bbe6f535ed8dc7eff6f1f581fb33f9be69a0d20218c379ea0e6f6f88be74",
+        "missing-kazoo-314": "f36640ffcca9884739a7a8610726236ad599f277ce867506808d3972f6a8bf44",
+        "missing-gymnasium-314": "641e497eb2715125b495a6a5fecf232f7afdb0c8d33c6c78d411c606981c1155",
+        "missing-tiktoken-314": "eb8acb1987351a7d42c9faef15bdc8302232eb2385ce169f028ca5a51e24005f",
+        "missing-source-313": "c83bd56f830ff6bce4b0096585f717ba1530de52b307167d2fbe19f9624d2975",
+        "missing-source-314": "aaa145586a0f82c424db9b3baff449b8a2d7cc0f8d85651442bff0fffd39afcd",
+        "setup-skip": "ad391a45690d673b851f2d74898e59f1244785d27ac65571aa4d3fb1022333e6",
+        "xpass": "92ccbb5e00d70675922d8a7aa2aecee6131fa5a8ced71d56fa2e618b7b371a58",
+        "skip": "41555338edfa0897e57bf2c6696e44b3d8696fcf931ca435d2118e7e593c6377",
+        "xfail": "09eea8e7d72c66255ce1689e4c8c224d061c0463ba630fc9211b90b729e23a46",
+        "collection-skip": "782a52aa5ec6d4553baad7258270ef0b324d2e7689801794bedcd102127c18e8",
+        "teardown-skip": "8148c6572c89f3e85631025dc9e30d5b618edab6f83c4c9f6bf98f6a1dcb6b38",
+        "ignored-required": "f22cf6ab9bdd659a42cbee9590896110f27a32c8d224ceac9c809215d2de3c5d",
+        "unexpected-deselection": "ad6cbb05de2c4d4cf06b181582cba5c1baac178bc7c305a86ae5cde6d6e8ae45",
+        "ignored-startup-runtime": "67c7d61758713b4e9d848c23eea8148242b5e0578e8061aaad6d877ea12b5c10"
+      }
+    },
+    "focused_and_markers": {
+      "count": 10,
+      "exit": 0,
+      "each_interpreter": [
+        "existing focused FedAvg strategy file passes",
+        "ordinary MPC -k round_info: 1 pass/2 deselected",
+        "native tokenizer target: 1 honest optional skip",
+        "startup_runtime: 3/48 collected, no execution",
+        "startup_containment: 6/48 collected, no execution"
+      ],
+      "exact_commands": {
+        "path": "/tmp/plato-phase1c-test-ci/final/focused-results.json",
+        "sha256": "c0c1ab2b5a8ff105173650d193dedd1a77f22e4233cd55080e421ad9dfac4674"
+      },
+      "log_sha256": {
+        "focused-strategies-3.13": "bdf154f903249cd270e44f7e511ef11afa126c9a49a6e471038f5bf6a2286b2e",
+        "focused-selection-3.13": "e006afc5439b9676f3fb07d2c7aff065d605a1816c7ace2b1b4902f5bcb86d7c",
+        "focused-native-3.13": "9ccc4f247e7650b91266385d2eeb0e9219fc43f703fbd1ae669202f55f0632e0",
+        "marker-sockets-3.13": "757526a9445bbe0879097fa46beaea6d6117ab1bad56e2b099a931aa37a649ef",
+        "marker-containment-3.13": "d299e93e3426e470b45bd08d3fdaab1d27faf2162c565deb0594614dc56d7aa7",
+        "focused-strategies-3.14": "a7315c9a0f66b213f7cf849076131e42ca87f7d2fa6a89be4833293f5aa03a2d",
+        "focused-selection-3.14": "8518d8f3379bca6e7eaf84fe4e34da9de5fa01d8d2f910b11c77fc7843c439b9",
+        "focused-native-3.14": "0989079a941a776dff7a20a63373429f9826a1cfd0fbea3038df7be06a22d517",
+        "marker-sockets-3.14": "a7d27ab84f0555d1ae2c1f453b65091a10c59f6a2cd4c036401bcea4b9ea5b30",
+        "marker-containment-3.14": "dc7466603567723854e3bac98fd7a6b067ff35eec7b4d9062f12a1a1d91e545c"
+      }
+    },
+    "probe_sources": {
+      "test_isolation.py": {
+        "path": "/tmp/plato-phase1c-test-ci/test_isolation.py",
+        "sha256": "cc0b922725a044acf48094a9f0a6fa4d06acca6a844262113deaa79dfb5b9fd7"
+      },
+      "test_paths.py": {
+        "path": "/tmp/plato-phase1c-test-ci/test_paths.py",
+        "sha256": "c965e12a5976991d0c3a4f3a932b77395d78bfbf195a4e9809c1db589f429e68"
+      },
+      "path_red.py": {
+        "path": "/tmp/plato-phase1c-test-ci/path_red.py",
+        "sha256": "1154827b942645ee8d673404bea5eafa6d108dc04c5fad0136f3afc5f38dfa3d"
+      },
+      "negative_probes.py": {
+        "path": "/tmp/plato-phase1c-test-ci/negative_probes.py",
+        "sha256": "a0c5d47b444a4ca9f69bee914861b676cf3503993af0707a85417b8bca7dfa62"
+      },
+      "focused_checks.py": {
+        "path": "/tmp/plato-phase1c-test-ci/final/focused_checks.py",
+        "sha256": "44e83d95416ed3f01ecd91be1418422f9eb9e97c8763c2f52e29f0e3ad6a3a95"
+      }
+    },
+    "replay": "Sync the two named locked groups for each interpreter. From the worktree run the retained negative_probes.py via zsh -lc with no concurrent environment users (deliberate package/source renames restore in finally). Probe arguments and expected failures are listed above. Qualification runner source and commands are retained below.",
+    "prior_reversed_order": {
+      "313": "15 passed, 1 skipped in 1.18s",
+      "314": "15 passed, 1 skipped in 1.14s"
+    },
+    "qualification_runner": {
+      "path": "/tmp/plato-phase1c-test-ci/final/run_qualification.py",
+      "sha256": "995260f6734222e2569c25a9d50a321ac01a334af7f14461bcdfae4f63e5abab"
+    }
+  },
+  "warnings": {
+    "historical_pytest": 8,
+    "final_pytest_each_partition": 0,
+    "investigation": "Setting preprocessing_num_proc=1 as designed still emitted eight fork DeprecationWarnings. Accepted datasets 5.0.1 arrow_dataset.py:3619-3620 starts mp.Pool for every num_proc>=1. Set None in the owned block-size test to run genuine Dataset.map/tokenization/grouping in-process; no production defaults, dependencies, process context or warning filters changed.",
+    "subprocess": "Startup raw stderr is retained and explicit Python warning lines are counted above; Torch elastic macOS redirect notices are platform logging, not pytest warning reports."
+  },
+  "coverage": {
+    "scope": "--cov=plato on mandatory core; separate startup subprocess execution is not included. No new coverage exclusions or filters.",
+    "historical": {
+      "artifact": {
+        "path": "/Users/bli/Playground/plato/evidence/2026-refresh/baseline-coverage.json",
+        "sha256": "9f82f36144f849c3b23f7575843234394f8fa3cee59923a230b58d5e632daea1"
+      },
+      "totals": {
+        "covered_lines": 7257,
+        "num_statements": 16935,
+        "percent_covered": 42.852081488042515,
+        "percent_covered_display": "43",
+        "missing_lines": 9678,
+        "excluded_lines": 192,
+        "percent_statements_covered": 42.852081488042515,
+        "percent_statements_covered_display": "43"
+      },
+      "files": 226
+    },
+    "final_raw": {
+      "313": {
+        "artifact": {
+          "path": "/tmp/plato-phase1c-test-ci/final/coverage-313.json",
+          "sha256": "90bad192e0319c92318db9ea2686ae048435f616be20584936d0cb40d89a11d6"
+        },
+        "totals": {
+          "covered_lines": 7387,
+          "num_statements": 17060,
+          "percent_covered": 43.30011723329426,
+          "percent_covered_display": "43",
+          "missing_lines": 9673,
+          "excluded_lines": 192,
+          "percent_statements_covered": 43.30011723329426,
+          "percent_statements_covered_display": "43"
+        },
+        "files": 226
+      },
+      "314": {
+        "artifact": {
+          "path": "/tmp/plato-phase1c-test-ci/final/coverage-314.json",
+          "sha256": "efdda3d671d28209b1ef68c6ba99621694bf0d525fe1cc9c0f2d67c7a86625bb"
+        },
+        "totals": {
+          "covered_lines": 7381,
+          "num_statements": 17049,
+          "percent_covered": 43.29286175142237,
+          "percent_covered_display": "43",
+          "missing_lines": 9668,
+          "excluded_lines": 192,
+          "percent_statements_covered": 43.29286175142237,
+          "percent_statements_covered_display": "43"
+        },
+        "files": 226
+      }
+    },
+    "vendor_denominator": "Historical coverage predates ViT submodule initialization. Both are now initialized at accepted pins, but the final raw coverage JSON still measures zero DViT/T2T files/statements and the same 226 first-party file paths. Source discovery does not report these unimported vendor namespaces; no new exclusion was configured.",
+    "denominator_changes": "Accepted 1B adds 123 statements in plato/client.py and two in plato/servers/base.py on 3.13. Coverage analyzer 7.16.2 reports eleven fewer statements across five unchanged files on 3.14. Raw final percentages therefore use different denominators from the historical baseline.",
+    "comparable_first_party": {
+      "counts": {
+        "baseline": {
+          "files": 219,
+          "covered": 6765,
+          "statements": 15314,
+          "percent": 44.17526446388925
+        },
+        "313": {
+          "files": 219,
+          "covered": 6886,
+          "statements": 15314,
+          "percent": 44.965391145357195
+        },
+        "314": {
+          "files": 219,
+          "covered": 6886,
+          "statements": 15314,
+          "percent": 44.965391145357195
+        }
+      },
+      "reporting_only_omissions": [
+        "plato/algorithms/split_learning.py",
+        "plato/client.py",
+        "plato/models/registry.py",
+        "plato/servers/base.py",
+        "plato/servers/fedavg_he.py",
+        "plato/trainers/huggingface.py",
+        "plato/utils/reinforcement_learning/policies/sac.py"
+      ],
+      "method": "Sum raw file summaries over the 219 unchanged files with identical statement counts in baseline/3.13/3.14. These reporting omissions do not alter measured raw coverage or configured exclusions."
+    },
+    "source_commit": "845255cdf358869d260699a9ef0786e37514e9f4",
+    "review_fix_retention": "Raw and comparable coverage measurements retained from 845255. Review fixes change only pytest selection eligibility and the workflow typing-output checker; no instrumented Plato runtime source changed. Core reruns omit coverage because no reporting-only rerun is needed."
+  },
+  "typing": {
+    "messages_each_interpreter": 404,
+    "first_party_messages": 80,
+    "first_party_distinct_locations": 79,
+    "vendor": {
+      "dvit": 306,
+      "t2tvit": 18,
+      "owner": "Phase 4 vendor/archive owner; pinned history, no vendor modernization in 1C"
+    },
+    "classifications": [
+      {
+        "file": "plato/algorithms/lora.py",
+        "owner": "3B",
+        "action": "Narrow guarded PEFT callables and remove unused ignores; preserve missing-dependency errors.",
+        "locations": [
+          "14:39 warning[unused-type-ignore-comment]",
+          "15:39 warning[unused-type-ignore-comment]",
+          "44:22 error[call-non-callable]",
+          "51:9 error[call-non-callable]"
+        ],
+        "messages": 4
+      },
+      {
+        "file": "plato/config.py",
+        "owner": "2A",
+        "action": "Correct annotation placement; F13 still needs a production reset regression.",
+        "locations": [
+          "321:28 error[invalid-type-form]"
+        ],
+        "messages": 1
+      },
+      {
+        "file": "plato/datasources/datalib/audio_extraction_tools.py",
+        "owner": "2A",
+        "action": "2A verifies the unused dependency closure and archives this bundle per plan-addendum; retain diagnostic history. No repair or archival claimed by 1C.",
+        "locations": [
+          "47:8 warning[deprecated]",
+          "52:12 warning[deprecated]"
+        ],
+        "messages": 2
+      },
+      {
+        "file": "plato/datasources/datalib/frames_extraction_tools.py",
+        "owner": "2A",
+        "action": "2A verifies the unused dependency closure and archives this bundle per plan-addendum; retain diagnostic history. No repair or archival claimed by 1C.",
+        "locations": [
+          "116:8 warning[deprecated]",
+          "149:8 warning[deprecated]"
+        ],
+        "messages": 2
+      },
+      {
+        "file": "plato/datasources/datalib/refer_utils/referitgame_utils.py",
+        "owner": "2A",
+        "action": "2A verifies the unused dependency closure and archives this bundle per plan-addendum; retain diagnostic history. No repair or archival claimed by 1C.",
+        "locations": [
+          "100:27 error[invalid-argument-type]",
+          "101:24 error[invalid-argument-type]",
+          "111:25 error[invalid-argument-type]",
+          "144:48 error[invalid-argument-type]",
+          "146:48 error[invalid-argument-type]",
+          "151:69 error[invalid-argument-type]",
+          "155:48 error[invalid-argument-type]",
+          "158:62 error[invalid-argument-type]",
+          "160:52 error[invalid-argument-type]",
+          "164:20 error[invalid-argument-type]",
+          "173:24 error[invalid-argument-type]",
+          "185:48 error[invalid-argument-type]",
+          "186:24 error[invalid-argument-type]",
+          "85:18 error[invalid-argument-type]",
+          "86:23 error[invalid-argument-type]",
+          "86:56 error[invalid-argument-type]",
+          "88:13 error[invalid-assignment]",
+          "88:32 error[invalid-argument-type]",
+          "89:18 error[invalid-argument-type]",
+          "91:18 error[invalid-argument-type]",
+          "91:31 error[invalid-argument-type]",
+          "98:22 error[invalid-argument-type]",
+          "99:22 error[invalid-argument-type]"
+        ],
+        "messages": 23
+      },
+      {
+        "file": "plato/datasources/torchvision.py",
+        "owner": "2A",
+        "action": "Type attached Subset classes/targets metadata and verify alignment; retain useful metadata.",
+        "locations": [
+          "622:13 error[unresolved-attribute]",
+          "626:13 error[unresolved-attribute]"
+        ],
+        "messages": 2
+      },
+      {
+        "file": "plato/models/huggingface.py",
+        "owner": "3B",
+        "action": "Remove unused ignores during adapter work.",
+        "locations": [
+          "17:24 warning[unused-type-ignore-comment]",
+          "18:28 warning[unused-type-ignore-comment]"
+        ],
+        "messages": 2
+      },
+      {
+        "file": "plato/trainers/diff_privacy.py",
+        "owner": "2C with 2D privacy review",
+        "action": "Exercise real make_private/optimizer/accounting before narrowing GradSampleModule versus GradSampleHooks.",
+        "locations": [
+          "238:9 error[invalid-assignment]"
+        ],
+        "messages": 1
+      },
+      {
+        "file": "plato/trainers/huggingface.py",
+        "owner": "3B",
+        "action": "Remove redundant cast during adapter work; preserve F09 acceptance.",
+        "locations": [
+          "557:21 warning[redundant-cast]"
+        ],
+        "messages": 1
+      },
+      {
+        "file": "examples/model_search/fedrlnas/fedrlnas_server.py",
+        "owner": "4 model-search owner",
+        "action": "Verify and narrow the actual factory; root may archive obsolete paths with reproduction notes.",
+        "locations": [
+          "127:34 error[call-non-callable]"
+        ],
+        "messages": 1
+      },
+      {
+        "file": "examples/model_search/pfedrlnas/DARTS/fednas_server.py",
+        "owner": "4 model-search owner",
+        "action": "Verify and narrow the actual factory; root may archive obsolete paths with reproduction notes.",
+        "locations": [
+          "164:34 error[call-non-callable]"
+        ],
+        "messages": 1
+      },
+      {
+        "file": "examples/model_search/pfedrlnas/VIT/fednas_server.py",
+        "owner": "4 model-search owner",
+        "action": "Verify and narrow the actual factory; root may archive obsolete paths with reproduction notes.",
+        "locations": [
+          "148:34 error[call-non-callable]"
+        ],
+        "messages": 1
+      },
+      {
+        "file": "examples/model_search/fedtp/hypernetworks.py",
+        "owner": "4 model-search owner",
+        "action": "Remove redundant cast during example ownership.",
+        "locations": [
+          "87:32 warning[redundant-cast]"
+        ],
+        "messages": 1
+      },
+      {
+        "file": "examples/server_aggregation/feddf/feddf_algorithm.py",
+        "owner": "4 FedDF owner",
+        "action": "Specify the sized proxy-dataset contract; retain distillation behavior.",
+        "locations": [
+          "78:16 error[invalid-argument-type]"
+        ],
+        "messages": 1
+      },
+      {
+        "file": "examples/server_aggregation/feddf/feddf_server.py",
+        "owner": "4 FedDF owner",
+        "action": "Narrow strategy exposing _resolve_proxy_dataset; preserve dispatch.",
+        "locations": [
+          "45:25 error[unresolved-attribute]"
+        ],
+        "messages": 1
+      },
+      {
+        "file": "examples/server_aggregation/feddf/feddf_utils.py",
+        "owner": "4 FedDF owner",
+        "action": "Specify sized proxy-dataset contract; never invent iterable lengths.",
+        "locations": [
+          "32:26 error[invalid-argument-type]"
+        ],
+        "messages": 1
+      },
+      {
+        "file": "examples/unlearning/knot/knot_server.py",
+        "owner": "4 unlearning owner",
+        "action": "Reproduce scalar/array indexing and empty/None extrema; preserve unlearning semantics.",
+        "locations": [
+          "403:17 error[invalid-argument-type]",
+          "776:17 error[invalid-argument-type]",
+          "776:40 error[invalid-argument-type]",
+          "802:31 error[invalid-argument-type]"
+        ],
+        "messages": 5
+      },
+      {
+        "file": "tests/datasources/test_huggingface_datasource.py",
+        "owner": "3B; 1C owns only worker-count optimization",
+        "action": "Use restoring method monkeypatches; retain dispatch assertions.",
+        "locations": [
+          "100:5 error[invalid-assignment]",
+          "99:5 error[invalid-assignment]"
+        ],
+        "messages": 2
+      },
+      {
+        "file": "tests/datasources/test_torchvision_datasource.py",
+        "owner": "2A",
+        "action": "Assert subset presence before indices assertions.",
+        "locations": [
+          "241:12 error[unresolved-attribute]",
+          "243:16 error[unresolved-attribute]"
+        ],
+        "messages": 2
+      },
+      {
+        "file": "tests/integration/test_smoke_configs.py",
+        "owner": "2C with 1C test coordination",
+        "action": "Reconcile None/list cut_layer_grad with the trainer contract; keep this identified as a stub test.",
+        "locations": [
+          "115:9 error[invalid-assignment]"
+        ],
+        "messages": 1
+      },
+      {
+        "file": "tests/trainers/strategies/test_base.py",
+        "owner": "2C",
+        "action": "Keep pytest.raises(TypeError). Documented line-specific rule ignores are appropriate for intentional invalid calls; no broad suppression.",
+        "locations": [
+          "153:13 error[call-non-callable]",
+          "184:13 error[call-non-callable]",
+          "240:13 error[call-non-callable]",
+          "279:13 error[call-non-callable]",
+          "448:13 error[call-non-callable]"
+        ],
+        "messages": 5
+      }
+    ],
+    "policy": "No new suppression. Existing two HF test assignment findings remain assigned to 3B; five abstract-class calls are deliberate negative tests owned by 2C. Raw nonzero output retained. F13 is still open with 2A; fixture reset does not repair production Config reset.",
+    "exit": 1,
+    "new_diagnostics_in_touched_files": 0,
+    "comparison": "All 384 pre-integration diagnostics persist unchanged; 20 additions are confined to the byte-identical accepted 1B helpers. Both interpreter outputs match. No suppressions added.",
+    "accepted_1b_additions": [
+      {
+        "file": "tests/integration/startup_harness.py",
+        "diagnostic": "invalid-argument-type",
+        "locations": [
+          "78:36",
+          "78:53",
+          "78:68"
+        ],
+        "owner": "Root / original accepted 1B startup test-helper owner",
+        "classification": "Nested configuration literal inference treats the algorithm map as string-valued before adding bool/int cross-silo values; explicit heterogeneous mapping typing is follow-up work. Actual TOML construction and cross-silo probes pass."
+      },
+      {
+        "file": "tests/integration/startup_probe.py",
+        "diagnostic": "invalid-assignment",
+        "locations": [
+          "85:17",
+          "307:9",
+          "317:9",
+          "320:9",
+          "347:13",
+          "348:13",
+          "373:9",
+          "375:9"
+        ],
+        "owner": "Root / original accepted 1B startup test-helper owner",
+        "classification": "Test-only exception/entrypoint/Application/launcher substitution has intentionally narrower callable or class types than production attributes. Declare typed probe interfaces or local mutation wrappers in a follow-up; no suppression or accepted helper edit in 1C."
+      },
+      {
+        "file": "tests/integration/startup_probe.py",
+        "diagnostic": "invalid-method-override",
+        "locations": [
+          "231:19",
+          "275:13"
+        ],
+        "owner": "Root / original accepted 1B startup test-helper owner",
+        "classification": "Probe _periodic/start overrides narrow the base callable signature. Actual accepted invocation cases pass; preserve their intended no-argument dispatch while reviewing annotations/signatures with the original 1B owner."
+      },
+      {
+        "file": "tests/integration/startup_probe.py",
+        "diagnostic": "unresolved-attribute",
+        "locations": [
+          "237:40"
+        ],
+        "owner": "Root / original accepted 1B startup test-helper owner",
+        "classification": "asyncio.current_task() is typed optional; this branch runs inside the scheduled coroutine. Follow-up explicit non-None narrowing."
+      },
+      {
+        "file": "tests/integration/startup_probe.py",
+        "diagnostic": "call-non-callable",
+        "locations": [
+          "323:18",
+          "323:67",
+          "341:9"
+        ],
+        "owner": "Root / original accepted 1B startup test-helper owner",
+        "classification": "ProbeServer inherits abstract-decorated _process_reports without implementing it; base.Server has no ABCMeta, so the actual startup-only cases instantiate and pass. These probes do not process reports. An explicit probe implementation is follow-up work with the original 1B owner."
+      },
+      {
+        "file": "tests/integration/startup_socket.py",
+        "diagnostic": "invalid-method-override",
+        "locations": [
+          "103:15"
+        ],
+        "owner": "Root / original accepted 1B startup test-helper owner",
+        "classification": "FailingServer periodic override narrows the base signature; annotate or align the helper interface in follow-up without altering the failure assertion."
+      },
+      {
+        "file": "tests/integration/startup_socket.py",
+        "diagnostic": "invalid-assignment",
+        "locations": [
+          "146:5",
+          "147:5"
+        ],
+        "owner": "Root / original accepted 1B startup test-helper owner",
+        "classification": "Test-only observation wrappers replace Process.start and the real client entrypoint; callable assignment types differ. Preserve actual startup/round behavior and review typed instrumentation with the original 1B owner."
+      }
+    ],
+    "logs": {
+      "313": {
+        "path": "/tmp/plato-phase1c-test-ci/final/ty-313.log",
+        "sha256": "18c075ab4df70317eac5977ebd0106c2d9eb1f4a3b21fa927d1158239446d1b4"
+      },
+      "314": {
+        "path": "/tmp/plato-phase1c-test-ci/final/ty-314.log",
+        "sha256": "18c075ab4df70317eac5977ebd0106c2d9eb1f4a3b21fa927d1158239446d1b4"
+      }
+    },
+    "review_fix_checker": "The classified status-1 404-diagnostic output is retained and replays successfully. Verified actual clean status-0 output now passes. Status/output agreement, diagnostic summary counts, existing exact owned-location allowances and tool-failure detection remain enforced; no suppressions added."
+  },
+  "workflow": {
+    "partitions": "Base core and initialized mandatory core use -m not runtime; all 48 startup/socket/containment cases execute once per interpreter using mandatory -m runtime. Registered startup_runtime selects three socket cases; startup_containment selects six cases including five watchdogs and post-launch child failure.",
+    "bounds": "45-minute overall job; 10-minute installs, 12-minute base/core/runtime steps. Delivered 30+5+5 and 90+5+5 process deadlines preserved; measured local runtime partition durations appear in runs.",
+    "syntax": "Revised workflow passes actionlint 1.7.12 -shellcheck=, zsh parsing and embedded Python compilation. Captured ty_status is explicitly passed as a Python argv value. Clean status 0 requires exact All checks passed! with no diagnostics; status 1 requires a recognized summary matching parsed diagnostics; other statuses fail.",
+    "actionlint": {
+      "path": "/tmp/plato-phase1c-test-ci/review-fixes/actionlint.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "official_action_sources": {
+      "checkout v7.0.1": "https://github.com/actions/checkout/releases/tag/v7.0.1",
+      "setup-python v7.0.0": "https://github.com/actions/setup-python/releases/tag/v7.0.0",
+      "setup-uv v10.2.0": "https://github.com/astral-sh/setup-uv/releases/tag/v10.2.0",
+      "upload-artifact v7.0.1": "https://github.com/actions/upload-artifact/releases/tag/v7.0.1"
+    },
+    "linux_runtime": "Not locally executed: macOS Apple Silicon, no Docker. Root must verify published GitHub Ubuntu execution before Phase 2; lock resolution and syntax are not Linux runtime evidence."
+  },
+  "ruff": {
+    "command": "uv run --no-sync --python 3.13 ruff check . --select I",
+    "exit": 0,
+    "log": {
+      "path": "/tmp/plato-phase1c-test-ci/review-fixes/ruff.log",
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    }
+  },
+  "independent_review": {
+    "status": "First fresh root-created review requested exactly R01/R02. Both are locally corrected; revised exact-commit fresh review remains pending. Earlier nested observations remain supplemental only; no nested delegation resumed.",
+    "supplemental_nested_observations_only": [
+      "Evidence/source/four suite-log hashes match; lock has 278 identical package records after removing only the two added test-base metadata arrays; Python default remains 3.13.",
+      "Fresh archived-source probes reproduced 3.13 mandatory 250 passed/1 allowed skip and 7378/16935 coverage, 3.14 mandatory 250 passed/1 allowed skip, 3.13 base 246 passed/4 declared skip reports; no pytest warnings. Ruff and zsh/Python workflow syntax passed. This is preliminary local evidence, not Linux qualification.",
+      "CI uv pip freeze ignores UV_PROJECT_ENVIRONMENT and can list the default interpreter's packages. Fixed both workflow calls with explicit --python environment/bin/python and independently checked own profile package inventories.",
+      "Coverage analyzer was mislabeled 7.1.0 (the pytest-cov version). Corrected to coverage 7.16.2 and added analyzer versions; raw measured counts/denominators unchanged."
+    ],
+    "delegation": "Earlier nested reviewers were stopped; no nested delegation resumed. Their observations do not constitute the required independent review."
+  },
+  "remaining": [
+    "Root-created fresh exact-revised-commit review",
+    "Root merged validation, GitHub Linux execution and Phase 1 acceptance gate"
+  ],
+  "review_fixes": {
+    "review": {
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase1c-review.json",
+      "sha256": "cf24369733c0d2270854998356ec1bca39d53ab8faa19517fe6b1c4bd8cc5d4d"
+    },
+    "reviewed_candidate": "845255cdf358869d260699a9ef0786e37514e9f4",
+    "scope": "Exactly P1C-R01 and P1C-R02: two code files plus this evidence; no runtime/helper/marker/dependency/environment changes.",
+    "R01": {
+      "red_each_interpreter": "Six ordinary root -k/-m/--deselect checks fail: base exits 4 for unrelated absent Opacus, mandatory exits 1 despite selected/collected tests succeeding.",
+      "green_each_interpreter": "18 checks: root -k passes one actual MPC test in both environments (base also has one honest collection-level DP skip); root -m integration collects nine cases and root --deselect collection succeeds; six matching explicit-profile selections reject omissions. File-scoped -k passes in both environments; implicit unfiltered base still fails mandatory preflight and implicit unfiltered mandatory collects all 299; explicit omitted runtime partitions still fail in both environments.",
+      "implementation": "Keep root positional scope detection unchanged. Eligibility is explicit profile OR unfiltered root scope; only implicit keyword/marker/deselect selection opts out. All explicit guard branches remain unchanged."
+    },
+    "R02": {
+      "red_each_interpreter": "Actual clean ty exits 0 with All checks passed! but the original extracted checker exits 1. Actual classified baseline status 1 and existing negative paths behave as previously reviewed.",
+      "green_each_interpreter": "Three actual ty invocations plus twelve checker replays: clean status 0 and retained classified baseline status 1 pass; actual new-owned diagnostic and actual tool-failure status 2 fail, as do missing/unrecognized output at either status, failure status with valid baseline text, mismatched statuses, and a summary without its diagnostics.",
+      "implementation": "Pass captured ty_status into the embedded checker explicitly. Check status/output agreement and parsed summary count before retaining the exact new-owned diagnostic gate; no suppressions."
+    },
+    "results": {
+      "red-313": {
+        "selection_checks": 6,
+        "typing_tool_and_replay_checks": 11,
+        "selection_records": {
+          "path": "/tmp/plato-phase1c-test-ci/review-fixes/selection-red-313.json",
+          "sha256": "f991133552deff3a937a7860f1a96863cc4711880e55ed68aa6919ddb2b2f49e"
+        },
+        "typing_records": {
+          "path": "/tmp/plato-phase1c-test-ci/review-fixes/typing-red-313.json",
+          "sha256": "7a955b5803c5dc58bc1b4e839a8d2278cff764ca603d49bc2c7c0ecd38e3376b"
+        },
+        "logs_manifest_sha256": "e0702b3c1c427db5389caa790a8dd5092aa2124a1620f4c5a8683ad513aa673d"
+      },
+      "red-314": {
+        "selection_checks": 6,
+        "typing_tool_and_replay_checks": 11,
+        "selection_records": {
+          "path": "/tmp/plato-phase1c-test-ci/review-fixes/selection-red-314.json",
+          "sha256": "fd6ecdc00a88f76dd2c8cb3f8d6038445cc70e59491b18aebedc7f7eba6f9f63"
+        },
+        "typing_records": {
+          "path": "/tmp/plato-phase1c-test-ci/review-fixes/typing-red-314.json",
+          "sha256": "6175683ceded8d902529c2f2f97ec610ee7d92477bd4fb4e9cbcc1346b6bb67a"
+        },
+        "logs_manifest_sha256": "41768dac2d72491d6504498a037d3010fbd558226e2b5de45a173092a7d32cef"
+      },
+      "green-313": {
+        "selection_checks": 18,
+        "typing_tool_and_replay_checks": 15,
+        "selection_records": {
+          "path": "/tmp/plato-phase1c-test-ci/review-fixes/selection-green-313.json",
+          "sha256": "b196efba0d98c6b80422db5e086227811838a63f82d2646e3093a7925c99ee91"
+        },
+        "typing_records": {
+          "path": "/tmp/plato-phase1c-test-ci/review-fixes/typing-green-313.json",
+          "sha256": "dc6d04f0d0e643d921e20c29961973f37ea3a4f2290da2e55d0e153f28ba9f3f"
+        },
+        "logs_manifest_sha256": "fbfe2cc6422c7170afcd8165db3db0c26b24aa8c54647462251b0337995b7212"
+      },
+      "green-314": {
+        "selection_checks": 18,
+        "typing_tool_and_replay_checks": 15,
+        "selection_records": {
+          "path": "/tmp/plato-phase1c-test-ci/review-fixes/selection-green-314.json",
+          "sha256": "9b6eac83ec0d262613f0a78bd337c18657177cc6a506b9c9ab24398281ba8768"
+        },
+        "typing_records": {
+          "path": "/tmp/plato-phase1c-test-ci/review-fixes/typing-green-314.json",
+          "sha256": "33f2623d973ab76ca4af627ee4691bf70bb160af272d2c3db75f048d001ddb10"
+        },
+        "logs_manifest_sha256": "757c96d1b406f5a417ae5ec080965b059bcbc91cd99694cfaf98260cb196e85d"
+      }
+    },
+    "replay_sources": {
+      "check_selection.py": {
+        "path": "/tmp/plato-phase1c-test-ci/review-fixes/check_selection.py",
+        "sha256": "486526313cdb7d69443f2e2262fa07af8728ef63dfb571b1827551b2e48a5646"
+      },
+      "check_typing.py": {
+        "path": "/tmp/plato-phase1c-test-ci/review-fixes/check_typing.py",
+        "sha256": "061f726161d3b76493e05fb39bb75074f1fc6a5418d9e9a4fdaf42de1ea68fe8"
+      },
+      "run_core.py": {
+        "path": "/tmp/plato-phase1c-test-ci/review-fixes/run_core.py",
+        "sha256": "bdbe23056275009176c369ae610a12cadb3dbbba17a854ba3ae57fdbf3a430fd"
+      }
+    },
+    "runtime_retention": "All 48 cases per interpreter already passed on 845255. Explicit eligibility remains True, positional full scope/inventory/guards and all startup source are unchanged. Complete explicit startup partition collection revalidated on each interpreter; no runtime case rerun. Root full merged validation will execute them again.",
+    "scratch_root": "/tmp/plato-phase1c-test-ci/review-fixes"
+  }
+}

@@ -66,6 +66,8 @@ model_name = "lenet5"
 # Aggregation algorithm
 type = "fedavg"
 alpha_coef = 0.01
+# Equal-client objective. Sample mode requires the full realized count vector.
+feddyn_weighting = "uniform"
 
 [parameters]
 
@@ -73,5 +75,5 @@ alpha_coef = 0.01
 lr = 0.03
 momentum = 0.0
 
-# learning rate is fixed as in Appendix C.2
+# Plain SGD has fixed learning rate; the proximal quadratic is in the loss.
 weight_decay = 0.0

@@ -1,0 +1,408 @@
+{
+  "schema_version": 1,
+  "written_at_utc": "2026-10-03T10:47:56.746626+00:00",
+  "status": "SCOPED_DOCUMENTATION_CHECKS_COMPLETE_FRESH_INDEPENDENT_REVIEWS_PENDING",
+  "acceptance_claimed": false,
+  "scope": "FedDyn standalone prose and final-source SCAFFOLD reconciliation only; no nested agents, training reruns, source/test/config/manifest edits, push or cleanup.",
+  "identities": {
+    "branch": "maintenance/2026-phase2-scaffold-docs",
+    "starting_docs_commit": "eed4bfa23edc37cf41b598fc976b281e141756c4",
+    "final_C_commit": "13e38dafce476286db7e673e7f21343d54416b56",
+    "final_C_tree": "9fe8cfb039d0d97fc5b2c95a459de4c73c6d1b51",
+    "separate_dependency_merge": "448e3e75198dc330ecfd3709ae28b57f83f69203",
+    "dependency_merge_tree": "fd5ee6cfeda0a6f9366e205567b278d9cfe0ad99",
+    "merge_conflicts": false,
+    "prior_reviewed_docs_commit": "95c7218fc9801099cd7ffa3afc1be227384d8500",
+    "prior_original_source": "0dc34dd1d79d90071a0babfa6aa89f33d72a976f",
+    "prior_reconciled_source": "15e0cebd78ec6752b9aae1e922b33e22e168387f",
+    "candidate_identity": "The commit containing this report; exact public-doc hashes below avoid a self-referential report hash."
+  },
+  "historical_evidence": {
+    "path": "evidence/2026-refresh/phase2c-scaffold-docs-validation.json",
+    "sha256": "6356985643631f85ed95baed0f1af53a31016c9afff9f9f3f1ad8999f4ea3004",
+    "unchanged_from_start": true,
+    "meaning": "Historical 95c/0dc and eed/15e prose/source qualification only. This report supersedes its current-source scope; earlier pending-execution statements are not a current assertion."
+  },
+  "inputs": [
+    {
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2c-feddyn-design.json",
+      "sha256": "62c5d61805c49ccc06f99776d0da820c5b27cffeb5916754ddb16bb3135c1d5b"
+    },
+    {
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2c-feddyn-design-review-2.json",
+      "sha256": "454aa4b5d6503e2d3fbdc572719620983bab13cd7fbd5e59df8a3dc254e0f0e1"
+    },
+    {
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2c-feddyn-acceptance.json",
+      "sha256": "7ceed23ecbdcb73119863bb5ab9b1c0372d3f7dfb9101ace6a1100bcbcbca6c0"
+    },
+    {
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2c-scaffold-design.json",
+      "sha256": "f323f3aa9d824df44a1043b2d6aff9c8a963c42964f6e6685108c59b25fc3a89"
+    },
+    {
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2c-scaffold-acceptance.json",
+      "sha256": "40b202708a4cfdbe6f299e75249c1a19921e410ec4ab7b5e3c6323f536ca8d37"
+    },
+    {
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2c-scaffold-docs-review.json",
+      "sha256": "c0a4cd79ad8110f136cc02f702feb4490f9a06004c7b91d66c7ff96510f8f658"
+    },
+    {
+      "path": "evidence/2026-refresh/phase2c-feddyn-facts.json",
+      "sha256": "31e724a60a09d548f66621ff8d2b384670ddd22b8ff9c97cc2ebd9975cafbd7e"
+    },
+    {
+      "path": "evidence/2026-refresh/phase2c-feddyn-validation.json",
+      "sha256": "1beca9f0465a6afa30c7aaf2ddb1334bfdcc1beccc09feb2656456c8a727e440"
+    },
+    {
+      "path": "evidence/2026-refresh/phase2c-feddyn-delivery-receipt.json",
+      "sha256": "aeb0299f3082465d8e71f1e48dceba74109fb599a9a08527620cd9b775f84058"
+    }
+  ],
+  "design_and_review_boundary": "Both accepted designs authorize implementation, not qualification. Prior SCAFFOLD writing PASS was provisional against 95c/0dc. Final code reviews and fresh writing review/root gate remain pending per assignment; no C/Phase2 closure.",
+  "changed_public_claims": {
+    "FedDyn": "Replaced incorrect double-shift objective and step-for-step reference claims with the corrected objective, displacement recursion and selected-endpoint plus population-history server equation. Added count modes, supported boundary, dedicated CPU command, authoritative server/worker state, saved committed-round bundle/CPU RNG resume, read-only legacy inspection and explicit fresh warm start.",
+    "SCAFFOLD": "Added successful cleanup to the pre-acceptance boundary and cleanup failures to the rejection guarantee, in both README and shared section. No other SCAFFOLD claims changed beyond wrapping.",
+    "SCAFFOLD_unchanged": "Main Algorithm 1/Eqs 3-5 signs, corrected Option II/V2, actual K and fixed equal positive finite LR accounting, additive optimizer extension, sample-weighted model versus population-normalized controls, canonical/legacy paths and logical-client isolation, callback-versus-evaluation commit boundary, and bounded restart caveats.",
+    "shared_page_scope": "Only FedDyn and SCAFFOLD sections changed; all other sections byte-identical to both starting docs and final C."
+  },
+  "consulted_source_facts": [
+    {
+      "paths": [
+        "plato/trainers/strategies/algorithms/feddyn_strategy.py",
+        "examples/customized_client_training/feddyn/feddyn_server.py"
+      ],
+      "fact": "Loss F+alpha_i<h,w>+alpha_i/2||w-x||^2; unscaled history h+=y-x; cloud=sum(selected endpoints)/|S|+sum(all updated histories)/N. Counts only scale alpha_i in sample mode."
+    },
+    {
+      "paths": [
+        "examples/customized_client_training/feddyn/feddyn_trainer.py",
+        "plato/trainers/strategies/algorithms/feddyn_strategy.py"
+      ],
+      "fact": "settings_from_config, CountedLoader and PlainSGD enforce fixed population, positive alpha/LR, plain SGD and realized sampler counts. alpha=0 is supported only by the reusable local loss. Fixed trainable schema and static nontrainable state; accumulated tail normalized and at least one actual update required."
+    },
+    {
+      "paths": [
+        "examples/customized_client_training/feddyn/feddyn_client.py",
+        "examples/customized_client_training/feddyn/feddyn_server.py"
+      ],
+      "fact": "Dedicated assignment identity, whole raw/post-callback batch validation and provisional worker handoff; server owns all histories. Successful aggregation callbacks commit model/history/count/token state; later evaluation failure keeps that commit."
+    },
+    {
+      "paths": [
+        "examples/customized_client_training/feddyn/feddyn_server.py",
+        "plato/servers/base.py"
+      ],
+      "fact": "Full versioned atomic saved committed-round bundle; separate Python global/selector/context selector, NumPy global and default Torch CPU RNG. _resume_from_checkpoint stages RNG; start installs it once before inherited registration. Model-only warm_start_model creates new UUID, round zero and zero histories."
+    },
+    {
+      "paths": [
+        "plato/trainers/strategies/algorithms/feddyn_strategy.py"
+      ],
+      "fact": "read_legacy_history is explicit read-only same-client inspection with canonical feddyn_grad_<id>.pth first, then exact root_feddyn_grad_<id>.pth; validates trainables/frozen extras without adoption or writes. save_path rejects live training."
+    },
+    {
+      "paths": [
+        "plato/trainers/composable.py",
+        "plato/trainers/strategies/algorithms/scaffold_strategy.py"
+      ],
+      "fact": "train_model runs fallible successful cleanup before direct acceptance; owns rejection if its stage fails. train_process only rejects failures after train_model completed. Cleanup releases hooks while provisional worker state survives; parent validates handoff before acceptance."
+    },
+    {
+      "paths": [
+        "examples/customized_client_training/scaffold/scaffold_server.py",
+        "plato/trainers/strategies/algorithms/scaffold_strategy.py"
+      ],
+      "fact": "SCAFFOLD implementation-specific equations, control persistence paths and server aggregation-callback commit boundary unchanged from 15e; only shared composable lifecycle changed in this source reconciliation."
+    },
+    {
+      "paths": [
+        "tests/trainers/test_feddyn_strategy.py",
+        "tests/integration/test_feddyn_round_flow.py",
+        "tests/integration/test_feddyn_entrypoint.py",
+        "tests/integration/test_scaffold_callback_lifecycle.py",
+        "tests/integration/scaffold_cleanup_worker.py"
+      ],
+      "fact": "Read assertions for scalar/weighted equations, partition counts, callback rejection, bundle continuation/RNG handoff, actual entrypoint spawn/sockets, and cleanup-failure canonical-state/outbound rejection. Test source inspection is not writer execution."
+    }
+  ],
+  "source_sha256": {
+    "AGENTS.md": "b50f87f31ea3d87076952d8b7d2d8af067132fbf877d80f8780c208fb45527ec",
+    "pyproject.toml": "799bd7ba1865b097fdc8ca84a7b70337794e338de4aa9a6a13f6a4c1b9156246",
+    "uv.lock": "573b10c2ba1a2317e02f9e40c6181359cafab6f6e0a0f9be12bb256cb276fe1d",
+    "docs/mkdocs.yml": "a3954634249d84cefd8cab51fd14f48f618c7eddf1439b5f45c501e1c015b056",
+    "plato/config.py": "c96aed26f35e2cbf2e54153dbb7099cd8ba3c8042ff5cf467d2e954cbb95308e",
+    "plato/trainers/composable.py": "0a4549f08fa1afaec3ab7814930dcfc59cd671bb8b1a608862a4c58a480093a5",
+    "plato/servers/base.py": "80eb69f6af6602747e37264540aed3c989731a6c76c2c4a9bf6cc6692d32b918",
+    "plato/trainers/strategies/algorithms/feddyn_strategy.py": "53017a085b7047dddcc0f467f5d2c1fc91c66a1921febf107db0f09cd7fd7d4c",
+    "plato/trainers/strategies/algorithms/scaffold_strategy.py": "4363134ffffc73d59a6f5872a8120a85983ea57b7f6908ccba03235f0a81a10c",
+    "tests/trainers/test_feddyn_strategy.py": "4f5f23163a39756f9a0638f0ccf2624c4ea66707fcc2af041cfb05ce0c396b26",
+    "tests/trainers/test_scaffold_strategy.py": "27f7626b9851846eb91b507344c2b658896e8faacb22e5d87a738b98f1cf6fd9",
+    "tests/integration/test_feddyn_round_flow.py": "b75032b94a7fa6559c4d642b8f97bb21be7f9eea231b2e8863b239c7d1cee5d0",
+    "tests/integration/test_feddyn_entrypoint.py": "91462fb25e11e7b6062f74d955fb99c5dbd93b4753b5d06f5bfceadc546c91eb",
+    "tests/integration/test_scaffold_round_flow.py": "ef289f9437ef6f308c05cb41a37f36c06454422072ef3a633f64873728eb7183",
+    "tests/integration/test_scaffold_callback_lifecycle.py": "9450c99fc68c084b33146b26a1293a5fc6b5af121736c5fda9e1dc1332109276",
+    "tests/integration/scaffold_cleanup_worker.py": "8dc26767b1f32fd193f6c4919fadb106ae3e1402923fd7a7d85c07a6ff0e4e96",
+    "examples/customized_client_training/feddyn/feddyn.py": "559e4171711a0d16a1cb7513085336d12ee85d7d6eb7e0c49d3af6cfad893710",
+    "examples/customized_client_training/feddyn/feddyn_MNIST_lenet5.toml": "dcfea2e1d461a51bfd3232e4a17dfc1f15a46ebd3cba6d2ffb152dab1a354cb8",
+    "examples/customized_client_training/feddyn/feddyn_client.py": "b9d28a20d1a6f69dffddb42e2e6755f98bdf0a53be288655498794831bba8bfc",
+    "examples/customized_client_training/feddyn/feddyn_server.py": "3c59025f6a0d052b988ebc9e9909129c34f1534ffe27205d4bc67ccd43ab276a",
+    "examples/customized_client_training/feddyn/feddyn_trainer.py": "3dd093ccb595a53f1c153db215d97f4f76b7b473864fab7ba9c13dffbea775ca",
+    "examples/customized_client_training/scaffold/scaffold.py": "37587214941e1532d5552b7477249b18b5fadf905739ac94735d17df9886ac3a",
+    "examples/customized_client_training/scaffold/scaffold_MNIST_lenet5.toml": "43110532d391896d4080782a4dbace3fbe2bc7813ac9e7baa662074f044f290c",
+    "examples/customized_client_training/scaffold/scaffold_callback.py": "159a2adbbae5c7982c30896af596c546e601669b0230b841656ee464ee66d39f",
+    "examples/customized_client_training/scaffold/scaffold_client.py": "01a08e2001ba4f9e4e61c2ff520e3d1b3fcff5d44168a3d5ac002c45b4c48a8b",
+    "examples/customized_client_training/scaffold/scaffold_server.py": "259e738c6408f91b43e0d195b5c4e0e609cae33499fe04ea7c22059b83b3caf8",
+    "examples/customized_client_training/scaffold/scaffold_trainer.py": "405c0d270a4362ab0cc2569899ef1deb9b03a5a235ef44c75261b43fdbaf00de"
+  },
+  "primary_sources": {
+    "links": {
+      "scaffold-paper.pdf": {
+        "url": "https://arxiv.org/pdf/1910.06378v4",
+        "status": 200,
+        "final_url": "https://arxiv.org/pdf/1910.06378v4",
+        "bytes": 4381988,
+        "sha256": "efe06c86acc7a06116e372a7ab6386c300f4d0dc9c7ba2dd5c82e95111a1d694"
+      },
+      "feddyn-paper.pdf": {
+        "url": "https://arxiv.org/pdf/2111.04263v1",
+        "status": 200,
+        "final_url": "https://arxiv.org/pdf/2111.04263v1",
+        "bytes": 2779369,
+        "sha256": "395f508d4f1adf94b8509897fe1fdb40a36090d2171ea74bd15c4b59c1e2e2ff"
+      },
+      "feddyn-reference.html": {
+        "url": "https://github.com/alpemreacar/FedDyn/blob/48a19fac440ef079ce563da8e0c2896f8256fef9/utils_methods.py",
+        "status": 200,
+        "final_url": "https://github.com/alpemreacar/FedDyn/blob/48a19fac440ef079ce563da8e0c2896f8256fef9/utils_methods.py",
+        "bytes": 664015,
+        "sha256": "6016d7eaf0b28c464c4ff00476276a88dcf3d6dea2982a78dab1f086b7ed4ddc"
+      },
+      "feddyn-loss-reference.html": {
+        "url": "https://github.com/alpemreacar/FedDyn/blob/48a19fac440ef079ce563da8e0c2896f8256fef9/utils_general.py",
+        "status": 200,
+        "final_url": "https://github.com/alpemreacar/FedDyn/blob/48a19fac440ef079ce563da8e0c2896f8256fef9/utils_general.py",
+        "bytes": 431077,
+        "sha256": "4c541f396dbf3e71a0a7e138ff559dad4f18d9a498d87a9ce81ab90e4d047742"
+      }
+    },
+    "research_checks": "Read SCAFFOLD main Algorithm 1/Eqs 3-5 versus appendix Eq 19; FedDyn Algorithm 1 plus pinned author train_FedDyn and train_feddyn_mdl. Displacement-history algebra and count scaling match pinned source; no finite-SGD convergence, active clipping or original communication-budget equivalence claimed.",
+    "author_reference_commit": "48a19fac440ef079ce563da8e0c2896f8256fef9",
+    "author_source_receipts": [
+      {
+        "path": "/tmp/plato-phase2c-feddyn-design/utils_methods.py",
+        "sha256": "87026e71e3826893f3176359ce45bedfde858919f304b40e4ba564e214892d4d"
+      },
+      {
+        "path": "/tmp/plato-phase2c-feddyn-design/utils_general.py",
+        "sha256": "6e79b259456475934b71cddc797b8dcf1e66818bd543465ad02225b6e506eca5"
+      }
+    ]
+  },
+  "writer_validation": {
+    "environment": "Owned /tmp/plato-phase2c-scaffold-docs/final-13e/venv; CPython 3.13.16; no other agent environment mutated.",
+    "sync": {
+      "command": "UV_PROJECT_ENVIRONMENT=/tmp/plato-phase2c-scaffold-docs/final-13e/venv uv sync --locked --no-dev --group docs --no-install-project --python 3.13",
+      "exit_code": 0,
+      "log": {
+        "path": "/tmp/plato-phase2c-scaffold-docs/final-13e/sync.log",
+        "sha256": "f07a16981d6876102a66f0dfbf58ca512f2ffa39e7c2ebaa16f6d82072c0d946"
+      }
+    },
+    "shell": "All shell invocations use zsh -lc.",
+    "validation_scripts": [
+      {
+        "path": "/tmp/plato-phase2c-scaffold-docs/final-13e/validate_docs.py",
+        "sha256": "4014638d7ec9927e4343b6bb8b66513b958d439a5cad5d694cc7120401c693eb"
+      },
+      {
+        "path": "/tmp/plato-phase2c-scaffold-docs/final-13e/final_render.py",
+        "sha256": "efff5e66171fb0e2c3353993d0fad3773780105c15013644836d644407645c3f"
+      }
+    ],
+    "script_commands": [
+      "/tmp/plato-phase2c-scaffold-docs/final-13e/venv/bin/python /tmp/plato-phase2c-scaffold-docs/final-13e/validate_docs.py",
+      "/tmp/plato-phase2c-scaffold-docs/final-13e/venv/bin/python /tmp/plato-phase2c-scaffold-docs/final-13e/final_render.py"
+    ],
+    "executed_checks": {
+      "scaffold-help": {
+        "command": "env PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=/private/tmp/plato-refresh-worktrees/scaffold-docs UV_PROJECT_ENVIRONMENT=/tmp/plato-phase2c-scaffold-docs/final-13e/venv uv run --no-sync python examples/customized_client_training/scaffold/scaffold.py --help",
+        "cwd": "/private/tmp/plato-refresh-worktrees/scaffold-docs",
+        "exit_code": 0,
+        "log": "/tmp/plato-phase2c-scaffold-docs/final-13e/scaffold-help.log",
+        "sha256": "338e750f208efd64f72afb9802d0c9f5b488b0257341acab78149b19970e195e"
+      },
+      "scaffold-config-root": {
+        "command": "env PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=/private/tmp/plato-refresh-worktrees/scaffold-docs UV_PROJECT_ENVIRONMENT=/tmp/plato-phase2c-scaffold-docs/final-13e/venv /tmp/plato-phase2c-scaffold-docs/final-13e/venv/bin/python -c 'import json; from plato.config import Config; c=Config(); assert c.args.cpu and c.args.resume; assert c.trainer.model_name=='\"'\"'lenet5'\"'\"'; print(json.dumps({'\"'\"'config'\"'\"':c.args.config,'\"'\"'base'\"'\"':c.params['\"'\"'base_path'\"'\"'],'\"'\"'checkpoint'\"'\"':c.params['\"'\"'checkpoint_path'\"'\"'],'\"'\"'cpu'\"'\"':c.args.cpu,'\"'\"'resume'\"'\"':c.args.resume}))' -c examples/customized_client_training/scaffold/scaffold_MNIST_lenet5.toml --cpu --resume -b /tmp/plato-phase2c-scaffold-docs/final-13e/config-probes/scaffold-root",
+        "cwd": "/private/tmp/plato-refresh-worktrees/scaffold-docs",
+        "exit_code": 0,
+        "log": "/tmp/plato-phase2c-scaffold-docs/final-13e/scaffold-config-root.log",
+        "sha256": "b1462b32da8c3fe695caf4a6357eaafa329fcf2eb78f995301351dc1495cd8a9"
+      },
+      "scaffold-config-examples": {
+        "command": "env PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=/private/tmp/plato-refresh-worktrees/scaffold-docs UV_PROJECT_ENVIRONMENT=/tmp/plato-phase2c-scaffold-docs/final-13e/venv /tmp/plato-phase2c-scaffold-docs/final-13e/venv/bin/python -c 'import json; from plato.config import Config; c=Config(); assert c.args.cpu and c.args.resume; assert c.trainer.model_name=='\"'\"'lenet5'\"'\"'; print(json.dumps({'\"'\"'config'\"'\"':c.args.config,'\"'\"'base'\"'\"':c.params['\"'\"'base_path'\"'\"'],'\"'\"'checkpoint'\"'\"':c.params['\"'\"'checkpoint_path'\"'\"'],'\"'\"'cpu'\"'\"':c.args.cpu,'\"'\"'resume'\"'\"':c.args.resume}))' -c scaffold/scaffold_MNIST_lenet5.toml --cpu --resume -b /tmp/plato-phase2c-scaffold-docs/final-13e/config-probes/scaffold-examples",
+        "cwd": "/private/tmp/plato-refresh-worktrees/scaffold-docs/examples/customized_client_training",
+        "exit_code": 0,
+        "log": "/tmp/plato-phase2c-scaffold-docs/final-13e/scaffold-config-examples.log",
+        "sha256": "66b57645fd843e360fc2dfbd129ca12d7f29df969e309444e1b994ab2d71fadb"
+      },
+      "feddyn-help": {
+        "command": "env PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=/private/tmp/plato-refresh-worktrees/scaffold-docs UV_PROJECT_ENVIRONMENT=/tmp/plato-phase2c-scaffold-docs/final-13e/venv uv run --no-sync python examples/customized_client_training/feddyn/feddyn.py --help",
+        "cwd": "/private/tmp/plato-refresh-worktrees/scaffold-docs",
+        "exit_code": 0,
+        "log": "/tmp/plato-phase2c-scaffold-docs/final-13e/feddyn-help.log",
+        "sha256": "3f73a1187cb84c21c84ce0ebc1f395dce00cbecaaa25e5ea2108b2b77d6d90eb"
+      },
+      "feddyn-config-root": {
+        "command": "env PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=/private/tmp/plato-refresh-worktrees/scaffold-docs UV_PROJECT_ENVIRONMENT=/tmp/plato-phase2c-scaffold-docs/final-13e/venv /tmp/plato-phase2c-scaffold-docs/final-13e/venv/bin/python -c 'import json; from plato.config import Config; c=Config(); assert c.args.cpu and c.args.resume; assert c.trainer.model_name=='\"'\"'lenet5'\"'\"'; print(json.dumps({'\"'\"'config'\"'\"':c.args.config,'\"'\"'base'\"'\"':c.params['\"'\"'base_path'\"'\"'],'\"'\"'checkpoint'\"'\"':c.params['\"'\"'checkpoint_path'\"'\"'],'\"'\"'cpu'\"'\"':c.args.cpu,'\"'\"'resume'\"'\"':c.args.resume})); from plato.trainers.strategies.algorithms.feddyn_strategy import settings_from_config; print(settings_from_config())' -c examples/customized_client_training/feddyn/feddyn_MNIST_lenet5.toml --cpu --resume -b /tmp/plato-phase2c-scaffold-docs/final-13e/config-probes/feddyn-root",
+        "cwd": "/private/tmp/plato-refresh-worktrees/scaffold-docs",
+        "exit_code": 0,
+        "log": "/tmp/plato-phase2c-scaffold-docs/final-13e/feddyn-config-root.log",
+        "sha256": "1b7cb537b446830e095ac68033bf0b2e0c4903532a2ae17e145f842135de8795"
+      },
+      "feddyn-config-examples": {
+        "command": "env PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=/private/tmp/plato-refresh-worktrees/scaffold-docs UV_PROJECT_ENVIRONMENT=/tmp/plato-phase2c-scaffold-docs/final-13e/venv /tmp/plato-phase2c-scaffold-docs/final-13e/venv/bin/python -c 'import json; from plato.config import Config; c=Config(); assert c.args.cpu and c.args.resume; assert c.trainer.model_name=='\"'\"'lenet5'\"'\"'; print(json.dumps({'\"'\"'config'\"'\"':c.args.config,'\"'\"'base'\"'\"':c.params['\"'\"'base_path'\"'\"'],'\"'\"'checkpoint'\"'\"':c.params['\"'\"'checkpoint_path'\"'\"'],'\"'\"'cpu'\"'\"':c.args.cpu,'\"'\"'resume'\"'\"':c.args.resume})); from plato.trainers.strategies.algorithms.feddyn_strategy import settings_from_config; print(settings_from_config())' -c feddyn/feddyn_MNIST_lenet5.toml --cpu --resume -b /tmp/plato-phase2c-scaffold-docs/final-13e/config-probes/feddyn-examples",
+        "cwd": "/private/tmp/plato-refresh-worktrees/scaffold-docs/examples/customized_client_training",
+        "exit_code": 0,
+        "log": "/tmp/plato-phase2c-scaffold-docs/final-13e/feddyn-config-examples.log",
+        "sha256": "3a9fbca9d5701065528e0c7626f0e638b0e21028e051dc6e98d2501cd161f89d"
+      },
+      "mkdocs-baseline": {
+        "command": "/tmp/plato-phase2c-scaffold-docs/final-13e/venv/bin/python -m mkdocs build --strict -f /tmp/plato-phase2c-scaffold-docs/final-13e/baseline/docs/mkdocs.yml -d /tmp/plato-phase2c-scaffold-docs/final-13e/baseline-site",
+        "cwd": "/private/tmp/plato-refresh-worktrees/scaffold-docs",
+        "exit_code": 1,
+        "log": "/tmp/plato-phase2c-scaffold-docs/final-13e/mkdocs-baseline.log",
+        "sha256": "1896a0e95fd9266f5ce9a8e9d5ea64d5d2d01979ad1595023433f7b30e1f0871"
+      },
+      "mkdocs-candidate": {
+        "command": "/tmp/plato-phase2c-scaffold-docs/final-13e/venv/bin/python -m mkdocs build --strict -f /private/tmp/plato-refresh-worktrees/scaffold-docs/docs/mkdocs.yml -d /tmp/plato-phase2c-scaffold-docs/final-13e/candidate-site",
+        "cwd": "/private/tmp/plato-refresh-worktrees/scaffold-docs",
+        "exit_code": 1,
+        "log": "/tmp/plato-phase2c-scaffold-docs/final-13e/mkdocs-candidate.log",
+        "sha256": "a3f8f2b6845c44921ef6864ed26408f806e1fdc466cb4ddb5983e1ec23276b35"
+      },
+      "diff-check": {
+        "command": "git diff --check",
+        "cwd": "/private/tmp/plato-refresh-worktrees/scaffold-docs",
+        "exit_code": 0,
+        "log": "/tmp/plato-phase2c-scaffold-docs/final-13e/diff-check.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    "command_and_config_checks": "All documented bash paths/options/TOML values parsed; actual entrypoint --help and Config parsing in root and examples working directories passed. CPU/resume flags parsed only; training/resume not launched. Probe base paths redirected to owned scratch.",
+    "render_checks": [
+      {
+        "path": "examples/customized_client_training/scaffold/README.md",
+        "part": "scaffold",
+        "math_elements": 17,
+        "code_elements": 20
+      },
+      {
+        "path": "examples/customized_client_training/feddyn/README.md",
+        "part": "feddyn",
+        "math_elements": 14,
+        "code_elements": 25
+      },
+      {
+        "path": "docs/docs/examples/algorithms/5. Algorithms with Customized Client Training Loops.md",
+        "part": "SCAFFOLD-section",
+        "math_elements": 14,
+        "code_elements": 15
+      },
+      {
+        "path": "docs/docs/examples/algorithms/5. Algorithms with Customized Client Training Loops.md",
+        "part": "FedDyn-section",
+        "math_elements": 12,
+        "code_elements": 20
+      }
+    ],
+    "strict_mkdocs": {
+      "baseline_exit": 1,
+      "candidate_exit": 1,
+      "result": "FAIL in both; identical two existing Phase5-owned Nanochat links, no additional warnings. Not a strict-build PASS.",
+      "warnings": [
+        "WARNING -  Doc file 'configurations/evaluation.md' contains a link 'examples/case-studies/5. Nanochat in Plato.md', but the target 'configurations/examples/case-studies/5. Nanochat in Plato.md' is not found among documentation files.",
+        "WARNING -  Doc file 'references/evaluators.md' contains a link 'examples/case-studies/5. Nanochat in Plato.md', but the target 'references/examples/case-studies/5. Nanochat in Plato.md' is not found among documentation files."
+      ]
+    },
+    "integrity": {
+      "unchanged_pinned_blobs": 1005,
+      "all_production_tests_configs_manifests_exact_final_C": true,
+      "accepted_A_B_D_ancestry_verified": true,
+      "unrelated_sections_byte_identical": true
+    },
+    "initial_probe_error": {
+      "cause": "Writer scratch probe initially imported nonexistent validate_configuration; corrected to actual settings_from_config. No implementation or public command change.",
+      "retained_logs": [
+        {
+          "path": "/tmp/plato-phase2c-scaffold-docs/final-13e/initial-probe-error.log",
+          "sha256": "32f92a255d1b4ca3fc38ee8c9ac29693a4a01a15c6a45a9175ce7a1fa6987bf3"
+        },
+        {
+          "path": "/tmp/plato-phase2c-scaffold-docs/final-13e/initial-feddyn-config-error.log",
+          "sha256": "9adf7cbc65658768f3e41d8837b20facf7eeccd2cb48dd60afc4cc245d6a3ba1"
+        }
+      ]
+    }
+  },
+  "author_execution_not_rerun": {
+    "source": "evidence/2026-refresh/phase2c-feddyn-validation.json",
+    "profile_results": {
+      "final-mandatory-not-runtime-313": {
+        "head": "7d310b90d698a7be4aa9a184dc415f7dbb401e5b",
+        "summary": "1231 passed, 1 skipped, 51 deselected, 17 warnings in 763.02s (0:12:43)",
+        "exit_code": 0
+      },
+      "final-mandatory-not-runtime-314": {
+        "head": "7d310b90d698a7be4aa9a184dc415f7dbb401e5b",
+        "summary": "1231 passed, 1 skipped, 51 deselected, 17 warnings in 835.52s (0:13:55)",
+        "exit_code": 0
+      },
+      "final-base-not-runtime-313": {
+        "head": "7d310b90d698a7be4aa9a184dc415f7dbb401e5b",
+        "summary": "1229 passed, 3 skipped, 51 deselected, 17 warnings in 760.02s (0:12:40)",
+        "exit_code": 0
+      },
+      "final-base-not-runtime-314": {
+        "head": "7d310b90d698a7be4aa9a184dc415f7dbb401e5b",
+        "summary": "1229 passed, 3 skipped, 51 deselected, 17 warnings in 833.90s (0:13:53)",
+        "exit_code": 0
+      }
+    },
+    "runtime_results": {
+      "313": {
+        "head": "05a9f00b8a4d54c233c1a9c00ef9ce2c4467480c",
+        "summary": "51 passed, 1232 deselected in 659.89s (0:10:59)",
+        "exit_code": 0,
+        "source_attribution": "Executed at 05a9f00b. Later 7d310b changes only one unrelated FedDyn test-isolation branch; all production/runtime test and harness blobs are identical."
+      },
+      "314": {
+        "head": "05a9f00b8a4d54c233c1a9c00ef9ce2c4467480c",
+        "summary": "51 passed, 1232 deselected in 680.58s (0:11:20)",
+        "exit_code": 0,
+        "source_attribution": "Executed at 05a9f00b. Later 7d310b changes only one unrelated FedDyn test-isolation branch; all production/runtime test and harness blobs are identical."
+      }
+    },
+    "qualification_limit": "Profiles overlap and are not summed. Author reports CPU synthetic/socket cases, not MNIST accuracy/GPU qualification. 7d310b to final13e changes only evidence; runtime was executed at05a9f with documented source-identical carry-forward. Writer ran no pytest or training."
+  },
+  "material_design_code_mismatch_found": false,
+  "doc_sha256": {
+    "examples/customized_client_training/scaffold/README.md": "7019ecd7181901e54e60e62efd9a785018c7c198143db923d82ed515ca4b95f8",
+    "examples/customized_client_training/feddyn/README.md": "14596f51ffde51c68971e48305de21a4569f1113b49d09565f44fb725d294e1a",
+    "docs/docs/examples/algorithms/5. Algorithms with Customized Client Training Loops.md": "ea06c89de74fcfce9f908ce191d94013d7425cd407518fbe078fc5c73158e6d1"
+  },
+  "owned_changes_this_turn": [
+    "examples/customized_client_training/scaffold/README.md",
+    "examples/customized_client_training/feddyn/README.md",
+    "docs/docs/examples/algorithms/5. Algorithms with Customized Client Training Loops.md",
+    "evidence/2026-refresh/phase2c-algorithm-docs-validation.json"
+  ],
+  "limits": [
+    "Final source is exact13e only; reconcile any ensuing code-review fixes before integration.",
+    "No whole-C/Phase2 acceptance or fresh independent writing review claimed.",
+    "No dataset download, full experiment/training rerun, optimizer/privacy/GPU or in-flight replay qualification.",
+    "Strict site build remains blocked by the two unchanged baseline Nanochat links; unrelated pages untouched."
+  ]
+}

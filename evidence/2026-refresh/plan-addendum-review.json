@@ -1,0 +1,514 @@
+{
+  "schema_version": 1,
+  "review_date": "2026-10-02",
+  "reviewer": "Independent addendum reviewer; no delegated or nested agents",
+  "review_scope": "ONLY the policy/archival handoff addendum. Original plan and accepted designs are preserved; their implementation qualification is not reopened or granted by this review.",
+  "reviewed_artifact": {
+    "path": "evidence/2026-refresh/plan-addendum.json",
+    "sha256": "5b51b0fb7ed6f68d9fce7176335b3e7be5e5f178a2788590912aa2396a487709",
+    "expected_sha256": "5b51b0fb7ed6f68d9fce7176335b3e7be5e5f178a2788590912aa2396a487709",
+    "matches": true
+  },
+  "baseline_commit": "5b8359bd40bbe65c7753e71f6627c490f9aa144f",
+  "accepted_dependency_candidate": "7304703905189baf771032f1cd923a37f66ed97f",
+  "decision": "PASS",
+  "changes_requested": false,
+  "summary": "No critical, high or medium issue found in the policy reconciliation or owned archival handoffs. The specified shared NAS set covers MobileNetV3's inspected import closure; provenance, existing phase gates and substantive acceptance are retained. F18 and F20 remain owned repairs, and F19 remains pending archival rather than fixed.",
+  "findings": [],
+  "finding_counts": {
+    "critical": 0,
+    "high": 0,
+    "medium": 0,
+    "low": 0
+  },
+  "input_verification": {
+    "plan.md": {
+      "sha256": "edb9a58cc7915a940854f16d5029fe97434703bf2f75eca0dcb96de2d0f0eb15",
+      "expected_sha256": "edb9a58cc7915a940854f16d5029fe97434703bf2f75eca0dcb96de2d0f0eb15",
+      "matches": true
+    },
+    "phase1a-acceptance.json": {
+      "sha256": "10c330d418d49a4ac43a0844290f272583232f9d7515d18dfc9cb31bf0c9beaf",
+      "expected_sha256": "10c330d418d49a4ac43a0844290f272583232f9d7515d18dfc9cb31bf0c9beaf",
+      "matches": true
+    },
+    "phase1a-review.json": {
+      "sha256": "4a27a339a3bc174ca378bba80c8214f9dc5ac536417d7f64f38eff3eb58a26f1",
+      "expected_sha256": "4a27a339a3bc174ca378bba80c8214f9dc5ac536417d7f64f38eff3eb58a26f1",
+      "matches": true
+    },
+    "design-acceptance.json": {
+      "sha256": "ff4d6acde0d0312b49b9767be5210b55fb4db0e8fb5727203c148b63d123693a",
+      "expected_sha256": "ff4d6acde0d0312b49b9767be5210b55fb4db0e8fb5727203c148b63d123693a",
+      "matches": true
+    },
+    "design-revision-review.json": {
+      "sha256": "0535b3ccbac91a264317bd8fb9314465a0379155bc7113de99a27a9b66b7be39",
+      "expected_sha256": "0535b3ccbac91a264317bd8fb9314465a0379155bc7113de99a27a9b66b7be39",
+      "matches": true
+    },
+    "startup-design.json": {
+      "sha256": "0a5e2c57102fa4beae7f4b4ceb6e091fd61e8af49b966f023bc57dfa6714ae47",
+      "expected_sha256": "0a5e2c57102fa4beae7f4b4ceb6e091fd61e8af49b966f023bc57dfa6714ae47",
+      "matches": true
+    },
+    "mlx-roadmap.json": {
+      "sha256": "76093b75c76e304117bd32f59d0eabf59bf726a2aaff051d82aa429761945ea9",
+      "expected_sha256": "76093b75c76e304117bd32f59d0eabf59bf726a2aaff051d82aa429761945ea9",
+      "matches": true
+    },
+    "test-ci-design.json": {
+      "sha256": "13f3d272e921d05afd2b3457ff977374528ea4653ff1ca8c238b5b945f5b9ef2",
+      "expected_sha256": "13f3d272e921d05afd2b3457ff977374528ea4653ff1ca8c238b5b945f5b9ef2",
+      "matches": true
+    },
+    "archive-candidates.json": {
+      "sha256": "063206ca530b3cf650257a44c04348e52e8893e0879bea849ac9b0cf5259e9d0",
+      "expected_sha256": "063206ca530b3cf650257a44c04348e52e8893e0879bea849ac9b0cf5259e9d0",
+      "matches": true
+    },
+    "aggregation-input-probes.json": {
+      "sha256": "3415944b801a8737f9e8cfab13e7b38740334517dd9a2372820f27613364ea4e",
+      "expected_sha256": "3415944b801a8737f9e8cfab13e7b38740334517dd9a2372820f27613364ea4e",
+      "matches": true
+    },
+    "vit-initialization-probe.json": {
+      "sha256": "d3c8fceb58d4d0fad63422bb8ce07b73d46e03d51bb7d5459b019c1ebeb5641c",
+      "expected_sha256": "d3c8fceb58d4d0fad63422bb8ce07b73d46e03d51bb7d5459b019c1ebeb5641c",
+      "matches": true
+    },
+    "fedprox-gradient-probe.json": {
+      "sha256": "b432e646e568d493956b6c56f89a9ccaf2c8cfa75da32c801f3a558a73f321b2",
+      "expected_sha256": "b432e646e568d493956b6c56f89a9ccaf2c8cfa75da32c801f3a558a73f321b2",
+      "matches": true
+    },
+    "AGENTS.md": {
+      "sha256": "b50f87f31ea3d87076952d8b7d2d8af067132fbf877d80f8780c208fb45527ec"
+    },
+    "evidence/2026-refresh/plan-addendum.json": {
+      "sha256": "5b51b0fb7ed6f68d9fce7176335b3e7be5e5f178a2788590912aa2396a487709"
+    },
+    "evidence/2026-refresh/session-binding-probe.json": {
+      "sha256": "7ab5d328a3898ac048781cf19942aba7347dd01f715fd85064679b381fa5fa92"
+    }
+  },
+  "repository_identity": {
+    "head": "5b8359bd40bbe65c7753e71f6627c490f9aa144f",
+    "baseline_tree": "938f42e9a0c471641ae5fb8a8ecf0e19c6ac39c8",
+    "candidate_tree": "862fed283336f488cb284dc2b0f47bd987946095",
+    "candidate_diff_sha256": "54437cb6f9d753b5c728f061edbc99611aeca177b994c9d345150aa4ba38e8cf",
+    "tracked_status": "",
+    "candidate_pyproject_sha256": "fecc507660f280019ccc6869bde5bd886f26685cfa2361fdab7f4ee60d7f4dfa",
+    "candidate_lock_sha256": "a7d30a4f7f2f824d656cf934b148d315fc1380817d3dd93e5070057b6cee58f6"
+  },
+  "assessments": [
+    {
+      "id": "policy_and_accepted_work",
+      "result": "PASS",
+      "addendum_locations": [
+        "/immutable_plan",
+        "/authority",
+        "/accepted_work"
+      ],
+      "evidence": [
+        {
+          "path": "AGENTS.md",
+          "detail": "Read repository instructions; all shell commands use zsh -lc."
+        },
+        {
+          "path": "evidence/2026-refresh/plan.md",
+          "detail": "Original SHA256 is unchanged. Sections 1, 3 and 4-8 supply the preserved algorithm/security, ownership, phase-order and review/acceptance rules."
+        },
+        {
+          "path": "evidence/2026-refresh/plan-review-3.json",
+          "detail": "Original plan review is PASS with no findings."
+        },
+        {
+          "path": "evidence/2026-refresh/phase1a-acceptance.json",
+          "detail": "Accepts the exact dependency candidate, retains Python 3.13 and the NLTK override/advisory, and authorizes ViT archival."
+        },
+        {
+          "path": "evidence/2026-refresh/phase1a-review.json",
+          "detail": "Candidate tree, binary diff hash, pyproject and lock hashes independently match Git objects. Recorded outside-workspace NLTK resolution, platform/runtime limits and separate robotics profile remain disclosed."
+        },
+        {
+          "path": "evidence/2026-refresh/design-acceptance.json",
+          "detail": "Accepted hashes of startup-design.json, mlx-roadmap.json and test-ci-design.json all match the addendum and current bytes."
+        }
+      ],
+      "conclusion": "Latest explicit user authorization reconciles stale default-promotion/archive/optimization wording without editing plan.md. No additional approval gate, algorithm rewrite, authentication redesign or unselected MLX expansion is introduced. Candidate acceptance is not misrepresented as root integration or whole-phase completion."
+    },
+    {
+      "id": "phase_and_acceptance_preservation",
+      "result": "PASS",
+      "addendum_locations": [
+        "/phase_handoffs",
+        "/remaining_coverage",
+        "/completion_policy"
+      ],
+      "evidence": [
+        {
+          "path": "evidence/2026-refresh/plan.md",
+          "line": 153,
+          "detail": "Existing independent task review, exact-commit/diff evidence, shared-file serialization, phase gate, root integration/push/PR and cleanup rules remain applicable."
+        },
+        {
+          "path": "evidence/2026-refresh/startup-design.json",
+          "json_pointers": [
+            "/design",
+            "/tests",
+            "/handoff"
+          ],
+          "detail": "Addendum explicitly follows accepted startup design, preserving borrowed loops, synchronous extension dispatch, error precedence, real 2/6-sample socket smoke, natural success and bounded owned-process containment."
+        },
+        {
+          "path": "evidence/2026-refresh/test-ci-design.json",
+          "json_pointers": [
+            "/profiles",
+            "/typing",
+            "/linux_cpu_ci",
+            "/acceptance"
+          ],
+          "detail": "Base/mandatory profiles, DP/MPC and initialized Nanochat execution, narrow tokenizer allowance, fixture restoration, warning/typing evidence and CPU forward-compatibility matrix carry forward."
+        },
+        {
+          "path": "evidence/2026-refresh/mlx-roadmap.json",
+          "json_pointers": [
+            "/current_selection",
+            "/pre_aggregation_contract",
+            "/device_and_mode_contract",
+            "/host_array_ownership",
+            "/acceptance_experiments"
+          ],
+          "detail": "A1/A2/P1, E1-E7 and bounded E8 carry forward. Raw/transformed and zero-weight trees, all three dispatch paths, both arrival orders, owned snapshots, caller streams/modes and narrow 3A-after-2B handoff remain required."
+        }
+      ],
+      "conclusion": "Phase order 1 -> 2 -> 3 -> 4 -> 5 and existing implementers remain intact. Necessary later manifest/lock/registry edits use serialized handoffs. Active supported families still need meaningful executed smokes and confirmed-defect closure; archived or externally blocked paths cannot count as supported passes."
+    },
+    {
+      "id": "F18_ownership",
+      "result": "PASS",
+      "addendum_locations": [
+        "/phase_handoffs/2",
+        "/new_findings/0",
+        "/remaining_coverage/2"
+      ],
+      "evidence": [
+        {
+          "path": "evidence/2026-refresh/aggregation-input-probes.json",
+          "detail": "Retained probes show negative/nonfinite counts enter arithmetic and excess payloads are ignored; evidence identifies Phase 2B."
+        },
+        {
+          "path": "plato/servers/strategies/aggregation/fedavg.py",
+          "line": 42,
+          "detail": "Delta flow pairs by report index and sums num_samples without cardinality or finite/nonnegative validation."
+        },
+        {
+          "path": "plato/servers/strategies/aggregation/fedavg.py",
+          "line": 89,
+          "detail": "Direct-weight flow has the same validation gap; zero-total and feature-report behavior are established branches to preserve."
+        },
+        {
+          "path": "plato/servers/fedavg.py",
+          "line": 175,
+          "detail": "Actual server has transformed-input, direct-strategy, legacy aggregate_weights and delta dispatches; coordinating validation here with 3A/F17 is necessary."
+        }
+      ],
+      "conclusion": "F18 is a bounded addition to existing 2B ownership, with focused tests and validation before arithmetic/global mutation, preserved valid/fractional/zero-count contracts and report/tree alignment. The later narrow MLX ingress handoff is retained."
+    },
+    {
+      "id": "F20_ownership_and_legacy_objective",
+      "result": "PASS",
+      "addendum_locations": [
+        "/phase_handoffs/3",
+        "/new_findings/2"
+      ],
+      "evidence": [
+        {
+          "path": "evidence/2026-refresh/fedprox-gradient-probe.json",
+          "detail": "Recorded actual strategy probe has nonfinite zero-distance gradients for both mu=0 and positive mu; identifies 2C with 4A/5 coordination."
+        },
+        {
+          "path": "plato/trainers/strategies/algorithms/fedprox_strategy.py",
+          "line": 46,
+          "detail": "Existing documented compatibility objective is unsquared L2, so preserving it does not introduce a new research equation."
+        },
+        {
+          "path": "plato/trainers/strategies/algorithms/fedprox_strategy.py",
+          "line": 193,
+          "detail": "sqrt of summed squared differences creates the zero-distance differentiation hazard; existing l1 path has its own mu scaling."
+        },
+        {
+          "path": "configs/MNIST/fedprox_lenet5.toml",
+          "line": 42,
+          "detail": "Reference config selects nonexistent FedProx optimizer and puts mu under optimizer parameters."
+        },
+        {
+          "path": "plato/trainers/optimizers.py",
+          "line": 16,
+          "detail": "Registered optimizer table has no FedProx entry."
+        },
+        {
+          "path": "examples/customized_client_training/fedprox/fedprox_trainer.py",
+          "line": 36,
+          "detail": "Actual customized trainer installs FedProxLossStrategyFromConfig; config wrapper reads clients.proximal_term_penalty_constant or algorithm.fedprox_mu."
+        },
+        {
+          "path": "docs/docs/examples/algorithms/5. Algorithms with Customized Client Training Loops.md",
+          "line": 33,
+          "detail": "Current squared-objective/identical-reference-gradient claims conflict with the inspected legacy objective; documentation correction is explicitly assigned."
+        }
+      ],
+      "conclusion": "2C owns the repair, with 4A reference-config/entrypoint and 5 documentation handoffs. Acceptance requires finite initial gradients, mu=0 base-loss parity, independent nonzero-distance gradient reference, l1 preservation and actual parameter-changing proximal training. Merely replacing the optimizer with SGD cannot satisfy it. A new paper-faithful mode is not required."
+    },
+    {
+      "id": "F19_and_coherent_vit_retirement",
+      "result": "PASS",
+      "addendum_locations": [
+        "/phase_handoffs/3",
+        "/phase_handoffs/5",
+        "/new_findings/1",
+        "/vit_archival/retire",
+        "/vit_archival/active_reference_cleanup"
+      ],
+      "evidence": [
+        {
+          "path": "evidence/2026-refresh/vit-initialization-probe.json",
+          "detail": "Retained local real-checkpoint probe confirms pretrained=false preserves checkpoint weights; its explicit disposition selects archival."
+        },
+        {
+          "path": "plato/models/vit.py",
+          "line": 39,
+          "detail": "Adapter unconditionally uses from_pretrained and later init_weights; no initialization repair is selected."
+        },
+        {
+          "path": "plato/models/registry.py",
+          "line": 23,
+          "detail": "Active import and vit factory entry need the assigned retirement handoff."
+        },
+        {
+          "path": "configs/ViT/",
+          "detail": "All four inventoried TOMLs exist and select model_type=vit, including SwinV2/LeViT."
+        },
+        {
+          "path": "examples/model_search/fedtp/",
+          "detail": "Six listed bundle files exist; both provided configs use the retired vit factory."
+        },
+        {
+          "path": "examples/model_search/pfedrlnas/VIT/",
+          "detail": "Seven top-level experiment Python files and workspace manifest exist; shared nasvit_wrapper code is independently active through MobileNetV3."
+        },
+        {
+          "path": "pyproject.toml",
+          "detail": "VIT workspace and vendor/exclusion paths exist in baseline and accepted candidate; narrow later metadata/lock/build checks are assigned."
+        }
+      ],
+      "conclusion": "F19 is correctly removed from 2C repair/migration scope and assigned to existing Phase 4 archive ownership with core/root handoffs. Its disposition closes only after archive/reference/dependency checks, and it is never labeled fixed. Independent AnyCostFL/FedRolex local ViT implementations and their ResNet entrypoints, DARTS and Nanochat are protected from blanket retirement."
+    },
+    {
+      "id": "mobilenet_shared_dependency_boundary",
+      "result": "PASS",
+      "addendum_locations": [
+        "/vit_archival/mobilenet_dependency_edges",
+        "/vit_archival/shared_support",
+        "/vit_archival/preserve_unrelated"
+      ],
+      "evidence": [
+        {
+          "path": "examples/model_search/pfedrlnas/MobileNetV3/model/architect.py",
+          "line": 18,
+          "detail": "Active Architect inherits the VIT wrapper Architect; base wrapper eagerly imports its model/config."
+        },
+        {
+          "path": "examples/model_search/pfedrlnas/MobileNetV3/model/mobilenetv3_supernet.py",
+          "line": 20,
+          "detail": "Active supernet imports wrapper model/layers and NASViT nn_utils/static_layers; current sys.path additions depend on caller cwd."
+        },
+        {
+          "path": "examples/model_search/pfedrlnas/VIT/nasvit_wrapper/NASViT/models/__init__.py",
+          "line": 2,
+          "detail": "Eager model_factory import reaches dynamic/static NAS models and transformer utilities."
+        },
+        {
+          "path": "examples/model_search/pfedrlnas/VIT/nasvit_wrapper/NASViT/models/modules/transformer.py",
+          "line": 9,
+          "detail": "Shared closure needs timm.layers even when a MobileNet subnet does not execute transformer blocks."
+        },
+        {
+          "path": "examples/model_search/pfedrlnas/VIT/nasvit_wrapper/NASViT/models/modules/nn_base.py",
+          "line": 10,
+          "detail": "fvcore PathManager import is optional with a local-file fallback; wrapper config requires yacs."
+        },
+        {
+          "git_object": "7304703905189baf771032f1cd923a37f66ed97f:examples/model_search/pfedrlnas/MobileNetV3/pyproject.toml",
+          "detail": "Accepted manifest retains local Plato workspace dependency and yacs; addendum requires checking actual shared requirements with root lock owner."
+        }
+      ],
+      "static_closure_check": {
+        "method": "Read-only Python AST traversal of local imports and package initializers from actual MobileNetV3 shared-module seeds; includes imports inside functions and optional branches.",
+        "source_root": "examples/model_search/pfedrlnas/VIT/nasvit_wrapper/",
+        "files": [
+          "NASViT/models/__init__.py",
+          "NASViT/models/attentive_nas_dynamic_model.py",
+          "NASViT/models/attentive_nas_static_model.py",
+          "NASViT/models/model_factory.py",
+          "NASViT/models/modules/__init__.py",
+          "NASViT/models/modules/activations.py",
+          "NASViT/models/modules/dynamic_layers.py",
+          "NASViT/models/modules/dynamic_ops.py",
+          "NASViT/models/modules/nn_base.py",
+          "NASViT/models/modules/nn_utils.py",
+          "NASViT/models/modules/static_layers.py",
+          "NASViT/models/modules/transformer.py",
+          "architect.py",
+          "attentive_nas_dynamic_model.py",
+          "config.py",
+          "dynamic_layers.py"
+        ],
+        "missing_from_preserve_list": [],
+        "preserve_paths_missing_on_disk": [],
+        "external_imports_including_optional": [
+          "collections",
+          "copy",
+          "fvcore.common.file_io",
+          "logging",
+          "math",
+          "numpy",
+          "pathlib",
+          "pickle",
+          "plato.config",
+          "random",
+          "timm.layers",
+          "torch",
+          "torch.autograd",
+          "torch.autograd.function",
+          "torch.distributed",
+          "torch.nn",
+          "torch.nn.functional",
+          "torch.nn.modules._functions",
+          "torch.nn.parameter",
+          "torch.utils.checkpoint",
+          "yacs.config"
+        ]
+      },
+      "conclusion": "All 16 closure files are explicitly preserved. Shared support is relocated before retiring the experiment directory; active imports must leave VIT/archive paths and work from documented and root invocations. Seeded output/state/update comparison, sampled-subnet forward/backward and extraction/aggregation acceptance prevent import-only preservation claims. Existing failures must be recorded and resolved/disposed by the current owner without silently retiring MobileNetV3."
+    },
+    {
+      "id": "licenses_provenance_and_other_archives",
+      "result": "PASS",
+      "addendum_locations": [
+        "/authority/archives",
+        "/vit_archival/retire/1",
+        "/vit_archival/shared_support/licenses_and_provenance",
+        "/vit_archival/historical_reproduction",
+        "/other_archival_handoffs"
+      ],
+      "evidence": [
+        {
+          "path": ".gitmodules",
+          "detail": "Recorded DViT/T2T upstream URLs match repository metadata; baseline gitlink pins exactly match the addendum."
+        },
+        {
+          "path": "examples/model_search/pfedrlnas/VIT/nasvit_wrapper/NASViT/LICENSE",
+          "detail": "Existing text is Attribution-NonCommercial 4.0; it must accompany retained support and historical archive, not be relabeled under Plato's root license."
+        },
+        {
+          "path": "examples/model_search/pfedrlnas/VIT/nasvit_wrapper/NASViT/README.md",
+          "detail": "Existing provenance identifies NASViT and separately licensed Timm/Swin portions; addendum preserves README/upstream attribution and copyright headers."
+        },
+        {
+          "path": "plato/datasources/datalib/",
+          "detail": "Tracked count is 14; searched runtime/example/config/test/docs references are internal to this helper bundle. Retirement remains conditional on owned recheck and cleanup."
+        },
+        {
+          "path": "plato/utils/rl_env.py",
+          "detail": "No external tracked caller/import found; separately used reinforcement_learning package and FEI audit remain active."
+        },
+        {
+          "path": "examples/outdated/",
+          "detail": "Tracked count is 20 across the four existing families; status consolidation does not require a rename or repair of historical defects."
+        }
+      ],
+      "verified_submodule_pins": [
+        "160000 commit c75fe54aa7c1fa881701c246f9427bcbe4eee5a4\texternal/nanochat",
+        "160000 commit 1ccb152cea43fcbc3cd517a45c12c65734f8ace3\tplato/models/dvit",
+        "160000 commit 0f63dc9558f4d192de926504dbddfa1b3f5db6ca\tplato/models/t2tvit"
+      ],
+      "license_and_provenance_sha256": {
+        "plato/models/dvit/LICENSE": {
+          "sha256": "a8479fb992512f85a3226f59d27cf27860b35848f7f3dfb12f8a4e2242f3809a",
+          "first_line": "MIT License"
+        },
+        "plato/models/dvit/lib_deit/LICENSE": {
+          "sha256": "b208c52b00a2df2c8f4c3298c34407bf2bfe409968213372251c91fcc737a1a5",
+          "first_line": "                                 Apache License"
+        },
+        "plato/models/dvit/utils/progress/LICENSE": {
+          "sha256": "71a13496c621f01b454f9aa54fa608a712f58eb253e6dd2c91027fe78340c773",
+          "first_line": "# Copyright (c) 2012 Giorgos Verigakis <verigak@gmail.com>"
+        },
+        "plato/models/t2tvit/LICENSE": {
+          "sha256": "aa9ef78719c4db82567d6c9ef8fb8f97df550de3a71b65ae4bdd0953a2d0197b",
+          "first_line": "The Clear BSD License"
+        },
+        "examples/model_search/pfedrlnas/VIT/nasvit_wrapper/NASViT/LICENSE": {
+          "sha256": "50f03face87211373b7a447607f9ca26ad95ad339e8293ac2807958bad7b5447",
+          "first_line": "Attribution-NonCommercial 4.0 International"
+        },
+        "examples/model_search/pfedrlnas/VIT/nasvit_wrapper/NASViT/README.md": {
+          "sha256": "2a39acde75afc485d842822751107e12604e4c51c0923dc8e597572fae45413d",
+          "first_line": "# Summary"
+        }
+      },
+      "conclusion": "The handoff preserves source, authorship, nested license files, baseline/content hashes, exact path map and pinned historical reproduction; it invents no NASViT upstream SHA and fetches no latest branch. Active registry/workspace/CI/docs/package cleanup and post-move checks remain required."
+    },
+    {
+      "id": "session_binding_extra_evidence",
+      "result": "PASS",
+      "addendum_locations": [
+        "/authority/scope",
+        "/phase_handoffs/2",
+        "/remaining_coverage/2",
+        "/remaining_coverage/4"
+      ],
+      "evidence": [
+        {
+          "path": "evidence/2026-refresh/session-binding-probe.json",
+          "sha256": "7ab5d328a3898ac048781cf19942aba7347dd01f715fd85064679b381fa5fa92",
+          "detail": "Direct inert-report handler probe records acceptance/buffer mutation for wrong and unknown sessions; it explicitly does not establish a complete aggregation exploit."
+        },
+        {
+          "path": "evidence/2026-refresh/plan.md",
+          "line": 374,
+          "detail": "Existing Phase 2 security acceptance already covers session-to-client identity, wrong/unknown/stale-session rejection, bounded payload checks and trusted-peer pickle limits."
+        },
+        {
+          "path": "plato/servers/base.py",
+          "line": 902,
+          "detail": "Report handler deserializes and creates session buffers without verifying sid/client assignment."
+        },
+        {
+          "path": "plato/servers/base.py",
+          "line": 676,
+          "detail": "Physical worker sessions are reassigned to server-selected logical client IDs."
+        },
+        {
+          "path": "plato/servers/base.py",
+          "line": 1017,
+          "detail": "Urgent async reports may use a different client ID; current server-issued assignment/request context, including edge behavior, must determine valid identity."
+        }
+      ],
+      "conclusion": "The probe strengthens already-planned 2B acceptance with 2D payload coordination, not a new feature or authentication scope. Identity validation must precede unsafe parsing/unrelated mutation while preserving legitimate worker reuse and urgent/edge reports. Session binding is not cryptographic authentication and does not make pickle safe for untrusted peers."
+    }
+  ],
+  "validation": {
+    "performed": [
+      "SHA256 verification of the exact addendum and all 12 cited source artifacts",
+      "Git baseline/candidate tree, diff, manifest and lock identity checks",
+      "Read-only repository searches and source/config/docs inspection",
+      "Static AST closure traversal and archive inventory/license/pin checks"
+    ],
+    "not_claimed": "No implementation tests, installs, builds or archive moves ran. Referenced runtime probes remain attributed evidence. Future runtime, relocation, package and phase acceptance must execute under the existing owned tasks.",
+    "write_scope": "Only evidence/2026-refresh/plan-addendum-review.json. No code, plan, design or other evidence edits; no installs, commits, pushes or agents."
+  }
+}

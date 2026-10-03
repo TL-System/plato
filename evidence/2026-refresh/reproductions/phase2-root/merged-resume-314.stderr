@@ -1,0 +1,288 @@
+[INFO][04:56:02]: [93m[1m[81276] Logging runtime results to: /private/tmp/plato-phase2-root/merged-resume-314-cases/case-0/results/81276.csv.[0m
+[INFO][04:56:02]: [Server #81276] Started training on 10 clients with 2 per round.
+[INFO][04:56:02]: [Server] Selected clients: [9, 7]
+[INFO][04:56:02]: [Server] Selected clients: [5, 6]
+[INFO][04:56:02]: [Server #81276] Saving the checkpoint to /private/tmp/plato-phase2-root/merged-resume-314-cases/case-0/checkpoints/checkpoint_lenet5_2.safetensors.
+[INFO][04:56:02]: [Server #81276] Model saved to /private/tmp/plato-phase2-root/merged-resume-314-cases/case-0/checkpoints/checkpoint_lenet5_2.safetensors.
+[INFO][04:56:02]: [Server] Selected clients: [5, 3]
+[INFO][04:56:02]: [Server] Selected clients: [9, 5]
+[INFO][04:56:02]: [Server] Selected clients: [2, 1]
+[INFO][04:56:02]: [Server] Selected clients: [4, 7]
+[INFO][04:56:02]: [Server] Selected clients: [7, 5]
+[INFO][04:56:02]: [Server #81276] Resume a training session from a previously saved checkpoint.
+[INFO][04:56:02]: [Client #0] Model loaded from /private/tmp/plato-phase2-root/merged-resume-314-cases/case-0/checkpoints/checkpoint_lenet5_2.safetensors.
+[INFO][04:56:02]: [Server] Selected clients: [5, 3]
+[INFO][04:56:02]: [Server] Selected clients: [9, 5]
+[INFO][04:56:02]: [Server] Selected clients: [2, 1]
+[INFO][04:56:02]: [Server] Selected clients: [4, 7]
+[INFO][04:56:02]: [Server] Selected clients: [7, 5]
+[INFO][04:56:02]: [93m[1m[81276] Logging runtime results to: /private/tmp/plato-phase2-root/merged-resume-314-cases/case-1/results/81276.csv.[0m
+[INFO][04:56:02]: [Server #81276] Started training on 10 clients with 2 per round.
+[INFO][04:56:02]: [Server] Selected clients: [9, 7]
+[INFO][04:56:02]: [Server] Selected clients: [5, 6]
+[INFO][04:56:02]: [Server #81276] Saving the checkpoint to /private/tmp/plato-phase2-root/merged-resume-314-cases/case-1/checkpoints/checkpoint_lenet5_2.safetensors.
+[INFO][04:56:02]: [Server #81276] Model saved to /private/tmp/plato-phase2-root/merged-resume-314-cases/case-1/checkpoints/checkpoint_lenet5_2.safetensors.
+[INFO][04:56:02]: [Server] Selected clients: [5, 3]
+[INFO][04:56:02]: [Server] Selected clients: [9, 5]
+[INFO][04:56:02]: [Server] Selected clients: [2, 1]
+[INFO][04:56:02]: [Server] Selected clients: [4, 7]
+[INFO][04:56:02]: [Server] Selected clients: [7, 5]
+[INFO][04:56:02]: [Server #81276] Resume a training session from a previously saved checkpoint.
+[INFO][04:56:02]: [Client #0] Model loaded from /private/tmp/plato-phase2-root/merged-resume-314-cases/case-1/checkpoints/checkpoint_lenet5_2.safetensors.
+[INFO][04:56:02]: [Server] Selected clients: [5, 3]
+[INFO][04:56:02]: [Server] Selected clients: [9, 5]
+[INFO][04:56:02]: [Server] Selected clients: [2, 1]
+[INFO][04:56:02]: [Server] Selected clients: [4, 7]
+[INFO][04:56:02]: [Server] Selected clients: [7, 5]
+[INFO][04:56:02]: [93m[1m[81276] Logging runtime results to: /private/tmp/plato-phase2-root/merged-resume-314-cases/case-2/results/81276.csv.[0m
+[INFO][04:56:02]: [Server #81276] Started training on 10 clients with 2 per round.
+[INFO][04:56:02]: [Server] Selected clients: [9, 7]
+[INFO][04:56:02]: [Server] Selected clients: [5, 6]
+[INFO][04:56:02]: [Server #81276] Saving the checkpoint to /private/tmp/plato-phase2-root/merged-resume-314-cases/case-2/checkpoints/checkpoint_~c87c0c64d2fb215b38496b07952d86526559fee390c98b0f383fef0d230107f4_2.safetensors.
+[INFO][04:56:02]: [Server #81276] Model saved to /private/tmp/plato-phase2-root/merged-resume-314-cases/case-2/checkpoints/checkpoint_~c87c0c64d2fb215b38496b07952d86526559fee390c98b0f383fef0d230107f4_2.safetensors.
+[INFO][04:56:02]: [Server] Selected clients: [5, 3]
+[INFO][04:56:02]: [Server] Selected clients: [9, 5]
+[INFO][04:56:02]: [Server] Selected clients: [2, 1]
+[INFO][04:56:02]: [Server] Selected clients: [4, 7]
+[INFO][04:56:02]: [Server] Selected clients: [7, 5]
+[INFO][04:56:02]: [Server #81276] Resume a training session from a previously saved checkpoint.
+[INFO][04:56:02]: [Client #0] Model loaded from /private/tmp/plato-phase2-root/merged-resume-314-cases/case-2/checkpoints/checkpoint_~c87c0c64d2fb215b38496b07952d86526559fee390c98b0f383fef0d230107f4_2.safetensors.
+[INFO][04:56:02]: [Server] Selected clients: [5, 3]
+[INFO][04:56:02]: [Server] Selected clients: [9, 5]
+[INFO][04:56:02]: [Server] Selected clients: [2, 1]
+[INFO][04:56:02]: [Server] Selected clients: [4, 7]
+[INFO][04:56:02]: [Server] Selected clients: [7, 5]
+[INFO][04:56:02]: [93m[1m[81276] Logging runtime results to: /private/tmp/plato-phase2-root/merged-resume-314-cases/case-3/results/81276.csv.[0m
+[INFO][04:56:02]: [Server #81276] Started training on 10 clients with 2 per round.
+[INFO][04:56:02]: [Server] Selected clients: [9, 7]
+[INFO][04:56:02]: [Server] Selected clients: [5, 6]
+[INFO][04:56:02]: [Server #81276] Saving the checkpoint to /private/tmp/plato-phase2-root/merged-resume-314-cases/case-3/checkpoints/checkpoint_~c87c0c64d2fb215b38496b07952d86526559fee390c98b0f383fef0d230107f4_2.safetensors.
+[INFO][04:56:02]: [Server #81276] Model saved to /private/tmp/plato-phase2-root/merged-resume-314-cases/case-3/checkpoints/checkpoint_~c87c0c64d2fb215b38496b07952d86526559fee390c98b0f383fef0d230107f4_2.safetensors.
+[INFO][04:56:02]: [Server] Selected clients: [5, 3]
+[INFO][04:56:02]: [Server] Selected clients: [9, 5]
+[INFO][04:56:02]: [Server] Selected clients: [2, 1]
+[INFO][04:56:02]: [Server] Selected clients: [4, 7]
+[INFO][04:56:02]: [Server] Selected clients: [7, 5]
+[INFO][04:56:02]: [Server #81276] Resume a training session from a previously saved checkpoint.
+[INFO][04:56:02]: [Client #0] Model loaded from /private/tmp/plato-phase2-root/merged-resume-314-cases/case-3/checkpoints/checkpoint_~c87c0c64d2fb215b38496b07952d86526559fee390c98b0f383fef0d230107f4_2.safetensors.
+[INFO][04:56:02]: [Server] Selected clients: [5, 3]
+[INFO][04:56:02]: [Server] Selected clients: [9, 5]
+[INFO][04:56:02]: [Server] Selected clients: [2, 1]
+[INFO][04:56:02]: [Server] Selected clients: [4, 7]
+[INFO][04:56:02]: [Server] Selected clients: [7, 5]
+[INFO][04:56:02]: [93m[1m[81276] Logging runtime results to: /private/tmp/plato-phase2-root/merged-resume-314-cases/case-4/results/81276.csv.[0m
+[INFO][04:56:02]: [Server #81276] Started training on 10 clients with 2 per round.
+[INFO][04:56:02]: [Server] Selected clients: [9, 7]
+[INFO][04:56:02]: [Server] Selected clients: [5, 6]
+[INFO][04:56:02]: [Server #81276] Saving the checkpoint to /private/tmp/plato-phase2-root/merged-resume-314-cases/case-4/checkpoints/checkpoint_org_model_2.safetensors.
+[INFO][04:56:02]: [Server #81276] Model saved to /private/tmp/plato-phase2-root/merged-resume-314-cases/case-4/checkpoints/checkpoint_org_model_2.safetensors.
+[INFO][04:56:02]: [Server] Selected clients: [5, 3]
+[INFO][04:56:02]: [Server] Selected clients: [9, 5]
+[INFO][04:56:02]: [Server] Selected clients: [2, 1]
+[INFO][04:56:02]: [Server] Selected clients: [4, 7]
+[INFO][04:56:02]: [Server] Selected clients: [7, 5]
+[INFO][04:56:02]: [Server #81276] Resume a training session from a previously saved checkpoint.
+[INFO][04:56:02]: [Client #0] Model loaded from /private/tmp/plato-phase2-root/merged-resume-314-cases/case-4/checkpoints/checkpoint_org_model_2.safetensors.
+[INFO][04:56:02]: [Server] Selected clients: [5, 3]
+[INFO][04:56:02]: [Server] Selected clients: [9, 5]
+[INFO][04:56:02]: [Server] Selected clients: [2, 1]
+[INFO][04:56:02]: [Server] Selected clients: [4, 7]
+[INFO][04:56:02]: [Server] Selected clients: [7, 5]
+[INFO][04:56:02]: [93m[1m[81276] Logging runtime results to: /private/tmp/plato-phase2-root/merged-resume-314-cases/case-5/results/81276.csv.[0m
+[INFO][04:56:02]: [Server #81276] Started training on 10 clients with 2 per round.
+[INFO][04:56:02]: [Server] Selected clients: [9, 7]
+[INFO][04:56:02]: [Server] Selected clients: [5, 6]
+[INFO][04:56:02]: [Server #81276] Saving the checkpoint to /private/tmp/plato-phase2-root/merged-resume-314-cases/case-5/checkpoints/checkpoint_org_model_2.safetensors.
+[INFO][04:56:02]: [Server #81276] Model saved to /private/tmp/plato-phase2-root/merged-resume-314-cases/case-5/checkpoints/checkpoint_org_model_2.safetensors.
+[INFO][04:56:02]: [Server] Selected clients: [5, 3]
+[INFO][04:56:02]: [Server] Selected clients: [9, 5]
+[INFO][04:56:02]: [Server] Selected clients: [2, 1]
+[INFO][04:56:02]: [Server] Selected clients: [4, 7]
+[INFO][04:56:02]: [Server] Selected clients: [7, 5]
+[INFO][04:56:02]: [Server #81276] Resume a training session from a previously saved checkpoint.
+[INFO][04:56:02]: [Client #0] Model loaded from /private/tmp/plato-phase2-root/merged-resume-314-cases/case-5/checkpoints/checkpoint_org_model_2.safetensors.
+[INFO][04:56:02]: [Server] Selected clients: [5, 3]
+[INFO][04:56:02]: [Server] Selected clients: [9, 5]
+[INFO][04:56:02]: [Server] Selected clients: [2, 1]
+[INFO][04:56:02]: [Server] Selected clients: [4, 7]
+[INFO][04:56:02]: [Server] Selected clients: [7, 5]
+[INFO][04:56:02]: [93m[1m[81276] Logging runtime results to: /private/tmp/plato-phase2-root/merged-resume-314-cases/case-6/results/81276.csv.[0m
+[INFO][04:56:02]: [Server #81276] Started training on 10 clients with 2 per round.
+[INFO][04:56:02]: [Server] Selected clients: [9, 7]
+[INFO][04:56:02]: [Server] Selected clients: [5, 6]
+[INFO][04:56:02]: [Server #81276] Saving the checkpoint to /private/tmp/plato-phase2-root/merged-resume-314-cases/case-6/checkpoints/~tdeb2c7d617bd42e8cb5c716c5b9c6a5fdfac7f71f61c430eb629a02b5ddb545c.safetensors.
+[INFO][04:56:02]: [Server #81276] Model saved to /private/tmp/plato-phase2-root/merged-resume-314-cases/case-6/checkpoints/~tdeb2c7d617bd42e8cb5c716c5b9c6a5fdfac7f71f61c430eb629a02b5ddb545c.safetensors.
+[INFO][04:56:02]: [Server] Selected clients: [5, 3]
+[INFO][04:56:02]: [Server] Selected clients: [9, 5]
+[INFO][04:56:02]: [Server] Selected clients: [2, 1]
+[INFO][04:56:02]: [Server] Selected clients: [4, 7]
+[INFO][04:56:02]: [Server] Selected clients: [7, 5]
+[INFO][04:56:02]: [Server #81276] Resume a training session from a previously saved checkpoint.
+[INFO][04:56:02]: [Client #0] Model loaded from /private/tmp/plato-phase2-root/merged-resume-314-cases/case-6/checkpoints/~tdeb2c7d617bd42e8cb5c716c5b9c6a5fdfac7f71f61c430eb629a02b5ddb545c.safetensors.
+[INFO][04:56:02]: [Server] Selected clients: [5, 3]
+[INFO][04:56:02]: [Server] Selected clients: [9, 5]
+[INFO][04:56:02]: [Server] Selected clients: [2, 1]
+[INFO][04:56:02]: [Server] Selected clients: [4, 7]
+[INFO][04:56:02]: [Server] Selected clients: [7, 5]
+[INFO][04:56:02]: [93m[1m[81276] Logging runtime results to: /private/tmp/plato-phase2-root/merged-resume-314-cases/case-7/results/81276.csv.[0m
+[INFO][04:56:02]: [Server #81276] Started training on 10 clients with 2 per round.
+[INFO][04:56:02]: [Server] Selected clients: [9, 7]
+[INFO][04:56:02]: [Server] Selected clients: [5, 6]
+[INFO][04:56:02]: [Server #81276] Saving the checkpoint to /private/tmp/plato-phase2-root/merged-resume-314-cases/case-7/checkpoints/~tdeb2c7d617bd42e8cb5c716c5b9c6a5fdfac7f71f61c430eb629a02b5ddb545c.safetensors.
+[INFO][04:56:02]: [Server #81276] Model saved to /private/tmp/plato-phase2-root/merged-resume-314-cases/case-7/checkpoints/~tdeb2c7d617bd42e8cb5c716c5b9c6a5fdfac7f71f61c430eb629a02b5ddb545c.safetensors.
+[INFO][04:56:02]: [Server] Selected clients: [5, 3]
+[INFO][04:56:02]: [Server] Selected clients: [9, 5]
+[INFO][04:56:02]: [Server] Selected clients: [2, 1]
+[INFO][04:56:02]: [Server] Selected clients: [4, 7]
+[INFO][04:56:02]: [Server] Selected clients: [7, 5]
+[INFO][04:56:02]: [Server #81276] Resume a training session from a previously saved checkpoint.
+[INFO][04:56:02]: [Client #0] Model loaded from /private/tmp/plato-phase2-root/merged-resume-314-cases/case-7/checkpoints/~tdeb2c7d617bd42e8cb5c716c5b9c6a5fdfac7f71f61c430eb629a02b5ddb545c.safetensors.
+[INFO][04:56:02]: [Server] Selected clients: [5, 3]
+[INFO][04:56:02]: [Server] Selected clients: [9, 5]
+[INFO][04:56:02]: [Server] Selected clients: [2, 1]
+[INFO][04:56:02]: [Server] Selected clients: [4, 7]
+[INFO][04:56:02]: [Server] Selected clients: [7, 5]
+[INFO][04:56:02]: [93m[1m[81276] Logging runtime results to: /private/tmp/plato-phase2-root/merged-resume-314-cases/case-8/results/81276.csv.[0m
+[INFO][04:56:02]: [Server #81276] Started training on 10 clients with 2 per round.
+[INFO][04:56:02]: [Server] Selected clients: [9, 7]
+[INFO][04:56:02]: [Server] Selected clients: [5, 6]
+[INFO][04:56:02]: [Server #81276] Saving the checkpoint to /private/tmp/plato-phase2-root/merged-resume-314-cases/case-8/checkpoints/checkpoint_lenet5_2.safetensors.
+[INFO][04:56:02]: [Server #81276] Model saved to /private/tmp/plato-phase2-root/merged-resume-314-cases/case-8/checkpoints/checkpoint_lenet5_2.safetensors.
+[INFO][04:56:02]: [Server] Selected clients: [5, 3]
+[INFO][04:56:02]: [Server] Selected clients: [9, 5]
+[INFO][04:56:02]: [Server] Selected clients: [2, 1]
+[INFO][04:56:02]: [Server] Selected clients: [4, 7]
+[INFO][04:56:02]: [Server] Selected clients: [7, 5]
+[INFO][04:56:02]: [Server #81276] Resume a training session from a previously saved checkpoint.
+[INFO][04:56:02]: [Client #0] Model loaded from /private/tmp/plato-phase2-root/merged-resume-314-cases/case-8/checkpoints/checkpoint_lenet5_2.safetensors.
+[INFO][04:56:02]: [Server] Selected clients: [5, 3]
+[INFO][04:56:02]: [Server] Selected clients: [9, 5]
+[INFO][04:56:02]: [Server] Selected clients: [2, 1]
+[INFO][04:56:02]: [Server] Selected clients: [4, 7]
+[INFO][04:56:02]: [Server] Selected clients: [7, 5]
+[INFO][04:56:02]: [93m[1m[81276] Logging runtime results to: /private/tmp/plato-phase2-root/merged-resume-314-cases/case-9/results/81276.csv.[0m
+[INFO][04:56:02]: [Server #81276] Started training on 10 clients with 2 per round.
+[INFO][04:56:02]: [Server] Selected clients: [9, 7]
+[INFO][04:56:02]: [Server] Selected clients: [5, 6]
+[INFO][04:56:02]: [Server #81276] Saving the checkpoint to /private/tmp/plato-phase2-root/merged-resume-314-cases/case-9/checkpoints/checkpoint_lenet5_2.safetensors.
+[INFO][04:56:02]: [Server #81276] Model saved to /private/tmp/plato-phase2-root/merged-resume-314-cases/case-9/checkpoints/checkpoint_lenet5_2.safetensors.
+[INFO][04:56:02]: [Server] Selected clients: [5, 3]
+[INFO][04:56:02]: [Server] Selected clients: [9, 5]
+[INFO][04:56:02]: [Server] Selected clients: [2, 1]
+[INFO][04:56:02]: [Server] Selected clients: [4, 7]
+[INFO][04:56:02]: [Server] Selected clients: [7, 5]
+[INFO][04:56:02]: [Server #81276] Resume a training session from a previously saved checkpoint.
+[INFO][04:56:02]: [Client #0] Model loaded from /private/tmp/plato-phase2-root/merged-resume-314-cases/case-9/checkpoints/checkpoint_lenet5_2.safetensors.
+[INFO][04:56:02]: [Server] Selected clients: [5, 3]
+[INFO][04:56:02]: [Server] Selected clients: [9, 5]
+[INFO][04:56:02]: [Server] Selected clients: [2, 1]
+[INFO][04:56:02]: [Server] Selected clients: [4, 7]
+[INFO][04:56:02]: [Server] Selected clients: [7, 5]
+[INFO][04:56:02]: [93m[1m[81276] Logging runtime results to: /private/tmp/plato-phase2-root/merged-resume-314-cases/case-10/results/81276.csv.[0m
+[INFO][04:56:02]: [Server #81276] Started training on 10 clients with 2 per round.
+[INFO][04:56:02]: [Server] Selected clients: [9, 7]
+[INFO][04:56:02]: [Server] Selected clients: [5, 6]
+[INFO][04:56:02]: [Server #81276] Saving the checkpoint to /private/tmp/plato-phase2-root/merged-resume-314-cases/case-10/checkpoints/checkpoint_~c87c0c64d2fb215b38496b07952d86526559fee390c98b0f383fef0d230107f4_2.safetensors.
+[INFO][04:56:02]: [Server #81276] Model saved to /private/tmp/plato-phase2-root/merged-resume-314-cases/case-10/checkpoints/checkpoint_~c87c0c64d2fb215b38496b07952d86526559fee390c98b0f383fef0d230107f4_2.safetensors.
+[INFO][04:56:02]: [Server] Selected clients: [5, 3]
+[INFO][04:56:02]: [Server] Selected clients: [9, 5]
+[INFO][04:56:02]: [Server] Selected clients: [2, 1]
+[INFO][04:56:02]: [Server] Selected clients: [4, 7]
+[INFO][04:56:02]: [Server] Selected clients: [7, 5]
+[INFO][04:56:02]: [Server #81276] Resume a training session from a previously saved checkpoint.
+[INFO][04:56:02]: [Client #0] Model loaded from /private/tmp/plato-phase2-root/merged-resume-314-cases/case-10/checkpoints/checkpoint_~c87c0c64d2fb215b38496b07952d86526559fee390c98b0f383fef0d230107f4_2.safetensors.
+[INFO][04:56:02]: [Server] Selected clients: [5, 3]
+[INFO][04:56:02]: [Server] Selected clients: [9, 5]
+[INFO][04:56:02]: [Server] Selected clients: [2, 1]
+[INFO][04:56:02]: [Server] Selected clients: [4, 7]
+[INFO][04:56:02]: [Server] Selected clients: [7, 5]
+[INFO][04:56:02]: [93m[1m[81276] Logging runtime results to: /private/tmp/plato-phase2-root/merged-resume-314-cases/case-11/results/81276.csv.[0m
+[INFO][04:56:02]: [Server #81276] Started training on 10 clients with 2 per round.
+[INFO][04:56:02]: [Server] Selected clients: [9, 7]
+[INFO][04:56:02]: [Server] Selected clients: [5, 6]
+[INFO][04:56:02]: [Server #81276] Saving the checkpoint to /private/tmp/plato-phase2-root/merged-resume-314-cases/case-11/checkpoints/checkpoint_~c87c0c64d2fb215b38496b07952d86526559fee390c98b0f383fef0d230107f4_2.safetensors.
+[INFO][04:56:02]: [Server #81276] Model saved to /private/tmp/plato-phase2-root/merged-resume-314-cases/case-11/checkpoints/checkpoint_~c87c0c64d2fb215b38496b07952d86526559fee390c98b0f383fef0d230107f4_2.safetensors.
+[INFO][04:56:02]: [Server] Selected clients: [5, 3]
+[INFO][04:56:02]: [Server] Selected clients: [9, 5]
+[INFO][04:56:02]: [Server] Selected clients: [2, 1]
+[INFO][04:56:02]: [Server] Selected clients: [4, 7]
+[INFO][04:56:02]: [Server] Selected clients: [7, 5]
+[INFO][04:56:02]: [Server #81276] Resume a training session from a previously saved checkpoint.
+[INFO][04:56:02]: [Client #0] Model loaded from /private/tmp/plato-phase2-root/merged-resume-314-cases/case-11/checkpoints/checkpoint_~c87c0c64d2fb215b38496b07952d86526559fee390c98b0f383fef0d230107f4_2.safetensors.
+[INFO][04:56:02]: [Server] Selected clients: [5, 3]
+[INFO][04:56:02]: [Server] Selected clients: [9, 5]
+[INFO][04:56:02]: [Server] Selected clients: [2, 1]
+[INFO][04:56:02]: [Server] Selected clients: [4, 7]
+[INFO][04:56:02]: [Server] Selected clients: [7, 5]
+[INFO][04:56:02]: [93m[1m[81276] Logging runtime results to: /private/tmp/plato-phase2-root/merged-resume-314-cases/case-12/results/81276.csv.[0m
+[INFO][04:56:02]: [Server #81276] Started training on 10 clients with 2 per round.
+[INFO][04:56:02]: [Server] Selected clients: [9, 7]
+[INFO][04:56:02]: [Server] Selected clients: [5, 6]
+[INFO][04:56:02]: [Server #81276] Saving the checkpoint to /private/tmp/plato-phase2-root/merged-resume-314-cases/case-12/checkpoints/checkpoint_org_model_2.safetensors.
+[INFO][04:56:02]: [Server #81276] Model saved to /private/tmp/plato-phase2-root/merged-resume-314-cases/case-12/checkpoints/checkpoint_org_model_2.safetensors.
+[INFO][04:56:02]: [Server] Selected clients: [5, 3]
+[INFO][04:56:02]: [Server] Selected clients: [9, 5]
+[INFO][04:56:02]: [Server] Selected clients: [2, 1]
+[INFO][04:56:02]: [Server] Selected clients: [4, 7]
+[INFO][04:56:02]: [Server] Selected clients: [7, 5]
+[INFO][04:56:02]: [Server #81276] Resume a training session from a previously saved checkpoint.
+[INFO][04:56:02]: [Client #0] Model loaded from /private/tmp/plato-phase2-root/merged-resume-314-cases/case-12/checkpoints/checkpoint_org_model_2.safetensors.
+[INFO][04:56:02]: [Server] Selected clients: [5, 3]
+[INFO][04:56:02]: [Server] Selected clients: [9, 5]
+[INFO][04:56:02]: [Server] Selected clients: [2, 1]
+[INFO][04:56:02]: [Server] Selected clients: [4, 7]
+[INFO][04:56:02]: [Server] Selected clients: [7, 5]
+[INFO][04:56:02]: [93m[1m[81276] Logging runtime results to: /private/tmp/plato-phase2-root/merged-resume-314-cases/case-13/results/81276.csv.[0m
+[INFO][04:56:02]: [Server #81276] Started training on 10 clients with 2 per round.
+[INFO][04:56:02]: [Server] Selected clients: [9, 7]
+[INFO][04:56:02]: [Server] Selected clients: [5, 6]
+[INFO][04:56:02]: [Server #81276] Saving the checkpoint to /private/tmp/plato-phase2-root/merged-resume-314-cases/case-13/checkpoints/checkpoint_org_model_2.safetensors.
+[INFO][04:56:02]: [Server #81276] Model saved to /private/tmp/plato-phase2-root/merged-resume-314-cases/case-13/checkpoints/checkpoint_org_model_2.safetensors.
+[INFO][04:56:02]: [Server] Selected clients: [5, 3]
+[INFO][04:56:02]: [Server] Selected clients: [9, 5]
+[INFO][04:56:02]: [Server] Selected clients: [2, 1]
+[INFO][04:56:02]: [Server] Selected clients: [4, 7]
+[INFO][04:56:02]: [Server] Selected clients: [7, 5]
+[INFO][04:56:02]: [Server #81276] Resume a training session from a previously saved checkpoint.
+[INFO][04:56:02]: [Client #0] Model loaded from /private/tmp/plato-phase2-root/merged-resume-314-cases/case-13/checkpoints/checkpoint_org_model_2.safetensors.
+[INFO][04:56:02]: [Server] Selected clients: [5, 3]
+[INFO][04:56:02]: [Server] Selected clients: [9, 5]
+[INFO][04:56:02]: [Server] Selected clients: [2, 1]
+[INFO][04:56:02]: [Server] Selected clients: [4, 7]
+[INFO][04:56:02]: [Server] Selected clients: [7, 5]
+[INFO][04:56:02]: [93m[1m[81276] Logging runtime results to: /private/tmp/plato-phase2-root/merged-resume-314-cases/case-14/results/81276.csv.[0m
+[INFO][04:56:02]: [Server #81276] Started training on 10 clients with 2 per round.
+[INFO][04:56:02]: [Server] Selected clients: [9, 7]
+[INFO][04:56:02]: [Server] Selected clients: [5, 6]
+[INFO][04:56:02]: [Server #81276] Saving the checkpoint to /private/tmp/plato-phase2-root/merged-resume-314-cases/case-14/checkpoints/~tdeb2c7d617bd42e8cb5c716c5b9c6a5fdfac7f71f61c430eb629a02b5ddb545c.safetensors.
+[INFO][04:56:02]: [Server #81276] Model saved to /private/tmp/plato-phase2-root/merged-resume-314-cases/case-14/checkpoints/~tdeb2c7d617bd42e8cb5c716c5b9c6a5fdfac7f71f61c430eb629a02b5ddb545c.safetensors.
+[INFO][04:56:02]: [Server] Selected clients: [5, 3]
+[INFO][04:56:02]: [Server] Selected clients: [9, 5]
+[INFO][04:56:02]: [Server] Selected clients: [2, 1]
+[INFO][04:56:02]: [Server] Selected clients: [4, 7]
+[INFO][04:56:02]: [Server] Selected clients: [7, 5]
+[INFO][04:56:02]: [Server #81276] Resume a training session from a previously saved checkpoint.
+[INFO][04:56:02]: [Client #0] Model loaded from /private/tmp/plato-phase2-root/merged-resume-314-cases/case-14/checkpoints/~tdeb2c7d617bd42e8cb5c716c5b9c6a5fdfac7f71f61c430eb629a02b5ddb545c.safetensors.
+[INFO][04:56:02]: [Server] Selected clients: [5, 3]
+[INFO][04:56:02]: [Server] Selected clients: [9, 5]
+[INFO][04:56:02]: [Server] Selected clients: [2, 1]
+[INFO][04:56:02]: [Server] Selected clients: [4, 7]
+[INFO][04:56:02]: [Server] Selected clients: [7, 5]
+[INFO][04:56:02]: [93m[1m[81276] Logging runtime results to: /private/tmp/plato-phase2-root/merged-resume-314-cases/case-15/results/81276.csv.[0m
+[INFO][04:56:02]: [Server #81276] Started training on 10 clients with 2 per round.
+[INFO][04:56:02]: [Server] Selected clients: [9, 7]
+[INFO][04:56:02]: [Server] Selected clients: [5, 6]
+[INFO][04:56:02]: [Server #81276] Saving the checkpoint to /private/tmp/plato-phase2-root/merged-resume-314-cases/case-15/checkpoints/~tdeb2c7d617bd42e8cb5c716c5b9c6a5fdfac7f71f61c430eb629a02b5ddb545c.safetensors.
+[INFO][04:56:02]: [Server #81276] Model saved to /private/tmp/plato-phase2-root/merged-resume-314-cases/case-15/checkpoints/~tdeb2c7d617bd42e8cb5c716c5b9c6a5fdfac7f71f61c430eb629a02b5ddb545c.safetensors.
+[INFO][04:56:02]: [Server] Selected clients: [5, 3]
+[INFO][04:56:02]: [Server] Selected clients: [9, 5]
+[INFO][04:56:02]: [Server] Selected clients: [2, 1]
+[INFO][04:56:02]: [Server] Selected clients: [4, 7]
+[INFO][04:56:02]: [Server] Selected clients: [7, 5]
+[INFO][04:56:02]: [Server #81276] Resume a training session from a previously saved checkpoint.
+[INFO][04:56:02]: [Client #0] Model loaded from /private/tmp/plato-phase2-root/merged-resume-314-cases/case-15/checkpoints/~tdeb2c7d617bd42e8cb5c716c5b9c6a5fdfac7f71f61c430eb629a02b5ddb545c.safetensors.
+[INFO][04:56:02]: [Server] Selected clients: [5, 3]
+[INFO][04:56:02]: [Server] Selected clients: [9, 5]
+[INFO][04:56:02]: [Server] Selected clients: [2, 1]
+[INFO][04:56:02]: [Server] Selected clients: [4, 7]
+[INFO][04:56:02]: [Server] Selected clients: [7, 5]

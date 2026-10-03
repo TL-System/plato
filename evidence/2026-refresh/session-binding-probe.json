@@ -1,0 +1,28 @@
+{
+  "date": "2026-10-02",
+  "baseline": "5b8359bd40bbe65c7753e71f6627c490f9aa144f",
+  "scope": "Direct execution of actual Server._client_report_arrived with inert pickle report; no network or arbitrary-code payload. This proves entry-handler acceptance/mutation, not a complete aggregation exploit.",
+  "results": [
+    {
+      "sid": "registered",
+      "claimed_client_id": 1,
+      "report_accepted": true,
+      "buffers_created": true
+    },
+    {
+      "sid": "registered",
+      "claimed_client_id": 2,
+      "report_accepted": true,
+      "buffers_created": true
+    },
+    {
+      "sid": "unknown",
+      "claimed_client_id": 2,
+      "report_accepted": true,
+      "buffers_created": true
+    }
+  ],
+  "owner": "Phase 2B socket identity acceptance already required by plan; coordinate bounded payload limits with 2D.",
+  "implementation_constraint": "Bind to current server-issued logical client assignment/session, including reused physical workers, urgent async reports and edge servers. Comparing only original registration client_id would break valid multiplexing. Validate before pickle parsing or unrelated state mutation.",
+  "trust_boundary": "Session binding is not cryptographic authentication and does not make pickle safe for untrusted peers."
+}

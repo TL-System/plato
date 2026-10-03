@@ -5,7 +5,6 @@ The base class for all federated learning clients on edge devices or edge server
 import logging
 import os
 import pickle
-import re
 import sys
 import uuid
 from abc import abstractmethod
@@ -19,6 +18,11 @@ from plato.callbacks.handler import CallbackHandler
 from plato.clients.composable import ComposableClient
 from plato.clients.strategies import ClientContext
 from plato.config import Config
+from plato.utils.checkpoint_paths import (
+    checkpoint_name,
+    checkpoint_path,
+    snapshot_details,
+)
 
 
 class Client:
@@ -269,12 +273,10 @@ class Client:
                 else "custom"
             )
 
-            if "/" in model_name:
-                model_name = model_name.replace("/", "_")
-
-            checkpoint_path = Config().params["checkpoint_path"]
-            payload_filename = (
-                f"{checkpoint_path}/{model_name}_client_{self.client_id}.pkl"
+            checkpoint_root = Config().params["checkpoint_path"]
+            payload_filename = checkpoint_path(
+                checkpoint_root,
+                checkpoint_name(model_name, "client", self.client_id, suffix=".pkl"),
             )
 
             with open(payload_filename, "wb") as payload_file:
@@ -321,14 +323,14 @@ class Client:
     def _clear_checkpoint_files(self):
         """Delete all the temporary checkpoint files created by the client."""
         model_path = Config().params["model_path"]
+        if not os.path.isdir(model_path):
+            return
         for filename in os.listdir(model_path):
-            split = re.match(
-                r"(?P<client_id>\d+)_(?P<epoch>\d+)_(?P<training_time>\d+.\d+)\.(?:safetensors|pth)",
-                filename,
-            )
-            if split is not None:
-                file_path = f"{model_path}/{filename}"
-                os.remove(file_path)
+            details = snapshot_details(filename)
+            if details is not None and details[0] == self.client_id:
+                file_path = os.path.join(model_path, filename)
+                if not os.path.isdir(file_path):
+                    os.remove(file_path)
 
     def add_callbacks(self, callbacks):
         """Adds a list of callbacks to the client callback handler."""

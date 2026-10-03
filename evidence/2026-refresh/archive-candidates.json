@@ -1,0 +1,67 @@
+{
+  "date": "2026-10-02",
+  "baseline": "5b8359bd40bbe65c7753e71f6627c490f9aa144f",
+  "authorization": "User explicitly allows outdated modules/examples to be moved to archives. Root may select after evidence review without another approval question.",
+  "status": "Candidates for owned implementation in later phases; no files moved by this inspection.",
+  "candidates": [
+    {
+      "path": "plato/utils/rl_env.py",
+      "owner": "2D shared utilities, coordinated with Phase 4 archive documentation",
+      "observations": [
+        "No tracked caller/import found.",
+        "step returns legacy four-element Gym tuple and observation shape (1,1) against declared (1,).",
+        "Step uses placeholder time_step in place of action; legacy synchronous event-loop bridge."
+      ],
+      "proposed_disposition": "Archive unused legacy environment; retain the separately used reinforcement_learning package until FEI workflow audit."
+    },
+    {
+      "path": "plato/datasources/datalib/",
+      "owner": "2A datasource inventory, coordinated with Phase 4 archive documentation",
+      "files": 14,
+      "observations": [
+        "Tracked import search found only internal datalib references.",
+        "No registered current datasource uses this legacy multimodal helper package.",
+        "Contains legacy MMCV/video extraction shell utilities and REFER helper diagnostics."
+      ],
+      "proposed_disposition": "Review retirement of the unused multimodal helper bundle. Preserve source and historical reproduction notes; document known defects as archived, not repaired."
+    },
+    {
+      "path": "examples/outdated/",
+      "owner": "4B archives",
+      "files": 20,
+      "observations": [
+        "Already designated outdated: norm_bounding, fjord, fl_maml and cs_maml.",
+        "docs/docs/references/clients.md currently cites an outdated FL-MAML example as an illustration."
+      ],
+      "proposed_disposition": "Consolidate archive index and remove misleading supported-path documentation; a directory rename is optional and must update references/exclusions if selected."
+    }
+  ],
+  "reference_search": {
+    "plato.datasources.datalib": [
+      {
+        "path": "plato/datasources/datalib/audio_extraction_tools.py",
+        "line": 12
+      },
+      {
+        "path": "plato/datasources/datalib/flickr30kE_utils.py",
+        "line": 12
+      },
+      {
+        "path": "plato/datasources/datalib/frames_extraction_tools.py",
+        "line": 13
+      },
+      {
+        "path": "plato/datasources/datalib/modality_data_anntation_tools.py",
+        "line": 13
+      }
+    ],
+    "plato.utils.rl_env": [],
+    "from plato.utils import rl_env": []
+  },
+  "constraints": [
+    "Retain code, authorship, licenses, paper references and baseline commit reproduction directions.",
+    "Update active registries/imports/workspace/CI/docs and rerun relevant checks when moving paths.",
+    "Do not archive an active paper implementation solely because its paper is old or local hardware is unavailable.",
+    "No claim that archived defects were fixed or archived experiments remain compatible with current environments."
+  ]
+}

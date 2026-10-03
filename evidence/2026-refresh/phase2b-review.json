@@ -1,0 +1,684 @@
+{
+  "schema_version": 1,
+  "review": "Fresh independent Phase 2B exact-candidate review",
+  "reviewer": "Root review agent; no nested agents or delegation",
+  "completed_at_utc": "2026-10-03T02:15:56Z",
+  "decision": "CHANGES_REQUESTED",
+  "decision_basis": [
+    "One high and two medium candidate-local runtime defects reproduced on Python 3.13.16 and 3.14.8. The new high finding independently confirms root steering and normal batched-worker reachability.",
+    "The confirmed empty-prefix S3 integration correction also remains required before phase integration; it is recorded separately as a cross-owner handoff."
+  ],
+  "identities": {
+    "candidate_commit": "b3b038efa376b060e1c01f1da39173240768a019",
+    "candidate_tree": "188ad9d6e7a76ef4da2e201d918fe1c0a63b7125",
+    "implementation_commit": "759be841c2c9c6d92608c1ac7186a5e9ded42fe4",
+    "implementation_tree": "6a61cbe3dc324185ad03eb06c9d13376d7a3362a",
+    "base_commit": "fda60becedfa6236c11d415b87a868b52789a41e",
+    "candidate_worktree": "/private/tmp/plato-refresh-worktrees/runtime",
+    "review_scratch": "/tmp/plato-phase2b-review",
+    "candidate_read_only": true,
+    "candidate_status_before_and_after": "clean",
+    "evidence_commit_boundary": "Candidate differs from implementation only by evidence/2026-refresh/phase2b-validation.json.",
+    "all_changed_source_and_test_files_in_review_copy_match_candidate": true,
+    "review_environments": [
+      {
+        "python": "3.13.16",
+        "path": "/tmp/plato-phase2b-review/venv313"
+      },
+      {
+        "python": "3.14.8",
+        "path": "/tmp/plato-phase2b-review/venv314"
+      }
+    ],
+    "provision": "git archive exact candidate into owned scratch; UV_PROJECT_ENVIRONMENT=<owned venv> uv sync --locked --group dev --python <version>; zsh -lc throughout. Author environments were not executed or mutated.",
+    "source_and_authority_sha256": {
+      "AGENTS.md": "b50f87f31ea3d87076952d8b7d2d8af067132fbf877d80f8780c208fb45527ec",
+      "uv.lock": "573b10c2ba1a2317e02f9e40c6181359cafab6f6e0a0f9be12bb256cb276fe1d",
+      "pyproject.toml": "799bd7ba1865b097fdc8ca84a7b70337794e338de4aa9a6a13f6a4c1b9156246",
+      ".python-version": "02e735b3dfe1c32833eb550b7ff8ffa17f5f2bc3fa1e7bae61a8f5a3883ce398",
+      "evidence/2026-refresh/plan.md": "edb9a58cc7915a940854f16d5029fe97434703bf2f75eca0dcb96de2d0f0eb15",
+      "evidence/2026-refresh/plan-addendum.json": "5b51b0fb7ed6f68d9fce7176335b3e7be5e5f178a2788590912aa2396a487709",
+      "evidence/2026-refresh/phase2b-validation.json": "8244777fa82bda5b3939f9d0030b63f2d0a19757d9c7551d5eac1a4da98fb5eb",
+      "tests/conftest.py": "3eb55a1fa7c0fd5428c296c1bcd7300b23b0ade3d276f5c687af3b9bd78304c7",
+      "tests/integration/test_event_loop_startup.py": "a92c9ee2347e2113cd65b7949c922ac5bbf1846f4caeca30a128db580c79751e",
+      "tests/integration/startup_harness.py": "988f216f9367b1e9e8156bad62d3c03a813e26d32f919981ae227f5d8754642e",
+      "tests/integration/startup_probe.py": "e6c9bb2bf39616fe3a6745da528690a578e7416837e0914578ec688d2851b34f",
+      "tests/integration/startup_socket.py": "64d04c2ab0e041f35f5e5aca88aa46a436507cb76f54ef4ca3c3df702666720f",
+      "tests/integration/utils.py": "7a4af3c5bece78c256f268fb47ee31e384f14cca098d1690ebe2c05f79b21634"
+    }
+  },
+  "scope": {
+    "authorities_read": [
+      "AGENTS.md",
+      "accepted plan.md Phase 2B, F10/F11 and socket acceptance",
+      "accepted plan-addendum.json F18 and narrow 3A handoff",
+      "phase2b-validation.json",
+      "actual full base-to-candidate diff",
+      "latest root S3 cross-owner steering"
+    ],
+    "included": [
+      "Own-client checkpoint cleanup",
+      "Actual PORT writer/historical reader and stale weighting",
+      "Raw/transformed aggregation cardinality and finite nonnegative sample validation",
+      "Session assignment, reused workers, urgent reports, edge assignment and registration",
+      "Bounded reports/chunks/parts/completion/S3 ingress, expiry, malformed cleanup, queued/completed accounting",
+      "Callbacks, async partial selection, simulated-time stale enumeration, cross-silo and all-zero evaluation",
+      "Retained red/green evidence and actual runtime events/artifact hashes"
+    ],
+    "excluded": [
+      "Accepted Phase 1 package/design re-review",
+      "F07 global slash-name checkpoint repair, owned by 2C",
+      "MLX tree validation, owned by 3A",
+      "HE/MPC and unrelated S3 utility implementation, owned by 2D",
+      "Trainer F21-F24, confirmed in separate scope",
+      "Authentication, nonces, protocol redesign or arbitrary untrusted pickle protection"
+    ]
+  },
+  "findings": [
+    {
+      "id": "R2B-03",
+      "severity": "high",
+      "blocking": true,
+      "root_correspondence": "ROOT-2B-01",
+      "title": "Urgent requests for stale reports sharing one physical worker overwrite the outstanding assignment and strand training.",
+      "path": "plato/servers/base.py",
+      "line": 1289,
+      "related_lines": [
+        1249,
+        1281,
+        1291,
+        1293,
+        971,
+        977
+      ],
+      "description": "A reused worker can own several retained simulated-time reports. The urgent loop sends requests for all of them concurrently, but _session_assignments permits only one current logical assignment per sid. Each request overwrites the preceding assignment and appends the same sid to training_sids. The first valid requested report is then rejected. Completing the last request removes the sole assignment but leaves the earlier client marked update_requested with a duplicate sid reservation, so aggregation waits indefinitely.",
+      "reachability": "Independent probe constructs the retained reports through actual _select_clients batching and actual report/chunk/part/completion handlers, starting with clean assignments. With asynchronous=True, simulate_wall_time=True, request_update=True, max_concurrency=1, clients_per_round=3, minimum_clients=1 and staleness_bound=1, one worker reports clients 7,2,9 in round 1. Client 9 reports again in rounds 2 and 3, while clients 7 and 2 retain future finish times 100 and 101. At round 3 the default should_request_update rule requests both old clients from that same worker. No synthetic retained queue or forced staleness predicate is used. The shipped PORT config enables the corresponding combination and max_concurrency=5 with per_round=30.",
+      "reproduction": {
+        "probe": "/tmp/plato-phase2b-review/candidate/tests/test_phase2b_review_probes.py::test_actual_batched_reuse_serializes_urgent_assignments_per_worker",
+        "versions": [
+          "3.13.16",
+          "3.14.8"
+        ],
+        "normal_round_reports": [
+          [
+            1,
+            7
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            1,
+            9
+          ],
+          [
+            2,
+            9
+          ],
+          [
+            3,
+            9
+          ]
+        ],
+        "urgent_requests_in_independent_run": [
+          [
+            2,
+            "worker"
+          ],
+          [
+            7,
+            "worker"
+          ]
+        ],
+        "assignment_after_requests": {
+          "worker": 7
+        },
+        "training_sids_after_requests": [
+          "worker",
+          "worker"
+        ],
+        "training_clients_after_requests": [
+          2,
+          7
+        ],
+        "first_requested_response": "ValueError: Session does not match a current logical client assignment.",
+        "after_last_requested_response_completes": {
+          "assignments": {},
+          "training_sids": [
+            "worker"
+          ],
+          "training_clients": [
+            2
+          ]
+        },
+        "stubs": "Physical payload sends deliver the reports through real ingress handlers. Aggregation and wrap-up are inert; client selection, batching, retained queues, simulated-time advance, default staleness predicate, urgent dispatch, assignment checks and last-response completion execute.",
+        "root_probe_boundary": "Root synthetic-queue probe requests 7 then 2 and observes the same overwrite. Independent actual-batching probe requests 2 then 7, confirming that failure does not depend on request order."
+      },
+      "required_correction": "Keep at most one outstanding urgent logical assignment per physical sid. Serialize or queue other urgent requests for that worker, preserve their report/byte accounting, and issue the next after the preceding response completes or cleanup releases it. Avoid duplicate training_sids. Preserve concurrent urgency for distinct workers, valid requested-response identities and rejection of wrong/stale sessions. Add a bounded reused-worker regression that finishes all requested responses and verifies round progress. No authentication, nonces or protocol redesign is required.",
+      "test_gap": "The all-buffered-stale regression uses distinct sids, and the existing reused-worker urgent test has only one urgent client. They do not cover multiple retained logical clients on one worker.",
+      "baseline_boundary": "The newly enforced single-current-assignment contract makes the previously concurrent same-worker urgent dispatch reject a response it just requested. This is a candidate-local interaction defect."
+    },
+    {
+      "id": "R2B-01",
+      "severity": "medium",
+      "blocking": true,
+      "title": "Removing selected urgent reports corrupts the finish-time heap.",
+      "path": "plato/servers/base.py",
+      "line": 1278,
+      "related_lines": [
+        1249,
+        1309,
+        1319
+      ],
+      "description": "reported_clients is maintained with heapq, but list.remove() does not restore its heap invariant. When only some buffered reports require urgency, later heappush/heappop can select a later-finishing client ahead of an earlier one, or move simulated wall_time backward. Snapshot iteration fixes skipped requests but does not preserve the chronological selection contract.",
+      "reproduction": {
+        "probe": "/tmp/plato-phase2b-review/candidate/tests/test_phase2b_review_probes.py::test_urgent_partial_removal_preserves_finish_time_order",
+        "versions": [
+          "3.13.16",
+          "3.14.8"
+        ],
+        "setup": "Actual _process_clients and report/chunk/part/completion handlers. Valid initial heap finish times [9,20,58,31,28,94]; round 20, wall_time 1, staleness_bound 10. Only client 20 starts at round 1; the others start at round 20. The default should_request_update selects client 20. Its actual urgent response has update_response=True and finish near 1.",
+        "minimum_three": {
+          "expected_client_order": [
+            20,
+            9,
+            28
+          ],
+          "actual_client_order": [
+            20,
+            9,
+            31
+          ],
+          "expected_wall_time": 28,
+          "actual_wall_time": 31
+        },
+        "minimum_four": {
+          "expected_client_order": [
+            20,
+            9,
+            28,
+            31
+          ],
+          "actual_client_order": [
+            20,
+            9,
+            31,
+            28
+          ],
+          "expected_wall_time": 31,
+          "actual_wall_time": 28
+        },
+        "stubs": "Socket emit plus downstream aggregate/wrap/select are inert. Urgency decision, heap removal, re-registration of the urgent assignment, actual ingress and selection of updates execute."
+      },
+      "required_correction": "Restore the heap invariant after selective removal, before any concurrent response or subsequent heappush/heappop can use it. Keep snapshot enumeration. Add a partial-urgency regression that checks the selected client set/order and simulated-time progress, not only that all urgent requests were emitted.",
+      "test_gap": "The new all-buffered-stale test removes every entry and therefore cannot detect a corrupted remaining heap.",
+      "baseline_boundary": "The baseline indexed deletion also violated this invariant. This is a concrete latent defect in the revised, in-scope urgent path, not a claim that Phase 2B introduced the original ordering bug."
+    },
+    {
+      "id": "R2B-02",
+      "severity": "medium",
+      "blocking": true,
+      "title": "Logical-client deduplication omits a distinct retained completed transfer.",
+      "path": "plato/servers/base.py",
+      "line": 1015,
+      "related_lines": [
+        962,
+        1209,
+        1211,
+        1021
+      ],
+      "description": "Queued wire accounting is keyed only by logical client ID. Every completed transfer carrying that ID is excluded when one queued entry exists, even when older completion-hook fields on another physical worker retain a different decoded report/payload. This undercounts retained buffers during normal asynchronous worker reassignment and permits ingress beyond max_buffered_bytes.",
+      "reproduction": {
+        "probe": "/tmp/plato-phase2b-review/candidate/tests/test_phase2b_review_probes.py::test_repeated_logical_client_keeps_distinct_retained_wire_accounting",
+        "versions": [
+          "3.13.16",
+          "3.14.8"
+        ],
+        "setup": "Three registered physical workers; asynchronous clients_per_round=3; third worker still trains logical client 3. First and second workers complete logical clients 1 and 7 through actual handlers, then processed queued accounting is released while legacy completion fields remain. Actual _select_clients chooses replacements [7,8]. While its first send awaits, the first worker completes the new logical client 7 before the second worker is reassigned.",
+        "wire_sizes": {
+          "report_bytes": 169,
+          "payload_bytes": 21,
+          "bytes_per_completed_transfer": 190,
+          "configured_server_budget": 400
+        },
+        "observed": {
+          "completed_transfers": {
+            "second": [
+              7,
+              190
+            ],
+            "first": [
+              7,
+              190
+            ]
+          },
+          "queued": {
+            "7": 190
+          },
+          "reported_buffered_bytes": 190,
+          "actually_retained_wire_bytes": 380,
+          "next_valid_report_for_still_training_client_3": "accepted",
+          "retained_wire_bytes_after_that_report": 549
+        },
+        "expected": "Both distinct retained transfers count once. The third worker report must be rejected before parsing because 380+169 exceeds 400, without modifying its prior assignment or other workers.",
+        "stubs": "Payload sends are instrumented to deliver fast responses at the real await boundary; downstream report processing is inert. Actual assignment selection, completion hooks/ledger transition, report reservation and ingress execute."
+      },
+      "required_correction": "Deduplicate the queued/completed references by transfer identity or owning session, rather than excluding all completed values with the same logical client ID. Retain legacy report/payload visibility and preserve queued bytes when the worker is reused. Verify the real selection await boundary, repeated logical identities across workers, processed release and disconnect/close cleanup.",
+      "test_gap": "The existing completed-unaggregated budget test covers one completion only; the reused-worker test uses different logical IDs on the same worker. Neither exercises distinct retained completions for a repeated logical ID.",
+      "baseline_boundary": "Introduced by the new Phase 2B buffer ledger."
+    }
+  ],
+  "optional_low_observations": [
+    {
+      "id": "R2B-L01",
+      "severity": "low",
+      "blocking": false,
+      "path": "plato/clients/transport.py",
+      "line": 90,
+      "title": "Client socket/S3 paths do not apply max_buffered_bytes when it is below max_payload_bytes.",
+      "reproduction": "DefaultPayloadStrategy accepts an 82-byte chunk with max_buffered_bytes=20 and max_payload_bytes=max_chunk_bytes=256 on both interpreters. InboundTransfer.reserve checks only the payload cap; client S3 uses the same reserve. Client simulated-file ingress applies min(payload, buffered).",
+      "impact_and_limit": "Client ingress still has a finite payload cap. The evidence specifically describes the global buffer budget as a server ledger, so this narrower client configuration inconsistency is not a separate blocking acceptance failure.",
+      "optional_correction": "Make the scope of max_buffered_bytes consistent and explicit. If it is shared with client ingress, apply it before retaining client socket/S3 bytes; otherwise document the server-only budget and the separate client payload cap."
+    }
+  ],
+  "mandatory_contract_results": {
+    "F10": "PASS: actual disconnect uses current logical identity 17, removes .pth/.pth.pkl/.safetensors snapshots, and preserves former/other clients, server resume files, unrelated suffixes and directories. Candidate full-match predicate is correct.",
+    "F11": "PASS: actual PORT weights_aggregated writer produces Safetensors plus sidecar; reader deserializes repository tree and falls back to CPU weights_only .pth. Shipped numerical stale similarity 0.6 and 2/6 weighting pass. Independent two-key reversed-insertion delta gives cosine 1/3 and preserves live values, storage pointers, device and eval mode for both formats.",
+    "F18": "PASS: code validates raw and transformed cardinality and finite nonnegative real sample weights before ordinary/legacy/delta dispatch, with finite eligible total. Independent callback mutations (negative, infinity, cardinality removal and overflowing finite total) reject before global or dispatch mutation in all three paths. Shipped fractional, zero, feature, reverse-order and cross-silo pre-mutation tests pass.",
+    "identity": "Current assignment rejection guards, registration, wrong/unknown/stale ingress, ordinary reuse and edge assignment are correct in the reviewed cases. Urgent dispatch across multiple retained logical clients on one worker violates that current assignment contract and has high-severity R2B-03. This is a liveness failure, not a request to weaken identity checks or add authentication.",
+    "bounded_ingress": "Finite report/chunk/payload/count/deadline defaults and bounded malformed/trailing/truncated/incomplete cleanup execute. Real local HTTP S3 header/stream/timeout checks pass. Global retained accounting has the R2B-02 failure.",
+    "callbacks_and_evaluation": "PASS: registration-order iteration, callback-body AttributeError identity propagation, descriptive missing methods, cross-silo validation before trainer identity mutation and finite all-zero accuracy handling.",
+    "async_selection": "PASS for the final ordinary/batched partial-round replacement correction and relevant personalized/split strategy tests. Urgent simulated-time selection still has R2B-01. Actual simulated-time batching also reproduces the shared-worker urgent liveness failure R2B-03."
+  },
+  "checks_performed": [
+    {
+      "check": "Independent candidate runtime suite in owned Python 3.13 environment",
+      "command": "/tmp/plato-phase2b-review/venv313/bin/python -m pytest tests/clients tests/servers tests/callbacks tests/integration/test_smoke_configs.py -q --basetemp /tmp/plato-phase2b-review/pytest313",
+      "result": "163 passed in 1.11s; zero skips or warnings.",
+      "log": {
+        "path": "/tmp/plato-phase2b-review/pytest313.log",
+        "sha256": "5edca9a3ba4acb5d4251e7eedffb5d689236c7256aa2433318f2842f360b0715"
+      }
+    },
+    {
+      "check": "Independent bounded numerical/negative probes on final review-probe source",
+      "commands": [
+        "/tmp/plato-phase2b-review/venv313/bin/python -m pytest tests/test_phase2b_review_probes.py -q -s --basetemp /tmp/plato-phase2b-review/final-probes313",
+        "/tmp/plato-phase2b-review/venv314/bin/python -m pytest tests/test_phase2b_review_probes.py -q -s --basetemp /tmp/plato-phase2b-review/final-probes314"
+      ],
+      "result": "Each interpreter: 15 positive cases passed and four negative assertions failed. Two failing heap cases establish R2B-01, one real-selection ledger case establishes R2B-02, and one client-budget case establishes the nonblocking low observation.",
+      "source": {
+        "path": "/tmp/plato-phase2b-review/initial_19_probes_snapshot.py",
+        "sha256": "4e4ad8b81656f04b14e56da582c3f4a7c7be95f258e3e6fd6ea7d9e81fcc0337"
+      },
+      "logs": [
+        {
+          "path": "/tmp/plato-phase2b-review/final-probes313.log",
+          "sha256": "d4fe7d03c9477c0409e63b5f3459e0412db954a4bb5a154db25a43a7fc7151fb"
+        },
+        {
+          "path": "/tmp/plato-phase2b-review/final-probes314.log",
+          "sha256": "b73d046e7989fbd757cf4377771de7fc97751d036c3f91a2a6eb078f585b3f6d"
+        }
+      ],
+      "harness_boundary": "Initial owned probe collection/configuration/signature mistakes were corrected in scratch. Final retained probe failures occur at the intended behavioral assertions, not setup errors. No candidate test/source was changed.",
+      "source_boundary": "Exact historical source snapshot preserved after root requested one additional independent probe. Candidate sources and the first 19 probe functions remain unchanged."
+    },
+    {
+      "check": "Retained evidence integrity and independent weighted-round numerical recomputation",
+      "source": {
+        "path": "/tmp/plato-phase2b-review/audit_evidence.py",
+        "sha256": "85e8d9fe6a4b72ddfde075b37c0b140873cdc70d849f95a54d1dd4c713f18217"
+      },
+      "audit_output": {
+        "path": "/tmp/plato-phase2b-review/evidence-audit.json",
+        "sha256": "25ac64343b281d2554df1a0ff302457900734b6fc1d0bb819a2df1613af3a310"
+      },
+      "result": "96 final startup result records inspected; 48/interpreter, all durable event-file contents exactly match result events, no surviving owned processes. Five deliberate watchdog-containment records per interpreter kept distinct from normal success. Both socket rounds return naturally, train separate CPU child processes with 2/6 sample reports, and return both clients naturally. All client/final/checkpoint Safetensors values exactly match recorded events.",
+      "maximum_weighted_reference_errors": {
+        "accepted313": {
+          "linear.weight": 1.4901161193847656e-08,
+          "linear.bias": 2.9103830456733704e-10
+        },
+        "accepted314": {
+          "linear.weight": 1.4901161193847656e-08,
+          "linear.bias": 2.9103830456733704e-10
+        }
+      }
+    },
+    {
+      "check": "Retained red/green logs and evidence truthfulness",
+      "result": "Inspected actual writer .pth rejection, cleanup/session/limits failures, invalid-weight/all-zero/callback failures, baseline numerical probe and the async selection failures. Final logs match reported 209 broad passes/interpreter and 55 supplemental selection passes/interpreter. These runs overlap and add only two final async cases: 211 distinct cases, not 264. Broad logs predate that final selection source change; the 55-case supplemental run is the explicit affected-path boundary.",
+      "log_identities": {
+        "accepted313.log": {
+          "sha256": "cd83cb032dadd5b8ce233f0ce7dd4ae106695f53e159cc0f93d9245685b4f63a",
+          "last_line": "209 passed in 442.30s (0:07:22)"
+        },
+        "accepted314.log": {
+          "sha256": "571a011670811c59630dbe4ab563d203138a54fd07de1a93f81f18cd469f241d",
+          "last_line": "209 passed in 457.58s (0:07:37)"
+        },
+        "green-selection313.log": {
+          "sha256": "5cd181dda365720baffdf768f949c8e316bcb70ddea43d796c2d87478ee7ad40",
+          "last_line": "55 passed in 0.55s"
+        },
+        "green-selection314.log": {
+          "sha256": "5cd181dda365720baffdf768f949c8e316bcb70ddea43d796c2d87478ee7ad40",
+          "last_line": "55 passed in 0.55s"
+        },
+        "red-port313.log": {
+          "sha256": "9b3caa33b11990741d8c4e2f194e3c27acc969e894dd1db155e6ff44463db3a9",
+          "last_line": "2 failed in 0.11s"
+        },
+        "red-transport-cleanup313.log": {
+          "sha256": "750d757f2967b8f9ac6304e8813cabdf82f8d50e3879f399a430e0bb3994a735",
+          "last_line": "28 failed, 2 passed, 9 deselected in 1.01s"
+        },
+        "red-aggregation-callback313.log": {
+          "sha256": "203940571bab3652869893a30870298e52969fa57b1a3454ba9d9664906a4b30",
+          "last_line": "52 failed, 21 deselected in 0.70s"
+        },
+        "red-async-selection313.log": {
+          "sha256": "a38e407b2a559f6cfedff6f3071143d7a1dc9999abd86df01d1be1ec9ee3f1db",
+          "last_line": "2 failed, 4 deselected in 0.16s"
+        },
+        "red-cross-silo313.log": {
+          "sha256": "0709bc0b656b5692840aff7927110b1dc758e72267ba799c24f230dc4ec14888",
+          "last_line": "2 failed, 1 passed, 3 warnings in 0.19s"
+        },
+        "baseline-input-values.json": {
+          "sha256": "357ab473120e45c58434fe4abd46750f5b09fbf00d23bbe0ce60bde7cfd1240c",
+          "last_line": "}"
+        },
+        "s3-prefix-handoff.json": {
+          "sha256": "578ab4652ef07d1eeeaae0ce82efe65dc660f7b83329262a639cf8ca55151bf1",
+          "last_line": "}"
+        }
+      }
+    },
+    {
+      "check": "Static and immutable source boundaries",
+      "result": "Scoped production Ruff import-order check passed. git diff --check passed. Accepted startup test, startup_harness/probe/socket, shared conftest/utils are byte-for-byte unchanged from the baseline. Every changed tracked file tested in review scratch matches the exact candidate git object. Original worktree remains clean."
+    },
+    {
+      "check": "Root-steered shared-worker urgency independently confirmed through bounded actual batching",
+      "commands": [
+        "/tmp/plato-phase2b-review/venv313/bin/python -m pytest tests/test_phase2b_review_probes.py -k actual_batched_reuse -q -s --basetemp /tmp/plato-phase2b-review/shared-worker-final313",
+        "/tmp/plato-phase2b-review/venv314/bin/python -m pytest tests/test_phase2b_review_probes.py -k actual_batched_reuse -q -s --basetemp /tmp/plato-phase2b-review/shared-worker-final314"
+      ],
+      "result": "Each interpreter: one selected probe fails at the intended first valid requested-response assertion; 19 unchanged cases deselected. Five ordinary actual round reports create the stale queue, both urgent requests are emitted to the same worker, and completing the last urgent response demonstrably leaves the earlier client stranded without an assignment.",
+      "source": {
+        "path": "/tmp/plato-phase2b-review/candidate/tests/test_phase2b_review_probes.py",
+        "sha256": "d216c04ecbc1c79d2d92f3303af906cbf98e641b1d3ef43b55aef4af5bc6546e"
+      },
+      "logs": [
+        {
+          "path": "/tmp/plato-phase2b-review/shared-worker-final313.log",
+          "sha256": "9b22aaff662cc6757db3e4eddcd72eb5570b8defcfe3b6bfb704bac76dc36c39"
+        },
+        {
+          "path": "/tmp/plato-phase2b-review/shared-worker-final314.log",
+          "sha256": "bd8d510b8b2895665155a1dd382bfc9c275f6fc93c7fc39b4ba4525a9c237eb4"
+        }
+      ],
+      "root_evidence": {
+        "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2b-root-probe.json",
+        "sha256": "a7c9674d09f06c36edc8d5315b5152758a6d1efb1c37a1f07e786a907b282900"
+      },
+      "root_source": {
+        "path": "/tmp/plato-phase2-root/urgent_shared_sid.py",
+        "sha256": "727e020e394d9c7b24bb2e763f3677763cb2173f483d617a487d5b6a480e04fb"
+      },
+      "root_log": {
+        "path": "/tmp/plato-phase2-root/urgent-shared-sid.log",
+        "sha256": "c3a214f06a5d19cbe47faa077efa520ecb358a5527dd60dc312b620ef0ee3841"
+      },
+      "root_log_name_boundary": "Steering named urgent_shared_sid.log; the actual retained file is urgent-shared-sid.log and its SHA256 matches the root JSON c3a214f06a5d19cbe47faa077efa520ecb358a5527dd60dc312b620ef0ee3841."
+    }
+  ],
+  "retained_runtime_evidence_identities": {
+    "accepted313": {
+      "records": 48,
+      "survivors": 0,
+      "deliberate_forced_records": [
+        {
+          "path": "/tmp/plato-phase2b-runtime/accepted313/test_noncooperative_teardown_i0/task/result.json",
+          "case": "client_lifecycle",
+          "options": {
+            "absent": true,
+            "stall": "task"
+          },
+          "forced": [
+            "TERM"
+          ]
+        },
+        {
+          "path": "/tmp/plato-phase2b-runtime/accepted313/test_noncooperative_teardown_i1/generator/result.json",
+          "case": "client_lifecycle",
+          "options": {
+            "absent": true,
+            "stall": "generator"
+          },
+          "forced": [
+            "TERM"
+          ]
+        },
+        {
+          "path": "/tmp/plato-phase2b-runtime/accepted313/test_noncooperative_teardown_i2/executor/result.json",
+          "case": "client_lifecycle",
+          "options": {
+            "absent": true,
+            "stall": "executor"
+          },
+          "forced": [
+            "TERM"
+          ]
+        },
+        {
+          "path": "/tmp/plato-phase2b-runtime/accepted313/test_noncooperative_teardown_i3/aiohttp_task/result.json",
+          "case": "ordinary",
+          "options": {
+            "absent": true,
+            "real": true,
+            "startup_fail": true,
+            "secondary": true,
+            "stall": "task"
+          },
+          "forced": [
+            "TERM",
+            "KILL"
+          ]
+        },
+        {
+          "path": "/tmp/plato-phase2b-runtime/accepted313/test_stalled_real_client_is_co0/stalled/result.json",
+          "case": "socket_stall",
+          "options": {},
+          "forced": [
+            "TERM"
+          ]
+        }
+      ],
+      "all_durable_events_match_results": true,
+      "socket_result_path": "/tmp/plato-phase2b-runtime/accepted313/test_real_two_client_cpu_socke0/round/result.json",
+      "socket_result_sha256": "76ea78134ad4e1912e391d3e3018f2d3271f85d5d794735deafbc27d0922f3de",
+      "socket_elapsed": 14.624215124873444,
+      "socket_event_sha256": {
+        "/tmp/plato-phase2b-runtime/accepted313/test_real_two_client_cpu_socke0/round/events-45115.jsonl": "3039c1314743e1c8af4fe6e89a34515429464eaa18a89517a3510e94bf3b6a62",
+        "/tmp/plato-phase2b-runtime/accepted313/test_real_two_client_cpu_socke0/round/events-45114.jsonl": "ebdd5f620572fe1c2b3aec9abcbb3eff978bb7846b519ade5060735438615ed6",
+        "/tmp/plato-phase2b-runtime/accepted313/test_real_two_client_cpu_socke0/round/events-45112.jsonl": "fdadbee960d7ff7ba7f5c076828e80ce82992593a4bb53bd2f41574625011955"
+      },
+      "trained": [
+        {
+          "id": 1,
+          "samples": 2,
+          "pid": 45114
+        },
+        {
+          "id": 2,
+          "samples": 6,
+          "pid": 45115
+        }
+      ],
+      "maximum_tensor_errors": {
+        "linear.weight": 1.4901161193847656e-08,
+        "linear.bias": 2.9103830456733704e-10
+      },
+      "artifact_hashes": {
+        "/tmp/plato-phase2b-runtime/accepted313/test_real_two_client_cpu_socke0/round/models/pretrained/startup_tiny_1_45114.safetensors": "7d1b4e39fe8c20fbc8d5a1bcdaaf68d23955752149ef34cffa2e58f5e8a68961",
+        "/tmp/plato-phase2b-runtime/accepted313/test_real_two_client_cpu_socke0/round/models/pretrained/startup_tiny_2_45115.safetensors": "c4c686574485435175402208fbefbbdea1fe5aa735b1bca4f93d4836651becd4",
+        "/tmp/plato-phase2b-runtime/accepted313/test_real_two_client_cpu_socke0/round/models/pretrained/startup_tiny.safetensors": "a5a3bff8503c83d1f8b64c96494315c337dc682a2cfab1bb0b5c665176ab1632",
+        "/tmp/plato-phase2b-runtime/accepted313/test_real_two_client_cpu_socke0/round/checkpoints/checkpoint_startup_tiny_1.safetensors": "a5a3bff8503c83d1f8b64c96494315c337dc682a2cfab1bb0b5c665176ab1632"
+      }
+    },
+    "accepted314": {
+      "records": 48,
+      "survivors": 0,
+      "deliberate_forced_records": [
+        {
+          "path": "/tmp/plato-phase2b-runtime/accepted314/test_noncooperative_teardown_i0/task/result.json",
+          "case": "client_lifecycle",
+          "options": {
+            "absent": true,
+            "stall": "task"
+          },
+          "forced": [
+            "TERM"
+          ]
+        },
+        {
+          "path": "/tmp/plato-phase2b-runtime/accepted314/test_noncooperative_teardown_i1/generator/result.json",
+          "case": "client_lifecycle",
+          "options": {
+            "absent": true,
+            "stall": "generator"
+          },
+          "forced": [
+            "TERM"
+          ]
+        },
+        {
+          "path": "/tmp/plato-phase2b-runtime/accepted314/test_noncooperative_teardown_i2/executor/result.json",
+          "case": "client_lifecycle",
+          "options": {
+            "absent": true,
+            "stall": "executor"
+          },
+          "forced": [
+            "TERM"
+          ]
+        },
+        {
+          "path": "/tmp/plato-phase2b-runtime/accepted314/test_noncooperative_teardown_i3/aiohttp_task/result.json",
+          "case": "ordinary",
+          "options": {
+            "absent": true,
+            "real": true,
+            "startup_fail": true,
+            "secondary": true,
+            "stall": "task"
+          },
+          "forced": [
+            "TERM",
+            "KILL"
+          ]
+        },
+        {
+          "path": "/tmp/plato-phase2b-runtime/accepted314/test_stalled_real_client_is_co0/stalled/result.json",
+          "case": "socket_stall",
+          "options": {},
+          "forced": [
+            "TERM"
+          ]
+        }
+      ],
+      "all_durable_events_match_results": true,
+      "socket_result_path": "/tmp/plato-phase2b-runtime/accepted314/test_real_two_client_cpu_socke0/round/result.json",
+      "socket_result_sha256": "8425a80f7e1100e09859c6b4777a1973a3f65d15e1c4ff3b8fb34a22ddd8b06d",
+      "socket_elapsed": 15.704020125092939,
+      "socket_event_sha256": {
+        "/tmp/plato-phase2b-runtime/accepted314/test_real_two_client_cpu_socke0/round/events-45122.jsonl": "c3ce790bbbb425c88364aacf0e23185f69fb6ebb8c97ab2f1726c8b9be84d128",
+        "/tmp/plato-phase2b-runtime/accepted314/test_real_two_client_cpu_socke0/round/events-45130.jsonl": "bb5aa74d89592f13464293f88233a33fb509d32f09db386d93d166d8a5555318",
+        "/tmp/plato-phase2b-runtime/accepted314/test_real_two_client_cpu_socke0/round/events-45129.jsonl": "7979d38fc7dfc46c322b3cc2c6056b466a754be90d833a1aaab0a2f0dc857354"
+      },
+      "trained": [
+        {
+          "id": 2,
+          "samples": 2,
+          "pid": 45129
+        },
+        {
+          "id": 1,
+          "samples": 6,
+          "pid": 45130
+        }
+      ],
+      "maximum_tensor_errors": {
+        "linear.weight": 1.4901161193847656e-08,
+        "linear.bias": 2.9103830456733704e-10
+      },
+      "artifact_hashes": {
+        "/tmp/plato-phase2b-runtime/accepted314/test_real_two_client_cpu_socke0/round/models/pretrained/startup_tiny_2_45129.safetensors": "7d1b4e39fe8c20fbc8d5a1bcdaaf68d23955752149ef34cffa2e58f5e8a68961",
+        "/tmp/plato-phase2b-runtime/accepted314/test_real_two_client_cpu_socke0/round/models/pretrained/startup_tiny_1_45130.safetensors": "c4c686574485435175402208fbefbbdea1fe5aa735b1bca4f93d4836651becd4",
+        "/tmp/plato-phase2b-runtime/accepted314/test_real_two_client_cpu_socke0/round/models/pretrained/startup_tiny.safetensors": "a5a3bff8503c83d1f8b64c96494315c337dc682a2cfab1bb0b5c665176ab1632",
+        "/tmp/plato-phase2b-runtime/accepted314/test_real_two_client_cpu_socke0/round/checkpoints/checkpoint_startup_tiny_1.safetensors": "a5a3bff8503c83d1f8b64c96494315c337dc682a2cfab1bb0b5c665176ab1632"
+      }
+    }
+  },
+  "handoffs_and_pending_integration": [
+    {
+      "id": "S3-2B-2D-EMPTY-PREFIX",
+      "status": "Confirmed pending correction; required before phase integration",
+      "owner": "Original 2B author, coordinated by root; fresh independent review of correction before integration",
+      "runtime_path": "plato/clients/transport.py",
+      "line": 148,
+      "delivered_2d_commit": "a4a4733e96cf248a73db76e6b2182536b9f592ea",
+      "delivered_2d_tree": "8f64fa760a4c1e5be3eb28956a3b22e0ba206f7c",
+      "confirmed_behavior": "Actual fixed S3 writer + exact candidate bounded reader works for nonempty/nested/trailing-slash prefixes. With empty prefix D writes client_payload_7_ABC123 while B requests /client_payload_7_ABC123 and gets HTTP 404.",
+      "required_correction": "Align bounded runtime key composition with D storage._object_key(key), which canonicalizes exactly once and returns bare K when prefix is empty. Preserve B byte reservations, total deadline, and session/S3-reference validation. Verify combined actual send/put -> bounded reader for prefixed and unprefixed storage. No unrelated S3 utility edit or protocol feature is requested here.",
+      "evidence_checked": "Read D _object_key implementation and both retained integration logs, verified their hashes and that the pinned B transport snapshot equals this candidate. Logs used D implementation e7c0d59571d88efd7eb1fdbf4fc63ac2a7b81395; git diff confirms plato/utils/s3.py is unchanged between it and delivered a4a4733e.",
+      "logs": [
+        {
+          "path": "/tmp/plato-phase2d.G3jkGH/runtime-s3-integration313.log",
+          "sha256": "90903e284487e3a7b1cc50556c66aede71c68b068048570304646e2c55a6d469"
+        },
+        {
+          "path": "/tmp/plato-phase2d.G3jkGH/runtime-s3-integration314.log",
+          "sha256": "90903e284487e3a7b1cc50556c66aede71c68b068048570304646e2c55a6d469"
+        }
+      ],
+      "candidate_transport": {
+        "path": "/private/tmp/plato-refresh-worktrees/runtime/plato/clients/transport.py",
+        "sha256": "631ff16e76913156fa1ad764fcd5b6b6cc375a81c777397321ddf101e874e4ad"
+      }
+    },
+    {
+      "id": "F07",
+      "owner": "2C",
+      "status": "Explicitly deferred; not a new Phase 2B failure",
+      "requirement": "Preserve the complete writer/reader and sidecar/resume path inventory in phase2b-validation.json. Coordinate slash-name handling across payload simulation, trainer time snapshots, server save/resume, PORT history, personalized local layers and worker artifacts after acceptance."
+    },
+    {
+      "id": "MLX-F17",
+      "owner": "3A",
+      "status": "Later narrow capability handoff",
+      "requirement": "Extend Server._validate_aggregation_inputs for raw/transformed MLX tree validation, including zero-weight trees and both arrival orders, before direct/legacy/delta mutation. No MLX redesign required in 2B."
+    },
+    {
+      "id": "PHASE-INTEGRATION",
+      "owner": "Root",
+      "status": "Pending after corrected exact candidate passes fresh review",
+      "requirement": "Run full merged validation and phase gate. This report is a component review, not a merged-tree acceptance claim."
+    }
+  ],
+  "explicit_limits": [
+    "No full eight-minute startup suite rerun: unchanged accepted sources, inspected 96 retained results and actual tensors/event hashes suffice for this bounded component review. Root merged validation follows the phase gate.",
+    "No live S3 credentials/service, distributed GPU or production multi-silo execution. Candidate actual local HTTP negative reader cases and delivered 2D local integration evidence were inspected.",
+    "Independent PORT checks preserve CPU device/storage/mode; accelerator non-mutation follows the inspected read-only detach().cpu() tensor copies, not an accelerator execution claim.",
+    "Finite wire caps do not bound arbitrary decoded pickle expansion or CPU execution. Peers and object writers remain trusted, as disclosed in candidate evidence.",
+    "Same-logical-ID replay across indistinguishable assignments is outside this existing protocol. No authentication/nonces/security redesign demanded.",
+    "No package/design re-review, first-party typing quota, broad unchanged-suite repetition, code changes, branch changes, author-environment mutation, commits, pushes or nested agents.",
+    "Review scratch and logs remain available. Only this report was written outside owned scratch; the exact candidate was kept unchanged.",
+    "After the initial report was written, root supplied a new concrete urgent shared-worker issue. Only its new probe was executed on both interpreters; unchanged passing suites were not repeated. The report was amended, and the initial probe source snapshot was retained with its original exact hash."
+  ]
+}

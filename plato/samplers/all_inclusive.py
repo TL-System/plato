@@ -19,7 +19,7 @@ class Sampler(base.Sampler):
         if testing:
             all_inclusive = range(len(datasource.get_test_set()))
             if hasattr(Config().data, "testset_size"):
-                self.data_samples = random.sample(
+                self.data_samples = random.Random(self.random_seed).sample(
                     all_inclusive, Config().data.testset_size
                 )
             else:

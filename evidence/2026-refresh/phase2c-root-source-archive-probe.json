@@ -1,0 +1,18 @@
+{
+  "id": "ROOT-2C-02",
+  "severity": "medium",
+  "status": "Confirmed; original C author already authorized bounded historical fixture correction in accepted FedDyn handoff",
+  "candidate": "f9772f61d52dfe0f4a3281252d23b8303ec237d2",
+  "source": "git archive of exact candidate into /tmp/plato-phase2-root/f977-source-archive",
+  "file": "tests/trainers/test_review_training_boundaries.py",
+  "line": 132,
+  "cause": "New migration test invokes git show on unpublished historical commit at runtime; source archives and shallow checkouts cannot supply it.",
+  "expected": "Execute exact historical writer fixture without requiring repository history, retaining provenance and byte identity.",
+  "actual": "4 failed, 13 deselected in 0.26s; CalledProcessError exit128 not a git repository.",
+  "command": "PYTHONDONTWRITEBYTECODE=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 /tmp/plato-phase2c-313/bin/python -m pytest tests/trainers/test_review_training_boundaries.py -k actual_accepted_b_feddyn_writer_migration -q --basetemp=/tmp/plato-phase2-root/f977-archive-test",
+  "cwd": "/tmp/plato-phase2-root/f977-source-archive",
+  "python": "3.13.16",
+  "log": "/tmp/plato-phase2-root/f977-archive-test.log",
+  "log_sha256": "1b0c4c488e629079b6094a84901a0ffc5750cc4e023e7996786f4ab9d636d0e2",
+  "limits": "Python3.13 source-archive regression; not an executed GitHubCI claim. Current workflow uses default shallow checkout without fetch-depth override. Production code unaffected."
+}

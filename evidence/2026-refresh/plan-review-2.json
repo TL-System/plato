@@ -1,0 +1,152 @@
+{
+  "schema_version": 1,
+  "reviewer": "plato-plan-review-2",
+  "review_role": "Fresh independent Sol xhigh plan reviewer",
+  "review_date": "2026-10-02",
+  "baseline_commit": "5b8359bd40bbe65c7753e71f6627c490f9aa144f",
+  "reviewed_plan_sha256": "7b18d1986613c29fc3a16271b440a78884d43a397413c92ab7e98d1c6a1918ac",
+  "snapshot": {
+    "baseline_commit_at_start": "5b8359bd40bbe65c7753e71f6627c490f9aa144f",
+    "baseline_commit_at_end": "5b8359bd40bbe65c7753e71f6627c490f9aa144f",
+    "plan_sha256_at_start": "7b18d1986613c29fc3a16271b440a78884d43a397413c92ab7e98d1c6a1918ac",
+    "plan_sha256_at_end": "7b18d1986613c29fc3a16271b440a78884d43a397413c92ab7e98d1c6a1918ac",
+    "unchanged": true,
+    "tracked_worktree_clean": true,
+    "observed_plan_lines": 739,
+    "requested_plan_lines": 668,
+    "disposition": "Reviewed the stable 739-line file captured at review start. The stated line count differs, but the captured plan and baseline did not change. Approval does not extend to another hash."
+  },
+  "authorization": {
+    "agents_spawned": 0,
+    "installs_performed": 0,
+    "implementation_edits": 0,
+    "commits_created": 0,
+    "sole_permitted_write": "evidence/2026-refresh/plan-review-2.json",
+    "guidance_read": "AGENTS.md",
+    "shell": "zsh -lc",
+    "validation_method": "Read-only plan, evidence and source review; no implementation tests or training runs."
+  },
+  "inputs": [
+    "AGENTS.md",
+    "evidence/2026-refresh/plan.md",
+    "evidence/2026-refresh/plan-review-1.json",
+    "evidence/2026-refresh/baseline-findings.json",
+    "https://baochun.org/2026-09-05/",
+    "plato/client.py",
+    "plato/servers/base.py",
+    "plato/servers/fedavg.py",
+    "plato/clients/base.py",
+    "plato/clients/strategies/defaults.py",
+    "plato/trainers/base.py",
+    "plato/trainers/basic.py",
+    "plato/trainers/composable.py",
+    "plato/trainers/strategies/training_step.py",
+    "plato/trainers/strategies/lr_scheduler.py",
+    "plato/servers/strategies/aggregation/port.py",
+    "examples/async/port/port_server.py",
+    "plato/algorithms/mlx_fedavg.py",
+    "plato/utils/s3.py",
+    "plato/datasources/base.py",
+    "plato/datasources/purchase.py",
+    "plato/datasources/texas.py",
+    "plato/evaluators/nanochat_core.py",
+    "tests/integration/utils.py",
+    "tests/integration/test_smoke_configs.py",
+    "configs/MNIST/fedavg_lenet5.toml",
+    "pyproject.toml",
+    ".github/workflows/pytorch_tests.yml"
+  ],
+  "prior_review_dispositions": [
+    {
+      "topic": "Explicit acceptance for confirmed defects",
+      "status": "PARTIALLY_RESOLVED",
+      "evidence": "Plan lines 86-120 give F01-F17 mandatory owners, acceptance and ordering. Baseline B01-B13 are represented, including the separate S3 defects; B14 is assigned to Phase 5A. F11 still omits its actual checkpoint writer from the Phase 2 scope; see R2-01."
+    },
+    {
+      "topic": "Concrete trust, identity, payload and archive security criteria",
+      "status": "RESOLVED",
+      "evidence": "Plan lines 31-35 and 374-401 require trusted-peer-only pickle handling, session identity negative tests, finite byte/chunk/buffer limits before unsafe parsing, bounded failure and buffer cleanup, and TAR/ZIP containment across Python 3.13/3.14. Datasource, socket and Nanochat ownership is assigned without an authentication or protocol rewrite."
+    },
+    {
+      "topic": "Real socket exchange, parameter changes and aggregation smoke criteria",
+      "status": "RESOLVED",
+      "evidence": "Plan lines 237-256 require fresh actual synchronous entrypoints on both Python versions, comm_simulation=false, actual socket/processor/serialization exchange, independently trained parameter-changing clients, a sample-weighted reference from received updates, isolated resources, deadlines and child-process cleanup."
+    },
+    {
+      "topic": "Supported examples require executed validation and closure of internal defects",
+      "status": "RESOLVED",
+      "evidence": "Plan lines 494-526 require executed meaningful bounded behavioral smokes and reviewed fixes with executed regressions for internal defects. Parsing/import-only results or external-blocker relabeling cannot satisfy supported-family acceptance."
+    },
+    {
+      "topic": "Superseded GitHub publication blocker",
+      "status": "RESOLVED",
+      "evidence": "Plan lines 70, 176-178 and 713-715 record root-confirmed GitHub app capabilities and reachable SSH origin as the available publication path; gh authentication is no longer a prerequisite. This review did not independently test remote writes."
+    }
+  ],
+  "additional_required_checks": [
+    {
+      "topic": "Phase 1 ownership and ordering",
+      "status": "PASS",
+      "evidence": "1A -> 1B -> 1C -> gate is feasible. Metadata/lock, entrypoint startup, and test/workflow/default-promotion responsibilities have explicit handoffs. Root narrows broad envelopes into bounded tasks and serializes shared files. A tiny nonempty-data, ordinary-model, default-step FedAvg smoke need not await the later confirmed-defect repairs."
+    },
+    {
+      "topic": "Python support boundary",
+      "status": "PASS",
+      "evidence": "Python 3.13 remains the minimum. Python 3.14 default promotion follows startup/runtime qualification and the Phase 1 gate; failure retains the 3.13 default with a named blocker."
+    },
+    {
+      "topic": "Two independently trained MLX clients",
+      "status": "PASS",
+      "evidence": "Plan lines 432-446 require two real MLX models trained from a common baseline on their local data, changed parameters, real extracted updates, numerical sample-weighted aggregation/application, checkpoint prediction equivalence, transport round trips and F17 rejection regressions."
+    },
+    {
+      "topic": "Scope containment",
+      "status": "PASS",
+      "evidence": "Larger MLX features remain approval-required roadmap work in section 11. Existing transport repairs preserve the contract, and authentication/protocol rewrites are excluded."
+    }
+  ],
+  "findings": [
+    {
+      "id": "R2-01",
+      "priority": "medium",
+      "topic": "F11 omits the actual PORT checkpoint writer from its Phase 2 ownership",
+      "location": {
+        "path": "evidence/2026-refresh/plan.md",
+        "line": 106
+      },
+      "description": "F11 names only plato/servers/strategies/aggregation/port.py as its exact implementation scope and is mandatory in Phase 2B. The corresponding writer is examples/async/port/port_server.py:34-41: weights_aggregated() passes model_<round>.pth to trainer.save_model(). ComposableTrainer rejects that extension at plato/trainers/composable.py:302-305. Fixing the scoped reader alone leaves the real PORT round failing and cannot meet F11's save/load acceptance. Active example files otherwise belong to Phase 4A, after the Phase 2 gate.",
+      "baseline_evidence": [
+        {
+          "path": "evidence/2026-refresh/baseline-findings.json",
+          "finding_id": "B07",
+          "detail": "The confirmed defect and red/green acceptance explicitly include the real PORT weights_aggregated hook."
+        },
+        {
+          "path": "examples/async/port/port_server.py",
+          "line": 39,
+          "detail": "The actual writer constructs a .pth filename and calls trainer.save_model."
+        },
+        {
+          "path": "plato/trainers/composable.py",
+          "line": 302,
+          "detail": "save_model rejects filenames that do not end in .safetensors."
+        },
+        {
+          "path": "plato/servers/strategies/aggregation/port.py",
+          "line": 119,
+          "detail": "The corresponding historical-model reader also constructs a .pth filename."
+        },
+        {
+          "path": "plato/servers/fedavg.py",
+          "line": 239,
+          "detail": "The real aggregation lifecycle invokes weights_aggregated."
+        }
+      ],
+      "requested_change": "Add an explicit, limited handoff of examples/async/port/port_server.py and its focused regression to the Phase 2 F11 task, alongside the strategy reader and F07 checkpoint-contract coordination. Require the regression to call the real weights_aggregated hook and then exercise historical-model retrieval/stale-update similarity with the numerical aggregation reference before F11 closes. No broader example or protocol rewrite is needed."
+    }
+  ],
+  "decision": "CHANGES_REQUESTED",
+  "acceptance": "FAIL",
+  "result": "changes_requested",
+  "summary": "One medium ownership/order gap remains for an already confirmed PORT defect. All other requested planning criteria are addressed; resolve R2-01 before approving implementation."
+}

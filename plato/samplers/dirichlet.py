@@ -15,10 +15,10 @@ class Sampler(base.Sampler):
     dataset, biased across labels according to the Dirichlet distribution."""
 
     def __init__(self, datasource, client_id, testing):
-        super().__init__()
+        super().__init__(client_id, edge_evaluation=testing)
 
         # Different clients should have a different bias across the labels & partition size
-        np.random.seed(self.random_seed * int(client_id))
+        self.rng.seed(self.random_seed * int(client_id))
 
         # Concentration parameter to be used in the Dirichlet distribution
         concentration = (
@@ -44,21 +44,21 @@ class Sampler(base.Sampler):
 
         class_list = datasource.classes()
 
-        target_proportions = np.random.dirichlet(
+        if len(target_list) == 0 or len(class_list) == 0:
+            raise ValueError("Dirichlet sampling requires nonempty data and classes.")
+
+        target_proportions = self.rng.dirichlet(
             np.repeat(concentration, len(class_list))
         )
 
         if np.isnan(np.sum(target_proportions)):
             target_proportions = np.repeat(0, len(class_list))
-            target_proportions[np.random.randint(0, len(class_list))] = 1
+            target_proportions[self.rng.randint(0, len(class_list))] = 1
 
         weights = target_proportions[target_list]
         if hasattr(weights, "tolist"):
             weights = weights.tolist()
         self.sample_weights = list(weights)
-
-    def num_samples(self) -> int:
-        """Returns the length of the dataset after sampling."""
         sampled_size = Config().data.partition_size
 
         # Variable partition size across clients
@@ -66,14 +66,23 @@ class Sampler(base.Sampler):
             dist = Config().data.partition_distribution
 
             if dist.distribution.lower() == "uniform":
-                sampled_size *= np.random.uniform(dist.low, dist.high)
+                sampled_size *= self.rng.uniform(dist.low, dist.high)
 
             if dist.distribution.lower() == "normal":
-                sampled_size *= np.random.normal(dist.mean, dist.high)
+                sampled_size *= self.rng.normal(dist.mean, dist.high)
 
             sampled_size = int(sampled_size)
 
-        return sampled_size
+        if not 0 < sampled_size <= len(self.sample_weights):
+            raise ValueError(
+                "Dirichlet partition size must be positive and no larger than "
+                f"the dataset ({len(self.sample_weights)}); got {sampled_size}."
+            )
+        self.sampled_size = sampled_size
+
+    def num_samples(self) -> int:
+        """Return the fixed count realized at construction, without drawing RNG."""
+        return self.sampled_size
 
     def get(self):
         """Obtains an instance of the sampler."""
