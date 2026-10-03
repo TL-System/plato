@@ -1,0 +1,25 @@
+{
+  "head": "6bf8836d06072c7946cdfb5499a09e4bce459805",
+  "lock_sha256": "e2a53aaae9a0dd49f5446b490bb3071e86aa3a9a20d6271c9dd30b4ae2dcbff9",
+  "locked_hatchling": "1.32.4",
+  "distributions": [
+    {
+      "file": "plato_learn-1.4.3-py3-none-any.whl",
+      "bytes": 382932,
+      "sha256": "d00d2c2acd5e5867e6a818fe3bc4132db8f92e00f47017da35e5a3159a60ba96",
+      "members": 213,
+      "wheel_metadata": "Wheel-Version: 1.0\nGenerator: hatchling 1.32.4\nRoot-Is-Purelib: true\nTag: py3-none-any\n"
+    },
+    {
+      "file": "plato_learn-1.4.3.tar.gz",
+      "bytes": 3510074,
+      "sha256": "74e0e5a4263afd0807752a32bdaff3052362e4966d8673dc4e88b4c018c0d67f",
+      "members": 1210,
+      "wheel_metadata": null
+    }
+  ],
+  "retired_and_vendor_sources_absent": true,
+  "retained_registry_native_model_and_retirement_diagnostics_present": true,
+  "strict_docs_log_sha256": "cd531ee0278d188eaaab5464c8de868967d10ce4883a7ade44f3f6c05c8f167f",
+  "source_unchanged_binding": "Final profile runners independently snapshot all tracked source before/after. This check does not replace those snapshots."
+}

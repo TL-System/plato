@@ -1,0 +1,19 @@
+{
+  "head": "6bf8836d06072c7946cdfb5499a09e4bce459805",
+  "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+  "cwd": "/private/tmp",
+  "prefix": "/private/tmp/plato-archive-integration/wheel-env",
+  "plato_path": "/tmp/plato-archive-integration/wheel-env/lib/python3.13/site-packages/plato/__init__.py",
+  "registry_path": "/tmp/plato-archive-integration/wheel-env/lib/python3.13/site-packages/plato/models/registry.py",
+  "version": "1.4.3",
+  "direct_url": {
+    "url": "file:///tmp/plato-archive-integration/dist/plato_learn-1.4.3-py3-none-any.whl",
+    "archive_info": {}
+  },
+  "retirement_diagnostics": {
+    "vit": "The model 'vit' was retired. Historical source and restoration instructions: archives/retired/legacy-vit/README.md.",
+    "nanochat": "The model 'nanochat' was retired. Historical source and restoration instructions: archives/retired/nanochat/README.md. For supported text training, use configs/HuggingFace/fedavg_qwen3_06b_lora.toml.",
+    "lerobot": "The model 'lerobot' was retired. Historical source and restoration instructions: archives/retired/lerobot/README.md.",
+    "smolvla": "The model 'smolvla' was retired. Historical source and restoration instructions: archives/retired/lerobot/README.md."
+  }
+}
