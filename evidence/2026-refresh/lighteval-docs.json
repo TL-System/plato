@@ -1,0 +1,253 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-03T21:57:30.924515+00:00",
+  "status": "DRAFT_PROSE_COMPLETE_PENDING_FRESH_REVIEW_AND_ACCEPTED_RUNTIME_PROFILE_REBINDING",
+  "publication_gate": {
+    "ready": false,
+    "required": [
+      "Fresh independent documentation review.",
+      "Bind final accepted runtime commit and hashes after code review.",
+      "Bind accepted implemented llm-eval profile and exact case ledger; verify all documented command/profile/resource semantics on that integration.",
+      "Record actual optional and combined execution qualification before publication; remove no guard or pending gate based on this docs-only check."
+    ],
+    "reader_prose": "Commands are drafted for the accepted final profile contract. Pending implementation bookkeeping stays in this receipt by root instruction; user flows contain no internal review status."
+  },
+  "source": {
+    "base_commit": "c1bdae78456b6a8b16d2b78d16ab6ec973067b06",
+    "docs_commit": "3dcd7f9bfa1d32821a1544c9bcbc8b0fb80d8f78",
+    "docs_tree": "0cef360ac14377b19ceec25a24576f365bccd8d8",
+    "docs_before_sha256": {
+      "docs/docs/configurations/evaluation.md": "1eb66018ff17dbbab6f6105f3b62ed4a0b5531d317b7c0b0307a0df4f9866ba1",
+      "docs/docs/development.md": "96ae93b80908f36d27bf8faaed16ac6e70c8966f07ba38155a1cbdad1026e057",
+      "docs/docs/examples/case-studies/4. Server-side Lighteval for SmolLM2.md": "394f0ddd860b1c01aa3d9ba450a32ea2199719f8fd6cd2ddc4e930d808c1d98e",
+      "docs/docs/install.md": "8f7e57f4c0c72df67d769af788bcb9ece2d6907f823513fec17692644b21340b",
+      "docs/docs/quickstart.md": "1cd72bfbaf114d44b3c1b177c0d38709c8e7e939d2780f29b040139b713a4d0b",
+      "docs/docs/references/evaluators.md": "b1285df00132e7e1882dc937ee0c1a9e71f04d9191fe1e2413f24cb0eb09da71"
+    },
+    "docs_after_sha256": {
+      "docs/docs/configurations/evaluation.md": "08dccc460ba982f8636008787344efe36285b5664dcce298cbf7f35a868dbf5c",
+      "docs/docs/development.md": "9fcaa651c861444ca36220d4732a7496087bbd51aff501b6aa8de44977ddf6f0",
+      "docs/docs/examples/case-studies/4. Server-side Lighteval for SmolLM2.md": "d20a43f6bbd0fb96b5d0bb65843b6939fe4506c928e5051d8c5b3a479a9664c7",
+      "docs/docs/install.md": "495ac1c33737e5c9f477b8d650952840164bbb98957bc6e9ab6632fc55727eb2",
+      "docs/docs/quickstart.md": "6e946cfd836abfe7e87044eaaf0c64d89ed256a6e3e1c2fb47bbd2a641d5065f",
+      "docs/docs/references/evaluators.md": "627cf014487123ca67b18974126c8a9873a510ef2bb7d392a5069129ce2be40b"
+    },
+    "inspected_repository_sha256": {
+      "pyproject.toml": "6c313baf90888edeb24c42828b93411ab1f075e2cf1197663299f46dccbfadcd",
+      "uv.lock": "66a4e4442d7b1f26d220b44ca73c44ff4f1151a86857bb3f93a594819fd08126",
+      "plato/evaluators/lighteval.py": "73a6f9f790ed1810033f4dcdc7c35bba68cd738260462e517dffd946d26b9775",
+      "plato/evaluators/lighteval_tasks.py": "c5af11e1f9cc71d8cbd0318266690246045049701d00ddd944f45cce121c984f",
+      "plato/evaluators/runner.py": "e08bae291acdcbefee340b8d7c8f41c168a0e00a2d257ff74932514a186985f3",
+      "configs/HuggingFace/fedavg_smol_smoltalk_smollm2_135m.toml": "899ef9b1289c8fd08f7caafe754768cf1e13520caecc981bf24c7ac726f165fa",
+      "tests/llm_eval/test_lighteval_runtime.py": "1f55137024bbc8fdfcf894aef97088ef07ca545c63f518e4e1d5ae4db5faaa14",
+      "tests/llm_eval/helpers.py": "0a3c9f230f3de6095791f0930f7e2963aaf2a88a2190f00b8aed01d878614bf1"
+    },
+    "external_inputs_sha256": {
+      "/tmp/plato-lighteval-profile-plan.json": "8a457832ca649ba39e7ba4f39175aec35e111e00e8856068641ac324ce4015fe",
+      "/tmp/plato-lighteval-profile-plan-review2.json": "953261a846d0d19658279a99f688f465f741f3ad040806a9e2cb5a7ccf727529",
+      "/tmp/plato-refresh-worktrees/lighteval-runtime/evidence/2026-refresh/lighteval-runtime-qualification.json": "dce1aef82b4ab7c02603c6b4d9eb8a4953cba4ae34be1d315da9c353de32d0be",
+      "/tmp/plato-lighteval-dependency-checks/command-semantics.json": "5085b7db4b13d5fa91569cb765a05fd01f061743e76d5af6a7bbfeac5e1dc9f9",
+      "/tmp/plato-archive-integration/docs-all-extras-red.log": "e4535c59d52f38cf45e064fd47ebfb7309daa524ed7b7b8285490bb522da21ff"
+    },
+    "frozen_runtime_reference": "e079df6228f9529472c7b3c3d9a2db46a42636a8",
+    "runtime_source_match": "Local lighteval.py, lighteval_tasks.py and real runtime test module are byte-identical to the frozen runtime worktree at authoring time."
+  },
+  "validation": {
+    "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+    "tool_versions": {
+      "mkdocs": "1.6.1",
+      "mkdocs-material": "9.7.7",
+      "Markdown": "3.11"
+    },
+    "tooling_environment": {
+      "path": "/tmp/plato-lighteval-docs-tooling",
+      "provision_command": "UV_PROJECT_ENVIRONMENT=/tmp/plato-lighteval-docs-tooling uv sync --locked --python 3.13 --only-group docs --no-install-project",
+      "returncode": 0,
+      "scope": "Task-owned docs-only environment; no other environment mutations."
+    },
+    "strict_mkdocs": {
+      "command": [
+        "/tmp/plato-lighteval-docs-tooling/bin/python",
+        "-m",
+        "mkdocs",
+        "build",
+        "--strict",
+        "--config-file",
+        "docs/mkdocs.yml",
+        "--site-dir",
+        "/tmp/plato-lighteval-docs-validation/site"
+      ],
+      "returncode": 0,
+      "log_sha256": "2d28bbd67d37def28c40491860507a0e905e23327b6a018d17db12b4f19580e7",
+      "observations": "Existing Material advisory banner and informational unlisted retired Nanochat/LeRobot pages remain; strict build succeeds."
+    },
+    "checks": {
+      "files": [
+        "docs/docs/configurations/evaluation.md",
+        "docs/docs/development.md",
+        "docs/docs/examples/case-studies/4. Server-side Lighteval for SmolLM2.md",
+        "docs/docs/install.md",
+        "docs/docs/quickstart.md",
+        "docs/docs/references/evaluators.md"
+      ],
+      "rendered_links_checked": 412,
+      "errors": [],
+      "evaluator_commands": [
+        {
+          "file": "docs/docs/examples/case-studies/4. Server-side Lighteval for SmolLM2.md",
+          "command": "uv sync --locked --python 3.13 --extra llm_eval",
+          "check": "Syntax/extra/group/resource/target checked; runtime not executed."
+        },
+        {
+          "file": "docs/docs/examples/case-studies/4. Server-side Lighteval for SmolLM2.md",
+          "command": "uv run --locked --extra llm_eval python -m nltk.downloader punkt punkt_tab",
+          "check": "Syntax/extra/group/resource/target checked; runtime not executed."
+        },
+        {
+          "file": "docs/docs/examples/case-studies/4. Server-side Lighteval for SmolLM2.md",
+          "command": "uv run --locked --extra llm_eval python plato.py --config configs/HuggingFace/fedavg_smol_smoltalk_smollm2_135m.toml",
+          "check": "Syntax/extra/group/resource/target checked; runtime not executed."
+        },
+        {
+          "file": "docs/docs/install.md",
+          "command": "uv sync --locked --python 3.13 --extra llm_eval",
+          "check": "Syntax/extra/group/resource/target checked; runtime not executed."
+        },
+        {
+          "file": "docs/docs/install.md",
+          "command": "uv run --locked --extra llm_eval python -m nltk.downloader punkt punkt_tab",
+          "check": "Syntax/extra/group/resource/target checked; runtime not executed."
+        },
+        {
+          "file": "docs/docs/quickstart.md",
+          "command": "uv sync --locked --python 3.13 --extra llm_eval",
+          "check": "Syntax/extra/group/resource/target checked; runtime not executed."
+        },
+        {
+          "file": "docs/docs/quickstart.md",
+          "command": "uv run --locked --extra llm_eval python -m nltk.downloader punkt punkt_tab",
+          "check": "Syntax/extra/group/resource/target checked; runtime not executed."
+        },
+        {
+          "file": "docs/docs/quickstart.md",
+          "command": "uv run --locked --extra llm_eval python plato.py --config configs/HuggingFace/fedavg_smol_smoltalk_smollm2_135m.toml",
+          "check": "Syntax/extra/group/resource/target checked; runtime not executed."
+        },
+        {
+          "file": "docs/docs/references/evaluators.md",
+          "command": "uv sync --locked --python 3.13 --extra llm_eval --group test",
+          "check": "Syntax/extra/group/resource/target checked; runtime not executed."
+        },
+        {
+          "file": "docs/docs/references/evaluators.md",
+          "command": "uv run --locked --extra llm_eval python -m nltk.downloader punkt punkt_tab",
+          "check": "Syntax/extra/group/resource/target checked; runtime not executed."
+        },
+        {
+          "file": "docs/docs/references/evaluators.md",
+          "command": "uv run --locked --extra llm_eval --group test python -m pytest tests/llm_eval --test-profile=llm-eval -ra",
+          "check": "Syntax/extra/group/resource/target checked; runtime not executed."
+        },
+        {
+          "file": "docs/docs/references/evaluators.md",
+          "command": "uv run --locked --extra llm_eval --group test python -m pytest tests/llm_eval/test_lighteval_runtime.py -k model_config -ra",
+          "check": "Syntax/extra/group/resource/target checked; runtime not executed."
+        },
+        {
+          "file": "docs/docs/references/evaluators.md",
+          "command": "uv run --locked --extra llm_eval --group test-model-search python -m pytest tests --test-profile=llm-eval -ra",
+          "check": "Syntax/extra/group/resource/target checked; runtime not executed."
+        }
+      ],
+      "dependency_dryruns": [
+        {
+          "name": "eval",
+          "command": [
+            "uv",
+            "sync",
+            "--locked",
+            "--dry-run",
+            "--python",
+            "3.13",
+            "--extra",
+            "llm_eval"
+          ],
+          "returncode": 0,
+          "log_sha256": "a90ab9177b0b3d0da8de6b878db90722b95bb9fa27c235c0811ecf25b68a6abd",
+          "compatible_xxhash_selected": true
+        },
+        {
+          "name": "eval-test",
+          "command": [
+            "uv",
+            "sync",
+            "--locked",
+            "--dry-run",
+            "--python",
+            "3.13",
+            "--extra",
+            "llm_eval",
+            "--group",
+            "test"
+          ],
+          "returncode": 0,
+          "log_sha256": "c4f583bc34aca02c0e24ee5de268104b671414bdb55b83bc5f1b1f6e51c95c2a",
+          "compatible_xxhash_selected": true
+        },
+        {
+          "name": "eval-combined",
+          "command": [
+            "uv",
+            "sync",
+            "--locked",
+            "--dry-run",
+            "--python",
+            "3.13",
+            "--extra",
+            "llm_eval",
+            "--group",
+            "test-model-search"
+          ],
+          "returncode": 0,
+          "log_sha256": "5636437407f16fdbfa4d8aa8c8ae4d43e1daa8663f5566d0ed0b1f33a87b8744",
+          "compatible_xxhash_selected": true
+        },
+        {
+          "name": "conflicting-all-extras",
+          "command": [
+            "uv",
+            "sync",
+            "--locked",
+            "--dry-run",
+            "--python",
+            "3.13",
+            "--all-extras"
+          ],
+          "returncode": 2,
+          "log_sha256": "ade9bcfa3c036204dcd0808fc2caa6e4881aa0c51725e6f9b120f3bf002ba78b",
+          "compatible_xxhash_selected": false
+        }
+      ],
+      "protected_files_unchanged": 325,
+      "profile_status": "Accepted plan only; actual profile implementation, final source rebinding and integrated execution not validated by this documentation task.",
+      "limits": "No model training, NLTK downloads, benchmark datasets or runtime test collection executed."
+    },
+    "git_diff_check": {
+      "returncode": 0
+    }
+  },
+  "artifacts": {
+    "path": "evidence/2026-refresh/reproductions/lighteval-docs-validation.tar.gz",
+    "sha256": "cec8a28c85e2b630ca61ec6a83e728dbd43009dee324db0dac512c01e46201a3",
+    "content": "Exact source checker, command/dependency/link results, dry-run logs and strict build log. No model or dataset downloads."
+  },
+  "factual_boundaries": [
+    "The author runtime receipt reports 11 real CPU cases. This docs task does not rerun or independently qualify them; scores from tiny local GPT-2/parquet/one-token fixtures are regression proof, not public benchmark accuracy/performance or Hub/GPU/distributed qualification.",
+    "xxhash compatibility is tied to selecting llm_eval on every syncing evaluator command; direct interpreter/no-sync requires compatible locked provisioning first.",
+    "Exactly punkt and punkt_tab resources are provisioned; no unrelated NLTK corpora or implicit collection downloads prescribed.",
+    "Whole local fallback model/tokenizer directories are independently copied, deduplicating identical source directories. Read-only originals stay unchanged; owned temporary caches/artifacts are cleaned on success and failure; large-checkpoint disk/time costs and lack of atomic concurrent-writer guarantee are explicit.",
+    "Upstream metric semantics are preserved; helper syntax compatibility is not portrayed as a public API defect.",
+    "No runtime/config/metadata/lock/CI/Docker/Netlify/release edits. Native guide, Qwen pinned guide/config, archive originals and existing core/retained commands are preserved.",
+    "Four dependency dry runs selected compatible xxhash for evaluator combinations and rejected the incompatible all-extras request. Runtime commands/resources were inspected, not executed or downloaded."
+  ]
+}
