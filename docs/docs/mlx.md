@@ -158,9 +158,15 @@ run with no native skips, xfails, or xpasses. Prerequisites include macOS arm64,
 matching installed `mlx` and `mlx-metal` versions, and working CPU and Metal
 arithmetic. Missing prerequisites fail instead of silently skipping tests.
 The profile also requires the `dp`, `mpc`, and `rl` dependencies supplied by the
-`test` group. Use `tests` in place of `tests/mlx_native` for combined core and
-native qualification. `--collect-only` checks prerequisites and the inventory
-but does not qualify runtime behavior.
+`test` group. `--collect-only` checks prerequisites and the inventory but does
+not qualify runtime behavior.
+
+For combined core and native qualification, use `test-model-search`. This group
+includes `test` and supplies `ptflops` for the retained model-search tests:
+
+```bash
+uv run --extra mlx --group test-model-search python -m pytest tests --test-profile=mlx-native -ra
+```
 
 For a focused debugging run, specify a native filesystem path and omit the
 profile:
@@ -182,6 +188,18 @@ import. Installing MLX does not opt those commands into native testing. A core
 pass therefore does not establish MLX qualification. Native validation results
 apply to their recorded source and environment; rerun the strict command after
 runtime changes.
+
+For the full core suite, including retained model-search tests, use:
+
+```bash
+uv run --group test-model-search python -m pytest tests --test-profile=mandatory -ra
+```
+
+To run only the retained model-search checks:
+
+```bash
+uv run --group test-model-search python -m pytest tests/integration/test_retained_model_search.py --test-profile=mandatory -m retained_model_search -ra
+```
 
 Historical timing receipts measure their recorded source revisions and bounded
 workloads. Later validation and import-loading changes mean those wall times
