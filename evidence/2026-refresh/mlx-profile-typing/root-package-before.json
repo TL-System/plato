@@ -1,0 +1,11 @@
+{
+  "root_before_artifact": "/tmp/plato-mlx-integration/package-audit/plato_learn-1.4.3.tar.gz",
+  "sha256": "396f16e0ee033b5ddfac771d9ebc8d72bd56f7b3a4cae585630fa3b7628fb339",
+  "compressed_bytes": 102900650,
+  "members": 1466,
+  "audit_members": 289,
+  "audit_bytes": 104025215,
+  "reproduction_members": 80,
+  "reproduction_bytes": 94457294,
+  "root_and_author_pyproject_equal": true
+}

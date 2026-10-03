@@ -79,7 +79,10 @@ line-length = 88
 lint.select = ["I"]
 
 [tool.hatch.build]
-exclude = ["archives/retired/**"]
+exclude = [
+    "archives/retired/**",
+    "evidence/2026-refresh/reproductions/**",
+]
 
 [tool.hatch.build.targets.wheel]
 packages = ["plato"]

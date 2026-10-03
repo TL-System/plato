@@ -1,0 +1,637 @@
+{
+  "changed_python_paths": [
+    "plato/algorithms/mlx_fedavg.py",
+    "plato/algorithms/registry.py",
+    "plato/models/registry.py",
+    "plato/servers/fedavg.py",
+    "plato/trainers/mlx.py",
+    "plato/trainers/registry.py",
+    "plato/utils/tree.py",
+    "tests/conftest.py",
+    "tests/mlx_import_audit_runner.py",
+    "tests/mlx_native/__init__.py",
+    "tests/mlx_native/benchmark.py",
+    "tests/mlx_native/helpers.py",
+    "tests/mlx_native/seed_probe.py",
+    "tests/mlx_native/socket_harness.py",
+    "tests/mlx_native/socket_probe.py",
+    "tests/mlx_native/test_phase3_controls.py",
+    "tests/mlx_native/test_phase3_dispatch.py",
+    "tests/mlx_native/test_phase3_rng.py",
+    "tests/mlx_native/test_phase3_runtime.py",
+    "tests/mlx_native/test_phase3_selection.py",
+    "tests/mlx_native/test_phase3_socket.py",
+    "tests/mlx_native/test_phase3_tree_contract.py",
+    "tests/test_mlx_import_contract.py",
+    "tests/test_mlx_profile_contract.py"
+  ],
+  "owned_changed_paths_count": 24,
+  "original_two_datasource_allowances_unchanged": true,
+  "full_base_linux_checks": {
+    "before": {
+      "total_diagnostics": 711,
+      "profile_owned_diagnostics": [
+        {
+          "path": "tests/test_mlx_profile_contract.py",
+          "line": "44",
+          "column": "16",
+          "rule": "unresolved-attribute"
+        },
+        {
+          "path": "tests/test_mlx_profile_contract.py",
+          "line": "165",
+          "column": "5",
+          "rule": "unresolved-attribute"
+        },
+        {
+          "path": "tests/test_mlx_profile_contract.py",
+          "line": "559",
+          "column": "16",
+          "rule": "unresolved-attribute"
+        },
+        {
+          "path": "tests/test_mlx_profile_contract.py",
+          "line": "559",
+          "column": "39",
+          "rule": "unresolved-attribute"
+        },
+        {
+          "path": "tests/test_mlx_profile_contract.py",
+          "line": "559",
+          "column": "55",
+          "rule": "unresolved-attribute"
+        },
+        {
+          "path": "tests/test_mlx_profile_contract.py",
+          "line": "560",
+          "column": "20",
+          "rule": "unresolved-attribute"
+        }
+      ],
+      "changed_other_owner_diagnostics": [
+        {
+          "path": "plato/servers/fedavg.py",
+          "line": "165",
+          "column": "17",
+          "rule": "unresolved-attribute"
+        },
+        {
+          "path": "tests/mlx_native/benchmark.py",
+          "line": "90",
+          "column": "17",
+          "rule": "too-many-positional-arguments"
+        },
+        {
+          "path": "tests/mlx_native/seed_probe.py",
+          "line": "56",
+          "column": "13",
+          "rule": "invalid-method-override"
+        },
+        {
+          "path": "tests/mlx_native/seed_probe.py",
+          "line": "57",
+          "column": "47",
+          "rule": "unresolved-attribute"
+        },
+        {
+          "path": "tests/mlx_native/socket_harness.py",
+          "line": "83",
+          "column": "9",
+          "rule": "invalid-assignment"
+        },
+        {
+          "path": "tests/mlx_native/socket_harness.py",
+          "line": "84",
+          "column": "9",
+          "rule": "invalid-assignment"
+        },
+        {
+          "path": "tests/mlx_native/socket_harness.py",
+          "line": "85",
+          "column": "9",
+          "rule": "invalid-assignment"
+        },
+        {
+          "path": "tests/mlx_native/socket_harness.py",
+          "line": "86",
+          "column": "9",
+          "rule": "invalid-assignment"
+        },
+        {
+          "path": "tests/mlx_native/socket_harness.py",
+          "line": "95",
+          "column": "36",
+          "rule": "invalid-argument-type"
+        },
+        {
+          "path": "tests/mlx_native/socket_harness.py",
+          "line": "95",
+          "column": "36",
+          "rule": "invalid-argument-type"
+        },
+        {
+          "path": "tests/mlx_native/socket_harness.py",
+          "line": "95",
+          "column": "53",
+          "rule": "invalid-argument-type"
+        },
+        {
+          "path": "tests/mlx_native/socket_harness.py",
+          "line": "95",
+          "column": "53",
+          "rule": "invalid-argument-type"
+        },
+        {
+          "path": "tests/mlx_native/socket_harness.py",
+          "line": "95",
+          "column": "68",
+          "rule": "invalid-argument-type"
+        },
+        {
+          "path": "tests/mlx_native/socket_harness.py",
+          "line": "95",
+          "column": "68",
+          "rule": "invalid-argument-type"
+        },
+        {
+          "path": "tests/mlx_native/socket_probe.py",
+          "line": "62",
+          "column": "1",
+          "rule": "invalid-assignment"
+        },
+        {
+          "path": "tests/mlx_native/socket_probe.py",
+          "line": "138",
+          "column": "5",
+          "rule": "invalid-assignment"
+        },
+        {
+          "path": "tests/mlx_native/socket_probe.py",
+          "line": "139",
+          "column": "5",
+          "rule": "invalid-assignment"
+        },
+        {
+          "path": "tests/mlx_native/test_phase3_controls.py",
+          "line": "75",
+          "column": "9",
+          "rule": "unresolved-attribute"
+        },
+        {
+          "path": "tests/mlx_native/test_phase3_controls.py",
+          "line": "78",
+          "column": "16",
+          "rule": "unresolved-attribute"
+        },
+        {
+          "path": "tests/mlx_native/test_phase3_controls.py",
+          "line": "79",
+          "column": "16",
+          "rule": "unresolved-attribute"
+        },
+        {
+          "path": "tests/mlx_native/test_phase3_controls.py",
+          "line": "80",
+          "column": "20",
+          "rule": "unresolved-attribute"
+        },
+        {
+          "path": "tests/mlx_native/test_phase3_controls.py",
+          "line": "174",
+          "column": "50",
+          "rule": "unresolved-attribute"
+        },
+        {
+          "path": "tests/mlx_native/test_phase3_controls.py",
+          "line": "229",
+          "column": "13",
+          "rule": "unresolved-attribute"
+        },
+        {
+          "path": "tests/mlx_native/test_phase3_controls.py",
+          "line": "263",
+          "column": "29",
+          "rule": "unresolved-attribute"
+        },
+        {
+          "path": "tests/mlx_native/test_phase3_controls.py",
+          "line": "269",
+          "column": "13",
+          "rule": "unresolved-attribute"
+        },
+        {
+          "path": "tests/mlx_native/test_phase3_controls.py",
+          "line": "272",
+          "column": "13",
+          "rule": "unresolved-attribute"
+        },
+        {
+          "path": "tests/mlx_native/test_phase3_controls.py",
+          "line": "346",
+          "column": "9",
+          "rule": "unresolved-attribute"
+        },
+        {
+          "path": "tests/mlx_native/test_phase3_controls.py",
+          "line": "348",
+          "column": "16",
+          "rule": "unresolved-attribute"
+        },
+        {
+          "path": "tests/mlx_native/test_phase3_controls.py",
+          "line": "349",
+          "column": "26",
+          "rule": "unresolved-attribute"
+        },
+        {
+          "path": "tests/mlx_native/test_phase3_controls.py",
+          "line": "350",
+          "column": "9",
+          "rule": "unresolved-attribute"
+        },
+        {
+          "path": "tests/mlx_native/test_phase3_controls.py",
+          "line": "357",
+          "column": "24",
+          "rule": "unresolved-attribute"
+        },
+        {
+          "path": "tests/mlx_native/test_phase3_controls.py",
+          "line": "359",
+          "column": "16",
+          "rule": "unresolved-attribute"
+        },
+        {
+          "path": "tests/mlx_native/test_phase3_controls.py",
+          "line": "359",
+          "column": "43",
+          "rule": "unresolved-attribute"
+        },
+        {
+          "path": "tests/mlx_native/test_phase3_controls.py",
+          "line": "360",
+          "column": "20",
+          "rule": "unresolved-attribute"
+        },
+        {
+          "path": "tests/mlx_native/test_phase3_runtime.py",
+          "line": "32",
+          "column": "15",
+          "rule": "invalid-method-override"
+        },
+        {
+          "path": "tests/mlx_native/test_phase3_runtime.py",
+          "line": "57",
+          "column": "5",
+          "rule": "invalid-assignment"
+        },
+        {
+          "path": "tests/mlx_native/test_phase3_runtime.py",
+          "line": "235",
+          "column": "31",
+          "rule": "call-non-callable"
+        },
+        {
+          "path": "tests/mlx_native/test_phase3_runtime.py",
+          "line": "240",
+          "column": "50",
+          "rule": "call-non-callable"
+        },
+        {
+          "path": "tests/mlx_native/test_phase3_tree_contract.py",
+          "line": "56",
+          "column": "27",
+          "rule": "invalid-argument-type"
+        },
+        {
+          "path": "tests/mlx_native/test_phase3_tree_contract.py",
+          "line": "66",
+          "column": "32",
+          "rule": "unresolved-attribute"
+        },
+        {
+          "path": "tests/mlx_native/test_phase3_tree_contract.py",
+          "line": "70",
+          "column": "50",
+          "rule": "unresolved-attribute"
+        },
+        {
+          "path": "tests/mlx_native/test_phase3_tree_contract.py",
+          "line": "74",
+          "column": "27",
+          "rule": "invalid-argument-type"
+        },
+        {
+          "path": "tests/mlx_native/test_phase3_tree_contract.py",
+          "line": "80",
+          "column": "27",
+          "rule": "invalid-argument-type"
+        },
+        {
+          "path": "tests/mlx_native/test_phase3_tree_contract.py",
+          "line": "102",
+          "column": "27",
+          "rule": "invalid-argument-type"
+        }
+      ],
+      "allowed_datasource_diagnostics": [
+        {
+          "path": "tests/datasources/test_huggingface_datasource.py",
+          "line": "99",
+          "column": "5",
+          "rule": "invalid-assignment"
+        },
+        {
+          "path": "tests/datasources/test_huggingface_datasource.py",
+          "line": "100",
+          "column": "5",
+          "rule": "invalid-assignment"
+        }
+      ]
+    },
+    "after": {
+      "total_diagnostics": 705,
+      "profile_owned_diagnostics": [],
+      "changed_other_owner_diagnostics": [
+        {
+          "path": "plato/servers/fedavg.py",
+          "line": "165",
+          "column": "17",
+          "rule": "unresolved-attribute"
+        },
+        {
+          "path": "tests/mlx_native/benchmark.py",
+          "line": "90",
+          "column": "17",
+          "rule": "too-many-positional-arguments"
+        },
+        {
+          "path": "tests/mlx_native/seed_probe.py",
+          "line": "56",
+          "column": "13",
+          "rule": "invalid-method-override"
+        },
+        {
+          "path": "tests/mlx_native/seed_probe.py",
+          "line": "57",
+          "column": "47",
+          "rule": "unresolved-attribute"
+        },
+        {
+          "path": "tests/mlx_native/socket_harness.py",
+          "line": "83",
+          "column": "9",
+          "rule": "invalid-assignment"
+        },
+        {
+          "path": "tests/mlx_native/socket_harness.py",
+          "line": "84",
+          "column": "9",
+          "rule": "invalid-assignment"
+        },
+        {
+          "path": "tests/mlx_native/socket_harness.py",
+          "line": "85",
+          "column": "9",
+          "rule": "invalid-assignment"
+        },
+        {
+          "path": "tests/mlx_native/socket_harness.py",
+          "line": "86",
+          "column": "9",
+          "rule": "invalid-assignment"
+        },
+        {
+          "path": "tests/mlx_native/socket_harness.py",
+          "line": "95",
+          "column": "36",
+          "rule": "invalid-argument-type"
+        },
+        {
+          "path": "tests/mlx_native/socket_harness.py",
+          "line": "95",
+          "column": "36",
+          "rule": "invalid-argument-type"
+        },
+        {
+          "path": "tests/mlx_native/socket_harness.py",
+          "line": "95",
+          "column": "53",
+          "rule": "invalid-argument-type"
+        },
+        {
+          "path": "tests/mlx_native/socket_harness.py",
+          "line": "95",
+          "column": "53",
+          "rule": "invalid-argument-type"
+        },
+        {
+          "path": "tests/mlx_native/socket_harness.py",
+          "line": "95",
+          "column": "68",
+          "rule": "invalid-argument-type"
+        },
+        {
+          "path": "tests/mlx_native/socket_harness.py",
+          "line": "95",
+          "column": "68",
+          "rule": "invalid-argument-type"
+        },
+        {
+          "path": "tests/mlx_native/socket_probe.py",
+          "line": "62",
+          "column": "1",
+          "rule": "invalid-assignment"
+        },
+        {
+          "path": "tests/mlx_native/socket_probe.py",
+          "line": "138",
+          "column": "5",
+          "rule": "invalid-assignment"
+        },
+        {
+          "path": "tests/mlx_native/socket_probe.py",
+          "line": "139",
+          "column": "5",
+          "rule": "invalid-assignment"
+        },
+        {
+          "path": "tests/mlx_native/test_phase3_controls.py",
+          "line": "75",
+          "column": "9",
+          "rule": "unresolved-attribute"
+        },
+        {
+          "path": "tests/mlx_native/test_phase3_controls.py",
+          "line": "78",
+          "column": "16",
+          "rule": "unresolved-attribute"
+        },
+        {
+          "path": "tests/mlx_native/test_phase3_controls.py",
+          "line": "79",
+          "column": "16",
+          "rule": "unresolved-attribute"
+        },
+        {
+          "path": "tests/mlx_native/test_phase3_controls.py",
+          "line": "80",
+          "column": "20",
+          "rule": "unresolved-attribute"
+        },
+        {
+          "path": "tests/mlx_native/test_phase3_controls.py",
+          "line": "174",
+          "column": "50",
+          "rule": "unresolved-attribute"
+        },
+        {
+          "path": "tests/mlx_native/test_phase3_controls.py",
+          "line": "229",
+          "column": "13",
+          "rule": "unresolved-attribute"
+        },
+        {
+          "path": "tests/mlx_native/test_phase3_controls.py",
+          "line": "263",
+          "column": "29",
+          "rule": "unresolved-attribute"
+        },
+        {
+          "path": "tests/mlx_native/test_phase3_controls.py",
+          "line": "269",
+          "column": "13",
+          "rule": "unresolved-attribute"
+        },
+        {
+          "path": "tests/mlx_native/test_phase3_controls.py",
+          "line": "272",
+          "column": "13",
+          "rule": "unresolved-attribute"
+        },
+        {
+          "path": "tests/mlx_native/test_phase3_controls.py",
+          "line": "346",
+          "column": "9",
+          "rule": "unresolved-attribute"
+        },
+        {
+          "path": "tests/mlx_native/test_phase3_controls.py",
+          "line": "348",
+          "column": "16",
+          "rule": "unresolved-attribute"
+        },
+        {
+          "path": "tests/mlx_native/test_phase3_controls.py",
+          "line": "349",
+          "column": "26",
+          "rule": "unresolved-attribute"
+        },
+        {
+          "path": "tests/mlx_native/test_phase3_controls.py",
+          "line": "350",
+          "column": "9",
+          "rule": "unresolved-attribute"
+        },
+        {
+          "path": "tests/mlx_native/test_phase3_controls.py",
+          "line": "357",
+          "column": "24",
+          "rule": "unresolved-attribute"
+        },
+        {
+          "path": "tests/mlx_native/test_phase3_controls.py",
+          "line": "359",
+          "column": "16",
+          "rule": "unresolved-attribute"
+        },
+        {
+          "path": "tests/mlx_native/test_phase3_controls.py",
+          "line": "359",
+          "column": "43",
+          "rule": "unresolved-attribute"
+        },
+        {
+          "path": "tests/mlx_native/test_phase3_controls.py",
+          "line": "360",
+          "column": "20",
+          "rule": "unresolved-attribute"
+        },
+        {
+          "path": "tests/mlx_native/test_phase3_runtime.py",
+          "line": "32",
+          "column": "15",
+          "rule": "invalid-method-override"
+        },
+        {
+          "path": "tests/mlx_native/test_phase3_runtime.py",
+          "line": "57",
+          "column": "5",
+          "rule": "invalid-assignment"
+        },
+        {
+          "path": "tests/mlx_native/test_phase3_runtime.py",
+          "line": "235",
+          "column": "31",
+          "rule": "call-non-callable"
+        },
+        {
+          "path": "tests/mlx_native/test_phase3_runtime.py",
+          "line": "240",
+          "column": "50",
+          "rule": "call-non-callable"
+        },
+        {
+          "path": "tests/mlx_native/test_phase3_tree_contract.py",
+          "line": "56",
+          "column": "27",
+          "rule": "invalid-argument-type"
+        },
+        {
+          "path": "tests/mlx_native/test_phase3_tree_contract.py",
+          "line": "66",
+          "column": "32",
+          "rule": "unresolved-attribute"
+        },
+        {
+          "path": "tests/mlx_native/test_phase3_tree_contract.py",
+          "line": "70",
+          "column": "50",
+          "rule": "unresolved-attribute"
+        },
+        {
+          "path": "tests/mlx_native/test_phase3_tree_contract.py",
+          "line": "74",
+          "column": "27",
+          "rule": "invalid-argument-type"
+        },
+        {
+          "path": "tests/mlx_native/test_phase3_tree_contract.py",
+          "line": "80",
+          "column": "27",
+          "rule": "invalid-argument-type"
+        },
+        {
+          "path": "tests/mlx_native/test_phase3_tree_contract.py",
+          "line": "102",
+          "column": "27",
+          "rule": "invalid-argument-type"
+        }
+      ],
+      "allowed_datasource_diagnostics": [
+        {
+          "path": "tests/datasources/test_huggingface_datasource.py",
+          "line": "99",
+          "column": "5",
+          "rule": "invalid-assignment"
+        },
+        {
+          "path": "tests/datasources/test_huggingface_datasource.py",
+          "line": "100",
+          "column": "5",
+          "rule": "invalid-assignment"
+        }
+      ]
+    }
+  }
+}
