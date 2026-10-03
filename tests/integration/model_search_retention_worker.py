@@ -415,9 +415,12 @@ def socket_round(module: Any) -> None:
         original_aggregated(updates)
 
     server.weights_aggregated = inspect_aggregate
+    selection_index = 0
 
     def select(response: dict[str, Any], client_id: int) -> dict[str, Any]:
-        target = 0.5 if client_id == 1 else 1.0
+        nonlocal selection_index
+        target = (0.5, 1.0)[selection_index]
+        selection_index += 1
         rates = server.require_algorithm().rates
         seed = next(
             candidate
@@ -436,6 +439,7 @@ def socket_round(module: Any) -> None:
             "selected_rate",
             client_id=client_id,
             rate=result["rate"],
+            selection_call=selection_index,
             seed=seed,
             rng_state_sha256=state_hash,
             limitation_activated=False,

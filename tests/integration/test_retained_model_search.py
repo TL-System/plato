@@ -212,12 +212,11 @@ def _run_case(
 @pytest.mark.parametrize("family", ["anycostfl", "fedrolex", "heterofl"])
 def test_retained_width_round(tmp_path: Path, family: str) -> None:
     result = _run_case(tmp_path / family, family, "socket", 90)
-    rates = {
-        event["client_id"]: event["rate"]
-        for event in result["events"]
-        if event["event"] == "selected_rate"
-    }
-    assert rates == {1: 0.5, 2: 1.0}
+    selected = [
+        event for event in result["events"] if event["event"] == "selected_rate"
+    ]
+    assert [event["rate"] for event in selected] == [0.5, 1.0]
+    assert {event["client_id"] for event in selected} == {1, 2}
     assert sorted(
         event["samples"]
         for event in result["events"]
