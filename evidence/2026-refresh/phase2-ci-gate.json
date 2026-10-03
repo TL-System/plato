@@ -1,0 +1,125 @@
+{
+  "schema_version": 1,
+  "written_at_utc": "2026-10-03T16:42:32.032076+00:00",
+  "decision": "AUTHORIZE_CI_ONLY_INTEGRATION_AND_HOSTED_PYTHON_313_QUALIFICATION",
+  "scope": "Bounded Phase 2 CI-only acceptance addendum. No Linux PASS, final merge acceptance, new production-source qualification, or later-phase acceptance is claimed.",
+  "material_findings": [],
+  "reviewed_source": {
+    "candidate_worktree": "/tmp/plato-refresh-worktrees/phase2-ci-budget",
+    "head": "ae3d066664d1eb5715cd20e5792b9e9c3e605240",
+    "tree": "ad96807bf04ee9b04f6973266e61fff36f20455e",
+    "parent": "0ada82cca599310c40d4a6691aaa16a0e737f2fd",
+    "review_base": "9ee92c52307cd3ecdce0c7416708c504bdb52137",
+    "fully_qualified_local_commit": "204082f53d0fd335e57712ac981ad7d40bff19dd",
+    "clean_status": "",
+    "changed_paths": [
+      ".github/scripts/stage_ci_artifacts.py",
+      ".github/workflows/pytorch_tests.yml",
+      "evidence/2026-refresh/phase2-ci-budget-validation.json"
+    ],
+    "local_to_review_base_evidence_only_paths": [
+      "evidence/2026-refresh/execution-state.json",
+      "evidence/2026-refresh/phase2-final-local-acceptance.json",
+      "evidence/2026-refresh/reproductions/phase2-final-local-qualification-manifest.json",
+      "evidence/2026-refresh/reproductions/phase2-final-local-qualification.tar.gz"
+    ]
+  },
+  "source_equivalence": {
+    "status": "VERIFIED_FROM_GIT_OBJECT_DIFFS",
+    "statement": "Production code, tests, configurations, dependencies, lock and submodule gitlinks are identical from fully qualified local 204082 through evidence descendant 9ee92 to candidate ae3d. Only the listed workflow/helper/receipt differ in this CI change.",
+    "lock_sha256": "573b10c2ba1a2317e02f9e40c6181359cafab6f6e0a0f9be12bb256cb276fe1d"
+  },
+  "accepted_ci_contract": {
+    "python_versions": [
+      "3.13"
+    ],
+    "budget_minutes": {
+      "base": 25,
+      "mandatory": 30,
+      "runtime": 16,
+      "staging": 2,
+      "job": 110
+    },
+    "test_command_and_assertion_preservation": "Verified in the bounded workflow diff; no coverage or runtime assertion relaxation and no continue-on-error.",
+    "artifact_selection": "Top-level and runtime evidence including actual payloads/checkpoints retained; symlink aliases and special files excluded without following them; reproducible unit fixtures and unit diagnostics above 1 MiB excluded with manifest accounting.",
+    "collection_failure": "Actual CLI returns nonzero on read issues and missing source. Successful prior qualification adds --require-complete and fails for missing required records. Already failed/cancelled qualification permits expected partial records. Manifest is written before these exits, and upload uses always().",
+    "validation_basis": "Fresh independent review verifies real CLI negative cases, exact workflow shell branches, runtime retention, downloaded failed-Linux fixture, hashes, syntax, import ordering, formatting and helper typing. This gate verifies review/source hashes and reviews the bounded diff; it does not duplicate the full suites."
+  },
+  "prior_local_acceptance": {
+    "status": "REUSABLE_WITH_SOURCE_EQUIVALENCE",
+    "source_commit": "204082f53d0fd335e57712ac981ad7d40bff19dd",
+    "mandatory_313": {
+      "passed": 1302,
+      "skipped": 1,
+      "runtime_tests": 51
+    },
+    "mandatory_314_historical": {
+      "passed": 1302,
+      "skipped": 1,
+      "runtime_tests": 51
+    },
+    "base_each_historical": {
+      "passed": 1242,
+      "skipped": 4
+    },
+    "interpretation": "Prior audited Mac qualification remains valid for unchanged production/tests/lock. No gratuitous full Mac rerun is required for this CI-only amendment. Historical Python 3.14 results remain evidence, not a requirement to restore Python 3.14 CI."
+  },
+  "superseded_requirements": "The user-authorized Python 3.13-only hosted scope supersedes Python 3.13/3.14 Linux wording in earlier gates/local acceptance. New finite budgets supersede the earlier 20-minute base/mandatory and 90-minute job budgets; runtime budget and assertions are preserved.",
+  "initial_linux_run": {
+    "id": 37129360804,
+    "status": "FAILED_NOT_FULL_QUALIFICATION",
+    "facts": "Original mandatory step reached 20-minute timeout; base took approximately 18:02 on Python 3.13 and 19:02 on Python 3.14. Artifact alias ENOENT was observed. Partial logs are regression fixtures and do not establish Linux PASS."
+  },
+  "authorization": {
+    "integrate_exact_reviewed_ci_changes": true,
+    "add_gate_and_delivery_evidence_overlay": true,
+    "publish_and_start_python_313_hosted_qualification": true,
+    "merge_after_actual_audited_linux_pass_under_existing_user_authorization": true,
+    "new_user_confirmation_required": false,
+    "condition": "Record resulting commit/tree and verify exact candidate non-evidence content after integration; evidence-only overlays are permitted. Merge remains contingent on actual successful exact-source Linux qualification and its audit."
+  },
+  "pending_checks": [
+    "Run exact integrated source on hosted Ubuntu Python 3.13 with base, mandatory initialized suite, runtime and quality steps all successful within finite budgets.",
+    "Audit actual test inventories, documented skips/notices, runtime natural completion/failure containment and no survivors; do not infer pass from staging.",
+    "Verify uploaded provenance, expected records and artifact-selection manifest with retained runtime payload/checkpoint evidence, plus actual staging/upload success.",
+    "Record hosted commit/tree mapping, run URL, timing and result receipts; finalize PR and Phase 2 delivery only after audited hosted PASS."
+  ],
+  "sources": [
+    {
+      "path": "/tmp/plato-ci-internal-review2/review.json",
+      "bytes": 25916,
+      "sha256": "67b0c8a17f7a929994ed7eac2cfa72f2551c6b3a9aa5c16c1a041c173469391b"
+    },
+    {
+      "path": "/tmp/plato-ci-internal-review/review.json",
+      "bytes": 11777,
+      "sha256": "8f9b342e3228c65f5a1bb01080be93b8cdd501292c62874df5b93de74d9164e9"
+    },
+    {
+      "path": "/tmp/plato-phase2-ci-budget-validation/staging-failure-delivery.json",
+      "bytes": 2889,
+      "sha256": "2f34f749b88dfd2d48e90cc0e6208d1c3a39ccc45c878d2c859259953c51bc45"
+    },
+    {
+      "path": "/tmp/plato-refresh-worktrees/phase2-ci-budget/evidence/2026-refresh/phase2-gate.json",
+      "bytes": 26829,
+      "sha256": "fcb6d70a71a425eeba0a30444da42b49a1fa5b69cca38354efff6a48baa4101a"
+    },
+    {
+      "path": "/tmp/plato-refresh-worktrees/phase2-ci-budget/evidence/2026-refresh/phase2-gate-corrections.json",
+      "bytes": 16717,
+      "sha256": "501270b4cd3bc505d16e1bcbb7cba295eec04b18c3aa252af0649cd071fff2b2"
+    },
+    {
+      "path": "/tmp/plato-refresh-worktrees/phase2-ci-budget/evidence/2026-refresh/phase2-final-local-acceptance.json",
+      "bytes": 7104,
+      "sha256": "9b28f61a45006a6360ca057984f4087ae28d811feea6791a2dc159fafe8cedbf"
+    },
+    {
+      "path": "/tmp/plato-refresh-worktrees/phase2-ci-budget/evidence/2026-refresh/phase2-ci-budget-validation.json",
+      "bytes": 66126,
+      "sha256": "0bd86dca4bb2e236056c14ff8b04296cdb4a66806443e1fb3d8625bd46c37f69"
+    }
+  ],
+  "review_method": "Read-only repositories; reviewed CI diff/helper and original gate/local acceptance; independently bound HEAD/tree/cleanliness, exact changed-path scope, local-source equivalence and fresh review/source evidence hashes. Wrote only this requested /tmp gate. No nested agents, source edits, commits, installs, broad suite reruns, hosted actions or unrelated LLM-retirement review."
+}

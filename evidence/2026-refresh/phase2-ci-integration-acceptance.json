@@ -1,0 +1,12 @@
+{
+  "status": "ACCEPT_CI_CORRECTION_PENDING_HOSTED_PYTHON313",
+  "utc": "2026-10-03T16:44:55.252783+00:00",
+  "integrated_candidate": "ae3d066664d1eb5715cd20e5792b9e9c3e605240",
+  "candidate_tree": "ad96807bf04ee9b04f6973266e61fff36f20455e",
+  "fully_qualified_local_source": "204082f53d0fd335e57712ac981ad7d40bff19dd",
+  "unchanged_production_tests_lock": true,
+  "fresh_review": "phase2-ci-linux-review2.json",
+  "gate": "phase2-ci-gate.json",
+  "remaining": "Run hosted Linux3.13 fullprofile and audit delivered evidence before mergingPR417.",
+  "policy": "Python3.13onlyCI. Existinghistorical3.14resultsretained. Codexsubagentsinternal; herdrClaudeonly."
+}

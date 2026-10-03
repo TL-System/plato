@@ -1,0 +1,120 @@
+{
+  "schema_version": 1,
+  "review_type": "Fresh independent read-only design review",
+  "reviewer": "/root/llm_retirement_plan_review",
+  "date": "2026-10-03",
+  "repository": "/Users/bli/Playground/plato",
+  "inspected_head": "9ee92c52307cd3ecdce0c7416708c504bdb52137",
+  "plan": {
+    "path": "/tmp/plato-llm-retirement-plan.json",
+    "sha256": "c2a5a34a32bc3f41228efb61e542e575fcd863861c68ead856b5d6453208b62e"
+  },
+  "decision": "ACCEPT_DESIGN",
+  "unresolved_findings": {
+    "critical": 0,
+    "high": 0,
+    "medium": 0,
+    "low": 0
+  },
+  "findings": [],
+  "required_plan_adjustments": [],
+  "review_basis": [
+    {
+      "area": "Bounded scope and ownership",
+      "assessment": "Accept",
+      "evidence": "R1-R4 and coordination assign retirement, HF/LoRA runtime, test and documentation ownership. Root serializes registry/conftest/package/lock/shared documentation edits and publishes only after Phase 2 PR 417 acceptance. Unrelated MobileNetV3/DARTS, active SmolLM and optional Lighteval remain preserved. The selected work adds one plain-text reference scenario through existing HF/PEFT interfaces; no new engine, robotics replacement, quantization stack or remote custom code is proposed."
+    },
+    {
+      "area": "Retirement and archive closure",
+      "assessment": "Accept",
+      "evidence": "Tracked active-name search matches the explicitly listed runtime modules, registries, CORE hooks, test fixtures/contracts, package/workspace/submodule entries and documentation. Plan also mandates a final classification sweep. Nanochat gitlink and initialized source both resolve to c75fe54aa7c1fa881701c246f9427bcbe4eee5a4; its source MIT notice includes the Andrej Karpathy copyright. Snapshot of tracked upstream source, original-path/hash manifests, historical reproduction provenance, inactive packaging/test/lint/build containment and public migration stubs are required. Generic evaluation/checkpoint and adapter coverage remain active. Removing LEGACY_OPTIONAL_EVALUATORS is necessary because runner currently allows nanochat_core to disappear silently."
+    },
+    {
+      "area": "Model pin and license",
+      "assessment": "Accept",
+      "evidence": "Local official metadata reports Qwen/Qwen3-0.6B-Base at da87bfb608c14b7cf20ba1ce41287e8de496c0cd, ungated, Qwen3ForCausalLM, 596049920 BF16 stored parameters and Apache-2.0. Pinned official resolve requests independently reproduce the exact plan hashes for config.json, LICENSE and tokenizer_config.json. Local README hash also matches and documents Transformers >=4.51.0. This supports the selected native causal-LM path and metadata provenance; it does not qualify real checkpoint execution. Model and fixture licenses are treated separately."
+    },
+    {
+      "area": "Shared HF interfaces and payload correctness",
+      "assessment": "Accept",
+      "evidence": "Current loaders demonstrably hardcode main or omit revision; R2 names all four affected model/trainer/datasource modules, preserves legacy defaults and requires exact artifact pins/fail-closed behavior. Local JSON support stays in the existing LoRA datasource. Cache invalidation requirements cover explicitly pinned/local inputs where caching is touched. Existing LoRA extraction uses tensor.cpu() and the supplied actual PEFT tiny-Qwen probe reports four live CPU storage aliases, while current load round-trip passes. R2 requires detached clones and actual PEFT key/load/storage tests without prematurely replacing working wrapper logic."
+    },
+    {
+      "area": "Meaningful validation and honest claims",
+      "assessment": "Accept",
+      "evidence": "R3 requires a real locally instantiated Qwen3/PEFT optimizer update through Plato collator/trainer/evaluator, label masking, frozen base, adapter persistence and restored logits. Actual production weighted aggregation with unequal client sample counts and a negative unweighted-mean comparison covers federated semantics. R2 retains mandatory numerical full/partial accumulation F09 evidence, including finalize/callback/scheduler/optimizer flags; batch-size-one accumulation=1 is explicitly insufficient. Separate official real-weight qualification records SHA, packages, device/dtype, parameter count, adapter change, finite metrics, duration and peak RSS and cannot pass via random fallback or skip. Offline architecture tests and this review are explicitly insufficient to claim pretrained replacement qualification."
+    },
+    {
+      "area": "Python target and delivery ordering",
+      "assessment": "Accept",
+      "evidence": "Plan keeps Python 3.13 as full qualification target and limits any 3.14 work to a root-directed selected probe. Inspected HEAD still contains a Python 3.14 core-forward-compatibility workflow entry; parent identifies a separately owned Phase 2 CI correction. This review does not certify that correction. Plan explicitly requires reinspection of the delivered Phase 2 head before integration, preserving the sequencing boundary."
+    }
+  ],
+  "implementation_notes": [
+    "Make the existing resource-bound intention concrete in the reference command/config: use --cpu because Config.device() otherwise chooses available CUDA, set supported max_concurrency=1 for serial client training, and report measured peak RSS including server/base-model residency. These are routine details under the accepted plan, not additional scope or blockers.",
+    "Reinspect the actual Phase 2 accepted head for shared-file, CI-profile and LoRA typing/callability changes before integration; current HEAD evidence is not a review of future delivered changes.",
+    "Final implementation review must inspect archive manifests/containment, retired-selection diagnostics, numerical accumulation and weighted adapter evidence. No runtime acceptance gate has been waived by design acceptance."
+  ],
+  "direct_official_metadata_checks": [
+    {
+      "url": "https://huggingface.co/Qwen/Qwen3-0.6B-Base/resolve/da87bfb608c14b7cf20ba1ce41287e8de496c0cd/config.json",
+      "bytes": 727,
+      "sha256": "504a6b58c4271583724e66584b6b7698aea18450209df6b2f7582df0e89cee59"
+    },
+    {
+      "url": "https://huggingface.co/Qwen/Qwen3-0.6B-Base/resolve/da87bfb608c14b7cf20ba1ce41287e8de496c0cd/LICENSE",
+      "bytes": 11343,
+      "sha256": "832dd9e00a68dd83b3c3fb9f5588dad7dcf337a0db50f7d9483f310cd292e92e"
+    },
+    {
+      "url": "https://huggingface.co/Qwen/Qwen3-0.6B-Base/resolve/da87bfb608c14b7cf20ba1ce41287e8de496c0cd/tokenizer_config.json",
+      "bytes": 9678,
+      "sha256": "3c04ed3ca964ea2f6b2b5faf0dc4d31aec1cb1e8b4bcf63f402d295046b422b5"
+    }
+  ],
+  "supplied_runtime_evidence": {
+    "path": "/tmp/plato-llm-model-evidence/existing-lora-probe.json",
+    "sha256": "eac9bb092accf3ab713511e734e84960b3df01031c6913206c3d4c6f55ee7af6",
+    "scope": "Parent-produced tiny instantiated Qwen3/installed PEFT probe: four CPU payload storage aliases; existing adapter extraction/load round-trip passes. Independently read/source-correlated, not rerun and not a pretrained qualification."
+  },
+  "reviewed_file_hashes": {
+    "AGENTS.md": "b50f87f31ea3d87076952d8b7d2d8af067132fbf877d80f8780c208fb45527ec",
+    "pyproject.toml": "799bd7ba1865b097fdc8ca84a7b70337794e338de4aa9a6a13f6a4c1b9156246",
+    ".gitmodules": "d39136e1bfba768da1b969c651ef669a569df5d128b03c9c705780c21151d721",
+    ".github/workflows/pytorch_tests.yml": "7c0c144730cbb0d38bb00e10c390e2ab60d6df0a6086de75fcd675bcc0fdc683",
+    "plato/models/huggingface.py": "0655b21a03d851dc87f95605c85cb097f8e88e59136ab85b11c5dcbb38340e08",
+    "plato/models/registry.py": "8f499c870ec4a31d0323b8e8cf27c9cea6e9aaedc0d3b98dd397989c26958aa8",
+    "plato/datasources/lora.py": "67ac3512d6edcb087976f02cbb45a70bf1d334b8731ba5e10aa6d7db4310e8cb",
+    "plato/datasources/huggingface.py": "f26c2a6f97e707ab53f1630749d90f24f14d417c22d38d3aca3a78fbb0aad293",
+    "plato/datasources/registry.py": "38a76f407edd6f46ccbdf56e231ac93d18e379971a5dbf007f15c22f5da602b6",
+    "plato/trainers/huggingface.py": "353d836738fa574de36a84ab1b2b4492889e9c0bf3539de66c01120c4283c646",
+    "plato/trainers/composable.py": "0a4549f08fa1afaec3ab7814930dcfc59cd671bb8b1a608862a4c58a480093a5",
+    "plato/trainers/registry.py": "dc17cf3bd8e1c168213173e7d16e5d4e4f12282c41d33a67f241b294afb64fa1",
+    "plato/algorithms/lora.py": "be2f7ce48ce4c256e3f06864d760d8d78095941b354cb5fcb9df7445747bca56",
+    "plato/algorithms/fedavg.py": "512006d85daa070cd7a7a595b849a96ba70805bc88aa41d329b340dc4edc0258",
+    "plato/algorithms/registry.py": "860df64c61c0de23bfc18e576e719e1603e42ff16c7089b4a034c782b2f629cb",
+    "plato/evaluators/runner.py": "9cb2125f3c03924a8e73f8b62e1e4044a55f9222f38aa01ec8dfaac56588955f",
+    "plato/evaluators/registry.py": "e661fc199bd2f84ec23b17eea348493cf903a1d7d34c5b34fb3e623639a1f642",
+    "plato/servers/fedavg.py": "f184068a11c5be9e523f08b95e1cce76dff2e20e2fdb4e6426caf95dac0bcee5",
+    "plato/servers/fedavg_cs.py": "6998754dfc6a07732ab58a3fb398679c47390afeb4ce3859c166acae106515e0",
+    "plato/servers/split_learning.py": "fa4da694a332ce496b75b753bfb9cd91900ccf80db93f1321cbc3c282cae7abc",
+    "tests/conftest.py": "3eb55a1fa7c0fd5428c296c1bcd7300b23b0ade3d276f5c687af3b9bd78304c7",
+    "tests/integration/utils.py": "7a4af3c5bece78c256f268fb47ee31e384f14cca098d1690ebe2c05f79b21634",
+    "tests/test_config_loader.py": "b79285e4822273311cc09cbd5bc5160c3026716754dbbf50bef190c8f8613c1d",
+    "tests/evaluators/test_registry_runner.py": "55bc828845b057a8f95fd4b4479f4b968cc19be84b6cb3d77022347d3a702007",
+    "tests/trainers/test_composable_trainer.py": "491c30fba4858571430430ac52cc63f632c683b10de35c1420fb6a77324ac440",
+    "tests/algorithms/test_fedavg_algorithm.py": "61ef08d248c464655ed9b9894c0c212d917a101b4a48ddce5a14571e55ea2028",
+    "tests/integration/test_huggingface_smollm_smoke.py": "1fb8e1066af566f1571b0fcd6881b43185f00a7f18347d4ee6cc252e46c62a60",
+    "configs/HuggingFace/fedavg_opt_lora.toml": "d3c8678d98bae7f6e71f988299dc6d1157abcf331cb246af26d8e80f10a9119e",
+    "docs/third_party.md": "a19c39846c81f1919a891ced33836613f0881e743a82ddd2f30e9c98ecfd2692",
+    "plato/models/smolvla.py": "6a082410a12b839e6064e4829568a55af54ce194a3f190c75f109772f83c35e1",
+    "plato/trainers/lerobot.py": "1f647426a85df75df3ff2e9a7a90a8e8bb96d93e93d39f79729b7ff9d2f31ba8",
+    "plato/datasources/lerobot.py": "fb6399418c5174415d0ba02a51fcfbcd5d04b555bd5190924fc228a605edc95d"
+  },
+  "limits": [
+    "Read-only repository review; only this requested report artifact was written.",
+    "No pretrained weights or large artifacts downloaded; only 21748 bytes of official config/license/tokenizer metadata read directly for hash verification.",
+    "No new runtime tests executed and no replacement implementation exists in the reviewed plan.",
+    "No subagents or external review system used."
+  ]
+}

@@ -1,0 +1,171 @@
+{
+  "status": "Read-only design; no repository sources, dependencies, weights, commits or PRs changed.",
+  "date": "2026-10-03",
+  "inspected_head": "9ee92c52307cd3ecdce0c7416708c504bdb52137",
+  "authorization": {
+    "nanochat": "Explicit user instruction to retire and replace with a modern open-source LLM.",
+    "lerobot_smolvla": "Latest explicit user instruction: Retire LeRobot too. Unconditional retirement.",
+    "python": "Python 3.13 is the active full qualification/CI target. Preserve compatibility fixes; a bounded selected Python 3.14 probe may be run at root direction, without adding a 3.14 CI matrix or implying full qualification. Do not justify retirement by universal Python 3.14 failure: NumPy 2.2.6 source-build audit succeeded and standalone LeRobot resolves an older stack. Root refreshed stack conflicts with LeRobot 0.6.1 constraints.",
+    "delivery": "Implementation may start in an isolated worktree/branch now; integration, PR delivery and merge are ordered after Phase 2 PR 417 CI acceptance. Root owns serialized shared files, publication and merge. Existing user authorization covers routine model selection, necessary fixes and validation; no additional permission is required."
+  },
+  "selected_model": {
+    "repository": "Qwen/Qwen3-0.6B-Base",
+    "revision": "da87bfb608c14b7cf20ba1ce41287e8de496c0cd",
+    "license": "Apache-2.0",
+    "gated": false,
+    "architecture": "Qwen3ForCausalLM",
+    "model_type": "qwen3",
+    "parameter_count": 596049920,
+    "rationale": "Small 2025 Qwen3 base causal model; native Transformers AutoModelForCausalLM support, explicit Apache-2.0 license, no remote code, no new training engine, no multimodal processor, no quantization/native extension dependency. Base variant directly suits bounded plain-text causal-LM adaptation and perplexity evaluation, avoiding chat/thinking-template requirements.",
+    "recency_limit": "Modern small text-only reference, not the newest Qwen release. Qwen3.5 is newer but its distributed checkpoint is multimodal.",
+    "upstream_min_transformers": "4.51.0; refreshed root has 5.18.0. Native source exists locally; this is not yet a real-weight compatibility test.",
+    "model_and_tokenizer_pin": "da87bfb608c14b7cf20ba1ce41287e8de496c0cd",
+    "metadata_hashes": {
+      "README.md": "910d9be25c648ab1cb5a7b1d20d67ca6d43d43559a705010198886f9af68e8f1",
+      "config.json": "504a6b58c4271583724e66584b6b7698aea18450209df6b2f7582df0e89cee59",
+      "LICENSE": "832dd9e00a68dd83b3c3fb9f5588dad7dcf337a0db50f7d9483f310cd292e92e",
+      "tokenizer_config.json": "3c04ed3ca964ea2f6b2b5faf0dc4d31aec1cb1e8b4bcf63f402d295046b422b5"
+    },
+    "resource_estimates": "~1.2 GB BF16 serialized weights and ~2.4 GB FP32 parameter memory; peak training RSS must be measured, not inferred from these minima. Run clients serially or on a suitable dedicated worker to bound peak memory.",
+    "alternatives": [
+      {
+        "repository": "Qwen/Qwen3.5-0.8B",
+        "revision": "2fc06364715b967f1860aea9cf38778875588b17",
+        "license": "Apache-2.0",
+        "reason_not_selected": "Official config is Qwen3_5ForConditionalGeneration (qwen3_5) with text_config and vision_config; existing loader expects AutoModelForCausalLM. Requires explicit checkpoint/text-backbone integration and mixed-attention/vision decisions, widening a text-only replacement."
+      },
+      {
+        "repository": "HuggingFaceTB/SmolLM3-3B",
+        "revision": "a07cc9a04f16550a088caea529712d1d335b0ac1",
+        "reason_not_selected": "Native SmolLM3ForCausalLM and recent open model, but about 3.075B parameters impose substantially larger smoke/CI resources."
+      },
+      {
+        "repository": "Qwen/Qwen3-0.6B",
+        "revision": "c1899de289a04d12100db370d81485cdf75e47ca",
+        "reason_not_selected": "Useful later instruction-tuning variant; chat/thinking semantics add unnecessary requirements to a plain causal-LM replacement. API currently reports 751632384 stored parameters; do not substitute its weights while retaining the Base pin."
+      }
+    ]
+  },
+  "archive_policy": {
+    "location": "archives/retired/{nanochat,lerobot}/ with original relative paths recorded in manifest.json; use the existing project archive convention if one is introduced before implementation.",
+    "preserve": [
+      "All retired Plato source/config/example/test/runbook files, with original paths and hashes.",
+      "Pre-retirement Plato commit, Python/uv/package-lock provenance and original supported/reproduction commands; label historical environments unverified unless actually reproduced.",
+      "Nanochat upstream URL https://github.com/karpathy/nanochat.git and gitlink c75fe54aa7c1fa881701c246f9427bcbe4eee5a4; upstream MIT LICENSE including Andrej Karpathy copyright.",
+      "Snapshot upstream tracked Nanochat source at the gitlink pin into an inert source archive or ordinary archived files, preserving licenses and a SHA256 manifest; do not retain an active submodule requirement.",
+      "LeRobot upstream/source/model/dataset provenance and license references already present in the integration; preserve copies of notices for any copied third-party material. Do not assert weights or datasets were vendored.",
+      "Restoration instructions using an isolated historical worktree at the recorded pre-retirement Plato commit, followed by git submodule update --init external/nanochat. Historical reproduction does not imply support on the new dependency stack."
+    ],
+    "containment": [
+      "Archive paths absent from wheel, supported workspace membership, root test collection, supported config inventory and CI import gates.",
+      "Exclude archive source from maintained type/lint scans and build/sdist payload deliberately; retain archive integrity/provenance checks, not runtime skip masks.",
+      "Historical evidence/2026-refresh reports remain immutable; references there are not active dependency leaks.",
+      "Old documentation URLs become short retirement/migration notices linking archive provenance and new Qwen3 guide."
+    ]
+  },
+  "workstreams": [
+    {
+      "id": "R1",
+      "owner": "Retirement implementation owner",
+      "tasks": [
+        "Capture pre-change baseline, complete file/hash manifest, upstream source/license snapshot, and reproduction notes before detaching imports.",
+        "Move Nanochat-specific source: plato/models/nanochat.py, plato/trainers/nanochat.py, plato/datasources/nanochat.py, plato/processors/nanochat_tokenizer.py, plato/evaluators/nanochat_core.py and plato/utils/third_party.py (currently Nanochat-only).",
+        "Move configs/Nanochat/, examples/nanochat/, tests/test_nanochat_integration.py and tests/trainers/test_nanochat_trainer.py plus Nanochat-only fixtures/helpers and original docs.",
+        "Move LeRobot/SmolVLA source: plato/models/smolvla.py, plato/trainers/lerobot.py, plato/datasources/lerobot.py; configs/LeRobot/; tests/models/test_smolvla_model.py, tests/trainers/test_lerobot_trainer.py, tests/datasources/test_lerobot_datasource.py, tests/integration/test_lerobot_smolvla_smoke.py, tests/test_utils/lerobot_stubs.py and original runbook.",
+        "Remove Nanochat/LeRobot/SmolVLA registry imports/entries from models/trainers/datasources registries; verify no processor registry entry exists before removing anything there.",
+        "Remove Nanochat-only CORE state/logging/result hooks from servers/fedavg.py, servers/fedavg_cs.py, servers/split_learning.py, trainers/composable.py and evaluators/runner.py. Remove LEGACY_OPTIONAL_EVALUATORS exemption so old nanochat_core configs cannot silently run without evaluation; unsupported names fail clearly with archive/migration guidance.",
+        "Keep generic EvaluationResult/context/checkpoint plumbing, Lighteval, HF collator/loss/trainer/datasource behavior, PEFT LoRA, dtype-safe FedAvg and generic adapter payload selection. Rename SmolVLA-specific wording in generic adapter tests rather than deleting useful coverage.",
+        "Remove nanochat optional extra, examples/nanochat workspace entry, nanochat test extra, obsolete ty path, .gitmodules entry and active external/nanochat gitlink; retain unrelated submodules. Regenerate uv.lock, pruning only dependencies with no remaining active consumers.",
+        "Keep MobileNetV3/DARTS dependencies until the separately authorized whole-family archive actually lands; this plan is not authorization to partially break those consumers."
+      ],
+      "acceptance": [
+        "No runtime import path or packaging/CI source checkout requires retired backends.",
+        "All moved source and relevant upstream notices accounted for in manifest.",
+        "Old retired registry/evaluator selections produce clear unsupported errors, not silent fallback."
+      ]
+    },
+    {
+      "id": "R2",
+      "owner": "Hugging Face/LoRA implementation owner",
+      "tasks": [
+        "Add model_revision/tokenizer_revision support consistently to AutoConfig, model and tokenizer calls in plato/models/huggingface.py, plato/trainers/huggingface.py, plato/datasources/lora.py and plato/datasources/huggingface.py. Existing code hardcodes main or omits revision, so a TOML pin alone is ineffective.",
+        "Default tokenizer revision to model revision only when tokenizer repository is the same; otherwise honor an explicit tokenizer revision. Preserve existing default-main behavior for legacy configs, but pin every artifact in the new scenario.",
+        "Use supported current Transformers argument names and fail closed on unavailable pinned artifacts. Do not silently substitute main, random initialization, a different architecture, or remote custom code.",
+        "Extend the existing LoRA datasource minimally to accept local datasets JSON data_files (train/validation paths) and optional dataset revision; avoid a new datasource backend. Keep tests local and use plain text to avoid chat templating scope.",
+        "Where HF datasource caching is touched, include dataset revision and local input identity/content in cache keys; do not accept legacy unpinned cache entries for explicitly pinned inputs.",
+        "Add one bounded reference TOML configs/HuggingFace/fedavg_qwen3_06b_lora.toml with model and tokenizer set to Qwen/Qwen3-0.6B-Base at the selected SHA, datasource LoRA, algorithm fedavg_lora, trainer HuggingFace, two clients, one round, one epoch, CPU FP32 default, batch size 1, max_length 64, deterministic seeds, LoRA rank 4/alpha 8/dropout 0 and targets q_proj/v_proj, AdamW lr 1e-4. Use a small checked-in original-prose train/validation fixture with provenance and disjoint splits. Document its purpose as integration/reproduction, not meaningful benchmark training.",
+        "Carry forward mandatory Phase 3 F09: demonstrate numerically that partial final gradient-accumulation windows match the intended unaccumulated reference, including finalize behavior, callbacks/scheduler and optimizer flags. Fix within HF strategy and coordinate any shared machinery handoff. A batch-size-one example with accumulation=1 cannot substitute for this regression evidence.",
+        "Use existing HuggingFaceTestingStrategy finite held-out perplexity/loss as the acceptance evaluator; preserve optional Lighteval and existing SmolLM configurations without forcing its generation tasks into the tiny replacement gate.",
+        "Validate that fedavg_lora uses PEFT save/load APIs with the correct wrapper and stable adapter keys. Repair wrapper/key handling only if the real round-trip test reveals an issue; preserve base weights.",
+        "Document adapter checkpoint save_pretrained/from_pretrained or equivalent supported APIs, recording exact base revision and tokenizer revision in checkpoint metadata.",
+        "Fix CPU adapter payload aliasing if demonstrated: tensor.cpu() can retain shared storage; extract detached cloned payload snapshots. Exercise extraction/load/checkpoint with real installed PEFT APIs, not mocks, and verify stable keys and independent payload storage. Audit prior Phase 2 LoRA callability/typing handoff as part of the same focused work."
+      ],
+      "acceptance": [
+        "Every model/config/tokenizer loader sees the exact pin.",
+        "Local fixture training/evaluation exercises actual HF/PEFT/Plato interfaces without introducing a custom engine.",
+        "Base weights remain frozen; adapter payloads exclude base tensors and survive checkpoint reload.",
+        "HF full and partial accumulation numerical updates satisfy the accepted shared contract, and CPU adapter payloads remain unchanged after subsequent local training."
+      ]
+    },
+    {
+      "id": "R3",
+      "owner": "Tests and CI owner",
+      "tasks": [
+        "Remove retired backend test nodes from tests/conftest.py mandatory requirements, initialization imports, fixture definitions and exact skip allowances; remove Nanochat helpers from tests/integration/utils.py while retaining shared isolated_config_state and configure_environment.",
+        "Replace generic configuration/evaluator tests that use nanochat_core with active evaluator or dummy registered evaluator coverage. Archive the LeRobot-only config contract test. Preserve negative invalid-evaluator tests and generic persisted evaluation state coverage.",
+        "Update .github/workflows/pytorch_tests.yml Nanochat type-triage targets and relevant inventory/count artifacts. Leave unrelated submodule checkout enabled where still needed; no new blanket deselect/importorskip/allow_missing workaround.",
+        "Mandatory offline test layer on Python 3.13: instantiate tiny local Qwen3 config with a local tokenizer fixture, PEFT adapters, actual Plato collator/trainer/evaluator. Treat it explicitly as architecture/runtime coverage, not pretrained-model qualification.",
+        "Offline acceptance verifies finite loss and gradients, padding/causal labels, an actual optimizer update, frozen base params, adapter-only save/load, identical restored eval logits within tolerance, strict revision propagation and bad-pin failures. Add only tests protecting these behavior changes.",
+        "Two-client federated acceptance: start both clients from identical base and adapter state, train on deterministic disjoint examples with unequal reported sample counts (e.g. 2 and 3), snapshot payloads to avoid shared tensor aliasing, route actual fedavg_lora payloads through the production weighted aggregation/server path, compare every adapter tensor against (2*A + 3*B)/5, verify base unchanged, load global adapter and evaluate. Assert payload lacks base keys and the result differs from an unweighted mean when updates differ.",
+        "Real pretrained qualification is a separate explicit integration command/job with bounded resources and cached artifacts pinned by model SHA; download the real official checkpoint during authorized implementation, after pin/fixture design review. Run an actual tiny-batch update, evaluation and adapter save/reload using the same source/datasource/trainer path. Record resolved SHA, package versions, seed, dtype/device, trainable parameter count, before/after adapter hash, finite metrics, elapsed time and peak RSS.",
+        "Run real-weight qualification on Python 3.13, the active supported target. A selected Python 3.14 compatibility probe may run separately at root direction and must be reported with exact scope, not as full interpreter qualification. No new 3.14 CI matrix. Real-weight qualification fails on download/config/weight errors; no random model fallback or success-by-skip. Offline CI remains network-free, and separate qualification uses an explicit named command/marker or test directory so counts remain honest.",
+        "Reconcile old-to-new collection counts using a removal/addition ledger and reasoned identity changes. Retired tests are archived; remaining mandatory requirements and permitted DP omissions stay enforced."
+      ],
+      "acceptance": [
+        "Python 3.13 locked installs and mandatory/base suites pass with an explicit collection ledger and no retirement-specific skip allowances; any selected Python 3.14 probe is reported separately.",
+        "Offline tiny fixture is labeled honestly.",
+        "Real pretrained update + reload has evidence before claiming supported replacement.",
+        "Weighted two-client adapter result, frozen base, and global evaluation assertions pass."
+      ]
+    },
+    {
+      "id": "R4",
+      "owner": "Documentation/integration owner",
+      "tasks": [
+        "Replace active Nanochat/LeRobot installation/quickstart/case-study navigation with a new Qwen3 federated LoRA guide and short retirement notices; keep old runbooks under the archive.",
+        "Update docs/mkdocs.yml, docs/docs/index.md, docs/docs/quickstart.md, docs/docs/install.md, docs/docs/development.md, docs/docs/examples/Getting Started.md and case studies 1/3/5 as appropriate.",
+        "Remove obsolete supported Nanochat CORE/LeRobot/SmolVLA references from docs/docs/references/{evaluators,trainers}.md and docs/docs/configurations/{evaluation,server,overview,trainer,parameters}.md; retain generic evaluator contracts and Lighteval examples.",
+        "Archive docs/nanochat_integration_checklist.md and update docs/third_party.md with archive upstream provenance and the pinned Qwen3 Apache-2.0 model source. State model and dataset licenses separately.",
+        "Search all tracked active files and classify remaining retired-name references as migration notices, integrity checks, archive provenance or immutable historical evidence; do not globally replace historical reports.",
+        "Build docs, verify internal links, run appropriate import/style/type checks, archive containment checks, package/lock checks and focused regression suites; root owner integrates and writes PR description with explicit intentional compatibility removal and validation evidence."
+      ],
+      "acceptance": [
+        "No supported runbook tells users to install/use retired backends.",
+        "Old public doc links have a useful destination.",
+        "PR describes final behavior and reproducible validation without overstating training quality or Python compatibility."
+      ]
+    }
+  ],
+  "primary_sources": [
+    "https://huggingface.co/Qwen/Qwen3-0.6B-Base/tree/da87bfb608c14b7cf20ba1ce41287e8de496c0cd",
+    "https://huggingface.co/Qwen/Qwen3-0.6B-Base/blob/da87bfb608c14b7cf20ba1ce41287e8de496c0cd/README.md",
+    "https://huggingface.co/Qwen/Qwen3-0.6B-Base/blob/da87bfb608c14b7cf20ba1ce41287e8de496c0cd/config.json",
+    "https://huggingface.co/Qwen/Qwen3-0.6B-Base/blob/da87bfb608c14b7cf20ba1ce41287e8de496c0cd/LICENSE",
+    "https://huggingface.co/api/models/Qwen/Qwen3-0.6B-Base",
+    "https://huggingface.co/Qwen/Qwen3.5-0.8B/blob/2fc06364715b967f1860aea9cf38778875588b17/config.json",
+    "https://huggingface.co/HuggingFaceTB/SmolLM3-3B",
+    "https://huggingface.co/docs/peft/developer_guides/checkpoint",
+    "https://github.com/karpathy/nanochat/tree/c75fe54aa7c1fa881701c246f9427bcbe4eee5a4"
+  ],
+  "limitations": [
+    "Only model metadata/config/license were fetched. No pretrained model weights downloaded and no new execution validation performed.",
+    "Planned training constants are bounded starting values, not proven convergence/hardware guarantees.",
+    "Implementation must inspect the final Phase 2 delivered head again because CI and type-triage details are still changing."
+  ],
+  "coordination": {
+    "retirement_author": "Own R1 archive moves and removal proposals; coordinate root-controlled registries, conftest, package manifests/lock and documentation with serialized handoff.",
+    "hf_author": "Own R2 existing HF/LoRA runtime fixes, real numerical F09 and adapter tests, replacement config and bounded qualification; do not edit retiring modules.",
+    "root_integrator": "Serialize registry/conftest/pyproject/uv.lock changes, preserve Phase 2 delivery order, consolidate R3/R4 and fresh independent review, then publish/merge.",
+    "review": "Review this plan before coding shared interfaces; fresh independent review of final numerical behavior/archive closure and evidence before delivery. No further user confirmation implied."
+  }
+}

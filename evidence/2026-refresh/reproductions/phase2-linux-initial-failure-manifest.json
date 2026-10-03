@@ -1,0 +1,104 @@
+{
+  "run": 37129360804,
+  "status": "LINUX_QUALIFICATION_FAILED_REQUIRES_CI_CORRECTION_AND_RERUN",
+  "bundle": "phase2-linux-initial-failure.tar.gz",
+  "sha256": "df2fcbc703a794c3649aad8170920237992c067638c2ed3a919ba16fdcffe984",
+  "files": [
+    {
+      "path": "base-collection.log",
+      "bytes": 114532,
+      "sha256": "dbd36a020c5c28b3a638f04e59d7bd7336ad1b0427b578d7ad19d04007cd27c6"
+    },
+    {
+      "path": "base-packages.txt",
+      "bytes": 1927,
+      "sha256": "7f8e5cf120560cd100de0029a60a90b8dcf6e547f9c29c902cf4f9c50761dd97"
+    },
+    {
+      "path": "base.log",
+      "bytes": 9157,
+      "sha256": "71ae04c98e08e855c9c2bd00c0eca1bafccf1a4783c7aed5fa9066fe88f47f01"
+    },
+    {
+      "path": "base.xml",
+      "bytes": 192154,
+      "sha256": "db9faf54e1a6a03ffd66e9ef99b3381f1ed2241dc2a7306d0655c89828564872"
+    },
+    {
+      "path": "commit.txt",
+      "bytes": 41,
+      "sha256": "f2449a2a2b682c7cd8ceac37fcbf9f1eba5ffb71a023f4b57f1fa2ca5b71e41c"
+    },
+    {
+      "path": "lock.txt",
+      "bytes": 74,
+      "sha256": "af74bfc11c69ac76f73dcf31f5bdc51a4cb1b522b3ba212948b4bd828b3688b7"
+    },
+    {
+      "path": "mandatory-packages.txt",
+      "bytes": 2559,
+      "sha256": "a6560c7117d68f7c216fcf6ca11120e792e715a18f1792c2eb4fbf4e8ed5056f"
+    },
+    {
+      "path": "mandatory.log",
+      "bytes": 7662,
+      "sha256": "7a8d6eca3958211b82781c5b5e253eb1524020cb0c943660ed60767331f4d1cb"
+    },
+    {
+      "path": "missing-extra.log",
+      "bytes": 64,
+      "sha256": "faa6bbe6f535ed8dc7eff6f1f581fb33f9be69a0d20218c379ea0e6f6f88be74"
+    },
+    {
+      "path": "python.txt",
+      "bytes": 15,
+      "sha256": "322f765b04793d55160c8788550761630087e4847a77ed7a1090d79791f73c3b"
+    },
+    {
+      "path": "root/linux-ci-step-progress.json",
+      "bytes": 5750,
+      "sha256": "ce0513721c1b96cd887d4a5419d0ca5753d0123c2690ac26bcb7043ef480e6bf"
+    },
+    {
+      "path": "root/linux-initial-313-job.log",
+      "bytes": 69503,
+      "sha256": "a9810a00e24843793b180f1e629b8bae9f7e1531616c48befec2ba5c55b26a16"
+    },
+    {
+      "path": "root/linux-initial-314-job.log",
+      "bytes": 63152,
+      "sha256": "fa24bc10203cf234bea681190dc6d445951e2ab338005f7bc28397002f2d9d8b"
+    },
+    {
+      "path": "root/linux-initial-failure-audit.json",
+      "bytes": 4374,
+      "sha256": "fb5180571cbda0215c32eb418e26e97bdcb51f371035b53dbdc06aefd19a86a8"
+    },
+    {
+      "path": "root/linux-initial-failure-jobs.json",
+      "bytes": 6226,
+      "sha256": "a51c43fb80f50f34bb585d0a1d7ed8ad3533f4d6bc0f8f0462826a3597e4bb01"
+    },
+    {
+      "path": "root/linux-merge-source-equivalence.json",
+      "bytes": 406,
+      "sha256": "86e30307a498d8c1ea8c2e20f8a43e4522727f3ccccc10dc0f43d11e86228bb5"
+    },
+    {
+      "path": "root/published-source-equivalence.json",
+      "bytes": 495,
+      "sha256": "50786e0e73b47919edcb2a2e5acdfa83088c3856e424801951a349bbd604ad9d"
+    },
+    {
+      "path": "submodules.txt",
+      "bytes": 220,
+      "sha256": "e935eea9ba4a9421e2a96f609cf033e12c4725b820493d08489c8092a356ed8d"
+    },
+    {
+      "path": "uv.txt",
+      "bytes": 38,
+      "sha256": "dcccc14d410dab345544375b730933845d90c3222a4a8a0c08ed6c412ca336a4"
+    }
+  ],
+  "excluded": "Regenerable bulk base/mandatory test checkpoint fixtures; no runtime job executed; 3.14 artifact did not exist."
+}
