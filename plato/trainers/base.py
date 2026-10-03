@@ -7,6 +7,7 @@ from abc import ABC, abstractmethod
 from typing import Any, Optional
 
 from plato.config import Config
+from plato.utils.checkpoint_paths import checkpoint_name, checkpoint_path
 
 
 class Trainer(ABC):
@@ -53,11 +54,12 @@ class Trainer(ABC):
         if not os.path.exists(model_path):
             os.makedirs(model_path)
 
-        if filename is not None:
-            accuracy_path = f"{model_path}/{filename}"
-        else:
-            accuracy_path = f"{model_path}/{model_name}.acc"
+        accuracy_path = checkpoint_path(
+            model_path, filename if filename is not None
+            else checkpoint_name(model_name, suffix=".acc"),
+        )
 
+        os.makedirs(os.path.dirname(accuracy_path), exist_ok=True)
         with open(accuracy_path, "w", encoding="utf-8") as file:
             file.write(str(accuracy))
 
@@ -67,10 +69,10 @@ class Trainer(ABC):
         model_path = Config().params["model_path"]
         model_name = Config().trainer.model_name
 
-        if filename is not None:
-            accuracy_path = f"{model_path}/{filename}"
-        else:
-            accuracy_path = f"{model_path}/{model_name}.acc"
+        accuracy_path = checkpoint_path(
+            model_path, filename if filename is not None
+            else checkpoint_name(model_name, suffix=".acc"),
+        )
 
         with open(accuracy_path, encoding="utf-8") as file:
             accuracy = float(file.read())
@@ -82,16 +84,14 @@ class Trainer(ABC):
         if hasattr(Config().trainer, "max_concurrency"):
             model_name = Config().trainer.model_name
             model_path = Config().params["model_path"]
-            model_file = f"{model_path}/{model_name}_{self.client_id}_{Config().params['run_id']}.safetensors"
-            accuracy_file = f"{model_path}/{model_name}_{self.client_id}_{Config().params['run_id']}.acc"
-            evaluation_file = f"{model_path}/{model_name}_{self.client_id}_{Config().params['run_id']}.eval.pkl"
-
-            if os.path.exists(model_file):
-                os.remove(model_file)
-            if os.path.exists(accuracy_file):
-                os.remove(accuracy_file)
-            if os.path.exists(evaluation_file):
-                os.remove(evaluation_file)
+            worker_name = checkpoint_name(
+                model_name, self.client_id, Config().params["run_id"]
+            )
+            for suffix in (".safetensors", ".safetensors.pkl", ".acc", ".eval.pkl",
+                           ".train.pkl"):
+                path = checkpoint_path(model_path, worker_name + suffix)
+                if os.path.exists(path):
+                    os.remove(path)
 
     @abstractmethod
     def train(self, trainset, sampler, **kwargs) -> float:

@@ -25,6 +25,7 @@ import os
 import pickle
 import re
 import time
+import uuid
 from collections import OrderedDict
 from collections.abc import Callable
 from typing import Any, List, Optional, Union, cast
@@ -61,6 +62,7 @@ from plato.trainers.strategies.model_update import NoOpUpdateStrategy
 from plato.trainers.strategies.optimizer import DefaultOptimizerStrategy
 from plato.trainers.strategies.testing import DefaultTestingStrategy
 from plato.trainers.strategies.training_step import DefaultTrainingStepStrategy
+from plato.utils.checkpoint_paths import checkpoint_name, checkpoint_path
 
 
 class ComposableTrainer(base.Trainer):
@@ -188,11 +190,11 @@ class ComposableTrainer(base.Trainer):
 
     def _test_accuracy_filename(self, run_id: str) -> str:
         model_name = Config().trainer.model_name
-        return f"{model_name}_{self.client_id}_{run_id}.acc"
+        return checkpoint_name(model_name, self.client_id, run_id, suffix=".acc")
 
     def _test_state_filename(self, run_id: str) -> str:
         model_name = Config().trainer.model_name
-        return f"{model_name}_{self.client_id}_{run_id}.eval.pkl"
+        return checkpoint_name(model_name, self.client_id, run_id, suffix=".eval.pkl")
 
     def _save_test_state(self, filename: str) -> None:
         """Persist evaluation-related context state from a test subprocess."""
@@ -206,7 +208,7 @@ class ComposableTrainer(base.Trainer):
             for key in self._persisted_test_state_keys()
             if key in state
         }
-        with open(f"{model_path}/{filename}", "wb") as state_file:
+        with open(checkpoint_path(model_path, filename), "wb") as state_file:
             pickle.dump(payload, state_file)
 
     def _load_test_state(self, filename: str) -> None:
@@ -219,7 +221,7 @@ class ComposableTrainer(base.Trainer):
         for key in self._persisted_test_state_keys():
             state.pop(key, None)
 
-        state_path = f"{model_path}/{filename}"
+        state_path = checkpoint_path(model_path, filename)
         if not os.path.exists(state_path):
             return
 
@@ -266,8 +268,17 @@ class ComposableTrainer(base.Trainer):
 
     def set_client_id(self, client_id):
         """Set client ID for both trainer and context."""
+        previous_id = self.client_id
         super().set_client_id(client_id)
         self.context.client_id = client_id
+        if previous_id != client_id:
+            for strategy in (
+                self.model_update_strategy, self.loss_strategy,
+                self.optimizer_strategy, self.training_step_strategy,
+                self.lr_scheduler_strategy, self.testing_strategy,
+                self.data_loader_strategy,
+            ):
+                strategy.on_client_id_changed(self.context)
 
     def zeros(self, shape):
         """Returns a PyTorch zero tensor with the given shape."""
@@ -285,10 +296,12 @@ class ComposableTrainer(base.Trainer):
         except FileExistsError:
             pass
 
-        if filename is not None:
-            model_path = f"{model_path}/{filename}"
-        else:
-            model_path = f"{model_path}/{model_name}.safetensors"
+        model_path = checkpoint_path(
+            model_path,
+            filename if filename is not None else checkpoint_name(
+                model_name, suffix=".safetensors"
+            ),
+        )
 
         model = self._require_model()
         state_dict = (
@@ -305,6 +318,7 @@ class ComposableTrainer(base.Trainer):
             )
 
         serialized = serialize_tree(state_dict)
+        os.makedirs(os.path.dirname(model_path), exist_ok=True)
         with open(model_path, "wb") as model_file:
             model_file.write(serialized)
 
@@ -321,10 +335,12 @@ class ComposableTrainer(base.Trainer):
         model_path = Config().params["model_path"] if location is None else location
         model_name = Config().trainer.model_name
 
-        if filename is not None:
-            model_path = f"{model_path}/{filename}"
-        else:
-            model_path = f"{model_path}/{model_name}.safetensors"
+        model_path = checkpoint_path(
+            model_path,
+            filename if filename is not None else checkpoint_name(
+                model_name, suffix=".safetensors"
+            ),
+        )
 
         if not model_path.endswith(".safetensors"):
             raise ValueError(
@@ -384,15 +400,51 @@ class ComposableTrainer(base.Trainer):
 
     def train_process(self, config, trainset, sampler, **kwargs):
         """The training process in a federated learning workload."""
-        self.train_model(config, trainset, sampler, **kwargs)
+        try:
+            self.train_model(config, trainset, sampler, **kwargs)
+            model_name = Config().trainer.model_name
+            filename = checkpoint_name(
+                model_name, self.client_id, config["run_id"], suffix=".safetensors"
+            )
+            self.save_model(filename)
+            token = config.get("worker_state_token")
+            if token is not None and self.model_update_strategy.requires_worker_state:
+                state = {
+                    "token": token, "client_id": self.client_id,
+                    "state": self.model_update_strategy.get_worker_state(self.context),
+                }
+                with open(self._training_state_path(config["run_id"]), "wb") as state_file:
+                    pickle.dump(state, state_file)
+        except BaseException:
+            self.model_update_strategy.on_train_cleanup(self.context, successful=False)
+            raise
 
-        model_name = Config().trainer.model_name
-        filename = f"{model_name}_{self.client_id}_{config['run_id']}.safetensors"
-        self.save_model(filename)
+    def _training_state_path(self, run_id):
+        return checkpoint_path(
+            Config().params["model_path"],
+            checkpoint_name(Config().trainer.model_name, self.client_id, run_id,
+                            suffix=".train.pkl"),
+        )
 
     def train_model(self, config, trainset, sampler, **kwargs):
+        """Run local training and always release transient step state."""
+        self.context.config = config
+        self.context.current_round = self.current_round
+        self.context.state.pop("optimizer", None)
+        successful = False
+        try:
+            self.training_step_strategy.on_train_start(self.context)
+            result = self._train_model(config, trainset, sampler, **kwargs)
+            successful = True
+            return result
+        finally:
+            self.training_step_strategy.on_train_end(self.context)
+            self.model_update_strategy.on_train_cleanup(self.context, successful)
+            self.context.state.pop("complete_optimizer_step", None)
+            self.context.state.pop("optimizer_step_hooks_handled", None)
+
+    def _train_model(self, config, trainset, sampler, **kwargs):
         """The main training loop using strategies."""
-        batch_size = config["batch_size"]
         self.trainset = trainset
         self.sampler = sampler
         self.context.config = config
@@ -445,14 +497,24 @@ class ComposableTrainer(base.Trainer):
 
         # Strategy hook: on_train_start
         self.model_update_strategy.on_train_start(self.context)
+        self.loss_strategy.on_train_start(self.context)
 
         # Create data loader using strategy
+        batch_size = config["batch_size"]
         self.train_loader = self.data_loader_strategy.create_train_loader(
             trainset, sampler, batch_size, self.context
         )
 
         # Store train_loader in context for potential use by strategies
         self.context.state["train_loader"] = self.train_loader
+        try:
+            self.context.state["optimizer_updates_per_epoch"] = (
+                self.training_step_strategy.optimizer_steps_per_epoch(
+                    len(self.train_loader)
+                )
+            )
+        except TypeError:
+            self.context.state.pop("optimizer_updates_per_epoch", None)
         sampled_size = 0
         if sampler is not None and hasattr(sampler, "num_samples"):
             try:
@@ -479,6 +541,7 @@ class ComposableTrainer(base.Trainer):
         # Create optimizer using strategy
         model = self._require_model()
         self.optimizer = self.optimizer_strategy.create_optimizer(model, self.context)
+        self.context.state["optimizer"] = self.optimizer
 
         # Create LR scheduler using strategy
         self.lr_scheduler = self.lr_scheduler_strategy.create_scheduler(
@@ -541,14 +604,36 @@ class ComposableTrainer(base.Trainer):
                     )
 
                 # Perform training step using strategy
-                loss = self.training_step_strategy.training_step(
-                    model=model,
-                    optimizer=self.optimizer,
-                    examples=examples,
-                    labels=labels,
-                    loss_criterion=compute_loss,
-                    context=self.context,
-                )
+                self.context.state.pop("optimizer_step_completed", None)
+                self.context.state.pop("optimizer_step_hooks_handled", None)
+
+                def complete_optimizer_step(step_loss):
+                    # Dispatch at each actual update so schedulers can affect
+                    # the next update of a multi-update training strategy.
+                    self.context.state["optimizer_step_completed"] = True
+                    self.context.state["optimizer_step_hooks_handled"] = True
+                    self.context.state["last_loss"] = step_loss.item()
+                    current_optimizer = self.optimizer
+                    if current_optimizer is None:
+                        raise RuntimeError("Optimizer is missing after a training update.")
+                    self.optimizer_strategy.on_optimizer_step(current_optimizer, self.context)
+                    self.model_update_strategy.after_step(self.context)
+                    self.callback_handler.call_event(
+                        "on_train_step_end", self, config, batch=batch_id, loss=step_loss
+                    )
+
+                self.context.state["complete_optimizer_step"] = complete_optimizer_step
+                try:
+                    loss = self.training_step_strategy.training_step(
+                        model=model,
+                        optimizer=self.optimizer,
+                        examples=examples,
+                        labels=labels,
+                        loss_criterion=compute_loss,
+                        context=self.context,
+                    )
+                finally:
+                    self.context.state.pop("complete_optimizer_step", None)
 
                 # Track loss
                 self._loss_tracker.update(loss, labels.size(0))
@@ -560,19 +645,10 @@ class ComposableTrainer(base.Trainer):
                 )
 
                 if optimizer_step_done:
-                    # Strategy hook: after optimizer step
-                    self.optimizer_strategy.on_optimizer_step(
-                        self.optimizer, self.context
-                    )
-
-                    # Strategy hook: after_step
-                    self.model_update_strategy.after_step(self.context)
-
-                    # Callbacks: step end
-                    self.callback_handler.call_event(
-                        "on_train_step_end", self, config, batch=batch_id, loss=loss
-                    )
+                    if not self.context.state.pop("optimizer_step_hooks_handled", False):
+                        complete_optimizer_step(loss)
                     self.context.state.pop("optimizer_step_completed", None)
+                    self.context.state.pop("optimizer_step_hooks_handled", None)
 
                     control_actions = {}
                     if hasattr(self, "_consume_control_flags"):
@@ -721,6 +797,11 @@ class ComposableTrainer(base.Trainer):
 
         if "max_concurrency" in config:
             tic = time.perf_counter()
+            self.model_update_strategy.on_train_cleanup(self.context, successful=False)
+            config["worker_state_token"] = uuid.uuid4().hex
+            state_path = self._training_state_path(config["run_id"])
+            if self.model_update_strategy.requires_worker_state and os.path.exists(state_path):
+                os.remove(state_path)
 
             if mp.get_start_method(allow_none=True) != "spawn":
                 mp.set_start_method("spawn", force=True)
@@ -748,12 +829,28 @@ class ComposableTrainer(base.Trainer):
 
             model_name = Config().trainer.model_name
             filename = (
-                f"{model_name}_{self.client_id}_{Config().params['run_id']}.safetensors"
+                checkpoint_name(
+                    model_name, self.client_id, Config().params["run_id"],
+                    suffix=".safetensors",
+                )
             )
 
             try:
+                worker_state = None
+                if self.model_update_strategy.requires_worker_state:
+                    with open(state_path, "rb") as state_file:
+                        worker_state = pickle.load(state_file)
+                    if (not isinstance(worker_state, dict)
+                            or worker_state.get("token") != config["worker_state_token"]
+                            or worker_state.get("client_id") != self.client_id):
+                        raise ValueError("Training worker returned stale or mismatched strategy state.")
                 self.load_model(filename)
+                if worker_state is not None:
+                    self.model_update_strategy.load_worker_state(
+                        worker_state.get("state"), self.context
+                    )
             except OSError as error:
+                self.model_update_strategy.on_train_cleanup(self.context, successful=False)
                 logging.error(
                     "[Client #%d] Failed to load model from %s: %s",
                     self.client_id,
@@ -764,6 +861,7 @@ class ComposableTrainer(base.Trainer):
                     f"Training on client {self.client_id} failed."
                 ) from error
             except Exception as error:
+                self.model_update_strategy.on_train_cleanup(self.context, successful=False)
                 logging.error(
                     "[Client #%d] Unexpected error loading model: %s",
                     self.client_id,
@@ -907,12 +1005,11 @@ class ComposableTrainer(base.Trainer):
 
     def obtain_model_at_time(self, client_id, requested_time):
         """
-        Obtain a saved model for a particular epoch that finishes just after
-        the provided wall clock time is reached.
+        Obtain the latest snapshot completed strictly before the requested time.
 
         This method is used for asynchronous training with wall-clock simulation.
         It searches through saved model checkpoints and returns the model from
-        the latest epoch that finished before the requested time.
+        the latest completion time strictly below the cutoff (epoch breaks ties).
 
         Subclasses can override this method to provide custom model retrieval logic
         (e.g., loading models with specific architectures or configurations).
@@ -927,52 +1024,32 @@ class ComposableTrainer(base.Trainer):
         Raises:
             ValueError: If no model checkpoint matches the wall-clock time provided
         """
-        # Constructing a list of epochs and training times
-        models_per_epoch = {}
-
-        for filename in os.listdir(Config().params["model_path"]):
-            split = re.match(
-                r"(?P<client_id>\d+)_(?P<epoch>\d+)_(?P<training_time>\d+.\d+).safetensors$",
-                filename,
-            )
-
-            if split is not None:
-                epoch = split.group("epoch")
-                training_time = split.group("training_time")
-                if client_id == int(split.group("client_id")):
-                    models_per_epoch[epoch] = {
-                        "training_time": float(training_time),
-                        "model_checkpoint": filename,
-                    }
-
-        # Locate the model at a specific wall clock time
-        for epoch in sorted(models_per_epoch, reverse=True):
-            model_training_time = models_per_epoch[epoch]["training_time"]
-            model_checkpoint = models_per_epoch[epoch]["model_checkpoint"]
-
-            if model_training_time < requested_time:
-                model_path = f"{Config().params['model_path']}/{model_checkpoint}"
-
-                pretrained = None
-                if torch.cuda.is_available():
-                    pretrained = torch.load(model_path)
-                else:
-                    pretrained = torch.load(
-                        model_path, map_location=torch.device("cpu")
-                    )
-
-                model = models_registry.get()
-                model.load_state_dict(pretrained, strict=True)
-
-                logging.info(
-                    "[Client #%s] Responding to the server with the model after "
-                    "epoch %s finished, at time %s.",
-                    client_id,
-                    epoch,
-                    model_training_time,
+        root = Config().params["model_path"]
+        candidates = []
+        if os.path.isdir(root):
+            for filename in os.listdir(root):
+                match = re.fullmatch(
+                    r"(?P<client>\d+)_(?P<epoch>\d+)_"
+                    r"(?P<time>\d+(?:\.\d+)?(?:[eE][+-]?\d+)?)\.safetensors",
+                    filename,
                 )
-
-                return model
+                if match is None or int(match["client"]) != client_id:
+                    continue
+                finished = float(match["time"])
+                if finished < requested_time:
+                    candidates.append((finished, int(match["epoch"]), filename))
+        if candidates:
+            finished, epoch, filename = max(candidates)
+            with open(checkpoint_path(root, filename), "rb") as checkpoint:
+                pretrained = deserialize_tree(checkpoint.read())
+            # Preserve injected architecture and current model/device/mode.
+            model = copy.deepcopy(self._require_model())
+            model.load_state_dict(pretrained, strict=True)
+            logging.info(
+                "[Client #%s] Responding with epoch %s, finished at time %s.",
+                client_id, epoch, finished,
+            )
+            return model
 
         raise ValueError(
             f"[Client #{client_id}] Cannot find an epoch that matches the wall-clock time provided."

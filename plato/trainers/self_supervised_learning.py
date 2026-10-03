@@ -134,7 +134,8 @@ class SSLDataLoaderStrategy(DataLoaderStrategy):
         # Personalization phase: use simple data loader
         if current_round > Config().trainer.rounds:
             dataset = (
-                self.personalized_trainset if self.personalized_trainset else trainset
+                self.personalized_trainset
+                if self.personalized_trainset is not None else trainset
             )
             return torch.utils.data.DataLoader(
                 dataset=dataset,
@@ -469,7 +470,7 @@ class SSLTestingStrategy(TestingStrategy):
                 total += labels.size(0)
                 correct += (predicted == labels).sum().item()
 
-        accuracy = correct / total
+        accuracy = correct / total if total else 0.0
         return accuracy
 
     def _test_with_knn(self, model, testset, sampler, batch_size, context):
@@ -486,7 +487,6 @@ class SSLTestingStrategy(TestingStrategy):
             dataset=self.personalized_trainset,
             shuffle=False,
             batch_size=batch_size,
-            sampler=sampler_obj,
         )
         test_loader = torch.utils.data.DataLoader(
             testset, batch_size=batch_size, shuffle=False, sampler=sampler_obj
@@ -499,6 +499,10 @@ class SSLTestingStrategy(TestingStrategy):
         test_encodings, test_labels = self._collect_encodings(
             model, test_loader, context
         )
+        if test_labels is None:
+            return 0.0
+        if train_labels is None:
+            raise ValueError("KNN requires a nonempty reference dataset")
 
         # Build KNN and perform prediction
         distances = torch.cdist(test_encodings, train_encodings, p=2)
@@ -583,6 +587,8 @@ class Trainer(BasicTrainer):
         # Initialize model first if needed to access encoder
         if model is None:
             temp_model = models_registry.get()
+        elif isinstance(model, torch.nn.Module):
+            temp_model = model
         elif callable(model):
             temp_model = model()
         else:

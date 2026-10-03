@@ -9,6 +9,7 @@ from collections import OrderedDict
 from plato.algorithms import fedavg
 from plato.config import Config
 from plato.serialization.safetensor import deserialize_tree, serialize_tree
+from plato.utils.checkpoint_paths import checkpoint_name, checkpoint_path
 
 
 class Algorithm(fedavg.Algorithm):
@@ -27,8 +28,10 @@ class Algorithm(fedavg.Algorithm):
             # Get the filename of the previous saved local layer
             model_path = Config().params["model_path"]
             model_name = Config().trainer.model_name
-            filename = (
-                f"{model_path}/{model_name}_{self.client_id}_local_layers.safetensors"
+            filename = checkpoint_path(
+                model_path, checkpoint_name(
+                    model_name, self.client_id, "local_layers", suffix=".safetensors"
+                )
             )
 
             # Load local layers to the weights when the file exists

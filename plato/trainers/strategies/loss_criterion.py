@@ -306,6 +306,16 @@ class CompositeLossStrategy(LossCriterionStrategy):
         for strategy, _ in self.strategies:
             strategy.setup(context)
 
+    def on_train_start(self, context: TrainingContext) -> None:
+        """Refresh each component's received-model snapshot for this run."""
+        for strategy, _ in self.strategies:
+            strategy.on_train_start(context)
+
+    def on_client_id_changed(self, context: TrainingContext) -> None:
+        """Propagate logical-client ownership to each component."""
+        for strategy, _ in self.strategies:
+            strategy.on_client_id_changed(context)
+
     def compute_loss(
         self, outputs: torch.Tensor, labels: torch.Tensor, context: TrainingContext
     ) -> torch.Tensor:

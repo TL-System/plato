@@ -8,6 +8,7 @@ https://pytorch.org/tutorials/beginner/dcgan_faces_tutorial.html
 import logging
 import math
 import os
+import pickle
 from collections.abc import Callable
 from typing import Optional, cast
 
@@ -28,6 +29,7 @@ from plato.trainers.strategies.base import (
     TrainingContext,
     TrainingStepStrategy,
 )
+from plato.utils.checkpoint_paths import checkpoint_name, checkpoint_path
 
 
 class GANOptimizerStrategy(OptimizerStrategy):
@@ -453,6 +455,10 @@ class Trainer(ComposableTrainer):
             filename: Optional filename (without path)
             location: Optional directory path
         """
+        # Worker and urgent snapshots share the ordinary tree reader contract.
+        # Historical default/explicit .pth pairs retain their existing format.
+        if filename is not None and filename.endswith(".safetensors"):
+            return super().save_model(filename, location)
         model_path = Config().params["model_path"] if location is None else location
         model_name = Config().trainer.model_name
 
@@ -463,14 +469,25 @@ class Trainer(ComposableTrainer):
             pass
 
         if filename is not None:
-            net_gen_path = f"{model_path}/Generator_{filename}"
-            net_disc_path = f"{model_path}/Discriminator_{filename}"
+            net_gen_path = checkpoint_path(model_path, f"Generator_{filename}")
+            net_disc_path = checkpoint_path(model_path, f"Discriminator_{filename}")
         else:
-            net_gen_path = f"{model_path}/Generator_{model_name}.pth"
-            net_disc_path = f"{model_path}/Discriminator_{model_name}.pth"
+            net_gen_path = checkpoint_path(
+                model_path, checkpoint_name("Generator", model_name, suffix=".pth")
+            )
+            net_disc_path = checkpoint_path(
+                model_path, checkpoint_name("Discriminator", model_name, suffix=".pth")
+            )
 
+        os.makedirs(os.path.dirname(net_gen_path), exist_ok=True)
+        os.makedirs(os.path.dirname(net_disc_path), exist_ok=True)
         torch.save(self.generator.state_dict(), net_gen_path)
         torch.save(self.discriminator.state_dict(), net_disc_path)
+        history_name = filename if filename is not None else checkpoint_name(model_name, suffix=".pth")
+        history_path = checkpoint_path(model_path, history_name + ".pkl")
+        os.makedirs(os.path.dirname(history_path), exist_ok=True)
+        with open(history_path, "wb") as history_file:
+            pickle.dump(self.run_history, history_file)
 
         if self.client_id == 0:
             logging.info(
@@ -503,13 +520,20 @@ class Trainer(ComposableTrainer):
         """
         model_path = Config().params["model_path"] if location is None else location
         model_name = Config().trainer.model_name
+        if (filename is not None and filename.endswith(".safetensors")
+                and os.path.isfile(checkpoint_path(model_path, filename))):
+            return super().load_model(filename, location)
 
         if filename is not None:
-            net_gen_path = f"{model_path}/Generator_{filename}"
-            net_disc_path = f"{model_path}/Discriminator_{filename}"
+            net_gen_path = checkpoint_path(model_path, f"Generator_{filename}")
+            net_disc_path = checkpoint_path(model_path, f"Discriminator_{filename}")
         else:
-            net_gen_path = f"{model_path}/Generator_{model_name}.pth"
-            net_disc_path = f"{model_path}/Discriminator_{model_name}.pth"
+            net_gen_path = checkpoint_path(
+                model_path, checkpoint_name("Generator", model_name, suffix=".pth")
+            )
+            net_disc_path = checkpoint_path(
+                model_path, checkpoint_name("Discriminator", model_name, suffix=".pth")
+            )
 
         if self.client_id == 0:
             logging.info(
@@ -534,7 +558,32 @@ class Trainer(ComposableTrainer):
                 net_disc_path,
             )
 
-        self.generator.load_state_dict(torch.load(net_gen_path, weights_only=False))
-        self.discriminator.load_state_dict(
-            torch.load(net_disc_path, weights_only=False)
-        )
+        # GAN checkpoints historically contain torch.save data, including
+        # worker files whose supplied name ends in .safetensors. File handles
+        # avoid torch.load's suffix-based Safetensors dispatch for these files.
+        with open(net_gen_path, "rb") as generator_file:
+            generator_state = torch.load(
+                generator_file, map_location="cpu", weights_only=True
+            )
+        with open(net_disc_path, "rb") as discriminator_file:
+            discriminator_state = torch.load(
+                discriminator_file, map_location="cpu", weights_only=True
+            )
+        self.generator.load_state_dict(generator_state)
+        self.discriminator.load_state_dict(discriminator_state)
+        history_name = filename if filename is not None else checkpoint_name(model_name, suffix=".pth")
+        history_path = checkpoint_path(model_path, history_name + ".pkl")
+        if os.path.isfile(history_path):
+            with open(history_path, "rb") as history_file:
+                self.run_history = pickle.load(history_file)
+
+    def pause_training(self):
+        """Remove this worker's ordinary artifacts and any historical GAN pair."""
+        super().pause_training()
+        if hasattr(Config().trainer, "max_concurrency"):
+            worker = checkpoint_name(Config().trainer.model_name, self.client_id,
+                                     Config().params["run_id"], suffix=".safetensors")
+            for prefix in ("Generator", "Discriminator"):
+                path = checkpoint_path(Config().params["model_path"], f"{prefix}_{worker}")
+                if os.path.isfile(path):
+                    os.remove(path)

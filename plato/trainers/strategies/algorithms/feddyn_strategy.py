@@ -43,6 +43,7 @@ from plato.trainers.strategies.base import (
     ModelUpdateStrategy,
     TrainingContext,
 )
+from plato.utils.checkpoint_paths import checkpoint_name, checkpoint_path
 
 
 class FedDynLossStrategy(LossCriterionStrategy):
@@ -57,8 +58,12 @@ class FedDynLossStrategy(LossCriterionStrategy):
     The cumulative gradient vector grad_vector is maintained across rounds:
         grad_vector += (w_trained - w_global) after each training round
 
-    Mathematical formulation (from paper):
+    Preserved legacy formulation:
         loss = task_loss + α * <w, -w_global + grad_vector> + (α/2)||w - w_global||^2
+
+    The shifted quadratic differs from the authors' implementation, which uses
+    an unshifted quadratic with this linear term. Equation modernization needs
+    a separate design disposition; state lifecycle fixes preserve this objective.
 
     Args:
         alpha: Regularization coefficient (default: 0.01).
@@ -166,13 +171,22 @@ class FedDynLossStrategy(LossCriterionStrategy):
             }
             context.state["feddyn_cumulative_grad"] = self.cumulative_grad_vector
 
+    def on_train_start(self, context: TrainingContext) -> None:
+        """Use the update strategy's state for the current client and round."""
+        self.global_model_weights = context.state.get("feddyn_global_weights")
+        self.cumulative_grad_vector = context.state.get("feddyn_cumulative_grad")
+
+    def on_client_id_changed(self, context: TrainingContext) -> None:
+        self.global_model_weights = None
+        self.cumulative_grad_vector = None
+
     def compute_loss(
         self, outputs: torch.Tensor, labels: torch.Tensor, context: TrainingContext
     ) -> torch.Tensor:
         """
         Compute FedDyn loss with cumulative dynamic regularization.
 
-        The total loss is (following the original paper and GitHub implementation):
+        The preserved total loss is:
             loss = task_loss + α * <w, -w_global + grad_vector> + (α/2)||w - w_global||^2
 
         where grad_vector is the cumulative sum of (w_trained - w_global) across rounds.
@@ -339,7 +353,17 @@ class FedDynUpdateStrategy(ModelUpdateStrategy):
             base_path = Config().params["model_path"]
 
         # Path for saving cumulative gradient vector
-        self.grad_vector_path = f"{base_path}_feddyn_grad_{context.client_id}.pth"
+        self.grad_vector_path = checkpoint_path(
+            base_path, checkpoint_name("feddyn_grad", context.client_id, suffix=".pth")
+        )
+        os.makedirs(base_path, exist_ok=True)
+
+    def on_client_id_changed(self, context: TrainingContext) -> None:
+        self.global_model_weights = None
+        self.cumulative_grad_vector = None
+        context.state.pop("feddyn_global_weights", None)
+        context.state.pop("feddyn_cumulative_grad", None)
+        self.setup(context)
 
     def on_train_start(self, context: TrainingContext) -> None:
         """
@@ -364,11 +388,17 @@ class FedDynUpdateStrategy(ModelUpdateStrategy):
         grad_vector_path = self.grad_vector_path
         if grad_vector_path is None:
             raise RuntimeError("FedDyn gradient vector path has not been initialised.")
+        if not os.path.exists(grad_vector_path) and context.client_id != 0:
+            root = self.save_path if self.save_path is not None else Config().params["model_path"]
+            legacy_path = f"{root}feddyn_grad_{context.client_id}.pth"
+            # Exact same-client read-only migration; new writes stay contained.
+            if os.path.isfile(legacy_path):
+                grad_vector_path = legacy_path
 
         if os.path.exists(grad_vector_path):
             try:
                 self.cumulative_grad_vector = torch.load(
-                    grad_vector_path, map_location=torch.device("cpu")
+                    grad_vector_path, map_location=torch.device("cpu"), weights_only=True
                 )
                 logging.info(
                     "[Client #%d] Loaded FedDyn cumulative gradient vector from: %s",
@@ -455,6 +485,22 @@ class FedDynUpdateStrategy(ModelUpdateStrategy):
 
         # Update state in context for next potential use
         context.state["feddyn_cumulative_grad"] = cumulative_grad_vector
+
+    @property
+    def requires_worker_state(self) -> bool:
+        return True
+
+    def get_worker_state(self, context: TrainingContext) -> dict[str, Any]:
+        return copy.deepcopy({"cumulative_grad": self.cumulative_grad_vector,
+                              "global_weights": self.global_model_weights})
+
+    def load_worker_state(self, state: Any, context: TrainingContext) -> None:
+        if not isinstance(state, dict) or not isinstance(state.get("cumulative_grad"), dict):
+            raise ValueError("FedDyn worker cumulative gradient state is missing.")
+        self.cumulative_grad_vector = copy.deepcopy(state["cumulative_grad"])
+        self.global_model_weights = copy.deepcopy(state["global_weights"])
+        context.state["feddyn_cumulative_grad"] = self.cumulative_grad_vector
+        context.state["feddyn_global_weights"] = self.global_model_weights
 
     def get_update_payload(self, context: TrainingContext) -> dict[str, Any]:
         """

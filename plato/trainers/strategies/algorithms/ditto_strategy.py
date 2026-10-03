@@ -42,6 +42,7 @@ from plato.config import Config
 from plato.models import registry as models_registry
 from plato.trainers import tracking
 from plato.trainers.strategies.base import ModelUpdateStrategy, TrainingContext
+from plato.utils.checkpoint_paths import checkpoint_name, checkpoint_path
 
 
 class DittoUpdateStrategy(ModelUpdateStrategy):
@@ -149,9 +150,16 @@ class DittoUpdateStrategy(ModelUpdateStrategy):
             else "model"
         )
 
-        self.personalized_model_path = (
-            f"{base_path}/{model_name}_{context.client_id}_v_net.pth"
+        self.personalized_model_path = checkpoint_path(
+            base_path, checkpoint_name(model_name, context.client_id, "v_net", suffix=".pth")
         )
+        os.makedirs(base_path, exist_ok=True)
+
+    def on_client_id_changed(self, context: TrainingContext) -> None:
+        self.initial_global_weights = None
+        context.state.pop("ditto_initial_global_weights", None)
+        context.state.pop("ditto_personalized_model", None)
+        self.setup(context)
 
     def on_train_start(self, context: TrainingContext) -> None:
         """
@@ -182,6 +190,7 @@ class DittoUpdateStrategy(ModelUpdateStrategy):
                     torch.load(
                         personalized_model_path,
                         map_location=torch.device("cpu"),
+                        weights_only=True,
                     )
                 )
                 logging.info(
@@ -345,6 +354,23 @@ class DittoUpdateStrategy(ModelUpdateStrategy):
             if model is None:
                 raise ValueError("Training context must provide a model for Ditto.")
             model.load_state_dict(personalized_model.state_dict())
+
+    @property
+    def requires_worker_state(self) -> bool:
+        return True
+
+    def get_worker_state(self, context: TrainingContext) -> dict[str, Any]:
+        if self.personalized_model is None:
+            raise RuntimeError("Ditto worker has no personalized model.")
+        return copy.deepcopy({"model": self.personalized_model.state_dict(),
+                              "initial_global_weights": self.initial_global_weights})
+
+    def load_worker_state(self, state: Any, context: TrainingContext) -> None:
+        if not isinstance(state, dict) or self.personalized_model is None:
+            raise ValueError("Ditto worker personalized state is missing.")
+        self.personalized_model.load_state_dict(state["model"], strict=True)
+        self.initial_global_weights = copy.deepcopy(state["initial_global_weights"])
+        context.state["ditto_personalized_model"] = self.personalized_model
 
     def get_update_payload(self, context: TrainingContext) -> dict[str, Any]:
         """
