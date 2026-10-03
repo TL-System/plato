@@ -38,8 +38,15 @@ EXPECTED_RECORDS = (
     "coverage.json",
     "runtime.log",
     "runtime.xml",
+    "model-search-packages.txt",
+    "model-search-prerequisites.log",
+    "model-search-collection.log",
+    "model-search.log",
+    "model-search.xml",
+    "model-search-acceptance.json",
     "ruff.log",
     "ty.log",
+    "ty-stager.log",
 )
 
 
