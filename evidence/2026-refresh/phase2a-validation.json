@@ -2,7 +2,7 @@
   "schema_version": 1,
   "task": "2A: configuration, active non-adapter datasources and samplers",
   "date": "2026-10-02",
-  "status": "Implementation and scoped validation complete; independent root review pending.",
+  "status": "All four independent review findings and both additional root findings corrected and green; fresh exact-candidate review and root integration pending.",
   "identity": {
     "worktree": "/private/tmp/plato-refresh-worktrees/data",
     "branch": "maintenance/2026-phase2-data",
@@ -19,14 +19,30 @@
       {
         "sha": "53a60a7514b71e8098fe8c0f335547725d1e269e",
         "subject": "Corrected EMNIST training and evaluation split selection."
+      },
+      {
+        "sha": "ee3d9ccd5467276f4f8abc257769461b467dfced",
+        "subject": "Restored assigned cross-silo edge evaluation sampler IDs."
+      },
+      {
+        "sha": "f2c77a071b67cef9b2ee954f94d565c4eddaf0d9",
+        "subject": "Repaired datasource cache publication and evaluation recovery."
       }
     ],
-    "final_implementation_commit": "53a60a7514b71e8098fe8c0f335547725d1e269e",
-    "final_implementation_tree": "3b85e0835066742ba0c145d8657708a8064b7721",
-    "baseline_to_final_binary_diff_sha256": "7a85d21a4c6dd9a106f5c4c3b228d68b0789513b18199bf24e3c664428c1cbd1",
-    "evidence_commit_contract": "This JSON is committed in an evidence-only child of final_implementation_commit. Its containing commit cannot embed its own SHA; the exact terminal commit is supplied in the final root handoff. All runtime/test/archive content and recorded validation identify the exact implementation commit above.",
+    "final_implementation_commit": "f2c77a071b67cef9b2ee954f94d565c4eddaf0d9",
+    "final_implementation_tree": "7a907bed864c19753e09d6fcee52c77e4325103e",
+    "baseline_to_final_binary_diff_sha256": "b2f08f01e8aacdd61f4b2b129e49a372ce2e0cf86476cf406a53043f24632e89",
+    "evidence_commit_contract": "Exact previous evidence commit is a7bfd3dcdf7aaf3ec3ca466a1b5f27efa58054eb. This revised JSON is committed in an evidence-only child of f2c77a071b67cef9b2ee954f94d565c4eddaf0d9. The containing child cannot embed its own hash; its exact terminal SHA is supplied in the final root handoff. All validated runtime/test/archive content identifies the exact final implementation parent above.",
     "tracked_tree_before_evidence": "clean",
-    "shared_metadata": "pyproject.toml, uv.lock, CI and shared conftest unchanged; no push, merge, PR edit, submodule update or other worktree/environment mutation."
+    "shared_metadata": "pyproject.toml, uv.lock, CI and shared conftest unchanged; no push, merge, PR edit, submodule update or other worktree/environment mutation.",
+    "previous_candidate": {
+      "commit": "a7bfd3dcdf7aaf3ec3ca466a1b5f27efa58054eb",
+      "implementation": "53a60a7514b71e8098fe8c0f335547725d1e269e",
+      "evidence_commit": "a7bfd3dcdf7aaf3ec3ca466a1b5f27efa58054eb",
+      "evidence_file_sha256": "b3b83408a9bca12209cc4ead3b936b078e0cb1d7dd71f6cd47fd8c828e5fa628",
+      "verdict": "CHANGES_REQUESTED; immutable independent review remains unchanged."
+    },
+    "previous_candidate_to_final_binary_diff_sha256": "8964d0bd84b9c9dc4dd827a32f1adf2aba7e7e2807ea4a1dd57ccf29791f9b7a"
   },
   "environment": {
     "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
@@ -127,6 +143,10 @@
         "archive-preservation.json",
         "refer-probe.json"
       ]
+    },
+    {
+      "inventory": "Review corrections: _vector_cache.py, _image_folder.py, guarded cache consumers, edge sampler roles and dataset-specific completion checks",
+      "outcome": "184 scoped cases pass on each interpreter, including the original 150. Actual real-branch edge evaluation, paused real NPZ ZIP writes with concurrent reader processes, killed writer recovery, current and historical corrupt NPZ repair, local PNG label/transform behavior and actual HTTP stale-marker recovery are covered. All 14 archived originals and LICENSE still match fda60bec byte for byte; active archive closure rechecked. No B/C-owned runtime caller changes."
     }
   ],
   "confirmed_findings": [
@@ -199,7 +219,7 @@
       "id": "2A-04",
       "status": "fixed",
       "observed": "Out-of-range partition client IDs returned wrong data or failed later; orthogonal no-replacement sampling exceeded eligible class membership and selected zero-weight wrong-class samples.",
-      "resolution": "Validate partition IDs and requested size against positive-weight eligibility.",
+      "resolution": "Validate partition IDs and requested size against positive-weight eligibility. R2A-01 correction preserves assigned cross-silo full-pool evaluation IDs while rejecting invalid ordinary/training roles.",
       "red": [
         "red-invalid-3.13.log"
       ]
@@ -255,7 +275,7 @@
       "id": "2A-09",
       "status": "fixed",
       "observed": "Purchase/Texas checked deleted raw files instead of NPZ readiness, redownloaded usable caches/raw data, mutated global RNG and reported hardcoded counts/failed empty test tensor shapes.",
-      "resolution": "Cache-aware serialized download/preprocessing, local legacy shuffle, vectorized empty-safe tensors and actual split lengths.",
+      "resolution": "Cache-aware serialized download/preprocessing, local legacy shuffle, vectorized empty-safe tensors and actual split lengths. R2A-02 correction additionally guards all cache readers, validates complete arrays, atomically publishes successful writes and recovers legacy partial final caches.",
       "red": [
         "red-local-3.13.log",
         "baseline-vector-seed.json"
@@ -265,7 +285,7 @@
       "id": "2A-10",
       "status": "fixed",
       "observed": "CINIC treated an empty root as downloaded; official Tiny ImageNet nested/native layout failed or classified unlabeled test/images as one class; both used hardcoded counts.",
-      "resolution": "Check concrete split readiness, use labeled Tiny validation annotations and training class IDs, preserve prepared labeled layouts and report actual lengths.",
+      "resolution": "Check concrete split readiness, use labeled Tiny validation annotations and training class IDs, preserve prepared labeled layouts and report actual lengths. R2A-03/R2A-04 and root corrections enforce labeled prepared compatibility, shared training IDs, deterministic Tiny evaluation and stale-marker recovery.",
       "red": [
         "red-local-3.13.log",
         "red-native-layout-3.13.log"
@@ -424,24 +444,24 @@
       ]
     },
     "green": {
-      "command": "OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2a-lZqbqj/venv-{python}/bin/python -m pytest tests/test_config_loader.py tests/samplers tests/datasources/test_registry.py tests/datasources/test_torchvision_datasource.py tests/datasources/test_feature_dataset.py tests/datasources/test_feature_datasource.py tests/datasources/test_data_loaders.py tests/datasources/test_download_contracts.py tests/datasources/test_local_datasets.py tests/utils/test_archive.py -q",
+      "command": "OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2a-lZqbqj/venv-{python}/bin/python -m pytest tests/test_config_loader.py tests/samplers tests/datasources/test_registry.py tests/datasources/test_torchvision_datasource.py tests/datasources/test_feature_dataset.py tests/datasources/test_feature_datasource.py tests/datasources/test_data_loaders.py tests/datasources/test_download_contracts.py tests/datasources/test_local_datasets.py tests/datasources/test_review_regressions.py tests/utils/test_archive.py -q --basetemp=/tmp/plato-phase2a-lZqbqj/revision/final-fixtures-{python}",
       "3.13": {
-        "log": "green-delivery-3.13.log",
-        "passed": 150,
+        "log": "revision/green-full-3.13.log",
+        "passed": 184,
         "failed": 0,
         "skipped": 0,
         "warnings": 0,
-        "seconds": 2.43
+        "seconds": 9.96
       },
       "3.14": {
-        "log": "green-delivery-3.14.log",
-        "passed": 150,
+        "log": "revision/green-full-3.14.log",
+        "passed": 184,
         "failed": 0,
         "skipped": 0,
         "warnings": 0,
-        "seconds": 37.68
+        "seconds": 46.08
       },
-      "negative_paths": "Five-second IID/empty-padding/class-pool/minimum subprocess guards; dead-lock three-second retry guard; live-lock contender must emit ready before waiting; inert local HTTP/archive failures and no-outside-write/no-completion assertions.",
+      "negative_paths": "Five-second IID/empty-padding/class-pool/minimum subprocess guards; dead-lock three-second retry guard; live-lock contender must emit ready before waiting; inert local HTTP/archive failures and no-outside-write/no-completion assertions. Plus six invalid edge-role/training cases, real killed NPZ writers, corrupt/missing-key/mismatched-shape caches, unknown evaluation classes, incomplete unlabeled native trees and readiness rejection without completion.",
       "no_weakened_checks": "No broad suppressions, blanket API modernization, mirror-only tests, changed shared fixtures or dropped existing assertions."
     },
     "ssl_transform_smoke": {
@@ -466,21 +486,42 @@
     },
     "static_checks": [
       {
-        "command": "/tmp/plato-phase2a-lZqbqj/venv-3.13/bin/ruff check plato/config.py plato/datasources plato/samplers tests/test_config_loader.py tests/samplers/test_partition_contracts.py tests/datasources/test_download_contracts.py tests/datasources/test_local_datasets.py plato/utils/archive.py tests/utils/test_archive.py --select I",
+        "command": "/tmp/plato-phase2a-lZqbqj/venv-3.13/bin/ruff check plato/config.py plato/datasources plato/samplers tests/test_config_loader.py tests/samplers/test_partition_contracts.py tests/datasources/test_download_contracts.py tests/datasources/test_local_datasets.py tests/datasources/test_review_regressions.py plato/utils/archive.py tests/utils/test_archive.py --select I",
         "result": "All checks passed",
-        "log": "ruff-delivery.log"
+        "log": "revision/ruff.log"
       },
       {
-        "command": "/tmp/plato-phase2a-lZqbqj/venv-3.13/bin/ty check plato/config.py plato/datasources/base.py plato/datasources/cinic10.py plato/datasources/purchase.py plato/datasources/texas.py plato/datasources/tiny_imagenet.py plato/datasources/feature.py plato/datasources/feature_dataset.py plato/datasources/femnist.py plato/datasources/registry.py plato/datasources/self_supervised_learning.py plato/datasources/torchvision.py plato/samplers plato/utils/archive.py --output-format concise",
+        "command": "/tmp/plato-phase2a-lZqbqj/venv-3.13/bin/ty check plato/config.py plato/datasources/base.py plato/datasources/cinic10.py plato/datasources/purchase.py plato/datasources/texas.py plato/datasources/tiny_imagenet.py plato/datasources/_vector_cache.py plato/datasources/_image_folder.py plato/datasources/feature.py plato/datasources/feature_dataset.py plato/datasources/femnist.py plato/datasources/registry.py plato/datasources/self_supervised_learning.py plato/datasources/torchvision.py plato/samplers plato/utils/archive.py --output-format concise",
         "result": "All checks passed; no suppressions",
-        "log": "typing-delivery.log"
+        "log": "revision/typing-final.log"
       },
       {
         "command": "git diff --check",
         "result": "clean"
       }
     ],
-    "harness_notes": "Before the controlled cache-red rerun, a preliminary test omitted network interception and its owned pytest process (PID 43177) was terminated when external URL retrieval stalled. Final cache tests fail any unexpected download. Early SSL argv/base harness was corrected before recorded successful probes. Neither preliminary harness outcome is claimed as production evidence."
+    "harness_notes": "Before the controlled cache-red rerun, a preliminary test omitted network interception and its owned pytest process (PID 43177) was terminated when external URL retrieval stalled. Final cache tests fail any unexpected download. Early SSL argv/base harness was corrected before recorded successful probes. Neither preliminary harness outcome is claimed as production evidence.",
+    "previous_candidate_green": {
+      "command": "OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2a-lZqbqj/venv-{python}/bin/python -m pytest tests/test_config_loader.py tests/samplers tests/datasources/test_registry.py tests/datasources/test_torchvision_datasource.py tests/datasources/test_feature_dataset.py tests/datasources/test_feature_datasource.py tests/datasources/test_data_loaders.py tests/datasources/test_download_contracts.py tests/datasources/test_local_datasets.py tests/utils/test_archive.py -q",
+      "3.13": {
+        "log": "green-delivery-3.13.log",
+        "passed": 150,
+        "failed": 0,
+        "skipped": 0,
+        "warnings": 0,
+        "seconds": 2.43
+      },
+      "3.14": {
+        "log": "green-delivery-3.14.log",
+        "passed": 150,
+        "failed": 0,
+        "skipped": 0,
+        "warnings": 0,
+        "seconds": 37.68
+      },
+      "negative_paths": "Five-second IID/empty-padding/class-pool/minimum subprocess guards; dead-lock three-second retry guard; live-lock contender must emit ready before waiting; inert local HTTP/archive failures and no-outside-write/no-completion assertions.",
+      "no_weakened_checks": "No broad suppressions, blanket API modernization, mirror-only tests, changed shared fixtures or dropped existing assertions."
+    }
   },
   "primary_documentation_consulted": [
     {
@@ -506,6 +547,18 @@
     {
       "url": "https://github.com/lightly-ai/lightly/blob/v1.5.26/lightly/transforms/simclr_transform.py",
       "use": "Pinned current transform constructor; installed transform registrations and actual outputs probed."
+    },
+    {
+      "url": "https://numpy.org/doc/stable/reference/generated/numpy.savez.html",
+      "use": "Current documented file-like NPZ output supports private temporary write before publication."
+    },
+    {
+      "url": "https://docs.python.org/3.13/library/os.html#os.replace",
+      "use": "Successful same-filesystem replacement publishes atomically; temporary file lives beside final cache."
+    },
+    {
+      "url": "https://docs.pytorch.org/vision/stable/generated/torchvision.transforms.Resize.html",
+      "use": "Deterministic aspect-preserving evaluation resize followed by intended 299-pixel center crop."
     }
   ],
   "root_handoffs": [
@@ -519,7 +572,7 @@
     },
     {
       "owner": "Phase 5 documentation",
-      "action": "Update docs/docs/configurations/data.md for native Tiny ImageNet labeled validation versus prepared labeled directories, actual sample counts, EMNIST variant versus train flag, empty IID error, stable Dirichlet count and private-seed/ID contracts. Add legacy_datalib provenance/license/status to shared archive index."
+      "action": "Update docs/docs/configurations/data.md for native Tiny ImageNet labeled validation versus prepared labeled directories, actual sample counts, EMNIST variant versus train flag, empty IID error, stable Dirichlet count and private-seed/ID contracts. Add legacy_datalib provenance/license/status to shared archive index. Also document training-space evaluation subset labels, Tiny deterministic default evaluation/custom test_transform, atomic validated vector caches, and stale-completion recovery."
     },
     {
       "owner": "Root qualification",
@@ -532,7 +585,8 @@
     "HuggingFace/LoRA/LeRobot/Nanochat adapter implementations and trainer findings F21-F24 were reserved and not modified or qualified.",
     "Archive helper assumes no concurrent external writer mutates destination during preflight/extraction; no rollback guarantee for corrupt-data or filesystem failures. Safe TAR links point inside the root; ZIP symlink entries are intentionally rejected.",
     "Archived multimedia helpers need external historical tools/data and remain unqualified; observed REFER defects are preserved, not repaired.",
-    "SSL validation covers constructor and tensor transform behavior, not training, accelerator execution or full external dataset downloads."
+    "SSL validation covers constructor and tensor transform behavior, not training, accelerator execution or full external dataset downloads.",
+    "Review fixes are validated implementation changes pending a fresh independent exact-commit review; original CHANGES_REQUESTED review remains immutable. Shared runtime callers were not edited, so the unrelated socket matrix was not repeated."
   ],
   "owned_temporary_resources": {
     "scratch_root": "/tmp/plato-phase2a-lZqbqj",
@@ -540,7 +594,134 @@
     "retention": "Keep scratch and committed evidence until root acceptance; no cleanup or workspace closure performed.",
     "processes": "No intentionally retained subprocesses or HTTP workers. Tests join/terminate owned children. Preliminary stalled owned pytest PID 43177 was terminated.",
     "pytest_fixtures": "Pytest-managed per-run directories under system temporary storage; shared pytest temporary parent not claimed or manually cleaned.",
-    "evidence_file": "evidence/2026-refresh/phase2a-validation.json"
+    "evidence_file": "evidence/2026-refresh/phase2a-validation.json",
+    "revision_scratch": "/tmp/plato-phase2a-lZqbqj/revision",
+    "revision_contents": "Retained pre-fix/corrected-edge/default-marker/final logs, per-version fixture roots, source-of-evidence update script, previous JSON snapshot and commit bodies; existing isolated environments reused. All launched writer/reader children and HTTP workers completed or were joined/killed by test finally blocks."
   },
-  "unresolved_conflicts": []
+  "unresolved_conflicts": [],
+  "review_corrections": {
+    "independent_inputs": [
+      {
+        "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2a-review.json",
+        "sha256": "24c037f3d18051a5cd4c58a410e35f45e1d75d6d5ed215d4477bf1fbb98baf84",
+        "candidate": "a7bfd3dcdf7aaf3ec3ca466a1b5f27efa58054eb",
+        "verdict": "CHANGES_REQUESTED",
+        "findings": [
+          "R2A-01",
+          "R2A-02",
+          "R2A-03",
+          "R2A-04"
+        ]
+      },
+      {
+        "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2a-root-probes.json",
+        "sha256": "d8afe582f8c7e75989edba835d582532edfb22f24e51a404a08528fa65b8d975",
+        "candidate": "a7bfd3dcdf7aaf3ec3ca466a1b5f27efa58054eb",
+        "findings": [
+          "ROOT-2A-01",
+          "ROOT-2A-02"
+        ]
+      }
+    ],
+    "independent_reproduction_sources_read": [
+      "/tmp/plato-phase2a-review/edge_sampler_probe.py",
+      "/tmp/plato-phase2a-review/cache_writer_probe.py",
+      "/tmp/plato-phase2a-review/risk_probes.py",
+      "ROOT root-probes JSON embedded prepared_image_probe source/results"
+    ],
+    "immutable_review_contract": "All independent inputs and /tmp/plato-phase2a-review resources read only; no verdict, probe, candidate snapshot or reviewer environment edits. Original review is not claimed to approve this new candidate.",
+    "dispositions": [
+      {
+        "id": "R2A-01",
+        "status": "corrected, re-review pending",
+        "change": "Base sampler opt-in permits full-pool evaluation only when testing, cross-silo edge role, configured CLI physical ID and total_clients+silo range all agree. Dirichlet opts in; mixed inherits it. Indexed ordinary-client partitions retain strict ID bounds. No server/client caller handoff required.",
+        "verification": "Actual fedavg_cs.Server.configure using the real tracked configuration accepts both IDs 4/5 with deterministic 600 unique indices from 1000 local examples, caller RNG unchanged. Six negative role/training cases reject. Original F15 repeated fixed-count/private-RNG/loader tests still pass."
+      },
+      {
+        "id": "R2A-02",
+        "status": "corrected, re-review pending",
+        "change": "Purchase/Texas always acquire the preparation lock, eagerly validate NPZ X/Y arrays and matching shapes, rebuild corrupt caches, write/fsync a private same-directory temporary NPZ and publish by os.replace after close. Lock-guarded cleanup removes killed-writer temporaries. Loaded arrays pass directly to splitting to avoid a second large read.",
+        "verification": "Both datasets: actual np.savez pauses after first ZIP header write; a separate real reader starts and stays blocked while writer owns flock and final pathname remains unpublished. Released writer and reader succeed. SIGKILL writer case releases lock; next actual reader preprocesses complete raw files and publishes valid arrays. Historical truncated ZIP, missing Y and mismatched shape cases recover offline; accepted cache-only/raw-only fixtures, golden counts/shuffle and RNG isolation pass."
+      },
+      {
+        "id": "R2A-03",
+        "status": "corrected, re-review pending",
+        "change": "Select complete native validation or a class-compatible prepared layout; official test/images never becomes a fabricated class. Known incomplete native roots recover with configured URL or a previous default-download marker, otherwise clearly reject missing validation artifacts.",
+        "verification": "Direct/nested native missing-annotation fixtures reject usefully without external downloads; accepted direct/nested native and labeled prepared fixtures continue to pass."
+      },
+      {
+        "id": "R2A-04",
+        "status": "corrected, re-review pending",
+        "change": "Optional caller ready callback checks extracted requirements. Base downloader rechecks readiness and invalidates stale marker under existing flock, then checks readiness before new completion publication. CINIC and Tiny supply their concrete layout predicates.",
+        "verification": "Actual localhost ZIP download -> remove CINIC test directory or Tiny validation annotation -> instantiate again restores required artifacts despite previous marker. Tiny covers configured and default URL identities (default HTTP request redirected to local server). Closed-server completed-root reuse still succeeds. Archive without required artifact raises and emits no completion marker."
+      },
+      {
+        "id": "ROOT-2A-01",
+        "status": "corrected, re-review pending",
+        "change": "Shared evaluation-folder helper maps valid missing-class subsets into training class IDs; samples/imgs/targets/classes/class_to_idx agree and unknown classes reject.",
+        "verification": "Actual CINIC and Tiny training [n001,n002] with evaluation-only n002 yields label 1 and exact coherent metadata; n999 rejects. Native Tiny annotations retain accepted training-space mapping."
+      },
+      {
+        "id": "ROOT-2A-02",
+        "status": "corrected, re-review pending",
+        "change": "Tiny default evaluation uses deterministic Resize(299)/CenterCrop(299) and the original mean/std normalization. Training RandomResizedCrop remains; explicit train/test custom transforms are independent.",
+        "verification": "Actual native/prepared gradient PNG repeated evaluation is bit-equal, finite and (3,299,299); repeated training stays augmented. Known constant RGB pixels agree with independent channel arithmetic (pixel/255-mean)/std within 1e-6. Separate custom train/test callables return their distinct expected results."
+      }
+    ],
+    "red": {
+      "command": "OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2a-lZqbqj/venv-{python}/bin/python -m pytest tests/datasources/test_review_regressions.py tests/samplers/test_partition_contracts.py::test_real_cross_silo_configure_accepts_assigned_edge_evaluation_id tests/samplers/test_partition_contracts.py::test_dirichlet_rejects_unassigned_edge_or_training_ids -q --basetemp=/tmp/plato-phase2a-lZqbqj/revision/red-fixtures-{python}",
+      "source_state": "Exact a7bfd3dc production content plus newly written tests.",
+      "3.13": {
+        "log": "revision/red-3.13.log",
+        "failed": 24,
+        "passed": 6,
+        "warnings": 0,
+        "seconds": 6.46
+      },
+      "3.14": {
+        "log": "revision/red-3.14.log",
+        "failed": 24,
+        "passed": 6,
+        "warnings": 0,
+        "seconds": 42.16
+      },
+      "harness_disposition": "22 dataset failures are actual product failures. Two initial edge nodes inherited fixture config_file and missed the real branch, so their AttributeError is excluded as R2A-01 evidence. Corrected harness removes config_file before loading tracked cross-silo config and asserts the edge role. It then reproduces the actual production ValueError on both assigned edge IDs and both interpreters."
+    },
+    "corrected_edge_red": {
+      "command": "OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2a-lZqbqj/venv-{python}/bin/python -m pytest tests/samplers/test_partition_contracts.py::test_real_cross_silo_configure_accepts_assigned_edge_evaluation_id -q --basetemp=/tmp/plato-phase2a-lZqbqj/revision/red-edge-fixtures-{python}",
+      "source_state": "a7bfd3dc production sources unchanged; corrected fixture-environment harness.",
+      "results": {
+        "3.13": "revision/red-edge-3.13.log: 2 failed in 0.13s; real configure rejects assigned IDs 4/5",
+        "3.14": "revision/red-edge-3.14.log: 2 failed in 0.14s; same actual ValueError"
+      }
+    },
+    "default_url_regression_caught": {
+      "command": "OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2a-lZqbqj/venv-{python}/bin/python -m pytest tests/datasources/test_review_regressions.py -k 'stale_completion_marker and True' -q --basetemp=/tmp/plato-phase2a-lZqbqj/revision/red-default-fixtures-{python}",
+      "source_state": "Staged native-layout correction before recognizing the prior default-download marker; not claimed as an exact pristine-baseline run.",
+      "results": {
+        "3.13": "revision/red-default-3.13.log: 1 failed, 24 deselected, 0.11s",
+        "3.14": "revision/red-default-3.14.log: 1 failed, 24 deselected, 35.11s"
+      },
+      "resolution": "A prior tiny-imagenet-200.zip.complete marker permits default-URL recovery of incomplete native data. Final full green includes this case."
+    },
+    "green": "See red_green.green: exact final command and both 184-case outcomes.",
+    "intermediate_green": "revision/green-new-3.13.log and green-new-3.14.log: 32 cases passed (7.18s / 42.78s), before additional default-URL and missing-required-artifact cases. Final green has all 34 added cases plus the original 150.",
+    "raw_logs_sha256": {
+      "red-3.13.log": "e204740e36a80f64b7e88a3129a36b99a2fcf57371d6de0c40cb3bd0943a9708",
+      "red-3.14.log": "68ceb8fa4acd8c8331cde0d3309506f9f20ca0934dd341f000f86927f6da4a84",
+      "red-edge-3.13.log": "732de42fcc41ea4207dbbf98f8fc25a1733ee2d10463730ac96a24fb642ff6f9",
+      "red-edge-3.14.log": "aa30526c8ea9f998c541210e157bc301820eaa6a676c4a1c4defeff090e6803a",
+      "red-default-3.13.log": "b7699298b7766df7bc1c30e2066ec4dfc1fb5f8777239fb67995d8fd5b52e4e6",
+      "red-default-3.14.log": "986ba25b7aa46d86a5cdb39301270dd65c76d275fd9f9fb600129062d4c314fb",
+      "green-new-3.13.log": "039ac19cfeeea1af340165a07a0344bb2019fbb187120252dab3eb26b3e39819",
+      "green-new-3.14.log": "9c36cfc6329fea1365ff0a4110ff1cfcd1ff26769d80e7c09627cfa1922c2a38",
+      "green-full-3.13.log": "72f4c4a8220c0f7543f9aea0937a701b5517c1f4aad65c37e2c758fbf841270f",
+      "green-full-3.14.log": "04359b4fa74589d41bf22fe487e93cac8225ededd4e57798f3fd6b9426ac7276",
+      "ruff.log": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "typing-final.log": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    "scoped_checks": "Final Ruff import-order and first-party ty scope both pass without suppressions; git diff --check clean. No unrelated socket matrix or shared runtime edits.",
+    "preservation": "Config reset and EMNIST production files unchanged from reviewed candidate. Dirichlet count/weight/RNG behavior preserved; only edge-role validation changed. Extraction helper unchanged. All 14 archived original files and LICENSE reverified against full baseline; active archive import scan remains empty.",
+    "limits": "macOS ARM64 CPU only, bounded local/inert fixtures and subprocesses. Cache atomicity is successful same-filesystem publication with fsync of file contents; no simulated power-loss/directory-fsync guarantee or unrelated external writer qualification. No full training/socket/remote-corpus qualification added."
+  }
 }
