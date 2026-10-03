@@ -169,6 +169,21 @@ class Server(base.Server):
                 if getattr(update.report, "type", "weights") != "features":
                     validator(payload, baseline, client_id=update.client_id)
 
+    def _validate_original_positions(
+        self, original: tuple, current: list, description: str
+    ) -> None:
+        """Reject observable reassociation within the positional hook contract."""
+        positions = {}
+        for index, item in enumerate(original):
+            positions.setdefault(id(item), set()).add(index)
+        for index, item in enumerate(current):
+            original_positions = positions.get(id(item))
+            if original_positions is not None and index not in original_positions:
+                raise ValueError(
+                    f"client {self.updates[index].client_id}: {description} "
+                    "reordered the original client association."
+                )
+
     async def aggregate_deltas(self, updates, deltas_received):
         """Aggregate weight updates from the clients using federated averaging.
 
@@ -201,6 +216,10 @@ class Server(base.Server):
             self.updates, weights_received, baseline_weights
         )
         received_order = tuple(weights_received)
+        if baseline_weights is not None:
+            received_updates = tuple(self.updates)
+            received_reports = tuple(update.report for update in self.updates)
+            received_clients = tuple(update.client_id for update in self.updates)
 
         weights_received = self.weights_received(weights_received)
         self.callback_handler.call_event("on_weights_received", self, weights_received)
@@ -208,22 +227,37 @@ class Server(base.Server):
             self.updates, weights_received, baseline_weights
         )
         if baseline_weights is not None:
-            # Preserve observable client association across unlabeled-tree hooks.
-            positions = {}
-            for index, payload in enumerate(received_order):
-                positions.setdefault(id(payload), set()).add(index)
-            for index, payload in enumerate(weights_received):
-                original_positions = positions.get(id(payload))
-                if original_positions is not None and index not in original_positions:
-                    raise ValueError(
-                        f"client {self.updates[index].client_id}: transformed weights "
-                        "reordered the original client payloads."
-                    )
+            self._validate_original_positions(
+                received_order, weights_received, "transformed weights"
+            )
 
         # Notify client selection strategy about received reports
         self.context.updates = self.updates
         self.context.current_round = self.current_round
         self.client_selection_strategy.on_reports_received(self.updates, self.context)
+
+        if baseline_weights is not None:
+            # The selector is the last mutable hook before aggregation dispatch.
+            self._validate_aggregation_inputs(
+                self.updates, weights_received, baseline_weights
+            )
+            self._validate_original_positions(
+                received_order, weights_received, "transformed weights"
+            )
+            self._validate_original_positions(
+                received_updates, self.updates, "received reports"
+            )
+            self._validate_original_positions(
+                received_reports,
+                [update.report for update in self.updates],
+                "received reports",
+            )
+            for update, client_id in zip(self.updates, received_clients, strict=True):
+                if update.client_id != client_id:
+                    raise ValueError(
+                        f"client {update.client_id}: report association changed "
+                        f"from original client {client_id}."
+                    )
 
         # Extract the current model weights as the baseline
         if baseline_weights is None:
