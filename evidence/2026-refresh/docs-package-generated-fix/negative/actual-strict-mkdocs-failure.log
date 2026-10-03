@@ -1,0 +1,68 @@
+Resolved 264 packages in 4ms
+Resolved 264 packages in 4ms
+Checked 29 packages in 0.85ms
+Using Python 3.13.16 environment at: /tmp/plato-p2-generated-fix/negative-docs-environment/.venv-docs
+Checked 29 packages in 0.44ms
+All installed packages are compatible
+{
+  "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+  "executable": "/tmp/plato-p2-generated-fix/negative-docs-environment/.venv-docs/bin/python",
+  "prefix": "/tmp/plato-p2-generated-fix/negative-docs-environment/.venv-docs",
+  "packages": {
+    "babel": "2.18.0",
+    "backrefs": "8.0",
+    "certifi": "2026.7.22",
+    "charset-normalizer": "3.5.2",
+    "click": "8.5.0",
+    "colorama": "0.4.6",
+    "ghp-import": "2.1.0",
+    "idna": "3.20",
+    "jinja2": "3.1.6",
+    "markdown": "3.11",
+    "markupsafe": "3.0.3",
+    "mergedeep": "1.3.4",
+    "mkdocs": "1.6.1",
+    "mkdocs-get-deps": "0.2.2",
+    "mkdocs-material": "9.7.7",
+    "mkdocs-material-extensions": "1.3.1",
+    "packaging": "26.3",
+    "paginate": "0.5.7",
+    "pathspec": "1.1.1",
+    "platformdirs": "4.12.2",
+    "pygments": "2.21.0",
+    "pymdown-extensions": "12.1",
+    "python-dateutil": "2.9.0.post0",
+    "pyyaml": "6.0.3",
+    "pyyaml-env-tag": "1.1",
+    "requests": "2.34.2",
+    "six": "1.17.0",
+    "urllib3": "2.8.0",
+    "watchdog": "6.0.0"
+  },
+  "requirements_parity": true,
+  "runtime_and_project_absent": true
+}
+
+[31m │  ⚠  Warning from the Material for MkDocs team[0m
+[31m │[0m
+[31m │[0m  MkDocs 2.0, the underlying framework of Material for MkDocs,
+[31m │[0m  will introduce backward-incompatible changes, including:
+[31m │[0m
+[31m │  × [0mAll plugins will stop working – the plugin system has been removed
+[31m │  × [0mAll theme overrides will break – the theming system has been rewritten
+[31m │  × [0mNo migration path exists – existing projects cannot be upgraded
+[31m │  × [0mClosed contribution model – community members can't report bugs
+[31m │  × [0mCurrently unlicensed – unsuitable for production use
+[31m │[0m
+[31m │[0m  Our full analysis:
+[31m │[0m
+[31m │[0m  [4mhttps://squidfunk.github.io/mkdocs-material/blog/2026/02/18/mkdocs-2.0/[0m
+[0m
+INFO    -  Cleaning site directory
+INFO    -  Building documentation to directory: /private/tmp/plato-refresh-worktrees/docs-package-fix-negative/docs/site
+INFO    -  The following pages exist in the docs directory, but are not included in the "nav" configuration:
+  - examples/case-studies/3. SmolVLA Trainer with LeRobot.md
+  - examples/case-studies/5. Nanochat in Plato.md
+WARNING -  A reference to 'p2_missing_page.md' is included in the 'nav' configuration, which is not found in the documentation files.
+
+Aborted with 1 warnings in strict mode!

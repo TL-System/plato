@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "<string>", line 13, in <module>
+    assert not Path.cwd().resolve().is_relative_to(repository), Path.cwd()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: /private/tmp/plato-refresh-worktrees/docs-package-refresh
