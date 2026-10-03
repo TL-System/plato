@@ -1,0 +1,44 @@
+{
+  "head": "86573a123c4166e5f9124e46f9ccef33505fc6cf",
+  "utc": "2026-10-03T23:14:16.527186+00:00",
+  "results": [
+    {
+      "name": "core-evaluator",
+      "command": [
+        "/tmp/plato-lighteval-final/env/bin/python",
+        "-m",
+        "pytest",
+        "tests/evaluators",
+        "--test-profile=mandatory",
+        "-ra",
+        "--basetemp=/tmp/plato-lighteval-final/core-evaluator-tmp",
+        "--junitxml=/tmp/plato-lighteval-final/core-evaluator.xml"
+      ],
+      "passed": 28,
+      "returncode": 0,
+      "seconds": 34.23996154195629,
+      "log_sha256": "f971733230729a12cae9e0e2888030fc7d439b80703684bc56225a416aeb289c"
+    },
+    {
+      "name": "mlx-native",
+      "command": [
+        "/tmp/plato-lighteval-final/env/bin/python",
+        "-m",
+        "pytest",
+        "tests/mlx_native",
+        "--test-profile=mlx-native",
+        "-ra",
+        "--basetemp=/tmp/plato-lighteval-final/mlx-native-tmp",
+        "--junitxml=/tmp/plato-lighteval-final/mlx-native.xml"
+      ],
+      "passed": 383,
+      "returncode": 0,
+      "seconds": 101.11970729101449,
+      "log_sha256": "1d67f7ea812e503e1f4ef01e175ffab1456525f892914d1593e5efca2386879b"
+    }
+  ],
+  "source_unchanged": true,
+  "reused_runtime_review": "/tmp/plato-lighteval-profile-cleanup-review.json",
+  "source_manifest_sha256": "ad48fbe267b961b7f7e8a32a49414381012ef7c1ab09516df867304e6d9d886c",
+  "limits": "Full exact11 optional runtime and installed/absent profile guards were independently executed on source-equivalent d2ed. This run adds final assembled core-evaluator and actual native coverage for changed shared profile hooks; exact Linux is pending."
+}
