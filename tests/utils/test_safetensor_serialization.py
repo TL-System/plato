@@ -123,3 +123,60 @@ def test_serialize_tree_roundtrip_preserves_torch_bfloat16_tensors():
     assert isinstance(restored["weight"], torch.Tensor)
     assert restored["weight"].dtype == torch.bfloat16
     assert torch.equal(restored["weight"], tree["weight"])
+
+
+@pytest.mark.parametrize(
+    "tree",
+    [
+        {"a.b": np.array(1), "a": {"b": np.array(2)}},
+        {"a": {"b": np.array(2)}, "a.b": np.array(1)},
+        {"a[0]": np.array(1), "a": [np.array(2)]},
+        {"a": [np.array(2)], "a[0]": np.array(1)},
+        {"a": {"[0]": np.array(1)}, "a[0]": np.array(2)},
+        {"a.b": {}, "a": {"b": np.array(2)}},
+        {"": np.array(1)},
+        {1: np.array(1), "1": np.array(2)},
+        {"_tree_metadata": np.array([1, 2])},
+    ],
+)
+def test_ambiguous_tree_is_rejected_before_encoding(tree):
+    with pytest.raises(ValueError, match="[Aa]mbiguous|reserved"):
+        safetensor_encode.Processor().process(tree)
+
+
+def test_dotted_state_dict_and_unambiguous_brackets_remain_compatible():
+    model = torch.nn.Sequential(torch.nn.Linear(3, 2), torch.nn.BatchNorm1d(2))
+    tree = {
+        "model": model.state_dict(),
+        "literal.dot": np.arange(3, dtype=np.int16),
+        "literal[0]": torch.tensor([True, False]),
+        "nested": ([], {}, [torch.tensor(2.0, dtype=torch.float64)]),
+    }
+    restored = deserialize_tree(serialize_tree(tree))
+    assert set(restored) == set(tree)
+    for key, expected in tree["model"].items():
+        assert restored["model"][key].dtype == expected.dtype
+        assert restored["model"][key].shape == expected.shape
+        assert torch.equal(restored["model"][key], expected)
+    np.testing.assert_array_equal(restored["literal.dot"], tree["literal.dot"])
+    assert restored["literal.dot"].dtype == np.int16
+    assert torch.equal(restored["literal[0]"], tree["literal[0]"])
+    assert restored["nested"][:2] == ([], {})
+    assert restored["nested"][2][0].dtype == torch.float64
+    assert restored["nested"][2][0].item() == 2.0
+
+
+def test_noncontiguous_torch_tree_roundtrip():
+    tensor = torch.arange(12, dtype=torch.int64).reshape(3, 4).T
+    restored = deserialize_tree(serialize_tree({"tensor": tensor}))
+    assert torch.equal(restored["tensor"], tensor)
+    assert restored["tensor"].dtype == tensor.dtype
+
+
+def test_native_scalar_types_roundtrip_in_hybrid_payload_metadata():
+    tree = {"indices": [0, 2], "scale": 1.25, "enabled": True}
+    restored = deserialize_tree(serialize_tree(tree))
+    assert restored == tree
+    assert all(type(value) is int for value in restored["indices"])
+    assert type(restored["scale"]) is float
+    assert type(restored["enabled"]) is bool
