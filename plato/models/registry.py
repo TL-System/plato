@@ -15,13 +15,12 @@ from plato.models import (
     huggingface,
     lenet5,
     multilayer,
-    nanochat,
     resnet,
-    smolvla,
     torch_hub,
     vgg,
     vit,
 )
+from plato.utils.retired_backends import raise_if_retired
 
 try:  # pragma: no cover - optional MLX models
     from plato.models.mlx import lenet5 as mlx_lenet5
@@ -42,8 +41,6 @@ registered_factories = {
     "torch_hub": torch_hub.Model,
     "huggingface": huggingface.Model,
     "vit": vit.Model,
-    "nanochat": nanochat.Model,
-    "smolvla": smolvla.Model,
 }
 
 registered_mlx_models = {}
@@ -99,6 +96,8 @@ def get(**kwargs: Any) -> Any:
     # If model_type is still empty, derive it from model_name
     if not model_type and model_name:
         model_type = model_name.split("_")[0]
+
+    raise_if_retired(model_type, category="model")
 
     # Get model parameters
     model_params: dict[str, Any] = {}

@@ -14,12 +14,7 @@ from plato.trainers import (
     pfedgraph,
     split_learning,
 )
-from plato.trainers import (
-    lerobot as lerobot_trainer,
-)
-from plato.trainers import (
-    nanochat as nanochat_trainer,
-)
+from plato.utils.retired_backends import raise_if_retired
 
 registered_trainers = {
     "composable": composable.ComposableTrainer,
@@ -29,8 +24,6 @@ registered_trainers = {
     "gan": gan.Trainer,
     "pfedgraph": pfedgraph.Trainer,
     "split_learning": split_learning.Trainer,
-    "nanochat": nanochat_trainer.Trainer,
-    "lerobot": lerobot_trainer.Trainer,
 }
 
 
@@ -52,6 +45,7 @@ def get(model=None, callbacks=None):
     """Get the trainer with the provided name."""
     config = Config().trainer
     trainer_name = _resolve_trainer_name(config)
+    raise_if_retired(trainer_name, category="trainer")
     logging.info("Trainer: %s", trainer_name)
 
     if trainer_name == "diff_privacy":

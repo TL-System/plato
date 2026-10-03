@@ -3,7 +3,6 @@
 import importlib
 import importlib.util
 import random
-import subprocess
 import sys
 from collections import Counter
 from pathlib import Path
@@ -16,8 +15,6 @@ from plato.config import Config
 from tests.integration.utils import (
     configure_environment,
     isolated_config_state,
-    nanochat_source,
-    native_tokenizer_available,
 )
 from tests.test_utils.fakes import (
     FakeDatasource,
@@ -30,17 +27,9 @@ from tests.test_utils.fakes import (
     WeightedAverageAggregation,
 )
 
-_NANOCHAT = "tests/test_nanochat_integration.py::"
-_NANOCHAT_TESTS = {
-    _NANOCHAT + "test_nanochat_tokenizer_processor_round_trip",
-    _NANOCHAT + "test_nanochat_trainer_smoke",
-    _NANOCHAT + "test_nanochat_trainer_selects_core_eval_strategy",
-}
 _DP_MODULE = "tests/trainers/test_dp_data_loader_strategy.py"
-_BASE_NANOCHAT_REASON = "base profile omits optional nanochat integration"
-_NATIVE_REASON = "optional native nanochat tokenizer: callable rustbpe.Tokenizer absent"
 _DP_REASON = "base profile optional dp: opacus not installed"
-_REQUIRED = _NANOCHAT_TESTS | {
+_REQUIRED = {
     _DP_MODULE + "::test_dp_strategy_handles_plato_sampler_get",
     _DP_MODULE + "::test_dp_strategy_handles_torch_sampler_directly",
     "tests/mpc/test_mpc.py::test_round_info_store_local",
@@ -116,7 +105,6 @@ class _ProfileChecks:
             self.full and not selected
         )
         self.base = config.getoption("test_profile") == "base"
-        self.native = False
         self.violations = []
         self.passed = set()
         self.allowed_skips = set()
@@ -125,75 +113,20 @@ class _ProfileChecks:
         if not self.qualify or self.base:
             return
         try:
-            for name in ("opacus", "kazoo", "gymnasium", "tiktoken"):
+            for name in ("opacus", "kazoo", "gymnasium"):
                 importlib.import_module(name)
-            with nanochat_source() as source:
-                repository = Path(__file__).resolve().parents[1]
-                expected_pin = subprocess.check_output(
-                    ["git", "ls-tree", "HEAD", "external/nanochat"],
-                    cwd=repository,
-                    text=True,
-                ).split()[2]
-                actual_pin = subprocess.check_output(
-                    ["git", "rev-parse", "HEAD"],
-                    cwd=source,
-                    text=True,
-                ).strip()
-                if actual_pin != expected_pin:
-                    raise ImportError(
-                        "Nanochat checkout does not match its gitlink pin"
-                    )
-                model = importlib.import_module("nanochat.gpt")
-                filename = getattr(model, "__file__", None)
-                if filename is None or (
-                    Path(filename).resolve()
-                    != (source / "nanochat/gpt.py").resolve()
-                ):
-                    raise ImportError(
-                        "Nanochat model must import from the pinned source"
-                    )
-                importlib.import_module("plato.models.nanochat")
-                importlib.import_module("plato.trainers.nanochat")
-            self.native = native_tokenizer_available()
-        except (ImportError, subprocess.CalledProcessError) as exc:
+        except ImportError as exc:
             raise pytest.UsageError(f"mandatory prerequisite failed: {exc}") from exc
-
-    def pytest_collection_modifyitems(self, items):
-        for item in items:
-            if not self.qualify:
-                continue
-            if self.base and item.nodeid in _NANOCHAT_TESTS:
-                item.add_marker(pytest.mark.skip(reason=_BASE_NANOCHAT_REASON))
-            elif (
-                item.nodeid
-                == _NANOCHAT + "test_nanochat_tokenizer_processor_round_trip"
-                and not self.native
-            ):
-                item.add_marker(pytest.mark.skip(reason=_NATIVE_REASON))
 
     def _check_skip(self, report):
         if not self.qualify or not report.skipped:
             return
         reason = report.longrepr[2].removeprefix("Skipped: ")
         allowed = (
-            (
-                self.base
-                and report.nodeid == _DP_MODULE
-                and reason == _DP_REASON
-                and importlib.util.find_spec("opacus") is None
-            )
-            or (
-                self.base
-                and report.nodeid in _NANOCHAT_TESTS
-                and reason == _BASE_NANOCHAT_REASON
-            )
-            or (
-                not self.base
-                and not self.native
-                and report.nodeid
-                == _NANOCHAT + "test_nanochat_tokenizer_processor_round_trip"
-                and reason == _NATIVE_REASON
-            )
+            self.base
+            and report.nodeid == _DP_MODULE
+            and reason == _DP_REASON
+            and importlib.util.find_spec("opacus") is None
         )
         if allowed:
             self.allowed_skips.add(report.nodeid)
@@ -292,14 +225,6 @@ def isolate_test_state():
         np.random.set_state(numpy_rng)
         torch.set_rng_state(torch_rng)
         sys.path[:] = previous_path
-
-
-@pytest.fixture
-def initialized_nanochat(tmp_path, monkeypatch):
-    """Keep the real source importable only for the duration of a Nanochat test."""
-    monkeypatch.setenv("NANOCHAT_BASE_DIR", str(tmp_path / "nanochat-cache"))
-    with nanochat_source() as source:
-        yield source
 
 
 @pytest.fixture
