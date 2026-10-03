@@ -147,6 +147,60 @@ Plato's Lighteval adapter adds several integration details on top of upstream Li
 
 The adapter also exposes the preset `smollm_round_fast`, used by the SmolLM2 server-side evaluation example.
 
+Task scoring follows upstream Lighteval metric definitions. Plato maps those
+outputs to stable summary names and detailed CSV columns; normalization does
+not change the upstream scoring rules.
+
+Current-model exports and configured local fallbacks receive fresh response
+caches per evaluation. Local fallback directories are independent full copies,
+with cleanup on success and failure; source artifacts remain untouched. See
+[model artifacts and response caches](../configurations/evaluation.md#model-artifacts-and-response-caches)
+for storage costs and concurrent-writer limits.
+
+## Optional runtime qualification
+
+Provision the locked extra, test dependencies, and the exact required NLTK
+resources before running the complete optional suite:
+
+```bash
+uv sync --locked --python 3.13 --extra llm_eval --group test
+uv run --locked --extra llm_eval python -m nltk.downloader punkt punkt_tab
+uv run --locked --extra llm_eval --group test python -m pytest tests/llm_eval --test-profile=llm-eval -ra
+```
+
+The strict profile requires its complete reviewed case inventory and successful
+execution, with no skips, xfails, or xpasses. Missing dependencies or resources
+fail during preflight; preflight does not download models or resources.
+`--collect-only` checks prerequisites and inventory, not runtime behavior.
+Filters such as `-k`, `-m`, and collection exclusions are incompatible with
+complete qualification. Use an explicit filesystem path without the profile
+for a focused run:
+
+```bash
+uv run --locked --extra llm_eval --group test python -m pytest tests/llm_eval/test_lighteval_runtime.py -k model_config -ra
+```
+
+Focused runs retain prerequisite and strict outcome checks but do not qualify
+the full inventory. Native MLX and Lighteval optional tests run separately;
+optional `--pyargs` selection and cross-profile targets are unsupported.
+
+For combined core and Lighteval qualification, the retained model-search tests
+also need the `test-model-search` group, which includes `test` and `ptflops`:
+
+```bash
+uv run --locked --extra llm_eval --group test-model-search python -m pytest tests --test-profile=llm-eval -ra
+```
+
+Ordinary core, `base`, `mandatory`, and `mlx-native` requests exclude `tests/llm_eval` before importing its modules.
+Existing unit tests in `tests/evaluators` remain core tests and do not establish
+actual Lighteval runtime qualification.
+
+The real runtime regression fixtures use a tiny local GPT-2 model, local parquet
+tasks, and controlled one-token generation on CPU with Python 3.13. They exercise
+the actual registry, runner, Pipeline, metrics, cache freshness, and cleanup.
+Their scores demonstrate regression behavior, not public benchmark accuracy,
+performance, downloaded Hub-model quality, GPU, or distributed qualification.
+
 ## Server logging contract
 
 Evaluator metrics appear in the runtime CSV under the `evaluation_` prefix.

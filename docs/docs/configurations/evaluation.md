@@ -38,11 +38,38 @@ controls failures during evaluation, not unsupported backend selection.
 
 | Evaluator | Install path | Primary output style | Typical use |
 | --- | --- | --- | --- |
-| `lighteval` | `uv sync --extra llm_eval` | Named benchmark metrics such as `ifeval_avg` and `arc_avg` | Server-side LLM evaluation |
+| `lighteval` | `uv sync --locked --python 3.13 --extra llm_eval` | Named benchmark metrics such as `ifeval_avg` and `arc_avg` | Server-side LLM evaluation |
 
 ## Lighteval
 
 Plato's Lighteval adapter wraps the `lighteval` package and normalizes its task outputs into CSV-friendly metrics.
+
+Install the `llm_eval` extra and the NLTK `punkt` and `punkt_tab` resources as
+shown in [Installation](../install.md#optional-server-side-llm-evaluation-with-lighteval).
+Include `--extra llm_eval` on syncing `uv run` commands. Use a separate
+environment for the incompatible `ssl` extra.
+
+### Model artifacts and response caches
+
+When the current model and tokenizer both provide `save_pretrained()`, Plato
+exports them to a fresh temporary directory for each evaluation. This ensures
+that later federated rounds evaluate their current weights rather than reuse
+responses from an earlier round.
+
+Otherwise, the adapter falls back to `trainer.model_name` and
+`trainer.tokenizer_name` (the latter defaults to the model reference). Existing
+local directories are copied in full into independent temporary directories;
+if both references resolve to the same directory, it is copied once. The
+configured source directories, including read-only sources, remain unchanged.
+Large checkpoints and existing cache files can make this fallback expensive
+in disk space and copy time. The normal current-model export path does not
+perform this additional copy.
+
+Plato uses fresh per-evaluation response-cache configuration and removes its
+owned temporary model copies, exports, output directories, and response caches
+on success or failure. This does not clear ordinary Hugging Face download
+caches. Keep local source artifacts stable during copying: the fallback does
+not provide an atomic snapshot while another process writes checkpoints.
 
 ### Supported options
 
