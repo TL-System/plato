@@ -169,18 +169,16 @@ below describe the PyTorch path unless stated otherwise. See
     - `general_multilayer` (for generating a multi-layer perceptron using a provided configuration)
     - `huggingface` (for [HuggingFace](https://huggingface.co/models) causal language models)
     - `torch_hub` (for models from [PyTorch Hub](https://pytorch.org/hub/))
-    - `vit` (for Vision Transformer models from [HuggingFace](https://huggingface.co/models), [Tokens-to-Token ViT](https://github.com/yitu-opensource/T2T-ViT), and [Deep Vision Transformer](https://github.com/zhoudaquan/dvit_repo))
 
     The name of the model should be specified below, in `model_name`.
 
-    !!! note "Note"
-        For `vit`, please replace the `/` in model name from [https://huggingface.co/models](https://huggingface.co/models) with `@`. For example, use `google@vit-base-patch16-224-in21k` instead of `google/vit-base-patch16-224-in21k`. If you do not want to use the pretrained weights, set `parameters -> model -> pretrained` to `false`, as in the following example:
-
-        ```toml
-        [parameters]
-        [parameters.model]
-        pretrained = false
-        ```
+    !!! note "Retired legacy ViT factory"
+        The former `model_type = "vit"` factory and its `@`-encoded model names
+        are archived. See [archived research examples](../examples/archived.md)
+        for historical source and restoration. This retirement is specific to
+        Plato's old factory; generic Hugging Face and Torchvision models are
+        separate. The current `huggingface` factory serves causal language models
+        and is not a replacement image-classification ViT factory.
 
 !!! example "model_name"
     The name of the machine learning model. The following options are available:
