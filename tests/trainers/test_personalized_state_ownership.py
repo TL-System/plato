@@ -208,9 +208,23 @@ def test_feddyn_exact_legacy_prefix_load_is_same_client_and_canonical_wins(tmp_p
 @pytest.mark.parametrize("family", ["ditto", "apfl", "feddyn", "fedala"])
 def test_actual_spawn_returns_personal_state_and_optimizer_across_rounds(tmp_path, family):
     if family == "feddyn":
-        from tests.integration.test_feddyn_round_flow import run_partial
+        import json
+        import shlex
+        import subprocess
+        import sys
 
-        run_partial(tmp_path, spawn=True, reuse=True)
+        # Other example-loader tests replace this module name. A guarded
+        # interpreter gives real spawn stable import identities, as deployment
+        # does, while retaining all three round/parent-state oracle assertions.
+        output = tmp_path / "feddyn-result.json"
+        command = [sys.executable, "-m", "tests.integration.feddyn_round_worker",
+                   str(tmp_path / "runtime"), str(output), "uniform", "2,2"]
+        completed = subprocess.run(["zsh", "-lc", shlex.join(command)],
+                                   capture_output=True, text=True, timeout=100)
+        assert completed.returncode == 0, completed.stdout + completed.stderr
+        assert [record["x"] for record in json.loads(output.read_text())] == pytest.approx(
+            [1.433, 1.9717445, 1.47705273425], abs=1e-12
+        )
         return
     config = build_minimal_config(model_name="org/model")
     config["trainer"].update(batch_size=2, epochs=1, max_concurrency=1)
