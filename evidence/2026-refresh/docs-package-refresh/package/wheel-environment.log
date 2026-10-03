@@ -1,0 +1,5 @@
+cwd: /var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-package-pk0x01i4
+command: ["uv", "venv", "--python", "3.13", "/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-package-pk0x01i4/environment"]
+Using CPython 3.13.16
+Creating virtual environment at: /var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-package-pk0x01i4/environment
+Activate with: source /var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-package-pk0x01i4/environment/bin/activate
