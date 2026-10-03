@@ -54,8 +54,10 @@ class MPCTrainingStrategy(DefaultTrainingStrategy):
         self.round_store = round_store
 
     async def train(self, context):
+        round_number = self.round_store.load_state().round_number
         report, payload = await super().train(context)
         num_samples = getattr(report, "num_samples", 0)
-        if num_samples:
-            self.round_store.record_client_samples(context.client_id, num_samples)
+        self.round_store.record_client_samples(
+            context.client_id, num_samples, round_number=round_number
+        )
         return report, payload

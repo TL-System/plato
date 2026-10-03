@@ -54,12 +54,12 @@ class Processor(model.Processor):
                 logging.debug("Unable to persist MPC debug artefact at %s.", path)
 
     @staticmethod
-    def _calculate_poly_value(x: int, coefficients: torch.Tensor) -> float:
+    def _calculate_poly_value(x: int, coefficients: list[int]) -> int:
         """Evaluate polynomial with the given coefficients at position ``x``."""
-        y_val = 0.0
-        power = 1.0
+        y_val = 0
+        power = 1
         for coeff in coefficients:
-            y_val += coeff.item() * power
+            y_val += coeff * power
             power *= x
         return y_val
 
@@ -68,19 +68,23 @@ class Processor(model.Processor):
     ) -> torch.Tensor:
         """Generate Shamir shares for a single scalar secret."""
         scaled_secret = round(secret.item() * 1_000_000)
-        coefficients = torch.zeros(threshold)
-        coefficients[0] = scaled_secret
+        coefficients = [scaled_secret]
 
         for idx in range(1, threshold):
             value = randint(1, 999)
             while value in coefficients:
                 value = randint(1, 999)
-            coefficients[idx] = value
+            coefficients.append(value)
 
-        points = torch.zeros([num_clients, 2])
+        points = torch.zeros([num_clients, 2], dtype=torch.float64)
         for j in range(1, num_clients + 1):
+            value = self._calculate_poly_value(j, coefficients)
+            if abs(value) > 2**53:
+                raise ValueError(
+                    "Shamir coordinate exceeds exact float64 integer range."
+                )
             points[j - 1][0] = j
-            points[j - 1][1] = self._calculate_poly_value(j, coefficients)
+            points[j - 1][1] = value
 
         return points
 
@@ -88,19 +92,10 @@ class Processor(model.Processor):
         self, tensor: torch.Tensor, num_clients: int, threshold: int
     ) -> torch.Tensor:
         """Encrypt tensor entries using Shamir secret sharing."""
-        if num_clients == 1:
-            size = list(tensor.size())
-            size.insert(0, 1)
-            size.append(2)
-            coords = torch.zeros(size)
-            coords[0, ..., 0] = 1
-            coords[0, ..., 1] = tensor
-            return coords
-
         flattened_size = math.prod(list(tensor.size()))
-        flattened = tensor.view(flattened_size)
+        flattened = tensor.reshape(flattened_size)
 
-        coords = torch.empty([num_clients, flattened_size, 2])
+        coords = torch.empty([num_clients, flattened_size, 2], dtype=torch.float64)
         for idx in range(flattened_size):
             coords[:, idx] = self._secret_shares(flattened[idx], num_clients, threshold)
 
@@ -120,15 +115,17 @@ class Processor(model.Processor):
 
         num_samples = state.client_samples.get(self.client_id)
         if num_samples is None:
-            logging.warning(
-                "Client %s is encrypting updates without recorded num_samples. Defaulting to 0.",
-                self.client_id,
-            )
-            num_samples = 0
+            raise ValueError("MPC encryption requires a recorded sample count.")
 
         selected_clients = state.selected_clients
         num_clients = len(selected_clients)
-        threshold = self.threshold or max(num_clients - 2, 1)
+        threshold = (
+            self.threshold if self.threshold is not None else max(num_clients - 2, 1)
+        )
+        if not 1 <= threshold <= min(num_clients, 1000):
+            raise ValueError(
+                "Shamir threshold must be within the participant count (≤1000)."
+            )
 
         data_shares: list[MutableMapping[str, torch.Tensor]] = [
             copy.deepcopy(data) for _ in range(num_clients)
@@ -148,7 +145,10 @@ class Processor(model.Processor):
             if idx == self_index:
                 continue
             self.round_store.store_pairwise_share(
-                target_client, self.client_id, dict(data_shares[idx])
+                target_client,
+                self.client_id,
+                dict(data_shares[idx]),
+                round_number=state.round_number,
             )
 
         self._write_debug_artifact(
