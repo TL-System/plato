@@ -54,6 +54,33 @@ def runtime_assets(monkeypatch, tmp_path, temp_config):
     return helpers.make_model_and_tokenizer()
 
 
+@pytest.fixture
+def readonly_source_permissions(tmp_path, record_property):
+    """Restore permissions on synthetic sources after all test assertions."""
+    original_modes = {}
+
+    def make_readonly(*roots: Path) -> None:
+        for root in dict.fromkeys(roots):
+            assert root.resolve().is_relative_to(tmp_path.resolve())
+            paths = [*root.rglob("*"), root] if root.is_dir() else [root]
+            for path in paths:
+                if not path.is_symlink():
+                    original_modes.setdefault(
+                        path, stat.S_IMODE(path.stat().st_mode)
+                    )
+                    path.chmod(0o555 if path.is_dir() else 0o444)
+
+    try:
+        yield make_readonly
+    finally:
+        restored = 0
+        for path, mode in original_modes.items():
+            if path.exists() and not path.is_symlink():
+                path.chmod(mode)
+                restored += 1
+        record_property("readonly_fixture_permissions_restored", restored)
+
+
 @pytest.mark.parametrize("input_source", ["current-model", "configured-local"])
 def test_real_preset_pipeline_normalizes_metrics_and_refreshes_exports(
     runtime_assets, monkeypatch, record_property, tmp_path, input_source
@@ -315,7 +342,12 @@ def test_real_missing_primary_metric_is_rejected(runtime_assets):
 
 @pytest.mark.parametrize("tokenizer_source", ["same", "separate"])
 def test_real_readonly_local_source_ignores_old_responses(
-    runtime_assets, tmp_path, monkeypatch, record_property, tokenizer_source
+    runtime_assets,
+    tmp_path,
+    monkeypatch,
+    record_property,
+    tokenizer_source,
+    readonly_source_permissions,
 ):
     from lighteval.logging.evaluation_tracker import EvaluationTracker
     from lighteval.models.transformers.transformers_model import TransformersModelConfig
@@ -366,11 +398,7 @@ def test_real_readonly_local_source_ignores_old_responses(
     sentinel = source / "nested" / "preserved.txt"
     sentinel.parent.mkdir()
     sentinel.write_text("old source artifacts remain unchanged")
-    for directory in {source, tokenizer_directory}:
-        for path in [*directory.rglob("*"), directory]:
-            if not path.is_symlink():
-                path.chmod(0o555 if path.is_dir() else 0o444)
-    blob.chmod(0o444)
+    readonly_source_permissions(source, tokenizer_directory, blob)
     source_before = helpers.snapshot_directory(source)
     tokenizer_before = helpers.snapshot_directory(tokenizer_directory)
     blob_before = blob.read_bytes()
