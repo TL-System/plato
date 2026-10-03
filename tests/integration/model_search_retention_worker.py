@@ -13,6 +13,7 @@ import random
 import sys
 from pathlib import Path
 from typing import Any, cast
+from unittest.mock import patch
 
 REPOSITORY = Path(__file__).resolve().parents[2]
 
@@ -509,40 +510,40 @@ def activated_budget(module: Any) -> None:
         queries.append({"model_rate": model.scaler.rate, "macs": numeric_macs})
         return result
 
-    cast(Any, ptflops).get_model_complexity_info = observe_profile
-    for candidate_rate in (1.0, 0.75 if family != "heterofl" else 0.5):
-        candidate = model(
-            model_rate=candidate_rate, **Config().parameters.client_model._asdict()
-        )
-        measured = resource_profile(candidate)
-        budget = tuple(value * 1.03 for value in measured)
-        selected = algorithm.choose_rate(budget, model)
-        assert 0.5 <= selected <= 1.0
-        if family != "heterofl":
-            assert selected not in (0.5, 1.0)
-        else:
-            assert selected in algorithm.rates
-        payload = algorithm.extract_weights()
-        selected_model = model(
-            model_rate=selected, **Config().parameters.client_model._asdict()
-        )
-        selected_model.load_state_dict(payload)
-        actual = resource_profile(selected_model)
-        assert all(
-            value <= ceiling for value, ceiling in zip(actual, budget, strict=True)
-        )
-        loss = train_batch(selected_model)
-        records.append(
-            {
-                "candidate_rate": candidate_rate,
-                "profile": measured,
-                "margin": 1.03,
-                "budget": budget,
-                "selected_rate": selected,
-                "selected_profile": actual,
-                "loss": loss,
-            }
-        )
+    with patch.object(ptflops, "get_model_complexity_info", observe_profile):
+        for candidate_rate in (1.0, 0.75 if family != "heterofl" else 0.5):
+            candidate = model(
+                model_rate=candidate_rate, **Config().parameters.client_model._asdict()
+            )
+            measured = resource_profile(candidate)
+            budget = tuple(value * 1.03 for value in measured)
+            selected = algorithm.choose_rate(budget, model)
+            assert 0.5 <= selected <= 1.0
+            if family != "heterofl":
+                assert selected not in (0.5, 1.0)
+            else:
+                assert selected in algorithm.rates
+            payload = algorithm.extract_weights()
+            selected_model = model(
+                model_rate=selected, **Config().parameters.client_model._asdict()
+            )
+            selected_model.load_state_dict(payload)
+            actual = resource_profile(selected_model)
+            assert all(
+                value <= ceiling for value, ceiling in zip(actual, budget, strict=True)
+            )
+            loss = train_batch(selected_model)
+            records.append(
+                {
+                    "candidate_rate": candidate_rate,
+                    "profile": measured,
+                    "margin": 1.03,
+                    "budget": budget,
+                    "selected_rate": selected,
+                    "selected_profile": actual,
+                    "loss": loss,
+                }
+            )
     assert records[1]["selected_rate"] < records[0]["selected_rate"]
     emit(
         "activated_budget", limitation_activated=True, records=records, queries=queries
