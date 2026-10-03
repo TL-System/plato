@@ -1,0 +1,646 @@
+{
+  "archive": {
+    "all_manifest_members_verified": true,
+    "bytes": 2067050,
+    "manifest_sha256": "21630735cbd520fe35d3c6031a3b1e97dfeec259f9f80333c1686f95e7b80cc2",
+    "members": 101,
+    "path": "evidence/2026-refresh/reproductions/phase3-mlx-selector-correction.tar.gz",
+    "sha256": "de72c3442b5edb3958c8800e564dd2c6d268666e2b1fe6fa1cc34a4b1b17a5b6"
+  },
+  "e8": {
+    "historical_measured_source": "Preserved e8-exact-source/source-binding.json in prior archive.",
+    "historical_receipt": "evidence/2026-refresh/phase3-mlx-native.json",
+    "historical_source_commit": "589249b77e81b164549ec65e47daccec87794277",
+    "interpretation": "Numerical trainer/model and eager policy are unchanged. Historical full-round timings are bound to the earlier server and do not measure the added final validation overhead. No new speed or compiled-benefit claim is made.",
+    "new_delta_from_historical_candidate": {
+      "plato/servers/fedavg.py": "026225563a04beaf2536b026850e089f82a4378341506fefe4ccb4ba117ba0d8",
+      "tests/mlx_native/test_phase3_dispatch.py": "f1a6929ef580c4220c833cb2b1d17a04489266ac5554f23fb20b37fa7165ff88"
+    },
+    "rerun": false
+  },
+  "finding": "MLX-NATIVE-R1-01",
+  "implementation": [
+    "Retains owned baseline capture and raw/effective weights-hook preflight.",
+    "After on_reports_received, immediately before dispatch, capable native backend revalidates report/payload cardinality, finite/nonnegative sample weights and finite total, and all eligible parameter trees.",
+    "Reuses original-object position checking for effective payloads, updates and reports, and rejects changed labeled logical client association.",
+    "Non-capable PyTorch/default backend branches and existing all-zero fallback semantics are unchanged."
+  ],
+  "ledger_handoff": {
+    "cases_owner": "/root/mlx_profile_author",
+    "combined_profile_qualification": "Root must integrate both corrections before native profile qualification; no combined acceptance claim here.",
+    "native_nodes": 383,
+    "new_module_sha256": "f1a6929ef580c4220c833cb2b1d17a04489266ac5554f23fb20b37fa7165ff88",
+    "new_nodes": 100,
+    "path": "/tmp/plato-phase3-mlx/selector-frozen-node-handoff.json",
+    "reported_updated_cases_sha256": "c168dc33a4d4e7ed70079e09c3de70f5b318d543c035ec13de2826b48e1175bb",
+    "sha256": "1196cc66d0b46f17e05a5026af18b0274d5c910e912d2b36882c75363aeb1508",
+    "source_author_edited_cases_json": false
+  },
+  "new_regressions": {
+    "count": "36 cases: direct/delta/legacy x both arrival orders x short/long report list, negative/NaN/infinite sample count, finite individual counts with overflowing total.",
+    "experiments": "New negatives and zero-total controls map E1; valid copied 8/24 controls map E1/E2. Existing E1-E7 mappings remain unchanged.",
+    "malformed": "36 native LeNet cases: direct/delta/legacy x both arrival orders x weighted/zero-weight client2 x broadcast/missing/None late tree mutation.",
+    "native_total": 383,
+    "nodes": 100,
+    "order": "18 cases: direct/delta/legacy x both arrival orders x reversed update objects/reversed report objects/changed logical client IDs.",
+    "valid": "6 direct/delta/legacy positional deep-copy controls match float64 weighted 8/24 reference (bias3.25) within rtol1e-5/atol1e-6;4 direct/delta zero-total fallback controls preserve baseline."
+  },
+  "qualification": {
+    "command": "PYTHONDONTWRITEBYTECODE=1 /tmp/plato-phase3-mlx/env/bin/python -m pytest tests/mlx_native tests/models/test_model_registry.py tests/servers/test_fedavg_strategy.py tests/algorithms -q --basetemp=/tmp/plato-phase3-mlx/selector-frozen-tests --junitxml=/tmp/plato-phase3-mlx/selector-frozen-tests.xml",
+    "environment": "Same unchanged task-owned /tmp/plato-phase3-mlx/env locked mlx extra; full environment/source hashes archived from earlier qualification.",
+    "existing_affected": 80,
+    "failed": 0,
+    "git_diff_check": "pass",
+    "junit": "logs/selector-frozen-tests.xml",
+    "mlx": "0.32.3",
+    "mlx-metal": "0.32.3",
+    "native": 383,
+    "new_module_focused": {
+      "failed": 0,
+      "junit": "logs/selector-post-hook-final.xml",
+      "passed": 100,
+      "skipped": 0
+    },
+    "passed": 463,
+    "python": "3.13.16",
+    "ruff_I_F": "pass",
+    "seconds": 46.31,
+    "shell": "zsh -lc",
+    "skipped": 0,
+    "socket": "Actual entrypoint/codec native 8/24 socket regression reran under corrected server; finite changing training and every-leaf float64 weighted reference pass.",
+    "socket_artifacts": "final-native-socket",
+    "socket_lifecycle": {
+      "forced_containment": [],
+      "natural_returncode": 0,
+      "owned_survivors": [],
+      "port": 52046,
+      "port_rebind": true,
+      "utc": "2026-10-03T19:36:17.691543+00:00"
+    },
+    "warnings": 0
+  },
+  "red_green": {
+    "frozen_test_replay_red": {
+      "failed": 90,
+      "log": "logs/selector-frozen-red.log",
+      "passed": 10,
+      "source": "Exact parent shared server module injected with importlib; candidate native algorithm and final frozen tests retained.",
+      "warnings": 1
+    },
+    "probe_adaptation": "Only the task-owned artifact path prefix differs from original reviewer probes; original and adapted scripts retained.",
+    "provisional_test_development": "Retained initial logs include two newly written assumptions corrected before freezing: all-zero counts were incorrectly assumed invalid despite existing fallback semantics, and delta floating arithmetic was initially asserted bitwise3.25 instead of accepted tolerance. The test-only Legacy helper returns None for all-zero weights; its behavior was untouched and fallback preservation controls cover existing direct/delta paths. No existing assertion or production behavior was weakened to pass these controls.",
+    "reviewer_probe_green": {
+      "late_order": [
+        {
+          "arithmetic_called": false,
+          "error": "client 2: received reports reordered the original client association.",
+          "expected_bias": [
+            3.25,
+            3.25,
+            3.25,
+            3.25,
+            3.25,
+            3.25,
+            3.25,
+            3.25,
+            3.25,
+            3.25
+          ],
+          "final_bias": [
+            -0.10019809752702713,
+            0.08371483534574509,
+            0.03182563930749893,
+            -0.04948395490646362,
+            -0.06774232536554337,
+            -0.05142875015735626,
+            -0.00781867653131485,
+            -0.012516669929027557,
+            0.04210468381643295,
+            -0.09996969252824783
+          ],
+          "final_report_order": [
+            2,
+            1
+          ],
+          "kind": "direct"
+        },
+        {
+          "arithmetic_called": false,
+          "error": "client 2: received reports reordered the original client association.",
+          "expected_bias": [
+            3.25,
+            3.25,
+            3.25,
+            3.25,
+            3.25,
+            3.25,
+            3.25,
+            3.25,
+            3.25,
+            3.25
+          ],
+          "final_bias": [
+            -0.10019809752702713,
+            0.08371483534574509,
+            0.03182563930749893,
+            -0.04948395490646362,
+            -0.06774232536554337,
+            -0.05142875015735626,
+            -0.00781867653131485,
+            -0.012516669929027557,
+            0.04210468381643295,
+            -0.09996969252824783
+          ],
+          "final_report_order": [
+            2,
+            1
+          ],
+          "kind": "delta"
+        },
+        {
+          "arithmetic_called": false,
+          "error": "client 2: received reports reordered the original client association.",
+          "expected_bias": [
+            3.25,
+            3.25,
+            3.25,
+            3.25,
+            3.25,
+            3.25,
+            3.25,
+            3.25,
+            3.25,
+            3.25
+          ],
+          "final_bias": [
+            -0.10019809752702713,
+            0.08371483534574509,
+            0.03182563930749893,
+            -0.04948395490646362,
+            -0.06774232536554337,
+            -0.05142875015735626,
+            -0.00781867653131485,
+            -0.012516669929027557,
+            0.04210468381643295,
+            -0.09996969252824783
+          ],
+          "final_report_order": [
+            2,
+            1
+          ],
+          "kind": "legacy"
+        }
+      ],
+      "late_shape": [
+        {
+          "arithmetic_called": false,
+          "error": "client 2.weights.fc3.bias: expected shape (10,), got (1,).",
+          "expected_shape": [
+            10
+          ],
+          "final_bias": [
+            -0.10019809752702713,
+            0.08371483534574509,
+            0.03182563930749893,
+            -0.04948395490646362,
+            -0.06774232536554337,
+            -0.05142875015735626,
+            -0.00781867653131485,
+            -0.012516669929027557,
+            0.04210468381643295,
+            -0.09996969252824783
+          ],
+          "kind": "direct",
+          "model_changed": false,
+          "received_bad_shape": [
+            1
+          ],
+          "rejected": true,
+          "reverse": false
+        },
+        {
+          "arithmetic_called": false,
+          "error": "client 2.weights.fc3.bias: expected shape (10,), got (1,).",
+          "expected_shape": [
+            10
+          ],
+          "final_bias": [
+            -0.10019809752702713,
+            0.08371483534574509,
+            0.03182563930749893,
+            -0.04948395490646362,
+            -0.06774232536554337,
+            -0.05142875015735626,
+            -0.00781867653131485,
+            -0.012516669929027557,
+            0.04210468381643295,
+            -0.09996969252824783
+          ],
+          "kind": "direct",
+          "model_changed": false,
+          "received_bad_shape": [
+            1
+          ],
+          "rejected": true,
+          "reverse": true
+        },
+        {
+          "arithmetic_called": false,
+          "error": "client 2.weights.fc3.bias: expected shape (10,), got (1,).",
+          "expected_shape": [
+            10
+          ],
+          "final_bias": [
+            -0.10019809752702713,
+            0.08371483534574509,
+            0.03182563930749893,
+            -0.04948395490646362,
+            -0.06774232536554337,
+            -0.05142875015735626,
+            -0.00781867653131485,
+            -0.012516669929027557,
+            0.04210468381643295,
+            -0.09996969252824783
+          ],
+          "kind": "delta",
+          "model_changed": false,
+          "received_bad_shape": [
+            1
+          ],
+          "rejected": true,
+          "reverse": false
+        },
+        {
+          "arithmetic_called": false,
+          "error": "client 2.weights.fc3.bias: expected shape (10,), got (1,).",
+          "expected_shape": [
+            10
+          ],
+          "final_bias": [
+            -0.10019809752702713,
+            0.08371483534574509,
+            0.03182563930749893,
+            -0.04948395490646362,
+            -0.06774232536554337,
+            -0.05142875015735626,
+            -0.00781867653131485,
+            -0.012516669929027557,
+            0.04210468381643295,
+            -0.09996969252824783
+          ],
+          "kind": "delta",
+          "model_changed": false,
+          "received_bad_shape": [
+            1
+          ],
+          "rejected": true,
+          "reverse": true
+        },
+        {
+          "arithmetic_called": false,
+          "error": "client 2.weights.fc3.bias: expected shape (10,), got (1,).",
+          "expected_shape": [
+            10
+          ],
+          "final_bias": [
+            -0.10019809752702713,
+            0.08371483534574509,
+            0.03182563930749893,
+            -0.04948395490646362,
+            -0.06774232536554337,
+            -0.05142875015735626,
+            -0.00781867653131485,
+            -0.012516669929027557,
+            0.04210468381643295,
+            -0.09996969252824783
+          ],
+          "kind": "legacy",
+          "model_changed": false,
+          "received_bad_shape": [
+            1
+          ],
+          "rejected": true,
+          "reverse": false
+        },
+        {
+          "arithmetic_called": false,
+          "error": "client 2.weights.fc3.bias: expected shape (10,), got (1,).",
+          "expected_shape": [
+            10
+          ],
+          "final_bias": [
+            -0.10019809752702713,
+            0.08371483534574509,
+            0.03182563930749893,
+            -0.04948395490646362,
+            -0.06774232536554337,
+            -0.05142875015735626,
+            -0.00781867653131485,
+            -0.012516669929027557,
+            0.04210468381643295,
+            -0.09996969252824783
+          ],
+          "kind": "legacy",
+          "model_changed": false,
+          "received_bad_shape": [
+            1
+          ],
+          "rejected": true,
+          "reverse": true
+        }
+      ]
+    },
+    "reviewer_probe_red": {
+      "late_order": [
+        {
+          "arithmetic_called": true,
+          "error": null,
+          "expected_bias": [
+            3.25,
+            3.25,
+            3.25,
+            3.25,
+            3.25,
+            3.25,
+            3.25,
+            3.25,
+            3.25,
+            3.25
+          ],
+          "final_bias": [
+            1.75,
+            1.75,
+            1.75,
+            1.75,
+            1.75,
+            1.75,
+            1.75,
+            1.75,
+            1.75,
+            1.75
+          ],
+          "final_report_order": [
+            2,
+            1
+          ],
+          "kind": "direct"
+        },
+        {
+          "arithmetic_called": true,
+          "error": null,
+          "expected_bias": [
+            3.25,
+            3.25,
+            3.25,
+            3.25,
+            3.25,
+            3.25,
+            3.25,
+            3.25,
+            3.25,
+            3.25
+          ],
+          "final_bias": [
+            1.75,
+            1.7500001192092896,
+            1.75,
+            1.75,
+            1.75,
+            1.75,
+            1.75,
+            1.75,
+            1.75,
+            1.75
+          ],
+          "final_report_order": [
+            2,
+            1
+          ],
+          "kind": "delta"
+        },
+        {
+          "arithmetic_called": true,
+          "error": null,
+          "expected_bias": [
+            3.25,
+            3.25,
+            3.25,
+            3.25,
+            3.25,
+            3.25,
+            3.25,
+            3.25,
+            3.25,
+            3.25
+          ],
+          "final_bias": [
+            1.75,
+            1.75,
+            1.75,
+            1.75,
+            1.75,
+            1.75,
+            1.75,
+            1.75,
+            1.75,
+            1.75
+          ],
+          "final_report_order": [
+            2,
+            1
+          ],
+          "kind": "legacy"
+        }
+      ],
+      "late_shape": [
+        {
+          "arithmetic_called": true,
+          "error": null,
+          "expected_shape": [
+            10
+          ],
+          "final_bias": [
+            3.25,
+            3.25,
+            3.25,
+            3.25,
+            3.25,
+            3.25,
+            3.25,
+            3.25,
+            3.25,
+            3.25
+          ],
+          "kind": "direct",
+          "model_changed": true,
+          "received_bad_shape": [
+            1
+          ],
+          "rejected": false,
+          "reverse": false
+        },
+        {
+          "arithmetic_called": true,
+          "error": null,
+          "expected_shape": [
+            10
+          ],
+          "final_bias": [
+            3.25,
+            3.25,
+            3.25,
+            3.25,
+            3.25,
+            3.25,
+            3.25,
+            3.25,
+            3.25,
+            3.25
+          ],
+          "kind": "direct",
+          "model_changed": true,
+          "received_bad_shape": [
+            1
+          ],
+          "rejected": false,
+          "reverse": true
+        },
+        {
+          "arithmetic_called": false,
+          "error": "weights.fc3.bias: expected shape (10,), got (1,).",
+          "expected_shape": [
+            10
+          ],
+          "final_bias": [
+            -0.10019809752702713,
+            0.08371483534574509,
+            0.03182563930749893,
+            -0.04948395490646362,
+            -0.06774232536554337,
+            -0.05142875015735626,
+            -0.00781867653131485,
+            -0.012516669929027557,
+            0.04210468381643295,
+            -0.09996969252824783
+          ],
+          "kind": "delta",
+          "model_changed": false,
+          "received_bad_shape": [
+            1
+          ],
+          "rejected": true,
+          "reverse": false
+        },
+        {
+          "arithmetic_called": false,
+          "error": "weights.fc3.bias: expected shape (10,), got (1,).",
+          "expected_shape": [
+            10
+          ],
+          "final_bias": [
+            -0.10019809752702713,
+            0.08371483534574509,
+            0.03182563930749893,
+            -0.04948395490646362,
+            -0.06774232536554337,
+            -0.05142875015735626,
+            -0.00781867653131485,
+            -0.012516669929027557,
+            0.04210468381643295,
+            -0.09996969252824783
+          ],
+          "kind": "delta",
+          "model_changed": false,
+          "received_bad_shape": [
+            1
+          ],
+          "rejected": true,
+          "reverse": true
+        },
+        {
+          "arithmetic_called": true,
+          "error": null,
+          "expected_shape": [
+            10
+          ],
+          "final_bias": [
+            3.25,
+            3.25,
+            3.25,
+            3.25,
+            3.25,
+            3.25,
+            3.25,
+            3.25,
+            3.25,
+            3.25
+          ],
+          "kind": "legacy",
+          "model_changed": true,
+          "received_bad_shape": [
+            1
+          ],
+          "rejected": false,
+          "reverse": false
+        },
+        {
+          "arithmetic_called": true,
+          "error": null,
+          "expected_shape": [
+            10
+          ],
+          "final_bias": [
+            3.25,
+            3.25,
+            3.25,
+            3.25,
+            3.25,
+            3.25,
+            3.25,
+            3.25,
+            3.25,
+            3.25
+          ],
+          "kind": "legacy",
+          "model_changed": true,
+          "received_bad_shape": [
+            1
+          ],
+          "rejected": false,
+          "reverse": true
+        }
+      ]
+    },
+    "warning": "Injected baseline pytest replay reports one existing anyio assertion-rewrite warning because pytest plugin import preceded pytest.main; no suppression added."
+  },
+  "rejection_semantics": [
+    "No aggregation arithmetic, delta dispatch or global load follows final preflight rejection.",
+    "Owned model/baseline and independent source-client trees are unchanged.",
+    "Deliberate user-hook side effects remain. Snapshot assertions immediately after the hook prove preflight/rejection adds no further effective-tree, payload, report-count or client-association changes.",
+    "No rollback of arbitrary hook mutations is promised. Existing raw/weights-hook ownership assertions are unchanged."
+  ],
+  "review": {
+    "archived_as": "review.json",
+    "decision_before_correction": "CHANGES_REQUESTED",
+    "path": "/tmp/plato-mlx-native-review.json",
+    "sha256": "3c53678c9b4b719a4559a15db8f7706ad9dd524f00690936528e71e671ca4462"
+  },
+  "schema_version": 1,
+  "scope_and_limits": [
+    "Only plato/servers/fedavg.py and one new native regression module changed.",
+    "No tree/model/algorithm registry, native training, manifest/lock/CI/sharedConfig/conftest or retirement/Qwen source changes.",
+    "Unlabeled deep-copied replacements remain schema-validated at original report positions; callers preserve semantic correspondence. Arbitrary same-schema swaps cannot be detected.",
+    "Earlier bounded native float32/Python3.13/Apple CPU-Metal/weight-only/eager limits remain.",
+    "Separate lazy optional-import correction is owned by the profile author; root handles combined integration, fresh review and remote actions."
+  ],
+  "source": {
+    "commit": "aa7983d2fd1d750b2a6ecb176ab96f14e3d9ea80",
+    "files": {
+      "plato/servers/fedavg.py": "026225563a04beaf2536b026850e089f82a4378341506fefe4ccb4ba117ba0d8",
+      "tests/mlx_native/test_phase3_dispatch.py": "f1a6929ef580c4220c833cb2b1d17a04489266ac5554f23fb20b37fa7165ff88"
+    },
+    "parent": "6582dc9394733003a94461bbf74ab6b115790986",
+    "tree": "83d90cfa7074cad5014a6b8facc275c0d8c9aed7"
+  },
+  "status": "Correction implemented and locally qualified; fresh independent review and combined profile integration are root-owned."
+}
