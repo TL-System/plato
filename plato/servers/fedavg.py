@@ -260,24 +260,7 @@ class Server(base.Server):
             trainer = self.require_trainer()
             self.accuracy = trainer.test(self.testset, self.testset_sampler)
 
-            # Extract CORE evaluation results if available (Nanochat CORE evaluation)
-            if (
-                hasattr(trainer, "context")
-                and "nanochat_core_results" in trainer.context.state
-            ):
-                core_results = trainer.context.state["nanochat_core_results"]
-                self._core_metric = core_results.get("core_metric", self.accuracy)
-
-        # If CORE benchmark was run via a Nanochat testing strategy, report the specialized CORE metric instead of the generic 'Global model accuracy' label.
-        core_metric = getattr(self, "_core_metric", None)
-
-        if core_metric is not None:
-            logging.info(
-                fonts.colourize(
-                    f"[{self}] Average Centered CORE benchmark metric: {100 * core_metric:.2f}%\n"
-                )
-            )
-        elif hasattr(Config().trainer, "target_perplexity"):
+        if hasattr(Config().trainer, "target_perplexity"):
             logging.info(
                 fonts.colourize(
                     f"[{self}] Global model perplexity: {self.accuracy:.2f}\n"
@@ -315,7 +298,6 @@ class Server(base.Server):
         logged = {
             "round": self.current_round,
             "accuracy": self.accuracy,
-            "core_metric": getattr(self, "_core_metric", None),
             "accuracy_std": self.accuracy_std,
             "elapsed_time": self.wall_time - self.initial_wall_time,
             "processing_time": max(
@@ -348,10 +330,6 @@ class Server(base.Server):
                 logged["train_loss"] = weighted_loss / total_samples
             else:
                 logged["train_loss"] = None
-
-        # Add core_metric if Nanochat CORE evaluation was performed
-        if hasattr(self, "_core_metric"):
-            logged["core_metric"] = self._core_metric
 
         logged.update(evaluation_logging.extract_logged_items(self.trainer))
 

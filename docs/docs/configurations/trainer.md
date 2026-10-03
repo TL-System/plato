@@ -6,8 +6,6 @@
     - `timm_basic` a basic trainer with the [timm](https://timm.fast.ai/) learning rate scheduler.
     - `diff_privacy` a trainer that supports local differential privacy in its training loop by adding noise to the gradients during each step of training.
     - `HuggingFace` a trainer for Hugging Face causal language models and tokenizers.
-    - `nanochat` a trainer for Nanochat language-model workloads.
-    - `lerobot` a trainer for LeRobot / SmolVLA workloads.
     - `split_learning` a trainer that supports the split learning framework.
     - `self_supervised_learning` a trainer that supports personalized federated learning based on self supervised learning.
     - `gan` a trainer for Generative Adversarial Networks (GANs).
@@ -167,7 +165,6 @@
     - `huggingface` (for [HuggingFace](https://huggingface.co/models) causal language models)
     - `torch_hub` (for models from [PyTorch Hub](https://pytorch.org/hub/))
     - `vit` (for Vision Transformer models from [HuggingFace](https://huggingface.co/models), [Tokens-to-Token ViT](https://github.com/yitu-opensource/T2T-ViT), and [Deep Vision Transformer](https://github.com/zhoudaquan/dvit_repo))
-    - `smolvla` (for LeRobot / SmolVLA robotics policies)
 
     The name of the model should be specified below, in `model_name`.
 
@@ -188,11 +185,9 @@
     - `vgg_x`
     - `dcgan`
     - `multilayer`
-    - `nanochat`
-    - `smolvla`
 
     !!! note "Note"
-        If the `model_type` above specified a model repository, supply the name of the model, such as `gpt2`, `HuggingFaceTB/SmolLM2-135M`, or `smolvla`, here.
+        If the `model_type` above specified a model repository, supply the name of the model, such as `gpt2`, `HuggingFaceTB/SmolLM2-135M`, or `Qwen/Qwen3-0.6B-Base`, here.
 
         For `resnet_x`, x = 18, 34, 50, 101, or 152; for `vgg_x`, x = 11, 13, 16, or 19.
 
@@ -200,3 +195,18 @@
     An optional tokenizer identifier to use instead of `trainer.model_name`.
 
     This is mainly useful for Hugging Face language-model workloads where the tokenizer/chat template comes from a separate repository.
+
+!!! example "model_revision"
+    The Hugging Face model revision passed to model configuration and weight
+    loaders. Use an immutable commit SHA for reproducible runs. When omitted,
+    existing configurations retain the default `main` revision.
+
+!!! example "tokenizer_revision"
+    The Hugging Face tokenizer revision. If omitted and the tokenizer repository
+    matches `model_name`, it inherits `model_revision`. A different tokenizer
+    repository defaults to `main`; set its own immutable revision explicitly.
+
+!!! example "model_dtype"
+    The dtype used when loading a Hugging Face model. The
+    [Qwen3 reference](../examples/case-studies/6. Qwen3 Federated LoRA.md) uses
+    `float32` and the `--cpu` command-line flag for its CPU execution path.

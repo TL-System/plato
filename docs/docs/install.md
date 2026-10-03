@@ -49,7 +49,6 @@ where `mlx` is the name of the dependency group.
 Useful extras in the current root package include:
 
 - `llm_eval` for server-side Lighteval evaluation
-- `nanochat` for Nanochat training and CORE evaluation
 - `mlx` for Apple Silicon MLX workloads
 - `dp`, `rl`, and `mpc` for specialized research workloads
 
@@ -87,36 +86,12 @@ See:
 - [Evaluation](configurations/evaluation.md) for the configuration contract
 - [Server-side Lighteval for SmolLM2](examples/case-studies/4. Server-side Lighteval for SmolLM2.md) for an end-to-end example
 
-### Optional: Nanochat Training and CORE Evaluation
+### Qwen3 Federated LoRA
 
-To use Nanochat workloads or the `nanochat_core` evaluator, install:
-
-```bash
-uv sync --extra nanochat
-```
-
-Nanochat also requires the `external/nanochat` git submodule, and the Rust tokenizer extension must be built before running the Nanochat configs successfully.
-
-See [Nanochat in Plato](examples/case-studies/5. Nanochat in Plato.md) for the full step-by-step setup, including:
-
-- `git submodule update --init --recursive`
-- installing `maturin` and building `rustbpe`
-- preparing the tokenizer required by CORE evaluation
-- running `configs/Nanochat/synthetic_micro.toml` and `configs/Nanochat/parquet_micro.toml`
-
-### Optional: SmolVLA + LeRobot Robotics Stack
-
-The LeRobot / SmolVLA path is intentionally kept separate from the default Plato install so the root environment stays lean.
-
-!!! warning "Migration note"
-    Older runbooks may still reference `uv sync --extra robotics`.
-    That root-package extra no longer exists. Use a dedicated environment that already has the LeRobot / SmolVLA stack installed, then verify it with:
-
-    ```bash
-    uv run python -c "import lerobot; print(lerobot.__version__)"
-    ```
-
-See [SmolVLA Trainer with LeRobot](examples/case-studies/3. SmolVLA Trainer with LeRobot.md) for the current setup guidance, configuration contract, and troubleshooting notes.
+The Qwen3 reference uses the standard Hugging Face and PEFT dependencies from
+`uv sync`. Use Python 3.13, the default qualification and CI target. See
+[Qwen3 Federated LoRA](examples/case-studies/6. Qwen3 Federated LoRA.md)
+for the pinned model, local data, CPU command, and validation scope.
 
 ### Building the `plato-learn` PyPi Package
 

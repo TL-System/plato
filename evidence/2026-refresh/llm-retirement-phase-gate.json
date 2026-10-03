@@ -1,0 +1,155 @@
+{
+  "schema_version": 1,
+  "created_utc": "2026-10-03T18:17:10.366249+00:00",
+  "reviewer": "/root/llm_phase_gate",
+  "decision": "ACCEPT_LOCAL_QUALIFICATION_AND_ROOT_PUBLICATION_PENDING_LINUX_MERGE_GATE",
+  "accepted_production_tree": "d230cd65244b4e8fc030778ad02c8760615f863f",
+  "source_worktree": "/tmp/plato-refresh-worktrees/llm-integrated",
+  "head_at_gate": "7beda2a8257e5c1e2a7aeef45314f01f143fd6b4",
+  "findings": [],
+  "independent_final_checks": {
+    "index_equals_accepted_tree": true,
+    "tracked_source_unchanged": true,
+    "both_suite_source_manifests_match_current_source": true,
+    "exact_collection_and_junit_identity_confirmed": true,
+    "all_470_retained_bundle_members_hash_and_length_verified": true,
+    "all_55_actual_runtime_receipts_hash_verified": true,
+    "runtime_oracle_script_reviewed": true,
+    "runtime_oracle_numeric_execution": "Root independently executed Fraction/weighted numerical oracle; this gate read its code/results and hash-verified raw retained observations/checkpoints. No new runtime test was run."
+  },
+  "local_results": {
+    "mandatory": {
+      "passed": 1333,
+      "skipped": 0,
+      "warnings": 27,
+      "runtime_nodes_included": 51
+    },
+    "base": {
+      "collected": 1326,
+      "passed": 1275,
+      "documented_dp_collection_skips": 1,
+      "existing_runtime_deselections": 51,
+      "warnings": 10
+    },
+    "coverage_reported_percent": 74,
+    "actual_runtime_records": 55,
+    "surviving_processes": 0,
+    "runtime_negative_path_note": "Expected failure, cancellation and noncooperative timeout cases retain nonzero exits/forced cleanup; normal FedAvg/FedDyn observations complete naturally.",
+    "fedavg_samples": [
+      2,
+      6
+    ],
+    "fedavg_max_absolute_error": 1.4901161193847656e-08,
+    "feddyn": "Root Fraction oracle verifies four-round endpoints/histories for uniform and sample modes plus resumed model/history/count/CPU RNG equality."
+  },
+  "root_actions_accepted": [
+    "Commit the accepted source with a clearly enumerated evidence-only overlay and publish the new Python 3.13 CI PR under existing user authorization.",
+    "Reparent onto merged main dcf787c012e30bcd7680a4398d54f946fde958e5 because its tree equals the qualified 7beda baseline. Verify the resulting production/source subtree against accepted tree d230cd65244b4e8fc030778ad02c8760615f863f; do not silently absorb unrelated changes.",
+    "Durably retain the verified bundle/manifest and review/qualification receipts in the delivery evidence. Bind final commit to the accepted source plus enumerated evidence-only additions; no claim that an evidence overlay leaves the full tree hash unchanged."
+  ],
+  "merge_conditions": [
+    "Complete Linux Python 3.13 qualification of the published candidate, including mandatory/base profile results, strict prerequisite and skip enforcement, type guard, import/collection and CI artifact staging. Audit downloaded final CI artifacts and their candidate SHA/exit codes before merge.",
+    "Inspect final PR description for intentional backend compatibility removal, Qwen replacement scope, reproducible validation and limitations; retain model/dataset/archive provenance separately.",
+    "Merge only after actual local and Linux gates pass under existing authorization. Verify merged main source/tree equivalence to the accepted published candidate and record PR/merge/artifact identities."
+  ],
+  "linux_status": "PENDING: no Linux qualification or merge acceptance is claimed by this local gate.",
+  "evidence_retention": {
+    "artifact": "llm-retirement-local-qualification.tar.gz",
+    "bytes": 4293395,
+    "sha256": "35cb7d055f36f9ae3463eb2ae4bc22d919f9e6f4c931924ead5c37a4ed3e7c33",
+    "verified_members": 470,
+    "includes": "Final collections/JUnit/logs, actual runtime payloads/checkpoints, author/reviewer evidence and honestly labeled interrupted prior-candidate observations."
+  },
+  "evidence_bindings": [
+    {
+      "path": "/tmp/plato-llm-phase-gate-preparation.json",
+      "sha256": "bab9f2dba7decd625ed8e41e235758b5a23cbb501ab37752bfbd76a18b25a5ee"
+    },
+    {
+      "path": "/tmp/plato-llm-integration/suite-audit.json",
+      "sha256": "b49eaf90444b9e8336c9c5c0ae8010d813ff3df01b36419b1f7e527239965a87"
+    },
+    {
+      "path": "/tmp/plato-llm-integration/runtime-audit.json",
+      "sha256": "00ed7ecc95f69623ea6beaa31d25c7d73f65b8fc97467e329ea320cb48c2d7e1"
+    },
+    {
+      "path": "/tmp/plato-llm-integration/dependency-bytecode-compilation.json",
+      "sha256": "dd3cb3e8c92ec2b4dba06e85a0bc18c3216a6a00d79a8d72f98534f1fd007527"
+    },
+    {
+      "path": "/tmp/plato-llm-integration/llm-retirement-local-qualification-manifest.json",
+      "sha256": "77054d1adac19b66906565c402674fe0267bbb3494e8b6b1f0347cc5c74b7a61"
+    },
+    {
+      "path": "/tmp/plato-llm-integration/audit_suites.py",
+      "sha256": "3dfb543eda0c85f9554761c63405d11f9fb0663e2a519c6641956a3ba90ccafb"
+    },
+    {
+      "path": "/tmp/plato-llm-integration/audit_runtime.py",
+      "sha256": "77a503128553168a195bf3ea9854a7a4b924a8fbb65fbd306694ad54a8956dcd"
+    },
+    {
+      "path": "/tmp/plato-llm-integration/retain_evidence.py",
+      "sha256": "3f8664360c7b6dcb60278a7b8d256543153e32156dce3ca9124502d912145b0b"
+    }
+  ],
+  "component_review_basis": [
+    {
+      "path": "/tmp/plato-llm-retirement-plan.json",
+      "sha256": "c2a5a34a32bc3f41228efb61e542e575fcd863861c68ead856b5d6453208b62e",
+      "decision": "Read-only design; no repository sources, dependencies, weights, commits or PRs changed."
+    },
+    {
+      "path": "/tmp/plato-llm-retirement-plan-review.json",
+      "sha256": "ba20ec92c2d1323203edf081218c317fe3dd7ba7e175a2cc4997d0806a0aca1a",
+      "decision": "ACCEPT_DESIGN"
+    },
+    {
+      "path": "/tmp/plato-retirement-review/review.json",
+      "sha256": "0cee58d5fc9d804cd066fd8964f4ef7b8717ceef17c1075c90d2b2c40a9d9c20",
+      "decision": "ACCEPT_RETIREMENT_IMPLEMENTATION"
+    },
+    {
+      "path": "/tmp/plato-qwen-review2/qwen-reference-review-bca1f6e.json",
+      "sha256": "412432d844697795fd2c9198c5d9758971d4c6afaead6760dda29a659aac951a",
+      "decision": "ACCEPT"
+    },
+    {
+      "path": "/tmp/plato-llm-docs-review/review.json",
+      "sha256": "f235a92726404f61dcd57d7c5bb5bf85aa4c82272e1d2832b4f8c157b8c25ddb",
+      "decision": "ACCEPT_DOCUMENTATION_SCOPE"
+    },
+    {
+      "path": "/tmp/plato-llm-docs-review/addendum-review.json",
+      "sha256": "5868990ab9dffc53119c4a1069b542ffa263b29f3e8483c7cf4ccac4ec783e44",
+      "decision": "ACCEPT_DOCUMENTATION_ADDENDUM_SCOPE_WITH_LOW_WORDING_FINDING"
+    },
+    {
+      "path": "/tmp/plato-llm-docs-review/final-binding-review.json",
+      "sha256": "78135028efcef99e6f7eba945434b7e770eb6f5da1b40d661e951b1d257c54cb",
+      "decision": "ACCEPT_DOCUMENTATION_FINAL_BINDING_SCOPE"
+    },
+    {
+      "path": "/tmp/plato-llm-integration/checks/final-integration-checks.json",
+      "sha256": "29b90778b3f3eb02c281e649249215f6d625610eb940492321bdfbad53971f62",
+      "decision": "ACCEPT_BOUNDED_FINAL_INTEGRATION_CHECKS"
+    },
+    {
+      "path": "/tmp/plato-phase2-root/phase2-delivery.json",
+      "sha256": "0eac71054c75cd76aa487028c169d4dfd44d2ffda3a53ee059c3784879099870",
+      "decision": "DELIVERED_PHASE2"
+    }
+  ],
+  "limits": [
+    "Actual transport normal CLI observation remains historical d3569ec: correction predicate is false for shipped unchanged vocabulary, adapter keys/hashes match, but no corrected-source CLI replay is claimed.",
+    "One visible semaphore cleanup warning occurred in that CLI log; exit was natural with no surviving processes. Do not claim warning-free shutdown or established cause.",
+    "Offline tiny Qwen runtime tests, official pretrained shared-base qualifier, and normal multiprocess CLI are separate scopes; single-process peak RSS and sampled process-group RSS are distinct.",
+    "No benchmark quality, convergence, full optimizer-state resume, complete Python 3.14 qualification or security-clean claim. Python 3.13 is default/CI; preserve historical 3.14 compatibility fixes.",
+    "Nineteen unchanged legacy archive files remain in sdist; only new retirement archives and retired runtimes are proven excluded from both distributions.",
+    "Security questions were user-deferred and are not a new approval block. Phase 2 PR417 has already merged; only root publishes and merges this next PR.",
+    "Task-environment dependency bytecode compilation occurred during runs without source/package/assertion changes; duration is not a performance benchmark.",
+    "Base profile deliberately excludes the same 51 runtime nodes that mandatory executed. Do not report 1326 base passes.",
+    "Only root publishes, merges and cleans up. Preserve evidence until actual audited Linux completion and merged-source identity verification."
+  ]
+}

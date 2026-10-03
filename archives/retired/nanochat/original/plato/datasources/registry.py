@@ -1,0 +1,112 @@
+"""
+Having a registry of all available classes is convenient for retrieving an instance
+based on a configuration at run-time.
+"""
+
+import logging
+
+from plato.config import Config
+from plato.datasources import (
+    cinic10,
+    feature,
+    femnist,
+    huggingface,
+    lerobot,
+    lora,
+    nanochat,
+    purchase,
+    texas,
+    tiny_imagenet,
+    torchvision,
+)
+
+registered_datasources = {
+    "HuggingFace": huggingface,
+    "Torchvision": torchvision,
+    "LoRA": lora,
+    "CINIC10": cinic10,
+    "Purchase": purchase,
+    "Texas": texas,
+    "TinyImageNet": tiny_imagenet,
+    "Feature": feature,
+    "Nanochat": nanochat,
+}
+
+registered_partitioned_datasources = {"FEMNIST": femnist, "LeRobot": lerobot}
+
+_datasource_aliases = {
+    "STL10": ("Torchvision", {"dataset_name": "STL10"}),
+    "MNIST": ("Torchvision", {"dataset_name": "MNIST"}),
+    "FashionMNIST": ("Torchvision", {"dataset_name": "FashionMNIST"}),
+    "EMNIST": ("Torchvision", {"dataset_name": "EMNIST"}),
+    "CIFAR10": ("Torchvision", {"dataset_name": "CIFAR10"}),
+    "CIFAR100": ("Torchvision", {"dataset_name": "CIFAR100"}),
+    "CelebA": ("Torchvision", {"dataset_name": "CelebA"}),
+}
+
+
+def get(client_id: int = 0, **kwargs):
+    """Get the data source with the provided name."""
+    if "datasource_name" in kwargs:
+        datasource_name = kwargs.pop("datasource_name")
+    else:
+        datasource_name = Config().data.datasource
+
+    logging.info("Data source: %s", datasource_name)
+
+    if datasource_name in _datasource_aliases:
+        target_name, extra_kwargs = _datasource_aliases[datasource_name]
+        kwargs = {**extra_kwargs, **kwargs}
+        datasource_name = target_name
+
+    if datasource_name in registered_datasources:
+        module = registered_datasources[datasource_name]
+        datasource_cls = getattr(module, "DataSource", None)
+        if datasource_cls is None:
+            raise AttributeError(
+                f"Registered datasource '{datasource_name}' lacks a DataSource class."
+            )
+        dataset = datasource_cls(**kwargs)
+    elif datasource_name in registered_partitioned_datasources:
+        module = registered_partitioned_datasources[datasource_name]
+        datasource_cls = getattr(module, "DataSource", None)
+        if datasource_cls is None:
+            raise AttributeError(
+                f"Registered partitioned datasource '{datasource_name}' lacks a DataSource class."
+            )
+        dataset = datasource_cls(client_id, **kwargs)
+    else:
+        raise ValueError(f"No such data source: {datasource_name}")
+
+    return dataset
+
+
+def get_input_shape():
+    """Get the input shape of data source with the provided name."""
+    datasource_name = Config().data.datasource
+
+    logging.info("Data source: %s", Config().data.datasource)
+
+    if datasource_name in _datasource_aliases:
+        datasource_name = _datasource_aliases[datasource_name][0]
+
+    if datasource_name in registered_datasources:
+        module = registered_datasources[datasource_name]
+        datasource_cls = getattr(module, "DataSource", None)
+        if datasource_cls is None:
+            raise AttributeError(
+                f"Registered datasource '{datasource_name}' lacks a DataSource class."
+            )
+        input_shape = datasource_cls.input_shape()
+    elif datasource_name in registered_partitioned_datasources:
+        module = registered_partitioned_datasources[datasource_name]
+        datasource_cls = getattr(module, "DataSource", None)
+        if datasource_cls is None:
+            raise AttributeError(
+                f"Registered partitioned datasource '{datasource_name}' lacks a DataSource class."
+            )
+        input_shape = datasource_cls.input_shape()
+    else:
+        raise ValueError(f"No such data source: {datasource_name}")
+
+    return input_shape

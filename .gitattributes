@@ -1,0 +1,2 @@
+# Historical originals preserve their bytes, including inherited whitespace.
+archives/retired/*/original/** -text -whitespace

@@ -1,0 +1,504 @@
+{
+  "schema_version": 1,
+  "review_type": "Independent bounded final combined integration qualification",
+  "reviewer": "/root/llm_integration_checks",
+  "completed_at": "2026-10-03T17:48:46.862370+00:00",
+  "decision": "ACCEPT_BOUNDED_FINAL_INTEGRATION_CHECKS",
+  "repository_worktree": "/tmp/plato-refresh-worktrees/llm-integrated",
+  "staged_tree": "d230cd65244b4e8fc030778ad02c8760615f863f",
+  "previous_receipt": {
+    "path": "/tmp/plato-llm-integration/checks/preliminary-integration-validation.json",
+    "bytes": 42276,
+    "sha256": "ebea29ef9485b55b2ab49884aa37aaa413edcdcc6ac3c5078ee7749cbad4c3dc"
+  },
+  "exact_delta": {
+    "plato/trainers/huggingface.py": {
+      "before": {
+        "mode": "100644",
+        "kind": "blob",
+        "oid": "f4e15f05cbacd31b009d08667aa26b16acd14c0f"
+      },
+      "after": {
+        "mode": "100644",
+        "kind": "blob",
+        "oid": "dab2d2b6291e83952cd1ecbb5eec2ca6a6805f1e"
+      },
+      "exact_owner_commit": "bca1f6ec3541090dccb838197206fee2d6412516"
+    },
+    "evidence/2026-refresh/llm-retirement-docs-cli-addendum.json": {
+      "before": null,
+      "after": {
+        "mode": "100644",
+        "kind": "blob",
+        "oid": "a2d010091a21d7ed3baa6b4cf0fa4b3d4261e066"
+      },
+      "exact_owner_commit": "39f58144ffe5aa7ba4b940f76c984f991f93d6ab"
+    },
+    "tests/integration/test_qwen3_lora.py": {
+      "before": {
+        "mode": "100644",
+        "kind": "blob",
+        "oid": "22f6c996ba9a6e5640b05c59079aed7ad86a3558"
+      },
+      "after": {
+        "mode": "100644",
+        "kind": "blob",
+        "oid": "0737d006f947e158733b5c96c5503aa0120275de"
+      },
+      "exact_owner_commit": "bca1f6ec3541090dccb838197206fee2d6412516"
+    },
+    "evidence/2026-refresh/llm-retirement-docs-final-binding.json": {
+      "before": null,
+      "after": {
+        "mode": "100644",
+        "kind": "blob",
+        "oid": "81f962c86e78424159dece07af55ea60f9384538"
+      },
+      "exact_owner_commit": "fd4a2bcfa0eb3a57fa015281a156e893d95e9484"
+    },
+    "docs/docs/examples/case-studies/6. Qwen3 Federated LoRA.md": {
+      "before": {
+        "mode": "100644",
+        "kind": "blob",
+        "oid": "aad6b569958925863e15e7e35ef19f15dd00ea2e"
+      },
+      "after": {
+        "mode": "100644",
+        "kind": "blob",
+        "oid": "de9bf0b4cac581006ad2ec082e682097b1b7eff7"
+      },
+      "exact_owner_commit": "fd4a2bcfa0eb3a57fa015281a156e893d95e9484"
+    },
+    "evidence/2026-refresh/qwen-reference-expanded-embeddings-validation.json": {
+      "before": null,
+      "after": {
+        "mode": "100644",
+        "kind": "blob",
+        "oid": "884e29455c289a5cd0db773e2c99e76fb1c8feb5"
+      },
+      "exact_owner_commit": "bca1f6ec3541090dccb838197206fee2d6412516"
+    }
+  },
+  "exact_owner_commit_bytes_verified": true,
+  "index_exactly_matches_declared_tree": true,
+  "index_entries_sha256": "03ac4ba0632dc5ae555eb7f9b369a0764517d91c0b7677ca56032e3d286ef7ec",
+  "tracked_source_and_index_unchanged_during_all_owned_checks": true,
+  "final_source_manifest": {
+    "path": "/tmp/plato-llm-integration/checks/final/source-before.json",
+    "bytes": 321858,
+    "sha256": "eebd6a109665674d7b0b3a29517dbb01e1df57b90f1e22e4e64718706f878478"
+  },
+  "final_source_fingerprints": {
+    "plato/trainers/huggingface.py": {
+      "mode": "100644",
+      "kind": "blob",
+      "oid": "dab2d2b6291e83952cd1ecbb5eec2ca6a6805f1e",
+      "bytes": 44363,
+      "sha256": "cde9f121c4358be7da12f34167a9b313debc2969fd598b743acf022adaef3102"
+    },
+    "evidence/2026-refresh/llm-retirement-docs-cli-addendum.json": {
+      "mode": "100644",
+      "kind": "blob",
+      "oid": "a2d010091a21d7ed3baa6b4cf0fa4b3d4261e066",
+      "bytes": 9448,
+      "sha256": "d020c1158dea23ee5ec9ef64e32078ae07b73b6ec4adbcefec3b04f271470a17"
+    },
+    "tests/integration/test_qwen3_lora.py": {
+      "mode": "100644",
+      "kind": "blob",
+      "oid": "0737d006f947e158733b5c96c5503aa0120275de",
+      "bytes": 9933,
+      "sha256": "dfb7b2bd0ec532fc5093e3a800fedf0539ebec2fa8f5853fab7fe477951766c9"
+    },
+    "evidence/2026-refresh/llm-retirement-docs-final-binding.json": {
+      "mode": "100644",
+      "kind": "blob",
+      "oid": "81f962c86e78424159dece07af55ea60f9384538",
+      "bytes": 4151,
+      "sha256": "82676922df0e158cd20b963750b84d1229a63bd34daa1a640d27c4aa3070056a"
+    },
+    "docs/docs/examples/case-studies/6. Qwen3 Federated LoRA.md": {
+      "mode": "100644",
+      "kind": "blob",
+      "oid": "de9bf0b4cac581006ad2ec082e682097b1b7eff7",
+      "bytes": 8241,
+      "sha256": "0e6c10676a580e6135cc65c5708840a97069b2133aac7d4576495786dc5f7dae"
+    },
+    "evidence/2026-refresh/qwen-reference-expanded-embeddings-validation.json": {
+      "mode": "100644",
+      "kind": "blob",
+      "oid": "884e29455c289a5cd0db773e2c99e76fb1c8feb5",
+      "bytes": 13623,
+      "sha256": "741816d489fe473159eb84e26760d7704ed6cf2cec7b9814fe1d4256d41fe64c"
+    }
+  },
+  "ci": {
+    "python_matrix": [
+      {
+        "python": "3.13",
+        "profile": "supported-default"
+      }
+    ],
+    "matrix_and_helper_byte_unchanged": true,
+    "prior_helper_behavior_probe_reused": true,
+    "fresh_existing_type_guard_passed": true
+  },
+  "typing": {
+    "baseline_root_initialized": 664,
+    "preliminary": 657,
+    "final": 657,
+    "new_diagnostic_signatures_vs_preliminary": 0,
+    "new_diagnostic_signatures_vs_root": 0,
+    "final_output_byte_identical_to_preliminary": true,
+    "all_28_changed_active_python_files_have_zero_full_diagnostics": true,
+    "both_delta_python_files_have_zero_scoped_diagnostics": true,
+    "fresh_ci_guard_exit_code": 0
+  },
+  "collection": {
+    "baseline": 1303,
+    "retirement": 1308,
+    "initial_qwen": 1332,
+    "final_mandatory": 1333,
+    "final_base": 1326,
+    "correction_added": [
+      "tests/integration/test_qwen3_lora.py::test_supplied_preexpanded_peft_model_preserves_embedding_snapshots_and_logits"
+    ],
+    "correction_removed": [],
+    "base_omissions": [
+      "tests/trainers/test_dp_data_loader_strategy.py::test_actual_dp_consecutive_training_exchange_checkpoint_and_accounting",
+      "tests/trainers/test_dp_data_loader_strategy.py::test_actual_dp_physical_batches_only_report_real_updates_and_cleanup",
+      "tests/trainers/test_dp_data_loader_strategy.py::test_actual_spawned_dp_rounds_return_accounting_and_isolate_clients",
+      "tests/trainers/test_dp_data_loader_strategy.py::test_dp_actual_time_snapshot_writer_to_plain_urgent_reader",
+      "tests/trainers/test_dp_data_loader_strategy.py::test_dp_memory_splitting_matches_logical_batch_parameter_reference",
+      "tests/trainers/test_dp_data_loader_strategy.py::test_dp_strategy_handles_plato_sampler_get",
+      "tests/trainers/test_dp_data_loader_strategy.py::test_dp_strategy_handles_torch_sampler_directly"
+    ],
+    "exact_node_set_and_source_binding_verified": true,
+    "ledger": {
+      "path": "/tmp/plato-llm-integration/checks/final/collection-ledger.json",
+      "bytes": 10131,
+      "sha256": "306c4b7ff23e38fa5a558ac7bae74ebaa96bfeb80b7fa555c88692e182c4b3d3"
+    }
+  },
+  "reused_evidence": {
+    "lock_check": {
+      "all_inputs_byte_identical_to_previous_receipt": true,
+      "input_fingerprints": {
+        "uv.lock": "46236f61039c07a844bbddaa185c32582b6f4436203bd719aa8e7dcfdbd26e89",
+        "pyproject.toml": "2c194cf625de70ceea14b737c2b2f4c64ea68dbde23039464f97015216752edf"
+      }
+    },
+    "ci_matrix_and_staging_helper_probe": {
+      "all_inputs_byte_identical_to_previous_receipt": true,
+      "input_fingerprints": {
+        ".github/workflows/pytorch_tests.yml": "9901a1766341a9b9369a31ede1a5f8d94429eaf2e74c66f7a77c2520324e703b",
+        ".github/scripts/stage_ci_artifacts.py": "df7030fd29802baa0fd4858deb2f4047e02a305a2862a3432d9a63764a8671c2"
+      }
+    },
+    "archive_exclusions_and_identity": {
+      "all_inputs_byte_identical_to_previous_receipt": true,
+      "input_fingerprints": {
+        "pyproject.toml": "2c194cf625de70ceea14b737c2b2f4c64ea68dbde23039464f97015216752edf",
+        ".gitattributes": "8aa0ac639d30f11631290d009202e5d75c8036efac949b3833fd62506f484e5b",
+        ".gitmodules": "df62d800fe0b6c27c924cdba64e6bcdd9fae3957d1efe613b01e1f51752e3428",
+        "archives/legacy_datalib/LICENSE": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+        "archives/legacy_datalib/README.md": "6a5e002446780ad2e25337ab8f48434f25ce106e420b7e47dde1a5d3b9bc8cd7",
+        "archives/legacy_datalib/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "archives/legacy_datalib/audio_extraction_tools.py": "afa61fd9f87becda3bee4791d5dd18dcbe3557405d0c49a9a0731bb8f7f5c3f3",
+        "archives/legacy_datalib/data_utils.py": "53d83b9734a7d0a036393062daafbb0191bab8abfc061397f876559f1a4962fd",
+        "archives/legacy_datalib/flickr30kE_utils.py": "545540ef26d363c1cea0b7a4c6881be99593a67e2ae70f42db30d0187ccf36ff",
+        "archives/legacy_datalib/frames_extraction_tools.py": "6eab47d5ef3dbbb5d129b16868f10a60851c968b96b990c1a8aa2d9c2f394553",
+        "archives/legacy_datalib/gym_utils/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "archives/legacy_datalib/gym_utils/gym_trim.py": "7dca933a707d78ae9e9d25cd754396030e5a7d0f5f9e8ba9ad7347669a716165",
+        "archives/legacy_datalib/modality_data_anntation_tools.py": "7ab25ac2b0983da3f9b50cc9a18ad061eab3049311e61c88a3c1ff81aa768624",
+        "archives/legacy_datalib/modality_extraction_base.py": "192d092044cf982a0354cfd4235b3e64ace1f6cb4f902ad8452c2e3cbc0a9041",
+        "archives/legacy_datalib/parse_datasets.py": "79883cead5983b3cdbc119bd479c8c4503e6cb6674ff54e54ab8255051c3a017",
+        "archives/legacy_datalib/refer_utils/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "archives/legacy_datalib/refer_utils/referitgame_utils.py": "636ddd92f2ae09a9d17708226daeb672a6356f2e183edb5d2e487027a70d4f6a",
+        "archives/legacy_datalib/tiny_data_tools.py": "33d8ec92496c510632d906d1c838a5e788a6c7f482017cf477cabd2ced80b793",
+        "archives/legacy_datalib/video_transform.py": "354dd8ad20a605bfa421f423fdab793ce601ed46e27eb2dcb5291c24d8b83db2",
+        "archives/legacy_rl_env/LICENSE": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+        "archives/legacy_rl_env/README.md": "648f74dbdb2b577069a6f4363de407b2cd4d2b4ca8d6e9462f69be442bfd7a93",
+        "archives/legacy_rl_env/rl_env.py": "557fec876520d089a69c18484bcc73465eb1f52ac332442acc35427d57c7a40c",
+        "archives/retired/lerobot/README.md": "6017d10b7717806f79653414b9e59e0445e492ae530bb8f9cbc8c1b5356f79d2",
+        "archives/retired/lerobot/manifest.json": "06735f7c441f86aaec6208b5dd67fd6a36a55a6aa009267bbd8b6900bc4818f5",
+        "archives/retired/lerobot/original/LICENSE": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+        "archives/retired/lerobot/original/configs/LeRobot/lerobot_datasource_base.toml": "01acba088dbfcf153abf035dc283863dd83091028cbe7cd7853319da0e95c514",
+        "archives/retired/lerobot/original/configs/LeRobot/smolvla_fedavg_two_client_smoke.toml": "06860652a1c2d989fb46f2b6933842de9c0bd6a3e89a2e2f3ef51865a211aa37",
+        "archives/retired/lerobot/original/configs/LeRobot/smolvla_full_finetune.toml": "769fe7e03c579bf4866315c1f8c1e1d0d7bc0fb834d8015da4cf9ffaf880532d",
+        "archives/retired/lerobot/original/configs/LeRobot/smolvla_single_client_smoke.toml": "b25188870533826549161ac1b50c6b7d3855024edb1f0b10f7d065e7e2766824",
+        "archives/retired/lerobot/original/docs/docs/examples/case-studies/3. SmolVLA Trainer with LeRobot.md": "2ceb580399deebd0ca3491644103b716046604aad3ed01880c130be088fd13db",
+        "archives/retired/lerobot/original/plato/datasources/lerobot.py": "fb6399418c5174415d0ba02a51fcfbcd5d04b555bd5190924fc228a605edc95d",
+        "archives/retired/lerobot/original/plato/datasources/registry.py": "38a76f407edd6f46ccbdf56e231ac93d18e379971a5dbf007f15c22f5da602b6",
+        "archives/retired/lerobot/original/plato/models/registry.py": "8f499c870ec4a31d0323b8e8cf27c9cea6e9aaedc0d3b98dd397989c26958aa8",
+        "archives/retired/lerobot/original/plato/models/smolvla.py": "6a082410a12b839e6064e4829568a55af54ce194a3f190c75f109772f83c35e1",
+        "archives/retired/lerobot/original/plato/trainers/lerobot.py": "1f647426a85df75df3ff2e9a7a90a8e8bb96d93e93d39f79729b7ff9d2f31ba8",
+        "archives/retired/lerobot/original/plato/trainers/registry.py": "dc17cf3bd8e1c168213173e7d16e5d4e4f12282c41d33a67f241b294afb64fa1",
+        "archives/retired/lerobot/original/pyproject.toml": "799bd7ba1865b097fdc8ca84a7b70337794e338de4aa9a6a13f6a4c1b9156246",
+        "archives/retired/lerobot/original/tests/algorithms/test_fedavg_algorithm.py": "61ef08d248c464655ed9b9894c0c212d917a101b4a48ddce5a14571e55ea2028",
+        "archives/retired/lerobot/original/tests/datasources/test_lerobot_datasource.py": "e75e9443328356f981036a43aab54a53d7999c14f73ff9f0f33f96bca14156e1",
+        "archives/retired/lerobot/original/tests/integration/test_lerobot_smolvla_smoke.py": "b7719295cc7ed036dff590a9d30ebdd0bcdc49a2220cfd476b0d8f4754932e85",
+        "archives/retired/lerobot/original/tests/models/test_smolvla_model.py": "2b34362cf27409903d3ab55b425c67dad011fdae578bb3a3959ef275cfea24d8",
+        "archives/retired/lerobot/original/tests/test_config_loader.py": "b79285e4822273311cc09cbd5bc5160c3026716754dbbf50bef190c8f8613c1d",
+        "archives/retired/lerobot/original/tests/test_utils/lerobot_stubs.py": "08977f6cc155faabf24cb30b48f91e8568a3a6bf2a944236b7068231c67d973d",
+        "archives/retired/lerobot/original/tests/trainers/test_lerobot_trainer.py": "c4ebc5e2d83bd356357c287572d14d2210caa3af8280a2ad3a4f5ef8525710ff",
+        "archives/retired/lerobot/original/uv.lock": "573b10c2ba1a2317e02f9e40c6181359cafab6f6e0a0f9be12bb256cb276fe1d",
+        "archives/retired/nanochat/README.md": "e49235c6623a45cf35b069cd4e8d7bd4ab309290a770875c5decf67cfb1f0be3",
+        "archives/retired/nanochat/UPSTREAM_LICENSE": "42bb09f339a8af8b90d3b4969b6f6e4ba4aff3b5c614103b031fccdf71c8f772",
+        "archives/retired/nanochat/manifest.json": "4f923c1a60c1153290ab0c024066a4d113a2e077059b80424f42f526ff5711e9",
+        "archives/retired/nanochat/original/.github/workflows/pytorch_tests.yml": "7c0c144730cbb0d38bb00e10c390e2ab60d6df0a6086de75fcd675bcc0fdc683",
+        "archives/retired/nanochat/original/.gitmodules": "d39136e1bfba768da1b969c651ef669a569df5d128b03c9c705780c21151d721",
+        "archives/retired/nanochat/original/LICENSE": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+        "archives/retired/nanochat/original/configs/Nanochat/parquet_micro.toml": "0fdf774ab9d17161bbe2de59c303a24a5d648e1e8db7c99a906c35a9cf514872",
+        "archives/retired/nanochat/original/configs/Nanochat/synthetic_micro.toml": "c4706d5d1422242a1c7408ad22aadad74d148ef2f33f2f2d01cac3d52fe4c9b0",
+        "archives/retired/nanochat/original/docs/docs/configurations/evaluation.md": "eace2f95f3352db4b950a518030e2b4627bde4bb91e28f917b0e143fe8180c45",
+        "archives/retired/nanochat/original/docs/docs/configurations/overview.md": "480ec3ab01fc7d384ef3c6f50ba5183ef0533aaaad7cb090ce9f4348bce6254e",
+        "archives/retired/nanochat/original/docs/docs/configurations/parameters.md": "9ffd51f87319bd2876add84e2ed83a28583e480be2438e1c43037d19674b2e94",
+        "archives/retired/nanochat/original/docs/docs/configurations/server.md": "c846b23e0ed08eb1a4cc9b728145d0fc1d42889bce4acbc7e1efb5f6a1e3535a",
+        "archives/retired/nanochat/original/docs/docs/configurations/trainer.md": "e6199390ab2acc69155a6827c0023be3e4cb349c75058bfa7db76dd56ad39e86",
+        "archives/retired/nanochat/original/docs/docs/development.md": "00b48e27a3b9142763c3ea4566044380ae10e9dcda3baedb4b566842dc71e6dd",
+        "archives/retired/nanochat/original/docs/docs/examples/Getting Started.md": "05f98d2c9ed43d48b11dd4ffd2b0a6ae321f881e4350487f62126be3d11693d5",
+        "archives/retired/nanochat/original/docs/docs/examples/case-studies/3. SmolVLA Trainer with LeRobot.md": "2ceb580399deebd0ca3491644103b716046604aad3ed01880c130be088fd13db",
+        "archives/retired/nanochat/original/docs/docs/examples/case-studies/5. Nanochat in Plato.md": "fdd566296869bb7cda391557636d14690c211cd939b7530138852b5581dda030",
+        "archives/retired/nanochat/original/docs/docs/index.md": "c7e0b74f19b23b43f99e1476125dcaeb1d207cf3fefc20131e00f9cfed24d2e0",
+        "archives/retired/nanochat/original/docs/docs/install.md": "dfcdccaab917a6590a6d9464af9b991e9dd7c6611e7e94e2695f2d965734a505",
+        "archives/retired/nanochat/original/docs/docs/quickstart.md": "eabcf5510b39f6bf84acfb809bd29537cf16588e4f9e4aed7e8db224c804ac3b",
+        "archives/retired/nanochat/original/docs/docs/references/evaluators.md": "dd9ad9537bd81ca3231c5972366f8762a37af83817c65108c7dbd967ad2fed17",
+        "archives/retired/nanochat/original/docs/docs/references/trainers.md": "a94acea1fcd607b07324ac941d6ac250b4444822019a4ea90370c4d429ebd73f",
+        "archives/retired/nanochat/original/docs/mkdocs.yml": "a3954634249d84cefd8cab51fd14f48f618c7eddf1439b5f45c501e1c015b056",
+        "archives/retired/nanochat/original/docs/nanochat_integration_checklist.md": "4a1ecb52df41db299f38d9b6dea28e9c5dbe4bede194cf438d8467848e004fd3",
+        "archives/retired/nanochat/original/docs/third_party.md": "a19c39846c81f1919a891ced33836613f0881e743a82ddd2f30e9c98ecfd2692",
+        "archives/retired/nanochat/original/examples/nanochat/README.md": "c30bc624a7780c7f9f3257c9b1f7fb7f450a31b3d4556e2bb47573e24b17c6d2",
+        "archives/retired/nanochat/original/examples/nanochat/pyproject.toml": "3931bdaa18658efb828aba8b3d19d5640788ea5bda1eba24fb454207b8bc38b8",
+        "archives/retired/nanochat/original/plato/datasources/nanochat.py": "b5ab5a5417aee22d426453a59c28ea5878cb430905b348e1dbb7ffb912752c64",
+        "archives/retired/nanochat/original/plato/datasources/registry.py": "38a76f407edd6f46ccbdf56e231ac93d18e379971a5dbf007f15c22f5da602b6",
+        "archives/retired/nanochat/original/plato/evaluators/nanochat_core.py": "7d05e824b09521d0d51a9f6481a95c0b3943c6f4f4ed81f144f6eb95739477f1",
+        "archives/retired/nanochat/original/plato/evaluators/registry.py": "e661fc199bd2f84ec23b17eea348493cf903a1d7d34c5b34fb3e623639a1f642",
+        "archives/retired/nanochat/original/plato/evaluators/runner.py": "9cb2125f3c03924a8e73f8b62e1e4044a55f9222f38aa01ec8dfaac56588955f",
+        "archives/retired/nanochat/original/plato/models/nanochat.py": "9e2ff36d559b80b3e1feb33c9ba7ac818c5fad337e1b3f77bfd40833bd703e77",
+        "archives/retired/nanochat/original/plato/models/registry.py": "8f499c870ec4a31d0323b8e8cf27c9cea6e9aaedc0d3b98dd397989c26958aa8",
+        "archives/retired/nanochat/original/plato/processors/nanochat_tokenizer.py": "e8961791065027bb7840671e6a8109b3856ddb3f473e482c8d35cce19b1f5e8b",
+        "archives/retired/nanochat/original/plato/servers/fedavg.py": "f184068a11c5be9e523f08b95e1cce76dff2e20e2fdb4e6426caf95dac0bcee5",
+        "archives/retired/nanochat/original/plato/servers/fedavg_cs.py": "6998754dfc6a07732ab58a3fb398679c47390afeb4ce3859c166acae106515e0",
+        "archives/retired/nanochat/original/plato/servers/split_learning.py": "fa4da694a332ce496b75b753bfb9cd91900ccf80db93f1321cbc3c282cae7abc",
+        "archives/retired/nanochat/original/plato/trainers/composable.py": "0a4549f08fa1afaec3ab7814930dcfc59cd671bb8b1a608862a4c58a480093a5",
+        "archives/retired/nanochat/original/plato/trainers/nanochat.py": "57e2d1167157aea1fe88703c85f4c8fc39daeaa0a53fc4e73f9ed40f99fe78b1",
+        "archives/retired/nanochat/original/plato/trainers/registry.py": "dc17cf3bd8e1c168213173e7d16e5d4e4f12282c41d33a67f241b294afb64fa1",
+        "archives/retired/nanochat/original/plato/utils/third_party.py": "fdf0bebe7a33023412b039f963e0acf31429f9ce29c1de20c1b8194521bfeb5c",
+        "archives/retired/nanochat/original/pyproject.toml": "799bd7ba1865b097fdc8ca84a7b70337794e338de4aa9a6a13f6a4c1b9156246",
+        "archives/retired/nanochat/original/tests/conftest.py": "3eb55a1fa7c0fd5428c296c1bcd7300b23b0ade3d276f5c687af3b9bd78304c7",
+        "archives/retired/nanochat/original/tests/evaluators/test_registry_runner.py": "55bc828845b057a8f95fd4b4479f4b968cc19be84b6cb3d77022347d3a702007",
+        "archives/retired/nanochat/original/tests/integration/utils.py": "7a4af3c5bece78c256f268fb47ee31e384f14cca098d1690ebe2c05f79b21634",
+        "archives/retired/nanochat/original/tests/test_config_loader.py": "b79285e4822273311cc09cbd5bc5160c3026716754dbbf50bef190c8f8613c1d",
+        "archives/retired/nanochat/original/tests/test_nanochat_integration.py": "07d59c06105cc5d3767f3899ac0b07f4a3692f679edeef34765e8ac43e04013c",
+        "archives/retired/nanochat/original/tests/trainers/test_composable_trainer.py": "491c30fba4858571430430ac52cc63f632c683b10de35c1420fb6a77324ac440",
+        "archives/retired/nanochat/original/tests/trainers/test_nanochat_trainer.py": "84a5eb97d6c9c9f35931bc9d02b208905e45bc28bebc985898a2c4321b6e1680",
+        "archives/retired/nanochat/original/uv.lock": "573b10c2ba1a2317e02f9e40c6181359cafab6f6e0a0f9be12bb256cb276fe1d",
+        "archives/retired/nanochat/upstream-c75fe54aa7c1fa881701c246f9427bcbe4eee5a4.tar.gz": "6fa7ddcccbe290af3fbf1abddf04478e3589aa5d37a83dc498ffed1e05081a8a"
+      }
+    }
+  },
+  "distributions": {
+    "plato_learn-1.4.3-py3-none-any.whl": {
+      "path": "/tmp/plato-llm-integration/checks/final/dist/plato_learn-1.4.3-py3-none-any.whl",
+      "bytes": 8676495,
+      "sha256": "13d414aad7e982cc2244c95619fb63b68c8ed8f78e29f1af362e7f3ffc727d1e",
+      "regular_files": 427,
+      "source_payloads_verified_against_final_worktree": 423,
+      "generated_metadata_payloads": [
+        {
+          "path": "plato_learn-1.4.3.dist-info/METADATA",
+          "bytes": 1983,
+          "sha256": "a47a39f810f7a5e3c775fccd2ee14020b1d4db53d14078a899defd8d2a9fd6f5"
+        },
+        {
+          "path": "plato_learn-1.4.3.dist-info/WHEEL",
+          "bytes": 87,
+          "sha256": "5b77e4a649bbfb07fdbc123967eeecd1e5a478cfaca6eefc23c35e6fdf037848"
+        },
+        {
+          "path": "plato_learn-1.4.3.dist-info/licenses/LICENSE",
+          "bytes": 11357,
+          "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+        },
+        {
+          "path": "plato_learn-1.4.3.dist-info/RECORD",
+          "bytes": 40394,
+          "sha256": "2bfd3ebf75159a871ce9f5e2d23a50e38ec21a72545e5910d928069a9e74d17c"
+        }
+      ],
+      "contents_manifest": {
+        "path": "/tmp/plato-llm-integration/checks/final/plato_learn-1.4.3-py3-none-any.whl.contents.json",
+        "bytes": 73824,
+        "sha256": "c64d26adf788d05ac9cc873169b48ec090dd4ae0a077030ced32a9dc2feadd2a"
+      },
+      "retired_and_retirement_archive_payloads": [],
+      "legacy_archive_paths": [],
+      "legacy_archive_bytes_unchanged": true,
+      "final_trainer_payload_sha256": "cde9f121c4358be7da12f34167a9b313debc2969fd598b743acf022adaef3102"
+    },
+    "plato_learn-1.4.3.tar.gz": {
+      "path": "/tmp/plato-llm-integration/checks/final/dist/plato_learn-1.4.3.tar.gz",
+      "bytes": 32378017,
+      "sha256": "098683329ef2dd95b28946174773a9957ac4cec7b80c150aae2387ac7d7fb650",
+      "regular_files": 1385,
+      "source_payloads_verified_against_final_worktree": 1384,
+      "generated_metadata_payloads": [
+        {
+          "path": "PKG-INFO",
+          "bytes": 1983,
+          "sha256": "a47a39f810f7a5e3c775fccd2ee14020b1d4db53d14078a899defd8d2a9fd6f5"
+        }
+      ],
+      "contents_manifest": {
+        "path": "/tmp/plato-llm-integration/checks/final/plato_learn-1.4.3.tar.gz.contents.json",
+        "bytes": 251735,
+        "sha256": "c34a5c22650aad13f49bf53c611fd0833b7c64437342b01eac59252ebb510df9"
+      },
+      "retired_and_retirement_archive_payloads": [],
+      "legacy_archive_paths": [
+        "archives/legacy_datalib/LICENSE",
+        "archives/legacy_datalib/README.md",
+        "archives/legacy_datalib/__init__.py",
+        "archives/legacy_datalib/audio_extraction_tools.py",
+        "archives/legacy_datalib/data_utils.py",
+        "archives/legacy_datalib/flickr30kE_utils.py",
+        "archives/legacy_datalib/frames_extraction_tools.py",
+        "archives/legacy_datalib/modality_data_anntation_tools.py",
+        "archives/legacy_datalib/modality_extraction_base.py",
+        "archives/legacy_datalib/parse_datasets.py",
+        "archives/legacy_datalib/tiny_data_tools.py",
+        "archives/legacy_datalib/video_transform.py",
+        "archives/legacy_datalib/gym_utils/__init__.py",
+        "archives/legacy_datalib/gym_utils/gym_trim.py",
+        "archives/legacy_datalib/refer_utils/__init__.py",
+        "archives/legacy_datalib/refer_utils/referitgame_utils.py",
+        "archives/legacy_rl_env/LICENSE",
+        "archives/legacy_rl_env/README.md",
+        "archives/legacy_rl_env/rl_env.py"
+      ],
+      "legacy_archive_bytes_unchanged": true,
+      "final_trainer_payload_sha256": "cde9f121c4358be7da12f34167a9b313debc2969fd598b743acf022adaef3102"
+    }
+  },
+  "unresolved_findings_in_owned_bounded_scope": [],
+  "existing_packaging_followup": [
+    {
+      "area": "Legacy archive source distribution contents",
+      "assessment": "Existing packaging boundary, outside this retirement change.",
+      "files": 19,
+      "paths": "archives/legacy_datalib and archives/legacy_rl_env",
+      "byte_identical_to_root_head": true,
+      "wheel_contents": "No archive paths.",
+      "accepted_requirement": "New archives/retired and retired runtime modules excluded from both distributions."
+    }
+  ],
+  "commands": [
+    {
+      "command": "zsh -lc: PYTHONDONTWRITEBYTECODE=1 /tmp/plato-llm-integration/tooling-313/bin/python /tmp/plato-llm-integration/checks/final_snapshot.py",
+      "exit_code": 0,
+      "result": "Exact staged tree/index/source and six owner-commit deltas verified."
+    },
+    {
+      "command": "zsh -lc: /tmp/plato-llm-integration/tooling-313/bin/ruff check . --select I",
+      "exit_code": 0,
+      "result": "All checks passed!",
+      "log": {
+        "path": "/tmp/plato-llm-integration/checks/final/ruff.log",
+        "bytes": 19,
+        "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+      }
+    },
+    {
+      "command": "zsh -lc: PYTHONDONTWRITEBYTECODE=1 /tmp/plato-llm-integration/tooling-313/bin/ty check --python /tmp/plato-llm-integration/tooling-313/bin/python --output-format concise",
+      "exit_code": 1,
+      "result": "657 existing diagnostics; output byte-identical to preliminary log; all 28 changed active files remain clean.",
+      "log": {
+        "path": "/tmp/plato-llm-integration/checks/final/ty-full.log",
+        "bytes": 121439,
+        "sha256": "98ab50b6c9564af470858372523719ec276c769e32b8496398627859e9b89d62"
+      }
+    },
+    {
+      "command": "zsh -lc: PYTHONDONTWRITEBYTECODE=1 /tmp/plato-llm-integration/tooling-313/bin/ty check --python /tmp/plato-llm-integration/tooling-313/bin/python --output-format concise plato/trainers/huggingface.py tests/integration/test_qwen3_lora.py",
+      "exit_code": 0,
+      "result": "Both correction Python files pass scoped typing.",
+      "log": {
+        "path": "/tmp/plato-llm-integration/checks/final/ty-delta.log",
+        "bytes": 19,
+        "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+      }
+    },
+    {
+      "command": [
+        "/tmp/plato-llm-integration/tooling-313/bin/python",
+        "/tmp/plato-llm-integration/checks/workflow-type-guard.py",
+        "1"
+      ],
+      "cwd": "/tmp/plato-llm-integration/checks/final",
+      "exit_code": 0,
+      "result": "Exact unchanged embedded CI type guard passes fresh final output.",
+      "log": {
+        "path": "/tmp/plato-llm-integration/checks/final/workflow-type-guard.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "command": "zsh -lc: uv build --no-build-isolation --python /tmp/plato-llm-integration/tooling-313/bin/python --sdist --wheel --out-dir /tmp/plato-llm-integration/checks/final/dist",
+      "exit_code": 0,
+      "result": "Final wheel and sdist built; every source payload verified against final source.",
+      "log": {
+        "path": "/tmp/plato-llm-integration/checks/final/build.log",
+        "bytes": 238,
+        "sha256": "045a9faea22f6dce0f09a449ee1a406aac24eeb4ea597cbc2b56d7cf3b2ae8fb"
+      }
+    },
+    {
+      "command": "zsh -lc: git diff --cached --check",
+      "exit_code": 0,
+      "result": "Final staged whitespace check passed."
+    },
+    {
+      "command": "zsh -lc: PYTHONDONTWRITEBYTECODE=1 /tmp/plato-llm-integration/tooling-313/bin/python /tmp/plato-llm-integration/checks/write_final_report.py",
+      "exit_code": 0,
+      "result": "Final exact ledger, fresh typing guard, package content binding, evidence reuse and source/index preservation verified."
+    }
+  ],
+  "artifacts": {
+    "snapshot": {
+      "path": "/tmp/plato-llm-integration/checks/final/snapshot.json",
+      "bytes": 9388,
+      "sha256": "6193e21b8de7f88043a3abe0c7393a5b076cc8122d984821671f109f9b57534e"
+    },
+    "snapshot_script": {
+      "path": "/tmp/plato-llm-integration/checks/final_snapshot.py",
+      "bytes": 4536,
+      "sha256": "f213e4e2ca41ee1636e0c06c74a68c9e95b023eb3685a680c19af34c00225a19"
+    },
+    "verification_script": {
+      "path": "/tmp/plato-llm-integration/checks/write_final_report.py",
+      "bytes": 15261,
+      "sha256": "09821940a829b6f036f14d5d7f18f5e42dd4634bcf387ba6b40ff9eb4e62d25c"
+    },
+    "previous_typing_classification": {
+      "path": "/tmp/plato-llm-integration/checks/typing-classification.json",
+      "bytes": 6524,
+      "sha256": "dccf75fb0947557e0d0f72026afb721c37bf7687473e04e632f2c5f0911ea6b5"
+    },
+    "ci_guard_source": {
+      "path": "/tmp/plato-llm-integration/checks/workflow-type-guard.py",
+      "bytes": 1197,
+      "sha256": "a3900cdad29b0352e5b34dfb623fae569893a807ac7c6216c134fe5a4bb51e2b"
+    }
+  },
+  "limits": [
+    "Acceptance covers only the bounded integration checks on staged tree d230cd65244b4e8fc030778ad02c8760615f863f; it does not claim full-suite or hosted-CI results.",
+    "Root owns concurrently running complete base/mandatory suites; this receipt independently analyzes completed collection logs and exact source manifests only.",
+    "Fresh code and documentation reviewers independently own behavioral correction and final prose acceptance.",
+    "No Linux runtime, Python 3.14, final docs build, real pretrained-model execution, convergence or full optimizer-resume qualification is claimed here.",
+    "Lock, CI-helper behavior and immutable archive provenance are reused only after explicit byte equality; their full probes were not gratuitously rerun.",
+    "Nineteen pre-existing legacy archive files remain in the source distribution with unchanged bytes; the new retirement archive and retired runtime modules are absent from both distributions.",
+    "No source/index edits, commits, nested agents or remote writes were performed; only reviewer-owned scratch scripts, reports and artifacts were created."
+  ]
+}

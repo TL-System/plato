@@ -134,7 +134,7 @@ jobs:
           from pathlib import Path
           owned = {
               "tests/conftest.py", "tests/integration/utils.py",
-              "tests/test_nanochat_integration.py",
+              "tests/test_retired_backends.py", "plato/utils/retired_backends.py",
               "tests/trainers/test_dp_data_loader_strategy.py",
               "tests/clients/test_feddf_strategy.py",
               "tests/servers/test_feddf_server_strategy.py",

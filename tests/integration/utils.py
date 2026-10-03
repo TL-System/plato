@@ -7,7 +7,6 @@ from __future__ import annotations
 import asyncio
 import contextlib
 import copy
-import importlib
 import os
 import sys
 import tempfile
@@ -16,7 +15,6 @@ from typing import Iterator
 
 from plato.config import Config
 from plato.utils import toml_writer
-from plato.utils.third_party import ensure_nanochat_importable
 
 
 @contextlib.contextmanager
@@ -44,37 +42,6 @@ def isolated_config_state() -> Iterator[None]:
                 delattr(Config, name)
         for name, value in previous.items():
             setattr(Config, name, value)
-
-
-@contextlib.contextmanager
-def nanochat_source() -> Iterator[Path]:
-    """Import the initialized vendored source without retaining its path."""
-    previous_path = sys.path[:]
-    try:
-        source = Path(__file__).resolve().parents[2] / "external" / "nanochat"
-        if not (source / "nanochat" / "gpt.py").is_file():
-            raise ImportError(
-                "Initialized Nanochat source required: "
-                "git submodule update --init external/nanochat"
-            )
-        ensure_nanochat_importable()
-        importlib.invalidate_caches()
-        yield source
-    finally:
-        sys.path[:] = previous_path
-        importlib.invalidate_caches()
-
-
-def native_tokenizer_available() -> bool:
-    """A source namespace alone does not provide the native Tokenizer API."""
-    with nanochat_source():
-        try:
-            rustbpe = importlib.import_module("rustbpe")
-        except ModuleNotFoundError as exc:
-            if exc.name != "rustbpe":
-                raise
-            return False
-        return callable(getattr(rustbpe, "Tokenizer", None))
 
 
 def build_minimal_config(

@@ -453,7 +453,6 @@ class TestComposableTrainerEdgeCases:
             "metric": "ifeval_avg",
             "value": 0.31,
         }
-        trainer.context.state["nanochat_core_results"] = {"core_metric": 0.9}
 
         trainer._save_test_state(filename)
 
@@ -468,22 +467,17 @@ class TestComposableTrainerEdgeCases:
             "metric": "ifeval_avg",
             "value": 0.31,
         }
-        assert trainer.context.state["nanochat_core_results"] == {
-            "core_metric": 0.9
-        }
 
     def test_test_state_restore_clears_stale_evaluation_metadata(self, temp_config):
         trainer = ComposableTrainer(model=nn.Linear(2, 1))
 
         trainer.context.state[EVALUATION_RESULTS_KEY] = {"stale": {}}
         trainer.context.state[EVALUATION_PRIMARY_KEY] = {"metric": "old"}
-        trainer.context.state["nanochat_core_results"] = {"core_metric": 0.1}
 
         trainer._load_test_state("missing.eval.pkl")
 
         assert EVALUATION_RESULTS_KEY not in trainer.context.state
         assert EVALUATION_PRIMARY_KEY not in trainer.context.state
-        assert "nanochat_core_results" not in trainer.context.state
 
 
 class TestComposableTrainerComparison:

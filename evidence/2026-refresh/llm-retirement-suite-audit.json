@@ -1,0 +1,38 @@
+{
+  "status": "PASS_COMPLETE_INTEGRATED_SUITE_AUDIT",
+  "profiles": [
+    {
+      "profile": "mandatory",
+      "collected": 1333,
+      "passed": 1333,
+      "skips": [],
+      "warnings": 27,
+      "source_invariance": true,
+      "exact_execution_identity": true,
+      "receipt_sha256": "506670070319ac2ff26dcd3c788b50b52b645cf9a46b8392e1f720ab74dfb386"
+    },
+    {
+      "profile": "base",
+      "collected": 1326,
+      "passed": 1275,
+      "skips": [
+        {
+          "case": {
+            "classname": "",
+            "name": "tests.trainers.test_dp_data_loader_strategy",
+            "time": "0.000"
+          },
+          "reason": {
+            "message": "collection skipped"
+          }
+        }
+      ],
+      "warnings": 10,
+      "source_invariance": true,
+      "exact_execution_identity": true,
+      "receipt_sha256": "aa1e1900846b2b740e3e1c76745444355af87e65d92dc56c89ba90623e408519"
+    }
+  ],
+  "runtime_nodes_unchanged": 51,
+  "limitation": "Actual runtime payload/numerical/process records are audited separately."
+}

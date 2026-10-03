@@ -4,15 +4,14 @@ Federated averaging tailored for LoRA adapters.
 
 from __future__ import annotations
 
-from typing import Optional
-
 from plato.algorithms import fedavg
+from plato.utils.huggingface import adapter_save_embeddings
 
 try:
     from peft import get_peft_model_state_dict, set_peft_model_state_dict
 except ImportError:  # pragma: no cover
-    get_peft_model_state_dict = None  # type: ignore
-    set_peft_model_state_dict = None  # type: ignore
+    get_peft_model_state_dict = None
+    set_peft_model_state_dict = None
 
 
 class Algorithm(fedavg.Algorithm):
@@ -31,21 +30,30 @@ class Algorithm(fedavg.Algorithm):
 
     @staticmethod
     def _require_peft():
-        if get_peft_model_state_dict is None or set_peft_model_state_dict is None:
+        getter = get_peft_model_state_dict
+        setter = set_peft_model_state_dict
+        if getter is None or setter is None:
             raise ImportError(
                 "The 'peft' package is required for LoRA federated training. "
                 "Install it by running `uv add peft`."
             )
+        return getter, setter
 
     def extract_weights(self, model=None):
         """Extract only the LoRA adapter parameters."""
-        Algorithm._require_peft()
+        getter, _ = Algorithm._require_peft()
         peft_base = self._peft_base(model or self.model)
-        state_dict = get_peft_model_state_dict(peft_base)
-        return {name: tensor.cpu() for name, tensor in state_dict.items()}
+        state_dict = getter(
+            peft_base,
+            save_embedding_layers=adapter_save_embeddings(model or self.model),
+        )
+        return {
+            name: self._to_transport_tensor(tensor, name)
+            for name, tensor in state_dict.items()
+        }
 
     def load_weights(self, weights):
         """Load LoRA adapter parameters into the underlying model."""
-        Algorithm._require_peft()
+        _, setter = Algorithm._require_peft()
         peft_base = self._peft_base(self.model)
-        set_peft_model_state_dict(peft_base, weights)
+        setter(peft_base, weights)

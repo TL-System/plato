@@ -1,0 +1,143 @@
+{
+  "schema_version": 1,
+  "review_type": "Fresh independent read-only exact-candidate Qwen/HF/PEFT implementation review",
+  "reviewer": "/root/qwen_reference_review",
+  "date": "2026-10-03",
+  "decision": "REQUEST_CHANGES",
+  "reviewed_commit": "d3569ec98e64fb83ef43c2b50db4543cfe6a3bc6",
+  "reviewed_tree": "26974e6720164cc3ec3665bd968eb2238327daa2",
+  "baseline_commit": "9ee92c52307cd3ecdce0c7416708c504bdb52137",
+  "frozen_checkout": "/tmp/plato-refresh-worktrees/qwen-reference-review",
+  "checkout_clean_before_and_after_tests": true,
+  "unresolved_findings": {
+    "critical": 0,
+    "high": 0,
+    "medium": 1,
+    "low": 0
+  },
+  "findings": [
+    {
+      "id": "QWEN-01",
+      "severity": "medium",
+      "title": "Supplied PEFT models expanded before trainer construction silently lose added embeddings",
+      "paths": [
+        "plato/trainers/huggingface.py:648",
+        "plato/utils/huggingface.py:58",
+        "plato/algorithms/lora.py:46"
+      ],
+      "trigger": "Load the configured original base through Model.get(), expand that supplied PEFT model to the configured expanded tokenizer size using resize_token_embeddings(), then construct Trainer(model=model).",
+      "cause": "Trainer only sets plato_save_embedding_layers when it itself expands the input embedding. A supplied model that already has the required size does not receive the marker. adapter_save_embeddings then returns false for q/v LoRA, overriding PEFT's prior expanded-vocabulary preservation behavior.",
+      "impact": "Both input and output expanded embedding matrices are absent from production federated payloads and adapter checkpoints. Loading the saved adapter does not restore changed added-token embeddings, so the model's logits differ from the checkpoint.",
+      "independent_reproduction": {
+        "script": "/tmp/plato-qwen-review/edge_cases.py",
+        "receipt": "/tmp/plato-qwen-review/edges/receipt.json",
+        "log": "/tmp/plato-qwen-review/edge-cases.log",
+        "configured_original_vocabulary": 256,
+        "expanded_tokenizer_and_embedding_size": 257,
+        "trainer_performed_resize": {
+          "resize_when": "inside_trainer",
+          "tokenizer_size": 257,
+          "embedding_size": 257,
+          "plato_save_embedding_layers": true,
+          "payload_embedding_keys": [
+            "model.model.embed_tokens.weight",
+            "model.lm_head.weight"
+          ],
+          "native_peft_embedding_keys": [
+            "base_model.model.model.embed_tokens.weight",
+            "base_model.model.lm_head.weight"
+          ],
+          "checkpoint_embedding_keys": [
+            "base_model.model.lm_head.weight",
+            "base_model.model.model.embed_tokens.weight"
+          ],
+          "logits_restored": true,
+          "max_logit_error_after_reload": 0.0
+        },
+        "caller_performed_resize": {
+          "resize_when": "before_trainer",
+          "tokenizer_size": 257,
+          "embedding_size": 257,
+          "plato_save_embedding_layers": null,
+          "payload_embedding_keys": [],
+          "native_peft_embedding_keys": [
+            "base_model.model.model.embed_tokens.weight",
+            "base_model.model.lm_head.weight"
+          ],
+          "checkpoint_embedding_keys": [],
+          "logits_restored": false,
+          "max_logit_error_after_reload": 24.88932991027832
+        }
+      },
+      "required_fix": "Identify already-expanded supplied models using the already pinned original AutoConfig vocabulary or equivalent explicit original-vocabulary metadata, and preserve both input/output embeddings without an unpinned PEFT auto lookup. Add an actual supplied-model pre-resize payload/checkpoint/logit regression; rerun the existing in-trainer expansion case.",
+      "scope_note": "The shipped Qwen reference has no added vocabulary and passed its qualification. This finding violates the accepted requirement to preserve configured expanded-vocabulary embedding behavior in the shared HF/PEFT runtime."
+    }
+  ],
+  "verified_passes": [
+    "All 15 source SHA256 values in the committed validation receipt match this exact clean candidate.",
+    "Independent 48-case float64 SGD/momentum accumulation oracle: steps 1/2/3/4, counts 1/2/3/5/6/7, is_last_batch and finalize paths. All final parameters match exactly; callbacks, scheduler advancement, optimizer update counts, counter clearing and repeated finalize behavior match.",
+    "Independent actual PEFT tiny native Qwen payload variants show no CPU storage aliases, no changed snapshots after local trainable-parameter mutation, no implicit base-config calls and exact payload load round-trips. Ordinary q/v, modules_to_save head and embedding-LoRA states are preserved.",
+    "24 focused new candidate tests passed on the existing Python 3.13 environment with 10 visible warnings, zero skips/xfails/deselections. Coverage includes real offline tiny-Qwen/PEFT update, unequal 2/3 production weighted aggregation, every-tensor oracle, base hash preservation, checkpoint/restored logits, revision propagation/bad-pin failure, cache identity, configured seed, accumulation and actual HF callback/control/scheduler integration.",
+    "Source review confirms exact configured revisions flow through model config/weights, tokenizer loaders and PEFT revision; trust_remote_code is false, current token/dtype arguments are used and loader failures have no retry-main/random fallback.",
+    "Raw HF dataset cache identity includes explicit revision and resolved local-file path plus streaming SHA256; explicitly pinned/local inputs do not accept legacy unpinned raw caches.",
+    "trainer.random_seed is optional: adapter initialization seeds Torch only when configured; train_model applies configured seed plus client ID before sampling/training. Reference data/server seeds are explicitly 17. Existing configs without trainer.random_seed retain the prior no-seeding behavior.",
+    "Committed real-pretrained receipt matches the external qualification JSON exactly. It reports official Qwen3-0.6B-Base at the approved SHA, CPU FP32/Python 3.13, 596049920 frozen base parameters plus 573440 trainable adapter parameters, finite metrics/gradients, unequal 2/3 weighted aggregation, independent snapshots, unchanged base and matching reload logits.",
+    "Actual-transport CLI JSON/log/wrapper and real qualification log hashes match the committed evidence. CLI has comm_simulation=false on server/clients, safetensor encode/decode, real 2.22 MB transfers for both logical clients, returncode 0, natural process-group exit and zero survivors. Prior simulated run is explicitly historical."
+  ],
+  "evidence_bindings": {
+    "committed_validation_receipt": {
+      "path": "/tmp/plato-refresh-worktrees/qwen-reference-review/evidence/2026-refresh/qwen-reference-validation.json",
+      "sha256": "3d351576d92a9302237b10c6f223de172a8b2cc7cbc40b1b2b4cf8e7e734fe06"
+    },
+    "reviewed_source_sha256": {
+      "plato/algorithms/lora.py": "e1247014cbb04e9ded2255c5656d73b1225d36decc70c9ab8d8c328aae614cf1",
+      "plato/models/huggingface.py": "9e6f97fbf6a9eee00794868ab0aade6ad34dd153793f689c2e9c9f6315cc5f50",
+      "plato/datasources/lora.py": "ebb9b28c64811bde575dd9834240348afc5cc602d2dffa7d462de3f4f48713a8",
+      "plato/datasources/huggingface.py": "a50701c37c680c07ff35e43cd9b6ad9a3650364a14697f06e4329b6c1db7629d",
+      "plato/trainers/huggingface.py": "96f2f8dad5d2b24c559594717d081ecbdb345a7d778a71ae2ae152d4912b41b7",
+      "plato/utils/huggingface.py": "91b687453fc318a8fdfc27d75ac432b83a1ac04b1fcbdc67426b820efb683c9b",
+      "tests/test_huggingface_artifacts.py": "872a798ee7a4b2c50c0bc52931b54ca7c24a72694a784a158d0a5d352744858d",
+      "tests/test_utils/qwen3.py": "6e9aac5dab0dfb3133da450683681f60ef27c4d79fd15830c98acd73a52842a1",
+      "tests/integration/test_qwen3_lora.py": "0b0cf5f8fdde6cb7d7c37cec405e2143720cc6d80738985fe6bab4c343173433",
+      "tests/trainers/test_huggingface_accumulation.py": "cbd9dbf88147085e2ea4b08dec0f8b971c86d706a56b4c2fe9532d8a1f6086bc",
+      "examples/huggingface/qualify_qwen3.py": "2e1d3b6f9fa04ecdf2ddbf5e04957f39a00f7599c6ca4bf14d8f3af7ae8490c8",
+      "configs/HuggingFace/fedavg_qwen3_06b_lora.toml": "17347b1c0c3e8d297baf174581a09f0db18f97948303d3137b43cfb7f822dbf1",
+      "tests/fixtures/qwen3/train.json": "88cc392157d66d757cb1efad53e41859b782f0f8637e611fb0bebf8c422c2748",
+      "tests/fixtures/qwen3/validation.json": "149d0717e6c88626ad9eb5927c82e66508c160e2e228f0b54edce79e646d83cc",
+      "tests/fixtures/qwen3/PROVENANCE.txt": "aa890d67099e9ec249c14bc22df241a5d040158f9185e3e02636a80585520a3c"
+    },
+    "independent_baseline_probe": {
+      "path": "/tmp/plato-qwen-review/baseline-probe.json",
+      "sha256": "908c4fba73dcee39a0de585cc602798368cd744e1706985e8a83a18d47011855"
+    },
+    "independent_final_probe": {
+      "path": "/tmp/plato-qwen-review/final-probe.json",
+      "sha256": "6372aa467cb7004ded91cf84653cf54935179eff29950a9bab36beb1c3d46d01"
+    },
+    "independent_edge_receipt": {
+      "path": "/tmp/plato-qwen-review/edges/receipt.json",
+      "sha256": "52a106e71fe4c61d4ba752e792d33faa1838de1275ab89a88e5b129259a6e898"
+    },
+    "focused_test_log": {
+      "path": "/tmp/plato-qwen-review/focused-final.log",
+      "sha256": "cbff0139090f5e73d313eb32332bc071e31aa4602f5c470a71b27bd476c84f9c"
+    },
+    "actual_transport_cli": {
+      "path": "/tmp/plato-qwen-validation/cli-transport/cli-result.json",
+      "sha256": "aae32de8c790fa785e980479073786567c29aa19e35a613b9cd5ff1975f3bc43"
+    },
+    "real_pretrained": {
+      "path": "/tmp/plato-qwen-validation/real-pretrained/qualification.json",
+      "sha256": "e3e335d8b81ac9677fe5cee3e3ac392f2a973933153348e74813a1bce4946a1b"
+    }
+  },
+  "limitations": [
+    "No source files edited; only scratch scripts/reports were written. No nested agents or external review tool used.",
+    "The 596M real-weight run and normal CLI were read and hash-bound to supplied receipts; this independent reviewer did not rerun them or re-download/mutate model cache.",
+    "Independent tiny native Qwen tests are architecture/runtime checks, distinct from official pretrained qualification.",
+    "CLI exercised two logical clients serially with max_concurrency=1; the wrapper observed up to four process-group members. RSS observation is sampled aggregate RSS, while qualification peak RSS is a single-process measurement.",
+    "CLI contains one visible resource_tracker semaphore-cleanup warning. Natural exit and zero survivors are verified by the bound wrapper receipt. The warning's cause is not proven to be new HF/LoRA code and was not suppressed.",
+    "Fixture metrics establish bounded integration behavior, without benchmark quality/convergence, full optimizer resume or Python 3.14 qualification claims.",
+    "Retired archive closure, full combined repository suite, packaging and hosted CI remain root/other reviewers' scope."
+  ]
+}

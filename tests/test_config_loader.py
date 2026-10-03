@@ -173,9 +173,9 @@ def test_config_loads_evaluation_section(tmp_path: Path, monkeypatch):
         "trainer": {"type": "basic", "rounds": 1, "epochs": 1, "batch_size": 10},
         "algorithm": {"type": "fedavg"},
         "evaluation": {
-            "type": "nanochat_core",
-            "max_per_task": 128,
-            "bundle_dir": "/custom/path/to/nanochat",
+            "type": "lighteval",
+            "max_samples": 128,
+            "tasks": "leaderboard|arc:easy|0|0",
         },
     }
 
@@ -202,126 +202,14 @@ def test_config_loads_evaluation_section(tmp_path: Path, monkeypatch):
     config = Config()
 
     assert hasattr(config, "evaluation")
-    assert config.evaluation.type == "nanochat_core"
-    assert config.evaluation.max_per_task == 128
-    assert config.evaluation.bundle_dir == "/custom/path/to/nanochat"
+    assert config.evaluation.type == "lighteval"
+    assert config.evaluation.max_samples == 128
+    assert config.evaluation.tasks == "leaderboard|arc:easy|0|0"
 
     Config._instance = None
     if hasattr(Config, "args"):
         delattr(Config, "args")
     Config._cli_overrides = {}
-
-
-
-
-def test_config_loads_smolvla_lerobot_parameter_contract(tmp_path: Path, monkeypatch):
-    """SmolVLA/LeRobot config keys should round-trip through Config()."""
-    config_base = tmp_path / "runtime"
-    config_path = tmp_path / "smolvla_lerobot.toml"
-
-    config_data = {
-        "clients": {"type": "simple", "total_clients": 2, "per_round": 1},
-        "server": {"address": "127.0.0.1", "port": 8000},
-        "data": {"datasource": "LeRobot"},
-        "trainer": {
-            "type": "lerobot",
-            "rounds": 1,
-            "epochs": 1,
-            "batch_size": 2,
-            "model_type": "smolvla",
-            "model_name": "smolvla",
-        },
-        "algorithm": {"type": "fedavg"},
-        "parameters": {
-            "policy": {
-                "type": "smolvla",
-                "path": "lerobot/smolvla_base",
-                "finetune_mode": "adapter",
-                "precision": "bf16",
-                "device": "cuda",
-            },
-            "dataset": {
-                "repo_id": "lerobot/pusht_image",
-                "delta_timestamps": {
-                    "observation_image": [-0.2, -0.1, 0.0],
-                },
-            },
-            "transforms": {
-                "image_size": [224, 224],
-                "normalize": True,
-                "interpolation": "bilinear",
-            },
-        },
-    }
-
-    toml_writer.dump(config_data, config_path)
-
-    monkeypatch.delenv("config_file", raising=False)
-    monkeypatch.setattr(
-        sys,
-        "argv",
-        [
-            sys.argv[0],
-            "--config",
-            str(config_path),
-            "--base",
-            str(config_base),
-        ],
-    )
-
-    Config._instance = None
-    if hasattr(Config, "args"):
-        delattr(Config, "args")
-    Config._cli_overrides = {}
-
-    config = Config()
-
-    assert config.data.datasource == "LeRobot"
-    assert config.trainer.type == "lerobot"
-    assert config.trainer.model_type == "smolvla"
-    assert config.trainer.model_name == "smolvla"
-
-    assert config.parameters.policy.type == "smolvla"
-    assert config.parameters.policy.path == "lerobot/smolvla_base"
-    assert config.parameters.policy.finetune_mode == "adapter"
-    assert config.parameters.policy.precision == "bf16"
-    assert config.parameters.policy.device == "cuda"
-
-    assert config.parameters.dataset.repo_id == "lerobot/pusht_image"
-    assert config.parameters.dataset.delta_timestamps.observation_image == [
-        -0.2,
-        -0.1,
-        0.0,
-    ]
-
-    assert config.parameters.transforms.image_size == [224, 224]
-    assert config.parameters.transforms.normalize is True
-    assert config.parameters.transforms.interpolation == "bilinear"
-
-    assert config.parameters.policy._asdict() == {
-        "type": "smolvla",
-        "path": "lerobot/smolvla_base",
-        "finetune_mode": "adapter",
-        "precision": "bf16",
-        "device": "cuda",
-    }
-    assert config.parameters.dataset._asdict() == {
-        "repo_id": "lerobot/pusht_image",
-        "delta_timestamps": {
-            "observation_image": [-0.2, -0.1, 0.0],
-        },
-    }
-    assert config.parameters.transforms._asdict() == {
-        "image_size": [224, 224],
-        "normalize": True,
-        "interpolation": "bilinear",
-    }
-
-    Config._instance = None
-    if hasattr(Config, "args"):
-        delattr(Config, "args")
-    Config._cli_overrides = {}
-
 
 def test_is_central_server_requires_cross_silo_true(tmp_path: Path, monkeypatch):
     """Central-server detection should respect `cross_silo = false`."""
@@ -425,7 +313,7 @@ def test_config_reload_discards_optional_sections_in_both_orders(tmp_path, monke
     }
     optional = {
         "general": {"base_path": str(tmp_path / "from_config")},
-        "evaluation": {"type": "nanochat_core"},
+        "evaluation": {"type": "lighteval"},
         "results": {"types": "round, loss", "result_path": "custom_results"},
         "parameters": {"optimizer": {"lr": 0.02}},
     }

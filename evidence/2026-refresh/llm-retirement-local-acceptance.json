@@ -1,0 +1,66 @@
+{
+  "status": "ACCEPT_LOCAL_LLM_RETIREMENT_INTEGRATION_PENDING_LINUX",
+  "utc": "2026-10-03T18:19:42.010709+00:00",
+  "qualified_source_tree": "d230cd65244b4e8fc030778ad02c8760615f863f",
+  "parent_main": "dcf787c012e30bcd7680a4398d54f946fde958e5",
+  "integration": "Normal octopus merge of accepted retirement321c5311, corrected Qwenbca1f6ec, final docsfd4a2bcf. Before evidence overlay, Git tree exactly equals the fully qualified staged source. Author history is retained so historical CLI source links remain reachable after publication.",
+  "profiles": [
+    {
+      "profile": "mandatory",
+      "collected": 1333,
+      "passed": 1333,
+      "skips": [],
+      "warnings": 27,
+      "source_invariance": true,
+      "exact_execution_identity": true,
+      "receipt_sha256": "506670070319ac2ff26dcd3c788b50b52b645cf9a46b8392e1f720ab74dfb386"
+    },
+    {
+      "profile": "base",
+      "collected": 1326,
+      "passed": 1275,
+      "skips": [
+        {
+          "case": {
+            "classname": "",
+            "name": "tests.trainers.test_dp_data_loader_strategy",
+            "time": "0.000"
+          },
+          "reason": {
+            "message": "collection skipped"
+          }
+        }
+      ],
+      "warnings": 10,
+      "source_invariance": true,
+      "exact_execution_identity": true,
+      "receipt_sha256": "aa1e1900846b2b740e3e1c76745444355af87e65d92dc56c89ba90623e408519"
+    }
+  ],
+  "coverage": {
+    "covered_lines": 11977,
+    "num_statements": 16145,
+    "percent_covered": 74.18395788169713,
+    "percent_covered_display": "74",
+    "missing_lines": 4168,
+    "excluded_lines": 145,
+    "percent_statements_covered": 74.18395788169713,
+    "percent_statements_covered_display": "74"
+  },
+  "reviews": {
+    "llm-retirement-review.json": "0cee58d5fc9d804cd066fd8964f4ef7b8717ceef17c1075c90d2b2c40a9d9c20",
+    "qwen-reference-review1.json": "4f8766af24b117f84f48bf63c8500b60ebc7e442351ae8c0993bf7c468e61a11",
+    "qwen-reference-review2.json": "412432d844697795fd2c9198c5d9758971d4c6afaead6760dda29a659aac951a",
+    "llm-retirement-docs-review.json": "f235a92726404f61dcd57d7c5bb5bf85aa4c82272e1d2832b4f8c157b8c25ddb",
+    "llm-retirement-docs-addendum-review.json": "5868990ab9dffc53119c4a1069b542ffa263b29f3e8483c7cf4ccac4ec783e44",
+    "llm-retirement-docs-final-review.json": "78135028efcef99e6f7eba945434b7e770eb6f5da1b40d661e951b1d257c54cb",
+    "llm-retirement-phase-gate.json": "2d46046e83eb2ad9ac9c4f0f7e2e753cf81f788518cb6bca209d5502395c5d0c",
+    "llm-retirement-integration-checks.json": "29b90778b3f3eb02c281e649249215f6d625610eb940492321bdfbad53971f62",
+    "llm-retirement-suite-audit.json": "b49eaf90444b9e8336c9c5c0ae8010d813ff3df01b36419b1f7e527239965a87",
+    "llm-retirement-runtime-audit.json": "00ed7ecc95f69623ea6beaa31d25c7d73f65b8fc97467e329ea320cb48c2d7e1"
+  },
+  "raw_evidence": "reproductions/llm-retirement-local-qualification.tar.gz",
+  "raw_evidence_sha256": "35cb7d055f36f9ae3463eb2ae4bc22d919f9e6f4c931924ead5c37a4ed3e7c33",
+  "warnings": "Mandatory27:17knownOpacus notices plus10HF/PEFT test notices (2intentional tied-layer adapter variants,8datasets multiprocessing fork deprecations). Base has those10HF/PEFT notices. CLI historical run has1semaphore-cleanup warning with no live descendants. No suppression.",
+  "limits": "Linux qualification pending. Historical actual-transport CLI remains bound to d3569ec; corrected-source pinned numerical qualification reproduces exact ordinary-path hashes/metrics. No benchmark-quality, GPU, full optimizer-resume, Python3.14 requalification or security-clean claim. Full typing657existing diagnostics; new retirement excluded from distributions,19unchanged legacy source-archive files remain."
+}

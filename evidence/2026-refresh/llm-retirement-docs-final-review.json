@@ -1,0 +1,108 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-03",
+  "review_type": "Independent bounded final documentation correction and factual binding review",
+  "reviewer": "/root/llm_docs_review",
+  "decision": "ACCEPT_DOCUMENTATION_FINAL_BINDING_SCOPE",
+  "unresolved_findings": {
+    "critical": 0,
+    "high": 0,
+    "medium": 0,
+    "low": 0
+  },
+  "findings": [],
+  "closed_findings": [
+    {
+      "id": "DOCS-ADDENDUM-L01",
+      "status": "CLOSED",
+      "evidence": "Corrected guide explicitly distinguishes the 17 + client_id global Torch RNG reset from the IID sampler generator seeded with data.random_seed=17. Current trainer and IID/base sampler sources agree.",
+      "prior_review_sha256": "5868990ab9dffc53119c4a1069b542ffa263b29f3e8483c7cf4ccac4ec783e44"
+    }
+  ],
+  "source": {
+    "documentation_commit": "fd4a2bcfa0eb3a57fa015281a156e893d95e9484",
+    "documentation_parent": "39f58144ffe5aa7ba4b940f76c984f991f93d6ab",
+    "documentation_worktree_clean": true,
+    "only_changed_paths": [
+      "docs/docs/examples/case-studies/6. Qwen3 Federated LoRA.md",
+      "evidence/2026-refresh/llm-retirement-docs-final-binding.json"
+    ],
+    "guide_sha256": "0e6c10676a580e6135cc65c5708840a97069b2133aac7d4576495786dc5f7dae",
+    "final_binding_receipt_sha256": "82676922df0e158cd20b963750b84d1229a63bd34daa1a640d27c4aa3070056a",
+    "current_qwen_implementation_commit": "bca1f6ec3541090dccb838197206fee2d6412516",
+    "current_qwen_worktree_clean": true,
+    "current_qwen_receipt_sha256": "741816d489fe473159eb84e26760d7704ed6cf2cec7b9814fe1d4256d41fe64c",
+    "current_qwen_source_sha256_verified": {
+      "plato/algorithms/lora.py": "e1247014cbb04e9ded2255c5656d73b1225d36decc70c9ab8d8c328aae614cf1",
+      "plato/models/huggingface.py": "9e6f97fbf6a9eee00794868ab0aade6ad34dd153793f689c2e9c9f6315cc5f50",
+      "plato/datasources/lora.py": "ebb9b28c64811bde575dd9834240348afc5cc602d2dffa7d462de3f4f48713a8",
+      "plato/datasources/huggingface.py": "a50701c37c680c07ff35e43cd9b6ad9a3650364a14697f06e4329b6c1db7629d",
+      "plato/trainers/huggingface.py": "cde9f121c4358be7da12f34167a9b313debc2969fd598b743acf022adaef3102",
+      "plato/utils/huggingface.py": "91b687453fc318a8fdfc27d75ac432b83a1ac04b1fcbdc67426b820efb683c9b",
+      "tests/test_huggingface_artifacts.py": "872a798ee7a4b2c50c0bc52931b54ca7c24a72694a784a158d0a5d352744858d",
+      "tests/test_utils/qwen3.py": "6e9aac5dab0dfb3133da450683681f60ef27c4d79fd15830c98acd73a52842a1",
+      "tests/integration/test_qwen3_lora.py": "dfb7b2bd0ec532fc5093e3a800fedf0539ebec2fa8f5853fab7fe477951766c9",
+      "tests/trainers/test_huggingface_accumulation.py": "cbd9dbf88147085e2ea4b08dec0f8b971c86d706a56b4c2fe9532d8a1f6086bc",
+      "examples/huggingface/qualify_qwen3.py": "2e1d3b6f9fa04ecdf2ddbf5e04957f39a00f7599c6ca4bf14d8f3af7ae8490c8",
+      "configs/HuggingFace/fedavg_qwen3_06b_lora.toml": "17347b1c0c3e8d297baf174581a09f0db18f97948303d3137b43cfb7f822dbf1",
+      "tests/fixtures/qwen3/train.json": "88cc392157d66d757cb1efad53e41859b782f0f8637e611fb0bebf8c422c2748",
+      "tests/fixtures/qwen3/validation.json": "149d0717e6c88626ad9eb5927c82e66508c160e2e228f0b54edce79e646d83cc",
+      "tests/fixtures/qwen3/PROVENANCE.txt": "aa890d67099e9ec249c14bc22df241a5d040158f9185e3e02636a80585520a3c"
+    }
+  },
+  "factual_binding": {
+    "fresh_qualifier": {
+      "implementation_commit": "bca1f6ec3541090dccb838197206fee2d6412516",
+      "raw_receipt_sha256": "10c9b5957121bf6ce2fc616df706145786f89b2aef8fb428cb9e296f823e7799",
+      "result_exactly_matches_committed_correction_receipt": true,
+      "elapsed_seconds": 14.041988417040557,
+      "peak_rss_bytes": 4259299328,
+      "guide_rounding_matches": true,
+      "scope": "Single qualification process with one shared frozen base, serial logical clients and the production server object."
+    },
+    "historical_cli": {
+      "implementation_commit": "d3569ec98e64fb83ef43c2b50db4543cfe6a3bc6",
+      "original_receipt_sha256": "3d351576d92a9302237b10c6f223de172a8b2cc7cbc40b1b2b4cf8e7e734fe06",
+      "original_receipt_byte_identical_to_d3569ec": true,
+      "raw_receipt_sha256": "aae32de8c790fa785e980479073786567c29aa19e35a613b9cd5ff1975f3bc43",
+      "log_sha256": "e3ce0a1bce746fc131bb97d9ef53c0381fdee94bb6c719f95b7b60e674b13693",
+      "guide_explicitly_identifies_historical_revision": true,
+      "no_cli_replay_claim": true,
+      "measurements_and_warning_scope_unchanged": true
+    },
+    "assessment": "The fresh qualifier and corrected implementation have their own linked receipt; the normal CLI observation remains explicitly bound to d3569ec with its original receipt. Single-process qualification and sampled aggregate launcher RSS remain distinct, and the semaphore-warning cause remains unknown."
+  },
+  "independent_checks": {
+    "strict_mkdocs": {
+      "command": [
+        "/tmp/plato-llm-docs-venv/bin/python",
+        "-m",
+        "mkdocs",
+        "build",
+        "--strict",
+        "--config-file",
+        "docs/mkdocs.yml",
+        "--site-dir",
+        "/tmp/plato-llm-docs-review/final-binding-site"
+      ],
+      "exit_code": 0,
+      "log_sha256": "01af8d93a6560a16eb4aa3be15cd485a064f37752240150d64397779b37ccbcb"
+    },
+    "rendered_links": {
+      "path_hrefs": 1963,
+      "fragment_hrefs": 404,
+      "missing": []
+    },
+    "new_receipt_link_target_exists_in_committed_qwen_tree": true,
+    "whitespace_diff_check_exit_code": 0
+  },
+  "verification_script": {
+    "path": "/tmp/plato-llm-docs-review/verify_final_binding.py",
+    "sha256": "0e0e15c9c93a0592ab806c8f1883817c0392ec79018ddd940ee6880444fe8fc5"
+  },
+  "limits": [
+    "Focused two-file documentation correction review; earlier accepted archive/navigation/provenance review was not repeated.",
+    "No source edits, subagents, dependency changes or runtime executions. Supplied execution evidence was independently read and source/hash-correlated.",
+    "This accepts documentation facts and bindings at the exact named commits. Combined repository qualification and final publication remain root-owned."
+  ]
+}

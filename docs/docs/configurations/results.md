@@ -12,7 +12,6 @@
     - `round_time`
     - `comm_overhead`
     - `train_loss`
-    - `core_metric`
     - `local_epoch_num`
     - `edge_agg_num`
     - `evaluation_primary_value`

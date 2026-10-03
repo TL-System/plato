@@ -9,10 +9,12 @@ https://huggingface.co/docs/datasets/quicktour.html
 from __future__ import annotations
 
 import hashlib
+import json
 import logging
 import os
 import re
 from collections.abc import Mapping
+from pathlib import Path
 from typing import Any, cast
 
 from datasets import load_dataset, load_from_disk
@@ -27,6 +29,11 @@ from transformers.utils import logging as hf_logging
 
 from plato.config import Config
 from plato.datasources import base
+from plato.utils.huggingface import (
+    artifact_identity,
+    dataset_kwargs,
+    pretrained_kwargs,
+)
 
 
 def _sanitize_cache_component(value: Any) -> str:
@@ -44,6 +51,14 @@ def _legacy_dataset_cache_path(
     return f"{data_path}/{dataset_name}_{dataset_config}"
 
 
+def _local_file_identity(path: str) -> dict[str, str]:
+    """Hash a local input in bounded memory, including its resolved path."""
+    resolved = Path(path).resolve()
+    with resolved.open("rb") as source:
+        digest = hashlib.file_digest(source, "sha256").hexdigest()
+    return {"path": str(resolved), "sha256": digest}
+
+
 def _dataset_cache_path(
     data_path: str,
     *,
@@ -52,6 +67,8 @@ def _dataset_cache_path(
     preprocessing_mode: str,
     train_split: str,
     validation_split: str,
+    dataset_revision: str | None = None,
+    data_files: Mapping[str, Any] | None = None,
 ) -> str:
     """Build a stable cache path for the raw downloaded dataset."""
     signature = "|".join(
@@ -63,6 +80,14 @@ def _dataset_cache_path(
             validation_split,
         ]
     )
+    if dataset_revision is not None:
+        signature += "|revision=" + dataset_revision
+    if data_files is not None:
+        identities = {}
+        for split, files in sorted(data_files.items()):
+            paths = [files] if isinstance(files, str) else files
+            identities[split] = [_local_file_identity(path) for path in paths]
+        signature += "|files=" + json.dumps(identities, sort_keys=True)
     digest = hashlib.sha1(signature.encode("utf-8")).hexdigest()[:12]
     prefix = "__".join(
         [
@@ -167,6 +192,7 @@ class DataSource(base.DataSource):
         )
 
         logging.info("Dataset: %s", dataset_name)
+        load_kwargs = dataset_kwargs(data_cfg)
 
         saved_data_path = _dataset_cache_path(
             Config().params["data_path"],
@@ -175,6 +201,8 @@ class DataSource(base.DataSource):
             preprocessing_mode=preprocessing_mode,
             train_split=train_split_name,
             validation_split=requested_validation_split,
+            dataset_revision=load_kwargs.get("revision"),
+            data_files=load_kwargs.get("data_files"),
         )
         legacy_saved_data_path = _legacy_dataset_cache_path(
             Config().params["data_path"],
@@ -184,13 +212,14 @@ class DataSource(base.DataSource):
 
         if os.path.exists(saved_data_path):
             self.dataset = load_from_disk(saved_data_path)
-        elif os.path.exists(legacy_saved_data_path):
+        elif (
+            "revision" not in load_kwargs
+            and "data_files" not in load_kwargs
+            and os.path.exists(legacy_saved_data_path)
+        ):
             self.dataset = load_from_disk(legacy_saved_data_path)
         else:
-            dataset_kwargs: dict[str, Any] = {}
-            if dataset_config is not None:
-                dataset_kwargs["name"] = dataset_config
-            self.dataset = load_dataset(dataset_name, **dataset_kwargs)
+            self.dataset = load_dataset(dataset_name, **load_kwargs)
             save_to_disk = getattr(self.dataset, "save_to_disk", None)
             if callable(save_to_disk):
                 save_to_disk(saved_data_path)
@@ -201,28 +230,22 @@ class DataSource(base.DataSource):
         )
         self.training_args = cast(TrainingArguments, self.training_args)
 
-        tokenizer_name = getattr(Config().trainer, "tokenizer_name", None)
-        model_name = (
-            tokenizer_name
-            if isinstance(tokenizer_name, str) and tokenizer_name
-            else Config().trainer.model_name
+        identity = artifact_identity()
+        config_kwargs = pretrained_kwargs(
+            revision=identity["model_revision"],
+            cache_dir=Config().params["model_path"],
         )
-        auth_token = getattr(getattr(Config(), "parameters", None), "huggingface_token", None)
-        config_kwargs = {
-            "cache_dir": Config().params["model_path"],
-            "revision": "main",
-            "use_auth_token": auth_token,
-        }
-        tokenizer_kwargs = {
-            "cache_dir": Config().params["data_path"],
-            "use_fast": True,
-            "revision": "main",
-            "use_auth_token": auth_token,
-        }
+        tokenizer_kwargs = pretrained_kwargs(
+            revision=identity["tokenizer_revision"],
+            cache_dir=Config().params["data_path"],
+        )
+        tokenizer_kwargs["use_fast"] = True
 
-        self.config = AutoConfig.from_pretrained(model_name, **config_kwargs)
+        self.config = AutoConfig.from_pretrained(
+            identity["model_name"], **config_kwargs
+        )
         self.tokenizer: Any = AutoTokenizer.from_pretrained(
-            model_name,
+            identity["tokenizer_name"],
             config=self.config,
             **tokenizer_kwargs,
         )
@@ -325,7 +348,11 @@ class DataSource(base.DataSource):
             )
 
         configured_block_size = getattr(Config().data, "block_size", None)
-        block_size = configured_block_size if configured_block_size is not None else self.block_size
+        block_size = (
+            configured_block_size
+            if configured_block_size is not None
+            else self.block_size
+        )
         block_size = int(block_size)
         if block_size > 1024:
             logging.warning(
@@ -364,9 +391,7 @@ class DataSource(base.DataSource):
         if self.label_strategy == "full_sequence":
             return list(input_ids)
         if self.label_strategy != "assistant_only":
-            raise ValueError(
-                f"Unsupported chat label strategy: {self.label_strategy}"
-            )
+            raise ValueError(f"Unsupported chat label strategy: {self.label_strategy}")
 
         if not hasattr(self.tokenizer, "apply_chat_template"):
             raise AttributeError(

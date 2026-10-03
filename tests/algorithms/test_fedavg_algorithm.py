@@ -13,7 +13,7 @@ from plato.algorithms.fedavg import Algorithm as FedAvgAlgorithm
 
 
 class AdapterToyModel(torch.nn.Module):
-    """Toy model exposing adapter-mode metadata used by SmolVLA integration."""
+    """Toy model exposing generic adapter-mode payload metadata."""
 
     def __init__(self) -> None:
         super().__init__()
