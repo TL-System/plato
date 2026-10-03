@@ -1,0 +1,465 @@
+{
+  "schema_version": 1,
+  "task": "2B: Runtime lifecycle and strategy contracts",
+  "date": "2026-10-02",
+  "status": "Implementation and relevant validation complete; root independent review and integration pending.",
+  "identities": {
+    "worktree": "/private/tmp/plato-refresh-worktrees/runtime",
+    "branch": "maintenance/2026-phase2-runtime",
+    "baseline_commit": "fda60becedfa6236c11d415b87a868b52789a41e",
+    "final_implementation_commit": "759be841c2c9c6d92608c1ac7186a5e9ded42fe4",
+    "evidence_commit_policy": "This record is an evidence-only direct child of final_implementation_commit. Its exact delivery hash is reported separately, avoiding a self-hash circularity.",
+    "authorities": [
+      "AGENTS.md",
+      "evidence/2026-refresh/plan.md: Phase 2B and F07/F10/F11",
+      "evidence/2026-refresh/plan-addendum.json: accepted F18 and 3A ingress handoff",
+      "Root assignment and latest coordination: additional findings use task-local IDs; F21-F24 reserved for 2C."
+    ],
+    "excluded_paths_unchanged": "HE/MPC owner paths, trainers, algorithms, models/MLX, shared fixtures, manifests, lock, CI and startup regression sources.",
+    "no_push_merge_pr_or_delegation": true
+  },
+  "findings": [
+    {
+      "id": "F10",
+      "status": "Fixed",
+      "before": "Client disconnect removed matching temporary checkpoints belonging to every client.",
+      "after": "Actual disconnect removes only current logical client's full-matched .safetensors/.pth snapshots and .pkl sidecars; preserves other clients, resume state, directories and unrelated files.",
+      "regression": "tests/clients/test_checkpoint_cleanup.py"
+    },
+    {
+      "id": "F11",
+      "status": "Fixed locally; F07 naming remains with 2C",
+      "before": "Actual PORT weights_aggregated hook requested model_<round>.pth, which the Safetensors trainer rejects; reader also expected torch checkpoints.",
+      "after": "Actual hook writes model_<round>.safetensors; historical reader uses the repository's tree deserializer and falls back to legacy .pth with CPU/weights_only loading. Current model device, values and training mode remain unchanged.",
+      "reference": "Dot([2,1],[2,-1])/(sqrt(5)*sqrt(5)) = 0.6. Independently computed 2/6 sample/staleness weighting verifies final delta.",
+      "regression": "tests/servers/test_port_checkpoint_flow.py"
+    },
+    {
+      "id": "F18",
+      "status": "Fixed",
+      "before": "Baseline actual probe accepts [-1,2] with payload values [1,4] and returns 7; NaN/Inf enter aggregation and excess payload is ignored.",
+      "after": "Validate cardinality and finite nonnegative real sample weights, including eligible total, before raw/transformed ordinary, legacy and delta dispatch; cross-silo validation precedes trainer identity mutation.",
+      "reference": "Fractional weights 0.5/1.5 yield 3.25; a single nonzero weight yields 4; all-zero input preserves baseline 10. Feature reports stay excluded from eligible sample denominator.",
+      "regression": "tests/servers/test_fedavg_strategy.py"
+    },
+    {
+      "id": "T2B-SESSION",
+      "status": "Fixed",
+      "before": "Wrong/unknown session could create reports targeting another logical client; urgent responses could use worker's newer identity.",
+      "after": "Require current server-issued assignment before report parsing, chunks, parts, completion and S3 lookup. Validate embedded report identity; reject stale/unknown/duplicate ingress. Actual reused-worker, urgent-request/default-writer and central-edge selection paths execute.",
+      "regression": "tests/servers/test_runtime_transport.py"
+    },
+    {
+      "id": "T2B-BOUNDS",
+      "status": "Fixed within trusted-peer runtime",
+      "before": "Unbounded chunks/buffers and incomplete transfers retained memory; runtime S3 reader materialized an unbounded response.",
+      "after": "Finite configurable wire limits, total deadlines, per-sender malformed/expiry cleanup, queued/completed buffer accounting and bounded asynchronous S3 streaming; valid retry/other peers remain operational.",
+      "regressions": [
+        "tests/clients/test_payload_limits.py",
+        "tests/servers/test_runtime_transport.py",
+        "tests/clients/test_client_lifecycle_variants.py"
+      ]
+    },
+    {
+      "id": "T2B-CALLBACK",
+      "status": "Fixed",
+      "before": "__iter__ returned a list; callback-body AttributeError was misreported as a missing callback method.",
+      "after": "Registration-order iteration works; callback exceptions propagate unchanged; missing-method error remains descriptive.",
+      "regression": "tests/callbacks/test_handler_contract.py"
+    },
+    {
+      "id": "T2B-URGENT",
+      "status": "Fixed",
+      "before": "Deleting reported_clients while enumerating skipped the second stale client.",
+      "after": "Request updates for every stale buffered client using a snapshot; release replaced queued wire accounting.",
+      "regression": "tests/servers/test_runtime_transport.py:test_all_buffered_stale_clients_receive_urgent_requests"
+    },
+    {
+      "id": "T2B-ASYNC-SELECTION",
+      "status": "Fixed",
+      "before": "A partial async round selected a full new round and could assign several logical clients to the same available worker.",
+      "after": "Exclude clients still training, fill only outstanding round capacity and cap batches by idle physical workers; preserve pending logical selections.",
+      "regression": "tests/servers/test_lifecycle_contracts.py:test_async_partial_round_replaces_only_idle_workers"
+    },
+    {
+      "id": "T2B-ZERO-EVALUATION",
+      "status": "Fixed",
+      "before": "Valid all-zero sample reports divided by zero during client accuracy reporting.",
+      "after": "Return finite zero mean/std while preserving the all-zero aggregation baseline.",
+      "regression": "tests/servers/test_fedavg_strategy.py"
+    },
+    {
+      "id": "T2B-STARTUP-COMPATIBILITY",
+      "status": "Resolved implementation regressions",
+      "before": "Broad validation exposed direct-start subclasses without initialized transport_limits and legacy completion hooks inspecting report/payload fields after super().",
+      "after": "Startup obtains default limits for direct-start subclasses; completion retains legacy fields within the finite buffer ledger and cancels transfer timers. Accepted loop ownership/exception precedence code and all 48 original regression cases remain intact.",
+      "regression": "tests/integration/test_event_loop_startup.py (unchanged)"
+    },
+    {
+      "id": "T2B-S3-PREFIX",
+      "status": "Confirmed open handoff to 2D; outside owned runtime paths",
+      "before": "Actual S3.send_to_s3 with prefix /prefix writes /prefix//prefix/client_payload_7_ABC123, while receive_from_s3 requests /prefix/client_payload_7_ABC123.",
+      "evidence": "/tmp/plato-phase2b-runtime/s3-prefix-handoff.json",
+      "method": "Actual utility methods with patched HTTP/presigner; no network.",
+      "followup": "2D reconcile send_to_s3/put_to_s3 prefix handling and audit standalone utility receive calls. Runtime bounded reader follows existing reader prefix contract."
+    }
+  ],
+  "audit": [
+    {
+      "area": "Sync lifecycle, shutdown, errors, cancellation and ownership",
+      "outcome": "Unchanged 48 startup regressions per interpreter cover raw/borrowed/owned loops, child failures, configure failures, error precedence, natural socket success and bounded negative containment. No lifecycle rewrite."
+    },
+    {
+      "area": "Async and buffered round boundaries",
+      "outcome": "Actual completion/periodic paths verify minimum-client threshold and aggregate/wrap/select order; urgent requests and partial-round ordinary/batched selection regressions pass. FedBuff uniform mean = 3 for deltas 1/5 despite 2/6 sample counts."
+    },
+    {
+      "area": "Existing research weighting",
+      "outcome": "Actual FedAsync example algorithm with adaptive polynomial staleness mixing yields 7.6 from baseline 10 and payload 2; no research equations changed."
+    },
+    {
+      "area": "Split and personalized selection/client lifecycle",
+      "outcome": "Existing clients/servers cases and final focused personalized/split selection tests pass; no split protocol changes."
+    },
+    {
+      "area": "Cross-silo lifecycle",
+      "outcome": "Actual central selection binds edge physical process to issued logical identity; transformed invalid input is rejected before trainer identity changes. Local tests, no production multi-silo deployment."
+    },
+    {
+      "area": "Hooks, callbacks, context and report/payload alignment",
+      "outcome": "Raw and hook/callback-transformed validation precedes dispatch mutation. Both arrival orders and ordinary/legacy/delta contracts pass. Callback order/errors and urgent outbound identity preserve current context ownership."
+    },
+    {
+      "area": "Evaluation logging and negative paths",
+      "outcome": "Existing evaluation CSV/server logging cases pass; all-zero reporting fixed. Unknown/stale identity, malformed/trailing/truncated pickle, duplicate report, byte/chunk/part/buffer excess, total timeout and retry execute."
+    },
+    {
+      "area": "Checkpoint paths",
+      "outcome": "F10 disconnect and actual F11 hook-to-history paths repaired; all remaining writer/reader/auxiliary names inventoried below for serialized 2C/F07 work."
+    }
+  ],
+  "transport": {
+    "config_section": "server",
+    "defaults": {
+      "max_report_bytes": 1048576,
+      "max_chunk_bytes": 1048576,
+      "max_payload_bytes": 536870912,
+      "max_payload_chunks": 4096,
+      "max_payload_parts": 1024,
+      "max_buffered_bytes": 1073741824,
+      "payload_timeout": 120
+    },
+    "config_rules": "Byte/count values are positive integers; timeout is finite and positive. Defaults allow existing 1 MiB send chunks. No manifest/config fixture changes.",
+    "socket_max_http_buffer_size": "2 * max(max_report_bytes, max_chunk_bytes) + 65536; default 2162688 bytes.",
+    "semantics": "Payload byte/chunk/part limits are cumulative across parts. Server buffer budget includes reports plus active, queued and retained completed wire bytes without double-counting queued completed values. Incomplete-transfer deadline is absolute and expires without another message. Client inbound transfer and simulation-file reads are bounded by configured payload caps.",
+    "s3": "Existing presigned-object format/key prefix; 64 KiB HTTP streaming, Content-Length check, reserve-before-append and total deadline. Actual local aiohttp reader tests: valid, oversized header, oversized stream, malformed/truncated pickle and incomplete timeout. No live S3 credentials/service used.",
+    "compatibility": "Completed reports/payloads remain visible to legacy server completion hooks until assignment/disconnect/close. Default urgent communication uses report.client_id for envelope, parts, completion, simulation filename and S3 reference."
+  },
+  "environment": {
+    "host": "macOS-27.0-arm64-arm-64bit-Mach-O",
+    "uv": "0.12.22",
+    "python_default_and_minimum": "3.13 (unchanged)",
+    "environments": [
+      {
+        "python": "3.13.16",
+        "path": "/tmp/plato-phase2b-runtime/venv313",
+        "provision": "UV_PROJECT_ENVIRONMENT=/tmp/plato-phase2b-runtime/venv313 uv sync --locked --group dev --python 3.13"
+      },
+      {
+        "python": "3.14.8",
+        "path": "/tmp/plato-phase2b-runtime/venv314",
+        "provision": "UV_PROJECT_ENVIRONMENT=/tmp/plato-phase2b-runtime/venv314 uv sync --locked --group dev --python 3.14"
+      }
+    ],
+    "focused_versions": {
+      "torch": "2.14.1",
+      "python_socketio": "5.17.0",
+      "aiohttp": "3.14.3",
+      "safetensors": "0.8.0"
+    },
+    "identities_sha256": {
+      "uv.lock": "573b10c2ba1a2317e02f9e40c6181359cafab6f6e0a0f9be12bb256cb276fe1d",
+      "pyproject.toml": "799bd7ba1865b097fdc8ca84a7b70337794e338de4aa9a6a13f6a4c1b9156246",
+      ".python-version": "02e735b3dfe1c32833eb550b7ff8ffa17f5f2bc3fa1e7bae61a8f5a3883ce398"
+    },
+    "thread_controls": "OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1",
+    "shell": "Every shell invocation uses zsh -lc.",
+    "submodule": {
+      "path": "external/nanochat",
+      "commit": "c75fe54aa7c1fa881701c246f9427bcbe4eee5a4",
+      "command": "git submodule update --init external/nanochat",
+      "upstream_revision_updated": false
+    },
+    "isolation": "Root .venv and other agents' environments were not mutated."
+  },
+  "validation": {
+    "red_replay_policy": "Mandatory red runs temporarily replayed relevant production files from the exact baseline and restored current files in finally blocks. Baseline arithmetic probe loaded the exact baseline strategy as an owned scratch module. Tests were not weakened.",
+    "red": [
+      {
+        "findings": [
+          "F11"
+        ],
+        "command": "OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 /tmp/plato-phase2b-runtime/venv313/bin/python -m pytest tests/servers/test_port_checkpoint_flow.py -q",
+        "baseline_files": [
+          "examples/async/port/port_server.py",
+          "plato/servers/strategies/aggregation/port.py"
+        ],
+        "result": "2 failed: actual writer rejects .pth",
+        "log": "red-port313.log"
+      },
+      {
+        "findings": [
+          "F10",
+          "T2B-SESSION",
+          "T2B-BOUNDS",
+          "T2B-URGENT"
+        ],
+        "command": "OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 /tmp/plato-phase2b-runtime/venv313/bin/python -m pytest tests/clients/test_checkpoint_cleanup.py tests/clients/test_payload_limits.py tests/servers/test_runtime_transport.py -k 'not s3_ingress and not report_limit and not reused_worker and not actual_urgent and not unaggregated' -q",
+        "baseline_files": [
+          "plato/clients/base.py",
+          "plato/clients/composable.py",
+          "plato/clients/strategies/defaults.py",
+          "plato/servers/base.py"
+        ],
+        "result": "28 failed, 2 passed, 9 deselected at that test revision; cleanup/identity/limits/malformed retention and urgent skip observed",
+        "log": "red-transport-cleanup313.log"
+      },
+      {
+        "findings": [
+          "F18",
+          "T2B-ZERO-EVALUATION",
+          "T2B-CALLBACK"
+        ],
+        "command": "OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 /tmp/plato-phase2b-runtime/venv313/bin/python -m pytest tests/servers/test_fedavg_strategy.py tests/callbacks/test_handler_contract.py -k 'rejects_invalid or cardinality_mismatch or validates_raw or callback_body or registered_callbacks or (preserves_fractional and all)' -q",
+        "baseline_files": [
+          "plato/servers/fedavg.py",
+          "plato/servers/strategies/aggregation/fedavg.py",
+          "plato/callbacks/handler.py"
+        ],
+        "result": "52 failed, 21 deselected: 44 weight/alignment, 6 all-zero reporting and 2 callback failures",
+        "log": "red-aggregation-callback313.log"
+      },
+      {
+        "findings": [
+          "T2B-ASYNC-SELECTION"
+        ],
+        "command": "OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 /tmp/plato-phase2b-runtime/venv313/bin/python -m pytest tests/servers/test_lifecycle_contracts.py -k async_partial -q",
+        "source": "Implementation before the async selection fix; same affected selection behavior as baseline.",
+        "result": "2 failed, 4 deselected: ordinary and batched partial async rounds",
+        "log": "red-async-selection313.log"
+      },
+      {
+        "findings": [
+          "T2B-URGENT",
+          "T2B-BOUNDS"
+        ],
+        "result": "2 product failures: second urgent request skipped and completed unaggregated wire buffers lost from accounting.",
+        "log": "red-buffer-lifecycle313.log"
+      },
+      {
+        "findings": [
+          "F18 cross-silo"
+        ],
+        "result": "Actual transformed mismatch changes trainer client_id 9 to 0 before rejection. The same early run contained an async mock coroutine harness error; that harness error is excluded from product findings and was corrected.",
+        "log": "red-cross-silo313.log"
+      }
+    ],
+    "baseline_numerical_probe": {
+      "log": "baseline-input-values.json",
+      "result": "Actual baseline: [-1,2] -> 7.0; [NaN,2] -> None; [Inf,2] -> NaN; 1 report/2 payloads -> 1.0 ignoring excess."
+    },
+    "green": [
+      {
+        "python": "3.13.16",
+        "command": "OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2b-runtime/venv313/bin/python -m pytest tests/clients tests/servers tests/callbacks tests/integration/test_smoke_configs.py tests/integration/test_event_loop_startup.py -q --basetemp /tmp/plato-phase2b-runtime/accepted313",
+        "result": "209 passed; zero skips/warnings/failures",
+        "elapsed_seconds": 442.3,
+        "log": "accepted313.log"
+      },
+      {
+        "python": "3.14.8",
+        "command": "OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2b-runtime/venv314/bin/python -m pytest tests/clients tests/servers tests/callbacks tests/integration/test_smoke_configs.py tests/integration/test_event_loop_startup.py -q --basetemp /tmp/plato-phase2b-runtime/accepted314",
+        "result": "209 passed; zero skips/warnings/failures",
+        "elapsed_seconds": 457.58,
+        "log": "accepted314.log"
+      }
+    ],
+    "final_selection_change": [
+      {
+        "python": "3.13.16",
+        "command": "OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2b-runtime/venv313/bin/python -m pytest tests/servers/test_lifecycle_contracts.py tests/servers/test_runtime_transport.py tests/servers/test_personalized_selection_strategy.py tests/servers/test_split_learning_selection_strategy.py -q --basetemp /tmp/plato-phase2b-runtime/selection313",
+        "result": "55 passed; zero skips/warnings/failures; 0.55 seconds",
+        "log": "green-selection313.log"
+      },
+      {
+        "python": "3.14.8",
+        "command": "OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2b-runtime/venv314/bin/python -m pytest tests/servers/test_lifecycle_contracts.py tests/servers/test_runtime_transport.py tests/servers/test_personalized_selection_strategy.py tests/servers/test_split_learning_selection_strategy.py -q --basetemp /tmp/plato-phase2b-runtime/selection314",
+        "result": "55 passed; zero skips/warnings/failures; 0.55 seconds",
+        "log": "green-selection314.log"
+      }
+    ],
+    "count_policy": "The 55-case supplemental runs overlap the broad runs and add two final async cases: 211 distinct relevant cases per interpreter, not 264.",
+    "startup_acceptance": {
+      "source": "tests/integration/test_event_loop_startup.py unchanged from baseline",
+      "cases_per_interpreter": 48,
+      "surviving_owned_descendants": 0,
+      "deliberate_watchdog_negative_cases_per_interpreter": 5,
+      "policy": "Expected negative containment is not regular smoke success.",
+      "real_socket_rounds": [
+        {
+          "python": "3.13.16",
+          "returncode": 0,
+          "timed_out": false,
+          "forced": [],
+          "elapsed_seconds": 14.624215124873444,
+          "trained_clients": [
+            {
+              "id": 1,
+              "samples": 2,
+              "pid": 45114
+            },
+            {
+              "id": 2,
+              "samples": 6,
+              "pid": 45115
+            }
+          ]
+        },
+        {
+          "python": "3.14.8",
+          "returncode": 0,
+          "timed_out": false,
+          "forced": [],
+          "elapsed_seconds": 15.704020125092939,
+          "trained_clients": [
+            {
+              "id": 2,
+              "samples": 2,
+              "pid": 45129
+            },
+            {
+              "id": 1,
+              "samples": 6,
+              "pid": 45130
+            }
+          ]
+        }
+      ],
+      "reference": "Unchanged real socket test checks actual reports, separate trained child processes, changed local parameters and independently weighted final tensors (2/6 samples)."
+    },
+    "checks": [
+      {
+        "command": "/tmp/plato-phase2b-runtime/venv313/bin/ruff check . --select I",
+        "result": "Passed",
+        "log": "ruff.log"
+      },
+      {
+        "command": "/tmp/plato-phase2b-runtime/venv313/bin/ty check plato/clients/transport.py",
+        "result": "Passed for new helper only; no whole-repository typing claim",
+        "log": "ty-transport.log"
+      },
+      {
+        "command": "git diff --cached --check",
+        "result": "Passed before implementation commit"
+      }
+    ],
+    "interim_failures": "Earlier broad runs exposed two startup integration regressions (missing direct-start limit state and removed completion fields); both were corrected without changing accepted startup tests. Final accepted broad logs supersede those interim results."
+  },
+  "checkpoint_handoff_2c": {
+    "owner": "2C / F07 after 2B acceptance",
+    "policy": "No competing global model-name encoding introduced. 2C may adapt these accepted paths and all auxiliary paths consistently for slash-containing names; retain existing ordinary/legacy compatibility.",
+    "inventory": [
+      {
+        "writer": "plato/servers/base.py:_select_clients",
+        "reader": "plato/clients/composable.py:on_payload_to_arrive",
+        "root": "checkpoint_path",
+        "format": "<model_name with / replaced by _>_<logical_client_id>.pkl; server sends exact payload_filename; reader now bounded"
+      },
+      {
+        "writer": "plato/clients/base.py:_send and plato/clients/strategies/defaults.py:DefaultCommunicationStrategy.send_payload",
+        "reader": "plato/servers/base.py:_client_report_arrived",
+        "root": "checkpoint_path",
+        "format": "<model_name with / replaced by _>_client_<logical_client_id>.pkl; urgent default writer uses reported identity"
+      },
+      {
+        "writer": "plato/servers/base.py:save_to_checkpoint",
+        "reader": "plato/servers/base.py:_resume_from_checkpoint",
+        "root": "checkpoint_path",
+        "format": "checkpoint_<model_name>_<round>.safetensors plus trainer history .safetensors.pkl; writer replaces slash, resume reader uses raw name (F07 open)"
+      },
+      {
+        "writer": "plato/servers/base.py:save_to_checkpoint/_save_random_states",
+        "reader": "plato/servers/base.py:_resume_from_checkpoint/_restore_random_states",
+        "root": "checkpoint_path",
+        "format": "current_round.pkl; numpy_prng_state_<round>.pkl; prng_state_<round>.pkl"
+      },
+      {
+        "writer": "Trainer time snapshots (2C); runtime DefaultReportingStrategy requests obtain_model_at_time",
+        "reader": "Trainer obtain_model_at_time (2C)",
+        "cleanup": "plato/clients/base.py:_clear_checkpoint_files via actual disconnect",
+        "root": "model_path",
+        "format": "<client_id>_<epoch>_<decimal_time>.safetensors (legacy .pth), optional .pkl history; F10 deletes current identity only"
+      },
+      {
+        "writer": "examples/async/port/port_server.py:weights_aggregated",
+        "reader": "plato/servers/strategies/aggregation/port.py:_cosine_similarity",
+        "root": "model_path",
+        "format": "model_<round>.safetensors plus .safetensors.pkl; read current_round-2; .pth fallback"
+      },
+      {
+        "writer": "plato/clients/strategies/fedavg_personalized.py:outbound_ready -> algorithm.save_local_layers",
+        "reader": "Personalized algorithm/trainer (2C)",
+        "root": "model_path",
+        "format": "<raw_model_name>_<client_id>_local_layers.safetensors"
+      },
+      {
+        "writer": "plato/servers/base.py:_close -> trainer.save_model; plato/trainers/composable.py save/train/test worker paths (read-only inventory)",
+        "reader": "plato/trainers/composable.py:load_model/obtain_model_at_time; plato/trainers/base.py:cleanup_worker (2C)",
+        "root": "Configured model roots",
+        "format": "Default <model_name>.safetensors and .safetensors.pkl; worker <model_name>_<client_id>_<run_id>.safetensors plus .safetensors.pkl/.eval.pkl; evaluation-result filename and time-snapshot identity require coordinated 2C inventory"
+      }
+    ]
+  },
+  "mlx_handoff_3a": {
+    "extension": "plato/servers/fedavg.py:Server._validate_aggregation_inputs(updates, payloads)",
+    "call_sites": "Raw ingress, after weights_received and callback, and public aggregate_deltas before ordinary/legacy/delta dispatch. Cross-silo raw/transformed ingress also uses it.",
+    "scope": "2B validates report weights and cardinality only; no MLX/backend tree schema changes.",
+    "required_followup": "3A extends capability for raw/transformed eligible MLX trees, including zero-weight trees and both arrival orders, before mutation; preserve ordinary/legacy/delta contracts."
+  },
+  "authoritative_docs": [
+    {
+      "url": "https://python-socketio.readthedocs.io/en/stable/api_server.html",
+      "used_for": "max_http_buffer_size and server compatibility"
+    },
+    {
+      "url": "https://docs.pytorch.org/docs/stable/generated/torch.load.html",
+      "used_for": "Legacy .pth weights_only/map_location contract"
+    },
+    {
+      "url": "https://huggingface.co/docs/safetensors/api/torch",
+      "used_for": "Safetensors format review; repository tree metadata requires deserialize_tree"
+    },
+    {
+      "url": "https://docs.aiohttp.org/en/stable/client_reference.html",
+      "used_for": "Streaming response and ClientTimeout total"
+    },
+    {
+      "url": "https://docs.python.org/3.13/library/asyncio-eventloop.html",
+      "used_for": "Absolute/incomplete-transfer timer cleanup"
+    }
+  ],
+  "limitations": [
+    "Session binding preserves existing trusted-peer protocol; it does not introduce authentication or assignment nonces. Same logical-ID replay during an indistinguishable new assignment cannot be identified by this protocol.",
+    "Wire byte/count/deadline caps do not bound arbitrary decoded pickle object expansion or CPU execution. Pickle inputs and S3 object writers remain trusted.",
+    "Live S3, distributed GPU and production multi-silo deployment were not executed. Custom S3 adapters need the existing key_prefix/bucket/presigning interface.",
+    "Standalone S3 utility ingress remains outside 2B; confirmed prefix mismatch handed to 2D.",
+    "F07 slash-name checkpoint coordination and MLX tree specifics remain assigned to 2C and 3A. No whole-stack Python 3.14 claim."
+  ],
+  "owned_temporary_resources": {
+    "root": "/tmp/plato-phase2b-runtime",
+    "contents": "Isolated venv313/venv314, sync/submodule logs, red/green/interim raw logs, baseline module/probe JSON, S3 prefix probe JSON, pytest basetemp trees, process result.json and commit-message files.",
+    "additional": "Early focused red/green tests used pytest-managed per-run temp directories under the local pytest-of-bli root; they contain only test-owned artifacts.",
+    "policy": "Retain scratch/logs until root acceptance; no workspace closure, evidence cleanup or other agent resource cleanup.",
+    "process_outcome": "All 96 startup result records across final broad runs show no surviving owned descendants."
+  }
+}
