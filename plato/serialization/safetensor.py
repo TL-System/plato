@@ -47,7 +47,14 @@ def serialize_tree(tree: Any) -> bytes:
     Serialise a nested tree of tensors/arrays into Safetensors bytes.
     """
     flat, metadata = flatten_tree(tree)
-    tensors = {path or "__root__": array for path, array in flat.items()}
+    if "_tree_metadata" in flat:
+        raise ValueError("The tensor path '_tree_metadata' is reserved.")
+    # Safetensors expects C-order bytes; strided buffers can otherwise be saved
+    # in storage order while retaining the logical shape, silently reordering values.
+    tensors = {
+        path: np.ascontiguousarray(array) if array.ndim else array
+        for path, array in flat.items()
+    }
     metadata_json = _metadata_to_json(metadata).encode("utf-8")
     tensors["_tree_metadata"] = np.frombuffer(metadata_json, dtype=np.uint8)
     return save(tensors)

@@ -31,6 +31,13 @@ class Processor(model.Processor):
     def __init__(self, quantization_level=64, **kwargs) -> None:
         super().__init__(**kwargs)
 
+        if (
+            not isinstance(quantization_level, int)
+            or not 2 <= quantization_level <= 128
+        ):
+            raise ValueError(
+                "QSGD quantization level must be an integer from 2 to 128."
+            )
         self.quantization_level = quantization_level  # must <= 128!
 
     def _process_layer(self, layer: Any) -> Any:
@@ -40,7 +47,6 @@ class Processor(model.Processor):
             """Adds 1 to the corresponding positions with given probability."""
             size = prob.size()
             prob = prob.reshape(-1)
-            random.seed()
             for count, value in enumerate(prob):
                 if random.random() <= value:
                     prob[count] = 1
@@ -60,10 +66,16 @@ class Processor(model.Processor):
             return content
 
         # Step 1: quantization
+        if not layer.is_floating_point():
+            return layer
+        if not torch.isfinite(layer).all():
+            raise ValueError("QSGD requires finite tensor values.")
+        if any(size > 32767 for size in layer.shape) or layer.ndim > 32767:
+            raise ValueError("QSGD tensor dimensions exceed the 16-bit wire header.")
         tuning_param = self.quantization_level - 1  # tuning parameter
-        max_v = torch.max(abs(layer))  # max absolute value
+        max_v = torch.max(abs(layer)) if layer.numel() else layer.new_tensor(0)
         neg = (-1) * layer.lt(0) + 1 * layer.ge(0)
-        ratio = abs(layer) / max_v  # |v_i| / ||v||
+        ratio = abs(layer) / max_v if max_v > 0 else torch.zeros_like(layer)
         level = (ratio * tuning_param - 1).ceil()
         zeta = level + add_prob(ratio * tuning_param - level)
         zeta = zeta.mul(neg).to(int)

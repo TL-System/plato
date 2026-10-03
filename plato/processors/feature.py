@@ -39,12 +39,12 @@ class Processor(base.Processor):
 
         for logits, targets in data:
             if self.use_numpy:
-                logits = logits.detach().numpy()
+                logits = logits.detach().cpu().numpy()
 
             logits, targets = self.method(logits, targets)
 
             if self.use_numpy:
-                if device != "cpu":
+                if torch.device(device).type != "cpu":
                     logits = torch.from_numpy(logits.astype("float16"))
                 else:
                     logits = torch.from_numpy(logits.astype("float32"))
