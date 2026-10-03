@@ -506,3 +506,64 @@ def test_lgfedavg_two_real_updates_dispatch_timm_between_passes(tmp_path, monkey
         for actual, expected in zip(model.parameters(), reference.parameters()):
             torch.testing.assert_close(actual, expected, rtol=1e-12, atol=1e-12)
         assert "complete_optimizer_step" not in trainer.context.state
+
+
+def test_real_grad_scaler_overflow_does_not_dispatch_optimizer_update(tmp_path):
+    """Qualify real CPU scaler completion; CUDA execution needs GPU hardware."""
+    from plato.trainers.strategies.training_step import MixedPrecisionStepStrategy
+
+    config = build_minimal_config()
+    config["trainer"].update(batch_size=1, epochs=1)
+    with configure_environment(config, runtime_root=tmp_path):
+        model = torch.nn.Linear(1, 1, bias=False)
+        model.weight.data.fill_(1)
+        recorder = UpdateRecorder()
+        strategy = MixedPrecisionStepStrategy(enabled=False)
+        trainer = ComposableTrainer(
+            model=model, training_step_strategy=strategy, callbacks=[recorder],
+        )
+        # Inject the supported CPU scaler to exercise real overflow decisions
+        # without claiming CUDA mixed-precision hardware qualification.
+        strategy.enabled = True
+        strategy.scaler = torch.amp.GradScaler("cpu")
+        factor = [float("inf")]
+        trainer.loss_strategy.compute_loss = (
+            lambda output, labels, context:
+            torch.nn.functional.mse_loss(output, labels) * factor[0]
+        )
+        data = TensorDataset(torch.ones(1, 1), torch.zeros(1, 1))
+        run = {**config["trainer"], "run_id": "amp"}
+        initial_scale = strategy.scaler.get_scale()
+        trainer.train_model(run, data, [0])
+        assert model.weight.item() == 1
+        assert recorder.updates == []
+        assert strategy.scaler.get_scale() < initial_scale
+        factor[0] = 1.0
+        trainer.train_model(run, data, [0])
+        assert len(recorder.updates) == 1
+        assert model.weight.item() == pytest.approx(0.98)
+        assert not model.weight.grad.isnan().any()
+
+
+def test_feddyn_all_zero_labels_preserve_zero_weight_fallback(tmp_path):
+    """Keep the legacy objective; zero label sums must not make its guard NaN."""
+    from plato.trainers.strategies.algorithms.feddyn_strategy import FedDynLossStrategy
+
+    with configure_environment(build_minimal_config(), runtime_root=tmp_path):
+        model = torch.nn.Linear(1, 1, bias=False).double()
+        model.weight.data.fill_(2)
+        context = TrainingContext()
+        context.model = model
+        strategy = FedDynLossStrategy(
+            alpha=0.1, base_loss_fn=lambda output, labels: output.sum() * 0,
+        )
+        strategy.setup(context)
+        labels = torch.zeros(2, dtype=torch.int64)
+        loss = strategy.compute_loss(model(torch.ones(2, 1).double()), labels, context)
+        loss.backward()
+        # The preserved shifted-quadratic/linear legacy equation gives -.2
+        # here. This test makes no paper-equivalence claim.
+        assert torch.isfinite(loss)
+        assert model.weight.grad.item() == pytest.approx(-0.2)
+        coefficient = strategy._get_alpha_coefficient(torch.tensor([0, 1]), context)
+        assert coefficient.item() == pytest.approx(0.075)

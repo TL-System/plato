@@ -276,7 +276,11 @@ class FedDynLossStrategy(LossCriterionStrategy):
         )
 
         # Create uniform weight distribution
-        weight_list = labels / torch.sum(labels) * total_clients
+        label_sum = torch.sum(labels)
+        # Preserve the existing zero-weight fallback for all-zero labels too;
+        # dividing 0 by 0 previously defeated the guard below and produced NaN.
+        denominator = torch.where(label_sum != 0, label_sum, torch.ones_like(label_sum))
+        weight_list = labels / denominator * total_clients
 
         # Adaptive alpha: α / weight (avoid division by zero)
         adaptive_alpha = self.alpha / torch.where(weight_list != 0, weight_list, 1.0)

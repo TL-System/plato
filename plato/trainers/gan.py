@@ -297,7 +297,7 @@ class GANTestingStrategy(TestingStrategy):
             model: GAN model with generator
             config: Testing configuration dictionary
             testset: Test dataset
-            sampler: Optional data sampler (unused for GAN testing)
+            sampler: Optional evaluation partition sampler
             context: Training context with device info
 
         Returns:
@@ -308,8 +308,13 @@ class GANTestingStrategy(TestingStrategy):
 
         perplexity = -1
 
+        sampler_obj = sampler
+        if sampler is not None and not isinstance(sampler, torch.utils.data.Sampler):
+            get_sampler = getattr(sampler, "get", None)
+            if callable(get_sampler):
+                sampler_obj = get_sampler()
         test_loader = torch.utils.data.DataLoader(
-            testset, batch_size=config["batch_size"], shuffle=True
+            testset, batch_size=config["batch_size"], shuffle=False, sampler=sampler_obj
         )
 
         real_features, fake_features = [], []
@@ -318,7 +323,7 @@ class GANTestingStrategy(TestingStrategy):
                 real_examples = real_examples.to(context.device)
 
                 noise = torch.randn(
-                    config["batch_size"], model.nz, 1, 1, device=context.device
+                    len(real_examples), model.nz, 1, 1, device=context.device
                 )
                 fake_examples = model.generator(noise)
 
@@ -332,6 +337,8 @@ class GANTestingStrategy(TestingStrategy):
                 real_features.extend(list(feature_real))
                 fake_features.extend(list(feature_fake))
 
+            if len(real_features) < 2:
+                raise ValueError("GAN FID evaluation requires at least two samples.")
             real_features, fake_features = (
                 np.stack(real_features),
                 np.stack(fake_features),
@@ -359,8 +366,8 @@ class GANTestingStrategy(TestingStrategy):
         """
         # Since the input to InceptionV3 needs to be at least 75x75,
         # we will pad the input image if needed.
-        hpad = math.ceil((75 - inputs.size(dim=-2)) / 2)
-        vpad = math.ceil((75 - inputs.size(dim=-1)) / 2)
+        hpad = math.ceil((75 - inputs.size(dim=-1)) / 2)
+        vpad = math.ceil((75 - inputs.size(dim=-2)) / 2)
         hpad, vpad = max(0, hpad), max(0, vpad)
         pad = nn.ZeroPad2d((hpad, hpad, vpad, vpad))
         inputs = pad(inputs)
@@ -369,10 +376,7 @@ class GANTestingStrategy(TestingStrategy):
         features = None
         with torch.no_grad():
             features = self.inception_model(inputs)
-        features = features.cpu()
-        features = np.array(features)
-
-        return features
+        return features.detach().cpu().numpy()
 
     def _calculate_fid(self, real_features, fake_features):
         """

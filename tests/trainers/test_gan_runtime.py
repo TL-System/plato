@@ -1,14 +1,17 @@
 """Actual GAN registration, training, exchange and paired checkpoints."""
 
 import copy
+import math
 from pathlib import Path
 
+import pytest
 import torch
 from torch.utils.data import TensorDataset
 
 from plato.algorithms.fedavg_gan import Algorithm
 from plato.models import dcgan
-from plato.trainers.gan import Trainer
+from plato.trainers.gan import GANTestingStrategy, Trainer
+from plato.trainers.strategies.base import TrainingContext
 from tests.integration.utils import build_minimal_config, configure_environment
 
 
@@ -155,3 +158,41 @@ def test_gan_deltas_and_updates_preserve_bool_and_integer_buffer_contract(tmp_pa
         algorithm.load_weights(updated)
         assert trainer.generator.flag.item() is True
         assert trainer.discriminator.count.item() == 5
+
+
+def test_gan_fid_actual_partition_tail_padding_and_scalar_covariance_reference():
+    class Generator(torch.nn.Module):
+        def __init__(self):
+            super().__init__()
+            self.batch_sizes = []
+
+        def forward(self, noise):
+            self.batch_sizes.append(len(noise))
+            return torch.zeros(len(noise), 3, 32, 80)
+
+    class FeatureExtractor(torch.nn.Module):
+        def forward(self, images):
+            assert images.shape[-2] >= 75 and images.shape[-1] >= 75
+            # Central pixel survives padding; real features are [1,3,5], with
+            # mean 3 and unbiased variance 4. Generated features are zero.
+            value = images[:, 0, images.shape[-2] // 2, images.shape[-1] // 2]
+            return torch.stack((value, torch.zeros_like(value)), dim=1)
+
+    model = torch.nn.Module()
+    model.generator = Generator()
+    model.nz = 2
+    strategy = GANTestingStrategy.__new__(GANTestingStrategy)
+    strategy.inception_model = FeatureExtractor()
+    images = torch.arange(1, 6).view(5, 1, 1, 1).expand(5, 3, 32, 80).float()
+    data = TensorDataset(images, torch.zeros(5))
+    context = TrainingContext()
+    context.device = torch.device("cpu")
+    sampler = type("Partition", (), {"get": lambda self: [0, 2, 4]})()
+    score = strategy.test_model(model, {"batch_size": 2}, data, sampler, context)
+    epsilon = 1e-6
+    expected = 9 + 4 + 2 * epsilon - 2 * math.sqrt((4 + epsilon) * epsilon)
+    assert score == pytest.approx(expected)
+    assert model.generator.batch_sizes == [2, 1]
+    for partition in ([], [0]):
+        with pytest.raises(ValueError, match="at least two"):
+            strategy.test_model(model, {"batch_size": 2}, data, partition, context)

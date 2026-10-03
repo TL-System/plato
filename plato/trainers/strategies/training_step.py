@@ -227,6 +227,7 @@ class MixedPrecisionStepStrategy(TrainingStepStrategy):
         context: TrainingContext,
     ) -> torch.Tensor:
         """Perform training step with mixed precision."""
+        context.state["optimizer_step_completed"] = False
         optimizer.zero_grad()
 
         if self.enabled and self.scaler is not None:
@@ -239,7 +240,17 @@ class MixedPrecisionStepStrategy(TrainingStepStrategy):
             self.scaler.scale(loss).backward(create_graph=self.create_graph)
 
             # Unscale gradients and step
-            self.scaler.step(optimizer)
+            # GradScaler can suppress optimizer.step on overflow. Observe the
+            # actual public step hook, rather than counting scaler attempts or
+            # inferring completion from a change to its dynamic scale.
+            def completed(*_):
+                context.state["optimizer_step_completed"] = True
+
+            handle = optimizer.register_step_post_hook(completed)
+            try:
+                self.scaler.step(optimizer)
+            finally:
+                handle.remove()
             self.scaler.update()
         else:
             # Standard precision training
@@ -247,6 +258,7 @@ class MixedPrecisionStepStrategy(TrainingStepStrategy):
             loss = loss_criterion(outputs, labels)
             loss.backward(create_graph=self.create_graph)
             optimizer.step()
+            context.state["optimizer_step_completed"] = True
 
         return loss
 
