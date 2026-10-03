@@ -8,7 +8,7 @@ based on a configuration at run-time.
 from __future__ import annotations
 
 import logging
-from typing import Any, Dict, Optional, Type
+from typing import Any
 
 from plato.algorithms import (
     fedavg,
@@ -40,6 +40,12 @@ def _resolve_algorithm_type(algorithm_config: Any) -> str:
 
     framework_obj: Any | None = getattr(algorithm_config, "framework", "")
     framework = framework_obj if isinstance(framework_obj, str) else ""
+    if (framework.lower() == "mlx" and algo_type not in (None, "mlx_fedavg")) or (
+        algo_type == "mlx_fedavg" and framework and framework.lower() != "mlx"
+    ):
+        raise ValueError(
+            "MLX algorithm type and framework must select the same backend."
+        )
 
     if not algo_type and framework:
         if framework.lower() == "mlx":
@@ -54,6 +60,11 @@ def get(trainer: Any | None = None) -> AlgorithmBase:
     """Get the algorithm with the provided type."""
     algorithm_config = Config().algorithm
     algorithm_type = _resolve_algorithm_type(algorithm_config)
+    if algorithm_type == "mlx_fedavg":
+        from plato.trainers.mlx import ComposableMLXTrainer
+
+        if not isinstance(trainer, ComposableMLXTrainer):
+            raise TypeError("MLX FedAvg requires a native MLX trainer.")
 
     if algorithm_type in registered_algorithms:
         logging.info("Algorithm: %s", algorithm_type)

@@ -39,6 +39,10 @@ def _resolve_trainer_name(trainer_config) -> str:
     trainer_type_attr = getattr(trainer_config, "type", None)
     trainer_type = trainer_type_attr if isinstance(trainer_type_attr, str) else None
     framework = getattr(trainer_config, "framework", "")
+    if (framework.lower() == "mlx" and trainer_type not in (None, "mlx")) or (
+        trainer_type == "mlx" and framework and framework.lower() != "mlx"
+    ):
+        raise ValueError("MLX trainer type and framework must select the same backend.")
 
     if not trainer_type and framework:
         if framework.lower() == "mlx":

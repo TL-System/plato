@@ -38,7 +38,7 @@ def _tree_binary_map(
     if isinstance(tree_a, (list, tuple)) and isinstance(tree_b, (list, tuple)):
         mapped = [
             _tree_binary_map(func, item_a, item_b)
-            for item_a, item_b in zip(tree_a, tree_b)
+            for item_a, item_b in zip(tree_a, tree_b, strict=True)
         ]
         return type(tree_a)(mapped)
     return func(tree_a, tree_b)
@@ -61,6 +61,13 @@ def _to_numpy(value: Any) -> np.ndarray | None:
 
 class Algorithm(base.Algorithm):
     """Federated averaging helper for MLX parameter trees."""
+
+    def validate_weights(
+        self, weights: Any, baseline: Any, client_id: Any = None
+    ) -> None:
+        """Validate a full tree before aggregation; identify the logical client."""
+        label = "weights" if client_id is None else f"client {client_id}.weights"
+        mlx_trainer._validate_parameter_tree(weights, baseline, label)
 
     def compute_weight_deltas(
         self,
@@ -85,14 +92,18 @@ class Algorithm(base.Algorithm):
                 return None
             return current_np - baseline_np
 
+        received = list(weights_received)
+        for weights in received:
+            self.validate_weights(weights, baseline_weights)
         deltas = []
-        for weights in weights_received:
+        for weights in received:
             deltas.append(_tree_binary_map(difference, weights, baseline_weights))
         return deltas
 
     def update_weights(self, deltas: Any):
         """Apply parameter deltas to the current model weights."""
         baseline = self.extract_weights()
+        self.validate_weights(deltas, baseline)
 
         def add_delta(baseline_leaf, delta_leaf):
             baseline_np = _to_numpy(baseline_leaf)
@@ -116,18 +127,11 @@ class Algorithm(base.Algorithm):
 
     def load_weights(self, weights):
         """Load weights into the MLX model."""
-        restored = mlx_trainer._tree_map(mlx_trainer._to_mx_array, weights)
         if self.model is None:
             raise RuntimeError("MLX algorithm requires an initialized model.")
-        if hasattr(self.model, "update"):
-            self.model.update(restored)
-        else:
-            raise RuntimeError("MLX model does not support parameter updates.")
-        if mx is not None:
-            leaves = [
-                leaf
-                for leaf in mlx_trainer._tree_leaves(self.model.parameters())
-                if isinstance(leaf, mx.array)
-            ]
-            if leaves:
-                mx.eval(*leaves)
+        self.validate_weights(weights, self.model.parameters())
+        context = getattr(self.trainer, "context", None)
+        stream = getattr(context, "stream", None)
+        if stream is None:
+            stream = mlx_trainer._resolve_device()
+        mlx_trainer._apply_parameters(self.model, weights, stream)
