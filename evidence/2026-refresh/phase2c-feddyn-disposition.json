@@ -70,8 +70,8 @@
   ],
   "current_equations_preserved": true,
   "bounded_fix_applied": "All-zero labels now reach the existing zero-weight fallback, avoiding 0/0 NaN. Nonzero behavior and the objective remain unchanged.",
-  "requested_root_disposition": "Independent primary-source design and review before changing the equation or replacing label-based alpha with actual client sample weighting; not waived or classified as an external prerequisite.",
-  "implementation_commit": "0dc34dd1d79d90071a0babfa6aa89f33d72a976f",
+  "requested_root_disposition": "Root revisedAstra design andfreshreview remainpendingacceptedimplementationhandoff. 2C-11 remainsinternalopen, notwaived/archive/external; no equation rewrite in sixreviewfixes.",
+  "implementation_commit": "e65241c19448b74dcb57fc48bfe388152f3a3e58",
   "probe_command": "PYTHONPATH=. OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 /tmp/plato-phase2c-313/bin/python /tmp/plato-phase2c-scratch/feddyn_disposition_probe.py",
   "probe_source": {
     "path": "/tmp/plato-phase2c-scratch/feddyn_disposition_probe.py",
@@ -79,5 +79,6 @@
     "sha256": "bdc41326d83e94521018a7a45fb0b062423fcec7d29981e4158913947d646a13"
   },
   "equation_fix_not_authorized_or_implemented": true,
-  "closure_requirement": "Root bounded independent primary-source design+review, then explicit original-author implementation/review if selected; this is an open internal finding and cannot be counted as complete/waived/external. F20 accepted unsquared norm policy unchanged."
+  "closure_requirement": "Root bounded independent primary-source design+review, then explicit original-author implementation/review if selected; this is an open internal finding and cannot be counted as complete/waived/external. F20 accepted unsquared norm policy unchanged.",
+  "bounded_checkpoint_migration_correction": "TRAINING-2C-02 exactoldwriter root+'_feddyn_grad_'+id+'.pth' lookup fixed and actualacceptedBwriter default/custom/trailing-root cases verified; read-onlylegacy/canonicalprecedence/client0isolation. No objective/adaptivealpha change."
 }
