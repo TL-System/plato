@@ -24,7 +24,7 @@ class Processor(model.Processor):
         epsilon = Config().algorithm.epsilon
 
         # Apply randomized response as the local differential privacy mechanism
-        layer = layer.detach().cpu().numpy()
+        layer = layer.detach().cpu().numpy().copy()
 
         layer = unary_encoding.encode(layer)
         layer = unary_encoding.randomize(layer, epsilon)

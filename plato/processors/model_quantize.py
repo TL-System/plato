@@ -15,4 +15,4 @@ class Processor(model.Processor):
     def _process_layer(self, layer: torch.Tensor) -> torch.Tensor:
         """Dequantizes each individual layer of the model."""
 
-        return layer.to(torch.bfloat16)
+        return layer.to(torch.bfloat16) if layer.is_floating_point() else layer
