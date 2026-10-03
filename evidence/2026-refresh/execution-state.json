@@ -109,5 +109,7 @@
     "candidate": "0fbc1162994c05041105b1860fc8cb02582d21f3",
     "gate": "phase2-gate-corrections.json",
     "initial_run": "2633 full suite remains FAIL;1301pass/1skip/1collectionfailure; final rerun required."
-  }
+  },
+  "phase2_final_local_acceptance": "phase2-final-local-acceptance.json",
+  "phase2_status": "Local final qualification passed; Linux CI delivery pending."
 }

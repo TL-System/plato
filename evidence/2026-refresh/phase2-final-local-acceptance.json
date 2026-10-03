@@ -1,0 +1,195 @@
+{
+  "status": "ACCEPT_LOCAL_PHASE2_QUALIFICATION_PENDING_LINUX_DELIVERY",
+  "utc": "2026-10-03T14:22:13.335591+00:00",
+  "source_commit": "204082f53d0fd335e57712ac981ad7d40bff19dd",
+  "source_tree": "7b3e677886c1f1610624243723e1e6a9ae09b105",
+  "profiles": [
+    {
+      "profile": "mandatory-313",
+      "passed": 1302,
+      "runtime_test_count": 51,
+      "warning_count": 17,
+      "skips": [
+        {
+          "case": {
+            "classname": "tests.test_nanochat_integration",
+            "name": "test_nanochat_tokenizer_processor_round_trip",
+            "time": "0.000"
+          },
+          "reason": {
+            "type": "pytest.skip",
+            "message": "optional native nanochat tokenizer: callable rustbpe.Tokenizer absent"
+          }
+        }
+      ],
+      "junit_counts": {
+        "tests": 1303,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 1
+      },
+      "receipt": "reproductions/phase2-final-local-qualification.tar.gz:runs/mandatory-313-14436940f658/receipt.json",
+      "seconds": 1469.445
+    },
+    {
+      "profile": "mandatory-314",
+      "passed": 1302,
+      "runtime_test_count": 51,
+      "warning_count": 17,
+      "skips": [
+        {
+          "case": {
+            "classname": "tests.test_nanochat_integration",
+            "name": "test_nanochat_tokenizer_processor_round_trip",
+            "time": "0.000"
+          },
+          "reason": {
+            "type": "pytest.skip",
+            "message": "optional native nanochat tokenizer: callable rustbpe.Tokenizer absent"
+          }
+        }
+      ],
+      "junit_counts": {
+        "tests": 1303,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 1
+      },
+      "receipt": "reproductions/phase2-final-local-qualification.tar.gz:runs/mandatory-314-dda37b8168f1/receipt.json",
+      "seconds": 1570.105
+    },
+    {
+      "profile": "base-313",
+      "passed": 1242,
+      "runtime_test_count": 0,
+      "warning_count": 0,
+      "skips": [
+        {
+          "case": {
+            "classname": "",
+            "name": "tests.trainers.test_dp_data_loader_strategy",
+            "time": "0.000"
+          },
+          "reason": {
+            "message": "collection skipped"
+          }
+        },
+        {
+          "case": {
+            "classname": "tests.test_nanochat_integration",
+            "name": "test_nanochat_tokenizer_processor_round_trip",
+            "time": "0.000"
+          },
+          "reason": {
+            "type": "pytest.skip",
+            "message": "base profile omits optional nanochat integration"
+          }
+        },
+        {
+          "case": {
+            "classname": "tests.test_nanochat_integration",
+            "name": "test_nanochat_trainer_smoke",
+            "time": "0.000"
+          },
+          "reason": {
+            "type": "pytest.skip",
+            "message": "base profile omits optional nanochat integration"
+          }
+        },
+        {
+          "case": {
+            "classname": "tests.test_nanochat_integration",
+            "name": "test_nanochat_trainer_selects_core_eval_strategy",
+            "time": "0.000"
+          },
+          "reason": {
+            "type": "pytest.skip",
+            "message": "base profile omits optional nanochat integration"
+          }
+        }
+      ],
+      "junit_counts": {
+        "tests": 1246,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 4
+      },
+      "receipt": "reproductions/phase2-final-local-qualification.tar.gz:runs/base-313-1ed434509666/receipt.json",
+      "seconds": 717.814
+    },
+    {
+      "profile": "base-314",
+      "passed": 1242,
+      "runtime_test_count": 0,
+      "warning_count": 0,
+      "skips": [
+        {
+          "case": {
+            "classname": "",
+            "name": "tests.trainers.test_dp_data_loader_strategy",
+            "time": "0.000"
+          },
+          "reason": {
+            "message": "collection skipped"
+          }
+        },
+        {
+          "case": {
+            "classname": "tests.test_nanochat_integration",
+            "name": "test_nanochat_tokenizer_processor_round_trip",
+            "time": "0.000"
+          },
+          "reason": {
+            "type": "pytest.skip",
+            "message": "base profile omits optional nanochat integration"
+          }
+        },
+        {
+          "case": {
+            "classname": "tests.test_nanochat_integration",
+            "name": "test_nanochat_trainer_smoke",
+            "time": "0.000"
+          },
+          "reason": {
+            "type": "pytest.skip",
+            "message": "base profile omits optional nanochat integration"
+          }
+        },
+        {
+          "case": {
+            "classname": "tests.test_nanochat_integration",
+            "name": "test_nanochat_trainer_selects_core_eval_strategy",
+            "time": "0.000"
+          },
+          "reason": {
+            "type": "pytest.skip",
+            "message": "base profile omits optional nanochat integration"
+          }
+        }
+      ],
+      "junit_counts": {
+        "tests": 1246,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 4
+      },
+      "receipt": "reproductions/phase2-final-local-qualification.tar.gz:runs/base-314-a8148428fe45/receipt.json",
+      "seconds": 789.554
+    }
+  ],
+  "source_invariance": "PASS: 1588 tracked records and 131 upstream CPython 3.7 vendor bytecode files unchanged; no generated project bytecode",
+  "runtime": "Each mandatory interpreter: 48 startup cases and 3 FedDyn entrypoint cases, 55 actual result records. Natural normal completion and no survivors; failure-containment probes audited separately.",
+  "numerical": "Actual socket FedAvg 2/6 weighted reference; independent Fraction FedDyn four-round uniform/sample endpoints, all population histories and split/resume CPU RNG equality passed.",
+  "quality": "Lock, diff, Ruff imports, existing CI typing guard and scoped FedDyn/DP typing pass both versions. Full typing retains 664 classified diagnostics each; zero in changed active production source. No globally clean typing claim.",
+  "artifacts": "Wheel/sdist source identity, installed-wheel imports/native codec/checkpoint smoke and no-Git legacy migration tests pass on both versions. Dependencies use fresh locked environments; no independent PyPI resolution claim.",
+  "expected_notices": "17 visible known Opacus notices per mandatory run; no warning suppression. Native Rust tokenizer qualification remains Phase 3.",
+  "evidence": "phase2-final-local-qualification.tar.gz",
+  "evidence_sha256": "fa1ef0328af62aa113eb5f6dc8729c59b5316c5035f44a06d4555a5f38d1cd93",
+  "evidence_files": 575,
+  "previous_failure": "Initial 2633 integration found DP test typing and full-collection spawn identity defects. Both corrected by original author, independently reviewed, accepted and included in final 204082. Initial failure evidence retained.",
+  "pending": [
+    "Push evidence-only descendant and qualify exact non-evidence source on Linux Python 3.13 and 3.14",
+    "Finalize draft PR and Phase 2 delivery receipt",
+    "Clean only owned Phase 2 resources before Phase 3"
+  ]
+}
