@@ -11,6 +11,8 @@ from plato.trainers.strategies.algorithms.feddyn_strategy import same_state
 from tests.integration.feddyn_entrypoint_harness import run
 from tests.integration.test_feddyn_round_flow import configuration, rational_round
 
+pytestmark = pytest.mark.runtime
+
 
 def options(root, mode, rounds, kind="scalar"):
     config = configuration(mode, tuple(range(1, 11)), spawn=True, population=10)

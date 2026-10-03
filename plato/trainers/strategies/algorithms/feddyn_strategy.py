@@ -16,7 +16,6 @@ from numbers import Integral, Real
 from pathlib import Path
 from typing import Any
 
-import numpy as np
 import torch
 
 from plato.config import Config
@@ -267,32 +266,6 @@ def validate_identity(value, name):
     return value
 
 
-def native_metadata(values):
-    """Restore only declared scalar fields from the existing tree transport.
-
-    Its native numeric leaves decode as zero-dimensional NumPy arrays. Keep
-    their scalar types (including bool), so validation never coerces a vector,
-    float count or boolean identity into a valid integer.
-    """
-    if not isinstance(values, dict):
-        return values
-    result = dict(values)
-    for key in (
-        "version",
-        "round",
-        "client_id",
-        "base_alpha",
-        "effective_alpha",
-        "expected_count_or_null",
-        "num_samples",
-        "completed_steps",
-    ):
-        value = result.get(key)
-        if isinstance(value, np.ndarray) and value.shape == ():
-            result[key] = value.item()
-    return result
-
-
 def validate_dispatch(model, payload, settings, client_id, round_id):
     """Validate the entire downlink before changing model or strategy state."""
     if not isinstance(payload, (list, tuple)) or len(payload) != 2:
@@ -300,7 +273,7 @@ def validate_dispatch(model, payload, settings, client_id, round_id):
             "FedDyn needs [full model, versioned round state]; use the dedicated example."
         )
     full, raw_metadata = payload
-    meta = native_metadata(raw_metadata)
+    meta = raw_metadata
     keys = {
         "version",
         "run_id",

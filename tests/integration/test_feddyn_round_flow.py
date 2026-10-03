@@ -197,7 +197,13 @@ def test_actual_spawned_rejection_retry_and_logical_reuse(tmp_path, defect):
 
 
 def run_partial(
-    root, mode="uniform", counts=(2, 2), spawn=False, reuse=True, model_name="org/model"
+    root,
+    mode="uniform",
+    counts=(2, 2),
+    spawn=False,
+    reuse=True,
+    model_name="org/model",
+    visits=(1, 2, 1),
 ):
     records = []
     config = configuration(mode, counts, spawn)
@@ -206,7 +212,7 @@ def run_partial(
         s = server()
         c = client(1)
         x, histories = Fraction(2), [Fraction(0), Fraction(0)]
-        for i in (1, 2, 1):
+        for i in visits:
             assignment = dispatch(s, [i])[i]
             if not reuse:
                 c = client(i)
@@ -244,6 +250,32 @@ def run_partial(
             x, histories = next_x, next_histories
         assert not list((root / "models").glob("feddyn_grad*"))
     return records
+
+
+@pytest.mark.parametrize("mode,counts", [("uniform", (2, 2)), ("sample", (1, 3))])
+@pytest.mark.parametrize("spawn", [False, True])
+def test_consecutive_same_client_uses_current_cloud_and_dispatched_history(
+    tmp_path, mode, counts, spawn
+):
+    if not spawn:
+        run_partial(tmp_path, mode, counts, visits=(1, 1, 2, 1))
+        return
+    output = tmp_path / "result.json"
+    command = [
+        sys.executable,
+        "-m",
+        "tests.integration.feddyn_round_worker",
+        str(tmp_path / "runtime"),
+        str(output),
+        mode,
+        ",".join(map(str, counts)),
+        "1,1,2,1",
+    ]
+    completed = subprocess.run(
+        ["zsh", "-lc", shlex.join(command)], capture_output=True, text=True, timeout=100
+    )
+    assert completed.returncode == 0, completed.stdout + completed.stderr
+    assert [r["client"] for r in json.loads(output.read_text())] == [1, 1, 2, 1]
 
 
 @pytest.mark.parametrize(

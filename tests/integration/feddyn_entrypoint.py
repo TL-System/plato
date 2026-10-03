@@ -98,13 +98,6 @@ registry.registered_samplers["feddyn_fixture"] = Partition
 class Observe(ServerCallback):
     def on_weights_received(self, server, weights):
         payloads = copy.deepcopy(weights)
-        for payload in payloads:
-            payload[1] = {
-                key: value.item()
-                if isinstance(value, np.ndarray) and value.shape == ()
-                else value
-                for key, value in payload[1].items()
-            }
         torch.save(
             dict(
                 payloads=payloads,

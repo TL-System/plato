@@ -211,10 +211,13 @@ class Trainer(ComposableTrainer):
 
     def train_model(self, config, trainset, sampler, **kwargs):
         """Apply the same bounded rollback to direct local training failures."""
-        if not isinstance(
-            self.training_step_strategy,
-            (DefaultTrainingStepStrategy, GradientAccumulationStepStrategy),
-        ) or not isinstance(self.lr_scheduler_strategy, NoSchedulerStrategy):
+        if (
+            not isinstance(
+                self.training_step_strategy,
+                (DefaultTrainingStepStrategy, GradientAccumulationStepStrategy),
+            )
+            or type(self.lr_scheduler_strategy) is not NoSchedulerStrategy
+        ):
             raise ValueError(
                 "FedDyn supports ordinary/accumulated SGD without AMP, clipping, scheduler or custom multi-update strategies."
             )

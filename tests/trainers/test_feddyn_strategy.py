@@ -277,3 +277,23 @@ def test_adaptive_alpha_requires_authoritative_metadata(tmp_path):
         strategy.setup(context)
         with pytest.raises(ValueError, match="count|metadata"):
             strategy._get_alpha_coefficient(torch.tensor([0, 1]), context)
+
+
+@pytest.mark.parametrize("alpha,counts", [(1e308, [1, 100]), (5e-324, [10**300, 1])])
+def test_effective_alpha_overflow_and_underflow_are_rejected(tmp_path, alpha, counts):
+    from plato.trainers.strategies.algorithms.feddyn_strategy import (
+        settings_from_config,
+    )
+
+    config = build_minimal_config()
+    config["algorithm"].update(alpha_coef=alpha, feddyn_weighting="sample")
+    with configure_environment(config, runtime_root=tmp_path):
+        from types import SimpleNamespace
+
+        from plato.config import Config
+
+        Config.algorithm = SimpleNamespace(
+            **config["algorithm"], feddyn_sample_counts=counts
+        )
+        with pytest.raises(ValueError, match="alpha"):
+            settings_from_config()

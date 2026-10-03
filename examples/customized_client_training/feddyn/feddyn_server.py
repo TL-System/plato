@@ -20,7 +20,6 @@ from plato.servers import fedavg
 from plato.trainers.strategies.algorithms.feddyn_strategy import (
     effective_alpha,
     model_schema,
-    native_metadata,
     positive_integer,
     same_state,
     settings_from_config,
@@ -212,7 +211,7 @@ class Server(fedavg.Server):
             if not isinstance(payload, (list, tuple)) or len(payload) != 2:
                 raise ValueError("FedDyn requires full model and result metadata.")
             full, raw_metadata = payload
-            m = native_metadata(raw_metadata)
+            m = raw_metadata
             if not isinstance(m, dict) or set(m) != fields:
                 raise ValueError("FedDyn result metadata is incomplete or unknown.")
             i = positive_integer(m["client_id"], "client ID")
