@@ -1,0 +1,185 @@
+{
+  "schema_version": 1,
+  "reviewer": "independent archive delivery gate",
+  "utc": "2026-10-03T22:34:04.398832+00:00",
+  "decision": "ACCEPT_PUBLICATION_SUBJECT_TO_FINAL_DISTRIBUTION_REBIND",
+  "publication_review_accepted": true,
+  "publication_condition_pending": true,
+  "merge_accepted": false,
+  "archive_phase4_complete": false,
+  "source": {
+    "head": "7cbf60a65ba124dcac6f6ca027b33aa64507e33d",
+    "head_tree": "665d59a5010b0bcecdf95a22c1288a4f5a973340",
+    "qualified_source": "6bf8836d06072c7946cdfb5499a09e4bce459805",
+    "qualified_tree": "ec9ec02c54bf6e96809168cf9a9e22cd80876000",
+    "evidence_only_changed_paths": [
+      "evidence/2026-refresh/archive-final-local-acceptance.json",
+      "evidence/2026-refresh/archive-final-package-docs-checks.json",
+      "evidence/2026-refresh/archive-final-runtime-audit.json",
+      "evidence/2026-refresh/archive-final-static-checks.json",
+      "evidence/2026-refresh/archive-final-wheel-import.json",
+      "evidence/2026-refresh/archive-local-evidence-manifest.json",
+      "evidence/2026-refresh/archive-local-qualification.json",
+      "evidence/2026-refresh/phase3-mlx-final-linux-acceptance.json",
+      "evidence/2026-refresh/phase3-mlx-final-linux-manifest.json",
+      "evidence/2026-refresh/phase3-mlx-worktree-cleanup.json",
+      "evidence/2026-refresh/reproductions/archive-local-qualification.tar.gz",
+      "evidence/2026-refresh/reproductions/phase3-mlx-final-linux-qualification.tar.gz"
+    ]
+  },
+  "findings": [],
+  "accepted_evidence": [
+    {
+      "path": "evidence/2026-refresh/archive-final-local-acceptance.json",
+      "sha256": "13e5e3c60e5eedc02f329dcf7f71c02f781a75a8423ef2c7a189cc78bcc90217"
+    },
+    {
+      "path": "evidence/2026-refresh/archive-final-runtime-audit.json",
+      "sha256": "f08f5e18141d199bcd8d1462caf9b2eac0153fd3e0294d048b0e2d6b2ddd7814"
+    },
+    {
+      "path": "evidence/2026-refresh/archive-final-static-checks.json",
+      "sha256": "57a85f9cdbd2d66a6370af0936d4db7c5c6f8a48323a1b7d64eca5a6cfabc4c1"
+    },
+    {
+      "path": "evidence/2026-refresh/archive-final-package-docs-checks.json",
+      "sha256": "15b34852d3014a61696bc02f78438e7b4250e3fd361c086890f5f8c87734e948"
+    },
+    {
+      "path": "evidence/2026-refresh/archive-final-wheel-import.json",
+      "sha256": "377842035d504cef01dd61485934133f694ff92fe698a9819206264bad37dede"
+    },
+    {
+      "path": "evidence/2026-refresh/archive-profile-review.json",
+      "sha256": "26dc3cfbf5ef7bd56df83ada4fea99fe82d05e88eefa2c87a173eaf8d732537e"
+    }
+  ],
+  "independent_verification": {
+    "all_raw_hashes_verified": 10708,
+    "compact_members": 10673,
+    "compact_manifest_records_verified": 10672,
+    "mandatory": {
+      "cases": 1551,
+      "counts": {
+        "failure": 0,
+        "error": 0,
+        "skipped": 0
+      },
+      "source_hashes_verified": 1636,
+      "skips": []
+    },
+    "integration_classes": {
+      "tests.integration.test_checkpoint_runtime_agreement": 11,
+      "tests.integration.test_event_loop_startup": 48,
+      "tests.integration.test_feddyn_count_boundaries": 20,
+      "tests.integration.test_feddyn_entrypoint": 3,
+      "tests.integration.test_feddyn_round_flow": 152,
+      "tests.integration.test_huggingface_smollm_smoke": 1,
+      "tests.integration.test_qwen3_lora": 9,
+      "tests.integration.test_retained_model_search": 19,
+      "tests.integration.test_scaffold_callback_lifecycle": 30,
+      "tests.integration.test_scaffold_round_flow": 54,
+      "tests.integration.test_smoke_configs": 3
+    },
+    "base": {
+      "cases": 1475,
+      "counts": {
+        "failure": 0,
+        "error": 0,
+        "skipped": 1
+      },
+      "source_hashes_verified": 1636,
+      "skips": [
+        {
+          "name": "tests.trainers.test_dp_data_loader_strategy",
+          "message": "collection skipped"
+        }
+      ]
+    },
+    "mlx-native": {
+      "cases": 383,
+      "counts": {
+        "failure": 0,
+        "error": 0,
+        "skipped": 0
+      },
+      "source_hashes_verified": 1636,
+      "skips": []
+    },
+    "source": {
+      "head": "7cbf60a65ba124dcac6f6ca027b33aa64507e33d",
+      "head_tree": "665d59a5010b0bcecdf95a22c1288a4f5a973340",
+      "qualified_source": "6bf8836d06072c7946cdfb5499a09e4bce459805",
+      "qualified_tree": "ec9ec02c54bf6e96809168cf9a9e22cd80876000",
+      "evidence_only_changed_paths": [
+        "evidence/2026-refresh/archive-final-local-acceptance.json",
+        "evidence/2026-refresh/archive-final-package-docs-checks.json",
+        "evidence/2026-refresh/archive-final-runtime-audit.json",
+        "evidence/2026-refresh/archive-final-static-checks.json",
+        "evidence/2026-refresh/archive-final-wheel-import.json",
+        "evidence/2026-refresh/archive-local-evidence-manifest.json",
+        "evidence/2026-refresh/archive-local-qualification.json",
+        "evidence/2026-refresh/phase3-mlx-final-linux-acceptance.json",
+        "evidence/2026-refresh/phase3-mlx-final-linux-manifest.json",
+        "evidence/2026-refresh/phase3-mlx-worktree-cleanup.json",
+        "evidence/2026-refresh/reproductions/archive-local-qualification.tar.gz",
+        "evidence/2026-refresh/reproductions/phase3-mlx-final-linux-qualification.tar.gz"
+      ]
+    }
+  },
+  "runtime_audit": {
+    "core_runtime_cases": 51,
+    "core_runtime_process_records": 55,
+    "startup_cases": 48,
+    "retained_cases": 19,
+    "exact_retained_plan_inventory_match": true,
+    "numerical_oracle_reexecution": "Read-only replay of reviewed root runtime audit, with its output-writing tail removed; 55 core records and19 retained records passed; FedAvg max error1.4901161193847656e-08; FedDyn uniform/sample exact rational payload and CPU RNG resume oracles passed.",
+    "negative_path_note": "Expected nonzero exits and forced teardown in deliberate failure/noncooperative tests are asserted behavior, not failed positive qualification; positive training completes naturally.",
+    "qwen_tests_passed": 9,
+    "full_mandatory_passed": 1551,
+    "base_passed": 1474,
+    "base_expected_skips": 1,
+    "native_passed": 383
+  },
+  "component_provenance": "Prior preparation independently checked171 original/context records,374 upstream files,13 supplemental licenses, unchanged retained algorithms and historical files. The qualified tree is unchanged through the ancestry reconciliation; final HEAD differs only in evidence.",
+  "static_checks": {
+    "lock": "PASS",
+    "ruff_import_order": "PASS",
+    "typing": "337 classified historical diagnostics;2 specifically allowed preexisting HuggingFace assignments and zero other owned violations. Explicit stager typing passes. Not a global clean typing claim.",
+    "strict_docs": "PASS; raw log hash verified",
+    "wheel_import": "Verified source-bound outside-checkout installed-wheel receipt"
+  },
+  "distribution_scope": {
+    "qualified_source": "6bf8836d06072c7946cdfb5499a09e4bce459805",
+    "wheel_members": 213,
+    "sdist_members": 1210,
+    "retired_shortlist_and_dvit_t2tvit_sources_absent": true,
+    "older_legacy_sdist_files": 19,
+    "older_legacy_followup": "Known separate P2 tooling correction, not introduced or silently accepted as all-archives exclusion by this gate."
+  },
+  "publication_condition": {
+    "required": "After committing this gate receipt, rebuild wheel/sdist from final publication HEAD and inspect members/exclusions, metadata and import validity; record exact final HEAD, artifact hashes and results externally without another evidence-only commit. Source equivalence permits reuse of completed behavioral qualification, but evidence JSON can change sdist bytes.",
+    "root_may_discharge_without_reopening_review": "Yes, if checks pass and only evidence/source-equivalent history differs. A code, dependency, workflow, package-policy change or failed check requires fresh applicable review."
+  },
+  "pending_before_merge": [
+    "Exact final archive PR Linux Python3.13 base, mandatory non-runtime, full51 core runtime and dedicated exact19 retained qualification; zero unexpected skips/xfails/omissions.",
+    "Independently audit actual Linux source SHA/tree, lock/environment identities, collection/JUnit inventories and complete uploaded runtime payloads with reviewed stager; MLX parent Linux run does not qualify archive changes.",
+    "Confirm required checks pass for final PR head or establish reviewed exact-source equivalence after evidence-only commits; preserve native383 source binding.",
+    "Keep compact-bundle omission disclosure and full raw originals until complete Linux artifact acceptance; never claim all payload bytes committed."
+  ],
+  "evidence_limits": {
+    "raw_records_hash_verified": 10708,
+    "compact_manifest_records_verified": 10672,
+    "compact_tar_members": 10673,
+    "omitted_large_records": 36,
+    "omitted_bytes_verified_locally": true,
+    "preliminary_failures": "Prior concurrent timeout failures and incomplete reviewer attempts remain preserved; final complete suites now supply missing coverage.",
+    "broader_scope": "Bounded shortlist publication only; broader Phase4 family/evaluator/deployment audit remains separate; no Python3.14 qualification."
+  },
+  "mutations": "Only external gate/audit JSON files. No source/environment edits, suite reruns, or nested agents.",
+  "audit_harness_notes": [
+    "System Python lacked hashlib.file_digest; read-only hash audit rerun under provided Python3.13.",
+    "Compact tar verification includes hardlink members; all manifest records then matched.",
+    "Distribution inspector corrected .whl suffix comparison; both artifacts then verified."
+  ]
+}
