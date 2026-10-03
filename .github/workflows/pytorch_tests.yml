@@ -32,10 +32,9 @@ jobs:
       UV_PROJECT_ENVIRONMENT: ${{ github.workspace }}/.venv-mandatory
 
     steps:
-      - name: Checkout pinned submodules
+      - name: Checkout source
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          submodules: recursive
           persist-credentials: false
 
       - name: Provision zsh
@@ -119,7 +118,121 @@ jobs:
           HF_DATASETS_OFFLINE: "1"
         run: |
           set -eu
-          uv run --no-sync --python "${{ matrix.python }}" python -m pytest tests --test-profile=mandatory -m runtime -ra --basetemp=ci-artifacts/runtime-tmp --junitxml=ci-artifacts/runtime.xml > ci-artifacts/runtime.log 2>&1
+          uv run --no-sync --python "${{ matrix.python }}" python -m pytest tests --test-profile=mandatory -m "runtime and not retained_model_search" -ra --basetemp=ci-artifacts/runtime-tmp --junitxml=ci-artifacts/runtime.xml > ci-artifacts/runtime.log 2>&1
+
+      - name: Retained model-search qualification
+        timeout-minutes: 25
+        env:
+          UV_PROJECT_ENVIRONMENT: ${{ runner.temp }}/plato-retained-model-search
+          HF_HUB_OFFLINE: "1"
+          HF_DATASETS_OFFLINE: "1"
+        run: |
+          set -eu
+          uv sync --locked --python 3.13 --no-default-groups --group test-model-search
+          uv pip freeze --python "$UV_PROJECT_ENVIRONMENT/bin/python" > ci-artifacts/model-search-packages.txt
+          uv run --no-sync --python 3.13 python -c "import ptflops, opacus, kazoo, gymnasium" > ci-artifacts/model-search-prerequisites.log 2>&1
+          uv run --no-sync --python 3.13 python -m pytest tests/integration/test_retained_model_search.py --collect-only -q --test-profile=mandatory -m retained_model_search > ci-artifacts/model-search-collection.log 2>&1
+          uv run --no-sync --python 3.13 python -m pytest tests/integration/test_retained_model_search.py --test-profile=mandatory -m retained_model_search -ra --basetemp=ci-artifacts/model-search-tmp --junitxml=ci-artifacts/model-search.xml > ci-artifacts/model-search.log 2>&1
+          python - <<'PY'
+          import json
+          import re
+          from collections import Counter
+          from pathlib import Path
+          from xml.etree import ElementTree
+
+          expected_case_names = [
+              "test_retained_width_round[anycostfl]",
+              "test_retained_width_round[fedrolex]",
+              "test_retained_width_round[heterofl]",
+              "test_retained_activated_budget[anycostfl]",
+              "test_retained_activated_budget[fedrolex]",
+              "test_retained_activated_budget[heterofl]",
+              "test_sysheterofl_subnet_round",
+              "test_dlg_model_update[lenet]",
+              "test_dlg_model_update[resnet_18]",
+              "test_local_retired_selection[anycostfl]",
+              "test_local_retired_selection[fedrolex]",
+              "test_local_retired_selection[heterofl]",
+              "test_local_retired_selection[dlg]",
+              "test_retained_entrypoint_import[anycostfl-root]",
+              "test_retained_entrypoint_import[anycostfl-example]",
+              "test_retained_entrypoint_import[fedrolex-root]",
+              "test_retained_entrypoint_import[fedrolex-example]",
+              "test_retained_entrypoint_import[heterofl-root]",
+              "test_retained_entrypoint_import[heterofl-example]",
+          ]
+
+
+          def verify_model_search(
+              collection: Path, junit: Path, runlog: Path, receipt: Path
+          ) -> int:
+              module = "tests/integration/test_retained_model_search.py"
+              expected = Counter(f"{module}::{name}" for name in expected_case_names)
+              issues = []
+              collected = []
+              names = []
+              totals = {}
+              outcomes = Counter()
+              try:
+                  collected = re.findall(r"^(\S+\.py::\S+)$", collection.read_text(), re.M)
+                  if Counter(collected) != expected:
+                      issues.append("Collection must contain every expected node exactly once.")
+                  root = ElementTree.parse(junit).getroot()
+                  cases = list(root.iter("testcase"))
+                  names = [case.get("name", "") for case in cases]
+                  if Counter(names) != Counter(expected_case_names):
+                      issues.append("JUnit must contain every expected case exactly once.")
+                  if any(
+                      case.get("classname") != "tests.integration.test_retained_model_search"
+                      for case in cases
+                  ):
+                      issues.append("JUnit cases must belong to the dedicated module.")
+                  if any(
+                      case.find(tag) is not None
+                      for case in cases
+                      for tag in ("failure", "error", "skipped")
+                  ):
+                      issues.append(
+                          "Every JUnit case must pass without failure, error, skip or xfail."
+                      )
+                  totals = {
+                      key: sum(int(suite.attrib[key]) for suite in root.iter("testsuite"))
+                      for key in ("tests", "failures", "errors", "skipped")
+                  }
+                  if totals != {"tests": 19, "failures": 0, "errors": 0, "skipped": 0}:
+                      issues.append("JUnit suite totals must report exactly 19 passing cases.")
+                  for count, outcome in re.findall(
+                      r"\b(\d+) (passed|failed|skipped|xfailed|xpassed|errors?)\b",
+                      runlog.read_text(),
+                  ):
+                      outcomes[outcome] += int(count)
+                  if outcomes != Counter({"passed": 19}):
+                      issues.append("Execution must report 19 passes and no other outcome.")
+              except (OSError, ValueError, KeyError, ElementTree.ParseError) as error:
+                  issues.append(f"Missing or invalid qualification artifact: {error}")
+              record = {
+                  "schema_version": 1,
+                  "accepted": not issues,
+                  "expected_case_names": expected_case_names,
+                  "collected_nodes": collected,
+                  "junit_case_names": names,
+                  "suite_totals": totals,
+                  "execution_outcomes": dict(outcomes),
+                  "issues": issues,
+              }
+              receipt.write_text(json.dumps(record, indent=2) + "\n")
+              return int(bool(issues))
+
+
+          raise SystemExit(
+              verify_model_search(
+                  Path("ci-artifacts/model-search-collection.log"),
+                  Path("ci-artifacts/model-search.xml"),
+                  Path("ci-artifacts/model-search.log"),
+                  Path("ci-artifacts/model-search-acceptance.json"),
+              )
+          )
+          PY
 
       - name: Ruff and classified typing baseline
         timeout-minutes: 3
@@ -164,6 +277,15 @@ jobs:
               "tests/mlx_native/test_phase3_tree_contract.py",
               "tests/test_mlx_import_contract.py",
               "tests/test_mlx_profile_contract.py",
+              "tests/test_model_search_retirement.py",
+              "tests/integration/test_retained_model_search.py",
+              "tests/integration/model_search_retention_worker.py",
+              "examples/gradient_leakage_attacks/dlg_model.py",
+              "examples/model_search/anycostfl/anycostfl.py",
+              "examples/model_search/fedrolex/fedrolex.py",
+              "examples/model_search/heterofl/heterofl.py",
+              ".github/scripts/stage_ci_artifacts.py",
+              "tests/test_model_search_profile_contract.py",
           }
           allowed = {
               ("tests/datasources/test_huggingface_datasource.py", "99", "5", "invalid-assignment"),
@@ -181,6 +303,7 @@ jobs:
           for match in matches:
               assert match[1] not in owned or match.groups() in allowed, match[0]
           PY
+          uv run --no-sync --python "${{ matrix.python }}" ty check .github/scripts/stage_ci_artifacts.py --output-format concise --error-on-warning > ci-artifacts/ty-stager.log 2>&1
 
       - name: Stage qualification outputs without pytest aliases
         if: always()
