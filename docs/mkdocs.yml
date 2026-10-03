@@ -62,11 +62,12 @@ nav:
           - Split Learning Algorithms: examples/algorithms/7. Split Learning Algorithms.md
           - Personalized Federated Learning: examples/algorithms/8. Personalized Federated Learning Algorithms.md
           - Self-Supervised Personalized FL: examples/algorithms/9. Personalized Federated Learning Algorithms based on Self-Supervised Learning.md
-          - Neural Architecture Search: examples/algorithms/10. Algorithms based on Neural Architecture Search and Model Search.md
+          - Model Search: examples/algorithms/10. Algorithms based on Neural Architecture Search and Model Search.md
           - Three-layer Federated Learning: examples/algorithms/11. Three-layer Federated Learning Algorithms.md
           - Poisoning Detection: examples/algorithms/12. Poisoning Detection Algorithms.md
           - Model Pruning: examples/algorithms/13. Model Pruning Algorithms.md
           - Gradient Leakage Attacks and Defences: examples/algorithms/14. Gradient Leakage Attacks and Defences.md
+      - Archived Research: examples/archived.md
       - Case Studies:
           - Qwen3 Federated LoRA: examples/case-studies/6. Qwen3 Federated LoRA.md
           - Federated LoRA Fine-Tuning: examples/case-studies/1. LoRA.md
