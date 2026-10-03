@@ -14,10 +14,23 @@ class Sampler:
     """Base class for data samplers so that the dataset is divided into
     partitions across the clients."""
 
-    def __init__(self, client_id: int | str | None = None):
+    def __init__(
+        self, client_id: int | str | None = None, *, edge_evaluation: bool = False
+    ):
         if client_id is not None:
-            total_clients = Config().clients.total_clients
-            if not 1 <= int(client_id) <= total_clients:
+            config = Config()
+            total_clients = config.clients.total_clients
+            numeric_id = int(client_id)
+            # Full-pool evaluation samplers can retain an edge's physical ID
+            # (and seeded bias). Indexed client partitions do not opt in.
+            assigned_edge = (
+                edge_evaluation
+                and config.is_edge_server()
+                and config.args.id == numeric_id
+                and total_clients < numeric_id
+                <= total_clients + getattr(config.algorithm, "total_silos", 0)
+            )
+            if not 1 <= numeric_id <= total_clients and not assigned_edge:
                 raise ValueError(f"client_id must be between 1 and {total_clients}.")
         if hasattr(Config().data, "random_seed"):
             # Keeping random seed the same across the clients

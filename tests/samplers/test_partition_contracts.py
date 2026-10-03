@@ -349,3 +349,77 @@ else:
     except subprocess.TimeoutExpired:
         pytest.fail("Infeasible label pool caused an unbounded partition loop")
     assert result.returncode == 0, result.stderr
+
+
+@pytest.mark.parametrize("edge_id", [4, 5])
+def test_real_cross_silo_configure_accepts_assigned_edge_evaluation_id(
+    temp_config, tmp_path, monkeypatch, edge_id
+):
+    monkeypatch.delenv("config_file", raising=False)
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "edge-test", "-c", "configs/MNIST/fedavg_cross_silo_lenet5.toml",
+            "--base", str(tmp_path), "-i", str(edge_id), "-p", "8101",
+        ],
+    )
+    Config.reset()
+    Config()
+    assert Config.is_edge_server()
+    assert Config.clients.total_clients < Config.args.id <= (
+        Config.clients.total_clients + Config.algorithm.total_silos
+    )
+    from plato.servers import fedavg, fedavg_cs
+
+    Config.server.edge_do_test = True
+    Config.data.testset_sampler = "noniid"
+    Config.data.random_seed = 12
+    source = Datasource([0, 1] * 500)
+    server = object.__new__(fedavg_cs.Server)
+
+    class Trainer:
+        def set_client_id(self, client_id):
+            self.client_id = client_id
+
+    trainer = Trainer()
+    monkeypatch.setattr(fedavg.Server, "configure", lambda self: None)
+    monkeypatch.setattr(server, "init_trainer", lambda: None)
+    monkeypatch.setattr(server, "require_trainer", lambda: trainer)
+    monkeypatch.setattr(fedavg_cs.datasources_registry, "get", lambda **kw: source)
+    monkeypatch.setattr(
+        fedavg_cs.processor_registry, "get", lambda *a, **kw: (None, None)
+    )
+    before = np.random.get_state()
+    server.configure()
+    assert_numpy_state_equal(before)
+    assert trainer.client_id == edge_id
+    sampler = server.testset_sampler
+    assert sampler.num_samples() == 600
+    indices = list(sampler.get())
+    assert len(indices) == len(set(indices)) == 600
+    assert all(0 <= index < 1000 for index in indices)
+    repeated = registry.get(source, edge_id, testing=True, sampler_type="noniid")
+    assert list(repeated.get()) == indices
+
+
+@pytest.mark.parametrize(
+    "cross_silo,port,role_id,sampler_id,testing",
+    [
+        (False, 8101, 3, 3, True),
+        (True, None, 3, 3, True),
+        (True, 8101, 1, 3, True),
+        (True, 8101, 3, 4, True),
+        (True, 8101, 5, 5, True),
+        (True, 8101, 3, 3, False),
+    ],
+)
+def test_dirichlet_rejects_unassigned_edge_or_training_ids(
+    temp_config, cross_silo, port, role_id, sampler_id, testing
+):
+    Config.algorithm.cross_silo = cross_silo
+    Config.algorithm.total_silos = 2
+    Config.args.port = port
+    Config.args.id = role_id
+    with pytest.raises(ValueError, match="client_id"):
+        dirichlet.Sampler(Datasource(), sampler_id, testing)
