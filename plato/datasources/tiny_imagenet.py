@@ -53,6 +53,36 @@ def _locate_layout(root: Path) -> tuple[Path, bool] | None:
     return None
 
 
+def _default_recovery_layout(root: Path) -> tuple[Path, bool] | None:
+    """Wait for default recovery, then check its layout or retained artifacts."""
+    with base.DataSource._download_guard(str(root)):
+        layout = _locate_layout(root)
+        if layout is not None:
+            return layout
+        incomplete_native = any(
+            (candidate / "train").is_dir()
+            and (
+                (candidate / "val").is_dir()
+                or (candidate / "test/images").is_dir()
+            )
+            for candidate in (root, root / "tiny-imagenet-200")
+        )
+        # ZIP downloads retain the archive, including after extraction fails
+        # readiness. Completion is transient during recovery; a generic lock
+        # or unrelated archive alone does not identify a default download.
+        default_artifacts = (
+            root / "tiny-imagenet-200.zip",
+            root / "tiny-imagenet-200.zip.complete",
+        )
+        if incomplete_native and not any(path.is_file() for path in default_artifacts):
+            raise ValueError(
+                "Incomplete native Tiny ImageNet validation data: need "
+                "val/val_annotations.txt and val/images. Official test/images "
+                "is unlabeled; provide a download_url to recover the dataset."
+            )
+        return None
+
+
 class ValidationDataset(Dataset):
     """Read the canonical labeled validation split using training class IDs."""
 
@@ -97,28 +127,10 @@ class DataSource(base.DataSource):
 
         root = Path(_path)
         layout = _locate_layout(root)
+        if layout is None and not hasattr(Config().data, "download_url"):
+            # This guard is released before download acquires it again.
+            layout = _default_recovery_layout(root)
         if layout is None:
-            incomplete_native = any(
-                (candidate / "train").is_dir()
-                and (
-                    (candidate / "val").is_dir()
-                    or (candidate / "test/images").is_dir()
-                )
-                for candidate in (root, root / "tiny-imagenet-200")
-            )
-            completed_default_download = (
-                root / "tiny-imagenet-200.zip.complete"
-            ).is_file()
-            if (
-                incomplete_native
-                and not hasattr(Config().data, "download_url")
-                and not completed_default_download
-            ):
-                raise ValueError(
-                    "Incomplete native Tiny ImageNet validation data: need "
-                    "val/val_annotations.txt and val/images. Official test/images "
-                    "is unlabeled; provide a download_url to recover the dataset."
-                )
             logging.info(
                 "Downloading the Tiny ImageNet 200 dataset. This may take a while."
             )
