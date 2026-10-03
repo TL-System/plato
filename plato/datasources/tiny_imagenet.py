@@ -22,14 +22,21 @@ def _locate_layout(root: Path) -> tuple[Path, bool] | None:
     for candidate in (root, root / "tiny-imagenet-200"):
         if not (candidate / "train").is_dir():
             continue
+        training_classes = sorted(
+            folder.name for folder in (candidate / "train").iterdir() if folder.is_dir()
+        )
         annotation = candidate / "val/val_annotations.txt"
         if annotation.is_file() and (candidate / "val/images").is_dir():
-            return candidate, False
+            validation = ValidationDataset(candidate / "val", training_classes)
+            if (
+                validation.samples
+                and all(Path(filename).is_file() for filename, _ in validation.samples)
+                and _image_folder.folder_ready(candidate / "train")
+            ):
+                return candidate, False
+            continue
         if not (candidate / "test").is_dir():
             continue
-        training_classes = {
-            folder.name for folder in (candidate / "train").iterdir() if folder.is_dir()
-        }
         testing_classes = {
             folder.name for folder in (candidate / "test").iterdir() if folder.is_dir()
         }
@@ -38,10 +45,10 @@ def _locate_layout(root: Path) -> tuple[Path, bool] | None:
             "images" in testing_classes and "images" not in training_classes
         ):
             continue
-        unknown = testing_classes - training_classes
+        unknown = testing_classes - set(training_classes)
         if unknown:
             raise ValueError(f"Unknown evaluation classes: {sorted(unknown)}")
-        if testing_classes:
+        if testing_classes and _image_folder.prepared_ready(candidate):
             return candidate, True
     return None
 

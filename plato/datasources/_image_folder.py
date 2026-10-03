@@ -4,6 +4,34 @@ from collections.abc import Callable
 from pathlib import Path
 
 from torchvision import datasets
+from torchvision.datasets.folder import find_classes, is_image_file, make_dataset
+
+
+def folder_ready(root: str | Path) -> bool:
+    """Check that every present class has an existing supported image file."""
+    try:
+        return bool(
+            make_dataset(
+                str(root),
+                is_valid_file=lambda path: Path(path).is_file() and is_image_file(path),
+            )
+        )
+    except FileNotFoundError:
+        return False
+
+
+def prepared_ready(root: str | Path) -> bool:
+    """Check usable train/test folders without accepting unknown test classes."""
+    root = Path(root)
+    try:
+        training_classes, _ = find_classes(root / "train")
+        testing_classes, _ = find_classes(root / "test")
+    except FileNotFoundError:
+        return False
+    unknown = set(testing_classes) - set(training_classes)
+    if unknown:
+        raise ValueError(f"Unknown evaluation classes: {sorted(unknown)}")
+    return folder_ready(root / "train") and folder_ready(root / "test")
 
 
 def evaluation_folder(

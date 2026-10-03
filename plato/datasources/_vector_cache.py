@@ -17,6 +17,31 @@ def _validate(features: np.ndarray, labels: np.ndarray) -> None:
         raise InvalidVectorCacheError(
             "Dataset cache needs a feature matrix and matching one-dimensional labels."
         )
+    if features.dtype.kind not in "biuf" or labels.dtype.kind not in "biuf":
+        raise InvalidVectorCacheError(
+            "Dataset cache features and class labels must be real numeric arrays."
+        )
+    maximum = np.finfo(np.float32).max
+    if (
+        not np.isfinite(features).all()
+        or np.any(features > maximum)
+        or np.any(features < -maximum)
+    ):
+        raise InvalidVectorCacheError(
+            "Dataset cache features must be finite and within the float32 range."
+        )
+    # Both consumers have 100 classes and use torch.long targets. Check values
+    # before narrowing so fractional, nonfinite and overflowing labels cannot
+    # become a different class through truncation or wraparound.
+    if (
+        not np.isfinite(labels).all()
+        or np.any(labels < 0)
+        or np.any(labels >= 100)
+        or np.any(labels != labels.astype(np.int64))
+    ):
+        raise InvalidVectorCacheError(
+            "Dataset cache labels must be integral class IDs between 0 and 99."
+        )
 
 
 def load_cache(path: str | Path) -> tuple[np.ndarray, np.ndarray]:
@@ -30,7 +55,10 @@ def load_cache(path: str | Path) -> tuple[np.ndarray, np.ndarray]:
     except (OSError, EOFError, ValueError, KeyError, zipfile.BadZipFile) as exc:
         raise InvalidVectorCacheError(f"Invalid dataset cache {path}: {exc}") from exc
     _validate(features, labels)
-    return features, labels
+    # Native, supported dtypes make otherwise valid numeric caches (including
+    # non-native byte order) consumable by the existing tensor constructors.
+    # The NPZ storage format and original valid file remain unchanged.
+    return np.asarray(features, dtype=np.float32), np.asarray(labels, dtype=np.int64)
 
 
 def discard_abandoned_writes(path: str | Path) -> None:

@@ -23,9 +23,7 @@ class DataSource(base.DataSource):
         _path = Config().params["data_path"]
 
         def ready():
-            return all(
-                os.path.isdir(os.path.join(_path, split)) for split in ("train", "test")
-            )
+            return _image_folder.prepared_ready(_path)
 
         if not ready():
             logging.info("Downloading the CINIC-10 dataset. This may take a while.")
