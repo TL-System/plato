@@ -1,0 +1,227 @@
+[
+  {
+    "label": "base-non-runtime",
+    "command": [
+      "/tmp/plato-llm-integration/base-313/bin/python",
+      "-m",
+      "pytest",
+      "tests",
+      "--collect-only",
+      "--test-profile=base",
+      "-m",
+      "not runtime",
+      "-ra"
+    ],
+    "timeout_seconds": 120,
+    "exitstatus": 0,
+    "expected_exitstatus": 0,
+    "diagnostic": "",
+    "selected_count": 1474,
+    "deselected_count": 70
+  },
+  {
+    "label": "mandatory-non-runtime",
+    "command": [
+      "/tmp/plato-archive-integration/env/bin/python",
+      "-m",
+      "pytest",
+      "tests",
+      "--collect-only",
+      "--test-profile=mandatory",
+      "-m",
+      "not runtime",
+      "-ra"
+    ],
+    "timeout_seconds": 120,
+    "exitstatus": 0,
+    "expected_exitstatus": 0,
+    "diagnostic": "",
+    "selected_count": 1481,
+    "deselected_count": 70
+  },
+  {
+    "label": "core-runtime",
+    "command": [
+      "/tmp/plato-archive-integration/env/bin/python",
+      "-m",
+      "pytest",
+      "tests",
+      "--collect-only",
+      "--test-profile=mandatory",
+      "-m",
+      "runtime and not retained_model_search",
+      "-ra"
+    ],
+    "timeout_seconds": 120,
+    "exitstatus": 0,
+    "expected_exitstatus": 0,
+    "diagnostic": "",
+    "selected_count": 51,
+    "deselected_count": 1500
+  },
+  {
+    "label": "dedicated-retained",
+    "command": [
+      "/tmp/plato-archive-integration/env/bin/python",
+      "-m",
+      "pytest",
+      "tests/integration/test_retained_model_search.py",
+      "--collect-only",
+      "-q",
+      "--test-profile=mandatory",
+      "-m",
+      "retained_model_search"
+    ],
+    "timeout_seconds": 120,
+    "exitstatus": 0,
+    "expected_exitstatus": 0,
+    "diagnostic": "",
+    "selected_count": 19,
+    "deselected_count": 0
+  },
+  {
+    "label": "negative-expression",
+    "command": [
+      "/tmp/plato-archive-integration/env/bin/python",
+      "-m",
+      "pytest",
+      "tests",
+      "--collect-only",
+      "--test-profile=mandatory",
+      "-m",
+      "runtime and not retained_model_search and not startup_containment"
+    ],
+    "timeout_seconds": 120,
+    "exitstatus": 4,
+    "expected_exitstatus": 4,
+    "diagnostic": "unapproved full-suite partition"
+  },
+  {
+    "label": "negative-runtime-keyword",
+    "command": [
+      "/tmp/plato-archive-integration/env/bin/python",
+      "-m",
+      "pytest",
+      "tests",
+      "--collect-only",
+      "--test-profile=mandatory",
+      "-m",
+      "runtime and not retained_model_search",
+      "-k",
+      "not test_real_two_client_cpu_socket_round"
+    ],
+    "timeout_seconds": 120,
+    "exitstatus": 1,
+    "expected_exitstatus": 1,
+    "diagnostic": "unexpected deselection"
+  },
+  {
+    "label": "negative-runtime-deselect",
+    "command": [
+      "/tmp/plato-archive-integration/env/bin/python",
+      "-m",
+      "pytest",
+      "tests",
+      "--collect-only",
+      "--test-profile=mandatory",
+      "-m",
+      "runtime and not retained_model_search",
+      "--deselect",
+      "tests/integration/test_event_loop_startup.py::test_real_two_client_cpu_socket_round"
+    ],
+    "timeout_seconds": 120,
+    "exitstatus": 1,
+    "expected_exitstatus": 1,
+    "diagnostic": "collection exclusions"
+  },
+  {
+    "label": "negative-runtime-ignore",
+    "command": [
+      "/tmp/plato-archive-integration/env/bin/python",
+      "-m",
+      "pytest",
+      "tests",
+      "--collect-only",
+      "--test-profile=mandatory",
+      "-m",
+      "runtime and not retained_model_search",
+      "--ignore",
+      "tests/integration/test_event_loop_startup.py"
+    ],
+    "timeout_seconds": 120,
+    "exitstatus": 1,
+    "expected_exitstatus": 1,
+    "diagnostic": "collection exclusions"
+  },
+  {
+    "label": "negative-runtime-ignore-glob",
+    "command": [
+      "/tmp/plato-archive-integration/env/bin/python",
+      "-m",
+      "pytest",
+      "tests",
+      "--collect-only",
+      "--test-profile=mandatory",
+      "-m",
+      "runtime and not retained_model_search",
+      "--ignore-glob",
+      "*event_loop_startup*"
+    ],
+    "timeout_seconds": 120,
+    "exitstatus": 1,
+    "expected_exitstatus": 1,
+    "diagnostic": "collection exclusions"
+  },
+  {
+    "label": "negative-dedicated-keyword",
+    "command": [
+      "/tmp/plato-archive-integration/env/bin/python",
+      "-m",
+      "pytest",
+      "tests/integration/test_retained_model_search.py",
+      "--collect-only",
+      "--test-profile=mandatory",
+      "-m",
+      "retained_model_search",
+      "-k",
+      "not anycostfl"
+    ],
+    "timeout_seconds": 120,
+    "exitstatus": 4,
+    "expected_exitstatus": 4,
+    "diagnostic": "retained qualification does not permit filters"
+  },
+  {
+    "label": "missing-opacus",
+    "command": [
+      "/tmp/plato-llm-integration/base-313/bin/python",
+      "-m",
+      "pytest",
+      "tests",
+      "--collect-only",
+      "--test-profile=mandatory"
+    ],
+    "timeout_seconds": 120,
+    "exitstatus": 4,
+    "expected_exitstatus": 4,
+    "diagnostic": "mandatory prerequisite failed: No module named 'opacus'"
+  },
+  {
+    "label": "native-383-collection",
+    "command": [
+      "/tmp/plato-archive-integration/env/bin/python",
+      "-m",
+      "pytest",
+      "tests/mlx_native",
+      "--collect-only",
+      "--test-profile=mlx-native",
+      "-q"
+    ],
+    "timeout_seconds": 120,
+    "exitstatus": 0,
+    "expected_exitstatus": 0,
+    "diagnostic": "native collection-only validation",
+    "selected_count": 383,
+    "deselected_count": 0
+  }
+]

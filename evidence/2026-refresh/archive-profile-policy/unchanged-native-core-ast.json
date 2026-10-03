@@ -1,0 +1,39 @@
+{
+  "all_existing_module_globals_and_functions_unchanged": [
+    "_DP_MODULE",
+    "_DP_REASON",
+    "_REQUIRED",
+    "_STARTUP",
+    "_RUNTIME",
+    "_STARTUP_CASES",
+    "_full_suite",
+    "_native_prerequisites",
+    "_load_native_ledger",
+    "pytest_addoption",
+    "pytest_configure",
+    "isolate_test_state",
+    "temp_config",
+    "fake_model_cls",
+    "fake_datasource_cls",
+    "fake_training_strategy",
+    "fake_lifecycle_strategy",
+    "fake_reporting_strategy",
+    "fake_communication_strategy",
+    "recording_payload_strategy",
+    "fake_aggregation_strategy"
+  ],
+  "unchanged_profile_methods": [
+    "_native_path",
+    "_native_node",
+    "_unsupported_selector",
+    "pytest_ignore_collect",
+    "pytest_collect_file",
+    "pytest_sessionstart",
+    "_check_skip",
+    "pytest_collectreport",
+    "pytest_runtest_logreport",
+    "pytest_terminal_summary"
+  ],
+  "final_startup_case_count": 48,
+  "native_ledger_nodes": 383
+}

@@ -1,0 +1,852 @@
+{
+  "schema_version": 1,
+  "source_commit": "591d706b01bed27fb4ec8687b2f5a298740560e7",
+  "source_tree": "fbd062de4471d8b980188aefb62c8ff1a151e60e",
+  "base_commit": "aa2c3d5cdee60863dfe2c1d389ec1e0cbe89111b",
+  "accepted_archive_plan": {
+    "path": "/tmp/plato-archive-shortlist-plan.json",
+    "revision": 3,
+    "sha256": "c66577eac31a2eeaba68f29e2fee53760def2477184521bd1f2536e76507573f",
+    "review_sha256": "3fbeb6b47b5392515172b574bd9b0d11f427e5d6af4a72ba2c2d3057be8483be"
+  },
+  "accepted_native_base": {
+    "commit": "6311960cdd00955d4777e269ebee460be591065e",
+    "tree": "d302b222717177d4e04bb55214df0826dc9c9ee1",
+    "review": {
+      "path": "/tmp/plato-mlx-final-review.json",
+      "sha256": "8d934c2c99a86e68dc93769ba757918eb6b0de0488304661abd131279ef756b2"
+    },
+    "gate": {
+      "path": "/tmp/plato-mlx-delivery-gate.json",
+      "sha256": "a52849163c119ca04654925237f36f0e0ebe4c1ba326e644b63b6337279bbda1"
+    },
+    "bound_handoff_artifact": "profile-owner-handoff.json"
+  },
+  "owned_paths": [
+    "tests/conftest.py",
+    "tests/test_model_search_profile_contract.py",
+    ".github/workflows/pytorch_tests.yml",
+    ".github/scripts/stage_ci_artifacts.py"
+  ],
+  "source_before_sha256": {
+    "tests/conftest.py": "dcc25c17cbd872fc21b66bbc2d3f5951bf791b9f2474a71af6d9b8ac28e4356c",
+    "tests/test_model_search_profile_contract.py": null,
+    ".github/workflows/pytorch_tests.yml": "1ae4bf9d5be394b77a105ab294527a27ec8f2c123e46ac179e97fc148f843b75",
+    ".github/scripts/stage_ci_artifacts.py": "df7030fd29802baa0fd4858deb2f4047e02a305a2862a3432d9a63764a8671c2"
+  },
+  "source_after_sha256": {
+    "tests/conftest.py": "cf5bbbd976dd977396177892bc4997d7ad84c7e6e2f2163c6852d19c9aa65aee",
+    "tests/test_model_search_profile_contract.py": "fc8f8b300afab10bf5cc6f97b670aeba0e996b708202e14aeaeee015f5712e92",
+    ".github/workflows/pytorch_tests.yml": "697c6ae0c39fa7fd42766f8161f350944e90108b3dad852148da952acfcc9317",
+    ".github/scripts/stage_ci_artifacts.py": "f9142f03c92469aceed4aa06ae5b8bb04699c89042dd156f0b4783392ca85b24"
+  },
+  "unchanged_sha256": {
+    "tests/mlx_native/cases.json": "c168dc33a4d4e7ed70079e09c3de70f5b318d543c035ec13de2826b48e1175bb",
+    "pyproject.toml": "8aaa7414717fa17841900d377d89851547677ba2ae93963afef79fc5490ba610",
+    "uv.lock": "e2a53aaae9a0dd49f5446b490bb3071e86aa3a9a20d6271c9dd30b4ae2dcbff9",
+    "tests/integration/test_retained_model_search.py": "ff902a9a34c97ce4842f0dd35b2bc396da5c2998381a66f52d4c5d1142e4fe0d",
+    "tests/integration/model_search_retention_worker.py": "95779c99e4783cfeb4d53110a11f69c4a4529b512f4f9b0d738bb2261b24502d"
+  },
+  "changes": [
+    "Allow only the exact new qualified full-suite runtime and not retained_model_search expression alongside empty, runtime and not runtime. Apply its explicit truth table and the original runtime/startup presence/pass inventories; reject unapproved expressions.",
+    "Require the complete mandatory retained19 module/marker target, exact collected inventory and passing execution, with both markers and no keyword/exclusion/deselection/duplicate/skip/xfail/xpass loophole.",
+    "Add a separate locked Python3.13 test-model-search CI environment and exact independent collection/JUnit/outcome verifier; preserve core commands, missing-Opacus probe, native typing ownership, historical typing allowances and job timeout.",
+    "Remove recursive submodule checkout while retaining the empty submodules.txt provenance; active gitlink inventory is empty.",
+    "Add the six required retained records plus the explicit ty-stager.log record to staging completeness. Staging functions and selection policy remain unchanged.",
+    "Add the exact planned archive typing paths and an explicit staging-script ty check that fails errors or warnings."
+  ],
+  "verification": {
+    "source_bound_red": {
+      "failed": 14,
+      "passed": 4,
+      "deselected": 53,
+      "exitstatus": 1,
+      "cwd": "/tmp/plato-archive-profile-red-base",
+      "baseline": "aa2c3d5cdee60863dfe2c1d389ec1e0cbe89111b",
+      "exact_final_guard_test_file_hash_matches": true,
+      "scope": "Only the final new guard test file is copied into the untouched baseline worktree."
+    },
+    "policy_helpers": {
+      "passed": 190,
+      "skipped": 0,
+      "exitstatus": 0,
+      "new_guard_cases": 71,
+      "accepted_existing_policy_helper_cases": 119
+    },
+    "final_source_guard_and_ci_verifier": {
+      "passed": 71,
+      "exitstatus": 0,
+      "inline_formatting_is_ast_identical": true
+    },
+    "installed_production_graph": {
+      "passed": 9,
+      "exitstatus": 0
+    },
+    "actual_absence_policy_and_production_graph": {
+      "passed": 199,
+      "skipped": 0,
+      "exitstatus": 0,
+      "mlx_distribution": null
+    },
+    "four_real_collection_partitions": {
+      "base-non-runtime": {
+        "selected": 1474,
+        "deselected": 70,
+        "exitstatus": 0
+      },
+      "mandatory-non-runtime": {
+        "selected": 1481,
+        "deselected": 70,
+        "exitstatus": 0
+      },
+      "core-runtime": {
+        "selected": 51,
+        "deselected": 1500,
+        "exitstatus": 0
+      },
+      "dedicated-retained": {
+        "selected": 19,
+        "deselected": 0,
+        "exitstatus": 0
+      }
+    },
+    "negative_real_collection_probes": [
+      {
+        "label": "negative-expression",
+        "command": [
+          "/tmp/plato-archive-integration/env/bin/python",
+          "-m",
+          "pytest",
+          "tests",
+          "--collect-only",
+          "--test-profile=mandatory",
+          "-m",
+          "runtime and not retained_model_search and not startup_containment"
+        ],
+        "timeout_seconds": 120,
+        "exitstatus": 4,
+        "expected_exitstatus": 4,
+        "diagnostic": "unapproved full-suite partition"
+      },
+      {
+        "label": "negative-runtime-keyword",
+        "command": [
+          "/tmp/plato-archive-integration/env/bin/python",
+          "-m",
+          "pytest",
+          "tests",
+          "--collect-only",
+          "--test-profile=mandatory",
+          "-m",
+          "runtime and not retained_model_search",
+          "-k",
+          "not test_real_two_client_cpu_socket_round"
+        ],
+        "timeout_seconds": 120,
+        "exitstatus": 1,
+        "expected_exitstatus": 1,
+        "diagnostic": "unexpected deselection"
+      },
+      {
+        "label": "negative-runtime-deselect",
+        "command": [
+          "/tmp/plato-archive-integration/env/bin/python",
+          "-m",
+          "pytest",
+          "tests",
+          "--collect-only",
+          "--test-profile=mandatory",
+          "-m",
+          "runtime and not retained_model_search",
+          "--deselect",
+          "tests/integration/test_event_loop_startup.py::test_real_two_client_cpu_socket_round"
+        ],
+        "timeout_seconds": 120,
+        "exitstatus": 1,
+        "expected_exitstatus": 1,
+        "diagnostic": "collection exclusions"
+      },
+      {
+        "label": "negative-runtime-ignore",
+        "command": [
+          "/tmp/plato-archive-integration/env/bin/python",
+          "-m",
+          "pytest",
+          "tests",
+          "--collect-only",
+          "--test-profile=mandatory",
+          "-m",
+          "runtime and not retained_model_search",
+          "--ignore",
+          "tests/integration/test_event_loop_startup.py"
+        ],
+        "timeout_seconds": 120,
+        "exitstatus": 1,
+        "expected_exitstatus": 1,
+        "diagnostic": "collection exclusions"
+      },
+      {
+        "label": "negative-runtime-ignore-glob",
+        "command": [
+          "/tmp/plato-archive-integration/env/bin/python",
+          "-m",
+          "pytest",
+          "tests",
+          "--collect-only",
+          "--test-profile=mandatory",
+          "-m",
+          "runtime and not retained_model_search",
+          "--ignore-glob",
+          "*event_loop_startup*"
+        ],
+        "timeout_seconds": 120,
+        "exitstatus": 1,
+        "expected_exitstatus": 1,
+        "diagnostic": "collection exclusions"
+      },
+      {
+        "label": "negative-dedicated-keyword",
+        "command": [
+          "/tmp/plato-archive-integration/env/bin/python",
+          "-m",
+          "pytest",
+          "tests/integration/test_retained_model_search.py",
+          "--collect-only",
+          "--test-profile=mandatory",
+          "-m",
+          "retained_model_search",
+          "-k",
+          "not anycostfl"
+        ],
+        "timeout_seconds": 120,
+        "exitstatus": 4,
+        "expected_exitstatus": 4,
+        "diagnostic": "retained qualification does not permit filters"
+      },
+      {
+        "label": "missing-opacus",
+        "command": [
+          "/tmp/plato-llm-integration/base-313/bin/python",
+          "-m",
+          "pytest",
+          "tests",
+          "--collect-only",
+          "--test-profile=mandatory"
+        ],
+        "timeout_seconds": 120,
+        "exitstatus": 4,
+        "expected_exitstatus": 4,
+        "diagnostic": "mandatory prerequisite failed: No module named 'opacus'"
+      }
+    ],
+    "core_runtime": {
+      "selected": 51,
+      "startup": 48,
+      "retained_intentionally_deselected": 19,
+      "old_startup_and_runtime_constants_unchanged": true
+    },
+    "native": {
+      "ledger_nodes": 383,
+      "ledger_sha256": "c168dc33a4d4e7ed70079e09c3de70f5b318d543c035ec13de2826b48e1175bb",
+      "prerequisite_and_real_collection_exitstatus": 0,
+      "execution_qualification": "Root-owned combined final hardware qualification remains required; this receipt does not relabel collection as native execution."
+    },
+    "retained_actual_behavior": {
+      "passed": 19,
+      "skipped": 0,
+      "exitstatus": 0,
+      "elapsed_seconds": 135.24,
+      "distinct_naturally_completed_worker_receipts": 19,
+      "forced_teardown_or_survivors": 0,
+      "independent_final_inline_ci_gate": "accepted actual collection/JUnit/execution outcome artifacts"
+    },
+    "typing": {
+      "owned_diagnostics": 0,
+      "explicit_stager_diagnostics": 0,
+      "full_diagnostics": 337,
+      "full_exitstatus": 1,
+      "exact_workflow_classifier_exitstatus": 0,
+      "old_two_allowances_unchanged": true,
+      "classification_note": "Full repository debt is classified, not claimed fixed. Archive moved-file diagnostic disappearance belongs to the separate archive source change; no disappearance is relabeled a profile repair."
+    },
+    "ruff_imports_all": "passed",
+    "ruff_format": "passed",
+    "lock_check": "passed with byte-identical manifest/lock",
+    "git_diff_check": "passed",
+    "preserved_native_core_source": "All existing module globals/functions/fixtures and ten prerequisite/skip/native/summary methods are AST-identical; see unchanged-native-core-ast.json.",
+    "ci_structure": "Yaml, exact original core step preservation, Python3.13 matrix/job timeout, owned typing union, classifier, staging functions and empty submodule provenance checked."
+  },
+  "commands": {
+    "guard_policy_helpers": [
+      "/tmp/plato-archive-integration/env/bin/python",
+      "-m",
+      "pytest",
+      "tests/test_model_search_profile_contract.py",
+      "tests/test_mlx_profile_contract.py",
+      "tests/mpc/test_round_store_contracts.py",
+      "tests/utils/test_rl_payload_utilities.py",
+      "--test-profile=base",
+      "-q"
+    ],
+    "final_exact_inline_and_guard_tests": [
+      "/tmp/plato-archive-integration/env/bin/python",
+      "-m",
+      "pytest",
+      "tests/test_model_search_profile_contract.py",
+      "--test-profile=base",
+      "-q"
+    ],
+    "installed_production_import_audit": [
+      "/tmp/plato-archive-integration/env/bin/python",
+      "-m",
+      "pytest",
+      "tests/test_mlx_import_contract.py",
+      "--test-profile=base",
+      "-q",
+      "--basetemp=/tmp/plato-archive-profile-evidence/installed-import-tmp"
+    ],
+    "actual_absence_policy_helpers_import_audit": [
+      "/tmp/plato-llm-integration/base-313/bin/python",
+      "-m",
+      "pytest",
+      "tests/test_model_search_profile_contract.py",
+      "tests/test_mlx_profile_contract.py",
+      "tests/test_mlx_import_contract.py",
+      "tests/mpc/test_round_store_contracts.py",
+      "tests/utils/test_rl_payload_utilities.py",
+      "--test-profile=base",
+      "-q",
+      "--basetemp=/tmp/plato-archive-profile-evidence/base-guard-tmp"
+    ],
+    "actual_retained_behavior": [
+      "/tmp/plato-archive-integration/env/bin/python",
+      "-m",
+      "pytest",
+      "tests/integration/test_retained_model_search.py",
+      "--test-profile=mandatory",
+      "-m",
+      "retained_model_search",
+      "-ra",
+      "--basetemp=/tmp/plato-archive-profile-evidence/model-search-tmp",
+      "--junitxml=/tmp/plato-archive-profile-evidence/model-search.xml"
+    ],
+    "source_bound_baseline_red": [
+      "/tmp/plato-archive-integration/env/bin/python",
+      "-m",
+      "pytest",
+      "tests/test_model_search_profile_contract.py",
+      "-q",
+      "-k",
+      "unapproved_full_partition or core_runtime_required_presence or dedicated_retained_cannot_drop or dedicated_retained_rejects_filters"
+    ],
+    "owned_typing": [
+      "/tmp/plato-archive-integration/env/bin/ty",
+      "check",
+      "--python",
+      "/tmp/plato-archive-integration/env",
+      "--output-format",
+      "concise",
+      "tests/conftest.py",
+      "tests/test_model_search_profile_contract.py",
+      ".github/scripts/stage_ci_artifacts.py"
+    ],
+    "full_typing": [
+      "/tmp/plato-archive-integration/env/bin/ty",
+      "check",
+      "--python",
+      "/tmp/plato-archive-integration/env",
+      "--output-format",
+      "concise"
+    ],
+    "explicit_stager_typing": [
+      "/tmp/plato-archive-integration/env/bin/ty",
+      "check",
+      "--python",
+      "/tmp/plato-archive-integration/env",
+      "--output-format",
+      "concise",
+      "--error-on-warning",
+      ".github/scripts/stage_ci_artifacts.py"
+    ],
+    "ruff_all": [
+      "/tmp/plato-archive-integration/env/bin/ruff",
+      "check",
+      ".",
+      "--select",
+      "I"
+    ],
+    "ruff_format": [
+      "/tmp/plato-archive-integration/env/bin/ruff",
+      "format",
+      "--check",
+      "tests/conftest.py",
+      "tests/test_model_search_profile_contract.py",
+      ".github/scripts/stage_ci_artifacts.py"
+    ],
+    "lock_check": [
+      "uv",
+      "lock",
+      "--check",
+      "--offline"
+    ],
+    "retained_prerequisites": [
+      "/tmp/plato-archive-integration/env/bin/python",
+      "-c",
+      "import ptflops, opacus, kazoo, gymnasium"
+    ],
+    "packages": [
+      "uv",
+      "pip",
+      "freeze",
+      "--python",
+      "/tmp/plato-archive-integration/env/bin/python"
+    ],
+    "empty_submodules": [
+      "git",
+      "submodule",
+      "status",
+      "--recursive"
+    ]
+  },
+  "real_collection_commands": [
+    {
+      "label": "base-non-runtime",
+      "command": [
+        "/tmp/plato-llm-integration/base-313/bin/python",
+        "-m",
+        "pytest",
+        "tests",
+        "--collect-only",
+        "--test-profile=base",
+        "-m",
+        "not runtime",
+        "-ra"
+      ],
+      "timeout_seconds": 120,
+      "exitstatus": 0,
+      "expected_exitstatus": 0,
+      "diagnostic": "",
+      "selected_count": 1474,
+      "deselected_count": 70
+    },
+    {
+      "label": "mandatory-non-runtime",
+      "command": [
+        "/tmp/plato-archive-integration/env/bin/python",
+        "-m",
+        "pytest",
+        "tests",
+        "--collect-only",
+        "--test-profile=mandatory",
+        "-m",
+        "not runtime",
+        "-ra"
+      ],
+      "timeout_seconds": 120,
+      "exitstatus": 0,
+      "expected_exitstatus": 0,
+      "diagnostic": "",
+      "selected_count": 1481,
+      "deselected_count": 70
+    },
+    {
+      "label": "core-runtime",
+      "command": [
+        "/tmp/plato-archive-integration/env/bin/python",
+        "-m",
+        "pytest",
+        "tests",
+        "--collect-only",
+        "--test-profile=mandatory",
+        "-m",
+        "runtime and not retained_model_search",
+        "-ra"
+      ],
+      "timeout_seconds": 120,
+      "exitstatus": 0,
+      "expected_exitstatus": 0,
+      "diagnostic": "",
+      "selected_count": 51,
+      "deselected_count": 1500
+    },
+    {
+      "label": "dedicated-retained",
+      "command": [
+        "/tmp/plato-archive-integration/env/bin/python",
+        "-m",
+        "pytest",
+        "tests/integration/test_retained_model_search.py",
+        "--collect-only",
+        "-q",
+        "--test-profile=mandatory",
+        "-m",
+        "retained_model_search"
+      ],
+      "timeout_seconds": 120,
+      "exitstatus": 0,
+      "expected_exitstatus": 0,
+      "diagnostic": "",
+      "selected_count": 19,
+      "deselected_count": 0
+    },
+    {
+      "label": "negative-expression",
+      "command": [
+        "/tmp/plato-archive-integration/env/bin/python",
+        "-m",
+        "pytest",
+        "tests",
+        "--collect-only",
+        "--test-profile=mandatory",
+        "-m",
+        "runtime and not retained_model_search and not startup_containment"
+      ],
+      "timeout_seconds": 120,
+      "exitstatus": 4,
+      "expected_exitstatus": 4,
+      "diagnostic": "unapproved full-suite partition"
+    },
+    {
+      "label": "negative-runtime-keyword",
+      "command": [
+        "/tmp/plato-archive-integration/env/bin/python",
+        "-m",
+        "pytest",
+        "tests",
+        "--collect-only",
+        "--test-profile=mandatory",
+        "-m",
+        "runtime and not retained_model_search",
+        "-k",
+        "not test_real_two_client_cpu_socket_round"
+      ],
+      "timeout_seconds": 120,
+      "exitstatus": 1,
+      "expected_exitstatus": 1,
+      "diagnostic": "unexpected deselection"
+    },
+    {
+      "label": "negative-runtime-deselect",
+      "command": [
+        "/tmp/plato-archive-integration/env/bin/python",
+        "-m",
+        "pytest",
+        "tests",
+        "--collect-only",
+        "--test-profile=mandatory",
+        "-m",
+        "runtime and not retained_model_search",
+        "--deselect",
+        "tests/integration/test_event_loop_startup.py::test_real_two_client_cpu_socket_round"
+      ],
+      "timeout_seconds": 120,
+      "exitstatus": 1,
+      "expected_exitstatus": 1,
+      "diagnostic": "collection exclusions"
+    },
+    {
+      "label": "negative-runtime-ignore",
+      "command": [
+        "/tmp/plato-archive-integration/env/bin/python",
+        "-m",
+        "pytest",
+        "tests",
+        "--collect-only",
+        "--test-profile=mandatory",
+        "-m",
+        "runtime and not retained_model_search",
+        "--ignore",
+        "tests/integration/test_event_loop_startup.py"
+      ],
+      "timeout_seconds": 120,
+      "exitstatus": 1,
+      "expected_exitstatus": 1,
+      "diagnostic": "collection exclusions"
+    },
+    {
+      "label": "negative-runtime-ignore-glob",
+      "command": [
+        "/tmp/plato-archive-integration/env/bin/python",
+        "-m",
+        "pytest",
+        "tests",
+        "--collect-only",
+        "--test-profile=mandatory",
+        "-m",
+        "runtime and not retained_model_search",
+        "--ignore-glob",
+        "*event_loop_startup*"
+      ],
+      "timeout_seconds": 120,
+      "exitstatus": 1,
+      "expected_exitstatus": 1,
+      "diagnostic": "collection exclusions"
+    },
+    {
+      "label": "negative-dedicated-keyword",
+      "command": [
+        "/tmp/plato-archive-integration/env/bin/python",
+        "-m",
+        "pytest",
+        "tests/integration/test_retained_model_search.py",
+        "--collect-only",
+        "--test-profile=mandatory",
+        "-m",
+        "retained_model_search",
+        "-k",
+        "not anycostfl"
+      ],
+      "timeout_seconds": 120,
+      "exitstatus": 4,
+      "expected_exitstatus": 4,
+      "diagnostic": "retained qualification does not permit filters"
+    },
+    {
+      "label": "missing-opacus",
+      "command": [
+        "/tmp/plato-llm-integration/base-313/bin/python",
+        "-m",
+        "pytest",
+        "tests",
+        "--collect-only",
+        "--test-profile=mandatory"
+      ],
+      "timeout_seconds": 120,
+      "exitstatus": 4,
+      "expected_exitstatus": 4,
+      "diagnostic": "mandatory prerequisite failed: No module named 'opacus'"
+    },
+    {
+      "label": "native-383-collection",
+      "command": [
+        "/tmp/plato-archive-integration/env/bin/python",
+        "-m",
+        "pytest",
+        "tests/mlx_native",
+        "--collect-only",
+        "--test-profile=mlx-native",
+        "-q"
+      ],
+      "timeout_seconds": 120,
+      "exitstatus": 0,
+      "expected_exitstatus": 0,
+      "diagnostic": "native collection-only validation",
+      "selected_count": 383,
+      "deselected_count": 0
+    }
+  ],
+  "environment": {
+    "python": "3.13.16",
+    "platform": [
+      "Darwin",
+      "arm64"
+    ],
+    "versions": {
+      "pytest": "9.1.1",
+      "mlx": "0.32.3",
+      "ptflops": "0.7.5",
+      "opacus": "1.6.0",
+      "kazoo": "2.11.0",
+      "gymnasium": "1.3.0"
+    },
+    "primary": "/tmp/plato-archive-integration/env (explicitly authorized readonly dev + test-model-search + mlx environment)",
+    "base": "/tmp/plato-llm-integration/base-313 (readonly accepted unchanged test-base dependency environment, real missing MLX/Opacus)",
+    "test_env_variables": {
+      "PYTEST_DISABLE_PLUGIN_AUTOLOAD": "1",
+      "HF_HUB_OFFLINE": "1",
+      "HF_DATASETS_OFFLINE": "1",
+      "OMP_NUM_THREADS": "1",
+      "MKL_NUM_THREADS": "1"
+    },
+    "collection_observer": "Pure recording plugin via PYTEST_PLUGINS/PYTHONPATH; it changes no markers, selection, prerequisites or outcomes. Every real collect subprocess has a120-second timeout.",
+    "no_environment_mutation": true,
+    "no_manifest_or_lock_edits": true
+  },
+  "raw_evidence": {
+    "archive": "raw-records.tar.gz",
+    "manifest": "raw-records-manifest.json",
+    "files": 199,
+    "uncompressed_bytes": 2639536,
+    "compressed_bytes": 272148,
+    "policy": "Exact raw outputs, selected/deselected inventories, command/probe scripts, XML, package identities,19 worker config/overlay/result/event/stdout/stderr receipts, and installed/absent production audit records. Tensor/payload/checkpoint/unit fixture binaries and pytest aliases are excluded; original complete task outputs remain under /tmp/plato-archive-profile-evidence."
+  },
+  "ownership_and_limits": {
+    "only_four_authorized_source_paths_edited": true,
+    "native_ledger_and_modules_unchanged": true,
+    "fixtures_models_algorithms_registries_docs_and_metadata_unmodified": true,
+    "root_archive_integration_not_edited": true,
+    "no_subagents_remote_publication_or_cleanup": true,
+    "python313_only": true,
+    "no_e8_or_e9_work": true
+  },
+  "remaining_gates": [
+    "Fresh independent review of exact frozen591d706b source and this evidence.",
+    "Root-owned combined final base/mandatory non-runtime,51core-runtime and383native execution qualifications plus exact-source Linux CI checks.",
+    "Separate archive worker/ARS-01 correction review and documentation owner gates.",
+    "Root-owned final archive distribution/integrity/documentation/lock/environment and publication gates; this bounded profile receipt is not whole-archive or fullPhase4 acceptance."
+  ],
+  "artifacts": [
+    {
+      "path": "evidence/2026-refresh/archive-profile-policy/before-sources.json",
+      "sha256": "40ea7a4e887151cd90b50211ef9f432bec510d76e34630512c1a226456e1a439",
+      "raw_path_in_archive": "before-sources.json",
+      "raw_sha256": "40ea7a4e887151cd90b50211ef9f432bec510d76e34630512c1a226456e1a439"
+    },
+    {
+      "path": "evidence/2026-refresh/archive-profile-policy/final-red-source.json",
+      "sha256": "73696a0112cd13e17df28c1ca0d2fc598cd5548bae55a334198bddfa5703b76d",
+      "raw_path_in_archive": "final-red-source.json",
+      "raw_sha256": "73696a0112cd13e17df28c1ca0d2fc598cd5548bae55a334198bddfa5703b76d"
+    },
+    {
+      "path": "evidence/2026-refresh/archive-profile-policy/collection-probes.json",
+      "sha256": "94d8d7e3ee2c6b75b1c9f13a3cbb2347d280f936a118ba8414f4d986a50e4724",
+      "raw_path_in_archive": "collection-probes.json",
+      "raw_sha256": "94d8d7e3ee2c6b75b1c9f13a3cbb2347d280f936a118ba8414f4d986a50e4724"
+    },
+    {
+      "path": "evidence/2026-refresh/archive-profile-policy/ci-structure-verification.json",
+      "sha256": "38c5ddcb682865f6322d0c1487ea270ea7a6eec82ff1e1f3bc73e2e52ed0cdb4",
+      "raw_path_in_archive": "ci-structure-verification.json",
+      "raw_sha256": "38c5ddcb682865f6322d0c1487ea270ea7a6eec82ff1e1f3bc73e2e52ed0cdb4"
+    },
+    {
+      "path": "evidence/2026-refresh/archive-profile-policy/typing-classification.json",
+      "sha256": "f0fb0a6d92a2b2d7bbd4de4b2928da13102d6714c1d94bf3941c4efbe003966e",
+      "raw_path_in_archive": "typing-classification.json",
+      "raw_sha256": "f0fb0a6d92a2b2d7bbd4de4b2928da13102d6714c1d94bf3941c4efbe003966e"
+    },
+    {
+      "path": "evidence/2026-refresh/archive-profile-policy/unchanged-native-core-ast.json",
+      "sha256": "afe213e6189fa4849cf905d9c59856956fe0379124cbb0424e4d3091d1b1f1e2",
+      "raw_path_in_archive": "unchanged-native-core-ast.json",
+      "raw_sha256": "afe213e6189fa4849cf905d9c59856956fe0379124cbb0424e4d3091d1b1f1e2"
+    },
+    {
+      "path": "evidence/2026-refresh/archive-profile-policy/retained-worker-receipts.json",
+      "sha256": "18e3ad3d14cff7dd293ce90bacb722595f80bba8ae7004572ff5610631f7bb4f",
+      "raw_path_in_archive": "retained-worker-receipts.json",
+      "raw_sha256": "18e3ad3d14cff7dd293ce90bacb722595f80bba8ae7004572ff5610631f7bb4f"
+    },
+    {
+      "path": "evidence/2026-refresh/archive-profile-policy/model-search-acceptance.json",
+      "sha256": "e10a147ba493356bc162087b468f10f05b7587dc5f17613797c68cd1d959c94d",
+      "raw_path_in_archive": "model-search-acceptance.json",
+      "raw_sha256": "e10a147ba493356bc162087b468f10f05b7587dc5f17613797c68cd1d959c94d"
+    },
+    {
+      "path": "evidence/2026-refresh/archive-profile-policy/model-search-packages.txt",
+      "sha256": "9f7ba6caebcc18ea690e33c13c267e06aa30f20879d58b58f1c15d78ca79629f",
+      "raw_path_in_archive": "model-search-packages.txt",
+      "raw_sha256": "9f7ba6caebcc18ea690e33c13c267e06aa30f20879d58b58f1c15d78ca79629f"
+    },
+    {
+      "path": "evidence/2026-refresh/archive-profile-policy/model-search.xml",
+      "sha256": "bfbc1f805d6a73f287f9d2339d22fb42ca512e5c1b96a0454caf7d836050ad13",
+      "raw_path_in_archive": "model-search.xml",
+      "raw_sha256": "bfbc1f805d6a73f287f9d2339d22fb42ca512e5c1b96a0454caf7d836050ad13"
+    },
+    {
+      "path": "evidence/2026-refresh/archive-profile-policy/submodules.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_path_in_archive": "submodules.txt",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/2026-refresh/archive-profile-policy/ci-verifier.txt",
+      "sha256": "8fd5e780fdb9cdabc1c569e75416d3e051a2018e6d980cde3c5d335b04f20cd1",
+      "raw_path_in_archive": "ci-verifier.txt",
+      "raw_sha256": "8fd5e780fdb9cdabc1c569e75416d3e051a2018e6d980cde3c5d335b04f20cd1"
+    },
+    {
+      "path": "evidence/2026-refresh/archive-profile-policy/guard-green-final.log",
+      "sha256": "d4edc9608acbb9e8d2c4b5047a733db17e2c6414a157e39c4d28559d6dce12a6",
+      "raw_path_in_archive": "guard-green-final.log",
+      "raw_sha256": "d4edc9608acbb9e8d2c4b5047a733db17e2c6414a157e39c4d28559d6dce12a6"
+    },
+    {
+      "path": "evidence/2026-refresh/archive-profile-policy/guard-final-source.log",
+      "sha256": "b80a66c6c5fc073423c9e7e224a6ea7dea41db57ff3d7bfd0ae5b0be02fe43a6",
+      "raw_path_in_archive": "guard-final-source.log",
+      "raw_sha256": "b80a66c6c5fc073423c9e7e224a6ea7dea41db57ff3d7bfd0ae5b0be02fe43a6"
+    },
+    {
+      "path": "evidence/2026-refresh/archive-profile-policy/base-guard-import.log",
+      "sha256": "42db6d80ba2d9c83edea756ffd2b64de954b044914d2b5bfd0a8bdc1c3646cd5",
+      "raw_path_in_archive": "base-guard-import.log",
+      "raw_sha256": "42db6d80ba2d9c83edea756ffd2b64de954b044914d2b5bfd0a8bdc1c3646cd5"
+    },
+    {
+      "path": "evidence/2026-refresh/archive-profile-policy/installed-import.log",
+      "sha256": "c167b880907b1ad60a497a5f4c73c141c19bb30a6a1e9855520c9f7c8e8d3a08",
+      "raw_path_in_archive": "installed-import.log",
+      "raw_sha256": "c167b880907b1ad60a497a5f4c73c141c19bb30a6a1e9855520c9f7c8e8d3a08"
+    },
+    {
+      "path": "evidence/2026-refresh/archive-profile-policy/model-search.log",
+      "sha256": "4fa42660553dd9a21348d8e779a0ce944f26033acb61e317ac6dfd3641bc45f2",
+      "raw_path_in_archive": "model-search.log",
+      "raw_sha256": "4fa42660553dd9a21348d8e779a0ce944f26033acb61e317ac6dfd3641bc45f2"
+    },
+    {
+      "path": "evidence/2026-refresh/archive-profile-policy/final-red.log",
+      "sha256": "0cbc35217e7bb391cc1ddb38681bb571375a3e0a87bd10351995cdeecfb3a3f8",
+      "raw_path_in_archive": "final-red.log",
+      "raw_sha256": "0cbc35217e7bb391cc1ddb38681bb571375a3e0a87bd10351995cdeecfb3a3f8"
+    },
+    {
+      "path": "evidence/2026-refresh/archive-profile-policy/typing-owned.log",
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "raw_path_in_archive": "typing-owned.log",
+      "raw_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "path": "evidence/2026-refresh/archive-profile-policy/ty-stager.log",
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "raw_path_in_archive": "ty-stager.log",
+      "raw_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "path": "evidence/2026-refresh/archive-profile-policy/typing-classifier-replay.log",
+      "sha256": "016a3077e6b59b73edf67ebd95133a90a903ef60005cd6e13fb4e92d513bc443",
+      "raw_path_in_archive": "typing-classifier-replay.log",
+      "raw_sha256": "016a3077e6b59b73edf67ebd95133a90a903ef60005cd6e13fb4e92d513bc443"
+    },
+    {
+      "path": "evidence/2026-refresh/archive-profile-policy/ruff-all.log",
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "raw_path_in_archive": "ruff-all.log",
+      "raw_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "path": "evidence/2026-refresh/archive-profile-policy/ruff-format.log",
+      "sha256": "eee76f865de5a9f2456950f710ae5d5f9b5bd0ea02aa54f614c5eed6642a0bfd",
+      "raw_path_in_archive": "ruff-format.log",
+      "raw_sha256": "eee76f865de5a9f2456950f710ae5d5f9b5bd0ea02aa54f614c5eed6642a0bfd"
+    },
+    {
+      "path": "evidence/2026-refresh/archive-profile-policy/lock-check.log",
+      "sha256": "996d042f548e0fe4859fe04b4f2bedeef6c88833af6974ee5a201108041bbf3c",
+      "raw_path_in_archive": "lock-check.log",
+      "raw_sha256": "996d042f548e0fe4859fe04b4f2bedeef6c88833af6974ee5a201108041bbf3c"
+    },
+    {
+      "path": "evidence/2026-refresh/archive-profile-policy/profile-owner-handoff.json",
+      "sha256": "1020cdd71cb201b3620ec1d78e2f30e093a15493ba36fca24f27c24f24cf193a",
+      "upstream_path": "/tmp/plato-archive-integration/profile-owner-handoff.json"
+    },
+    {
+      "path": "evidence/2026-refresh/archive-profile-policy/accepted-plan-review3.json",
+      "sha256": "3fbeb6b47b5392515172b574bd9b0d11f427e5d6af4a72ba2c2d3057be8483be",
+      "upstream_path": "/tmp/plato-archive-shortlist-plan-review3.json"
+    },
+    {
+      "path": "evidence/2026-refresh/archive-profile-policy/raw-records.tar.gz",
+      "sha256": "abdc41cf47cef0dfe7202dd1f1596a007f29fd5af719a1991cc2044594f14ea6"
+    },
+    {
+      "path": "evidence/2026-refresh/archive-profile-policy/raw-records-manifest.json",
+      "sha256": "b654b87d7d6c772b513e357072da9dcf5a2296333828cc9e7da9acae4a802b02"
+    }
+  ]
+}

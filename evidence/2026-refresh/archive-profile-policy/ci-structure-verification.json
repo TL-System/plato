@@ -1,0 +1,14 @@
+{
+  "yaml_valid": true,
+  "python313_matrix_and_job_timeout_unchanged": true,
+  "core_steps_unchanged_except_exact_runtime_expression": true,
+  "empty_submodules_provenance_retained": true,
+  "no_active_gitlinks": true,
+  "all_native_owned_paths_retained": true,
+  "typing_classifier_ast_and_original_allowances_unchanged": true,
+  "exact_planned_archive_owned_path_union": true,
+  "explicit_stager_check_fails_warnings_and_errors": true,
+  "stager_function_asts_unchanged": true,
+  "retained_step_timeout_minutes": 25,
+  "fresh_separate_retained_environment": "${{ runner.temp }}/plato-retained-model-search"
+}
