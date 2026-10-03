@@ -18,8 +18,8 @@
     "dependency_merge_tree": "6421b546579a0bafe3e2fc0796291ab662cbc04a",
     "implementation_commit": "e65241c19448b74dcb57fc48bfe388152f3a3e58",
     "implementation_tree": "eb14eedcac3ce959020766883c61349087f436c9",
-    "evidence_body_commit": "PENDING_SENTENCE_SUBJECT_EVIDENCE_COMMIT",
-    "evidence_commit_receipt": "A following receipt commit records the exact evidence-body commit and its JSON SHA256; the final handoff gives the clean exact final candidate externally, avoiding a self-referential commit hash.",
+    "evidence_body_commit": "0c8930162504a3cb1bfea5b5ecda368f14aec19a",
+    "evidence_commit_receipt": "This following receipt commit records the exact evidence-body commit, tree and validationJSONhash. Its ownfinalhash is supplied externally in the clean handoff; a commit cannotembed its ownhash. Resolve with gitlog-1 on this file.",
     "implementation_owned_diff": {
       "path": "/tmp/plato-phase2c-fixes/implementation-owned.diff",
       "bytes": 576230,
@@ -36,7 +36,7 @@
       "c1e23fa7c5e25240b3d18461a8d63fe541c183b1 Corrected training updates, personalization ownership, and model checkpoints."
     ],
     "source_changes_after_qualification": [],
-    "source_immutability_check": "No source changes after exacte652 qualification. Only the three owned evidence JSONs will change in evidence/receipt commits. servers/base.py is byte-identical to reviewed62d; its prior codec changes retained.",
+    "source_immutability_check": "git diff --name-only e65241c19448b74dcb57fc48bfe388152f3a3e58 0c8930162504a3cb1bfea5b5ecda368f14aec19a contains only the threeowned evidence JSONfiles. No code/testsource changed after exactqualification. SCAFFOLDpublic validation/acceptance semantics changed since docs snapshot0dc as explicitly recorded in facts; equations/TOMLvalues/controlpath unchanged.",
     "reviewed_base": "62d7b7d8ef75be779149a96f567779c86699edb4",
     "general_review_fix_commit": "45fff1afbc63a78cc0827dd60f9126c5bda9d310",
     "scaffold_review_fix_commit": "e65241c19448b74dcb57fc48bfe388152f3a3e58",
@@ -59,7 +59,21 @@
       "tests/trainers/test_personalized_state_ownership.py",
       "tests/trainers/test_review_training_boundaries.py",
       "tests/trainers/test_scaffold_strategy.py"
-    ]
+    ],
+    "evidence_body_validation_sha256": "f70c78560f990f071cf406909f5a35826459687b29f7a5eafa13a33372b42740",
+    "evidence_body_tree": "47d73e61b9d5fbf44451a68499cb02c339c47e0f",
+    "evidence_generation": {
+      "body_command": "/tmp/plato-phase2c-313/bin/python /tmp/plato-phase2c-fixes/build_fix_evidence.py",
+      "body_addendum_command": "/tmp/plato-phase2c-313/bin/python /tmp/plato-phase2c-fixes/finalize_fix_evidence.py before",
+      "receipt_command": "/tmp/plato-phase2c-313/bin/python /tmp/plato-phase2c-fixes/finalize_fix_evidence.py after",
+      "shell": "zsh -lc",
+      "receipt_script": {
+        "path": "/tmp/plato-phase2c-fixes/finalize_fix_evidence.py",
+        "bytes": 3310,
+        "sha256": "9b364bc7a6cd98562747db9abc7e7b765edab658eac81dae0fd9658bf6e3fdc1"
+      },
+      "verification_command": "/tmp/plato-phase2c-313/bin/python /tmp/plato-phase2c-scratch/verify_evidence.py"
+    }
   },
   "authorization": [
     {
