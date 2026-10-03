@@ -1,0 +1,1466 @@
+{
+  "schema_version": 1,
+  "reviewer": "/root/mlx_final_review",
+  "reviewed_at_utc": "2026-10-03T20:28:11.456356+00:00",
+  "decision": "ACCEPTED_BOUNDED_REVIEW",
+  "summary": "No critical, high, or medium findings. All57 required changed-path typing diagnostics are closed on final6311 without runtime or numerical assertion weakening. Native/profile corrections, CI owned-path expansion, and reproduction-only manifest exclusion are accepted in this bounded scope.",
+  "findings": [],
+  "advisory_observations": [
+    {
+      "severity": "low",
+      "acceptance_blocking": false,
+      "path": "plato/utils/tree.py",
+      "line": 16,
+      "title": "Three unchanged unused typing aliases under optional expanded RuffF scope",
+      "details": "Dict, List and Tuple at columns40,46,52 yield F401 only under extra reviewer --select I,F. tree.py is byte-identical to0929; required existing RuffI policy passes. No source cleanup requested in this correction.",
+      "evidence": {
+        "path": "/tmp/plato-mlx-final-independent-review/ruff.log",
+        "sha256": "490dd89ee11a0a4595b5b710d21a7cab33c69bd05343dbfc54885fa0635133e2"
+      }
+    }
+  ],
+  "scope": "Independent final correction review of immutable combined6311 against semantic-reviewed0929. Exact 24 active Python paths, source receipts, assertions/fixtures/signatures, optional algorithm behavior, real-valued CPU/Metal prerequisite, lazy/import boundary, native ledger, CI typing classifier, and bounded packaging delta. No source edits, nested agents, environment sync/install, long full-core duplication, benchmarks, PR or merge actions.",
+  "implementation": {
+    "commit": "6311960cdd00955d4777e269ebee460be591065e",
+    "source_sha256": {
+      "plato/algorithms/mlx_fedavg.py": "469021332340cadf9c58b2349b3bb2ab856edb03aba4ab76136e6620066748f3",
+      "plato/algorithms/registry.py": "c28cd649d77b3bffab14e7f7b01e87c2b0b652d0b538ae7d0ad0bab0be5e2d58",
+      "plato/models/registry.py": "21e3eef31c433802aa042f430cdd869571ced0c6f421ac7e48863fd5f2385a8e",
+      "plato/servers/fedavg.py": "dc7deda9e07d758fd7e9b81b6bb59cbf43e3f3d5197b2b550273b163f450e087",
+      "plato/trainers/mlx.py": "bdd405bec5ca7255b585e7a99118699dc52e1dfcb939beef6e5fc0296381cb5e",
+      "plato/trainers/registry.py": "8e2c03428b45e14fc33fb919d1684fff1ed3d57810167f461f697371ee0fb9a1",
+      "plato/utils/tree.py": "33a02e8fe70eb62daa97b40c7edea19b0fb9fed1b41c2d64b5146242143b0ef6",
+      "tests/conftest.py": "dcc25c17cbd872fc21b66bbc2d3f5951bf791b9f2474a71af6d9b8ac28e4356c",
+      "tests/mlx_import_audit_runner.py": "62a6509de2b389d1ab143cc06a526745a132f035f978b18f8b78d183ec80d296",
+      "tests/mlx_native/__init__.py": "1a04a0e5e228220a93c51d9b3e52a231525e5bc660150ba8737024a2f2df1ca2",
+      "tests/mlx_native/benchmark.py": "4d84e40e99754cd533670aadd103b57f8adb1e323859957936d4e252f9d3c042",
+      "tests/mlx_native/helpers.py": "dc035bf36f25013ad729b166067c8667e87ff8b408a928a4362ca8c21a6f41be",
+      "tests/mlx_native/seed_probe.py": "ef12f16104913a853f66748a50238560add36d31fd91f59d6109d9e4eb8dca45",
+      "tests/mlx_native/socket_harness.py": "a50a6f4278fb8b567a834f181eeef59663a2f2a7534fd5e9e3c9d30fb7f145e9",
+      "tests/mlx_native/socket_probe.py": "ad9612b76c99fec5bf126f822ebafe64cd633db2cee6a0b39feeffbbb15b925d",
+      "tests/mlx_native/test_phase3_controls.py": "486bb96caf4bc00ab82bd8a1ec966700dee0dfdc677d97565357c32286b74af8",
+      "tests/mlx_native/test_phase3_dispatch.py": "f1a6929ef580c4220c833cb2b1d17a04489266ac5554f23fb20b37fa7165ff88",
+      "tests/mlx_native/test_phase3_rng.py": "c007293e24c26b0d17ba85b82841b38df17fc32db26df17b8c87ed7bf3657917",
+      "tests/mlx_native/test_phase3_runtime.py": "545de1c7eb23829990860610dde0c370e6dce0312c514dd4be4d69f4d75c092f",
+      "tests/mlx_native/test_phase3_selection.py": "aec3efc41b2473c23dec71662902d8f97c093158eb296809b3e3dbd62f2fd13b",
+      "tests/mlx_native/test_phase3_socket.py": "e4fcad87330ce9923eba2f7b05e87e6cf3eeb4fbe06ed0089742d0d53d3797a7",
+      "tests/mlx_native/test_phase3_tree_contract.py": "ce43ba9517e16ad3a4df5018ff00779f849d70ab6ef38344abf8c12be78ee4c8",
+      "tests/test_mlx_import_contract.py": "6c9eb81ab656a8695f34579fd590a02d51480c85a3353fcc57a33597f972be77",
+      "tests/test_mlx_profile_contract.py": "c26c766a599d235f6841aafe82f178b7fd8a3ae02d8362420d0d4f7e95dd8088",
+      "pyproject.toml": "0e62fd238c359027fae6c1b9e45c10a8f913fb8421d9300ee0a781af091f80e4",
+      ".github/workflows/pytorch_tests.yml": "1ae4bf9d5be394b77a105ab294527a27ec8f2c123e46ac179e97fc148f843b75",
+      "uv.lock": "46236f61039c07a844bbddaa185c32582b6f4436203bd719aa8e7dcfdbd26e89",
+      "tests/mlx_native/cases.json": "c168dc33a4d4e7ed70079e09c3de70f5b318d543c035ec13de2826b48e1175bb"
+    },
+    "CI_owned_paths": [
+      "plato/algorithms/mlx_fedavg.py",
+      "plato/algorithms/registry.py",
+      "plato/models/registry.py",
+      "plato/servers/fedavg.py",
+      "plato/trainers/mlx.py",
+      "plato/trainers/registry.py",
+      "plato/utils/retired_backends.py",
+      "plato/utils/tree.py",
+      "tests/clients/test_feddf_strategy.py",
+      "tests/conftest.py",
+      "tests/datasources/test_huggingface_datasource.py",
+      "tests/integration/test_event_loop_startup.py",
+      "tests/integration/utils.py",
+      "tests/mlx_import_audit_runner.py",
+      "tests/mlx_native/__init__.py",
+      "tests/mlx_native/benchmark.py",
+      "tests/mlx_native/helpers.py",
+      "tests/mlx_native/seed_probe.py",
+      "tests/mlx_native/socket_harness.py",
+      "tests/mlx_native/socket_probe.py",
+      "tests/mlx_native/test_phase3_controls.py",
+      "tests/mlx_native/test_phase3_dispatch.py",
+      "tests/mlx_native/test_phase3_rng.py",
+      "tests/mlx_native/test_phase3_runtime.py",
+      "tests/mlx_native/test_phase3_selection.py",
+      "tests/mlx_native/test_phase3_socket.py",
+      "tests/mlx_native/test_phase3_tree_contract.py",
+      "tests/servers/test_feddf_server_strategy.py",
+      "tests/test_mlx_import_contract.py",
+      "tests/test_mlx_profile_contract.py",
+      "tests/test_retired_backends.py",
+      "tests/trainers/test_dp_data_loader_strategy.py"
+    ],
+    "CI_classifier_AST_unchanged": true,
+    "datasource_allowances_unchanged": true,
+    "manifest_only_authorized_exclusion": true,
+    "case_ledger_and_runtime_frontdoors_byte_unchanged": true,
+    "test_names_decorators_preserved_and_assert_counts_not_reduced": true,
+    "source_binding": {
+      "native": {
+        "plato/servers/fedavg.py": {
+          "actual": "dc7deda9e07d758fd7e9b81b6bb59cbf43e3f3d5197b2b550273b163f450e087",
+          "author": "97a077f5aac8d23cb945b12af3a4c998c2b6cd2e98a0ad97fdefeb4e23e26713",
+          "matches": false,
+          "bounded_binding": "Native validation method AST identical; full-file difference is preaccepted Nanochat retirement retained from0929. Root0929-to-final diff is exactly the optional narrowing."
+        },
+        "tests/mlx_native/benchmark.py": {
+          "actual": "4d84e40e99754cd533670aadd103b57f8adb1e323859957936d4e252f9d3c042",
+          "author": "4d84e40e99754cd533670aadd103b57f8adb1e323859957936d4e252f9d3c042",
+          "matches": true
+        },
+        "tests/mlx_native/seed_probe.py": {
+          "actual": "ef12f16104913a853f66748a50238560add36d31fd91f59d6109d9e4eb8dca45",
+          "author": "ef12f16104913a853f66748a50238560add36d31fd91f59d6109d9e4eb8dca45",
+          "matches": true
+        },
+        "tests/mlx_native/socket_harness.py": {
+          "actual": "a50a6f4278fb8b567a834f181eeef59663a2f2a7534fd5e9e3c9d30fb7f145e9",
+          "author": "a50a6f4278fb8b567a834f181eeef59663a2f2a7534fd5e9e3c9d30fb7f145e9",
+          "matches": true
+        },
+        "tests/mlx_native/socket_probe.py": {
+          "actual": "ad9612b76c99fec5bf126f822ebafe64cd633db2cee6a0b39feeffbbb15b925d",
+          "author": "ad9612b76c99fec5bf126f822ebafe64cd633db2cee6a0b39feeffbbb15b925d",
+          "matches": true
+        },
+        "tests/mlx_native/test_phase3_controls.py": {
+          "actual": "486bb96caf4bc00ab82bd8a1ec966700dee0dfdc677d97565357c32286b74af8",
+          "author": "486bb96caf4bc00ab82bd8a1ec966700dee0dfdc677d97565357c32286b74af8",
+          "matches": true
+        },
+        "tests/mlx_native/test_phase3_rng.py": {
+          "actual": "c007293e24c26b0d17ba85b82841b38df17fc32db26df17b8c87ed7bf3657917",
+          "author": "c007293e24c26b0d17ba85b82841b38df17fc32db26df17b8c87ed7bf3657917",
+          "matches": true
+        },
+        "tests/mlx_native/test_phase3_runtime.py": {
+          "actual": "545de1c7eb23829990860610dde0c370e6dce0312c514dd4be4d69f4d75c092f",
+          "author": "545de1c7eb23829990860610dde0c370e6dce0312c514dd4be4d69f4d75c092f",
+          "matches": true
+        },
+        "tests/mlx_native/test_phase3_tree_contract.py": {
+          "actual": "ce43ba9517e16ad3a4df5018ff00779f849d70ab6ef38344abf8c12be78ee4c8",
+          "author": "ce43ba9517e16ad3a4df5018ff00779f849d70ab6ef38344abf8c12be78ee4c8",
+          "matches": true
+        }
+      },
+      "profile": {
+        "tests/conftest.py": {
+          "actual": "dcc25c17cbd872fc21b66bbc2d3f5951bf791b9f2474a71af6d9b8ac28e4356c",
+          "author": "dcc25c17cbd872fc21b66bbc2d3f5951bf791b9f2474a71af6d9b8ac28e4356c",
+          "matches": true
+        },
+        "tests/test_mlx_profile_contract.py": {
+          "actual": "c26c766a599d235f6841aafe82f178b7fd8a3ae02d8362420d0d4f7e95dd8088",
+          "author": "c26c766a599d235f6841aafe82f178b7fd8a3ae02d8362420d0d4f7e95dd8088",
+          "matches": true
+        },
+        ".github/workflows/pytorch_tests.yml": {
+          "actual": "1ae4bf9d5be394b77a105ab294527a27ec8f2c123e46ac179e97fc148f843b75",
+          "author": "1ae4bf9d5be394b77a105ab294527a27ec8f2c123e46ac179e97fc148f843b75",
+          "matches": true
+        },
+        "pyproject.toml": {
+          "actual": "0e62fd238c359027fae6c1b9e45c10a8f913fb8421d9300ee0a781af091f80e4",
+          "author": "0e62fd238c359027fae6c1b9e45c10a8f913fb8421d9300ee0a781af091f80e4",
+          "matches": true
+        }
+      }
+    },
+    "all_profile_artifact_hashes_verified": true,
+    "native_typing_archive_sha_verified": true,
+    "tree": "d302b222717177d4e04bb55214df0826dc9c9ee1"
+  },
+  "reviewed_prior_context": [
+    {
+      "path": "/tmp/plato-mlx-corrected-review.json",
+      "sha256": "c4aa98a1cc8e7dfd4bd0029066fc5830bd63d816bcca6599e2949b65dd6ffa28"
+    },
+    {
+      "path": "/tmp/plato-mlx-native-review.json",
+      "sha256": "3c53678c9b4b719a4559a15db8f7706ad9dd524f00690936528e71e671ca4462"
+    },
+    {
+      "path": "/tmp/plato-mlx-profile-review.json",
+      "sha256": "cf84a8542dba6962bdd8c5e6620f481adeebebe2bf013e714a6b3a382d8015ed"
+    },
+    {
+      "path": "/tmp/plato-mlx-profile-contract-clarification.json",
+      "sha256": "c4f4ba8a69e59aefa3f9ded0aafd3ea91bc42f761a734f9641cfa902202c7add"
+    },
+    {
+      "path": "/tmp/plato-mlx-docs-review.json",
+      "sha256": "1c1ef93989bac38ad001ae51beec5969fc5dcedcb2888332c06d61d1afa1018e"
+    }
+  ],
+  "correction_assessment": {
+    "optional_algorithm_narrowing": "Exactly adds algorithm is not None to callable-validator branch. Generic validation remains first; absent algorithm accepts valid generic inputs and rejects negative samples; provided baseline avoids extra extraction. No unconditional require_algorithm change.",
+    "preflight": "Exact final production function AST tested independently with CPU and GPU real3.0 controls, complex3+0j/3+1j,NaN,infinity,wrong4.0,None.14rows:2valid controls,12cause-bearing UsageError rejects with stream restored. Real float32 array construction, eval,synchronize,finite/equal3.0 checks remain unchanged.",
+    "native_fixture_casts": "typing.cast returns original model/loss/RNG-state/duck-typed trainer/sampler objects. Every changed native assertion and NumPy testing call has identical AST after erasing identity casts and substituting the explicitly assigned model alias. Native test names/parameter decorators retained.",
+    "method_overrides_and_observers": "Default callback **kwargs and aggregation parameter names now match base contracts. Fixture clients_processed lambda is an equivalent no-op subclass method. Client observer exactly matches plato.client.run seven-parameter signature and forwards all seven; Process.start observer receives BaseProcess and retains original start plus identity recording. Actual revised socket instrumentation independently executed successfully.",
+    "benchmark_API": "Only converted receives a tuple[mx.array,mx.array] annotation; no API call, arithmetic, timing loop, barrier or numerical assertion changes. The six-argument training_step interface matches model,optimizer,*two_arrays,loss,context. No benchmark execution or new timing claim.",
+    "policy_helpers": "Frozen _PytestResult preserves subprocess status and exact stdout+stderr string; AST module-name optional guard is safe; one additional plugin-presence assert is added. All prior policy assertions and test decorators retained.",
+    "CI": "Exact old owned set union24 changed active Python paths; classifier AST outside owned-set expression identical; two existing datasource allowances unchanged. No new typing suppression or dependency/config changes.",
+    "manifest": "Parsed pyproject equality after restoring solely previous hatch exclude list. uv.lock unchanged; active source/test/config/docs/workflow and ordinary evidence members remain in reviewed isolated package pair.",
+    "source_binding_limit": "Eight native changed files and four profile files exactly match correction receipt hashes. Final fedavg full-file SHA differs from native-author SHA only because preaccepted Nanochat retirement was already combined in0929; exact validation method AST matches and0929-to6311 delta is solely optional narrowing. Historical/native-author hashes are preserved as historical, not silently relabeled."
+  },
+  "independent_checks": {
+    "environments": [
+      {
+        "executable": "/tmp/plato-mlx-final/env/bin/python",
+        "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+        "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+        "machine": "arm64",
+        "versions": {
+          "numpy": "2.5.3",
+          "torch": "2.14.1",
+          "pytest": "9.1.1"
+        }
+      },
+      {
+        "executable": "/tmp/plato-llm-integration/base-313/bin/python",
+        "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+        "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+        "machine": "arm64",
+        "versions": {
+          "numpy": "2.5.3",
+          "torch": "2.14.1",
+          "pytest": "9.1.1"
+        }
+      }
+    ],
+    "statuses": [
+      {
+        "name": "typing-installed",
+        "command": [
+          "/tmp/plato-mlx-final/env/bin/ty",
+          "check",
+          "plato/algorithms/mlx_fedavg.py",
+          "plato/algorithms/registry.py",
+          "plato/models/registry.py",
+          "plato/servers/fedavg.py",
+          "plato/trainers/mlx.py",
+          "plato/trainers/registry.py",
+          "plato/utils/tree.py",
+          "tests/conftest.py",
+          "tests/mlx_import_audit_runner.py",
+          "tests/mlx_native/__init__.py",
+          "tests/mlx_native/benchmark.py",
+          "tests/mlx_native/helpers.py",
+          "tests/mlx_native/seed_probe.py",
+          "tests/mlx_native/socket_harness.py",
+          "tests/mlx_native/socket_probe.py",
+          "tests/mlx_native/test_phase3_controls.py",
+          "tests/mlx_native/test_phase3_dispatch.py",
+          "tests/mlx_native/test_phase3_rng.py",
+          "tests/mlx_native/test_phase3_runtime.py",
+          "tests/mlx_native/test_phase3_selection.py",
+          "tests/mlx_native/test_phase3_socket.py",
+          "tests/mlx_native/test_phase3_tree_contract.py",
+          "tests/test_mlx_import_contract.py",
+          "tests/test_mlx_profile_contract.py",
+          "--python",
+          "/tmp/plato-mlx-final/env/bin/python",
+          "--python-version",
+          "3.13",
+          "--output-format",
+          "concise"
+        ],
+        "exit_status": 0,
+        "log": "/tmp/plato-mlx-final-independent-review/typing-installed.log",
+        "log_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+      },
+      {
+        "name": "typing-absent-linux",
+        "command": [
+          "/tmp/plato-mlx-final/env/bin/ty",
+          "check",
+          "plato/algorithms/mlx_fedavg.py",
+          "plato/algorithms/registry.py",
+          "plato/models/registry.py",
+          "plato/servers/fedavg.py",
+          "plato/trainers/mlx.py",
+          "plato/trainers/registry.py",
+          "plato/utils/tree.py",
+          "tests/conftest.py",
+          "tests/mlx_import_audit_runner.py",
+          "tests/mlx_native/__init__.py",
+          "tests/mlx_native/benchmark.py",
+          "tests/mlx_native/helpers.py",
+          "tests/mlx_native/seed_probe.py",
+          "tests/mlx_native/socket_harness.py",
+          "tests/mlx_native/socket_probe.py",
+          "tests/mlx_native/test_phase3_controls.py",
+          "tests/mlx_native/test_phase3_dispatch.py",
+          "tests/mlx_native/test_phase3_rng.py",
+          "tests/mlx_native/test_phase3_runtime.py",
+          "tests/mlx_native/test_phase3_selection.py",
+          "tests/mlx_native/test_phase3_socket.py",
+          "tests/mlx_native/test_phase3_tree_contract.py",
+          "tests/test_mlx_import_contract.py",
+          "tests/test_mlx_profile_contract.py",
+          "--python",
+          "/tmp/plato-llm-integration/base-313/bin/python",
+          "--python-version",
+          "3.13",
+          "--python-platform",
+          "linux",
+          "--output-format",
+          "concise"
+        ],
+        "exit_status": 0,
+        "log": "/tmp/plato-mlx-final-independent-review/typing-absent-linux.log",
+        "log_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+      },
+      {
+        "name": "ruff-required",
+        "command": [
+          "/tmp/plato-mlx-final/env/bin/ruff",
+          "check",
+          "plato/algorithms/mlx_fedavg.py",
+          "plato/algorithms/registry.py",
+          "plato/models/registry.py",
+          "plato/servers/fedavg.py",
+          "plato/trainers/mlx.py",
+          "plato/trainers/registry.py",
+          "plato/utils/tree.py",
+          "tests/conftest.py",
+          "tests/mlx_import_audit_runner.py",
+          "tests/mlx_native/__init__.py",
+          "tests/mlx_native/benchmark.py",
+          "tests/mlx_native/helpers.py",
+          "tests/mlx_native/seed_probe.py",
+          "tests/mlx_native/socket_harness.py",
+          "tests/mlx_native/socket_probe.py",
+          "tests/mlx_native/test_phase3_controls.py",
+          "tests/mlx_native/test_phase3_dispatch.py",
+          "tests/mlx_native/test_phase3_rng.py",
+          "tests/mlx_native/test_phase3_runtime.py",
+          "tests/mlx_native/test_phase3_selection.py",
+          "tests/mlx_native/test_phase3_socket.py",
+          "tests/mlx_native/test_phase3_tree_contract.py",
+          "tests/test_mlx_import_contract.py",
+          "tests/test_mlx_profile_contract.py",
+          "--select",
+          "I"
+        ],
+        "exit_status": 0,
+        "log": "/tmp/plato-mlx-final-independent-review/ruff-required.log",
+        "log_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+      },
+      {
+        "name": "native-focused",
+        "command": [
+          "/tmp/plato-mlx-final/env/bin/python",
+          "-B",
+          "-m",
+          "pytest",
+          "tests/mlx_native/test_phase3_dispatch.py",
+          "tests/mlx_native/test_phase3_runtime.py",
+          "tests/mlx_native/test_phase3_tree_contract.py",
+          "tests/mlx_native/test_phase3_controls.py",
+          "tests/mlx_native/test_phase3_rng.py",
+          "tests/servers/test_fedavg_strategy.py",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--basetemp=/tmp/plato-mlx-final-independent-review/native-focused-tmp",
+          "--junitxml=/tmp/plato-mlx-final-independent-review/native-focused.xml"
+        ],
+        "exit_status": 0,
+        "log": "/tmp/plato-mlx-final-independent-review/native-focused.log",
+        "log_sha256": "77597549be2ea327b0b5cd9dd88a7139333bb5cf8ffcaa99c9584263395c433e"
+      },
+      {
+        "name": "profile-installed",
+        "command": [
+          "/tmp/plato-mlx-final/env/bin/python",
+          "-B",
+          "-m",
+          "pytest",
+          "tests/test_mlx_profile_contract.py",
+          "tests/test_mlx_import_contract.py",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--basetemp=/tmp/plato-mlx-final-independent-review/profile-installed-tmp",
+          "--junitxml=/tmp/plato-mlx-final-independent-review/profile-installed.xml"
+        ],
+        "exit_status": 0,
+        "log": "/tmp/plato-mlx-final-independent-review/profile-installed.log",
+        "log_sha256": "5fe26477c922b9e18a1dd98b63639fc92a3a2b07ab3765a5aa1715d94a168b6c"
+      },
+      {
+        "name": "profile-absent",
+        "command": [
+          "/tmp/plato-llm-integration/base-313/bin/python",
+          "-B",
+          "-m",
+          "pytest",
+          "tests/test_mlx_profile_contract.py",
+          "tests/test_mlx_import_contract.py",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--basetemp=/tmp/plato-mlx-final-independent-review/profile-absent-tmp",
+          "--junitxml=/tmp/plato-mlx-final-independent-review/profile-absent.xml"
+        ],
+        "exit_status": 0,
+        "log": "/tmp/plato-mlx-final-independent-review/profile-absent.log",
+        "log_sha256": "589423a88460b070cd35c5075def60e5ed2a5e586e49dab7ede0a2f04bce1ca6"
+      },
+      {
+        "name": "dispatch-independent",
+        "command": [
+          "/tmp/plato-mlx-final/env/bin/python",
+          "-B",
+          "/tmp/plato-mlx-final-independent-review/independent_dispatch.py"
+        ],
+        "exit_status": 0,
+        "log": "/tmp/plato-mlx-final-independent-review/dispatch-independent.log",
+        "log_sha256": "dee6799792bd658f4c4c667c8a6be74af73f3f014e40c25da7d4b89e2dc38f42"
+      },
+      {
+        "name": "frontdoors-installed",
+        "command": [
+          "/tmp/plato-mlx-final/env/bin/python",
+          "-B",
+          "/tmp/plato-mlx-final-independent-review/independent_frontdoors.py",
+          "/tmp/plato-mlx-final-independent-review/frontdoors-installed.json"
+        ],
+        "exit_status": 0,
+        "log": "/tmp/plato-mlx-final-independent-review/frontdoors-installed.log",
+        "log_sha256": "19860609eb444e48020e86e62b7dd6649c4e5ac2efd9fd0fc567d79994beafd7"
+      },
+      {
+        "name": "frontdoors-absent",
+        "command": [
+          "/tmp/plato-llm-integration/base-313/bin/python",
+          "-B",
+          "/tmp/plato-mlx-final-independent-review/independent_frontdoors.py",
+          "/tmp/plato-mlx-final-independent-review/frontdoors-absent.json"
+        ],
+        "exit_status": 0,
+        "log": "/tmp/plato-mlx-final-independent-review/frontdoors-absent.log",
+        "log_sha256": "a2bafc1fecb4eba5d66f6ceeb2c770f8676a0545527e387166fd73428b6a63f3"
+      },
+      {
+        "name": "collection-default",
+        "command": [
+          "/tmp/plato-mlx-final/env/bin/python",
+          "-B",
+          "/tmp/plato-mlx-final-independent-review/independent_import.py",
+          "/tmp/plato-mlx-final-independent-review/collection-default.json",
+          "observe",
+          "tests",
+          "--collect-only"
+        ],
+        "exit_status": 0,
+        "log": "/tmp/plato-mlx-final-independent-review/collection-default.log",
+        "log_sha256": "6cd44a0379c6065a3d4e1f19a7aa267d5714835a7a25911679ecbc9ed8413ef1"
+      },
+      {
+        "name": "collection-sentinel",
+        "command": [
+          "/tmp/plato-mlx-final/env/bin/python",
+          "-B",
+          "/tmp/plato-mlx-final-independent-review/independent_import.py",
+          "/tmp/plato-mlx-final-independent-review/collection-sentinel.json",
+          "sentinel",
+          "tests",
+          "--collect-only",
+          "--test-profile=base"
+        ],
+        "exit_status": 0,
+        "log": "/tmp/plato-mlx-final-independent-review/collection-sentinel.log",
+        "log_sha256": "7249a1a2fa969bd1d1bc31e80e19ba323af4095b56bdb83ca9b7ac077e1bea96"
+      },
+      {
+        "name": "collection-runtime",
+        "command": [
+          "/tmp/plato-mlx-final/env/bin/python",
+          "-B",
+          "/tmp/plato-mlx-final-independent-review/independent_import.py",
+          "/tmp/plato-mlx-final-independent-review/collection-runtime.json",
+          "observe",
+          "tests",
+          "--collect-only",
+          "--test-profile=mandatory",
+          "-m",
+          "runtime"
+        ],
+        "exit_status": 0,
+        "log": "/tmp/plato-mlx-final-independent-review/collection-runtime.log",
+        "log_sha256": "44cfb4139b6b5c754551bfa5a508890e2c3bebb5e1940d4d218643e32d6bd714"
+      },
+      {
+        "name": "collection-full-native",
+        "command": [
+          "/tmp/plato-mlx-final/env/bin/python",
+          "-B",
+          "/tmp/plato-mlx-final-independent-review/independent_import.py",
+          "/tmp/plato-mlx-final-independent-review/collection-full-native.json",
+          "observe",
+          "tests/mlx_native",
+          "--collect-only",
+          "--test-profile=mlx-native"
+        ],
+        "exit_status": 0,
+        "log": "/tmp/plato-mlx-final-independent-review/collection-full-native.log",
+        "log_sha256": "dc9b27dace62681815505682d328915cd2995831fd1d4e50fe7e31c875629d02"
+      },
+      {
+        "name": "socket-instrumentation",
+        "command": [
+          "/tmp/plato-mlx-final/env/bin/python",
+          "-B",
+          "-m",
+          "pytest",
+          "tests/mlx_native/test_phase3_socket.py",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--basetemp=/tmp/plato-mlx-final-independent-review/socket-instrumentation-tmp",
+          "--junitxml=/tmp/plato-mlx-final-independent-review/socket-instrumentation.xml"
+        ],
+        "exit_status": 0,
+        "log": "/tmp/plato-mlx-final-independent-review/socket-instrumentation.log",
+        "log_sha256": "0adcb6a9dfc9a453a0d53e7b79811c72e86275b222275934b48d6f59167ac829"
+      }
+    ],
+    "pytest": {
+      "native-focused": {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "0",
+        "tests": "445",
+        "time": "26.793",
+        "timestamp": "2026-10-03T16:16:00.928297-04:00",
+        "hostname": "miami.csl.utoronto.ca"
+      },
+      "profile-installed": {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "0",
+        "tests": "107",
+        "time": "57.978",
+        "timestamp": "2026-10-03T16:16:00.927975-04:00",
+        "hostname": "miami.csl.utoronto.ca"
+      },
+      "profile-absent": {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "0",
+        "tests": "107",
+        "time": "55.740",
+        "timestamp": "2026-10-03T16:16:01.578242-04:00",
+        "hostname": "miami.csl.utoronto.ca"
+      },
+      "socket-instrumentation": {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "0",
+        "tests": "1",
+        "time": "13.511",
+        "timestamp": "2026-10-03T16:22:08.630536-04:00",
+        "hostname": "miami.csl.utoronto.ca"
+      }
+    },
+    "total_executed_pytest_cases": 660,
+    "all_tests_zero_skip_failure_error": true,
+    "typing": "All24paths ty0 in real installed native Python3.13 and genuine absent-MLX base Python3.13 with static Linux target; required RuffI0.",
+    "collections": [
+      {
+        "name": "collection-default",
+        "exit_status": 0,
+        "node_count": 1440,
+        "native_node_count": 0,
+        "startup_count": 48,
+        "runtime_count": 51,
+        "backend_modules": 0,
+        "allowed_metadata_presence_queries": 1,
+        "native_counter_matches_frozen_ledger": null
+      },
+      {
+        "name": "collection-sentinel",
+        "exit_status": 0,
+        "node_count": 1440,
+        "native_node_count": 0,
+        "startup_count": 48,
+        "runtime_count": 51,
+        "backend_modules": 0,
+        "allowed_metadata_presence_queries": 1,
+        "native_counter_matches_frozen_ledger": null
+      },
+      {
+        "name": "collection-runtime",
+        "exit_status": 0,
+        "node_count": 51,
+        "native_node_count": 0,
+        "startup_count": 48,
+        "runtime_count": 51,
+        "backend_modules": 0,
+        "allowed_metadata_presence_queries": 1,
+        "native_counter_matches_frozen_ledger": null
+      },
+      {
+        "name": "collection-full-native",
+        "exit_status": 0,
+        "node_count": 383,
+        "native_node_count": 383,
+        "startup_count": 0,
+        "runtime_count": 0,
+        "backend_modules": 36,
+        "allowed_metadata_presence_queries": 1,
+        "native_counter_matches_frozen_ledger": true
+      }
+    ],
+    "dispatch": {
+      "invalid_cases": 120,
+      "valid_8_24_controls": 6,
+      "zero_total_controls": 4,
+      "details": "120 late-hook invalid shape/container/count/order/identity cases reject before subtraction/aggregation/load; global model, retained baseline and post-hook caller objects remain unchanged. Six valid copied positional controls produce3.25; four zero-total direct/delta controls preserve baseline.",
+      "accepted_positional_limit": {
+        "accepted_unlabeled_deep_copied_semantic_swap": true,
+        "result_bias": 1.75,
+        "interpretation": "Caller must preserve positional correspondence; shape and identity checks cannot infer copied semantic provenance."
+      }
+    },
+    "frontdoors_installed": {
+      "backend_absent_until_explicit_native": true,
+      "core_torch_and_custom_factories_preserved": true,
+      "mlx_distribution_version": "0.32.3",
+      "mixed_numpy_torch_mlx_serialization": true,
+      "tree_loaded_before_native_detects_later_arrays": true,
+      "upstream_caller_context_control": {
+        "cpu_stream_before": "Stream(Device(cpu, 0), 2)",
+        "cpu_stream_after": "Stream(Device(cpu, 0), 3)",
+        "device_restored": true,
+        "no_plato_operation_in_control": true
+      },
+      "custom_native_factories_not_overwritten": true,
+      "captured_lazy_wrappers_preserve_custom_registry_entries": true,
+      "native_builtin_exact_constructor_cache": true,
+      "native_model_device_placements": [
+        {
+          "mode": "normal",
+          "observed": "Device(gpu, 0)"
+        },
+        {
+          "mode": "cpu",
+          "observed": "Device(cpu, 0)"
+        },
+        {
+          "mode": "metal",
+          "observed": "Device(gpu, 0)"
+        },
+        {
+          "mode": "both",
+          "observed": "Device(cpu, 0)"
+        }
+      ],
+      "native_seeded_success_and_failure_restore_all_rngs_streams_devices": true,
+      "native_trainer_type_guard": true
+    },
+    "frontdoors_absent": {
+      "backend_absent_until_explicit_native": true,
+      "core_torch_and_custom_factories_preserved": true,
+      "mlx_distribution_version": null,
+      "native_model_explicit_missing_diagnostic": "MLX models require the optional mlx dependency on Apple Silicon.",
+      "native_algorithm_explicit_missing_diagnostic": "MLX is not installed. Install it with `pip install mlx` on Apple Silicon devices. Original import error: No module named 'mlx'"
+    },
+    "preflight_optional_algorithm": {
+      "preflight_rows": [
+        {
+          "device": "cpu",
+          "value_kind": "real",
+          "outcome": "pass",
+          "state": {
+            "active": "caller",
+            "evaluated": [
+              "cpu",
+              "gpu"
+            ],
+            "synchronized": [
+              "cpu",
+              "gpu"
+            ]
+          }
+        },
+        {
+          "device": "cpu",
+          "value_kind": "complex",
+          "outcome": "mlx-native prerequisite failed (Darwin arm64): cpu arithmetic returned complex (3+0j)",
+          "state": {
+            "active": "caller",
+            "evaluated": [
+              "cpu"
+            ],
+            "synchronized": [
+              "cpu"
+            ]
+          }
+        },
+        {
+          "device": "cpu",
+          "value_kind": "imaginary",
+          "outcome": "mlx-native prerequisite failed (Darwin arm64): cpu arithmetic returned complex (3+1j)",
+          "state": {
+            "active": "caller",
+            "evaluated": [
+              "cpu"
+            ],
+            "synchronized": [
+              "cpu"
+            ]
+          }
+        },
+        {
+          "device": "cpu",
+          "value_kind": "nan",
+          "outcome": "mlx-native prerequisite failed (Darwin arm64): cpu arithmetic returned nan",
+          "state": {
+            "active": "caller",
+            "evaluated": [
+              "cpu"
+            ],
+            "synchronized": [
+              "cpu"
+            ]
+          }
+        },
+        {
+          "device": "cpu",
+          "value_kind": "infinite",
+          "outcome": "mlx-native prerequisite failed (Darwin arm64): cpu arithmetic returned inf",
+          "state": {
+            "active": "caller",
+            "evaluated": [
+              "cpu"
+            ],
+            "synchronized": [
+              "cpu"
+            ]
+          }
+        },
+        {
+          "device": "cpu",
+          "value_kind": "wrong",
+          "outcome": "mlx-native prerequisite failed (Darwin arm64): cpu arithmetic returned 4.0",
+          "state": {
+            "active": "caller",
+            "evaluated": [
+              "cpu"
+            ],
+            "synchronized": [
+              "cpu"
+            ]
+          }
+        },
+        {
+          "device": "cpu",
+          "value_kind": "none",
+          "outcome": "mlx-native prerequisite failed (Darwin arm64): float() argument must be a string or a real number, not 'NoneType'",
+          "state": {
+            "active": "caller",
+            "evaluated": [
+              "cpu"
+            ],
+            "synchronized": [
+              "cpu"
+            ]
+          }
+        },
+        {
+          "device": "gpu",
+          "value_kind": "real",
+          "outcome": "pass",
+          "state": {
+            "active": "caller",
+            "evaluated": [
+              "cpu",
+              "gpu"
+            ],
+            "synchronized": [
+              "cpu",
+              "gpu"
+            ]
+          }
+        },
+        {
+          "device": "gpu",
+          "value_kind": "complex",
+          "outcome": "mlx-native prerequisite failed (Darwin arm64): gpu arithmetic returned complex (3+0j)",
+          "state": {
+            "active": "caller",
+            "evaluated": [
+              "cpu",
+              "gpu"
+            ],
+            "synchronized": [
+              "cpu",
+              "gpu"
+            ]
+          }
+        },
+        {
+          "device": "gpu",
+          "value_kind": "imaginary",
+          "outcome": "mlx-native prerequisite failed (Darwin arm64): gpu arithmetic returned complex (3+1j)",
+          "state": {
+            "active": "caller",
+            "evaluated": [
+              "cpu",
+              "gpu"
+            ],
+            "synchronized": [
+              "cpu",
+              "gpu"
+            ]
+          }
+        },
+        {
+          "device": "gpu",
+          "value_kind": "nan",
+          "outcome": "mlx-native prerequisite failed (Darwin arm64): gpu arithmetic returned nan",
+          "state": {
+            "active": "caller",
+            "evaluated": [
+              "cpu",
+              "gpu"
+            ],
+            "synchronized": [
+              "cpu",
+              "gpu"
+            ]
+          }
+        },
+        {
+          "device": "gpu",
+          "value_kind": "infinite",
+          "outcome": "mlx-native prerequisite failed (Darwin arm64): gpu arithmetic returned inf",
+          "state": {
+            "active": "caller",
+            "evaluated": [
+              "cpu",
+              "gpu"
+            ],
+            "synchronized": [
+              "cpu",
+              "gpu"
+            ]
+          }
+        },
+        {
+          "device": "gpu",
+          "value_kind": "wrong",
+          "outcome": "mlx-native prerequisite failed (Darwin arm64): gpu arithmetic returned 4.0",
+          "state": {
+            "active": "caller",
+            "evaluated": [
+              "cpu",
+              "gpu"
+            ],
+            "synchronized": [
+              "cpu",
+              "gpu"
+            ]
+          }
+        },
+        {
+          "device": "gpu",
+          "value_kind": "none",
+          "outcome": "mlx-native prerequisite failed (Darwin arm64): float() argument must be a string or a real number, not 'NoneType'",
+          "state": {
+            "active": "caller",
+            "evaluated": [
+              "cpu",
+              "gpu"
+            ],
+            "synchronized": [
+              "cpu",
+              "gpu"
+            ]
+          }
+        }
+      ],
+      "exact_final_production_function_AST": true,
+      "production_import_did_not_load_backend": true,
+      "missing_algorithm_valid_behavior_preserved": true,
+      "missing_algorithm_negative_count_still_rejected": true,
+      "provided_baseline_avoids_extra_extraction": true
+    },
+    "assertion_audit": {
+      "tests/mlx_native/test_phase3_controls.py": {
+        "all_assertions_and_numpy_testing_calls_AST_preserved_after_identity_cast_and_alias_normalization": true,
+        "functions_checked": 10
+      },
+      "tests/mlx_native/test_phase3_rng.py": {
+        "all_assertions_and_numpy_testing_calls_AST_preserved_after_identity_cast_and_alias_normalization": true,
+        "functions_checked": 4
+      },
+      "tests/mlx_native/test_phase3_runtime.py": {
+        "all_assertions_and_numpy_testing_calls_AST_preserved_after_identity_cast_and_alias_normalization": true,
+        "functions_checked": 7
+      },
+      "tests/mlx_native/test_phase3_tree_contract.py": {
+        "all_assertions_and_numpy_testing_calls_AST_preserved_after_identity_cast_and_alias_normalization": true,
+        "functions_checked": 2
+      },
+      "tests/test_mlx_profile_contract.py": {
+        "all_assertions_and_numpy_testing_calls_AST_preserved_after_identity_cast_and_alias_normalization": true,
+        "functions_checked": 28
+      }
+    },
+    "packaging": {
+      "raw_sdist_hashes_and_sizes_verified": {
+        "before": {
+          "path": "/tmp/plato-mlx-integration/package-audit/plato_learn-1.4.3.tar.gz",
+          "bytes": 102900650,
+          "sha256": "396f16e0ee033b5ddfac771d9ebc8d72bd56f7b3a4cae585630fa3b7628fb339"
+        },
+        "after": {
+          "path": "/tmp/plato-mlx-profile-typing/root-package-after/plato_learn-1.4.3.tar.gz",
+          "bytes": 11178831,
+          "sha256": "c6366a9308314e12612a05e2490d394ca4eb1f2fc7393f87c5ec84c7573352d8"
+        }
+      },
+      "before_members": 1466,
+      "after_members": 1386,
+      "removed_members": [
+        "evidence/2026-refresh/reproductions/llm-final-linux-qualification-manifest.json",
+        "evidence/2026-refresh/reproductions/llm-final-linux-qualification.tar.gz",
+        "evidence/2026-refresh/reproductions/llm-retirement-local-qualification-manifest.json",
+        "evidence/2026-refresh/reproductions/llm-retirement-local-qualification.tar.gz",
+        "evidence/2026-refresh/reproductions/phase2-accepted-review-raw-evidence-manifest.json",
+        "evidence/2026-refresh/reproductions/phase2-accepted-review-raw-evidence.tar.gz",
+        "evidence/2026-refresh/reproductions/phase2-ci-correction-review-manifest.json",
+        "evidence/2026-refresh/reproductions/phase2-ci-correction-review.tar.gz",
+        "evidence/2026-refresh/reproductions/phase2-count-collection-author-evidence-manifest.json",
+        "evidence/2026-refresh/reproductions/phase2-count-collection-author-evidence.tar.gz",
+        "evidence/2026-refresh/reproductions/phase2-count-collection-review-evidence-manifest.json",
+        "evidence/2026-refresh/reproductions/phase2-count-collection-review-evidence.tar.gz",
+        "evidence/2026-refresh/reproductions/phase2-dp-typing-author-evidence-manifest.json",
+        "evidence/2026-refresh/reproductions/phase2-dp-typing-author-evidence.tar.gz",
+        "evidence/2026-refresh/reproductions/phase2-dp-typing-review-evidence-manifest.json",
+        "evidence/2026-refresh/reproductions/phase2-dp-typing-review-evidence.tar.gz",
+        "evidence/2026-refresh/reproductions/phase2-final-docs-ci-author-evidence-manifest.json",
+        "evidence/2026-refresh/reproductions/phase2-final-docs-ci-author-evidence.tar.gz",
+        "evidence/2026-refresh/reproductions/phase2-final-integration/audit_source.py",
+        "evidence/2026-refresh/reproductions/phase2-final-integration/final-correction-combination.json",
+        "evidence/2026-refresh/reproductions/phase2-final-integration/initial-archive-verification.json",
+        "evidence/2026-refresh/reproductions/phase2-final-integration/integration-plan.json",
+        "evidence/2026-refresh/reproductions/phase2-final-integration/run_integration_profile.py",
+        "evidence/2026-refresh/reproductions/phase2-final-integration/verification.json",
+        "evidence/2026-refresh/reproductions/phase2-final-integration/wheel-vendor-assets-phase4.json",
+        "evidence/2026-refresh/reproductions/phase2-final-linux-qualification-manifest.json",
+        "evidence/2026-refresh/reproductions/phase2-final-linux-qualification.tar.gz",
+        "evidence/2026-refresh/reproductions/phase2-final-local-qualification-manifest.json",
+        "evidence/2026-refresh/reproductions/phase2-final-local-qualification.tar.gz",
+        "evidence/2026-refresh/reproductions/phase2-initial-integration-2633-evidence-manifest.json",
+        "evidence/2026-refresh/reproductions/phase2-initial-integration-2633-evidence.tar.gz",
+        "evidence/2026-refresh/reproductions/phase2-integration/audit_source.py",
+        "evidence/2026-refresh/reproductions/phase2-integration/final-criteria-mapping.json",
+        "evidence/2026-refresh/reproductions/phase2-integration/integration-plan.json",
+        "evidence/2026-refresh/reproductions/phase2-integration/object-and-evidence-verification.json",
+        "evidence/2026-refresh/reproductions/phase2-integration/proposed-component-combination.json",
+        "evidence/2026-refresh/reproductions/phase2-integration/retained-receipt-verification.json",
+        "evidence/2026-refresh/reproductions/phase2-integration/run_integration_profile.py",
+        "evidence/2026-refresh/reproductions/phase2-linux-initial-failure-manifest.json",
+        "evidence/2026-refresh/reproductions/phase2-linux-initial-failure.tar.gz",
+        "evidence/2026-refresh/reproductions/phase2-root/amp-clipping-probe-314.json",
+        "evidence/2026-refresh/reproductions/phase2-root/amp-clipping-probe.json",
+        "evidence/2026-refresh/reproductions/phase2-root/amp_clipping_probe.py",
+        "evidence/2026-refresh/reproductions/phase2-root/apfl_identity_probe.py",
+        "evidence/2026-refresh/reproductions/phase2-root/control_identity_probe.py",
+        "evidence/2026-refresh/reproductions/phase2-root/dp_checkpoint_probe.py",
+        "evidence/2026-refresh/reproductions/phase2-root/dp_probe.py",
+        "evidence/2026-refresh/reproductions/phase2-root/dp_steps_probe.py",
+        "evidence/2026-refresh/reproductions/phase2-root/manifest.json",
+        "evidence/2026-refresh/reproductions/phase2-root/merged-resume-313.initial.stderr",
+        "evidence/2026-refresh/reproductions/phase2-root/merged-resume-313.json",
+        "evidence/2026-refresh/reproductions/phase2-root/merged-resume-313.stderr",
+        "evidence/2026-refresh/reproductions/phase2-root/merged-resume-314.initial.stderr",
+        "evidence/2026-refresh/reproductions/phase2-root/merged-resume-314.json",
+        "evidence/2026-refresh/reproductions/phase2-root/merged-resume-314.stderr",
+        "evidence/2026-refresh/reproductions/phase2-root/merged_checkpoint_resume_probe.initial.py",
+        "evidence/2026-refresh/reproductions/phase2-root/merged_checkpoint_resume_probe.py",
+        "evidence/2026-refresh/reproductions/phase2-root/metadata_wire_probe.py",
+        "evidence/2026-refresh/reproductions/phase2-root/prepared_image_probe.py",
+        "evidence/2026-refresh/reproductions/phase2-root/scaffold_numerical_probe.py",
+        "evidence/2026-refresh/reproductions/phase2-root/server-resume-rng-313.json",
+        "evidence/2026-refresh/reproductions/phase2-root/server-resume-rng-314.json",
+        "evidence/2026-refresh/reproductions/phase2-root/server_resume_rng_probe.py",
+        "evidence/2026-refresh/reproductions/phase2-root/split_evaluation_probe.py",
+        "evidence/2026-refresh/reproductions/phase2-root/trainer_lifecycle_probe.py",
+        "evidence/2026-refresh/reproductions/phase2-root/urgent_checkpoint_probe.py",
+        "evidence/2026-refresh/reproductions/phase2-root/urgent_shared_sid.py",
+        "evidence/2026-refresh/reproductions/phase2c-13e-author-evidence-manifest.json",
+        "evidence/2026-refresh/reproductions/phase2c-13e-author-evidence.tar.gz",
+        "evidence/2026-refresh/reproductions/phase2c-8b-count-author-evidence-manifest.json",
+        "evidence/2026-refresh/reproductions/phase2c-8b-count-author-evidence.tar.gz",
+        "evidence/2026-refresh/reproductions/phase2c-feddyn-review1-evidence-manifest.json",
+        "evidence/2026-refresh/reproductions/phase2c-feddyn-review1-evidence.tar.gz",
+        "evidence/2026-refresh/reproductions/phase2c-feddyn-review2-evidence-manifest.json",
+        "evidence/2026-refresh/reproductions/phase2c-feddyn-review2-evidence.tar.gz",
+        "evidence/2026-refresh/reproductions/phase2c-scaffold-review4-evidence-manifest.json",
+        "evidence/2026-refresh/reproductions/phase2c-scaffold-review4-evidence.tar.gz",
+        "evidence/2026-refresh/reproductions/phase3-mlx-native-qualification.tar.gz",
+        "evidence/2026-refresh/reproductions/phase3-mlx-selector-correction.tar.gz",
+        "evidence/2026-refresh/reproductions/python314-dependency-audit.tar.gz"
+      ],
+      "added_members": [],
+      "changed_retained_members": [
+        "pyproject.toml"
+      ],
+      "unchanged_retained_members": 1385,
+      "retained_wheels_byte_identical": true,
+      "wheel_sha256": "49f542edee7865ee77ca849dfbd7733e9b023812a4deed7a33497b8b75afc46e",
+      "source_limit": "Package pair isolates only manifest exclusion on frozen0929; it does not bind all final6311 Python changes."
+    },
+    "native_evidence_archive": {
+      "archive_sha256": "52aed1bdfac2e88044ee9679b2c838068f79e31515ece43c8c5c54a04b6653f2",
+      "manifest_sha256": "338c4d4cde0b4c0815eedab9c4da25cd6d3b3673ce181e93e8926a17756d7974",
+      "manifest_members": 31,
+      "all_manifest_members_verified": true
+    },
+    "frozen_native_handoff": {
+      "383_node_IDs_and_all_E1_E7_criteria_exactly_match_final_ledger": true,
+      "handoff_sha256": "26da4791e33fc4ea14a46cfa061bfcd228609caa988a35f255209dd9f3e46d82"
+    },
+    "socket_result": {
+      "case": "socket_native",
+      "options": {},
+      "command": [
+        "/tmp/plato-mlx-final/env/bin/python",
+        "-B",
+        "-m",
+        "tests.mlx_native.socket_probe"
+      ],
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [],
+      "elapsed": 13.439259458100423,
+      "survivors": [],
+      "processes": {
+        "22760": 1791058928.693226,
+        "22763": 1791058931.917687,
+        "22764": 1791058931.925294,
+        "22765": 1791058931.929162
+      },
+      "events": [
+        {
+          "event": "child_started",
+          "pid": 22760,
+          "wall": 1791058931.9279559,
+          "child_pid": 22764,
+          "created": 1791058931.925294
+        },
+        {
+          "event": "child_started",
+          "pid": 22760,
+          "wall": 1791058931.9323342,
+          "child_pid": 22765,
+          "created": 1791058931.929162
+        },
+        {
+          "event": "server_baseline",
+          "pid": 22760,
+          "wall": 1791058940.428589,
+          "weights_file": "server_baseline-22760-0-round-0.safetensors"
+        },
+        {
+          "event": "round_started",
+          "pid": 22760,
+          "wall": 1791058940.4325051,
+          "round": 1,
+          "clients": [
+            2,
+            1
+          ]
+        },
+        {
+          "event": "server_received",
+          "pid": 22760,
+          "wall": 1791058940.4520051,
+          "weights_file": "server_received-22760-1-round-1.safetensors",
+          "client_id": 1,
+          "samples": 8,
+          "round": 1
+        },
+        {
+          "event": "server_received",
+          "pid": 22760,
+          "wall": 1791058940.452481,
+          "weights_file": "server_received-22760-2-round-1.safetensors",
+          "client_id": 2,
+          "samples": 24,
+          "round": 1
+        },
+        {
+          "event": "server_aggregate",
+          "pid": 22760,
+          "wall": 1791058940.4541051,
+          "weights_file": "server_aggregate-22760-0-round-1.safetensors",
+          "round": 1
+        },
+        {
+          "event": "server_close_started",
+          "pid": 22760,
+          "wall": 1791058940.456349,
+          "round": 1
+        },
+        {
+          "event": "client_baseline",
+          "pid": 22764,
+          "wall": 1791058940.446775,
+          "weights_file": "client_baseline-22764-1-round-1.safetensors",
+          "client_id": 1,
+          "round": 1
+        },
+        {
+          "event": "client_trained",
+          "pid": 22764,
+          "wall": 1791058940.447484,
+          "weights_file": "client_trained-22764-1-round-1.safetensors",
+          "client_id": 1,
+          "samples": 8,
+          "loss": 2.3224315643310547,
+          "device": "Device(gpu, 0)",
+          "round": 1
+        },
+        {
+          "event": "child_returned",
+          "pid": 22764,
+          "wall": 1791058941.467097,
+          "process_client_id": 1
+        },
+        {
+          "event": "client_baseline",
+          "pid": 22765,
+          "wall": 1791058940.449385,
+          "weights_file": "client_baseline-22765-2-round-1.safetensors",
+          "client_id": 2,
+          "round": 1
+        },
+        {
+          "event": "client_trained",
+          "pid": 22765,
+          "wall": 1791058940.449866,
+          "weights_file": "client_trained-22765-2-round-1.safetensors",
+          "client_id": 2,
+          "samples": 24,
+          "loss": 2.252690076828003,
+          "device": "Device(gpu, 0)",
+          "round": 1
+        },
+        {
+          "event": "child_returned",
+          "pid": 22765,
+          "wall": 1791058941.468073,
+          "process_client_id": 2
+        }
+      ],
+      "stdout": "======== Running on http://127.0.0.1:53117 ========\n(Press CTRL+C to quit)\n",
+      "stderr": "[INFO][16:22:11]: \u001b[93m\u001b[1m[22760] Logging runtime results to: /private/tmp/plato-mlx-final-independent-review/socket-instrumentation-tmp/test_real_native_lenet_two_cli0/socket/results/22760.csv.\u001b[0m\n[INFO][16:22:11]: [Server #22760] Started training on 2 clients with 2 per round.\n[INFO][16:22:11]: [Server #22760] Configuring the server...\n[INFO][16:22:11]: Training: 1 rounds\n\n[INFO][16:22:11]: Trainer: mlx\n[INFO][16:22:11]: Algorithm: mlx_fedavg\n[INFO][16:22:11]: Server: Using Processor for sending payload: safetensor_encode\n[INFO][16:22:11]: Server: Using Processor for receiving payload: safetensor_decode\n[INFO][16:22:11]: Starting client #1's process.\n[INFO][16:22:11]: Starting client #2's process.\n[INFO][16:22:11]: Setting the random seed for selecting clients: 7\n[INFO][16:22:11]: Starting a server at address 127.0.0.1 and port 53117.\n[INFO][16:22:15]: Starting a custom client #1.\n[INFO][16:22:15]: Trainer: mlx\n[INFO][16:22:15]: Starting a custom client #2.\n[INFO][16:22:15]: Trainer: mlx\n[INFO][16:22:15]: Algorithm: mlx_fedavg\n[INFO][16:22:15]: Algorithm: mlx_fedavg\n[INFO][16:22:15]: Client: Using Processor for sending payload: safetensor_encode\n[INFO][16:22:15]: Client: Using Processor for sending payload: safetensor_encode\n[INFO][16:22:15]: Client: Using Processor for receiving payload: safetensor_decode\n[INFO][16:22:15]: Client: Using Processor for receiving payload: safetensor_decode\n[INFO][16:22:20]: [Client #2] Contacting the server.\n[INFO][16:22:20]: [Client #1] Contacting the server.\n[INFO][16:22:20]: [Client #2] Connecting to the server at http://127.0.0.1:53117.\n[INFO][16:22:20]: [Client #1] Connecting to the server at http://127.0.0.1:53117.\n[INFO][16:22:20]: 127.0.0.1 [03/Oct/2026:16:22:20 -0400] \"GET /socket.io/?transport=polling&EIO=4&t=1791058940.4152489 HTTP/1.1\" 200 316 \"-\" \"Python/3.13 aiohttp/3.14.3\"\n[INFO][16:22:20]: 127.0.0.1 [03/Oct/2026:16:22:20 -0400] \"GET /socket.io/?transport=polling&EIO=4&t=1791058940.416666 HTTP/1.1\" 200 316 \"-\" \"Python/3.13 aiohttp/3.14.3\"\n[INFO][16:22:20]: [Server #22760] A new client just connected.\n[INFO][16:22:20]: [Server #22760] A new client just connected.\n[INFO][16:22:20]: [Client #2] Connected to the server.\n[INFO][16:22:20]: [Client #2] Waiting to be selected.\n[INFO][16:22:20]: [Client #1] Connected to the server.\n[INFO][16:22:20]: [Client #1] Waiting to be selected.\n[INFO][16:22:20]: [Server #22760] New client with id #2 arrived.\n[INFO][16:22:20]: [Server #22760] Client process #22765 registered.\n[INFO][16:22:20]: [Server #22760] New client with id #1 arrived.\n[INFO][16:22:20]: [Server #22760] Client process #22764 registered.\n[INFO][16:22:20]: [Server #22760] Starting training.\n[INFO][16:22:20]: \u001b[93m\u001b[1m\n[Server #22760] Starting round 1/1.\u001b[0m\n[INFO][16:22:20]: [Server] Selected clients: [2, 1]\n[INFO][16:22:20]: [Server #22760] Selecting client #2 for training.\n[INFO][16:22:20]: [Server #22760] Sending the current model to client #2.\n[INFO][16:22:20]: [Client #2] Selected by the server.\n[INFO][16:22:20]: [Client #2] Loading its data source...\n[INFO][16:22:20]: [Server #22760] Sent 0.17 MB of payload data to client #2.\n[INFO][16:22:20]: [Server #22760] Selecting client #1 for training.\n[INFO][16:22:20]: [Client #2] Dataset size: 32\n[INFO][16:22:20]: Client: Using Processor for sending payload: safetensor_encode\n[INFO][16:22:20]: Client: Using Processor for receiving payload: safetensor_decode\n[INFO][16:22:20]: [Client #2] Sampler: mlx_native_fixture\n[INFO][16:22:20]: [Server #22760] Sending the current model to client #1.\n[INFO][16:22:20]: [Client #1] Selected by the server.\n[INFO][16:22:20]: [Client #2] Received 0.17 MB of payload data from the server.\n[INFO][16:22:20]: [Client #2] Start to process inbound data.\n[INFO][16:22:20]: [Client #1] Loading its data source...\n[INFO][16:22:20]: [Server #22760] Sent 0.17 MB of payload data to client #1.\n[INFO][16:22:20]: [Client #1] Dataset size: 32\n[INFO][16:22:20]: Client: Using Processor for sending payload: safetensor_encode\n[INFO][16:22:20]: Client: Using Processor for receiving payload: safetensor_decode\n[INFO][16:22:20]: [Client #1] Sampler: mlx_native_fixture\n[INFO][16:22:20]: \u001b[93m\u001b[1m[Client #2] Started training in communication round #1.\u001b[0m\n[INFO][16:22:20]: [Client #2] Loading the dataset with size 24.\n[INFO][16:22:20]: \u001b[93m\u001b[1m[Client #2] Started training epoch 1.\u001b[0m\n[INFO][16:22:20]: [Client #1] Received 0.17 MB of payload data from the server.\n[INFO][16:22:20]: [Client #1] Start to process inbound data.\n[INFO][16:22:20]: \u001b[93m\u001b[1m[Client #1] Started training in communication round #1.\u001b[0m\n[INFO][16:22:20]: [Client #1] Loading the dataset with size 8.\n[INFO][16:22:20]: \u001b[93m\u001b[1m[Client #1] Started training epoch 1.\u001b[0m\n[INFO][16:22:20]: [Client #2] Epoch: [1/1][0/3]\tLoss: 2.309627\n[INFO][16:22:20]: [Client #1] Epoch: [1/1][0/1]\tLoss: 2.322432\n[INFO][16:22:20]: [Client #1] MLX model saved to /private/tmp/plato-mlx-final-independent-review/socket-instrumentation-tmp/test_real_native_lenet_two_cli0/socket/models/pretrained/lenet5_1_22764.safetensors.\n[INFO][16:22:20]: [Client #1] Inbound data has been processed.\n[INFO][16:22:20]: [Client #1] Outbound data is ready to be sent after being processed.\n[INFO][16:22:20]: [Client #1] Sent 0.17 MB of payload data to the server.\n[INFO][16:22:20]: [Client #2] MLX model saved to /private/tmp/plato-mlx-final-independent-review/socket-instrumentation-tmp/test_real_native_lenet_two_cli0/socket/models/pretrained/lenet5_2_22765.safetensors.\n[INFO][16:22:20]: [Client #2] Inbound data has been processed.\n[INFO][16:22:20]: [Server #22760] Received 0.17 MB of payload data from client #1.\n[INFO][16:22:20]: [Client #2] Outbound data is ready to be sent after being processed.\n[INFO][16:22:20]: [Client #2] Sent 0.17 MB of payload data to the server.\n[INFO][16:22:20]: [Server #22760] Received 0.17 MB of payload data from client #2.\n[INFO][16:22:20]: [Server #22760] All 2 client report(s) received. Processing.\n[INFO][16:22:20]: [Server #22760] Updated weights have been received.\n[INFO][16:22:20]: [Server #22760] Aggregating model weights directly rather than weight deltas.\n[INFO][16:22:20]: [Server #22760] Finished aggregating updated weights.\n[INFO][16:22:20]: [Server #22760] Average client accuracy: 0.00%.\n[INFO][16:22:20]: \u001b[93m\u001b[1m[Server #22760] Global model accuracy: 0.00%\n\u001b[0m\n[INFO][16:22:20]: [Server #22760] All client reports have been processed.\n[INFO][16:22:20]: [Server #22760] Saving the checkpoint to /private/tmp/plato-mlx-final-independent-review/socket-instrumentation-tmp/test_real_native_lenet_two_cli0/socket/checkpoints/checkpoint_lenet5_1.safetensors.\n[INFO][16:22:20]: [Server] MLX model saved to /private/tmp/plato-mlx-final-independent-review/socket-instrumentation-tmp/test_real_native_lenet_two_cli0/socket/checkpoints/checkpoint_lenet5_1.safetensors.\n[INFO][16:22:20]: Target number of training rounds reached.\n[INFO][16:22:20]: [Server #22760] Training concluded.\n[INFO][16:22:20]: [Server] MLX model saved to /private/tmp/plato-mlx-final-independent-review/socket-instrumentation-tmp/test_real_native_lenet_two_cli0/socket/models/pretrained/lenet5.safetensors.\n[INFO][16:22:20]: [Server #22760] Closing the server.\n[INFO][16:22:20]: Closing the connection to client #22765.\n[INFO][16:22:20]: Closing the connection to client #22764.\n[INFO][16:22:20]: [Client #2] The server disconnected the connection.\n[INFO][16:22:20]: [Client #1] The server disconnected the connection.\n[INFO][16:22:21]: [Client #1] Disconnect cleanup finished.\n[INFO][16:22:21]: [Client #2] Disconnect cleanup finished.\n",
+      "port": 53117
+    },
+    "root_full_typing_receipt_independently_classified": {
+      "log": {
+        "path": "/tmp/plato-mlx-final/checks/base-linux-full-typing.log",
+        "sha256": "464bf55aa6584996d443bb261d83ce86ad25c805200a25b63f3906df1c45bb75"
+      },
+      "summary": {
+        "command": [
+          "/tmp/plato-mlx-final/env/bin/ty",
+          "check",
+          "--python",
+          "/tmp/plato-llm-integration/base-313/bin/python",
+          "--python-version",
+          "3.13",
+          "--python-platform",
+          "linux",
+          "--output-format",
+          "concise"
+        ],
+        "returncode": 1,
+        "total": 661,
+        "owned": [],
+        "source": "6311960cdd00955d4777e269ebee460be591065e",
+        "limitation": "Static Linux target using genuine absent-MLX macOS base environment, not actual Linux execution."
+      },
+      "all661_diagnostics_parsed": true,
+      "zero24_changed_paths": true,
+      "exact_final_CI_classifier_execution": {
+        "exact_final_classifier_passed": true,
+        "only_input_artifact_path_redirected": true,
+        "full_typing_diagnostics": 661,
+        "whole_repository_typing_clean": false,
+        "workflow_sha256": "1ae4bf9d5be394b77a105ab294527a27ec8f2c123e46ac179e97fc148f843b75"
+      },
+      "limitation": "Root-produced full log independently classified, not a reviewer full-repository rerun or whole-repository typing-clean claim."
+    }
+  },
+  "historical_evidence_and_limits": {
+    "E8": "Historical E8 timings remain bound to measured original source. Final-hook/lazy/typing corrections were not remeasured; no new performance, compiled-benefit or full-round claim; eager remains default.",
+    "preflight_semantics": "Rejection adds no mutations after intentional mutable hook side effects; it does not promise rollback of hook actions. Copied unlabeled same-schema trees retain positional correspondence contract, so schema/identity cannot infer copied semantic association.",
+    "platform": "Only Python3.13 used. Native probes execute actual Apple arm64 CPU/Metal. Absent-MLX Linux static target is run on macOS base environment, not actual Linux runtime qualification.",
+    "full_qualification": "Root-final383 native execution receipt read and retained separately; reviewer ran445focused native/server plus1real socket and214profile cases, not the complete profile execution. Old0929 full-core/DP/runtime qualification remains historical-source-bound. Final actual Linux CI gate remains root-owned and pending; this bounded acceptance does not approve merging or complete delivery.",
+    "docs": "Prior docs review remains separately accepted; all final delta paths inspected and no documentation changes introduced.",
+    "other_limits": "Float32 training/float16 host transport/bfloat16 limit, weight-only checkpoint, same-environment replay, and prebuilt caller lazy-graph placement limits remain unchanged."
+  },
+  "harness_notes": [
+    "Initial source-audit hash equality intentionally exposed the native-author full fedavg file retaining retired Nanochat code; bounded correction-method binding and exact root delta were then verified. No source mutation or failure suppressed.",
+    "Copied independent dispatch harness first lacked its task-owned runtime directory. Initial failure log/status retained; creating only that directory produced120valid rejects/6valid controls/4zero controls. No production/assertion change.",
+    "Fresh dispatch/frontdoor/import probes adapt previous independent reviewer harness only by changing task-owned artifacts/bootstrap and final source configuration paths; assertions remain unchanged. Adaptation provenance retained."
+  ],
+  "source_integrity": {
+    "worktree": "/tmp/plato-refresh-worktrees/mlx-final",
+    "clean_before_and_after": true,
+    "no_source_edits": true,
+    "read_only_environments": true
+  },
+  "artifacts": [
+    {
+      "path": "/tmp/plato-mlx-final-independent-review/CI-classifier-execution.json",
+      "sha256": "d5bc69d3604582b0a909a6478cc6e2ad2b881e8aeff830f6a2a7d70e85e888b9"
+    },
+    {
+      "path": "/tmp/plato-mlx-final-independent-review/adapted-probes-provenance.json",
+      "sha256": "f9c6fdac9d6a169d0c44d2e0dadb5c3db5be9f7dc5532fa2bba26f42dfa27107"
+    },
+    {
+      "path": "/tmp/plato-mlx-final-independent-review/assertion-audit.json",
+      "sha256": "a33beffef98a45f6af1219b09af5a798227923ccb146cd3b5f422315e4f4e213"
+    },
+    {
+      "path": "/tmp/plato-mlx-final-independent-review/assertion_audit.py",
+      "sha256": "0bd4c5f152f81b12886726fb4805a5d8b5ed2efe16f27e6c6bac70248f350f81"
+    },
+    {
+      "path": "/tmp/plato-mlx-final-independent-review/collection-default-status.json",
+      "sha256": "d4f7902108bae113da08c01ac45cd441349c41fe3d25979d1bc5d3444997317c"
+    },
+    {
+      "path": "/tmp/plato-mlx-final-independent-review/collection-default.json",
+      "sha256": "62adb440e83821333e2d9799b1dd139f577d34d0c000f30a576df72769c0fb69"
+    },
+    {
+      "path": "/tmp/plato-mlx-final-independent-review/collection-default.log",
+      "sha256": "6cd44a0379c6065a3d4e1f19a7aa267d5714835a7a25911679ecbc9ed8413ef1"
+    },
+    {
+      "path": "/tmp/plato-mlx-final-independent-review/collection-full-native-status.json",
+      "sha256": "1b38a14fd4495e423f88d8a7d41926f95451ce5c8661272c78c4936d6429d97c"
+    },
+    {
+      "path": "/tmp/plato-mlx-final-independent-review/collection-full-native.json",
+      "sha256": "9a450a799c01d2a6f17eb3124d139c13cacfafd76000427087ac324d7e6826ec"
+    },
+    {
+      "path": "/tmp/plato-mlx-final-independent-review/collection-full-native.log",
+      "sha256": "dc9b27dace62681815505682d328915cd2995831fd1d4e50fe7e31c875629d02"
+    },
+    {
+      "path": "/tmp/plato-mlx-final-independent-review/collection-runtime-status.json",
+      "sha256": "e3a4d39e04bebceaea3f0d1ec4c8a627b8da87c47276bc48e3b146f556579e32"
+    },
+    {
+      "path": "/tmp/plato-mlx-final-independent-review/collection-runtime.json",
+      "sha256": "3b926dd3417fc51919c7a72c8f4155a227a5e0859d2b34f4e1145eb7257658fa"
+    },
+    {
+      "path": "/tmp/plato-mlx-final-independent-review/collection-runtime.log",
+      "sha256": "44cfb4139b6b5c754551bfa5a508890e2c3bebb5e1940d4d218643e32d6bd714"
+    },
+    {
+      "path": "/tmp/plato-mlx-final-independent-review/collection-sentinel-status.json",
+      "sha256": "4bf4b0f5bfa3127f2fe6860c4013cdf3410a93a89f0ad1b41bbb1d0eace31e61"
+    },
+    {
+      "path": "/tmp/plato-mlx-final-independent-review/collection-sentinel.json",
+      "sha256": "62adb440e83821333e2d9799b1dd139f577d34d0c000f30a576df72769c0fb69"
+    },
+    {
+      "path": "/tmp/plato-mlx-final-independent-review/collection-sentinel.log",
+      "sha256": "7249a1a2fa969bd1d1bc31e80e19ba323af4095b56bdb83ca9b7ac077e1bea96"
+    },
+    {
+      "path": "/tmp/plato-mlx-final-independent-review/dispatch-independent-initial-harness-failure-status.json",
+      "sha256": "c46cc646de54db3683bd80a9b1afbd0b11f31427513fe5f3e4005aa0067f12b6"
+    },
+    {
+      "path": "/tmp/plato-mlx-final-independent-review/dispatch-independent-initial-harness-failure.log",
+      "sha256": "b830382643062c59e35d6e3734448a0cedd3e53de94a21173246a8e8bf5ad2b9"
+    },
+    {
+      "path": "/tmp/plato-mlx-final-independent-review/dispatch-independent-status.json",
+      "sha256": "0f825bafe8b983635897aaa902d97b7cdab928b77215e320de7425069b355441"
+    },
+    {
+      "path": "/tmp/plato-mlx-final-independent-review/dispatch-independent.log",
+      "sha256": "dee6799792bd658f4c4c667c8a6be74af73f3f014e40c25da7d4b89e2dc38f42"
+    },
+    {
+      "path": "/tmp/plato-mlx-final-independent-review/environments.json",
+      "sha256": "aa7d933aa4c629139d4b77d8ae1e3a9e571580b61d18982fbf6b7077d3836932"
+    },
+    {
+      "path": "/tmp/plato-mlx-final-independent-review/extra_audits.py",
+      "sha256": "3fc5d213f65602550a1986d99dac7ced2fbabb5c3e162154db3bdd4d3319793f"
+    },
+    {
+      "path": "/tmp/plato-mlx-final-independent-review/frontdoors-absent-status.json",
+      "sha256": "eb64c6925449da9bcb18da78bba5fee2136958e69c9361b99138d89a9369ef05"
+    },
+    {
+      "path": "/tmp/plato-mlx-final-independent-review/frontdoors-absent.json",
+      "sha256": "16df67bfc07f056f77324196fff444d090b09050e82b3c66aa6ed82e3a3ff3ae"
+    },
+    {
+      "path": "/tmp/plato-mlx-final-independent-review/frontdoors-absent.log",
+      "sha256": "a2bafc1fecb4eba5d66f6ceeb2c770f8676a0545527e387166fd73428b6a63f3"
+    },
+    {
+      "path": "/tmp/plato-mlx-final-independent-review/frontdoors-installed-status.json",
+      "sha256": "fa0cd275e535c8d3056159286f83d1bb790edb28b7bf7252f59e3659e5d5224c"
+    },
+    {
+      "path": "/tmp/plato-mlx-final-independent-review/frontdoors-installed.json",
+      "sha256": "8564c8a9f602a8169fac0ea7463ed235c3c248c248b0c1a811af661b1065ac21"
+    },
+    {
+      "path": "/tmp/plato-mlx-final-independent-review/frontdoors-installed.log",
+      "sha256": "19860609eb444e48020e86e62b7dd6649c4e5ac2efd9fd0fc567d79994beafd7"
+    },
+    {
+      "path": "/tmp/plato-mlx-final-independent-review/independent-dispatch-results.json",
+      "sha256": "3e037fe58a31c9c9a9ebcc8aadf734269810d7dacaa42a00cbd84a1aef9ee126"
+    },
+    {
+      "path": "/tmp/plato-mlx-final-independent-review/independent_dispatch.py",
+      "sha256": "781990bdb2335ee6268a43894faf31eb07b7044aaeb9e323d4422fe0e185cd2f"
+    },
+    {
+      "path": "/tmp/plato-mlx-final-independent-review/independent_frontdoors.py",
+      "sha256": "cd5d48bfb9b33dc10c9e66a489512aa7bea13068feb2579a626ec74a60fc4c22"
+    },
+    {
+      "path": "/tmp/plato-mlx-final-independent-review/independent_import.py",
+      "sha256": "d35ebf36489e822999bba62bb73364271923a7701c82ad111396345087be7e6e"
+    },
+    {
+      "path": "/tmp/plato-mlx-final-independent-review/native-archive-audit.json",
+      "sha256": "d721c01eb15e5704699240502c8ff8c695e5d91869597c1e07b6c93f2743bf5e"
+    },
+    {
+      "path": "/tmp/plato-mlx-final-independent-review/native-focused-status.json",
+      "sha256": "0d2c4d93f0de178eb79c2e53b73957cbe1b51802f044c8ec72db9644bf84739d"
+    },
+    {
+      "path": "/tmp/plato-mlx-final-independent-review/native-focused.log",
+      "sha256": "77597549be2ea327b0b5cd9dd88a7139333bb5cf8ffcaa99c9584263395c433e"
+    },
+    {
+      "path": "/tmp/plato-mlx-final-independent-review/native-focused.xml",
+      "sha256": "598c4a005ca6587bd626152fa99be93ccb4ca732c133f80ab1f44d3c103ddba2"
+    },
+    {
+      "path": "/tmp/plato-mlx-final-independent-review/package-audit.json",
+      "sha256": "f066283734cc1de76f0b09b06f5ffdff2e2e60c14ad96fd6d5be85d427e69e4c"
+    },
+    {
+      "path": "/tmp/plato-mlx-final-independent-review/preflight-and-optional-algorithm.json",
+      "sha256": "15dde3148cf9ce855d8f6ddf77f6bf15dc9ab9714c1363debef7565a4c457327"
+    },
+    {
+      "path": "/tmp/plato-mlx-final-independent-review/profile-absent-status.json",
+      "sha256": "34d84d3a118e3301d11f64ae2d3cb158706021440a29b17de94cb500f240bfd3"
+    },
+    {
+      "path": "/tmp/plato-mlx-final-independent-review/profile-absent.log",
+      "sha256": "589423a88460b070cd35c5075def60e5ed2a5e586e49dab7ede0a2f04bce1ca6"
+    },
+    {
+      "path": "/tmp/plato-mlx-final-independent-review/profile-absent.xml",
+      "sha256": "64325ccb01f86184918d107696b5decb7433dc19aefb0510c1ae9c598e8ab362"
+    },
+    {
+      "path": "/tmp/plato-mlx-final-independent-review/profile-installed-status.json",
+      "sha256": "273150ea3da7ab3b6a8c981fecfed07687f59beca1bf5bb43b8ac03c85a0d990"
+    },
+    {
+      "path": "/tmp/plato-mlx-final-independent-review/profile-installed.log",
+      "sha256": "5fe26477c922b9e18a1dd98b63639fc92a3a2b07ab3765a5aa1715d94a168b6c"
+    },
+    {
+      "path": "/tmp/plato-mlx-final-independent-review/profile-installed.xml",
+      "sha256": "11aa6d4633c6fa64e62e7163ec24d4590133eb1d7bea8fd4a8bb4d8840aab762"
+    },
+    {
+      "path": "/tmp/plato-mlx-final-independent-review/ruff-required-status.json",
+      "sha256": "3bd47037b4f6b606157eb58cf9d78751ac7343708b66d9b9650ebdb578627cad"
+    },
+    {
+      "path": "/tmp/plato-mlx-final-independent-review/ruff-required.log",
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "path": "/tmp/plato-mlx-final-independent-review/ruff-status.json",
+      "sha256": "ddc7fd949e4dd6efd5dd8b1bea3df92f31517633b0730bd64c136c26ce53c0d2"
+    },
+    {
+      "path": "/tmp/plato-mlx-final-independent-review/ruff.log",
+      "sha256": "490dd89ee11a0a4595b5b710d21a7cab33c69bd05343dbfc54885fa0635133e2"
+    },
+    {
+      "path": "/tmp/plato-mlx-final-independent-review/run_checks.py",
+      "sha256": "5b9d11d2e5f748a5cdab7934602e4e164a5f9e9fbf553439f9245f2683c31874"
+    },
+    {
+      "path": "/tmp/plato-mlx-final-independent-review/socket-instrumentation-status.json",
+      "sha256": "bcb7e9960e0fc3f56cc8c23612b9c48617bedd874dcbceb6e7aa4b2b731f0238"
+    },
+    {
+      "path": "/tmp/plato-mlx-final-independent-review/socket-instrumentation.log",
+      "sha256": "0adcb6a9dfc9a453a0d53e7b79811c72e86275b222275934b48d6f59167ac829"
+    },
+    {
+      "path": "/tmp/plato-mlx-final-independent-review/socket-instrumentation.xml",
+      "sha256": "2ad81dc30af1dae0acaf228a01aad69ef6049e059c4bdf59ffb1a4a6047cc7c5"
+    },
+    {
+      "path": "/tmp/plato-mlx-final-independent-review/source-audit.json",
+      "sha256": "ef1549b90bf3e474e8dc714958cca53c4d297bcea2c38457c74cbd0236c50788"
+    },
+    {
+      "path": "/tmp/plato-mlx-final-independent-review/typing-absent-linux-status.json",
+      "sha256": "2409920721d01baad0f26ded74a6695b8967becff2b1258146ce914152cd6e3a"
+    },
+    {
+      "path": "/tmp/plato-mlx-final-independent-review/typing-absent-linux.log",
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "path": "/tmp/plato-mlx-final-independent-review/typing-installed-status.json",
+      "sha256": "0af490b90f1dd8291ecb7231118605e35c929342189ba3afd7a6f8a03a2b7f10"
+    },
+    {
+      "path": "/tmp/plato-mlx-final-independent-review/typing-installed.log",
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "path": "/tmp/plato-mlx-final-independent-review/write_report.py",
+      "sha256": "f468d9838bf9b63039aca66c00dcd9d6ef238631668549ecbd5ec9448cb83bd8"
+    }
+  ],
+  "root_native_execution_receipt": {
+    "path": "/tmp/plato-mlx-final/run-mlx-native/receipt.json",
+    "sha256": "b7c5cf658062f6946d0fc706cae60771428a958dcfcd3cbf48c522d31dea39e7"
+  },
+  "completion": {
+    "bounded_review_complete": true,
+    "original_author_correction_required": false,
+    "root_delivery_gates_remain": true
+  }
+}
