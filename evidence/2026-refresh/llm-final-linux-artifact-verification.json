@@ -1,0 +1,19 @@
+{
+  "status": "PASS_ARTIFACT_BYTES_AND_SOURCE_BINDING",
+  "published_head": "1130ff0250ee26a49328e15cf5596f430c468c9d",
+  "ci_merge": "f3f165d921dcc015e5d8ea0647e388235d4801de",
+  "tree": "82af1367f106218d0de98f46775c011e0afd930c",
+  "run": 37143836327,
+  "artifact_files": 3245,
+  "summary": {
+    "included_files": 3245,
+    "included_bytes": 10625269,
+    "omitted_entries": 4133,
+    "omitted_regular_bytes": 499856536,
+    "omitted_reasons": {
+      "reproducible_unit_fixture": 3366,
+      "symlink_not_followed": 767
+    }
+  },
+  "manifest_sha256": "499ca2425e6aed546933b32804d29048fcff2f29396f75694274d8f4e85e2aa6"
+}

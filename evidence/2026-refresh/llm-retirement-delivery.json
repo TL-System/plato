@@ -1,0 +1,12 @@
+{
+  "pr": 418,
+  "url": "https://github.com/TL-System/plato/pull/418",
+  "published_head": "1130ff0250ee26a49328e15cf5596f430c468c9d",
+  "merge_commit": "477f2f1bb52a1b5a58c1f9f2d30f640039f83a8e",
+  "merged_at": "2026-10-03T19:03:38Z",
+  "tree": "82af1367f106218d0de98f46775c011e0afd930c",
+  "published_and_merged_trees_equal": true,
+  "acceptance": "/tmp/plato-llm-integration/llm-final-linux-acceptance.json",
+  "status": "MERGED_AFTER_LOCAL_AND_LINUX_QUALIFICATION",
+  "cleanup": "Pending completed LLM worktrees; preserve llm-integrated environment bindings and active MLX worktrees."
+}
