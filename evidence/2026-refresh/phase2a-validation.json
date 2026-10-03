@@ -2,7 +2,7 @@
   "schema_version": 1,
   "task": "2A: configuration, active non-adapter datasources and samplers",
   "date": "2026-10-03",
-  "status": "R2A3-01 corrected with both-version red/green, untouched reviewer reproduction and clean base checks; prior contracts preserved. Fresh review4 and root integration pending.",
+  "status": "R2A4-01 corrected with both-version actual red/green, untouched review4/review3 author reruns and clean base checks; prior contracts preserved. Fresh independent review5 and root integration pending.",
   "identity": {
     "worktree": "/private/tmp/plato-refresh-worktrees/data",
     "branch": "maintenance/2026-phase2-data",
@@ -35,23 +35,27 @@
       {
         "sha": "5f4749d74bd70ff808e7bf52f2a8142ffed737d3",
         "subject": "Preserved default Tiny ImageNet recovery eligibility under its guard."
+      },
+      {
+        "sha": "f03695692307ea1175feb4b2b8ee3ee2c4240e91",
+        "subject": "Retained canonical ZIP archives through failed recovery downloads."
       }
     ],
-    "final_implementation_commit": "5f4749d74bd70ff808e7bf52f2a8142ffed737d3",
-    "final_implementation_tree": "760789001a60345c5f3079607ae667c98bfad9b3",
-    "baseline_to_final_binary_diff_sha256": "a92fb1719323796a48defb991b27e7ab3f2975626fcf4d557b21d17ce004478f",
-    "evidence_commit_contract": "Prior exact implementation/evidence commits and immutable review inputs remain in history. This JSON is committed in an evidence-only child of 5f4749d74bd70ff808e7bf52f2a8142ffed737d3. The containing child cannot embed its own hash; its exact terminal SHA is supplied in the final root handoff. Validated runtime/test/archive content identifies the exact implementation parent above.",
+    "final_implementation_commit": "f03695692307ea1175feb4b2b8ee3ee2c4240e91",
+    "final_implementation_tree": "f1e5d84d072050046882231bcfc94f3f85512a11",
+    "baseline_to_final_binary_diff_sha256": "95517fddc2bac734556266af843ab5972994d57a0ace7de6840ef91f194325f0",
+    "evidence_commit_contract": "Prior exact implementation/evidence commits and immutable review inputs remain in history. This JSON is committed in an evidence-only child of f03695692307ea1175feb4b2b8ee3ee2c4240e91. The containing child cannot embed its own hash; its exact terminal SHA is supplied in the final root handoff. Validated runtime/test/archive content identifies the exact implementation parent above.",
     "tracked_tree_before_evidence": "clean",
     "shared_metadata": "pyproject.toml, uv.lock, CI and shared conftest unchanged; no push, merge, PR edit, submodule update or other worktree/environment mutation.",
     "previous_candidate": {
-      "commit": "150a48860b556eab1575178891577dd07dc6f06d",
-      "tree": "f9a191f004077f32f01bf0a4ae651c173a914b2c",
-      "implementation": "49fe01e4787d3cb30ffaf82b59bacae932470453",
-      "evidence_commit": "150a48860b556eab1575178891577dd07dc6f06d",
-      "evidence_file_sha256": "88dbc7a7684e4b2b2e6748f2b6c0bc9a3f0c9ebb644c2db3d6bb2dd33597e677",
-      "verdict": "CHANGES_REQUESTED; one remaining medium default-recovery finding, source-attributed in review3_corrections."
+      "commit": "d26f2bc7bbd770dee86ae571e57ca79773a456a2",
+      "tree": "2ff60f07855a156de244974234ff2ae5c7021c7a",
+      "implementation": "5f4749d74bd70ff808e7bf52f2a8142ffed737d3",
+      "evidence_commit": "d26f2bc7bbd770dee86ae571e57ca79773a456a2",
+      "evidence_file_sha256": "f646800fec1cff3369d80c1d9ee6b735db9fbd473f577152c97219e7046ba72c",
+      "verdict": "CHANGES_REQUESTED; one remaining medium coupled default-recovery finding, source-attributed in review4_corrections."
     },
-    "previous_candidate_to_final_binary_diff_sha256": "5499be50f7e2097effbd53d9fb96dd0c00235a28bb818aba38f373d1abf02544",
+    "previous_candidate_to_final_binary_diff_sha256": "205b1e193fca5ef14e7025cc4c8f7eed9fa43ee25b88d45e482ca0279d688fc4",
     "earlier_candidates": [
       {
         "commit": "a7bfd3dcdf7aaf3ec3ca466a1b5f27efa58054eb",
@@ -67,6 +71,14 @@
         "evidence_commit": "b728a5b71d0945828dcf288a39b796b1e0fb4ec7",
         "evidence_file_sha256": "03515ac7b4e51f75fa74b4e872b0b98e42e68ddf1f4f06e858407511a974877f",
         "verdict": "CHANGES_REQUESTED; two remaining medium findings. Immutable second review source is attributed below."
+      },
+      {
+        "commit": "150a48860b556eab1575178891577dd07dc6f06d",
+        "tree": "f9a191f004077f32f01bf0a4ae651c173a914b2c",
+        "implementation": "49fe01e4787d3cb30ffaf82b59bacae932470453",
+        "evidence_commit": "150a48860b556eab1575178891577dd07dc6f06d",
+        "evidence_file_sha256": "88dbc7a7684e4b2b2e6748f2b6c0bc9a3f0c9ebb644c2db3d6bb2dd33597e677",
+        "verdict": "CHANGES_REQUESTED; one remaining medium default-recovery finding, source-attributed in review3_corrections."
       }
     ]
   },
@@ -185,6 +197,10 @@
     {
       "inventory": "Tiny default-source failed/readiness recovery and concurrent initialization eligibility; no other production paths changed.",
       "outcome": "Actual default/configured HTTP/ZIP/native/sample regressions cover failed readiness followed by a restored source, plus a contender during paused recovery with absent completion. All seven new tests and original 226 pass on each interpreter; clean base passes 436/4 allowed skips, 48 authorized runtime deselections. Original reviewer four-case script passes unchanged against owned source. Generic lock/unrelated ZIP cannot authorize incomplete manual native roots."
+    },
+    {
+      "inventory": "Review4 coupled ZIP recovery error cleanup in owned base.py; Tiny eligibility and all prior production paths unchanged.",
+      "outcome": "Three real default restored-retry failures captured on both versions, with six controls passing; staging correction passes all nine, full 242 focused and clean base 445/4 allowed skips/48 authorized runtime deselections per version. Untouched review4 eight cases and prior review3 four cases pass per version with source/HTTP/marker/sample observations. At the implementation commit all prior tracked blobs except base.py remain byte-identical to d26, with 14 archival originals rechecked against fda60bec and no active archive references."
     }
   ],
   "confirmed_findings": [
@@ -482,24 +498,24 @@
       ]
     },
     "green": {
-      "command": "OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2a-lZqbqj/venv-{python}/bin/python -m pytest tests/test_config_loader.py tests/samplers tests/datasources/test_registry.py tests/datasources/test_torchvision_datasource.py tests/datasources/test_feature_dataset.py tests/datasources/test_feature_datasource.py tests/datasources/test_data_loaders.py tests/datasources/test_download_contracts.py tests/datasources/test_local_datasets.py tests/datasources/test_review_regressions.py tests/datasources/test_review2_regressions.py tests/datasources/test_review3_regressions.py tests/utils/test_archive.py -q --basetemp=/tmp/plato-phase2a-lZqbqj/revision3/focused-fixtures-{python}",
+      "command": "OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2a-lZqbqj/venv-{python}/bin/python -m pytest tests/test_config_loader.py tests/samplers tests/datasources/test_registry.py tests/datasources/test_torchvision_datasource.py tests/datasources/test_feature_dataset.py tests/datasources/test_feature_datasource.py tests/datasources/test_data_loaders.py tests/datasources/test_download_contracts.py tests/datasources/test_local_datasets.py tests/datasources/test_review_regressions.py tests/datasources/test_review2_regressions.py tests/datasources/test_review3_regressions.py tests/datasources/test_review4_regressions.py tests/utils/test_archive.py -q --basetemp=/tmp/plato-phase2a-lZqbqj/revision4/focused-fixtures-{python}",
       "3.13": {
-        "log": "revision3/green-focused-3.13.log",
-        "passed": 233,
+        "log": "revision4/green-focused-3.13.log",
+        "passed": 242,
         "failed": 0,
         "skipped": 0,
         "warnings": 0,
-        "seconds": 9.75
+        "seconds": 28.52
       },
       "3.14": {
-        "log": "revision3/green-focused-3.14.log",
-        "passed": 233,
+        "log": "revision4/green-focused-3.14.log",
+        "passed": 242,
         "failed": 0,
         "skipped": 0,
         "warnings": 0,
-        "seconds": 45.48
+        "seconds": 64.29
       },
-      "negative_paths": "Five-second IID/empty-padding/class-pool/minimum subprocess guards; dead-lock three-second retry guard; live-lock contender must emit ready before waiting; inert local HTTP/archive failures and no-outside-write/no-completion assertions. Plus six invalid edge-role/training cases, real killed NPZ writers, corrupt/missing-key/mismatched-shape caches, unknown evaluation classes, incomplete unlabeled native trees and readiness rejection without completion. Also actual constructor rebuilding of incompatible, nonfinite, fractional and out-of-class-range caches; required train/evaluation image removal while directories, annotations and completion markers remain. Also default/configured failed-readiness retry, live recovery contenders, and incomplete manually prepared native roots with absent/generic/unrelated recovery artifacts.",
+      "negative_paths": "Five-second IID/empty-padding/class-pool/minimum subprocess guards; dead-lock three-second retry guard; live-lock contender must emit ready before waiting; inert local HTTP/archive failures and no-outside-write/no-completion assertions. Plus six invalid edge-role/training cases, real killed NPZ writers, corrupt/missing-key/mismatched-shape caches, unknown evaluation classes, incomplete unlabeled native trees and readiness rejection without completion. Also actual constructor rebuilding of incompatible, nonfinite, fractional and out-of-class-range caches; required train/evaluation image removal while directories, annotations and completion markers remain. Also default/configured failed-readiness retry, live recovery contenders, and incomplete manually prepared native roots with absent/generic/unrelated recovery artifacts. Also actual HTTP 503, invalid ZIP and truncated response recovery with restored default/configured sources, retained canonical ZIP, absent incomplete completion, no leftover staging and fresh-download failure controls.",
       "no_weakened_checks": "No broad suppressions, blanket API modernization, mirror-only tests, changed shared fixtures or dropped existing assertions."
     },
     "ssl_transform_smoke": {
@@ -524,18 +540,19 @@
     },
     "static_checks": [
       {
-        "command": "/tmp/plato-phase2a-lZqbqj/venv-3.13/bin/ruff check plato/config.py plato/datasources plato/samplers tests/test_config_loader.py tests/samplers/test_partition_contracts.py tests/datasources/test_download_contracts.py tests/datasources/test_local_datasets.py tests/datasources/test_review_regressions.py tests/datasources/test_review2_regressions.py tests/datasources/test_review3_regressions.py plato/utils/archive.py tests/utils/test_archive.py --select I",
+        "command": "/tmp/plato-phase2a-lZqbqj/venv-3.13/bin/ruff check plato/config.py plato/datasources plato/samplers tests/test_config_loader.py tests/samplers/test_partition_contracts.py tests/datasources/test_download_contracts.py tests/datasources/test_local_datasets.py tests/datasources/test_review_regressions.py tests/datasources/test_review2_regressions.py tests/datasources/test_review3_regressions.py tests/datasources/test_review4_regressions.py plato/utils/archive.py tests/utils/test_archive.py --select I",
         "result": "All checks passed",
-        "log": "revision3/ruff.log"
+        "log": "revision4/ruff.log"
       },
       {
         "command": "/tmp/plato-phase2a-lZqbqj/venv-3.13/bin/ty check plato/config.py plato/datasources/base.py plato/datasources/cinic10.py plato/datasources/purchase.py plato/datasources/texas.py plato/datasources/tiny_imagenet.py plato/datasources/_vector_cache.py plato/datasources/_image_folder.py plato/datasources/feature.py plato/datasources/feature_dataset.py plato/datasources/femnist.py plato/datasources/registry.py plato/datasources/self_supervised_learning.py plato/datasources/torchvision.py plato/samplers plato/utils/archive.py --output-format concise",
         "result": "All checks passed; no suppressions",
-        "log": "revision3/typing.log"
+        "log": "revision4/typing.log"
       },
       {
         "command": "git diff --check",
-        "result": "clean"
+        "result": "clean",
+        "log": "revision4/diff-check.log"
       }
     ],
     "harness_notes": "Before the controlled cache-red rerun, a preliminary test omitted network interception and its owned pytest process (PID 43177) was terminated when external URL retrieval stalled. Final cache tests fail any unexpected download. Early SSL argv/base harness was corrected before recorded successful probes. Neither preliminary harness outcome is claimed as production evidence.",
@@ -582,24 +599,24 @@
       "no_weakened_checks": "No broad suppressions, blanket API modernization, mirror-only tests, changed shared fixtures or dropped existing assertions."
     },
     "clean_base_profile": {
-      "command": "HF_HUB_OFFLINE=1 HF_DATASETS_OFFLINE=1 PYTHONDONTWRITEBYTECODE=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 TOKENIZERS_PARALLELISM=false /tmp/plato-phase2a-lZqbqj/revision2/base-{python}/bin/python -m pytest tests --test-profile=base -m 'not runtime' -ra --basetemp=/tmp/plato-phase2a-lZqbqj/revision3/base-fixtures-{python} --junitxml=/tmp/plato-phase2a-lZqbqj/revision3/base-{python}.xml",
+      "command": "HF_HUB_OFFLINE=1 HF_DATASETS_OFFLINE=1 PYTHONDONTWRITEBYTECODE=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 TOKENIZERS_PARALLELISM=false /tmp/plato-phase2a-lZqbqj/revision2/base-{python}/bin/python -m pytest tests --test-profile=base -m 'not runtime' -ra --basetemp=/tmp/plato-phase2a-lZqbqj/revision4/base-fixtures-{python} --junitxml=/tmp/plato-phase2a-lZqbqj/revision4/base-{python}.xml",
       "3.13": {
-        "log": "revision3/green-base-3.13.log",
-        "passed": 436,
+        "log": "revision4/green-base-3.13.log",
+        "passed": 445,
         "failed": 0,
         "skipped": 4,
         "warnings": 0,
         "deselected": 48,
-        "seconds": 20.8
+        "seconds": 39.05
       },
       "3.14": {
-        "log": "revision3/green-base-3.14.log",
-        "passed": 436,
+        "log": "revision4/green-base-3.14.log",
+        "passed": 445,
         "failed": 0,
         "skipped": 4,
         "warnings": 0,
         "deselected": 48,
-        "seconds": 58.18
+        "seconds": 76.65
       },
       "allowed_skips": "One DP loader node: opacus absent. Three Nanochat integration nodes: base profile omits this optional integration. No other skips or warnings.",
       "runtime_scope": "The unchanged 48 socket/runtime cases were explicitly deselected as authorized; no shared runtime changes justify repeating that matrix."
@@ -647,7 +664,67 @@
       },
       "allowed_skips": "One DP loader node: opacus absent. Three Nanochat integration nodes: base profile omits this optional integration. No other skips or warnings.",
       "runtime_scope": "The unchanged 48 socket/runtime cases were explicitly deselected as authorized; no shared runtime changes justify repeating that matrix."
-    }
+    },
+    "previous_review3_candidate_green": {
+      "command": "OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2a-lZqbqj/venv-{python}/bin/python -m pytest tests/test_config_loader.py tests/samplers tests/datasources/test_registry.py tests/datasources/test_torchvision_datasource.py tests/datasources/test_feature_dataset.py tests/datasources/test_feature_datasource.py tests/datasources/test_data_loaders.py tests/datasources/test_download_contracts.py tests/datasources/test_local_datasets.py tests/datasources/test_review_regressions.py tests/datasources/test_review2_regressions.py tests/datasources/test_review3_regressions.py tests/utils/test_archive.py -q --basetemp=/tmp/plato-phase2a-lZqbqj/revision3/focused-fixtures-{python}",
+      "3.13": {
+        "log": "revision3/green-focused-3.13.log",
+        "passed": 233,
+        "failed": 0,
+        "skipped": 0,
+        "warnings": 0,
+        "seconds": 9.75
+      },
+      "3.14": {
+        "log": "revision3/green-focused-3.14.log",
+        "passed": 233,
+        "failed": 0,
+        "skipped": 0,
+        "warnings": 0,
+        "seconds": 45.48
+      },
+      "negative_paths": "Five-second IID/empty-padding/class-pool/minimum subprocess guards; dead-lock three-second retry guard; live-lock contender must emit ready before waiting; inert local HTTP/archive failures and no-outside-write/no-completion assertions. Plus six invalid edge-role/training cases, real killed NPZ writers, corrupt/missing-key/mismatched-shape caches, unknown evaluation classes, incomplete unlabeled native trees and readiness rejection without completion. Also actual constructor rebuilding of incompatible, nonfinite, fractional and out-of-class-range caches; required train/evaluation image removal while directories, annotations and completion markers remain. Also default/configured failed-readiness retry, live recovery contenders, and incomplete manually prepared native roots with absent/generic/unrelated recovery artifacts.",
+      "no_weakened_checks": "No broad suppressions, blanket API modernization, mirror-only tests, changed shared fixtures or dropped existing assertions."
+    },
+    "previous_review3_clean_base_profile": {
+      "command": "HF_HUB_OFFLINE=1 HF_DATASETS_OFFLINE=1 PYTHONDONTWRITEBYTECODE=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 TOKENIZERS_PARALLELISM=false /tmp/plato-phase2a-lZqbqj/revision2/base-{python}/bin/python -m pytest tests --test-profile=base -m 'not runtime' -ra --basetemp=/tmp/plato-phase2a-lZqbqj/revision3/base-fixtures-{python} --junitxml=/tmp/plato-phase2a-lZqbqj/revision3/base-{python}.xml",
+      "3.13": {
+        "log": "revision3/green-base-3.13.log",
+        "passed": 436,
+        "failed": 0,
+        "skipped": 4,
+        "warnings": 0,
+        "deselected": 48,
+        "seconds": 20.8
+      },
+      "3.14": {
+        "log": "revision3/green-base-3.14.log",
+        "passed": 436,
+        "failed": 0,
+        "skipped": 4,
+        "warnings": 0,
+        "deselected": 48,
+        "seconds": 58.18
+      },
+      "allowed_skips": "One DP loader node: opacus absent. Three Nanochat integration nodes: base profile omits this optional integration. No other skips or warnings.",
+      "runtime_scope": "The unchanged 48 socket/runtime cases were explicitly deselected as authorized; no shared runtime changes justify repeating that matrix."
+    },
+    "previous_review3_static_checks": [
+      {
+        "command": "/tmp/plato-phase2a-lZqbqj/venv-3.13/bin/ruff check plato/config.py plato/datasources plato/samplers tests/test_config_loader.py tests/samplers/test_partition_contracts.py tests/datasources/test_download_contracts.py tests/datasources/test_local_datasets.py tests/datasources/test_review_regressions.py tests/datasources/test_review2_regressions.py tests/datasources/test_review3_regressions.py plato/utils/archive.py tests/utils/test_archive.py --select I",
+        "result": "All checks passed",
+        "log": "revision3/ruff.log"
+      },
+      {
+        "command": "/tmp/plato-phase2a-lZqbqj/venv-3.13/bin/ty check plato/config.py plato/datasources/base.py plato/datasources/cinic10.py plato/datasources/purchase.py plato/datasources/texas.py plato/datasources/tiny_imagenet.py plato/datasources/_vector_cache.py plato/datasources/_image_folder.py plato/datasources/feature.py plato/datasources/feature_dataset.py plato/datasources/femnist.py plato/datasources/registry.py plato/datasources/self_supervised_learning.py plato/datasources/torchvision.py plato/samplers plato/utils/archive.py --output-format concise",
+        "result": "All checks passed; no suppressions",
+        "log": "revision3/typing.log"
+      },
+      {
+        "command": "git diff --check",
+        "result": "clean"
+      }
+    ]
   },
   "primary_documentation_consulted": [
     {
@@ -680,7 +757,7 @@
     },
     {
       "url": "https://docs.python.org/3.13/library/os.html#os.replace",
-      "use": "Successful same-filesystem replacement publishes atomically; temporary file lives beside final cache."
+      "use": "Successful same-filesystem replacement publishes atomically; temporary file lives beside final cache. Rechecked for ZIP replacement after safe extraction using staging under the same destination/filesystem."
     },
     {
       "url": "https://docs.pytorch.org/vision/stable/generated/torchvision.transforms.Resize.html",
@@ -705,6 +782,14 @@
     {
       "url": "https://docs.python.org/3.13/library/sys.html#sys.setprofile",
       "use": "Thread-local C-call event observes the unmodified flock attempt in the concurrent test. Existing fcntl.flock primary documentation rechecked; no profiling of context-switch timing."
+    },
+    {
+      "url": "https://docs.python.org/3.13/library/tempfile.html#tempfile.TemporaryDirectory",
+      "use": "Owned ZIP staging directory beneath the destination automatically cleans on context exit."
+    },
+    {
+      "url": "https://docs.python.org/3.13/library/contextlib.html#contextlib.ExitStack",
+      "use": "ExitStack owns temporary directory cleanup inside the existing download guard."
     }
   ],
   "root_handoffs": [
@@ -732,7 +817,7 @@
     "Archive helper assumes no concurrent external writer mutates destination during preflight/extraction; no rollback guarantee for corrupt-data or filesystem failures. Safe TAR links point inside the root; ZIP symlink entries are intentionally rejected.",
     "Archived multimedia helpers need external historical tools/data and remain unqualified; observed REFER defects are preserved, not repaired.",
     "SSL validation covers constructor and tensor transform behavior, not training, accelerator execution or full external dataset downloads.",
-    "Current original-author correction awaits fresh independent review4 of the exact terminal candidate. All prior CHANGES_REQUESTED reports remain immutable. Root integration/Ubuntu and cross-owner archival/package/docs handoffs remain outstanding; unchanged socket/runtime tests were not repeated."
+    "Current original-author correction awaits fresh independent review5 of the exact terminal candidate. All four prior CHANGES_REQUESTED reports remain immutable. Root integration/Ubuntu and cross-owner archival/package/docs handoffs remain outstanding; unchanged socket/runtime tests were not repeated."
   ],
   "owned_temporary_resources": {
     "scratch_root": "/tmp/plato-phase2a-lZqbqj",
@@ -746,7 +831,9 @@
     "revision2_scratch": "/tmp/plato-phase2a-lZqbqj/revision2",
     "revision2_contents": "Owned dev-env red/new/focused logs, two newly provisioned clean base environments, base logs/JUnit, isolated per-run fixture roots, environment/preservation JSONs, previous b728 evidence snapshot and update/commit files. Test HTTP workers and subprocesses joined or terminated; no intentionally retained processes.",
     "revision3_scratch": "/tmp/plato-phase2a-lZqbqj/revision3",
-    "revision3_contents": "Retained original-candidate red, new/focused/base green, untouched reviewer-script rerun logs, JUnit/physical observations, environment/preservation manifests, own fixture roots, previous evidence snapshot and preparation files. Existing six environments retained; all launched subprocess/HTTP/constructor workers finished or were joined."
+    "revision3_contents": "Retained original-candidate red, new/focused/base green, untouched reviewer-script rerun logs, JUnit/physical observations, environment/preservation manifests, own fixture roots, previous evidence snapshot and preparation files. Existing six environments retained; all launched subprocess/HTTP/constructor workers finished or were joined.",
+    "revision4_scratch": "/tmp/plato-phase2a-lZqbqj/revision4",
+    "revision4_contents": "Retained d26 red/new/focused/base green, untouched review4/review3 author reruns, JUnit/physical observations, environment/preservation manifests, owned fixture roots, previous evidence snapshot and preparation/initial corrected assembly scripts. All six existing environments retained; no intended live workers or children. No root/reviewer artifacts modified or cleaned."
   },
   "unresolved_conflicts": [],
   "review_corrections": {
@@ -1079,7 +1166,7 @@
       "observation_summary": "Each interpreter has four verified observed.json files pointing to this worktree, no errors, three sequential retry requests or two concurrent requests, valid completion and one/two successful constructors. Sources read only, bytecode/cache writes disabled; fixtures/logs/JUnit live exclusively in owned revision3 scratch.",
       "observations": "revision3/independent-observations.json"
     },
-    "final_green": "Current commands/counts in red_green.green (233 each) and clean_base_profile (436 each, four allowed skips, 48 unchanged runtime deselections). Each suite ran once per version; no socket/runtime rerun.",
+    "final_green": "Historical reviewed d26f2bc7 candidate: red_green.previous_review3_candidate_green (233 each) and previous_review3_clean_base_profile (436 each, four allowed skips, 48 unchanged runtime deselections). New results are source-attributed in review4_corrections.",
     "environment": {
       "reuse": "Existing owned locked dev environments and revision2 clean test-base environments reused without dependency mutations or sync; original provision commands retained in environment.provision_commands.",
       "lock_sha256": "573b10c2ba1a2317e02f9e40c6181359cafab6f6e0a0f9be12bb256cb276fe1d",
@@ -1098,7 +1185,7 @@
       "optional_absence": "opacus, kazoo, gymnasium, tiktoken, lightly independently still absent in both base environments. Python default/minimum remains 3.13."
     },
     "static_and_preservation": {
-      "checks": "Scoped Ruff/ty both pass, diff clean; see current red_green.static_checks. No suppressions.",
+      "checks": "Historical d26f2bc7 Ruff/ty/diff all pass; see red_green.previous_review3_static_checks and retained revision3 logs. No suppressions.",
       "manifest": "revision3/preservation.json",
       "archive_originals": 14,
       "archive_LICENSE_sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
@@ -1131,5 +1218,197 @@
       "preservation.json": "54ac458b3d23bdf4862fd22db34cba60c4b6d92f8eac6ef6f128580c8c31ddc8",
       "independent-observations.json": "677a15be39398b028a2a0fe4a06b95f0190a7357a429ac3935e151349252a133"
     }
+  },
+  "review4_corrections": {
+    "independent_input": {
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2a-review-4.json",
+      "sha256": "a602fb94c5b5e3eeae855dae39082ceab99ff1f0dc6660203839f3ee1f8dce76",
+      "candidate": "d26f2bc7bbd770dee86ae571e57ca79773a456a2",
+      "verdict": "CHANGES_REQUESTED",
+      "findings": [
+        "R2A4-01"
+      ]
+    },
+    "read_only_probe_sources_sha256": {
+      "/tmp/plato-phase2a-review-4/test_coupled_recovery_corrected.py": "81870e18c8e87ba027fb79f1c63728fd662acf017f6d01760310e5a3ecf5833c",
+      "/tmp/plato-phase2a-review-4/test_independent_contracts.py": "be22218bc200e4a8ab94ede85df40097c83cba5685d776373db4ed4568936fd4",
+      "/tmp/plato-phase2a-review-3/test_default_recovery_negative.py": "aa6396e775236e7d6a693245e3294056ae840a95bea60b2e203fc114e3d1a3a8",
+      "/tmp/plato-phase2a-review-3/test_independent_contracts.py": "be22218bc200e4a8ab94ede85df40097c83cba5685d776373db4ed4568936fd4"
+    },
+    "attribution": "Root accepted the independently reproduced bounded correction. Immutable review4 reports two default-source restored-retry failures and six passing controls on d26, with all prior A and review3 controls passing. HTTP 503 and invalid ZIP are one coupled eligibility finding. Its initial bad-ZIP exception harness mismatch is disclosed in the original report; only the corrected untouched script is rerun here. All new counts below are original-author verification of this implementation, not fresh independent approval. All reports, probe sources and verdicts remain unchanged. Reviewer candidate/fixture/environments were neither used nor mutated; outside scripts ran with owned source/environments/fixtures. Counts overlap across these separate invocations and are not summed.",
+    "disposition": {
+      "id": "R2A4-01",
+      "status": "corrected; fresh independent review5 pending",
+      "change": "Under the existing download flock, ZIP replacement attempts use an owned temporary directory beneath the destination. HTTP/stream/archive errors remove only staging. The previous canonical ZIP remains eligible through marker invalidation and failed recovery. Successful safe extraction atomically replaces the canonical ZIP; existing readiness still gates completion. A valid but incomplete ZIP stays a recognized recovery artifact without completion, preserving review3. No Tiny eligibility changes, recursive flock, generic-lock eligibility, sidecar, manifest, new cache/archive format or protocol. Non-ZIP download paths are unchanged.",
+      "verification": "Real localhost/native-annotation constructor and sample tests preserve canonical default URL identity. After initial success and annotated-PNG deletion, HTTP 503, invalid ZIP or truncated body exhaust three actual retries, leave no marker/missing PNG/staging, and retain original ZIP bytes. Restored source succeeds with request five, correct literal label 1, finite 299-pixel samples and offline reuse. Configured controls and failed-first-download controls pass. Untouched review4 also verifies a failed-readiness owner releases a waiting contender to retry, and rejects unknown annotations despite default artifacts; untouched review3 verifies valid-incomplete-ZIP retry and successful paused-owner contention. Existing manual/unlabeled/generic-lock/unrelated-archive rejection remains covered."
+    },
+    "red": {
+      "command": "OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2a-lZqbqj/venv-{python}/bin/python -m pytest tests/datasources/test_review4_regressions.py -q --basetemp=/tmp/plato-phase2a-lZqbqj/revision4/red-fixtures-{python}",
+      "source_state": "Exact d26f2bc7 production content plus newly written durable tests before any production edit.",
+      "3.13": {
+        "log": "revision4/red-3.13.log",
+        "passed": 6,
+        "failed": 3,
+        "skipped": 0,
+        "warnings": 0,
+        "seconds": 18.69
+      },
+      "3.14": {
+        "log": "revision4/red-3.14.log",
+        "passed": 6,
+        "failed": 3,
+        "skipped": 0,
+        "warnings": 0,
+        "seconds": 53.81
+      },
+      "failure_disposition": "All three default-source restored-retry nodes fail with actual pre-HTTP incomplete-native ValueError. Three configured controls and three failed-first-download controls pass. No test harness correction, weakened assertion, retry/sleep/download/readiness/lock patch or suppression changes these product reds."
+    },
+    "green_new_cases": {
+      "command": "OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2a-lZqbqj/venv-{python}/bin/python -m pytest tests/datasources/test_review4_regressions.py -q --basetemp=/tmp/plato-phase2a-lZqbqj/revision4/green-new-fixtures-{python}",
+      "3.13": {
+        "log": "revision4/green-new-3.13.log",
+        "passed": 9,
+        "failed": 0,
+        "skipped": 0,
+        "warnings": 0,
+        "seconds": 18.5
+      },
+      "3.14": {
+        "log": "revision4/green-new-3.14.log",
+        "passed": 9,
+        "failed": 0,
+        "skipped": 0,
+        "warnings": 0,
+        "seconds": 53.56
+      }
+    },
+    "untouched_reviewer_scripts_author_rerun": {
+      "review4": {
+        "command": "HF_HUB_OFFLINE=1 HF_DATASETS_OFFLINE=1 PYTHONDONTWRITEBYTECODE=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 TOKENIZERS_PARALLELISM=false PYTHONPATH=/private/tmp/plato-refresh-worktrees/data /tmp/plato-phase2a-lZqbqj/revision2/base-{python}/bin/python -m pytest /tmp/plato-phase2a-review-4/test_coupled_recovery_corrected.py -q -p no:cacheprovider --basetemp=/tmp/plato-phase2a-lZqbqj/revision4/independent4-fixtures-{python} --junitxml=/tmp/plato-phase2a-lZqbqj/revision4/independent4-{python}.xml",
+        "3.13": {
+          "log": "revision4/independent4-3.13.log",
+          "passed": 8,
+          "failed": 0,
+          "skipped": 0,
+          "warnings": 0,
+          "seconds": 13.43
+        },
+        "3.14": {
+          "log": "revision4/independent4-3.14.log",
+          "passed": 8,
+          "failed": 0,
+          "skipped": 0,
+          "warnings": 0,
+          "seconds": 49.05
+        }
+      },
+      "review3": {
+        "command": "HF_HUB_OFFLINE=1 HF_DATASETS_OFFLINE=1 PYTHONDONTWRITEBYTECODE=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 TOKENIZERS_PARALLELISM=false PYTHONPATH=/private/tmp/plato-refresh-worktrees/data /tmp/plato-phase2a-lZqbqj/revision2/base-{python}/bin/python -m pytest /tmp/plato-phase2a-review-3/test_default_recovery_negative.py -q -p no:cacheprovider --basetemp=/tmp/plato-phase2a-lZqbqj/revision4/independent3-fixtures-{python} --junitxml=/tmp/plato-phase2a-lZqbqj/revision4/independent3-{python}.xml",
+        "3.13": {
+          "log": "revision4/independent3-3.13.log",
+          "passed": 4,
+          "failed": 0,
+          "skipped": 0,
+          "warnings": 0,
+          "seconds": 4.82
+        },
+        "3.14": {
+          "log": "revision4/independent3-3.14.log",
+          "passed": 4,
+          "failed": 0,
+          "skipped": 0,
+          "warnings": 0,
+          "seconds": 40.44
+        }
+      }
+    },
+    "observation_summary": "Exactly six physical review4 and four review3 observed.json files per interpreter point to owned source. Review4 restored-source cases record five requests/no errors/one successful constructor; default canonical ZIP survives failed recovery with no completion. Failed-readiness contention records three requests/one expected RuntimeError/one successful contender. Review3 records three retry requests/one success or two concurrent requests/two successes without errors. Final completion and samples pass. Original source reads use bytecode/cache writes disabled; all fixtures/logs/JUnit are under owned revision4 scratch. Original reviewer artifacts are unchanged.",
+    "observations": "revision4/independent-observations.json",
+    "final_green": "Current exact implementation: red_green.green (242 each), clean_base_profile (445 each, four allowed skips, 48 authorized unchanged runtime deselections), and static_checks. Each suite ran once per version; no socket/runtime rerun.",
+    "environment": {
+      "reuse": "Existing owned locked dev and clean test-base environments reused without sync or dependency mutation; provision commands retained in environment.provision_commands.",
+      "lock_sha256": "573b10c2ba1a2317e02f9e40c6181359cafab6f6e0a0f9be12bb256cb276fe1d",
+      "base_interpreters": {
+        "3.13": {
+          "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+          "prefix": "/tmp/plato-phase2a-lZqbqj/revision2/base-3.13",
+          "source": "/private/tmp/plato-refresh-worktrees/data/plato/__init__.py",
+          "optional_absent": {
+            "opacus": true,
+            "kazoo": true,
+            "gymnasium": true,
+            "tiktoken": true,
+            "lightly": true
+          }
+        },
+        "3.14": {
+          "python": "3.14.8 (main, Sep 30 2026, 17:55:09) [Clang 21.0.0 (clang-2100.3.34.2)]",
+          "prefix": "/private/tmp/plato-phase2a-lZqbqj/revision2/base-3.14",
+          "source": "/private/tmp/plato-refresh-worktrees/data/plato/__init__.py",
+          "optional_absent": {
+            "opacus": true,
+            "kazoo": true,
+            "gymnasium": true,
+            "tiktoken": true,
+            "lightly": true
+          }
+        }
+      },
+      "default_minimum": "3.13 unchanged",
+      "cpu_thread_limits": "OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1"
+    },
+    "static_and_preservation": {
+      "checks": "Scoped Ruff/ty/diff pass with no suppressions; exact commands in red_green.static_checks.",
+      "manifest": "revision4/preservation.json",
+      "archive_originals": 14,
+      "archive_LICENSE_sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+      "active_archive_reference_matches": 0,
+      "source_preservation": "At the exact implementation commit before this evidence-only child: Every other previously tracked file is byte-identical to d26, including Tiny, numeric cache helpers/consumers, config, samplers, EMNIST, archive code/provenance, shared runtime and metadata.",
+      "unchanged_gitlinks": {
+        "external/nanochat": "c75fe54aa7c1fa881701c246f9427bcbe4eee5a4",
+        "plato/models/dvit": "1ccb152cea43fcbc3cd517a45c12c65734f8ace3",
+        "plato/models/t2tvit": "0f63dc9558f4d192de926504dbddfa1b3f5db6ca"
+      },
+      "metadata": "All four metadata/conftest hashes match environment.metadata_sha256; no adapter/runtime/other-worktree/environment changes."
+    },
+    "harness_notes": [
+      "All product pytest invocations completed as classified above without harness corrections. Two subsequent evidence-assembly commands initially failed: generic file verification attempted git show on the external/nanochat gitlink (exit 128), and observation assembly used review4 http_requests for review3 requests (KeyError). Corrected assembly treats all three gitlinks as pinned index identities and uses each read-only observation schema. Initial scripts retained. No test rerun, product failure reclassification, reviewer edit or source change resulted."
+    ],
+    "limits": "Bounded ZIP staging retains prior recovery eligibility; it is not a corpus provenance manifest, full image decoder/checksum, extracted-tree rollback or arbitrary prepared inventory repair. Existing readiness remains image existence/extensions/native references; generic lock/unrelated archives/manual incomplete native data still reject. Killed processes may leave private staging directories; no generalized scavenger or lock redesign was added. Archive helper external-writer/partial-extraction limitations remain. macOS ARM64 CPython CPU only; fresh independent review5, root integration and Ubuntu remain pending.",
+    "retained_raw_artifacts_sha256": {
+      "red-3.13.log": "e0235bc8a3557b077bc47481f9121a83423f58ffe6831a82909b909063327372",
+      "green-new-3.13.log": "525218187b55b377687d3146b586c1f2a6107acd2ba4bebde7965ebbfaf374b6",
+      "green-focused-3.13.log": "50bf32a16ecfdf66752958dd3aadebe9b960a376268effb4214c81664a024d6e",
+      "green-base-3.13.log": "09c08ca65935f266c432b6a930d3d5950bb8f8ba01bdd5be42d12e25822b3d76",
+      "independent4-3.13.log": "599065d4df389e1500b3e016a9651ed02dbf61d70a590e1e7179e0222125c092",
+      "independent3-3.13.log": "d07adc9c61b334cc33f3125b4ea06095f40a39993f88420c6a0f59782d16e1d6",
+      "base-3.13.xml": "815448051266e9be52a070f7062d078deb6e9fbfc86c0f6554bd15dd4452a9c4",
+      "independent4-3.13.xml": "fd0f5a0bf4ed89e57942d41913d6f0a5b65b0abf20f9d899be137dc22528452d",
+      "independent3-3.13.xml": "bd219668294cdf3e0445a4afea0e0dce90aa6a68f82e3fd4da1619b730968501",
+      "environment-base-3.13.json": "5793071d24037988ed30fb6a2fbb0917ab5eab91d061d13a389409d816dbaa85",
+      "red-3.14.log": "d963ee60b2a43a5c2d8a888acd2a52ac782757e2c81d166dccf20790940ad963",
+      "green-new-3.14.log": "b2ee86a53b172848b8b6262fb5526e5f7f23e2b7bbdad34afdedc14ec54a7388",
+      "green-focused-3.14.log": "05ce28a7861f9a1632d91300d96d76eed376a8a4bcd315bf654a2ec7fe58149f",
+      "green-base-3.14.log": "3daaaaa8945588019c5485f1ed47de882df66a4d40c4d4b5de3c17108ef836e8",
+      "independent4-3.14.log": "c2600e9c4a1f2d32eb7978424d30046a9b3e31bad222912817712044ca6d0b82",
+      "independent3-3.14.log": "efcaf766517e6ffe5093c60ef57a34ab3d08dc1bea274159730c5368a1bfc01b",
+      "base-3.14.xml": "3647bce3961986b82debb01dd74adb01f3bcb1df9685d456e849c3ca42accc82",
+      "independent4-3.14.xml": "21924ce771a794e56d5b98d7ee7bb12a19159d61ad375fd4e96b863bc0095361",
+      "independent3-3.14.xml": "0c6393f8c0c70b9d9ea84300348e6b51481ce25f1dd0f8d803a4ebdf3ce7ff49",
+      "environment-base-3.14.json": "052efd6cb6f18c15e5804a14b2d39e89f4c406eeeb8ab4b95df09bc6c4a19f5b",
+      "ruff.log": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "typing.log": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "diff-check.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "preservation.json": "f04c02e078e124441225e973e90933e373df3f31c8ddd5be61429d1cef11151d",
+      "independent-observations.json": "0f91e63b5ed07a134a1cffb5d17c3560d4af6c82d25facfaf74508c45d045b72"
+    },
+    "identity_commands": [
+      "git rev-parse HEAD HEAD^{tree} HEAD^",
+      "git diff --binary fda60becedfa6236c11d415b87a868b52789a41e f03695692307ea1175feb4b2b8ee3ee2c4240e91",
+      "git diff --binary d26f2bc7bbd770dee86ae571e57ca79773a456a2 f03695692307ea1175feb4b2b8ee3ee2c4240e91",
+      "git status --porcelain",
+      "/tmp/plato-phase2a-lZqbqj/venv-3.13/bin/python /tmp/plato-phase2a-lZqbqj/revision4/verify-preservation.py",
+      "/tmp/plato-phase2a-lZqbqj/venv-3.13/bin/python /tmp/plato-phase2a-lZqbqj/revision4/verify-observations.py"
+    ]
   }
 }
