@@ -2,7 +2,6 @@
 A simple federated learning server using federated averaging.
 """
 
-import asyncio
 import logging
 import os
 
@@ -154,9 +153,21 @@ class Server(base.Server):
         elif self.algorithm is None and self.custom_algorithm is not None:
             self.algorithm = self.custom_algorithm(trainer=self.trainer)
 
-    def _validate_aggregation_inputs(self, updates: list, payloads: list) -> None:
+    def _validate_aggregation_inputs(
+        self, updates: list, payloads: list, baseline_weights=None
+    ) -> None:
         """Validate ingress before dispatch; backends may extend tree validation."""
         validate_aggregation_inputs(updates, payloads)
+        algorithm = self.algorithm
+        validator = getattr(algorithm, "validate_weights", None)
+        if callable(validator):
+            baseline = (
+                algorithm.extract_weights()
+                if baseline_weights is None else baseline_weights
+            )
+            for update, payload in zip(updates, payloads, strict=True):
+                if getattr(update.report, "type", "weights") != "features":
+                    validator(payload, baseline, client_id=update.client_id)
 
     async def aggregate_deltas(self, updates, deltas_received):
         """Aggregate weight updates from the clients using federated averaging.
@@ -181,11 +192,33 @@ class Server(base.Server):
     async def _process_reports(self):
         """Process the client reports by aggregating their weights."""
         weights_received = [update.payload for update in self.updates]
-        self._validate_aggregation_inputs(self.updates, weights_received)
+        algorithm = self.require_algorithm()
+        baseline_weights = (
+            algorithm.extract_weights()
+            if callable(getattr(algorithm, "validate_weights", None)) else None
+        )
+        self._validate_aggregation_inputs(
+            self.updates, weights_received, baseline_weights
+        )
+        received_order = tuple(weights_received)
 
         weights_received = self.weights_received(weights_received)
         self.callback_handler.call_event("on_weights_received", self, weights_received)
-        self._validate_aggregation_inputs(self.updates, weights_received)
+        self._validate_aggregation_inputs(
+            self.updates, weights_received, baseline_weights
+        )
+        if baseline_weights is not None:
+            # Preserve observable client association across unlabeled-tree hooks.
+            positions = {}
+            for index, payload in enumerate(received_order):
+                positions.setdefault(id(payload), set()).add(index)
+            for index, payload in enumerate(weights_received):
+                original_positions = positions.get(id(payload))
+                if original_positions is not None and index not in original_positions:
+                    raise ValueError(
+                        f"client {self.updates[index].client_id}: transformed weights "
+                        "reordered the original client payloads."
+                    )
 
         # Notify client selection strategy about received reports
         self.context.updates = self.updates
@@ -193,8 +226,8 @@ class Server(base.Server):
         self.client_selection_strategy.on_reports_received(self.updates, self.context)
 
         # Extract the current model weights as the baseline
-        algorithm = self.require_algorithm()
-        baseline_weights = algorithm.extract_weights()
+        if baseline_weights is None:
+            baseline_weights = algorithm.extract_weights()
 
         # Check if we should aggregate weights directly or use deltas
         # Try strategy's aggregate_weights first, fall back to aggregate_deltas
