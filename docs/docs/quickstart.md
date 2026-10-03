@@ -69,32 +69,18 @@ and pretrained-model qualification.
 
 ## Using MLX as a Backend
 
-Plato supports MLX as an alternative backend to PyTorch for Apple Silicon devices. To use MLX, first install the optional dependencies:
+Run the native LeNet-5/MNIST FedAvg reference on Apple Silicon with Python 3.13:
 
 ```bash
-uv sync --extra mlx
+uv sync --python 3.13 --extra mlx
+uv run --extra mlx python plato.py --config configs/MNIST/fedavg_lenet5_mlx.toml
 ```
 
-Then configure your TOML file to use the MLX framework by setting `framework = "mlx"` in the relevant sections:
-
-```toml
-[trainer]
-type = "mlx"
-framework = "mlx"
-
-[algorithm]
-type = "mlx_fedavg"
-framework = "mlx"
-
-[parameters.model]
-framework = "mlx"
-```
-
-A complete example configuration is available at `configs/MNIST/fedavg_lenet5_mlx.toml`. Run it with:
-
-```bash
-uv run plato.py -c configs/MNIST/fedavg_lenet5_mlx.toml
-```
+Add `--cpu` for Apple CPU execution; without a device flag the trainer preserves
+MLX's native default, normally Metal. The shipped config uses simulated payload
+communication and one physical client worker. See [Native MLX](mlx.md) for
+socket opt-in, seeds, clipping, optimizer options, checkpoint limits, and the
+explicit native qualification command.
 
 ## Running Plato in a Docker Container
 
