@@ -1,0 +1,83 @@
+[clients]
+type = "simple"
+total_clients = 2
+per_round = 1
+do_test = false
+random_seed = 12345
+comm_simulation = false
+compute_comm_time = false
+
+[server]
+address = "127.0.0.1"
+port = 56660
+do_test = true
+random_seed = 1234
+simulate_wall_time = false
+
+[data]
+datasource = "Torchvision"
+dataset_name = "CIFAR10"
+download = false
+partition_size = 1000
+test_partition_size = 10000
+sampler = "all_inclusive"
+testset_sampler = "all_inclusive"
+random_seed = 1234
+testset_size = 2
+
+[trainer]
+type = "basic"
+rounds = 1
+max_concurrency = 2
+target_accuracy = 1.0
+epochs = 1
+batch_size = 2
+loss_criterion = "CrossEntropyLoss"
+optimizer = "SGD"
+global_lr_scheduler = true
+lr_scheduler = "MultiStepLR"
+model_type = "torch_hub"
+model_name = "resnet152"
+
+[algorithm]
+type = "fedavg"
+
+[results]
+types = "round, accuracy, elapsed_time, comm_time, round_time, comm_overhead"
+
+[parameters]
+
+[parameters.model]
+track = true
+
+[parameters.client_model]
+track = true
+
+[parameters.optimizer]
+lr = 0.1
+weight_decay = 0.0005
+momentum = 0.9
+
+[parameters.learning_rate]
+milestone_steps = "150, 250"
+gamma = 0.1
+
+[parameters.limitation]
+activated = false
+min_size = 43
+max_size = 223
+min_flops = 531
+max_flops = 3563
+epsilon = 0.8
+max_loop = 1
+
+[parameters.distillation]
+activate = true
+iterations = 1
+
+[parameters.distillation.optimizer]
+lr = 0.001
+
+[parameters.supernet]
+depth = true
+width = true

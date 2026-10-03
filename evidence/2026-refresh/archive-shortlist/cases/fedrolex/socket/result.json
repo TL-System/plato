@@ -1,0 +1,765 @@
+{
+  "family": "fedrolex",
+  "case": "socket",
+  "variant": "",
+  "command": [
+    "/tmp/plato-archive-author/environment/bin/python",
+    "-B",
+    "-m",
+    "tests.integration.model_search_retention_worker",
+    "-u",
+    "-c",
+    "/private/tmp/plato-archive-author/accepted-cases/test_retained_width_round_fedr0/fedrolex/config.toml",
+    "-b",
+    "/private/tmp/plato-archive-author/accepted-cases/test_retained_width_round_fedr0/fedrolex/runtime"
+  ],
+  "returncode": 0,
+  "timed_out": false,
+  "forced": [],
+  "survivors": [],
+  "observed_pids": [
+    9052,
+    9095,
+    9096,
+    9097,
+    9233,
+    9235,
+    9237,
+    9239,
+    9304,
+    9306
+  ],
+  "elapsed_seconds": 25.86806487501599,
+  "events": [
+    {
+      "event": "source_identity",
+      "pid": 9052,
+      "config_sha256": "0d0eb934a15ef649a60b6d037bdd56927ab21c770aefcf1f067e6560a6e2af31",
+      "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+      "worker_sha256": "949e087b68296d4b372ebf4a2369c9b0dbaa4a5606b483a91bab8faed2683e55"
+    },
+    {
+      "event": "local_data",
+      "pid": 9052,
+      "client_id": 0,
+      "samples": 6
+    },
+    {
+      "event": "child_started",
+      "pid": 9052,
+      "child_pid": 9096,
+      "created": 1791056621.383577
+    },
+    {
+      "event": "child_started",
+      "pid": 9052,
+      "child_pid": 9097,
+      "created": 1791056621.391632
+    },
+    {
+      "event": "server_trainer_initialized",
+      "pid": 9052,
+      "channels": 64,
+      "model_rate_parameters": 512
+    },
+    {
+      "event": "selected_rate",
+      "pid": 9052,
+      "client_id": 2,
+      "rate": 0.5,
+      "selection_call": 1,
+      "seed": 1,
+      "rng_state_sha256": "95d9970691287f085063e90cc11c16fa228ad3243dc9fe01e2b9b865a290dec5",
+      "limitation_activated": false
+    },
+    {
+      "event": "selected_rate",
+      "pid": 9052,
+      "client_id": 1,
+      "rate": 1.0,
+      "selection_call": 2,
+      "seed": 2,
+      "rng_state_sha256": "b5c68ef98b04b8e566426cdb872faf999c435477bc69ca33b36aee76fcd7d935",
+      "limitation_activated": false
+    },
+    {
+      "event": "server_received",
+      "pid": 9052,
+      "counts": [
+        2,
+        6
+      ],
+      "payloads": 2
+    },
+    {
+      "event": "aggregation_oracle",
+      "pid": 9052,
+      "max_error": 1.1920928955078125e-07,
+      "weighting": "uniform channel average",
+      "parameter_tensors": 56
+    },
+    {
+      "event": "channel_alignment_oracle",
+      "pid": 9052,
+      "max_error": 0.0,
+      "parameter_tensors": 56,
+      "weighting": "uniform average over clients containing each channel"
+    },
+    {
+      "event": "second_rolling_alignment",
+      "pid": 9052,
+      "max_error": 0.0,
+      "first_conv_order": [
+        63,
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62
+      ]
+    },
+    {
+      "event": "post_alignment_backward",
+      "pid": 9052,
+      "loss": 3.2299797534942627
+    },
+    {
+      "event": "child_started",
+      "pid": 9052,
+      "child_pid": 9306,
+      "created": 1791056635.362326
+    },
+    {
+      "event": "success",
+      "pid": 9052,
+      "round": 1,
+      "real_socket": true
+    },
+    {
+      "event": "local_data",
+      "pid": 9096,
+      "client_id": 1,
+      "samples": 2
+    },
+    {
+      "event": "client_replaced_before_load",
+      "pid": 9096,
+      "client_id": 1,
+      "first_conv_channels": 64
+    },
+    {
+      "event": "client_trained",
+      "pid": 9096,
+      "client_id": 1,
+      "samples": 2,
+      "changed_parameters": 56,
+      "shapes": {
+        "conv1.weight": [
+          64,
+          3,
+          3,
+          3
+        ],
+        "layer1.0.batchnorm1.weight": [
+          64
+        ],
+        "layer1.0.batchnorm1.bias": [
+          64
+        ],
+        "layer1.0.conv1.weight": [
+          64,
+          64,
+          3,
+          3
+        ],
+        "layer1.0.batchnorm2.weight": [
+          64
+        ],
+        "layer1.0.batchnorm2.bias": [
+          64
+        ],
+        "layer1.0.conv2.weight": [
+          64,
+          64,
+          3,
+          3
+        ],
+        "layer1.1.batchnorm1.weight": [
+          64
+        ],
+        "layer1.1.batchnorm1.bias": [
+          64
+        ],
+        "layer1.1.conv1.weight": [
+          64,
+          64,
+          3,
+          3
+        ],
+        "layer1.1.batchnorm2.weight": [
+          64
+        ],
+        "layer1.1.batchnorm2.bias": [
+          64
+        ],
+        "layer1.1.conv2.weight": [
+          64,
+          64,
+          3,
+          3
+        ],
+        "layer2.0.batchnorm1.weight": [
+          64
+        ],
+        "layer2.0.batchnorm1.bias": [
+          64
+        ],
+        "layer2.0.conv1.weight": [
+          128,
+          64,
+          3,
+          3
+        ],
+        "layer2.0.batchnorm2.weight": [
+          128
+        ],
+        "layer2.0.batchnorm2.bias": [
+          128
+        ],
+        "layer2.0.conv2.weight": [
+          128,
+          128,
+          3,
+          3
+        ],
+        "layer2.0.shortcut.weight": [
+          128,
+          64,
+          1,
+          1
+        ],
+        "layer2.1.batchnorm1.weight": [
+          128
+        ],
+        "layer2.1.batchnorm1.bias": [
+          128
+        ],
+        "layer2.1.conv1.weight": [
+          128,
+          128,
+          3,
+          3
+        ],
+        "layer2.1.batchnorm2.weight": [
+          128
+        ],
+        "layer2.1.batchnorm2.bias": [
+          128
+        ],
+        "layer2.1.conv2.weight": [
+          128,
+          128,
+          3,
+          3
+        ],
+        "layer3.0.batchnorm1.weight": [
+          128
+        ],
+        "layer3.0.batchnorm1.bias": [
+          128
+        ],
+        "layer3.0.conv1.weight": [
+          256,
+          128,
+          3,
+          3
+        ],
+        "layer3.0.batchnorm2.weight": [
+          256
+        ],
+        "layer3.0.batchnorm2.bias": [
+          256
+        ],
+        "layer3.0.conv2.weight": [
+          256,
+          256,
+          3,
+          3
+        ],
+        "layer3.0.shortcut.weight": [
+          256,
+          128,
+          1,
+          1
+        ],
+        "layer3.1.batchnorm1.weight": [
+          256
+        ],
+        "layer3.1.batchnorm1.bias": [
+          256
+        ],
+        "layer3.1.conv1.weight": [
+          256,
+          256,
+          3,
+          3
+        ],
+        "layer3.1.batchnorm2.weight": [
+          256
+        ],
+        "layer3.1.batchnorm2.bias": [
+          256
+        ],
+        "layer3.1.conv2.weight": [
+          256,
+          256,
+          3,
+          3
+        ],
+        "layer4.0.batchnorm1.weight": [
+          256
+        ],
+        "layer4.0.batchnorm1.bias": [
+          256
+        ],
+        "layer4.0.conv1.weight": [
+          512,
+          256,
+          3,
+          3
+        ],
+        "layer4.0.batchnorm2.weight": [
+          512
+        ],
+        "layer4.0.batchnorm2.bias": [
+          512
+        ],
+        "layer4.0.conv2.weight": [
+          512,
+          512,
+          3,
+          3
+        ],
+        "layer4.0.shortcut.weight": [
+          512,
+          256,
+          1,
+          1
+        ],
+        "layer4.1.batchnorm1.weight": [
+          512
+        ],
+        "layer4.1.batchnorm1.bias": [
+          512
+        ],
+        "layer4.1.conv1.weight": [
+          512,
+          512,
+          3,
+          3
+        ],
+        "layer4.1.batchnorm2.weight": [
+          512
+        ],
+        "layer4.1.batchnorm2.bias": [
+          512
+        ],
+        "layer4.1.conv2.weight": [
+          512,
+          512,
+          3,
+          3
+        ],
+        "bn4.weight": [
+          512
+        ],
+        "bn4.bias": [
+          512
+        ],
+        "linear.weight": [
+          10,
+          512
+        ],
+        "linear.bias": [
+          10
+        ]
+      }
+    },
+    {
+      "event": "child_returned",
+      "pid": 9096,
+      "client_id": 1
+    },
+    {
+      "event": "local_data",
+      "pid": 9097,
+      "client_id": 2,
+      "samples": 6
+    },
+    {
+      "event": "client_replaced_before_load",
+      "pid": 9097,
+      "client_id": 2,
+      "first_conv_channels": 32
+    },
+    {
+      "event": "client_trained",
+      "pid": 9097,
+      "client_id": 2,
+      "samples": 6,
+      "changed_parameters": 56,
+      "shapes": {
+        "conv1.weight": [
+          32,
+          3,
+          3,
+          3
+        ],
+        "layer1.0.batchnorm1.weight": [
+          32
+        ],
+        "layer1.0.batchnorm1.bias": [
+          32
+        ],
+        "layer1.0.conv1.weight": [
+          32,
+          32,
+          3,
+          3
+        ],
+        "layer1.0.batchnorm2.weight": [
+          32
+        ],
+        "layer1.0.batchnorm2.bias": [
+          32
+        ],
+        "layer1.0.conv2.weight": [
+          32,
+          32,
+          3,
+          3
+        ],
+        "layer1.1.batchnorm1.weight": [
+          32
+        ],
+        "layer1.1.batchnorm1.bias": [
+          32
+        ],
+        "layer1.1.conv1.weight": [
+          32,
+          32,
+          3,
+          3
+        ],
+        "layer1.1.batchnorm2.weight": [
+          32
+        ],
+        "layer1.1.batchnorm2.bias": [
+          32
+        ],
+        "layer1.1.conv2.weight": [
+          32,
+          32,
+          3,
+          3
+        ],
+        "layer2.0.batchnorm1.weight": [
+          32
+        ],
+        "layer2.0.batchnorm1.bias": [
+          32
+        ],
+        "layer2.0.conv1.weight": [
+          64,
+          32,
+          3,
+          3
+        ],
+        "layer2.0.batchnorm2.weight": [
+          64
+        ],
+        "layer2.0.batchnorm2.bias": [
+          64
+        ],
+        "layer2.0.conv2.weight": [
+          64,
+          64,
+          3,
+          3
+        ],
+        "layer2.0.shortcut.weight": [
+          64,
+          32,
+          1,
+          1
+        ],
+        "layer2.1.batchnorm1.weight": [
+          64
+        ],
+        "layer2.1.batchnorm1.bias": [
+          64
+        ],
+        "layer2.1.conv1.weight": [
+          64,
+          64,
+          3,
+          3
+        ],
+        "layer2.1.batchnorm2.weight": [
+          64
+        ],
+        "layer2.1.batchnorm2.bias": [
+          64
+        ],
+        "layer2.1.conv2.weight": [
+          64,
+          64,
+          3,
+          3
+        ],
+        "layer3.0.batchnorm1.weight": [
+          64
+        ],
+        "layer3.0.batchnorm1.bias": [
+          64
+        ],
+        "layer3.0.conv1.weight": [
+          128,
+          64,
+          3,
+          3
+        ],
+        "layer3.0.batchnorm2.weight": [
+          128
+        ],
+        "layer3.0.batchnorm2.bias": [
+          128
+        ],
+        "layer3.0.conv2.weight": [
+          128,
+          128,
+          3,
+          3
+        ],
+        "layer3.0.shortcut.weight": [
+          128,
+          64,
+          1,
+          1
+        ],
+        "layer3.1.batchnorm1.weight": [
+          128
+        ],
+        "layer3.1.batchnorm1.bias": [
+          128
+        ],
+        "layer3.1.conv1.weight": [
+          128,
+          128,
+          3,
+          3
+        ],
+        "layer3.1.batchnorm2.weight": [
+          128
+        ],
+        "layer3.1.batchnorm2.bias": [
+          128
+        ],
+        "layer3.1.conv2.weight": [
+          128,
+          128,
+          3,
+          3
+        ],
+        "layer4.0.batchnorm1.weight": [
+          128
+        ],
+        "layer4.0.batchnorm1.bias": [
+          128
+        ],
+        "layer4.0.conv1.weight": [
+          256,
+          128,
+          3,
+          3
+        ],
+        "layer4.0.batchnorm2.weight": [
+          256
+        ],
+        "layer4.0.batchnorm2.bias": [
+          256
+        ],
+        "layer4.0.conv2.weight": [
+          256,
+          256,
+          3,
+          3
+        ],
+        "layer4.0.shortcut.weight": [
+          256,
+          128,
+          1,
+          1
+        ],
+        "layer4.1.batchnorm1.weight": [
+          256
+        ],
+        "layer4.1.batchnorm1.bias": [
+          256
+        ],
+        "layer4.1.conv1.weight": [
+          256,
+          256,
+          3,
+          3
+        ],
+        "layer4.1.batchnorm2.weight": [
+          256
+        ],
+        "layer4.1.batchnorm2.bias": [
+          256
+        ],
+        "layer4.1.conv2.weight": [
+          256,
+          256,
+          3,
+          3
+        ],
+        "bn4.weight": [
+          256
+        ],
+        "bn4.bias": [
+          256
+        ],
+        "linear.weight": [
+          10,
+          256
+        ],
+        "linear.bias": [
+          10
+        ]
+      }
+    },
+    {
+      "event": "child_returned",
+      "pid": 9097,
+      "client_id": 2
+    },
+    {
+      "event": "training_loss",
+      "pid": 9237,
+      "client_id": 2,
+      "loss": 2.305781126022339
+    },
+    {
+      "event": "training_loss",
+      "pid": 9237,
+      "client_id": 2,
+      "loss": 3.2113499641418457
+    },
+    {
+      "event": "training_loss",
+      "pid": 9237,
+      "client_id": 2,
+      "loss": 3.9776744842529297
+    },
+    {
+      "event": "training_loss",
+      "pid": 9239,
+      "client_id": 1,
+      "loss": 2.3473057746887207
+    }
+  ],
+  "overlay": {
+    "clients": {
+      "total_clients": 2,
+      "per_round": 2,
+      "comm_simulation": false,
+      "compute_comm_time": false,
+      "do_test": false
+    },
+    "server": {
+      "port": 56058,
+      "simulate_wall_time": false,
+      "random_seed": 1234
+    },
+    "trainer": {
+      "rounds": 1,
+      "epochs": 1,
+      "batch_size": 2,
+      "max_concurrency": 2
+    },
+    "data": {
+      "download": false,
+      "sampler": "all_inclusive",
+      "testset_sampler": "all_inclusive",
+      "testset_size": 2
+    },
+    "parameters": {
+      "limitation": {
+        "activated": false
+      }
+    }
+  },
+  "supplied_config_path": "examples/model_search/fedrolex/example_ResNet.toml",
+  "supplied_config_sha256": "4a74ee96d86be5786c935e3454cec0a1ea2861010d82112699ab01d77a07cbb5",
+  "lock_sha256": "e2a53aaae9a0dd49f5446b490bb3071e86aa3a9a20d6271c9dd30b4ae2dcbff9"
+}

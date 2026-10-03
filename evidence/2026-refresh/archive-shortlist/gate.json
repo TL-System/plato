@@ -1,0 +1,31 @@
+{
+  "source_commit": "8a8b3db59a7cc2d1b5cc8672729c4391bbf2c8ad",
+  "source_tree": "56d7f50dbae2404f47e59004e976f8abc97fa361",
+  "committed_original_records_verified": 171,
+  "active_import_and_vit_config_violations": [],
+  "no_gitlinks_or_gitmodules": true,
+  "expected_cases": [
+    "test_retained_width_round[anycostfl]",
+    "test_retained_width_round[fedrolex]",
+    "test_retained_width_round[heterofl]",
+    "test_retained_activated_budget[anycostfl]",
+    "test_retained_activated_budget[fedrolex]",
+    "test_retained_activated_budget[heterofl]",
+    "test_sysheterofl_subnet_round",
+    "test_dlg_model_update[lenet]",
+    "test_dlg_model_update[resnet_18]",
+    "test_local_retired_selection[anycostfl]",
+    "test_local_retired_selection[fedrolex]",
+    "test_local_retired_selection[heterofl]",
+    "test_local_retired_selection[dlg]",
+    "test_retained_entrypoint_import[anycostfl-root]",
+    "test_retained_entrypoint_import[anycostfl-example]",
+    "test_retained_entrypoint_import[fedrolex-root]",
+    "test_retained_entrypoint_import[fedrolex-example]",
+    "test_retained_entrypoint_import[heterofl-root]",
+    "test_retained_entrypoint_import[heterofl-example]"
+  ],
+  "collection_and_junit_exact": true,
+  "all_19_passed_once_no_skips": true,
+  "natural_success_all_workers": true
+}
