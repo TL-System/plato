@@ -1,0 +1,115 @@
+{
+  "source_before_receipt": "aa4a923e01c6d820bd0e24015253d34f78b531cb",
+  "review_records": [
+    {
+      "path": "evidence/2026-refresh/archive-shortlist-plan.json",
+      "sha256": "c66577eac31a2eeaba68f29e2fee53760def2477184521bd1f2536e76507573f"
+    },
+    {
+      "path": "evidence/2026-refresh/archive-shortlist-plan-review3.json",
+      "sha256": "3fbeb6b47b5392515172b574bd9b0d11f427e5d6af4a72ba2c2d3057be8483be"
+    },
+    {
+      "path": "evidence/2026-refresh/archive-shortlist-implementation-review.json",
+      "sha256": "efda9df7ad2fd12c4f38d8a3113749fc39a93f1dfbb4399c48998204bcb70dbd"
+    },
+    {
+      "path": "evidence/2026-refresh/archive-shortlist-fix-review.json",
+      "sha256": "02b8e281d393023c212ea2f4a25d2706ceeb2b192d0f2b34995ee5e8cab8bb29"
+    },
+    {
+      "path": "evidence/2026-refresh/archive-shortlist-docs-review.json",
+      "sha256": "2aa7fefe0ee33642a8d6e7bbb8f967e0b984a5e2dab552672fc1550913f10be4"
+    },
+    {
+      "path": "evidence/2026-refresh/archive-docs-command-fix-review.json",
+      "sha256": "2c598a867e0e490c5bcc680cea53e1ecc79eff22ec2da1c7cdd3ec39021b7db4"
+    },
+    {
+      "path": "evidence/2026-refresh/archive-profile-review.json",
+      "sha256": "26dc3cfbf5ef7bd56df83ada4fea99fe82d05e88eefa2c87a173eaf8d732537e"
+    }
+  ],
+  "profile_owned_and_unchanged_source_hashes_match": true,
+  "initial_root_combination": {
+    "passed": 58,
+    "skipped": 0,
+    "source": "0dace23da6f4432c4923515649f5caf9044f98b5",
+    "xml_sha256": "378310ffc9b26f01fbc2a39f7ac5cc8b9baa5ecd06da5cddf0e13bd1c5d4dd86"
+  },
+  "status": "Root accepts reviewed bounded components for final combined qualification. Full final profiles, distributions, publication gate, Linux CI and merge remain pending.",
+  "profile_review_limits": {
+    "initial_concurrent_retained_attempt": {
+      "passed": 18,
+      "failed": 1,
+      "failed_case": "test_retained_width_round[anycostfl]",
+      "observed_worker_timeout_seconds": 90,
+      "forced_TERM_observed": true,
+      "profile_and_exact_CI_artifact_verifier_both_rejected": true,
+      "status": {
+        "name": "retained-run",
+        "command": [
+          "zsh",
+          "-lc",
+          "/tmp/plato-archive-profile-independent-env/bin/python -m pytest tests/integration/test_retained_model_search.py --test-profile=mandatory -m retained_model_search -ra --basetemp=/tmp/plato-archive-profile-independent-review/model-search-tmp --junitxml=/tmp/plato-archive-profile-independent-review/model-search.xml"
+        ],
+        "cwd": "/tmp/plato-archive-profile-independent-worktree",
+        "returncode": 1,
+        "timed_out": false,
+        "elapsed_seconds": 367.6263835,
+        "extra_env": {}
+      },
+      "followup": "same source and deadlines, serial full19 passed"
+    },
+    "initial_concurrent_core_attempt": {
+      "status": {
+        "name": "core-runtime-run",
+        "command": [
+          "zsh",
+          "-lc",
+          "/tmp/plato-archive-profile-independent-dev/bin/python -m pytest tests --test-profile=mandatory -m 'runtime and not retained_model_search' -ra --basetemp=/tmp/plato-archive-profile-independent-review/core-runtime-tmp --junitxml=/tmp/plato-archive-profile-independent-review/core-runtime.xml"
+        ],
+        "cwd": "/tmp/plato-archive-profile-independent-worktree",
+        "returncode": null,
+        "timed_out": true,
+        "elapsed_seconds": 900.0205115,
+        "extra_env": {}
+      },
+      "aggregate_cap_seconds": 900,
+      "result": "incomplete; no full51 PASS claim",
+      "startup_cases_completed": 48,
+      "startup_case_failures": 1,
+      "failed_case": "client_custom-client_body",
+      "observed_worker_timeout_seconds": 30,
+      "followup": "same source and30s deadline, serial failedcase passed; root explicitly retained final integrated full51 qualification ownership"
+    },
+    "initial_absent_policy_import_attempt": {
+      "status": {
+        "name": "absent-base-guards",
+        "command": [
+          "zsh",
+          "-lc",
+          "/tmp/plato-archive-profile-independent-base/bin/python -m pytest tests/test_model_search_profile_contract.py tests/test_mlx_profile_contract.py tests/test_mlx_import_contract.py --test-profile=base -ra --basetemp=/tmp/plato-archive-profile-independent-review/base-guard-tmp --junitxml=/tmp/plato-archive-profile-independent-review/base-guard.xml"
+        ],
+        "cwd": "/tmp/plato-archive-profile-independent-worktree",
+        "returncode": null,
+        "timed_out": true,
+        "elapsed_seconds": 120.026293125,
+        "extra_env": {}
+      },
+      "aggregate_cap_seconds": 120,
+      "result": "incomplete; no independent199 absence policy claim",
+      "corroboration": "author exact199 raw/source-bound evidence independently hash-checked; independent169 guards and actual base collection/prerequisite controls passed"
+    },
+    "aggregate_timeout_cleanup": {
+      "owned_before": [],
+      "signals": [],
+      "remaining": []
+    },
+    "harness_notes": [
+      "Artifact stager probe was initially invoked using system Python3.9; retained error log and reran unchanged stager under task Python3.13.",
+      "Source audit harness was corrected to exclude only the intentionally extended owned assignment, compare node module paths before parameter text, count all seven absent DP cases, preserve spaced pytest parameter IDs, and distinguish28 referenced artifacts from29 added evidence files. No repository source, production assertions or deadlines were modified."
+    ],
+    "platform": "Reviewer runtime is actual Darwin arm64 Python3.13.16; actual Linux CI execution and final integrated full suites/native383 execution remain separately required."
+  }
+}

@@ -1,0 +1,1738 @@
+{
+  "schema_version": 1,
+  "reviewer": "/root/archive_profile_review",
+  "reviewed_at_utc": "2026-10-03T21:31:20.189775+00:00",
+  "decision": "ACCEPTED_BOUNDED_PROFILE_REVIEW",
+  "summary": "The exact approved compound runtime partition and dedicated retained19 gate preserve accepted base/mandatory/native enforcement. Independent runtime, prerequisite, marker/filter, typing and artifact controls passed; final integrated full-suite/Linux/native execution remains root-owned and pending.",
+  "findings": [],
+  "unresolved_findings_by_severity": {
+    "critical": 0,
+    "high": 0,
+    "medium": 0,
+    "low": 0
+  },
+  "scope": {
+    "base_commit": "aa2c3d5cdee60863dfe2c1d389ec1e0cbe89111b",
+    "source_commit": "591d706b01bed27fb4ec8687b2f5a298740560e7",
+    "source_tree": "fbd062de4471d8b980188aefb62c8ff1a151e60e",
+    "evidence_only_commit": "cda33622677c55679589bb04e42dc3b6397691a8",
+    "source_worktree": "/tmp/plato-archive-profile-independent-worktree",
+    "owned_paths": [
+      ".github/scripts/stage_ci_artifacts.py",
+      ".github/workflows/pytorch_tests.yml",
+      "tests/conftest.py",
+      "tests/test_model_search_profile_contract.py"
+    ],
+    "source_hashes": {
+      ".github/scripts/stage_ci_artifacts.py": "f9142f03c92469aceed4aa06ae5b8bb04699c89042dd156f0b4783392ca85b24",
+      ".github/workflows/pytorch_tests.yml": "697c6ae0c39fa7fd42766f8161f350944e90108b3dad852148da952acfcc9317",
+      "tests/conftest.py": "cf5bbbd976dd977396177892bc4997d7ad84c7e6e2f2163c6852d19c9aa65aee",
+      "tests/test_model_search_profile_contract.py": "fc8f8b300afab10bf5cc6f97b670aeba0e996b708202e14aeaeee015f5712e92",
+      "pyproject.toml": "8aaa7414717fa17841900d377d89851547677ba2ae93963afef79fc5490ba610",
+      "uv.lock": "e2a53aaae9a0dd49f5446b490bb3071e86aa3a9a20d6271c9dd30b4ae2dcbff9",
+      "tests/mlx_native/cases.json": "c168dc33a4d4e7ed70079e09c3de70f5b318d543c035ec13de2826b48e1175bb",
+      "tests/test_mlx_profile_contract.py": "c26c766a599d235f6841aafe82f178b7fd8a3ae02d8362420d0d4f7e95dd8088"
+    },
+    "accepted_native_base": "6311960cdd00955d4777e269ebee460be591065e",
+    "plan_revision": 3,
+    "plan_path": "/tmp/plato-archive-shortlist-plan.json",
+    "plan_sha256": "c66577eac31a2eeaba68f29e2fee53760def2477184521bd1f2536e76507573f",
+    "prior_MLX_review_sha256": "8d934c2c99a86e68dc93769ba757918eb6b0de0488304661abd131279ef756b2"
+  },
+  "source_audit": {
+    "source_commit": "591d706b01bed27fb4ec8687b2f5a298740560e7",
+    "source_tree": "fbd062de4471d8b980188aefb62c8ff1a151e60e",
+    "base_commit": "aa2c3d5cdee60863dfe2c1d389ec1e0cbe89111b",
+    "evidence_only_commit": "cda33622677c55679589bb04e42dc3b6397691a8",
+    "evidence_added_paths": [
+      "evidence/2026-refresh/archive-profile-policy/accepted-plan-review3.json",
+      "evidence/2026-refresh/archive-profile-policy/base-guard-import.log",
+      "evidence/2026-refresh/archive-profile-policy/before-sources.json",
+      "evidence/2026-refresh/archive-profile-policy/ci-structure-verification.json",
+      "evidence/2026-refresh/archive-profile-policy/ci-verifier.txt",
+      "evidence/2026-refresh/archive-profile-policy/collection-probes.json",
+      "evidence/2026-refresh/archive-profile-policy/final-red-source.json",
+      "evidence/2026-refresh/archive-profile-policy/final-red.log",
+      "evidence/2026-refresh/archive-profile-policy/guard-final-source.log",
+      "evidence/2026-refresh/archive-profile-policy/guard-green-final.log",
+      "evidence/2026-refresh/archive-profile-policy/installed-import.log",
+      "evidence/2026-refresh/archive-profile-policy/lock-check.log",
+      "evidence/2026-refresh/archive-profile-policy/model-search-acceptance.json",
+      "evidence/2026-refresh/archive-profile-policy/model-search-packages.txt",
+      "evidence/2026-refresh/archive-profile-policy/model-search.log",
+      "evidence/2026-refresh/archive-profile-policy/model-search.xml",
+      "evidence/2026-refresh/archive-profile-policy/profile-owner-handoff.json",
+      "evidence/2026-refresh/archive-profile-policy/raw-records-manifest.json",
+      "evidence/2026-refresh/archive-profile-policy/raw-records.tar.gz",
+      "evidence/2026-refresh/archive-profile-policy/receipt.json",
+      "evidence/2026-refresh/archive-profile-policy/retained-worker-receipts.json",
+      "evidence/2026-refresh/archive-profile-policy/ruff-all.log",
+      "evidence/2026-refresh/archive-profile-policy/ruff-format.log",
+      "evidence/2026-refresh/archive-profile-policy/submodules.txt",
+      "evidence/2026-refresh/archive-profile-policy/ty-stager.log",
+      "evidence/2026-refresh/archive-profile-policy/typing-classification.json",
+      "evidence/2026-refresh/archive-profile-policy/typing-classifier-replay.log",
+      "evidence/2026-refresh/archive-profile-policy/typing-owned.log",
+      "evidence/2026-refresh/archive-profile-policy/unchanged-native-core-ast.json"
+    ],
+    "source_hashes": {
+      ".github/scripts/stage_ci_artifacts.py": "f9142f03c92469aceed4aa06ae5b8bb04699c89042dd156f0b4783392ca85b24",
+      ".github/workflows/pytorch_tests.yml": "697c6ae0c39fa7fd42766f8161f350944e90108b3dad852148da952acfcc9317",
+      "tests/conftest.py": "cf5bbbd976dd977396177892bc4997d7ad84c7e6e2f2163c6852d19c9aa65aee",
+      "tests/test_model_search_profile_contract.py": "fc8f8b300afab10bf5cc6f97b670aeba0e996b708202e14aeaeee015f5712e92",
+      "pyproject.toml": "8aaa7414717fa17841900d377d89851547677ba2ae93963afef79fc5490ba610",
+      "uv.lock": "e2a53aaae9a0dd49f5446b490bb3071e86aa3a9a20d6271c9dd30b4ae2dcbff9",
+      "tests/mlx_native/cases.json": "c168dc33a4d4e7ed70079e09c3de70f5b318d543c035ec13de2826b48e1175bb",
+      "tests/test_mlx_profile_contract.py": "c26c766a599d235f6841aafe82f178b7fd8a3ae02d8362420d0d4f7e95dd8088"
+    },
+    "changed_paths": [
+      ".github/scripts/stage_ci_artifacts.py",
+      ".github/workflows/pytorch_tests.yml",
+      "tests/conftest.py",
+      "tests/test_model_search_profile_contract.py"
+    ],
+    "unchanged_production_and_runtime_test_subtree_git_objects": {
+      "plato": "ead7224e5ef9b50e977571ac738ad579dac43ebc",
+      "tests/integration": "efc339b14aac381daddbd5afbfeb6da197764d5b",
+      "tests/mlx_native": "ae13f7ec46a77569f36f5da742178f8f1fd22cdc",
+      "tests/mpc": "3ffa111b96a6fa6c0824601854f251afcc876853",
+      "tests/trainers": "8e157d6313976ef7371b7f7daa22c12635aa9238",
+      "tests/utils": "8fe67bf026dd91f4000ea54c899df00607fbf9d6"
+    },
+    "preserved_AST_definitions": [
+      "_REQUIRED",
+      "_RUNTIME",
+      "_STARTUP_CASES",
+      "_native_prerequisites",
+      "_load_native_ledger",
+      "_full_suite",
+      "pytest_addoption",
+      "_ProfileChecks._native_path",
+      "_ProfileChecks._native_node",
+      "_ProfileChecks._unsupported_selector",
+      "_ProfileChecks.pytest_ignore_collect",
+      "_ProfileChecks.pytest_collect_file",
+      "_ProfileChecks.pytest_sessionstart",
+      "_ProfileChecks._check_skip",
+      "_ProfileChecks.pytest_collectreport",
+      "_ProfileChecks.pytest_runtest_logreport",
+      "_ProfileChecks.pytest_terminal_summary"
+    ],
+    "native_accepted_hash_and_383_inventory_match": true,
+    "base_conftest_matches_accepted_MLX_review": true,
+    "typing_owned_paths": [
+      ".github/scripts/stage_ci_artifacts.py",
+      "examples/gradient_leakage_attacks/dlg_model.py",
+      "examples/model_search/anycostfl/anycostfl.py",
+      "examples/model_search/fedrolex/fedrolex.py",
+      "examples/model_search/heterofl/heterofl.py",
+      "plato/algorithms/mlx_fedavg.py",
+      "plato/algorithms/registry.py",
+      "plato/models/registry.py",
+      "plato/servers/fedavg.py",
+      "plato/trainers/mlx.py",
+      "plato/trainers/registry.py",
+      "plato/utils/retired_backends.py",
+      "plato/utils/tree.py",
+      "tests/clients/test_feddf_strategy.py",
+      "tests/conftest.py",
+      "tests/datasources/test_huggingface_datasource.py",
+      "tests/integration/model_search_retention_worker.py",
+      "tests/integration/test_event_loop_startup.py",
+      "tests/integration/test_retained_model_search.py",
+      "tests/integration/utils.py",
+      "tests/mlx_import_audit_runner.py",
+      "tests/mlx_native/__init__.py",
+      "tests/mlx_native/benchmark.py",
+      "tests/mlx_native/helpers.py",
+      "tests/mlx_native/seed_probe.py",
+      "tests/mlx_native/socket_harness.py",
+      "tests/mlx_native/socket_probe.py",
+      "tests/mlx_native/test_phase3_controls.py",
+      "tests/mlx_native/test_phase3_dispatch.py",
+      "tests/mlx_native/test_phase3_rng.py",
+      "tests/mlx_native/test_phase3_runtime.py",
+      "tests/mlx_native/test_phase3_selection.py",
+      "tests/mlx_native/test_phase3_socket.py",
+      "tests/mlx_native/test_phase3_tree_contract.py",
+      "tests/servers/test_feddf_server_strategy.py",
+      "tests/test_mlx_import_contract.py",
+      "tests/test_mlx_profile_contract.py",
+      "tests/test_model_search_profile_contract.py",
+      "tests/test_model_search_retirement.py",
+      "tests/test_retired_backends.py",
+      "tests/trainers/test_dp_data_loader_strategy.py"
+    ],
+    "typing_added_owned_paths": [
+      ".github/scripts/stage_ci_artifacts.py",
+      "examples/gradient_leakage_attacks/dlg_model.py",
+      "examples/model_search/anycostfl/anycostfl.py",
+      "examples/model_search/fedrolex/fedrolex.py",
+      "examples/model_search/heterofl/heterofl.py",
+      "tests/integration/model_search_retention_worker.py",
+      "tests/integration/test_retained_model_search.py",
+      "tests/test_model_search_profile_contract.py",
+      "tests/test_model_search_retirement.py"
+    ],
+    "typing_allowances_and_classifier_unchanged": true,
+    "collection_counts": {
+      "base_nonruntime": 1474,
+      "mandatory_nonruntime": 1481,
+      "core_runtime": 51,
+      "startup": 48,
+      "native": 383,
+      "retained": 19
+    },
+    "separate_locked_retained_environment": true,
+    "source_status": ""
+  },
+  "environments": {
+    "base": {
+      "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+      "executable": "/tmp/plato-archive-profile-independent-base/bin/python",
+      "platform": [
+        "Darwin",
+        "arm64"
+      ],
+      "versions": {
+        "pytest": "9.1.1",
+        "pytest-cov": "7.1.0",
+        "torch": "2.14.1",
+        "torchvision": "0.29.1",
+        "ptflops": null,
+        "opacus": null,
+        "kazoo": null,
+        "gymnasium": null,
+        "mlx": null,
+        "mlx-metal": null,
+        "ty": null,
+        "ruff": null
+      }
+    },
+    "dev": {
+      "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+      "executable": "/tmp/plato-archive-profile-independent-dev/bin/python",
+      "platform": [
+        "Darwin",
+        "arm64"
+      ],
+      "versions": {
+        "pytest": "9.1.1",
+        "pytest-cov": "7.1.0",
+        "torch": "2.14.1",
+        "torchvision": "0.29.1",
+        "ptflops": null,
+        "opacus": "1.6.0",
+        "kazoo": "2.11.0",
+        "gymnasium": "1.3.0",
+        "mlx": null,
+        "mlx-metal": null,
+        "ty": "0.0.84",
+        "ruff": "0.16.10"
+      }
+    },
+    "retained": {
+      "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+      "executable": "/tmp/plato-archive-profile-independent-env/bin/python",
+      "platform": [
+        "Darwin",
+        "arm64"
+      ],
+      "versions": {
+        "pytest": "9.1.1",
+        "pytest-cov": "7.1.0",
+        "torch": "2.14.1",
+        "torchvision": "0.29.1",
+        "ptflops": "0.7.5",
+        "opacus": "1.6.0",
+        "kazoo": "2.11.0",
+        "gymnasium": "1.3.0",
+        "mlx": null,
+        "mlx-metal": null,
+        "ty": null,
+        "ruff": null
+      }
+    },
+    "native": {
+      "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+      "executable": "/tmp/plato-archive-profile-independent-native/bin/python",
+      "platform": [
+        "Darwin",
+        "arm64"
+      ],
+      "versions": {
+        "pytest": "9.1.1",
+        "pytest-cov": "7.1.0",
+        "torch": "2.14.1",
+        "torchvision": "0.29.1",
+        "ptflops": null,
+        "opacus": "1.6.0",
+        "kazoo": "2.11.0",
+        "gymnasium": "1.3.0",
+        "mlx": "0.32.3",
+        "mlx-metal": "0.32.3",
+        "ty": "0.0.84",
+        "ruff": "0.16.10"
+      }
+    }
+  },
+  "independent_checks": {
+    "policy_guard_tests": {
+      "passed": 169,
+      "new_profile_cases": 71,
+      "accepted_existing_MLX_policy_cases": 98,
+      "skipped": 0,
+      "status": "guard-tests-status.json"
+    },
+    "actual_collection_counts": {
+      "base_nonruntime": 1474,
+      "mandatory_nonruntime": 1481,
+      "core_runtime": 51,
+      "startup": 48,
+      "native": 383,
+      "retained": 19
+    },
+    "real_prerequisites": {
+      "fresh_test_base_has_no_opacus_or_MLX": true,
+      "fresh_dev_has_no_ptflops_or_MLX": true,
+      "mandatory_base_collection_exits4_with_exact_missing_opacus_diagnostic": true,
+      "ptflops_absence_in_dev_real_import_exits1": true,
+      "test_model_search_real_ptflops_opacus_kazoo_gymnasium_imports_pass": true,
+      "native_real_Darwin_arm64_CPU_Metal_preflight_and_383_collection_pass": true
+    },
+    "positive_and_negative_collection_and_actual_skip_xfail_controls": {
+      "commands_and_statuses": [
+        {
+          "name": "base-nonruntime-collection",
+          "command": [
+            "zsh",
+            "-lc",
+            "/tmp/plato-archive-profile-independent-base/bin/python -m pytest tests --collect-only -q --test-profile=base -m 'not runtime'"
+          ],
+          "cwd": "/tmp/plato-archive-profile-independent-worktree",
+          "returncode": 0,
+          "timed_out": false,
+          "elapsed_seconds": 15.989134208000001,
+          "extra_env": {}
+        },
+        {
+          "name": "mandatory-nonruntime-collection",
+          "command": [
+            "zsh",
+            "-lc",
+            "/tmp/plato-archive-profile-independent-dev/bin/python -m pytest tests --collect-only -q --test-profile=mandatory -m 'not runtime'"
+          ],
+          "cwd": "/tmp/plato-archive-profile-independent-worktree",
+          "returncode": 0,
+          "timed_out": false,
+          "elapsed_seconds": 22.488942041999998,
+          "extra_env": {}
+        },
+        {
+          "name": "core-runtime-collection",
+          "command": [
+            "zsh",
+            "-lc",
+            "/tmp/plato-archive-profile-independent-dev/bin/python -m pytest tests --collect-only -q --test-profile=mandatory -m 'runtime and not retained_model_search'"
+          ],
+          "cwd": "/tmp/plato-archive-profile-independent-worktree",
+          "returncode": 0,
+          "timed_out": false,
+          "elapsed_seconds": 17.5012685,
+          "extra_env": {}
+        },
+        {
+          "name": "retained-collection",
+          "command": [
+            "zsh",
+            "-lc",
+            "/tmp/plato-archive-profile-independent-env/bin/python -m pytest tests/integration/test_retained_model_search.py --collect-only -q --test-profile=mandatory -m retained_model_search"
+          ],
+          "cwd": "/tmp/plato-archive-profile-independent-worktree",
+          "returncode": 0,
+          "timed_out": false,
+          "elapsed_seconds": 14.021931417000001,
+          "extra_env": {}
+        },
+        {
+          "name": "expression-negative",
+          "command": [
+            "zsh",
+            "-lc",
+            "/tmp/plato-archive-profile-independent-dev/bin/python -m pytest tests --collect-only --test-profile=mandatory -m 'runtime and not retained_model_search and not startup_containment'"
+          ],
+          "cwd": "/tmp/plato-archive-profile-independent-worktree",
+          "returncode": 4,
+          "timed_out": false,
+          "elapsed_seconds": 14.287402917,
+          "extra_env": {}
+        },
+        {
+          "name": "keyword-negative",
+          "command": [
+            "zsh",
+            "-lc",
+            "/tmp/plato-archive-profile-independent-dev/bin/python -m pytest tests --collect-only --test-profile=mandatory -m 'runtime and not retained_model_search' -k 'not test_real_two_client_cpu_socket_round'"
+          ],
+          "cwd": "/tmp/plato-archive-profile-independent-worktree",
+          "returncode": 1,
+          "timed_out": false,
+          "elapsed_seconds": 21.091844792,
+          "extra_env": {}
+        },
+        {
+          "name": "retained-filter-negative",
+          "command": [
+            "zsh",
+            "-lc",
+            "/tmp/plato-archive-profile-independent-env/bin/python -m pytest tests/integration/test_retained_model_search.py --collect-only --test-profile=mandatory -m retained_model_search -k 'not anycostfl'"
+          ],
+          "cwd": "/tmp/plato-archive-profile-independent-worktree",
+          "returncode": 4,
+          "timed_out": false,
+          "elapsed_seconds": 20.328777958,
+          "extra_env": {}
+        },
+        {
+          "name": "retained-drop-negative",
+          "command": [
+            "zsh",
+            "-lc",
+            "/tmp/plato-archive-profile-independent-env/bin/python -m pytest tests/integration/test_retained_model_search.py --collect-only --test-profile=mandatory -m retained_model_search -p drop_plugin"
+          ],
+          "cwd": "/tmp/plato-archive-profile-independent-worktree",
+          "returncode": 1,
+          "timed_out": false,
+          "elapsed_seconds": 15.753657458000001,
+          "extra_env": {}
+        },
+        {
+          "name": "retained-skip-negative",
+          "command": [
+            "zsh",
+            "-lc",
+            "/tmp/plato-archive-profile-independent-env/bin/python -m pytest tests/integration/test_retained_model_search.py --test-profile=mandatory -m retained_model_search -p skip_plugin"
+          ],
+          "cwd": "/tmp/plato-archive-profile-independent-worktree",
+          "returncode": 1,
+          "timed_out": false,
+          "elapsed_seconds": 18.10236325,
+          "extra_env": {}
+        },
+        {
+          "name": "retained-xfail-negative",
+          "command": [
+            "zsh",
+            "-lc",
+            "/tmp/plato-archive-profile-independent-env/bin/python -m pytest tests/integration/test_retained_model_search.py --test-profile=mandatory -m retained_model_search -p xfail_plugin"
+          ],
+          "cwd": "/tmp/plato-archive-profile-independent-worktree",
+          "returncode": 1,
+          "timed_out": false,
+          "elapsed_seconds": 24.136792292,
+          "extra_env": {}
+        },
+        {
+          "name": "mandatory-prerequisites-missing",
+          "command": [
+            "zsh",
+            "-lc",
+            "/tmp/plato-archive-profile-independent-base/bin/python -m pytest tests --collect-only --test-profile=mandatory"
+          ],
+          "cwd": "/tmp/plato-archive-profile-independent-worktree",
+          "returncode": 4,
+          "timed_out": false,
+          "elapsed_seconds": 33.468261875,
+          "extra_env": {}
+        }
+      ],
+      "expected_exitcodes_and_diagnostics_confirmed": {
+        "expression-negative": "unapproved full-suite partition",
+        "keyword-negative": "unexpected deselection",
+        "retained-filter-negative": "retained qualification does not permit filters",
+        "retained-drop-negative": "retained inventory mismatch",
+        "retained-skip-negative": "unexpected skip",
+        "retained-xfail-negative": "unexpected xfail/xpass",
+        "mandatory-prerequisites-missing": "mandatory prerequisite failed: No module named 'opacus'"
+      }
+    },
+    "retained_serial_execution": {
+      "passed": 19,
+      "failures": 0,
+      "skips": 0,
+      "xfails": 0,
+      "all_natural_without_forced_teardown_or_survivors": true,
+      "pytest_seconds": 275.64,
+      "wrapper_status": {
+        "name": "retained-run-serial",
+        "command": [
+          "zsh",
+          "-lc",
+          "/tmp/plato-archive-profile-independent-env/bin/python -m pytest tests/integration/test_retained_model_search.py --test-profile=mandatory -m retained_model_search -ra --basetemp=/tmp/plato-archive-profile-independent-review/model-search-serial-tmp --junitxml=/tmp/plato-archive-profile-independent-review/model-search-serial.xml"
+        ],
+        "cwd": "/tmp/plato-archive-profile-independent-worktree",
+        "returncode": 0,
+        "timed_out": false,
+        "elapsed_seconds": 285.876306083,
+        "extra_env": {}
+      },
+      "exact_final_CI_verifier": {
+        "schema_version": 1,
+        "accepted": true,
+        "expected_case_names": [
+          "test_retained_width_round[anycostfl]",
+          "test_retained_width_round[fedrolex]",
+          "test_retained_width_round[heterofl]",
+          "test_retained_activated_budget[anycostfl]",
+          "test_retained_activated_budget[fedrolex]",
+          "test_retained_activated_budget[heterofl]",
+          "test_sysheterofl_subnet_round",
+          "test_dlg_model_update[lenet]",
+          "test_dlg_model_update[resnet_18]",
+          "test_local_retired_selection[anycostfl]",
+          "test_local_retired_selection[fedrolex]",
+          "test_local_retired_selection[heterofl]",
+          "test_local_retired_selection[dlg]",
+          "test_retained_entrypoint_import[anycostfl-root]",
+          "test_retained_entrypoint_import[anycostfl-example]",
+          "test_retained_entrypoint_import[fedrolex-root]",
+          "test_retained_entrypoint_import[fedrolex-example]",
+          "test_retained_entrypoint_import[heterofl-root]",
+          "test_retained_entrypoint_import[heterofl-example]"
+        ],
+        "collected_nodes": [
+          "tests/integration/test_retained_model_search.py::test_retained_width_round[anycostfl]",
+          "tests/integration/test_retained_model_search.py::test_retained_width_round[fedrolex]",
+          "tests/integration/test_retained_model_search.py::test_retained_width_round[heterofl]",
+          "tests/integration/test_retained_model_search.py::test_retained_activated_budget[anycostfl]",
+          "tests/integration/test_retained_model_search.py::test_retained_activated_budget[fedrolex]",
+          "tests/integration/test_retained_model_search.py::test_retained_activated_budget[heterofl]",
+          "tests/integration/test_retained_model_search.py::test_sysheterofl_subnet_round",
+          "tests/integration/test_retained_model_search.py::test_dlg_model_update[lenet]",
+          "tests/integration/test_retained_model_search.py::test_dlg_model_update[resnet_18]",
+          "tests/integration/test_retained_model_search.py::test_local_retired_selection[anycostfl]",
+          "tests/integration/test_retained_model_search.py::test_local_retired_selection[fedrolex]",
+          "tests/integration/test_retained_model_search.py::test_local_retired_selection[heterofl]",
+          "tests/integration/test_retained_model_search.py::test_local_retired_selection[dlg]",
+          "tests/integration/test_retained_model_search.py::test_retained_entrypoint_import[anycostfl-root]",
+          "tests/integration/test_retained_model_search.py::test_retained_entrypoint_import[anycostfl-example]",
+          "tests/integration/test_retained_model_search.py::test_retained_entrypoint_import[fedrolex-root]",
+          "tests/integration/test_retained_model_search.py::test_retained_entrypoint_import[fedrolex-example]",
+          "tests/integration/test_retained_model_search.py::test_retained_entrypoint_import[heterofl-root]",
+          "tests/integration/test_retained_model_search.py::test_retained_entrypoint_import[heterofl-example]"
+        ],
+        "junit_case_names": [
+          "test_retained_width_round[anycostfl]",
+          "test_retained_width_round[fedrolex]",
+          "test_retained_width_round[heterofl]",
+          "test_retained_activated_budget[anycostfl]",
+          "test_retained_activated_budget[fedrolex]",
+          "test_retained_activated_budget[heterofl]",
+          "test_sysheterofl_subnet_round",
+          "test_dlg_model_update[lenet]",
+          "test_dlg_model_update[resnet_18]",
+          "test_local_retired_selection[anycostfl]",
+          "test_local_retired_selection[fedrolex]",
+          "test_local_retired_selection[heterofl]",
+          "test_local_retired_selection[dlg]",
+          "test_retained_entrypoint_import[anycostfl-root]",
+          "test_retained_entrypoint_import[anycostfl-example]",
+          "test_retained_entrypoint_import[fedrolex-root]",
+          "test_retained_entrypoint_import[fedrolex-example]",
+          "test_retained_entrypoint_import[heterofl-root]",
+          "test_retained_entrypoint_import[heterofl-example]"
+        ],
+        "suite_totals": {
+          "tests": 19,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "execution_outcomes": {
+          "passed": 19
+        },
+        "issues": []
+      },
+      "workers": [
+        {
+          "path": "/tmp/plato-archive-profile-independent-review/model-search-serial-tmp/test_dlg_model_update_lenet_0/lenet/result.json",
+          "sha256": "63386d32930342a8c8f9779eb7d17ba0028a1b74536157d37e0ce25c73b98f3b",
+          "family": "dlg",
+          "case": "update",
+          "variant": "lenet",
+          "elapsed_seconds": 4.088344458024949
+        },
+        {
+          "path": "/tmp/plato-archive-profile-independent-review/model-search-serial-tmp/test_dlg_model_update_resnet_10/resnet_18/result.json",
+          "sha256": "87c71424f6dd867c5a6d4a8a8742398c36051a0e9ea748fc0072c7c1e18beca2",
+          "family": "dlg",
+          "case": "update",
+          "variant": "resnet_18",
+          "elapsed_seconds": 4.312613875139505
+        },
+        {
+          "path": "/tmp/plato-archive-profile-independent-review/model-search-serial-tmp/test_local_retired_selection_a0/anycostfl/result.json",
+          "sha256": "a205c04b8ffc9e848c3b5f8ff25521edf77d12c6b6a0052222c6d372c227c93a",
+          "family": "anycostfl",
+          "case": "selector",
+          "variant": "",
+          "elapsed_seconds": 9.234731208067387
+        },
+        {
+          "path": "/tmp/plato-archive-profile-independent-review/model-search-serial-tmp/test_local_retired_selection_d0/dlg/result.json",
+          "sha256": "5d33b059d0ae840b4297f3ec02a43264bbf4ea89bf15ae10243c5def020364e1",
+          "family": "dlg",
+          "case": "selector",
+          "variant": "",
+          "elapsed_seconds": 4.112538249930367
+        },
+        {
+          "path": "/tmp/plato-archive-profile-independent-review/model-search-serial-tmp/test_local_retired_selection_f0/fedrolex/result.json",
+          "sha256": "194ef9a49275a3bc498b18d5ff306bc568cb956da50e4441994635d8ada14011",
+          "family": "fedrolex",
+          "case": "selector",
+          "variant": "",
+          "elapsed_seconds": 9.175419250037521
+        },
+        {
+          "path": "/tmp/plato-archive-profile-independent-review/model-search-serial-tmp/test_local_retired_selection_h0/heterofl/result.json",
+          "sha256": "fe797379c950123d3318540a57adc542965686f76b5e757a5329dc8d87d7b525",
+          "family": "heterofl",
+          "case": "selector",
+          "variant": "",
+          "elapsed_seconds": 9.22465524985455
+        },
+        {
+          "path": "/tmp/plato-archive-profile-independent-review/model-search-serial-tmp/test_retained_activated_budget0/anycostfl/result.json",
+          "sha256": "e61a21e22d88a81e696394004d0059dfec899a5261504d947ddc545ba875c2f5",
+          "family": "anycostfl",
+          "case": "budget",
+          "variant": "",
+          "elapsed_seconds": 9.935120834037662
+        },
+        {
+          "path": "/tmp/plato-archive-profile-independent-review/model-search-serial-tmp/test_retained_activated_budget1/fedrolex/result.json",
+          "sha256": "3f1c67eb31a72250f672c6f20b9c5d72c0da0423e8e8cb4c4a7802e8ff913571",
+          "family": "fedrolex",
+          "case": "budget",
+          "variant": "",
+          "elapsed_seconds": 9.927685250062495
+        },
+        {
+          "path": "/tmp/plato-archive-profile-independent-review/model-search-serial-tmp/test_retained_activated_budget2/heterofl/result.json",
+          "sha256": "2f0bba41c2256dd8e57b56cf02d6f7ec4d52d62aaf4716f0437e1bc358128f7a",
+          "family": "heterofl",
+          "case": "budget",
+          "variant": "",
+          "elapsed_seconds": 9.587062833132222
+        },
+        {
+          "path": "/tmp/plato-archive-profile-independent-review/model-search-serial-tmp/test_retained_entrypoint_impor0/anycostfl/result.json",
+          "sha256": "7752e46e1a34c780b431b7b7377d8f29b5cf93caf365ccb325001a266f006d4e",
+          "family": "anycostfl",
+          "case": "import",
+          "variant": "root",
+          "elapsed_seconds": 9.176854375051335
+        },
+        {
+          "path": "/tmp/plato-archive-profile-independent-review/model-search-serial-tmp/test_retained_entrypoint_impor1/anycostfl/result.json",
+          "sha256": "0051ec47e942a6f677fe8a3df343ad342457bacb1c6e6ed84741f550cdbb0589",
+          "family": "anycostfl",
+          "case": "import",
+          "variant": "example",
+          "elapsed_seconds": 9.211818541865796
+        },
+        {
+          "path": "/tmp/plato-archive-profile-independent-review/model-search-serial-tmp/test_retained_entrypoint_impor2/fedrolex/result.json",
+          "sha256": "839f6ba7f30013e92ee00dd0c201d2098bcfdc76ba59596eed0ed83a22643a56",
+          "family": "fedrolex",
+          "case": "import",
+          "variant": "root",
+          "elapsed_seconds": 9.245625499868765
+        },
+        {
+          "path": "/tmp/plato-archive-profile-independent-review/model-search-serial-tmp/test_retained_entrypoint_impor3/fedrolex/result.json",
+          "sha256": "2c780488ccfb97ed2db8f12756bed4baca89271cb7c25731de5f1f7820ed9098",
+          "family": "fedrolex",
+          "case": "import",
+          "variant": "example",
+          "elapsed_seconds": 9.267816083040088
+        },
+        {
+          "path": "/tmp/plato-archive-profile-independent-review/model-search-serial-tmp/test_retained_entrypoint_impor4/heterofl/result.json",
+          "sha256": "9f373eadc0f24101660f751678af35fb338645c9ca32f2031315dcbef00f7202",
+          "family": "heterofl",
+          "case": "import",
+          "variant": "root",
+          "elapsed_seconds": 9.23773616598919
+        },
+        {
+          "path": "/tmp/plato-archive-profile-independent-review/model-search-serial-tmp/test_retained_entrypoint_impor5/heterofl/result.json",
+          "sha256": "fa380ef21fe1242df8a300133fed3319324e02b16e9500eb8fa6b9632a116fd4",
+          "family": "heterofl",
+          "case": "import",
+          "variant": "example",
+          "elapsed_seconds": 9.299657208146527
+        },
+        {
+          "path": "/tmp/plato-archive-profile-independent-review/model-search-serial-tmp/test_retained_width_round_anyc0/anycostfl/result.json",
+          "sha256": "f1f841acd47640cbc15e57cc2ff59ee28456643eee967b089f3716cd717a7f89",
+          "family": "anycostfl",
+          "case": "socket",
+          "variant": "",
+          "elapsed_seconds": 45.991487625055015
+        },
+        {
+          "path": "/tmp/plato-archive-profile-independent-review/model-search-serial-tmp/test_retained_width_round_fedr0/fedrolex/result.json",
+          "sha256": "6485bf44714df663c4d43c6e81acda6524d693d429bbb5c550e3eccb0a3ee1b0",
+          "family": "fedrolex",
+          "case": "socket",
+          "variant": "",
+          "elapsed_seconds": 46.007740000030026
+        },
+        {
+          "path": "/tmp/plato-archive-profile-independent-review/model-search-serial-tmp/test_retained_width_round_hete0/heterofl/result.json",
+          "sha256": "b20c3785edc8860cf30d32e8cc324202d2723605b3901debe8ff939180dac57a",
+          "family": "heterofl",
+          "case": "socket",
+          "variant": "",
+          "elapsed_seconds": 46.29451216687448
+        },
+        {
+          "path": "/tmp/plato-archive-profile-independent-review/model-search-serial-tmp/test_sysheterofl_subnet_round0/sysheterofl/result.json",
+          "sha256": "045205b7d787f9ff57be00042b27734f95da22f9add4cbff53b3aaa535c9c958",
+          "family": "sysheterofl",
+          "case": "subnet",
+          "variant": "",
+          "elapsed_seconds": 12.199056291021407
+        }
+      ]
+    },
+    "failed_startup_case_serial_rerun": {
+      "passed": 1,
+      "node": "tests/integration/test_event_loop_startup.py::test_fresh_entrypoint_executes_scheduled_work[client_custom-client_body]",
+      "unchanged_worker_deadline_seconds": 30,
+      "wrapper_status": {
+        "name": "startup-client-custom-serial",
+        "command": [
+          "zsh",
+          "-lc",
+          "/tmp/plato-archive-profile-independent-dev/bin/python -m pytest 'tests/integration/test_event_loop_startup.py::test_fresh_entrypoint_executes_scheduled_work[client_custom-client_body]' --test-profile=mandatory -ra --basetemp=/tmp/plato-archive-profile-independent-review/startup-serial-tmp --junitxml=/tmp/plato-archive-profile-independent-review/startup-serial.xml"
+        ],
+        "cwd": "/tmp/plato-archive-profile-independent-worktree",
+        "returncode": 0,
+        "timed_out": false,
+        "elapsed_seconds": 19.645603040999998,
+        "extra_env": {}
+      },
+      "natural_result": {
+        "case": "client_custom",
+        "options": {},
+        "command": [
+          "/tmp/plato-archive-profile-independent-dev/bin/python",
+          "-B",
+          "-m",
+          "tests.integration.startup_probe"
+        ],
+        "returncode": 0,
+        "timed_out": false,
+        "forced": [],
+        "elapsed": 9.01682920800522,
+        "survivors": [],
+        "processes": {
+          "48229": 1791062940.620125
+        },
+        "events": [
+          {
+            "event": "fresh_process",
+            "pid": 48229,
+            "version": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+            "precreated_loop": false
+          },
+          {
+            "event": "client_configure",
+            "pid": 48229
+          },
+          {
+            "event": "client_body",
+            "pid": 48229,
+            "loop": 4791251504,
+            "client_id": 1
+          },
+          {
+            "event": "returned",
+            "pid": 48229
+          },
+          {
+            "event": "loop_after",
+            "pid": 48229,
+            "closed": false
+          }
+        ],
+        "stdout": "{\"event\": \"fresh_process\", \"pid\": 48229, \"version\": \"3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]\", \"precreated_loop\": false}\n{\"event\": \"client_configure\", \"pid\": 48229}\n{\"event\": \"client_body\", \"pid\": 48229, \"loop\": 4791251504, \"client_id\": 1}\n{\"event\": \"returned\", \"pid\": 48229}\n{\"event\": \"loop_after\", \"pid\": 48229, \"closed\": false}\n",
+        "stderr": "[INFO][17:29:09]: Starting a custom client #1.\n",
+        "port": 56646
+      },
+      "result_sha256": "f3dc8c0439eff0ad5a09065ce4b6f8900e9440e2aa5ef6b064a33a1ba358ca4e"
+    },
+    "artifact_and_classifier_controls": {
+      "author_receipt_sha256": "2bfe39410aaa769bfc6e247147e38b637706261505dd4c51b4287804d8b82684",
+      "author_artifacts_verified": 28,
+      "author_raw_files_verified": 199,
+      "exact_verifier_accepts_actual_author_19_artifacts": true,
+      "exact_CI_verifier_controls": [
+        {
+          "damage": "valid",
+          "status": 0
+        },
+        {
+          "damage": "drop",
+          "status": 1
+        },
+        {
+          "damage": "duplicate",
+          "status": 1
+        },
+        {
+          "damage": "extra",
+          "status": 1
+        },
+        {
+          "damage": "wrong-class",
+          "status": 1
+        },
+        {
+          "damage": "skip",
+          "status": 1
+        },
+        {
+          "damage": "failure",
+          "status": 1
+        },
+        {
+          "damage": "error",
+          "status": 1
+        },
+        {
+          "damage": "xfail",
+          "status": 1
+        },
+        {
+          "damage": "xpass",
+          "status": 1
+        },
+        {
+          "damage": "bad-totals",
+          "status": 1
+        },
+        {
+          "damage": "missing-file",
+          "status": 1
+        }
+      ],
+      "stager_controls": [
+        {
+          "missing": null,
+          "status": 0,
+          "included": 27,
+          "all_hashes_match": true
+        },
+        {
+          "missing": "model-search-acceptance.json",
+          "status": 1,
+          "included": 26,
+          "all_hashes_match": true
+        },
+        {
+          "missing": "model-search-collection.log",
+          "status": 1,
+          "included": 26,
+          "all_hashes_match": true
+        },
+        {
+          "missing": "model-search-packages.txt",
+          "status": 1,
+          "included": 26,
+          "all_hashes_match": true
+        },
+        {
+          "missing": "model-search-prerequisites.log",
+          "status": 1,
+          "included": 26,
+          "all_hashes_match": true
+        },
+        {
+          "missing": "model-search.log",
+          "status": 1,
+          "included": 26,
+          "all_hashes_match": true
+        },
+        {
+          "missing": "model-search.xml",
+          "status": 1,
+          "included": 26,
+          "all_hashes_match": true
+        },
+        {
+          "missing": "ty-stager.log",
+          "status": 1,
+          "included": 26,
+          "all_hashes_match": true
+        }
+      ],
+      "exact_classifier_controls": [
+        {
+          "label": "actual_full",
+          "accepted": true
+        },
+        {
+          "label": "new_owned_error",
+          "accepted": false
+        },
+        {
+          "label": "stager_error",
+          "accepted": false
+        },
+        {
+          "label": "clean",
+          "accepted": true
+        },
+        {
+          "label": "malformed",
+          "accepted": false
+        }
+      ]
+    },
+    "typing": {
+      "full_diagnostics": 333,
+      "full_exitstatus": 1,
+      "new_owned_diagnostics": 0,
+      "owned_violations": 0,
+      "retained_existing_exact_allowances": [
+        [
+          "tests/datasources/test_huggingface_datasource.py",
+          "99",
+          "5",
+          "invalid-assignment"
+        ],
+        [
+          "tests/datasources/test_huggingface_datasource.py",
+          "100",
+          "5",
+          "invalid-assignment"
+        ]
+      ],
+      "explicit_three_owned_path_typing_exitstatus": 0,
+      "exact_full_workflow_classifier_accepted": true,
+      "full_repository_typing_clean": false,
+      "environment": "fresh dev without MLX or ptflops"
+    },
+    "ruff_imports_and_locked_dependency_check": "passed"
+  },
+  "author_evidence_independently_checked": {
+    "commit": "cda33622677c55679589bb04e42dc3b6397691a8",
+    "receipt_path": "/tmp/plato-refresh-worktrees/archive-profile/evidence/2026-refresh/archive-profile-policy/receipt.json",
+    "receipt_sha256": "2bfe39410aaa769bfc6e247147e38b637706261505dd4c51b4287804d8b82684",
+    "receipt_artifact_hashes_verified": 28,
+    "raw_archive_file_hashes_verified": 199,
+    "actual_author19_collection_JUnit_runlog_exact_final_CI_gate_replay": "accepted",
+    "author190_installed_policy_and199_absent_policy_claims": "source-bound receipts/hash-checked corroboration, not relabeled independent reruns"
+  },
+  "preserved_failures_and_limits": {
+    "initial_concurrent_retained_attempt": {
+      "passed": 18,
+      "failed": 1,
+      "failed_case": "test_retained_width_round[anycostfl]",
+      "observed_worker_timeout_seconds": 90,
+      "forced_TERM_observed": true,
+      "profile_and_exact_CI_artifact_verifier_both_rejected": true,
+      "status": {
+        "name": "retained-run",
+        "command": [
+          "zsh",
+          "-lc",
+          "/tmp/plato-archive-profile-independent-env/bin/python -m pytest tests/integration/test_retained_model_search.py --test-profile=mandatory -m retained_model_search -ra --basetemp=/tmp/plato-archive-profile-independent-review/model-search-tmp --junitxml=/tmp/plato-archive-profile-independent-review/model-search.xml"
+        ],
+        "cwd": "/tmp/plato-archive-profile-independent-worktree",
+        "returncode": 1,
+        "timed_out": false,
+        "elapsed_seconds": 367.6263835,
+        "extra_env": {}
+      },
+      "followup": "same source and deadlines, serial full19 passed"
+    },
+    "initial_concurrent_core_attempt": {
+      "status": {
+        "name": "core-runtime-run",
+        "command": [
+          "zsh",
+          "-lc",
+          "/tmp/plato-archive-profile-independent-dev/bin/python -m pytest tests --test-profile=mandatory -m 'runtime and not retained_model_search' -ra --basetemp=/tmp/plato-archive-profile-independent-review/core-runtime-tmp --junitxml=/tmp/plato-archive-profile-independent-review/core-runtime.xml"
+        ],
+        "cwd": "/tmp/plato-archive-profile-independent-worktree",
+        "returncode": null,
+        "timed_out": true,
+        "elapsed_seconds": 900.0205115,
+        "extra_env": {}
+      },
+      "aggregate_cap_seconds": 900,
+      "result": "incomplete; no full51 PASS claim",
+      "startup_cases_completed": 48,
+      "startup_case_failures": 1,
+      "failed_case": "client_custom-client_body",
+      "observed_worker_timeout_seconds": 30,
+      "followup": "same source and30s deadline, serial failedcase passed; root explicitly retained final integrated full51 qualification ownership"
+    },
+    "initial_absent_policy_import_attempt": {
+      "status": {
+        "name": "absent-base-guards",
+        "command": [
+          "zsh",
+          "-lc",
+          "/tmp/plato-archive-profile-independent-base/bin/python -m pytest tests/test_model_search_profile_contract.py tests/test_mlx_profile_contract.py tests/test_mlx_import_contract.py --test-profile=base -ra --basetemp=/tmp/plato-archive-profile-independent-review/base-guard-tmp --junitxml=/tmp/plato-archive-profile-independent-review/base-guard.xml"
+        ],
+        "cwd": "/tmp/plato-archive-profile-independent-worktree",
+        "returncode": null,
+        "timed_out": true,
+        "elapsed_seconds": 120.026293125,
+        "extra_env": {}
+      },
+      "aggregate_cap_seconds": 120,
+      "result": "incomplete; no independent199 absence policy claim",
+      "corroboration": "author exact199 raw/source-bound evidence independently hash-checked; independent169 guards and actual base collection/prerequisite controls passed"
+    },
+    "aggregate_timeout_cleanup": {
+      "owned_before": [],
+      "signals": [],
+      "remaining": []
+    },
+    "harness_notes": [
+      "Artifact stager probe was initially invoked using system Python3.9; retained error log and reran unchanged stager under task Python3.13.",
+      "Source audit harness was corrected to exclude only the intentionally extended owned assignment, compare node module paths before parameter text, count all seven absent DP cases, preserve spaced pytest parameter IDs, and distinguish28 referenced artifacts from29 added evidence files. No repository source, production assertions or deadlines were modified."
+    ],
+    "platform": "Reviewer runtime is actual Darwin arm64 Python3.13.16; actual Linux CI execution and final integrated full suites/native383 execution remain separately required."
+  },
+  "commands": [
+    {
+      "name": "absent-base-guards",
+      "command": [
+        "zsh",
+        "-lc",
+        "/tmp/plato-archive-profile-independent-base/bin/python -m pytest tests/test_model_search_profile_contract.py tests/test_mlx_profile_contract.py tests/test_mlx_import_contract.py --test-profile=base -ra --basetemp=/tmp/plato-archive-profile-independent-review/base-guard-tmp --junitxml=/tmp/plato-archive-profile-independent-review/base-guard.xml"
+      ],
+      "cwd": "/tmp/plato-archive-profile-independent-worktree",
+      "returncode": null,
+      "timed_out": true,
+      "elapsed_seconds": 120.026293125,
+      "extra_env": {}
+    },
+    {
+      "name": "base-nonruntime-collection",
+      "command": [
+        "zsh",
+        "-lc",
+        "/tmp/plato-archive-profile-independent-base/bin/python -m pytest tests --collect-only -q --test-profile=base -m 'not runtime'"
+      ],
+      "cwd": "/tmp/plato-archive-profile-independent-worktree",
+      "returncode": 0,
+      "timed_out": false,
+      "elapsed_seconds": 15.989134208000001,
+      "extra_env": {}
+    },
+    {
+      "name": "core-runtime-collection",
+      "command": [
+        "zsh",
+        "-lc",
+        "/tmp/plato-archive-profile-independent-dev/bin/python -m pytest tests --collect-only -q --test-profile=mandatory -m 'runtime and not retained_model_search'"
+      ],
+      "cwd": "/tmp/plato-archive-profile-independent-worktree",
+      "returncode": 0,
+      "timed_out": false,
+      "elapsed_seconds": 17.5012685,
+      "extra_env": {}
+    },
+    {
+      "name": "core-runtime-run",
+      "command": [
+        "zsh",
+        "-lc",
+        "/tmp/plato-archive-profile-independent-dev/bin/python -m pytest tests --test-profile=mandatory -m 'runtime and not retained_model_search' -ra --basetemp=/tmp/plato-archive-profile-independent-review/core-runtime-tmp --junitxml=/tmp/plato-archive-profile-independent-review/core-runtime.xml"
+      ],
+      "cwd": "/tmp/plato-archive-profile-independent-worktree",
+      "returncode": null,
+      "timed_out": true,
+      "elapsed_seconds": 900.0205115,
+      "extra_env": {}
+    },
+    {
+      "name": "expression-negative",
+      "command": [
+        "zsh",
+        "-lc",
+        "/tmp/plato-archive-profile-independent-dev/bin/python -m pytest tests --collect-only --test-profile=mandatory -m 'runtime and not retained_model_search and not startup_containment'"
+      ],
+      "cwd": "/tmp/plato-archive-profile-independent-worktree",
+      "returncode": 4,
+      "timed_out": false,
+      "elapsed_seconds": 14.287402917,
+      "extra_env": {}
+    },
+    {
+      "name": "full-typing",
+      "command": [
+        "zsh",
+        "-lc",
+        "/tmp/plato-archive-profile-independent-dev/bin/ty check --output-format concise"
+      ],
+      "cwd": "/tmp/plato-archive-profile-independent-worktree",
+      "returncode": 1,
+      "timed_out": false,
+      "elapsed_seconds": 5.733526875,
+      "extra_env": {}
+    },
+    {
+      "name": "guard-tests",
+      "command": [
+        "zsh",
+        "-lc",
+        "/tmp/plato-archive-profile-independent-env/bin/python -m pytest tests/test_model_search_profile_contract.py tests/test_mlx_profile_contract.py --test-profile=mandatory -ra --basetemp=/tmp/plato-archive-profile-independent-review/guard-tmp --junitxml=/tmp/plato-archive-profile-independent-review/guard.xml"
+      ],
+      "cwd": "/tmp/plato-archive-profile-independent-worktree",
+      "returncode": 0,
+      "timed_out": false,
+      "elapsed_seconds": 62.971083458,
+      "extra_env": {}
+    },
+    {
+      "name": "initial-retained-CI-rejection",
+      "command": [
+        "zsh",
+        "-lc",
+        "/tmp/plato-archive-profile-independent-env/bin/python /tmp/plato-archive-profile-independent-review/replay_actual.py --junit /tmp/plato-archive-profile-independent-review/model-search.xml --runlog /tmp/plato-archive-profile-independent-review/retained-run.log --receipt /tmp/plato-archive-profile-independent-review/initial-retained-acceptance.json"
+      ],
+      "cwd": "/tmp/plato-archive-profile-independent-worktree",
+      "returncode": 1,
+      "timed_out": false,
+      "elapsed_seconds": 0.047322332999999994,
+      "extra_env": {}
+    },
+    {
+      "name": "keyword-negative",
+      "command": [
+        "zsh",
+        "-lc",
+        "/tmp/plato-archive-profile-independent-dev/bin/python -m pytest tests --collect-only --test-profile=mandatory -m 'runtime and not retained_model_search' -k 'not test_real_two_client_cpu_socket_round'"
+      ],
+      "cwd": "/tmp/plato-archive-profile-independent-worktree",
+      "returncode": 1,
+      "timed_out": false,
+      "elapsed_seconds": 21.091844792,
+      "extra_env": {}
+    },
+    {
+      "name": "lock-check",
+      "command": [
+        "zsh",
+        "-lc",
+        "uv lock --check"
+      ],
+      "cwd": "/tmp/plato-archive-profile-independent-worktree",
+      "returncode": 0,
+      "timed_out": false,
+      "elapsed_seconds": 0.02455625,
+      "extra_env": {}
+    },
+    {
+      "name": "mandatory-nonruntime-collection",
+      "command": [
+        "zsh",
+        "-lc",
+        "/tmp/plato-archive-profile-independent-dev/bin/python -m pytest tests --collect-only -q --test-profile=mandatory -m 'not runtime'"
+      ],
+      "cwd": "/tmp/plato-archive-profile-independent-worktree",
+      "returncode": 0,
+      "timed_out": false,
+      "elapsed_seconds": 22.488942041999998,
+      "extra_env": {}
+    },
+    {
+      "name": "mandatory-prerequisites-missing",
+      "command": [
+        "zsh",
+        "-lc",
+        "/tmp/plato-archive-profile-independent-base/bin/python -m pytest tests --collect-only --test-profile=mandatory"
+      ],
+      "cwd": "/tmp/plato-archive-profile-independent-worktree",
+      "returncode": 4,
+      "timed_out": false,
+      "elapsed_seconds": 33.468261875,
+      "extra_env": {}
+    },
+    {
+      "name": "native-383-collection",
+      "command": [
+        "zsh",
+        "-lc",
+        "/tmp/plato-archive-profile-independent-native/bin/python -m pytest tests/mlx_native --collect-only -q --test-profile=mlx-native"
+      ],
+      "cwd": "/tmp/plato-archive-profile-independent-worktree",
+      "returncode": 0,
+      "timed_out": false,
+      "elapsed_seconds": 39.196222833,
+      "extra_env": {}
+    },
+    {
+      "name": "owned-typing",
+      "command": [
+        "zsh",
+        "-lc",
+        "/tmp/plato-archive-profile-independent-dev/bin/ty check tests/conftest.py tests/test_model_search_profile_contract.py .github/scripts/stage_ci_artifacts.py --output-format concise --error-on-warning"
+      ],
+      "cwd": "/tmp/plato-archive-profile-independent-worktree",
+      "returncode": 0,
+      "timed_out": false,
+      "elapsed_seconds": 0.8621325000000001,
+      "extra_env": {}
+    },
+    {
+      "name": "ptflops-genuine-missing",
+      "command": [
+        "zsh",
+        "-lc",
+        "/tmp/plato-archive-profile-independent-dev/bin/python -c 'import ptflops, opacus, kazoo, gymnasium'"
+      ],
+      "cwd": "/tmp/plato-archive-profile-independent-worktree",
+      "returncode": 1,
+      "timed_out": false,
+      "elapsed_seconds": 0.098990917,
+      "extra_env": {}
+    },
+    {
+      "name": "retained-collection",
+      "command": [
+        "zsh",
+        "-lc",
+        "/tmp/plato-archive-profile-independent-env/bin/python -m pytest tests/integration/test_retained_model_search.py --collect-only -q --test-profile=mandatory -m retained_model_search"
+      ],
+      "cwd": "/tmp/plato-archive-profile-independent-worktree",
+      "returncode": 0,
+      "timed_out": false,
+      "elapsed_seconds": 14.021931417000001,
+      "extra_env": {}
+    },
+    {
+      "name": "retained-drop-negative",
+      "command": [
+        "zsh",
+        "-lc",
+        "/tmp/plato-archive-profile-independent-env/bin/python -m pytest tests/integration/test_retained_model_search.py --collect-only --test-profile=mandatory -m retained_model_search -p drop_plugin"
+      ],
+      "cwd": "/tmp/plato-archive-profile-independent-worktree",
+      "returncode": 1,
+      "timed_out": false,
+      "elapsed_seconds": 15.753657458000001,
+      "extra_env": {}
+    },
+    {
+      "name": "retained-filter-negative",
+      "command": [
+        "zsh",
+        "-lc",
+        "/tmp/plato-archive-profile-independent-env/bin/python -m pytest tests/integration/test_retained_model_search.py --collect-only --test-profile=mandatory -m retained_model_search -k 'not anycostfl'"
+      ],
+      "cwd": "/tmp/plato-archive-profile-independent-worktree",
+      "returncode": 4,
+      "timed_out": false,
+      "elapsed_seconds": 20.328777958,
+      "extra_env": {}
+    },
+    {
+      "name": "retained-prerequisites",
+      "command": [
+        "zsh",
+        "-lc",
+        "/tmp/plato-archive-profile-independent-env/bin/python -c 'import ptflops, opacus, kazoo, gymnasium'"
+      ],
+      "cwd": "/tmp/plato-archive-profile-independent-worktree",
+      "returncode": 0,
+      "timed_out": false,
+      "elapsed_seconds": 24.171993833,
+      "extra_env": {}
+    },
+    {
+      "name": "retained-run-serial",
+      "command": [
+        "zsh",
+        "-lc",
+        "/tmp/plato-archive-profile-independent-env/bin/python -m pytest tests/integration/test_retained_model_search.py --test-profile=mandatory -m retained_model_search -ra --basetemp=/tmp/plato-archive-profile-independent-review/model-search-serial-tmp --junitxml=/tmp/plato-archive-profile-independent-review/model-search-serial.xml"
+      ],
+      "cwd": "/tmp/plato-archive-profile-independent-worktree",
+      "returncode": 0,
+      "timed_out": false,
+      "elapsed_seconds": 285.876306083,
+      "extra_env": {}
+    },
+    {
+      "name": "retained-run",
+      "command": [
+        "zsh",
+        "-lc",
+        "/tmp/plato-archive-profile-independent-env/bin/python -m pytest tests/integration/test_retained_model_search.py --test-profile=mandatory -m retained_model_search -ra --basetemp=/tmp/plato-archive-profile-independent-review/model-search-tmp --junitxml=/tmp/plato-archive-profile-independent-review/model-search.xml"
+      ],
+      "cwd": "/tmp/plato-archive-profile-independent-worktree",
+      "returncode": 1,
+      "timed_out": false,
+      "elapsed_seconds": 367.6263835,
+      "extra_env": {}
+    },
+    {
+      "name": "retained-skip-negative",
+      "command": [
+        "zsh",
+        "-lc",
+        "/tmp/plato-archive-profile-independent-env/bin/python -m pytest tests/integration/test_retained_model_search.py --test-profile=mandatory -m retained_model_search -p skip_plugin"
+      ],
+      "cwd": "/tmp/plato-archive-profile-independent-worktree",
+      "returncode": 1,
+      "timed_out": false,
+      "elapsed_seconds": 18.10236325,
+      "extra_env": {}
+    },
+    {
+      "name": "retained-xfail-negative",
+      "command": [
+        "zsh",
+        "-lc",
+        "/tmp/plato-archive-profile-independent-env/bin/python -m pytest tests/integration/test_retained_model_search.py --test-profile=mandatory -m retained_model_search -p xfail_plugin"
+      ],
+      "cwd": "/tmp/plato-archive-profile-independent-worktree",
+      "returncode": 1,
+      "timed_out": false,
+      "elapsed_seconds": 24.136792292,
+      "extra_env": {}
+    },
+    {
+      "name": "ruff-imports",
+      "command": [
+        "zsh",
+        "-lc",
+        "/tmp/plato-archive-profile-independent-dev/bin/ruff check . --select I"
+      ],
+      "cwd": "/tmp/plato-archive-profile-independent-worktree",
+      "returncode": 0,
+      "timed_out": false,
+      "elapsed_seconds": 0.527844458,
+      "extra_env": {}
+    },
+    {
+      "name": "serial-retained-CI-acceptance",
+      "command": [
+        "zsh",
+        "-lc",
+        "/tmp/plato-archive-profile-independent-env/bin/python /tmp/plato-archive-profile-independent-review/replay_actual.py --junit /tmp/plato-archive-profile-independent-review/model-search-serial.xml --runlog /tmp/plato-archive-profile-independent-review/retained-run-serial.log --receipt /tmp/plato-archive-profile-independent-review/serial-retained-acceptance.json"
+      ],
+      "cwd": "/tmp/plato-archive-profile-independent-worktree",
+      "returncode": 0,
+      "timed_out": false,
+      "elapsed_seconds": 0.080188334,
+      "extra_env": {}
+    },
+    {
+      "name": "startup-client-custom-serial",
+      "command": [
+        "zsh",
+        "-lc",
+        "/tmp/plato-archive-profile-independent-dev/bin/python -m pytest 'tests/integration/test_event_loop_startup.py::test_fresh_entrypoint_executes_scheduled_work[client_custom-client_body]' --test-profile=mandatory -ra --basetemp=/tmp/plato-archive-profile-independent-review/startup-serial-tmp --junitxml=/tmp/plato-archive-profile-independent-review/startup-serial.xml"
+      ],
+      "cwd": "/tmp/plato-archive-profile-independent-worktree",
+      "returncode": 0,
+      "timed_out": false,
+      "elapsed_seconds": 19.645603040999998,
+      "extra_env": {}
+    }
+  ],
+  "source_integrity": {
+    "detached_review_worktree_clean": true,
+    "author_and_root_branches_not_edited": true,
+    "author_and_root_environments_not_used_or_mutated": true,
+    "all_production_and_runtime_test_subtree_git_objects_unchanged": {
+      "plato": "ead7224e5ef9b50e977571ac738ad579dac43ebc",
+      "tests/integration": "efc339b14aac381daddbd5afbfeb6da197764d5b",
+      "tests/mlx_native": "ae13f7ec46a77569f36f5da742178f8f1fd22cdc",
+      "tests/mpc": "3ffa111b96a6fa6c0824601854f251afcc876853",
+      "tests/trainers": "8e157d6313976ef7371b7f7daa22c12635aa9238",
+      "tests/utils": "8fe67bf026dd91f4000ea54c899df00607fbf9d6"
+    },
+    "reviewed_source_files_not_edited": true
+  },
+  "final_integrated_qualification": {
+    "pending": true,
+    "root_owned": [
+      "final frozen integrated base and mandatory suites",
+      "all51 core runtime cases rebound by complete integrated execution",
+      "dedicated19 replay at integrated source",
+      "native383 execution receipt and actual Linux qualification",
+      "separate archive/runtime/documentation review gates"
+    ],
+    "bounded_review_is_not_full_delivery_or_merge_qualification": true
+  },
+  "artifacts": [
+    {
+      "path": "/tmp/plato-archive-profile-independent-review/absent-base-guards-status.json",
+      "sha256": "bd108209391237d4e2fcebc9b3b5920ff1a656ae8e8d23dcb2c317c9d46ed770"
+    },
+    {
+      "path": "/tmp/plato-archive-profile-independent-review/absent-base-guards.log",
+      "sha256": "6ffdf8d3132fbbc2fca9166b3a72be26ae2e51ee16437d4a3b9982888ccc0850"
+    },
+    {
+      "path": "/tmp/plato-archive-profile-independent-review/aggregate-timeout-cleanup.json",
+      "sha256": "82dcf8bc08a3eb2dfda37a3cf315023c0f4961aca0fe5425bf35b0070bc42c83"
+    },
+    {
+      "path": "/tmp/plato-archive-profile-independent-review/artifact-control-audit.json",
+      "sha256": "42d2ff7ef9965e967770fb8c9d289377dcd3e6292315b2e8a2754a8bbf219217"
+    },
+    {
+      "path": "/tmp/plato-archive-profile-independent-review/artifact-control-audit.log",
+      "sha256": "86121b7224c141abc876945369651f5398a754a5e71c3ebbd1fd2a6f1f4cf98a"
+    },
+    {
+      "path": "/tmp/plato-archive-profile-independent-review/artifact-control-initial-wrong-python.log",
+      "sha256": "a42947142b021ae946880169db9ddf45f6a8e3d4c30969f917f541c3c87feb12"
+    },
+    {
+      "path": "/tmp/plato-archive-profile-independent-review/audit_source.py",
+      "sha256": "fdcd3d6fadd3ad4007e20e4e9975d38772a6a0e3261b379f20c9ee0791c53cee"
+    },
+    {
+      "path": "/tmp/plato-archive-profile-independent-review/author-CI-replay.json",
+      "sha256": "e10a147ba493356bc162087b468f10f05b7587dc5f17613797c68cd1d959c94d"
+    },
+    {
+      "path": "/tmp/plato-archive-profile-independent-review/base-nonruntime-collection-status.json",
+      "sha256": "144a501444124df0a3300ddf724a570608a92433d83216a6620926fb47112820"
+    },
+    {
+      "path": "/tmp/plato-archive-profile-independent-review/base-nonruntime-collection.log",
+      "sha256": "560365be849846d5797505c0182e3e6e875c087342261e06aa0c054203a21d67"
+    },
+    {
+      "path": "/tmp/plato-archive-profile-independent-review/base-packages.txt",
+      "sha256": "375b377bfbf4acc6da9583f857f1f89cc4000ca2239b6c5733034c40dd0aa228"
+    },
+    {
+      "path": "/tmp/plato-archive-profile-independent-review/base-sync.log",
+      "sha256": "da1ca5b3054d3ae40575e9a6cd54ffcc8fcac4066af979d66d4c4e2faf032bf6"
+    },
+    {
+      "path": "/tmp/plato-archive-profile-independent-review/check_artifacts.py",
+      "sha256": "d28596cf5e42f80c7bea7d6c541aca25a205af8aa5e2128775925a7edfc7055b"
+    },
+    {
+      "path": "/tmp/plato-archive-profile-independent-review/cleanup_owned.py",
+      "sha256": "5944443336d3074c5019e2f1c81f38e4a71b1ff9d08f4d6714d69296810c628c"
+    },
+    {
+      "path": "/tmp/plato-archive-profile-independent-review/core-runtime-collection-status.json",
+      "sha256": "94d6df3fa6cfc06a46ebf870239552779dba05b5cf94a6067a293540c33f189a"
+    },
+    {
+      "path": "/tmp/plato-archive-profile-independent-review/core-runtime-collection.log",
+      "sha256": "c0a7aa44940dfe1bfe4662ede10eb42b8ac2a05a8b6daf60d3fa65765fc1866a"
+    },
+    {
+      "path": "/tmp/plato-archive-profile-independent-review/core-runtime-run-status.json",
+      "sha256": "b6761608a573d42b371e36b26c706c7c25a95d5cf1493b1bfd5a25fe1814f3f7"
+    },
+    {
+      "path": "/tmp/plato-archive-profile-independent-review/core-runtime-run.log",
+      "sha256": "b2f0486f832822cccd2e72dc9888888352847084008e91eb967905ee099cccca"
+    },
+    {
+      "path": "/tmp/plato-archive-profile-independent-review/dev-packages.txt",
+      "sha256": "8a2b71034116ef43f4ba6bbf0cd9490d097ba7e05a7ae44c7b95647aaebe148b"
+    },
+    {
+      "path": "/tmp/plato-archive-profile-independent-review/dev-sync.log",
+      "sha256": "9e0eecf159b14f62f0d13b6e4aee232b16852ef743537cfc79dc80a8c9522011"
+    },
+    {
+      "path": "/tmp/plato-archive-profile-independent-review/drop_plugin.py",
+      "sha256": "7c2183200135a4cb967f964e1d6611c3c7b95711b9efae2e14232124f06df7ed"
+    },
+    {
+      "path": "/tmp/plato-archive-profile-independent-review/environment-base.json",
+      "sha256": "eb7ff95d1ca7df65ed0b9932e4c8141842b586089129bdd0c0ea9b5bc4179ecc"
+    },
+    {
+      "path": "/tmp/plato-archive-profile-independent-review/environment-dev.json",
+      "sha256": "2705fde7ff4cb66cd540880dc16c4780f6faa0d22745753167b1c82f249c294e"
+    },
+    {
+      "path": "/tmp/plato-archive-profile-independent-review/environment-native.json",
+      "sha256": "ec28365fd489ac3dff75e7f6d5ffcf0e734ac73b3928b5c7d90182d10829634c"
+    },
+    {
+      "path": "/tmp/plato-archive-profile-independent-review/environment-retained.json",
+      "sha256": "e982c4c71e394057934fa558c1839bb24bf3a96d12036b468a7a6aa328a9d521"
+    },
+    {
+      "path": "/tmp/plato-archive-profile-independent-review/environment_probe.py",
+      "sha256": "b7f79f85a8592b6eb9181588b4df59c6e39ea7d167462bf294296fa6f06df3e2"
+    },
+    {
+      "path": "/tmp/plato-archive-profile-independent-review/expression-negative-status.json",
+      "sha256": "9b5473d85630ead0384e4460d0a90c47147f9a2b1bef5895ad98199ab74bcdcf"
+    },
+    {
+      "path": "/tmp/plato-archive-profile-independent-review/expression-negative.log",
+      "sha256": "a0a94da0d4cdd0b38b399766bf60f22972a343e19d7845a8e0079071ecb4800a"
+    },
+    {
+      "path": "/tmp/plato-archive-profile-independent-review/full-typing-status.json",
+      "sha256": "cb97bfa3db1a3369e6a76c8a6964789d6ef15ab58dd4bda2c5580ca6d3d6ed6f"
+    },
+    {
+      "path": "/tmp/plato-archive-profile-independent-review/full-typing.log",
+      "sha256": "d70c29c75a137393e08b7a57b38cac5345b372dc34e1c478c39ab30a97701d12"
+    },
+    {
+      "path": "/tmp/plato-archive-profile-independent-review/guard-tests-status.json",
+      "sha256": "1cb129fdc305917ebb167cf61052dfb0625d161d881ed06cb1fd5ba37e02a4fe"
+    },
+    {
+      "path": "/tmp/plato-archive-profile-independent-review/guard-tests.log",
+      "sha256": "1b7bfa0bf21928bd100c4cabab41e3005ee8bc04a1105d5f1b0388430b04f0f5"
+    },
+    {
+      "path": "/tmp/plato-archive-profile-independent-review/guard.xml",
+      "sha256": "5834d28d917adadde03acb8023fe985052fb19f4b15053c023a8ca3f54cb57a3"
+    },
+    {
+      "path": "/tmp/plato-archive-profile-independent-review/initial-retained-CI-rejection-status.json",
+      "sha256": "8b1ace0f3cd2fdbb8874635baf6d9666157ab9475a3595e9d345944074672060"
+    },
+    {
+      "path": "/tmp/plato-archive-profile-independent-review/initial-retained-CI-rejection.log",
+      "sha256": "08a021cc660dad221167345ea3ed4a430458f0c8b0d6c0ede68d146818569007"
+    },
+    {
+      "path": "/tmp/plato-archive-profile-independent-review/initial-retained-acceptance.json",
+      "sha256": "d4c3c7c937b0ed5aa3d3f1328dc377f985e142270c6af1041e34a78463cfe3cd"
+    },
+    {
+      "path": "/tmp/plato-archive-profile-independent-review/keyword-negative-status.json",
+      "sha256": "8d1a17fc659635864955b0f07cd673b24a7c83302e5d5b43d9650858d7826de0"
+    },
+    {
+      "path": "/tmp/plato-archive-profile-independent-review/keyword-negative.log",
+      "sha256": "3890e58bbc57b5b8fc47c57c45d87c369a9ea28edab6a5a128aca2ff503a8fe8"
+    },
+    {
+      "path": "/tmp/plato-archive-profile-independent-review/lock-check-status.json",
+      "sha256": "06a069ef8421a35dd5a9cb38f6316712d174d11529465e0d8231d370e551d625"
+    },
+    {
+      "path": "/tmp/plato-archive-profile-independent-review/lock-check.log",
+      "sha256": "996d042f548e0fe4859fe04b4f2bedeef6c88833af6974ee5a201108041bbf3c"
+    },
+    {
+      "path": "/tmp/plato-archive-profile-independent-review/mandatory-nonruntime-collection-status.json",
+      "sha256": "a1377b612fdbb5a17df5892d74c083f89addeebb254fde194b1d45a8621ca126"
+    },
+    {
+      "path": "/tmp/plato-archive-profile-independent-review/mandatory-nonruntime-collection.log",
+      "sha256": "b06e3c0fd3bb5687f03623a137d6f78f85a33cc9be1f2dcc0a0a999d0e3b5dd0"
+    },
+    {
+      "path": "/tmp/plato-archive-profile-independent-review/mandatory-prerequisites-missing-status.json",
+      "sha256": "635dbe19a331878d0a773489b4dd6555c08c63dad1eaccba3f6556c6241816ef"
+    },
+    {
+      "path": "/tmp/plato-archive-profile-independent-review/mandatory-prerequisites-missing.log",
+      "sha256": "faa6bbe6f535ed8dc7eff6f1f581fb33f9be69a0d20218c379ea0e6f6f88be74"
+    },
+    {
+      "path": "/tmp/plato-archive-profile-independent-review/model-search-serial.xml",
+      "sha256": "2055222789249eaae9ec2fdb10578f5ccdf85f3208db742877a000e3411c30d1"
+    },
+    {
+      "path": "/tmp/plato-archive-profile-independent-review/model-search.xml",
+      "sha256": "aa5078ea22eba62131474b4dedede75d451751cf9125ba649699b89c66c61fa4"
+    },
+    {
+      "path": "/tmp/plato-archive-profile-independent-review/native-383-collection-status.json",
+      "sha256": "509a66f596ef6d7e8fc38652f0e9a05c21032a7c27b2123b5b6a82673cfe8d86"
+    },
+    {
+      "path": "/tmp/plato-archive-profile-independent-review/native-383-collection.log",
+      "sha256": "01dc0706e5b83cdf975ee133d03e75b88505aa27c98982c95757d4218378f7db"
+    },
+    {
+      "path": "/tmp/plato-archive-profile-independent-review/native-packages.txt",
+      "sha256": "6ddaa45c83a8393d4cecb025fa3394282b7944b14ba699cc9e27a7dec84cc866"
+    },
+    {
+      "path": "/tmp/plato-archive-profile-independent-review/native-sync.log",
+      "sha256": "2173dc0cbee0691ffddb04ed237f37bc35ad9eea03565f44f802ba3196573499"
+    },
+    {
+      "path": "/tmp/plato-archive-profile-independent-review/negative-receipts-verified.json",
+      "sha256": "107ceea08dc244734e5ef84e94a9f883879673959c9d52e7ddcb1c6e6df21e59"
+    },
+    {
+      "path": "/tmp/plato-archive-profile-independent-review/owned-typing-status.json",
+      "sha256": "59480b2047d7b236f6c339d7038fae78008c8e9f32b664df569a182c3c6b8ec7"
+    },
+    {
+      "path": "/tmp/plato-archive-profile-independent-review/owned-typing.log",
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "path": "/tmp/plato-archive-profile-independent-review/ptflops-genuine-missing-status.json",
+      "sha256": "42c431bb0ee39310d23c75f279e2133a01303285b07c00a9374e412906fdad9a"
+    },
+    {
+      "path": "/tmp/plato-archive-profile-independent-review/ptflops-genuine-missing.log",
+      "sha256": "75c676b7612401bf36b6cacb496d983a7aa260e9d8bc5abfe6abd1fac2f09226"
+    },
+    {
+      "path": "/tmp/plato-archive-profile-independent-review/replay_actual.py",
+      "sha256": "7ced73ab046e6684f7a8f8dad43ea4ac42dc1a403c00bdff6802a70430161f0d"
+    },
+    {
+      "path": "/tmp/plato-archive-profile-independent-review/retained-collection-status.json",
+      "sha256": "3c05eef754494f45bbb3464ce47e19c5c4f60b7709d2bdfd428f533612c7e41e"
+    },
+    {
+      "path": "/tmp/plato-archive-profile-independent-review/retained-collection.log",
+      "sha256": "7ea99351d2f0336279ff815064fcccb62dd766e909f6b4e7c1073fcdb2a93ba8"
+    },
+    {
+      "path": "/tmp/plato-archive-profile-independent-review/retained-drop-negative-status.json",
+      "sha256": "73dd4c4ebd3de18b8ebb90eaedf825cbca0eff5e8dbdcaffe2668238d229f03e"
+    },
+    {
+      "path": "/tmp/plato-archive-profile-independent-review/retained-drop-negative.log",
+      "sha256": "5563f6ef00b147b95faec6e32d61d4d4bf0eb8979fdb8f0af9319ba529a3d224"
+    },
+    {
+      "path": "/tmp/plato-archive-profile-independent-review/retained-filter-negative-status.json",
+      "sha256": "1585a8c978043fc402246fbed33ff38d3a109296b75e8eecf35e08c8e6e13536"
+    },
+    {
+      "path": "/tmp/plato-archive-profile-independent-review/retained-filter-negative.log",
+      "sha256": "6ec259208d4355bc6b3a7d1841f82560e97cfe89bea6c8407ac4977608807ad9"
+    },
+    {
+      "path": "/tmp/plato-archive-profile-independent-review/retained-packages.txt",
+      "sha256": "b2cd9090f8cc274c094f354eb75324297e48312e5aa03af3ccccb7537ab430e0"
+    },
+    {
+      "path": "/tmp/plato-archive-profile-independent-review/retained-prerequisites-status.json",
+      "sha256": "25b59e703afe9ece26137e26ecf525ed0b51b446158ce0e6d9ee120a75f28736"
+    },
+    {
+      "path": "/tmp/plato-archive-profile-independent-review/retained-prerequisites.log",
+      "sha256": "29759bc73fd2843fbe0baead55b68b065b360603c328f8f3407d833e5d142013"
+    },
+    {
+      "path": "/tmp/plato-archive-profile-independent-review/retained-run-serial-status.json",
+      "sha256": "b0a3ce058114848588d35e4874da73b3d3dc83cb1e575fcedc7689d09281fc60"
+    },
+    {
+      "path": "/tmp/plato-archive-profile-independent-review/retained-run-serial.log",
+      "sha256": "184e37df5c8394a86c218297db56c436472328b4ee7928467e82507f71179044"
+    },
+    {
+      "path": "/tmp/plato-archive-profile-independent-review/retained-run-status.json",
+      "sha256": "436a63c5ab04c4656eb2db73a6a9206356431ebe7717d499efb9d73c8abe3cda"
+    },
+    {
+      "path": "/tmp/plato-archive-profile-independent-review/retained-run.log",
+      "sha256": "db4c8102d0d71a452f53db67c1a08d8def1e9e74432dc1744f92767101318628"
+    },
+    {
+      "path": "/tmp/plato-archive-profile-independent-review/retained-skip-negative-status.json",
+      "sha256": "a683a4627ee5573ac084c87699c59681d04accd799aa6bcb6eb7eb60492aa911"
+    },
+    {
+      "path": "/tmp/plato-archive-profile-independent-review/retained-skip-negative.log",
+      "sha256": "adb40221b77cc51523f9b070e0660402340367742308875ff20021f031528570"
+    },
+    {
+      "path": "/tmp/plato-archive-profile-independent-review/retained-xfail-negative-status.json",
+      "sha256": "9b73b66981ca9ed6975ea54fdb1790acbc7680c9ef9b511e2092cbff4ad96d96"
+    },
+    {
+      "path": "/tmp/plato-archive-profile-independent-review/retained-xfail-negative.log",
+      "sha256": "7000594056d685ae583269352900e4862313e8f52dc8cb8f66619445875512bd"
+    },
+    {
+      "path": "/tmp/plato-archive-profile-independent-review/ruff-imports-status.json",
+      "sha256": "91e2b0bbc6b5d845134fd1360c88be5eea51fa1eacb16a0f951759ece84b9d0e"
+    },
+    {
+      "path": "/tmp/plato-archive-profile-independent-review/ruff-imports.log",
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "path": "/tmp/plato-archive-profile-independent-review/run_checks.py",
+      "sha256": "471e9533898c5adfe063d2e812df5b8a6d4ceb5e32dda045d2f2b680da40e782"
+    },
+    {
+      "path": "/tmp/plato-archive-profile-independent-review/serial-retained-CI-acceptance-status.json",
+      "sha256": "a2f6736c8e043c231a9d2255af92e641dc76759a9209bc4e4dc75902e1739115"
+    },
+    {
+      "path": "/tmp/plato-archive-profile-independent-review/serial-retained-CI-acceptance.log",
+      "sha256": "2bad85b3909b0c937897a88a7d0ccaa10dc34745d27d38c4a9630223bffe2dad"
+    },
+    {
+      "path": "/tmp/plato-archive-profile-independent-review/serial-retained-acceptance.json",
+      "sha256": "e10a147ba493356bc162087b468f10f05b7587dc5f17613797c68cd1d959c94d"
+    },
+    {
+      "path": "/tmp/plato-archive-profile-independent-review/skip_plugin.py",
+      "sha256": "85ee8e401651eb9e373255d4f4b3e49476cc757170d89b6b67d6940bd253c4c9"
+    },
+    {
+      "path": "/tmp/plato-archive-profile-independent-review/source-audit.json",
+      "sha256": "fdc245f701b15af15ef1c6ac866b4c67b38211bd1da25fb1691d4aeb4597e91a"
+    },
+    {
+      "path": "/tmp/plato-archive-profile-independent-review/source-audit.log",
+      "sha256": "fdc245f701b15af15ef1c6ac866b4c67b38211bd1da25fb1691d4aeb4597e91a"
+    },
+    {
+      "path": "/tmp/plato-archive-profile-independent-review/startup-client-custom-serial-status.json",
+      "sha256": "2105c0b36992e0f9c292406b7417339dbe2d9a2f08c77966624a1efd15c199f1"
+    },
+    {
+      "path": "/tmp/plato-archive-profile-independent-review/startup-client-custom-serial.log",
+      "sha256": "7cc581f18b5eba963a0daacdc3cd1e87b210bf1d334191716aff36c693c8125c"
+    },
+    {
+      "path": "/tmp/plato-archive-profile-independent-review/startup-serial.xml",
+      "sha256": "eed6350836e4c5e455b7266f557ff564567909e8d45831edb8a712fcb233c67c"
+    },
+    {
+      "path": "/tmp/plato-archive-profile-independent-review/sync.log",
+      "sha256": "77da8cd7474f9994a9a74bdb4ae34aec8dfd2649443ac1fff5c17654ae3d5a1e"
+    },
+    {
+      "path": "/tmp/plato-archive-profile-independent-review/verify_negative_receipts.py",
+      "sha256": "3310ec6227fe9037ae562d26dc1cf8c4335372094795085cb1c6c5da304c462d"
+    },
+    {
+      "path": "/tmp/plato-archive-profile-independent-review/write_report.py",
+      "sha256": "72ff17918d8efdad5d99ace4ea9749076c7247dccc2d1ee7bd28b39ac3e673c8"
+    },
+    {
+      "path": "/tmp/plato-archive-profile-independent-review/xfail_plugin.py",
+      "sha256": "03b2f4139bbca8a90a3829f6ddf71e65df7a1bc3b3525a7bdcc0d986f1f417fa"
+    }
+  ]
+}
