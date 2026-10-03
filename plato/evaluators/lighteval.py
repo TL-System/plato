@@ -34,10 +34,10 @@ TASK_PIPELINE_NAMES: dict[str, str] = {
     "piqa": "piqa_hf",
 }
 TASK_METRIC_PREFERENCES: dict[str, tuple[str, ...]] = {
-    "hellaswag": ("exact_match", "loglikelihood_acc", "accuracy", "acc"),
+    "hellaswag": ("exact_match", "em", "loglikelihood_acc", "accuracy", "acc"),
     "arc_easy": ("loglikelihood_acc", "exact_match", "accuracy", "acc"),
     "arc_challenge": ("loglikelihood_acc", "exact_match", "accuracy", "acc"),
-    "piqa": ("exact_match", "loglikelihood_acc", "accuracy", "acc"),
+    "piqa": ("exact_match", "em", "loglikelihood_acc", "accuracy", "acc"),
 }
 
 
@@ -128,6 +128,10 @@ def _to_float_metric(value: Any, *, metric_name: str) -> float:
 
 
 def _canonical_task_name(task_name: str) -> str:
+    """Remove current few-shot suffixes and historical version suffixes."""
+    prefix, separator, suffix = task_name.rpartition("|")
+    if separator and suffix.isdigit():
+        return prefix
     prefix, separator, suffix = task_name.rpartition(":")
     if separator and suffix.isdigit():
         return prefix
@@ -358,7 +362,9 @@ def _run_lighteval_pipeline(
         from lighteval.pipeline import ParallelismManager, Pipeline, PipelineParameters
     except ImportError as exc:  # pragma: no cover - optional dependency
         raise ImportError(
-            "Lighteval is an optional dependency. Install it via the project's llm_eval extra to use evaluation.type = 'lighteval'."
+            "Lighteval is an optional dependency. Install it via the project's "
+            "llm_eval extra to use evaluation.type = 'lighteval'. "
+            f"Original error: {exc}"
         ) from exc
 
     launcher_type = _resolve_launcher_type(backend, ParallelismManager)

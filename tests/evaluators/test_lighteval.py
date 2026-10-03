@@ -574,6 +574,32 @@ def test_lighteval_normalizes_versioned_task_keys(temp_config):
     }
 
 
+def test_lighteval_normalizes_current_fewshot_task_keys(temp_config):
+    from plato.evaluators.lighteval import _normalize_metrics
+
+    assert _normalize_metrics(
+        {
+            "ifeval|0": {
+                "prompt_level_strict_acc": 0.30,
+                "prompt_level_loose_acc": 0.50,
+                "inst_level_strict_acc": 0.99,
+            },
+            "hellaswag|0": {"unrelated": 0.99, "em": 0.44},
+            "arc:easy|0": {"acc": 0.35},
+            "arc:challenge|0": {"acc": 0.25},
+            "piqa_hf|0": {"unrelated": 0.99, "em": 0.61},
+            "all": {"exact_match": 0.99},
+        }
+    ) == {
+        "ifeval_avg": 0.40,
+        "hellaswag": 0.44,
+        "arc_easy": 0.35,
+        "arc_challenge": 0.25,
+        "arc_avg": 0.30,
+        "piqa": 0.61,
+    }
+
+
 def test_lighteval_evaluator_cleans_up_temp_exports(monkeypatch, temp_config):
     from plato.evaluators.lighteval import LightevalEvaluator
 
