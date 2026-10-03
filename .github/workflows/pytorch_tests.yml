@@ -13,7 +13,7 @@ jobs:
   PyTorch-Tests:
     name: Python ${{ matrix.python }} / ${{ matrix.profile }}
     runs-on: ubuntu-24.04
-    timeout-minutes: 90
+    timeout-minutes: 110
     strategy:
       fail-fast: false
       max-parallel: 2
@@ -21,8 +21,6 @@ jobs:
         include:
           - python: "3.13"
             profile: supported-default
-          - python: "3.14"
-            profile: core-forward-compatibility
     defaults:
       run:
         shell: zsh -lc ". {0}"
@@ -80,7 +78,7 @@ jobs:
           uv pip freeze --python "$UV_PROJECT_ENVIRONMENT/bin/python" > ci-artifacts/base-packages.txt
 
       - name: Base collection, suite and missing-extra probe
-        timeout-minutes: 20
+        timeout-minutes: 25
         env:
           UV_PROJECT_ENVIRONMENT: ${{ runner.temp }}/plato-base
           HF_HUB_OFFLINE: "1"
@@ -106,7 +104,7 @@ jobs:
           uv pip freeze --python "$UV_PROJECT_ENVIRONMENT/bin/python" > ci-artifacts/mandatory-packages.txt
 
       - name: Mandatory initialized core suite
-        timeout-minutes: 20
+        timeout-minutes: 30
         env:
           HF_HUB_OFFLINE: "1"
           HF_DATASETS_OFFLINE: "1"
@@ -160,11 +158,16 @@ jobs:
               assert match[1] not in owned or match.groups() in allowed, match[0]
           PY
 
+      - name: Stage qualification outputs without pytest aliases
+        if: always()
+        timeout-minutes: 2
+        run: python .github/scripts/stage_ci_artifacts.py
+
       - name: Upload qualification outputs
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: pytorch-${{ matrix.python }}-${{ github.run_attempt }}
-          path: ci-artifacts/
+          path: ci-artifacts-upload/
           retention-days: 14
           if-no-files-found: warn
