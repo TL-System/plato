@@ -37,6 +37,13 @@ def model():
 def test_identity_reassignment_isolates_and_reloads_actual_personal_state(
     tmp_path, family, name
 ):
+    if family == "feddyn":
+        # Corrected FedDyn's authority is a versioned server dispatch, rather
+        # than the old mathematically inconsistent per-client disk trajectory.
+        from tests.integration.test_feddyn_round_flow import run_partial
+
+        run_partial(tmp_path, reuse=True, model_name=name)
+        return
     config = build_minimal_config(model_name=name)
     config["trainer"].update(batch_size=2, epochs=1)
     with configure_environment(config, runtime_root=tmp_path):
@@ -182,27 +189,29 @@ def test_feddyn_exact_legacy_prefix_load_is_same_client_and_canonical_wins(tmp_p
             loss_strategy=FedDynLossStrategy(),
         )
         trainer.set_client_id(1)
-        strategy.on_train_start(trainer.context)
+        inspected = strategy.read_legacy_history(trainer.context)
         for name, value in saved.items():
-            torch.testing.assert_close(strategy.cumulative_grad_vector[name], value)
+            torch.testing.assert_close(inspected[name], value)
+        with pytest.raises(ValueError, match="read-only"):
+            strategy.on_train_start(trainer.context)
         trainer.set_client_id(2)
-        strategy.on_train_start(trainer.context)
-        assert all(
-            torch.count_nonzero(value) == 0
-            for value in strategy.cumulative_grad_vector.values()
-        )
+        assert strategy.read_legacy_history(trainer.context) is None
         torch.save(
             {name: value + 1 for name, value in saved.items()},
             custom / "feddyn_grad_1.pth",
         )
         trainer.set_client_id(1)
-        strategy.on_train_start(trainer.context)
-        assert strategy.cumulative_grad_vector["weight"][0, 0].item() == 4.0
+        assert strategy.read_legacy_history(trainer.context)["weight"][0, 0].item() == 4.0
         assert legacy.read_bytes() == original
 
 
 @pytest.mark.parametrize("family", ["ditto", "apfl", "feddyn", "fedala"])
 def test_actual_spawn_returns_personal_state_and_optimizer_across_rounds(tmp_path, family):
+    if family == "feddyn":
+        from tests.integration.test_feddyn_round_flow import run_partial
+
+        run_partial(tmp_path, spawn=True, reuse=True)
+        return
     config = build_minimal_config(model_name="org/model")
     config["trainer"].update(batch_size=2, epochs=1, max_concurrency=1)
     config["clients"]["random_seed"] = 17

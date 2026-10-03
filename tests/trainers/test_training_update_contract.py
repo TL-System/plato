@@ -547,8 +547,8 @@ def test_real_grad_scaler_overflow_does_not_dispatch_optimizer_update(tmp_path, 
         assert not model.weight.grad.isnan().any()
 
 
-def test_feddyn_all_zero_labels_preserve_zero_weight_fallback(tmp_path):
-    """Keep the legacy objective; zero label sums must not make its guard NaN."""
+def test_feddyn_all_zero_labels_leave_zero_origin_regularizer(tmp_path):
+    """The corrected objective has zero gradient at w=x,h=0 for all labels."""
     from plato.trainers.strategies.algorithms.feddyn_strategy import FedDynLossStrategy
 
     with configure_environment(build_minimal_config(), runtime_root=tmp_path):
@@ -563,9 +563,7 @@ def test_feddyn_all_zero_labels_preserve_zero_weight_fallback(tmp_path):
         labels = torch.zeros(2, dtype=torch.int64)
         loss = strategy.compute_loss(model(torch.ones(2, 1).double()), labels, context)
         loss.backward()
-        # The preserved shifted-quadratic/linear legacy equation gives -.2
-        # here. This test makes no paper-equivalence claim.
         assert torch.isfinite(loss)
-        assert model.weight.grad.item() == pytest.approx(-0.2)
+        assert model.weight.grad.item() == 0
         coefficient = strategy._get_alpha_coefficient(torch.tensor([0, 1]), context)
-        assert coefficient.item() == pytest.approx(0.075)
+        assert coefficient == pytest.approx(0.1)

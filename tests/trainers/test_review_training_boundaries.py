@@ -155,21 +155,18 @@ def test_actual_accepted_b_feddyn_writer_migration(
         assert expected.item() == 7.0
         reader = FedDynUpdateStrategy(save_path=save_path)
         reader.setup(context)
-        reader.on_train_start(context)
-        torch.testing.assert_close(reader.cumulative_grad_vector["weight"], expected)
+        torch.testing.assert_close(reader.read_legacy_history(context)["weight"], expected)
         context.client_id = 0
         writer.setup(context)
         torch.save({"weight": torch.full_like(expected, 99.0)}, writer.grad_vector_path)
         context.client_id = 2
         reader.on_client_id_changed(context)
-        reader.on_train_start(context)
-        assert reader.cumulative_grad_vector["weight"].item() == 0.0
+        assert reader.read_legacy_history(context) is None
         canonical = Path(root) / "feddyn_grad_1.pth"
         torch.save({"weight": expected + 1}, canonical)
         context.client_id = 1
         reader.on_client_id_changed(context)
-        reader.on_train_start(context)
-        assert reader.cumulative_grad_vector["weight"].item() == 8.0
+        assert reader.read_legacy_history(context)["weight"].item() == 8.0
         assert legacy.read_bytes() == original
 
 
