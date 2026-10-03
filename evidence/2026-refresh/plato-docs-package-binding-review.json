@@ -1,0 +1,678 @@
+{
+  "schema_version": 1,
+  "reviewer": "/root/docs_package_binding_review",
+  "reviewed_at_utc": "2026-10-03T23:57:33.095397+00:00",
+  "verdict": "ACCEPT",
+  "accepted": true,
+  "acceptance_scope": "Independent local acceptance of the repaired docs/package checker and actual default paths at frozen source 63f0d200. This is not Linux, hosted Netlify, publication, or final integrated tree acceptance.",
+  "source": {
+    "commit": "63f0d2000f0370708b9afe1e2e6a2dc8559b72e1",
+    "candidate_evidence_commit": "cd40f3f862782ccf22fd95d5c7ba1822328842f9",
+    "candidate_worktree": "/tmp/plato-refresh-worktrees/docs-package-refresh",
+    "candidate_clean_before_and_after": true,
+    "source_files_sha256": {
+      ".github/scripts/check_distribution.py": "1b3ea71a1eef084f602092de35a97ceed04beb4ab47da2074690dc89c5c34c3f",
+      "pyproject.toml": "2ff99eef16f4105af2810f58b1778c7ba131fe894f379837d2b65c7729724a7d",
+      "uv.lock": "e2a53aaae9a0dd49f5446b490bb3071e86aa3a9a20d6271c9dd30b4ae2dcbff9",
+      ".python-version": "02e735b3dfe1c32833eb550b7ff8ffa17f5f2bc3fa1e7bae61a8f5a3883ce398",
+      "netlify.toml": "9ae1049a54d5edc1a29b5f34ba7c235c7f0bf3e63802fb8a9f1d421ca79ead0b",
+      "docs/build.sh": "e21f333201ce75ea7e4a820d505e7b230a5a6048f279b56b0758f1a6cfc338b7",
+      "docs/requirements.txt": "9c33555b3d0cbc983d6dd59f261a242a92d136f2bb1364f300a01824f9eff665",
+      "docs/mkdocs.yml": "d26f6c6e7b91cf8835b4187e3b9e01125801e735122d79e7a148179b31a852ec",
+      ".github/workflows/docs_package_checks.yml": "3bd50449d468b4f6606648a66edc9d54e8710577ccd7878f291704391057aa64",
+      ".github/workflows/pypi_publish.yml": "44d20d3daa8e953546acf7e5b01ee61cf54d056b96b09b799ad3cfa65b105062"
+    },
+    "production_changes_relative_f196": [
+      ".github/scripts/check_distribution.py"
+    ],
+    "dependency_metadata_lock_markers_workflows_unchanged": true,
+    "policy": "Read-only candidate review. All executed builds, fixture edits, checkouts and environments are reviewer-owned under /tmp/plato-p2-binding-independent-review. Root .venv and other active environments were neither invoked nor synced. No candidate edits, nested agents, push, PR, release, dispatch, publication or hosted deployment."
+  },
+  "inputs": {
+    "source_commit": "63f0d2000f0370708b9afe1e2e6a2dc8559b72e1",
+    "evidence_commit": "cd40f3f862782ccf22fd95d5c7ba1822328842f9",
+    "qualification_sha256": "cd1a222f7f489e5745cdcb76efbe1d0227f19a521c58bf2906b9601d2c14f05e",
+    "artifact_manifest_sha256": "cdfb3085acf50c91b44888a925575a1462bdf06e793f2ed8f45925729458781f",
+    "artifact_count_verified": 96,
+    "input_sha256": {
+      "/tmp/plato-deployment-refresh-plan.json": "6d9eca53b96e1e70d6f89617fce2f2a1234fb5d8fc94fa79e387ade605c4fe9e",
+      "/tmp/plato-deployment-refresh-plan-review.json": "98b845c6dd3d1562a327239f4dd96c909b4d8bc6c9db2f24240393423dfb976b",
+      "/tmp/plato-docs-package-review.json": "46cdeab83688525106b3987064cf2da88d9cd5e75ea72fa4ad108b58c76de578",
+      "/tmp/plato-docs-package-fix-review.json": "80063d45b7a11395d28721adb83d39819c2230f45ccc90cede01206d6b800718"
+    },
+    "source_files_sha256": {
+      ".github/scripts/check_distribution.py": "1b3ea71a1eef084f602092de35a97ceed04beb4ab47da2074690dc89c5c34c3f",
+      "pyproject.toml": "2ff99eef16f4105af2810f58b1778c7ba131fe894f379837d2b65c7729724a7d",
+      "uv.lock": "e2a53aaae9a0dd49f5446b490bb3071e86aa3a9a20d6271c9dd30b4ae2dcbff9",
+      ".python-version": "02e735b3dfe1c32833eb550b7ff8ffa17f5f2bc3fa1e7bae61a8f5a3883ce398",
+      "netlify.toml": "9ae1049a54d5edc1a29b5f34ba7c235c7f0bf3e63802fb8a9f1d421ca79ead0b",
+      "docs/build.sh": "e21f333201ce75ea7e4a820d505e7b230a5a6048f279b56b0758f1a6cfc338b7",
+      "docs/requirements.txt": "9c33555b3d0cbc983d6dd59f261a242a92d136f2bb1364f300a01824f9eff665",
+      "docs/mkdocs.yml": "d26f6c6e7b91cf8835b4187e3b9e01125801e735122d79e7a148179b31a852ec",
+      ".github/workflows/docs_package_checks.yml": "3bd50449d468b4f6606648a66edc9d54e8710577ccd7878f291704391057aa64",
+      ".github/workflows/pypi_publish.yml": "44d20d3daa8e953546acf7e5b01ee61cf54d056b96b09b799ad3cfa65b105062"
+    },
+    "production_changes_relative_f196": [
+      ".github/scripts/check_distribution.py"
+    ],
+    "candidate_worktree_clean": true
+  },
+  "unresolved_findings_by_severity": {
+    "critical": 0,
+    "high": 0,
+    "medium": 0,
+    "low": 0
+  },
+  "findings": [],
+  "resolved_prior_findings": [
+    {
+      "id": "P2-M1",
+      "status": "Resolved and independently verified",
+      "evidence": "Actual strict docs\u2192dirty generated directories\u2192default package and separate release-default archives are identical, have no generated docs/CI payloads, and retained original generated-output red sdist is rejected."
+    },
+    {
+      "id": "P2-M2",
+      "status": "Resolved and independently verified",
+      "evidence": "Rejected invalid/pre-existing output paths receive no bytes; owned failure receipts require successful fresh directory creation. Every sdist source payload matches frozen Git blob bytes, and only PKG-INFO is excepted after byte equality to wheel METADATA. Actual untracked and tracked-byte changes reject; retained leaked-receipt red rejects against original f196 tree."
+    }
+  ],
+  "executed_commands_and_results": [
+    {
+      "command": [
+        "zsh",
+        "-lc",
+        ". /tmp/plato-p2-binding-independent-review/workflow-default.zsh"
+      ],
+      "exit_code": 0,
+      "sequence": "Fresh strict docs-only build \u2192 stale docs/site and ci-artifacts sentinels \u2192 package CLI with default output",
+      "package_command": [
+        "/tmp/plato-p2-binding-independent-review/controller-env/bin/python",
+        ".github/scripts/check_distribution.py"
+      ],
+      "docs_command": [
+        "./docs/build.sh"
+      ],
+      "docs_environment": "/tmp/plato-p2-binding-independent-review/docs-environment/.venv-docs",
+      "log": "/tmp/plato-p2-binding-independent-review/workflow-default.log"
+    },
+    {
+      "command": [
+        "zsh",
+        "-lc",
+        ". /tmp/plato-p2-binding-independent-review/release-default.zsh"
+      ],
+      "exit_code": 0,
+      "sequence": "Separate fresh source, no prior docs build, package CLI with default output",
+      "package_command": [
+        "/tmp/plato-p2-binding-independent-review/controller-env/bin/python",
+        ".github/scripts/check_distribution.py"
+      ],
+      "log": "/tmp/plato-p2-binding-independent-review/release-default.log"
+    },
+    {
+      "command": [
+        "zsh",
+        "-lc",
+        "/tmp/plato-p2-binding-independent-review/controller-env/bin/python /tmp/plato-p2-binding-independent-review/audit_inputs.py"
+      ],
+      "exit_code": 0,
+      "result": "Verified exact source/receipt inputs and all 96 committed artifact hashes"
+    },
+    {
+      "command": [
+        "zsh",
+        "-lc",
+        "/tmp/plato-p2-binding-independent-review/controller-env/bin/python /tmp/plato-p2-binding-independent-review/check_ownership.py"
+      ],
+      "exit_code": 0,
+      "result": "Six rejection cases preserve target bytes, paths, modes, sizes, and mtimes; no failure receipt created"
+    },
+    {
+      "command": [
+        "zsh",
+        "-lc",
+        "/tmp/plato-p2-binding-independent-review/docs-environment/.venv-docs/bin/python /tmp/plato-p2-binding-independent-review/verify_defaults.py"
+      ],
+      "exit_code": 0,
+      "result": "Independently verified both raw archives, every included Git blob byte, metadata, all 12 workspace manifests, source coverage, rebuild and installed-wheel receipts"
+    },
+    {
+      "command": [
+        "zsh",
+        "-lc",
+        "/tmp/plato-p2-binding-independent-review/controller-env/bin/python /tmp/plato-p2-binding-independent-review/actual_negative_builds.py"
+      ],
+      "exit_code": 0,
+      "result": "Actual untracked JSON, altered tracked Python bytes, and forced uv build failure each reject and create only owned failure receipts"
+    },
+    {
+      "command": [
+        "zsh",
+        "-lc",
+        "/tmp/plato-p2-binding-independent-review/controller-env/bin/python /tmp/plato-p2-binding-independent-review/archive_negatives.py"
+      ],
+      "exit_code": 0,
+      "result": "17 actual archive mutation/retained-red rejection probes passed"
+    },
+    {
+      "command": [
+        "zsh",
+        "-lc",
+        "/tmp/plato-p2-binding-independent-review/controller-env/bin/python /tmp/plato-p2-binding-independent-review/further_checks.py"
+      ],
+      "exit_code": 0,
+      "result": "Real build metadata corruption rejects, actual negative payload bytes verified, and real strict MkDocs warning propagates"
+    },
+    {
+      "command": [
+        "zsh",
+        "-lc",
+        "uv lock --check --python 3.13"
+      ],
+      "cwd": "/tmp/plato-p2-binding-independent-review/release-source",
+      "exit_code": 0,
+      "log": "/tmp/plato-p2-binding-independent-review/lock-check.log"
+    },
+    {
+      "command": [
+        "zsh",
+        "-lc",
+        "git diff --check f1963eb906228c287f9787251f4319339ca7ee78 63f0d2000f0370708b9afe1e2e6a2dc8559b72e1"
+      ],
+      "cwd": "/tmp/plato-p2-binding-independent-review/release-source",
+      "exit_code": 0,
+      "log": "/tmp/plato-p2-binding-independent-review/whitespace-check.log"
+    },
+    {
+      "command": [
+        "sh",
+        "-n",
+        "docs/build.sh"
+      ],
+      "exit_code": 0,
+      "invocation": "Executed from the Python 3.13 verifier launched under zsh -lc"
+    }
+  ],
+  "executed_local_checks": {
+    "actual_default_paths": {
+      "builds": {
+        "workflow": {
+          "source_commit": "63f0d2000f0370708b9afe1e2e6a2dc8559b72e1",
+          "accepted": true,
+          "checkout": "/private/tmp/plato-p2-binding-independent-review/workflow-source",
+          "wheel_sha256": "d00d2c2acd5e5867e6a818fe3bc4132db8f92e00f47017da35e5a3159a60ba96",
+          "sdist_sha256": "a6b70edef64f1b1defc5bd6aac40a37976e57f49d29cc280c0c4033c0bb552b3",
+          "sdist_source_binding_sha256": "de386904613a0172286924f92ca634f8359da468bd7e48008ea5aa1d1996cc4f",
+          "sdist_members": 1247,
+          "git_tree_bound_members": 1246,
+          "generated_metadata": {
+            "PKG-INFO": "08e03ffe8434783a17ca65294fd3c65c5f189a2ec3e0d70e1590a1b553654a7a"
+          },
+          "raw_archive_hashes_and_git_bytes_verified": true,
+          "generated_and_forbidden_payloads": [],
+          "tracked_plato_source_count": 209,
+          "retained_workspace_manifest_count": 12,
+          "metadata_dependency_and_extras_parity": true,
+          "clean_from_sdist_rebuild_payload_matches": true,
+          "outside_checkout_installed_wheel_proof": true,
+          "installed_package_count": 80,
+          "all_installed_versions_locked": true,
+          "build_constraints_sha256": "284e1018003f55e4ce6fbb5c80b7dad20e86d9ed60ef544d817f1892626326de",
+          "runtime_constraints_sha256": "9c9b82f4c52ba05fb5a1c7e6e841e15fcd69104f9867cf7d7526060055a32709",
+          "untracked_status": "?? ci-artifacts/docs-package/acceptance.json\n?? ci-artifacts/docs-package/build-constraints.txt\n?? ci-artifacts/docs-package/installed-wheel.json\n?? ci-artifacts/docs-package/provenance.json\n?? ci-artifacts/docs-package/rebuilt-wheel-manifest.json\n?? ci-artifacts/docs-package/runtime-constraints.txt\n?? ci-artifacts/docs-package/sdist-manifest.json\n?? ci-artifacts/docs-package/sdist-source-binding.json\n?? ci-artifacts/docs-package/wheel-manifest.json\n?? ci-artifacts/docs/commit.txt\n?? ci-artifacts/docs/docs-environment.json\n?? ci-artifacts/docs/python.txt\n?? ci-artifacts/docs/source-hashes.txt\n?? ci-artifacts/docs/uv.txt\n?? ci-artifacts/older/distributions/plato_learn-0.0.0.tar.gz\n?? ci-artifacts/older/reviewer-stale-artifact.json\n?? ci-artifacts/pre-existing/caller.txt\n"
+        },
+        "release": {
+          "source_commit": "63f0d2000f0370708b9afe1e2e6a2dc8559b72e1",
+          "accepted": true,
+          "checkout": "/private/tmp/plato-p2-binding-independent-review/release-source",
+          "wheel_sha256": "d00d2c2acd5e5867e6a818fe3bc4132db8f92e00f47017da35e5a3159a60ba96",
+          "sdist_sha256": "a6b70edef64f1b1defc5bd6aac40a37976e57f49d29cc280c0c4033c0bb552b3",
+          "sdist_source_binding_sha256": "de386904613a0172286924f92ca634f8359da468bd7e48008ea5aa1d1996cc4f",
+          "sdist_members": 1247,
+          "git_tree_bound_members": 1246,
+          "generated_metadata": {
+            "PKG-INFO": "08e03ffe8434783a17ca65294fd3c65c5f189a2ec3e0d70e1590a1b553654a7a"
+          },
+          "raw_archive_hashes_and_git_bytes_verified": true,
+          "generated_and_forbidden_payloads": [],
+          "tracked_plato_source_count": 209,
+          "retained_workspace_manifest_count": 12,
+          "metadata_dependency_and_extras_parity": true,
+          "clean_from_sdist_rebuild_payload_matches": true,
+          "outside_checkout_installed_wheel_proof": true,
+          "installed_package_count": 80,
+          "all_installed_versions_locked": true,
+          "build_constraints_sha256": "284e1018003f55e4ce6fbb5c80b7dad20e86d9ed60ef544d817f1892626326de",
+          "runtime_constraints_sha256": "9c9b82f4c52ba05fb5a1c7e6e841e15fcd69104f9867cf7d7526060055a32709",
+          "untracked_status": "?? ci-artifacts/docs-package/acceptance.json\n?? ci-artifacts/docs-package/build-constraints.txt\n?? ci-artifacts/docs-package/installed-wheel.json\n?? ci-artifacts/docs-package/provenance.json\n?? ci-artifacts/docs-package/rebuilt-wheel-manifest.json\n?? ci-artifacts/docs-package/runtime-constraints.txt\n?? ci-artifacts/docs-package/sdist-manifest.json\n?? ci-artifacts/docs-package/sdist-source-binding.json\n?? ci-artifacts/docs-package/wheel-manifest.json\n"
+        }
+      },
+      "docs_inventory": {
+        "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+        "executable": "/tmp/plato-p2-binding-independent-review/docs-environment/.venv-docs/bin/python",
+        "prefix": "/tmp/plato-p2-binding-independent-review/docs-environment/.venv-docs",
+        "packages": {
+          "babel": "2.18.0",
+          "backrefs": "8.0",
+          "certifi": "2026.7.22",
+          "charset-normalizer": "3.5.2",
+          "click": "8.5.0",
+          "colorama": "0.4.6",
+          "ghp-import": "2.1.0",
+          "idna": "3.20",
+          "jinja2": "3.1.6",
+          "markdown": "3.11",
+          "markupsafe": "3.0.3",
+          "mergedeep": "1.3.4",
+          "mkdocs": "1.6.1",
+          "mkdocs-get-deps": "0.2.2",
+          "mkdocs-material": "9.7.7",
+          "mkdocs-material-extensions": "1.3.1",
+          "packaging": "26.3",
+          "paginate": "0.5.7",
+          "pathspec": "1.1.1",
+          "platformdirs": "4.12.2",
+          "pygments": "2.21.0",
+          "pymdown-extensions": "12.1",
+          "python-dateutil": "2.9.0.post0",
+          "pyyaml": "6.0.3",
+          "pyyaml-env-tag": "1.1",
+          "requests": "2.34.2",
+          "six": "1.17.0",
+          "urllib3": "2.8.0",
+          "watchdog": "6.0.0"
+        },
+        "requirements_parity": true,
+        "runtime_and_project_absent": true
+      },
+      "requirements_parity": true,
+      "dirty_generated_sentinels_preserved": true,
+      "workflow_syntax": {
+        ".github/workflows/docs_package_checks.yml": {
+          "parsed": true,
+          "shell_or_python_steps_checked": 4
+        },
+        ".github/workflows/pypi_publish.yml": {
+          "parsed": true,
+          "shell_or_python_steps_checked": 3
+        }
+      },
+      "netlify_root_and_publish_path": {
+        "build": {
+          "base": ".",
+          "command": "./docs/build.sh",
+          "publish": "docs/site",
+          "environment": {
+            "PYTHON_VERSION": "3.13"
+          }
+        }
+      },
+      "publication_boundary_preserved": true
+    },
+    "output_ownership_rejections": [
+      {
+        "name": "existing-unsupported-tracked-directory",
+        "command": [
+          "/tmp/plato-p2-binding-independent-review/controller-env/bin/python",
+          ".github/scripts/check_distribution.py",
+          "--output-dir",
+          "/tmp/plato-p2-binding-independent-review/workflow-source/docs"
+        ],
+        "exit_code": 1,
+        "directory_unchanged": true,
+        "snapshot_entries": 61,
+        "snapshot_sha256": "eb7c7d048314ad6ddf63359a25ec3f06bd0d468871b6df584c1b302db45537b8",
+        "error": "Output within the checkout must be under the excluded ci-artifacts path."
+      },
+      {
+        "name": "existing-unsupported-untracked-directory",
+        "command": [
+          "/tmp/plato-p2-binding-independent-review/controller-env/bin/python",
+          ".github/scripts/check_distribution.py",
+          "--output-dir",
+          "/tmp/plato-p2-binding-independent-review/workflow-source/unowned-generated-output"
+        ],
+        "exit_code": 1,
+        "directory_unchanged": true,
+        "snapshot_entries": 2,
+        "snapshot_sha256": "0fa8a78a2d44c3bb5b0897911352b9401b2c916573455de5ccd251d84d1f3cf3",
+        "error": "Output within the checkout must be under the excluded ci-artifacts path."
+      },
+      {
+        "name": "existing-external-directory",
+        "command": [
+          "/tmp/plato-p2-binding-independent-review/controller-env/bin/python",
+          ".github/scripts/check_distribution.py",
+          "--output-dir",
+          "/tmp/plato-p2-binding-independent-review/existing-external"
+        ],
+        "exit_code": 1,
+        "directory_unchanged": true,
+        "snapshot_entries": 2,
+        "snapshot_sha256": "a0ed6ac910c6dfe5e1b248cba4d4e1b72edaa3f6bb59a5b4475b11a1a27dc87b",
+        "error": "[Errno 17] File exists: '/private/tmp/plato-p2-binding-independent-review/existing-external'"
+      },
+      {
+        "name": "existing-supported-unowned-directory",
+        "command": [
+          "/tmp/plato-p2-binding-independent-review/controller-env/bin/python",
+          ".github/scripts/check_distribution.py",
+          "--output-dir",
+          "/tmp/plato-p2-binding-independent-review/workflow-source/ci-artifacts/pre-existing"
+        ],
+        "exit_code": 1,
+        "directory_unchanged": true,
+        "snapshot_entries": 2,
+        "snapshot_sha256": "3db52b9279132d4e32117fee6016dadd34a59c6de6e0d5b73eb42c7a7a956161",
+        "error": "[Errno 17] File exists: '/private/tmp/plato-p2-binding-independent-review/workflow-source/ci-artifacts/pre-existing'"
+      },
+      {
+        "name": "checkout-root",
+        "command": [
+          "/tmp/plato-p2-binding-independent-review/controller-env/bin/python",
+          ".github/scripts/check_distribution.py",
+          "--output-dir",
+          "/tmp/plato-p2-binding-independent-review/workflow-source"
+        ],
+        "exit_code": 1,
+        "directory_unchanged": true,
+        "snapshot_entries": 2167,
+        "snapshot_sha256": "957ab27208c06061274bddb4e28175358253b08de42f388f0a4b30a688ed7545",
+        "error": "Output within the checkout must be under the excluded ci-artifacts path."
+      },
+      {
+        "name": "nonexistent-unsupported-output",
+        "command": [
+          "/tmp/plato-p2-binding-independent-review/controller-env/bin/python",
+          ".github/scripts/check_distribution.py",
+          "--output-dir",
+          "/tmp/plato-p2-binding-independent-review/workflow-source/unsupported-never-created/subdir"
+        ],
+        "exit_code": 1,
+        "no_directories_or_bytes_created": true,
+        "error": "Output within the checkout must be under the excluded ci-artifacts path."
+      }
+    ],
+    "repeated_default_existing_success_output_rejection": {
+      "command": [
+        "/tmp/plato-p2-binding-independent-review/controller-env/bin/python",
+        ".github/scripts/check_distribution.py"
+      ],
+      "exit_code": 1,
+      "error": "[Errno 17] File exists: '/private/tmp/plato-p2-binding-independent-review/workflow-source/ci-artifacts/docs-package'",
+      "output_unchanged": true,
+      "existing_success_receipt_unchanged": true,
+      "snapshot_entries": 25,
+      "snapshot_sha256": "cd9e1e7c11f487ff0199a4a9a3c2a80a7aa3ddbcaeffe4904d712ca5d6795cb8"
+    },
+    "actual_negative_builds": [
+      {
+        "name": "actual-untracked-default-build",
+        "command": [
+          "/tmp/plato-p2-binding-independent-review/controller-env/bin/python",
+          ".github/scripts/check_distribution.py"
+        ],
+        "exit_code": 1,
+        "receipt": {
+          "accepted": false,
+          "error": "Sdist source members absent from frozen Git tree: ['reviewer-untracked-input.json']"
+        },
+        "output_newly_created_and_owned": true,
+        "output_dir": "/tmp/plato-p2-binding-independent-review/negative-source/ci-artifacts/docs-package"
+      },
+      {
+        "name": "actual-altered-tracked-source-build",
+        "command": [
+          "/tmp/plato-p2-binding-independent-review/controller-env/bin/python",
+          ".github/scripts/check_distribution.py",
+          "--output-dir",
+          "/tmp/plato-p2-binding-independent-review/negative-source/ci-artifacts/altered-tracked"
+        ],
+        "exit_code": 1,
+        "receipt": {
+          "accepted": false,
+          "error": "Sdist bytes differ from frozen Git tree: ['plato/config.py']"
+        },
+        "output_newly_created_and_owned": true,
+        "output_dir": "/tmp/plato-p2-binding-independent-review/negative-source/ci-artifacts/altered-tracked"
+      },
+      {
+        "name": "actual-owned-cli-build-failure",
+        "command": [
+          "/tmp/plato-p2-binding-independent-review/controller-env/bin/python",
+          ".github/scripts/check_distribution.py",
+          "--output-dir",
+          "/tmp/plato-p2-binding-independent-review/negative-source/ci-artifacts/owned-failure"
+        ],
+        "exit_code": 1,
+        "receipt": {
+          "accepted": false,
+          "error": "Command failed (47); see /private/tmp/plato-p2-binding-independent-review/negative-source/ci-artifacts/owned-failure/build.log"
+        },
+        "output_newly_created_and_owned": true,
+        "output_dir": "/tmp/plato-p2-binding-independent-review/negative-source/ci-artifacts/owned-failure"
+      }
+    ],
+    "archive_negative_checks": [
+      {
+        "name": "untracked-source-member",
+        "rejected": true,
+        "error": "Sdist source members absent from frozen Git tree: ['reviewer-untracked.json']",
+        "archive": "/tmp/plato-p2-binding-independent-review/archive-negative-fixtures/untracked-source-member/plato_learn-1.4.3.tar.gz",
+        "archive_sha256": "b93099ace312369bd6c06cabcc2f858790552e1efde832710363bfc67da3282e",
+        "frozen_git_tree": "63f0d2000f0370708b9afe1e2e6a2dc8559b72e1"
+      },
+      {
+        "name": "altered-tracked-source-member",
+        "rejected": true,
+        "error": "Sdist bytes differ from frozen Git tree: ['README.md']",
+        "archive": "/tmp/plato-p2-binding-independent-review/archive-negative-fixtures/altered-tracked-source-member/plato_learn-1.4.3.tar.gz",
+        "archive_sha256": "c25877dd7a2d3ec7c565e60c9b8516beff8860e21ab77b267322e91d9d810697",
+        "frozen_git_tree": "63f0d2000f0370708b9afe1e2e6a2dc8559b72e1"
+      },
+      {
+        "name": "corrupt-generated-pkg-info",
+        "rejected": true,
+        "error": "Generated PKG-INFO must match the built wheel METADATA bytes.",
+        "archive": "/tmp/plato-p2-binding-independent-review/archive-negative-fixtures/corrupt-generated-pkg-info/plato_learn-1.4.3.tar.gz",
+        "archive_sha256": "846bacd1eba258922a65aaebd68a0a6aca6e666b406246a735d90830c211c705",
+        "frozen_git_tree": "63f0d2000f0370708b9afe1e2e6a2dc8559b72e1"
+      },
+      {
+        "name": "unallowed-generated-metadata",
+        "rejected": true,
+        "error": "Sdist source members absent from frozen Git tree: ['backend-generated.json']",
+        "archive": "/tmp/plato-p2-binding-independent-review/archive-negative-fixtures/unallowed-generated-metadata/plato_learn-1.4.3.tar.gz",
+        "archive_sha256": "c9301ea9b31f4a8cb162b6a8aee8dd192e02a0014de47c0b6c1f203d54944b2b",
+        "frozen_git_tree": "63f0d2000f0370708b9afe1e2e6a2dc8559b72e1"
+      },
+      {
+        "name": "duplicate-source-member",
+        "rejected": true,
+        "error": "Duplicate sdist source member: README.md",
+        "archive": "/tmp/plato-p2-binding-independent-review/archive-negative-fixtures/duplicate-source-member/plato_learn-1.4.3.tar.gz",
+        "archive_sha256": "ce2be1c3953785a0d77c91fd3d32f609a5f562e998ada9c55067237ae2569d09",
+        "frozen_git_tree": "63f0d2000f0370708b9afe1e2e6a2dc8559b72e1"
+      },
+      {
+        "name": "nonregular-source-member",
+        "rejected": true,
+        "error": "Non-regular sdist source member: plato_learn-1.4.3/reviewer-link",
+        "archive": "/tmp/plato-p2-binding-independent-review/archive-negative-fixtures/nonregular-source-member/plato_learn-1.4.3.tar.gz",
+        "archive_sha256": "e109282ef9091cc2f2407c6e9b9dc327786c2342816beb04bae80e6ef8fd9e6a",
+        "frozen_git_tree": "63f0d2000f0370708b9afe1e2e6a2dc8559b72e1"
+      },
+      {
+        "name": "missing-plato-source",
+        "rejected": true,
+        "error": "Missing Plato source files: ['plato/config.py']",
+        "archive": "/tmp/plato-p2-binding-independent-review/archive-negative-fixtures/missing-plato-source/plato_learn-1.4.3.tar.gz",
+        "archive_sha256": "ae9dcb0f1df40e0a6a048ea4519db1dc18cee1cbbe8bef1721b1c23bc7db2510",
+        "frozen_git_tree": "63f0d2000f0370708b9afe1e2e6a2dc8559b72e1"
+      },
+      {
+        "name": "generated-docs",
+        "rejected": true,
+        "error": "Forbidden distribution payloads: ['docs/site/reviewer.json']",
+        "archive": "/tmp/plato-p2-binding-independent-review/archive-negative-fixtures/generated-docs/plato_learn-1.4.3.tar.gz",
+        "archive_sha256": "bbd268510ddd7b4d93fb0d7f3baca20c0a7f70a24af81f059d13c077ff2c7760",
+        "frozen_git_tree": "63f0d2000f0370708b9afe1e2e6a2dc8559b72e1"
+      },
+      {
+        "name": "generated-ci",
+        "rejected": true,
+        "error": "Forbidden distribution payloads: ['ci-artifacts/reviewer.json']",
+        "archive": "/tmp/plato-p2-binding-independent-review/archive-negative-fixtures/generated-ci/plato_learn-1.4.3.tar.gz",
+        "archive_sha256": "1d8acd01aca04840461a363b724074e46743a09e11c092dd0c5ccc9a17b8a573",
+        "frozen_git_tree": "63f0d2000f0370708b9afe1e2e6a2dc8559b72e1"
+      },
+      {
+        "name": "archive",
+        "rejected": true,
+        "error": "Forbidden distribution payloads: ['archives/retired/reviewer.py']",
+        "archive": "/tmp/plato-p2-binding-independent-review/archive-negative-fixtures/archive/plato_learn-1.4.3.tar.gz",
+        "archive_sha256": "f099ab53fd5ca0b705907c8fe64127de3af1323ead0995be536a1f7598fda880",
+        "frozen_git_tree": "63f0d2000f0370708b9afe1e2e6a2dc8559b72e1"
+      },
+      {
+        "name": "reproduction",
+        "rejected": true,
+        "error": "Forbidden distribution payloads: ['evidence/2026-refresh/reproductions/reviewer.json']",
+        "archive": "/tmp/plato-p2-binding-independent-review/archive-negative-fixtures/reproduction/plato_learn-1.4.3.tar.gz",
+        "archive_sha256": "22de0d2a1344ae694e8560f4cdcc5577b006472e817c5dbc51475371951bff39",
+        "frozen_git_tree": "63f0d2000f0370708b9afe1e2e6a2dc8559b72e1"
+      },
+      {
+        "name": "environment",
+        "rejected": true,
+        "error": "Forbidden distribution payloads: ['.venv/lib/reviewer.py']",
+        "archive": "/tmp/plato-p2-binding-independent-review/archive-negative-fixtures/environment/plato_learn-1.4.3.tar.gz",
+        "archive_sha256": "721083998f3f70be75abf623b188509a6e24d6250e0bae2716d5468ffb73fa9f",
+        "frozen_git_tree": "63f0d2000f0370708b9afe1e2e6a2dc8559b72e1"
+      },
+      {
+        "name": "cache",
+        "rejected": true,
+        "error": "Forbidden distribution payloads: ['__pycache__/reviewer.pyc']",
+        "archive": "/tmp/plato-p2-binding-independent-review/archive-negative-fixtures/cache/plato_learn-1.4.3.tar.gz",
+        "archive_sha256": "1aa404567196185804d4a35b4b0d2fecb7f60a2c848f24c7db66e96913a027f3",
+        "frozen_git_tree": "63f0d2000f0370708b9afe1e2e6a2dc8559b72e1"
+      },
+      {
+        "name": "generated-docs-wheel",
+        "rejected": true,
+        "error": "Forbidden distribution payloads: ['docs/site/reviewer.json']",
+        "archive": "/tmp/plato-p2-binding-independent-review/archive-negative-fixtures/generated-docs-wheel/plato_learn-1.4.3-py3-none-any.whl",
+        "archive_sha256": "95fc28ca5b38592a0273d5864abef1a3a347b191cde66fed35614ceec2b61b2a",
+        "frozen_git_tree": "63f0d2000f0370708b9afe1e2e6a2dc8559b72e1"
+      },
+      {
+        "name": "generated-ci-wheel",
+        "rejected": true,
+        "error": "Forbidden distribution payloads: ['ci-artifacts/reviewer.json']",
+        "archive": "/tmp/plato-p2-binding-independent-review/archive-negative-fixtures/generated-ci-wheel/plato_learn-1.4.3-py3-none-any.whl",
+        "archive_sha256": "e70fb3013c3fe2047b7fc9ba8de2701cf2506325cd104531b259d5dbba1e64bf",
+        "frozen_git_tree": "63f0d2000f0370708b9afe1e2e6a2dc8559b72e1"
+      },
+      {
+        "name": "retained-p2-m2-red-against-original-tree",
+        "rejected": true,
+        "error": "Sdist source members absent from frozen Git tree: ['arbitrary-generated-output/acceptance.json', 'arbitrary-generated-output/existing-source.txt']",
+        "archive": "/tmp/plato-p2-binding-independent-review/archive-negative-fixtures/retained-p2-m2-red/plato_learn-1.4.3.tar.gz",
+        "archive_sha256": "a86ca7cea9a2e51fdeeab7d5ffb08fe9c458c8cf3fd1b7af85d032bfef657c5a",
+        "frozen_git_tree": "f1963eb906228c287f9787251f4319339ca7ee78"
+      },
+      {
+        "name": "retained-p2-m1-generated-red",
+        "rejected": true,
+        "error": "Forbidden distribution payloads: ['ci-artifacts/docs-package/build-constraints.txt', 'ci-artifacts/docs-package/distributions/.gitignore', 'ci-artifacts/docs-package/provenance.json', 'ci-artifacts/docs-package/runtime-constraints.txt', 'ci-artifacts/docs/commit.txt', 'ci-artifacts/docs/docs-environment.json', 'ci-artifacts/docs/python.txt', 'ci-artifacts/docs/source-hashes.txt', 'ci-artifacts/docs/uv.txt', 'docs/site/404.html', 'docs/site/assets/images/favicon.png', 'docs/site/assets/javascripts/bundle.d7400e89.min.js', 'docs/site/assets/javascripts/bundle.d7400e89.min.js.map', 'docs/site/assets/javascripts/lunr/min/lunr.ar.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.da.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.de.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.du.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.el.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.es.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.fi.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.fr.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.he.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.hi.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.hu.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.hy.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.it.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.ja.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.jp.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.kn.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.ko.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.multi.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.nl.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.no.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.pt.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.ro.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.ru.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.sa.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.stemmer.support.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.sv.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.ta.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.te.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.th.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.tr.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.vi.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.zh.min.js', 'docs/site/assets/javascripts/lunr/tinyseg.js', 'docs/site/assets/javascripts/lunr/wordcut.js', 'docs/site/assets/javascripts/workers/search.2c215733.min.js', 'docs/site/assets/javascripts/workers/search.2c215733.min.js.map', 'docs/site/assets/stylesheets/main.ec1eaa64.min.css', 'docs/site/assets/stylesheets/main.ec1eaa64.min.css.map', 'docs/site/assets/stylesheets/palette.ab4e12ef.min.css', 'docs/site/assets/stylesheets/palette.ab4e12ef.min.css.map', 'docs/site/ccdb/index.html', 'docs/site/configurations/algorithm/index.html', 'docs/site/configurations/clients/index.html', 'docs/site/configurations/evaluation/index.html', 'docs/site/configurations/general/index.html', 'docs/site/configurations/overview/index.html', 'docs/site/configurations/parameters/index.html', 'docs/site/configurations/server/index.html', 'docs/site/configurations/trainer/index.html', 'docs/site/deployment/index.html', 'docs/site/development/index.html', 'docs/site/examples/Getting Started/index.html', 'docs/site/examples/algorithms/1. Server Aggregation Algorithms/index.html', 'docs/site/examples/algorithms/10. Algorithms based on Neural Architecture Search and Model Search/index.html', 'docs/site/examples/algorithms/11. Three-layer Federated Learning Algorithms/index.html', 'docs/site/examples/algorithms/12. Poisoning Detection Algorithms/index.html', 'docs/site/examples/algorithms/13. Model Pruning Algorithms/index.html', 'docs/site/examples/algorithms/14. Gradient Leakage Attacks and Defences/index.html', 'docs/site/examples/algorithms/2. Secure Aggregation with Homomorphic Encryption/index.html', 'docs/site/examples/algorithms/3. Asynchronous Federated Learning Algorithms/index.html', 'docs/site/examples/algorithms/4. Federated Unlearning/index.html', 'docs/site/examples/algorithms/5. Algorithms with Customized Client Training Loops/index.html', 'docs/site/examples/algorithms/6. Client Selection Algorithms/index.html', 'docs/site/examples/algorithms/7. Split Learning Algorithms/index.html', 'docs/site/examples/algorithms/8. Personalized Federated Learning Algorithms/index.html', 'docs/site/examples/algorithms/9. Personalized Federated Learning Algorithms based on Self-Supervised Learning/index.html', 'docs/site/examples/archived/index.html', 'docs/site/examples/case-studies/1. LoRA/index.html', 'docs/site/examples/case-studies/2. Composable Trainer/index.html', 'docs/site/examples/case-studies/3. SmolVLA Trainer with LeRobot/index.html', 'docs/site/examples/case-studies/4. Server-side Lighteval for SmolLM2/index.html', 'docs/site/examples/case-studies/5. Nanochat in Plato/index.html', 'docs/site/examples/case-studies/6. Qwen3 Federated LoRA/index.html', 'docs/site/index.html', 'docs/site/install/index.html', 'docs/site/javascripts/katex.js', 'docs/site/misc/index.html', 'docs/site/mlx/index.html', 'docs/site/quickstart/index.html', 'docs/site/references/clients/index.html', 'docs/site/references/evaluators/index.html', 'docs/site/references/servers/index.html', 'docs/site/references/trainers/index.html', 'docs/site/search/search_index.json', 'docs/site/sitemap.xml', 'docs/site/sitemap.xml.gz', 'docs/site/stylesheets/extra.css']",
+        "archive": "/tmp/plato-p2-binding-independent-review/archive-negative-fixtures/retained-p2-m1-red/plato_learn-1.4.3.tar.gz",
+        "archive_sha256": "33fca2948256ec4b7457d75caed1bd56d14594dd63d097fbd63e4fb61e33d4d7",
+        "frozen_git_tree": "be2ae55c9d6d3efdabcd215959859c66c86837e8"
+      }
+    ],
+    "corrupt_metadata_raw_negative_payload_and_strict_docs_checks": [
+      {
+        "name": "actual-uv-build-corrupt-generated-metadata-cli",
+        "command": [
+          "/tmp/plato-p2-binding-independent-review/controller-env/bin/python",
+          ".github/scripts/check_distribution.py",
+          "--output-dir",
+          "/tmp/plato-p2-binding-independent-review/negative-source/ci-artifacts/corrupt-generated-metadata"
+        ],
+        "exit_code": 1,
+        "output_newly_created_and_owned": true,
+        "receipt": {
+          "accepted": false,
+          "error": "Generated PKG-INFO must match the built wheel METADATA bytes."
+        },
+        "method": "Delegated to real uv build, then changed only generated PKG-INFO bytes before checker inspection."
+      },
+      {
+        "name": "actual-untracked-input",
+        "raw_archive_injected_bytes_verified": true,
+        "archive_sha256": "54d28112b45c952dca7646aeaf5baf4ce53773eed5d89829046618299994ac0b",
+        "injected_member": "reviewer-untracked-input.json",
+        "member_sha256": "ef334a5c2aea56ae8c6ec197b0bc4072f0f648405f65e1d3329ec5aa13707e62"
+      },
+      {
+        "name": "actual-tracked-byte-change",
+        "raw_archive_injected_bytes_verified": true,
+        "archive_sha256": "6d9c1fd949858802c31b2c62614e4e4f6b8669628a04ddeb83d561228768bea6",
+        "injected_member": "plato/config.py",
+        "member_sha256": "a00db5577f0dca6f5d676c82bbf4f12d5814e5b1ddb0662df2b98e08a83109d1"
+      },
+      {
+        "name": "actual-strict-docs-warning-failure",
+        "command": [
+          "./docs/build.sh"
+        ],
+        "exit_code": 1,
+        "warning": "Navigation references reviewer-absent-page.md",
+        "fixture_restored": true
+      }
+    ],
+    "independent_negative_case_count": 29,
+    "author_committed_artifact_hashes_verified": 96,
+    "workflow_toml_and_embedded_python_zsh_syntax": "Pass",
+    "locked_docs_export_requirements_byte_parity": "Pass",
+    "unchanged_release_created_and_token_publication_intent": "Pass",
+    "source_status_claim": "Tracked status is explicitly scoped. Acceptance instead verifies included sdist inputs against the frozen Git tree.",
+    "all_reviewer_tracked_source_fixtures_restored": true
+  },
+  "unchanged_prior_checks_reused_with_binding": {
+    "previous_review_sha256": "80063d45b7a11395d28721adb83d39819c2230f45ccc90cede01206d6b800718",
+    "initial_review_sha256": "46cdeab83688525106b3987064cf2da88d9cd5e75ea72fa4ad108b58c76de578",
+    "accepted_plan_review_sha256": "98b845c6dd3d1562a327239f4dd96c909b4d8bc6c9db2f24240393423dfb976b",
+    "reason": "The only production repair relative to f196 is check_distribution.py. Netlify configuration, docs helper, requirements, workflows, project metadata and lock are byte-identical to prior independently reviewed inputs. Existing immutable action and uv-absent bootstrap checks remain bound unchanged; core checker changes and actual defaults were freshly executed here.",
+    "claim_limit": "No current remote execution or service/API claim is made from reused checks; prior REQUEST_CHANGES verdicts are not counted as acceptance."
+  },
+  "reviewer_fixture_notes": [
+    "An initial root-level .txt injection was excluded by the existing /*.txt Git ignore rule, yielding the clean canonical archive. The actual included-untracked-input rejection was therefore exercised with a .json fixture, whose raw archive payload was independently verified. The benign ignored-file build is retained under negative-source/ci-artifacts/ignored-txt-default."
+  ],
+  "remaining_remote_gates": [
+    "Root must execute actual docs/package GitHub Linux checks on the final integrated SHA and inspect source-bound distributions, constraints, logs, clean from-sdist rebuild and outside-checkout wheel provenance.",
+    "Obtain a real Netlify Deploy Preview on final integration when service access is available; verify effective repository-root build, Python 3.13 bootstrap and docs/site output. Report any hosted service limitation explicitly.",
+    "Evidence-bearing cd40f3f8 and the final integrated tree differ from qualified source 63f0d200; each packaged tree needs its own bound receipts.",
+    "Root preserves native383/core51/retained19 gates and decides final reruns. This focused review did not replace or weaken those gates."
+  ],
+  "not_executed": [
+    "GitHub Linux workflow",
+    "Hosted Netlify preview",
+    "Container/GPU/Metal/training qualification",
+    "Root native/core/retained suites",
+    "Push or PR creation",
+    "Release creation or dispatch",
+    "Package or image publication"
+  ],
+  "artifacts": {
+    "root": "/tmp/plato-p2-binding-independent-review",
+    "manifest": "/tmp/plato-p2-binding-independent-review/review-artifact-manifest.json",
+    "manifest_sha256": "fcd8d2e5e7a4f5c18089213219c8b5550278d8a0f37758709cfb3ae4d6771786",
+    "manifest_entries": 169,
+    "source_sdist_sha256": "a6b70edef64f1b1defc5bd6aac40a37976e57f49d29cc280c0c4033c0bb552b3",
+    "wheel_sha256": "d00d2c2acd5e5867e6a818fe3bc4132db8f92e00f47017da35e5a3159a60ba96",
+    "source_binding_sha256": "de386904613a0172286924f92ca634f8359da468bd7e48008ea5aa1d1996cc4f",
+    "qualification_receipt_sha256": "cd1a222f7f489e5745cdcb76efbe1d0227f19a521c58bf2906b9601d2c14f05e"
+  }
+}
