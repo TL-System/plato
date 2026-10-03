@@ -1,0 +1,87 @@
+{
+  "schema_version": 1,
+  "scope": "Implementation facts for the root-assigned fresh Astra FedDyn prose writer; no standalone prose added by implementer.",
+  "implementation_commit": "7d310b90d698a7be4aa9a184dc415f7dbb401e5b",
+  "implementation_tree": "019018a41c14b76ca974e148373d9aa8a66bb827",
+  "design_sha256": "62c5d61805c49ccc06f99776d0da820c5b27cffeb5916754ddb16bb3135c1d5b",
+  "paper": "https://arxiv.org/pdf/2111.04263v1",
+  "author_repository_commit": "48a19fac440ef079ce563da8e0c2896f8256fef9",
+  "algorithm": {
+    "local_objective": "J_i(w)=F_i(w)+alpha_i*<h_i,w>+(alpha_i/2)*||w-x||^2",
+    "local_history": "h_i_next=h_i+y_i-x, once after successful local updates; not a measured-gradient vector",
+    "cloud": "unweighted mean of all selected endpoints + mean of every logical history in the fixed population",
+    "default": "uniform: alpha_i=alpha",
+    "sample_mode": "q_i=N*n_i/sum_all_n; alpha_i=alpha/q_i. Full realized positive integer count vector is mandatory. Counts never weight either model/history mean.",
+    "labels": "No label-dependent coefficient. Matching output-column and label permutation preserves complete objective gradients.",
+    "optimization": "Finite local plain SGD, without a convergence claim. No equation change to legacy unsquared FedProx."
+  },
+  "public_entrypoints": {
+    "main": "examples/customized_client_training/feddyn/feddyn.py::main calls dedicated create_client and Server.run",
+    "client": "Composable default payload/transport/reporting with example-local lifecycle and training adapters. Full model and versioned round metadata, bound to actual assignment header.",
+    "server": "examples/customized_client_training/feddyn/feddyn_server.py::Server owns all population histories, count cache, run UUID, committed round and consumed dispatch tokens. Full synchronous fixed-population rounds only.",
+    "trainer": "Dedicated example Trainer plus preserved FedDynLossStrategy/FedDynUpdateStrategy/FedDynLossStrategyFromConfig imports. Corrected training refuses missing versioned dispatch.",
+    "local_loss_api": "alpha zero gives task-only loss locally; full example requires positive alpha. adaptive_alpha flag must match configured weighting and needs authoritative population count metadata."
+  },
+  "configuration": {
+    "new_keys": [
+      "algorithm.feddyn_weighting = \"uniform\" (default)",
+      "algorithm.feddyn_sample_counts = [...] (sample mode only)"
+    ],
+    "alpha_precedence": "algorithm.alpha_coef, then algorithm.feddyn_alpha, then .01",
+    "toml_changes": "Added weighting key and explanatory comments; all prior scalar TOML values unchanged.",
+    "supported": "ordinary torch module, nonempty fixed trainable Q; dense finite float32/float64 tensors; fixed plain SGD with one positive finite lr; ordinary or accumulated updates; nonempty realized sampler and drop_last=false. Frozen parameters and static float/integer/bool buffers are transported but absent from history and remain baseline-identical.",
+    "rejected": "async/urgent/cross-silo, DP/nonbasic trainer, nonSGD, momentum/dampening/weight decay/nesterov/maximize, AMP/clipping, actual scheduler, mutable nontrainables, shared parameter aliases, changed flags/shapes or optimizer ownership, empty/zero-epoch/all-skipped attempts."
+  },
+  "state_and_migration": {
+    "live_history_authority": "server only; no child/client canonical history file is written or implicitly loaded",
+    "worker": "provisional result identity/model/history/count/step state; parent loads matching model and current handoff before acceptance and outbound eligibility. Example-local rollback covers owned model tensors, parameter flags/gradients, strategy and context on failed model/save/state/handoff.",
+    "read_only_legacy": "FedDynUpdateStrategy.read_legacy_history(context): canonical contained feddyn_grad_ID.pth wins over exact accepted-B root+\"_feddyn_grad_ID.pth\"; same positive logical ID only, never client0. Full recognized frozen extras may be inspected then excluded from Q; corruption remains visible; bytes unchanged.",
+    "save_path": "Read-only legacy inspection location, never live training authority; attempts to train with it fail actionably.",
+    "trajectory": "No implicit continuation of old mathematically different state. Explicit Server.warm_start_model(weights) starts new UUID/round0/all histories0. Model-only export cannot resume corrected FedDyn.",
+    "checkpoint": "One atomically replaced weights_only-readable complete CPU bundle at checkpoint_path/checkpoint_name(\"feddyn\", model_name, suffix=\".pth\"). Complete model/all-N histories/config/schema/counts/committed round/run/token ledger and RNG. Ordinary feddyn_lenet5.pth; unsafe/long names use the shared collision-safe codec.",
+    "rng": "Python global and owned selection/context-selection are separately saved, plus NumPy global including Gaussian cache and Torch default CPU. Validated pending RNG is consumed exactly once in local start before inherited listener/registration. Rejected validation/install retains prior live/pending state. In-flight/process/GPU continuation is outside the contract.",
+    "round_boundary": "Dispatch round is separate from committed round. Save publishes coherent last committed snapshot. Whole batch and post-receive callback payload validation precede arithmetic. Aggregation/load/callback rejection restores known model/history/count/token/identity state; postcommit evaluation/report failure retains the algorithm commit. No arbitrary external callback side-effect rollback."
+  },
+  "scaffold_docs_reconciliation": {
+    "changed_after_15e": "ComposableTrainer now completes fallible training-step end and successful model-update cleanup BEFORE final direct on_train_result_accepted. Deferred train_process retains provisional controls until child model save/export and parent matching handoff acceptance. Failed train_model owns its rejection cleanup; failed post-model process handoff owns its cleanup. Primary and secondary end/cleanup exceptions remain visible as BaseExceptionGroup.",
+    "unchanged": "SCAFFOLD equations/constraints/control paths, callback commit/evaluation boundary, TOML scalar values and owned canonical naming remain unchanged from reviewed15e."
+  },
+  "validation_status": "Dual-version combined base/mandatory profiles qualified; fresh independent code/prose reviews and root acceptance pending.",
+  "limits": [
+    "CPU synthetic numeric/socket fixtures; no MNIST benchmark accuracy, convergence, live-cloud S3, native CUDA or GPU replay claim.",
+    "Inherited server close uses its normal process exit(0); real client entrypoints return naturally. Listener/transport/registration are not intercepted in the FD socket runs.",
+    "Fresh independent FD/SCAFFOLD code and Astra prose reviews, root combined phase acceptance and Linux qualification remain required.",
+    "Author active clipping order is unsupported; the differentiated full loss matches the author unclipped plain-SGD step, not an active-clipping experiment."
+  ],
+  "qualifying_counts": {
+    "final-mandatory-not-runtime-313": {
+      "tests": 1232,
+      "passed": 1231,
+      "failed": 0,
+      "skipped": 1
+    },
+    "final-mandatory-not-runtime-314": {
+      "tests": 1232,
+      "passed": 1231,
+      "failed": 0,
+      "skipped": 1
+    },
+    "final-base-not-runtime-313": {
+      "tests": 1232,
+      "passed": 1229,
+      "failed": 0,
+      "skipped": 3
+    },
+    "final-base-not-runtime-314": {
+      "tests": 1232,
+      "passed": 1229,
+      "failed": 0,
+      "skipped": 3
+    }
+  },
+  "runtime_cases_each": {
+    "startup_cases": 48,
+    "feddyn_entrypoint_cases": 3
+  },
+  "evidence": "phase2c-feddyn-validation.json"
+}

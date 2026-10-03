@@ -59,7 +59,10 @@ def _write_table(
     table: MutableMapping[str, Any],
     path: list[str],
     comment_map: Mapping[tuple[str, ...], list[str]],
+    comment_path: list[str] | None = None,
 ) -> None:
+    if comment_path is None:
+        comment_path = path
     inline_items: list[tuple[str, Any]] = []
     tables: list[tuple[str, MutableMapping[str, Any]]] = []
     array_tables: list[tuple[str, Sequence[Any]]] = []
@@ -80,7 +83,7 @@ def _write_table(
             inline_items.append((key, value))
 
     for key, value in inline_items:
-        _maybe_emit_comment(lines, comment_map, tuple(path + [key]))
+        _maybe_emit_comment(lines, comment_map, tuple(comment_path + [key]))
         key_repr = _format_key(key)
         lines.append(f"{key_repr} = {_format_value(value)}")
 
@@ -88,21 +91,21 @@ def _write_table(
         if lines and lines[-1] != "":
             lines.append("")
         header = _join(path + [key])
-        _maybe_emit_comment(lines, comment_map, tuple(path + [key]))
+        _maybe_emit_comment(lines, comment_map, tuple(comment_path + [key]))
         lines.append(f"[{header}]")
-        _write_table(lines, value, path + [key], comment_map)
+        _write_table(lines, value, path + [key], comment_map, comment_path + [key])
 
     for key, items in array_tables:
         if lines and lines[-1] != "":
             lines.append("")
         header = _join(path + [key])
         for index, item in enumerate(items):
-            item_path = tuple(path + [key, str(index)])
+            item_path = tuple(comment_path + [key, str(index)])
             _maybe_emit_comment(lines, comment_map, item_path)
             lines.append(f"[[{header}]]")
             if not isinstance(item, MutableMapping):
                 raise TypeError("Arrays of tables must contain mappings only.")
-            _write_table(lines, item, path + [key, str(index)], comment_map)
+            _write_table(lines, item, path + [key], comment_map, list(item_path))
             if index != len(items) - 1:
                 lines.append("")
 
@@ -115,18 +118,31 @@ def _join(segments: Iterable[str]) -> str:
 
 
 def _needs_quotes(key: str) -> bool:
-    return not key.replace("_", "").replace("-", "").isalnum()
+    return (
+        not key
+        or not key.isascii()
+        or not key.replace("_", "").replace("-", "").isalnum()
+    )
 
 
 def _format_key(key: str) -> str:
-    return json.dumps(key) if _needs_quotes(key) else key
+    return _quote_string(key) if _needs_quotes(key) else key
+
+
+def _quote_string(value: str) -> str:
+    # TOML escapes require scalar values, so supplementary characters must
+    # stay intact rather than become JSON surrogate pairs. DEL still needs
+    # an escape even though JSON's non-ASCII mode leaves it literal.
+    return json.dumps(value, ensure_ascii=False).replace("\x7f", "\\u007f")
 
 
 def _format_value(value: Any) -> str:
     if isinstance(value, dict):
         if value == {"null": True}:
             return "{ null = true }"
-        items = ", ".join(f"{k} = {_format_value(v)}" for k, v in value.items())
+        items = ", ".join(
+            f"{_format_key(k)} = {_format_value(v)}" for k, v in value.items()
+        )
         return f"{{ {items} }}"
     if isinstance(value, list):
         return "[" + ", ".join(_format_value(item) for item in value) + "]"
@@ -135,7 +151,7 @@ def _format_value(value: Any) -> str:
     if isinstance(value, (int, float)):
         return repr(value)
     if isinstance(value, str):
-        return json.dumps(value)
+        return _quote_string(value)
     raise TypeError(f"Unsupported value type for TOML serialization: {type(value)!r}")
 
 

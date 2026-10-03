@@ -74,11 +74,7 @@ class Processor(model.Processor):
 
         num_samples = state.client_samples.get(self.client_id)
         if num_samples is None:
-            logging.warning(
-                "Client %s is encrypting updates without recorded num_samples. Defaulting to 0.",
-                self.client_id,
-            )
-            num_samples = 0
+            raise ValueError("MPC encryption requires a recorded sample count.")
 
         num_clients = len(state.selected_clients)
         data_shares = [copy.deepcopy(data) for _ in range(num_clients)]
@@ -98,7 +94,10 @@ class Processor(model.Processor):
                 continue
 
             self.round_store.append_additive_share(
-                target_client, dict(data_shares[idx])
+                target_client,
+                dict(data_shares[idx]),
+                round_number=state.round_number,
+                from_client=self.client_id,
             )
 
         self._write_debug_artifact(

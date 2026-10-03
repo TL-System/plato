@@ -144,6 +144,8 @@ def _restore_backend(
         return clone_fn() if callable(clone_fn) else tensor
     if backend == "mlx":
         return array
+    if backend == "native" and array.ndim == 0:
+        return array.item()
     return array
 
 
@@ -170,6 +172,10 @@ def flatten_tree(tree: Any) -> tuple[dict[str, np.ndarray], dict[str, TreeMetada
     metadata: dict[str, TreeMetadata] = {}
 
     def recurse(node: Any, path: str) -> None:
+        # Dots and brackets are valid literal keys (including state_dict keys).
+        # Reject only paths that actually alias another node in this wire format.
+        if path in metadata:
+            raise ValueError(f"Ambiguous tree path '{path}'.")
         if isinstance(node, dict):
             metadata[path] = TreeMetadata(
                 type="dict",

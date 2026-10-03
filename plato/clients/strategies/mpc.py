@@ -15,7 +15,11 @@ from plato.mpc import RoundInfoStore
 
 
 class MPCLifecycleStrategy(DefaultLifecycleStrategy):
-    """Lifecycle strategy wiring the MPC round store into processor kwargs."""
+    """Bind MPC runtime fields and the server's Shamir threshold.
+
+    These protocol fields take precedence over explicit processor kwargs;
+    other processor-specific entries are preserved.
+    """
 
     def _build_processor_kwargs(self, context) -> dict[str, dict[str, Any]]:
         processor_kwargs = getattr(context, "processor_kwargs", {}) or {}
@@ -39,6 +43,12 @@ class MPCLifecycleStrategy(DefaultLifecycleStrategy):
                         "debug_artifacts": debug_artifacts,
                     }
                 )
+                if name == "mpc_model_encrypt_shamir":
+                    # Both ends must use the server's degree, including None's
+                    # existing participant-dependent default threshold.
+                    processor_kwargs[name]["threshold"] = getattr(
+                        Config().server, "mpc_shamir_threshold", None
+                    )
         return processor_kwargs
 
     def configure(self, context) -> None:
@@ -54,8 +64,10 @@ class MPCTrainingStrategy(DefaultTrainingStrategy):
         self.round_store = round_store
 
     async def train(self, context):
+        round_number = self.round_store.load_state().round_number
         report, payload = await super().train(context)
         num_samples = getattr(report, "num_samples", 0)
-        if num_samples:
-            self.round_store.record_client_samples(context.client_id, num_samples)
+        self.round_store.record_client_samples(
+            context.client_id, num_samples, round_number=round_number
+        )
         return report, payload

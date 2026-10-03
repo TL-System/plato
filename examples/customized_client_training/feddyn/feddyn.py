@@ -9,17 +9,14 @@ https://openreview.net/forum?id=B7v4QMR6Z9w
 Source code: https://github.com/alpemreacar/FedDyn
 """
 
-import feddyn_trainer
-
-from plato.clients import simple
-from plato.servers import fedavg
+import feddyn_client
+import feddyn_server
 
 
 def main():
     """A Plato federated learning training session using FedDyn."""
-    trainer = feddyn_trainer.Trainer
-    client = simple.Client(trainer=trainer)
-    server = fedavg.Server()
+    client = feddyn_client.create_client()
+    server = feddyn_server.Server()
     server.run(client)
 
 

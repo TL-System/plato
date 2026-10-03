@@ -375,7 +375,10 @@ class Server:
                 )
 
                 with _startup_task(loop, self._periodic(self.periodic_interval)):
-                    if hasattr(Config().server, "random_seed"):
+                    # A resume override owns the restored selection state.
+                    if not Config().args.resume and hasattr(
+                        Config().server, "random_seed"
+                    ):
                         seed = Config().server.random_seed
                         logging.info(
                             "Setting the random seed for selecting clients: %s", seed
@@ -390,7 +393,9 @@ class Server:
                 else:
                     Server._start_clients(client=self.client, client_kwargs=client_kwargs)
                 with _startup_task(loop, self._periodic(self.periodic_interval)):
-                    if hasattr(Config().server, "random_seed"):
+                    if not Config().args.resume and hasattr(
+                        Config().server, "random_seed"
+                    ):
                         seed = Config().server.random_seed
                         logging.info(
                             "Setting the random seed for selecting clients: %s", seed
@@ -1621,7 +1626,13 @@ class Server:
         trainer.load_model(filename, checkpoint_root)
 
     def _save_random_states(self, round_to_save, checkpoint_root):
-        """Saves the random states in the server for resuming its session later on."""
+        """Save NumPy state and the server's client-selection continuation state.
+
+        The existing Python tuple represents the owned selection stream, not
+        unrelated global draws. Restore still installs it globally. Legacy tuples
+        remain readable, but a previously lost selection boundary cannot be
+        reconstructed from a saved global state.
+        """
         states_to_save = [
             f"numpy_prng_state_{round_to_save}",
             f"prng_state_{round_to_save}",
@@ -1629,7 +1640,7 @@ class Server:
 
         variables_to_save = [
             np.random.get_state(),
-            random.getstate(),
+            self.prng_state,
         ]
 
         for i, state in enumerate(states_to_save):

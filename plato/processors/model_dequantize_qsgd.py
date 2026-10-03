@@ -14,6 +14,7 @@ Advances in neural information processing systems.
 https://proceedings.neurips.cc/paper/2017/file/6c340f25839e6acdc73414517203f5f0-Paper.pdf
 """
 
+import math
 from struct import unpack
 from typing import Any
 
@@ -30,19 +31,36 @@ class Processor(model.Processor):
     def __init__(self, quantization_level=64, **kwargs) -> None:
         super().__init__(**kwargs)
 
+        if (
+            not isinstance(quantization_level, int)
+            or not 2 <= quantization_level <= 128
+        ):
+            raise ValueError(
+                "QSGD quantization level must be an integer from 2 to 128."
+            )
         self.quantization_level = quantization_level  # must <= 128!
 
     def _process_layer(self, layer: Any) -> Any:
         """Dequantizes each individual layer of the model."""
 
         # Step 1: decompress the header
+        if isinstance(layer, torch.Tensor) and not layer.is_floating_point():
+            return layer
+        if len(layer) < 10:
+            raise ValueError("Truncated QSGD header.")
         tuning_param = self.quantization_level - 1
         max_v = unpack("!f", layer[0:4])[0]
         numel = unpack("!I", layer[4:8])[0]
         dimensions = unpack("!h", layer[8:10])[0]
+        if dimensions < 0 or len(layer) != 10 + 2 * dimensions + numel:
+            raise ValueError("Invalid QSGD dimensions or payload length.")
+        if not math.isfinite(max_v) or max_v < 0:
+            raise ValueError("Invalid QSGD scale.")
         size = []
         for i in range(dimensions):
             size.append(unpack("!h", layer[10 + 2 * i : 12 + 2 * i])[0])
+        if any(dim < 0 for dim in size) or math.prod(size) != numel:
+            raise ValueError("QSGD shape does not match its element count.")
 
         # Step 2: decompress the content
         layer = layer[10 + 2 * dimensions :]
@@ -52,10 +70,14 @@ class Processor(model.Processor):
             tmp = unpack("!I", prefix + layer[i : i + 1])[0]
             if tmp >= 128:
                 tmp = -1 * (tmp - 128)
+            if abs(tmp) > tuning_param:
+                raise ValueError("QSGD code exceeds the quantization level.")
             zeta.append(tmp)
         zeta = torch.tensor(zeta).reshape(size)
 
         # Step 3: dequantize the content
-        zeta = zeta * max_v / tuning_param
+        # Normalize first: the bounded ratio cannot overflow when multiplied
+        # by a finite float32 scale, unlike the unnormalized integer code.
+        zeta = zeta / tuning_param * max_v
 
         return zeta

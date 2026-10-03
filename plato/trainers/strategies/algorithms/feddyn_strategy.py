@@ -1,41 +1,22 @@
+"""FedDyn's corrected objective and server-dispatched provisional histories.
+
+J=F+alpha_i<h,w>+alpha_i/2||w-x||²; h is cumulative displacement, not a
+measured gradient. Reference: arXiv:2111.04263v1, Algorithm 1, and author
+commit 48a19fac440ef079ce563da8e0c2896f8256fef9. Old files are inspection only.
 """
-FedDyn Strategy Implementation
 
-Reference:
-Acar, D. A. E., Zhao, Y., Navarro, R. M., Mattina, M., Whatmough, P. N., & Saligrama, V. (2021).
-"Federated Learning Based on Dynamic Regularization."
-In Proceedings of ICLR 2021.
-
-Paper: https://openreview.net/forum?id=B7v4QMR6Z9w
-Source code: https://github.com/alpemreacar/FedDyn
-
-Description:
-FedDyn addresses client drift by dynamically adjusting a regularization term that
-accounts for cumulative local model updates. The local objective becomes:
-
-    min_θ [L_k(θ) - <∇L_k(θ_k^{t-1}), θ> + (α/2)||θ - θ^{t-1}||^2]
-
-where:
-- L_k(θ) is the local loss on client k's data
-- ∇L_k(θ_k^{t-1}) is a cumulative dynamic regularizer (gradient vector)
-- θ^{t-1} is the global model at round t-1
-- α is the regularization coefficient
-
-The dynamic regularizer is updated after training:
-    ∇L_k(θ_k^t) = ∇L_k(θ_k^{t-1}) - α(θ_k^t - θ^{t-1})
-
-This cumulative tracking of historical updates is the key innovation that makes
-FedDyn different from FedProx and other methods.
-"""
+from __future__ import annotations
 
 import copy
-import logging
-import os
-from collections.abc import Callable
-from typing import Any, Dict, Optional, cast
+import math
+import uuid
+from collections import OrderedDict
+from collections.abc import Callable, Mapping
+from numbers import Integral, Real
+from pathlib import Path
+from typing import Any
 
 import torch
-import torch.nn as nn
 
 from plato.config import Config
 from plato.trainers.strategies.base import (
@@ -46,541 +27,703 @@ from plato.trainers.strategies.base import (
 from plato.utils.checkpoint_paths import checkpoint_name, checkpoint_path
 
 
+def finite_real(value: Any, name: str, *, positive: bool = False) -> float:
+    """Validate finite nonnegative real coefficients, excluding bool."""
+    if isinstance(value, bool) or not isinstance(value, Real):
+        raise ValueError(f"FedDyn {name} must be a finite real number.")
+    try:
+        result = float(value)
+    except (OverflowError, ValueError) as exc:
+        raise ValueError(f"FedDyn {name} must be finite.") from exc
+    if not math.isfinite(result) or result < 0 or (positive and result == 0):
+        raise ValueError(
+            f"FedDyn {name} must be finite and nonnegative"
+            + (" and nonzero." if positive else ".")
+        )
+    return result
+
+
+def positive_integer(value: Any, name: str) -> int:
+    """Validate an authoritative positive integer count or identity."""
+    if isinstance(value, bool) or not isinstance(value, Integral) or value <= 0:
+        raise ValueError(f"FedDyn {name} must be a positive integer.")
+    return int(value)
+
+
+def population_counts(counts: Any, population: int) -> list[int]:
+    """Validate the full fixed population vector, never numeric labels."""
+    if not isinstance(counts, (list, tuple)) or len(counts) != population:
+        raise ValueError("FedDyn sample counts must cover the full population.")
+    result = [positive_integer(n, "sample count") for n in counts]
+    try:
+        total = float(sum(result))
+    except OverflowError as exc:
+        raise ValueError("FedDyn sample count sum overflows.") from exc
+    if not math.isfinite(total):
+        raise ValueError("FedDyn sample count sum must be finite.")
+    return result
+
+
+def effective_alpha(alpha: float, population: int, counts: Any, client_id: int):
+    """Return alpha/q_i from full-population realized counts."""
+    population = positive_integer(population, "population")
+    client_id = positive_integer(client_id, "client ID")
+    if client_id > population:
+        raise ValueError("FedDyn client ID is outside the population.")
+    counts = population_counts(counts, population)
+    return finite_real(
+        alpha * (sum(counts) / (population * counts[client_id - 1])), "effective alpha"
+    )
+
+
+def settings_from_config() -> dict[str, Any]:
+    """Validate the example's fixed synchronous plain-SGD configuration."""
+    c = Config()
+    n = positive_integer(c.clients.total_clients, "population")
+    per_round = positive_integer(c.clients.per_round, "per_round")
+    if per_round > n:
+        raise ValueError("FedDyn per_round exceeds the population.")
+    alpha = finite_real(
+        getattr(c.algorithm, "alpha_coef", getattr(c.algorithm, "feddyn_alpha", 0.01)),
+        "alpha",
+        positive=True,
+    )
+    mode = getattr(c.algorithm, "feddyn_weighting", "uniform")
+    if mode not in ("uniform", "sample"):
+        raise ValueError("FedDyn weighting must be uniform or sample.")
+    raw_counts = getattr(c.algorithm, "feddyn_sample_counts", None)
+    if mode == "uniform" and hasattr(c.algorithm, "feddyn_sample_counts"):
+        raise ValueError("FedDyn uniform mode does not accept sample counts.")
+    counts = population_counts(raw_counts, n) if mode == "sample" else None
+    if counts is not None:
+        for i in range(1, n + 1):
+            finite_real(
+                effective_alpha(alpha, n, counts, i), "effective alpha", positive=True
+            )
+    if getattr(c.algorithm, "type", None) != "fedavg":
+        raise ValueError("FedDyn requires the underlying fedavg model exchange.")
+    if (
+        getattr(c.server, "synchronous", True) is not True
+        or any(
+            getattr(c.server, k, False)
+            for k in ("request_update", "asynchronous", "fedbuff")
+        )
+        or hasattr(c.algorithm, "total_silos")
+    ):
+        raise ValueError("FedDyn supports synchronous non-cross-silo rounds only.")
+    if getattr(c.trainer, "type", "basic") != "basic":
+        raise ValueError("FedDyn requires the ordinary torch trainer, not DP.")
+    if getattr(c.trainer, "optimizer", None) != "SGD":
+        raise ValueError("FedDyn supports plain SGD only.")
+    if any(
+        getattr(c.trainer, k, False)
+        for k in (
+            "amp",
+            "use_amp",
+            "mixed_precision",
+            "gradient_clip",
+            "max_grad_norm",
+            "gradient_clip_val",
+            "gradient_clipping",
+            "differential_privacy",
+        )
+    ):
+        raise ValueError("FedDyn does not support AMP, clipping or DP.")
+    if hasattr(c.trainer, "lr_scheduler"):
+        raise ValueError("FedDyn requires fixed learning rate without a scheduler.")
+    positive_integer(c.trainer.epochs, "epochs")
+    positive_integer(c.trainer.batch_size, "batch size")
+    accumulation = positive_integer(
+        getattr(c.trainer, "gradient_accumulation_steps", 1), "accumulation steps"
+    )
+    params = c.parameters.optimizer._asdict()
+    lr = finite_real(params.get("lr"), "learning rate", positive=True)
+    for key in ("momentum", "dampening", "weight_decay"):
+        if finite_real(params.get(key, 0), key) != 0:
+            raise ValueError(f"FedDyn plain SGD requires {key}=0.")
+    if params.get("nesterov", False) or params.get("maximize", False):
+        raise ValueError("FedDyn plain SGD forbids nesterov/maximize.")
+    return dict(
+        population=n,
+        per_round=per_round,
+        base_alpha=alpha,
+        weighting=mode,
+        sample_counts=counts,
+        lr=lr,
+        accumulation_steps=accumulation,
+    )
+
+
+def model_schema(model: torch.nn.Module) -> dict[str, dict[str, Any]]:
+    """Fingerprint fixed trainability and exact full transport shape/dtype."""
+    if not isinstance(model, torch.nn.Module):
+        raise ValueError("FedDyn requires an ordinary torch model.")
+    parameters = list(model.named_parameters(remove_duplicate=False))
+    if len({id(p) for _, p in parameters}) != len(parameters):
+        raise ValueError("FedDyn does not support shared parameter aliases.")
+    q = {name for name, p in parameters if p.requires_grad}
+    if not q:
+        raise ValueError("FedDyn needs a nonempty fixed trainable parameter set.")
+    result = {}
+    for name, v in model.state_dict().items():
+        if (
+            not isinstance(v, torch.Tensor)
+            or v.layout != torch.strided
+            or v.is_complex()
+            or not torch.isfinite(v).all()
+            or (v.is_floating_point() and v.dtype not in (torch.float32, torch.float64))
+        ):
+            raise ValueError(
+                f"FedDyn model tensor {name} must be dense/finite float32/64 or static integral."
+            )
+        result[name] = dict(
+            shape=list(v.shape), dtype=str(v.dtype), trainable=name in q
+        )
+    return result
+
+
+def trainable_reference(model: torch.nn.Module):
+    model_schema(model)
+    return OrderedDict(
+        (n, p.detach()) for n, p in model.named_parameters() if p.requires_grad
+    )
+
+
+def context_model(context: TrainingContext) -> torch.nn.Module:
+    if context.model is None:
+        raise ValueError("FedDyn context must contain an ordinary torch model.")
+    return context.model
+
+
+def validate_tensors(values: Any, reference: Mapping, name: str):
+    """Validate exact keys/shapes/dtypes and take independent CPU ownership."""
+    if not isinstance(values, Mapping) or set(values) != set(reference):
+        raise ValueError(f"FedDyn {name} keys must match the exact model scope.")
+    result = OrderedDict()
+    for k, baseline in reference.items():
+        v = values[k]
+        if (
+            not isinstance(v, torch.Tensor)
+            or v.layout != torch.strided
+            or v.shape != baseline.shape
+            or v.dtype != baseline.dtype
+            or not torch.isfinite(v).all()
+        ):
+            raise ValueError(
+                f"FedDyn {name} tensor {k} needs finite exact shape/dtype."
+            )
+        result[k] = v.detach().cpu().clone()
+    return result
+
+
+def same_state(actual: Any, expected: Any) -> bool:
+    """Compare owned state without bool/integer or broadcast equivalence."""
+    if isinstance(expected, torch.Tensor):
+        return (
+            isinstance(actual, torch.Tensor)
+            and actual.dtype == expected.dtype
+            and actual.shape == expected.shape
+            and torch.equal(actual.cpu(), expected.cpu())
+        )
+    if isinstance(expected, Mapping):
+        return (
+            isinstance(actual, Mapping)
+            and {(type(k), k) for k in actual} == {(type(k), k) for k in expected}
+            and all(same_state(actual[k], v) for k, v in expected.items())
+        )
+    if isinstance(expected, (list, tuple)):
+        return (
+            type(actual) is type(expected)
+            and len(actual) == len(expected)
+            and all(same_state(a, e) for a, e in zip(actual, expected))
+        )
+    return type(actual) is type(expected) and actual == expected
+
+
+def validate_endpoint(model, endpoint, baseline, schema):
+    """Reject mutable buffers/frozen values instead of averaging them."""
+    if model_schema(model) != schema:
+        raise ValueError("FedDyn model trainability/schema changed.")
+    baseline = validate_tensors(baseline, model.state_dict(), "baseline")
+    endpoint = validate_tensors(endpoint, baseline, "endpoint")
+    for name, spec in schema.items():
+        if not spec["trainable"] and not torch.equal(endpoint[name], baseline[name]):
+            raise ValueError(
+                f"FedDyn mutable buffer/frozen parameter {name} is unsupported."
+            )
+    return endpoint
+
+
+def validate_identity(value, name):
+    if not isinstance(value, str):
+        raise ValueError(f"FedDyn {name} must be a UUID hex string.")
+    try:
+        parsed = uuid.UUID(hex=value)
+    except ValueError as exc:
+        raise ValueError(f"FedDyn {name} must be a UUID hex string.") from exc
+    if parsed.hex != value:
+        raise ValueError(f"FedDyn {name} must be canonical UUID hex.")
+    return value
+
+
+def validate_dispatch(model, payload, settings, client_id, round_id):
+    """Validate the entire downlink before changing model or strategy state."""
+    if not isinstance(payload, (list, tuple)) or len(payload) != 2:
+        raise ValueError(
+            "FedDyn needs [full model, versioned round state]; use the dedicated example."
+        )
+    full, raw_metadata = payload
+    meta = raw_metadata
+    keys = {
+        "version",
+        "run_id",
+        "round",
+        "client_id",
+        "dispatch_token",
+        "weighting",
+        "base_alpha",
+        "effective_alpha",
+        "expected_count_or_null",
+        "history",
+    }
+    if not isinstance(meta, dict) or set(meta) != keys:
+        raise ValueError("FedDyn dispatch metadata is incomplete or unknown.")
+    if type(meta["version"]) is not int or meta["version"] != 1:
+        raise ValueError("FedDyn dispatch version must be 1.")
+    client_id = positive_integer(client_id, "client ID")
+    if (
+        client_id > settings["population"]
+        or positive_integer(meta["client_id"], "client ID") != client_id
+        or positive_integer(meta["round"], "round") != round_id
+    ):
+        raise ValueError("FedDyn dispatch client/round differs from active assignment.")
+    validate_identity(meta["run_id"], "run ID")
+    validate_identity(meta["dispatch_token"], "dispatch token")
+    alpha = (
+        effective_alpha(
+            settings["base_alpha"],
+            settings["population"],
+            settings["sample_counts"],
+            client_id,
+        )
+        if settings["weighting"] == "sample"
+        else settings["base_alpha"]
+    )
+    if (
+        meta["weighting"] != settings["weighting"]
+        or finite_real(meta["base_alpha"], "alpha", positive=True)
+        != settings["base_alpha"]
+        or finite_real(meta["effective_alpha"], "effective alpha", positive=True)
+        != alpha
+    ):
+        raise ValueError("FedDyn dispatch configuration differs from this session.")
+    count = meta["expected_count_or_null"]
+    if count is not None:
+        positive_integer(count, "expected sample count")
+    if (
+        settings["sample_counts"] is not None
+        and count != settings["sample_counts"][client_id - 1]
+    ):
+        raise ValueError(
+            "FedDyn dispatch count differs from the full population vector."
+        )
+    schema = model_schema(model)
+    full = validate_tensors(full, model.state_dict(), "downlink model")
+    h = validate_tensors(meta["history"], trainable_reference(model), "history")
+    return dict(
+        metadata=copy.deepcopy({**meta, "history": h}), baseline=full, schema=schema
+    )
+
+
 class FedDynLossStrategy(LossCriterionStrategy):
-    """
-    FedDyn loss strategy with cumulative dynamic regularization.
-
-    This strategy implements the FedDyn local objective which includes:
-    1. Standard task loss (e.g., cross-entropy)
-    2. Linear penalty term: <w, -w_global + grad_vector>
-    3. L2 regularization: (α/2)||w - w_global||^2
-
-    The cumulative gradient vector grad_vector is maintained across rounds:
-        grad_vector += (w_trained - w_global) after each training round
-
-    Preserved legacy formulation:
-        loss = task_loss + α * <w, -w_global + grad_vector> + (α/2)||w - w_global||^2
-
-    The shifted quadratic differs from the authors' implementation, which uses
-    an unshifted quadratic with this linear term. Equation modernization needs
-    a separate design disposition; state lifecycle fixes preserve this objective.
-
-    Args:
-        alpha: Regularization coefficient (default: 0.01).
-               Higher values enforce stronger proximity to global model.
-        base_loss_fn: Base loss function. If None, uses CrossEntropyLoss.
-        adaptive_alpha: If True, scales alpha by 1/weight where weight
-                       is the relative data size of this client.
-
-    Attributes:
-        alpha: The regularization coefficient
-        base_loss_fn: The underlying loss criterion
-        adaptive_alpha: Whether to use adaptive alpha scaling
-        global_model_weights: Snapshot of global model weights
-        cumulative_grad_vector: Cumulative gradient vector tracking historical updates
-
-    Example:
-        >>> from plato.trainers.composable import ComposableTrainer
-        >>> from plato.trainers.strategies.algorithms import (
-        ...     FedDynLossStrategy,
-        ...     FedDynUpdateStrategy
-        ... )
-        >>>
-        >>> # Create trainer with FedDyn
-        >>> trainer = ComposableTrainer(
-        ...     loss_strategy=FedDynLossStrategy(alpha=0.01),
-        ...     model_update_strategy=FedDynUpdateStrategy()
-        ... )
-
-    Note:
-        FedDynLossStrategy should be used together with FedDynUpdateStrategy
-        which manages the cumulative gradient vector state across rounds.
-    """
+    """Shifted quadratic loss; adaptive alpha requires full population counts."""
 
     def __init__(
         self,
         alpha: float = 0.01,
-        base_loss_fn: None
-        | (Callable[[torch.Tensor, torch.Tensor], torch.Tensor]) = None,
-        adaptive_alpha: bool = True,
+        base_loss_fn: Callable | None = None,
+        adaptive_alpha: bool = False,
     ):
-        """
-        Initialize FedDyn loss strategy.
-
-        Args:
-            alpha: Regularization coefficient (typical: 0.001 to 0.1)
-            base_loss_fn: Base loss function. If None, uses CrossEntropyLoss
-            adaptive_alpha: Whether to scale alpha by client data weight
-        """
-        if alpha < 0:
-            raise ValueError(f"alpha must be non-negative, got {alpha}")
-
-        self.alpha = alpha
-        self.base_loss_fn = base_loss_fn
+        self.alpha = finite_real(alpha, "alpha")
+        if type(adaptive_alpha) is not bool:
+            raise ValueError("FedDyn adaptive_alpha must be bool.")
         self.adaptive_alpha = adaptive_alpha
-        self.global_model_weights: dict[str, torch.Tensor] | None = None
-        self.cumulative_grad_vector: dict[str, torch.Tensor] | None = None
-        self._criterion: (
-            None | (Callable[[torch.Tensor, torch.Tensor], torch.Tensor])
-        ) = None
+        self.base_loss_fn = base_loss_fn or torch.nn.CrossEntropyLoss()
+        self.global_model_weights = self.cumulative_grad_vector = None
+        self._alpha_for_run = None
 
     def setup(self, context: TrainingContext) -> None:
-        """
-        Setup the loss strategy.
-
-        Args:
-            context: Training context
-        """
-        # Initialize base loss criterion
-        if self.base_loss_fn is None:
-            self._criterion = nn.CrossEntropyLoss()
-        else:
-            self._criterion = self.base_loss_fn
-
-        model = context.model
-        if model is None:
-            raise ValueError("Training context must provide a model for FedDyn.")
-
-        # Try to retrieve state from context
-        global_weights_state = context.state.get("feddyn_global_weights")
-        if isinstance(global_weights_state, dict):
-            self.global_model_weights = cast(
-                dict[str, torch.Tensor], global_weights_state
-            )
-        else:
-            self.global_model_weights = None
-
-        cumulative_grad_state = context.state.get("feddyn_cumulative_grad")
-        if isinstance(cumulative_grad_state, dict):
-            self.cumulative_grad_vector = cast(
-                dict[str, torch.Tensor], cumulative_grad_state
-            )
-        else:
-            self.cumulative_grad_vector = None
-
-        # If not in context, initialize
-        if self.global_model_weights is None:
-            self.global_model_weights = copy.deepcopy(model.state_dict())
-            context.state["feddyn_global_weights"] = self.global_model_weights
-
-        if self.cumulative_grad_vector is None:
-            # Initialize cumulative gradient vector to zero
-            self.cumulative_grad_vector = {
-                name: torch.zeros_like(param)
-                for name, param in model.named_parameters()
-            }
-            context.state["feddyn_cumulative_grad"] = self.cumulative_grad_vector
+        model = context_model(context)
+        q = trainable_reference(model)
+        full = context.state.get("feddyn_global_weights", model.state_dict())
+        self.global_model_weights = validate_tensors(
+            {k: full[k] for k in q}, q, "loss baseline"
+        )
+        h = context.state.get(
+            "feddyn_cumulative_grad", {k: torch.zeros_like(v) for k, v in q.items()}
+        )
+        self.cumulative_grad_vector = validate_tensors(h, q, "loss history")
+        self._alpha_for_run = None
 
     def on_train_start(self, context: TrainingContext) -> None:
-        """Use the update strategy's state for the current client and round."""
-        self.global_model_weights = context.state.get("feddyn_global_weights")
-        self.cumulative_grad_vector = context.state.get("feddyn_cumulative_grad")
+        self.setup(context)
+        self._alpha_for_run = self._get_alpha_coefficient(None, context)
 
-    def on_client_id_changed(self, context: TrainingContext) -> None:
-        self.global_model_weights = None
-        self.cumulative_grad_vector = None
-
-    def compute_loss(
-        self, outputs: torch.Tensor, labels: torch.Tensor, context: TrainingContext
-    ) -> torch.Tensor:
-        """
-        Compute FedDyn loss with cumulative dynamic regularization.
-
-        The preserved total loss is:
-            loss = task_loss + α * <w, -w_global + grad_vector> + (α/2)||w - w_global||^2
-
-        where grad_vector is the cumulative sum of (w_trained - w_global) across rounds.
-
-        Args:
-            outputs: Model predictions (logits)
-            labels: Ground truth labels
-            context: Training context with model access
-
-        Returns:
-            Scalar loss tensor combining all three terms
-        """
-        # Compute standard task loss
-        criterion = self._criterion
-        if criterion is None:
-            raise RuntimeError("FedDyn loss criterion has not been initialised.")
-        task_loss = criterion(outputs, labels)
-
-        # Get alpha coefficient (potentially adaptive)
-        alpha_coef = self._get_alpha_coefficient(labels, context)
-
-        # Compute linear penalty: α * <w, -w_global + grad_vector>
-        linear_penalty = torch.tensor(0.0, device=outputs.device)
-
-        model = context.model
-        if model is None:
-            raise ValueError("Training context must provide a model for FedDyn.")
-
-        cumulative_grad_vector = self.cumulative_grad_vector
-        global_model_weights = self.global_model_weights
-        if cumulative_grad_vector is None or global_model_weights is None:
-            raise RuntimeError(
-                "FedDyn state has not been initialised before computing loss."
-            )
-
-        for name, param in model.named_parameters():
-            if name in cumulative_grad_vector and name in global_model_weights:
-                grad_vec = cumulative_grad_vector[name].to(param.device)
-                w_global = global_model_weights[name].to(param.device)
-
-                # Compute: <w, -w_global + grad_vector>
-                linear_penalty = linear_penalty + torch.sum(
-                    param * (-w_global + grad_vec)
-                )
-
-        linear_penalty = alpha_coef * linear_penalty
-
-        # Compute L2 regularization: (α/2)||w - w_global||^2
-        l2_reg = torch.tensor(0.0, device=outputs.device)
-
-        for name, param in model.named_parameters():
-            if name in global_model_weights:
-                w_global = global_model_weights[name].to(param.device)
-                l2_reg = l2_reg + torch.sum((param - w_global) ** 2)
-
-        l2_reg = (alpha_coef / 2.0) * l2_reg
-
-        # Total loss: task_loss + linear_penalty + l2_reg
-        # Note: We add linear_penalty because it already includes the sign
-        total_loss = task_loss + linear_penalty + l2_reg
-
-        return total_loss
-
-    def _get_alpha_coefficient(
-        self, labels: torch.Tensor, context: TrainingContext
-    ) -> torch.Tensor:
-        """
-        Get alpha coefficient, potentially adapted by client data weight.
-
-        Args:
-            labels: Current batch labels
-            context: Training context
-
-        Returns:
-            Alpha coefficient (scalar tensor)
-        """
+    def _get_alpha_coefficient(self, labels, context: TrainingContext):
         if not self.adaptive_alpha:
-            return torch.tensor(self.alpha, device=labels.device)
-
-        # Compute weight list: proportion of data on this client
-        # This is a simplified version - in practice, you'd need actual data sizes
-        total_clients = (
-            Config().clients.total_clients
-            if hasattr(Config(), "clients")
-            and hasattr(Config().clients, "total_clients")
-            else 100
+            return self.alpha
+        m = context.state.get("feddyn_count_metadata")
+        if not isinstance(m, dict):
+            raise ValueError(
+                "FedDyn adaptive alpha needs authoritative count metadata."
+            )
+        return effective_alpha(
+            self.alpha, m.get("population"), m.get("sample_counts"), m.get("client_id")
         )
 
-        # Create uniform weight distribution
-        label_sum = torch.sum(labels)
-        # Preserve the existing zero-weight fallback for all-zero labels too;
-        # dividing 0 by 0 previously defeated the guard below and produced NaN.
-        denominator = torch.where(label_sum != 0, label_sum, torch.ones_like(label_sum))
-        weight_list = labels / denominator * total_clients
+    def compute_loss(self, outputs, labels, context: TrainingContext):
+        task = self.base_loss_fn(outputs, labels)
+        alpha = (
+            self._alpha_for_run
+            if self._alpha_for_run is not None
+            else self._get_alpha_coefficient(labels, context)
+        )
+        if alpha == 0:
+            return task
+        if self.global_model_weights is None or self.cumulative_grad_vector is None:
+            raise ValueError("FedDyn loss needs setup before regularization.")
+        regularizer = None
+        for name, p in context_model(context).named_parameters():
+            if p.requires_grad:
+                x = self.global_model_weights[name].to(p.device)
+                h = self.cumulative_grad_vector[name].to(p.device)
+                term = p.new_tensor(alpha) * (
+                    (h * p).sum() + (p - x).square().sum() / 2
+                )
+                regularizer = term if regularizer is None else regularizer + term
+        return task + regularizer
 
-        # Adaptive alpha: α / weight (avoid division by zero)
-        adaptive_alpha = self.alpha / torch.where(weight_list != 0, weight_list, 1.0)
+    def on_client_id_changed(self, context: TrainingContext) -> None:
+        self.global_model_weights = self.cumulative_grad_vector = None
+        self._alpha_for_run = None
 
-        return torch.mean(adaptive_alpha).to(labels.device)
-
-    def teardown(self, context: TrainingContext) -> None:
-        """
-        Cleanup resources.
-
-        Args:
-            context: Training context
-        """
-        self.global_model_weights = None
-        self.cumulative_grad_vector = None
+    teardown = on_client_id_changed
 
 
 class FedDynUpdateStrategy(ModelUpdateStrategy):
-    """
-    FedDyn model update strategy for cumulative gradient state management.
+    """One staged result per dispatch; no child/client canonical history writes.
 
-    This strategy manages the FedDyn-specific cumulative state:
-    - Saves global model weights at start of training
-    - Loads/saves cumulative gradient vector across rounds
-    - Updates gradient vector after training: grad_vec += (w_trained - w_global)
-    - Provides state to FedDynLossStrategy
-
-    The cumulative gradient vector is the key to FedDyn's dynamic regularization,
-    tracking the sum of all historical local model deviations from global models.
-
-    Args:
-        save_path: Optional custom path for saving gradient vectors.
-                   If None, uses Config().params["model_path"]
-
-    Example:
-        >>> from plato.trainers.composable import ComposableTrainer
-        >>> from plato.trainers.strategies.algorithms import (
-        ...     FedDynLossStrategy,
-        ...     FedDynUpdateStrategy
-        ... )
-        >>>
-        >>> trainer = ComposableTrainer(
-        ...     loss_strategy=FedDynLossStrategy(alpha=0.01),
-        ...     model_update_strategy=FedDynUpdateStrategy()
-        ... )
-
-    Note:
-        This strategy should be used together with FedDynLossStrategy.
-        The loss strategy accesses the cumulative gradient vector managed by this strategy.
+    save_path is solely a read-only migration location. Corrected training needs
+    the dedicated example's validated server dispatch and parent transaction.
     """
 
     def __init__(self, save_path: str | None = None):
-        """
-        Initialize FedDyn update strategy.
-
-        Args:
-            save_path: Optional custom path for saving gradient vectors
-        """
         self.save_path = save_path
-        self.global_model_weights: dict[str, torch.Tensor] | None = None
-        self.cumulative_grad_vector: dict[str, torch.Tensor] | None = None
-        self.grad_vector_path: str | None = None
+        self.global_model_weights = self.cumulative_grad_vector = None
+        self.grad_vector_path = self.dispatch = self.result = self.schema = None
+        self.accepted = False
+        self.completed_steps = 0
+        self._lr = None
 
     def setup(self, context: TrainingContext) -> None:
-        """
-        Setup the strategy and determine save path.
-
-        Args:
-            context: Training context with client_id
-        """
-        if self.save_path is not None:
-            base_path = self.save_path
-        else:
-            base_path = Config().params["model_path"]
-
-        # Path for saving cumulative gradient vector
-        self.grad_vector_path = checkpoint_path(
-            base_path, checkpoint_name("feddyn_grad", context.client_id, suffix=".pth")
+        self.schema = model_schema(context.model)
+        root = (
+            self.save_path
+            if self.save_path is not None
+            else Config().params["model_path"]
         )
-        os.makedirs(base_path, exist_ok=True)
+        self.grad_vector_path = checkpoint_path(
+            root, checkpoint_name("feddyn_grad", context.client_id, suffix=".pth")
+        )
+
+    def install_dispatch(self, state, context: TrainingContext) -> None:
+        self.dispatch = copy.deepcopy(state)
+        self.result = None
+        self.accepted = False
+        self.global_model_weights = copy.deepcopy(state["baseline"])
+        self.cumulative_grad_vector = copy.deepcopy(state["metadata"]["history"])
+        context.state["feddyn_dispatch"] = copy.deepcopy(state)
 
     def on_client_id_changed(self, context: TrainingContext) -> None:
-        self.global_model_weights = None
-        self.cumulative_grad_vector = None
-        context.state.pop("feddyn_global_weights", None)
-        context.state.pop("feddyn_cumulative_grad", None)
+        self.dispatch = self.result = None
+        self.accepted = False
+        self.global_model_weights = self.cumulative_grad_vector = None
+        for key in list(context.state):
+            if key.startswith("feddyn_"):
+                context.state.pop(key)
         self.setup(context)
 
     def on_train_start(self, context: TrainingContext) -> None:
-        """
-        Initialize FedDyn state at start of training round.
-
-        This method:
-        1. Saves current global model weights
-        2. Loads cumulative gradient vector from previous rounds if it exists
-        3. Stores state in context for FedDynLossStrategy
-
-        Args:
-            context: Training context
-        """
-        # Save global model weights at start of this round
-        model = context.model
-        if model is None:
-            raise ValueError("Training context must provide a model for FedDyn.")
-
-        self.global_model_weights = copy.deepcopy(model.state_dict())
-
-        # Try to load cumulative gradient vector from previous rounds
-        grad_vector_path = self.grad_vector_path
-        if grad_vector_path is None:
-            raise RuntimeError("FedDyn gradient vector path has not been initialised.")
-        if not os.path.exists(grad_vector_path) and context.client_id != 0:
-            root = self.save_path if self.save_path is not None else Config().params["model_path"]
-            legacy_path = f"{root}_feddyn_grad_{context.client_id}.pth"
-            # Exact same-client read-only migration; new writes stay contained.
-            if os.path.isfile(legacy_path):
-                grad_vector_path = legacy_path
-
-        if os.path.exists(grad_vector_path):
-            try:
-                self.cumulative_grad_vector = torch.load(
-                    grad_vector_path, map_location=torch.device("cpu"), weights_only=True
-                )
-                logging.info(
-                    "[Client #%d] Loaded FedDyn cumulative gradient vector from: %s",
-                    context.client_id,
-                    grad_vector_path,
-                )
-            except Exception as e:
-                logging.warning(
-                    "[Client #%d] Failed to load cumulative gradient vector: %s",
-                    context.client_id,
-                    str(e),
-                )
-                # Initialize to zero if loading fails
-                self.cumulative_grad_vector = {
-                    name: torch.zeros_like(param)
-                    for name, param in model.named_parameters()
-                }
-        else:
-            # First round: initialize cumulative gradient vector to zero
-            logging.info(
-                "[Client #%d] No previous gradient vector found. "
-                "Initializing to zero for first round.",
-                context.client_id,
+        if self.save_path is not None:
+            raise ValueError(
+                "FedDyn save_path is read-only inspection; live history uses server checkpoint_path."
             )
-            self.cumulative_grad_vector = {
-                name: torch.zeros_like(param)
-                for name, param in model.named_parameters()
-            }
-
-        # Store in context for loss strategy
+        if self.dispatch is None:
+            raise ValueError(
+                "FedDyn training needs a versioned server dispatch; use the dedicated example or explicitly warm-start a new run."
+            )
+        s = self.dispatch
+        m = s["metadata"]
+        if m["client_id"] != context.client_id or m["round"] != context.current_round:
+            raise ValueError("FedDyn training has stale client/round dispatch state.")
+        settings = settings_from_config()
+        validate_dispatch(
+            context_model(context),
+            [s["baseline"], m],
+            settings,
+            context.client_id,
+            context.current_round,
+        )
+        model = context_model(context)
+        endpoint = validate_endpoint(
+            model, model.state_dict(), s["baseline"], s["schema"]
+        )
+        if any(not torch.equal(v, s["baseline"][k]) for k, v in endpoint.items()):
+            raise ValueError("FedDyn training must start at received global baseline.")
+        self.schema = s["schema"]
+        self.global_model_weights = copy.deepcopy(s["baseline"])
+        self.cumulative_grad_vector = copy.deepcopy(m["history"])
+        self.result = None
+        self.accepted = False
+        self.completed_steps = 0
+        self._lr = None
         context.state["feddyn_global_weights"] = self.global_model_weights
         context.state["feddyn_cumulative_grad"] = self.cumulative_grad_vector
+        context.state["feddyn_count_metadata"] = dict(
+            population=settings["population"],
+            sample_counts=settings["sample_counts"],
+            client_id=context.client_id,
+        )
+
+    def before_step(self, context: TrainingContext) -> None:
+        if model_schema(context.model) != self.schema:
+            raise ValueError("FedDyn model trainability/schema changed.")
+        validate_endpoint(
+            context_model(context),
+            context_model(context).state_dict(),
+            self.global_model_weights,
+            self.schema,
+        )
+        opt = context.state.get("optimizer")
+        if not isinstance(opt, torch.optim.SGD) or type(opt) is not torch.optim.SGD:
+            raise ValueError("FedDyn supports ordinary SGD only.")
+        owned = [p for g in opt.param_groups for p in g["params"]]
+        expected = [p for p in context_model(context).parameters() if p.requires_grad]
+        if (
+            len(owned) != len(expected)
+            or len({id(p) for p in owned}) != len(owned)
+            or {id(p) for p in owned} != {id(p) for p in expected}
+        ):
+            raise ValueError("FedDyn optimizer must own every trainable exactly once.")
+        rates = []
+        for g in opt.param_groups:
+            if any(
+                g.get(k, 0) != 0 for k in ("momentum", "weight_decay", "dampening")
+            ) or any(g.get(k, False) for k in ("nesterov", "maximize")):
+                raise ValueError("FedDyn requires plain SGD without momentum/decay.")
+            rates.append(finite_real(g["lr"], "learning rate", positive=True))
+        if len(set(rates)) != 1 or (self._lr is not None and self._lr != rates[0]):
+            raise ValueError("FedDyn requires one fixed local learning rate.")
+        if rates[0] != settings_from_config()["lr"]:
+            raise ValueError(
+                "FedDyn optimizer rate differs from the fixed configuration."
+            )
+        self._lr = rates[0]
+        count = positive_integer(
+            context.state.get("feddyn_num_samples"), "realized sample count"
+        )
+        if (
+            context.state.get("num_samples") != count
+            or len(context.state["train_loader"].sampler) != count
+        ):
+            raise ValueError("FedDyn sampler cardinality changed during training.")
+
+    def after_step(self, context: TrainingContext) -> None:
+        self.completed_steps += 1
 
     def on_train_end(self, context: TrainingContext) -> None:
-        """
-        Update and save cumulative gradient vector at end of training round.
-
-        This implements the key FedDyn update:
-            grad_vector += (w_trained - w_global)
-
-        Args:
-            context: Training context
-        """
-        # Update cumulative gradient vector: grad_vec += (w_trained - w_global)
-        model = context.model
-        if model is None:
-            raise ValueError("Training context must provide a model for FedDyn.")
-
-        grad_vector_path = self.grad_vector_path
-        if grad_vector_path is None:
-            raise RuntimeError("FedDyn gradient vector path has not been initialised.")
-        cumulative_grad_vector = self.cumulative_grad_vector
-        global_model_weights = self.global_model_weights
-        if cumulative_grad_vector is None or global_model_weights is None:
-            raise RuntimeError(
-                "FedDyn state has not been initialised before train end."
+        if self.global_model_weights is None or self.cumulative_grad_vector is None:
+            raise ValueError(
+                "FedDyn needs a current baseline/history before train end."
             )
-
-        trained_weights = model.state_dict()
-
-        for name in cumulative_grad_vector:
-            if name in trained_weights and name in global_model_weights:
-                # Compute the difference: w_trained - w_global (both on CPU)
-                trained_param_cpu = trained_weights[name].cpu()
-                global_param_cpu = global_model_weights[name].cpu()
-                diff = trained_param_cpu - global_param_cpu
-                # Add to cumulative gradient vector
-                cumulative_grad_vector[name] = cumulative_grad_vector[name] + diff
-
-        # Save updated cumulative gradient vector for next round
-        try:
-            torch.save(cumulative_grad_vector, grad_vector_path)
-            logging.info(
-                "[Client #%d] Updated and saved FedDyn cumulative gradient vector to %s.",
-                context.client_id,
-                grad_vector_path,
+        count = positive_integer(
+            context.state.get("feddyn_num_samples"), "realized sample count"
+        )
+        if (
+            context.state.get("num_samples") != count
+            or len(context.state["train_loader"].sampler) != count
+        ):
+            raise ValueError(
+                "FedDyn sampler cardinality changed before result staging."
             )
-        except Exception as e:
-            logging.error(
-                "[Client #%d] Failed to save cumulative gradient vector: %s",
-                context.client_id,
-                str(e),
-            )
-
-        # Update state in context for next potential use
-        context.state["feddyn_cumulative_grad"] = cumulative_grad_vector
+        steps = positive_integer(self.completed_steps, "completed optimizer steps")
+        y = validate_endpoint(
+            context_model(context),
+            context_model(context).state_dict(),
+            self.global_model_weights,
+            self.schema,
+        )
+        h = OrderedDict(
+            (k, v + y[k] - self.global_model_weights[k])
+            for k, v in self.cumulative_grad_vector.items()
+        )
+        h = validate_tensors(h, trainable_reference(context.model), "next history")
+        self.result = dict(
+            dispatch=copy.deepcopy(self.dispatch),
+            endpoint=y,
+            history=h,
+            num_samples=count,
+            completed_steps=steps,
+        )
 
     @property
     def requires_worker_state(self) -> bool:
         return True
 
-    def get_worker_state(self, context: TrainingContext) -> dict[str, Any]:
-        return copy.deepcopy({"cumulative_grad": self.cumulative_grad_vector,
-                              "global_weights": self.global_model_weights})
+    def get_worker_state(self, context: TrainingContext):
+        if self.result is None:
+            raise ValueError("FedDyn has no completed current worker result.")
+        return copy.deepcopy(self.result)
 
-    def load_worker_state(self, state: Any, context: TrainingContext) -> None:
-        if not isinstance(state, dict) or not isinstance(state.get("cumulative_grad"), dict):
-            raise ValueError("FedDyn worker cumulative gradient state is missing.")
-        self.cumulative_grad_vector = copy.deepcopy(state["cumulative_grad"])
-        self.global_model_weights = copy.deepcopy(state["global_weights"])
-        context.state["feddyn_cumulative_grad"] = self.cumulative_grad_vector
-        context.state["feddyn_global_weights"] = self.global_model_weights
+    def load_worker_state(self, state, context: TrainingContext) -> None:
+        if not isinstance(state, dict) or set(state) != {
+            "dispatch",
+            "endpoint",
+            "history",
+            "num_samples",
+            "completed_steps",
+        }:
+            raise ValueError("FedDyn worker state is missing or malformed.")
+        d = state["dispatch"]
+        if (
+            not isinstance(d, dict)
+            or set(d) != {"metadata", "baseline", "schema"}
+            or self.dispatch is None
+            or d["schema"] != self.dispatch["schema"]
+        ):
+            raise ValueError("FedDyn worker dispatch/schema mismatch.")
+        m, original = d["metadata"], self.dispatch["metadata"]
+        if not isinstance(m, dict) or set(m) != set(original):
+            raise ValueError("FedDyn worker metadata mismatch.")
+        if any(not same_state(m[k], original[k]) for k in original if k != "history"):
+            raise ValueError("FedDyn worker has stale/mismatched dispatch identity.")
+        x = validate_tensors(
+            d["baseline"], self.dispatch["baseline"], "worker baseline"
+        )
+        h = validate_tensors(m["history"], original["history"], "worker prior history")
+        if any(
+            not torch.equal(v, self.dispatch["baseline"][k]) for k, v in x.items()
+        ) or any(not torch.equal(v, original["history"][k]) for k, v in h.items()):
+            raise ValueError("FedDyn worker changed immutable baseline/history.")
+        y = validate_endpoint(context.model, state["endpoint"], x, d["schema"])
+        if any(
+            not torch.equal(v, context_model(context).state_dict()[k].detach().cpu())
+            for k, v in y.items()
+        ):
+            raise ValueError("FedDyn worker model/state pair disagrees.")
+        hn = validate_tensors(state["history"], h, "worker next history")
+        if any(not torch.equal(v, h[k] + y[k] - x[k]) for k, v in hn.items()):
+            raise ValueError("FedDyn worker history disagrees with endpoint.")
+        count = positive_integer(state["num_samples"], "worker sample count")
+        if (
+            original["expected_count_or_null"] is not None
+            and count != original["expected_count_or_null"]
+        ):
+            raise ValueError("FedDyn worker count disagrees with dispatch.")
+        self.completed_steps = positive_integer(
+            state["completed_steps"], "completed optimizer steps"
+        )
+        self.result = copy.deepcopy(state)
+        context.state["feddyn_num_samples"] = count
 
-    def get_update_payload(self, context: TrainingContext) -> dict[str, Any]:
-        """
-        Return additional payload data (currently none for FedDyn).
+    def on_train_result_accepted(self, context: TrainingContext) -> None:
+        self.load_worker_state(self.get_worker_state(context), context)
+        self.accepted = True
 
-        Args:
-            context: Training context
+    def on_train_cleanup(self, context: TrainingContext, successful: bool) -> None:
+        if not successful:
+            self.result = None
+            self.accepted = False
 
-        Returns:
-            Empty dictionary (FedDyn only sends model weights)
-        """
-        return {}
+    def get_update_payload(self, context: TrainingContext):
+        if not self.accepted or self.result is None:
+            raise ValueError("FedDyn has no accepted current result.")
+        if self.dispatch is None:
+            raise ValueError("FedDyn has no active dispatch.")
+        m = self.dispatch["metadata"]
+        return {
+            k: m[k]
+            for k in ("version", "run_id", "round", "client_id", "dispatch_token")
+        } | {
+            "num_samples": self.result["num_samples"],
+            "completed_steps": self.result["completed_steps"],
+        }
+
+    def read_legacy_history(self, context: TrainingContext):
+        """Inspect exact same-client bytes without adoption, creation or writes."""
+        if context.client_id == 0:
+            return None
+        positive_integer(context.client_id, "legacy client ID")
+        root = (
+            self.save_path
+            if self.save_path is not None
+            else Config().params["model_path"]
+        )
+        canonical = Path(
+            checkpoint_path(
+                root, checkpoint_name("feddyn_grad", context.client_id, suffix=".pth")
+            )
+        )
+        legacy = Path(f"{root}_feddyn_grad_{context.client_id}.pth")
+        path = canonical if canonical.is_file() else legacy
+        if not path.is_file():
+            return None
+        values = torch.load(path, weights_only=True, map_location="cpu")
+        q = trainable_reference(context.model)
+        frozen = {
+            n: p
+            for n, p in context_model(context).named_parameters()
+            if not p.requires_grad
+        }
+        if not isinstance(values, Mapping) or set(values) - set(q) - set(frozen):
+            raise ValueError("FedDyn legacy history has unrecognized keys.")
+        for name in set(values) & set(frozen):
+            validate_tensors(
+                {name: values[name]}, {name: frozen[name]}, "legacy frozen extra"
+            )
+        return validate_tensors(
+            {k: v for k, v in values.items() if k in q}, q, "legacy history"
+        )
 
     def teardown(self, context: TrainingContext) -> None:
-        """
-        Cleanup resources.
-
-        Args:
-            context: Training context
-        """
-        self.global_model_weights = None
-        self.cumulative_grad_vector = None
+        self.dispatch = self.result = None
+        self.global_model_weights = self.cumulative_grad_vector = None
+        self.accepted = False
+        for key in list(context.state):
+            if key.startswith("feddyn_"):
+                context.state.pop(key)
 
 
 class FedDynLossStrategyFromConfig(FedDynLossStrategy):
-    """
-    FedDyn loss strategy that reads configuration from Config.
-
-    This variant automatically reads the alpha parameter from the configuration
-    file, making it easier to use in existing Plato workflows.
-
-    Configuration:
-        The strategy looks for:
-        - Config().algorithm.alpha_coef (preferred)
-        - Config().algorithm.feddyn_alpha (fallback)
-        - Default: 0.01 if neither is specified
-
-    Example:
-        >>> # In config file:
-        >>> # algorithm:
-        >>> #   alpha_coef: 0.01
-        >>>
-        >>> from plato.trainers.composable import ComposableTrainer
-        >>> from plato.trainers.strategies.algorithms import (
-        ...     FedDynLossStrategyFromConfig,
-        ...     FedDynUpdateStrategy
-        ... )
-        >>>
-        >>> trainer = ComposableTrainer(
-        ...     loss_strategy=FedDynLossStrategyFromConfig(),
-        ...     model_update_strategy=FedDynUpdateStrategy()
-        ... )
-    """
+    """Resolve alpha precedence and configured population weighting."""
 
     def __init__(
-        self,
-        base_loss_fn: None
-        | (Callable[[torch.Tensor, torch.Tensor], torch.Tensor]) = None,
-        adaptive_alpha: bool = True,
+        self, base_loss_fn: Callable | None = None, adaptive_alpha: bool | None = None
     ):
-        """
-        Initialize FedDyn loss strategy with config-based alpha.
-
-        Args:
-            base_loss_fn: Base loss function. If None, uses CrossEntropyLoss
-            adaptive_alpha: Whether to scale alpha by client data weight
-        """
-        # Read alpha from config
-        config = Config()
-        alpha = 0.01  # default
-
-        if hasattr(config, "algorithm") and hasattr(config.algorithm, "alpha_coef"):
-            alpha = config.algorithm.alpha_coef
-        elif hasattr(config, "algorithm") and hasattr(config.algorithm, "feddyn_alpha"):
-            alpha = config.algorithm.feddyn_alpha
-
+        c = Config()
+        mode = getattr(c.algorithm, "feddyn_weighting", "uniform")
+        if mode not in ("uniform", "sample"):
+            raise ValueError("FedDyn weighting must be uniform or sample.")
+        resolved = mode == "sample"
+        if adaptive_alpha is not None and (
+            type(adaptive_alpha) is not bool or adaptive_alpha != resolved
+        ):
+            raise ValueError(
+                "FedDyn adaptive_alpha conflicts with configured weighting."
+            )
+        alpha = getattr(
+            c.algorithm, "alpha_coef", getattr(c.algorithm, "feddyn_alpha", 0.01)
+        )
         super().__init__(
-            alpha=alpha, base_loss_fn=base_loss_fn, adaptive_alpha=adaptive_alpha
+            alpha=alpha, base_loss_fn=base_loss_fn, adaptive_alpha=resolved
         )

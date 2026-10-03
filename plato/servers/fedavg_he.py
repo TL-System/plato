@@ -1,5 +1,6 @@
 """Server for homomorphic-encrypted FedAvg aggregation."""
 
+import math
 from typing import Protocol, cast
 
 import torch
@@ -72,11 +73,28 @@ class Server(fedavg.Server):
 
     def _fedavg_hybrid(self, updates, weights_received):
         """Aggregate the model updates in the hybrid form of encrypted and unencrypted weights."""
+        if not weights_received or len(updates) != len(weights_received):
+            raise ValueError("HE report/payload cardinality mismatch.")
+        counts = [update.report.num_samples for update in updates]
+        total_samples = sum(counts)
+        if (
+            any(not math.isfinite(count) or count < 0 for count in counts)
+            or not math.isfinite(total_samples)
+            or total_samples <= 0
+        ):
+            raise ValueError(
+                "HE sample counts must be finite, nonnegative, with a positive total."
+            )
+        vector_size = sum(self.para_nums.values())
+        for payload in weights_received:
+            homo_enc.validate_encrypted_model(payload, vector_size)
         trainer = cast(ZeroCapableTrainer, self.require_trainer())
         deserialized = [
             homo_enc.deserialize_weights(payload, self.he_context)
             for payload in weights_received
         ]
+        for payload in deserialized:
+            homo_enc.validate_encrypted_model(payload, vector_size)
         unencrypted_weights = [
             homo_enc.extract_encrypted_model(x)[0] for x in deserialized
         ]
@@ -86,11 +104,12 @@ class Server(fedavg.Server):
         # Assert the encrypted weights from all clients are aligned
         indices = [homo_enc.extract_encrypted_model(x)[2] for x in deserialized]
         for i in range(1, len(indices)):
-            assert indices[i] == indices[0]
+            if indices[i] != indices[0]:
+                raise ValueError("HE encrypted masks must align across clients.")
         encrypt_indices = indices[0]
 
         # Extract the total number of samples
-        self.total_samples = sum(update.report.num_samples for update in updates)
+        self.total_samples = total_samples
 
         # Perform weighted averaging on unencrypted and encrypted weights
         unencrypted_avg_update = trainer.zeros(unencrypted_weights[0].size)

@@ -32,15 +32,16 @@ def count_parameters(model: torch.nn.Module) -> int:
     return total_params
 
 
-resnet18 = torch.hub.load("pytorch/vision:v0.10.0", "resnet18", pretrained=True)
-mobilenet = torch.hub.load("pytorch/vision:v0.10.0", "mobilenet_v2", pretrained=True)
-alexnet = torch.hub.load("pytorch/vision:v0.10.0", "alexnet", pretrained=True)
+if __name__ == "__main__":
+    resnet18 = torch.hub.load("pytorch/vision:v0.10.0", "resnet18", pretrained=True)
+    mobilenet = torch.hub.load("pytorch/vision:v0.10.0", "mobilenet_v2", pretrained=True)
+    alexnet = torch.hub.load("pytorch/vision:v0.10.0", "alexnet", pretrained=True)
 
-print("The size of ResNet-18:")
-count_parameters(resnet18)
+    print("The size of ResNet-18:")
+    count_parameters(resnet18)
 
-print("\nThe size of MobileNet:")
-count_parameters(mobilenet)
+    print("\nThe size of MobileNet:")
+    count_parameters(mobilenet)
 
-print("\nThe size of AlexNet:")
-count_parameters(alexnet)
+    print("\nThe size of AlexNet:")
+    count_parameters(alexnet)

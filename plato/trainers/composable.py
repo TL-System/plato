@@ -407,9 +407,11 @@ class ComposableTrainer(base.Trainer):
 
     def train_process(self, config, trainset, sampler, **kwargs):
         """The training process in a federated learning workload."""
+        model_finished = False
         try:
             process_config = {**config, "_defer_strategy_commit": True}
             self.train_model(process_config, trainset, sampler, **kwargs)
+            model_finished = True
             model_name = Config().trainer.model_name
             filename = checkpoint_name(
                 model_name, self.client_id, config["run_id"], suffix=".safetensors"
@@ -425,8 +427,17 @@ class ComposableTrainer(base.Trainer):
                     pickle.dump(state, state_file)
             if token is None:
                 self.model_update_strategy.on_train_result_accepted(self.context)
-        except BaseException:
-            self.model_update_strategy.on_train_cleanup(self.context, successful=False)
+        except BaseException as error:
+            # train_model owns rejection of its failed stage. This stage owns
+            # only subsequent model-save/state-export/direct handoff failures.
+            if model_finished:
+                try:
+                    self.model_update_strategy.on_train_cleanup(self.context, successful=False)
+                except BaseException as cleanup_error:
+                    raise BaseExceptionGroup(
+                        "Training handoff failed and rejection cleanup also failed.",
+                        [error, cleanup_error],
+                    ) from error
             raise
 
     def _training_state_path(self, run_id):
@@ -441,7 +452,6 @@ class ComposableTrainer(base.Trainer):
         self.context.config = config
         self.context.current_round = self.current_round
         self.context.state.pop("optimizer", None)
-        successful = False
         end_hook_attempted = False
         try:
             self.training_step_strategy.on_train_start(self.context)
@@ -450,20 +460,33 @@ class ComposableTrainer(base.Trainer):
             # direct result only after they succeed, exactly once per run.
             end_hook_attempted = True
             self.training_step_strategy.on_train_end(self.context)
+            # Successful cleanup releases hooks but retains provisional state
+            # for deferred workers. It is fallible and precedes acceptance.
+            self.model_update_strategy.on_train_cleanup(self.context, successful=True)
             if not config.get("_defer_strategy_commit"):
                 self.model_update_strategy.on_train_result_accepted(self.context)
-            successful = True
             return result
-        finally:
+        except BaseException as error:
+            cleanup_errors = []
             try:
                 if not end_hook_attempted:
+                    end_hook_attempted = True
                     self.training_step_strategy.on_train_end(self.context)
-            finally:
-                try:
-                    self.model_update_strategy.on_train_cleanup(self.context, successful)
-                finally:
-                    self.context.state.pop("complete_optimizer_step", None)
-                    self.context.state.pop("optimizer_step_hooks_handled", None)
+            except BaseException as end_error:
+                cleanup_errors.append(end_error)
+            try:
+                self.model_update_strategy.on_train_cleanup(self.context, successful=False)
+            except BaseException as cleanup_error:
+                cleanup_errors.append(cleanup_error)
+            if cleanup_errors:
+                raise BaseExceptionGroup(
+                    "Training failed and rejection cleanup also failed.",
+                    [error, *cleanup_errors],
+                ) from error
+            raise
+        finally:
+            self.context.state.pop("complete_optimizer_step", None)
+            self.context.state.pop("optimizer_step_hooks_handled", None)
 
     def _train_model(self, config, trainset, sampler, **kwargs):
         """The main training loop using strategies."""
