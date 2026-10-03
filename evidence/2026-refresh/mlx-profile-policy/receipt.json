@@ -1,0 +1,236 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-03",
+  "kind": "Source-bound native MLX collection-profile implementation and bounded policy qualification",
+  "baseline_commit": "1130ff0250ee26a49328e15cf5596f430c468c9d",
+  "accepted_plan": {
+    "path": "/tmp/plato-mlx-profile-plan.json",
+    "sha256": "81a5a557b1ad018384da9b9290e0648048696af244c486849c653a09f0bea32b"
+  },
+  "fresh_plan_review": {
+    "path": "/tmp/plato-mlx-profile-plan-review2.json",
+    "decision": "accepted",
+    "sha256": "f7ed47c61715d649c4fe905bf13a1797e42a706c32ead03aa5d7e871d0169c00"
+  },
+  "source_hashes": {
+    "tests/conftest.py": "8e458b0925c1a83c32fa3869a4e9f229b27cdb77f10b56a7f66c3f933a9f7739",
+    "tests/test_mlx_profile_contract.py": "ac8b4b6c8c9ff40a1c0df37a874435e78a6f65e69731d6d3209f91c23f551b8c",
+    "tests/mlx_native/cases.json": "e8beb9cc735425ee678b0f11ba6d83747b5766748abf8de40609314b92eaa49f",
+    "pyproject.toml": "bd6e032489a67e61e2c8a022de6b4335e600c8f537ff128c3412a39d56dffd24",
+    "uv.lock": "46236f61039c07a844bbddaa185c32582b6f4436203bd719aa8e7dcfdbd26e89"
+  },
+  "ownership": {
+    "original": [
+      "tests/conftest.py",
+      "tests/test_mlx_profile_contract.py",
+      "this receipt and its logs"
+    ],
+    "explicit_root_exceptions": [
+      "pyproject.toml: mlx_native marker entry only",
+      "tests/mlx_native/cases.json: exclusive frozen ledger ownership"
+    ],
+    "unchanged": [
+      "uv.lock",
+      "runtime",
+      "native test modules and initializers",
+      "dependency/workspace manifests except marker",
+      "CI",
+      "public prose"
+    ],
+    "pending_serialized_handoff": "Archive retained_model_search partition may later require a separately approved conftest edit; deliberately unimplemented here."
+  },
+  "environments": {
+    "base": "/tmp/plato-llm-integration/base-313",
+    "mandatory": "/tmp/plato-llm-integration/mandatory-313",
+    "native_preflight_only": "/tmp/plato-phase3-mlx/env",
+    "python": "3.13.16",
+    "pytest": "9.1.1",
+    "shell": "zsh -lc",
+    "platform": "Darwin arm64"
+  },
+  "results": {
+    "red_before_implementation": {
+      "selected_case_count": 20,
+      "failed": 20,
+      "exit_status": 1,
+      "production_conftest_sha256": "24798dced0175024ca57cc08c331b7671faefd6f19883ea4df4e245ba7273de5",
+      "note": "Historical first regression-file revision had 86 total cases; selected default and canonical pyargs assertions are retained in the final file. Historical source hashes are retained."
+    },
+    "base_focused": {
+      "passed": 119,
+      "exit_status": 0,
+      "policy_cases": 98,
+      "existing_helper_cases": 21,
+      "command": "python -m pytest tests/test_mlx_profile_contract.py tests/mpc/test_round_store_contracts.py tests/utils/test_rl_payload_utilities.py --test-profile=base -q"
+    },
+    "mandatory_focused": {
+      "passed": 119,
+      "exit_status": 0,
+      "command": "python -m pytest tests/test_mlx_profile_contract.py tests/mpc/test_round_store_contracts.py tests/utils/test_rl_payload_utilities.py --test-profile=mandatory -q"
+    },
+    "core_collection": {
+      "base_total": 1424,
+      "mandatory_total": 1431,
+      "new_policy_cases": 98,
+      "unchanged_base_core": 1326,
+      "unchanged_mandatory_core": 1333,
+      "startup_cases_each": 48,
+      "native_nodes_each": 0,
+      "base_vs_mandatory_delta": [
+        "tests/trainers/test_dp_data_loader_strategy.py::test_actual_dp_consecutive_training_exchange_checkpoint_and_accounting",
+        "tests/trainers/test_dp_data_loader_strategy.py::test_actual_dp_physical_batches_only_report_real_updates_and_cleanup",
+        "tests/trainers/test_dp_data_loader_strategy.py::test_actual_spawned_dp_rounds_return_accounting_and_isolate_clients",
+        "tests/trainers/test_dp_data_loader_strategy.py::test_dp_actual_time_snapshot_writer_to_plain_urgent_reader",
+        "tests/trainers/test_dp_data_loader_strategy.py::test_dp_memory_splitting_matches_logical_batch_parameter_reference",
+        "tests/trainers/test_dp_data_loader_strategy.py::test_dp_strategy_handles_plato_sampler_get",
+        "tests/trainers/test_dp_data_loader_strategy.py::test_dp_strategy_handles_torch_sampler_directly"
+      ]
+    },
+    "runtime_collection": {
+      "selected": 51,
+      "startup_cases": 48,
+      "additional_existing_runtime_cases": 3,
+      "exit_status": 0
+    },
+    "actual_missing_opacus": {
+      "exit_status": 4,
+      "diagnostic": "mandatory prerequisite failed: No module named 'opacus'"
+    },
+    "actual_missing_mlx_profile_and_focused": {
+      "exit_status_each": 4,
+      "diagnostic": "mlx-native prerequisite failed (Darwin arm64): No module named 'mlx'"
+    },
+    "actual_unsupported_native_pyargs": {
+      "exit_status": 4,
+      "before_native_import": true
+    },
+    "actual_core_pyargs": {
+      "exit_status": 0,
+      "module": "tests.test_config_loader"
+    },
+    "actual_native_preflight": {
+      "schema_version": 1,
+      "kind": "actual production prerequisite probe; not E1-E7 qualification",
+      "source_sha256": "8e458b0925c1a83c32fa3869a4e9f229b27cdb77f10b56a7f66c3f933a9f7739",
+      "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+      "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+      "versions": {
+        "mlx": "0.32.3",
+        "mlx-metal": "0.32.3",
+        "pytest": "9.1.1"
+      },
+      "elapsed_seconds": 0.013626625062897801,
+      "default_device": "Device(gpu, 0)",
+      "default_streams": [
+        "Stream(Device(cpu, 0), 0)",
+        "Stream(Device(gpu, 0), 1)"
+      ],
+      "caller_device_streams_rng_restored": true
+    },
+    "native_ledger": {
+      "case_count": 283,
+      "criteria_tag_counts": {
+        "E5": 246,
+        "E6": 29,
+        "E7": 4,
+        "E1": 242,
+        "E2": 211,
+        "E3": 243,
+        "E4": 1
+      },
+      "handoff": "/tmp/plato-phase3-mlx/native-ledger-handoff.json",
+      "handoff_sha256": "5785a7464aa8f66235fe077615a0953c35bf25fffe03bbff2cb2786aaf9ddd6c",
+      "handoff_native_source_hashes_verified": true
+    },
+    "targeted_ruff_and_format_and_diff": "passed",
+    "uv_lock": {
+      "unchanged": true,
+      "sha256": "46236f61039c07a844bbddaa185c32582b6f4436203bd719aa8e7dcfdbd26e89"
+    }
+  },
+  "policy_test_limits": "Tiny projects copy exact production hooks and retain core ledger checks. Only native prerequisite simulation and dummy mandatory import modules are test-local. They establish collection/ledger/outcome policy, not native backend support. Every subprocess has a 30-second timeout; no recursive full-suite subprocesses or model training.",
+  "remaining_integration_gates": [
+    "Fresh independent review of this exact implementation",
+    "Actual complete E1-E7 native qualification with frozen ledger",
+    "Combined core plus native qualification and full selected core partitions",
+    "Bounded Linux core/policy checks",
+    "Integrated uv lock --check",
+    "Separate accepted E8 evidence; E9 remains unselected"
+  ],
+  "artifacts": [
+    {
+      "path": "evidence/2026-refresh/mlx-profile-policy/red-baseline.log",
+      "sha256": "437603f0d8b26d8767b220a2dd1bf78a602815dce6ba0eac2349d2267c0b3f59",
+      "raw_stdout_sha256": "8464726f38150b8d61bf538d14aa76d4dc4d0afa67667a7d4bae860823b5d11b",
+      "storage_normalization": "Removed trailing horizontal whitespace and trailing blank lines; raw command output remains in the named /tmp author logs."
+    },
+    {
+      "path": "evidence/2026-refresh/mlx-profile-policy/red-baseline-sources.sha256",
+      "sha256": "c69942903b651d32ac79d9ab8da2cd8a72720e5c968e492a3662c3a7146b9a2c"
+    },
+    {
+      "path": "evidence/2026-refresh/mlx-profile-policy/base-focused.log",
+      "sha256": "e8d1b99715b87459a38a980cc62726e11a2dea436ceca562b28fe0a80e231326"
+    },
+    {
+      "path": "evidence/2026-refresh/mlx-profile-policy/mandatory-focused.log",
+      "sha256": "6f25e17df23ace756121eb295563c9f3901a884a470f0ee2ee53441a31caead3"
+    },
+    {
+      "path": "evidence/2026-refresh/mlx-profile-policy/base-core-collection.log",
+      "sha256": "76a229fe18e77e9c1cb3f8266b3fb41123464e6102ae69f5c60a308f41a852e0"
+    },
+    {
+      "path": "evidence/2026-refresh/mlx-profile-policy/mandatory-core-collection.log",
+      "sha256": "b4dcd01f2f3bf4cf772a3369e9358941348611b1fc53662a389cb9e4c61cfefb"
+    },
+    {
+      "path": "evidence/2026-refresh/mlx-profile-policy/base-runtime-collection.log",
+      "sha256": "acd8de451ba6b92e87b64d93912036074904b7540ca466f295b063a89f1dfdbb"
+    },
+    {
+      "path": "evidence/2026-refresh/mlx-profile-policy/missing-opacus.log",
+      "sha256": "a1ff962047fa11f030b4a48fe88abb5e5732c50ebc4ae68422a5575f5495d5c8",
+      "raw_stdout_sha256": "faa6bbe6f535ed8dc7eff6f1f581fb33f9be69a0d20218c379ea0e6f6f88be74",
+      "storage_normalization": "Removed trailing horizontal whitespace and trailing blank lines; raw command output remains in the named /tmp author logs."
+    },
+    {
+      "path": "evidence/2026-refresh/mlx-profile-policy/missing-mlx-profile.log",
+      "sha256": "e971d9d4d9c29413c3632b6456618d3ff8f62c42eaba86e55dec9939ceba7cc0",
+      "raw_stdout_sha256": "d5fe08e8c264bc5bd17833bcc3902421a305c030398cd86d32b80deb6cd67e45",
+      "storage_normalization": "Removed trailing horizontal whitespace and trailing blank lines; raw command output remains in the named /tmp author logs."
+    },
+    {
+      "path": "evidence/2026-refresh/mlx-profile-policy/missing-mlx-focused.log",
+      "sha256": "e971d9d4d9c29413c3632b6456618d3ff8f62c42eaba86e55dec9939ceba7cc0",
+      "raw_stdout_sha256": "d5fe08e8c264bc5bd17833bcc3902421a305c030398cd86d32b80deb6cd67e45",
+      "storage_normalization": "Removed trailing horizontal whitespace and trailing blank lines; raw command output remains in the named /tmp author logs."
+    },
+    {
+      "path": "evidence/2026-refresh/mlx-profile-policy/unsupported-native-pyargs.log",
+      "sha256": "2fe648d8bf084a4d1ff8b9b11e32adb21c3a5dc3fc99aa40a800a6a820701bcb",
+      "raw_stdout_sha256": "9f34ec8677def2eb4a9cd2d57292e605fda6abc9b8206e09131886854e535a2a",
+      "storage_normalization": "Removed trailing horizontal whitespace and trailing blank lines; raw command output remains in the named /tmp author logs."
+    },
+    {
+      "path": "evidence/2026-refresh/mlx-profile-policy/core-pyargs.log",
+      "sha256": "ee41819d573b185f6e647d1b56a9d6a79480c6994619246d685c01f87366ccfe"
+    },
+    {
+      "path": "evidence/2026-refresh/mlx-profile-policy/real-preflight.log",
+      "sha256": "0400ea7b99debc65fcbbe18377b4ff8d80ffb327d389727a5c3aacf90f43671f"
+    },
+    {
+      "path": "evidence/2026-refresh/mlx-profile-policy/real-preflight.json",
+      "sha256": "0400ea7b99debc65fcbbe18377b4ff8d80ffb327d389727a5c3aacf90f43671f"
+    },
+    {
+      "path": "evidence/2026-refresh/mlx-profile-policy/real-preflight.py",
+      "sha256": "48f6e49b44e7fc738cc9daa0d4673106755f63ee5521400e33fa795764a8f9d2"
+    },
+    {
+      "path": "evidence/2026-refresh/mlx-profile-policy/lint.log",
+      "sha256": "afa20b27dacc9bf0aba3c1d265964c21e04ab42f6e39e2dd4769718ceded003a"
+    }
+  ]
+}

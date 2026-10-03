@@ -1,6 +1,8 @@
 [clients]
 
 type = "simple"
+# Payload communication defaults to simulation. Set false for socket payloads.
+# comm_simulation = false
 total_clients = 10
 per_round = 2
 do_test = false
@@ -28,6 +30,10 @@ model_name = "lenet5"
 epochs = 5
 batch_size = 32
 optimizer = "adam"
+# Optional native controls; omitted values preserve unseeded/unclipped behavior.
+# model_seed = 17
+# training_seed = 29
+# clip_grad_norm = 2.0
 
 [algorithm]
 type = "mlx_fedavg"

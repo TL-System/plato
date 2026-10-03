@@ -1,0 +1,62 @@
+{
+  "utc": "2026-10-03T19:08:47.386334+00:00",
+  "pr": 418,
+  "merge_commit": "477f2f1bb52a1b5a58c1f9f2d30f640039f83a8e",
+  "removed": [
+    {
+      "name": "llm-publication",
+      "path": "/tmp/plato-refresh-worktrees/llm-publication",
+      "head": "1130ff0250ee26a49328e15cf5596f430c468c9d",
+      "branch": "maintenance/2026-retire-llms",
+      "clean_before_removal": true,
+      "merged_ancestor": true
+    },
+    {
+      "name": "llm-retirement-docs",
+      "path": "/tmp/plato-refresh-worktrees/llm-retirement-docs",
+      "head": "fd4a2bcfa0eb3a57fa015281a156e893d95e9484",
+      "branch": "maintenance/2026-llm-retirement-docs",
+      "clean_before_removal": true,
+      "merged_ancestor": true
+    },
+    {
+      "name": "qwen-reference",
+      "path": "/tmp/plato-refresh-worktrees/qwen-reference",
+      "head": "bca1f6ec3541090dccb838197206fee2d6412516",
+      "branch": "maintenance/2026-qwen-reference",
+      "clean_before_removal": true,
+      "merged_ancestor": true
+    },
+    {
+      "name": "qwen-reference-review",
+      "path": "/tmp/plato-refresh-worktrees/qwen-reference-review",
+      "head": "d3569ec98e64fb83ef43c2b50db4543cfe6a3bc6",
+      "branch": null,
+      "clean_before_removal": true,
+      "merged_ancestor": true
+    },
+    {
+      "name": "qwen-reference-review2",
+      "path": "/tmp/plato-refresh-worktrees/qwen-reference-review2",
+      "head": "bca1f6ec3541090dccb838197206fee2d6412516",
+      "branch": null,
+      "clean_before_removal": true,
+      "merged_ancestor": true
+    },
+    {
+      "name": "retire-llm-backends",
+      "path": "/tmp/plato-refresh-worktrees/retire-llm-backends",
+      "head": "321c5311ac3f4bd4c92e398c73b5a9d5d8b53ad4",
+      "branch": "maintenance/2026-retire-llm-backends",
+      "clean_before_removal": true,
+      "merged_ancestor": true
+    }
+  ],
+  "preserved": [
+    "Root checkout and .venv",
+    "Shared caches and repositories",
+    "llm-integrated: editable source for base/mandatory/tooling envs still in use by active tests/review",
+    "All active MLX worktrees and review sources",
+    "Task scratch and retained raw evidence"
+  ]
+}

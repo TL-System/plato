@@ -63,13 +63,16 @@ This will make sure that any additional Python packages, specified in the local 
 
 ### Optional: MLX Backend for Apple Silicon
 
-To use MLX as a backend alternative to PyTorch on Apple Silicon devices, install the MLX dependencies:
+The native MLX reference is LeNet-5/MNIST with FedAvg on Apple Silicon. Install
+its optional extra with the default Python 3.13 interpreter:
 
 ```bash
-uv sync --extra mlx
+uv sync --python 3.13 --extra mlx
 ```
 
-See the [Quick Start guide](quickstart.md#using-mlx-as-a-backend) for configuration details.
+Use `uv run --extra mlx` when launching the workload. See [Native MLX](mlx.md)
+for runnable commands, supported controls, and native CPU/Metal qualification.
+The normal Linux core CI suite does not qualify this backend.
 
 ### Optional: Server-side LLM Evaluation with Lighteval
 

@@ -7,6 +7,16 @@ This framework makes extensive use of object oriented subclassing with the help 
 
 ---
 
+## Native MLX development
+
+The Apple Silicon backend has a separate `ComposableMLXTrainer` with native
+MLX strategy interfaces and the LeNet-5/MNIST reference. Read
+[Native MLX](mlx.md) before adapting a model or hook: device streams, parameter
+trees, positional report associations, and checkpoint state have explicit
+contracts. Standard core test runs exclude native tests; use the guide's
+`tests/mlx_native --test-profile=mlx-native` command for full native qualification
+on Python 3.13 with CPU and Metal available.
+
 ## Configuration Parameters
 
 All configuration parameters are globally accessed using the Singleton `Config` class (found in `config.py`). They are read from a configuration file when the clients and the servers launch, and the configuration file follows the TOML format for the sake of simplicity and readability.

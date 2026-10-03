@@ -10,6 +10,7 @@ transport or persistence, and restore them back when needed.
 from __future__ import annotations
 
 import importlib
+import sys
 from dataclasses import dataclass
 from types import ModuleType
 from typing import TYPE_CHECKING, Any, Dict, List, Tuple, cast
@@ -17,7 +18,6 @@ from typing import TYPE_CHECKING, Any, Dict, List, Tuple, cast
 import numpy as np
 
 if TYPE_CHECKING:  # pragma: no cover
-    import mlx.core as mx
     import torch
 else:  # pragma: no cover - optional dependency
     try:
@@ -25,14 +25,16 @@ else:  # pragma: no cover - optional dependency
     except ImportError:
         torch = None
 
-    try:
-        mx = cast(ModuleType, importlib.import_module("mlx.core"))
-    except ImportError:
-        mx = None
-
-
 _TORCH_TENSOR_TYPE = getattr(torch, "Tensor", None) if torch is not None else None
-_MX_ARRAY_TYPE = getattr(mx, "array", None) if mx is not None else None
+
+
+def _mlx_module_for(value: Any) -> ModuleType | None:
+    """Recognize arrays from an already loaded backend without importing MLX."""
+    module = sys.modules.get("mlx.core")
+    array_type = getattr(module, "array", None)
+    if array_type is not None and isinstance(value, array_type):
+        return module
+    return None
 
 
 def _join_path(prefix: str, suffix: str) -> str:
@@ -66,14 +68,18 @@ def _ensure_numpy(value: Any) -> np.ndarray:
         if callable(cpu_fn):
             tensor = cpu_fn()
         torch_bfloat16 = getattr(torch, "bfloat16", None) if torch is not None else None
-        if torch_bfloat16 is not None and getattr(tensor, "dtype", None) == torch_bfloat16:
+        if (
+            torch_bfloat16 is not None
+            and getattr(tensor, "dtype", None) == torch_bfloat16
+        ):
             tensor = tensor.to(torch.float32)
         numpy_fn = getattr(tensor, "numpy", None)
         if callable(numpy_fn):
             return numpy_fn()
         return np.asarray(tensor)
-    if _MX_ARRAY_TYPE is not None and isinstance(value, _MX_ARRAY_TYPE):
-        to_numpy_fn = getattr(mx, "to_numpy", None) if mx is not None else None
+    mx = _mlx_module_for(value)
+    if mx is not None:
+        to_numpy_fn = getattr(mx, "to_numpy", None)
         if callable(to_numpy_fn):
             return to_numpy_fn(value)
         for attr in ("to_numpy", "to_host"):
@@ -97,7 +103,7 @@ def _detect_backend(value: Any) -> str:
         return "bytes"
     if _TORCH_TENSOR_TYPE is not None and isinstance(value, _TORCH_TENSOR_TYPE):
         return "torch"
-    if _MX_ARRAY_TYPE is not None and isinstance(value, _MX_ARRAY_TYPE):
+    if _mlx_module_for(value) is not None:
         return "mlx"
     if isinstance(value, np.ndarray):
         return "numpy"

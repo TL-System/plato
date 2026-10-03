@@ -1,0 +1,868 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-03",
+  "kind": "Bounded lazy MLX frontdoor correction and exact-source import-policy evidence",
+  "baseline_commit": "3ad876fbf843f49912a03e76186e07cffc02b690",
+  "fresh_review": {
+    "finding": "MLX-PROFILE-IMPL-01",
+    "path": "/tmp/plato-mlx-profile-review.json",
+    "sha256": "cf84a8542dba6962bdd8c5e6620f481adeebebe2bf013e714a6b3a382d8015ed"
+  },
+  "source_hashes": {
+    "plato/utils/tree.py": "33a02e8fe70eb62daa97b40c7edea19b0fb9fed1b41c2d64b5146242143b0ef6",
+    "plato/models/registry.py": "21e3eef31c433802aa042f430cdd869571ced0c6f421ac7e48863fd5f2385a8e",
+    "plato/algorithms/registry.py": "c28cd649d77b3bffab14e7f7b01e87c2b0b652d0b538ae7d0ad0bab0be5e2d58",
+    "tests/mlx_import_audit_runner.py": "62a6509de2b389d1ab143cc06a526745a132f035f978b18f8b78d183ec80d296",
+    "tests/test_mlx_import_contract.py": "6c9eb81ab656a8695f34579fd590a02d51480c85a3353fcc57a33597f972be77",
+    "tests/mlx_native/cases.json": "c168dc33a4d4e7ed70079e09c3de70f5b318d543c035ec13de2826b48e1175bb"
+  },
+  "unchanged_source_hashes": {
+    "tests/conftest.py": "8e458b0925c1a83c32fa3869a4e9f229b27cdb77f10b56a7f66c3f933a9f7739",
+    "tests/test_mlx_profile_contract.py": "ac8b4b6c8c9ff40a1c0df37a874435e78a6f65e69731d6d3209f91c23f551b8c",
+    "pyproject.toml": "bd6e032489a67e61e2c8a022de6b4335e600c8f537ff128c3412a39d56dffd24",
+    "uv.lock": "46236f61039c07a844bbddaa185c32582b6f4436203bd719aa8e7dcfdbd26e89"
+  },
+  "ownership": {
+    "explicit_root_handoff": [
+      "plato/utils/tree.py: loaded-MLX array recognition",
+      "plato/models/registry.py: lazy native factory",
+      "plato/algorithms/registry.py: lazy native constructor",
+      "tests/mlx_native/cases.json: exclusive frozen ledger"
+    ],
+    "additional_files": [
+      "tests/test_mlx_import_contract.py",
+      "tests/mlx_import_audit_runner.py",
+      "this receipt and bounded evidence artifacts"
+    ],
+    "not_edited": [
+      "native runtime/server and native test modules/initializers",
+      "manifests/lock/CI",
+      "active mlx-integration checkout",
+      "archive partition guard/public prose"
+    ],
+    "native_integration_dependency": {
+      "source_commit": "aa7983d2fd1d750b2a6ecb176ab96f14e3d9ea80",
+      "evidence_commit": "9745697b27b246b0c5a18f54137a2498d4694e58",
+      "note": "This checkout has prior 283 native modules. New dispatch module and server correction are separately owned; integrate both corrections before complete 383-case qualification."
+    }
+  },
+  "implementation": {
+    "tree": "Checks already loaded mlx.core dynamically when a value is presented. Importing or using shared utilities on core values never imports/probes a native backend. Arrays created after the tree module loaded still retain MLX metadata and host conversion behavior.",
+    "models": "Built-in native key remains callable through a lazy factory. Explicit selection loads the real module with cause-preserving missing-dependency diagnostic, caches the exact real factory, and preserves custom registered factories and existing None injection. Existing native stream/model-seed scopes are unchanged.",
+    "algorithms": "Built-in native key remains callable through a lazy constructor and resolves to the exact native class on use. Explicit native selection retains real-trainer validation and now gives the existing cause-preserving availability diagnostic when the backend is absent. Core constructors/routes are unchanged."
+  },
+  "contract_clarification": {
+    "path": "evidence/2026-refresh/mlx-profile-correction/contract-clarification.json",
+    "sha256": "c4f4ba8a69e59aefa3f9ded0aafd3ea91bc42f761a734f9641cfa902202c7add",
+    "allowed": "Upstream Transformers _is_package_available(mlx, return_version=False) calls find_spec(mlx) to inspect top-level package presence; no module import or backend/device/RNG execution. Audit identifies the exact call-site provenance.",
+    "required_and_observed": "No MLX backend modules/native frontdoors/native test modules for core/default/rejected selectors; no dotted backend resolution or non-Transformers MLX import attempt. First actual native backend resolution occurs inside real prerequisite preflight.",
+    "no_suppression": "No Transformers modification, interception, global import suppression or production bypass. The blocker exists only in a fresh test subprocess and permits only the scoped metadata query."
+  },
+  "results": {
+    "final_red": {
+      "failed": 3,
+      "selected": 3,
+      "exit_status": 1,
+      "tests": [
+        "real conftest backend sentinel",
+        "canonical rejected selector imports no backend",
+        "first real backend resolution inside prerequisite"
+      ],
+      "source": "Untouched git archive of baseline with exact final tests/runner copied in; hashes retained."
+    },
+    "historical_red": "Initial stronger zero-any-lookup file had 10 failures. Nine reflected eager imports/preflight ordering; root-dot additionally hit existing vendor test import errors. The zero-any-lookup policy was corrected only under the explicit root clarification and historical outputs remain retained.",
+    "final_installed_real_production_graph": {
+      "passed": 9,
+      "exit_status": 0,
+      "mlx": "0.32.3",
+      "python": "3.13.16",
+      "pytest": "9.1.1",
+      "environment": "/tmp/plato-mlx-integration/env",
+      "case_audits": [
+        {
+          "case": "test_real_conftest_survives_ba0",
+          "exit_status": 0,
+          "mlx_distribution_version": "0.32.3",
+          "platform": [
+            "Darwin",
+            "arm64"
+          ],
+          "backend_spec_lookups": [
+            {
+              "module": "mlx",
+              "inside_preflight": false,
+              "upstream_presence_query": true
+            }
+          ],
+          "backend_modules": [],
+          "native_test_modules": [],
+          "native_frontdoor_modules": [],
+          "production_conftest_loaded": true
+        },
+        {
+          "case": "test_real_core_collection_does0",
+          "exit_status": 0,
+          "mlx_distribution_version": "0.32.3",
+          "platform": [
+            "Darwin",
+            "arm64"
+          ],
+          "backend_spec_lookups": [
+            {
+              "module": "mlx",
+              "inside_preflight": false,
+              "upstream_presence_query": true
+            }
+          ],
+          "backend_modules": [],
+          "native_test_modules": [],
+          "native_frontdoor_modules": [],
+          "production_conftest_loaded": true
+        },
+        {
+          "case": "test_real_core_collection_does1",
+          "exit_status": 0,
+          "mlx_distribution_version": "0.32.3",
+          "platform": [
+            "Darwin",
+            "arm64"
+          ],
+          "backend_spec_lookups": [
+            {
+              "module": "mlx",
+              "inside_preflight": false,
+              "upstream_presence_query": true
+            }
+          ],
+          "backend_modules": [],
+          "native_test_modules": [],
+          "native_frontdoor_modules": [],
+          "production_conftest_loaded": true
+        },
+        {
+          "case": "test_real_core_collection_does2",
+          "exit_status": 0,
+          "mlx_distribution_version": "0.32.3",
+          "platform": [
+            "Darwin",
+            "arm64"
+          ],
+          "backend_spec_lookups": [
+            {
+              "module": "mlx",
+              "inside_preflight": false,
+              "upstream_presence_query": true
+            }
+          ],
+          "backend_modules": [],
+          "native_test_modules": [],
+          "native_frontdoor_modules": [],
+          "production_conftest_loaded": true
+        },
+        {
+          "case": "test_real_core_pyargs_preserve0",
+          "exit_status": 0,
+          "mlx_distribution_version": "0.32.3",
+          "platform": [
+            "Darwin",
+            "arm64"
+          ],
+          "backend_spec_lookups": [
+            {
+              "module": "mlx",
+              "inside_preflight": false,
+              "upstream_presence_query": true
+            }
+          ],
+          "backend_modules": [],
+          "native_test_modules": [],
+          "native_frontdoor_modules": [],
+          "production_conftest_loaded": true
+        },
+        {
+          "case": "test_real_focused_native_backe0",
+          "exit_status": 0,
+          "mlx_distribution_version": "0.32.3",
+          "platform": [
+            "Darwin",
+            "arm64"
+          ],
+          "backend_spec_lookups": [
+            {
+              "module": "mlx",
+              "inside_preflight": false,
+              "upstream_presence_query": true
+            },
+            {
+              "module": "mlx",
+              "inside_preflight": true,
+              "upstream_presence_query": false
+            },
+            {
+              "module": "mlx.core",
+              "inside_preflight": true,
+              "upstream_presence_query": false
+            },
+            {
+              "module": "mlx._reprlib_fix",
+              "inside_preflight": true,
+              "upstream_presence_query": false
+            },
+            {
+              "module": "mlx.__array_api_info",
+              "inside_preflight": true,
+              "upstream_presence_query": false
+            },
+            {
+              "module": "mlx.nn",
+              "inside_preflight": true,
+              "upstream_presence_query": false
+            },
+            {
+              "module": "mlx.nn.init",
+              "inside_preflight": true,
+              "upstream_presence_query": false
+            },
+            {
+              "module": "mlx.nn.losses",
+              "inside_preflight": true,
+              "upstream_presence_query": false
+            },
+            {
+              "module": "mlx.nn.layers",
+              "inside_preflight": true,
+              "upstream_presence_query": false
+            },
+            {
+              "module": "mlx.nn.layers.activations",
+              "inside_preflight": true,
+              "upstream_presence_query": false
+            },
+            {
+              "module": "mlx.nn.layers.base",
+              "inside_preflight": true,
+              "upstream_presence_query": false
+            },
+            {
+              "module": "mlx.utils",
+              "inside_preflight": true,
+              "upstream_presence_query": false
+            },
+            {
+              "module": "mlx.nn.layers.containers",
+              "inside_preflight": true,
+              "upstream_presence_query": false
+            },
+            {
+              "module": "mlx.nn.layers.convolution",
+              "inside_preflight": true,
+              "upstream_presence_query": false
+            },
+            {
+              "module": "mlx.nn.layers.convolution_transpose",
+              "inside_preflight": true,
+              "upstream_presence_query": false
+            },
+            {
+              "module": "mlx.nn.layers.distributed",
+              "inside_preflight": true,
+              "upstream_presence_query": false
+            },
+            {
+              "module": "mlx.nn.layers.linear",
+              "inside_preflight": true,
+              "upstream_presence_query": false
+            },
+            {
+              "module": "mlx.nn.layers.quantized",
+              "inside_preflight": true,
+              "upstream_presence_query": false
+            },
+            {
+              "module": "mlx.nn.layers.dropout",
+              "inside_preflight": true,
+              "upstream_presence_query": false
+            },
+            {
+              "module": "mlx.nn.layers.embedding",
+              "inside_preflight": true,
+              "upstream_presence_query": false
+            },
+            {
+              "module": "mlx.nn.layers.normalization",
+              "inside_preflight": true,
+              "upstream_presence_query": false
+            },
+            {
+              "module": "mlx.nn.layers.pooling",
+              "inside_preflight": true,
+              "upstream_presence_query": false
+            },
+            {
+              "module": "mlx.nn.layers.positional_encoding",
+              "inside_preflight": true,
+              "upstream_presence_query": false
+            },
+            {
+              "module": "mlx.nn.layers.recurrent",
+              "inside_preflight": true,
+              "upstream_presence_query": false
+            },
+            {
+              "module": "mlx.nn.layers.transformer",
+              "inside_preflight": true,
+              "upstream_presence_query": false
+            },
+            {
+              "module": "mlx.nn.utils",
+              "inside_preflight": true,
+              "upstream_presence_query": false
+            },
+            {
+              "module": "mlx.nn.layers.upsample",
+              "inside_preflight": true,
+              "upstream_presence_query": false
+            },
+            {
+              "module": "mlx.optimizers",
+              "inside_preflight": true,
+              "upstream_presence_query": false
+            },
+            {
+              "module": "mlx.optimizers.optimizers",
+              "inside_preflight": true,
+              "upstream_presence_query": false
+            },
+            {
+              "module": "mlx.optimizers.schedulers",
+              "inside_preflight": true,
+              "upstream_presence_query": false
+            }
+          ],
+          "backend_modules": [
+            "mlx",
+            "mlx._reprlib_fix",
+            "mlx.__array_api_info",
+            "mlx.core.metal",
+            "mlx.core.cuda",
+            "mlx.core.random",
+            "mlx.core.fft",
+            "mlx.core.linalg",
+            "mlx.core.fast",
+            "mlx.core.distributed",
+            "mlx.core",
+            "mlx.nn.init",
+            "mlx.nn.losses",
+            "mlx.utils",
+            "mlx.nn.layers.base",
+            "mlx.nn.layers.activations",
+            "mlx.nn.layers.containers",
+            "mlx.nn.layers.convolution",
+            "mlx.nn.layers.convolution_transpose",
+            "mlx.nn.layers.quantized",
+            "mlx.nn.layers.linear",
+            "mlx.nn.layers.distributed",
+            "mlx.nn.layers.dropout",
+            "mlx.nn.layers.embedding",
+            "mlx.nn.layers.normalization",
+            "mlx.nn.layers.pooling",
+            "mlx.nn.layers.positional_encoding",
+            "mlx.nn.layers.recurrent",
+            "mlx.nn.utils",
+            "mlx.nn.layers.transformer",
+            "mlx.nn.layers.upsample",
+            "mlx.nn.layers",
+            "mlx.nn",
+            "mlx.optimizers.optimizers",
+            "mlx.optimizers.schedulers",
+            "mlx.optimizers"
+          ],
+          "native_test_modules": [
+            "tests.mlx_native.test_phase3_tree_contract"
+          ],
+          "native_frontdoor_modules": [
+            "plato.trainers.mlx",
+            "plato.algorithms.mlx_fedavg",
+            "plato.models.mlx.lenet5"
+          ],
+          "production_conftest_loaded": true
+        },
+        {
+          "case": "test_real_unsupported_native_r0",
+          "exit_status": 4,
+          "mlx_distribution_version": "0.32.3",
+          "platform": [
+            "Darwin",
+            "arm64"
+          ],
+          "backend_spec_lookups": [
+            {
+              "module": "mlx",
+              "inside_preflight": false,
+              "upstream_presence_query": true
+            }
+          ],
+          "backend_modules": [],
+          "native_test_modules": [],
+          "native_frontdoor_modules": [],
+          "production_conftest_loaded": true
+        },
+        {
+          "case": "test_real_unsupported_native_r1",
+          "exit_status": 4,
+          "mlx_distribution_version": "0.32.3",
+          "platform": [
+            "Darwin",
+            "arm64"
+          ],
+          "backend_spec_lookups": [
+            {
+              "module": "mlx",
+              "inside_preflight": false,
+              "upstream_presence_query": true
+            }
+          ],
+          "backend_modules": [],
+          "native_test_modules": [],
+          "native_frontdoor_modules": [],
+          "production_conftest_loaded": true
+        },
+        {
+          "case": "test_real_unsupported_native_r2",
+          "exit_status": 4,
+          "mlx_distribution_version": "0.32.3",
+          "platform": [
+            "Darwin",
+            "arm64"
+          ],
+          "backend_spec_lookups": [
+            {
+              "module": "mlx",
+              "inside_preflight": false,
+              "upstream_presence_query": true
+            }
+          ],
+          "backend_modules": [],
+          "native_test_modules": [],
+          "native_frontdoor_modules": [],
+          "production_conftest_loaded": true
+        }
+      ]
+    },
+    "final_actual_absence_real_production_graph": {
+      "passed": 9,
+      "exit_status": 0,
+      "mlx": null,
+      "python": "3.13.16",
+      "pytest": "9.1.1",
+      "environment": "/tmp/plato-llm-integration/base-313",
+      "case_audits": [
+        {
+          "case": "test_real_conftest_survives_ba0",
+          "exit_status": 0,
+          "mlx_distribution_version": null,
+          "platform": [
+            "Darwin",
+            "arm64"
+          ],
+          "backend_spec_lookups": [
+            {
+              "module": "mlx",
+              "inside_preflight": false,
+              "upstream_presence_query": true
+            }
+          ],
+          "backend_modules": [],
+          "native_test_modules": [],
+          "native_frontdoor_modules": [],
+          "production_conftest_loaded": true
+        },
+        {
+          "case": "test_real_core_collection_does0",
+          "exit_status": 0,
+          "mlx_distribution_version": null,
+          "platform": [
+            "Darwin",
+            "arm64"
+          ],
+          "backend_spec_lookups": [
+            {
+              "module": "mlx",
+              "inside_preflight": false,
+              "upstream_presence_query": true
+            }
+          ],
+          "backend_modules": [],
+          "native_test_modules": [],
+          "native_frontdoor_modules": [],
+          "production_conftest_loaded": true
+        },
+        {
+          "case": "test_real_core_collection_does1",
+          "exit_status": 0,
+          "mlx_distribution_version": null,
+          "platform": [
+            "Darwin",
+            "arm64"
+          ],
+          "backend_spec_lookups": [
+            {
+              "module": "mlx",
+              "inside_preflight": false,
+              "upstream_presence_query": true
+            }
+          ],
+          "backend_modules": [],
+          "native_test_modules": [],
+          "native_frontdoor_modules": [],
+          "production_conftest_loaded": true
+        },
+        {
+          "case": "test_real_core_collection_does2",
+          "exit_status": 0,
+          "mlx_distribution_version": null,
+          "platform": [
+            "Darwin",
+            "arm64"
+          ],
+          "backend_spec_lookups": [
+            {
+              "module": "mlx",
+              "inside_preflight": false,
+              "upstream_presence_query": true
+            }
+          ],
+          "backend_modules": [],
+          "native_test_modules": [],
+          "native_frontdoor_modules": [],
+          "production_conftest_loaded": true
+        },
+        {
+          "case": "test_real_core_pyargs_preserve0",
+          "exit_status": 0,
+          "mlx_distribution_version": null,
+          "platform": [
+            "Darwin",
+            "arm64"
+          ],
+          "backend_spec_lookups": [
+            {
+              "module": "mlx",
+              "inside_preflight": false,
+              "upstream_presence_query": true
+            }
+          ],
+          "backend_modules": [],
+          "native_test_modules": [],
+          "native_frontdoor_modules": [],
+          "production_conftest_loaded": true
+        },
+        {
+          "case": "test_real_focused_native_backe0",
+          "exit_status": 4,
+          "mlx_distribution_version": null,
+          "platform": [
+            "Darwin",
+            "arm64"
+          ],
+          "backend_spec_lookups": [
+            {
+              "module": "mlx",
+              "inside_preflight": false,
+              "upstream_presence_query": true
+            },
+            {
+              "module": "mlx",
+              "inside_preflight": true,
+              "upstream_presence_query": false
+            }
+          ],
+          "backend_modules": [],
+          "native_test_modules": [],
+          "native_frontdoor_modules": [],
+          "production_conftest_loaded": true
+        },
+        {
+          "case": "test_real_unsupported_native_r0",
+          "exit_status": 4,
+          "mlx_distribution_version": null,
+          "platform": [
+            "Darwin",
+            "arm64"
+          ],
+          "backend_spec_lookups": [
+            {
+              "module": "mlx",
+              "inside_preflight": false,
+              "upstream_presence_query": true
+            }
+          ],
+          "backend_modules": [],
+          "native_test_modules": [],
+          "native_frontdoor_modules": [],
+          "production_conftest_loaded": true
+        },
+        {
+          "case": "test_real_unsupported_native_r1",
+          "exit_status": 4,
+          "mlx_distribution_version": null,
+          "platform": [
+            "Darwin",
+            "arm64"
+          ],
+          "backend_spec_lookups": [
+            {
+              "module": "mlx",
+              "inside_preflight": false,
+              "upstream_presence_query": true
+            }
+          ],
+          "backend_modules": [],
+          "native_test_modules": [],
+          "native_frontdoor_modules": [],
+          "production_conftest_loaded": true
+        },
+        {
+          "case": "test_real_unsupported_native_r2",
+          "exit_status": 4,
+          "mlx_distribution_version": null,
+          "platform": [
+            "Darwin",
+            "arm64"
+          ],
+          "backend_spec_lookups": [
+            {
+              "module": "mlx",
+              "inside_preflight": false,
+              "upstream_presence_query": true
+            }
+          ],
+          "backend_modules": [],
+          "native_test_modules": [],
+          "native_frontdoor_modules": [],
+          "production_conftest_loaded": true
+        }
+      ]
+    },
+    "existing_policy_and_manual_helpers": {
+      "passed": 119,
+      "exit_status": 0
+    },
+    "core_compatibility": {
+      "passed": 61,
+      "exit_status": 0,
+      "scope": "Torch model/algorithm and tree/safetensor cases; retirement routing; real local HF pin checks and tiny random Qwen3 LoRA initialization replay."
+    },
+    "native_compatibility": {
+      "passed": 17,
+      "exit_status": 0,
+      "scope": "Existing native selection, explicit CPU shortcut, device/stream scopes and factory RNG failure restoration; focused execution, not whole-native qualification."
+    },
+    "actual_frontdoor_installed_probe": {
+      "mlx_distribution_version": "0.32.3",
+      "backend_modules_before_explicit_selection": [],
+      "builtin_native_registry_keys_preserved": true,
+      "tree_loaded_before_mlx_detects_native_array": true,
+      "mixed_tree_serialization_preserved": true,
+      "registry_constructors_resolve_to_exact_native_objects": true,
+      "device_streams_rng_preserved": true,
+      "real_native_trainer_type_guard_preserved": true
+    },
+    "actual_frontdoor_absent_probe": {
+      "mlx_distribution_version": null,
+      "backend_modules_before_explicit_selection": [],
+      "builtin_native_registry_keys_preserved": true,
+      "model_missing_diagnostic": "MLX models require the optional mlx dependency on Apple Silicon.",
+      "algorithm_missing_diagnostic": "MLX is not installed. Install it with `pip install mlx` on Apple Silicon devices. Original import error: No module named 'mlx'"
+    },
+    "root_dot": {
+      "exit_status": 2,
+      "backend_modules": 0,
+      "native_modules": 0,
+      "diagnostic": "Three pre-existing dvit vendor test import errors under initialized submodule traversal. Backend exclusion proved; no claim that this command fully qualifies. No norecursedirs/archive change made."
+    },
+    "native_ledger": {
+      "total": 383,
+      "previous_cases_unchanged": 283,
+      "new_dispatch_cases": 100,
+      "per_node_criteria_preserved": true,
+      "all_seven_native_module_and_server_handoff_hashes_verified": true,
+      "sha256": "c168dc33a4d4e7ed70079e09c3de70f5b318d543c035ec13de2826b48e1175bb"
+    },
+    "targeted_ruff_imports_format_and_diff": "passed",
+    "manifest_lock_and_existing_profile_hooks": "byte-identical to integrated baseline"
+  },
+  "limits_and_remaining_gates": [
+    "Fresh independent review of exact combined corrections",
+    "Root-owned integrated 383-case native and combined core qualification",
+    "Root-owned Linux checks and final lock validation",
+    "Separate E8 evidence remains independent; no E8 rerun or E9 work here",
+    "Archive partition handoff remains serialized and unimplemented"
+  ],
+  "artifacts": [
+    {
+      "path": "evidence/2026-refresh/mlx-profile-correction/final-red.log",
+      "sha256": "5701920438034b5854670a79a1be457f781bfaafcb9c26980ed5eafb5963d9d7",
+      "raw_stdout_sha256": "d2d90e7f18d9acd701327aa9ca919f852b567d312e5e35d86d1d1184be036453",
+      "storage_normalization": "Trailing whitespace and trailing blank lines removed; original author /tmp outputs retained."
+    },
+    {
+      "path": "evidence/2026-refresh/mlx-profile-correction/final-red-sources.sha256",
+      "sha256": "a7a8f9f4726c129dc5d237acc136d6702d5a6316ce05173bbfb18a265e73f7da"
+    },
+    {
+      "path": "evidence/2026-refresh/mlx-profile-correction/initial-overbroad-red.log",
+      "sha256": "8673c36faa678a93ab3dd4be5e807f9a77ebd971cd0bdf05f864b8b3befecdb8",
+      "raw_stdout_sha256": "3d424f325626e6faa167d947bfd769c01fb23f43e570f51d272462e36d896dc6",
+      "storage_normalization": "Trailing whitespace and trailing blank lines removed; original author /tmp outputs retained."
+    },
+    {
+      "path": "evidence/2026-refresh/mlx-profile-correction/initial-red-sources.sha256",
+      "sha256": "b0a357d3314a6fc6591c93151c0de63793317a0fbe860353313941fce1aba5d7"
+    },
+    {
+      "path": "evidence/2026-refresh/mlx-profile-correction/initial-red-tests.py",
+      "sha256": "cede6e3a6013bfb924dbae70052cec9ff5b6ff3397b86c7a1446af21ca65c8dc",
+      "raw_source_sha256": "1177bc2dcc0be6455dc4e79c96b03ddd19fd10dc669c1524631995fc913879c9",
+      "storage_normalization": "Trimmed trailing blank lines only; original historical source retained at /tmp/plato-mlx-profile-correction-red-tests.py."
+    },
+    {
+      "path": "evidence/2026-refresh/mlx-profile-correction/installed-green.log",
+      "sha256": "462f17e0d51139847e9f8973024954c3472248f5ce299f3c532b2150258e3a6a"
+    },
+    {
+      "path": "evidence/2026-refresh/mlx-profile-correction/absent-green.log",
+      "sha256": "992f2170e93da35c98ec03f46ac97b895bb791872d5b6690fa014fbdc57c6792"
+    },
+    {
+      "path": "evidence/2026-refresh/mlx-profile-correction/policy-helpers.log",
+      "sha256": "5a32c6d384f7f03dafb7cc7807d362dcbcea7276ea8edae6918685f6d2867b73"
+    },
+    {
+      "path": "evidence/2026-refresh/mlx-profile-correction/core-compatibility.log",
+      "sha256": "5b8c7495536992dcaa813c1bde6015f89ab2d3062a0419f89bdde8c687d56dd3"
+    },
+    {
+      "path": "evidence/2026-refresh/mlx-profile-correction/native-compatibility.log",
+      "sha256": "5bef37d194b281cc7b28956f5996b2adaaf3b91b58aeb55ef632e4ff229cf047"
+    },
+    {
+      "path": "evidence/2026-refresh/mlx-profile-correction/frontdoor-probe.py",
+      "sha256": "73bd79aea988b398097ca05d31ebc16214e077748abf9de14fb25dfc9161644f"
+    },
+    {
+      "path": "evidence/2026-refresh/mlx-profile-correction/frontdoor-installed.json",
+      "sha256": "a63b977ed9646ec494e0dc387015c01be7c8f091044e086f35450c3ed9906b71"
+    },
+    {
+      "path": "evidence/2026-refresh/mlx-profile-correction/frontdoor-installed.log",
+      "sha256": "382c94031139b9465cadd93425047c5dcda8de7d8f0045786b5e4f00f5c6abf6"
+    },
+    {
+      "path": "evidence/2026-refresh/mlx-profile-correction/frontdoor-absent.json",
+      "sha256": "29fa578cf1d9374284b9aa74733e3d6c43ad9e0bf254867b35ca9d6d48c867d6"
+    },
+    {
+      "path": "evidence/2026-refresh/mlx-profile-correction/frontdoor-absent.log",
+      "sha256": "29fa578cf1d9374284b9aa74733e3d6c43ad9e0bf254867b35ca9d6d48c867d6"
+    },
+    {
+      "path": "evidence/2026-refresh/mlx-profile-correction/package-presence-trace.log",
+      "sha256": "ab29d3e88851410067b6a65bc3515ae4ae4e8c0d6b5d8260a7b575827aa4cfe3",
+      "raw_stdout_sha256": "0c390d7710ae50ed498276396f332bed92f468416c3472c27a85d5192990aaaa",
+      "storage_normalization": "Trailing whitespace and trailing blank lines removed; original author /tmp outputs retained."
+    },
+    {
+      "path": "evidence/2026-refresh/mlx-profile-correction/package-presence-trace.py",
+      "sha256": "07b3b1f2349699878bb9abbaf76b10d306025d133549c2f74d764b9bf8406bae"
+    },
+    {
+      "path": "evidence/2026-refresh/mlx-profile-correction/contract-clarification.json",
+      "sha256": "c4f4ba8a69e59aefa3f9ded0aafd3ea91bc42f761a734f9641cfa902202c7add"
+    },
+    {
+      "path": "evidence/2026-refresh/mlx-profile-correction/native-ledger-handoff.json",
+      "sha256": "1196cc66d0b46f17e05a5026af18b0274d5c910e912d2b36882c75363aeb1508"
+    },
+    {
+      "path": "evidence/2026-refresh/mlx-profile-correction/root-dot-collection.log",
+      "sha256": "899d1c01b91e6378765b8a103a7badcc82716ec9ad127cbf0b9c6e115b38e55e"
+    },
+    {
+      "path": "evidence/2026-refresh/mlx-profile-correction/root-dot-imports.json",
+      "sha256": "f051ef96418549d672dd2a0a3c417dce57e9eb960c53e0e3d960e003b83a1746"
+    },
+    {
+      "path": "evidence/2026-refresh/mlx-profile-correction/installed-audits/test_real_conftest_survives_ba0.json",
+      "sha256": "9d72af84f50bb6e91c3c83a6247043a576b8c517df95e57e64f5fb73578fef03"
+    },
+    {
+      "path": "evidence/2026-refresh/mlx-profile-correction/installed-audits/test_real_core_collection_does0.json",
+      "sha256": "9d72af84f50bb6e91c3c83a6247043a576b8c517df95e57e64f5fb73578fef03"
+    },
+    {
+      "path": "evidence/2026-refresh/mlx-profile-correction/installed-audits/test_real_core_collection_does1.json",
+      "sha256": "9d72af84f50bb6e91c3c83a6247043a576b8c517df95e57e64f5fb73578fef03"
+    },
+    {
+      "path": "evidence/2026-refresh/mlx-profile-correction/installed-audits/test_real_core_collection_does2.json",
+      "sha256": "9d72af84f50bb6e91c3c83a6247043a576b8c517df95e57e64f5fb73578fef03"
+    },
+    {
+      "path": "evidence/2026-refresh/mlx-profile-correction/installed-audits/test_real_core_pyargs_preserve0.json",
+      "sha256": "9d72af84f50bb6e91c3c83a6247043a576b8c517df95e57e64f5fb73578fef03"
+    },
+    {
+      "path": "evidence/2026-refresh/mlx-profile-correction/installed-audits/test_real_focused_native_backe0.json",
+      "sha256": "4697623e9c485885dfc67ed732a53b5718f85f613c49de4fd997bd81416bfff5"
+    },
+    {
+      "path": "evidence/2026-refresh/mlx-profile-correction/installed-audits/test_real_unsupported_native_r0.json",
+      "sha256": "7efebf860f7aa8c3950b4731bb30225f1b3a2707559d803bfbe5d4041dc6827c"
+    },
+    {
+      "path": "evidence/2026-refresh/mlx-profile-correction/installed-audits/test_real_unsupported_native_r1.json",
+      "sha256": "7efebf860f7aa8c3950b4731bb30225f1b3a2707559d803bfbe5d4041dc6827c"
+    },
+    {
+      "path": "evidence/2026-refresh/mlx-profile-correction/installed-audits/test_real_unsupported_native_r2.json",
+      "sha256": "7efebf860f7aa8c3950b4731bb30225f1b3a2707559d803bfbe5d4041dc6827c"
+    },
+    {
+      "path": "evidence/2026-refresh/mlx-profile-correction/absent-audits/test_real_conftest_survives_ba0.json",
+      "sha256": "6f7b589b22adac4120819a6d274aedd8f950dd1ed8f413151d3b902191bb5d07"
+    },
+    {
+      "path": "evidence/2026-refresh/mlx-profile-correction/absent-audits/test_real_core_collection_does0.json",
+      "sha256": "6f7b589b22adac4120819a6d274aedd8f950dd1ed8f413151d3b902191bb5d07"
+    },
+    {
+      "path": "evidence/2026-refresh/mlx-profile-correction/absent-audits/test_real_core_collection_does1.json",
+      "sha256": "6f7b589b22adac4120819a6d274aedd8f950dd1ed8f413151d3b902191bb5d07"
+    },
+    {
+      "path": "evidence/2026-refresh/mlx-profile-correction/absent-audits/test_real_core_collection_does2.json",
+      "sha256": "6f7b589b22adac4120819a6d274aedd8f950dd1ed8f413151d3b902191bb5d07"
+    },
+    {
+      "path": "evidence/2026-refresh/mlx-profile-correction/absent-audits/test_real_core_pyargs_preserve0.json",
+      "sha256": "6f7b589b22adac4120819a6d274aedd8f950dd1ed8f413151d3b902191bb5d07"
+    },
+    {
+      "path": "evidence/2026-refresh/mlx-profile-correction/absent-audits/test_real_focused_native_backe0.json",
+      "sha256": "0500e80c6c05cb90ba1c5a1e7f5f660c6ca6514a7f0164749631f6d1eb2441a3"
+    },
+    {
+      "path": "evidence/2026-refresh/mlx-profile-correction/absent-audits/test_real_unsupported_native_r0.json",
+      "sha256": "1af8808b5cb27fe883aa85e88f5761e6ae8b3bf1bc529f3644450f3a032c0dec"
+    },
+    {
+      "path": "evidence/2026-refresh/mlx-profile-correction/absent-audits/test_real_unsupported_native_r1.json",
+      "sha256": "1af8808b5cb27fe883aa85e88f5761e6ae8b3bf1bc529f3644450f3a032c0dec"
+    },
+    {
+      "path": "evidence/2026-refresh/mlx-profile-correction/absent-audits/test_real_unsupported_native_r2.json",
+      "sha256": "1af8808b5cb27fe883aa85e88f5761e6ae8b3bf1bc529f3644450f3a032c0dec"
+    }
+  ]
+}

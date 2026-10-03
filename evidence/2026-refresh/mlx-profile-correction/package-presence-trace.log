@@ -1,0 +1,32 @@
+MLX LOOKUP STACK mlx
+  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+  File "<frozen importlib._bootstrap>", line 1369, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1340, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 1027, in exec_module
+  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+  File "/tmp/plato-mlx-integration/env/lib/python3.13/site-packages/transformers/utils/__init__.py", line 22, in <module>
+    from .auto_docstring import (
+  File "<frozen importlib._bootstrap>", line 1369, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1340, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 1027, in exec_module
+  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+  File "/tmp/plato-mlx-integration/env/lib/python3.13/site-packages/transformers/utils/auto_docstring.py", line 33, in <module>
+    from .generic import ModelOutput
+  File "<frozen importlib._bootstrap>", line 1369, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1340, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 1027, in exec_module
+  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+  File "/tmp/plato-mlx-integration/env/lib/python3.13/site-packages/transformers/utils/generic.py", line 90, in <module>
+    if is_mlx_available():
+  File "/tmp/plato-mlx-integration/env/lib/python3.13/site-packages/transformers/utils/import_utils.py", line 1643, in is_mlx_available
+    return _is_package_available("mlx")[0]
+  File "/tmp/plato-mlx-integration/env/lib/python3.13/site-packages/transformers/utils/import_utils.py", line 75, in _is_package_available
+    spec = importlib.util.find_spec(pkg_name)
+  File "<frozen importlib.util>", line 100, in find_spec
+  File "<frozen importlib._bootstrap>", line 1265, in _find_spec
+  File "/tmp/plato-mlx-profile-correction-trace-probe.py", line 9, in find_spec
+    traceback.print_stack(limit=24)
+ERROR: mlx-native selector unsupported: --pyargs cannot target native tests; use filesystem paths, e.g. tests/mlx_native --test-profile=mlx-native

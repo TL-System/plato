@@ -79,7 +79,10 @@ line-length = 88
 lint.select = ["I"]
 
 [tool.hatch.build]
-exclude = ["archives/retired/**"]
+exclude = [
+    "archives/retired/**",
+    "evidence/2026-refresh/reproductions/**",
+]
 
 [tool.hatch.build.targets.wheel]
 packages = ["plato"]
@@ -166,6 +169,7 @@ norecursedirs = [
 ]
 addopts = "--strict-markers"
 markers = [
+    "mlx_native: explicit Apple Silicon native MLX qualification cases.",
     "runtime: fresh startup, CPU socket rounds and containment regressions.",
     "startup_runtime: real CPU socket round and socket failure cases.",
     "startup_containment: deliberate noncooperative teardown and child containment.",

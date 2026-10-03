@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "kind": "actual production prerequisite probe; not E1-E7 qualification",
+  "source_sha256": "8e458b0925c1a83c32fa3869a4e9f229b27cdb77f10b56a7f66c3f933a9f7739",
+  "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+  "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+  "versions": {
+    "mlx": "0.32.3",
+    "mlx-metal": "0.32.3",
+    "pytest": "9.1.1"
+  },
+  "elapsed_seconds": 0.013626625062897801,
+  "default_device": "Device(gpu, 0)",
+  "default_streams": [
+    "Stream(Device(cpu, 0), 0)",
+    "Stream(Device(gpu, 0), 1)"
+  ],
+  "caller_device_streams_rng_restored": true
+}

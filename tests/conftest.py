@@ -1,8 +1,13 @@
 """Pytest fixtures shared across test modules."""
 
 import importlib
+import importlib.metadata
 import importlib.util
+import json
+import math
+import platform
 import random
+import re
 import sys
 from collections import Counter
 from pathlib import Path
@@ -74,17 +79,94 @@ _STARTUP_CASES = {
 def _full_suite(config) -> bool:
     roots = (config.rootpath.resolve(), (config.rootpath / "tests").resolve())
     return any(
-        "::" not in str(arg) and Path(str(arg)).resolve() in roots
+        "::" not in str(arg)
+        and (config.invocation_params.dir / str(arg)).resolve() in roots
         for arg in config.args
     )
+
+
+def _native_prerequisites() -> None:
+    """Require the selected Apple Silicon CPU and Metal qualification backend."""
+    observed = f"{platform.system()} {platform.machine()}"
+    try:
+        if observed != "Darwin arm64":
+            raise RuntimeError("selected native profile requires Darwin arm64")
+        mx = importlib.import_module("mlx.core")
+        importlib.import_module("mlx.nn")
+        importlib.import_module("mlx.optimizers")
+        versions = {
+            name: importlib.metadata.version(name) for name in ("mlx", "mlx-metal")
+        }
+        if versions["mlx"] != versions["mlx-metal"]:
+            raise RuntimeError(f"mlx / mlx-metal versions differ: {versions}")
+        if not mx.metal.is_available():
+            raise RuntimeError("Metal is unavailable")
+        for device in (mx.cpu, mx.gpu):
+            with mx.stream(device):
+                result = mx.sum(mx.array([1.0, 2.0], dtype=mx.float32))
+                mx.eval(result)
+                mx.synchronize(device)
+                scalar = result.item()
+                if isinstance(scalar, complex):
+                    raise TypeError(f"{device} arithmetic returned complex {scalar}")
+                value = float(scalar)
+                if not math.isfinite(value) or value != 3.0:
+                    raise RuntimeError(f"{device} arithmetic returned {value}")
+    except Exception as exc:
+        raise pytest.UsageError(
+            f"mlx-native prerequisite failed ({observed}): {exc}"
+        ) from exc
+
+
+def _load_native_ledger(path: Path) -> Counter:
+    """Read the reviewed full node inventory without deriving it from collection."""
+    try:
+        ledger = json.loads(path.read_text())
+        if not isinstance(ledger, dict) or ledger.get("schema_version") != 1:
+            raise ValueError("expected schema_version 1 object")
+        cases = ledger.get("cases")
+        if not isinstance(cases, list) or not cases:
+            raise ValueError("cases must be a nonempty list")
+        nodes = []
+        for case in cases:
+            if not isinstance(case, dict):
+                raise ValueError("each case must be an object")
+            node = case.get("nodeid")
+            if (
+                not isinstance(node, str)
+                or not node.startswith("tests/mlx_native/")
+                or "::" not in node
+                or ".." in Path(node.split("::", 1)[0]).parts
+            ):
+                raise ValueError(f"invalid native nodeid: {node!r}")
+            criteria = case.get("criteria")
+            if (
+                not isinstance(criteria, list)
+                or not criteria
+                or any(
+                    value not in {f"E{i}" for i in range(1, 8)} for value in criteria
+                )
+            ):
+                raise ValueError(f"invalid E1-E7 criteria for {node}")
+            nodes.append(node)
+        counts = Counter(nodes)
+        duplicate = sorted(node for node, count in counts.items() if count != 1)
+        if duplicate:
+            raise ValueError(f"duplicate nodeids: {duplicate}")
+        return counts
+    except (OSError, ValueError, TypeError) as exc:
+        raise pytest.UsageError(f"mlx-native ledger invalid: {path}: {exc}") from exc
 
 
 def pytest_addoption(parser):
     parser.addoption(
         "--test-profile",
-        choices=("base", "mandatory"),
+        choices=("base", "mandatory", "mlx-native"),
         default=None,
-        help="base permits named optional omissions; unfiltered suites default mandatory",
+        help=(
+            "base permits named optional omissions; unfiltered suites default "
+            "mandatory core; mlx-native adds complete native qualification"
+        ),
     )
 
 
@@ -93,7 +175,7 @@ def pytest_configure(config):
 
 
 class _ProfileChecks:
-    """Enforce the two declared profiles and their exact omission allowances."""
+    """Enforce declared core/native scopes and their exact case contracts."""
 
     def __init__(self, config):
         self.config = config
@@ -105,25 +187,139 @@ class _ProfileChecks:
             self.full and not selected
         )
         self.base = config.getoption("test_profile") == "base"
+        self.native_boundary = (config.rootpath / "tests/mlx_native").resolve()
+        self.native_qualification = config.getoption("test_profile") == "mlx-native"
+        explicit_native = any(
+            self._native_path(config.invocation_params.dir / str(arg).split("::", 1)[0])
+            for arg in config.args
+        )
+        dotted_native = any(
+            str(arg).split("::", 1)[0] == "tests.mlx_native"
+            or str(arg).split("::", 1)[0].startswith("tests.mlx_native.")
+            for arg in config.args
+        )
+        self.native_requested = self.native_qualification or explicit_native
+        self.native_prerequisite_passed = False
+        self.native_expected = Counter()
+        self.native_collected = Counter()
+        self.session = None
         self.violations = []
         self.passed = set()
         self.allowed_skips = set()
+        if config.getoption("pyargs") and (self.native_requested or dotted_native):
+            raise pytest.UsageError(self._unsupported_selector())
+        if explicit_native and config.getoption("test_profile") in {
+            "base",
+            "mandatory",
+        }:
+            raise pytest.UsageError(
+                "mlx-native target conflicts with core-only profile; use filesystem "
+                "paths without --test-profile for focused checks, or "
+                "tests/mlx_native --test-profile=mlx-native"
+            )
+        markexpr = config.getoption("markexpr") or ""
+        if (
+            "mlx_native" in re.findall(r"\b\w+\b", markexpr)
+            and not self.native_requested
+        ):
+            raise pytest.UsageError(
+                "mlx_native marker requires an explicit native filesystem path "
+                "or --test-profile=mlx-native"
+            )
+        if self.native_qualification and any(
+            config.getoption(option)
+            for option in ("keyword", "markexpr", "deselect", "ignore", "ignore_glob")
+        ):
+            raise pytest.UsageError(
+                "mlx-native qualification does not permit selection or collection "
+                "filters; use an unprofiled native filesystem path for focused checks"
+            )
+
+    def _native_path(self, path) -> bool:
+        return Path(path).resolve().is_relative_to(self.native_boundary)
+
+    def _native_node(self, nodeid: str) -> bool:
+        return self._native_path(self.config.rootpath / nodeid.split("::", 1)[0])
+
+    @staticmethod
+    def _unsupported_selector() -> str:
+        return (
+            "mlx-native selector unsupported: --pyargs cannot target native tests; "
+            "use filesystem paths, e.g. tests/mlx_native --test-profile=mlx-native"
+        )
+
+    def pytest_ignore_collect(self, collection_path):
+        if not self.native_requested and self._native_path(collection_path):
+            return True
+        return None
+
+    @pytest.hookimpl(wrapper=True, tryfirst=True)
+    def pytest_collect_file(self, file_path, parent):
+        if self._native_path(file_path):
+            if self.config.getoption("pyargs"):
+                raise pytest.UsageError(self._unsupported_selector())
+            if not self.native_requested or not self.native_prerequisite_passed:
+                raise pytest.UsageError(
+                    "mlx-native preflight required before native file collection; "
+                    "use filesystem paths, e.g. tests/mlx_native "
+                    "--test-profile=mlx-native"
+                )
+        return (yield)
 
     def pytest_sessionstart(self):
-        if not self.qualify or self.base:
-            return
-        try:
-            for name in ("opacus", "kazoo", "gymnasium"):
-                importlib.import_module(name)
-        except ImportError as exc:
-            raise pytest.UsageError(f"mandatory prerequisite failed: {exc}") from exc
+        if self.native_requested:
+            _native_prerequisites()
+            self.native_prerequisite_passed = True
+        if self.qualify and not self.base:
+            try:
+                for name in ("opacus", "kazoo", "gymnasium"):
+                    importlib.import_module(name)
+            except ImportError as exc:
+                raise pytest.UsageError(
+                    f"mandatory prerequisite failed: {exc}"
+                ) from exc
+        if self.native_qualification:
+            self.native_expected = _load_native_ledger(
+                self.native_boundary / "cases.json"
+            )
+
+    def pytest_collection_modifyitems(self, items):
+        for item in items:
+            if self._native_path(item.path):
+                if not self.native_requested or not self.native_prerequisite_passed:
+                    raise pytest.UsageError("mlx-native collection escaped preflight")
+                item.add_marker("mlx_native")
+            elif item.get_closest_marker("mlx_native") is not None:
+                raise pytest.UsageError(
+                    f"mlx_native marker outside native directory: {item.nodeid}"
+                )
+
+    def pytest_collection_finish(self, session):
+        self.native_collected = Counter(
+            item.nodeid for item in session.items if self._native_path(item.path)
+        )
+        if self.native_qualification:
+            for label, difference in (
+                ("missing", self.native_expected - self.native_collected),
+                ("extra", self.native_collected - self.native_expected),
+            ):
+                if difference:
+                    self.violations.append(f"native ledger {label}: {dict(difference)}")
+            duplicate = sorted(
+                node for node, count in self.native_collected.items() if count > 1
+            )
+            if duplicate:
+                self.violations.append(
+                    f"native ledger duplicate collection: {duplicate}"
+                )
 
     def _check_skip(self, report):
-        if not self.qualify or not report.skipped:
+        if not (self.qualify or self._native_node(report.nodeid)) or not report.skipped:
             return
         reason = report.longrepr[2].removeprefix("Skipped: ")
         allowed = (
             self.base
+            and not self._native_node(report.nodeid)
             and report.nodeid == _DP_MODULE
             and reason == _DP_REASON
             and importlib.util.find_spec("opacus") is None
@@ -137,7 +333,7 @@ class _ProfileChecks:
         self._check_skip(report)
 
     def pytest_runtest_logreport(self, report):
-        if not self.qualify:
+        if not (self.qualify or self._native_node(report.nodeid)):
             return
         if hasattr(report, "wasxfail"):
             self.violations.append(f"unexpected xfail/xpass: {report.nodeid}")
@@ -159,14 +355,19 @@ class _ProfileChecks:
                 self.violations.append(f"unexpected deselection: {item.nodeid}")
 
     def pytest_sessionfinish(self, session, exitstatus):
-        if not self.qualify:
-            return
-        if any(
+        self.session = session
+        if self.native_qualification and not self.config.getoption("collectonly"):
+            missing = self.native_expected.keys() - self.passed
+            if missing:
+                self.violations.append(
+                    "native ledger cases did not pass: " + ", ".join(sorted(missing))
+                )
+        if self.qualify and any(
             self.config.getoption(option)
             for option in ("ignore", "ignore_glob", "deselect")
         ):
             self.violations.append("test profiles do not permit collection exclusions")
-        if self.full:
+        if self.qualify and self.full:
             nodes = {item.nodeid for item in session.items}
             partition = self.config.getoption("markexpr")
             runtime = partition == "runtime"
@@ -200,10 +401,24 @@ class _ProfileChecks:
                         f"cases, collected {sum(actual.values())}; "
                         f"mismatched functions: {sorted(name for name in actual.keys() | expected.keys() if actual[name] != expected.get(name, 0))}"
                     )
-        if self.violations:
+        if self.violations and session.exitstatus == pytest.ExitCode.OK:
             session.exitstatus = pytest.ExitCode.TESTS_FAILED
 
     def pytest_terminal_summary(self, terminalreporter):
+        success = (
+            self.session is not None and self.session.exitstatus == pytest.ExitCode.OK
+        )
+        if not self.native_requested:
+            scope = "core scope (native excluded)"
+        elif not self.native_qualification:
+            scope = "native focused execution (not complete qualification)"
+        elif success and self.config.getoption("collectonly"):
+            scope = "native collection-only validation (no execution qualification)"
+        elif success:
+            scope = "native complete qualification"
+        else:
+            scope = "native qualification failed"
+        terminalreporter.write_line(f"test profile: {scope}")
         if self.violations:
             terminalreporter.section("test profile violations", red=True)
             for violation in sorted(set(self.violations)):

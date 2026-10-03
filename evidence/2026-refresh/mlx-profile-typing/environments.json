@@ -1,0 +1,17 @@
+{
+  "installed": {
+    "python": "3.13.16",
+    "mlx": "0.32.3",
+    "pytest": "9.1.1"
+  },
+  "tools": {
+    "ty": "ty 0.0.84 (8dd9a7f7f 2026-09-24)",
+    "ruff": "ruff 0.16.10",
+    "uv": "uv 0.12.22 (70fe1196a 2026-10-01 aarch64-apple-darwin)"
+  },
+  "base": {
+    "python": "3.13.16",
+    "pytest": "9.1.1",
+    "mlx": null
+  }
+}
