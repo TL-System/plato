@@ -1,0 +1,5 @@
+W1003 14:47:27.783000 86755 /private/tmp/plato-llm-integration/mandatory-313/lib/python3.13/site-packages/torch/distributed/elastic/multiprocessing/redirects.py:35] NOTE: Redirects are currently not supported in MacOs.
+........................................................................ [ 60%]
+...............................................                          [100%]
+test profile: core scope (native excluded)
+119 passed in 11.64s

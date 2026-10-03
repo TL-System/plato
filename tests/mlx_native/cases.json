@@ -1,0 +1,2396 @@
+{
+  "schema_version": 1,
+  "cases": [
+    {
+      "nodeid": "tests/mlx_native/test_phase3_controls.py::test_clipping_changes_native_sgd_update",
+      "criteria": [
+        "E5",
+        "E6"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_controls.py::test_native_optimizer_aliases[momentum]",
+      "criteria": [
+        "E5",
+        "E6"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_controls.py::test_native_optimizer_aliases[rmsprop]",
+      "criteria": [
+        "E5",
+        "E6"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_controls.py::test_no_flag_factory_uses_caller_native_device",
+      "criteria": [
+        "E5",
+        "E6"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_controls.py::test_evaluation_restores_submodule_modes_on_error",
+      "criteria": [
+        "E5",
+        "E6"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_controls.py::test_clipping_native_update_count_and_original_norm[disabled]",
+      "criteria": [
+        "E5",
+        "E6"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_controls.py::test_clipping_native_update_count_and_original_norm[below-threshold]",
+      "criteria": [
+        "E5",
+        "E6"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_controls.py::test_clipping_native_update_count_and_original_norm[zero-gradient]",
+      "criteria": [
+        "E5",
+        "E6"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_controls.py::test_clipping_native_update_count_and_original_norm[zero-threshold]",
+      "criteria": [
+        "E5",
+        "E6"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_controls.py::test_clipping_native_update_count_and_original_norm[clipped]",
+      "criteria": [
+        "E5",
+        "E6"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_controls.py::test_invalid_clipping_rejected_before_updates[negative]",
+      "criteria": [
+        "E5",
+        "E6"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_controls.py::test_invalid_clipping_rejected_before_updates[nan]",
+      "criteria": [
+        "E5",
+        "E6"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_controls.py::test_invalid_clipping_rejected_before_updates[positive-infinity]",
+      "criteria": [
+        "E5",
+        "E6"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_controls.py::test_invalid_clipping_rejected_before_updates[negative-infinity]",
+      "criteria": [
+        "E5",
+        "E6"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_controls.py::test_nonfinite_clipped_gradients_do_not_update[nan-gradient]",
+      "criteria": [
+        "E5",
+        "E6"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_controls.py::test_nonfinite_clipped_gradients_do_not_update[infinite-gradient]",
+      "criteria": [
+        "E5",
+        "E6"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_controls.py::test_requested_jit_is_not_silently_ignored",
+      "criteria": [
+        "E5",
+        "E6"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_controls.py::test_custom_training_strategy_retains_clipping_control",
+      "criteria": [
+        "E5",
+        "E6"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_controls.py::test_native_device_stream_scopes_factory_train_eval_load[normal-caller-normal-metal]",
+      "criteria": [
+        "E5",
+        "E6"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_controls.py::test_native_device_stream_scopes_factory_train_eval_load[normal-caller-cpu]",
+      "criteria": [
+        "E5",
+        "E6"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_controls.py::test_native_device_stream_scopes_factory_train_eval_load[normal-caller-mps]",
+      "criteria": [
+        "E5",
+        "E6"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_controls.py::test_native_device_stream_scopes_factory_train_eval_load[normal-caller-cpu-precedence]",
+      "criteria": [
+        "E5",
+        "E6"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_controls.py::test_native_device_stream_scopes_factory_train_eval_load[cpu-custom-stream-normal-metal]",
+      "criteria": [
+        "E5",
+        "E6"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_controls.py::test_native_device_stream_scopes_factory_train_eval_load[cpu-custom-stream-cpu]",
+      "criteria": [
+        "E5",
+        "E6"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_controls.py::test_native_device_stream_scopes_factory_train_eval_load[cpu-custom-stream-mps]",
+      "criteria": [
+        "E5",
+        "E6"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_controls.py::test_native_device_stream_scopes_factory_train_eval_load[cpu-custom-stream-cpu-precedence]",
+      "criteria": [
+        "E5",
+        "E6"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_controls.py::test_factory_failure_restores_device_streams_and_rngs",
+      "criteria": [
+        "E5",
+        "E6"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_controls.py::test_unavailable_explicit_metal_is_clear",
+      "criteria": [
+        "E5",
+        "E6"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_controls.py::test_repeated_evaluation_is_deterministic_and_preserves_statistics",
+      "criteria": [
+        "E5",
+        "E6"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_rng.py::test_fresh_and_reassigned_workers_replay_same_logical_streams",
+      "criteria": [
+        "E7"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_rng.py::test_seeded_factory_and_training_restore_all_caller_rngs[success]",
+      "criteria": [
+        "E7"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_rng.py::test_seeded_factory_and_training_restore_all_caller_rngs[dataset-failure]",
+      "criteria": [
+        "E7"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_rng.py::test_initialization_seed_replays_and_unseeded_initialization_remains_legacy",
+      "criteria": [
+        "E7"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-weighted-raw-valid-first-direct]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-weighted-raw-valid-first-delta]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-weighted-raw-valid-first-legacy]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-weighted-raw-malformed-first-direct]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-weighted-raw-malformed-first-delta]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-weighted-raw-malformed-first-legacy]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-weighted-hook-valid-first-direct]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-weighted-hook-valid-first-delta]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-weighted-hook-valid-first-legacy]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-weighted-hook-malformed-first-direct]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-weighted-hook-malformed-first-delta]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-weighted-hook-malformed-first-legacy]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-weighted-callback-valid-first-direct]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-weighted-callback-valid-first-delta]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-weighted-callback-valid-first-legacy]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-weighted-callback-malformed-first-direct]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-weighted-callback-malformed-first-delta]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-weighted-callback-malformed-first-legacy]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-zero-weight-raw-valid-first-direct]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-zero-weight-raw-valid-first-delta]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-zero-weight-raw-valid-first-legacy]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-zero-weight-raw-malformed-first-direct]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-zero-weight-raw-malformed-first-delta]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-zero-weight-raw-malformed-first-legacy]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-zero-weight-hook-valid-first-direct]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-zero-weight-hook-valid-first-delta]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-zero-weight-hook-valid-first-legacy]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-zero-weight-hook-malformed-first-direct]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-zero-weight-hook-malformed-first-delta]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-zero-weight-hook-malformed-first-legacy]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-zero-weight-callback-valid-first-direct]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-zero-weight-callback-valid-first-delta]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-zero-weight-callback-valid-first-legacy]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-zero-weight-callback-malformed-first-direct]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-zero-weight-callback-malformed-first-delta]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-zero-weight-callback-malformed-first-legacy]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-weighted-raw-valid-first-direct]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-weighted-raw-valid-first-delta]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-weighted-raw-valid-first-legacy]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-weighted-raw-malformed-first-direct]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-weighted-raw-malformed-first-delta]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-weighted-raw-malformed-first-legacy]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-weighted-hook-valid-first-direct]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-weighted-hook-valid-first-delta]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-weighted-hook-valid-first-legacy]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-weighted-hook-malformed-first-direct]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-weighted-hook-malformed-first-delta]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-weighted-hook-malformed-first-legacy]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-weighted-callback-valid-first-direct]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-weighted-callback-valid-first-delta]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-weighted-callback-valid-first-legacy]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-weighted-callback-malformed-first-direct]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-weighted-callback-malformed-first-delta]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-weighted-callback-malformed-first-legacy]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-zero-weight-raw-valid-first-direct]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-zero-weight-raw-valid-first-delta]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-zero-weight-raw-valid-first-legacy]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-zero-weight-raw-malformed-first-direct]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-zero-weight-raw-malformed-first-delta]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-zero-weight-raw-malformed-first-legacy]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-zero-weight-hook-valid-first-direct]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-zero-weight-hook-valid-first-delta]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-zero-weight-hook-valid-first-legacy]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-zero-weight-hook-malformed-first-direct]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-zero-weight-hook-malformed-first-delta]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-zero-weight-hook-malformed-first-legacy]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-zero-weight-callback-valid-first-direct]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-zero-weight-callback-valid-first-delta]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-zero-weight-callback-valid-first-legacy]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-zero-weight-callback-malformed-first-direct]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-zero-weight-callback-malformed-first-delta]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-zero-weight-callback-malformed-first-legacy]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-weighted-raw-valid-first-direct]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-weighted-raw-valid-first-delta]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-weighted-raw-valid-first-legacy]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-weighted-raw-malformed-first-direct]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-weighted-raw-malformed-first-delta]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-weighted-raw-malformed-first-legacy]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-weighted-hook-valid-first-direct]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-weighted-hook-valid-first-delta]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-weighted-hook-valid-first-legacy]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-weighted-hook-malformed-first-direct]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-weighted-hook-malformed-first-delta]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-weighted-hook-malformed-first-legacy]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-weighted-callback-valid-first-direct]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-weighted-callback-valid-first-delta]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-weighted-callback-valid-first-legacy]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-weighted-callback-malformed-first-direct]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-weighted-callback-malformed-first-delta]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-weighted-callback-malformed-first-legacy]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-zero-weight-raw-valid-first-direct]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-zero-weight-raw-valid-first-delta]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-zero-weight-raw-valid-first-legacy]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-zero-weight-raw-malformed-first-direct]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-zero-weight-raw-malformed-first-delta]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-zero-weight-raw-malformed-first-legacy]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-zero-weight-hook-valid-first-direct]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-zero-weight-hook-valid-first-delta]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-zero-weight-hook-valid-first-legacy]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-zero-weight-hook-malformed-first-direct]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-zero-weight-hook-malformed-first-delta]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-zero-weight-hook-malformed-first-legacy]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-zero-weight-callback-valid-first-direct]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-zero-weight-callback-valid-first-delta]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-zero-weight-callback-valid-first-legacy]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-zero-weight-callback-malformed-first-direct]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-zero-weight-callback-malformed-first-delta]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-zero-weight-callback-malformed-first-legacy]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-weighted-raw-valid-first-direct]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-weighted-raw-valid-first-delta]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-weighted-raw-valid-first-legacy]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-weighted-raw-malformed-first-direct]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-weighted-raw-malformed-first-delta]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-weighted-raw-malformed-first-legacy]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-weighted-hook-valid-first-direct]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-weighted-hook-valid-first-delta]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-weighted-hook-valid-first-legacy]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-weighted-hook-malformed-first-direct]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-weighted-hook-malformed-first-delta]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-weighted-hook-malformed-first-legacy]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-weighted-callback-valid-first-direct]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-weighted-callback-valid-first-delta]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-weighted-callback-valid-first-legacy]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-weighted-callback-malformed-first-direct]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-weighted-callback-malformed-first-delta]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-weighted-callback-malformed-first-legacy]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-zero-weight-raw-valid-first-direct]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-zero-weight-raw-valid-first-delta]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-zero-weight-raw-valid-first-legacy]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-zero-weight-raw-malformed-first-direct]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-zero-weight-raw-malformed-first-delta]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-zero-weight-raw-malformed-first-legacy]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-zero-weight-hook-valid-first-direct]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-zero-weight-hook-valid-first-delta]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-zero-weight-hook-valid-first-legacy]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-zero-weight-hook-malformed-first-direct]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-zero-weight-hook-malformed-first-delta]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-zero-weight-hook-malformed-first-legacy]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-zero-weight-callback-valid-first-direct]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-zero-weight-callback-valid-first-delta]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-zero-weight-callback-valid-first-legacy]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-zero-weight-callback-malformed-first-direct]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-zero-weight-callback-malformed-first-delta]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-zero-weight-callback-malformed-first-legacy]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-weighted-raw-valid-first-direct]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-weighted-raw-valid-first-delta]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-weighted-raw-valid-first-legacy]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-weighted-raw-malformed-first-direct]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-weighted-raw-malformed-first-delta]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-weighted-raw-malformed-first-legacy]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-weighted-hook-valid-first-direct]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-weighted-hook-valid-first-delta]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-weighted-hook-valid-first-legacy]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-weighted-hook-malformed-first-direct]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-weighted-hook-malformed-first-delta]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-weighted-hook-malformed-first-legacy]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-weighted-callback-valid-first-direct]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-weighted-callback-valid-first-delta]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-weighted-callback-valid-first-legacy]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-weighted-callback-malformed-first-direct]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-weighted-callback-malformed-first-delta]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-weighted-callback-malformed-first-legacy]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-zero-weight-raw-valid-first-direct]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-zero-weight-raw-valid-first-delta]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-zero-weight-raw-valid-first-legacy]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-zero-weight-raw-malformed-first-direct]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-zero-weight-raw-malformed-first-delta]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-zero-weight-raw-malformed-first-legacy]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-zero-weight-hook-valid-first-direct]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-zero-weight-hook-valid-first-delta]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-zero-weight-hook-valid-first-legacy]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-zero-weight-hook-malformed-first-direct]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-zero-weight-hook-malformed-first-delta]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-zero-weight-hook-malformed-first-legacy]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-zero-weight-callback-valid-first-direct]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-zero-weight-callback-valid-first-delta]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-zero-weight-callback-valid-first-legacy]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-zero-weight-callback-malformed-first-direct]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-zero-weight-callback-malformed-first-delta]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-zero-weight-callback-malformed-first-legacy]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_exact_native_sequence_tree[short-valid-first-direct]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_exact_native_sequence_tree[short-valid-first-delta]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_exact_native_sequence_tree[short-valid-first-legacy]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_exact_native_sequence_tree[short-malformed-first-direct]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_exact_native_sequence_tree[short-malformed-first-delta]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_exact_native_sequence_tree[short-malformed-first-legacy]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_exact_native_sequence_tree[long-valid-first-direct]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_exact_native_sequence_tree[long-valid-first-delta]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_exact_native_sequence_tree[long-valid-first-legacy]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_exact_native_sequence_tree[long-malformed-first-direct]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_exact_native_sequence_tree[long-malformed-first-delta]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_exact_native_sequence_tree[long-malformed-first-legacy]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_exact_native_sequence_tree[tuple-valid-first-direct]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_exact_native_sequence_tree[tuple-valid-first-delta]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_exact_native_sequence_tree[tuple-valid-first-legacy]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_exact_native_sequence_tree[tuple-malformed-first-direct]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_exact_native_sequence_tree[tuple-malformed-first-delta]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_exact_native_sequence_tree[tuple-malformed-first-legacy]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_observable_hook_reordering[direct]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_observable_hook_reordering[delta]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_observable_hook_reordering[legacy]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_actual_unequal_client_training_matches_float64_weighted_reference[sgd-direct]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_actual_unequal_client_training_matches_float64_weighted_reference[sgd-delta]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_actual_unequal_client_training_matches_float64_weighted_reference[sgd-legacy]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_actual_unequal_client_training_matches_float64_weighted_reference[adam-direct]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_actual_unequal_client_training_matches_float64_weighted_reference[adam-delta]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_actual_unequal_client_training_matches_float64_weighted_reference[adam-legacy]",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_native_checkpoint_codec_prediction_equality_and_next_update",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_float16_transport_and_explicit_bfloat16_rejection",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_runtime.py::test_cpu_and_metal_equal_work_training_agree_with_tolerance",
+      "criteria": [
+        "E1",
+        "E2",
+        "E3",
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_selection.py::test_explicit_mlx_cannot_fall_back[unsupported-native-model]",
+      "criteria": [
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_selection.py::test_explicit_mlx_cannot_fall_back[torch-trainer-with-mlx]",
+      "criteria": [
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_selection.py::test_explicit_mlx_cannot_fall_back[torch-algorithm-with-mlx]",
+      "criteria": [
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_selection.py::test_missing_native_model_dependency_diagnosed",
+      "criteria": [
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_selection.py::test_conflicting_model_framework_diagnosed",
+      "criteria": [
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_selection.py::test_native_model_name_cannot_override_explicit_torch_backend",
+      "criteria": [
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_selection.py::test_native_model_name_shortcut_scopes_factory_to_cpu",
+      "criteria": [
+        "E5"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_socket.py::test_real_native_lenet_two_client_socket_round",
+      "criteria": [
+        "E2",
+        "E3",
+        "E4"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_tree_contract.py::test_lenet_rejects_tree_before_mutation[missing-delta]",
+      "criteria": [
+        "E1",
+        "E3"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_tree_contract.py::test_lenet_rejects_tree_before_mutation[missing-update]",
+      "criteria": [
+        "E1",
+        "E3"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_tree_contract.py::test_lenet_rejects_tree_before_mutation[missing-load]",
+      "criteria": [
+        "E1",
+        "E3"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_tree_contract.py::test_lenet_rejects_tree_before_mutation[missing-trainer_load]",
+      "criteria": [
+        "E1",
+        "E3"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_tree_contract.py::test_lenet_rejects_tree_before_mutation[extra-delta]",
+      "criteria": [
+        "E1",
+        "E3"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_tree_contract.py::test_lenet_rejects_tree_before_mutation[extra-update]",
+      "criteria": [
+        "E1",
+        "E3"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_tree_contract.py::test_lenet_rejects_tree_before_mutation[extra-load]",
+      "criteria": [
+        "E1",
+        "E3"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_tree_contract.py::test_lenet_rejects_tree_before_mutation[extra-trainer_load]",
+      "criteria": [
+        "E1",
+        "E3"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_tree_contract.py::test_lenet_rejects_tree_before_mutation[broadcast-delta]",
+      "criteria": [
+        "E1",
+        "E3"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_tree_contract.py::test_lenet_rejects_tree_before_mutation[broadcast-update]",
+      "criteria": [
+        "E1",
+        "E3"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_tree_contract.py::test_lenet_rejects_tree_before_mutation[broadcast-load]",
+      "criteria": [
+        "E1",
+        "E3"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_tree_contract.py::test_lenet_rejects_tree_before_mutation[broadcast-trainer_load]",
+      "criteria": [
+        "E1",
+        "E3"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_tree_contract.py::test_lenet_rejects_tree_before_mutation[shape-delta]",
+      "criteria": [
+        "E1",
+        "E3"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_tree_contract.py::test_lenet_rejects_tree_before_mutation[shape-update]",
+      "criteria": [
+        "E1",
+        "E3"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_tree_contract.py::test_lenet_rejects_tree_before_mutation[shape-load]",
+      "criteria": [
+        "E1",
+        "E3"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_tree_contract.py::test_lenet_rejects_tree_before_mutation[shape-trainer_load]",
+      "criteria": [
+        "E1",
+        "E3"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_tree_contract.py::test_lenet_rejects_tree_before_mutation[none-delta]",
+      "criteria": [
+        "E1",
+        "E3"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_tree_contract.py::test_lenet_rejects_tree_before_mutation[none-update]",
+      "criteria": [
+        "E1",
+        "E3"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_tree_contract.py::test_lenet_rejects_tree_before_mutation[none-load]",
+      "criteria": [
+        "E1",
+        "E3"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_tree_contract.py::test_lenet_rejects_tree_before_mutation[none-trainer_load]",
+      "criteria": [
+        "E1",
+        "E3"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_tree_contract.py::test_lenet_rejects_tree_before_mutation[container-delta]",
+      "criteria": [
+        "E1",
+        "E3"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_tree_contract.py::test_lenet_rejects_tree_before_mutation[container-update]",
+      "criteria": [
+        "E1",
+        "E3"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_tree_contract.py::test_lenet_rejects_tree_before_mutation[container-load]",
+      "criteria": [
+        "E1",
+        "E3"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_tree_contract.py::test_lenet_rejects_tree_before_mutation[container-trainer_load]",
+      "criteria": [
+        "E1",
+        "E3"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_tree_contract.py::test_exact_sequence_and_none_contract[short]",
+      "criteria": [
+        "E1",
+        "E3"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_tree_contract.py::test_exact_sequence_and_none_contract[long]",
+      "criteria": [
+        "E1",
+        "E3"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_tree_contract.py::test_exact_sequence_and_none_contract[tuple-for-list]",
+      "criteria": [
+        "E1",
+        "E3"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_tree_contract.py::test_exact_sequence_and_none_contract[none-for-array]",
+      "criteria": [
+        "E1",
+        "E3"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_tree_contract.py::test_extracted_host_weights_own_snapshots",
+      "criteria": [
+        "E1",
+        "E3"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_tree_contract.py::test_array_cannot_replace_none_leaf",
+      "criteria": [
+        "E1",
+        "E3"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_tree_contract.py::test_matching_nested_none_and_sequences",
+      "criteria": [
+        "E1",
+        "E3"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_tree_contract.py::test_all_received_trees_preflight_before_first_subtraction",
+      "criteria": [
+        "E1",
+        "E3"
+      ]
+    }
+  ]
+}
