@@ -65,11 +65,19 @@ def assert_launch_branch(launches, central):
     assert launches[0].get("as_server", False) == central
 
 
-def save_committed_round():
+def assert_numpy_state_equal(expected):
+    actual = np.random.get_state()
+    assert actual[0] == expected[0]
+    np.testing.assert_array_equal(actual[1], expected[1])
+    assert actual[2:] == expected[2:]
+
+
+def save_committed_round(unrelated_draws=0):
     server = make_server()
     server.configure()
     random.seed(17)
     np.random.seed(19)
+    np.random.random(5)
     server.prng_state = random.getstate()
     prior = [server._select_clients_with_strategy(POPULATION, 2) for _ in range(2)]
     assert prior == [[9, 7], [5, 6]]
@@ -84,7 +92,19 @@ def save_committed_round():
     python_reference.setstate(server.prng_state)
     numpy_reference = np.random.RandomState()
     numpy_reference.set_state(np.random.get_state())
+    for _ in range(unrelated_draws):
+        random.random()
+    global_python_state = random.getstate()
+    selection_state = server.prng_state
+    context_state = server.context.state["prng_state"]
+    if unrelated_draws:
+        assert global_python_state != selection_state
     server.save_to_checkpoint()
+    # Writing a checkpoint must not reset either live Python stream or NumPy.
+    assert random.getstate() == global_python_state
+    assert server.prng_state == selection_state
+    assert server.context.state["prng_state"] == context_state
+    assert_numpy_state_equal(numpy_reference.get_state())
     assert {path.name for path in Path(Config.params["checkpoint_path"]).iterdir()} == {
         "checkpoint_lenet5_2.safetensors",
         "checkpoint_lenet5_2.safetensors.pkl",
@@ -92,7 +112,8 @@ def save_committed_round():
         "numpy_prng_state_2.pkl",
         "prng_state_2.pkl",
     }
-    return weights, python_reference, numpy_reference
+    uninterrupted = [select_and_check_state(server) for _ in range(3)]
+    return weights, python_reference, numpy_reference, uninterrupted
 
 
 def select_and_check_state(server):
@@ -105,13 +126,17 @@ def select_and_check_state(server):
 
 @pytest.mark.parametrize("central", [False, True], ids=["ordinary", "central"])
 @pytest.mark.parametrize("seed", [17, None], ids=["configured-seed", "no-seed"])
+@pytest.mark.parametrize("unrelated_draws", [0, 1, 13], ids=["zero", "one", "many"])
 def test_actual_checkpoint_continues_selection_through_run(
-    monkeypatch, tmp_path, central, seed
+    monkeypatch, tmp_path, central, seed, unrelated_draws
 ):
     with configure_environment(runtime_config(central, seed), runtime_root=tmp_path):
-        weights, python_reference, numpy_reference = save_committed_round()
+        weights, python_reference, numpy_reference, uninterrupted = (
+            save_committed_round(unrelated_draws)
+        )
         expected = [python_reference.sample(POPULATION, 2) for _ in range(3)]
         assert expected[0] == [5, 3]
+        assert uninterrupted == expected
         random.seed(99)
         np.random.seed(98)
         server = make_server()
@@ -123,6 +148,7 @@ def test_actual_checkpoint_continues_selection_through_run(
             assert server.current_round == 2
             assert server.resumed_session
             assert server.prng_state == random.getstate()
+            assert_numpy_state_equal(numpy_reference.get_state())
             for name, value in server.trainer.model.state_dict().items():
                 assert torch.equal(value, weights[name])
             for _ in range(3):
@@ -135,6 +161,44 @@ def test_actual_checkpoint_continues_selection_through_run(
         assert_launch_branch(launches, central)
         assert observed == expected
         assert server.prng_state == python_reference.getstate()
+
+
+@pytest.mark.parametrize("central", [False, True], ids=["ordinary", "central"])
+def test_legacy_global_rng_tuple_remains_readable(monkeypatch, tmp_path, central):
+    with configure_environment(runtime_config(central, 17), runtime_root=tmp_path):
+        weights, reference, numpy_reference, uninterrupted = save_committed_round()
+        # Legacy writers captured global Python state after unrelated draws.
+        # Its lost selection boundary cannot be reconstructed from this tuple.
+        reference.random()
+        legacy_state = reference.getstate()
+        path = Path(Config.params["checkpoint_path"]) / "prng_state_2.pkl"
+        with path.open("wb") as stream:
+            pickle.dump(legacy_state, stream, protocol=4)
+        expected = [reference.sample(POPULATION, 2) for _ in range(3)]
+        assert expected != uninterrupted
+        random.seed(99)
+        np.random.seed(98)
+        server = make_server()
+        launches = intercept_process_launches(monkeypatch)
+        Config.args.resume = True
+        observed = []
+
+        def capture_start():
+            assert server.current_round == 2
+            assert server.resumed_session
+            assert random.getstate() == server.prng_state == legacy_state
+            assert_numpy_state_equal(numpy_reference.get_state())
+            for name, value in server.trainer.model.state_dict().items():
+                assert torch.equal(value, weights[name])
+            for _ in range(3):
+                observed.append(select_and_check_state(server))
+                assert np.random.random() == numpy_reference.random_sample()
+
+        monkeypatch.setattr(server, "start", capture_start)
+        server.run()
+        assert_launch_branch(launches, central)
+        assert observed == expected
+        assert server.prng_state == random.getstate() == reference.getstate()
 
 
 @pytest.mark.parametrize("central", [False, True], ids=["ordinary", "central"])
