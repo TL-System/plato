@@ -1,0 +1,383 @@
+{
+  "archive": {
+    "bytes": 56659217,
+    "every_archived_member_verified_against_manifest": true,
+    "files": 832,
+    "manifest_sha256": "6830cdd270f81dc189369cac429333f1fde0b26beb9145a1e1691f3d66d9a15a",
+    "path": "evidence/2026-refresh/reproductions/phase3-mlx-native-qualification.tar.gz",
+    "sha256": "41a8353cbdead3d54dc5d16d6f2c316c3026c875bc124d911d9355f6c279e228"
+  },
+  "artifact_policy": "Raw native parameter trees and owned task process identities retained. Environments and real MNIST dataset bytes excluded; origin/checksums and fresh-cache replay included. All-host process argv snapshots excluded from publication; sanitized host/source/timestamp metadata preserved.",
+  "environment": {
+    "details": "environment.json",
+    "lock_sha256": "573b10c2ba1a2317e02f9e40c6181359cafab6f6e0a0f9be12bb256cb276fe1d",
+    "locked_extra": "mlx",
+    "mlx": "0.32.3",
+    "mlx-metal": "0.32.3",
+    "normal_dependency_bytecode_caches": true,
+    "platform": "macOS 27.0 Apple M1 Max arm64, 64 GiB",
+    "python": "3.13.16",
+    "qualified_devices": [
+      "Apple CPU",
+      "Apple Metal"
+    ],
+    "repository_source_bytecode_disabled_for_subprocesses": true
+  },
+  "experiments": {
+    "E1": {
+      "facts": [
+        "Exact keys/container kinds/list and tuple lengths/shapes/None compatibility validated before arithmetic or mutation.",
+        "All 180 server invalid-input matrix cases cover direct/delta/legacy, both arrival orders, raw/hook/callback transformations, zero/nonzero sample weights, and five structural damage families.",
+        "Nested short/long/tuple module cases, reject before first subtraction, input/model/baseline nonmutation and owned host snapshots pass.",
+        "Original-object reordering is rejected; deep-copied unlabeled replacements use the existing positional report contract."
+      ],
+      "status": "pass"
+    },
+    "E2": {
+      "facts": [
+        "Actual independently trained changing native float32 LeNets, SGD and Adam, sample counts 8/24, finite losses.",
+        "All three dispatch paths compare every leaf against independently computed float64 NumPy weighted reference cast to target dtype.",
+        "Tolerance rtol=1e-5 and atol=1e-6; raw/received/final parameter artifacts retained for actual socket rounds."
+      ],
+      "status": "pass"
+    },
+    "E3": {
+      "facts": [
+        "Real configured Safetensor codecs and weight checkpoints preserve exact predictions, followed by a changing update.",
+        "Malformed checkpoints fail without partial model mutation; host extraction snapshots own arrays and retain baseline across later training.",
+        "Float16 host transport passes; native bfloat16 conversion fails clearly without silent casts."
+      ],
+      "status": "pass"
+    },
+    "E4": {
+      "facts": [
+        "Actual synchronous server/client entrypoints, native LeNet, real codecs both directions, two physical clients and unequal 8/24 samples, comm_simulation=false.",
+        "One-round final native test and nine three-round benchmark sessions finish naturally with no watchdog cleanup, surviving descendants or occupied owned ports.",
+        "Actual documented plato.py MNIST entrypoint runs real cached 60000/10000 dataset with bounded 32/16 subsets, two logical clients of 8 samples, one physical reused worker, epoch/round=1.",
+        "Documented shipped config retains default comm_simulation=true and simulate_wall_time=true; changing checkpoint has all ten parameter leaves changed against the same model_seed=17 no-flag Metal baseline."
+      ],
+      "mnist_artifacts": [
+        "mnist-main-run",
+        "mnist-config-run",
+        "mnist-cache-provenance.json"
+      ],
+      "socket_artifacts": "final-native-socket",
+      "status": "pass"
+    },
+    "E5": {
+      "facts": [
+        "Factory/train/eval/load operations observe no-flag normal Metal, explicit CPU, mps/Metal, both flags CPU precedence and caller CPU/custom streams; success and injected failure restore caller devices/streams.",
+        "Native dropout and BatchNorm show deterministic evaluation, unchanged running statistics and restoration of intentionally different child modes; training explicitly enters train mode.",
+        "Momentum alias and RMSprop spelling corrected with native updates; missing dependency real base environment preserves unrelated Torch selection.",
+        "Unsupported models, conflicting frameworks, explicit Torch with mlx_lenet5 and native-name CPU factory placement have negative-path regressions."
+      ],
+      "status": "pass"
+    },
+    "E6": {
+      "facts": [
+        "Native norm-5 threshold-2 epsilon-scaled clipping gives reference SGD update and reports original norm exactly once.",
+        "Disabled/below-threshold/zero-gradient/zero-threshold cases pass; negative/NaN/infinite thresholds and nonfinite gradients reject before optimizer mutation.",
+        "Custom training strategies retain their clipping control; jit=True is explicitly rejected instead of ignored."
+      ],
+      "status": "pass"
+    },
+    "E7": {
+      "facts": [
+        "Separate model_seed and training_seed with stable logical client/master/round/epoch streams replay initialization, shuffle/order, Python/NumPy/Torchvision transforms, MLX stochastic masks/losses/final weights.",
+        "Fresh processes, changed PIDs, reversed worker launch and reused A/B/A logical-client assignment agree; changed master or round changes intended local stream.",
+        "Python, NumPy, Torch CPU generator and native MLX caller RNG state restored on seeded success/data/factory failures; legacy unseeded initialization and stream behavior retained.",
+        "MLX 0.32.3 read-only random.state key encoding verified against tagged and installed source; same-environment replay only."
+      ],
+      "status": "pass"
+    },
+    "E8": {
+      "all_concurrent_intervals_overlap": true,
+      "all_ten_round_native_active_memory_ranges_bytes": 0,
+      "comparison_limits": "No compiled speed comparison and no unequal stock Torch/MLX architecture speed claim. Tiny 8/24 socket clients produce partial batches for32/64; synchronized kernel measurements use fixed full batches.",
+      "compilation_adopted": false,
+      "decision": "No measured compiled benefit is established. Small native eager steps and dominant fresh socket/process startup support retaining the bounded eager path; no compilation optimization introduced.",
+      "delta_explanation": {
+        "plato/models/registry.py": "Explicit Torch/native-name conflict and native alias factory CPU scope; measured framework=mlx path and numerical trainer unchanged.",
+        "tests/mlx_native/socket_harness.py": "Added actual MNIST plato.py branch; existing measured socket_native path unchanged.",
+        "tests/mlx_native/test_phase3_selection.py": "Two negative/placement regression cases added after E8; no numerical benchmark change."
+      },
+      "eager_default": true,
+      "end_utc": "2026-10-03T18:34:26.661423+00:00",
+      "isolated_overlap_field_note": "For a single worker this raw field is its interval duration; simultaneity is asserted only for two-worker runs.",
+      "measured_source": "e8-exact-source/source-binding.json",
+      "measurement_window_opened_and_closed_by": "/root",
+      "method": "Fixed 256-sample NHWC float32 dataset seed41; native LeNet model seed17, Adam, training seed29; batches8/32/64; three fresh repetitions per isolated and two genuinely concurrent processes; 10 warmups, 100 synchronized measured steps; reset native peak after warmup, active/peak/cache/RSS,10-round retention; separate nine actual three-round8/24 socket sessions.",
+      "numerical_runs": 18,
+      "numerical_workers": 27,
+      "post_measurement_source_deltas": {
+        "plato/models/registry.py": {
+          "candidate_sha256": "96cd2013eedab9081f4c0ad84d5cdecc032b2f89dd80607d79147c91abddaa69",
+          "measured_sha256": "715662ca59a9ed34fd56807629da1d925f0a9038fb433d26be8220da2e866741"
+        },
+        "tests/mlx_native/socket_harness.py": {
+          "candidate_sha256": "1034c4d0b2e9c0f52d61ab2343923d9f019d1ef5d2ce7f949b612cfc0d5ce928",
+          "measured_sha256": "ec6265d800e0b45d737600e8d76b295177dc04dd29e08d6dc577799b853e50e6"
+        },
+        "tests/mlx_native/test_phase3_selection.py": {
+          "candidate_sha256": "aec3efc41b2473c23dec71662902d8f97c093158eb296809b3e3dbd62f2fd13b",
+          "measured_sha256": "ce4bc3b5b369018d98ba369657b7fe5208557fb12b2c7aaef5ede2c6ae3bff69"
+        }
+      },
+      "seconds": 288.417862,
+      "socket_sessions": 9,
+      "source_sha256_unchanged_during_measurement": true,
+      "start_utc": "2026-10-03T18:29:38.243561+00:00",
+      "status": "pass",
+      "summary": {
+        "concurrent-32": {
+          "max_active": 1094272,
+          "max_cache": 8756252,
+          "max_peak": 9845708,
+          "max_rss": 499777536,
+          "median_ms": 1.3679374824278057,
+          "overlap_seconds": 0.13877511024475098,
+          "p95_ms": 1.5821916342247277,
+          "retention_active_range": 0
+        },
+        "concurrent-64": {
+          "max_active": 1186944,
+          "max_cache": 16162740,
+          "max_peak": 17283940,
+          "max_rss": 501841920,
+          "median_ms": 2.2825627820566297,
+          "overlap_seconds": 0.1853010654449463,
+          "p95_ms": 2.4291641952004284,
+          "retention_active_range": 0
+        },
+        "concurrent-8": {
+          "max_active": 1006992,
+          "max_cache": 3086544,
+          "max_peak": 4093316,
+          "max_rss": 498892800,
+          "median_ms": 1.2545937788672745,
+          "overlap_seconds": 0.12094998359680176,
+          "p95_ms": 1.6062531853094697,
+          "retention_active_range": 0
+        },
+        "isolated-32": {
+          "max_active": 1094272,
+          "max_cache": 8756252,
+          "max_peak": 9845708,
+          "max_rss": 501301248,
+          "median_ms": 1.3864999637007713,
+          "overlap_seconds": 0.1362600326538086,
+          "p95_ms": 1.6947082243859766,
+          "retention_active_range": 0
+        },
+        "isolated-64": {
+          "max_active": 1186944,
+          "max_cache": 16097180,
+          "max_peak": 17283916,
+          "max_rss": 498941952,
+          "median_ms": 1.48756243288517,
+          "overlap_seconds": 0.15862226486206055,
+          "p95_ms": 1.8682090914808214,
+          "retention_active_range": 0
+        },
+        "isolated-8": {
+          "max_active": 1006568,
+          "max_cache": 3053876,
+          "max_peak": 4060236,
+          "max_rss": 498302976,
+          "median_ms": 1.2218335177749395,
+          "overlap_seconds": 0.11667680740356445,
+          "p95_ms": 1.5043110819533465,
+          "retention_active_range": 0
+        },
+        "socket-32": {
+          "cold": 0.024995088577270508,
+          "fresh_process_full_session": 14.215695834020153,
+          "warm": 0.0077245235443115234
+        },
+        "socket-64": {
+          "cold": 0.022207975387573242,
+          "fresh_process_full_session": 14.213301374809816,
+          "warm": 0.007736921310424805
+        },
+        "socket-8": {
+          "cold": 0.16341686248779297,
+          "fresh_process_full_session": 14.34340383298695,
+          "warm": 0.010255575180053711
+        }
+      }
+    }
+  },
+  "node_coverage_counts": {
+    "E1": 242,
+    "E2": 211,
+    "E3": 243,
+    "E4": 1,
+    "E5": 246,
+    "E6": 29,
+    "E7": 4
+  },
+  "node_inventory": {
+    "count": 283,
+    "path": "native-ledger-handoff.json",
+    "profile_ledger_handoff": "tests/mlx_native/cases.json and root conftest/profile policy are owned by /root/mlx_profile_author; native modules and inert initializer are frozen in this source candidate.",
+    "sha256": "5785a7464aa8f66235fe077615a0953c35bf25fffe03bbff2cb2786aaf9ddd6c"
+  },
+  "ownership": {
+    "edited_files": [
+      "configs/MNIST/fedavg_lenet5_mlx.toml",
+      "plato/algorithms/mlx_fedavg.py",
+      "plato/algorithms/registry.py",
+      "plato/models/registry.py",
+      "plato/servers/fedavg.py",
+      "plato/trainers/mlx.py",
+      "plato/trainers/registry.py",
+      "tests/mlx_native/__init__.py",
+      "tests/mlx_native/benchmark.py",
+      "tests/mlx_native/helpers.py",
+      "tests/mlx_native/seed_probe.py",
+      "tests/mlx_native/socket_harness.py",
+      "tests/mlx_native/socket_probe.py",
+      "tests/mlx_native/test_phase3_controls.py",
+      "tests/mlx_native/test_phase3_rng.py",
+      "tests/mlx_native/test_phase3_runtime.py",
+      "tests/mlx_native/test_phase3_selection.py",
+      "tests/mlx_native/test_phase3_socket.py",
+      "tests/mlx_native/test_phase3_tree_contract.py"
+    ],
+    "manifests_lock_CI_sharedConfig_conftest_edited": false,
+    "non_MLX_registry_logic_preserved": true,
+    "publication_and_merge": "Root only",
+    "registry_edits": {
+      "plato/algorithms/registry.py": "Reject framework=mlx with non-MLX algorithm type and require native trainer for native algorithm selection.",
+      "plato/models/registry.py": "MLX selection only: missing native dependency/unsupported model/framework conflict, seeded device-scoped evaluated factory, native-name alias scope.",
+      "plato/trainers/registry.py": "Reject framework=mlx with non-MLX trainer type."
+    },
+    "retirement_Qwen_sources_edited": false,
+    "shared_server_handoff": "Conditional native validate_weights capability reuses Phase2 raw/effective ingress checks, captures one owned baseline before hooks, and rejects detectable original-object reorder."
+  },
+  "phase": "Phase 3A bounded native MLX audit and repair",
+  "process_port_audit": {
+    "global_process_commandlines_published": false,
+    "loopback_port_rebind": {
+      "50604": true,
+      "50619": true,
+      "50628": true,
+      "50639": true,
+      "50652": true,
+      "50665": true,
+      "50675": true,
+      "50687": true,
+      "50695": true,
+      "50758": true,
+      "51878": true,
+      "56135": true,
+      "63602": true
+    },
+    "qualification_receipts_all_natural": true,
+    "result_count": 14,
+    "survivors": [],
+    "tracked_owned_process_identities": 49,
+    "utc": "2026-10-03T19:04:07.457024+00:00"
+  },
+  "red_green": {
+    "blanket_suppressions_added": false,
+    "exact_merged_source_replay": "After implementation, exact merged Phase2 trainer replay fails3 RNG cases, and exact merged Phase2 server replay fails3 ingress cases with candidate validator. Preserved source and replay helpers; these timestamps are not represented as original pre-fix execution.",
+    "existing_assertions_weakened": false,
+    "initial_pre_repair": "logs/baseline-red.log:34 failed,1 passed; logs/first-green.log:35 passed.",
+    "post_E8_alias_repair": "logs/alias-red.log:2 failed,5 passed; logs/alias-green.log:7 passed.",
+    "retained_harness_failures": [
+      "socket-initial-failure: spawned sampler registration was incorrectly inside main; moved test helper registration to import.",
+      "socket-observation-failure: server.run return marker contradicted inherited natural os._exit(0); corrected new observation to natural zero exit, aggregate and client-return facts.",
+      "logs/e8-driver.log: unsupported ServerContext constructor keyword in evidence harness; corrected setters.",
+      "logs/e8-corrected-driver.log: owned driver interrupted to make dataset fixed256 across batch sizes. Entire accepted campaign restarted in e8-final."
+    ],
+    "selection_pre_repair": "logs/selection-red.log:5 failed; logs/selection-green.log:5 passed."
+  },
+  "remaining_limits": [
+    "Native Apple CPU/Metal and Python3.13 only; no new Python3.14/Linux MLX/CUDA/Windows qualification.",
+    "Float32 training qualified. Float16 is a host-transport probe. Native bfloat16 host conversion explicitly unsupported.",
+    "Checkpoint remains weight-only; optimizer/RNG/scheduler/full or mid-window resume is outside selected scope.",
+    "Prebuilt caller lazy graphs retain original placement; a new stream scope cannot migrate already constructed work.",
+    "Hook reports and unlabeled deep-copied replacements remain positional; callers must preserve correspondence. Schema checks cannot detect arbitrary same-schema semantic swaps.",
+    "Seed replay promises the same environment; cross-device comparisons use tolerance and have no bitwise guarantee.",
+    "No new models, broad algorithm parity, mixed-framework conversion, MLX-LM/LoRA, accumulation or compiled execution features."
+  ],
+  "reproduction_commands": {
+    "candidate_source_replay": "Use baseline checkout dcf787c012e30bcd7680a4398d54f946fde958e5; git apply <archive>/reproduction/source-candidate.patch and verify source-candidate.json. Alternatively checkout source commit 589249b77e81b164549ec65e47daccec87794277.",
+    "collected_nodes": "<owned-env>/bin/python -m pytest tests/mlx_native --collect-only -q",
+    "e8": "<owned-env>/bin/python -B -m tests.mlx_native.benchmark --root <new-owned-runtime>",
+    "e8_source_replay": "Use baseline checkout dcf787c012e30bcd7680a4398d54f946fde958e5; overlay every file under e8-exact-source except source-binding.json and verify SHA256 against source-binding.json. Run E8 in an isolated host window. Numeric model files are unmodified baseline source.",
+    "focused_affected": "<owned-env>/bin/python -m pytest tests/mlx_native tests/models/test_model_registry.py tests/servers/test_fedavg_strategy.py tests/algorithms -q --basetemp=<owned-runtime> --junitxml=<owned-runtime>.xml",
+    "import_policy": "<owned-env>/bin/ruff check . --select I --no-cache",
+    "merged_baseline_rng_red": "<owned-env>/bin/python -B <archive>/reproduction/replay_baseline.py --repo <candidate-repo> --root <new-owned-runtime> --case rng",
+    "merged_baseline_server_red": "<owned-env>/bin/python -B <archive>/reproduction/replay_baseline.py --repo <candidate-repo> --root <new-owned-runtime> --case server",
+    "missing_environment": "UV_PROJECT_ENVIRONMENT=<owned-base-env> uv sync --frozen --python 3.13",
+    "missing_mlx": "<owned-base-env>/bin/python -B <archive>/reproduction/replay_missing.py --repo <candidate-repo> --root <new-owned-runtime>",
+    "mnist": "<owned-env>/bin/python -B <archive>/reproduction/replay_mnist.py --repo <candidate-repo> --root <new-owned-runtime> --cache <new-owned-real-MNIST-cache> --download",
+    "native_environment": "UV_PROJECT_ENVIRONMENT=<owned-env> uv sync --frozen --python 3.13 --extra mlx",
+    "shell": "All shell commands executed with zsh -lc.",
+    "typing": "<owned-env>/bin/ty check plato/trainers/mlx.py plato/algorithms/mlx_fedavg.py plato/models/registry.py plato/trainers/registry.py plato/algorithms/registry.py"
+  },
+  "schema_version": 1,
+  "source_identity": {
+    "base_commit": "dcf787c012e30bcd7680a4398d54f946fde958e5",
+    "files": {
+      "configs/MNIST/fedavg_lenet5_mlx.toml": "7d9fe11b19c8487d801d37288f40e6fd959108cfc4085800f60f0bdd9804de56",
+      "plato/algorithms/mlx_fedavg.py": "469021332340cadf9c58b2349b3bb2ab856edb03aba4ab76136e6620066748f3",
+      "plato/algorithms/registry.py": "8b04fa6baf16981c5b0f68fdd055af899ff31d9a47e3c166925ea6f62e976823",
+      "plato/models/registry.py": "96cd2013eedab9081f4c0ad84d5cdecc032b2f89dd80607d79147c91abddaa69",
+      "plato/servers/fedavg.py": "c254e4e363e64d3f1abeb393a71e230602ecf66e2aac34ed7018a06851d670ec",
+      "plato/trainers/mlx.py": "bdd405bec5ca7255b585e7a99118699dc52e1dfcb939beef6e5fc0296381cb5e",
+      "plato/trainers/registry.py": "41b5e807506ec4f439900da0411c17ae3b20d9791c515c16675361829598eaca",
+      "tests/mlx_native/__init__.py": "1a04a0e5e228220a93c51d9b3e52a231525e5bc660150ba8737024a2f2df1ca2",
+      "tests/mlx_native/benchmark.py": "d06a39ba31c96623ce6492c97110f3aaf5337a5b48ee5d7242160d8496c11beb",
+      "tests/mlx_native/helpers.py": "dc035bf36f25013ad729b166067c8667e87ff8b408a928a4362ca8c21a6f41be",
+      "tests/mlx_native/seed_probe.py": "8b73af203727be6751e4caf7050fce178b1bf232d266fa6235656ca396c4f700",
+      "tests/mlx_native/socket_harness.py": "1034c4d0b2e9c0f52d61ab2343923d9f019d1ef5d2ce7f949b612cfc0d5ce928",
+      "tests/mlx_native/socket_probe.py": "c8b071c5e3e69c9014770da0d65295a8598bfde4dde673f420eab0ac9b118209",
+      "tests/mlx_native/test_phase3_controls.py": "9d25d316df0482e3cb705c82b34a06ab8b1b03aa94c985505e38670b595ce633",
+      "tests/mlx_native/test_phase3_rng.py": "9ff37ccf9e97291ea752d25e845cff0a840187e2ef68a4289bdb9442459f4df3",
+      "tests/mlx_native/test_phase3_runtime.py": "946706274e10bae70aa60fe0b7267366e5f77c95fc610f127661d1f6eefd2a6f",
+      "tests/mlx_native/test_phase3_selection.py": "aec3efc41b2473c23dec71662902d8f97c093158eb296809b3e3dbd62f2fd13b",
+      "tests/mlx_native/test_phase3_socket.py": "e4fcad87330ce9923eba2f7b05e87e6cf3eeb4fbe06ed0089742d0d53d3797a7",
+      "tests/mlx_native/test_phase3_tree_contract.py": "923f280aecf4b151545e177048a9490f9b94c3772d79f60bdd683542b30b1389"
+    },
+    "source_commit": "589249b77e81b164549ec65e47daccec87794277",
+    "source_tree": "a6300438bd3a3ac48d8cfebdba301fd05664fc6d"
+  },
+  "sources": {
+    "MNIST_primary_download_mirror": "https://ossci-datasets.s3.amazonaws.com/mnist/",
+    "seed": "https://ml-explore.github.io/mlx/build/html/python/_autosummary/mlx.core.random.seed.html",
+    "stream": "https://ml-explore.github.io/mlx/build/html/python/_autosummary/mlx.core.stream.html",
+    "tagged_native_module": "https://github.com/ml-explore/mlx/blob/v0.32.3/python/mlx/nn/layers/base.py",
+    "tagged_native_optimizer": "https://github.com/ml-explore/mlx/blob/v0.32.3/python/mlx/optimizers/optimizers.py",
+    "tagged_native_random": "https://github.com/ml-explore/mlx/blob/v0.32.3/python/src/random.cpp",
+    "version_sensitive_precision": "Tagged/installed0.32.3 source and byte hashes recorded; live documentation can move."
+  },
+  "status": "Implementation qualification complete; fresh root review and integration are separate gates.",
+  "validation": {
+    "diff_check": "pass",
+    "errors": 0,
+    "existing_affected_nodes": 80,
+    "failed": 0,
+    "focused_ruff_I_F": "pass",
+    "full_optional_profile_claim": false,
+    "import_policy": "pass",
+    "junit": "logs/final-tests.xml",
+    "native_nodes": 283,
+    "passed": 363,
+    "root_integrated_profile_report": {
+      "commit": "3ad876fbf843f49912a03e76186e07cffc02b690",
+      "native_failed": 0,
+      "native_passed": 283,
+      "native_skipped": 0,
+      "receipt_ownership": "Root supplies its independent integration receipt.",
+      "reported_by": "/root",
+      "tracked_source_unchanged": true
+    },
+    "scope": "Native targeted collection plus existing affected model/server/algorithm tests.",
+    "seconds": 37.52,
+    "skipped": 0,
+    "typing": "pass"
+  }
+}
