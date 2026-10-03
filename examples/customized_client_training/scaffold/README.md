@@ -63,11 +63,14 @@ receive no control correction.
 
 `ScaffoldCallback` installs processors that extract `[weights, server_controls]`
 before training and attach `[weights, delta_ci]` afterward. The federated example
-requires a valid current server control payload. Direct training uses the
-strategy's resulting state in the same process. Spawned training returns the
-new client controls, delta, update count, and rate to the parent alongside the
-saved model; a missing or stale worker handoff cannot supply a successful
-outbound delta.
+requires a valid current server control payload. Direct training accepts the
+result and saves client controls only after training callbacks and end hooks
+succeed. Spawned training returns provisional client controls, delta, update
+count, and rate to the parent alongside the saved model. The parent checks the
+current model/control handoff before accepting and persisting the controls.
+Rejected end hooks or worker handoffs retain the previously accepted client
+controls and cannot supply a successful outbound delta; the child does not
+overwrite the canonical control file.
 
 For participating clients $S$ out of a total population $N$, the server updates
 its control as
@@ -84,6 +87,14 @@ The shipped momentum of `0.9` also makes the post-optimizer correction an
 extension of vanilla SCAFFOLD. Other non-vanilla optimizers use this additive
 correction within the same rate constraints. The paper's vanilla-SGD,
 uniform-client convergence guarantees are not claimed for these extensions.
+
+The server validates each model and control payload before staging an update,
+then checks the model/control state used after receive callbacks. It commits
+the model and server controls only after aggregation callbacks and final
+validation succeed. Failure before that boundary clears staged controls and
+preserves the previous committed model/control values. Later evaluation or
+reporting failures retain the completed aggregation. This guarantee covers
+model/control state; external callback side effects are not rolled back.
 
 Client controls are owned by `SCAFFOLDUpdateStrategy` and saved as
 `scaffold_cv_<client_id>.pkl` inside `Config().params["model_path"]`, or the

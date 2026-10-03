@@ -1,208 +1,276 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "date": "2026-10-03",
   "finding": "F27",
-  "status": "PROVISIONAL_DOCUMENTATION_CANDIDATE; final C reconciliation and independent review pending",
-  "base_commit": "0dc34dd1d79d90071a0babfa6aa89f33d72a976f",
-  "included_accepted_B_commit": "00eeb9dcdd2b513e64db9408969356037e09bb8e",
-  "branch": "maintenance/2026-phase2-scaffold-docs",
+  "status": "PROVISIONAL_RECONCILED_TO_EXACT_15e; fresh code review3 and final-source/writing acceptance remain root-owned",
+  "provenance": {
+    "prior_docs_commit": "95c7218fc9801099cd7ffa3afc1be227384d8500",
+    "prior_docs_tree": "525080ae1f36c218a9510becd9c1cd30b2db87fd",
+    "original_code_base": "0dc34dd1d79d90071a0babfa6aa89f33d72a976f",
+    "prior_evidence_path": "evidence/2026-refresh/phase2c-scaffold-docs-validation.json",
+    "prior_evidence_sha256": "b181289763d67d47a7cd0b72425448f9ebd2d4feddbf2ea394be8c924c9a3967",
+    "history": "Original evidence remains available at prior_docs_commit. Its pending-execution status was historical; current attributed results below supersede it without claiming writer execution.",
+    "prior_prose_review": "Provisional PASS at 95c/0dc, no writing findings; not C acceptance. New lifecycle records supersede its affected implementation boundaries."
+  },
+  "source": {
+    "pinned_C_commit": "15e0cebd78ec6752b9aae1e922b33e22e168387f",
+    "pinned_C_tree": "9c9ce313f88552968b487388d681eda82384abfc",
+    "authorized_dependency_merge": "1c5a5893f446a4208ffe44c083c248a9bcd38ad3",
+    "merge_parents": [
+      "95c7218fc9801099cd7ffa3afc1be227384d8500",
+      "15e0cebd78ec6752b9aae1e922b33e22e168387f"
+    ],
+    "merge_conflicts": false,
+    "accepted_A_ancestor": "79da1f97d8a12fe97402750cc32c7b3e8f5cdf6e",
+    "accepted_B_ancestor": "00eeb9dcdd2b513e64db9408969356037e09bb8e",
+    "scope_check": "Every path outside the three allowed docs/evidence paths is byte-identical to pinned C; this includes all production/tests and A/B dependencies. No evolving training worktree read or source edit.",
+    "intermediate_limit": "B resume supplement a058 and ongoing FedDyn implementation are outside this exact intermediate; no additional dependency merged."
+  },
   "worktree": "/private/tmp/plato-refresh-worktrees/scaffold-docs",
+  "branch": "maintenance/2026-phase2-scaffold-docs",
   "scope": [
     "examples/customized_client_training/scaffold/README.md",
     "docs/docs/examples/algorithms/5. Algorithms with Customized Client Training Loops.md",
     "evidence/2026-refresh/phase2c-scaffold-docs-validation.json"
   ],
   "documentation_sha256": {
-    "examples/customized_client_training/scaffold/README.md": "37bbceefde3864b39475ba1ef1bb0d73e7aca935bbb5a5f157e29e564e230911",
-    "docs/docs/examples/algorithms/5. Algorithms with Customized Client Training Loops.md": "c5f0a8602461a4b26b73245350e7537eee5679fb1f965df2fc7e26f90a714ea9"
+    "examples/customized_client_training/scaffold/README.md": "93eecf94900f659ace6db0aae06503693f73c0dcbf95877c06cf1a446cd2c04f",
+    "docs/docs/examples/algorithms/5. Algorithms with Customized Client Training Loops.md": "0e1f7c010f32d0fb07c82572bafeedcf005db152b039c61d7d448bada975e0a4"
   },
-  "root_evidence_read_from": "/Users/bli/Playground/plato",
-  "root_evidence_inputs": [
+  "inputs": [
     {
-      "path": "evidence/2026-refresh/phase2c-scaffold-design.json",
-      "sha256": "f323f3aa9d824df44a1043b2d6aff9c8a963c42964f6e6685108c59b25fc3a89",
-      "use": "Accepted bounded semantic design; exact requested hash verified."
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2c-scaffold-docs-review.json",
+      "sha256": "c0a4cd79ad8110f136cc02f702feb4490f9a06004c7b91d66c7ff96510f8f658"
     },
     {
-      "path": "evidence/2026-refresh/phase2c-scaffold-design-review.json",
-      "sha256": "8eb83f21091827d03534db1b8c4e23a6f239b5df4f82363b4c9ead5a60b3258d",
-      "use": "PASS for design only; does not qualify implementation."
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2c-scaffold-design.json",
+      "sha256": "f323f3aa9d824df44a1043b2d6aff9c8a963c42964f6e6685108c59b25fc3a89"
     },
     {
-      "path": "evidence/2026-refresh/phase2c-scaffold-acceptance.json",
-      "sha256": "40b202708a4cfdbe6f299e75249c1a19921e410ec4ab7b5e3c6323f536ca8d37",
-      "use": "Design accepted for implementation; F27 remains open."
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2c-scaffold-design-review.json",
+      "sha256": "8eb83f21091827d03534db1b8c4e23a6f239b5df4f82363b4c9ead5a60b3258d"
     },
     {
-      "path": "evidence/2026-refresh/scaffold-equation-probe.json",
-      "sha256": "834fa629fd914b97273b0cacb60e91a2e9917bc558af07fa0b27636ea77e9164",
-      "use": "Historical baseline wrong-sign/Option-II regression; not a result for C."
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2c-scaffold-acceptance.json",
+      "sha256": "40b202708a4cfdbe6f299e75249c1a19921e410ec4ab7b5e3c6323f536ca8d37"
     },
     {
-      "path": "evidence/2026-refresh/trainer-lifecycle-probes.json",
-      "sha256": "7e236a1156d139e64ce93f260f6d7968c96b4b604ad85678f4de5ef94777b82b",
-      "use": "Historical additional_F23_control_state_confirmation: logical clients persisted as client 0 at prefix-concatenated paths; not a result for C."
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2c-scaffold-code-review.json",
+      "sha256": "455f6467dd6986a1de751f0a9dea6bfef4d9ca4c16746ce38239b2b77a3bb7d7"
+    },
+    {
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2c-scaffold-code-review-2.json",
+      "sha256": "aa00c76f5e3fbe3eb2f419ed277620c32f382b8dabb99f4a3e5c190308162eb1"
+    },
+    {
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2c-training-review.json",
+      "sha256": "efa4427422c1d0c12d1020e22f7fc8dd9afc1c25f0e5369fa0d4f5a2df44eea1"
+    },
+    {
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2c-training-review-2.json",
+      "sha256": "2712a8b892cf3a65b684dfb4470ab293b1d3c4ceedeb0ba7e4613c372e6c8ca1"
+    },
+    {
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2c-root-intermediate-base-validation.json",
+      "sha256": "5a0b6c2e9a761e08dd8daecd32118b1e058f44fc12037280b2a3643a4b234f98"
+    },
+    {
+      "path": "evidence/2026-refresh/phase2c-scaffold-review2-fixes-validation.json",
+      "revision": "15e0cebd78ec6752b9aae1e922b33e22e168387f",
+      "sha256": "9cfad869c3648509dcff1d76d777b4e5e35dad9678b056c3c0a880d3347f2502"
+    },
+    {
+      "path": "evidence/2026-refresh/phase2c-scaffold-review2-fixes-receipt.json",
+      "revision": "15e0cebd78ec6752b9aae1e922b33e22e168387f",
+      "sha256": "2e5527410e4b1faab2a66de92c9131855772b64bc97a7c7a85433b7a827e63e1"
     }
   ],
-  "consulted_snapshot_facts": [
+  "consulted_pinned_source": [
     {
-      "path": "AGENTS.md",
-      "sha256": "b50f87f31ea3d87076952d8b7d2d8af067132fbf877d80f8780c208fb45527ec",
-      "fact_or_read_scope": "Repository scope, zsh -lc, uv workflow and commit style."
+      "path": "examples/customized_client_training/scaffold/scaffold_server.py",
+      "git_blob": "7b89b65b7e484da3779e2f69477c783d5be9d991",
+      "sha256": "259e738c6408f91b43e0d195b5c4e0e609cae33499fe04ea7c22059b83b3caf8",
+      "fact": "weights_received validates both raw halves before staging. _process_reports revalidates post-receive-callback state, marks committed only after aggregation callbacks and final checks, restores prior model/control tensors on precommit failure, and clears staging in finally. Postcommit evaluation/reporting failures retain the commit; external side effects excluded."
     },
     {
-      "path": "plato/trainers/strategies/algorithms/scaffold_strategy.py",
-      "sha256": "2b6e2953f8b93f7919d95d70f598c2f4d33c9cbaff129352387f248c004d4ff6",
-      "fact_or_read_scope": "Subtractive post-step correction; Option II ci_old-c+(x-y)/(K*eta); completed-update K; actual pre-step finite positive equal constant LR; next-round reset; parameter ownership; K=0; canonical and exact same-client legacy loading; V2 compatibility subclass; worker fields and outbound success guard."
+      "path": "plato/servers/fedavg.py",
+      "git_blob": "10cd1a9cd8940ba5f7245824cd6b53a703d60a6c",
+      "sha256": "f184068a11c5be9e523f08b95e1cce76dff2e20e2fdb4e6426caf95dac0bcee5",
+      "fact": "Inherited _process_reports ordering places receive callbacks before aggregation, aggregation callbacks before evaluation/reporting."
     },
     {
       "path": "plato/trainers/composable.py",
-      "sha256": "6bc4dab135cd7249346ac3ca23b0e24ea638961cda7806558ab81338dc0496a8",
-      "fact_or_read_scope": "set_client_id dispatch; published optimizer; completed-step and accumulation-finalize hooks; direct versus max_concurrency spawn; attempt-token/client-ID worker-state validation before delta handoff."
+      "git_blob": "a083d558942d7bace16aa79be560b79bd1c8e47f",
+      "sha256": "e844500f270b51d7dc72e6f927b667bb0fa7aa441e32f50d92a571533517acd3",
+      "fact": "train_model runs the training-step end hook before direct acceptance and guarantees cleanup; train_process defers controls through model save/handoff; parent checks token/client and loads model/control state before acceptance."
     },
     {
-      "path": "plato/trainers/strategies/training_step.py",
-      "sha256": "ba912ceea97a1fe592d690cb06c9827cd988d37320a92f1dc72bbb42feea2983",
-      "fact_or_read_scope": "GradientAccumulationStepStrategy normalizes and flushes a partial window at epoch end; completed-step flag controls correction/counting."
+      "path": "plato/trainers/strategies/algorithms/scaffold_strategy.py",
+      "git_blob": "85fa152673708605cae75dac2cd4180ee6983096",
+      "sha256": "4363134ffffc73d59a6f5872a8120a85983ea57b7f6908ccba03235f0a81a10c",
+      "fact": "on_train_end stages controls; on_train_result_accepted atomically replaces canonical file; rejection restores prior controls and refuses outbound delta. Child get_worker_state exports provisional state. Equations, LR/K rules, V2 and legacy paths unchanged."
     },
     {
-      "path": "plato/utils/checkpoint_paths.py",
-      "sha256": "7f530a13e9dac30d4c8a6bb7c05de2ff242d12f203dbf3e4c45495442c789dfd",
-      "fact_or_read_scope": "Contained canonical path resolution; relative historical example subdirectories allowed if contained; canonical names use logical components."
-    },
-    {
-      "path": "plato/servers/strategies/aggregation/fedavg.py",
-      "sha256": "fa1e2a6bbbc8e3829b72cd0cdd47f10b0a8fffbdabdaa2dfb3efed81872877c1",
-      "fact_or_read_scope": "Inherited model averaging uses report.num_samples, with positive total count for weighted-average formula."
-    },
-    {
-      "path": "plato/config.py",
-      "sha256": "8bbe0146a6c112f484efb1ef267c54cda1b48df79935789aaa5febe116bc41a4",
-      "fact_or_read_scope": "-c, -b and --cpu parser definitions; model/data/checkpoint/result paths resolved under base."
-    },
-    {
-      "path": "examples/customized_client_training/scaffold/scaffold.py",
-      "sha256": "37587214941e1532d5552b7477249b18b5fadf905739ac94735d17df9886ac3a",
-      "fact_or_read_scope": "Actual client, trainer, callback and server entrypoint wiring."
-    },
-    {
-      "path": "examples/customized_client_training/scaffold/scaffold_callback.py",
-      "sha256": "159a2adbbae5c7982c30896af596c546e601669b0230b841656ee464ee66d39f",
-      "fact_or_read_scope": "Current inbound controls installed directly in active context; stale fields cleared; processors rebound; successful delta attached before encoding."
-    },
-    {
-      "path": "examples/customized_client_training/scaffold/scaffold_client.py",
-      "sha256": "01a08e2001ba4f9e4e61c2ff520e3d1b3fcff5d44168a3d5ac002c45b4c48a8b",
-      "fact_or_read_scope": "Lifecycle assigns logical identity; strategy is sole client-control owner."
-    },
-    {
-      "path": "examples/customized_client_training/scaffold/scaffold_trainer.py",
-      "sha256": "405c0d270a4362ab0cc2569899ef1deb9b03a5a235ef44c75261b43fdbaf00de",
-      "fact_or_read_scope": "ComposableTrainer with SCAFFOLDUpdateStrategy and compatibility delta view."
-    },
-    {
-      "path": "examples/customized_client_training/scaffold/scaffold_server.py",
-      "sha256": "e2325ee39337489f15711c4073aeb10335e2b47ecc0cc9aefd0406bbbb18c78a",
-      "fact_or_read_scope": "All control deltas validated/staged before model commit; sum(delta)/total_clients; controls sent with full model payload; trainable parameter controls only."
-    },
-    {
-      "path": "examples/customized_client_training/scaffold/scaffold_MNIST_lenet5.toml",
-      "sha256": "43110532d391896d4080782a4dbace3fbe2bc7813ac9e7baa662074f044f290c",
-      "fact_or_read_scope": "MNIST/LeNet-5, population 5, participation 2, epochs 3, rounds 5, spawn concurrency 2; SGD lr .01, momentum .9, weight_decay 0 retained."
-    },
-    {
-      "path": "tests/trainers/test_scaffold_strategy.py",
-      "sha256": "7419ab4ea2088f7825bc8008be99c2d99a18f139dab50188a3c06a6eefd9c02e",
-      "fact_or_read_scope": "Read assertions for independent equations, V2, tail/empty/skipped updates, LR rejection/capture, parameters/buffers, momentum/Adam composition, legacy precedence/client-0 isolation and failures. Not executed by this writing task."
+      "path": "tests/integration/test_scaffold_callback_lifecycle.py",
+      "git_blob": "c0e067014b34f38befb7f5a78ede8122b625ba47",
+      "sha256": "816499d3c791e5cc197d7a5a66e13359a6325b5843fefc9ec5a8ed28505b881c",
+      "fact": "Read all 20 parameterized callback/end-hook boundary cases: precommit x/c preservation, cleared staging, postcommit reporting retention, canonical bytes/absence, cleanup, reconstruction and numerical retry. Not executed by writer."
     },
     {
       "path": "tests/integration/test_scaffold_round_flow.py",
-      "sha256": "5477fbc57455ebbc3ded0a10181fa9b6433edf1b0c1bf200710e51995b21f128",
-      "fact_or_read_scope": "Read synthetic two-round rational oracle, actual-config LR/next-round and momentum checks, reused/reconstructed clients, direct/spawn callbacks and stale/missing worker failure assertions. Not executed by this writing task."
+      "git_blob": "f0cb1fc1dff70b7f59e244fb13960d9624a1f35a",
+      "sha256": "ef289f9437ef6f308c05cb41a37f36c06454422072ef3a633f64873728eb7183",
+      "fact": "Read changed raw-model validation and failed-worker canonical/reuse/retry assertions plus prior direct/spawn two-round coverage. Not executed by writer."
     },
     {
-      "path": "tests/integration/scaffold_round_worker.py",
-      "sha256": "5bf3ca3c59f0b28d76528ebf7ffb5410eb11b05269b962b6080977e97e64c64e",
-      "fact_or_read_scope": "Bounded subprocess harness target for synthetic successful and failed spawn handoffs; not execution evidence."
+      "path": "tests/trainers/test_scaffold_strategy.py",
+      "git_blob": "6070c00c0d78b904e50ea708cb5b03354e76dad0",
+      "sha256": "27f7626b9851846eb91b507344c2b658896e8faacb22e5d87a738b98f1cf6fd9",
+      "fact": "Read acceptance-hook additions and direct callback interruption test, including canonical bytes/absence and outbound refusal. Prior equation/rate/ownership assertions retained. Not executed by writer."
     },
     {
-      "path": "pyproject.toml",
-      "sha256": "799bd7ba1865b097fdc8ca84a7b70337794e338de4aa9a6a13f6a4c1b9156246",
-      "fact_or_read_scope": "uv project/workspace metadata and docs dependency group."
-    },
-    {
-      "path": "docs/mkdocs.yml",
-      "sha256": "a3954634249d84cefd8cab51fd14f48f618c7eddf1439b5f45c501e1c015b056",
-      "fact_or_read_scope": "Existing page navigation, admonition and arithmatex rendering configuration."
-    },
-    {
-      "path": "docs/requirements.txt",
-      "sha256": "b648383d0fa36ceccb3fce7c76e0aa36df591c817b7e5ce46ee61c0c92f29b04",
-      "fact_or_read_scope": "Existing mkdocs-material documentation dependency."
+      "path": "plato/config.py",
+      "git_blob": "510766b62e544e64920e32e7c03214149adb081f",
+      "sha256": "c96aed26f35e2cbf2e54153dbb7099cd8ba3c8042ff5cf467d2e954cbb95308e",
+      "fact": "Read CLI and runtime path logic; actual Config probes exercise both documented relative TOML paths with --cpu and owned -b directories."
     }
   ],
-  "primary_source": {
-    "title": "Karimireddy et al., SCAFFOLD: Stochastic Controlled Averaging for Federated Learning, ICML 2020",
-    "abstract_url": "https://arxiv.org/abs/1910.06378",
-    "pdf_url": "https://arxiv.org/pdf/1910.06378v4",
-    "revision": "v4, 9 April 2021",
-    "read": "Official arXiv abstract and PDF extracted text: Algorithm 1 / Eq. 3 on PDF page 4, Eqs. 4-5 on page 5; appendix Eq. 19 on page 26 checked for sign discrepancy.",
-    "retained_pdf": "/tmp/plato-phase2c-scaffold-docs/1910.06378v4.pdf",
-    "pdf_sha256": "efe06c86acc7a06116e372a7ab6386c300f4d0dc9c7ba2dd5c82e95111a1d694",
-    "equations": [
-      "y <- y-eta*(g-ci+c)",
-      "ci_new=ci-c+(x-y)/(K*eta); delta_ci=ci_new-ci",
-      "c_new=c+sum(delta_ci)/N"
+  "unchanged_sources_from_prior_candidate": [
+    "examples/customized_client_training/scaffold/scaffold.py",
+    "examples/customized_client_training/scaffold/scaffold_callback.py",
+    "examples/customized_client_training/scaffold/scaffold_client.py",
+    "examples/customized_client_training/scaffold/scaffold_trainer.py",
+    "examples/customized_client_training/scaffold/scaffold_MNIST_lenet5.toml",
+    "plato/utils/checkpoint_paths.py",
+    "plato/servers/strategies/aggregation/fedavg.py",
+    "tests/integration/scaffold_round_worker.py"
+  ],
+  "claim_reconciliation": {
+    "edited_in_both_documents": [
+      "Replace direct in-process/worker-return paragraph with acceptance after successful callbacks/end hooks, provisional child controls, parent model/control handoff checks before persistence, and rejected-result preservation of previously accepted controls/outbound refusal.",
+      "Add bounded server validation/commit paragraph: raw halves before staging, actual post-receive-callback state, aggregation callbacks and final validation before commit, staging cleared and prior model/control retained on precommit failure, postcommit evaluation/reporting retention, external side effects excluded."
     ],
-    "interpretation": "Main algorithm is authoritative. Summing fixed-rate vanilla SGD steps yields ci_new=mean(g); appendix Eq. 19 reverses c and ci in the displacement expression. No convergence theorem extended to momentum/adaptive correction or unequal sample-weighted model averaging."
+    "unchanged": "All other prose: setup/run commands, main-paper equations and citation, Option II/V2, K/LR/accumulation, momentum .9 and unequal-count extensions, filenames/legacy precedence/logical identity, changed legacy numerical evolution and no complete restart promise.",
+    "other_algorithms": "FedProx/FedDyn and all later sections byte-identical to both prior prose and pinned C; no FedDyn writing.",
+    "material_source_mismatch_identified": false,
+    "boundary": "Source reconciliation, not independent implementation qualification. Public guide omits agent/workflow status."
   },
-  "design_code_reconciliation": {
-    "material_mismatch_identified_in_documented_scope": false,
-    "boundary": "Manual code/test/source comparison at exact base only, not exhaustive implementation review or qualification.",
-    "worker_claim": "Describes implemented direct/spawn state flow. Existing synthetic test assertions are inspected, not reported as passing.",
-    "legacy_claim": "Canonical wins; absent canonical permits exact contained model_name/client legacy example file then exact nonzero-client concatenated prefix file. No client-0 substitution, broad search, legacy numerical equivalence or coordinated restart promise."
+  "attributed_execution_evidence_not_writer_runs": {
+    "root": {
+      "receipt": "phase2c-root-intermediate-base-validation.json",
+      "revision": "15e0cebd78ec6752b9aae1e922b33e22e168387f",
+      "profile": "Python 3.13.16 base profile from exact source archive without .git",
+      "passed": 797,
+      "expected_optional_skips": 4,
+      "allowed_runtime_deselections": 48,
+      "exit_code": 0,
+      "warnings_reported": 0
+    },
+    "original_author": {
+      "receipt": "phase2c-scaffold-review2-fixes-validation.json and receipt.json",
+      "executed_commit": "0f17708afefde13eeba1fd71578258b68c5911ee",
+      "source_identity_check": "Only two evidence JSON files differ from executed commit to pinned 15e; no production/test changes.",
+      "profiles": [
+        "Python 3.13.16",
+        "Python 3.14.8"
+      ],
+      "passed_each": 174,
+      "warnings_each": 17,
+      "skips_each": 0,
+      "coverage": "Includes new lifecycle cases, actual spawned success/failure/retry and two-round checks; 17 warnings disclosed in author receipt."
+    },
+    "interpretation": "Counts overlap and are not summed. Writer read these records and test assertions; no runtime suite rerun here. Assignment says fresh code review3 is running on immutable 15e; no review3 acceptance consumed."
   },
-  "executed_checks": [
-    {
-      "command": "zsh -lc 'UV_PROJECT_ENVIRONMENT=/tmp/plato-phase2c-scaffold-docs/venv uv sync --locked --only-group docs --no-install-project --python 3.13'",
+  "writer_checks": {
+    "environment": "Existing owned docs venv, Python 3.13.16, MkDocs 1.6.1, Material 9.7.7; installed locked numpy 2.5.3/munch 4.0.0 for Config probes only.",
+    "config_dependency_install": {
+      "command": "UV_CACHE_DIR=/tmp/plato-phase2c-scaffold-docs/reconciliation-15e/uv-cache uv pip install --python /tmp/plato-phase2c-scaffold-docs/venv/bin/python numpy==2.5.3 munch==4.0.0",
+      "shell": "zsh -lc",
       "exit_code": 0,
-      "result": "Owned docs-only environment; uv 0.12.22, CPython 3.13.16, MkDocs 1.6.1, Material 9.7.7. No other environment mutated.",
-      "log": "/tmp/plato-phase2c-scaffold-docs/docs-sync.log"
+      "log": "/tmp/plato-phase2c-scaffold-docs/reconciliation-15e/config-deps.log"
     },
-    {
-      "command": "zsh -lc '/tmp/plato-phase2c-scaffold-docs/venv/bin/python -m mkdocs build --strict -f docs/mkdocs.yml -d /tmp/plato-phase2c-scaffold-docs/site'",
-      "exit_code": 1,
-      "result": "Exactly two existing Nanochat link warnings; no new SCAFFOLD warning. Strict build is not claimed passing.",
-      "log": "/tmp/plato-phase2c-scaffold-docs/mkdocs-candidate.log"
+    "executions": [
+      {
+        "label": "docs",
+        "command": "env PYTHONDONTWRITEBYTECODE=1 /tmp/plato-phase2c-scaffold-docs/venv/bin/python /tmp/plato-phase2c-scaffold-docs/reconciliation-15e/validate_docs.py",
+        "shell": "zsh -lc",
+        "cwd": "/private/tmp/plato-refresh-worktrees/scaffold-docs",
+        "exit_code": 0,
+        "seconds": 1.69,
+        "log": "/tmp/plato-phase2c-scaffold-docs/reconciliation-15e/docs.log",
+        "log_sha256": "11d6658fe1d9896ce2129575c20443a67d5dfa0edfe949d3932ebbdd6f77a161"
+      },
+      {
+        "label": "config-root",
+        "command": "env PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=/private/tmp/plato-refresh-worktrees/scaffold-docs /tmp/plato-phase2c-scaffold-docs/venv/bin/python /tmp/plato-phase2c-scaffold-docs/reconciliation-15e/config_probe.py -c examples/customized_client_training/scaffold/scaffold_MNIST_lenet5.toml --cpu -b /tmp/plato-phase2c-scaffold-docs/reconciliation-15e/config-root",
+        "shell": "zsh -lc",
+        "cwd": "/private/tmp/plato-refresh-worktrees/scaffold-docs",
+        "exit_code": 0,
+        "seconds": 0.446,
+        "log": "/tmp/plato-phase2c-scaffold-docs/reconciliation-15e/config-root.log",
+        "log_sha256": "9751c33908b8171fe61af418fa01604ad1b155acc0c2cee498322c5e06536383"
+      },
+      {
+        "label": "config-examples",
+        "command": "env PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=/private/tmp/plato-refresh-worktrees/scaffold-docs /tmp/plato-phase2c-scaffold-docs/venv/bin/python /tmp/plato-phase2c-scaffold-docs/reconciliation-15e/config_probe.py -c scaffold/scaffold_MNIST_lenet5.toml --cpu -b /tmp/plato-phase2c-scaffold-docs/reconciliation-15e/config-examples",
+        "shell": "zsh -lc",
+        "cwd": "/private/tmp/plato-refresh-worktrees/scaffold-docs/examples/customized_client_training",
+        "exit_code": 0,
+        "seconds": 0.175,
+        "log": "/tmp/plato-phase2c-scaffold-docs/reconciliation-15e/config-examples.log",
+        "log_sha256": "c52e7e27ad4a62e616e207f032cb5835e902b28389e42201217dc7214e5f9ec8"
+      },
+      {
+        "label": "paper-link",
+        "command": "curl --fail --location --silent --show-error --max-time 45 https://arxiv.org/pdf/1910.06378v4 -o /tmp/plato-phase2c-scaffold-docs/reconciliation-15e/paper.pdf",
+        "shell": "zsh -lc",
+        "cwd": "/private/tmp/plato-refresh-worktrees/scaffold-docs",
+        "exit_code": 0,
+        "seconds": 0.074,
+        "log": "/tmp/plato-phase2c-scaffold-docs/reconciliation-15e/paper-link.log",
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    ],
+    "docs_check_result": "PASS: command paths, TOML settings, flags, Markdown math/code/admonition/link rendering, non-SCAFFOLD suffix, exact non-doc source scope, A/B ancestry and git diff --check.",
+    "config_check_result": "PASS: actual Config argument loading from repository root and examples/customized_client_training, --cpu and owned base paths; no training invocation or dataset download.",
+    "primary_link": "Official versioned arXiv PDF fetched; SHA256 efe06c86acc7a06116e372a7ab6386c300f4d0dc9c7ba2dd5c82e95111a1d694 matches prior source. Research text unchanged.",
+    "scripts": [
+      {
+        "path": "/tmp/plato-phase2c-scaffold-docs/reconciliation-15e/validate_docs.py",
+        "sha256": "3dcc7158bed9f66501b13fe198352e1846e2579f506d7b27f58724280cd70685"
+      },
+      {
+        "path": "/tmp/plato-phase2c-scaffold-docs/reconciliation-15e/config_probe.py",
+        "sha256": "898ab3add3a31dd5ab4e74839193bbd0941edbe0b967d335886b8a66ebbcc23f"
+      }
+    ],
+    "results": {
+      "path": "/tmp/plato-phase2c-scaffold-docs/reconciliation-15e/checks.json",
+      "sha256": "11d6658fe1d9896ce2129575c20443a67d5dfa0edfe949d3932ebbdd6f77a161"
     },
-    {
-      "command": "zsh -lc 'PYTHONDONTWRITEBYTECODE=1 /tmp/plato-phase2c-scaffold-docs/venv/bin/python /tmp/plato-phase2c-scaffold-docs/validate_docs.py'",
-      "exit_code": 0,
-      "result": "Static run-command/config/CLI-flag checks; README and section math/link/code/admonition rendering; unchanged non-SCAFFOLD suffix and TOML; git diff --check; exact-base archived docs strict build reproduces identical two warnings.",
-      "duration_seconds": 0.791,
-      "script_sha256": "24ff67e500e97d3998ed925b8e64e72f02bd125b627d4cd5383b980a55ceb017",
-      "results": "/tmp/plato-phase2c-scaffold-docs/checks.json",
-      "results_sha256": "0e4486508fa26c036b62ac236cd7f1bd8888fce28a6b840a07d7d51a24784e26",
-      "baseline_build_command": "zsh -lc '/tmp/plato-phase2c-scaffold-docs/venv/bin/python -m mkdocs build --strict -f /tmp/plato-phase2c-scaffold-docs/baseline/docs/mkdocs.yml -d /tmp/plato-phase2c-scaffold-docs/baseline-site'",
-      "baseline_build_exit_code": 1,
-      "baseline_log": "/tmp/plato-phase2c-scaffold-docs/mkdocs-baseline.log"
-    },
-    {
-      "command": "zsh -lc 'git merge-base --is-ancestor 00eeb9dc HEAD'",
-      "exit_code": 0,
-      "result": "Accepted B is an ancestor of the exact C base."
+    "strict_mkdocs": {
+      "baseline_command": "/tmp/plato-phase2c-scaffold-docs/venv/bin/python -m mkdocs build --strict -f /tmp/plato-phase2c-scaffold-docs/reconciliation-15e/baseline/docs/mkdocs.yml -d /tmp/plato-phase2c-scaffold-docs/reconciliation-15e/baseline-site",
+      "candidate_command": "/tmp/plato-phase2c-scaffold-docs/venv/bin/python -m mkdocs build --strict -f docs/mkdocs.yml -d /tmp/plato-phase2c-scaffold-docs/reconciliation-15e/site",
+      "shell": "zsh -lc",
+      "baseline_exit_code": 1,
+      "candidate_exit_code": 1,
+      "identical_warnings": [
+        "WARNING -  Doc file 'configurations/evaluation.md' contains a link 'examples/case-studies/5. Nanochat in Plato.md', but the target 'configurations/examples/case-studies/5. Nanochat in Plato.md' is not found among documentation files.",
+        "WARNING -  Doc file 'references/evaluators.md' contains a link 'examples/case-studies/5. Nanochat in Plato.md', but the target 'references/examples/case-studies/5. Nanochat in Plato.md' is not found among documentation files."
+      ],
+      "new_scaffold_warnings": 0,
+      "disposition": "Two preexisting Nanochat link failures remain Phase5-owned. Strict build is not passing; no warnings hidden or unrelated pages repaired.",
+      "logs": [
+        "/tmp/plato-phase2c-scaffold-docs/reconciliation-15e/mkdocs-baseline.log",
+        "/tmp/plato-phase2c-scaffold-docs/reconciliation-15e/mkdocs-candidate.log"
+      ]
     }
-  ],
-  "existing_phase5_link_failures": [
-    "WARNING -  Doc file 'configurations/evaluation.md' contains a link 'examples/case-studies/5. Nanochat in Plato.md', but the target 'configurations/examples/case-studies/5. Nanochat in Plato.md' is not found among documentation files.",
-    "WARNING -  Doc file 'references/evaluators.md' contains a link 'examples/case-studies/5. Nanochat in Plato.md', but the target 'references/examples/case-studies/5. Nanochat in Plato.md' is not found among documentation files."
-  ],
+  },
   "limits": [
-    "C execution evidence is pending. No C test or MNIST training run executed by this task; source/test presence is not a passing result.",
-    "No claim of C acceptance, F27 closure, convergence, GPU support or full server/optimizer/RNG/privacy recovery.",
-    "Run instructions checked statically; docs-only locked sync does not qualify the complete training environment or entrypoint runtime.",
-    "Markdown rendered with repository extensions; no browser/KaTeX visual inspection or full-site external link crawl.",
-    "No production, configuration, fixture, shared metadata, unrelated documentation or root-report edits; no push/publication or nested agents.",
-    "Root must reconcile prose with final C commit and obtain fresh independent writing review before integration; no changing C commits merged here."
+    "No C/Phase2 acceptance, F27 closure or fresh independent writing-review claim. Final C/source reconciliation and exact-candidate review remain required.",
+    "No full training install, runtime test suite, MNIST training/download, GPU or convergence claim. Config probes only complement static run-command checks.",
+    "No browser/KaTeX visual inspection or full-site external link crawl. Retained rendered HTML and verified paper link.",
+    "Bounded model/control failure semantics do not promise rollback of external callback effects or full server/optimizer/RNG/privacy restart.",
+    "Only authorized dependency merge and three scoped prose/evidence edits. No production/test edits, evolving C merge, FedDyn prose, nested agents, push or cleanup."
   ]
 }
