@@ -34,11 +34,9 @@ class Sampler(base.Sampler):
     dataset, biased across partition size."""
 
     def __init__(self, datasource, client_id, testing):
-        super().__init__()
+        super().__init__(client_id)
 
         self.client_id = client_id
-
-        np.random.seed(self.random_seed)
 
         # obtain the dataset information
         if testing:
@@ -47,13 +45,13 @@ class Sampler(base.Sampler):
             dataset = datasource.get_train_set()
 
         # The list of labels (targets) for all the examples
-        self.targets_list = datasource.targets
+        self.targets_list = dataset.targets if testing else datasource.targets
 
         self.dataset_size = len(dataset)
 
         indices = list(range(self.dataset_size))
 
-        np.random.shuffle(indices)
+        self.rng.shuffle(indices)
 
         # Concentration parameter to be used in the Dirichlet distribution
         concentration = (
@@ -88,6 +86,7 @@ class Sampler(base.Sampler):
             min_partition_size=min_partition_size,
             number_partitions=num_clients + 1,
             is_extend_total_size=True,
+            rng=self.rng,
         )
 
         proportions_range = (np.cumsum(proportions) * dataset_size).astype(int)[:-1]
@@ -116,7 +115,10 @@ class Sampler(base.Sampler):
 
     def get_sampled_data_condition(self):
         """Get the detailed info of the trainset"""
-        targets_array = np.array(self.targets_list)
+        targets = (
+            self.targets_list() if callable(self.targets_list) else self.targets_list
+        )
+        targets_array = np.array(targets)
         client_sampled_subset_labels = targets_array[self.subset_indices]
         unique, counts = np.unique(client_sampled_subset_labels, return_counts=True)
         return np.asarray((unique, counts)).T

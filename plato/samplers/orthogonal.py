@@ -19,7 +19,7 @@ class Sampler(base.Sampler):
         super().__init__()
 
         # Different clients should have a different bias across the labels
-        np.random.seed(self.random_seed * int(client_id))
+        self.rng.seed(self.random_seed * int(client_id))
 
         self.partition_size = Config().data.partition_size
 
@@ -61,7 +61,7 @@ class Sampler(base.Sampler):
                 else 1.0
             )
 
-            class_proportions = np.random.dirichlet(
+            class_proportions = self.rng.dirichlet(
                 np.repeat(concentration, len(class_id_list))
             )
 
@@ -76,6 +76,12 @@ class Sampler(base.Sampler):
         target_proportions = np.asarray(target_proportions)
 
         self.sample_weights = target_proportions[target_list]
+        eligible = np.count_nonzero(self.sample_weights)
+        if not 0 < self.partition_size <= eligible:
+            raise ValueError(
+                f"Orthogonal partition size must be between 1 and {eligible} "
+                "eligible samples from the assigned classes."
+            )
 
     def get(self):
         """Obtains an instance of the sampler."""

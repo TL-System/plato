@@ -7,8 +7,6 @@ Samples data from a dataset, biased across modalities in an
     There is no difference between the train sampler and test sampler.
 """
 
-import numpy as np
-
 from plato.samplers import base
 
 
@@ -24,8 +22,6 @@ class Sampler(base.Sampler):
             modalities_name = datasource.get_modality_name()
         else:  # default: it only contains image data
             modalities_name = ["rgb"]
-
-        np.random.seed(self.random_seed)
 
         # obtain the modalities that hold for this data
         self.subset_modalities = modalities_name

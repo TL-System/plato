@@ -8,6 +8,10 @@ import numpy as np
 def extend_indices(indices, required_total_size):
     """Extend the indices to obtain the required total size
     by duplicating the indices"""
+    if required_total_size < 0:
+        raise ValueError("required_total_size must be nonnegative.")
+    if len(indices) == 0 and required_total_size > 0:
+        raise ValueError("Cannot extend empty dataset indices to a positive size.")
     # add extra samples to make it evenly divisible, if needed
     if len(indices) < required_total_size:
         while len(indices) < required_total_size:
@@ -19,16 +23,19 @@ def extend_indices(indices, required_total_size):
     return indices
 
 
-def generate_left_classes_pool(anchor_classes, all_classes, keep_anchor_size=1):
+def generate_left_classes_pool(
+    anchor_classes, all_classes, keep_anchor_size=1, rng=None
+):
     """Generate classes pool by 1. removng anchor classes from the all classes
     2. randomly select 'keep_anchor_size' from anchor classes to the left
     class pool."""
 
-    if anchor_classes is None:
+    if not anchor_classes:
         return all_classes
+    rng = np.random if rng is None else rng
 
     # obtain subset classes from the anchor class
-    left_anchor_classes = np.random.choice(
+    left_anchor_classes = rng.choice(
         anchor_classes, size=keep_anchor_size, replace=False
     )
     # remove the anchor classes from the whole classes
@@ -58,9 +65,10 @@ def assign_fully_classes(dataset_labels, dataset_classes, num_clients, client_id
 
         # the samples of each class is evenly assigned to this client
         split = np.array_split(idx_k, num_clients)
-        clients_dataidx_map[client_id] = np.append(
-            clients_dataidx_map[client_id], split[client_id]
-        )
+        for partition_id in range(num_clients):
+            clients_dataidx_map[partition_id] = np.append(
+                clients_dataidx_map[partition_id], split[partition_id]
+            )
     return clients_dataidx_map
 
 
@@ -72,6 +80,7 @@ def assign_sub_classes(
     anchor_classes=None,
     consistent_clients=None,
     keep_anchor_classes_size=None,
+    rng=None,
 ):
     """Assign subset of classes to each client and assign corresponding samples of classes
 
@@ -86,6 +95,7 @@ def assign_sub_classes(
                                                     in the class pool for global classes
                                                     assignment.
     """
+    rng = np.random if rng is None else rng
     # define the client_id to sample index mapper
     clients_dataidx_map = {
         client_id: np.ndarray(0, dtype=np.int64) for client_id in range(num_clients)
@@ -107,17 +117,23 @@ def assign_sub_classes(
                 anchor_classes=anchor_classes,
                 all_classes=dataset_classes,
                 keep_anchor_size=keep_anchor_classes_size,
+                rng=rng,
             )
 
             num_classes = len(left_classes_id_list)
+            if not 0 < per_client_classes_size <= num_classes:
+                raise ValueError(
+                    "Requested classes exceed the available class pool "
+                    f"({num_classes})."
+                )
             current_assigned_cls_idx = client_id % num_classes
-            assigned_cls = dataset_classes[current_assigned_cls_idx]
+            assigned_cls = left_classes_id_list[current_assigned_cls_idx]
             current_assigned_cls = [assigned_cls]
             classes_assigned_count[assigned_cls] += 1
             j = 1
             while j < per_client_classes_size:
                 # ind = np.random.randint(0, max_class_id)
-                ind = np.random.choice(left_classes_id_list, size=1)[0]
+                ind = rng.choice(left_classes_id_list, size=1)[0]
                 if ind not in current_assigned_cls:
                     j = j + 1
                     current_assigned_cls.append(ind)
@@ -149,6 +165,7 @@ def create_dirichlet_skew(
     number_partitions,  # number of partitions
     min_partition_size=None,  # minimum required size for partitions
     is_extend_total_size=False,
+    rng=None,
 ):
     """Create the distribution skewness based on the dirichlet distribution
 
@@ -157,11 +174,33 @@ def create_dirichlet_skew(
          partitions satisfying min_partition_size by directly extending
          the total data size.
     """
-    if min_partition_size is not None:
+    rng = np.random if rng is None else rng
+    if total_size <= 0 or number_partitions <= 0:
+        raise ValueError(
+            "Dirichlet skew requires positive data size and partition count."
+        )
+    if concentration <= 0 or not np.isfinite(concentration):
+        raise ValueError("Dirichlet concentration must be finite and positive.")
+    if min_partition_size is not None and min_partition_size != 0:
+        if min_partition_size < 0:
+            raise ValueError("min_partition_size must be nonnegative.")
+        if (
+            not is_extend_total_size
+            and (
+                min_partition_size * number_partitions > total_size
+                or (
+                    number_partitions > 1
+                    and min_partition_size * number_partitions == total_size
+                )
+            )
+        ):
+            raise ValueError(
+                "Minimum partition sizes are infeasible for the dataset size."
+            )
         if not is_extend_total_size:
             min_size = 0
             while min_size < min_partition_size:
-                proportions = np.random.dirichlet(
+                proportions = rng.dirichlet(
                     np.repeat(concentration, number_partitions)
                 )
 
@@ -171,7 +210,7 @@ def create_dirichlet_skew(
         else:  # extend the total size to satisfy the minimum requirement
             minimum_proportion_bound = float(min_partition_size / total_size)
 
-            proportions = np.random.dirichlet(
+            proportions = rng.dirichlet(
                 np.repeat(concentration, number_partitions)
             )
 
@@ -187,6 +226,6 @@ def create_dirichlet_skew(
             proportions = list(map(set_min_bound, proportions))
 
     else:
-        proportions = np.random.dirichlet(np.repeat(concentration, number_partitions))
+        proportions = rng.dirichlet(np.repeat(concentration, number_partitions))
 
     return proportions
