@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
   "task": "2B: Runtime lifecycle and strategy contracts",
-  "date": "2026-10-02",
-  "status": "Implementation and relevant validation complete; root independent review and integration pending.",
+  "date": "2026-10-03",
+  "status": "Review corrections and relevant validation complete; fresh root independent review and final combined-source integration pending.",
   "identities": {
     "worktree": "/private/tmp/plato-refresh-worktrees/runtime",
     "branch": "maintenance/2026-phase2-runtime",
     "baseline_commit": "fda60becedfa6236c11d415b87a868b52789a41e",
-    "final_implementation_commit": "759be841c2c9c6d92608c1ac7186a5e9ded42fe4",
+    "final_implementation_commit": "516da21d66472d8916ed42aa21ce462d29944f73",
     "evidence_commit_policy": "This record is an evidence-only direct child of final_implementation_commit. Its exact delivery hash is reported separately, avoiding a self-hash circularity.",
     "authorities": [
       "AGENTS.md",
@@ -16,7 +16,12 @@
       "Root assignment and latest coordination: additional findings use task-local IDs; F21-F24 reserved for 2C."
     ],
     "excluded_paths_unchanged": "HE/MPC owner paths, trainers, algorithms, models/MLX, shared fixtures, manifests, lock, CI and startup regression sources.",
-    "no_push_merge_pr_or_delegation": true
+    "no_push_merge_pr_or_delegation": true,
+    "previous_delivery": {
+      "implementation_commit": "759be841c2c9c6d92608c1ac7186a5e9ded42fe4",
+      "evidence_commit": "b3b038efa376b060e1c01f1da39173240768a019",
+      "review_decision": "CHANGES_REQUESTED"
+    }
   },
   "findings": [
     {
@@ -97,11 +102,11 @@
     },
     {
       "id": "T2B-S3-PREFIX",
-      "status": "Confirmed open handoff to 2D; outside owned runtime paths",
+      "status": "Runtime correction complete against pinned corrected 2D source; final accepted combination pending root validation",
       "before": "Actual S3.send_to_s3 with prefix /prefix writes /prefix//prefix/client_payload_7_ABC123, while receive_from_s3 requests /prefix/client_payload_7_ABC123.",
       "evidence": "/tmp/plato-phase2b-runtime/s3-prefix-handoff.json",
       "method": "Actual utility methods with patched HTTP/presigner; no network.",
-      "followup": "2D reconcile send_to_s3/put_to_s3 prefix handling and audit standalone utility receive calls. Runtime bounded reader follows existing reader prefix contract."
+      "followup": "Original broken writer evidence retained in history. Corrected runtime exactly-once normalization now passes with pinned D writer and minimal adapters. Root revalidates accepted combined commits; no historical-key migration."
     }
   ],
   "audit": [
@@ -151,8 +156,8 @@
     },
     "config_rules": "Byte/count values are positive integers; timeout is finite and positive. Defaults allow existing 1 MiB send chunks. No manifest/config fixture changes.",
     "socket_max_http_buffer_size": "2 * max(max_report_bytes, max_chunk_bytes) + 65536; default 2162688 bytes.",
-    "semantics": "Payload byte/chunk/part limits are cumulative across parts. Server buffer budget includes reports plus active, queued and retained completed wire bytes without double-counting queued completed values. Incomplete-transfer deadline is absolute and expires without another message. Client inbound transfer and simulation-file reads are bounded by configured payload caps.",
-    "s3": "Existing presigned-object format/key prefix; 64 KiB HTTP streaming, Content-Length check, reserve-before-append and total deadline. Actual local aiohttp reader tests: valid, oversized header, oversized stream, malformed/truncated pickle and incomplete timeout. No live S3 credentials/service used.",
+    "semantics": "Payload byte/chunk/part limits are cumulative across parts. max_buffered_bytes is both the server-wide retained wire budget and each client's cumulative inbound socket/S3/file cap. Server budget includes reports, active, queued and retained completion-cache bytes, deduplicated by distinct transfer identity. Reuse/disconnect drop only that session's cache; queued bytes survive until their exact update is released. Incomplete-transfer deadline is absolute and expires without another message.",
+    "s3": "Existing presigned-object format/key prefix; 64 KiB HTTP streaming, Content-Length check, reserve-before-append and total deadline. Actual local aiohttp reader tests: valid, oversized header, oversized stream, malformed/truncated pickle and incomplete timeout. No live S3 credentials/service used. Review correction validates exactly-once canonical prefix normalization with actual pinned D writer/presigner and minimal adapters; no historical malformed-key migration.",
     "compatibility": "Completed reports/payloads remain visible to legacy server completion hooks until assignment/disconnect/close. Default urgent communication uses report.client_id for envelope, parts, completion, simulation filename and S3 reference."
   },
   "environment": {
@@ -363,7 +368,9 @@
         "result": "Passed before implementation commit"
       }
     ],
-    "interim_failures": "Earlier broad runs exposed two startup integration regressions (missing direct-start limit state and removed completion fields); both were corrected without changing accepted startup tests. Final accepted broad logs supersede those interim results."
+    "interim_failures": "Earlier broad runs exposed two startup integration regressions (missing direct-start limit state and removed completion fields); both were corrected without changing accepted startup tests. Final accepted broad logs supersede those interim results.",
+    "implementation_commit": "759be841c2c9c6d92608c1ac7186a5e9ded42fe4",
+    "scope": "Historical initial-author validation; final correction results are in review_corrections.results."
   },
   "checkpoint_handoff_2c": {
     "owner": "2C / F07 after 2B acceptance",
@@ -452,14 +459,206 @@
     "Session binding preserves existing trusted-peer protocol; it does not introduce authentication or assignment nonces. Same logical-ID replay during an indistinguishable new assignment cannot be identified by this protocol.",
     "Wire byte/count/deadline caps do not bound arbitrary decoded pickle object expansion or CPU execution. Pickle inputs and S3 object writers remain trusted.",
     "Live S3, distributed GPU and production multi-silo deployment were not executed. Custom S3 adapters need the existing key_prefix/bucket/presigning interface.",
-    "Standalone S3 utility ingress remains outside 2B; confirmed prefix mismatch handed to 2D.",
-    "F07 slash-name checkpoint coordination and MLX tree specifics remain assigned to 2C and 3A. No whole-stack Python 3.14 claim."
+    "F07 slash-name checkpoint coordination and MLX tree specifics remain assigned to 2C and 3A. No whole-stack Python 3.14 claim.",
+    "Combined B/D S3 evidence is provisional against immutable a4a4733; root must revalidate final accepted combination. No D worktree changes/cherry-pick or live cloud qualification.",
+    "Full urgent trainer time-snapshot writer-to-reader execution awaits 2C/F26. Runtime regressions use actual selection/dispatch/ingress/queues with inert report/payload generation; trainer metadata loading and epoch sorting were not repaired here."
   ],
   "owned_temporary_resources": {
     "root": "/tmp/plato-phase2b-runtime",
     "contents": "Isolated venv313/venv314, sync/submodule logs, red/green/interim raw logs, baseline module/probe JSON, S3 prefix probe JSON, pytest basetemp trees, process result.json and commit-message files.",
     "additional": "Early focused red/green tests used pytest-managed per-run temp directories under the local pytest-of-bli root; they contain only test-owned artifacts.",
     "policy": "Retain scratch/logs until root acceptance; no workspace closure, evidence cleanup or other agent resource cleanup.",
-    "process_outcome": "All 96 startup result records across final broad runs show no surviving owned descendants."
+    "process_outcome": "All 96 startup result records across final broad runs show no surviving owned descendants.",
+    "review_correction_root": "/tmp/plato-phase2b-runtime/review-fixes"
+  },
+  "review_corrections": {
+    "recorded_at_utc": "2026-10-03T02:43:32.273568+00:00",
+    "review": {
+      "candidate_commit": "b3b038efa376b060e1c01f1da39173240768a019",
+      "candidate_tree": "188ad9d6e7a76ef4da2e201d918fe1c0a63b7125",
+      "file": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2b-review.json",
+      "sha256": "6664ea117a5c8457551e8fb0256937297bef0012aca9c8cdd1f74cfbe5787c13",
+      "root_probe": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2b-root-probe.json",
+      "root_probe_sha256": "a7c9674d09f06c36edc8d5315b5152758a6d1efb1c37a1f07e786a907b282900",
+      "read_only_reference": "/tmp/plato-phase2b-review/candidate/tests/test_phase2b_review_probes.py",
+      "reference_sha256": "d216c04ecbc1c79d2d92f3303af906cbf98e641b1d3ef43b55aef4af5bc6546e"
+    },
+    "outcomes": [
+      {
+        "id": "R2B-03",
+        "status": "Fixed",
+        "change": "Only one outstanding urgent assignment per physical sid. Deferred same-worker reports and bytes stay in the finish-time heap; next urgent request issues after completion. All distinct-worker assignments are prepared before any emit await.",
+        "regression": "Actual _select_clients batching and ingress build round-1 reports 7/2/9, then 9 in rounds 2/3. Both requested stale-client responses complete, no duplicate training_sids, round advances to 4. Distinct-worker requests stay concurrent and both complete."
+      },
+      {
+        "id": "R2B-01",
+        "status": "Fixed",
+        "change": "heapify immediately after selective urgent removal; simulated time advances with max(current_time, finish_time) in both heap extraction paths.",
+        "regression": "Partial urgency selects [20,9,28] or [20,9,28,31] with independently known finish order and wall_time 28/31. An actual earlier response at wall_time 50 cannot rewind the clock."
+      },
+      {
+        "id": "R2B-02",
+        "status": "Fixed",
+        "change": "Deduplicate queued and completion-cache bytes by distinct local transfer identity, propagated through client_info and updates, rather than logical client ID. Tokens never enter the wire protocol. Close releases queue objects as well as byte records.",
+        "regression": "Actual fast-response await boundary retains two distinct completions for logical client 7 across two workers; third-worker report rejects before parsing at the exact budget. Reuse removes only its own completion cache; malformed ingress/disconnect preserve still-queued bytes; processed release and close clean them. Legacy completion report/payload fields stay visible."
+      },
+      {
+        "id": "R2B-L01",
+        "status": "Fixed",
+        "change": "max_buffered_bytes also caps each client's cumulative socket/S3 transfer, in addition to the existing server-wide budget and simulated-file cap. reserve checks before retaining bytes.",
+        "regression": "82-byte socket and actual HTTP S3 ingress reject at max_buffered_bytes=20 with payload/chunk limits=256, then clear their transfer buffers."
+      },
+      {
+        "id": "T2B-S3-PREFIX / 2D-17",
+        "status": "Runtime correction implemented; combined-source acceptance provisional",
+        "change": "Strip leading/trailing prefix slashes, prepend nonempty prefix exactly once, leave empty prefix and already-qualified key unchanged. Uses only minimal adapter fields key_prefix, bucket, s3_client; no migration of historically broken keys.",
+        "regression": "Eight owned minimal-adapter key cases plus 24 actual pinned-2D writer/botocore-presigner/bounded-reader cases cover empty, prefixed, nested and trailing-slash prefixes, full/minimal adapters, valid roundtrip, size cap and absolute deadline."
+      }
+    ],
+    "results": {
+      "313": {
+        "python": "3.13.16",
+        "red": {
+          "command": "OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2b-runtime/venv313/bin/python -m pytest tests/servers/test_runtime_review_regressions.py tests/servers/test_runtime_s3_contract.py /tmp/plato-phase2b-runtime/review-fixes/test_s3_combined.py -q --basetemp /tmp/plato-phase2b-runtime/review-fixes/red313",
+          "result": "22 failed, 18 passed; meaningful behavior failures against unmodified reviewed candidate",
+          "log": "/tmp/plato-phase2b-runtime/review-fixes/red-behavior313.log",
+          "sha256": "da557faffe134668f39e17fc3e6185fe0993373f7ebe60db93f669b0999778f2"
+        },
+        "green": {
+          "command": "OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2b-runtime/venv313/bin/python -m pytest tests/servers/test_runtime_review_regressions.py tests/servers/test_runtime_s3_contract.py /tmp/plato-phase2b-runtime/review-fixes/test_s3_combined.py -q --basetemp /tmp/plato-phase2b-runtime/review-fixes/green313",
+          "result": "40 passed; no skips or warnings",
+          "log": "/tmp/plato-phase2b-runtime/review-fixes/green313.log",
+          "sha256": "72731a6fe4dd1040c41381eb883f17f26490827ad77cc746a6deeaa44f908743"
+        },
+        "final_affected_suite": {
+          "command": "OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2b-runtime/venv313/bin/python -m pytest tests/clients tests/servers tests/callbacks tests/integration/test_smoke_configs.py tests/integration/test_event_loop_startup.py -q --basetemp /tmp/plato-phase2b-runtime/review-fixes/accepted313",
+          "result": "227 passed; no skips, warnings or failures",
+          "elapsed_seconds": 432.09,
+          "log": "/tmp/plato-phase2b-runtime/review-fixes/accepted313.log",
+          "sha256": "84038006d7002d8e3f966096db58c1eef4f5b6a61916f8ebb8e897668d8e6bf3",
+          "note": "Includes final added malformed-ingress cleanup assertion after the 40-case run."
+        },
+        "startup": {
+          "cases": 48,
+          "surviving_owned_descendants": 0,
+          "deliberate_watchdog_negative_cases": 5,
+          "source_unchanged": true,
+          "socket": {
+            "returncode": 0,
+            "timed_out": false,
+            "forced": [],
+            "elapsed_seconds": 14.200878167059273,
+            "trained_clients": [
+              {
+                "id": 1,
+                "samples": 2,
+                "pid": 49552
+              },
+              {
+                "id": 2,
+                "samples": 6,
+                "pid": 49553
+              }
+            ],
+            "independent_float64_weighted_reference_max_abs_error": {
+              "linear.weight": 1.4901161193847656e-08,
+              "linear.bias": 2.9103830456733704e-10
+            },
+            "reference_method": "For each parameter, sum(actual_received_tensor * actual_sample_count) / sum(sample_count), independently using NumPy float64.",
+            "raw_result": "/tmp/plato-phase2b-runtime/review-fixes/accepted313/test_real_two_client_cpu_socke0/round/result.json"
+          }
+        }
+      },
+      "314": {
+        "python": "3.14.8",
+        "red": {
+          "command": "OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2b-runtime/venv314/bin/python -m pytest tests/servers/test_runtime_review_regressions.py tests/servers/test_runtime_s3_contract.py /tmp/plato-phase2b-runtime/review-fixes/test_s3_combined.py -q --basetemp /tmp/plato-phase2b-runtime/review-fixes/red314",
+          "result": "22 failed, 18 passed; meaningful behavior failures against unmodified reviewed candidate",
+          "log": "/tmp/plato-phase2b-runtime/review-fixes/red-behavior314.log",
+          "sha256": "08c527c9455f33d573b41b1345c7a37a2d986cd36f682b2a35686e421d6b63cc"
+        },
+        "green": {
+          "command": "OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2b-runtime/venv314/bin/python -m pytest tests/servers/test_runtime_review_regressions.py tests/servers/test_runtime_s3_contract.py /tmp/plato-phase2b-runtime/review-fixes/test_s3_combined.py -q --basetemp /tmp/plato-phase2b-runtime/review-fixes/green314",
+          "result": "40 passed; no skips or warnings",
+          "log": "/tmp/plato-phase2b-runtime/review-fixes/green314.log",
+          "sha256": "7d2b9d0bb631306e2f6a4aa8cd5ee586da7c909274793437093513eeaa39cda6"
+        },
+        "final_affected_suite": {
+          "command": "OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2b-runtime/venv314/bin/python -m pytest tests/clients tests/servers tests/callbacks tests/integration/test_smoke_configs.py tests/integration/test_event_loop_startup.py -q --basetemp /tmp/plato-phase2b-runtime/review-fixes/accepted314",
+          "result": "227 passed; no skips, warnings or failures",
+          "elapsed_seconds": 480.55,
+          "log": "/tmp/plato-phase2b-runtime/review-fixes/accepted314.log",
+          "sha256": "efcab313a8c5e667bd7e7d4eec65b91062eae29393f0dd5fd6b5c5c41ad7d666",
+          "note": "Includes final added malformed-ingress cleanup assertion after the 40-case run."
+        },
+        "startup": {
+          "cases": 48,
+          "surviving_owned_descendants": 0,
+          "deliberate_watchdog_negative_cases": 5,
+          "source_unchanged": true,
+          "socket": {
+            "returncode": 0,
+            "timed_out": false,
+            "forced": [],
+            "elapsed_seconds": 15.865072750020772,
+            "trained_clients": [
+              {
+                "id": 1,
+                "samples": 2,
+                "pid": 49633
+              },
+              {
+                "id": 2,
+                "samples": 6,
+                "pid": 49634
+              }
+            ],
+            "independent_float64_weighted_reference_max_abs_error": {
+              "linear.weight": 1.4901161193847656e-08,
+              "linear.bias": 2.9103830456733704e-10
+            },
+            "reference_method": "For each parameter, sum(actual_received_tensor * actual_sample_count) / sum(sample_count), independently using NumPy float64.",
+            "raw_result": "/tmp/plato-phase2b-runtime/review-fixes/accepted314/test_real_two_client_cpu_socke0/round/result.json"
+          }
+        }
+      }
+    },
+    "count_policy": "227 affected suite cases plus 24 separate provisional D-combination cases = 251 distinct cases per interpreter. The 40-case run overlaps 16 owned affected cases; do not add 40 to 227.",
+    "red_failure_breakdown": "Five blocking lifecycle failures (two heap orders, monotonic time, shared worker and distinct accounting), two client-buffer failures, six minimal-adapter prefix failures and nine provisional D-combination prefix failures.",
+    "harness": "Initial collection imported FedAvg before Config fixture isolation and exited without tests. Corrected owned test import placement before meaningful red runs; red313.log/red314.log are harness failures, not product evidence.",
+    "checks": [
+      {
+        "command": "/tmp/plato-phase2b-runtime/venv313/bin/ruff check . --select I",
+        "result": "Passed",
+        "log": "/tmp/plato-phase2b-runtime/review-fixes/ruff.log"
+      },
+      {
+        "command": "/tmp/plato-phase2b-runtime/venv313/bin/ty check plato/clients/transport.py",
+        "result": "Passed for transport helper only",
+        "log": "/tmp/plato-phase2b-runtime/review-fixes/ty-transport.log"
+      },
+      {
+        "command": "git diff --check",
+        "result": "Passed before correction implementation commit"
+      }
+    ],
+    "combined_source": {
+      "d_candidate": "a4a4733e96cf248a73db76e6b2182536b9f592ea",
+      "d_tree": "8f64fa760a4c1e5be3eb28956a3b22e0ba206f7c",
+      "d_source": "plato/utils/s3.py",
+      "owned_read_only_copy": "/tmp/plato-phase2b-runtime/review-fixes/s3_a4a4733.py",
+      "source_sha256": "a26d306daa6a4accd4d67c9f26dea9f9ad153e74353fe8698643987cb6f25c03",
+      "integration_probe": "/tmp/plato-phase2b-runtime/review-fixes/test_s3_combined.py",
+      "probe_sha256": "f11bc92cc5c013146962d68e3eb8d45100be9aaf7b7072ec7a88b4103d711222",
+      "method": "git show exact D commit into owned scratch; actual S3 constructor/send_to_s3/put_to_s3 plus botocore presigner and Requests writer, with bounded runtime aiohttp reader against a local HTTP object contract using dummy local credentials.",
+      "policy": "No D worktree edits or cherry-pick. D independent review is separate; root revalidates the final accepted B/D combination. No cloud service or historical-key migration."
+    },
+    "trainer_handoff": {
+      "owner": "2C",
+      "F26": "Full urgent trainer snapshot retrieval remains unqualified: ComposableTrainer.obtain_model_at_time fails tree-Safetensors metadata loading on Torch 2.14.1 and sorts epoch 9 ahead of 10. Root trainer-lifecycle-probes.json owns reproduction. These tests exercise real runtime dispatch/batching/ingress/round progress with inert report/payload generation, not full trainer snapshot retrieval.",
+      "F23": "Ditto/APFL/FedDyn/SCAFFOLD state persistence remains with 2C; no runtime expansion.",
+      "F07": "Detailed checkpoint writer/reader/temporary/resume inventory below remains the accepted serialized 2C handoff."
+    },
+    "resources": "All new logs, pytest bases, pinned D source/probe and evidence-builder/commit messages remain under /tmp/plato-phase2b-runtime/review-fixes until root acceptance. Reviewer/root files and other agent environments remain read-only."
   }
 }
