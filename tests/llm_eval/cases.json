@@ -1,0 +1,80 @@
+{
+  "schema_version": 1,
+  "cases": [
+    {
+      "nodeid": "tests/llm_eval/test_lighteval_runtime.py::test_real_preset_pipeline_normalizes_metrics_and_refreshes_exports[current-model]",
+      "criteria": [
+        "LE1",
+        "LE2",
+        "LE3"
+      ]
+    },
+    {
+      "nodeid": "tests/llm_eval/test_lighteval_runtime.py::test_real_preset_pipeline_normalizes_metrics_and_refreshes_exports[configured-local]",
+      "criteria": [
+        "LE1",
+        "LE2",
+        "LE3"
+      ]
+    },
+    {
+      "nodeid": "tests/llm_eval/test_lighteval_runtime.py::test_real_piqa_prompt_and_preset_task_contract",
+      "criteria": [
+        "LE2"
+      ]
+    },
+    {
+      "nodeid": "tests/llm_eval/test_lighteval_runtime.py::test_real_model_config_failure_clears_stale_results_and_exports[False]",
+      "criteria": [
+        "LE3",
+        "LE4"
+      ]
+    },
+    {
+      "nodeid": "tests/llm_eval/test_lighteval_runtime.py::test_real_model_config_failure_clears_stale_results_and_exports[True]",
+      "criteria": [
+        "LE3",
+        "LE4"
+      ]
+    },
+    {
+      "nodeid": "tests/llm_eval/test_lighteval_runtime.py::test_real_missing_primary_metric_is_rejected",
+      "criteria": [
+        "LE2",
+        "LE4"
+      ]
+    },
+    {
+      "nodeid": "tests/llm_eval/test_lighteval_runtime.py::test_real_readonly_local_source_ignores_old_responses[same]",
+      "criteria": [
+        "LE3"
+      ]
+    },
+    {
+      "nodeid": "tests/llm_eval/test_lighteval_runtime.py::test_real_readonly_local_source_ignores_old_responses[separate]",
+      "criteria": [
+        "LE3"
+      ]
+    },
+    {
+      "nodeid": "tests/llm_eval/test_lighteval_runtime.py::test_failure_after_actual_inference_cleans_local_copies[False]",
+      "criteria": [
+        "LE3",
+        "LE4"
+      ]
+    },
+    {
+      "nodeid": "tests/llm_eval/test_lighteval_runtime.py::test_failure_after_actual_inference_cleans_local_copies[True]",
+      "criteria": [
+        "LE3",
+        "LE4"
+      ]
+    },
+    {
+      "nodeid": "tests/llm_eval/test_lighteval_runtime.py::test_real_hub_style_response_cache_is_per_run",
+      "criteria": [
+        "LE3"
+      ]
+    }
+  ]
+}
