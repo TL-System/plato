@@ -13195,5 +13195,103 @@
       "sha256": "79355c0184680eaac2ad8646a23ff79d5ef70e5797cea1e313db7948a96488db"
     },
     "implementation_not_included": "F28 generic selectionRNG startup correction is separately B/root-owned, outside six fixes and not claimed resolved."
+  },
+  "current_feddyn_scaffold_delivery": {
+    "status": "IMPLEMENTED_DUAL_VERSION_QUALIFIED_FRESH_REVIEW_PENDING",
+    "implementation_commit": "7d310b90d698a7be4aa9a184dc415f7dbb401e5b",
+    "implementation_tree": "019018a41c14b76ca974e148373d9aa8a66bb827",
+    "evidence": {
+      "path": "/private/tmp/plato-refresh-worktrees/training/evidence/2026-refresh/phase2c-feddyn-validation.json",
+      "bytes": 56795,
+      "sha256": "1beca9f0465a6afa30c7aaf2ddb1334bfdcc1beccc09feb2656456c8a727e440"
+    },
+    "facts": {
+      "path": "/private/tmp/plato-refresh-worktrees/training/evidence/2026-refresh/phase2c-feddyn-facts.json",
+      "bytes": 7711,
+      "sha256": "31e724a60a09d548f66621ff8d2b384670ddd22b8ff9c97cc2ebd9975cafbd7e"
+    },
+    "dependency_merges": {
+      "A": "abf27a34db3e40fc743f329d40bed5dae4dc70f7",
+      "B": {
+        "premerge": "15e0cebd78ec6752b9aae1e922b33e22e168387f",
+        "accepted_b": "a058a2ef8d230ca2e34dbf1c91e6eaac0b0205ac",
+        "conflicts": true,
+        "restored_draft_sha256": "d7595d180ec24be5ec1e1c754af48b5f29686b7484813f7c2bcfad95f01f72c9",
+        "status": "MERGED",
+        "merge": "1fe8b63940c21eca23b91e9f79281171e80f0cbc",
+        "parents": [
+          "15e0cebd78ec6752b9aae1e922b33e22e168387f",
+          "a058a2ef8d230ca2e34dbf1c91e6eaac0b0205ac"
+        ],
+        "tree": "af6317a3b438f4ef99e8a7bac6ac3a434850eabc",
+        "conflict_resolution": "Only _save_random_states signature/docstring: retain C checkpoint_root argument and accepted B docstring. B startup guards and self.prng_state persistence merged unchanged."
+      },
+      "D": {
+        "merge_commit": "f25530b1dc2d92d1a7a64ace89c18bdfcfe4e1e8",
+        "parents": [
+          "8a43d96aa093021fd4677ba3bbd2193d8a744221",
+          "96323afa094a37584844275cc04bf1e1eedfaa0d"
+        ],
+        "tree": "71358cbf03c0d6110ed2654c2a646cb7aef2932d",
+        "accepted_D": "96323afa094a37584844275cc04bf1e1eedfaa0d",
+        "review_sha256": "ea5c8a01719582167ae2a78b7a9cca11384679b71c5933379bcbfbf284533186",
+        "conflicts": false,
+        "native_metadata_compatibility_removed": true,
+        "command": "zsh -lc git merge --no-ff 96323afa094a37584844275cc04bf1e1eedfaa0d -m 'Integrated the accepted payload serialization and utility dependency.'"
+      }
+    },
+    "preserved_historical_report": "Original f977/earlier counts/findings remain historical, never relabelled as new candidate passes.",
+    "general_four_corrections": "Root independently accepted at f977; retained, not reopened.",
+    "new_corrections": [
+      "F27-R3-01 cleanup before direct acceptance; L01 failed-stage cleanup ownership and primary/secondary exception visibility.",
+      "ROOT-2BC-01 test reconciliation to independently referenced owned selection RNG.",
+      "ROOT-2C-02 portable actual old-writer fixture retained; FD now uses explicit read-only legacy inspection API."
+    ],
+    "finding_2C_11": "Implemented/qualified under accepted FD design; still open pending independent code/prose review and root acceptance.",
+    "public_scaffold_change": "Fallible successful cleanup now precedes final direct result acceptance; deferred parent/token/model-save ordering, equations/control paths and server callback/evaluation boundary unchanged. Astra prose reconciliation needed.",
+    "counts": {
+      "final-mandatory-not-runtime-313": {
+        "tests": 1232,
+        "passed": 1231,
+        "failed": 0,
+        "skipped": 1
+      },
+      "final-mandatory-not-runtime-314": {
+        "tests": 1232,
+        "passed": 1231,
+        "failed": 0,
+        "skipped": 1
+      },
+      "final-base-not-runtime-313": {
+        "tests": 1232,
+        "passed": 1229,
+        "failed": 0,
+        "skipped": 3
+      },
+      "final-base-not-runtime-314": {
+        "tests": 1232,
+        "passed": 1229,
+        "failed": 0,
+        "skipped": 3
+      }
+    },
+    "runtime": {
+      "313": {
+        "startup_cases": 48,
+        "feddyn_entrypoint_cases": 3
+      },
+      "314": {
+        "startup_cases": 48,
+        "feddyn_entrypoint_cases": 3
+      }
+    },
+    "runtime_provenance": {
+      "executed_commit": "05a9f00b8a4d54c233c1a9c00ef9ce2c4467480c",
+      "final_implementation_commit": "7d310b90d698a7be4aa9a184dc415f7dbb401e5b",
+      "only_intervening_source_change": "FedDyn-only test branch in tests/trainers/test_personalized_state_ownership.py isolates its import namespace via guarded subprocess; no production/runtime test/harness/config difference.",
+      "diff": "tests/trainers/test_personalized_state_ownership.py | 18 ++++++++++++++++--\n 1 file changed, 16 insertions(+), 2 deletions(-)",
+      "no_repeat_reason": "All51 runtime cases passed; unrelated test-only import isolation is fully covered by rerun base/mandatory non-runtime profiles. No extra startup rerun solely for evidence commits."
+    },
+    "whole_phase_acceptance": "Not claimed."
   }
 }
