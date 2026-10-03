@@ -1,0 +1,881 @@
+{
+  "schema_version": 1,
+  "reviewed_at_utc": "2026-10-03T02:25:55.873335+00:00",
+  "review_role": "Fresh independent Phase 2D reviewer, root alone; no subagents, collaboration, delegation, candidate edits, branch switches, commits, pushes, questions, PR edits, or implementer resource cleanup.",
+  "decision": "CHANGES_REQUESTED",
+  "candidate_local_acceptance": "CHANGES_REQUESTED: four concrete medium correctness findings remain in the accepted scope. F02-F05 and F12 pass the bounded candidate-local checks.",
+  "phase_integration_acceptance": "PENDING: the separately tracked 2B bounded-reader namespace correction and root merged validation are required even after candidate-local findings close. This report does not grant a Phase 2 or integration PASS.",
+  "identity": {
+    "candidate_commit": "a4a4733e96cf248a73db76e6b2182536b9f592ea",
+    "candidate_tree": "8f64fa760a4c1e5be3eb28956a3b22e0ba206f7c",
+    "tested_implementation_commit": "e7c0d59571d88efd7eb1fdbf4fc63ac2a7b81395",
+    "tested_implementation_tree": "c75f88fa49260ced9e2b65b3e0101f1ba5be0f60",
+    "baseline_commit": "fda60becedfa6236c11d415b87a868b52789a41e",
+    "baseline_tree": "11a5f04acd220db9ba6b7da4971d07895846c05e",
+    "cwd": "/private/tmp/plato-refresh-worktrees/payloads",
+    "candidate_vs_implementation": "Only evidence/2026-refresh/phase2d-validation.json differs; production and test source are identical.",
+    "working_source_verification": "All 44 present changed tracked files matched their exact candidate Git blobs; removed legacy source path is absent. Tracked status clean before and after review.",
+    "source_hash_manifest": {
+      "path": "/tmp/plato-phase2d-review/source_identities.json",
+      "sha256": "30e28c4f61fa04c21f7921ba3c8c73eefc6c278370147e25195f696e0664b15b"
+    },
+    "instruction_artifacts": [
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/payloads/AGENTS.md",
+        "sha256": "b50f87f31ea3d87076952d8b7d2d8af067132fbf877d80f8780c208fb45527ec"
+      },
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/payloads/evidence/2026-refresh/plan.md",
+        "sha256": "edb9a58cc7915a940854f16d5029fe97434703bf2f75eca0dcb96de2d0f0eb15"
+      },
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/payloads/evidence/2026-refresh/plan-addendum.json",
+        "sha256": "5b51b0fb7ed6f68d9fce7176335b3e7be5e5f178a2788590912aa2396a487709"
+      },
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/payloads/evidence/2026-refresh/plan-addendum-acceptance.json",
+        "sha256": "5f5d5a8e22e14072b5d031c19a27be14bda9bdbc2a157d14af78845daac6c56b"
+      }
+    ],
+    "validation_artifact": {
+      "path": "/private/tmp/plato-refresh-worktrees/payloads/evidence/2026-refresh/phase2d-validation.json",
+      "sha256": "4ea352a714117beb6b55328c996a6a021f9828748fa5f3abeba4b4397dbad352"
+    },
+    "accepted_addendum_binding": "Artifact SHA-256 5b51b0fb7ed6f68d9fce7176335b3e7be5e5f178a2788590912aa2396a487709 matches the accepted addendum and the implementation evidence."
+  },
+  "scope": {
+    "reviewed": [
+      "Actual baseline-to-candidate production/test/archive diff and accepted Phase 2D plan/addendum.",
+      "Processors, serialization, tree utilities, S3, cleanup, TOML and shared utility fixes.",
+      "HE utility/server/aggregation strategy and explicitly handed-off MPC client/server/strategy/store paths.",
+      "Active reinforcement_learning DDPG/SAC/TD3 policies, batch/recurrent handling, and checkpoint synchronization.",
+      "Only unused plato/utils/rl_env.py archival, original bytes, provenance/license, dependency closure, and preservation of active RL/FEI.",
+      "Retained evidence identities, final suites, representative real socket/lifecycle events, and independent bounded probes."
+    ],
+    "excluded_or_other_owners": [
+      "Phase 1 package/startup design and already accepted local/Linux qualification; unchanged startup source was inspected through retained evidence, not rerun broadly.",
+      "General runtime/session/transport behavior belongs to 2B; its known S3 key helper dependency is recorded separately below.",
+      "Nanochat tokenizer, third_party.py, archive.py, trainers/algorithms, MLX qualification, dependency metadata/lock/CI, and unrelated examples.",
+      "FEI constructor and zero-norm defects are explicit Phase 4 handoffs, not missing 2D fixes.",
+      "No authentication redesign, finite-field Shamir redesign, new wire protocol, blanket typing cleanup, or whole-repository support certification."
+    ],
+    "writes": "Only this report outside owned /tmp/plato-phase2d-review scratch. Candidate and implementer environments/raw evidence stayed read-only."
+  },
+  "findings": [
+    {
+      "id": "2D-R01",
+      "severity": "MEDIUM",
+      "path": "plato/clients/strategies/mpc.py",
+      "line": 35,
+      "related_locations": [
+        {
+          "path": "plato/servers/fedavg_mpc_shamir.py",
+          "line": 20
+        },
+        {
+          "path": "plato/processors/mpc_model_encrypt_shamir.py",
+          "line": 122
+        },
+        {
+          "path": "plato/servers/strategies/mpc.py",
+          "line": 212
+        }
+      ],
+      "title": "Configured Shamir threshold reaches the server but not the production client processor.",
+      "scope_basis": "Explicit additional ownership includes MPC client/server strategies; reconstruction, threshold wiring, and numerical correctness were claimed as reviewed. This is an existing advertised configuration, not a new feature request.",
+      "description": "MPCLifecycleStrategy only supplies client_id, round_store, and debug_artifacts. With five selected clients and server.mpc_shamir_threshold=1, the registry-created client processors use their default threshold 3 while the aggregation strategy reconstructs using threshold 1. A degree-two polynomial evaluated at the client coordinate is mistaken for its constant term, silently biasing valid model weights. Tests that manually pass the same threshold to both ends miss this production wiring gap.",
+      "reproduction": {
+        "versions": [
+          "Python 3.13.16",
+          "Python 3.14.8"
+        ],
+        "script": "/tmp/plato-phase2d-review/numerical_probes.py",
+        "steps": [
+          "Use configure_environment with clients.outbound_processors=[mpc_model_encrypt_shamir], five selected clients and server.mpc_shamir_threshold=1.",
+          "Initialize a real isolated RoundInfoStore for round 9 and record one sample for each selected client.",
+          "Build actual MPCLifecycleStrategy kwargs and registry.get(Client) outbound pipelines; process identical float64 weights [0.125,-0.2] for all five clients.",
+          "Aggregate actual shares with MPCShamirAggregationStrategy using the configured server threshold, preserving ordinary sender-target orientation."
+        ],
+        "client_threshold_kwargs": [
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "effective_client_threshold": 3,
+        "actual": [
+          0.13390880000000002,
+          -0.19542239999999997
+        ],
+        "independent_plaintext_reference": [
+          0.125,
+          -0.2
+        ],
+        "max_absolute_error": 0.008908800000000022,
+        "expected_tolerance": 2e-06
+      },
+      "correction": "Propagate the existing server.mpc_shamir_threshold consistently into registry-created Shamir client processor kwargs, with a defined precedence for explicitly supplied processor kwargs. Keep the current real-valued/scaled prototype and default threshold behavior.",
+      "acceptance": "A config-driven client lifecycle/registry plus real store/aggregation probe with a nondefault threshold below n-2 must match the independent weighted plaintext reference; default and zero-count behavior remain correct."
+    },
+    {
+      "id": "2D-R02",
+      "severity": "MEDIUM",
+      "path": "plato/processors/model_dequantize_qsgd.py",
+      "line": 79,
+      "title": "QSGD produces infinities from valid finite float32 values because scaling overflows before division.",
+      "scope_basis": "Accepted QSGD finite values, error bounds, and malformed-input behavior are part of the additional processor correctness fixes.",
+      "description": "The header scale and quantized codes pass all new finite/length/level checks, but zeta * max_v / tuning_param multiplies in float32 before normalization. At level 64, the code 63 times a finite scale 1e38 overflows even though the final reconstructed endpoint should be 1e38. The decoder silently returns infinities and breaks its finite/error-bound contract.",
+      "reproduction": {
+        "versions": [
+          "Python 3.13.16",
+          "Python 3.14.8"
+        ],
+        "minimal_python": "x = torch.tensor([1e38, -1e38, 0.], dtype=torch.float32)\nencoded = model_quantize_qsgd.Processor(client_id=1).process({'w': x})\ny = model_dequantize_qsgd.Processor(client_id=1).process(encoded)['w']",
+        "actual": [
+          "inf",
+          "-inf",
+          "0.0"
+        ],
+        "independent_float64_reference": [
+          "9.999999680285692e+37",
+          "-9.999999680285692e+37",
+          "0.0"
+        ],
+        "also_fails_levels": [
+          16,
+          128
+        ],
+        "level_2_control": "Finite and correct."
+      },
+      "correction": "Normalize codes before multiplying by the scale, or use a sufficiently wide intermediate and cast only the final result. Preserve the existing sign/magnitude wire, levels, and max-norm stochastic quantization equation.",
+      "acceptance": "Roundtrip valid large finite positive/negative float32 endpoints at the default level with finite results and the existing error bound, alongside the already passing ordinary/zero/empty cases."
+    },
+    {
+      "id": "2D-R03",
+      "severity": "MEDIUM",
+      "path": "plato/utils/toml_writer.py",
+      "line": 129,
+      "related_locations": [
+        {
+          "path": "plato/utils/toml_writer.py",
+          "line": 147
+        }
+      ],
+      "title": "Valid Unicode outside the BMP is emitted as invalid TOML surrogate escapes.",
+      "scope_basis": "Unicode key and nested array-table roundtrips are expressly included in the TOML repair and acceptance review.",
+      "description": "Quoted keys and string values use json.dumps with ensure_ascii=True. Non-BMP code points become two surrogate \\u escapes. JSON permits that representation, but TOML requires Unicode scalar values and rejects the generated document. BMP examples pass while valid emoji and supplementary CJK text fail.",
+      "reproduction": {
+        "versions": [
+          "Python 3.13.16",
+          "Python 3.14.8"
+        ],
+        "minimal_python": "tomllib.loads(toml_writer.dumps({'🚀': 1}))",
+        "generated_toml": "\"\\ud83d\\ude80\" = 1\n",
+        "actual_error": "TOMLDecodeError: Escaped character is not a Unicode scalar value (at line 1, column 8)",
+        "additional_inputs": [
+          {
+            "title": "experiment 🚀"
+          },
+          {
+            "tables": [
+              {
+                "𠮷": {
+                  "literal.dot": [
+                    1,
+                    2
+                  ]
+                }
+              }
+            ]
+          }
+        ],
+        "independent_reference": "Each valid input mapping must be reproduced exactly by stdlib tomllib."
+      },
+      "correction": "Emit these code points as actual UTF-8 characters (for example ensure_ascii=False) or valid eight-digit TOML Unicode escapes in both keys and values. Preserve the existing mixed-array/null wrapper conventions.",
+      "acceptance": "Stdlib tomllib roundtrips a non-BMP quoted key, ordinary string value, and nested array-table key, while the existing literal-dot/BMP/comment structure remains correct."
+    },
+    {
+      "id": "2D-R04",
+      "severity": "MEDIUM",
+      "path": "plato/processors/mpc_model_encrypt_shamir.py",
+      "line": 73,
+      "related_locations": [
+        {
+          "path": "plato/processors/mpc_model_encrypt_shamir.py",
+          "line": 125
+        }
+      ],
+      "title": "The accepted threshold-1000 boundary can enter an impossible unbounded coefficient-selection loop.",
+      "scope_basis": "The revised processor explicitly accepts thresholds through min(participants,1000) and claims bounded exact-range rejection instead of inaccurate prototype results.",
+      "description": "A scaled secret in 1..999 already occupies one element of the finite random coefficient pool. Threshold 1000 requires 999 more distinct coefficients, but only 998 remain. The while value in coefficients loop therefore cannot terminate. The later coordinate-range error is never reached. This concerns the currently accepted boundary; rejecting unsupported input promptly is sufficient and does not require a new cryptographic scheme.",
+      "reproduction": {
+        "version": "Python 3.13.16",
+        "minimal_python": "random.seed(23)\np = Processor.__new__(Processor)\np._secret_shares(torch.tensor(0.000010, dtype=torch.float64), 1000, 1000)",
+        "probe": {
+          "path": "/tmp/plato-phase2d-review/shamir_threshold_bound.json",
+          "sha256": "0d34f51e7d4533d386c6ca9cb8723059e70e55a751462b6eb898fd0373a3027c"
+        },
+        "actual": "Isolated process printed entered and failed to return within the 4-second subprocess deadline; the process was contained by the review harness.",
+        "independent_reason": "The scaled secret is 10. The pool 1..999 excluding 10 contains 998 values, strictly fewer than the 999 additional coefficients required.",
+        "public_path": "Processor.process accepts this threshold at line 125 and invokes _split_tensor -> _secret_shares for a scaled model element of 0.000010."
+      },
+      "correction": "Validate coefficient-pool capacity before sampling and reject impossible requests, or use bounded sampling without replacement with an explicit capacity check. Preserve the real-valued polynomial prototype; no finite-field redesign is needed.",
+      "acceptance": "The currently accepted impossible boundary fails promptly with a useful error before any shares are persisted; normal thresholds retain the existing numerical reconstruction reference."
+    }
+  ],
+  "mandatory_acceptance": [
+    {
+      "id": "F02",
+      "candidate_local_result": "PASS",
+      "evidence": "Actual local botocore/Requests put/send/receive/delete/list tests plus independent logical and already-qualified operations for empty/nested/leading/trailing prefix forms; utility prefixes exactly once."
+    },
+    {
+      "id": "F03",
+      "candidate_local_result": "PASS",
+      "evidence": "Empty successful listings without Contents return []; the independent paginator also consumed an empty intermediate page with a continuation token."
+    },
+    {
+      "id": "F04",
+      "candidate_local_result": "PASS",
+      "evidence": "Original five matching objects over three pages and unrelated-key exclusion; independent three-page tokens 0,1,2 with empty middle page and namespace filtering."
+    },
+    {
+      "id": "F05",
+      "candidate_local_result": "PASS_WITH_DISCLOSED_LIMIT",
+      "evidence": "Ten actual local botocore/Requests stall/error probes passed in the focused run; independent default-three-attempt PUT recovery, GET exhaustion and 403 HEAD error propagation passed. Source defaults remain connect/read inactivity 5/30 seconds, three attempts, bounded backoff and no Retry-After delay. No universal trickling-body deadline or live-cloud claim."
+    },
+    {
+      "id": "F12",
+      "candidate_local_result": "PASS",
+      "evidence": "Actual flat-path collisions/reserved tensor metadata reject before Safetensors save, including both insertion orders and string-coerced aliases. Independent manually constructed historical wire and valid dotted/bracketed model keys remain compatible."
+    }
+  ],
+  "performed_checks": [
+    {
+      "name": "Retained evidence/source identity verification",
+      "result": "PASS",
+      "details": "All 38 path/SHA-256 raw evidence references matched; accepted addendum hash matched acceptance; exact 2B retained transport snapshot matched its reported Git blob; all changed candidate source matched exact Git blobs.",
+      "artifact": {
+        "path": "/tmp/plato-phase2d-review/evidence_hashes.json",
+        "sha256": "fec80be4cc107f24b73ff2b26110894d30aefff8cacfedbba463a202a2a8352f"
+      }
+    },
+    {
+      "name": "Independent focused candidate tests in owned locked Python 3.13 environment",
+      "command": "PYTHONDONTWRITEBYTECODE=1 OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 /tmp/plato-phase2d-review/venv313/bin/python -m pytest tests/utils/test_s3.py tests/utils/test_safetensor_serialization.py tests/processors/test_payload_regressions.py tests/mpc/test_mpc_regressions.py tests/mpc/test_round_store_contracts.py tests/servers/test_he_payload_regressions.py tests/utils/test_cleanup.py tests/utils/test_shared_payload_utilities.py tests/utils/test_rl_payload_utilities.py -q -p no:cacheprovider -W error::UserWarning --basetemp=/tmp/plato-phase2d-review/pytest-focused313 --junitxml=/tmp/plato-phase2d-review/focused313.xml",
+      "result": {
+        "passed": 121,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "reported_seconds": 12.64
+      },
+      "artifacts": [
+        {
+          "path": "/tmp/plato-phase2d-review/focused313.log",
+          "sha256": "6d326138b3d3d9fe125d557d47857e57318314ad9dd12888a656d04d8d1cbf58"
+        },
+        {
+          "path": "/tmp/plato-phase2d-review/focused313.xml",
+          "sha256": "eef94edbd8c91e99baf66f64c152ff9320324876642962c09f6275a3e8e84948"
+        }
+      ],
+      "note": "121 passed. This scoped rerun exercised the retained tests; the independent probes below, rather than suite counts, established the four remaining findings. No unchanged passing broad suite was rerun."
+    },
+    {
+      "name": "Independent numerical/wire references on Python 3.13 and 3.14",
+      "commands": [
+        "PYTHONDONTWRITEBYTECODE=1 OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 PYTHONPATH=/private/tmp/plato-refresh-worktrees/payloads /tmp/plato-phase2d-review/venv313/bin/python /tmp/plato-phase2d-review/numerical_probes.py",
+        "PYTHONDONTWRITEBYTECODE=1 OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 PYTHONPATH=/private/tmp/plato-refresh-worktrees/payloads /tmp/plato-phase2d-review/venv314/bin/python /tmp/plato-phase2d-review/numerical_probes.py"
+      ],
+      "result": "Six bounded check groups passed on each interpreter; QSGD finite-scale, non-BMP TOML, and config-driven Shamir probes reproduced the findings on both.",
+      "references": {
+        "safetensors": "Independent exact values/shapes/dtypes for transpose/negative-stride/scalar/empty/bfloat16 leaves and manually authored historical flat Safetensors wire.",
+        "qsgd": "512 seeded draws at levels 2,16,128 checked against max(abs(x))/(levels-1) and a six-standard-error expectation bound; source unchanged, integer/bool buffers exact, empty/scalar and malformed scale/code/shape rejected. Large finite values expose 2D-R02.",
+        "compression": "Exact independent strided feature/target values and dtypes including empty int64 targets; historical C-order zstd tuple wire; heterogeneous shape/dtype rejection.",
+        "toml": "Two nested array-table levels, literal dotted keys and BMP Unicode match stdlib tomllib; non-BMP inputs expose 2D-R03.",
+        "mpc": "Actual processors/store/aggregators with five out-of-order clients, fractional counts including zero, scalar/strided/empty weights, and independent plaintext sums. Additive max error 5.55e-17; matched Shamir thresholds 1/3/5 max error 6.94e-18. All three stale store writer methods rejected without changing persisted state. Production config mismatch exposes 2D-R01.",
+        "he": "Native TenSEAL CKKS for no/partial/all masks, matrices and a scalar with 1.5/4.5 sample counts. Independent weighted reference max error below 1.2e-7 (acceptance abs 2e-5); caller mask unchanged; malformed ciphertext failed without replacing encrypted_model."
+      },
+      "artifacts": [
+        {
+          "path": "/tmp/plato-phase2d-review/numerical_probes.py",
+          "sha256": "86bf95b9d4b76925ddd80a42ea3e2d2a589d18dfcd8a7b7eedeedaa00626bae5"
+        },
+        {
+          "path": "/tmp/plato-phase2d-review/numerical13.json",
+          "sha256": "eaf491a8c45ab7bb0991a2c333ed22267a59b6e7ed44b01ab621bcdd401e95c6"
+        },
+        {
+          "path": "/tmp/plato-phase2d-review/numerical14.json",
+          "sha256": "6727121ef97f362b53d42ce567e7238d9d02b4652f49bebe479df49baed49e23"
+        }
+      ]
+    },
+    {
+      "name": "Independent HTTP namespace/pagination, RL updates/persistence and cleanup on Python 3.13 and 3.14",
+      "commands": [
+        "PYTHONDONTWRITEBYTECODE=1 OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 PYTHONPATH=/private/tmp/plato-refresh-worktrees/payloads /tmp/plato-phase2d-review/venv313/bin/python /tmp/plato-phase2d-review/network_rl_probes.py",
+        "PYTHONDONTWRITEBYTECODE=1 OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 PYTHONPATH=/private/tmp/plato-refresh-worktrees/payloads /tmp/plato-phase2d-review/venv314/bin/python /tmp/plato-phase2d-review/network_rl_probes.py"
+      ],
+      "result": "Utility HTTP operations, default retry counts, all five policy update/checkpoint variants, recurrent actor/both-critic isolation and actual cleanup CLI passed on both interpreters. The exact separate 2B reader reproduced the known integration mismatch.",
+      "details": {
+        "network": "Own credential-free ThreadingHTTPServer; real boto3/botocore/Requests and exact Git-loaded 2B reader. Logical and qualified utility keys work; empty intermediate list page progresses; unrelated objects stay intact. Three-attempt PUT recovers after two 503s, three-attempt GET fails after exhaustion in about 0.22s, and 403 HEAD prevents overwrite.",
+        "rl": "DDPG, TD3 plain/recurrent, SAC stochastic/deterministic: both actor and critic parameters actually changed and losses stayed finite. Existing checkpoint key sets were retained; loaded actor and critic target parameters matched exactly, and training after loading stayed finite. Variable-length recurrent actor and both critics matched independent per-transition evaluation within 1e-7, excluded padding and left input sequences unchanged.",
+        "cleanup": "Actual cleanup.py CLI on an owned miniature root removed ordinary runtime contents, preserved outside symlink targets and cache/runtime aliases, and left the external checkpoint bytes intact."
+      },
+      "artifacts": [
+        {
+          "path": "/tmp/plato-phase2d-review/network_rl_probes.py",
+          "sha256": "038147ed47b760153522c5f697edc53f9731ee5f78a6e8e2a0fcc18049bb389e"
+        },
+        {
+          "path": "/tmp/plato-phase2d-review/network_rl13.json",
+          "sha256": "193d4d304334e0d68a775514baf59b9929982e97abf6cd1615717e53cacfe60a"
+        },
+        {
+          "path": "/tmp/plato-phase2d-review/network_rl14.json",
+          "sha256": "87b338c2fc3dbecfbc7d3891d337882bf5335d63a8c056d05c2bde53689ee852"
+        }
+      ]
+    },
+    {
+      "name": "Source/evidence checks for pruning, randomized response, utilities and store error handling",
+      "result": "PASS for the exercised bounded cases",
+      "details": "Focused tests exercised pruning after trainer.model replacement against the independent magnitude reference, randomized-response source immutability/binary float32 output, exact integer/bool quantization buffers, offline parameter-counter import, stable epsilon=2000 unary probabilities, zero-length compound loaders, CSV schema/quoting, atomic local store failure preservation, remote service-error propagation and failed/false ZooKeeper lock cleanup. Kazoo service contracts were mocked; no live ZooKeeper claim."
+    },
+    {
+      "name": "Bounded Shamir coefficient-pool boundary",
+      "result": "FAIL: 2D-R04",
+      "details": "A single actual _secret_shares call in an isolated Python 3.13 process entered and exceeded its 4-second deadline. Finite-pool cardinality proves termination impossible for the input; the review harness contained that subprocess.",
+      "artifact": {
+        "path": "/tmp/plato-phase2d-review/shamir_threshold_bound.json",
+        "sha256": "0d34f51e7d4533d386c6ca9cb8723059e70e55a751462b6eb898fd0373a3027c"
+      }
+    },
+    {
+      "name": "Archive bytes, license, provenance and active dependency closure",
+      "result": "PASS",
+      "details": "Archive rl_env.py byte-for-byte matches baseline plato/utils/rl_env.py (SHA-256 557fec876520d089a69c18484bcc73465eb1f52ac332442acc35427d57c7a40c); copied Apache license matches baseline LICENSE (c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4). Last original source modification matches da8869512e417002975a16f818bcad7e91224279. Active-source/config/reference scan found no imports/entrypoints for the removed adapter. Active reinforcement_learning and FEI remain present; historical limitations are documented."
+    },
+    {
+      "name": "Diff hygiene",
+      "command": "git diff --check fda60becedfa6236c11d415b87a868b52789a41e a4a4733e96cf248a73db76e6b2182536b9f592ea",
+      "result": "PASS; no source or test edits by the reviewer."
+    }
+  ],
+  "retained_validation_inspection": {
+    "author_full_suites": {
+      "python313": {
+        "command": [
+          "/tmp/plato-phase2d.G3jkGH/venv313/bin/python",
+          "-m",
+          "pytest",
+          "tests",
+          "--test-profile",
+          "mandatory",
+          "-q",
+          "--basetemp=/tmp/plato-phase2d.G3jkGH/pytest-final313",
+          "--junitxml=/tmp/plato-phase2d.G3jkGH/final-full313.xml"
+        ],
+        "exit_code": 0,
+        "elapsed_seconds": 449.13,
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/final-full313.log",
+          "sha256": "534930d61cd5a0aae98b2f52526a639352d29cc96342fb2f1393fa5c5fee0a8e"
+        },
+        "junit": {
+          "tests": 413,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 1,
+          "skips": [
+            {
+              "test": "test_nanochat_tokenizer_processor_round_trip",
+              "reason": "optional native nanochat tokenizer: callable rustbpe.Tokenizer absent"
+            }
+          ],
+          "passed": 412
+        }
+      },
+      "python314": {
+        "command": [
+          "/private/tmp/plato-phase2d.G3jkGH/venv314/bin/python",
+          "-m",
+          "pytest",
+          "tests",
+          "--test-profile",
+          "mandatory",
+          "-q",
+          "--basetemp=/tmp/plato-phase2d.G3jkGH/pytest-final314",
+          "--junitxml=/tmp/plato-phase2d.G3jkGH/final-full314.xml"
+        ],
+        "exit_code": 0,
+        "elapsed_seconds": 502.4,
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/final-full314.log",
+          "sha256": "df7678ebb6e4e74452fec8b1b2936a8ed722d2350f2d3dcc3ebb20754cc3a80f"
+        },
+        "junit": {
+          "tests": 413,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 1,
+          "skips": [
+            {
+              "test": "test_nanochat_tokenizer_processor_round_trip",
+              "reason": "optional native nanochat tokenizer: callable rustbpe.Tokenizer absent"
+            }
+          ],
+          "passed": 412
+        }
+      }
+    },
+    "verification": "Parsed both retained final XML files: 413 testcase nodes each, zero failures/errors, exactly the permitted native nanochat tokenizer skip, 412 passes, and 48 startup cases each. Final logs agree. Source files for startup/conftest/integration utilities are unchanged from baseline.",
+    "representative_events": [
+      {
+        "path": "/tmp/plato-phase2d.G3jkGH/pytest-final313/test_real_two_client_cpu_socke0/round/result.json",
+        "sha256": "89e7ab3a87d6ed8185f027a746966a45abf6416500478ac848f87eee53d95263",
+        "case": "socket_round",
+        "returncode": 0,
+        "timed_out": false,
+        "forced": [],
+        "survivors": [],
+        "events": [
+          "fresh_process",
+          "child_started",
+          "child_started",
+          "server_baseline",
+          "server_received",
+          "server_received",
+          "server_aggregate",
+          "server_close_started",
+          "local_data",
+          "client_baseline",
+          "client_trained",
+          "child_returned",
+          "local_data",
+          "client_baseline",
+          "client_trained",
+          "child_returned"
+        ],
+        "weighted_reference_max_abs_error": 1.4901161193847656e-08,
+        "received_sample_counts": [
+          2,
+          6
+        ],
+        "both_clients_changed": true
+      },
+      {
+        "path": "/tmp/plato-phase2d.G3jkGH/pytest-final313/test_stalled_real_client_is_co0/stalled/result.json",
+        "sha256": "9579c8e56501e8d41af23ace17be3e2575f979d559477b9fac61a14d1b966685",
+        "case": "socket_stall",
+        "returncode": 0,
+        "timed_out": true,
+        "forced": [
+          "TERM"
+        ],
+        "survivors": [],
+        "events": [
+          "fresh_process",
+          "child_started",
+          "child_started",
+          "server_baseline",
+          "server_payload_processed",
+          "server_close_started",
+          "server_close_started",
+          "local_data",
+          "client_baseline",
+          "client_trained",
+          "local_data",
+          "client_baseline",
+          "client_trained",
+          "client_stall_entered"
+        ]
+      },
+      {
+        "path": "/tmp/plato-phase2d.G3jkGH/pytest-final313/test_owned_client_finalizes_ta0/client/result.json",
+        "sha256": "c0d0264754b2002825ee51dae37f4ee7964ba64a77709d508a5f44330b56d436",
+        "case": "client_lifecycle",
+        "returncode": 0,
+        "timed_out": false,
+        "forced": [],
+        "survivors": [],
+        "events": [
+          "fresh_process",
+          "client_configure",
+          "client_body",
+          "executor_entered",
+          "task_finalizer_entered",
+          "task_finalized",
+          "generator_finalizer_entered",
+          "executor_finished",
+          "generator_finalized",
+          "returned",
+          "loop_after"
+        ]
+      },
+      {
+        "path": "/tmp/plato-phase2d.G3jkGH/pytest-final314/test_real_two_client_cpu_socke0/round/result.json",
+        "sha256": "1782b6433eb66006c0a9ffbde7ec2087f2a6435675ee06760d3add3c556c1604",
+        "case": "socket_round",
+        "returncode": 0,
+        "timed_out": false,
+        "forced": [],
+        "survivors": [],
+        "events": [
+          "fresh_process",
+          "child_started",
+          "child_started",
+          "server_baseline",
+          "server_received",
+          "server_received",
+          "server_aggregate",
+          "server_close_started",
+          "local_data",
+          "client_baseline",
+          "client_trained",
+          "child_returned",
+          "local_data",
+          "client_baseline",
+          "client_trained",
+          "child_returned"
+        ],
+        "weighted_reference_max_abs_error": 1.4901161193847656e-08,
+        "received_sample_counts": [
+          2,
+          6
+        ],
+        "both_clients_changed": true
+      },
+      {
+        "path": "/tmp/plato-phase2d.G3jkGH/pytest-final314/test_stalled_real_client_is_co0/stalled/result.json",
+        "sha256": "c485558d31cd30b66618907221042874d9d51060dc29ea7390fd472646202655",
+        "case": "socket_stall",
+        "returncode": 0,
+        "timed_out": true,
+        "forced": [
+          "TERM"
+        ],
+        "survivors": [],
+        "events": [
+          "fresh_process",
+          "child_started",
+          "child_started",
+          "server_baseline",
+          "server_payload_processed",
+          "server_close_started",
+          "local_data",
+          "client_baseline",
+          "client_trained",
+          "local_data",
+          "client_baseline",
+          "client_trained",
+          "client_stall_entered"
+        ]
+      },
+      {
+        "path": "/tmp/plato-phase2d.G3jkGH/pytest-final314/test_owned_client_finalizes_ta0/client/result.json",
+        "sha256": "0ef38d5747899570fff3ecbcc066b0d0970b8f206fdbdb4c720a85fc644263e1",
+        "case": "client_lifecycle",
+        "returncode": 0,
+        "timed_out": false,
+        "forced": [],
+        "survivors": [],
+        "events": [
+          "fresh_process",
+          "client_configure",
+          "client_body",
+          "executor_entered",
+          "task_finalizer_entered",
+          "task_finalized",
+          "generator_finalizer_entered",
+          "executor_finished",
+          "generator_finalized",
+          "returned",
+          "loop_after"
+        ]
+      }
+    ],
+    "event_conclusion": "Real socket rounds had two parameter-changing clients with 2/6 samples, received weights matching trained weights, and independently recomputed weighted aggregate max absolute error 1.49e-8. Lifecycle events include task/generator/executor finalization. Stalled rounds were watchdog-contained with TERM and zero survivors, without a server_aggregate event; they are not reported as successful rounds.",
+    "identity_manifest": [
+      {
+        "path": "/tmp/plato-phase2d.G3jkGH/sync313.log",
+        "sha256": "174d445a9f7f9ec60c70ad35ab8901ec93af1747b0200192ef88eac052b0aae3"
+      },
+      {
+        "path": "/tmp/plato-phase2d.G3jkGH/sync314.log",
+        "sha256": "3bd77836a43f140bc2cd9678c5a1b2c88fbe39c880b26c9b8cd41b1db2d7e326"
+      },
+      {
+        "path": "/tmp/plato-phase2d.G3jkGH/red-s3-tree313.log",
+        "sha256": "3ae4388d1a4ec933a8046396db67f5d3323d4b13f758a350ebe70d7c3fb1b197"
+      },
+      {
+        "path": "/tmp/plato-phase2d.G3jkGH/red-pagination313.log",
+        "sha256": "8fb4f808efc998b5f2680b8bc93a37f2b1511afe904eae87fe6f6e90c37588da"
+      },
+      {
+        "path": "/tmp/plato-phase2d.G3jkGH/red-processors-cleanup313.log",
+        "sha256": "fc62be58bab32c83b5916dc53ac90b1741a7c57c583adebad51b5da7039a171e"
+      },
+      {
+        "path": "/tmp/plato-phase2d.G3jkGH/red-randomized313.log",
+        "sha256": "c398f1948e03c17a578356d33e7d0ab76939ab0ee8cc5752e7d2da8e502c6847"
+      },
+      {
+        "path": "/tmp/plato-phase2d.G3jkGH/red-feature-toml313.log",
+        "sha256": "c138db0670c36316cd3f5582d40613d979a4482c58bba2bb7a888b2a5a6448f1"
+      },
+      {
+        "path": "/tmp/plato-phase2d.G3jkGH/red-toml-baseline313.log",
+        "sha256": "bfaee4147f9c5f4e77838392a4f8a1c97c2aebaa95c8da547f8013df204b4ed4"
+      },
+      {
+        "path": "/tmp/plato-phase2d.G3jkGH/red-shared313.log",
+        "sha256": "eab8477cd8f1917dbce6348ff99af870091ddca4b11338a60a71840c24ea998b"
+      },
+      {
+        "path": "/tmp/plato-phase2d.G3jkGH/red-he313.log",
+        "sha256": "1f31ad0660f820728c7b1dea45863a977b43ef961a2ff6204c2312ff421c5399"
+      },
+      {
+        "path": "/tmp/plato-phase2d.G3jkGH/red-he-wire313.log",
+        "sha256": "70504e6bd38f3fdda7656c589e8159a76aa5dd62c05cd7c93d06d593cc33ca55"
+      },
+      {
+        "path": "/tmp/plato-phase2d.G3jkGH/red-mpc313.log",
+        "sha256": "79820dcbfa022323dff778005bf7e4eb172366bf873b59f2ad95c090ef364208"
+      },
+      {
+        "path": "/tmp/plato-phase2d.G3jkGH/red-mpc-race313.log",
+        "sha256": "287c7c2a157c26aceaf3adfc23aad7981c591a627baddc55f39e8c6d4d65633a"
+      },
+      {
+        "path": "/tmp/plato-phase2d.G3jkGH/red-atomic313.log",
+        "sha256": "f50acd7e59c1347c007578b18596a61b83f2d74e2011c4d266e0875a67077f5d"
+      },
+      {
+        "path": "/tmp/plato-phase2d.G3jkGH/red-zk313.log",
+        "sha256": "71a96f27674d2c6a4a541e91e33fdcbb264585d921e0cd2a8458f42cadf07499"
+      },
+      {
+        "path": "/tmp/plato-phase2d.G3jkGH/red-remote-errors313.log",
+        "sha256": "79d91ab02cfc141b414b7e2d50f5f564f0a8597aaab78f4309b3a40361df6464"
+      },
+      {
+        "path": "/tmp/plato-phase2d.G3jkGH/red-rl313.log",
+        "sha256": "9004e7642c25e9928488cf9eed26e18f52afb52f9b413b4e474c91a7e54137b6"
+      },
+      {
+        "path": "/tmp/plato-phase2d.G3jkGH/red-rl-numerical313.log",
+        "sha256": "9fd4cb63a6dd12c7c7683ec04f42af2ce6f928eb4e874490db05e887b97da66b"
+      },
+      {
+        "path": "/tmp/plato-phase2d.G3jkGH/green-owned313.log",
+        "sha256": "01de6a165708b9a292161935edd6af66bec6fd142f65867806727d57513b4831"
+      },
+      {
+        "path": "/tmp/plato-phase2d.G3jkGH/full313.log",
+        "sha256": "e2cc69112baae11e2921ea865c740ee85b5c42d15462984639b0ecd0ffeb3a84"
+      },
+      {
+        "path": "/tmp/plato-phase2d.G3jkGH/full314.log",
+        "sha256": "a7adf0ba4fa5a39eada1befc8b9378c20fb57a8bc5ea1035a21f6be395fa9cca"
+      },
+      {
+        "path": "/tmp/plato-phase2d.G3jkGH/lifecycle-fix313.log",
+        "sha256": "f4c77b58e2280613a49ba18da1c4a02d440e862c49a6c8fe5daaf277333ff99d"
+      },
+      {
+        "path": "/tmp/plato-phase2d.G3jkGH/lifecycle-fix314.log",
+        "sha256": "f4c77b58e2280613a49ba18da1c4a02d440e862c49a6c8fe5daaf277333ff99d"
+      },
+      {
+        "path": "/tmp/plato-phase2d.G3jkGH/final-full313.log",
+        "sha256": "534930d61cd5a0aae98b2f52526a639352d29cc96342fb2f1393fa5c5fee0a8e"
+      },
+      {
+        "path": "/tmp/plato-phase2d.G3jkGH/final-full314.log",
+        "sha256": "df7678ebb6e4e74452fec8b1b2936a8ed722d2350f2d3dcc3ebb20754cc3a80f"
+      },
+      {
+        "path": "/tmp/plato-phase2d.G3jkGH/probe_utilities.py",
+        "sha256": "903835ccc39974462e94e03503555f30af46e424e7d3c87a334577b79fc43aed"
+      },
+      {
+        "path": "/tmp/plato-phase2d.G3jkGH/utilities313.log",
+        "sha256": "d6afe248e8bc616b852173b6e1f115783dec9a6b791a4a2a13ec3f3f1a1d344b"
+      },
+      {
+        "path": "/tmp/plato-phase2d.G3jkGH/utilities314.log",
+        "sha256": "d6afe248e8bc616b852173b6e1f115783dec9a6b791a4a2a13ec3f3f1a1d344b"
+      },
+      {
+        "path": "/tmp/plato-phase2d.G3jkGH/probe_fei.py",
+        "sha256": "d866e8573b188d2b84621b7ca75607362b2a06fa230dc0fb80a20e793c4ce32f"
+      },
+      {
+        "path": "/tmp/plato-phase2d.G3jkGH/fei313.log",
+        "sha256": "26919a5a1ec8f12399cd19e5656a37d294f481962a4491a4e7db190b6ed9649e"
+      },
+      {
+        "path": "/tmp/plato-phase2d.G3jkGH/fei314.log",
+        "sha256": "d0a0e9089c3c7541648f6f7f024c6ad03af4ca2f5fe554a518fa28dcd8a6e501"
+      },
+      {
+        "path": "/tmp/plato-phase2d.G3jkGH/probe_runtime_s3.py",
+        "sha256": "c18663d5adb12aa585f211705db84e6191b7b769bcaf38387964b8b8d4c271e7"
+      },
+      {
+        "path": "/tmp/plato-phase2d.G3jkGH/runtime-s3-integration313.log",
+        "sha256": "90903e284487e3a7b1cc50556c66aede71c68b068048570304646e2c55a6d469"
+      },
+      {
+        "path": "/tmp/plato-phase2d.G3jkGH/runtime-s3-integration314.log",
+        "sha256": "90903e284487e3a7b1cc50556c66aede71c68b068048570304646e2c55a6d469"
+      },
+      {
+        "path": "/tmp/plato-phase2d.G3jkGH/phase2b_transport_b3b038e.py",
+        "sha256": "631ff16e76913156fa1ad764fcd5b6b6cc375a81c777397321ddf101e874e4ad"
+      },
+      {
+        "path": "/tmp/plato-phase2d.G3jkGH/ruff-final.log",
+        "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+      },
+      {
+        "path": "/tmp/plato-phase2d.G3jkGH/ty-final.log",
+        "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+      },
+      {
+        "path": "/tmp/plato-phase2d.G3jkGH/coverage313.json",
+        "sha256": "bb8b1966c5f533e9ce8d6ea015c4847d569a309c1d3f7427600ead21dba0bf26"
+      }
+    ],
+    "limits": "Raw log hashes establish artifact identity; the exact-run commit attribution comes from the retained author evidence metadata. Independently executed review tests/probes used the clean exact candidate. Red aggregate counts include acknowledged early fixture/expectation errors and were not treated as one defect per failure. Reviewed representative stale-round red log and corresponding passing actual race test."
+  },
+  "research_equation_and_checkpoint_review": {
+    "qsgd": "Preserved max-norm scaling and existing sign/magnitude wire; ordinary independent error/expectation references pass. The primary QSGD paper section 4 explicitly discusses max-value scaling, so no L2-norm migration is requested. Required correction 2D-R02 concerns arithmetic ordering only. [QSGD primary paper](https://proceedings.neurips.cc/paper/2017/file/6c340f25839e6acdc73414517203f5f0-Paper.pdf)",
+    "rl": "Reviewed scalar-per-transition Bellman targets, terminal gating, TD3 twin-critic minimum/delayed soft updates, and SAC entropy/policy objectives against the primary equations. Shape and normalization repairs restore transition isolation; they preserve the existing FL action-weight adaptation. No generic benchmark-equivalence or full research reproduction claim. [DDPG](https://arxiv.org/pdf/1509.02971), [TD3](https://arxiv.org/pdf/1802.09477), [SAC algorithms and applications](https://arxiv.org/pdf/1812.05905)",
+    "mpc": "Independent weighted plaintext sums and polynomial reconstruction validated the existing scaled real-valued prototype at matched thresholds. Sender/recipient orientation and Fraction interpolation pass; configured-endpoint mismatch and impossible coefficient sampling remain findings. No finite-field replacement requested.",
+    "checkpoints_and_wire": "Ordinary dotted Safetensors historical wire and zstd tuple wire were independently read successfully. Active policy .pth model/optimizer filenames and actor/critic state keys remain unchanged; both targets synchronize to loaded weights. Exact mid-training replay/entropy-optimizer resume was not promised by this change and is not claimed."
+  },
+  "handoffs": [
+    {
+      "id": "2D-17 / T2B-S3-PREFIX",
+      "status": "REQUIRED_PENDING_INTEGRATION_CORRECTION",
+      "owner": "Root and original 2B implementer, followed by fresh exact-commit review",
+      "separate_candidate": "b3b038efa376b060e1c01f1da39173240768a019",
+      "path": "plato/clients/transport.py",
+      "line": 148,
+      "description": "The separately delivered bounded reader composes key_prefix + / + key. Empty prefix adds a leading slash to the canonical bare key; already-qualified keys get a second prefix. Actual independent local HTTP integration reproduced empty-prefix 404s and qualified-key 404s while nested-prefix logical reads passed. This known cross-owner dependency is explicitly tracked and is not an unexplained candidate-local omission.",
+      "correction": "Reuse the canonical storage._object_key(key), preserving the 2B deadlines and byte caps. Root has already accepted the need for this correction; no additional permission is required.",
+      "acceptance": "Actual combined fixed utility put/send plus bounded reader regression for empty and prefixed/nested namespaces, including already-qualified keys; fresh exact corrected 2B commit review; root full merged validation before integration/phase PASS.",
+      "review_snapshot": {
+        "path": "/tmp/plato-phase2d-review/transport_b3b038e.py",
+        "sha256": "631ff16e76913156fa1ad764fcd5b6b6cc375a81c777397321ddf101e874e4ad"
+      }
+    },
+    {
+      "id": "2D-15",
+      "status": "PHASE_4_HANDOFF",
+      "owner": "FEI example owner",
+      "path": "examples/reinforcement_learning/fei/fei_server.py",
+      "description": "Actual zero-norm normalization produces NaNs. Retained actual probe and untouched source confirm the concrete handoff; not an unimplemented Phase 2D repair."
+    },
+    {
+      "id": "2D-16",
+      "status": "PHASE_4_HANDOFF",
+      "owner": "FEI example owner",
+      "path": "examples/reinforcement_learning/fei/fei_server.py",
+      "description": "Constructor misroutes algorithm/trainer positional dependencies. Retained actual subclass probe with superclass argument capture and untouched source confirm the concrete handoff; not an unimplemented Phase 2D repair."
+    },
+    {
+      "id": "legacy_rl_env_index",
+      "status": "ROOT_FOLLOWUP",
+      "owner": "Root/Phase 4 archive index and Phase 5 docs",
+      "description": "Archive source/license/provenance and closure pass locally; shared archive index remains root-owned."
+    },
+    {
+      "id": "root_merged_gate",
+      "status": "PENDING",
+      "owner": "Root",
+      "description": "Close candidate-local findings through the existing owner and fresh exact-commit review, close the known 2B namespace correction, then perform the root full merged validation. This review does not substitute for that gate."
+    }
+  ],
+  "limits": [
+    "Owned locked no-install-project review environments: Python 3.13.16 and 3.14.8; 109 dependency distributions each, with source imported from the exact candidate. Author environments had an additional editable Plato distribution. Candidate and implementer environments were not mutated.",
+    "Network evidence is actual botocore/Requests against credential-free local HTTP services. No live-cloud, live ZooKeeper or universal network deadline claim. Read-inactivity timeout disclosure is accepted.",
+    "Native TenSEAL CKKS CPU arithmetic was exercised with an ephemeral one-thread context. Complete HE/MPC distributed federated deployments and active FEI example qualification remain later-phase work.",
+    "Native MLX and GPU policy execution were not qualified by these PyTorch/NumPy CPU probes.",
+    "Trusted-peer/storage/local-file pickle boundaries remain recorded; no arbitrary untrusted-input safety or authentication claim.",
+    "Shared feature compression header retains its homogeneous shape/dtype requirement. Heterogeneous payload rejection is accepted; a format redesign is not requested.",
+    "Shamir remains the accepted scaled real-valued prototype. Finding corrections may reject unsupported boundaries promptly; no finite-field or cryptographic redesign is requested.",
+    "All four findings are concrete remaining accepted-scope defects, including inherited behavior, rather than claims that every listed line newly introduced a regression.",
+    "This is bounded acceptance review, not a coverage quota, blanket audit/support claim, whole-repository typing demand, broad suite rerun, or Phase 2 gate approval."
+  ],
+  "review_scratch": {
+    "root": "/tmp/plato-phase2d-review",
+    "retention": "Retained for root/implementer reproduction; no cleanup performed.",
+    "artifacts": [
+      {
+        "path": "/tmp/plato-phase2d-review/sync313.log",
+        "sha256": "3bbd69826ef404ecf13b715ca1a0ec80d2cae2f1cd4d03644bf63f8aaa78b7ab"
+      },
+      {
+        "path": "/tmp/plato-phase2d-review/sync314.log",
+        "sha256": "9f277b6d32e50b78ca5fe88fc421313d0f24ae9cd6c5576094b21ac4709b8acd"
+      },
+      {
+        "path": "/tmp/plato-phase2d-review/focused313.log",
+        "sha256": "6d326138b3d3d9fe125d557d47857e57318314ad9dd12888a656d04d8d1cbf58"
+      },
+      {
+        "path": "/tmp/plato-phase2d-review/focused313.xml",
+        "sha256": "eef94edbd8c91e99baf66f64c152ff9320324876642962c09f6275a3e8e84948"
+      },
+      {
+        "path": "/tmp/plato-phase2d-review/numerical_probes.py",
+        "sha256": "86bf95b9d4b76925ddd80a42ea3e2d2a589d18dfcd8a7b7eedeedaa00626bae5"
+      },
+      {
+        "path": "/tmp/plato-phase2d-review/numerical13.json",
+        "sha256": "eaf491a8c45ab7bb0991a2c333ed22267a59b6e7ed44b01ab621bcdd401e95c6"
+      },
+      {
+        "path": "/tmp/plato-phase2d-review/numerical14.json",
+        "sha256": "6727121ef97f362b53d42ce567e7238d9d02b4652f49bebe479df49baed49e23"
+      },
+      {
+        "path": "/tmp/plato-phase2d-review/network_rl_probes.py",
+        "sha256": "038147ed47b760153522c5f697edc53f9731ee5f78a6e8e2a0fcc18049bb389e"
+      },
+      {
+        "path": "/tmp/plato-phase2d-review/network_rl13.json",
+        "sha256": "193d4d304334e0d68a775514baf59b9929982e97abf6cd1615717e53cacfe60a"
+      },
+      {
+        "path": "/tmp/plato-phase2d-review/network_rl14.json",
+        "sha256": "87b338c2fc3dbecfbc7d3891d337882bf5335d63a8c056d05c2bde53689ee852"
+      },
+      {
+        "path": "/tmp/plato-phase2d-review/shamir_threshold_bound.json",
+        "sha256": "0d34f51e7d4533d386c6ca9cb8723059e70e55a751462b6eb898fd0373a3027c"
+      },
+      {
+        "path": "/tmp/plato-phase2d-review/retained_events.json",
+        "sha256": "45aa11859365f0c3512fad6f48cb86d1efa75d7b43d9fa4f5ae16aac53206ec5"
+      },
+      {
+        "path": "/tmp/plato-phase2d-review/evidence_hashes.json",
+        "sha256": "fec80be4cc107f24b73ff2b26110894d30aefff8cacfedbba463a202a2a8352f"
+      },
+      {
+        "path": "/tmp/plato-phase2d-review/source_identities.json",
+        "sha256": "30e28c4f61fa04c21f7921ba3c8c73eefc6c278370147e25195f696e0664b15b"
+      }
+    ]
+  },
+  "review_role_requested_profile": "gpt-6.1-sol xhigh, as requested by the user"
+}

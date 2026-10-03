@@ -1,0 +1,1776 @@
+{
+  "schema_version": 1,
+  "reviewer": "Fresh independent Sol reviewer; no nested agents.",
+  "model_requested": "Sol",
+  "reasoning_effort_requested": "xhigh",
+  "review_role": "Exact clean Phase 2A candidate review 5, including R2A4-01 closure and retained A contracts.",
+  "written_at_utc": "2026-10-03T06:35:39.008699+00:00",
+  "verdict": "PASS",
+  "decision": "PASS for this exact scoped A candidate; no whole-phase, root integration, Linux or whole-stack qualification claim.",
+  "finding_counts": {
+    "critical": 0,
+    "high": 0,
+    "medium": 0,
+    "low": 0
+  },
+  "findings": [],
+  "low_findings": [],
+  "summary": "R2A4-01 is resolved. Actual default-URL Tiny constructors survive exhausted HTTP 503, invalid ZIP and truncated-body recovery, retain prior canonical ZIP bytes, publish no incomplete marker, clean normal-exception staging, then recover correct useful samples and work offline. Waiting contenders, valid-incomplete-ZIP readiness recovery, first-download failures, safe containment and prior A contracts pass on Python 3.13.16 and 3.14.8. No material issue found within accepted contracts.",
+  "identity": {
+    "base_commit": "fda60becedfa6236c11d415b87a868b52789a41e",
+    "base_tree": "11a5f04acd220db9ba6b7da4971d07895846c05e",
+    "candidate_commit": "79da1f97d8a12fe97402750cc32c7b3e8f5cdf6e",
+    "candidate_tree": "dbd5d3847797665c80ea5ca2f92da48f6576467f",
+    "implementation_commit": "f03695692307ea1175feb4b2b8ee3ee2c4240e91",
+    "implementation_tree": "f1e5d84d072050046882231bcfc94f3f85512a11",
+    "observed_head": "79da1f97d8a12fe97402750cc32c7b3e8f5cdf6e",
+    "observed_status": "",
+    "base_to_candidate_binary_diff_sha256": "f4c44e2cbddb2be3c7aebc0db6196cee9e575cf7f2e0e06ed7073bf7bfbf3f41",
+    "base_to_implementation_binary_diff_sha256": "95517fddc2bac734556266af843ab5972994d57a0ace7de6840ef91f194325f0",
+    "prior_to_implementation_binary_diff_sha256": "205b1e193fca5ef14e7025cc4c8f7eed9fa43ee25b88d45e482ca0279d688fc4",
+    "evidence_only_child_changed_paths": [
+      "evidence/2026-refresh/phase2a-validation.json"
+    ],
+    "base_to_candidate_name_status": [
+      "A\tarchives/legacy_datalib/LICENSE",
+      "A\tarchives/legacy_datalib/README.md",
+      "R100\tplato/datasources/datalib/__init__.py\tarchives/legacy_datalib/__init__.py",
+      "R100\tplato/datasources/datalib/audio_extraction_tools.py\tarchives/legacy_datalib/audio_extraction_tools.py",
+      "R100\tplato/datasources/datalib/data_utils.py\tarchives/legacy_datalib/data_utils.py",
+      "R100\tplato/datasources/datalib/flickr30kE_utils.py\tarchives/legacy_datalib/flickr30kE_utils.py",
+      "R100\tplato/datasources/datalib/frames_extraction_tools.py\tarchives/legacy_datalib/frames_extraction_tools.py",
+      "R100\tplato/datasources/datalib/gym_utils/__init__.py\tarchives/legacy_datalib/gym_utils/__init__.py",
+      "R100\tplato/datasources/datalib/gym_utils/gym_trim.py\tarchives/legacy_datalib/gym_utils/gym_trim.py",
+      "R100\tplato/datasources/datalib/modality_data_anntation_tools.py\tarchives/legacy_datalib/modality_data_anntation_tools.py",
+      "R100\tplato/datasources/datalib/modality_extraction_base.py\tarchives/legacy_datalib/modality_extraction_base.py",
+      "R100\tplato/datasources/datalib/parse_datasets.py\tarchives/legacy_datalib/parse_datasets.py",
+      "R100\tplato/datasources/datalib/refer_utils/__init__.py\tarchives/legacy_datalib/refer_utils/__init__.py",
+      "R100\tplato/datasources/datalib/refer_utils/referitgame_utils.py\tarchives/legacy_datalib/refer_utils/referitgame_utils.py",
+      "R100\tplato/datasources/datalib/tiny_data_tools.py\tarchives/legacy_datalib/tiny_data_tools.py",
+      "R100\tplato/datasources/datalib/video_transform.py\tarchives/legacy_datalib/video_transform.py",
+      "A\tevidence/2026-refresh/phase2a-validation.json",
+      "M\tplato/config.py",
+      "A\tplato/datasources/_image_folder.py",
+      "A\tplato/datasources/_vector_cache.py",
+      "M\tplato/datasources/base.py",
+      "M\tplato/datasources/cinic10.py",
+      "M\tplato/datasources/purchase.py",
+      "M\tplato/datasources/texas.py",
+      "M\tplato/datasources/tiny_imagenet.py",
+      "M\tplato/datasources/torchvision.py",
+      "M\tplato/samplers/all_inclusive.py",
+      "M\tplato/samplers/base.py",
+      "M\tplato/samplers/dirichlet.py",
+      "M\tplato/samplers/distribution_noniid.py",
+      "M\tplato/samplers/iid.py",
+      "M\tplato/samplers/label_quantity_noniid.py",
+      "M\tplato/samplers/mixed_label_quantity_noniid.py",
+      "M\tplato/samplers/modality_iid.py",
+      "M\tplato/samplers/modality_quantity_noniid.py",
+      "M\tplato/samplers/orthogonal.py",
+      "M\tplato/samplers/sample_quantity_noniid.py",
+      "M\tplato/samplers/sampler_utils.py",
+      "A\tplato/utils/archive.py",
+      "A\ttests/datasources/test_download_contracts.py",
+      "A\ttests/datasources/test_local_datasets.py",
+      "A\ttests/datasources/test_review2_regressions.py",
+      "A\ttests/datasources/test_review3_regressions.py",
+      "A\ttests/datasources/test_review4_regressions.py",
+      "A\ttests/datasources/test_review_regressions.py",
+      "A\ttests/samplers/test_partition_contracts.py",
+      "M\ttests/test_config_loader.py",
+      "A\ttests/utils/test_archive.py"
+    ],
+    "candidate_blob_check": {
+      "tracked_non_gitlink_blobs": 945,
+      "mismatches": [],
+      "gitlinks": [
+        "external/nanochat",
+        "plato/models/dvit",
+        "plato/models/t2tvit"
+      ]
+    },
+    "export_blob_check": {
+      "tracked_non_gitlink_blobs": 945,
+      "mismatches": [],
+      "gitlinks": [
+        "external/nanochat",
+        "plato/models/dvit",
+        "plato/models/t2tvit"
+      ]
+    },
+    "inputs": {
+      "plan.md": {
+        "path": "/Users/bli/Playground/plato/evidence/2026-refresh/plan.md",
+        "bytes": 50719,
+        "sha256": "edb9a58cc7915a940854f16d5029fe97434703bf2f75eca0dcb96de2d0f0eb15"
+      },
+      "plan-addendum.json": {
+        "path": "/Users/bli/Playground/plato/evidence/2026-refresh/plan-addendum.json",
+        "bytes": 28579,
+        "sha256": "5b51b0fb7ed6f68d9fce7176335b3e7be5e5f178a2788590912aa2396a487709"
+      },
+      "plan-review-3.json": {
+        "path": "/Users/bli/Playground/plato/evidence/2026-refresh/plan-review-3.json",
+        "bytes": 4110,
+        "sha256": "a1bc8bd69f43ea3280872a4c8259b431c4a9c27776ebd42fde658d6d48bd41b6"
+      },
+      "plan-addendum-acceptance.json": {
+        "path": "/Users/bli/Playground/plato/evidence/2026-refresh/plan-addendum-acceptance.json",
+        "bytes": 474,
+        "sha256": "5f5d5a8e22e14072b5d031c19a27be14bda9bdbc2a157d14af78845daac6c56b"
+      },
+      "phase2a-review.json": {
+        "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2a-review.json",
+        "bytes": 31402,
+        "sha256": "24c037f3d18051a5cd4c58a410e35f45e1d75d6d5ed215d4477bf1fbb98baf84"
+      },
+      "phase2a-root-probes.json": {
+        "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2a-root-probes.json",
+        "bytes": 4128,
+        "sha256": "d8afe582f8c7e75989edba835d582532edfb22f24e51a404a08528fa65b8d975"
+      },
+      "phase2a-review-2.json": {
+        "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2a-review-2.json",
+        "bytes": 71136,
+        "sha256": "279154c2f27de00181721e68ae12fded2aee14edf0357d7d6eec04ea5b5d3132"
+      },
+      "phase2a-root-base-validation.json": {
+        "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2a-root-base-validation.json",
+        "bytes": 1589,
+        "sha256": "7b4c234c52b2f225b16f5888bbfb9505534f9c003095af4e38ba3b19fa13671a"
+      },
+      "phase2a-review-3.json": {
+        "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2a-review-3.json",
+        "bytes": 80080,
+        "sha256": "dbf8aad9fc371c7b001a7f04240abfab338b2682a922761f900e7eb0cb3d521d"
+      },
+      "phase2a-review-4.json": {
+        "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2a-review-4.json",
+        "bytes": 138875,
+        "sha256": "a602fb94c5b5e3eeae855dae39082ceab99ff1f0dc6660203839f3ee1f8dce76"
+      },
+      "candidate_validation": {
+        "path": "/private/tmp/plato-refresh-worktrees/data/evidence/2026-refresh/phase2a-validation.json",
+        "bytes": 107467,
+        "sha256": "f1c1ceb8ab3cf0aa9371a34873e8aa43a884f5175c7db385921c7fafd32d7e40"
+      },
+      "AGENTS.md": {
+        "path": "/private/tmp/plato-refresh-worktrees/data/AGENTS.md",
+        "bytes": 3119,
+        "sha256": "b50f87f31ea3d87076952d8b7d2d8af067132fbf877d80f8780c208fb45527ec"
+      },
+      "/tmp/plato-phase2a-review-2/test_remaining_contracts.py": {
+        "path": "/tmp/plato-phase2a-review-2/test_remaining_contracts.py",
+        "bytes": 3166,
+        "sha256": "0b33343f857f2e58c36b7bc780bae31f94fd7db3b8bcbb9c789e53779c1553bf",
+        "expected_sha256": "0b33343f857f2e58c36b7bc780bae31f94fd7db3b8bcbb9c789e53779c1553bf",
+        "equal": true
+      },
+      "/tmp/plato-phase2a-review-2/independent_probes.py": {
+        "path": "/tmp/plato-phase2a-review-2/independent_probes.py",
+        "bytes": 17841,
+        "sha256": "5e3019aad7651f5499d189b091efe4d241e3a3ff97872ff93150aa91c2d4bb85",
+        "expected_sha256": "5e3019aad7651f5499d189b091efe4d241e3a3ff97872ff93150aa91c2d4bb85",
+        "equal": true
+      }
+    },
+    "author_log_integrity": {
+      "revision/red-3.13.log": {
+        "path": "/tmp/plato-phase2a-lZqbqj/revision/red-3.13.log",
+        "bytes": 63356,
+        "sha256": "e204740e36a80f64b7e88a3129a36b99a2fcf57371d6de0c40cb3bd0943a9708",
+        "expected_sha256": "e204740e36a80f64b7e88a3129a36b99a2fcf57371d6de0c40cb3bd0943a9708",
+        "equal": true
+      },
+      "revision/red-3.14.log": {
+        "path": "/tmp/plato-phase2a-lZqbqj/revision/red-3.14.log",
+        "bytes": 63636,
+        "sha256": "68ceb8fa4acd8c8331cde0d3309506f9f20ca0934dd341f000f86927f6da4a84",
+        "expected_sha256": "68ceb8fa4acd8c8331cde0d3309506f9f20ca0934dd341f000f86927f6da4a84",
+        "equal": true
+      },
+      "revision/red-edge-3.13.log": {
+        "path": "/tmp/plato-phase2a-lZqbqj/revision/red-edge-3.13.log",
+        "bytes": 6898,
+        "sha256": "732de42fcc41ea4207dbbf98f8fc25a1733ee2d10463730ac96a24fb642ff6f9",
+        "expected_sha256": "732de42fcc41ea4207dbbf98f8fc25a1733ee2d10463730ac96a24fb642ff6f9",
+        "equal": true
+      },
+      "revision/red-edge-3.14.log": {
+        "path": "/tmp/plato-phase2a-lZqbqj/revision/red-edge-3.14.log",
+        "bytes": 6898,
+        "sha256": "aa30526c8ea9f998c541210e157bc301820eaa6a676c4a1c4defeff090e6803a",
+        "expected_sha256": "aa30526c8ea9f998c541210e157bc301820eaa6a676c4a1c4defeff090e6803a",
+        "equal": true
+      },
+      "revision/red-default-3.13.log": {
+        "path": "/tmp/plato-phase2a-lZqbqj/revision/red-default-3.13.log",
+        "bytes": 5304,
+        "sha256": "b7699298b7766df7bc1c30e2066ec4dfc1fb5f8777239fb67995d8fd5b52e4e6",
+        "expected_sha256": "b7699298b7766df7bc1c30e2066ec4dfc1fb5f8777239fb67995d8fd5b52e4e6",
+        "equal": true
+      },
+      "revision/red-default-3.14.log": {
+        "path": "/tmp/plato-phase2a-lZqbqj/revision/red-default-3.14.log",
+        "bytes": 5305,
+        "sha256": "986ba25b7aa46d86a5cdb39301270dd65c76d275fd9f9fb600129062d4c314fb",
+        "expected_sha256": "986ba25b7aa46d86a5cdb39301270dd65c76d275fd9f9fb600129062d4c314fb",
+        "equal": true
+      },
+      "revision/green-new-3.13.log": {
+        "path": "/tmp/plato-phase2a-lZqbqj/revision/green-new-3.13.log",
+        "bytes": 99,
+        "sha256": "039ac19cfeeea1af340165a07a0344bb2019fbb187120252dab3eb26b3e39819",
+        "expected_sha256": "039ac19cfeeea1af340165a07a0344bb2019fbb187120252dab3eb26b3e39819",
+        "equal": true
+      },
+      "revision/green-new-3.14.log": {
+        "path": "/tmp/plato-phase2a-lZqbqj/revision/green-new-3.14.log",
+        "bytes": 100,
+        "sha256": "9c36cfc6329fea1365ff0a4110ff1cfcd1ff26769d80e7c09627cfa1922c2a38",
+        "expected_sha256": "9c36cfc6329fea1365ff0a4110ff1cfcd1ff26769d80e7c09627cfa1922c2a38",
+        "equal": true
+      },
+      "revision/green-full-3.13.log": {
+        "path": "/tmp/plato-phase2a-lZqbqj/revision/green-full-3.13.log",
+        "bytes": 260,
+        "sha256": "72f4c4a8220c0f7543f9aea0937a701b5517c1f4aad65c37e2c758fbf841270f",
+        "expected_sha256": "72f4c4a8220c0f7543f9aea0937a701b5517c1f4aad65c37e2c758fbf841270f",
+        "equal": true
+      },
+      "revision/green-full-3.14.log": {
+        "path": "/tmp/plato-phase2a-lZqbqj/revision/green-full-3.14.log",
+        "bytes": 261,
+        "sha256": "04359b4fa74589d41bf22fe487e93cac8225ededd4e57798f3fd6b9426ac7276",
+        "expected_sha256": "04359b4fa74589d41bf22fe487e93cac8225ededd4e57798f3fd6b9426ac7276",
+        "equal": true
+      },
+      "revision/ruff.log": {
+        "path": "/tmp/plato-phase2a-lZqbqj/revision/ruff.log",
+        "bytes": 19,
+        "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+        "expected_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+        "equal": true
+      },
+      "revision/typing-final.log": {
+        "path": "/tmp/plato-phase2a-lZqbqj/revision/typing-final.log",
+        "bytes": 19,
+        "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+        "expected_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+        "equal": true
+      },
+      "revision2/red-3.13.log": {
+        "path": "/tmp/plato-phase2a-lZqbqj/revision2/red-3.13.log",
+        "bytes": 153592,
+        "sha256": "9ce3e3e482af33089bc1aa2a47483c10ddd339cc6c032b1ca9a9d23ba9a31f74",
+        "expected_sha256": "9ce3e3e482af33089bc1aa2a47483c10ddd339cc6c032b1ca9a9d23ba9a31f74",
+        "equal": true
+      },
+      "revision2/red-3.14.log": {
+        "path": "/tmp/plato-phase2a-lZqbqj/revision2/red-3.14.log",
+        "bytes": 153617,
+        "sha256": "1ee4aff035b47efb64082b9e28168192e257659f8c97764078764ff9f47b839c",
+        "expected_sha256": "1ee4aff035b47efb64082b9e28168192e257659f8c97764078764ff9f47b839c",
+        "equal": true
+      },
+      "revision2/green-new-3.13.log": {
+        "path": "/tmp/plato-phase2a-lZqbqj/revision2/green-new-3.13.log",
+        "bytes": 99,
+        "sha256": "99ddbbc44105f9ea135b1e3c813b4e5786c765d706e01dd8a4cc140b4553c283",
+        "expected_sha256": "99ddbbc44105f9ea135b1e3c813b4e5786c765d706e01dd8a4cc140b4553c283",
+        "equal": true
+      },
+      "revision2/green-new-3.14.log": {
+        "path": "/tmp/plato-phase2a-lZqbqj/revision2/green-new-3.14.log",
+        "bytes": 100,
+        "sha256": "8767caaa26ef50893e91a5af3bfd39b3581dda00d23502f99446ea7b1de3b138",
+        "expected_sha256": "8767caaa26ef50893e91a5af3bfd39b3581dda00d23502f99446ea7b1de3b138",
+        "equal": true
+      },
+      "revision2/green-focused-3.13.log": {
+        "path": "/tmp/plato-phase2a-lZqbqj/revision2/green-focused-3.13.log",
+        "bytes": 341,
+        "sha256": "7a0d7e35588d40bb652300375a84d6f1fa87721f38bad3a25a47fc8fa7ec8b17",
+        "expected_sha256": "7a0d7e35588d40bb652300375a84d6f1fa87721f38bad3a25a47fc8fa7ec8b17",
+        "equal": true
+      },
+      "revision2/green-focused-3.14.log": {
+        "path": "/tmp/plato-phase2a-lZqbqj/revision2/green-focused-3.14.log",
+        "bytes": 341,
+        "sha256": "e6d8de0650dc732f86002824ed12de2327414496a69e5d3502c7f49d4ee9edc2",
+        "expected_sha256": "e6d8de0650dc732f86002824ed12de2327414496a69e5d3502c7f49d4ee9edc2",
+        "equal": true
+      },
+      "revision2/green-base-3.13.log": {
+        "path": "/tmp/plato-phase2a-lZqbqj/revision2/green-base-3.13.log",
+        "bytes": 5488,
+        "sha256": "e831147b665d66291605774a062fa092c1f962d73cb65a2c6bf2654d4eff9f5c",
+        "expected_sha256": "e831147b665d66291605774a062fa092c1f962d73cb65a2c6bf2654d4eff9f5c",
+        "equal": true
+      },
+      "revision2/green-base-3.14.log": {
+        "path": "/tmp/plato-phase2a-lZqbqj/revision2/green-base-3.14.log",
+        "bytes": 5487,
+        "sha256": "0822e64daf63cf180c49694c5015e6c87c4c0adf4fadbf48fb6c1866c54cc858",
+        "expected_sha256": "0822e64daf63cf180c49694c5015e6c87c4c0adf4fadbf48fb6c1866c54cc858",
+        "equal": true
+      },
+      "revision2/base-3.13.xml": {
+        "path": "/tmp/plato-phase2a-lZqbqj/revision2/base-3.13.xml",
+        "bytes": 64913,
+        "sha256": "8684ff78d8eb5bf56300e91e5353b11dabb3e2413fd68e8f696c5ff4ac42d882",
+        "expected_sha256": "8684ff78d8eb5bf56300e91e5353b11dabb3e2413fd68e8f696c5ff4ac42d882",
+        "equal": true
+      },
+      "revision2/base-3.14.xml": {
+        "path": "/tmp/plato-phase2a-lZqbqj/revision2/base-3.14.xml",
+        "bytes": 64914,
+        "sha256": "f3185786525b89d3460cc16bb96b6564bee9e83e3c31c9b86402e2cd7e9d7e6c",
+        "expected_sha256": "f3185786525b89d3460cc16bb96b6564bee9e83e3c31c9b86402e2cd7e9d7e6c",
+        "equal": true
+      },
+      "revision2/sync-base-3.13.log": {
+        "path": "/tmp/plato-phase2a-lZqbqj/revision2/sync-base-3.13.log",
+        "bytes": 1906,
+        "sha256": "18eaac770dfa4bf066ab151e0b2927969d17f3c83a6688c560d48d263a6275fc",
+        "expected_sha256": "18eaac770dfa4bf066ab151e0b2927969d17f3c83a6688c560d48d263a6275fc",
+        "equal": true
+      },
+      "revision2/sync-base-3.14.log": {
+        "path": "/tmp/plato-phase2a-lZqbqj/revision2/sync-base-3.14.log",
+        "bytes": 1966,
+        "sha256": "5c732b77c2f947385be549961ee1663a3cd6ff7efd51eed348c92909810a9ad0",
+        "expected_sha256": "5c732b77c2f947385be549961ee1663a3cd6ff7efd51eed348c92909810a9ad0",
+        "equal": true
+      },
+      "revision2/ruff.log": {
+        "path": "/tmp/plato-phase2a-lZqbqj/revision2/ruff.log",
+        "bytes": 19,
+        "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+        "expected_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+        "equal": true
+      },
+      "revision2/typing.log": {
+        "path": "/tmp/plato-phase2a-lZqbqj/revision2/typing.log",
+        "bytes": 19,
+        "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+        "expected_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+        "equal": true
+      },
+      "revision2/environment-base-3.13.json": {
+        "path": "/tmp/plato-phase2a-lZqbqj/revision2/environment-base-3.13.json",
+        "bytes": 594,
+        "sha256": "586849fcfa6573131f67780bfbc4cc667b58ca710f9ddbe5bc2e8b577fb17ebc",
+        "expected_sha256": "586849fcfa6573131f67780bfbc4cc667b58ca710f9ddbe5bc2e8b577fb17ebc",
+        "equal": true
+      },
+      "revision2/environment-base-3.14.json": {
+        "path": "/tmp/plato-phase2a-lZqbqj/revision2/environment-base-3.14.json",
+        "bytes": 628,
+        "sha256": "368147a2788646487b2c3e59f0b8bdbd4e899b8eea1dd704ab5e09b49c56d5e2",
+        "expected_sha256": "368147a2788646487b2c3e59f0b8bdbd4e899b8eea1dd704ab5e09b49c56d5e2",
+        "equal": true
+      },
+      "revision2/preservation.json": {
+        "path": "/tmp/plato-phase2a-lZqbqj/revision2/preservation.json",
+        "bytes": 2103,
+        "sha256": "e05706fdd64ab3ba5460a2fda8fa1f1e5f8583a670bbedc442a13297be409e4c",
+        "expected_sha256": "e05706fdd64ab3ba5460a2fda8fa1f1e5f8583a670bbedc442a13297be409e4c",
+        "equal": true
+      },
+      "revision3/red-3.13.log": {
+        "path": "/tmp/plato-phase2a-lZqbqj/revision3/red-3.13.log",
+        "bytes": 8981,
+        "sha256": "9797bcbeee458c532bd734aacfd4d16a1c5b8487384703f96b8ac455e1f9695d",
+        "expected_sha256": "9797bcbeee458c532bd734aacfd4d16a1c5b8487384703f96b8ac455e1f9695d",
+        "equal": true
+      },
+      "revision3/red-3.14.log": {
+        "path": "/tmp/plato-phase2a-lZqbqj/revision3/red-3.14.log",
+        "bytes": 8982,
+        "sha256": "547f7480a5f9058f4f51243cdb94d60dd532dc232b71365ff03b48ebe3f88f4a",
+        "expected_sha256": "547f7480a5f9058f4f51243cdb94d60dd532dc232b71365ff03b48ebe3f88f4a",
+        "equal": true
+      },
+      "revision3/green-new-3.13.log": {
+        "path": "/tmp/plato-phase2a-lZqbqj/revision3/green-new-3.13.log",
+        "bytes": 98,
+        "sha256": "22dda2ca00ae6324a6f97b96c400ce0c3cb8bf22b31857fc022eeba879e7e569",
+        "expected_sha256": "22dda2ca00ae6324a6f97b96c400ce0c3cb8bf22b31857fc022eeba879e7e569",
+        "equal": true
+      },
+      "revision3/green-new-3.14.log": {
+        "path": "/tmp/plato-phase2a-lZqbqj/revision3/green-new-3.14.log",
+        "bytes": 99,
+        "sha256": "d47a130fc7bd5bc30d20d5c78106e950ddfb07de24c0f36ff722ed9ef1c626a6",
+        "expected_sha256": "d47a130fc7bd5bc30d20d5c78106e950ddfb07de24c0f36ff722ed9ef1c626a6",
+        "equal": true
+      },
+      "revision3/green-focused-3.13.log": {
+        "path": "/tmp/plato-phase2a-lZqbqj/revision3/green-focused-3.13.log",
+        "bytes": 340,
+        "sha256": "1747f71d06931f44faaa06a24ecc4c4960e764327dca1263a8f140919c283bc6",
+        "expected_sha256": "1747f71d06931f44faaa06a24ecc4c4960e764327dca1263a8f140919c283bc6",
+        "equal": true
+      },
+      "revision3/green-focused-3.14.log": {
+        "path": "/tmp/plato-phase2a-lZqbqj/revision3/green-focused-3.14.log",
+        "bytes": 341,
+        "sha256": "12e18785bb15340001c08617af2d7bd0e81063d0fae087734ab8be5250077f76",
+        "expected_sha256": "12e18785bb15340001c08617af2d7bd0e81063d0fae087734ab8be5250077f76",
+        "equal": true
+      },
+      "revision3/green-base-3.13.log": {
+        "path": "/tmp/plato-phase2a-lZqbqj/revision3/green-base-3.13.log",
+        "bytes": 5568,
+        "sha256": "8feec7eab761d5970175f175f73c03ef40385950fdf5bd137f0f6fbe0ca665ed",
+        "expected_sha256": "8feec7eab761d5970175f175f73c03ef40385950fdf5bd137f0f6fbe0ca665ed",
+        "equal": true
+      },
+      "revision3/green-base-3.14.log": {
+        "path": "/tmp/plato-phase2a-lZqbqj/revision3/green-base-3.14.log",
+        "bytes": 5567,
+        "sha256": "30bb5cd0caa87611dc7e00b53225a3a9e61ed9bfa94f4aa8754eb54e8ab14e40",
+        "expected_sha256": "30bb5cd0caa87611dc7e00b53225a3a9e61ed9bfa94f4aa8754eb54e8ab14e40",
+        "equal": true
+      },
+      "revision3/independent-3.13.log": {
+        "path": "/tmp/plato-phase2a-lZqbqj/revision3/independent-3.13.log",
+        "bytes": 98,
+        "sha256": "d07adc9c61b334cc33f3125b4ea06095f40a39993f88420c6a0f59782d16e1d6",
+        "expected_sha256": "d07adc9c61b334cc33f3125b4ea06095f40a39993f88420c6a0f59782d16e1d6",
+        "equal": true
+      },
+      "revision3/independent-3.14.log": {
+        "path": "/tmp/plato-phase2a-lZqbqj/revision3/independent-3.14.log",
+        "bytes": 99,
+        "sha256": "672d3f90dd796e4c0bd1c5934c1542366c398950fb97dcaccff9311b8c30fa79",
+        "expected_sha256": "672d3f90dd796e4c0bd1c5934c1542366c398950fb97dcaccff9311b8c30fa79",
+        "equal": true
+      },
+      "revision3/base-3.13.xml": {
+        "path": "/tmp/plato-phase2a-lZqbqj/revision3/base-3.13.xml",
+        "bytes": 66087,
+        "sha256": "f4214dafaa1925abb7a3ac67d13910eab442a071170b923155bc53026daede85",
+        "expected_sha256": "f4214dafaa1925abb7a3ac67d13910eab442a071170b923155bc53026daede85",
+        "equal": true
+      },
+      "revision3/base-3.14.xml": {
+        "path": "/tmp/plato-phase2a-lZqbqj/revision3/base-3.14.xml",
+        "bytes": 66088,
+        "sha256": "b80f1e8c30f52416946a16db80ba1376ff5836d30c13d65a462f7da29b3b5d4d",
+        "expected_sha256": "b80f1e8c30f52416946a16db80ba1376ff5836d30c13d65a462f7da29b3b5d4d",
+        "equal": true
+      },
+      "revision3/independent-3.13.xml": {
+        "path": "/tmp/plato-phase2a-lZqbqj/revision3/independent-3.13.xml",
+        "bytes": 831,
+        "sha256": "42735085e499a49ee3fcba69fcf7f8eb9941d2a56f747c96d546cb9b76372e40",
+        "expected_sha256": "42735085e499a49ee3fcba69fcf7f8eb9941d2a56f747c96d546cb9b76372e40",
+        "equal": true
+      },
+      "revision3/independent-3.14.xml": {
+        "path": "/tmp/plato-phase2a-lZqbqj/revision3/independent-3.14.xml",
+        "bytes": 833,
+        "sha256": "770d23f6bc1dd1ac4bb5ecbc91aa90d1b7d7a3343f28fc2803e977b85a94463d",
+        "expected_sha256": "770d23f6bc1dd1ac4bb5ecbc91aa90d1b7d7a3343f28fc2803e977b85a94463d",
+        "equal": true
+      },
+      "revision3/ruff.log": {
+        "path": "/tmp/plato-phase2a-lZqbqj/revision3/ruff.log",
+        "bytes": 19,
+        "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+        "expected_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+        "equal": true
+      },
+      "revision3/typing.log": {
+        "path": "/tmp/plato-phase2a-lZqbqj/revision3/typing.log",
+        "bytes": 19,
+        "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+        "expected_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+        "equal": true
+      },
+      "revision3/environment-base-3.13.json": {
+        "path": "/tmp/plato-phase2a-lZqbqj/revision3/environment-base-3.13.json",
+        "bytes": 429,
+        "sha256": "a94b24f9b8e50213c7d13b65fd703fc6325db1b9fc1db4aa419e2a07699f37cd",
+        "expected_sha256": "a94b24f9b8e50213c7d13b65fd703fc6325db1b9fc1db4aa419e2a07699f37cd",
+        "equal": true
+      },
+      "revision3/environment-base-3.14.json": {
+        "path": "/tmp/plato-phase2a-lZqbqj/revision3/environment-base-3.14.json",
+        "bytes": 463,
+        "sha256": "3c851aa10927764783f27f0b734ec9dfd05fe4150bbd0f11125e98db3c58530e",
+        "expected_sha256": "3c851aa10927764783f27f0b734ec9dfd05fe4150bbd0f11125e98db3c58530e",
+        "equal": true
+      },
+      "revision3/preservation.json": {
+        "path": "/tmp/plato-phase2a-lZqbqj/revision3/preservation.json",
+        "bytes": 1308,
+        "sha256": "54ac458b3d23bdf4862fd22db34cba60c4b6d92f8eac6ef6f128580c8c31ddc8",
+        "expected_sha256": "54ac458b3d23bdf4862fd22db34cba60c4b6d92f8eac6ef6f128580c8c31ddc8",
+        "equal": true
+      },
+      "revision3/independent-observations.json": {
+        "path": "/tmp/plato-phase2a-lZqbqj/revision3/independent-observations.json",
+        "bytes": 2911,
+        "sha256": "677a15be39398b028a2a0fe4a06b95f0190a7357a429ac3935e151349252a133",
+        "expected_sha256": "677a15be39398b028a2a0fe4a06b95f0190a7357a429ac3935e151349252a133",
+        "equal": true
+      },
+      "revision4/red-3.13.log": {
+        "path": "/tmp/plato-phase2a-lZqbqj/revision4/red-3.13.log",
+        "bytes": 19535,
+        "sha256": "e0235bc8a3557b077bc47481f9121a83423f58ffe6831a82909b909063327372",
+        "expected_sha256": "e0235bc8a3557b077bc47481f9121a83423f58ffe6831a82909b909063327372",
+        "equal": true
+      },
+      "revision4/green-new-3.13.log": {
+        "path": "/tmp/plato-phase2a-lZqbqj/revision4/green-new-3.13.log",
+        "bytes": 99,
+        "sha256": "525218187b55b377687d3146b586c1f2a6107acd2ba4bebde7965ebbfaf374b6",
+        "expected_sha256": "525218187b55b377687d3146b586c1f2a6107acd2ba4bebde7965ebbfaf374b6",
+        "equal": true
+      },
+      "revision4/green-focused-3.13.log": {
+        "path": "/tmp/plato-phase2a-lZqbqj/revision4/green-focused-3.13.log",
+        "bytes": 341,
+        "sha256": "50bf32a16ecfdf66752958dd3aadebe9b960a376268effb4214c81664a024d6e",
+        "expected_sha256": "50bf32a16ecfdf66752958dd3aadebe9b960a376268effb4214c81664a024d6e",
+        "equal": true
+      },
+      "revision4/green-base-3.13.log": {
+        "path": "/tmp/plato-phase2a-lZqbqj/revision4/green-base-3.13.log",
+        "bytes": 5648,
+        "sha256": "09c08ca65935f266c432b6a930d3d5950bb8f8ba01bdd5be42d12e25822b3d76",
+        "expected_sha256": "09c08ca65935f266c432b6a930d3d5950bb8f8ba01bdd5be42d12e25822b3d76",
+        "equal": true
+      },
+      "revision4/independent4-3.13.log": {
+        "path": "/tmp/plato-phase2a-lZqbqj/revision4/independent4-3.13.log",
+        "bytes": 99,
+        "sha256": "599065d4df389e1500b3e016a9651ed02dbf61d70a590e1e7179e0222125c092",
+        "expected_sha256": "599065d4df389e1500b3e016a9651ed02dbf61d70a590e1e7179e0222125c092",
+        "equal": true
+      },
+      "revision4/independent3-3.13.log": {
+        "path": "/tmp/plato-phase2a-lZqbqj/revision4/independent3-3.13.log",
+        "bytes": 98,
+        "sha256": "d07adc9c61b334cc33f3125b4ea06095f40a39993f88420c6a0f59782d16e1d6",
+        "expected_sha256": "d07adc9c61b334cc33f3125b4ea06095f40a39993f88420c6a0f59782d16e1d6",
+        "equal": true
+      },
+      "revision4/base-3.13.xml": {
+        "path": "/tmp/plato-phase2a-lZqbqj/revision4/base-3.13.xml",
+        "bytes": 67713,
+        "sha256": "815448051266e9be52a070f7062d078deb6e9fbfc86c0f6554bd15dd4452a9c4",
+        "expected_sha256": "815448051266e9be52a070f7062d078deb6e9fbfc86c0f6554bd15dd4452a9c4",
+        "equal": true
+      },
+      "revision4/independent4-3.13.xml": {
+        "path": "/tmp/plato-phase2a-lZqbqj/revision4/independent4-3.13.xml",
+        "bytes": 1532,
+        "sha256": "fd0f5a0bf4ed89e57942d41913d6f0a5b65b0abf20f9d899be137dc22528452d",
+        "expected_sha256": "fd0f5a0bf4ed89e57942d41913d6f0a5b65b0abf20f9d899be137dc22528452d",
+        "equal": true
+      },
+      "revision4/independent3-3.13.xml": {
+        "path": "/tmp/plato-phase2a-lZqbqj/revision4/independent3-3.13.xml",
+        "bytes": 831,
+        "sha256": "bd219668294cdf3e0445a4afea0e0dce90aa6a68f82e3fd4da1619b730968501",
+        "expected_sha256": "bd219668294cdf3e0445a4afea0e0dce90aa6a68f82e3fd4da1619b730968501",
+        "equal": true
+      },
+      "revision4/environment-base-3.13.json": {
+        "path": "/tmp/plato-phase2a-lZqbqj/revision4/environment-base-3.13.json",
+        "bytes": 340,
+        "sha256": "5793071d24037988ed30fb6a2fbb0917ab5eab91d061d13a389409d816dbaa85",
+        "expected_sha256": "5793071d24037988ed30fb6a2fbb0917ab5eab91d061d13a389409d816dbaa85",
+        "equal": true
+      },
+      "revision4/red-3.14.log": {
+        "path": "/tmp/plato-phase2a-lZqbqj/revision4/red-3.14.log",
+        "bytes": 19664,
+        "sha256": "d963ee60b2a43a5c2d8a888acd2a52ac782757e2c81d166dccf20790940ad963",
+        "expected_sha256": "d963ee60b2a43a5c2d8a888acd2a52ac782757e2c81d166dccf20790940ad963",
+        "equal": true
+      },
+      "revision4/green-new-3.14.log": {
+        "path": "/tmp/plato-phase2a-lZqbqj/revision4/green-new-3.14.log",
+        "bytes": 99,
+        "sha256": "b2ee86a53b172848b8b6262fb5526e5f7f23e2b7bbdad34afdedc14ec54a7388",
+        "expected_sha256": "b2ee86a53b172848b8b6262fb5526e5f7f23e2b7bbdad34afdedc14ec54a7388",
+        "equal": true
+      },
+      "revision4/green-focused-3.14.log": {
+        "path": "/tmp/plato-phase2a-lZqbqj/revision4/green-focused-3.14.log",
+        "bytes": 351,
+        "sha256": "05ce28a7861f9a1632d91300d96d76eed376a8a4bcd315bf654a2ec7fe58149f",
+        "expected_sha256": "05ce28a7861f9a1632d91300d96d76eed376a8a4bcd315bf654a2ec7fe58149f",
+        "equal": true
+      },
+      "revision4/green-base-3.14.log": {
+        "path": "/tmp/plato-phase2a-lZqbqj/revision4/green-base-3.14.log",
+        "bytes": 5647,
+        "sha256": "3daaaaa8945588019c5485f1ed47de882df66a4d40c4d4b5de3c17108ef836e8",
+        "expected_sha256": "3daaaaa8945588019c5485f1ed47de882df66a4d40c4d4b5de3c17108ef836e8",
+        "equal": true
+      },
+      "revision4/independent4-3.14.log": {
+        "path": "/tmp/plato-phase2a-lZqbqj/revision4/independent4-3.14.log",
+        "bytes": 99,
+        "sha256": "c2600e9c4a1f2d32eb7978424d30046a9b3e31bad222912817712044ca6d0b82",
+        "expected_sha256": "c2600e9c4a1f2d32eb7978424d30046a9b3e31bad222912817712044ca6d0b82",
+        "equal": true
+      },
+      "revision4/independent3-3.14.log": {
+        "path": "/tmp/plato-phase2a-lZqbqj/revision4/independent3-3.14.log",
+        "bytes": 99,
+        "sha256": "efcaf766517e6ffe5093c60ef57a34ab3d08dc1bea274159730c5368a1bfc01b",
+        "expected_sha256": "efcaf766517e6ffe5093c60ef57a34ab3d08dc1bea274159730c5368a1bfc01b",
+        "equal": true
+      },
+      "revision4/base-3.14.xml": {
+        "path": "/tmp/plato-phase2a-lZqbqj/revision4/base-3.14.xml",
+        "bytes": 67714,
+        "sha256": "3647bce3961986b82debb01dd74adb01f3bcb1df9685d456e849c3ca42accc82",
+        "expected_sha256": "3647bce3961986b82debb01dd74adb01f3bcb1df9685d456e849c3ca42accc82",
+        "equal": true
+      },
+      "revision4/independent4-3.14.xml": {
+        "path": "/tmp/plato-phase2a-lZqbqj/revision4/independent4-3.14.xml",
+        "bytes": 1533,
+        "sha256": "21924ce771a794e56d5b98d7ee7bb12a19159d61ad375fd4e96b863bc0095361",
+        "expected_sha256": "21924ce771a794e56d5b98d7ee7bb12a19159d61ad375fd4e96b863bc0095361",
+        "equal": true
+      },
+      "revision4/independent3-3.14.xml": {
+        "path": "/tmp/plato-phase2a-lZqbqj/revision4/independent3-3.14.xml",
+        "bytes": 833,
+        "sha256": "0c6393f8c0c70b9d9ea84300348e6b51481ce25f1dd0f8d803a4ebdf3ce7ff49",
+        "expected_sha256": "0c6393f8c0c70b9d9ea84300348e6b51481ce25f1dd0f8d803a4ebdf3ce7ff49",
+        "equal": true
+      },
+      "revision4/environment-base-3.14.json": {
+        "path": "/tmp/plato-phase2a-lZqbqj/revision4/environment-base-3.14.json",
+        "bytes": 366,
+        "sha256": "052efd6cb6f18c15e5804a14b2d39e89f4c406eeeb8ab4b95df09bc6c4a19f5b",
+        "expected_sha256": "052efd6cb6f18c15e5804a14b2d39e89f4c406eeeb8ab4b95df09bc6c4a19f5b",
+        "equal": true
+      },
+      "revision4/ruff.log": {
+        "path": "/tmp/plato-phase2a-lZqbqj/revision4/ruff.log",
+        "bytes": 19,
+        "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+        "expected_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+        "equal": true
+      },
+      "revision4/typing.log": {
+        "path": "/tmp/plato-phase2a-lZqbqj/revision4/typing.log",
+        "bytes": 19,
+        "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+        "expected_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+        "equal": true
+      },
+      "revision4/diff-check.log": {
+        "path": "/tmp/plato-phase2a-lZqbqj/revision4/diff-check.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "expected_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "equal": true
+      },
+      "revision4/preservation.json": {
+        "path": "/tmp/plato-phase2a-lZqbqj/revision4/preservation.json",
+        "bytes": 2331,
+        "sha256": "f04c02e078e124441225e973e90933e373df3f31c8ddd5be61429d1cef11151d",
+        "expected_sha256": "f04c02e078e124441225e973e90933e373df3f31c8ddd5be61429d1cef11151d",
+        "equal": true
+      },
+      "revision4/independent-observations.json": {
+        "path": "/tmp/plato-phase2a-lZqbqj/revision4/independent-observations.json",
+        "bytes": 11623,
+        "sha256": "0f91e63b5ed07a134a1cffb5d17c3560d4af6c82d25facfaf74508c45d045b72",
+        "expected_sha256": "0f91e63b5ed07a134a1cffb5d17c3560d4af6c82d25facfaf74508c45d045b72",
+        "equal": true
+      }
+    },
+    "archives": [
+      {
+        "original": "plato/datasources/datalib/__init__.py",
+        "archived": "archives/legacy_datalib/__init__.py",
+        "equal": true,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "original": "plato/datasources/datalib/audio_extraction_tools.py",
+        "archived": "archives/legacy_datalib/audio_extraction_tools.py",
+        "equal": true,
+        "sha256": "afa61fd9f87becda3bee4791d5dd18dcbe3557405d0c49a9a0731bb8f7f5c3f3"
+      },
+      {
+        "original": "plato/datasources/datalib/data_utils.py",
+        "archived": "archives/legacy_datalib/data_utils.py",
+        "equal": true,
+        "sha256": "53d83b9734a7d0a036393062daafbb0191bab8abfc061397f876559f1a4962fd"
+      },
+      {
+        "original": "plato/datasources/datalib/flickr30kE_utils.py",
+        "archived": "archives/legacy_datalib/flickr30kE_utils.py",
+        "equal": true,
+        "sha256": "545540ef26d363c1cea0b7a4c6881be99593a67e2ae70f42db30d0187ccf36ff"
+      },
+      {
+        "original": "plato/datasources/datalib/frames_extraction_tools.py",
+        "archived": "archives/legacy_datalib/frames_extraction_tools.py",
+        "equal": true,
+        "sha256": "6eab47d5ef3dbbb5d129b16868f10a60851c968b96b990c1a8aa2d9c2f394553"
+      },
+      {
+        "original": "plato/datasources/datalib/gym_utils/__init__.py",
+        "archived": "archives/legacy_datalib/gym_utils/__init__.py",
+        "equal": true,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "original": "plato/datasources/datalib/gym_utils/gym_trim.py",
+        "archived": "archives/legacy_datalib/gym_utils/gym_trim.py",
+        "equal": true,
+        "sha256": "7dca933a707d78ae9e9d25cd754396030e5a7d0f5f9e8ba9ad7347669a716165"
+      },
+      {
+        "original": "plato/datasources/datalib/modality_data_anntation_tools.py",
+        "archived": "archives/legacy_datalib/modality_data_anntation_tools.py",
+        "equal": true,
+        "sha256": "7ab25ac2b0983da3f9b50cc9a18ad061eab3049311e61c88a3c1ff81aa768624"
+      },
+      {
+        "original": "plato/datasources/datalib/modality_extraction_base.py",
+        "archived": "archives/legacy_datalib/modality_extraction_base.py",
+        "equal": true,
+        "sha256": "192d092044cf982a0354cfd4235b3e64ace1f6cb4f902ad8452c2e3cbc0a9041"
+      },
+      {
+        "original": "plato/datasources/datalib/parse_datasets.py",
+        "archived": "archives/legacy_datalib/parse_datasets.py",
+        "equal": true,
+        "sha256": "79883cead5983b3cdbc119bd479c8c4503e6cb6674ff54e54ab8255051c3a017"
+      },
+      {
+        "original": "plato/datasources/datalib/refer_utils/__init__.py",
+        "archived": "archives/legacy_datalib/refer_utils/__init__.py",
+        "equal": true,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "original": "plato/datasources/datalib/refer_utils/referitgame_utils.py",
+        "archived": "archives/legacy_datalib/refer_utils/referitgame_utils.py",
+        "equal": true,
+        "sha256": "636ddd92f2ae09a9d17708226daeb672a6356f2e183edb5d2e487027a70d4f6a"
+      },
+      {
+        "original": "plato/datasources/datalib/tiny_data_tools.py",
+        "archived": "archives/legacy_datalib/tiny_data_tools.py",
+        "equal": true,
+        "sha256": "33d8ec92496c510632d906d1c838a5e788a6c7f482017cf477cabd2ced80b793"
+      },
+      {
+        "original": "plato/datasources/datalib/video_transform.py",
+        "archived": "archives/legacy_datalib/video_transform.py",
+        "equal": true,
+        "sha256": "354dd8ad20a605bfa421f423fdab793ce601ed46e27eb2dcb5291c24d8b83db2"
+      }
+    ],
+    "archive_license": {
+      "equal": true,
+      "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+    },
+    "shared_metadata": {
+      "pyproject.toml": {
+        "path": "/private/tmp/plato-refresh-worktrees/data/pyproject.toml",
+        "bytes": 4079,
+        "sha256": "799bd7ba1865b097fdc8ca84a7b70337794e338de4aa9a6a13f6a4c1b9156246",
+        "unchanged_from_phase_base": true
+      },
+      "uv.lock": {
+        "path": "/private/tmp/plato-refresh-worktrees/data/uv.lock",
+        "bytes": 739161,
+        "sha256": "573b10c2ba1a2317e02f9e40c6181359cafab6f6e0a0f9be12bb256cb276fe1d",
+        "unchanged_from_phase_base": true
+      },
+      ".python-version": {
+        "path": "/private/tmp/plato-refresh-worktrees/data/.python-version",
+        "bytes": 5,
+        "sha256": "02e735b3dfe1c32833eb550b7ff8ffa17f5f2bc3fa1e7bae61a8f5a3883ce398",
+        "unchanged_from_phase_base": true
+      },
+      "tests/conftest.py": {
+        "path": "/private/tmp/plato-refresh-worktrees/data/tests/conftest.py",
+        "bytes": 14382,
+        "sha256": "3eb55a1fa7c0fd5428c296c1bcd7300b23b0ade3d276f5c687af3b9bd78304c7",
+        "unchanged_from_phase_base": true
+      }
+    },
+    "shared_runtime_changed": [],
+    "unchanged_since_review2": [],
+    "active_archive_reference_scan": {
+      "command": [
+        "/bin/zsh",
+        "-lc",
+        "rg -n --glob '*.py' 'plato\\.datasources\\.datalib|from .*datalib|import .*datalib|archives\\.legacy_datalib|from archives|import archives' plato tests examples"
+      ],
+      "exit_code": 1,
+      "matches": []
+    },
+    "author_identity_matches": {
+      "implementation_tree": true,
+      "base_diff": true,
+      "prior_diff": true
+    }
+  },
+  "accepted_and_prior_sources_read": {
+    "plan.md": {
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/plan.md",
+      "bytes": 50719,
+      "sha256": "edb9a58cc7915a940854f16d5029fe97434703bf2f75eca0dcb96de2d0f0eb15"
+    },
+    "plan-addendum.json": {
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/plan-addendum.json",
+      "bytes": 28579,
+      "sha256": "5b51b0fb7ed6f68d9fce7176335b3e7be5e5f178a2788590912aa2396a487709"
+    },
+    "phase2a-review.json": {
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2a-review.json",
+      "bytes": 31402,
+      "sha256": "24c037f3d18051a5cd4c58a410e35f45e1d75d6d5ed215d4477bf1fbb98baf84"
+    },
+    "phase2a-review-2.json": {
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2a-review-2.json",
+      "bytes": 71136,
+      "sha256": "279154c2f27de00181721e68ae12fded2aee14edf0357d7d6eec04ea5b5d3132"
+    },
+    "phase2a-review-3.json": {
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2a-review-3.json",
+      "bytes": 80080,
+      "sha256": "dbf8aad9fc371c7b001a7f04240abfab338b2682a922761f900e7eb0cb3d521d"
+    },
+    "phase2a-review-4.json": {
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2a-review-4.json",
+      "bytes": 138875,
+      "sha256": "a602fb94c5b5e3eeae855dae39082ceab99ff1f0dc6660203839f3ee1f8dce76"
+    },
+    "phase2a-root-probes.json": {
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2a-root-probes.json",
+      "bytes": 4128,
+      "sha256": "d8afe582f8c7e75989edba835d582532edfb22f24e51a404a08528fa65b8d975"
+    },
+    "root_AGENTS.md": {
+      "path": "/Users/bli/Playground/plato/AGENTS.md",
+      "bytes": 3119,
+      "sha256": "b50f87f31ea3d87076952d8b7d2d8af067132fbf877d80f8780c208fb45527ec"
+    },
+    "candidate_validation": {
+      "path": "/private/tmp/plato-refresh-worktrees/data/evidence/2026-refresh/phase2a-validation.json",
+      "bytes": 107467,
+      "sha256": "f1c1ceb8ab3cf0aa9371a34873e8aa43a884f5175c7db385921c7fafd32d7e40"
+    }
+  },
+  "write_scope_and_authority": {
+    "sole_root_write": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2a-review-5.json",
+    "scratch": "/tmp/plato-phase2a-review-5",
+    "all_shells": "/bin/zsh -lc",
+    "agents_spawned": 0,
+    "source_edits": 0,
+    "commits": 0,
+    "pushes": 0,
+    "cleanup": 0,
+    "other_reports_or_environments_mutated": false,
+    "execution": "Exact git-archive exports. Existing reviewer4 Python environments used read only with PYTHONPATH and cwd pinned to review5 candidate (prior for intentional red). No sync, install or package mutation. Bytecode and pytest cache writes disabled; fixtures, journals, logs, artifacts and tool caches owned here.",
+    "source_checks": "All 945 non-gitlink tracked blobs match the candidate in both worktree and export, before and after; clean HEAD unchanged. Prior export retains all 944 prior blobs plus the separately attributed new regression module."
+  },
+  "environment": {
+    "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+    "python": {
+      "3.13": {
+        "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+        "executable": "/tmp/plato-phase2a-review-4/base-3.13/bin/python",
+        "prefix": "/tmp/plato-phase2a-review-4/base-3.13",
+        "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+        "machine": "arm64",
+        "source": "/tmp/plato-phase2a-review-5/candidate/plato/__init__.py",
+        "child_command": "/tmp/plato-phase2a-review-4/base-3.13/bin/python -c 'import json,plato,sys; print(json.dumps({\"source\":plato.__file__,\"prefix\":sys.prefix}))'",
+        "child": {
+          "source": "/private/tmp/plato-phase2a-review-5/candidate/plato/__init__.py",
+          "prefix": "/tmp/plato-phase2a-review-4/base-3.13"
+        },
+        "packages": {
+          "plato-learn": "1.4.3",
+          "numpy": "2.5.3",
+          "torch": "2.14.1",
+          "torchvision": "0.29.1",
+          "requests": "2.34.2",
+          "pytest": "9.1.1",
+          "pytest-cov": "7.1.0"
+        },
+        "optional_available": {
+          "opacus": false,
+          "kazoo": false,
+          "gymnasium": false,
+          "tiktoken": false,
+          "lightly": false
+        },
+        "default_python": "3.13",
+        "torchvision_folder_source_path": "/tmp/plato-phase2a-review-4/base-3.13/lib/python3.13/site-packages/torchvision/datasets/folder.py",
+        "torchvision_folder_source_sha256": "b2a36e520cf451d82b993e6fdaa1266d8526ef6a402dcf401f23f0c9cd0a8efa"
+      },
+      "3.14": {
+        "python": "3.14.8 (main, Sep 30 2026, 17:55:09) [Clang 21.0.0 (clang-2100.3.34.2)]",
+        "executable": "/private/tmp/plato-phase2a-review-4/base-3.14/bin/python",
+        "prefix": "/private/tmp/plato-phase2a-review-4/base-3.14",
+        "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+        "machine": "arm64",
+        "source": "/tmp/plato-phase2a-review-5/candidate/plato/__init__.py",
+        "child_command": "/private/tmp/plato-phase2a-review-4/base-3.14/bin/python -c 'import json,plato,sys; print(json.dumps({\"source\":plato.__file__,\"prefix\":sys.prefix}))'",
+        "child": {
+          "source": "/private/tmp/plato-phase2a-review-5/candidate/plato/__init__.py",
+          "prefix": "/private/tmp/plato-phase2a-review-4/base-3.14"
+        },
+        "packages": {
+          "plato-learn": "1.4.3",
+          "numpy": "2.5.3",
+          "torch": "2.14.1",
+          "torchvision": "0.29.1",
+          "requests": "2.34.2",
+          "pytest": "9.1.1",
+          "pytest-cov": "7.1.0"
+        },
+        "optional_available": {
+          "opacus": false,
+          "kazoo": false,
+          "gymnasium": false,
+          "tiktoken": false,
+          "lightly": false
+        },
+        "default_python": "3.13",
+        "torchvision_folder_source_path": "/private/tmp/plato-phase2a-review-4/base-3.14/lib/python3.14/site-packages/torchvision/datasets/folder.py",
+        "torchvision_folder_source_sha256": "b2a36e520cf451d82b993e6fdaa1266d8526ef6a402dcf401f23f0c9cd0a8efa"
+      }
+    },
+    "read_only_python_environments": [
+      "/tmp/plato-phase2a-review-4/base-3.13",
+      "/tmp/plato-phase2a-review-4/base-3.14"
+    ],
+    "provisioning_in_this_review": "None. Existing locked test-base environments read only, expressly allowed by the user.",
+    "parent_and_child_source_pin": "Both versions independently verify plato.__file__ resolves to /private/tmp/plato-phase2a-review-5/candidate/plato/__init__.py in parent and fresh shell child; interpreter prefixes agree. All saved current observations and actual public probes point there.",
+    "metadata": {
+      "pyproject.toml": {
+        "path": "/private/tmp/plato-refresh-worktrees/data/pyproject.toml",
+        "bytes": 4079,
+        "sha256": "799bd7ba1865b097fdc8ca84a7b70337794e338de4aa9a6a13f6a4c1b9156246",
+        "unchanged_from_phase_base": true
+      },
+      "uv.lock": {
+        "path": "/private/tmp/plato-refresh-worktrees/data/uv.lock",
+        "bytes": 739161,
+        "sha256": "573b10c2ba1a2317e02f9e40c6181359cafab6f6e0a0f9be12bb256cb276fe1d",
+        "unchanged_from_phase_base": true
+      },
+      ".python-version": {
+        "path": "/private/tmp/plato-refresh-worktrees/data/.python-version",
+        "bytes": 5,
+        "sha256": "02e735b3dfe1c32833eb550b7ff8ffa17f5f2bc3fa1e7bae61a8f5a3883ce398",
+        "unchanged_from_phase_base": true
+      },
+      "tests/conftest.py": {
+        "path": "/private/tmp/plato-refresh-worktrees/data/tests/conftest.py",
+        "bytes": 14382,
+        "sha256": "3eb55a1fa7c0fd5428c296c1bcd7300b23b0ade3d276f5c687af3b9bd78304c7",
+        "unchanged_from_phase_base": true
+      }
+    },
+    "default_and_minimum": "3.13 remains unchanged.",
+    "static_tools": "Read-only author dev-environment Ruff/ty executables. Scope and repository checks run from pinned scratch source; original environments never synced."
+  },
+  "independent_validation": {
+    "focused": {
+      "3.13": {
+        "action": "focused",
+        "version": "3.13",
+        "shell": "/bin/zsh -lc",
+        "command": "HF_HUB_OFFLINE=1 HF_DATASETS_OFFLINE=1 PYTHONDONTWRITEBYTECODE=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 TOKENIZERS_PARALLELISM=false XDG_CACHE_HOME=/tmp/plato-phase2a-review-5/cache TMPDIR=/tmp/plato-phase2a-review-5/tmp PYTHONPATH=/tmp/plato-phase2a-review-5/candidate /tmp/plato-phase2a-review-4/base-3.13/bin/python -m pytest tests/test_config_loader.py tests/samplers tests/datasources/test_registry.py tests/datasources/test_torchvision_datasource.py tests/datasources/test_feature_dataset.py tests/datasources/test_feature_datasource.py tests/datasources/test_data_loaders.py tests/datasources/test_download_contracts.py tests/datasources/test_local_datasets.py tests/datasources/test_review_regressions.py tests/datasources/test_review2_regressions.py tests/datasources/test_review3_regressions.py tests/datasources/test_review4_regressions.py tests/utils/test_archive.py --test-profile=base -ra -p no:cacheprovider --basetemp=/tmp/plato-phase2a-review-5/focused-3.13-fixtures --junitxml=/tmp/plato-phase2a-review-5/logs/focused-3.13.xml",
+        "cwd": "/tmp/plato-phase2a-review-5/candidate",
+        "log": "/tmp/plato-phase2a-review-5/logs/focused-3.13.log",
+        "started_utc": "2026-10-03T06:25:15.577288+00:00",
+        "exit_code": 0,
+        "seconds": 50.23499262495898,
+        "counts": {
+          "tests": 242,
+          "errors": 0,
+          "failures": 0,
+          "skipped": 0,
+          "passed": 242,
+          "pytest_seconds": 38.252,
+          "new_durable_regressions_passed": 9
+        },
+        "log_identity": {
+          "path": "/tmp/plato-phase2a-review-5/logs/focused-3.13.log",
+          "bytes": 1962,
+          "sha256": "1693c57088a16f4517a2d9ccdf4c8d01db29a967c7a0368077dc531121240aa2"
+        },
+        "junit_identity": {
+          "path": "/tmp/plato-phase2a-review-5/logs/focused-3.13.xml",
+          "bytes": 38571,
+          "sha256": "6a128e1dbe0a0fc3ea084c8f88f7417b89f48cec81c50a5f7fc9a0c5e752c63f"
+        }
+      },
+      "3.14": {
+        "action": "focused",
+        "version": "3.14",
+        "shell": "/bin/zsh -lc",
+        "command": "HF_HUB_OFFLINE=1 HF_DATASETS_OFFLINE=1 PYTHONDONTWRITEBYTECODE=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 TOKENIZERS_PARALLELISM=false XDG_CACHE_HOME=/tmp/plato-phase2a-review-5/cache TMPDIR=/tmp/plato-phase2a-review-5/tmp PYTHONPATH=/tmp/plato-phase2a-review-5/candidate /tmp/plato-phase2a-review-4/base-3.14/bin/python -m pytest tests/test_config_loader.py tests/samplers tests/datasources/test_registry.py tests/datasources/test_torchvision_datasource.py tests/datasources/test_feature_dataset.py tests/datasources/test_feature_datasource.py tests/datasources/test_data_loaders.py tests/datasources/test_download_contracts.py tests/datasources/test_local_datasets.py tests/datasources/test_review_regressions.py tests/datasources/test_review2_regressions.py tests/datasources/test_review3_regressions.py tests/datasources/test_review4_regressions.py tests/utils/test_archive.py --test-profile=base -ra -p no:cacheprovider --basetemp=/tmp/plato-phase2a-review-5/focused-3.14-fixtures --junitxml=/tmp/plato-phase2a-review-5/logs/focused-3.14.xml",
+        "cwd": "/tmp/plato-phase2a-review-5/candidate",
+        "log": "/tmp/plato-phase2a-review-5/logs/focused-3.14.log",
+        "started_utc": "2026-10-03T06:25:15.577248+00:00",
+        "exit_code": 0,
+        "seconds": 89.4933548332192,
+        "counts": {
+          "tests": 242,
+          "errors": 0,
+          "failures": 0,
+          "skipped": 0,
+          "passed": 242,
+          "pytest_seconds": 76.199,
+          "new_durable_regressions_passed": 9
+        },
+        "log_identity": {
+          "path": "/tmp/plato-phase2a-review-5/logs/focused-3.14.log",
+          "bytes": 1961,
+          "sha256": "16ce4091a0852319a6c5cd1881bdd872f629ffbc7c44143ac2a1c18d18934803"
+        },
+        "junit_identity": {
+          "path": "/tmp/plato-phase2a-review-5/logs/focused-3.14.xml",
+          "bytes": 38572,
+          "sha256": "929ad867bfbf4a4e58e322bcb042796083a667c31ac4ac70cfe0fb9044260c3d"
+        }
+      }
+    },
+    "base": {
+      "3.13": {
+        "action": "base",
+        "version": "3.13",
+        "shell": "/bin/zsh -lc",
+        "command": "HF_HUB_OFFLINE=1 HF_DATASETS_OFFLINE=1 PYTHONDONTWRITEBYTECODE=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 TOKENIZERS_PARALLELISM=false XDG_CACHE_HOME=/tmp/plato-phase2a-review-5/cache TMPDIR=/tmp/plato-phase2a-review-5/tmp PYTHONPATH=/tmp/plato-phase2a-review-5/candidate /tmp/plato-phase2a-review-4/base-3.13/bin/python -m pytest tests --test-profile=base -m 'not runtime' -ra -p no:cacheprovider --basetemp=/tmp/plato-phase2a-review-5/base-3.13-fixtures --junitxml=/tmp/plato-phase2a-review-5/logs/base-3.13.xml",
+        "cwd": "/tmp/plato-phase2a-review-5/candidate",
+        "log": "/tmp/plato-phase2a-review-5/logs/base-3.13.log",
+        "started_utc": "2026-10-03T06:26:05.847890+00:00",
+        "exit_code": 0,
+        "seconds": 49.42143650003709,
+        "counts": {
+          "tests": 449,
+          "errors": 0,
+          "failures": 0,
+          "skipped": 4,
+          "passed": 445,
+          "pytest_seconds": 39.524,
+          "deselected": 48
+        },
+        "log_identity": {
+          "path": "/tmp/plato-phase2a-review-5/logs/base-3.13.log",
+          "bytes": 5652,
+          "sha256": "feff617f2b06c164fe0485e6246e1612e78b3e22218109d586c3c7587dfeb93e"
+        },
+        "junit_identity": {
+          "path": "/tmp/plato-phase2a-review-5/logs/base-3.13.xml",
+          "bytes": 67729,
+          "sha256": "d5db93ae51504eabed48ccd6eac4855279668513db9219e53c7234586ffee88b"
+        }
+      },
+      "3.14": {
+        "action": "base",
+        "version": "3.14",
+        "shell": "/bin/zsh -lc",
+        "command": "HF_HUB_OFFLINE=1 HF_DATASETS_OFFLINE=1 PYTHONDONTWRITEBYTECODE=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 TOKENIZERS_PARALLELISM=false XDG_CACHE_HOME=/tmp/plato-phase2a-review-5/cache TMPDIR=/tmp/plato-phase2a-review-5/tmp PYTHONPATH=/tmp/plato-phase2a-review-5/candidate /tmp/plato-phase2a-review-4/base-3.14/bin/python -m pytest tests --test-profile=base -m 'not runtime' -ra -p no:cacheprovider --basetemp=/tmp/plato-phase2a-review-5/base-3.14-fixtures --junitxml=/tmp/plato-phase2a-review-5/logs/base-3.14.xml",
+        "cwd": "/tmp/plato-phase2a-review-5/candidate",
+        "log": "/tmp/plato-phase2a-review-5/logs/base-3.14.log",
+        "started_utc": "2026-10-03T06:26:45.104870+00:00",
+        "exit_code": 0,
+        "seconds": 88.42451316700317,
+        "counts": {
+          "tests": 449,
+          "errors": 0,
+          "failures": 0,
+          "skipped": 4,
+          "passed": 445,
+          "pytest_seconds": 77.104,
+          "deselected": 48
+        },
+        "log_identity": {
+          "path": "/tmp/plato-phase2a-review-5/logs/base-3.14.log",
+          "bytes": 5651,
+          "sha256": "40357b2694f58554f1f7dfd1f97da1eee9fc85307eb91d3250e942a812c2074c"
+        },
+        "junit_identity": {
+          "path": "/tmp/plato-phase2a-review-5/logs/base-3.14.xml",
+          "bytes": 67730,
+          "sha256": "4436637183e6819ad34778fe8a73da51182805dd0a10f4eb9f2d1dd8a4879938"
+        }
+      }
+    },
+    "independent": {
+      "3.13": {
+        "action": "independent",
+        "version": "3.13",
+        "shell": "/bin/zsh -lc",
+        "command": "HF_HUB_OFFLINE=1 HF_DATASETS_OFFLINE=1 PYTHONDONTWRITEBYTECODE=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 TOKENIZERS_PARALLELISM=false XDG_CACHE_HOME=/tmp/plato-phase2a-review-5/cache TMPDIR=/tmp/plato-phase2a-review-5/tmp PYTHONPATH=/tmp/plato-phase2a-review-5/candidate /tmp/plato-phase2a-review-4/base-3.13/bin/python -m pytest /tmp/plato-phase2a-review-5/test_independent_contracts.py /tmp/plato-phase2a-review-5/test_prior_remaining_contracts.py -ra -p no:cacheprovider --basetemp=/tmp/plato-phase2a-review-5/independent-3.13-fixtures --junitxml=/tmp/plato-phase2a-review-5/logs/independent-3.13.xml",
+        "cwd": "/tmp/plato-phase2a-review-5/candidate",
+        "log": "/tmp/plato-phase2a-review-5/logs/independent-3.13.log",
+        "started_utc": "2026-10-03T06:26:55.303448+00:00",
+        "exit_code": 0,
+        "seconds": 6.280252875061706,
+        "counts": {
+          "tests": 99,
+          "errors": 0,
+          "failures": 0,
+          "skipped": 0,
+          "passed": 99,
+          "pytest_seconds": 5.434
+        },
+        "log_identity": {
+          "path": "/tmp/plato-phase2a-review-5/logs/independent-3.13.log",
+          "bytes": 798,
+          "sha256": "609f41248d26e58270d6f41196d64fcc8c2ea5902d9d105d8137eac91a59b4e6"
+        },
+        "junit_identity": {
+          "path": "/tmp/plato-phase2a-review-5/logs/independent-3.13.xml",
+          "bytes": 16162,
+          "sha256": "068b9c3f583db3babccf627693b33ac944b5023903f76667badec8466e4e7186"
+        }
+      },
+      "3.14": {
+        "action": "independent",
+        "version": "3.14",
+        "shell": "/bin/zsh -lc",
+        "command": "HF_HUB_OFFLINE=1 HF_DATASETS_OFFLINE=1 PYTHONDONTWRITEBYTECODE=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 TOKENIZERS_PARALLELISM=false XDG_CACHE_HOME=/tmp/plato-phase2a-review-5/cache TMPDIR=/tmp/plato-phase2a-review-5/tmp PYTHONPATH=/tmp/plato-phase2a-review-5/candidate /tmp/plato-phase2a-review-4/base-3.14/bin/python -m pytest /tmp/plato-phase2a-review-5/test_independent_contracts.py /tmp/plato-phase2a-review-5/test_prior_remaining_contracts.py -ra -p no:cacheprovider --basetemp=/tmp/plato-phase2a-review-5/independent-3.14-fixtures --junitxml=/tmp/plato-phase2a-review-5/logs/independent-3.14.xml",
+        "cwd": "/tmp/plato-phase2a-review-5/candidate",
+        "log": "/tmp/plato-phase2a-review-5/logs/independent-3.14.log",
+        "started_utc": "2026-10-03T06:28:13.563295+00:00",
+        "exit_code": 0,
+        "seconds": 42.1223505421076,
+        "counts": {
+          "tests": 99,
+          "errors": 0,
+          "failures": 0,
+          "skipped": 0,
+          "passed": 99,
+          "pytest_seconds": 41.089
+        },
+        "log_identity": {
+          "path": "/tmp/plato-phase2a-review-5/logs/independent-3.14.log",
+          "bytes": 797,
+          "sha256": "3d27e85d94bd7be2be010cd325795247b418657d7fbbcf83a053c7bfb512422e"
+        },
+        "junit_identity": {
+          "path": "/tmp/plato-phase2a-review-5/logs/independent-3.14.xml",
+          "bytes": 16164,
+          "sha256": "f93c775ec1ca77cd8ebc28add8fd4e11ce815d1dc83f0d1bc51266e1ca4e6e2c"
+        }
+      }
+    },
+    "original": {
+      "3.13": {
+        "action": "original",
+        "version": "3.13",
+        "shell": "/bin/zsh -lc",
+        "command": "HF_HUB_OFFLINE=1 HF_DATASETS_OFFLINE=1 PYTHONDONTWRITEBYTECODE=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 TOKENIZERS_PARALLELISM=false XDG_CACHE_HOME=/tmp/plato-phase2a-review-5/cache TMPDIR=/tmp/plato-phase2a-review-5/tmp PYTHONPATH=/tmp/plato-phase2a-review-5/candidate /tmp/plato-phase2a-review-4/base-3.13/bin/python -m pytest /tmp/plato-phase2a-review-5/test_default_recovery_negative.py -s -ra -p no:cacheprovider --basetemp=/tmp/plato-phase2a-review-5/original-3.13-fixtures --junitxml=/tmp/plato-phase2a-review-5/logs/original-3.13.xml",
+        "cwd": "/tmp/plato-phase2a-review-5/candidate",
+        "log": "/tmp/plato-phase2a-review-5/logs/original-3.13.log",
+        "started_utc": "2026-10-03T06:27:01.617994+00:00",
+        "exit_code": 0,
+        "seconds": 5.352530290838331,
+        "counts": {
+          "tests": 4,
+          "errors": 0,
+          "failures": 0,
+          "skipped": 0,
+          "passed": 4,
+          "pytest_seconds": 4.549
+        },
+        "log_identity": {
+          "path": "/tmp/plato-phase2a-review-5/logs/original-3.13.log",
+          "bytes": 2111,
+          "sha256": "560b3f127815f8da03c9dc0e7d8ae75feed06075cddead7c76873902cf16c1d7"
+        },
+        "junit_identity": {
+          "path": "/tmp/plato-phase2a-review-5/logs/original-3.13.xml",
+          "bytes": 831,
+          "sha256": "a8b068f7ed4da631292e4efe63abd1005ee94820153741eb3d60f4542e277011"
+        }
+      },
+      "3.14": {
+        "action": "original",
+        "version": "3.14",
+        "shell": "/bin/zsh -lc",
+        "command": "HF_HUB_OFFLINE=1 HF_DATASETS_OFFLINE=1 PYTHONDONTWRITEBYTECODE=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 TOKENIZERS_PARALLELISM=false XDG_CACHE_HOME=/tmp/plato-phase2a-review-5/cache TMPDIR=/tmp/plato-phase2a-review-5/tmp PYTHONPATH=/tmp/plato-phase2a-review-5/candidate /tmp/plato-phase2a-review-4/base-3.14/bin/python -m pytest /tmp/plato-phase2a-review-5/test_default_recovery_negative.py -s -ra -p no:cacheprovider --basetemp=/tmp/plato-phase2a-review-5/original-3.14-fixtures --junitxml=/tmp/plato-phase2a-review-5/logs/original-3.14.xml",
+        "cwd": "/tmp/plato-phase2a-review-5/candidate",
+        "log": "/tmp/plato-phase2a-review-5/logs/original-3.14.log",
+        "started_utc": "2026-10-03T06:28:55.722283+00:00",
+        "exit_code": 0,
+        "seconds": 41.731844999827445,
+        "counts": {
+          "tests": 4,
+          "errors": 0,
+          "failures": 0,
+          "skipped": 0,
+          "passed": 4,
+          "pytest_seconds": 40.674
+        },
+        "log_identity": {
+          "path": "/tmp/plato-phase2a-review-5/logs/original-3.14.log",
+          "bytes": 2182,
+          "sha256": "13cb4c449d7a27c8caa51fac7d366f1b9bcc8343bdbb3f2c884bf0da6d25f55e"
+        },
+        "junit_identity": {
+          "path": "/tmp/plato-phase2a-review-5/logs/original-3.14.xml",
+          "bytes": 833,
+          "sha256": "f168e048f12a5093fd3f7afa06235095cbb529e461ed5f30d409c07d93df94bf"
+        }
+      }
+    },
+    "coupled-corrected": {
+      "3.13": {
+        "action": "coupled-corrected",
+        "version": "3.13",
+        "shell": "/bin/zsh -lc",
+        "command": "HF_HUB_OFFLINE=1 HF_DATASETS_OFFLINE=1 PYTHONDONTWRITEBYTECODE=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 TOKENIZERS_PARALLELISM=false XDG_CACHE_HOME=/tmp/plato-phase2a-review-5/cache TMPDIR=/tmp/plato-phase2a-review-5/tmp PYTHONPATH=/tmp/plato-phase2a-review-5/candidate /tmp/plato-phase2a-review-4/base-3.13/bin/python -m pytest /tmp/plato-phase2a-review-5/test_coupled_recovery_corrected.py -s -ra -p no:cacheprovider --basetemp=/tmp/plato-phase2a-review-5/coupled-corrected-3.13-fixtures --junitxml=/tmp/plato-phase2a-review-5/logs/coupled-corrected-3.13.xml",
+        "cwd": "/tmp/plato-phase2a-review-5/candidate",
+        "log": "/tmp/plato-phase2a-review-5/logs/coupled-corrected-3.13.log",
+        "started_utc": "2026-10-03T06:27:07.004428+00:00",
+        "exit_code": 0,
+        "seconds": 13.139124374836683,
+        "counts": {
+          "tests": 8,
+          "errors": 0,
+          "failures": 0,
+          "skipped": 0,
+          "passed": 8,
+          "pytest_seconds": 12.326
+        },
+        "log_identity": {
+          "path": "/tmp/plato-phase2a-review-5/logs/coupled-corrected-3.13.log",
+          "bytes": 7594,
+          "sha256": "1efc95c295e22f6e4184fe93c18dab8cbbee35a980b1b7c40b8d6cbb0102583e"
+        },
+        "junit_identity": {
+          "path": "/tmp/plato-phase2a-review-5/logs/coupled-corrected-3.13.xml",
+          "bytes": 1532,
+          "sha256": "3f8eb3385d309e24246a352302723d99151a8441f713659f04c3e664480dad22"
+        }
+      },
+      "3.14": {
+        "action": "coupled-corrected",
+        "version": "3.14",
+        "shell": "/bin/zsh -lc",
+        "command": "HF_HUB_OFFLINE=1 HF_DATASETS_OFFLINE=1 PYTHONDONTWRITEBYTECODE=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 TOKENIZERS_PARALLELISM=false XDG_CACHE_HOME=/tmp/plato-phase2a-review-5/cache TMPDIR=/tmp/plato-phase2a-review-5/tmp PYTHONPATH=/tmp/plato-phase2a-review-5/candidate /tmp/plato-phase2a-review-4/base-3.14/bin/python -m pytest /tmp/plato-phase2a-review-5/test_coupled_recovery_corrected.py -s -ra -p no:cacheprovider --basetemp=/tmp/plato-phase2a-review-5/coupled-corrected-3.14-fixtures --junitxml=/tmp/plato-phase2a-review-5/logs/coupled-corrected-3.14.xml",
+        "cwd": "/tmp/plato-phase2a-review-5/candidate",
+        "log": "/tmp/plato-phase2a-review-5/logs/coupled-corrected-3.14.log",
+        "started_utc": "2026-10-03T06:29:37.489267+00:00",
+        "exit_code": 0,
+        "seconds": 49.14209700003266,
+        "counts": {
+          "tests": 8,
+          "errors": 0,
+          "failures": 0,
+          "skipped": 0,
+          "passed": 8,
+          "pytest_seconds": 48.113
+        },
+        "log_identity": {
+          "path": "/tmp/plato-phase2a-review-5/logs/coupled-corrected-3.14.log",
+          "bytes": 7701,
+          "sha256": "f7943d36efb9915509ab1c3153be3e611ddf07c729d0c48429c45119e60e6655"
+        },
+        "junit_identity": {
+          "path": "/tmp/plato-phase2a-review-5/logs/coupled-corrected-3.14.xml",
+          "bytes": 1533,
+          "sha256": "8bf6e3611b54c3d56fa67036b2d1ac5ea0766bf92d4779f2a003dafcae192047"
+        }
+      }
+    },
+    "new-independent": {
+      "3.13": {
+        "action": "new-independent",
+        "version": "3.13",
+        "shell": "/bin/zsh -lc",
+        "command": "HF_HUB_OFFLINE=1 HF_DATASETS_OFFLINE=1 PYTHONDONTWRITEBYTECODE=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 TOKENIZERS_PARALLELISM=false XDG_CACHE_HOME=/tmp/plato-phase2a-review-5/cache TMPDIR=/tmp/plato-phase2a-review-5/tmp PYTHONPATH=/tmp/plato-phase2a-review-5/candidate /tmp/plato-phase2a-review-4/base-3.13/bin/python -m pytest /tmp/plato-phase2a-review-5/test_review5_transitions.py -s -ra -p no:cacheprovider --basetemp=/tmp/plato-phase2a-review-5/new-independent-3.13-fixtures --junitxml=/tmp/plato-phase2a-review-5/logs/new-independent-3.13.xml",
+        "cwd": "/tmp/plato-phase2a-review-5/candidate",
+        "log": "/tmp/plato-phase2a-review-5/logs/new-independent-3.13.log",
+        "started_utc": "2026-10-03T06:27:54.460105+00:00",
+        "exit_code": 0,
+        "seconds": 27.841834290884435,
+        "counts": {
+          "tests": 16,
+          "errors": 0,
+          "failures": 0,
+          "skipped": 0,
+          "passed": 16,
+          "pytest_seconds": 27.017
+        },
+        "log_identity": {
+          "path": "/tmp/plato-phase2a-review-5/logs/new-independent-3.13.log",
+          "bytes": 1117,
+          "sha256": "8209e119b4435666d98b6799bce00924fdfcc5934b8f7c4773aa1f19ef8e9bde"
+        },
+        "junit_identity": {
+          "path": "/tmp/plato-phase2a-review-5/logs/new-independent-3.13.xml",
+          "bytes": 2619,
+          "sha256": "fcb01d5fbe57a77266c395e4f6f45c56d31c304d029f51128c51e819aa4769cd"
+        }
+      },
+      "3.14": {
+        "action": "new-independent",
+        "version": "3.14",
+        "shell": "/bin/zsh -lc",
+        "command": "HF_HUB_OFFLINE=1 HF_DATASETS_OFFLINE=1 PYTHONDONTWRITEBYTECODE=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 TOKENIZERS_PARALLELISM=false XDG_CACHE_HOME=/tmp/plato-phase2a-review-5/cache TMPDIR=/tmp/plato-phase2a-review-5/tmp PYTHONPATH=/tmp/plato-phase2a-review-5/candidate /tmp/plato-phase2a-review-4/base-3.14/bin/python -m pytest /tmp/plato-phase2a-review-5/test_review5_transitions.py -s -ra -p no:cacheprovider --basetemp=/tmp/plato-phase2a-review-5/new-independent-3.14-fixtures --junitxml=/tmp/plato-phase2a-review-5/logs/new-independent-3.14.xml",
+        "cwd": "/tmp/plato-phase2a-review-5/candidate",
+        "log": "/tmp/plato-phase2a-review-5/logs/new-independent-3.14.log",
+        "started_utc": "2026-10-03T06:27:54.461473+00:00",
+        "exit_code": 0,
+        "seconds": 63.71746912505478,
+        "counts": {
+          "tests": 16,
+          "errors": 0,
+          "failures": 0,
+          "skipped": 0,
+          "passed": 16,
+          "pytest_seconds": 62.608
+        },
+        "log_identity": {
+          "path": "/tmp/plato-phase2a-review-5/logs/new-independent-3.14.log",
+          "bytes": 1116,
+          "sha256": "c0b716c9b2b861a6b0ef0cd9625ecb54ff60a0ca95a90ec70292eb472ff9e94e"
+        },
+        "junit_identity": {
+          "path": "/tmp/plato-phase2a-review-5/logs/new-independent-3.14.xml",
+          "bytes": 2620,
+          "sha256": "39f062a91af31c274e812ae9b8dbf0e215c7c7e071cc0bf2d7293c8eb36525e0"
+        }
+      }
+    },
+    "author-red": {
+      "3.13": {
+        "action": "author-red",
+        "version": "3.13",
+        "shell": "/bin/zsh -lc",
+        "command": "HF_HUB_OFFLINE=1 HF_DATASETS_OFFLINE=1 PYTHONDONTWRITEBYTECODE=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 TOKENIZERS_PARALLELISM=false XDG_CACHE_HOME=/tmp/plato-phase2a-review-5/cache TMPDIR=/tmp/plato-phase2a-review-5/tmp PYTHONPATH=/tmp/plato-phase2a-review-5/prior /tmp/plato-phase2a-review-4/base-3.13/bin/python -m pytest tests/datasources/test_review4_regressions.py --test-profile=base -ra -p no:cacheprovider --basetemp=/tmp/plato-phase2a-review-5/author-red-3.13-fixtures --junitxml=/tmp/plato-phase2a-review-5/logs/author-red-3.13.xml",
+        "cwd": "/tmp/plato-phase2a-review-5/prior",
+        "log": "/tmp/plato-phase2a-review-5/logs/author-red-3.13.log",
+        "started_utc": "2026-10-03T06:29:49.520554+00:00",
+        "exit_code": 1,
+        "seconds": 29.185218749800697,
+        "counts": {
+          "tests": 9,
+          "errors": 0,
+          "failures": 3,
+          "skipped": 0,
+          "passed": 6,
+          "pytest_seconds": 18.867,
+          "expected_failures": [
+            {
+              "node": "test_tiny_download_error_keeps_default_recovery_eligible_with_restored_source[http_503-True]",
+              "actual": "ValueError: Incomplete native Tiny ImageNet validation data: need val/val_annotations.txt and val/images. Official test/images is unlabeled; provide a download_url to recover the dataset."
+            },
+            {
+              "node": "test_tiny_download_error_keeps_default_recovery_eligible_with_restored_source[bad_zip-True]",
+              "actual": "ValueError: Incomplete native Tiny ImageNet validation data: need val/val_annotations.txt and val/images. Official test/images is unlabeled; provide a download_url to recover the dataset."
+            },
+            {
+              "node": "test_tiny_download_error_keeps_default_recovery_eligible_with_restored_source[truncated_body-True]",
+              "actual": "ValueError: Incomplete native Tiny ImageNet validation data: need val/val_annotations.txt and val/images. Official test/images is unlabeled; provide a download_url to recover the dataset."
+            }
+          ]
+        },
+        "log_identity": {
+          "path": "/tmp/plato-phase2a-review-5/logs/author-red-3.13.log",
+          "bytes": 19921,
+          "sha256": "8c394996305407f95b0aedce627d067e3b5f44b424a2d201f68058d35e8c50a3"
+        },
+        "junit_identity": {
+          "path": "/tmp/plato-phase2a-review-5/logs/author-red-3.13.xml",
+          "bytes": 14603,
+          "sha256": "83805ade49a79020305a6b6c84b7ee2bddd2deb4949676383b31d436e6a83e49"
+        }
+      },
+      "3.14": {
+        "action": "author-red",
+        "version": "3.14",
+        "shell": "/bin/zsh -lc",
+        "command": "HF_HUB_OFFLINE=1 HF_DATASETS_OFFLINE=1 PYTHONDONTWRITEBYTECODE=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 TOKENIZERS_PARALLELISM=false XDG_CACHE_HOME=/tmp/plato-phase2a-review-5/cache TMPDIR=/tmp/plato-phase2a-review-5/tmp PYTHONPATH=/tmp/plato-phase2a-review-5/prior /tmp/plato-phase2a-review-4/base-3.14/bin/python -m pytest tests/datasources/test_review4_regressions.py --test-profile=base -ra -p no:cacheprovider --basetemp=/tmp/plato-phase2a-review-5/author-red-3.14-fixtures --junitxml=/tmp/plato-phase2a-review-5/logs/author-red-3.14.xml",
+        "cwd": "/tmp/plato-phase2a-review-5/prior",
+        "log": "/tmp/plato-phase2a-review-5/logs/author-red-3.14.log",
+        "started_utc": "2026-10-03T06:29:49.520724+00:00",
+        "exit_code": 1,
+        "seconds": 65.50507254106924,
+        "counts": {
+          "tests": 9,
+          "errors": 0,
+          "failures": 3,
+          "skipped": 0,
+          "passed": 6,
+          "pytest_seconds": 54.028,
+          "expected_failures": [
+            {
+              "node": "test_tiny_download_error_keeps_default_recovery_eligible_with_restored_source[http_503-True]",
+              "actual": "ValueError: Incomplete native Tiny ImageNet validation data: need val/val_annotations.txt and val/images. Official test/images is unlabeled; provide a download_url to recover the dataset."
+            },
+            {
+              "node": "test_tiny_download_error_keeps_default_recovery_eligible_with_restored_source[bad_zip-True]",
+              "actual": "ValueError: Incomplete native Tiny ImageNet validation data: need val/val_annotations.txt and val/images. Official test/images is unlabeled; provide a download_url to recover the dataset."
+            },
+            {
+              "node": "test_tiny_download_error_keeps_default_recovery_eligible_with_restored_source[truncated_body-True]",
+              "actual": "ValueError: Incomplete native Tiny ImageNet validation data: need val/val_annotations.txt and val/images. Official test/images is unlabeled; provide a download_url to recover the dataset."
+            }
+          ]
+        },
+        "log_identity": {
+          "path": "/tmp/plato-phase2a-review-5/logs/author-red-3.14.log",
+          "bytes": 20049,
+          "sha256": "99707ba67ea0f6ef9737fa4d39eff38927ffee5f745123222ac21f3e80b7376c"
+        },
+        "junit_identity": {
+          "path": "/tmp/plato-phase2a-review-5/logs/author-red-3.14.xml",
+          "bytes": 14604,
+          "sha256": "a0c3aa7831cde3dedb13260c61849184a1f73173dfa41f088ca0e66fe8dd3315"
+        }
+      }
+    },
+    "static": {
+      "ruff": {
+        "action": "ruff",
+        "command": "/tmp/plato-phase2a-lZqbqj/venv-3.13/bin/ruff check plato/config.py plato/datasources plato/samplers tests/test_config_loader.py tests/samplers/test_partition_contracts.py tests/datasources/test_download_contracts.py tests/datasources/test_local_datasets.py tests/datasources/test_review_regressions.py tests/datasources/test_review2_regressions.py tests/datasources/test_review3_regressions.py tests/datasources/test_review4_regressions.py plato/utils/archive.py tests/utils/test_archive.py --select I",
+        "cwd": "/tmp/plato-phase2a-review-5/candidate",
+        "shell": "/bin/zsh -lc",
+        "log": "/tmp/plato-phase2a-review-5/logs/ruff.log",
+        "exit_code": 0,
+        "seconds": 0.08477695798501372,
+        "log_identity": {
+          "path": "/tmp/plato-phase2a-review-5/logs/ruff.log",
+          "bytes": 19,
+          "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+        }
+      },
+      "ruff-repository": {
+        "action": "ruff-repository",
+        "command": "/tmp/plato-phase2a-lZqbqj/venv-3.13/bin/ruff check . --select I",
+        "cwd": "/tmp/plato-phase2a-review-5/candidate",
+        "shell": "/bin/zsh -lc",
+        "log": "/tmp/plato-phase2a-review-5/logs/ruff-repository.log",
+        "exit_code": 0,
+        "seconds": 0.08252199995331466,
+        "log_identity": {
+          "path": "/tmp/plato-phase2a-review-5/logs/ruff-repository.log",
+          "bytes": 19,
+          "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+        }
+      },
+      "typing": {
+        "action": "typing",
+        "command": "/tmp/plato-phase2a-lZqbqj/venv-3.13/bin/ty check plato/config.py plato/datasources/base.py plato/datasources/cinic10.py plato/datasources/purchase.py plato/datasources/texas.py plato/datasources/tiny_imagenet.py plato/datasources/_vector_cache.py plato/datasources/_image_folder.py plato/datasources/feature.py plato/datasources/feature_dataset.py plato/datasources/femnist.py plato/datasources/registry.py plato/datasources/self_supervised_learning.py plato/datasources/torchvision.py plato/samplers plato/utils/archive.py --output-format concise",
+        "cwd": "/tmp/plato-phase2a-review-5/candidate",
+        "shell": "/bin/zsh -lc",
+        "log": "/tmp/plato-phase2a-review-5/logs/typing.log",
+        "exit_code": 0,
+        "seconds": 0.24508795817382634,
+        "log_identity": {
+          "path": "/tmp/plato-phase2a-review-5/logs/typing.log",
+          "bytes": 19,
+          "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+        }
+      }
+    },
+    "diff_check": "git diff --check fda60becedfa6236c11d415b87a868b52789a41e 79da1f97d8a12fe97402750cc32c7b3e8f5cdf6e exited 0.",
+    "base_skips": "Exactly one absent-Opacus DP module and three optional Nanochat integration cases. No warnings, new skips or suppressions.",
+    "runtime_exclusions": "48 unchanged runtime/socket cases explicitly deselected as authorized. Shared runtime source byte-identical; no socket matrix repeated.",
+    "untouched_scripts": "Byte-identical owned copies of the exact requested review4 corrected script and review3 negative/independent scripts were executed; source originals and hashes unchanged. The coupled script permits precisely BadZipFile/tarfile.ReadError as in accepted corrected version. No harness correction or assertion weakening in this review.",
+    "counts_overlap": "Suites and constructor probes overlap. Counts are per invocation/interpreter and are not added into a support total.",
+    "actual_public_behavior": {
+      "artifact": {
+        "path": "/tmp/plato-phase2a-review-5/public-probes.json",
+        "bytes": 20537,
+        "sha256": "68d6407e50d92e77a75e41665a9ee3edb9a71d87523d6d9965686975d3a1241a"
+      },
+      "each_version": "All five groups complete: 2 actual edge configure cases, 4 live/killed NPZ writer cases, 14 cache input cases, 4 native/prepared image cases and 6 HTTP recovery cases.",
+      "qualification": "Edge configure uses actual tracked config/server/sampler branch with inert model/processor setup. NPZ probe pauses real np.savez, observes unpublished final pathname and blocked actual reader, then releases/SIGKILLs writer. Child processes bounded and joined. No socket or training qualification claimed."
+    },
+    "observations_artifact": {
+      "path": "/tmp/plato-phase2a-review-5/observations.json",
+      "bytes": 75458,
+      "sha256": "d6d15285de53379f59efce3aeec260356a8095a44545348992ecf901f796f160"
+    }
+  },
+  "correction_dispositions": [
+    {
+      "id": "R2A4-01",
+      "prior_severity": "medium",
+      "status": "RESOLVED",
+      "prior_report_sha256": "a602fb94c5b5e3eeae855dae39082ceab99ff1f0dc6660203839f3ee1f8dce76",
+      "implementation_locations": [
+        {
+          "path": "plato/datasources/base.py",
+          "line": 85,
+          "purpose": "Flock scope owns ExitStack cleanup."
+        },
+        {
+          "path": "plato/datasources/base.py",
+          "line": 94,
+          "purpose": "ZIP replacement uses private temporary directory under destination."
+        },
+        {
+          "path": "plato/datasources/base.py",
+          "line": 136,
+          "purpose": "Request cleanup deletes staged file, preserving canonical archive."
+        },
+        {
+          "path": "plato/datasources/base.py",
+          "line": 167,
+          "purpose": "Successful safe extraction atomically replaces canonical ZIP."
+        },
+        {
+          "path": "plato/datasources/base.py",
+          "line": 183,
+          "purpose": "Readiness gates completion after archive publication."
+        }
+      ],
+      "expected": "Failed replacement preserves recognized default recovery eligibility and old archive; no marker or normal-exception staging leak. Restored source is fetched by actual constructor and yields training-space labels, finite 299-pixel evaluation tensors and offline reuse.",
+      "actual": "All three failure triggers exhaust exactly three real attempts, retain old ZIP byte for byte, and leave marker/staging absent. Restored default/configured source succeeds on request five. Prior nine-case author regression independently reproduces 3 failures/6 controls on exact d26 export and all nine cases pass within both 242-case current suites. Untouched review4 8/8 and review3 4/4 pass each version.",
+      "fresh_additional_reproduction": "16 independently written cases per interpreter: HTTP 503, truncated stream, real member CRC failure and traversal preflight for default Tiny/configured Tiny/CINIC; source restoration publishes observably different safe ZIP bytes; waiting contender blocks at real C flock while owner exhausts retries, then succeeds; FEMNIST public server/client ZIP constructor controls. No download, readiness, guard, extraction or retry patch. Only canonical public URL dispatch redirects requests to localhost.",
+      "readiness_and_contention": "Untouched probes verify valid incomplete ZIP fails readiness without completion, restores source and succeeds; paused successful owner/contender uses one recovery; failed-readiness owner releases waiter for a healthy request. New retry-exhaustion contention yields one expected HTTPError, one successful waiter, five requests and no staging leak.",
+      "containment": "Fresh unsafe ZIP preflight writes no traversal target, retains old canonical ZIP and removes staging. Fresh CRC error also retains canonical archive. Existing absolute/traversal/link/symlink TAR/ZIP tests pass both versions."
+    },
+    {
+      "id": "R2A3-01 / R2A-04 / R2A2-02",
+      "status": "RESOLVED within accepted readiness contract",
+      "evidence": "Actual HTTP/extraction restores required directories, annotations, empty-class images and native referenced validation PNGs. Default failed-readiness and waiting-contender transitions succeed; no incomplete completion."
+    },
+    {
+      "id": "R2A2-01",
+      "status": "PRESERVED",
+      "evidence": "Independent malformed NPZ constructor cases rebuild from correct raw arrays: real finite float32-compatible features; integral IDs 0..99; string/object/structured/datetime/complex/nonfinite/overflow/fractional/out-of-range refusal. Compatible cache-only numeric/bool/endian/boundary inputs retain original NPZ bytes and exact tensor values. Failed recovery later rebuilds offline."
+    },
+    {
+      "id": "R2A-02",
+      "status": "PRESERVED",
+      "evidence": "Actual Purchase/Texas live/killed NPZ writers and readers establish lock exclusion, unpublished final pathname, atomic valid publication and abandoned temporary cleanup; raw/cache offline reuse preserved on both interpreters."
+    },
+    {
+      "id": "R2A-01",
+      "status": "PRESERVED",
+      "evidence": "Actual tracked cross-silo config edge configure accepts IDs 4/5, deterministic unique 600-index evaluation partitions and unchanged caller RNG. Invalid ordinary/unassigned/wrong-role/training/indexed-IID IDs reject."
+    },
+    {
+      "id": "R2A-03 / manual recovery refusal",
+      "status": "PRESERVED",
+      "evidence": "Direct/nested native and labeled prepared layouts remain distinct. Official test/images stays unlabeled. Manual incomplete native roots, generic lock and unrelated archives remain insufficient eligibility. Unknown prepared/native labels reject, including with canonical default artifacts."
+    },
+    {
+      "id": "ROOT-2A-01 / ROOT-2A-02",
+      "status": "PRESERVED",
+      "evidence": "CINIC/Tiny evaluation subsets retain training IDs with coherent class/samples/imgs/targets metadata. Tiny native/prepared evaluation is deterministic, finite 3x299x299 with preserved normalization; training randomness and custom transforms remain supported."
+    },
+    {
+      "id": "F13",
+      "status": "PRESERVED",
+      "evidence": "Config optional reset, repeated/reverse reloads, legacy singleton reset, include/CLI and client-speed RNG cases pass."
+    },
+    {
+      "id": "F15 / F16",
+      "status": "PRESERVED",
+      "evidence": "Realized Dirichlet counts agree with loader membership without redraw/RNG mutation. Timeout-guarded empty IID and infeasible pools reject; literal seeded nonempty padding/membership contracts pass."
+    },
+    {
+      "id": "EMNIST",
+      "status": "PRESERVED",
+      "evidence": "Actual native balanced/digits IDX constructor checks retain distinct training/test flags, labels and counts."
+    }
+  ],
+  "source_and_scope_audit": {
+    "paths_since_review4": [
+      "evidence/2026-refresh/phase2a-validation.json",
+      "plato/datasources/base.py",
+      "tests/datasources/test_review4_regressions.py"
+    ],
+    "all_other_previously_tracked_blobs_unchanged": true,
+    "gitlinks": [
+      "160000 commit c75fe54aa7c1fa881701c246f9427bcbe4eee5a4\texternal/nanochat",
+      "160000 commit 1ccb152cea43fcbc3cd517a45c12c65734f8ace3\tplato/models/dvit",
+      "160000 commit 0f63dc9558f4d192de926504dbddfa1b3f5db6ca\tplato/models/t2tvit"
+    ],
+    "new_suppressions_or_skips": [],
+    "metadata_config_runtime_lock_submodule_preservation": true,
+    "scope_basis": "New downloader/test diff inspected completely, with prior full-A reviews plus exact blob preservation for unchanged production. Current focused/base/public and independent contract checks independently revalidate retained behavior.",
+    "new_production_delta": "Only plato/datasources/base.py since d26; private ZIP staging, exception cleanup and os.replace publication. Tiny source byte-identical. Non-ZIP branches retain their prior file/extraction behavior.",
+    "evidence_only_child": "79da1f9 differs from f036956 only in phase2a-validation.json.",
+    "no_extra_protocol": "No provenance manifest, cache/archive schema, generic-lock eligibility, manual incomplete-native acceptance, lock redesign, research equation change or unrelated runtime/adapter change.",
+    "typing_suppression_policy": "No added suppression. Existing pyproject unresolved-import rule/exclusions are unchanged from phase base; scoped ty pass does not constitute whole-tree/vendor typing qualification."
+  },
+  "archive_review": {
+    "original_files": [
+      {
+        "original": "plato/datasources/datalib/__init__.py",
+        "archived": "archives/legacy_datalib/__init__.py",
+        "equal": true,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "original": "plato/datasources/datalib/audio_extraction_tools.py",
+        "archived": "archives/legacy_datalib/audio_extraction_tools.py",
+        "equal": true,
+        "sha256": "afa61fd9f87becda3bee4791d5dd18dcbe3557405d0c49a9a0731bb8f7f5c3f3"
+      },
+      {
+        "original": "plato/datasources/datalib/data_utils.py",
+        "archived": "archives/legacy_datalib/data_utils.py",
+        "equal": true,
+        "sha256": "53d83b9734a7d0a036393062daafbb0191bab8abfc061397f876559f1a4962fd"
+      },
+      {
+        "original": "plato/datasources/datalib/flickr30kE_utils.py",
+        "archived": "archives/legacy_datalib/flickr30kE_utils.py",
+        "equal": true,
+        "sha256": "545540ef26d363c1cea0b7a4c6881be99593a67e2ae70f42db30d0187ccf36ff"
+      },
+      {
+        "original": "plato/datasources/datalib/frames_extraction_tools.py",
+        "archived": "archives/legacy_datalib/frames_extraction_tools.py",
+        "equal": true,
+        "sha256": "6eab47d5ef3dbbb5d129b16868f10a60851c968b96b990c1a8aa2d9c2f394553"
+      },
+      {
+        "original": "plato/datasources/datalib/gym_utils/__init__.py",
+        "archived": "archives/legacy_datalib/gym_utils/__init__.py",
+        "equal": true,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "original": "plato/datasources/datalib/gym_utils/gym_trim.py",
+        "archived": "archives/legacy_datalib/gym_utils/gym_trim.py",
+        "equal": true,
+        "sha256": "7dca933a707d78ae9e9d25cd754396030e5a7d0f5f9e8ba9ad7347669a716165"
+      },
+      {
+        "original": "plato/datasources/datalib/modality_data_anntation_tools.py",
+        "archived": "archives/legacy_datalib/modality_data_anntation_tools.py",
+        "equal": true,
+        "sha256": "7ab25ac2b0983da3f9b50cc9a18ad061eab3049311e61c88a3c1ff81aa768624"
+      },
+      {
+        "original": "plato/datasources/datalib/modality_extraction_base.py",
+        "archived": "archives/legacy_datalib/modality_extraction_base.py",
+        "equal": true,
+        "sha256": "192d092044cf982a0354cfd4235b3e64ace1f6cb4f902ad8452c2e3cbc0a9041"
+      },
+      {
+        "original": "plato/datasources/datalib/parse_datasets.py",
+        "archived": "archives/legacy_datalib/parse_datasets.py",
+        "equal": true,
+        "sha256": "79883cead5983b3cdbc119bd479c8c4503e6cb6674ff54e54ab8255051c3a017"
+      },
+      {
+        "original": "plato/datasources/datalib/refer_utils/__init__.py",
+        "archived": "archives/legacy_datalib/refer_utils/__init__.py",
+        "equal": true,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "original": "plato/datasources/datalib/refer_utils/referitgame_utils.py",
+        "archived": "archives/legacy_datalib/refer_utils/referitgame_utils.py",
+        "equal": true,
+        "sha256": "636ddd92f2ae09a9d17708226daeb672a6356f2e183edb5d2e487027a70d4f6a"
+      },
+      {
+        "original": "plato/datasources/datalib/tiny_data_tools.py",
+        "archived": "archives/legacy_datalib/tiny_data_tools.py",
+        "equal": true,
+        "sha256": "33d8ec92496c510632d906d1c838a5e788a6c7f482017cf477cabd2ced80b793"
+      },
+      {
+        "original": "plato/datasources/datalib/video_transform.py",
+        "archived": "archives/legacy_datalib/video_transform.py",
+        "equal": true,
+        "sha256": "354dd8ad20a605bfa421f423fdab793ce601ed46e27eb2dcb5291c24d8b83db2"
+      }
+    ],
+    "license": {
+      "equal": true,
+      "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+    },
+    "provenance": {
+      "path": "/tmp/plato-phase2a-review-5/candidate/archives/legacy_datalib/README.md",
+      "bytes": 2519,
+      "sha256": "6a5e002446780ad2e25337ab8f48434f25ce106e420b7e47dde1a5d3b9bc8cd7"
+    },
+    "active_import_scan": {
+      "command": [
+        "/bin/zsh",
+        "-lc",
+        "rg -n --glob '*.py' 'plato\\.datasources\\.datalib|from .*datalib|import .*datalib|archives\\.legacy_datalib|from archives|import archives' plato tests examples"
+      ],
+      "exit_code": 1,
+      "matches": []
+    },
+    "disposition": "All 14 baseline datalib files and copied license byte-identical. README records original path map, exact baseline, authors, historical dependencies/reproduction and unchanged REFER defects. No active archive/datalib Python imports; historical bundle support is not claimed."
+  },
+  "author_and_root_evidence_attribution": {
+    "author_evidence": {
+      "path": "/private/tmp/plato-refresh-worktrees/data/evidence/2026-refresh/phase2a-validation.json",
+      "bytes": 107467,
+      "sha256": "f1c1ceb8ab3cf0aa9371a34873e8aa43a884f5175c7db385921c7fafd32d7e40"
+    },
+    "implementation_and_diff_match": {
+      "implementation_tree": true,
+      "base_diff": true,
+      "prior_diff": true
+    },
+    "author_raw_artifact_hashes": "All four correction generations of retained author log/artifact hashes match the checked files; see identity-before/after.json.",
+    "author_current_claims_verified": "9 new green / red 3 failed+6 controls each; 242 focused each; 445 base passed+4 allowed skips+48 runtime deselections each; untouched corrected review4/review3 8/4 each. Raw logs and JUnit agree. Own current runs and exact-prior red independently corroborate these numbers.",
+    "historical_report_attribution": "Original reviewer verdicts/files/probe sources unchanged and correctly hashed. Historical candidate evidence blobs match author attribution; author green reruns are author verification, distinct from this independent PASS.",
+    "root_probes": "ROOT-2A-01/02 are previously independent root findings whose behavior is independently revalidated here. Root whole-phase/merged-tree evidence is not promoted into this review claim.",
+    "audit_artifact": {
+      "path": "/tmp/plato-phase2a-review-5/evidence-audit.json",
+      "bytes": 14480,
+      "sha256": "18a9553ff38284f547737ae8997d0bee129fe6c773a401e43927adb4401efb24"
+    }
+  },
+  "harness_disposition": "No product/harness correction, failure reclassification or weakened assertion in this review. Expected red exit 1 is exclusively the three known prior default-source refusals; current invocations all exit 0. Earlier author/reviewer harness notes remain in their original immutable reports.",
+  "limits": [
+    "macOS ARM64 CPU, CPython 3.13.16 and 3.14.8 only. Linux, final merged root, whole Phase 2 and whole-stack qualification remain root-owned.",
+    "Existing Python environments used read only with independently verified parent/child source pins. No fresh provisioning, installed wheel/sdist isolation, full mandatory-extra, SSL runtime or config-inventory campaign repeated.",
+    "Local synthesized raw/IDX/PNG/JSON/native annotation fixtures and localhost HTTP only; no full corpus, external service, accelerator or training/accuracy qualification.",
+    "Readiness checks filesystem existence, supported extensions, present usable classes and native annotation references; no image decode/checksum or reconstruction of loss among surviving prepared-class images without source inventory.",
+    "No full extracted-tree rollback on corrupt archive/filesystem failures, hostile unrelated concurrent destination writer, power-loss/directory-fsync durability or new provenance protocol is promised.",
+    "Normal exceptions remove private staging; SIGKILL may leave staging. No generalized scavenger or killed-ZIP-staging cleanup requirement added. Existing stable-inode flock/platform boundaries retained.",
+    "Base skips only the four allowed optional cases; 48 unchanged runtime cases explicitly deselected. Optional integrations, Windows flock and whole-tree/vendor typing remain unqualified by this report."
+  ],
+  "retained_resources": {
+    "scratch": "/tmp/plato-phase2a-review-5",
+    "source_export": "/tmp/plato-phase2a-review-5/candidate",
+    "prior_export": "/tmp/plato-phase2a-review-5/prior",
+    "identity_before": {
+      "path": "/tmp/plato-phase2a-review-5/identity-before.json",
+      "bytes": 37831,
+      "sha256": "63fb70cf05d4b07c190228a73b8e975519d5a23ea1bdc0697bd430e7c5a4f568"
+    },
+    "identity_after": {
+      "path": "/tmp/plato-phase2a-review-5/identity-after.json",
+      "bytes": 37831,
+      "sha256": "63fb70cf05d4b07c190228a73b8e975519d5a23ea1bdc0697bd430e7c5a4f568"
+    },
+    "artifact_manifest": {
+      "path": "/tmp/plato-phase2a-review-5/artifact-manifest.json",
+      "bytes": 13798,
+      "sha256": "a5f2c5447d3dce679db508d91a6c57479629914a47adedda7b6c1dc6bd5789b6"
+    },
+    "report_sha256_handoff": "/tmp/plato-phase2a-review-5/final-verification.json",
+    "cleanup": "None. Source exports, fixtures, scripts, logs and journals retained for root."
+  }
+}

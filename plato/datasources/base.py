@@ -4,18 +4,23 @@ custom augmentations and transforms already accommodated.
 """
 
 import contextlib
+import fcntl
 import gzip
 import logging
 import os
 import sys
 import tarfile
+import tempfile
 import time
 import zipfile
+from collections.abc import Callable
 from pathlib import Path
 from typing import Any, Optional
 from urllib.parse import urlparse
 
 import requests
+
+from plato.utils.archive import UnsafeArchiveError, extract_archive
 
 
 class DataSource:
@@ -32,47 +37,68 @@ class DataSource:
     @contextlib.contextmanager
     def _download_guard(data_path: str):
         """Serialise dataset downloads to avoid concurrent corruption."""
+        if Path(data_path).is_symlink():
+            raise UnsafeArchiveError(
+                f"Unsafe download destination symlink: {data_path}"
+            )
         os.makedirs(data_path, exist_ok=True)
         lock_file = os.path.join(data_path, ".download.lock")
-        lock_fd = None
-        waited = False
-
-        try:
-            while True:
-                try:
-                    lock_fd = os.open(lock_file, os.O_CREAT | os.O_EXCL | os.O_RDWR)
-                    break
-                except FileExistsError:
-                    if not waited:
-                        logging.info(
-                            "Another process is preparing the dataset at %s. Waiting.",
-                            data_path,
-                        )
-                        waited = True
-                    time.sleep(1)
-            yield
-        finally:
-            if lock_fd is not None:
-                os.close(lock_fd)
-                try:
-                    os.remove(lock_file)
-                except FileNotFoundError:
-                    pass
+        if Path(lock_file).is_symlink():
+            raise UnsafeArchiveError(f"Unsafe download lock symlink: {lock_file}")
+        # Keep a stable lock inode: unlinking a flock file can let a newcomer
+        # bypass a waiter on the previous inode. The kernel releases the lock
+        # even if the owning process exits without executing this finally block.
+        with open(lock_file, "a+b") as lock:
+            fcntl.flock(lock, fcntl.LOCK_EX)
+            try:
+                yield
+            finally:
+                fcntl.flock(lock, fcntl.LOCK_UN)
 
     @staticmethod
-    def download(url, data_path):
-        """Download a dataset from a URL if it is not already available."""
+    def download(url, data_path, *, ready: Callable[[], bool] | None = None):
+        """Download a dataset; readiness checks can validate extracted artifacts."""
         url_parse = urlparse(url)
         file_name = os.path.join(data_path, url_parse.path.split("/")[-1])
+        name, suffix = os.path.splitext(file_name)
+        if suffix not in {".gz", ".zip"}:
+            raise ValueError(f"Unsupported download archive format: {file_name}")
+        if Path(data_path).is_symlink():
+            raise UnsafeArchiveError(
+                f"Unsafe download destination symlink: {data_path}"
+            )
         os.makedirs(data_path, exist_ok=True)
         sentinel = Path(f"{file_name}.complete")
 
-        if sentinel.exists():
+        artifacts = [Path(file_name), sentinel]
+        if suffix == ".gz" and not file_name.endswith("tar.gz"):
+            artifacts.append(Path(name))
+        for artifact in artifacts:
+            if artifact.is_symlink():
+                raise UnsafeArchiveError(
+                    f"Unsafe download artifact symlink: {artifact}"
+                )
+
+        if sentinel.exists() and (ready is None or ready()):
             return
 
-        with DataSource._download_guard(data_path):
+        with DataSource._download_guard(data_path), contextlib.ExitStack() as resources:
             if sentinel.exists():
-                return
+                if ready is None or ready():
+                    return
+                # The caller found missing extracted artifacts. Invalidate only
+                # under the same lock used by download/extraction and recheck
+                # after acquiring it so a competing recovery can finish first.
+                sentinel.unlink()
+
+            download_file = file_name
+            if suffix == ".zip":
+                # Retain the prior canonical ZIP through failed replacement
+                # attempts. Publish only after the new archive extracts safely.
+                temporary = resources.enter_context(
+                    tempfile.TemporaryDirectory(prefix=".download-", dir=data_path)
+                )
+                download_file = os.path.join(temporary, os.path.basename(file_name))
 
             max_attempts = 3
             for attempt in range(1, max_attempts + 1):
@@ -87,32 +113,31 @@ class DataSource:
                     )
 
                 try:
-                    res = requests.get(url, stream=True, timeout=60)
-                    res.raise_for_status()
+                    with requests.get(url, stream=True, timeout=60) as res:
+                        res.raise_for_status()
+                        total_size = int(res.headers.get("Content-Length", 0))
+                        downloaded_size = 0
+                        with open(download_file, "wb+") as file:
+                            for chunk in res.iter_content(chunk_size=1024):
+                                if not chunk:
+                                    continue
+                                downloaded_size += len(chunk)
+                                file.write(chunk)
+                                file.flush()
+                                if total_size:
+                                    sys.stdout.write(
+                                        f"\r{100 * downloaded_size / total_size:.1f}%"
+                                    )
+                                    sys.stdout.flush()
+                            if total_size:
+                                sys.stdout.write("\n")
                 except requests.RequestException as exc:
                     logging.warning("Download failed for %s: %s", url, exc)
+                    Path(download_file).unlink(missing_ok=True)
                     if attempt == max_attempts:
                         raise
                     time.sleep(1)
                     continue
-
-                total_size = int(res.headers.get("Content-Length", 0))
-                downloaded_size = 0
-
-                with open(file_name, "wb+") as file:
-                    for chunk in res.iter_content(chunk_size=1024):
-                        if not chunk:
-                            continue
-                        downloaded_size += len(chunk)
-                        file.write(chunk)
-                        file.flush()
-                        if total_size:
-                            sys.stdout.write(
-                                f"\r{100 * downloaded_size / total_size:.1f}%"
-                            )
-                            sys.stdout.flush()
-                    if total_size:
-                        sys.stdout.write("\n")
 
                 if total_size and downloaded_size != total_size:
                     logging.warning(
@@ -121,8 +146,8 @@ class DataSource:
                         total_size,
                         downloaded_size,
                     )
-                    if os.path.exists(file_name):
-                        os.remove(file_name)
+                    if os.path.exists(download_file):
+                        os.remove(download_file)
                     if attempt == max_attempts:
                         raise RuntimeError(
                             f"Incomplete download for {url}. Please retry."
@@ -132,34 +157,33 @@ class DataSource:
 
                 # Unzip the compressed file just downloaded
                 logging.info("Decompressing the dataset downloaded.")
-                name, suffix = os.path.splitext(file_name)
 
                 try:
                     if file_name.endswith("tar.gz"):
-                        with tarfile.open(file_name, "r:gz") as tar:
-                            tar.extractall(data_path)
+                        extract_archive(file_name, data_path)
                         os.remove(file_name)
                     elif suffix == ".zip":
-                        logging.info("Extracting %s to %s.", file_name, data_path)
-                        with zipfile.ZipFile(file_name, "r") as zip_ref:
-                            zip_ref.extractall(data_path)
+                        logging.info("Extracting %s to %s.", download_file, data_path)
+                        extract_archive(download_file, data_path)
+                        os.replace(download_file, file_name)
                     elif suffix == ".gz":
                         with gzip.open(file_name, "rb") as zipped_file:
                             with open(name, "wb") as unzipped_file:
                                 unzipped_file.write(zipped_file.read())
                         os.remove(file_name)
-                    else:
-                        logging.info("Unknown compressed file type for %s.", file_name)
-                        sys.exit()
                 except (OSError, tarfile.ReadError, zipfile.BadZipFile) as exc:
                     logging.warning("Failed to extract %s: %s", file_name, exc)
-                    if os.path.exists(file_name):
-                        os.remove(file_name)
+                    if os.path.exists(download_file):
+                        os.remove(download_file)
                     if attempt == max_attempts:
                         raise
                     time.sleep(1)
                     continue
 
+                if ready is not None and not ready():
+                    raise RuntimeError(
+                        f"Archive {url} lacks required extracted dataset artifacts."
+                    )
                 sentinel.touch()
                 break
 

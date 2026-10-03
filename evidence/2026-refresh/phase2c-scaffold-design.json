@@ -1,0 +1,362 @@
+{
+  "schema_version": 1,
+  "finding": "F27",
+  "date": "2026-10-02",
+  "status": "READY_FOR_FRESH_REVIEW; design only, implementation not authorized by this artifact",
+  "baseline_commit": "fda60becedfa6236c11d415b87a868b52789a41e",
+  "decision": {
+    "disposition": "Mandatory, explicit SCAFFOLD semantic bugfix, followed by narrow example integration and documentation corrections in Phase 2C.",
+    "rationale": "Preserving the advertised local SCAFFOLD research equations requires changing established numerical behavior. The two wrong equations are legacy defects, not a strategy-refactor regression. Neither silently preserving them nor claiming they implement the paper satisfies the accepted research-intent requirement.",
+    "authority": "This bounded design reconciles plan.md sections 1, 5/2C and 7 with the user's current explicit authorization of necessary bugfixes and request for independent design review. It proposes the specific F27 exception to legacy-output preservation for root acceptance after fresh Sol review; it does not create a general research-rewrite exemption or another user-permission gate.",
+    "preserve": [
+      "F20's explicitly accepted legacy unsquared-L2 FedProx objective/default and its l1 behavior remain unchanged; do not infer a FedProx squared-norm migration from F27.",
+      "Existing SCAFFOLD entrypoint, payload pair structure, optimizer selection/configuration values, and sample-weighted model aggregation remain compatible.",
+      "No legacy-wrong-sign mode, broad algorithm/protocol framework, benchmarks, or convergence claims."
+    ],
+    "closure": "F27 remains open until all mandatory checks pass on the integrated F07/F08/F23/F27 candidate, independent implementation review passes, and root accepts the evidence. Design approval alone does not close the finding."
+  },
+  "inputs": [
+    {
+      "path": "AGENTS.md",
+      "sha256": "b50f87f31ea3d87076952d8b7d2d8af067132fbf877d80f8780c208fb45527ec"
+    },
+    {
+      "path": "evidence/2026-refresh/plan.md",
+      "sha256": "edb9a58cc7915a940854f16d5029fe97434703bf2f75eca0dcb96de2d0f0eb15"
+    },
+    {
+      "path": "evidence/2026-refresh/plan-addendum.json",
+      "sha256": "5b51b0fb7ed6f68d9fce7176335b3e7be5e5f178a2788590912aa2396a487709"
+    },
+    {
+      "path": "evidence/2026-refresh/scaffold-equation-probe.json",
+      "sha256": "834fa629fd914b97273b0cacb60e91a2e9917bc558af07fa0b27636ea77e9164"
+    },
+    {
+      "path": "evidence/2026-refresh/trainer-lifecycle-probes.json",
+      "scope": "Read only: additional_F23_control_state_confirmation and its logical-client/path ownership contract"
+    }
+  ],
+  "sources": [
+    {
+      "id": "paper",
+      "title": "Karimireddy et al., SCAFFOLD: Stochastic Controlled Averaging for Federated Learning",
+      "url": "https://arxiv.org/pdf/1910.06378v4",
+      "revision": "v4, 9 April 2021",
+      "verified": "Primary PDF text inspected directly: Algorithm 1 (PDF page 4, lines 10/12/17), equations (3)-(5) (PDF pages 4-5). Screenshot fetch timed out; equations were available in extracted PDF text.",
+      "authority": "Main algorithm and equations (3)-(5). Appendix E equation (19), PDF page 26, has an apparent c/ci reversal in its displacement expression; its asserted gradient-average equality fails with those signs. Use the main algorithm plus the independent telescoping derivation below."
+    },
+    {
+      "id": "legacy",
+      "path": "examples/customized_client_training/scaffold/scaffold_trainer.py",
+      "git_revision": "20380c4f^ = df1d763b487634ab3708f75f8f055af6f2789941",
+      "inspected_methods": [
+        "train_step_end",
+        "train_run_end"
+      ],
+      "finding": "The parent example already adds eta*(c-ci) and uses c+(x-y)/(eta*K). The old get_optimizer did read optimizer.param_groups for lr; the present strategy's trainer.lr/.01 fallback is a separate integration regression."
+    },
+    {
+      "id": "current",
+      "paths": [
+        "plato/trainers/strategies/algorithms/scaffold_strategy.py",
+        "plato/trainers/composable.py",
+        "plato/trainers/strategies/base.py",
+        "plato/trainers/strategies/optimizer.py",
+        "plato/trainers/optimizers.py",
+        "plato/clients/strategies/defaults.py",
+        "plato/servers/fedavg.py",
+        "plato/servers/strategies/aggregation/fedavg.py",
+        "examples/customized_client_training/scaffold/scaffold.py",
+        "examples/customized_client_training/scaffold/scaffold_callback.py",
+        "examples/customized_client_training/scaffold/scaffold_client.py",
+        "examples/customized_client_training/scaffold/scaffold_trainer.py",
+        "examples/customized_client_training/scaffold/scaffold_server.py",
+        "examples/customized_client_training/scaffold/scaffold_MNIST_lenet5.toml",
+        "docs/docs/examples/algorithms/5. Algorithms with Customized Client Training Loops.md"
+      ],
+      "coverage": "All six shipped SCAFFOLD example files inspected, including configuration and client/processor/trainer/server dataflow. General runtime files were read only."
+    }
+  ],
+  "equations": {
+    "notation": "x: initial local copy of global parameters; y: current local parameters; c: fixed server control for this round; ci: old client control, fixed during local steps; eta: actual fixed scalar optimizer LR; K: completed optimizer updates; N: total population; S: participating clients.",
+    "local": "y[k+1] = y[k] - eta * (g[k] - ci + c)",
+    "post_optimizer_correction": "After vanilla SGD computes y_raw = y[k] - eta*g[k], apply y[k+1] = y_raw - eta*(c-ci).",
+    "option_II": "ci_new = ci - c + (x-y[K])/(K*eta); delta_ci = ci_new-ci.",
+    "population_control": "c_new = c + sum(delta_ci for i in S)/N.",
+    "paper_model_aggregation": "x_new = x + eta_global * sum(y_i-x for i in S)/len(S); paper reference here uses eta_global=1.",
+    "independent_derivation": "Summing the local steps gives (x-y[K])/(K*eta) = mean(g[k]) - ci + c. Substitution into Option II yields ci_new = mean(g[k]), independently detecting either sign error. No production helper computes the oracle.",
+    "equation_19_counterexample": "With g=0,c=2,ci=1,eta=.1,K=1, correct x-y=.1. Reversed c-ci+(x-y)/(K*eta) would give 2 rather than mean(g)=0.",
+    "scope": "The gradient-average identity is claimed for constant-rate vanilla SGD on the gradients actually used. A post-optimizer correction with momentum/adaptive optimizers is a defined extension, not Algorithm 1's gradient step."
+  },
+  "executed_design_checks": {
+    "baseline_reproduction": {
+      "method": "Re-executed the source retained in scaffold-equation-probe.json with TemporaryDirectory redirected to owned /tmp/plato-phase2c-scaffold-design; no production edits.",
+      "observed": {
+        "initial_w": 1,
+        "c": 2,
+        "ci": 1,
+        "g": 0,
+        "eta": 0.1,
+        "production_w": 1.1,
+        "production_ci_new": 0.9999999999999991
+      },
+      "required": {
+        "w": 0.9,
+        "ci_new": 0,
+        "delta_ci": -1
+      }
+    },
+    "independent_float64_sgd": {
+      "method": "Real torch.optim.SGD on a float64 parameter, independently applied subtractive correction after each step; no SCAFFOLD implementation calls.",
+      "inputs": {
+        "x": 1,
+        "c": 2,
+        "ci": 1,
+        "eta": 0.1,
+        "gradients": [
+          3,
+          1
+        ]
+      },
+      "observed": {
+        "y": 0.4,
+        "ci_new": 1.9999999999999996
+      },
+      "analytical": {
+        "y": 0.4,
+        "ci_new": 2,
+        "delta_ci": 1,
+        "mean_gradient": 2
+      }
+    },
+    "independent_multiround_oracle": {
+      "method": "Executed exact Fraction arithmetic, quadratic loss f_i(y)=0.5*(y-a_i)^2, eta=1/10, K=2, N=3. This is an oracle, not a passing production integration test.",
+      "initial": {
+        "x": "1",
+        "c": "2",
+        "ci": [
+          "1",
+          "3",
+          "2"
+        ],
+        "targets": [
+          "0",
+          "2",
+          "-1"
+        ],
+        "sample_counts": [
+          2,
+          6,
+          4
+        ]
+      },
+      "rounds": [
+        {
+          "selected": [
+            1,
+            2
+          ],
+          "local_y": [
+            "31/50",
+            "69/50"
+          ],
+          "ci_new": [
+            "9/10",
+            "-9/10"
+          ],
+          "delta_ci": [
+            "-1/10",
+            "-39/10"
+          ],
+          "sample_weighted_x": "119/100",
+          "uniform_x": "1",
+          "c_new": "2/3"
+        },
+        {
+          "selected": [
+            1,
+            3
+          ],
+          "starting_x": "119/100",
+          "local_y": [
+            "30247/30000",
+            "30817/30000"
+          ],
+          "ci_new": [
+            "6853/6000",
+            "12883/6000"
+          ],
+          "delta_ci": [
+            "1453/6000",
+            "883/6000"
+          ],
+          "sample_weighted_x": "10209/10000",
+          "uniform_x_for_these_local_models": "7633/7500",
+          "c_new": "896/1125"
+        }
+      ],
+      "assertions": "Each computed ci_new equals that client's arithmetic mean of the two gradients. After each round c equals the mean of all three retained ci values, including the inactive client's unchanged value.",
+      "scratch": "/tmp/plato-phase2c-scaffold-design/oracle.json"
+    }
+  },
+  "concern_dispositions": [
+    {
+      "id": "C01",
+      "concern": "Wrong correction sign and missing old ci/reversed c in Option II",
+      "baseline": "after_step adds eta*(c-ci); on_train_end uses c+(x-y)/(eta*K).",
+      "mandatory": "Apply the equations above using detached round-start snapshots of ci,c,x. Compute the delta against old ci before storing new ci. Update every corresponding docstring and formula. No compatibility switch to retain the wrong equations."
+    },
+    {
+      "id": "C02",
+      "concern": "Learning-rate provenance and optimizer timing",
+      "baseline": "Optimizer registry reads parameters.optimizer; the SCAFFOLD strategy reads cached learning_rate/context.state or trainer.lr/.01. No core writer of context.state['learning_rate'] exists. on_train_start precedes optimizer creation.",
+      "mandatory": "Use the actual optimizer object, not config fallbacks, as rate and parameter-group authority. Narrowly publish it through context.state['optimizer'] in ComposableTrainer after construction. SCAFFOLD validates/captures rates before the update; use the executed rate even if on_optimizer_step or a scheduler subsequently changes the live value. Cover normal and final accumulation steps. Do not globally reorder on_train_start.",
+      "selected_boundary": "Require the participating optimizer groups to share a finite positive scalar LR that remains constant within the local round; multiple groups with the same rate work by parameter identity. Reject heterogeneous rates or within-round changes before the affected optimizer update, with a useful SCAFFOLD-specific error; do not divide by the last rate or average rates. A different constant rate in a later round is valid and resets cached rate state.",
+      "compatibility": "This converts previously silent, incorrect scheduler/group behavior into a documented rejection. Remove implicit .01 and trainer.lr fallback. Standalone strategy-hook callers supply context.state['optimizer']; a synthetic learning_rate field is not proof of a real step rate. Variable/group-specific rate extensions are not needed to repair the supported reference."
+    },
+    {
+      "id": "C03",
+      "concern": "Generic optimizers and shipped momentum",
+      "baseline": "The shipped TOML uses SGD lr=.01,momentum=.9,weight_decay=0 and ordinary sample-weighted FedAvg aggregation.",
+      "mandatory": "Keep these configuration values. Preserve the existing post-optimizer composition point, with the corrected subtractive sign and Option II displacement formula. Document and emit a once-per-training-run warning when the optimizer is not vanilla descent SGD without momentum/weight decay: this is an additive-control optimizer extension, not paper-equivalent SCAFFOLD. Do not silently replace momentum/Adam or inject control into their gradient history.",
+      "qualification": "The strict numerical paper reference uses plain SGD, momentum=0,weight_decay=0,maximize=false, fixed scalar eta and equal local K. Other optimizers supported by the existing trainer remain usable within C02's rate boundary; they get no paper-gradient-average or convergence guarantee. No blanket claim for clipping, adaptive preconditioning or momentum. Test shipped momentum=.9 and a constant-rate Adam composition against independently stepped raw optimizers plus the explicit correction."
+    },
+    {
+      "id": "C04",
+      "concern": "Parameter-name filter and state buffers",
+      "baseline": "Correction filters names containing weight/bias, while final control updates iterate all named_parameters. Server c starts from the entire state_dict, potentially including integer and floating buffers.",
+      "mandatory": "Remove substring filtering. Identify model parameters by object identity and named_parameters; correct all optimizer-owned, requires_grad parameters regardless of name. Never apply parameter corrections or displacement formulas to state buffers, frozen parameters or optimizer-excluded parameters. Treat a missing gradient on an included trainable parameter as zero local gradient for the additive correction. Keep zero deltas/unchanged ci for model parameters excluded from optimization.",
+      "transport": "Build new server controls from trainable named parameters. Accept known extra model-buffer or frozen-parameter entries in historical full-state control dictionaries by ignoring them explicitly; buffers continue through the ordinary model payload/aggregation policy. Require matching parameter shapes and finite numerical controls before arithmetic; reject missing required trainable parameters or unknown keys rather than silently skipping corrections. Avoid mutating inbound dictionaries/tensors."
+    },
+    {
+      "id": "C05",
+      "concern": "Accumulation, zero steps and zero LR",
+      "mandatory": "K counts completed optimizer updates, including exactly one final partial accumulation update, never microbatches. Depend on F08's optimizer_step_completed contract, including skipped steps. With K=0 retain ci, emit fresh zero delta, and avoid any division or inherited last-round delta. Reject zero/negative/nonfinite LR before a prospective update. Do not replace K with max(1,K). Check final partial-step correction and denominator against the actual normalized gradient."
+    },
+    {
+      "id": "C06",
+      "concern": "Logical-client state, legacy files and spawned workers",
+      "baseline": "setup runs with construction-time client_id=0 and uses a prefix-concatenated path. The example loads model_name_id_control_variate.pth into a trainer attribute; the strategy owns a separate ci/path. With max_concurrency, the child computes delta but baseline train() reloads model/history only.",
+      "mandatory": "Use F23's logical-client ownership lifecycle and F07's contained filename handling. Resolve/load state only for the assigned client, preserve same-client ci across rounds, and reset/reload on 1->2->1 reuse. Clear transient c,x,K,rate and outbound delta at the appropriate round/client boundaries. Make the strategy the single ci authority; replace the example's dead attribute assignment with a deliberate strategy-state handoff or remove that redundant loader after equivalent strategy loading is established.",
+      "persistence": "Retain trusted historical control dictionaries and recognized paths. Canonical per-client state wins; only if absent may the exact matching legacy example file or exact nonzero-client strategy prefix path be imported. Never adopt construction-time client-0 state for another client. Validate keys/shapes and project known buffer extras; preserve original legacy files. F23/F07 author chooses the existing canonical path helper, not a second F27 naming scheme.",
+      "worker_handoff": "The parent must receive both new ci and delta from the successful current training worker before outbound processing, via F23's narrow training-state persistence/handoff. Do not infer success from an old file, and do not send None/stale delta. A failed load/save/handoff must surface; logging and continuing with missing client state is not accepted.",
+      "resume_boundary": "Persisted controls produced before F27 may be loaded structurally, but corrected continuation is not numerically equivalent to old runs. Document this discontinuity and recommend a new run with all server/client controls initialized consistently. Do not silently reset just one client or claim complete server/optimizer restart support."
+    },
+    {
+      "id": "C07",
+      "concern": "Late inbound server c and stale callback state",
+      "baseline": "DefaultLifecycleStrategy.configure calls set_client_id before inbound processors run. ExtractControlVariatesProcessor later sets additional_data; the example trainer copies it to context only during set_client_id.",
+      "mandatory": "At extraction of each current [weights,c] payload, immediately install a detached c in the active trainer context before training begins. Retain additional_data only as a compatibility view if needed. Remove reliance on set_client_id timing. Reused processors must point to the current trainer/client. Reject a missing/malformed c in the federated example and clear any stale value before failure; an omitted round payload must not silently reuse the preceding round.",
+      "core_boundary": "The standalone core strategy may retain explicitly documented warning-plus-zero initialization when no server c is supplied; the supported federated example must always supply and validate c."
+    },
+    {
+      "id": "C08",
+      "concern": "Population control update versus model weighting",
+      "baseline": "Example weights_aggregated already divides control deltas by Config().clients.total_clients, correctly. Its docstring says 1/m; the base server averages model weights by report.num_samples.",
+      "mandatory": "Keep control update sum(delta_ci)/N, not /len(S) and not sample weighting. Correct notation/docs. Validate required deltas for the participating model updates before committing the round; missing deltas must not be silently dropped. Server control keys cover parameters, so buffer-only keys never cause KeyError or receive a control update.",
+      "selected_compatibility_policy": "Preserve existing sample-weighted model aggregation x_new=sum(n_i*y_i)/sum(n_i), with eta_global=1. Explicitly call the shipped combination a sample-weighted SCAFFOLD-derived extension for unequal sample counts; do not claim it is the paper's uniform-client model update or a proved weighted-objective extension. With equal counts and plain SGD the local and server equations reduce to the reference. No new model-weighting toggle or general server-base change.",
+      "independent_discriminator": "For the oracle's first round n=(2,6), y=(.62,1.38), preserved model aggregation gives 1.19, uniform Algorithm 1 would give 1.0, and population c is 2/3 under either model aggregation. All three values must be distinguished in acceptance."
+    },
+    {
+      "id": "C09",
+      "concern": "Exported SCAFFOLDUpdateStrategyV2 falsely advertised as paper Option I",
+      "baseline": "V2 accumulates raw optimizer displacements, not an extra gradient evaluation at x; it also has independent rate/zero-step/device handling.",
+      "mandatory": "Keep the exported class and constructor, but implement it as a compatibility subclass using the corrected Option II implementation. Remove the false Option I/more-accurate claim. For fixed eta, raw-displacement averaging telescopes to the corrected Option II result after subtractive controls, so no second accumulator implementation is needed. Test V2 equality with the base strategy, including nonzero controls and the accumulation tail.",
+      "deferred": "A true Option I additional gradient pass is an optional new feature, not required to close F27. Do not retain the known broken accumulator under an unsupported/external-blocker label."
+    },
+    {
+      "id": "C10",
+      "concern": "False existing public documentation",
+      "baseline": "The SCAFFOLD docs currently claim the wrong control formula mirrors Option II and that the message flow yields theoretical convergence guarantees.",
+      "mandatory": "Replace the SCAFFOLD section's formulas and blanket equivalence/convergence claims in the same Phase 2C change. Explain the intentional numerical bugfix, fixed-rate contract, generic-optimizer and model-weighting boundaries, actual momentum=.9 default, real delta transport and legacy-state caveat. Link the versioned primary source. Do not change the FedProx section or defer false SCAFFOLD claims to Phase 5."
+    }
+  ],
+  "implementation_handoff": {
+    "owner": "Original Phase 2C author, only after root accepts fresh Sol review of this exact design hash; this planner does not contact or modify wZ.",
+    "dependencies": [
+      "F08: actual optimizer-step and final-tail contract; consume it rather than invent a SCAFFOLD microbatch counter.",
+      "F23: logical-client state and successful child-to-parent training-state transfer; add SCAFFOLD-specific fields/checks to the already owned repair.",
+      "F07: contained canonical checkpoint paths and legacy compatibility.",
+      "2B: use the reviewed runtime/aggregation candidate in integrated checks. Any necessary general client/server change requires a narrow root-serialized handoff; none is currently selected."
+    ],
+    "core_paths": [
+      "plato/trainers/strategies/algorithms/scaffold_strategy.py",
+      "plato/trainers/composable.py: only optimizer reference/executed-LR availability and SCAFFOLD state transfer coordinated with existing F08/F23 edits",
+      "tests/trainers/test_scaffold_strategy.py (new focused tests)"
+    ],
+    "phase2c_example_paths_reserved_from_phase4": [
+      "examples/customized_client_training/scaffold/scaffold_callback.py",
+      "examples/customized_client_training/scaffold/scaffold_client.py",
+      "examples/customized_client_training/scaffold/scaffold_trainer.py",
+      "examples/customized_client_training/scaffold/scaffold_server.py",
+      "examples/customized_client_training/scaffold/scaffold_MNIST_lenet5.toml: explanatory comments only; retain all values",
+      "examples/customized_client_training/scaffold/README.md: new bounded behavior/configuration/compatibility documentation",
+      "tests/integration/test_scaffold_round_flow.py (new)",
+      "tests/integration/scaffold_round_worker.py (new subprocess harness only if needed)"
+    ],
+    "documentation_path": "docs/docs/examples/algorithms/5. Algorithms with Customized Client Training Loops.md: SCAFFOLD section only, reserved from Phase 4/5 until root handoff; FedProx remains under its existing F20 policy.",
+    "entrypoint": "examples/customized_client_training/scaffold/scaffold.py needs no planned code change; exercise its real trainer/client/server/callback wiring in the smoke.",
+    "exclusions": "No general client/server base, optimizer registry, sampler, transport, manifests, lockfile, F20 objective or other algorithm changes. No production/test edits by this design task.",
+    "phase4_receipt": "Root records these exact SCAFFOLD paths as repaired/qualified by 2C with commit and test evidence. Phase 4 revalidates integration and ownership before any further edits; it does not concurrently redo this fix."
+  },
+  "mandatory_acceptance": [
+    {
+      "id": "A01",
+      "check": "Independent equation regressions",
+      "criteria": "Run float64 CPU real SGD and actual strategy hooks with x=1,c=2,ci=1,eta=.1,g=0: y=.9,ci_new=0,delta=-1. Repeat nonzero gradients [3,1]: y=.4,ci_new=2,delta=1. Independently record gradients and prove ci_new=their mean within atol=1e-12; do not compute expected values using strategy helpers. Baseline must fail the first case."
+    },
+    {
+      "id": "A02",
+      "check": "Actual configured optimizer/rate boundaries",
+      "criteria": "Load the real shipped TOML through Config; use the real optimizer factory and trainer with parameters.optimizer.lr overridden to .1 and .025, no trainer.lr or manually injected learning_rate. Verify correction and denominator, including a different LR next round and equal-rate reordered parameter groups. Missing optimizer, unequal group rates, nonfinite/zero rate and within-round scheduler changes give useful failures before the affected update, no control save/outbound success. Confirm captured executed LR is not replaced by a post-step hook's new LR."
+    },
+    {
+      "id": "A03",
+      "check": "Parameters and buffers",
+      "criteria": "Use a model with a trainable parameter named theta, ordinary weight/bias, a frozen parameter, an optimizer-excluded parameter and floating/integer buffers. Verify theta is corrected, excluded/frozen values are unchanged by SCAFFOLD, and no buffer gets a parameter/control update. Known historical buffer extras are tolerated; missing/unknown/mismatched/nonfinite control values fail before parameter correction. Input control tensors remain unchanged."
+    },
+    {
+      "id": "A04",
+      "check": "Completed steps, accumulation and empty rounds",
+      "criteria": "Through ComposableTrainer, exercise accumulation windows 2 with 1,3,4 microbatches and independently normalized gradients: K=1,2,2, one correction per real update including the tail and no duplicate finalize. Verify skipped-step flags suppress corrections. After a nonempty round, an empty/zero-update round retains ci and emits zero delta rather than stale data, with no divide-by-zero. Include the V2 compatibility subclass."
+    },
+    {
+      "id": "A05",
+      "check": "Client ownership and persistence",
+      "criteria": "Exercise one reused trainer for logical IDs 1->2->1 and fresh reconstruction for each ID; compare ci and resumed local updates with dedicated-trainer references over at least two rounds. Distinct nonzero controls survive same-client reload and never come from client 0 or another client. Test canonical precedence and each exact supported legacy dictionary/path, known buffer projection, custom save_path and slash model-name containment under F07. A deliberate save/load failure cannot produce a successful stale update."
+    },
+    {
+      "id": "A06",
+      "check": "Actual inbound/outbound dataflow and worker return",
+      "criteria": "Run real example configure/set_client_id first, then actual inbound callback/processor with nonzero c, real train(), outbound callback/processor and server payload extraction. Repeat with a changed c next round and processor reuse. Inspect strategy-consumed c and emitted delta, not merely additional_data. Execute both direct training and the shipped max_concurrency spawn path; parent ci/delta/model match the child result and direct reference. Failed/missing worker state cannot send None or prior-round delta. Use a bounded subprocess deadline."
+    },
+    {
+      "id": "A07",
+      "check": "Deterministic public-configuration multiround smoke",
+      "criteria": "Load the shipped TOML and instantiate its actual example components with local synthetic quadratic data, real optimizer, processors and server aggregation. Retain raw config plus explicit test overrides: CPU, fixed seed, temporary paths, scalar float64 model and quadratic loss, plain SGD momentum=0, eta=.1,N=3,selected (1,2) then (1,3), actual sample counts (2,6,4), batch_size=6,epochs=2. Each client's samples repeat its own target, so one real minibatch per epoch gives K=2 for every client without falsifying sample counts. Match every local model/ci/delta and sample-weighted global model/population c to the retained rational oracle. Data gradients must come from real independent client training; do not fabricate payload deltas. Verify inactive ci unchanged and c=mean(all ci). Add equal-count case matching uniform paper aggregation. No dataset download or convergence benchmark required; an in-process real pipeline plus A06 spawn qualification suffices."
+    },
+    {
+      "id": "A08",
+      "check": "Server denominator, payload validity and buffers",
+      "criteria": "Use partial participation N>len(S), unequal sample counts and nonzero controls through actual weights_received/aggregation/weights_aggregated/customize_server_payload. Control update is sum(delta)/N, never sum(delta)/len(S) or sample weighting; next payload contains that c. Reject missing/malformed required deltas before committing either model/control state. Full model buffers remain under inherited aggregation behavior, without control keys/KeyError. A failed round leaves server state unchanged."
+    },
+    {
+      "id": "A09",
+      "check": "Generic optimizer compatibility and V2",
+      "criteria": "Exercise the unmodified shipped momentum=.9 optimizer and constant-rate Adam on at least two real steps with nonzero c/ci. Compare against independently stepped raw optimizers followed by -eta*(c-ci), then ci_old-c+(x-y)/(K*eta); verify warning/documented boundary, not mean-gradient equivalence. V2 gives the same results as corrected Option II and has no Option I claim."
+    },
+    {
+      "id": "A10",
+      "check": "Review and integration evidence",
+      "criteria": "Run focused new tests and the existing affected F07/F08/F23/F20 trainer regressions on the locked supported Python 3.13 profile; run focused equation/worker checks on available Python 3.14 profile. Retain exact commands, versions, durations, configuration overrides, results and diff hash for independent review. Check imports with the repo Ruff policy and JSON/docs links as applicable. Confirm TOML values and F20 objective unchanged; corrected public docs contain no blanket convergence guarantee. Report any failure honestly; no known internal defect is an external prerequisite."
+    }
+  ],
+  "deferred_enhancements": [
+    "True paper Option I gradient pass.",
+    "Variable local LR, unequal parameter-group LR and optimizer-specific SCAFFOLD derivations.",
+    "A new uniform-client aggregation mode or a proved sample-weighted SCAFFOLD objective.",
+    "Full server/optimizer/RNG restart protocol, GPU qualification and convergence/benchmark studies."
+  ],
+  "planner_write_scope": "Only root evidence/2026-refresh/phase2c-scaffold-design.json and optional owned /tmp/plato-phase2c-scaffold-design scratch. No agents, production/tests/worktree edits, commits, push or PR changes."
+}

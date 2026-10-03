@@ -1,0 +1,19 @@
+{
+  "status": "Proposed exact combination; fresh corrected FedDyn and final prose reviews pending, no integration authorized yet.",
+  "C": "8b01bf47ca8bdf9232bffeb4e50f78d4f00c9e3b",
+  "docs": "c199ebe02831a47351a10026e64721f77c9dfe9b",
+  "CI": "8d27c5c7a205299537a2835358f1d5e91a7b51c3",
+  "merge_tree": "e866a28a50fa411b5f93223c3d828111ea07bf88",
+  "merge_tree_conflicts": false,
+  "changed_from_C": [
+    ".github/workflows/pytorch_tests.yml",
+    "docs/docs/examples/algorithms/5. Algorithms with Customized Client Training Loops.md",
+    "evidence/2026-refresh/phase2-ci-budget-validation.json",
+    "evidence/2026-refresh/phase2c-algorithm-docs-count-reconciliation.json",
+    "evidence/2026-refresh/phase2c-algorithm-docs-validation.json",
+    "evidence/2026-refresh/phase2c-scaffold-docs-validation.json",
+    "examples/customized_client_training/feddyn/README.md",
+    "examples/customized_client_training/scaffold/README.md"
+  ],
+  "root_evidence_overlay": "Root review, acceptance, execution and reproduction evidence will be recorded separately."
+}

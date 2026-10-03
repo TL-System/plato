@@ -56,6 +56,8 @@ type = "fedavg"
 [parameters]
 
 [parameters.optimizer]
+# Fixed positive LR is required within each local round. Momentum below retains
+# the additive-control optimizer extension; vanilla SGD is the paper reference.
 lr = 0.01
 momentum = 0.9
 weight_decay = 0.0

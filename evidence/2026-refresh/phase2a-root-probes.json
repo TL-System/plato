@@ -1,0 +1,58 @@
+{
+  "candidate": "a7bfd3dcdf7aaf3ec3ca466a1b5f27efa58054eb",
+  "python": "3.13.16",
+  "command": "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=/tmp/plato-refresh-worktrees/data OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 .venv/bin/python /tmp/plato-phase2-root/prepared_image_probe.py",
+  "source": "import json\nimport tempfile\nfrom pathlib import Path\n\nimport numpy as np\nimport torch\nfrom PIL import Image\n\nfrom plato.config import Config\nfrom plato.datasources import cinic10, tiny_imagenet\nfrom tests.integration.utils import build_minimal_config, configure_environment\n\nresults=[]\nwith tempfile.TemporaryDirectory(prefix='plato-prepared-images-') as temporary:\n    for name, module in [('tiny',tiny_imagenet),('cinic',cinic10)]:\n        root=Path(temporary)/name\n        root.mkdir()\n        with configure_environment(build_minimal_config(),runtime_root=root):\n            data=Path(Config().params['data_path'])\n            for part, cls in [('train','n001'),('train','n002'),('test','n002')]:\n                dest=data/part/cls/'one.png'\n                dest.parent.mkdir(parents=True,exist_ok=True)\n                rows,cols=np.indices((64,64))\n                pixels=np.stack((rows*4,cols*4,(rows+cols)*2),axis=2).astype(np.uint8)\n                Image.fromarray(pixels).save(dest)\n            source=module.DataSource()\n            train=source.get_train_set();test=source.get_test_set()\n            torch.manual_seed(27)\n            first=test[0][0];second=test[0][0]\n            results.append({'dataset':name,'train_classes':train.classes,'test_classes':test.classes,'actual_test_targets':test.targets,'expected_training_space_target':train.class_to_idx['n002'],'repeated_test_equal':bool(torch.equal(first,second)),'max_abs_test_difference':float((first-second).abs().max())})\nprint('PROBE_RESULT',json.dumps(results))\n",
+  "log_sha256": "1de3cc4b052caf3f8a306254be1cb266e218360de42c1c460e9146bd3a63b982",
+  "observed": [
+    {
+      "dataset": "tiny",
+      "train_classes": [
+        "n001",
+        "n002"
+      ],
+      "test_classes": [
+        "n002"
+      ],
+      "actual_test_targets": [
+        0
+      ],
+      "expected_training_space_target": 1,
+      "repeated_test_equal": false,
+      "max_abs_test_difference": 1.1644833087921143
+    },
+    {
+      "dataset": "cinic",
+      "train_classes": [
+        "n001",
+        "n002"
+      ],
+      "test_classes": [
+        "n002"
+      ],
+      "actual_test_targets": [
+        0
+      ],
+      "expected_training_space_target": 1,
+      "repeated_test_equal": true,
+      "max_abs_test_difference": 0.0
+    }
+  ],
+  "findings": [
+    {
+      "id": "ROOT-2A-01",
+      "severity": "medium",
+      "title": "Prepared image evaluation subsets use a different class ID space.",
+      "detail": "Both actual TinyImageNet and CINIC ImageFolder test sets assign n002 index0 when training maps it to1. This silently mislabels a valid labeled evaluation subset.",
+      "acceptance": "Map evaluation labels into training class IDs even when evaluation omits a class; reject unknown evaluation classes. Keep targets/samples/class metadata consistent. R2A-03 layout repair should also address this related class compatibility case."
+    },
+    {
+      "id": "ROOT-2A-02",
+      "severity": "medium",
+      "title": "TinyImageNet default evaluation applies random training crops.",
+      "detail": "Two actual evaluations of one fixed PNG differ by1.16448 after deterministic seed initialization because the default test transform reuses RandomResizedCrop. CINIC deterministic control is unchanged.",
+      "acceptance": "Use deterministic default evaluation preprocessing, preserve intended dimensions/normalization and training augmentation, support explicit transform customization without breaking valid native/prepared layouts."
+    }
+  ],
+  "scope": "Local real dataset construction and transformed samples onPython3.13; no corpus download/training/accuracy/GPU qualification claim. Candidate stayedread-only. Initial harness attempt omitted temporaryrootmkdir and failed before datasourceconstruction; corrected before this product probe."
+}

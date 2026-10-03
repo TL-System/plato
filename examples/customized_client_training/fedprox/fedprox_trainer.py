@@ -2,7 +2,7 @@
 A federated learning training session using FedProx.
 
 To better handle system heterogeneity, the FedProx algorithm introduced a
-proximal term in the optimizer used by local training on the clients. It has
+proximal term in the loss used by local training on the clients. It has
 been quite widely cited and compared with in the federated learning literature.
 
 Reference:
@@ -23,6 +23,8 @@ class Trainer(ComposableTrainer):
 
     This trainer uses the composition-based design with FedProx loss strategy.
     The proximal term coefficient (mu) is read from the configuration file.
+    This retains Plato's legacy unsquared L2 norm rather than the paper's
+    squared L2 objective.
     """
 
     def __init__(self, model=None, callbacks=None):

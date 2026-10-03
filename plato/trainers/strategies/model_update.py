@@ -118,10 +118,38 @@ class CompositeUpdateStrategy(ModelUpdateStrategy):
         for strategy in self.strategies:
             strategy.on_train_start(context)
 
+    def on_client_id_changed(self, context: TrainingContext) -> None:
+        """Propagate ownership changes to each composed strategy."""
+        for strategy in self.strategies:
+            strategy.on_client_id_changed(context)
+
     def on_train_end(self, context: TrainingContext) -> None:
         """Call on_train_end for all strategies."""
         for strategy in self.strategies:
             strategy.on_train_end(context)
+
+    def on_train_cleanup(self, context: TrainingContext, successful: bool) -> None:
+        """Release each component's run resources."""
+        for strategy in self.strategies:
+            strategy.on_train_cleanup(context, successful)
+
+    def on_train_result_accepted(self, context: TrainingContext) -> None:
+        """Commit each component's staged successful result."""
+        for strategy in self.strategies:
+            strategy.on_train_result_accepted(context)
+
+    @property
+    def requires_worker_state(self) -> bool:
+        return any(strategy.requires_worker_state for strategy in self.strategies)
+
+    def get_worker_state(self, context: TrainingContext) -> list:
+        return [strategy.get_worker_state(context) for strategy in self.strategies]
+
+    def load_worker_state(self, state: Any, context: TrainingContext) -> None:
+        if not isinstance(state, list) or len(state) != len(self.strategies):
+            raise ValueError("Training worker returned mismatched strategy state.")
+        for strategy, component_state in zip(self.strategies, state):
+            strategy.load_worker_state(component_state, context)
 
     def before_step(self, context: TrainingContext) -> None:
         """Call before_step for all strategies."""

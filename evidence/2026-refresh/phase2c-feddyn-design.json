@@ -1,0 +1,1112 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-03",
+  "role": "Fresh independent Astra design/planning author; no implementation or review acceptance claimed.",
+  "finding": "internal 2C-11",
+  "verdict": "RETAIN_AND_REPAIR; REVISED_FOR_FRESH_SOL_DESIGN_REVIEW; FINDING_REMAINS_OPEN",
+  "decision": {
+    "recommendation": "Retain FedDyn and repair its advertised end-to-end synchronous example. Correct the local objective and replace label-derived alpha, add the missing server history correction, and make the server the authoritative owner of logical-client histories. Do not archive this maintainable example, rename the incorrect algorithm, or close the finding with a local-loss-only patch.",
+    "supported_contract": "Fixed population of positive logical client IDs; synchronous uniform selection without replacement; every selected client succeeds before the round commits; ordinary PyTorch model with a fixed trainable parameter set; plain SGD, no momentum, no optimizer weight decay, no clipping or AMP; CPU float32/float64 qualification. Full participation and proper partial participation are supported. Equal-client weighting is the default; explicitly configured fixed sample weighting follows the pinned author code.",
+    "scope_reason": "LeNet, the existing example entrypoint, and composable trainer hooks are usable. The defects are algebra, missing aggregation, and state ownership, not obsolete dependencies. An example-local server/client/trainer adapter and the already owned FedDyn strategy suffice. No accepted B runtime changes or generic federated protocol redesign are required.",
+    "zero_alpha": "The reusable local loss accepts finite alpha >= 0, with alpha=0 exactly the base loss. The end-to-end FedDyn example requires alpha > 0 and rejects zero before dispatch: Algorithm 1 is not defined at zero, and adding the cumulative correction to zero-regularization local SGD would not be FedAvg. Do not silently select another algorithm.",
+    "closure": "Fresh Sol review of this exact artifact, root acceptance, original C author implementation, fresh independent code/numerical/failure-path review, standalone Astra FedDyn prose and prose review, then root integrated acceptance before Phase 2 closes. This design alone closes nothing."
+  },
+  "rationale": [
+    "At w=x=2, h=0, alpha=.1, lr=.1 and zero task gradient, the candidate steps to 2.02. The correct regularizer gradient is zero, so the expected weight is 2.0. The global shift is counted twice in the current loss.",
+    "Numeric label values contain no sample-size information. The all-zero fallback made the bug finite but did not repair its semantics. Relabeling otherwise identical data must not change alpha or the regularizer.",
+    "feddyn.py creates simple.Client with a custom trainer and plain fedavg.Server. Default aggregation weights models by report.num_samples. Neither the client payload nor that server supplies the population history correction. Fixing only feddyn_strategy.py would still misrepresent the example.",
+    "Central authoritative histories make logical client reuse, rejection, and coherent round-boundary restart tractable without changing accepted runtime files. This deliberately adds one trainable-history vector to each downlink and O(Nd) server state; no claim of original communication cost is allowed.",
+    "The accepted F20 legacy UNSQUARED FedProx policy remains untouched. ROOT-2C-01 AMP clipping and the SCAFFOLD fixes are separate work. F27-R01/R02 supply failure cases to avoid, not a working implementation to copy."
+  ],
+  "sourceidentities": {
+    "candidate_commit": "62d7b7d8ef75be779149a96f567779c86699edb4",
+    "implementation_commit": "0dc34dd1d79d90071a0babfa6aa89f33d72a976f",
+    "candidate_root": "/private/tmp/plato-refresh-worktrees/feddyn-design",
+    "primary_code": [
+      {
+        "path": "/tmp/plato-phase2c-feddyn-design/utils_general.py",
+        "bytes": 12240,
+        "sha256": "6e79b259456475934b71cddc797b8dcf1e66818bd543465ad02225b6e506eca5",
+        "url": "https://github.com/alpemreacar/FedDyn/blob/48a19fac440ef079ce563da8e0c2896f8256fef9/utils_general.py",
+        "original_receipt": {
+          "path": "/tmp/plato-phase2-root/feddyn-primary/utils_general.py",
+          "bytes": 12240,
+          "sha256": "6e79b259456475934b71cddc797b8dcf1e66818bd543465ad02225b6e506eca5"
+        },
+        "commit": "48a19fac440ef079ce563da8e0c2896f8256fef9"
+      },
+      {
+        "path": "/tmp/plato-phase2c-feddyn-design/utils_methods.py",
+        "bytes": 33856,
+        "sha256": "87026e71e3826893f3176359ce45bedfde858919f304b40e4ba564e214892d4d",
+        "url": "https://github.com/alpemreacar/FedDyn/blob/48a19fac440ef079ce563da8e0c2896f8256fef9/utils_methods.py",
+        "original_receipt": {
+          "path": "/tmp/plato-phase2-root/feddyn-primary/utils_methods.py",
+          "bytes": 33856,
+          "sha256": "87026e71e3826893f3176359ce45bedfde858919f304b40e4ba564e214892d4d"
+        },
+        "commit": "48a19fac440ef079ce563da8e0c2896f8256fef9"
+      },
+      {
+        "path": "/tmp/plato-phase2c-feddyn-design/README.md",
+        "bytes": 1624,
+        "sha256": "d04e9fe2e8d64dd7ec28ef785e8e428563354c32fc240fab8f2a09bb2dff2766",
+        "url": "https://github.com/alpemreacar/FedDyn/blob/48a19fac440ef079ce563da8e0c2896f8256fef9/README.md",
+        "original_receipt": {
+          "path": "/tmp/plato-phase2-root/feddyn-primary/README.md",
+          "bytes": 1624,
+          "sha256": "d04e9fe2e8d64dd7ec28ef785e8e428563354c32fc240fab8f2a09bb2dff2766"
+        },
+        "commit": "48a19fac440ef079ce563da8e0c2896f8256fef9"
+      }
+    ],
+    "author_earlier_retained_copy_verified": {
+      "path": "/tmp/plato-phase2c-scratch/feddyn-author-utils_general.py",
+      "bytes": 12240,
+      "sha256": "6e79b259456475934b71cddc797b8dcf1e66818bd543465ad02225b6e506eca5"
+    },
+    "primary_paper": {
+      "path": "/tmp/plato-phase2c-feddyn-design/2111.04263v1.pdf",
+      "bytes": 2779369,
+      "sha256": "395f508d4f1adf94b8509897fe1fdb40a36090d2171ea74bd15c4b59c1e2e2ff",
+      "title": "Federated Learning Based on Dynamic Regularization",
+      "version": "arXiv:2111.04263v1, 8 November 2021; ICLR 2021 paper, 42 pages",
+      "url": "https://arxiv.org/pdf/2111.04263v1",
+      "canonical": "https://openreview.net/forum?id=B7v4QMR6Z9w",
+      "retrieval": "OpenReview returned a browser challenge. Read the primary arXiv PDF via web.open; subsequently curl --fail --location with normal TLS verification succeeded into owned scratch. No verification bypass.",
+      "relevant_locations": "Section 2 and Algorithm 1, printed pages 3-4; experimental clipping/reporting distinctions in Appendix A.4, printed pages 14-16. The example comment citing Appendix C.2 for fixed learning rate is not a verified citation in this version."
+    },
+    "code_locations": {
+      "utils_general.py": "train_feddyn_mdl: SGD decay alpha_coef+weight_decay; batch-mean task loss; linear alpha_coef<w,-avg_mdl_param+local_grad_vector>; clipping before optimizer.step. Use pinned function anchors, not the stale public-doc line spans.",
+      "utils_methods.py": "train_FedDyn: len(clnt_y[i]) normalized to population-mean-one weights; alpha_coef/weight_list[clnt]; warm start from cld_model; local_param_list += curr_model_par-cld_mdl_param; avg selected models + mean history over all clients; separate selected/all/cloud evaluation models."
+    },
+    "inputs": [
+      {
+        "path": "/Users/bli/Playground/plato/AGENTS.md",
+        "bytes": 3119,
+        "sha256": "b50f87f31ea3d87076952d8b7d2d8af067132fbf877d80f8780c208fb45527ec"
+      },
+      {
+        "path": "/Users/bli/Playground/plato/evidence/2026-refresh/plan.md",
+        "bytes": 50719,
+        "sha256": "edb9a58cc7915a940854f16d5029fe97434703bf2f75eca0dcb96de2d0f0eb15"
+      },
+      {
+        "path": "/Users/bli/Playground/plato/evidence/2026-refresh/plan-addendum.json",
+        "bytes": 28579,
+        "sha256": "5b51b0fb7ed6f68d9fce7176335b3e7be5e5f178a2788590912aa2396a487709"
+      },
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/feddyn-design/evidence/2026-refresh/phase2c-feddyn-disposition.json",
+        "bytes": 3222,
+        "sha256": "4622a0f8cf1b07a45514684cd2b6ca104d0d39a97ec7f60cf593ed6e2aedcd36"
+      },
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/feddyn-design/evidence/2026-refresh/phase2c-validation.json",
+        "bytes": 163310,
+        "sha256": "5674d9ef3e2ffda63b8041ed3f8c2c13ebaa6062ee967292ac2c459eba387fa8"
+      },
+      {
+        "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2c-scaffold-code-review.json",
+        "bytes": 194941,
+        "sha256": "455f6467dd6986a1de751f0a9dea6bfef4d9ca4c16746ce38239b2b77a3bb7d7"
+      },
+      {
+        "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2c-training-review.json",
+        "bytes": 114275,
+        "sha256": "efa4427422c1d0c12d1020e22f7fc8dd9afc1c25f0e5369fa0d4f5a2df44eea1"
+      }
+    ],
+    "input_reconciliation": "The FedDyn disposition and C validation inventory are in the candidate worktree, not ROOT. They explicitly leave 2C-11 open; the inventory records finite-only 2C-16 and local F23 persistence tests. Those passes do not establish the correct objective or a FedDyn server. Current FedDyn disk-ownership tests require an explicit migration under this design, not a claim that their old ownership model proves the new flow.",
+    "inspected_flow_receipts": [
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/feddyn-design/examples/customized_client_training/feddyn/feddyn.py",
+        "bytes": 598,
+        "sha256": "8d69597d611e4be84c8b6861b55d099c2b65a53c32d013a97c7518760a372271"
+      },
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/feddyn-design/examples/customized_client_training/feddyn/feddyn_trainer.py",
+        "bytes": 1378,
+        "sha256": "1032d49bf20a53d85a90468c1f2afb3782b3cad44bf8149bd214f800c0633354"
+      },
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/feddyn-design/examples/customized_client_training/feddyn/feddyn_MNIST_lenet5.toml",
+        "bytes": 1302,
+        "sha256": "61e6f7116322cb4657cc730b5612fa3baf675d0f8e824af8eb8e4670502e8722"
+      },
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/feddyn-design/plato/trainers/strategies/algorithms/feddyn_strategy.py",
+        "bytes": 22469,
+        "sha256": "93abaa09f8f31018ba8cfe1e6de9f507d4ec4e6abe8170d5919b41c054597d8c"
+      },
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/feddyn-design/plato/trainers/composable.py",
+        "bytes": 41822,
+        "sha256": "6bc4dab135cd7249346ac3ca23b0e24ea638961cda7806558ab81338dc0496a8"
+      },
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/feddyn-design/plato/trainers/strategies/base.py",
+        "bytes": 18248,
+        "sha256": "905261bbaf05f8024110f9b0be2c29886bdc39a91c6be18aa9e83bb4868ec0d3"
+      },
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/feddyn-design/plato/clients/simple.py",
+        "bytes": 4221,
+        "sha256": "c88220ec85ea614257648cb956a89624d11c03a944357c683aafb333e51b2a2e"
+      },
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/feddyn-design/plato/clients/strategies/defaults.py",
+        "bytes": 21145,
+        "sha256": "6a41108b7878113ed4b7c9555d818b1f59862f55c487524b26052a0f12c3feca"
+      },
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/feddyn-design/plato/servers/fedavg.py",
+        "bytes": 15905,
+        "sha256": "f184068a11c5be9e523f08b95e1cce76dff2e20e2fdb4e6426caf95dac0bcee5"
+      },
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/feddyn-design/plato/servers/base.py",
+        "bytes": 73482,
+        "sha256": "79355c0184680eaac2ad8646a23ff79d5ef70e5797cea1e313db7948a96488db"
+      },
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/feddyn-design/plato/servers/strategies/aggregation/fedavg.py",
+        "bytes": 11663,
+        "sha256": "fa1e2a6bbbc8e3829b72cd0cdd47f10b0a8fffbdabdaa2dfb3efed81872877c1"
+      },
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/feddyn-design/plato/algorithms/fedavg.py",
+        "bytes": 12558,
+        "sha256": "512006d85daa070cd7a7a595b849a96ba70805bc88aa41d329b340dc4edc0258"
+      },
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/feddyn-design/plato/samplers/dirichlet.py",
+        "bytes": 3219,
+        "sha256": "c98522f22ee527d5f698b9ece68f05f87e2cb7ca5af3dc83f6b2d83c52c77e83"
+      },
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/feddyn-design/plato/samplers/iid.py",
+        "bytes": 1739,
+        "sha256": "e74bb8dd278025523f55526143c9f2d8ab42c4e8167cce20da730a4524fffeb9"
+      },
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/feddyn-design/tests/trainers/test_personalized_state_ownership.py",
+        "bytes": 12934,
+        "sha256": "f2a808dd1c6763164283f02b8801bee7b211327570d152a91b32fb74c9d9f233"
+      },
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/feddyn-design/tests/trainers/test_training_update_contract.py",
+        "bytes": 24186,
+        "sha256": "87059fc3f336d6a9e319d372577d30ed7066fd9e1bd1f7fe3d0efb6fda92f676"
+      },
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/feddyn-design/docs/docs/examples/algorithms/5. Algorithms with Customized Client Training Loops.md",
+        "bytes": 11152,
+        "sha256": "aaf8cc3b4ef22a19356c2e0d6f2e1ef1fee2a741ab195959754b0c18e76b1d60"
+      }
+    ]
+  },
+  "algorithm": {
+    "notation": "N is total fixed population; S_t is the nonempty selected set; x_t is the cloud model received at the beginning of round t; y_i is the successful local endpoint; h_i is an unscaled cumulative displacement, initially zero. h_i is not a measured gradient and is not the paper server variable h. Every vector below contains only the fixed trainable parameter names Q.",
+    "uniform": {
+      "objective": "F(w)=(1/N) sum_i F_i(w), where F_i is a local mean task loss.",
+      "q_i": "1",
+      "alpha_i": "alpha"
+    },
+    "sample": {
+      "objective": "F(w)=sum_i n_i F_i(w)/sum_i n_i for fixed positive realized per-client sample counts.",
+      "q_i": "N*n_i/sum_j n_j",
+      "alpha_i": "alpha/q_i = alpha*sum_j n_j/(N*n_i)",
+      "derivation": "Multiplying the local objective by q_i gives q_i F_i + alpha<h_i,w> + alpha/2||w-x_t||^2. Thus the common-alpha algorithm acts on scaled local losses q_i F_i. SGD on the unscaled local loss corresponds to learning rate eta/q_i on that scaled loss, matching the pinned code. This is our algebraic interpretation; do not claim a new convergence theorem for finite local steps."
+    },
+    "local_loss": "J_i(w)=F_i(w)+alpha_i<h_i,w>+(alpha_i/2)||w-x_t||^2.",
+    "local_gradient": "grad F_i(w)+alpha_i*(w-x_t+h_i). x_t, h_i and alpha_i are detached, fixed throughout all epochs/microbatches of this attempt. Construct scalar accumulators/coefficient tensors in the parameter computation dtype/device; do not downcast alpha through a default float32 tensor during a float64 oracle or derive its dtype from integer labels.",
+    "equivalent_author_form": "F_i(w)+alpha_i<w,-x_t+h_i>+(alpha_i/2)||w||^2 differs only by a w-independent constant. Use the shifted form with linear h_i alone; never add a second -x_t linear term. Do not additionally put alpha_i into optimizer weight_decay.",
+    "successful_round": [
+      "Train each selected client from the same immutable x_t, with its own committed h_i.",
+      "For selected i, stage h_i_next=h_i+y_i-x_t exactly once per accepted round. For inactive i, retain h_i exactly.",
+      "m_t=(1/|S_t|) sum_{i in S_t} y_i. This is an unweighted selected mean in BOTH weighting modes.",
+      "H_next=(1/N) sum_{i=1..N} h_i_next, including inactive and never-selected zero histories.",
+      "x_next=m_t+H_next. Broadcast and evaluate this corrected cloud model. Do not conflate it with the separate selected/all-client models reported by the reference experiment."
+    ],
+    "paper_mapping": "For the scaled objective, the paper local gradient-state variable is g_i=-alpha*h_i and its server state is g_bar=-alpha*mean(h_i). The server rule mean(y)-g_bar/alpha therefore equals mean(y)+mean(h_i). The implementation stores h_i to avoid sign/scaling ambiguity.",
+    "optimizer_policy": "The supported example uses ordinary torch.optim.SGD with momentum=0, dampening=0, nesterov=false, maximize=false, weight_decay=0, finite positive fixed local learning rate, no scheduler or clipping, and default or accepted gradient accumulation steps. Reject Adam/AdamW, momentum, weight decay, AMP, DP, and custom multi-optimizer/update combinations early with an actionable unsupported-mode error. Do not quietly coerce them to SGD. The local loss remains a differentiable reusable objective, but arbitrary optimizers are not a qualified end-to-end FedDyn mode.",
+    "reference_limit": "The authors split the quadratic gradient into SGD weight decay and clip the remaining gradient first. Explicit full-loss differentiation matches their unclipped SGD update when clipping is inactive; it does not reproduce their active clipping order. No exact experiment/step-for-step claim, momentum equivalence claim, or benchmark reproduction claim is allowed.",
+    "parameter_policy": {
+      "Q": "Names with requires_grad=True at setup; fixed for the session and fingerprinted with exact shapes/dtypes. Supported trainable dtypes float32 and float64, dense finite tensors. Reject empty Q, complex/sparse parameters, changing trainability/schema, and ambiguous shared parameter aliases in this bounded mode.",
+      "optimizer_ownership": "Require the actual optimizer parameter groups to own each member of Q exactly once and no frozen/foreign parameter. Match by object identity, not tensor equality or shape. Group order is irrelevant. Filter frozen parameters when constructing the example optimizer, then validate. Missing trainables, duplicates and foreign parameters fail before a step.",
+      "nontrainables": "Frozen parameters and every model buffer are excluded from loss/history/correction. Exchange a full state_dict and retain the server baseline for those keys. Require uploaded nontrainable entries to equal that baseline; reject mutations rather than silently average integer/bool buffers or change frozen values. Static float/int/bool buffers are supported. BatchNorm running-stat updates and other mutable-buffer training are outside this bounded mode and must fail explicitly.",
+      "model_validation": "At each incoming boundary require the exact full state_dict key set, tensor types, exact shapes (no broadcasting), exact supported dtypes and finite floating values. Histories require the exact Q key set, shapes/dtypes and finite entries. Make independent CPU clones; no payload alias may mutate committed state."
+    }
+  },
+  "stateflow": {
+    "authority": "Only the example Server commits h_i, cloud model, observed counts and round generation. Keep committed_round separate from the runtime current_round, which advances for dispatch before training succeeds. Clients/workers receive a snapshot and produce provisional results. No worker or client writes canonical per-client history files. A newly created process and a reused physical process therefore obtain the same logical history from the server.",
+    "server_dispatch": "Use existing customize_server_response/customize_server_payload hooks; selected_client_id is already assigned and the two hooks run without an intervening await in the inspected synchronous loop. Bind a unique dispatch token to run UUID, round, logical client ID, schema, baseline and its history. Store these immutable dispatch records for validation. Do not infer identity from physical worker ID or an unbound payload field.",
+    "downlink_schema_v1": "[full_model_state, {version: 1, run_id, round, client_id, dispatch_token, weighting, base_alpha, effective_alpha, expected_count_or_null, history: Q_tensor_mapping}]",
+    "uplink_schema_v1": "[full_local_model_state, {version: 1, run_id, round, client_id, dispatch_token, num_samples, completed_steps}]",
+    "uplink_history": "No client history tensor is needed on the wire: the server computes h_i_next from its own committed history and the validated endpoint. Validate every resulting history before commit. Worker result state does include provisional history and baseline so the parent can reject a mismatched model/state pair.",
+    "client_adapter": "Install an example-local subclass of DefaultTrainingStrategy through _configure_composable while retaining default lifecycle/payload/reporting/communication strategies. The actual DefaultPayloadStrategy calls training_strategy.load_payload/train directly; overriding simple.Client._load_payload or _train alone is insufficient. In load_payload validate the ENTIRE model plus history/metadata/count contract before changing model or trainer state. In train call the actual trainer and package a result only after successful acceptance. DefaultTrainingStrategy can catch ValueError and continue building a report, so explicitly clear stale training_error at attempt start and rethrow/suppress outbound on any failure; never send a failed attempt as a successful baseline model.",
+    "same_client_and_reuse": "set_client_id changes clear all pending state; every new dispatch also replaces the snapshot even if the logical ID is unchanged. Client 1 -> 2 -> 1 must load h_1 from the server, never h_2, client 0 or a stale disk file. New global baselines replace the prior x even for consecutive rounds on the same client.",
+    "worker_handoff": "FedDynUpdateStrategy.on_train_end only stages h_next and actual completed step/count metadata. get_worker_state returns owned copies with dispatch/schema identity. Parent acceptance must validate model AND worker state, confirm h_next=h_before+(y-x), and only then expose a successful local result. feddyn_trainer.Trainer.train wraps the existing composable train call transactionally: snapshot model/strategy/context before the attempt, verify the accepted pair before returning, and restore snapshots plus clear provisional state on ANY exception, nonzero child exit, missing/stale/corrupt sidecar, or post-child callback failure. The generic loader currently loads the model before load_worker_state; use the local rollback wrapper to contain that ordering. No child canonical history writes, including after the child has saved model artifacts. A finally path must release owned temporary handles; checkpoint files outside the attempt remain byte-identical.",
+    "step_semantics": "Accumulate the full J_i using the accepted F08 mean-of-microbatch-means convention, including the correctly normalized tail. Regularizer history updates once at local run end, not once per microbatch/epoch/step. Count completed updates in FedDynUpdateStrategy.after_step, which the inspected composable trainer dispatches for normal and tail updates; no extra callback class is needed. A skipped step does not advance history; endpoint displacement already captures the successful steps. Zero completed updates, empty loaders, zero-count partitions or zero epochs produce a failed attempt and no round commit, not a baseline pseudo-update that adds old H again.",
+    "server_aggregation_adapter": "Subclass fedavg.Server in the example. Route direct weight aggregation to the subclass aggregate_weights (override _should_prefer_weight_aggregation to false so the default FedAvg strategy cannot bypass it). weights_received validates/unpacks the whole batch. aggregate_weights revalidates the whole batch after on_weights_received callbacks, checks exact dispatched set/identities, then computes finite staged histories and corrected model. weights_aggregated commits the already validated histories after model load. A local _process_reports wrapper snapshots model/history and rolls back any exception before that commit, clears pending state in finally, and rejects duplicate consumption. Restore known tensor snapshots without re-entering an injected failing loader during rollback. Do not copy/rewrite the base orchestration loop. Exceptions in evaluation after the round commit are not a second update or a rollback of an already committed algorithm round.",
+    "batch_atomicity": "For every participating report validate both metadata and every original model key/tensor before arithmetic, including the second/later payload. Enforce unique client IDs in 1..N, report.client_id/update identity/dispatch agreement, matching run/round/token, positive integer counts, completed_steps>0, count-vector agreement, full dispatched-set membership, finite baseline/history/result. Reject empty, duplicate, stale, extra, missing and mixed-generation batches. Failure leaves cloud model, all h_i, observed counts, round checkpoint, and accepted-token ledger unchanged; no residual staged history may leak into a later batch.",
+    "participation": "Uniformly sampled subsets may vary between rounds. N never becomes len(reports), number of seen clients, or sum of active sample weights. Inactive history persists, including across many skipped rounds. Within a selected round every dispatched member must return successfully; dropout/retry/asynchronous/buffered/urgent/cross-silo behavior is not supported by this example. Abort a failed round without accepting a smaller effective S_t. Restart from a committed round if needed.",
+    "checkpoint": {
+      "owner": "Example Server overrides save_to_checkpoint, _resume_from_checkpoint and start; the start override performs the validated pending RNG handoff after inherited Server.run reseeding and before delegating to inherited start. No changes to plato/servers/base.py or generic runtime/selection strategies.",
+      "canonical": "One versioned FedDyn round-boundary bundle under configured checkpoint_path, named with checkpoint_name/checkpoint_path (including slash-containing model names). Contents: full cloud model, all nonzero h_i keyed by logical ID with omitted never-selected entries defined as zero, N, Q/full-state schema, base alpha, weighting and full sample count vector or observed-count map, committed round, run UUID, deterministic selection RNG state (including server.prng_state/context selection state) and necessary CPU Torch/Python/NumPy RNG states. Tensors and primitive containers only; encode NumPy RNG arrays without arbitrary object loading.",
+      "write": "Capture a coherent committed snapshot including RNG at the round commit. Serialize that snapshot, not a mixture of current_round or RNG already advanced by a failed next dispatch. Write a complete temporary bundle in the same directory and atomically replace the canonical bundle only after serialization succeeds. A standalone model export may also be written, but it is never the resume authority. Save failures propagate; never publish a newer round marker with older histories. Do not delegate to the base multi-file checkpoint marker as the FedDyn resume contract.",
+      "read": "Load on CPU with weights_only=True where torch.save is used; validate the entire bundle and model/history/count/schema/config compatibility into temporary structures before mutating live model, histories, round, RNG or existing pending resume state. Validate selection/Python RNG with private random.Random instances, NumPy state with a private numpy.random.RandomState, and Torch CPU state with a private torch.Generator(device=\"cpu\"); validation must not seed, draw from, or set any live generator. Check duplicated serialized selection fields agree. After successful whole-bundle validation/installation, establish the normal successful-resume metadata (current_round, context.current_round and resumed_session=True) and publish an owned copy of the RNG snapshot as self._pending_resume_rng, bound to this committed run/round. Defer its live application to the local start hook, because inherited run restores first and then reseeds/replaces self.prng_state. Rejected loads leave all live state, RNG and any prior pending snapshot unchanged; do not clear pending state before validation or reset history on error. Changed alpha, weighting, population, sample vector or trainable schema requires an explicit fresh run, not an automatic history rescale.",
+      "scope": "Resume only at completed synchronous rounds; optimizer state is intentionally fresh each local run because supported SGD has no momentum. Prove continuation through actual Server.run/--resume startup and the example-local start handoff, not only direct _resume_from_checkpoint calls. Compare later selections, cloud models and all-client histories with uninterrupted deterministic CPU training. Arbitrary external datasource RNG, in-flight recovery and exact GPU replay are not promised.",
+      "startup_handoff": {
+        "ordering_in_immutable_62d": "Server.run calls configure, _resume_from_checkpoint when args.resume is true, launches clients, then random.seed(server.random_seed) and replaces self.prng_state before calling self.start. _select_clients_with_strategy later copies self.prng_state into context.state[\"prng_state\"]. Restoring only in _resume_from_checkpoint or only in context is therefore insufficient.",
+        "local_hook": "Initialize _pending_resume_rng=None on the example Server. Override start with compatible forwarding of its arguments; before calling super().start, consume a successfully validated pending snapshot for the current committed run/round. Recheck its identity/schema without changing live state. In one synchronous block with no await, set self.prng_state and context.state[\"prng_state\"] to the saved selection state, set Python random global state to its separately saved value, set numpy.random global state including its Gaussian cache, and restore the saved Torch default CPU generator state. Do not conflate Python global RNG with selection RNG if their saved states differ. Restore each already-promised serialized CPU RNG field, not merely the client selector.",
+        "commit_and_rejection": "Validate all RNG values using private generators before applying any of them. Snapshot the live RNGs, server/context selection fields and pending object at this boundary; if restoration fails, restore those snapshots and leave the pending snapshot unconsumed. Do not delegate to inherited start after a rejected handoff. Clear _pending_resume_rng only after all promised states are successfully installed, before super().start can register sockets or service client registration/selection. Subsequent start calls without a new successful resume load must not reapply an already consumed snapshot.",
+        "fresh_run": "With no pending snapshot, forward directly to super().start without setting or consuming RNG state. Preserve inherited fresh-run server.random_seed behavior exactly. Do not remove seeding, reset it after restored state is installed, move checkpoint loading into generic run, or alter accepted B.",
+        "boundary": "The handoff runs after inherited client-launch/reseed work but before inherited start opens/services the registration and selection path. Child process launch does not imply registration has been serviced. Keep this hook synchronous and exercise the actual run ordering. Cross-silo remains unsupported; this adds no GPU, in-flight or arbitrary datasource RNG promise.",
+        "later_accepted_B_integration": "Root has assigned generic startup defect F28 to the original B author in a separate worktree with fresh review required. This design does not depend on that unaccepted change and assigns no generic runtime edits. Later accepted B integration must preserve the explicit example-local checkpoint/pending-RNG/start handshake and fresh-run behavior. If shared startup no longer overwrites restored selection state, the local hook still installs the validated checkpoint snapshot once and consumes it without drawing or reseeding; it must not be removed merely because generic reseeding was corrected. Root reruns FD-A12/13 and the accepted B startup/resume regressions on the combined candidate before acceptance.",
+        "concrete_reproducer": {
+          "seed": 17,
+          "total_clients": 10,
+          "per_round": 2,
+          "ordered_pool": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10
+          ],
+          "committed_selections": [
+            [
+              9,
+              7
+            ],
+            [
+              5,
+              6
+            ]
+          ],
+          "expected_next": [
+            5,
+            3
+          ],
+          "uncorrected_next": [
+            9,
+            7
+          ],
+          "expected_following": [
+            9,
+            5
+          ]
+        }
+      }
+    }
+  },
+  "configuration_and_metadata": {
+    "existing_keys": "Keep the existing entrypoint, TOML path, [algorithm].type=\"fedavg\" as the underlying model-exchange algorithm, and alpha_coef precedence over feddyn_alpha with default .01. The dedicated Server is selected by feddyn.py, not by changing the global server registry. The shipped example remains SGD/lr .03/momentum 0/weight_decay 0.",
+    "new_keys": {
+      "algorithm.feddyn_weighting": "\"uniform\" (default) or \"sample\". Explicitly write uniform in the shipped TOML.",
+      "algorithm.feddyn_sample_counts": "Required only for sample mode: a list of length total_clients, index i-1 for client i, containing positive integers excluding bool. Full population counts must be available before the first dispatch. Reject the key in uniform mode to avoid an ignored configuration. No selected-only normalization.",
+      "trainer.gradient_accumulation_steps": "Example-local optional positive integer, default 1. Construct DefaultTrainingStepStrategy for 1 or the existing GradientAccumulationStepStrategy for a larger window. Do not assume the generic basic trainer automatically consumes the HuggingFace-style key.",
+      "adaptive_alpha_API": "Retain the Python argument name. FedDynLossStrategy defaults to false: explicit false means uniform; explicit true requires validated population/count metadata and computes alpha/q_i. Missing metadata is an error, never labels or a fabricated uniform fallback. FedDynLossStrategyFromConfig uses an omitted/None sentinel to resolve feddyn_weighting (uniform if absent); conflicting explicit bool choices raise. Preserve alpha_coef/feddyn_alpha precedence and document the corrected default."
+    },
+    "actual_available_metadata": "TrainingContext receives num_samples only after on_train_start, and its generic fallback can use len(trainset). Default client reports call sampler.num_samples and may fall back to whole trainset length. Neither supplies complete population counts; the MNIST trainset is shared backing data and is not a client partition. In immutable 62d, Dirichlet.num_samples can still redraw with partition_distribution. Accepted Phase2A commit 79da1f97d8a12fe97402750cc32c7b3e8f5cdf6e is now available as the realized-count dependency; root must integrate/verify it in the implementation candidate. Do not assume that accepted sampler behavior is already present in immutable 62d or weaken the existing realized-loader/count cross-checks.",
+    "count_binding": "Use an example-local data-loader wrapper to obtain the realized loader sampler cardinality once after loader creation and before optimization; keep drop_last=false so that it matches the local sample set. Require an authoritative finite positive integer count; compare the selected client against configured n_i in sample mode. Cross-check any declared sampler.num_samples without using a later redraw for normalization. Return this validated count in worker state and override the outgoing report count, bypassing generic whole-dataset fallbacks. Reject unknown-length/streaming/changing-cardinality samplers in this mode. For uniform mode, sample counts only identify a valid local dataset and metrics; never weight model averaging. Cache each accepted client count and reject a later cardinality change for the fixed-data contract.",
+    "compatibility": "The current fixed-size MNIST sampler yields 600 per client, so q_i=1; uniform and sample modes with all 600 are numerically identical. Do not construct a 1000-entry vector by summing labels or enumerating all datasets as a side effect. User-supplied unequal counts must describe actual realized client partitions, not batch sizes, epochs*count, unique class counts or global backing-dataset length.",
+    "validation": "Reject bool/non-real/NaN/+Inf/-Inf/negative alpha, nonfinite effective alpha, nonpositive/noninteger N or per_round, per_round>N, zero/nonintegral/bool/missing counts, overflowed sums, unknown weighting strings and conflicting flags before any state mutation. Positive finite alpha is required in the full example. Enforce supported optimizer and synchronous configuration rather than silently changing them.",
+    "available_sampler_dependency": {
+      "commit": "79da1f97d8a12fe97402750cc32c7b3e8f5cdf6e",
+      "status": "Root-accepted Phase2A component; available dependency, not part of the inspected immutable source claim.",
+      "acceptance_receipt": {
+        "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2a-acceptance.json",
+        "bytes": 2974,
+        "sha256": "21fc799903097a0424106e3792ddcdb71f6ae0c8b5f361a9276a89e6d8c973da"
+      },
+      "integration_requirement": "Retain the count_binding contract and verify the final merged sampler/loader/report agreement; no sampler edit is assigned to this revision."
+    }
+  },
+  "files": {
+    "implementation_owner": "Original C Sol author after fresh independent design review and root acceptance.",
+    "exact_owned_implementation": [
+      {
+        "path": "plato/trainers/strategies/algorithms/feddyn_strategy.py",
+        "change": "Correct objective/count-derived alpha; exact Q/history validation; dispatch-scoped staged local state and worker validation; remove canonical client-file authority; retain public class names and provide explicit migration errors."
+      },
+      {
+        "path": "examples/customized_client_training/feddyn/feddyn.py",
+        "change": "Instantiate the FedDyn example client and server, preserving the documented invocation."
+      },
+      {
+        "path": "examples/customized_client_training/feddyn/feddyn_trainer.py",
+        "change": "Bounded optimizer/data-loader validation, explicit accumulation strategy selection, transactional parent handoff wrapper and correct trainer docstring."
+      },
+      {
+        "path": "examples/customized_client_training/feddyn/feddyn_client.py",
+        "change": "New example-local training strategy and factory; install through the actual composable payload path, validate full downlink, fail closed on local training errors, return result metadata."
+      },
+      {
+        "path": "examples/customized_client_training/feddyn/feddyn_server.py",
+        "change": "New synchronous aggregation/history/dispatch/checkpoint subclass using existing hooks, including example-local start to apply validated pending CPU RNG state after inherited reseeding and before registration/selection; preserve fresh seeding and leave accepted B base.py unchanged."
+      },
+      {
+        "path": "examples/customized_client_training/feddyn/feddyn_MNIST_lenet5.toml",
+        "change": "Declare uniform weighting and explain positive alpha/SGD limitations; remove unverified Appendix C.2 comment."
+      }
+    ],
+    "new_tests": [
+      "tests/trainers/test_feddyn_strategy.py",
+      "tests/integration/test_feddyn_round_flow.py"
+    ],
+    "minimal_shared_handoffs": [
+      "tests/trainers/test_personalized_state_ownership.py: change only FedDyn training branches from implicit client-file restore to explicit server-owned round state; preserve equivalent or stronger same-client, client1->2->1 and real-spawn assertions. Retain actual accepted-B-writer/new-reader coverage for the explicit read-only legacy reader, including custom save_path/canonical precedence/client0 exclusion. Other family coverage remains unchanged.",
+      "tests/trainers/test_training_update_contract.py: replace the FedDyn label-zero fallback test with zero/all-label invariance and correct scalar expectations. Leave F08/F20 and other algorithms unchanged.",
+      "evidence/2026-refresh/phase2c-feddyn-disposition.json and phase2c-validation.json: original author/root updates statuses and superseded F23 assumptions after implementation/review, with exact commit/receipts.",
+      "docs/docs/examples/algorithms/5. Algorithms with Customized Client Training Loops.md: ROOT assigns only the FedDyn section to a fresh Astra writer after implementation; serialize with SCAFFOLD writer. No concurrent prose edit and no SCAFFOLD section change."
+    ],
+    "forbidden_incidental_changes": "No accepted B runtime files, general aggregation strategy, generic client protocol, Config/sampler implementation, optimizer registry, base serialization, shared trainer loop, FedProx, SCAFFOLD, AMP, lockfile or manifests need changing. If an actual missing hook prevents the local adapters, stop that implementation choice and give root the exact missing handoff for review instead of expanding scope."
+  },
+  "migration": {
+    "old_results": "The legacy double-shift/label-weighted/FedAvg-server trajectory was incorrect. Preserve evidence and old artifacts for historical reproduction; do not promise numerical compatibility with it. The corrected algorithm retains the FedDyn name because it repairs the advertised method; do not present a rename as remediation.",
+    "old_history_files": "Old feddyn_grad_<client>.pth files lack algorithm/version/global-history coherence. The corrected end-to-end example never auto-loads them. Preserve their bytes. Do not adopt client0 or infer a global history from a subset of old files. An explicit fresh run may use old model weights as a warm start, with all histories zero and a new run UUID; that is not continuation.",
+    "proven_legacy_spelling": "TRAINING-2C-02 independently executed the accepted-B writer at 00eeb9dcdd2b513e64db9408969356037e09bb8e: f\"{base_path}_feddyn_grad_{client_id}.pth\". The candidate omitted the underscore. Root has assigned that independent compatibility repair to the original author before this equation work. Do not erase the repair or repeat the incorrect handcrafted-reader test.",
+    "legacy_reader_contract": "Retain save_path and expose an explicit read_legacy_history(context) migration/inspection operation on FedDynUpdateStrategy. It returns a validated detached history without adopting it as live state or writing anything. Canonical <root>/feddyn_grad_ID.pth wins; if absent, read exactly <root>_feddyn_grad_ID.pth for nonzero same-client IDs. The unproven no-underscore spelling is not the accepted-B format; do not use fuzzy prefix search. Missing files are distinguishable from corrupt files; no corruption-to-zero fallback. Never read client0 for another ID. Preserve custom save_path and originals. Validate all old entries, and project only explicitly recognized frozen-parameter extras if necessary; do not broadly ignore unknown keys.",
+    "public_strategy_API": "Keep FedDynLossStrategy, FedDynLossStrategyFromConfig and FedDynUpdateStrategy exported. FedDynUpdateStrategy requires explicit validated round state for training; a plain generic ComposableTrainer lacking it fails with instructions to use the dedicated FedDyn example. save_path remains meaningful for explicit read-only legacy inspection; if supplied for new training, raise a migration error directing the caller to server checkpoint_path rather than silently ignoring it. Recognizing a legacy file is not authorization to continue the old numerical trajectory under new equations. This intentional training-state interface change must be reviewed and documented.",
+    "tests_and_inventory": "Update the old FedDyn training-file-persistence assertions explicitly under this decision. Replace automatic training adoption with no-file-mutation, server persistence and worker-failure isolation checks; preserve the exact old-writer/new-reader test through the explicit reader. Leave other F23 family migrations intact. Record that compatibility recovery was repaired before numerical migration, rather than labeling the old spelling defect waived."
+  },
+  "testacceptance": [
+    {
+      "id": "FD-A01",
+      "title": "Independent scalar loss oracle",
+      "setup": "Use float64 scalar w=x=2,h=0,alpha=.1,eta=.1, differentiable zero task loss. Compute the analytical gradient without importing the implementation and compare both the strategy and one SGD step.",
+      "expected": "regularizer gradient=0; local y=2.0; h_next=0. Candidate result 2.02 must fail. Also w=1,x=2,h=.5 gives gradient=-.05 and y=1.005. With same-client new x=w=3,h=.5: gradient=.05,y=2.995,h_next=.495. Alpha zero gives exactly the base task gradient locally, while the full example rejects alpha zero.",
+      "status": "REQUIRED_NOT_YET_IMPLEMENTED"
+    },
+    {
+      "id": "FD-A02",
+      "title": "Three-round partial-participation oracle",
+      "setup": "N=2, x0=2, h=[0,0], alpha=.1, eta=.1; F1=.5*w^2,F2=.5*(w-4)^2; two SGD steps per visit; S1={1},S2={2},S3={1}. Compare actual client train -> accepted worker state -> actual server._process_reports -> next downlink against the retained Fraction oracle at every boundary.",
+      "expected": "Uniform local endpoints [1.622,1.918163,1.6062289895], cloud models [1.433,1.9717445,1.47705273425], final h=[-.7435155105,.485163]. Inactive h2 stays zero in round1; h1 stays -.378 in round2. Never accept FedAvg local endpoints as cloud answers.",
+      "status": "REQUIRED_NOT_YET_IMPLEMENTED"
+    },
+    {
+      "id": "FD-A03",
+      "title": "Unequal counts and equal-count reduction",
+      "setup": "Repeat FD-A02 with counts [1,3], sample mode. Each local dataset repeats the same scalar loss, so only alpha weighting changes. Then sample counts [2,2] must reproduce uniform exactly; uniform counts [17,93] must leave the uniform sequence unchanged.",
+      "expected": "Sample alpha1=.2, alpha2=1/15. Local endpoints [1.624,1.9214506666666666,1.618792512]; cloud [1.436,1.976176,1.4948261013333333]; final h=[-.733383488,.48545066666666664]. Exact rational values are in oracle-results.json. Uniform vs sample quadratic objective optima are 2 vs 3, respectively; do not infer weighting from a selected-only denominator.",
+      "status": "REQUIRED_NOT_YET_IMPLEMENTED"
+    },
+    {
+      "id": "FD-A04",
+      "title": "Multiple participants, inactive history and population denominator",
+      "setup": "Aggregation-only independent algebra test: N=3, x=2, h=[.4,-.2,.6], S={1,3}, valid y1=1,y3=4, actual counts [1,3,2]. Run both modes. Also exercise a real two-client full-participation first round using FD-A02 losses.",
+      "expected": "Staged h=[-.6,-.2,2.6], H=.6, selected mean=2.5, cloud=3.1 in both modes. Assert inactive -.2 preserved. From x2 with h0 and both real clients: uniform cloud=2; sample counts[1,3] cloud=2.0026666666666667. Model averaging never uses counts.",
+      "status": "REQUIRED_NOT_YET_IMPLEMENTED"
+    },
+    {
+      "id": "FD-A05",
+      "title": "Label permutation and count provenance",
+      "setup": "Hold logits/task gradients/partition cardinalities fixed; compare labels all-zero, [0,1], [1,1], and permuted arbitrary class IDs for regularizer-only gradient. For a classification-loss test permute output columns with labels so the task objective is unchanged. Exercise actual loader sampler cardinality, report count and supplied full count vector.",
+      "expected": "Identical alpha and regularizer gradients under every relabeling and label batch composition; finite all-zero result. Complete objective gradients agree after the matching class permutation. Wrong/missing count metadata, counts taken from global trainset or changed partitions fail before a step/commit. Equal-cardinality class imbalance never changes alpha.",
+      "status": "REQUIRED_NOT_YET_IMPLEMENTED"
+    },
+    {
+      "id": "FD-A06",
+      "title": "Finite inputs and supported configuration",
+      "setup": "Parameterize alpha=-1,NaN,+Inf,-Inf,bool,string and valid 0,.1; N/per_round invalid types/ranges; missing/zero/negative/nonintegral/bool sample counts, wrong vector length, overflow/nonfinite effective alpha, bad mode/conflict. Exercise optimizer momentum/weight_decay/nonSGD/clipping/AMP and async configuration.",
+      "expected": "Invalid settings raise useful errors without modifying model/history/files or creating an outbound success. Local alpha0 equals task-only; example alpha0 rejected. Valid uniform/sample and all-equal vector pass. Unsupported optimizer choices fail explicitly and no alpha decay is injected into SGD.",
+      "status": "REQUIRED_NOT_YET_IMPLEMENTED"
+    },
+    {
+      "id": "FD-A07",
+      "title": "Parameter identity and full-state scope",
+      "setup": "Toy model with two same-shaped trainables, frozen float parameter, static floating buffer, integer buffer and bool buffer. Reverse optimizer group order, omit one trainable, duplicate a param, add a foreign param, change flags/shape mid-run, inject buffer mutation.",
+      "expected": "Loss and h use exactly Q matched by names and actual optimizer identity. Reversed group order gives identical output. Frozen/static buffers are byte-identical across correct aggregation/checkpoint and absent from history. Invalid ownership/schema or changed nontrainables reject before any commit; no shape-based pairing or integer history arithmetic.",
+      "status": "REQUIRED_NOT_YET_IMPLEMENTED"
+    },
+    {
+      "id": "FD-A08",
+      "title": "Accumulation, empty and skipped updates",
+      "setup": "At w=x=2,h=.5,alpha=.1, zero task gradient, eta=.1, train three equal mean-loss microbatches with accumulation_steps=2. Repeat divisible/tail/short windows and one explicitly skipped step. Exercise empty loader, zero epochs and all skipped updates.",
+      "expected": "Three microbatches cause two real SGD updates: y=1.99005, h_next=.49005. There are exactly two calls each to optimizer_strategy.on_optimizer_step, model_update_strategy.after_step, and callback on_train_step_end, and one history staging. No scheduler object is created or actually stepped in the supported no-scheduler mode; a strategy create_scheduler call returning None and a no-op lr_scheduler_strategy.step(None, context) epoch callback are distinct from optimizer-update notifications and must not be asserted to occur twice. A single successful step after a skipped one yields y=1.995,h_next=.495. All-empty/all-skipped attempts fail with no canonical state change and no accepted result; rerun starts without leaked gradients.",
+      "status": "REQUIRED_NOT_YET_IMPLEMENTED"
+    },
+    {
+      "id": "FD-A09",
+      "title": "Logical identity and real spawn persistence",
+      "setup": "Run FD-A02 through one reused physical client 1->2->1; compare a dedicated-client run and fresh process per visit. Repeat actual max_concurrency spawn, including changed global baseline for consecutive same-client dispatches. Parent state must reflect each successful child before packaging its report.",
+      "expected": "All intermediate model/h/count/step values match the oracle. No client0 or per-client disk history is adopted; forged old files remain byte-identical. Every history comes from the corresponding current server dispatch; changing physical worker has no numerical effect.",
+      "status": "REQUIRED_NOT_YET_IMPLEMENTED"
+    },
+    {
+      "id": "FD-A10",
+      "title": "Worker rejection transaction",
+      "setup": "Let a real spawned child finish/save its candidate result, then inject failure before parent acceptance: nonzero exit after save, missing/corrupt state file, token/client/round mismatch, missing key/shape mismatch/NaN history, inconsistent h_next, corrupt model, or a parent handoff exception. Test each then retry client1, reuse as client2, and return to client1.",
+      "expected": "The failed attempt sends no update; parent model/strategy/history/dispatch state roll back; server state and canonical checkpoint bytes do not advance. A valid retry reproduces the pre-failure oracle exactly. No child-written history artifact can contaminate reuse. This must reproduce the F27-R02 failure pattern as a FedDyn regression, not merely compare successful child states.",
+      "status": "REQUIRED_NOT_YET_IMPLEMENTED"
+    },
+    {
+      "id": "FD-A11",
+      "title": "Whole-batch malformed payload rejection",
+      "setup": "Run actual example client inbound path and server._process_reports. First participant valid; later one has missing/extra model key, scalar-for-[1] broadcastable shape, wrong dtype, NaN/Inf, non-tensor, changed buffer or invalid metadata. Also malformed downlink history/model and corrupt worker history; duplicate/stale/unknown IDs, token mismatch, count mismatch, missing selected member, empty batch; inject mutation in on_weights_received callback. Test a valid payload immediately after every failure.",
+      "expected": "The ENTIRE batch validates before model/history arithmetic or live load. No model key, any h_i, observed count, checkpoint bytes or accepted-token state changes on rejection; pending fields clear. Check each original model, not just final aggregate shape. Valid follow-up consumes each dispatch exactly once and matches oracle. Also inject load/aggregation failure after staging and require precommit rollback. This is the explicit F27-R01 analogue.",
+      "status": "REQUIRED_NOT_YET_IMPLEMENTED"
+    },
+    {
+      "id": "FD-A12",
+      "title": "Round-boundary checkpoint continuation and atomic rejection",
+      "setup": "Commit FD-A02 round2, save, destroy server and all clients, restore into fresh objects and run round3 with a new physical client. Repeat sample mode. Include deterministic selection-RNG continuation, slash model name, static buffers/frozen parameters. Corrupt/mismatch model or h/schema/count/alpha/round/version; inject serialization failure before replace. Additionally run a focused actual Server.run/--resume continuation fixture through the example start override and inherited startup, with server.random_seed=17, N=10, per_round=2 and ordered pool 1..10. Let F_i(w)=.5*(w-i)^2, x0=2, all h_i=0, alpha=.1, eta=.1 and two local SGD updates per selected client; use fixed positive realized counts (e.g. n_i=i, repeated identical local loss, batch_size=10, epochs=2), in both uniform and sample modes. Commit rounds selecting [9,7] then [5,6], save the real bundle, destroy/recreate server and clients, and resume via the real run entrypoint for at least rounds 3 and 4. Derive model and every client history expectation independently with the existing equations, compare uninterrupted/resumed runs, and observe all promised live/context RNG states at entry to inherited start before registration. Retain a separate fresh-run seed check and malformed RNG/model/bundle cases that assert prior pending state is unchanged. Calling _resume_from_checkpoint followed directly by selection is insufficient.",
+      "expected": "Resumed round3 equals uninterrupted float64 oracle to atol=1e-12,rtol=0; float32 integration uses atol=1e-6,rtol=1e-6. Missing legacy history bundle yields a migration error, not zeros. Rejected load leaves all live state and RNG unchanged. Failed write leaves the previous canonical bundle byte-identical. Full model export alone cannot resume FedDyn. In the actual run/--resume fixture, the next selections are [5,3] then [9,5], never a restart at [9,7]. Later-round cloud models, every selected/inactive history, committed round, and subsequent RNG progression equal uninterrupted training in each weighting mode at the stated tolerances. Verify saved Python global, NumPy global and Torch default CPU RNGs as well as server.prng_state and context.state[\"prng_state\"] before inherited start; use distinct saved Python-global/selection states so restoring only one cannot pass. A fresh run still selects [9,7] then [5,6] under seed17 and the hook does not otherwise alter fresh RNG state. Rejected whole-bundle/RNG validation preserves all live RNGs, both selection fields, model/history and prior pending snapshot. Successful handoff consumes pending state exactly once; a rejected handoff never starts registration/selection. These production continuation assertions remain required beyond the retained scratch probes.",
+      "status": "REQUIRED_NOT_YET_IMPLEMENTED"
+    },
+    {
+      "id": "FD-A13",
+      "title": "Shipped entrypoint and transport integration",
+      "setup": "Load the actual shipped TOML and invoke its main wiring with bounded synthetic MNIST-shaped data/LeNet and explicit overrides N=2, per_round=1, epochs=1, three rounds, --cpu; no download. Exercise the actual default client payload strategy, full example server flow and real spawn. Add a deadline-bounded comm_simulation=false local socket smoke with isolated ports/runtime directories on the accepted integration harness. Include or share FD-A12's seed17 actual Server.run/--resume continuation case through the shipped example wiring: exercise the restore -> inherited reseed -> local start handoff -> registration/selection ordering and later-round model/history equivalence. Do not substitute direct resume-method/selection calls or the scratch-only intercepted-start probe for this entrypoint acceptance.",
+      "expected": "Finite parameter-changing local training, corrected cloud model verified from captured successful endpoints and independently maintained h table, intended custom server/client instantiated, state serialization round-trip works, no failed reports sent, normal bounded shutdown with no surviving task children. Record exact overrides: a synthetic smoke is not MNIST benchmark accuracy. Run CPU 3.13 and 3.14; existing F20 and B lifecycle regressions remain green. The shared actual-entrypoint resume case must preserve saved live/context CPU RNG state before registration, select the later rounds expected by FD-A12, and produce the same cloud model and all-client histories as its uninterrupted control. Record the shared test identity/log once rather than claiming two separate executions. Retain the required local-socket and spawn smoke coverage. After any later accepted B/F28 supplement is integrated, rerun this checkpoint/start handshake plus fresh-run behavior and the accepted B startup/resume regressions on the combined candidate; no result from immutable 62d alone establishes that integration.",
+      "status": "REQUIRED_NOT_YET_IMPLEMENTED"
+    },
+    {
+      "id": "FD-A14",
+      "title": "Source, migration and documentation gate",
+      "setup": "Fresh reviewer checks primary bytes/hash, equations against independent scalar/rational oracle, corrected public prose against final implementation, and diff ownership. Run scoped Ruff import checks and appropriate type checks plus focused and integration regression suite on Python 3.13/3.14.",
+      "expected": "No accepted B runtime modification; no changes to F20 unsquared equation or SCAFFOLD section; explicit documented API/state migration and retained old artifacts. No tests weakened to preserve incorrect scalar/label behavior. Evidence records commands/interpreter/lock/source hashes, results, skips and limits; 2C-11 closes only after fresh independent review and root acceptance.",
+      "status": "REQUIRED_NOT_YET_IMPLEMENTED"
+    },
+    {
+      "id": "FD-A15",
+      "title": "Actual legacy writer and explicit numerical migration",
+      "setup": "Use accepted-B writer bytes at commit 00eeb9dcdd2b513e64db9408969356037e09bb8e to produce client1 history at root+\"_feddyn_grad_1.pth\". Invoke the new explicit read-only legacy reader with default and custom save_path. Add canonical and client0 decoys, malformed legacy state, and then attempt corrected training/resume without a versioned round state.",
+      "expected": "Read the exact same-client vector (review fixture weight=7,bias=8), canonical wins when present, client0 never adopted, originals unchanged. Corruption is a visible error. Training/resume refuses to turn an unversioned vector into a coherent FedDyn continuation; explicit fresh model-only warm start has h_i=0 and a new run UUID. This preserves the independently repaired filename contract while documenting the numerical migration.",
+      "status": "REQUIRED_NOT_YET_IMPLEMENTED"
+    }
+  ],
+  "docs_requirements": {
+    "writer": "Fresh Astra writer after original C implementation; fresh independent prose/source reconciliation before closure.",
+    "must_cover": [
+      "State the corrected local equation, displacement-history sign, and full server correction, with defined x/y/h/N/S and trainable scope.",
+      "State uniform default, sample-count vector requirement, alpha_i=alpha*sum(n)/(N*n_i), and unweighted selected model averaging in both modes. Labels never determine weights.",
+      "Describe dedicated example server/client wiring; composing a loss with plain FedAvg is not a complete FedDyn implementation.",
+      "Explain server-owned history transmission and coherent round-boundary restart, old-checkpoint incompatibility, positive-alpha restriction, and preserved historical artifacts.",
+      "Describe plain SGD/zero decay/no clipping qualified contract, mean-microbatch accumulation, empty/failure rejection, static buffers/frozen parameters and unsupported modes. Do not claim optimizer/AMP/GPU/convergence coverage beyond executed evidence.",
+      "Distinguish evaluated cloud model from the authors selected/all-model metrics and disclose extra downlink/history storage cost.",
+      "Replace exact-reference, step-for-step and label-weighted bookkeeping claims; cite pinned author function links and primary paper Algorithm 1. Avoid stale line-number prose and the false Appendix C.2 learning-rate attribution.",
+      "Give a working existing example command with --cpu and the new explicit config keys. Retain attribution. Change only FedDyn prose; SCAFFOLD remains under its separate owner."
+    ],
+    "not_written_now": "This JSON is a design artifact, not the required standalone public prose. The candidate documentation remains knowingly incorrect until the writer implements the reviewed replacement."
+  },
+  "limits": [
+    "Design and independent arithmetic are complete; production implementation, green acceptance tests and independent approval remain pending.",
+    "No paper-scale accuracy or convergence experiment is required or claimed for this bounded repair. Finite local SGD is an inexact solver.",
+    "Qualification is CPU float32/float64 on Python 3.13 and 3.14. GPU/AMP/DP, asynchronous/partial-failure rounds, dynamic populations/counts/trainability and mutable-buffer training are outside the supported example; reject incompatible requested modes.",
+    "Central state changes communication/storage placement while preserving the defined update equations. It cannot be marketed as the paper communication budget.",
+    "Full mid-round or arbitrary datasource/accelerator RNG recovery is out of scope. Only coherent round-boundary continuation with the declared fixed dataset/sampler contract is promised.",
+    "No source, tests, candidate docs or other evidence edited by this author; no nested agents, commits, pushes or cleanup of others artifacts."
+  ],
+  "workflow": {
+    "authorized_writes": [
+      "/Users/bli/Playground/plato/evidence/2026-refresh/phase2c-feddyn-design.json",
+      "/tmp/plato-phase2c-feddyn-design"
+    ],
+    "shell": "All shell invocations use zsh -lc.",
+    "next": "Root sends the exact output hash to a fresh Sol design reviewer, resolves findings, then assigns original C implementation. Do not present this independently authored plan as independently reviewed.",
+    "immutable_worktree_handoff": "Initial source inspection used the original training worktree while it was pinned and clean. On root steering, switched all further source reads and replay to the new detached /tmp/plato-refresh-worktrees/feddyn-design worktree; verified HEAD=62d7b7d8ef75be779149a96f567779c86699edb4 and clean status. All final source receipts below are from that immutable worktree. No claim is made about the evolving original C worktree."
+  },
+  "testacceptance_execution_policy": {
+    "independence": "The acceptance oracle imports no Plato helper and uses Fraction arithmetic. Implementation tests must derive expectations from the retained equations/constants, not call the new aggregation/history helper to calculate expected output. Compare per-round intermediate state as well as final model.",
+    "existing_red_evidence": "Author scalar probe replayed against the exact candidate, with PYTHONDONTWRITEBYTECODE=1 and TMPDIR restricted to owned scratch. Replaying an author probe confirms reproducibility but is not an independently authored production test. The retained Fraction oracle is independently authored.",
+    "numeric_tolerances": "Pure loss/local/server float64 checks atol=1e-12,rtol=0 when inputs are representable within that precision; use rational expected values converted once. Real float32 LeNet flow atol=1e-6,rtol=1e-6 for oracle arithmetic from received endpoints, with justified scaling if multi-tensor accumulation requires it. NaNs never pass equal_nan.",
+    "suggested_commands_after_implementation": [
+      "zsh -lc \"uv run pytest tests/trainers/test_feddyn_strategy.py tests/integration/test_feddyn_round_flow.py tests/trainers/test_personalized_state_ownership.py tests/trainers/test_training_update_contract.py\"",
+      "Run the same selected suite with the root-qualified Python 3.13 and 3.14 locked environments; retain real spawn and local-socket test logs, bounded deadlines and cleanup evidence.",
+      "zsh -lc \"uv run ruff check <owned changed Python paths> --select I\"; appropriate owned-source type check; then root runs integrated B/C regression profile."
+    ],
+    "not_claimed": "No proposed green production tests or independent design review have run yet."
+  },
+  "oracle": {
+    "script": {
+      "path": "/tmp/plato-phase2c-feddyn-design/oracle.py",
+      "bytes": 1826,
+      "sha256": "e17ff0503dd29dc1f637146b0d9adb3ca4d36882e42c99f16b19770588523e84"
+    },
+    "results": {
+      "path": "/tmp/plato-phase2c-feddyn-design/oracle-results.json",
+      "bytes": 5049,
+      "sha256": "bb44e4f4fa75f58dd3fb2e97af5811ca1cdb939ac8ebd280ff3b2abc8d599f0c"
+    },
+    "trajectory": {
+      "uniform": [
+        {
+          "round": 1,
+          "client": 1,
+          "baseline": {
+            "exact": "2",
+            "decimal": 2.0
+          },
+          "alpha": {
+            "exact": "1/10",
+            "decimal": 0.1
+          },
+          "history_before": {
+            "exact": "0",
+            "decimal": 0.0
+          },
+          "local": {
+            "exact": "811/500",
+            "decimal": 1.622
+          },
+          "delta": {
+            "exact": "-189/500",
+            "decimal": -0.378
+          },
+          "h1": {
+            "exact": "-189/500",
+            "decimal": -0.378
+          },
+          "h2": {
+            "exact": "0",
+            "decimal": 0.0
+          },
+          "history_mean": {
+            "exact": "-189/1000",
+            "decimal": -0.189
+          },
+          "global_next": {
+            "exact": "1433/1000",
+            "decimal": 1.433
+          }
+        },
+        {
+          "round": 2,
+          "client": 2,
+          "baseline": {
+            "exact": "1433/1000",
+            "decimal": 1.433
+          },
+          "alpha": {
+            "exact": "1/10",
+            "decimal": 0.1
+          },
+          "history_before": {
+            "exact": "0",
+            "decimal": 0.0
+          },
+          "local": {
+            "exact": "1918163/1000000",
+            "decimal": 1.918163
+          },
+          "delta": {
+            "exact": "485163/1000000",
+            "decimal": 0.485163
+          },
+          "h1": {
+            "exact": "-189/500",
+            "decimal": -0.378
+          },
+          "h2": {
+            "exact": "485163/1000000",
+            "decimal": 0.485163
+          },
+          "history_mean": {
+            "exact": "107163/2000000",
+            "decimal": 0.0535815
+          },
+          "global_next": {
+            "exact": "3943489/2000000",
+            "decimal": 1.9717445
+          }
+        },
+        {
+          "round": 3,
+          "client": 1,
+          "baseline": {
+            "exact": "3943489/2000000",
+            "decimal": 1.9717445
+          },
+          "alpha": {
+            "exact": "1/10",
+            "decimal": 0.1
+          },
+          "history_before": {
+            "exact": "-189/500",
+            "decimal": -0.378
+          },
+          "local": {
+            "exact": "3212457979/2000000000",
+            "decimal": 1.6062289895
+          },
+          "delta": {
+            "exact": "-731031021/2000000000",
+            "decimal": -0.3655155105
+          },
+          "h1": {
+            "exact": "-1487031021/2000000000",
+            "decimal": -0.7435155105
+          },
+          "h2": {
+            "exact": "485163/1000000",
+            "decimal": 0.485163
+          },
+          "history_mean": {
+            "exact": "-516705021/4000000000",
+            "decimal": -0.12917625525
+          },
+          "global_next": {
+            "exact": "5908210937/4000000000",
+            "decimal": 1.47705273425
+          }
+        }
+      ],
+      "sample": [
+        {
+          "round": 1,
+          "client": 1,
+          "baseline": {
+            "exact": "2",
+            "decimal": 2.0
+          },
+          "alpha": {
+            "exact": "1/5",
+            "decimal": 0.2
+          },
+          "history_before": {
+            "exact": "0",
+            "decimal": 0.0
+          },
+          "local": {
+            "exact": "203/125",
+            "decimal": 1.624
+          },
+          "delta": {
+            "exact": "-47/125",
+            "decimal": -0.376
+          },
+          "h1": {
+            "exact": "-47/125",
+            "decimal": -0.376
+          },
+          "h2": {
+            "exact": "0",
+            "decimal": 0.0
+          },
+          "history_mean": {
+            "exact": "-47/250",
+            "decimal": -0.188
+          },
+          "global_next": {
+            "exact": "359/250",
+            "decimal": 1.436
+          }
+        },
+        {
+          "round": 2,
+          "client": 2,
+          "baseline": {
+            "exact": "359/250",
+            "decimal": 1.436
+          },
+          "alpha": {
+            "exact": "1/15",
+            "decimal": 0.06666666666666667
+          },
+          "history_before": {
+            "exact": "0",
+            "decimal": 0.0
+          },
+          "local": {
+            "exact": "90068/46875",
+            "decimal": 1.9214506666666666
+          },
+          "delta": {
+            "exact": "45511/93750",
+            "decimal": 0.48545066666666664
+          },
+          "h1": {
+            "exact": "-47/125",
+            "decimal": -0.376
+          },
+          "h2": {
+            "exact": "45511/93750",
+            "decimal": 0.48545066666666664
+          },
+          "history_mean": {
+            "exact": "10261/187500",
+            "decimal": 0.054725333333333334
+          },
+          "global_next": {
+            "exact": "123511/62500",
+            "decimal": 1.976176
+          }
+        },
+        {
+          "round": 3,
+          "client": 1,
+          "baseline": {
+            "exact": "123511/62500",
+            "decimal": 1.976176
+          },
+          "alpha": {
+            "exact": "1/5",
+            "decimal": 0.2
+          },
+          "history_before": {
+            "exact": "-47/125",
+            "decimal": -0.376
+          },
+          "local": {
+            "exact": "25293633/15625000",
+            "decimal": 1.618792512
+          },
+          "delta": {
+            "exact": "-5584117/15625000",
+            "decimal": -0.357383488
+          },
+          "h1": {
+            "exact": "-11459117/15625000",
+            "decimal": -0.733383488
+          },
+          "h2": {
+            "exact": "45511/93750",
+            "decimal": 0.48545066666666664
+          },
+          "history_mean": {
+            "exact": "-11621851/93750000",
+            "decimal": -0.12396641066666667
+          },
+          "global_next": {
+            "exact": "140139947/93750000",
+            "decimal": 1.4948261013333333
+          }
+        }
+      ]
+    },
+    "command": "zsh -lc 'PYTHONDONTWRITEBYTECODE=1 python3 /tmp/plato-phase2c-feddyn-design/oracle.py'",
+    "result": "PASSED independent exact Fraction assertions for both modes and equal-count/uniform invariance."
+  },
+  "candidate_scalar_replay": {
+    "result": "REPRODUCED known red scalar; not a new independent probe implementation.",
+    "script": {
+      "path": "/tmp/plato-phase2c-scratch/feddyn_disposition_probe.py",
+      "bytes": 3445,
+      "sha256": "bdc41326d83e94521018a7a45fb0b062423fcec7d29981e4158913947d646a13"
+    },
+    "output": {
+      "path": "/tmp/plato-phase2c-feddyn-design/candidate-scalar-replay.json",
+      "bytes": 2464,
+      "sha256": "29372845a0778d978d035a339acc9fee33178df8834be88d6a837d98a187d644"
+    },
+    "stderr": {
+      "path": "/tmp/plato-phase2c-feddyn-design/candidate-scalar-replay.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "command": "zsh -lc 'PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=/private/tmp/plato-refresh-worktrees/feddyn-design TMPDIR=/tmp/plato-phase2c-feddyn-design OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 /tmp/plato-phase2c-313/bin/python /tmp/plato-phase2c-scratch/feddyn_disposition_probe.py'",
+    "cwd": "/private/tmp/plato-refresh-worktrees/feddyn-design",
+    "records": [
+      {
+        "adaptive_alpha": false,
+        "labels": [
+          0,
+          0
+        ],
+        "samples": 2,
+        "actual_alpha": 0.10000000149011612,
+        "actual_regularizer_gradient": -0.20000000298023224,
+        "actual_next_weight": 2.0200000002980234,
+        "author_next_weight": 2.0,
+        "author_effective_regularizer_gradient": 0.0
+      },
+      {
+        "adaptive_alpha": true,
+        "labels": [
+          0,
+          0
+        ],
+        "samples": 2,
+        "actual_alpha": 0.10000000149011612,
+        "actual_regularizer_gradient": -0.20000000298023224,
+        "actual_next_weight": 2.0200000002980234,
+        "author_next_weight": 2.0,
+        "author_effective_regularizer_gradient": 0.0
+      },
+      {
+        "adaptive_alpha": true,
+        "labels": [
+          0,
+          1
+        ],
+        "samples": 2,
+        "actual_alpha": 0.07500000298023224,
+        "actual_regularizer_gradient": -0.15000000596046448,
+        "actual_next_weight": 2.0150000005960464,
+        "author_next_weight": 2.0,
+        "author_effective_regularizer_gradient": 0.0
+      },
+      {
+        "adaptive_alpha": true,
+        "labels": [
+          1,
+          1
+        ],
+        "samples": 2,
+        "actual_alpha": 0.10000000149011612,
+        "actual_regularizer_gradient": -0.20000000298023224,
+        "actual_next_weight": 2.0200000002980234,
+        "author_next_weight": 2.0,
+        "author_effective_regularizer_gradient": 0.0
+      }
+    ]
+  },
+  "revision": {
+    "number": 2,
+    "authorization": "Root accepted FD-D-R01 and FD-D-L01 for this bounded author revision; root will obtain another fresh review before implementation.",
+    "previous_design": {
+      "path": "/tmp/plato-phase2c-feddyn-design/phase2c-feddyn-design.original-455d1447.json",
+      "bytes": 65749,
+      "sha256": "455d144736f6318246c834d679e2ca8d371160dd654bfea6bab96b7abc9c4d60"
+    },
+    "review_receipt": {
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2c-feddyn-design-review.json",
+      "bytes": 69176,
+      "sha256": "e2b46a83c1a098e4b9d19e123b4c8c92fb1298f0a41515c4663e523aaae3522a"
+    },
+    "review_verdict_preserved": "REQUEST_CHANGES; immutable review was read, not edited or reinterpreted as acceptance.",
+    "dispositions": [
+      {
+        "id": "FD-D-R01",
+        "disposition": "ADDRESSED_IN_REVISED_DESIGN_PENDING_FRESH_REVIEW",
+        "change": "Specified the example-local deferred RNG handoff at start after inherited reseeding, all promised live/context CPU RNG fields, preserved fresh seed behavior and transactional rejection; strengthened FD-A12/13 with real run/--resume later-round selection/model/history continuation."
+      },
+      {
+        "id": "FD-D-L01",
+        "disposition": "ADDRESSED_IN_REVISED_DESIGN_PENDING_FRESH_REVIEW",
+        "change": "FD-A08 names two optimizer_strategy.on_optimizer_step, model_update_strategy.after_step and on_train_step_end notifications; no real scheduler creation/steps, separate no-op epoch callback; unchanged scalar and zero-completed expectations."
+      }
+    ],
+    "bounded_changed_fields": [
+      "/configuration_and_metadata/actual_available_metadata",
+      "/configuration_and_metadata/available_sampler_dependency",
+      "/files/exact_owned_implementation/4/change",
+      "/stateflow/checkpoint/owner",
+      "/stateflow/checkpoint/read",
+      "/stateflow/checkpoint/scope",
+      "/stateflow/checkpoint/startup_handoff",
+      "/testacceptance/7/expected",
+      "/testacceptance/11/expected",
+      "/testacceptance/11/setup",
+      "/testacceptance/12/expected",
+      "/testacceptance/12/setup",
+      "/verdict",
+      "/revision"
+    ],
+    "preserved": "All algebra, original exact oracle/numerical records, parameter/weighting/state ownership contracts, API/history migration, 15 criterion IDs, existing tolerance/negative-path/socket/spawn requirements and all other fields compare unchanged except the enumerated bounded paths.",
+    "review_probe_inputs": [
+      {
+        "path": "/tmp/plato-phase2c-feddyn-design-review/review_probes.py",
+        "bytes": 15180,
+        "sha256": "6449b65e351814bbb450e196acfe36c9f3e7708dc151e7d418a928e4e3ee0725"
+      },
+      {
+        "path": "/tmp/plato-phase2c-feddyn-design-review/probes-313.json",
+        "bytes": 11849,
+        "sha256": "03f92d49b234cdc9fcf899d4d123316631547cd8a2d3a55385a4366db0de8db0"
+      },
+      {
+        "path": "/tmp/plato-phase2c-feddyn-design-review/probes-314.json",
+        "bytes": 11867,
+        "sha256": "07e41baae6ad83ef25eced1684ec0f3a6f527736836075954032143ef6f32c39"
+      },
+      {
+        "path": "/tmp/plato-phase2c-feddyn-design-review/command-records.json",
+        "bytes": 1835,
+        "sha256": "02d88067010a0f3dc48f81921904e2d552409ba7e8cb3ee203f46e1236548cc6"
+      }
+    ],
+    "related_F28_handoff": {
+      "root_probe": {
+        "path": "/Users/bli/Playground/plato/evidence/2026-refresh/server-resume-rng-probe.json",
+        "bytes": 4602,
+        "sha256": "40f09d88509f1ebb21c6d05cde97b60ca3322e6a420ad0d71d6bc9a6a45b1c5c"
+      },
+      "status_at_revision": "OPEN_CONFIRMED generic defect; original B author owns a separate proposed narrow startup fix, still requiring fresh review. No unaccepted B code was inspected or used.",
+      "disposition": "Retain local pending-RNG/start contract on immutable62d; later accepted B integration must preserve that handshake and fresh-run behavior and pass combined regressions."
+    },
+    "own_probe": {
+      "path": "/tmp/plato-phase2c-feddyn-design/revision_startup_probe.py",
+      "bytes": 6526,
+      "sha256": "038d8b473c84b6bc1a0ede2600d3cb0ea25d3ed03510a3e898703fb23347fcf3"
+    },
+    "own_verification": [
+      {
+        "command": "zsh -lc 'PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=/private/tmp/plato-refresh-worktrees/feddyn-design TMPDIR=/tmp/plato-phase2c-feddyn-design OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 MPLCONFIGDIR=/tmp/plato-phase2c-feddyn-design/revision-matplotlib /tmp/plato-phase2c-313/bin/python /tmp/plato-phase2c-feddyn-design/revision_startup_probe.py > /tmp/plato-phase2c-feddyn-design/revision-startup-313.json 2> /tmp/plato-phase2c-feddyn-design/revision-startup-313.stderr.log'",
+        "cwd": "/private/tmp/plato-refresh-worktrees/feddyn-design",
+        "exit_code": 0,
+        "stdout": {
+          "path": "/tmp/plato-phase2c-feddyn-design/revision-startup-313.json",
+          "bytes": 1042,
+          "sha256": "8870252c503a4170faf129d99268504ab5e997396ac1ec99e5b2c86470ac4b65"
+        },
+        "stderr": {
+          "path": "/tmp/plato-phase2c-feddyn-design/revision-startup-313.stderr.log",
+          "bytes": 738,
+          "sha256": "a758dd3a0172763043c2b51742eca1f88c2fb8894c420882d672d34df061bda8"
+        },
+        "result": {
+          "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+          "torch": "2.14.1",
+          "seed": 17,
+          "committed_selections": [
+            [
+              9,
+              7
+            ],
+            [
+              5,
+              6
+            ]
+          ],
+          "expected_later_selections": [
+            [
+              5,
+              3
+            ],
+            [
+              9,
+              5
+            ]
+          ],
+          "uncorrected_first": [
+            9,
+            7
+          ],
+          "corrected_later": [
+            [
+              5,
+              3
+            ],
+            [
+              9,
+              5
+            ]
+          ],
+          "live_python_numpy_torch_cpu_restored_before_base_start": true,
+          "server_and_context_selection_state_restored": true,
+          "pending_consumed_before_base_start": true,
+          "fresh_seed_behavior_preserved": true,
+          "rejection_unchanged_rng_and_pending": [
+            "selection",
+            "python",
+            "numpy",
+            "torch"
+          ],
+          "limitation": "Actual inherited Server.run and selection strategy; base start intercepted before socket creation. In-memory RNG-only bundle and scratch subclass, no production FedDyn implementation, model/history training, checkpoint serialization or network. These remain required acceptance tests."
+        }
+      },
+      {
+        "command": "zsh -lc 'PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=/private/tmp/plato-refresh-worktrees/feddyn-design TMPDIR=/tmp/plato-phase2c-feddyn-design OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 MPLCONFIGDIR=/tmp/plato-phase2c-feddyn-design/revision-matplotlib /tmp/plato-phase2c-314/bin/python /tmp/plato-phase2c-feddyn-design/revision_startup_probe.py > /tmp/plato-phase2c-feddyn-design/revision-startup-314.json 2> /tmp/plato-phase2c-feddyn-design/revision-startup-314.stderr.log'",
+        "cwd": "/private/tmp/plato-refresh-worktrees/feddyn-design",
+        "exit_code": 0,
+        "stdout": {
+          "path": "/tmp/plato-phase2c-feddyn-design/revision-startup-314.json",
+          "bytes": 1060,
+          "sha256": "740f7d61c6414d7033f25e86a2e0824f91467677e3794e7d5bf58bffc871e0d4"
+        },
+        "stderr": {
+          "path": "/tmp/plato-phase2c-feddyn-design/revision-startup-314.stderr.log",
+          "bytes": 738,
+          "sha256": "46bf87119110c092c0a0992de1b89e10ad2c43f4fc4c07f0fd3058d0a22ad89f"
+        },
+        "result": {
+          "python": "3.14.8 (main, Sep 30 2026, 17:55:09) [Clang 21.0.0 (clang-2100.3.34.2)]",
+          "torch": "2.14.1",
+          "seed": 17,
+          "committed_selections": [
+            [
+              9,
+              7
+            ],
+            [
+              5,
+              6
+            ]
+          ],
+          "expected_later_selections": [
+            [
+              5,
+              3
+            ],
+            [
+              9,
+              5
+            ]
+          ],
+          "uncorrected_first": [
+            9,
+            7
+          ],
+          "corrected_later": [
+            [
+              5,
+              3
+            ],
+            [
+              9,
+              5
+            ]
+          ],
+          "live_python_numpy_torch_cpu_restored_before_base_start": true,
+          "server_and_context_selection_state_restored": true,
+          "pending_consumed_before_base_start": true,
+          "fresh_seed_behavior_preserved": true,
+          "rejection_unchanged_rng_and_pending": [
+            "selection",
+            "python",
+            "numpy",
+            "torch"
+          ],
+          "limitation": "Actual inherited Server.run and selection strategy; base start intercepted before socket creation. In-memory RNG-only bundle and scratch subclass, no production FedDyn implementation, model/history training, checkpoint serialization or network. These remain required acceptance tests."
+        }
+      }
+    ],
+    "additional_source_receipts": [
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/feddyn-design/plato/servers/base.py",
+        "bytes": 73482,
+        "sha256": "79355c0184680eaac2ad8646a23ff79d5ef70e5797cea1e313db7948a96488db"
+      },
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/feddyn-design/plato/servers/strategies/client_selection/random_selection.py",
+        "bytes": 992,
+        "sha256": "952c93808d82f458114526939d28c0879515f0a05dd9fa4fbfbe2986521f4dd7"
+      },
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/feddyn-design/plato/trainers/composable.py",
+        "bytes": 41822,
+        "sha256": "6bc4dab135cd7249346ac3ca23b0e24ea638961cda7806558ab81338dc0496a8"
+      },
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/feddyn-design/plato/trainers/strategies/lr_scheduler.py",
+        "bytes": 20777,
+        "sha256": "4b9118641555640083fce2417774fe7cd2e96ec9975885cfaf8023b1d92f8a41"
+      }
+    ],
+    "structural_verification": {
+      "command": "zsh -lc 'PYTHONDONTWRITEBYTECODE=1 /tmp/plato-phase2c-313/bin/python /tmp/plato-phase2c-feddyn-design/revise_design.py'",
+      "script": {
+        "path": "/tmp/plato-phase2c-feddyn-design/revise_design.py",
+        "bytes": 21461,
+        "sha256": "7c0d39077cf195b0a1a67221ff505caa53a69e1302e3f83685a3a22dea1568a8"
+      },
+      "checks": "Exact original/review SHA verified; JSON parses; precisely enumerated changed fields; all other original fields, algebra/oracle/migration and 15 test IDs preserved; startup probe assertions passed on CPU Python3.13/3.14; final output receipt written in owned scratch.",
+      "status": "PASSED",
+      "initial_attempt": "The first invocation used system python3 and exited 1 because its zip() lacks the strict keyword. It failed during in-memory field-diff validation before writing the ROOT artifact. Re-ran with the qualified Python3.13 interpreter; no production test failure is implied."
+    },
+    "limitations": "Scratch feasibility uses real inherited run and selector but intercepts base start before sockets, with an in-memory RNG-only bundle. It is not production FedDyn implementation, serialized full-checkpoint continuation, model/history training or socket acceptance. FD-A12/13 remain required and no review verdict/phase closure is changed.",
+    "write_scope": "Only ROOT phase2c-feddyn-design.json and own /tmp/plato-phase2c-feddyn-design scratch. No evolving training worktree reads, source/test edits, other report edits or agents.",
+    "final_sha256_receipt": "/tmp/plato-phase2c-feddyn-design/revision-receipt.json"
+  }
+}

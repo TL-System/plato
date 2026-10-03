@@ -26,6 +26,7 @@ with the original Plato implementation, although the paper formula shows ||w - w
 """
 
 from collections.abc import Callable
+from math import isfinite
 from typing import Dict, Optional
 
 import torch
@@ -98,8 +99,8 @@ class FedProxLossStrategy(LossCriterionStrategy):
             base_loss_fn: Base loss function. If None, uses CrossEntropyLoss
             norm_type: Norm type for proximal term ('l2' or 'l1')
         """
-        if mu < 0:
-            raise ValueError(f"mu must be non-negative, got {mu}")
+        if not isfinite(mu) or mu < 0:
+            raise ValueError(f"mu must be finite and non-negative, got {mu}")
 
         if norm_type not in ["l2", "l1"]:
             raise ValueError(f"norm_type must be 'l2' or 'l1', got {norm_type}")
@@ -133,6 +134,10 @@ class FedProxLossStrategy(LossCriterionStrategy):
         else:
             self._criterion = self.base_loss_fn
 
+        self.on_train_start(context)
+
+    def on_train_start(self, context: TrainingContext) -> None:
+        """Snapshot received global parameters once per local training run."""
         # Capture global model weights at start of training
         # These represent w^t in the FedProx formulation
         self.global_weights = {}
@@ -171,10 +176,12 @@ class FedProxLossStrategy(LossCriterionStrategy):
         if criterion is None:
             raise RuntimeError("FedProx loss criterion has not been initialised.")
         base_loss = criterion(outputs, labels)
+        if self.mu == 0:
+            return base_loss
 
         # Compute proximal term: (mu/2) * ||w - w_global||
         # Note: We use L2 norm (not squared) for backward compatibility
-        squared_diff_sum = torch.tensor(0.0, device=outputs.device)
+        differences = []
 
         model = context.model
         if model is None:
@@ -190,23 +197,19 @@ class FedProxLossStrategy(LossCriterionStrategy):
             if param.requires_grad and name in global_weights:
                 global_param = global_weights[name].to(param.device)
 
-                if self.norm_type == "l2":
-                    # Sum of squared differences for L2 norm computation
-                    squared_diff_sum = squared_diff_sum + torch.sum(
-                        (param - global_param) ** 2
-                    )
-                else:  # l1
-                    # L1 norm: ||w - w_global||
-                    squared_diff_sum = squared_diff_sum + torch.sum(
-                        torch.abs(param - global_param)
-                    )
+                differences.append((param - global_param).reshape(-1))
+
+        if not differences:
+            return base_loss
+        difference = torch.cat(differences)
 
         # Compute the actual norm and scale by mu/2
         if self.norm_type == "l2":
             # Take square root to get L2 norm (not squared L2 norm)
-            proximal_term = (self.mu / 2.0) * torch.sqrt(squared_diff_sum)
+            # vector_norm defines a finite zero subgradient at the origin.
+            proximal_term = (self.mu / 2.0) * torch.linalg.vector_norm(difference)
         else:
-            proximal_term = self.mu * squared_diff_sum
+            proximal_term = self.mu * difference.abs().sum()
 
         # Total loss
         total_loss = base_loss + proximal_term

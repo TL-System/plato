@@ -163,14 +163,18 @@ class Server(fedavg.Server):
 
     async def _process_reports(self):
         """Process the client reports by aggregating their weights."""
-        # To pass the client_id == 0 assertion during aggregation
-        trainer = self.require_trainer()
-        trainer.set_client_id(0)
-
+        self._validate_aggregation_inputs(
+            self.updates, [update.payload for update in self.updates]
+        )
         weights_received = [update.payload for update in self.updates]
 
         weights_received = self.weights_received(weights_received)
         self.callback_handler.call_event("on_weights_received", self, weights_received)
+        self._validate_aggregation_inputs(self.updates, weights_received)
+
+        # To pass the client_id == 0 assertion during aggregation
+        trainer = self.require_trainer()
+        trainer.set_client_id(0)
 
         # Extract the current model weights as the baseline
         algorithm = self.require_algorithm()

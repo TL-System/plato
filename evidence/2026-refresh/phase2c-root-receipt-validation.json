@@ -1,0 +1,405 @@
+{
+  "status": "SOURCE_AND_REPORTED_RUN_BYTES_VERIFIED",
+  "candidate": "62d7b7d8ef75be779149a96f567779c86699edb4",
+  "tree": "bfc18588145c935adaf36850f909f3223b5ad058",
+  "worktree_status": "",
+  "source_receipts": [
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/training/configs/MNIST/fedprox_lenet5.toml",
+      "sha256": "45da742c8daa0b616341edb5d03ecd19f9c4d5af1fc3436e1282dc2b9ddab2e8",
+      "matches": true
+    },
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/training/examples/async/port/port_server.py",
+      "sha256": "e369f280d9c704411cf85ba752c2e7fb5cd790d50e5ff313151b2852bc2efdea",
+      "matches": true
+    },
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/training/examples/customized_client_training/fedprox/fedprox_trainer.py",
+      "sha256": "266e14da78843bfd1130d25d25d306a45817d57baf08e13433c0a9e7941dc7a3",
+      "matches": true
+    },
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/training/examples/customized_client_training/scaffold/scaffold_MNIST_lenet5.toml",
+      "sha256": "43110532d391896d4080782a4dbace3fbe2bc7813ac9e7baa662074f044f290c",
+      "matches": true
+    },
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/training/examples/customized_client_training/scaffold/scaffold_callback.py",
+      "sha256": "159a2adbbae5c7982c30896af596c546e601669b0230b841656ee464ee66d39f",
+      "matches": true
+    },
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/training/examples/customized_client_training/scaffold/scaffold_client.py",
+      "sha256": "01a08e2001ba4f9e4e61c2ff520e3d1b3fcff5d44168a3d5ac002c45b4c48a8b",
+      "matches": true
+    },
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/training/examples/customized_client_training/scaffold/scaffold_server.py",
+      "sha256": "e2325ee39337489f15711c4073aeb10335e2b47ecc0cc9aefd0406bbbb18c78a",
+      "matches": true
+    },
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/training/examples/customized_client_training/scaffold/scaffold_trainer.py",
+      "sha256": "405c0d270a4362ab0cc2569899ef1deb9b03a5a235ef44c75261b43fdbaf00de",
+      "matches": true
+    },
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/training/plato/algorithms/fedavg_gan.py",
+      "sha256": "fc892e85dbb4f5f9f86d966d98366f638e10853e7585b1b2d4c9b1ccdec5284d",
+      "matches": true
+    },
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/training/plato/algorithms/fedavg_personalized.py",
+      "sha256": "00fc6afc3f81851f10df3f59a00945801c9b7992d5aec551493c6507ac8cce88",
+      "matches": true
+    },
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/training/plato/clients/base.py",
+      "sha256": "ed510a35fbe31ec89ee4234bbb849ebeb14a51115ac9b7ede6a58a0635a1626e",
+      "matches": true
+    },
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/training/plato/clients/strategies/defaults.py",
+      "sha256": "6a41108b7878113ed4b7c9555d818b1f59862f55c487524b26052a0f12c3feca",
+      "matches": true
+    },
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/training/plato/models/dcgan.py",
+      "sha256": "8d01709791ac0d4201bf99f53e5c8a86155b14858965ea23a22a26f4db08d48d",
+      "matches": true
+    },
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/training/plato/servers/base.py",
+      "sha256": "79355c0184680eaac2ad8646a23ff79d5ef70e5797cea1e313db7948a96488db",
+      "matches": true
+    },
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/training/plato/servers/strategies/aggregation/port.py",
+      "sha256": "c7e553bede3413780046915c5736b99266b33931ad24ddf85376cf9e754c978f",
+      "matches": true
+    },
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/training/plato/trainers/base.py",
+      "sha256": "2fb5e25983d1f737acf7b05d7324130458caab187b34d3e835a92d574adb1ec8",
+      "matches": true
+    },
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/training/plato/trainers/composable.py",
+      "sha256": "6bc4dab135cd7249346ac3ca23b0e24ea638961cda7806558ab81338dc0496a8",
+      "matches": true
+    },
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/training/plato/trainers/diff_privacy.py",
+      "sha256": "7ef0ba5978fbe30947cefe106923ba2d90e138fb4d788f909893dd9c440ff74a",
+      "matches": true
+    },
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/training/plato/trainers/fedprox.py",
+      "sha256": "ce299648690455362b601e8fbd009a419b4c5c2317206f9588257899ebc4fb5d",
+      "matches": true
+    },
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/training/plato/trainers/gan.py",
+      "sha256": "236c8c51be9797d97d9b63fdd1bb870c8a7c64d266dc25e8c44b9f9c3558fdc7",
+      "matches": true
+    },
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/training/plato/trainers/registry.py",
+      "sha256": "dc17cf3bd8e1c168213173e7d16e5d4e4f12282c41d33a67f241b294afb64fa1",
+      "matches": true
+    },
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/training/plato/trainers/self_supervised_learning.py",
+      "sha256": "7b9727b6e0a840048f3f8c0d38fec16116e659ecf25fcd352360f3047adaf071",
+      "matches": true
+    },
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/training/plato/trainers/split_learning.py",
+      "sha256": "b5256e53be61767362d463437e903439bcea65579e4a68378b27ec225e6eaf72",
+      "matches": true
+    },
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/training/plato/trainers/strategies/algorithms/apfl_strategy.py",
+      "sha256": "cc56941235907603583c16d8388b2566ef3ceb2001f3028accf19f01fd4ea0a5",
+      "matches": true
+    },
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/training/plato/trainers/strategies/algorithms/ditto_strategy.py",
+      "sha256": "55f3f863d428cd845b8141b43d60642646ccc49dfd28bbfce464deb383bc11c6",
+      "matches": true
+    },
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/training/plato/trainers/strategies/algorithms/fedala_strategy.py",
+      "sha256": "588d0ac13e23bf21fadc8e60be399afd25e76a26fb1c008d4fe4a3f7eb3ebc4e",
+      "matches": true
+    },
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/training/plato/trainers/strategies/algorithms/feddyn_strategy.py",
+      "sha256": "93abaa09f8f31018ba8cfe1e6de9f507d4ec4e6abe8170d5919b41c054597d8c",
+      "matches": true
+    },
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/training/plato/trainers/strategies/algorithms/fedmos_strategy.py",
+      "sha256": "a4da28637abdf2b15a374283e9df83db190ec0a1e9b9fbb4745fac3f5d3cb521",
+      "matches": true
+    },
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/training/plato/trainers/strategies/algorithms/fedprox_strategy.py",
+      "sha256": "6041f84186d710a48740a39eac0bf93562562554168991e347a7e71a81216221",
+      "matches": true
+    },
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/training/plato/trainers/strategies/algorithms/lgfedavg_strategy.py",
+      "sha256": "2bf3ab77a930e2f8f6eced3a110278a6f63cd506adb749605387f1ff5901638a",
+      "matches": true
+    },
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/training/plato/trainers/strategies/algorithms/personalized_fl_strategy.py",
+      "sha256": "f4a55389650c7e050ad773a0a3beb5d81382e783a454c37341ee14f8586cd32c",
+      "matches": true
+    },
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/training/plato/trainers/strategies/algorithms/scaffold_strategy.py",
+      "sha256": "2b6e2953f8b93f7919d95d70f598c2f4d33c9cbaff129352387f248c004d4ff6",
+      "matches": true
+    },
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/training/plato/trainers/strategies/base.py",
+      "sha256": "905261bbaf05f8024110f9b0be2c29886bdc39a91c6be18aa9e83bb4868ec0d3",
+      "matches": true
+    },
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/training/plato/trainers/strategies/loss_criterion.py",
+      "sha256": "189ed60fc473d149ac54de8472e36d311d309f3827453b23882c7d91f7c8c2c2",
+      "matches": true
+    },
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/training/plato/trainers/strategies/lr_scheduler.py",
+      "sha256": "4b9118641555640083fce2417774fe7cd2e96ec9975885cfaf8023b1d92f8a41",
+      "matches": true
+    },
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/training/plato/trainers/strategies/model_update.py",
+      "sha256": "3a16a643de9d9b531bc1b2bab9e7c5606cb0c4e6b38e079f204d9ce9976fa782",
+      "matches": true
+    },
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/training/plato/trainers/strategies/optimizer.py",
+      "sha256": "ffbeab17d1a2455013871d32f4e82402f5422a6c14fc629d334b2d93c59e7957",
+      "matches": true
+    },
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/training/plato/trainers/strategies/training_step.py",
+      "sha256": "ba912ceea97a1fe592d690cb06c9827cd988d37320a92f1dc72bbb42feea2983",
+      "matches": true
+    },
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/training/plato/trainers/tracking.py",
+      "sha256": "ca52a12d7c181e2c03d2fb67f5d788aabed0c5dbae8797e80280ed8c2f360332",
+      "matches": true
+    },
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/training/plato/utils/checkpoint_paths.py",
+      "sha256": "7f530a13e9dac30d4c8a6bb7c05de2ff242d12f203dbf3e4c45495442c789dfd",
+      "matches": true
+    },
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/training/tests/integration/scaffold_round_worker.py",
+      "sha256": "5bf3ca3c59f0b28d76528ebf7ffb5410eb11b05269b962b6080977e97e64c64e",
+      "matches": true
+    },
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/training/tests/integration/test_checkpoint_runtime_agreement.py",
+      "sha256": "6414ef651d44042616c8bce772333584643b3c2e6b0596d69f3b04ff849b9e3e",
+      "matches": true
+    },
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/training/tests/integration/test_scaffold_round_flow.py",
+      "sha256": "5477fbc57455ebbc3ded0a10181fa9b6433edf1b0c1bf200710e51995b21f128",
+      "matches": true
+    },
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/training/tests/trainers/test_apfl_optimizer_ownership.py",
+      "sha256": "a42b571b4542d408f523ca5ae0b0cba157309380e1484856c8538312b03b113c",
+      "matches": true
+    },
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/training/tests/trainers/test_checkpoint_path_contract.py",
+      "sha256": "92bdf6b20221139ae3c0e3e8c64cdc884ed473ae212710bcbf90a12ad33831cf",
+      "matches": true
+    },
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/training/tests/trainers/test_dp_data_loader_strategy.py",
+      "sha256": "97245aa7f8318d7875cafcc3c7c93e2e30047d61684a836efc1ea5e6c47e3c42",
+      "matches": true
+    },
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/training/tests/trainers/test_gan_runtime.py",
+      "sha256": "3d16413dabb7d8eeda56f0444d66e445fb0356d47bd2db7a64a5b49ade876d43",
+      "matches": true
+    },
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/training/tests/trainers/test_personalized_state_ownership.py",
+      "sha256": "f2a808dd1c6763164283f02b8801bee7b211327570d152a91b32fb74c9d9f233",
+      "matches": true
+    },
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/training/tests/trainers/test_scaffold_strategy.py",
+      "sha256": "7419ab4ea2088f7825bc8008be99c2d99a18f139dab50188a3c06a6eefd9c02e",
+      "matches": true
+    },
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/training/tests/trainers/test_split_learning_testing_strategy.py",
+      "sha256": "54d2da6ba1574873736ab7aa6278e7f341cf53bf0a63350e6a34e0a0a6ce3943",
+      "matches": true
+    },
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/training/tests/trainers/test_ssl_personalized_state.py",
+      "sha256": "887c7e100ca3fc69e5a26c399fd4990ed9ad15df74ef52041953dea6c17e706a",
+      "matches": true
+    },
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/training/tests/trainers/test_ssl_training_contract.py",
+      "sha256": "66f1f40fcfbe86b3abe2a983fd281e364f080c98718e2b0e42c26e369bb5cd9e",
+      "matches": true
+    },
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/training/tests/trainers/test_training_update_contract.py",
+      "sha256": "87059fc3f336d6a9e319d372577d30ed7066fd9e1bd1f7fe3d0efb6fda92f676",
+      "matches": true
+    },
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/training/plato/trainers/basic.py",
+      "sha256": "4f5749e4f5784ea0ce6e98183c1a7bc25ce0c5c44be751665c054f8fdbbd2c2e",
+      "matches": true
+    },
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/training/plato/trainers/loss_criterion.py",
+      "sha256": "acce75d0d24af4f7d6de762991739fb1a32c0e1b0f730ea0467e01a7a675a6f0",
+      "matches": true
+    },
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/training/plato/trainers/lr_schedulers.py",
+      "sha256": "d2563ca3a6f609e91f30ca585aa00a7eae5bbe2537680d476029e219ceae372f",
+      "matches": true
+    },
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/training/plato/trainers/optimizers.py",
+      "sha256": "da613c5d2975a7cf124619233645ba8b02e6ad32218f08dd508b9b410da06e34",
+      "matches": true
+    },
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/training/plato/trainers/pfedgraph.py",
+      "sha256": "fe6eef5176076cbd61ada88d60e6f4055beeb30bb88b3f9e27aac31776fbc5aa",
+      "matches": true
+    },
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/training/plato/trainers/strategies/data_loader.py",
+      "sha256": "aefaf38c4bbd40c6796969fb638f04fea4e69de4520ecb073721e768668df23f",
+      "matches": true
+    },
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/training/plato/trainers/strategies/testing.py",
+      "sha256": "c938fd5c9acc50537bbdf12a36f25f452fdfc45b0e53cf0c5be0eb7f1dfabba0",
+      "matches": true
+    },
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/training/plato/trainers/strategies/algorithms/pfedgraph_strategy.py",
+      "sha256": "e6a645989577011f7e7c1696d068848170fa0333bf687399946b4513f6f3b2b9",
+      "matches": true
+    },
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/training/plato/algorithms/base.py",
+      "sha256": "775480879884212b9ed3fb1e05091b2d28bacba06352a1e00e3edb95aeac486c",
+      "matches": true
+    },
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/training/plato/algorithms/fedavg.py",
+      "sha256": "512006d85daa070cd7a7a595b849a96ba70805bc88aa41d329b340dc4edc0258",
+      "matches": true
+    },
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/training/plato/algorithms/pfedgraph.py",
+      "sha256": "18d684a26392ca3efd67da104ae76795bc3ac6a2e67934f09a27763139ff1ee3",
+      "matches": true
+    },
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/training/plato/algorithms/registry.py",
+      "sha256": "860df64c61c0de23bfc18e576e719e1603e42ff16c7089b4a034c782b2f629cb",
+      "matches": true
+    },
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/training/plato/algorithms/split_learning.py",
+      "sha256": "d776457dfa171200fdb9eeaaedcaede7ed841541951749fd1a24187af127787c",
+      "matches": true
+    },
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/training/plato/models/cnn_encoder.py",
+      "sha256": "ece371a2ba4cc6d9e8e1f0de88d4fbc6b96076b820edb26a3b69852ddf237e6c",
+      "matches": true
+    },
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/training/plato/models/general_multilayer.py",
+      "sha256": "ab521a467e447ad8d7262fd3fe52833ae2fd68c6c2e51ab55904200494dc09b6",
+      "matches": true
+    },
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/training/plato/models/lenet5.py",
+      "sha256": "76ed3d42f18fc8b06a245f3327293fb0ddcb1b8fb8afd8aa6bc6093c31a36db5",
+      "matches": true
+    },
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/training/plato/models/multilayer.py",
+      "sha256": "80d923e8908977f7d100c398acae4dfbf9f1bd8f866877a170b8142b688b85f3",
+      "matches": true
+    },
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/training/plato/models/registry.py",
+      "sha256": "8f499c870ec4a31d0323b8e8cf27c9cea6e9aaedc0d3b98dd397989c26958aa8",
+      "matches": true
+    },
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/training/plato/models/resnet.py",
+      "sha256": "fe6f1b6b4fb5aa7c2f18ed4c97ac5bc76aaea9f5acb316f388ebd822b0c7c70f",
+      "matches": true
+    },
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/training/plato/models/torch_hub.py",
+      "sha256": "0aab79ad209628a5a55724c7006bcb829c029e966693ef6019f79ea7922d524a",
+      "matches": true
+    },
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/training/plato/models/vgg.py",
+      "sha256": "45f931f3288d208ae268153d39c2bfc1064db6008952fa9dab37c053f25bcb5d",
+      "matches": true
+    },
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/training/evidence/2026-refresh/phase2c-scaffold-facts.json",
+      "sha256": "b17bb958fff4862b7c7ef0bff04a6618c40f09155cc5f25e02d5ca4338b7aed9",
+      "matches": true
+    },
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/training/evidence/2026-refresh/phase2c-feddyn-disposition.json",
+      "sha256": "4622a0f8cf1b07a45514684cd2b6ca104d0d39a97ec7f60cf593ed6e2aedcd36",
+      "matches": true
+    }
+  ],
+  "qualified_logs": [
+    {
+      "path": "/tmp/plato-phase2c-scratch/qualified-validation-313.log",
+      "sha256": "b798f791851a3751c34b67fdb1805c221b8155a1f16bafdef417ed9b47b04c4d",
+      "matches": true,
+      "summary": "468 passed, 19 warnings in 561.83s (0:09:21)",
+      "source": "0dc34dd1d79d90071a0babfa6aa89f33d72a976f"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scratch/qualified-validation-314.log",
+      "sha256": "c5c9b29d6f4d500839bd29eb52ff93002891b578de3a26ec94231f248261f91f",
+      "matches": true,
+      "summary": "468 passed, 19 warnings in 617.34s (0:10:17)",
+      "source": "0dc34dd1d79d90071a0babfa6aa89f33d72a976f"
+    }
+  ],
+  "limits": "Hash verification of reported source and run bytes only; independent reviews and final combined execution remain. FedDyn2C-11 still open."
+}

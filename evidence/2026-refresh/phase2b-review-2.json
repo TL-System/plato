@@ -1,0 +1,1243 @@
+{
+  "schema_version": 1,
+  "review": "Fresh independent Phase2B correction review 2",
+  "reviewer": "plato-phase2-runtime-review-2",
+  "requested_model": "GPT6.1Solxhigh",
+  "completed_at_utc": "2026-10-03T03:13:05.234834+00:00",
+  "decision": "CHANGES_REQUESTED",
+  "decision_basis": [
+    "One material medium disconnect-recovery finding remains; no critical/high findings in this review.",
+    "Original responsive-worker R2B-03, R2B-01, R2B-02, R2B-L01 and B-local S3 namespace corrections pass. Their positive results do not waive R2B-04."
+  ],
+  "identities": {
+    "candidate_commit": "7753ca37bacbbdbcaef4192150e6532d79247011",
+    "candidate_tree": "6d6b55c2d8baf566df7826b6134e88eaf7e57363",
+    "implementation_commit": "516da21d66472d8916ed42aa21ce462d29944f73",
+    "implementation_tree": "8d61b15c63a83c7a6f18fdf9f0c076a84748e893",
+    "initial_reviewed_candidate": "b3b038efa376b060e1c01f1da39173240768a019",
+    "phase_base": "fda60becedfa6236c11d415b87a868b52789a41e",
+    "candidate_worktree": "/private/tmp/plato-refresh-worktrees/runtime",
+    "root_worktree": "/Users/bli/Playground/plato",
+    "review_scratch": "/tmp/plato-phase2b-review-2",
+    "candidate_read_only": true,
+    "candidate_status_before_and_after": "clean",
+    "evidence_commit_boundary": "Exact B is an evidence-only direct child of 516da21d; only phase2b-validation.json differs.",
+    "all_changed_source_and_test_files_match_exact_git_objects": true,
+    "base_to_candidate_diff": {
+      "path": "/tmp/plato-phase2b-review-2/base-to-candidate.diff",
+      "sha256": "e6874d9d3782962bcef1039f94c0bdbe4040b2275b966a9bd1a09d490060576d"
+    },
+    "correction_diff": {
+      "path": "/tmp/plato-phase2b-review-2/corrections.diff",
+      "sha256": "c870e3e4de8f42f74f49b3f7f66bbc3e49b5007264f94156ce67641370c77224"
+    },
+    "source_sha256": {
+      "evidence/2026-refresh/phase2b-validation.json": "746eb49331a881a78b4b03aa9d9fa9d40873cb0c620e4f24499648f9c8a03f22",
+      "examples/async/port/port_server.py": "32c838c99bdf913a8092adb4ed1e410d49a860273c8260d9dcf51bb038326bb3",
+      "plato/callbacks/handler.py": "d86e707b96f6784cc8548087ec5f226ad1689157311aacadcb224ddcbc9ead67",
+      "plato/clients/base.py": "a935d2615a33ceecd0c5866ef1a2e3dd49fbee972bad457a740144ac25d2d034",
+      "plato/clients/composable.py": "25de844fe9f9b2c2b7d8e9a633c3ed1fb9831c10fae2a14404dadd5d7670fe53",
+      "plato/clients/strategies/defaults.py": "7d30f52b05df63c706a3dea20b40a02affa811c508d03ebb43b3b88b09d57c4f",
+      "plato/clients/transport.py": "c6c482ae5557641f03fb9419253c92b6c8c6dc5e028a6a6ea1525e061799df57",
+      "plato/servers/base.py": "da36129f67b337c6bd722bb4944c7c4aaa40b6017131e70eb5c81eaf21f6c513",
+      "plato/servers/fedavg.py": "f184068a11c5be9e523f08b95e1cce76dff2e20e2fdb4e6426caf95dac0bcee5",
+      "plato/servers/fedavg_cs.py": "6998754dfc6a07732ab58a3fb398679c47390afeb4ce3859c166acae106515e0",
+      "plato/servers/strategies/aggregation/fedavg.py": "fa1e2a6bbbc8e3829b72cd0cdd47f10b0a8fffbdabdaa2dfb3efed81872877c1",
+      "plato/servers/strategies/aggregation/port.py": "27dcba80763fce77dee667934840e3d407665463c900b06725bcdf66b3d7e1ac",
+      "tests/callbacks/test_handler_contract.py": "11bdc22cc6a116b36809b1b22f9411c098565a6c97a85fd515e21c561199d3d6",
+      "tests/clients/test_checkpoint_cleanup.py": "b94b0c61b517ad6216343e605d23f4acb0baa1c36caf1bbe3e4a5d8989c95799",
+      "tests/clients/test_client_lifecycle_variants.py": "a10f28b4cbc125d67fa63a97c97050828b66c02eb7218c869adfea346f53a9dc",
+      "tests/clients/test_payload_limits.py": "07080983b9cc271bafec71477811d532dc8282a588472eb04dafa7a9a76412f8",
+      "tests/servers/test_fedavg_strategy.py": "b7b3c406d9acf42233d26a2ee9d4e80861ebb7ea18732402c5a9019532f8cc1f",
+      "tests/servers/test_lifecycle_contracts.py": "fa8d27a56707c3bbce713aa33554b5c4c77450bd33eec3a5a839e7c63fb2ce03",
+      "tests/servers/test_port_checkpoint_flow.py": "046b8b948e977bbaf79d71935f4183da92e1df924fd2f895509f893595ea0664",
+      "tests/servers/test_runtime_review_regressions.py": "fc0e5ed312553564e75f22fb210e7949bb63f949fe884f5e471503b4841293ab",
+      "tests/servers/test_runtime_s3_contract.py": "b66dcf24d55867ed85c0cd998db7de513c1fc0cc168d9352e187f47ad3a9a54a",
+      "tests/servers/test_runtime_transport.py": "41237fa504a5751101132f2b7e088e074e9f3237a8569ea85dae85db4fc2ac9e"
+    },
+    "authority_sha256": {
+      "AGENTS.md": "b50f87f31ea3d87076952d8b7d2d8af067132fbf877d80f8780c208fb45527ec",
+      "uv.lock": "573b10c2ba1a2317e02f9e40c6181359cafab6f6e0a0f9be12bb256cb276fe1d",
+      "pyproject.toml": "799bd7ba1865b097fdc8ca84a7b70337794e338de4aa9a6a13f6a4c1b9156246",
+      ".python-version": "02e735b3dfe1c32833eb550b7ff8ffa17f5f2bc3fa1e7bae61a8f5a3883ce398",
+      "evidence/2026-refresh/plan.md": "edb9a58cc7915a940854f16d5029fe97434703bf2f75eca0dcb96de2d0f0eb15",
+      "evidence/2026-refresh/plan-addendum.json": "5b51b0fb7ed6f68d9fce7176335b3e7be5e5f178a2788590912aa2396a487709",
+      "evidence/2026-refresh/plan-addendum-acceptance.json": "5f5d5a8e22e14072b5d031c19a27be14bda9bdbc2a157d14af78845daac6c56b",
+      "tests/conftest.py": "3eb55a1fa7c0fd5428c296c1bcd7300b23b0ade3d276f5c687af3b9bd78304c7",
+      "tests/integration/test_event_loop_startup.py": "a92c9ee2347e2113cd65b7949c922ac5bbf1846f4caeca30a128db580c79751e",
+      "tests/integration/startup_harness.py": "988f216f9367b1e9e8156bad62d3c03a813e26d32f919981ae227f5d8754642e",
+      "tests/integration/startup_probe.py": "e6c9bb2bf39616fe3a6745da528690a578e7416837e0914578ec688d2851b34f",
+      "tests/integration/startup_socket.py": "64d04c2ab0e041f35f5e5aca88aa46a436507cb76f54ef4ca3c3df702666720f",
+      "tests/integration/utils.py": "7a4af3c5bece78c256f268fb47ee31e384f14cca098d1690ebe2c05f79b21634",
+      "/Users/bli/Playground/plato/evidence/2026-refresh/phase2b-review.json": "6664ea117a5c8457551e8fb0256937297bef0012aca9c8cdd1f74cfbe5787c13",
+      "/Users/bli/Playground/plato/evidence/2026-refresh/phase2b-root-probe.json": "a7c9674d09f06c36edc8d5315b5152758a6d1efb1c37a1f07e786a907b282900",
+      "/tmp/plato-phase2b-review/candidate/tests/test_phase2b_review_probes.py": "d216c04ecbc1c79d2d92f3303af906cbf98e641b1d3ef43b55aef4af5bc6546e"
+    },
+    "review_environments": [
+      {
+        "python": "3.13.16",
+        "path": "/tmp/plato-phase2b-review-2/venv313",
+        "sync_log": {
+          "path": "/tmp/plato-phase2b-review-2/sync313.log",
+          "sha256": "2345042ea95733b4c39a6a09daca46c38ed839c3ba58c1773ca375c6af435e35"
+        }
+      },
+      {
+        "python": "3.14.8",
+        "path": "/tmp/plato-phase2b-review-2/venv314",
+        "sync_log": {
+          "path": "/tmp/plato-phase2b-review-2/sync314.log",
+          "sha256": "cae3fd77b3c666c4b420fb78533a47b4ec271f8af2da3d50f276a333b1c31bfb"
+        }
+      }
+    ],
+    "provision": "git archive exact B into owned scratch; UV_PROJECT_ENVIRONMENT=<owned venv> uv sync --locked --group dev --python 3.13/3.14. All execution uses zsh -lc; PYTHONDONTWRITEBYTECODE=1 prevents imported read-only files from gaining cache writes.",
+    "d_source_verification": {
+      "old_d": "a4a4733e96cf248a73db76e6b2182536b9f592ea",
+      "current_d": "aa232791f04d93eb9de09ed6c596ac714db5b605",
+      "current_d_tree": "0a6824bcfa23fa406da5e1b5835b4564161f5c3c",
+      "implementation": "639ca69bf4eaeff868462d0b30a5fcc72218f061",
+      "source_sha256": "a26d306daa6a4accd4d67c9f26dea9f9ad153e74353fe8698643987cb6f25c03",
+      "identical_between_d_candidates": true,
+      "author_probe_sha256": "f11bc92cc5c013146962d68e3eb8d45100be9aaf7b7072ec7a88b4103d711222"
+    }
+  },
+  "scope": {
+    "authorities_read": [
+      "AGENTS.md",
+      "accepted plan.md",
+      "accepted plan-addendum.json and acceptance",
+      "entire phase2b-validation.json including initial evidence and review_corrections",
+      "root phase2b-review.json and phase2b-root-probe.json"
+    ],
+    "included": [
+      "F10 own-client cleanup",
+      "F11 actual PORT writer, historical reader and weighted numerical reference",
+      "F18 raw/transformed/direct/legacy/delta/cross-silo pre-mutation validation",
+      "runtime session/registration/selection/urgent identity, heap/time invariants",
+      "report/socket/S3/file limits, deadlines and cleanup",
+      "distinct transfer accounting, retained completion visibility and lifecycle",
+      "callback/context/async/buffered/split/personalized/cross-silo and evaluation regressions",
+      "actual D S3 source identity and bounded writer-reader integration",
+      "retained startup/process/event/tensor/source/log evidence"
+    ],
+    "excluded": [
+      "F07 global checkpoint codec and F21-F26 trainer/DP/personalization lifecycle owned by 2C",
+      "MLX tree validation owned by 3A",
+      "HE/MPC and S3 utility fixes/review owned by 2D",
+      "auth, nonces, new wire protocols or untrusted-pickle protection"
+    ]
+  },
+  "findings": [
+    {
+      "id": "R2B-04",
+      "severity": "medium",
+      "blocking": true,
+      "title": "A deferred urgent request is assigned to a disconnected physical worker and permanently stops recovery mode.",
+      "path": "plato/servers/base.py",
+      "line": 1277,
+      "related_lines": [
+        1252,
+        1274,
+        1289,
+        1300,
+        1308,
+        1476,
+        1487,
+        1504,
+        1511
+      ],
+      "description": "The corrected same-worker queue retains old reports, but the urgent loop checks only whether their sid is busy. In general.debug=false recovery mode, disconnect removes the physical worker and its current urgent assignment while leaving its completed deferred reports retained. When another worker finishes its valid urgent response, the urgent loop removes the next retained report and issues a new assignment to the removed sid. Its emit has no recipient. The session validator correctly refuses a report from that unregistered sid, so this assignment can never complete. No active transfer timer exists, and the periodic task does not advance simulated-time rounds.",
+      "reachability": "Two physical workers with max_concurrency=2 on one device, per_round=4, minimum_clients=1, asynchronous simulated wall time, request_update=true, staleness_bound=1, rounds=10 and general.debug=false. Actual selection/batching/ingress creates round-1 reports 7/2/8/9, followed by 9 in rounds 2 and 3. Logical clients 7 and 8 belong to the same reused physical worker. The default staleness predicate issues client 7 to lost and client 2 to survivor, deferring client 8. Disconnect lost, then finish survivor/client 2 through real handlers. The server issues client 8 to the absent lost session.",
+      "reproduction": {
+        "source": {
+          "path": "/tmp/plato-phase2b-review-2/candidate/tests/test_review2_disconnect_probe.py",
+          "sha256": "eeb1d72a79b9b4061e10291252cffae6da241f872e48deaa02ccf912523ecad7"
+        },
+        "helper_source": {
+          "path": "/tmp/plato-phase2b-review-2/candidate/tests/test_review2_probes.py",
+          "sha256": "1d3422fa6ac664c434309a4ef8303e1138f8b30c1b8adaef505cef9b7f460192"
+        },
+        "test": "tests/test_review2_disconnect_probe.py::test_actual_batched_urgent_disconnect_never_reassigns_dead_session",
+        "bounded_seconds": 2,
+        "interpreters": [
+          "3.13.16",
+          "3.14.8"
+        ],
+        "results": {
+          "313": {
+            "log": {
+              "path": "/tmp/plato-phase2b-review-2/confirmed313.log",
+              "sha256": "144faaa873d962271f64db68ae683d95a169c93d1c91312601ddc3259c8f08c6"
+            },
+            "before": {
+              "normal": [
+                [
+                  1,
+                  "lost",
+                  7
+                ],
+                [
+                  1,
+                  "survivor",
+                  2
+                ],
+                [
+                  1,
+                  "lost",
+                  8
+                ],
+                [
+                  1,
+                  "survivor",
+                  9
+                ],
+                [
+                  2,
+                  "lost",
+                  9
+                ],
+                [
+                  3,
+                  "lost",
+                  9
+                ]
+              ],
+              "assignments": {
+                "lost": 7,
+                "survivor": 2
+              },
+              "deferred": [
+                8
+              ]
+            },
+            "after": {
+              "round": 3,
+              "assignments": {
+                "lost": 8
+              },
+              "training_sids": [
+                "lost"
+              ],
+              "training_clients": [
+                8
+              ],
+              "requests": [
+                [
+                  "lost",
+                  7
+                ],
+                [
+                  "survivor",
+                  2
+                ],
+                [
+                  "lost",
+                  8
+                ]
+              ],
+              "registered_sids": [
+                "survivor"
+              ],
+              "close_called": 0,
+              "active_transfers": [],
+              "update_requested": {
+                "8": true
+              },
+              "round_after_periodic": 3
+            }
+          },
+          "314": {
+            "log": {
+              "path": "/tmp/plato-phase2b-review-2/confirmed314.log",
+              "sha256": "0982b35fa95fd6a250a99727cad07f8e6fc739889632ed334889bb0a74eeaef0"
+            },
+            "before": {
+              "normal": [
+                [
+                  1,
+                  "lost",
+                  7
+                ],
+                [
+                  1,
+                  "survivor",
+                  2
+                ],
+                [
+                  1,
+                  "lost",
+                  8
+                ],
+                [
+                  1,
+                  "survivor",
+                  9
+                ],
+                [
+                  2,
+                  "lost",
+                  9
+                ],
+                [
+                  3,
+                  "lost",
+                  9
+                ]
+              ],
+              "assignments": {
+                "lost": 7,
+                "survivor": 2
+              },
+              "deferred": [
+                8
+              ]
+            },
+            "after": {
+              "round": 3,
+              "assignments": {
+                "lost": 8
+              },
+              "training_sids": [
+                "lost"
+              ],
+              "training_clients": [
+                8
+              ],
+              "requests": [
+                [
+                  "lost",
+                  7
+                ],
+                [
+                  "survivor",
+                  2
+                ],
+                [
+                  "lost",
+                  8
+                ]
+              ],
+              "registered_sids": [
+                "survivor"
+              ],
+              "close_called": 0,
+              "active_transfers": [],
+              "update_requested": {
+                "8": true
+              },
+              "round_after_periodic": 3
+            }
+          }
+        },
+        "raw_result": {
+          "path": "/tmp/plato-phase2b-review-2/disconnect-result.json",
+          "sha256": "c3ab55d99d20a7637c8c18778f7fee6ee52d36e89cbbc6b739028733c8ea4a90"
+        },
+        "observed": "Only survivor remains registered. assignments={lost:8}, training_sids=[lost], training_clients=[8], update_requested[8]=true, active_transfers=[], close_called=0; round and round_after_periodic both equal 3. Absent-session response is rejected before parsing. Final failure is the intended no-dead-session-assignment assertion after cleanup.",
+        "stubs": "Outbound emit is AsyncMock. _send generates inert reports/payloads via actual ingress. Aggregation, wrap_up and close are inert; selection, batching, queue construction, default urgency predicate, assignment validation, disconnect recovery branch, second urgent completion and periodic task are production code. No trainer snapshot decoder is invoked."
+      },
+      "required_correction": "Handle retained/deferred urgency when its physical worker disappears. Never create an outstanding assignment for an unregistered sid. Continue or end with a bounded surfaced failure according to the existing disconnect policy, keeping usable completed reports and exact byte accounting consistent. Add this actual-batching degradation regression and verify surviving-worker progress or explicit termination. Preserve current session rejection and concurrent requests for live distinct workers; no auth, nonce or wire change is needed.",
+      "test_gap": "The new shared-worker correction regression finishes both responses from a live worker. The disconnect regression clears one active transfer but has no deferred urgent report and does not test subsequent round progress.",
+      "baseline_boundary": "This is a remaining material failure in the in-scope correction and recovery path, not a claim that general.debug=false recovery first became defective in this commit. Initial R2B-03 already prevented the normal same-worker flow; correcting its serialization exposes the deferred-worker-loss case."
+    }
+  ],
+  "mandatory_contract_disposition": {
+    "R2B-03": {
+      "status": "Responsive-worker acceptance passes; recovery corner remains blocked by R2B-04",
+      "result": "Actual single-worker rounds 7/2/9 then 9/9 issue exactly one outstanding urgent assignment, preserve the other report/payload and 190-byte ownership until dispatch, accept both responses, reject wrong/deferred/old/unknown identities, aggregate both and reach round 4. Distinct-worker assignments are established before any emit await; immediate response inside each emit passes without premature aggregation."
+    },
+    "R2B-01": {
+      "status": "PASS",
+      "result": "Selective removal restores the heap. Actual ingress-created partial heap selects [20,9,28] and [20,9,28,31], with the independently recorded finish-time reference. Simulated wall time stays at 50 for earlier responses in both minimum-selection and stale-drain paths."
+    },
+    "R2B-02": {
+      "status": "PASS",
+      "result": "Two distinct retained completions for logical ID 7 across workers each count once at the actual _select_clients send-await boundary. 190+190 bytes against budget 400 reject the third 169-byte report before load_pickle. Reuse releases only its cache; malformed third-worker ingress and first-worker disconnect preserve queued bytes. Processed release and close clear the correct owners and queue objects. Legacy report/payload values remain visible."
+    },
+    "R2B-L01": {
+      "status": "PASS",
+      "result": "The cumulative reserve check enforces max_buffered_bytes as well as max_payload_bytes before append. Actual client socket and local HTTP S3 reject 82-byte payloads at a 20-byte cap and clear transfer state; bounded simulated-file cap remains consistent."
+    },
+    "S3_B_local": {
+      "status": "PASS; final accepted B/D combination still required at root",
+      "result": "Minimal interface requires only key_prefix, bucket and s3_client.generate_presigned_url. Empty, prefixed, qualified, nested and leading/trailing-slash cases pass. Actual immutable D S3 utility source is identical at a4a4733 and current aa232791 (SHA256 a26d306d...). All 24 actual writer/presigner/bounded-reader key/size/deadline cases pass on both interpreters; copied namespace assertions alone are not the evidence."
+    },
+    "F10": {
+      "status": "PASS",
+      "result": "Actual disconnect cleans current logical identity 17 .pth/.pth.pkl/.safetensors files, preserving former/other identities, server resume state, unrelated suffixes and directories."
+    },
+    "F11": {
+      "status": "PASS locally; F07 handoff retained",
+      "result": "Actual weights_aggregated hook writes Safetensors plus sidecar. Reader deserializes repository tree and CPU weights_only legacy .pth. Actual stale cosine 0.6 and independent 2/6 stale weighting pass; reversed insertion order with two parameter keys gives cosine 1/3 while values, storage, CPU device and eval mode remain unchanged."
+    },
+    "F18": {
+      "status": "PASS",
+      "result": "Raw/transformed sample weights and cardinality reject before ordinary, legacy or delta mutation, including negative/nonfinite counts and nonfinite total. Twelve independent callback mutations pass; shipped direct/legacy/delta/raw/hook/reverse/fractional/zero/feature and cross-silo trainer-identity-before-mutation cases pass."
+    },
+    "identity_and_bounded_ingress": {
+      "status": "PASS in tested ingress; R2B-04 is dispatcher liveness",
+      "result": "Current assignment and embedded identity checks reject wrong/unknown/stale/duplicate ingress and S3 references before affecting other peers. Finite report/chunk/payload/count/deadline limits, malformed/trailing/truncated/incomplete cleanup, retry, header/stream S3 caps and timeout tests pass. No weakening of the identity guard is needed."
+    },
+    "callbacks_selection_evaluation": {
+      "status": "PASS for tested contracts",
+      "result": "Registration order and callback-body AttributeError propagation pass. Async partial replacement, FedBuff uniform mean, actual FedAsync example staleness mixing, personalized/split selection, central-edge assignment, cross-silo pre-mutation validation and finite all-zero evaluation pass."
+    },
+    "startup_runtime": {
+      "status": "PASS retained exact-source acceptance",
+      "result": "48 unchanged startup cases per interpreter and final 227-pass author matrices verified. Corrected real two-client CPU socket results have natural returns, no forced success or survivors, actual sample counts 2/6 and numerical error <=1.4901161193847656e-08. No full startup matrix rerun; retained raw artifacts and hashes independently rechecked."
+    }
+  },
+  "checks_performed": [
+    {
+      "check": "Independent affected runtime suite excluding unchanged startup subprocess matrix",
+      "python": "3.13.16",
+      "command": "PYTHONDONTWRITEBYTECODE=1 OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2b-review-2/venv313/bin/python -m pytest tests/clients tests/servers tests/callbacks tests/integration/test_smoke_configs.py -q -p no:cacheprovider --basetemp /tmp/plato-phase2b-review-2/pytest313",
+      "cwd": "/tmp/plato-phase2b-review-2/candidate",
+      "result": "179 passed; no skips or warnings",
+      "log": {
+        "path": "/tmp/plato-phase2b-review-2/runtime313.log",
+        "sha256": "513165ae5fc5af4dbba054408ff7281b0979b4df750fab7369a9375560b3d0dd"
+      }
+    },
+    {
+      "check": "Independent final correction, numerical and disconnect probes",
+      "python": "3.13.16",
+      "command": "PYTHONDONTWRITEBYTECODE=1 OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2b-review-2/venv313/bin/python -m pytest tests/test_review2_probes.py tests/test_review2_disconnect_probe.py -q -s -p no:cacheprovider --basetemp /tmp/plato-phase2b-review-2/confirmed313",
+      "cwd": "/tmp/plato-phase2b-review-2/candidate",
+      "result": "22 passed, 1 failed. Sole product failure is R2B-04 at the final absent-session assertion.",
+      "log": {
+        "path": "/tmp/plato-phase2b-review-2/confirmed313.log",
+        "sha256": "144faaa873d962271f64db68ae683d95a169c93d1c91312601ddc3259c8f08c6"
+      },
+      "scope": "F10, F11 and 12 F18 callback-transformation cases reused the original independent review source; seven new positive correction cases and the disconnect degradation case were independently authored in owned scratch. Actual runtime selection, batching, default staleness predicate, ingress, heap, accounting and disconnect execute. Payload/report generation, outbound network and aggregate/wrap are stubs."
+    },
+    {
+      "check": "Actual immutable D S3 utility writer and B bounded HTTP reader",
+      "python": "3.13.16",
+      "command": "PYTHONDONTWRITEBYTECODE=1 OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2b-review-2/venv313/bin/python -m pytest tests/test_review2_probes.py tests/test_review2_s3_combined.py -q -s -p no:cacheprovider --basetemp /tmp/plato-phase2b-review-2/probes313",
+      "result": "All 24 writer/botocore-presigner/bounded-reader integration cases passed. This early combined run had 44 passes and two reviewer harness cleanup failures; those two lacked a configured Socket.IO stub, were corrected only in owned scratch, and both pass in the final 22-case positive probe set.",
+      "log": {
+        "path": "/tmp/plato-phase2b-review-2/probes313.log",
+        "sha256": "1ce858b1a0370e54c184daf5105d987a2377aafb02afe4335a7203f155a6dec1"
+      },
+      "source": {
+        "path": "/tmp/plato-phase2b-review-2/candidate/tests/test_review2_s3_combined.py",
+        "sha256": "7382fd4b732863ccb7ad0c4d4efbbddb39f5ba79218e67a7eaaf1553b70a8fcb"
+      },
+      "scope": "Author 24-case probe copied into owned scratch, changing only pinned utility source pathname. Real exact D constructor, head requests, send_to_s3 -> put_to_s3, Requests PUT and botocore presigning execute against local HTTP. Empty/prefixed/nested/trailing-slash namespaces, full/minimal adapters, successful reads, size rejection and absolute deadline execute. Shipped eight minimal-adapter cases separately cover already-qualified keys and leading/trailing slashes."
+    },
+    {
+      "check": "Independent affected runtime suite excluding unchanged startup subprocess matrix",
+      "python": "3.14.8",
+      "command": "PYTHONDONTWRITEBYTECODE=1 OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2b-review-2/venv314/bin/python -m pytest tests/clients tests/servers tests/callbacks tests/integration/test_smoke_configs.py -q -p no:cacheprovider --basetemp /tmp/plato-phase2b-review-2/pytest314",
+      "cwd": "/tmp/plato-phase2b-review-2/candidate",
+      "result": "179 passed; no skips or warnings",
+      "log": {
+        "path": "/tmp/plato-phase2b-review-2/runtime314.log",
+        "sha256": "5757d348d5a57a4930d38f1f6538046656b8d0658988f09cb4338c3a4a6fa3c8"
+      }
+    },
+    {
+      "check": "Independent final correction, numerical and disconnect probes",
+      "python": "3.14.8",
+      "command": "PYTHONDONTWRITEBYTECODE=1 OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2b-review-2/venv314/bin/python -m pytest tests/test_review2_probes.py tests/test_review2_disconnect_probe.py -q -s -p no:cacheprovider --basetemp /tmp/plato-phase2b-review-2/confirmed314",
+      "cwd": "/tmp/plato-phase2b-review-2/candidate",
+      "result": "22 passed, 1 failed. Sole product failure is R2B-04 at the final absent-session assertion.",
+      "log": {
+        "path": "/tmp/plato-phase2b-review-2/confirmed314.log",
+        "sha256": "0982b35fa95fd6a250a99727cad07f8e6fc739889632ed334889bb0a74eeaef0"
+      },
+      "scope": "F10, F11 and 12 F18 callback-transformation cases reused the original independent review source; seven new positive correction cases and the disconnect degradation case were independently authored in owned scratch. Actual runtime selection, batching, default staleness predicate, ingress, heap, accounting and disconnect execute. Payload/report generation, outbound network and aggregate/wrap are stubs."
+    },
+    {
+      "check": "Actual immutable D S3 utility writer and B bounded HTTP reader",
+      "python": "3.14.8",
+      "command": "PYTHONDONTWRITEBYTECODE=1 OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2b-review-2/venv314/bin/python -m pytest tests/test_review2_probes.py tests/test_review2_s3_combined.py -q -s -p no:cacheprovider --basetemp /tmp/plato-phase2b-review-2/probes314",
+      "result": "All 24 writer/botocore-presigner/bounded-reader integration cases passed. This early combined run had 44 passes and two reviewer harness cleanup failures; those two lacked a configured Socket.IO stub, were corrected only in owned scratch, and both pass in the final 22-case positive probe set.",
+      "log": {
+        "path": "/tmp/plato-phase2b-review-2/probes314.log",
+        "sha256": "67961c0532565d9877c2ec9ee1fd70723cef5a76b0b9487a463554cbaf358ac9"
+      },
+      "source": {
+        "path": "/tmp/plato-phase2b-review-2/candidate/tests/test_review2_s3_combined.py",
+        "sha256": "7382fd4b732863ccb7ad0c4d4efbbddb39f5ba79218e67a7eaaf1553b70a8fcb"
+      },
+      "scope": "Author 24-case probe copied into owned scratch, changing only pinned utility source pathname. Real exact D constructor, head requests, send_to_s3 -> put_to_s3, Requests PUT and botocore presigning execute against local HTTP. Empty/prefixed/nested/trailing-slash namespaces, full/minimal adapters, successful reads, size rejection and absolute deadline execute. Shipped eight minimal-adapter cases separately cover already-qualified keys and leading/trailing slashes."
+    },
+    {
+      "check": "Retained evidence integrity and numerical socket references",
+      "command": "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=/tmp/plato-phase2b-review-2/candidate OMP_NUM_THREADS=1 /tmp/plato-phase2b-review-2/venv313/bin/python /tmp/plato-phase2b-review-2/audit_evidence.py",
+      "result": "Verified every changed source/test file against exact B git objects; original accepted startup sources/fixtures byte-identical to phase base. All declared correction red/green/broad log hashes and original reviewed log hashes match. Inspected 192 retained startup records (96 initial plus 96 correction), each durable event stream matches its result, zero survivors, five deliberate negative containment cases per run. Both corrected socket rounds return naturally with separate real CPU clients and actual 2/6 reports. Four socket rounds including initial evidence reproduce weighted NumPy float64 errors <=1.4901161193847656e-08; client/final/checkpoint Safetensors equal recorded values.",
+      "source": {
+        "path": "/tmp/plato-phase2b-review-2/audit_evidence.py",
+        "sha256": "d9c9fe63b1cd327a9311d2b5ba5430a416fb51ddb3ad148d66a3155807b69df2"
+      },
+      "output": {
+        "path": "/tmp/plato-phase2b-review-2/evidence-audit.json",
+        "sha256": "16657ef907004b479c58222f1c0d57409ed45f783106c7845d5e10a37ec8042e"
+      },
+      "log": {
+        "path": "/tmp/plato-phase2b-review-2/evidence-audit.log",
+        "sha256": "647e93e999112fde91f4584217ff08d6521c49460076221d1f995cb5db98f82a"
+      }
+    },
+    {
+      "check": "Actual author correction red and green evidence",
+      "result": "Verified both interpreter log hashes, meaningful 22-failure breakdown, 40-case correction green results and final 227-pass affected matrices. Collection of exact B yields 227 affected nodes, including 48 unchanged startup cases. The separate actual D combination adds 24 distinct nodes: 251 per interpreter, not 227+40. Initial collection-only author harness failures remain excluded from product red evidence.",
+      "logs": {
+        "/tmp/plato-phase2b-runtime/review-fixes/red-behavior313.log": {
+          "sha256": "da557faffe134668f39e17fc3e6185fe0993373f7ebe60db93f669b0999778f2",
+          "last_line": "22 failed, 18 passed in 18.64s",
+          "failure_lines": [
+            "FAILED tests/servers/test_runtime_review_regressions.py::test_partial_urgency_preserves_heap_order[3]",
+            "FAILED tests/servers/test_runtime_review_regressions.py::test_partial_urgency_preserves_heap_order[4]",
+            "FAILED tests/servers/test_runtime_review_regressions.py::test_earlier_response_never_rewinds_simulated_time",
+            "FAILED tests/servers/test_runtime_review_regressions.py::test_batched_shared_worker_completes_every_urgent_response",
+            "FAILED tests/servers/test_runtime_review_regressions.py::test_distinct_retained_transfers_survive_worker_reuse_and_cleanup",
+            "FAILED tests/servers/test_runtime_s3_contract.py::test_minimal_s3_adapter_prefixes_exactly_once[False-]",
+            "FAILED tests/servers/test_runtime_s3_contract.py::test_minimal_s3_adapter_prefixes_exactly_once[False-/prefix/]",
+            "FAILED tests/servers/test_runtime_s3_contract.py::test_minimal_s3_adapter_prefixes_exactly_once[True-]",
+            "FAILED tests/servers/test_runtime_s3_contract.py::test_minimal_s3_adapter_prefixes_exactly_once[True-prefix]",
+            "FAILED tests/servers/test_runtime_s3_contract.py::test_minimal_s3_adapter_prefixes_exactly_once[True-nested/prefix]",
+            "FAILED tests/servers/test_runtime_s3_contract.py::test_minimal_s3_adapter_prefixes_exactly_once[True-/prefix/]",
+            "FAILED tests/servers/test_runtime_s3_contract.py::test_client_buffer_cap_applies_below_payload_cap[socket]",
+            "FAILED tests/servers/test_runtime_s3_contract.py::test_client_buffer_cap_applies_below_payload_cap[s3]",
+            "FAILED ::test_exact_d_writer_presigner_and_bounded_b_reader[valid-False-] - V...",
+            "FAILED ::test_exact_d_writer_presigner_and_bounded_b_reader[valid-True-] - Va...",
+            "FAILED ::test_exact_d_writer_presigner_and_bounded_b_reader[valid-True-prefix/]",
+            "FAILED ::test_exact_d_writer_presigner_and_bounded_b_reader[oversize-False-]",
+            "FAILED ::test_exact_d_writer_presigner_and_bounded_b_reader[oversize-True-]",
+            "FAILED ::test_exact_d_writer_presigner_and_bounded_b_reader[oversize-True-prefix/]",
+            "FAILED ::test_exact_d_writer_presigner_and_bounded_b_reader[deadline-False-]",
+            "FAILED ::test_exact_d_writer_presigner_and_bounded_b_reader[deadline-True-]",
+            "FAILED ::test_exact_d_writer_presigner_and_bounded_b_reader[deadline-True-prefix/]"
+          ]
+        },
+        "/tmp/plato-phase2b-runtime/review-fixes/green313.log": {
+          "sha256": "72731a6fe4dd1040c41381eb883f17f26490827ad77cc746a6deeaa44f908743",
+          "last_line": "40 passed in 18.21s"
+        },
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted313.log": {
+          "sha256": "84038006d7002d8e3f966096db58c1eef4f5b6a61916f8ebb8e897668d8e6bf3",
+          "last_line": "227 passed in 432.09s (0:07:12)"
+        },
+        "/tmp/plato-phase2b-runtime/review-fixes/red-behavior314.log": {
+          "sha256": "08c527c9455f33d573b41b1345c7a37a2d986cd36f682b2a35686e421d6b63cc",
+          "last_line": "22 failed, 18 passed in 53.14s",
+          "failure_lines": [
+            "FAILED tests/servers/test_runtime_review_regressions.py::test_partial_urgency_preserves_heap_order[3]",
+            "FAILED tests/servers/test_runtime_review_regressions.py::test_partial_urgency_preserves_heap_order[4]",
+            "FAILED tests/servers/test_runtime_review_regressions.py::test_earlier_response_never_rewinds_simulated_time",
+            "FAILED tests/servers/test_runtime_review_regressions.py::test_batched_shared_worker_completes_every_urgent_response",
+            "FAILED tests/servers/test_runtime_review_regressions.py::test_distinct_retained_transfers_survive_worker_reuse_and_cleanup",
+            "FAILED tests/servers/test_runtime_s3_contract.py::test_minimal_s3_adapter_prefixes_exactly_once[False-]",
+            "FAILED tests/servers/test_runtime_s3_contract.py::test_minimal_s3_adapter_prefixes_exactly_once[False-/prefix/]",
+            "FAILED tests/servers/test_runtime_s3_contract.py::test_minimal_s3_adapter_prefixes_exactly_once[True-]",
+            "FAILED tests/servers/test_runtime_s3_contract.py::test_minimal_s3_adapter_prefixes_exactly_once[True-prefix]",
+            "FAILED tests/servers/test_runtime_s3_contract.py::test_minimal_s3_adapter_prefixes_exactly_once[True-nested/prefix]",
+            "FAILED tests/servers/test_runtime_s3_contract.py::test_minimal_s3_adapter_prefixes_exactly_once[True-/prefix/]",
+            "FAILED tests/servers/test_runtime_s3_contract.py::test_client_buffer_cap_applies_below_payload_cap[socket]",
+            "FAILED tests/servers/test_runtime_s3_contract.py::test_client_buffer_cap_applies_below_payload_cap[s3]",
+            "FAILED ::test_exact_d_writer_presigner_and_bounded_b_reader[valid-False-] - V...",
+            "FAILED ::test_exact_d_writer_presigner_and_bounded_b_reader[valid-True-] - Va...",
+            "FAILED ::test_exact_d_writer_presigner_and_bounded_b_reader[valid-True-prefix/]",
+            "FAILED ::test_exact_d_writer_presigner_and_bounded_b_reader[oversize-False-]",
+            "FAILED ::test_exact_d_writer_presigner_and_bounded_b_reader[oversize-True-]",
+            "FAILED ::test_exact_d_writer_presigner_and_bounded_b_reader[oversize-True-prefix/]",
+            "FAILED ::test_exact_d_writer_presigner_and_bounded_b_reader[deadline-False-]",
+            "FAILED ::test_exact_d_writer_presigner_and_bounded_b_reader[deadline-True-]",
+            "FAILED ::test_exact_d_writer_presigner_and_bounded_b_reader[deadline-True-prefix/]"
+          ]
+        },
+        "/tmp/plato-phase2b-runtime/review-fixes/green314.log": {
+          "sha256": "7d2b9d0bb631306e2f6a4aa8cd5ee586da7c909274793437093513eeaa39cda6",
+          "last_line": "40 passed in 53.04s"
+        },
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted314.log": {
+          "sha256": "efcab313a8c5e667bd7e7d4eec65b91062eae29393f0dd5fd6b5c5c41ad7d666",
+          "last_line": "227 passed in 480.55s (0:08:00)"
+        },
+        "/tmp/plato-phase2b-runtime/accepted313.log": {
+          "sha256": "cd83cb032dadd5b8ce233f0ce7dd4ae106695f53e159cc0f93d9245685b4f63a",
+          "last_line": "209 passed in 442.30s (0:07:22)"
+        },
+        "/tmp/plato-phase2b-runtime/accepted314.log": {
+          "sha256": "571a011670811c59630dbe4ab563d203138a54fd07de1a93f81f18cd469f241d",
+          "last_line": "209 passed in 457.58s (0:07:37)"
+        },
+        "/tmp/plato-phase2b-runtime/green-selection313.log": {
+          "sha256": "5cd181dda365720baffdf768f949c8e316bcb70ddea43d796c2d87478ee7ad40",
+          "last_line": "55 passed in 0.55s"
+        },
+        "/tmp/plato-phase2b-runtime/green-selection314.log": {
+          "sha256": "5cd181dda365720baffdf768f949c8e316bcb70ddea43d796c2d87478ee7ad40",
+          "last_line": "55 passed in 0.55s"
+        },
+        "/tmp/plato-phase2b-runtime/red-port313.log": {
+          "sha256": "9b3caa33b11990741d8c4e2f194e3c27acc969e894dd1db155e6ff44463db3a9",
+          "last_line": "2 failed in 0.11s"
+        },
+        "/tmp/plato-phase2b-runtime/red-transport-cleanup313.log": {
+          "sha256": "750d757f2967b8f9ac6304e8813cabdf82f8d50e3879f399a430e0bb3994a735",
+          "last_line": "28 failed, 2 passed, 9 deselected in 1.01s"
+        },
+        "/tmp/plato-phase2b-runtime/red-aggregation-callback313.log": {
+          "sha256": "203940571bab3652869893a30870298e52969fa57b1a3454ba9d9664906a4b30",
+          "last_line": "52 failed, 21 deselected in 0.70s"
+        },
+        "/tmp/plato-phase2b-runtime/red-async-selection313.log": {
+          "sha256": "a38e407b2a559f6cfedff6f3071143d7a1dc9999abd86df01d1be1ec9ee3f1db",
+          "last_line": "2 failed, 4 deselected in 0.16s"
+        },
+        "/tmp/plato-phase2b-runtime/red-cross-silo313.log": {
+          "sha256": "0709bc0b656b5692840aff7927110b1dc758e72267ba799c24f230dc4ec14888",
+          "last_line": "2 failed, 1 passed, 3 warnings in 0.19s"
+        },
+        "/tmp/plato-phase2b-runtime/baseline-input-values.json": {
+          "sha256": "357ab473120e45c58434fe4abd46750f5b09fbf00d23bbe0ce60bde7cfd1240c",
+          "last_line": "}"
+        },
+        "/tmp/plato-phase2b-runtime/s3-prefix-handoff.json": {
+          "sha256": "578ab4652ef07d1eeeaae0ce82efe65dc660f7b83329262a639cf8ca55151bf1",
+          "last_line": "}"
+        }
+      },
+      "collection": {
+        "path": "/tmp/plato-phase2b-review-2/collection227.log",
+        "sha256": "a49940be759f3627e0bb0d9551d3dad014f04b70e19d02293cbdc7dab1bc7d45"
+      }
+    },
+    {
+      "check": "Static source checks",
+      "result": "Scoped production Ruff import-order check and git diff --check from phase base to exact B pass. No changes to candidate, other environments, metadata, CI, trainer/algorithm sources or D worktree."
+    }
+  ],
+  "retained_runtime_evidence": {
+    "/tmp/plato-phase2b-runtime/accepted313": {
+      "records": 48,
+      "survivors": 0,
+      "result_hashes": {
+        "/tmp/plato-phase2b-runtime/accepted313/test_active_edge_failure_unwin0/edge/result.json": "9c1f377f748ab5f16c791558588ef762f4026804aad9db7143c67856f1f88eef",
+        "/tmp/plato-phase2b-runtime/accepted313/test_active_failure_reaches_sy0/client_custom/result.json": "d73d71cc03eb578a8d88cf23a652ad57e34bad8bde3979deabf133fcdda68bd9",
+        "/tmp/plato-phase2b-runtime/accepted313/test_active_failure_reaches_sy1/ordinary/result.json": "4d72e53e93826757fedb1ca74802d18fd56536de70e2cc5b6e6592af5dda0d60",
+        "/tmp/plato-phase2b-runtime/accepted313/test_active_failure_reaches_sy2/central/result.json": "399062da5bbc7213ba11cb59f81b86af3b2c6495102907a2c7feb8439d75cd35",
+        "/tmp/plato-phase2b-runtime/accepted313/test_active_failure_reaches_sy3/edge_custom/result.json": "6acfc1dd4c297eac709b0d3a6227cb6907ef08176c1fc1882073715070aa1d5a",
+        "/tmp/plato-phase2b-runtime/accepted313/test_cancellation_already_fina0/cancelling/result.json": "ad8ffd6d14eaef4c479723cf1252390f978700259dcfcfb3f604dc8afb94f098",
+        "/tmp/plato-phase2b-runtime/accepted313/test_client_control_flow_keeps0/interrupt/result.json": "9990dfb8dbc9ff38a9978da0e9000588fa16a17441e7ebfa4f4709a5736a6a69",
+        "/tmp/plato-phase2b-runtime/accepted313/test_client_control_flow_keeps1/exit/result.json": "df17286d8986bb04f55285d463e5470684b6891ebe71140d0ada7f791a89e8c8",
+        "/tmp/plato-phase2b-runtime/accepted313/test_closed_current_client_loo0/closed/result.json": "262f471ed4a306d013159a6df7d8bc01d474a40b45ff4b4eff4ff729d0bba80d",
+        "/tmp/plato-phase2b-runtime/accepted313/test_configure_failure_is_pres0/configure/result.json": "71e772ec09b01d05f0e77761366532a362548128a4cffc6b20c0f6d5803e0580",
+        "/tmp/plato-phase2b-runtime/accepted313/test_delegating_server_consume0/delegated/result.json": "6bea09584ab11395a025b91e557a38fd25a41687ffa71181b1b509f70b5f5f7d",
+        "/tmp/plato-phase2b-runtime/accepted313/test_edge_cancellation_error_k0/edge/result.json": "c5bce7f713cf2203e71669c82798504ddf70d2c28d84955f234ff6eb087b48e7",
+        "/tmp/plato-phase2b-runtime/accepted313/test_explicitly_absent_loop_on0/ordinary/result.json": "d422c42757ba61d44d54fed243fe7e4028f0e5e188d7c82de8d1938935edaacf",
+        "/tmp/plato-phase2b-runtime/accepted313/test_explicitly_absent_loop_on1/central/result.json": "31740380f5ed34e727d0193e2745a1a5e349c4054a8ed20e13a57206f1866275",
+        "/tmp/plato-phase2b-runtime/accepted313/test_explicitly_absent_loop_on2/edge_default/result.json": "9f15c12372ce2815bd474daa1154bb4e212d25b0b7d04c956e1a71713284e149",
+        "/tmp/plato-phase2b-runtime/accepted313/test_explicitly_absent_loop_on3/edge_custom/result.json": "2bfe10411ded5814a51ab80e9732e1c7429c0feb91ffd756e2d11bc337b8369b",
+        "/tmp/plato-phase2b-runtime/accepted313/test_fresh_entrypoint_executes0/client_default/result.json": "66993209fdb5ae988ca41875faf31c8a98b2167b9ed91b505fe0e135b6aa7828",
+        "/tmp/plato-phase2b-runtime/accepted313/test_fresh_entrypoint_executes1/client_custom/result.json": "15874a4e82df547ded17fb80a76bd6c3cdfe5c01feddaf3ea7bfb839fddf8ec3",
+        "/tmp/plato-phase2b-runtime/accepted313/test_fresh_entrypoint_executes2/ordinary/result.json": "84dfa734ba2be8c340c72d252e42a4d731bf12ff75d5cf4f11e61332b25722f7",
+        "/tmp/plato-phase2b-runtime/accepted313/test_fresh_entrypoint_executes3/central/result.json": "259b8c1982fee7c688b5b501464098e703a425f0b26a4c37d41a4e734d748c6f",
+        "/tmp/plato-phase2b-runtime/accepted313/test_fresh_entrypoint_executes4/direct/result.json": "7538520569cfec046162ede74fbac325ad49955224c61883cd5f11b76776870c",
+        "/tmp/plato-phase2b-runtime/accepted313/test_fresh_entrypoint_executes5/edge_default/result.json": "95a746a764c3da4da8669acbda50e9865f1fcdc5d1cdf9fd159cdda64a78d930",
+        "/tmp/plato-phase2b-runtime/accepted313/test_fresh_entrypoint_executes6/edge_custom/result.json": "eff7fab60b294857018011cc2393bffed7e58adde3f577bf0a1e67db3c5e3d81",
+        "/tmp/plato-phase2b-runtime/accepted313/test_independent_runtime_error0/independent/result.json": "28dc33aef0067a5e60ce41c4fa993bdaa2e4f81c0b424a1feb4c0a990e67f2d3",
+        "/tmp/plato-phase2b-runtime/accepted313/test_missing_external_edge_cli0/edge/result.json": "a269b4d7b2850194b31b35f7de9b63b7728bbf114355e655d988dfcd73b83404",
+        "/tmp/plato-phase2b-runtime/accepted313/test_noncooperative_teardown_i0/task/result.json": "bb5e8386e58ee06da86d4f4eb0048f57f69e4cde404776b86aec9a3c7098eb9a",
+        "/tmp/plato-phase2b-runtime/accepted313/test_noncooperative_teardown_i1/generator/result.json": "099acc4380ad89989a18acc9417c6d6f440f2bf9ad25519bb1999d97a5140c3a",
+        "/tmp/plato-phase2b-runtime/accepted313/test_noncooperative_teardown_i2/executor/result.json": "7c7dc914e91b192b4c0c401f9d60896e550d0b7c960fb738c3cdd1591b4afe1e",
+        "/tmp/plato-phase2b-runtime/accepted313/test_noncooperative_teardown_i3/aiohttp_task/result.json": "fa9b83f742536ca8d2a359a7b6b8991d7e28f3ad8954477bc037d6acc7ec288d",
+        "/tmp/plato-phase2b-runtime/accepted313/test_owned_client_finalizes_ta0/client/result.json": "849647c95334adb6ae1aa1a4cedefb2932378e00c1f94f4a5fc951726b40f3a4",
+        "/tmp/plato-phase2b-runtime/accepted313/test_owned_client_finalizes_ta1/client/result.json": "8d89c2037fb8374f52455a09e701d1ee8e7b5bc9c27e5fc742128ede17a39d6c",
+        "/tmp/plato-phase2b-runtime/accepted313/test_owned_server_fallback_fin0/fallback/result.json": "b0523aeca1d3e02748c589dbb34d78349ceb0f224bf4dfa5052a7278c416c4f4",
+        "/tmp/plato-phase2b-runtime/accepted313/test_owned_server_fallback_fin1/fallback/result.json": "077e19941d4b53e337d8fbf82801e9ff70ca9852c59582a0ee900310dc692e08",
+        "/tmp/plato-phase2b-runtime/accepted313/test_post_launch_failure_keeps0/failure/result.json": "f2d1bd986b6a0584c67ba1688dc65be57f1d2d9e874a805817462ec6a91181a4",
+        "/tmp/plato-phase2b-runtime/accepted313/test_preconstructed_borrowed_l0/client_lifecycle/result.json": "bf80b4179fe7f1d1fdace5378241eb75da3455c5a5af76be476ea188b944acd1",
+        "/tmp/plato-phase2b-runtime/accepted313/test_preconstructed_borrowed_l1/client_lifecycle/result.json": "980818f74b2fa650c92aade15470a184c92bd2290c8af2edc0cf2c500d0b7699",
+        "/tmp/plato-phase2b-runtime/accepted313/test_preconstructed_borrowed_l2/ordinary/result.json": "98e9990229ae8eeecbc42a70925669dd08f361af8ef9f3fa4a8a9437aef2037b",
+        "/tmp/plato-phase2b-runtime/accepted313/test_preconstructed_borrowed_l3/ordinary/result.json": "0128ced2b2b30ada87d60a6d3892fb58b2dbf17a5f7baada60af6413afadb318",
+        "/tmp/plato-phase2b-runtime/accepted313/test_real_two_client_cpu_socke0/round/result.json": "76ea78134ad4e1912e391d3e3018f2d3271f85d5d794735deafbc27d0922f3de",
+        "/tmp/plato-phase2b-runtime/accepted313/test_repeated_owned_client_ent0/client/result.json": "58b0849314b5644d8729faaebc81a019a8fe5b40b6070539e6a30dbe75b3bd4c",
+        "/tmp/plato-phase2b-runtime/accepted313/test_runner_cleanup_error_keep0/cleanup/result.json": "1399bc44da42ea11d25e1f1d27c68ae765db6efac8628ec7b0fe7dd468cefba9",
+        "/tmp/plato-phase2b-runtime/accepted313/test_running_loop_rejected_bef0/running/result.json": "20ba5935802a038e8fd5537b97f0370a992e85657471ae03ae72d41ee0afbe75",
+        "/tmp/plato-phase2b-runtime/accepted313/test_server_error_precedence_a0/server/result.json": "1848cc31fb39bb545b7728c3e8842ad59d3db7537f422d2158d95870529ce5b9",
+        "/tmp/plato-phase2b-runtime/accepted313/test_server_error_precedence_a1/server/result.json": "4a571158bf956a9bd4346b7ec722a5eb20f234bdd1ed7b6c9258414c190034e9",
+        "/tmp/plato-phase2b-runtime/accepted313/test_server_error_precedence_a2/server/result.json": "34aaca7ccc599e343dad4d51447024296564d3cb3a76f5871d8181f14b167a1c",
+        "/tmp/plato-phase2b-runtime/accepted313/test_server_error_precedence_a3/server/result.json": "b5da0542e06f65415a59e982313eb8beb615671b32986fc33c9a568986305586",
+        "/tmp/plato-phase2b-runtime/accepted313/test_server_error_precedence_a4/server/result.json": "a74d0ce461e4a4e99bac9b2f62ae9d22f466fa2def836900aca768e1b2e5aeb2",
+        "/tmp/plato-phase2b-runtime/accepted313/test_stalled_real_client_is_co0/stalled/result.json": "ab242f0061be115c30775e33e7627ab950faaaf762a6e405bfc639562fe5a726"
+      },
+      "deliberate_negative_containment": [
+        {
+          "path": "/tmp/plato-phase2b-runtime/accepted313/test_noncooperative_teardown_i0/task/result.json",
+          "case": "client_lifecycle",
+          "options": {
+            "absent": true,
+            "stall": "task"
+          },
+          "forced": [
+            "TERM"
+          ]
+        },
+        {
+          "path": "/tmp/plato-phase2b-runtime/accepted313/test_noncooperative_teardown_i1/generator/result.json",
+          "case": "client_lifecycle",
+          "options": {
+            "absent": true,
+            "stall": "generator"
+          },
+          "forced": [
+            "TERM"
+          ]
+        },
+        {
+          "path": "/tmp/plato-phase2b-runtime/accepted313/test_noncooperative_teardown_i2/executor/result.json",
+          "case": "client_lifecycle",
+          "options": {
+            "absent": true,
+            "stall": "executor"
+          },
+          "forced": [
+            "TERM"
+          ]
+        },
+        {
+          "path": "/tmp/plato-phase2b-runtime/accepted313/test_noncooperative_teardown_i3/aiohttp_task/result.json",
+          "case": "ordinary",
+          "options": {
+            "absent": true,
+            "real": true,
+            "startup_fail": true,
+            "secondary": true,
+            "stall": "task"
+          },
+          "forced": [
+            "TERM",
+            "KILL"
+          ]
+        },
+        {
+          "path": "/tmp/plato-phase2b-runtime/accepted313/test_stalled_real_client_is_co0/stalled/result.json",
+          "case": "socket_stall",
+          "options": {},
+          "forced": [
+            "TERM"
+          ]
+        }
+      ],
+      "all_durable_events_match_results": true,
+      "socket_result": "/tmp/plato-phase2b-runtime/accepted313/test_real_two_client_cpu_socke0/round/result.json",
+      "socket_result_sha256": "76ea78134ad4e1912e391d3e3018f2d3271f85d5d794735deafbc27d0922f3de",
+      "socket_elapsed": 14.624215124873444,
+      "socket_forced": [],
+      "socket_event_hashes": {
+        "/tmp/plato-phase2b-runtime/accepted313/test_real_two_client_cpu_socke0/round/events-45115.jsonl": "3039c1314743e1c8af4fe6e89a34515429464eaa18a89517a3510e94bf3b6a62",
+        "/tmp/plato-phase2b-runtime/accepted313/test_real_two_client_cpu_socke0/round/events-45114.jsonl": "ebdd5f620572fe1c2b3aec9abcbb3eff978bb7846b519ade5060735438615ed6",
+        "/tmp/plato-phase2b-runtime/accepted313/test_real_two_client_cpu_socke0/round/events-45112.jsonl": "fdadbee960d7ff7ba7f5c076828e80ce82992593a4bb53bd2f41574625011955"
+      },
+      "trained": [
+        {
+          "id": 1,
+          "samples": 2,
+          "pid": 45114
+        },
+        {
+          "id": 2,
+          "samples": 6,
+          "pid": 45115
+        }
+      ],
+      "maximum_weighted_reference_errors": {
+        "linear.weight": 1.4901161193847656e-08,
+        "linear.bias": 2.9103830456733704e-10
+      },
+      "artifact_hashes": {
+        "/tmp/plato-phase2b-runtime/accepted313/test_real_two_client_cpu_socke0/round/models/pretrained/startup_tiny_1_45114.safetensors": "7d1b4e39fe8c20fbc8d5a1bcdaaf68d23955752149ef34cffa2e58f5e8a68961",
+        "/tmp/plato-phase2b-runtime/accepted313/test_real_two_client_cpu_socke0/round/models/pretrained/startup_tiny_2_45115.safetensors": "c4c686574485435175402208fbefbbdea1fe5aa735b1bca4f93d4836651becd4",
+        "/tmp/plato-phase2b-runtime/accepted313/test_real_two_client_cpu_socke0/round/models/pretrained/startup_tiny.safetensors": "a5a3bff8503c83d1f8b64c96494315c337dc682a2cfab1bb0b5c665176ab1632",
+        "/tmp/plato-phase2b-runtime/accepted313/test_real_two_client_cpu_socke0/round/checkpoints/checkpoint_startup_tiny_1.safetensors": "a5a3bff8503c83d1f8b64c96494315c337dc682a2cfab1bb0b5c665176ab1632"
+      }
+    },
+    "/tmp/plato-phase2b-runtime/accepted314": {
+      "records": 48,
+      "survivors": 0,
+      "result_hashes": {
+        "/tmp/plato-phase2b-runtime/accepted314/test_active_edge_failure_unwin0/edge/result.json": "a91724e37ac4c611351d7cf0bc978b85414bc2a41c7858c59b738e62d8fb9dea",
+        "/tmp/plato-phase2b-runtime/accepted314/test_active_failure_reaches_sy0/client_custom/result.json": "bb0211b41b93c94c586b5bf4e1f098cd5cd7974e9a3d2f71b73ff18e24bbdf03",
+        "/tmp/plato-phase2b-runtime/accepted314/test_active_failure_reaches_sy1/ordinary/result.json": "f7f3c05af87d91ebf90e2c1795757b792f05d037bf0c94043fcb883c3b9b9e0d",
+        "/tmp/plato-phase2b-runtime/accepted314/test_active_failure_reaches_sy2/central/result.json": "5ce56eedbfcef72c59d4eefbf7b59c7ee3c9bc33654fc720c15376942c8dcfd7",
+        "/tmp/plato-phase2b-runtime/accepted314/test_active_failure_reaches_sy3/edge_custom/result.json": "930359699803ead3070caebb22af42ff187d1a2e16085066ea32925b58b4d48c",
+        "/tmp/plato-phase2b-runtime/accepted314/test_cancellation_already_fina0/cancelling/result.json": "b08f08af761a28b7b88bb45ec02d5cf7ad107d945619e04163c7f654b3e0f9a2",
+        "/tmp/plato-phase2b-runtime/accepted314/test_client_control_flow_keeps0/interrupt/result.json": "d21067474a823c4ac2b585a9e2d8280982e0869639a5602f3072edf6bdaf8615",
+        "/tmp/plato-phase2b-runtime/accepted314/test_client_control_flow_keeps1/exit/result.json": "fb20949e79938c7bfa436594b629028bac75896e895b2de579eb830a520a951e",
+        "/tmp/plato-phase2b-runtime/accepted314/test_closed_current_client_loo0/closed/result.json": "1e37b8574a51375a6a5465a7ddcdea7db3c1552ceb8cd240a17795264a98ad9a",
+        "/tmp/plato-phase2b-runtime/accepted314/test_configure_failure_is_pres0/configure/result.json": "9065f3b795c8fd548cbf5529ad3822c2dac41de635df152516d6369b60b97927",
+        "/tmp/plato-phase2b-runtime/accepted314/test_delegating_server_consume0/delegated/result.json": "572ededd10685b8c44c19cdfccd2ff2ccda53dfca03171dc9bda22e4378241fb",
+        "/tmp/plato-phase2b-runtime/accepted314/test_edge_cancellation_error_k0/edge/result.json": "694af766108795af0b7e4055720f78b22403cffdbc83faf28ff67db5315f6769",
+        "/tmp/plato-phase2b-runtime/accepted314/test_explicitly_absent_loop_on0/ordinary/result.json": "21c14bd9bbd051272766dfbeb45cceb95c2c44fd9df366d0172440b97f65b50b",
+        "/tmp/plato-phase2b-runtime/accepted314/test_explicitly_absent_loop_on1/central/result.json": "ecbf7b1829dbac2e7a6a4efa11052e9d302a5ec4f63876832d10d40a4627e7e9",
+        "/tmp/plato-phase2b-runtime/accepted314/test_explicitly_absent_loop_on2/edge_default/result.json": "5c113e1acabac60d78917b7ff73d3d7933d4e6be0bca2259e429c1ecddd4ce03",
+        "/tmp/plato-phase2b-runtime/accepted314/test_explicitly_absent_loop_on3/edge_custom/result.json": "1879d5a9e7a47082195457168bf7b881ec02cc30287f18544a0c3989f872edd4",
+        "/tmp/plato-phase2b-runtime/accepted314/test_fresh_entrypoint_executes0/client_default/result.json": "3e0c3e72d7fb3d7f898f4c5c2dd57389487eebc61ab00edf62ec63877f73e582",
+        "/tmp/plato-phase2b-runtime/accepted314/test_fresh_entrypoint_executes1/client_custom/result.json": "6af035661084e7644c797ec7b80bf0d3105c8c255e4dd728ffbebbf489448a81",
+        "/tmp/plato-phase2b-runtime/accepted314/test_fresh_entrypoint_executes2/ordinary/result.json": "ae3b97be79486c58a544bfd1e73852e19c1f4ab8a71561f09589a638b1b54ce7",
+        "/tmp/plato-phase2b-runtime/accepted314/test_fresh_entrypoint_executes3/central/result.json": "76bf0cad4571f28dab134273b1d7e9ab7d86232e30e43a680df5cd4252a04e41",
+        "/tmp/plato-phase2b-runtime/accepted314/test_fresh_entrypoint_executes4/direct/result.json": "350f4173bc88c4a8babfeeb08a6f10d23b4f8e60eb7abac05803a77051925022",
+        "/tmp/plato-phase2b-runtime/accepted314/test_fresh_entrypoint_executes5/edge_default/result.json": "178962263e762137b5fc6747d3efd3ed2f761e446001a5beb2e9012f72379038",
+        "/tmp/plato-phase2b-runtime/accepted314/test_fresh_entrypoint_executes6/edge_custom/result.json": "2c5434645a30101fccf7a9a80290f8cc11e16bbf3f410b925b8531b2509676a3",
+        "/tmp/plato-phase2b-runtime/accepted314/test_independent_runtime_error0/independent/result.json": "32a66a9d19c0e3c017e02651ffb974fe37ebcdecdef80af8016f6efc9776305a",
+        "/tmp/plato-phase2b-runtime/accepted314/test_missing_external_edge_cli0/edge/result.json": "e5f8d10b2e5eedee44c5ccd3e07144670172994c29a068682aa0fca5e7c0519c",
+        "/tmp/plato-phase2b-runtime/accepted314/test_noncooperative_teardown_i0/task/result.json": "fd2245358f2b7511e7ebf446fd4daa75dc7c75b25d61ad1c35c1c92f805b725a",
+        "/tmp/plato-phase2b-runtime/accepted314/test_noncooperative_teardown_i1/generator/result.json": "0e88b13c62c423c55b1cc3775a0c7d736d5e19f4a91e83e213b72274f5403dbd",
+        "/tmp/plato-phase2b-runtime/accepted314/test_noncooperative_teardown_i2/executor/result.json": "71e62603e72a64e543df51b456cff669df7a09703114db6d6a14a3ee2109be3d",
+        "/tmp/plato-phase2b-runtime/accepted314/test_noncooperative_teardown_i3/aiohttp_task/result.json": "4f333fa21cad5bdff20d3e5dc0f59909fd3a6cb7a85e0c3642f268e906ffa886",
+        "/tmp/plato-phase2b-runtime/accepted314/test_owned_client_finalizes_ta0/client/result.json": "5d78620c7a3737535542ac97758df8e7eaf89f52b67e9c59fbc86aeb37e519f1",
+        "/tmp/plato-phase2b-runtime/accepted314/test_owned_client_finalizes_ta1/client/result.json": "cdcebe3c802ade2282b2bc640325ceae70ed51fc5d4a1b6a544a50fa909b9f7a",
+        "/tmp/plato-phase2b-runtime/accepted314/test_owned_server_fallback_fin0/fallback/result.json": "196d0dface7a45fbe6be862b1577c532728e5857b29c5a724b934e67f6fba074",
+        "/tmp/plato-phase2b-runtime/accepted314/test_owned_server_fallback_fin1/fallback/result.json": "4e20866b5a66f0432aba03d5f5aa5573f9912c3136860e743b82d22f2f244711",
+        "/tmp/plato-phase2b-runtime/accepted314/test_post_launch_failure_keeps0/failure/result.json": "ab4452114176bc80e17a3fb07077f28a2e3b3b76ff3ac9275579ab9aa35593a3",
+        "/tmp/plato-phase2b-runtime/accepted314/test_preconstructed_borrowed_l0/client_lifecycle/result.json": "cc008af1d127f750646ee7367990b4aa41e58668938068e7f0358f0443372bbf",
+        "/tmp/plato-phase2b-runtime/accepted314/test_preconstructed_borrowed_l1/client_lifecycle/result.json": "e9755d733f9ebaa608c08e91b04592da707d2c4b7d88986b8260d11dfe0e698f",
+        "/tmp/plato-phase2b-runtime/accepted314/test_preconstructed_borrowed_l2/ordinary/result.json": "447532a8346b853be0a85efc5a27c95f63f5ba1216fbb23b0b1dd1bc92a12da5",
+        "/tmp/plato-phase2b-runtime/accepted314/test_preconstructed_borrowed_l3/ordinary/result.json": "614d81815071868dad81ef951adf879fdfabbba94712c2708da90d03b82b5166",
+        "/tmp/plato-phase2b-runtime/accepted314/test_real_two_client_cpu_socke0/round/result.json": "8425a80f7e1100e09859c6b4777a1973a3f65d15e1c4ff3b8fb34a22ddd8b06d",
+        "/tmp/plato-phase2b-runtime/accepted314/test_repeated_owned_client_ent0/client/result.json": "9f5ef35f461ca7b254c40aaa424358102cd1617f7f63bed8dfe9b2f5e3be92b9",
+        "/tmp/plato-phase2b-runtime/accepted314/test_runner_cleanup_error_keep0/cleanup/result.json": "ce62b64553b7142ea73696ba43fff5afa89a58e1dbbead05e8fb8de84f9098f5",
+        "/tmp/plato-phase2b-runtime/accepted314/test_running_loop_rejected_bef0/running/result.json": "2128fe75f258be350e90a4f5a90e256ba77ab8e3014183462ad2c4ef534624db",
+        "/tmp/plato-phase2b-runtime/accepted314/test_server_error_precedence_a0/server/result.json": "fc7fb9eb54a719ca7fd619ec74a5e2eaa7010294f4e24e2a0357d559a0a29b06",
+        "/tmp/plato-phase2b-runtime/accepted314/test_server_error_precedence_a1/server/result.json": "0f5951ec9246a0da421726df63fe8dc3f86f7bf6e8efcf1789cfe740cdaf8d98",
+        "/tmp/plato-phase2b-runtime/accepted314/test_server_error_precedence_a2/server/result.json": "22de8ae5fe6fcbbca95bcc3a262d176ff5829f11df227ed6789146bec06bf03e",
+        "/tmp/plato-phase2b-runtime/accepted314/test_server_error_precedence_a3/server/result.json": "76f143cb825c5be56909bfb8732d7135c9698fdd53971e2978b17fb7f7fabb98",
+        "/tmp/plato-phase2b-runtime/accepted314/test_server_error_precedence_a4/server/result.json": "5e453a3b2fe801542243cdac8156b501df5518d4b0ae82a7494a12ae3ecac462",
+        "/tmp/plato-phase2b-runtime/accepted314/test_stalled_real_client_is_co0/stalled/result.json": "8f046ce7baeb4912866632b50a64bd20f20582d7e2ee09ea7d256798cd398e2f"
+      },
+      "deliberate_negative_containment": [
+        {
+          "path": "/tmp/plato-phase2b-runtime/accepted314/test_noncooperative_teardown_i0/task/result.json",
+          "case": "client_lifecycle",
+          "options": {
+            "absent": true,
+            "stall": "task"
+          },
+          "forced": [
+            "TERM"
+          ]
+        },
+        {
+          "path": "/tmp/plato-phase2b-runtime/accepted314/test_noncooperative_teardown_i1/generator/result.json",
+          "case": "client_lifecycle",
+          "options": {
+            "absent": true,
+            "stall": "generator"
+          },
+          "forced": [
+            "TERM"
+          ]
+        },
+        {
+          "path": "/tmp/plato-phase2b-runtime/accepted314/test_noncooperative_teardown_i2/executor/result.json",
+          "case": "client_lifecycle",
+          "options": {
+            "absent": true,
+            "stall": "executor"
+          },
+          "forced": [
+            "TERM"
+          ]
+        },
+        {
+          "path": "/tmp/plato-phase2b-runtime/accepted314/test_noncooperative_teardown_i3/aiohttp_task/result.json",
+          "case": "ordinary",
+          "options": {
+            "absent": true,
+            "real": true,
+            "startup_fail": true,
+            "secondary": true,
+            "stall": "task"
+          },
+          "forced": [
+            "TERM",
+            "KILL"
+          ]
+        },
+        {
+          "path": "/tmp/plato-phase2b-runtime/accepted314/test_stalled_real_client_is_co0/stalled/result.json",
+          "case": "socket_stall",
+          "options": {},
+          "forced": [
+            "TERM"
+          ]
+        }
+      ],
+      "all_durable_events_match_results": true,
+      "socket_result": "/tmp/plato-phase2b-runtime/accepted314/test_real_two_client_cpu_socke0/round/result.json",
+      "socket_result_sha256": "8425a80f7e1100e09859c6b4777a1973a3f65d15e1c4ff3b8fb34a22ddd8b06d",
+      "socket_elapsed": 15.704020125092939,
+      "socket_forced": [],
+      "socket_event_hashes": {
+        "/tmp/plato-phase2b-runtime/accepted314/test_real_two_client_cpu_socke0/round/events-45122.jsonl": "c3ce790bbbb425c88364aacf0e23185f69fb6ebb8c97ab2f1726c8b9be84d128",
+        "/tmp/plato-phase2b-runtime/accepted314/test_real_two_client_cpu_socke0/round/events-45130.jsonl": "bb5aa74d89592f13464293f88233a33fb509d32f09db386d93d166d8a5555318",
+        "/tmp/plato-phase2b-runtime/accepted314/test_real_two_client_cpu_socke0/round/events-45129.jsonl": "7979d38fc7dfc46c322b3cc2c6056b466a754be90d833a1aaab0a2f0dc857354"
+      },
+      "trained": [
+        {
+          "id": 2,
+          "samples": 2,
+          "pid": 45129
+        },
+        {
+          "id": 1,
+          "samples": 6,
+          "pid": 45130
+        }
+      ],
+      "maximum_weighted_reference_errors": {
+        "linear.weight": 1.4901161193847656e-08,
+        "linear.bias": 2.9103830456733704e-10
+      },
+      "artifact_hashes": {
+        "/tmp/plato-phase2b-runtime/accepted314/test_real_two_client_cpu_socke0/round/models/pretrained/startup_tiny_2_45129.safetensors": "7d1b4e39fe8c20fbc8d5a1bcdaaf68d23955752149ef34cffa2e58f5e8a68961",
+        "/tmp/plato-phase2b-runtime/accepted314/test_real_two_client_cpu_socke0/round/models/pretrained/startup_tiny_1_45130.safetensors": "c4c686574485435175402208fbefbbdea1fe5aa735b1bca4f93d4836651becd4",
+        "/tmp/plato-phase2b-runtime/accepted314/test_real_two_client_cpu_socke0/round/models/pretrained/startup_tiny.safetensors": "a5a3bff8503c83d1f8b64c96494315c337dc682a2cfab1bb0b5c665176ab1632",
+        "/tmp/plato-phase2b-runtime/accepted314/test_real_two_client_cpu_socke0/round/checkpoints/checkpoint_startup_tiny_1.safetensors": "a5a3bff8503c83d1f8b64c96494315c337dc682a2cfab1bb0b5c665176ab1632"
+      }
+    },
+    "/tmp/plato-phase2b-runtime/review-fixes/accepted313": {
+      "records": 48,
+      "survivors": 0,
+      "result_hashes": {
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted313/test_active_edge_failure_unwin0/edge/result.json": "6c20b41b2fe7a3051399fdd5773ab2d578c493f20dcbe08cfc4501cd43395030",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted313/test_active_failure_reaches_sy0/client_custom/result.json": "e7fc9759e7bee8475ffe38b7c182968f8832d84a44c1e8a3d5ac2a2c2174fe4e",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted313/test_active_failure_reaches_sy1/ordinary/result.json": "f075e6f5fc90c0008e06d044fa8624cdbd98a118f5181c328d709b4b2ba47053",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted313/test_active_failure_reaches_sy2/central/result.json": "0c65b37bad80cce8c7812ba1c31d0bd95285a7ca77d1e332819a2bba705737a9",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted313/test_active_failure_reaches_sy3/edge_custom/result.json": "6b8c4927bb7f8625469d23be9e41ed68803b4b67ae1a93d4d45380c4f7a36832",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted313/test_cancellation_already_fina0/cancelling/result.json": "3aebed3bcd64dc83c83150afca8e720ea9cd8b32ad8a602254137d1564f634b1",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted313/test_client_control_flow_keeps0/interrupt/result.json": "0201a806cf6767f8a7198ff626a91c1376ecad7549a398b40d89bb58e2531308",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted313/test_client_control_flow_keeps1/exit/result.json": "7885f47dfc47a05bb9dc2cbba847615f0d730c5eba05842709465fce609f7195",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted313/test_closed_current_client_loo0/closed/result.json": "0debd1f6271e7a2272b47b33b1dd0dce6aa0699ad45538ee422c504feb6b3882",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted313/test_configure_failure_is_pres0/configure/result.json": "73974a8773e093ce2b5080acd14c0915b9f2a53e67d6043779ba5ceca1e38782",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted313/test_delegating_server_consume0/delegated/result.json": "37c7614c615aad70e3335056a638025b6503a03d00a023bc38a0bcf6378ea65d",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted313/test_edge_cancellation_error_k0/edge/result.json": "88410adbb5274abf5f3b702ab85cb1c0f1ce6501eafc866b6bc536bb7cdb84cf",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted313/test_explicitly_absent_loop_on0/ordinary/result.json": "94d5b385e61d2b0cd33656511641ff07f25202515d4730335595bef82c9b58e2",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted313/test_explicitly_absent_loop_on1/central/result.json": "5fc6cb3a23e7447bce9dfffbea80f3c8740542d57ab8b2285fbeced323eae3d2",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted313/test_explicitly_absent_loop_on2/edge_default/result.json": "5c7d295f3c0afd483fd2f28e6726fd5b1c075d955ae9514479204d9e04617a27",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted313/test_explicitly_absent_loop_on3/edge_custom/result.json": "8bb203b497fcb50c7a35e0b4b69658b30a404a1c7b216fc639e2da24dcb7f0ee",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted313/test_fresh_entrypoint_executes0/client_default/result.json": "80724986422e1513481be02246fa025a7473f268fc1faba52ebec99455a64386",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted313/test_fresh_entrypoint_executes1/client_custom/result.json": "d5aaa09769e77dfbd1c482cb14f012a40209e103df88c0dcf20b195b2e6c40e5",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted313/test_fresh_entrypoint_executes2/ordinary/result.json": "43d4f891a62c6fccd7b91b3610f15467bf5b271ddabfff0237958d600a3faad0",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted313/test_fresh_entrypoint_executes3/central/result.json": "2fca1c08e845be5d9d0c18c76d249129255b05e40cdc237607d56a4f4e17a89a",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted313/test_fresh_entrypoint_executes4/direct/result.json": "98977d415aaf12172c9efdbcfdb27ad59eb6edfa25a8ff9d223d0d281dc88a9d",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted313/test_fresh_entrypoint_executes5/edge_default/result.json": "d9d156b17caa6877701a302ba6cb2710e2bcec54aaf686f79e9793cbe5857536",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted313/test_fresh_entrypoint_executes6/edge_custom/result.json": "e7dde73fdeef9e193fe7da08023dfbbd1e38a73c4c3b5d92bb3b74bab557b5d3",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted313/test_independent_runtime_error0/independent/result.json": "65d8fd5dca92a7273ef87d1ff4730a5fc85a788fe248ba32ee23b60be6ae14f2",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted313/test_missing_external_edge_cli0/edge/result.json": "2ad8338408940b7ca056e1740aca15e120cbc6947cce5cd1c0042be1a71ec2c2",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted313/test_noncooperative_teardown_i0/task/result.json": "c96d24e7015a7784b7c8168087fd1bad1190982a89aba6ff4c15322a5b5fc89a",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted313/test_noncooperative_teardown_i1/generator/result.json": "ba1ecd81929d1d40cc3ffcd5f8d1db975fd65f43342edde3ee5c3c638d0f421d",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted313/test_noncooperative_teardown_i2/executor/result.json": "f20120452346f20e83b9e27664e737a025db3db0da9b833a9cb323f990169148",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted313/test_noncooperative_teardown_i3/aiohttp_task/result.json": "92075b3e6f5b0e599530a2139d80a50029e8e89a7b8cce310512a93db8fc49b6",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted313/test_owned_client_finalizes_ta0/client/result.json": "e85eb6ac1d00e8ef915b7b4b680b5941f95208519dbfcf2051548e3ab1303d70",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted313/test_owned_client_finalizes_ta1/client/result.json": "1cb16985869c73d814be994b197d1d34f01f8ff0e3545008f986ead762071540",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted313/test_owned_server_fallback_fin0/fallback/result.json": "25a2535a1163092f873d136f61ffa694174265d653f2568e5f47824d5cc8807c",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted313/test_owned_server_fallback_fin1/fallback/result.json": "336faef1e6c3f41e754be6883dc5758af4cfb81c4169916098d157529db45350",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted313/test_post_launch_failure_keeps0/failure/result.json": "e77be52a13509714f35a385b1444952b522b66a4997a7aea1dcf77f5afb0867c",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted313/test_preconstructed_borrowed_l0/client_lifecycle/result.json": "1e10a06d1ce91877c372700c0af705db5d62793b74248d0ae61ebe9bb9415fa6",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted313/test_preconstructed_borrowed_l1/client_lifecycle/result.json": "f6315073f1be9a052c28d15bdf76d53ea73fe21823b923d268b30605b10e2b9e",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted313/test_preconstructed_borrowed_l2/ordinary/result.json": "4a20012c7f1305c0ae1b65dee3bca244021ce45e9d2702f3ab3706062c8edbed",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted313/test_preconstructed_borrowed_l3/ordinary/result.json": "7c81c406874c9bf818983b0354bd5452209d90e6a9cf4f90537a53988264b2a5",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted313/test_real_two_client_cpu_socke0/round/result.json": "8509263c51c9532efaa6add0654dd23d0e4f95802ca33ce5df76617969b67c8d",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted313/test_repeated_owned_client_ent0/client/result.json": "9bfd57cbe67cf8d3fa70661f147cc258cfb89d8cd734c2f7477c514ed89e9bc5",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted313/test_runner_cleanup_error_keep0/cleanup/result.json": "27bbe5f0a68c86cce9a9cd01bf84c3a0f97da2ed32046c1b1e722aa90ffb5379",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted313/test_running_loop_rejected_bef0/running/result.json": "5ee2e9a5c05df0d8515d6310ff3af707257e2ee27b9a906d2703dec7d37180b4",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted313/test_server_error_precedence_a0/server/result.json": "59d51f63d48984d1ece2bed19543ea472fd3d447d3681ba8088297f7e123c6f6",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted313/test_server_error_precedence_a1/server/result.json": "798e4b162ef6ebedaa30bb22fa570951f99d6b37850c6290a016dbbdc67bc63a",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted313/test_server_error_precedence_a2/server/result.json": "aeed0e9b0307f9369b771e5fa97d1ae0cb185b6b1ab99dc960db3259a9aabda3",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted313/test_server_error_precedence_a3/server/result.json": "13fc05ab53ae15eb0dc0d6ffe20d52c715c93c723412419fa2fa99f326659556",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted313/test_server_error_precedence_a4/server/result.json": "3ff8d9e399d8158b6ac2fd46fb0d432dfdda06a5374a0e3ea0f3dd2599c7472f",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted313/test_stalled_real_client_is_co0/stalled/result.json": "ac25239169fffd64b13a3d0641c03120bd3db6574d0d9f8893facdef6a6ffe6a"
+      },
+      "deliberate_negative_containment": [
+        {
+          "path": "/tmp/plato-phase2b-runtime/review-fixes/accepted313/test_noncooperative_teardown_i0/task/result.json",
+          "case": "client_lifecycle",
+          "options": {
+            "absent": true,
+            "stall": "task"
+          },
+          "forced": [
+            "TERM"
+          ]
+        },
+        {
+          "path": "/tmp/plato-phase2b-runtime/review-fixes/accepted313/test_noncooperative_teardown_i1/generator/result.json",
+          "case": "client_lifecycle",
+          "options": {
+            "absent": true,
+            "stall": "generator"
+          },
+          "forced": [
+            "TERM"
+          ]
+        },
+        {
+          "path": "/tmp/plato-phase2b-runtime/review-fixes/accepted313/test_noncooperative_teardown_i2/executor/result.json",
+          "case": "client_lifecycle",
+          "options": {
+            "absent": true,
+            "stall": "executor"
+          },
+          "forced": [
+            "TERM"
+          ]
+        },
+        {
+          "path": "/tmp/plato-phase2b-runtime/review-fixes/accepted313/test_noncooperative_teardown_i3/aiohttp_task/result.json",
+          "case": "ordinary",
+          "options": {
+            "absent": true,
+            "real": true,
+            "startup_fail": true,
+            "secondary": true,
+            "stall": "task"
+          },
+          "forced": [
+            "TERM",
+            "KILL"
+          ]
+        },
+        {
+          "path": "/tmp/plato-phase2b-runtime/review-fixes/accepted313/test_stalled_real_client_is_co0/stalled/result.json",
+          "case": "socket_stall",
+          "options": {},
+          "forced": [
+            "TERM"
+          ]
+        }
+      ],
+      "all_durable_events_match_results": true,
+      "socket_result": "/tmp/plato-phase2b-runtime/review-fixes/accepted313/test_real_two_client_cpu_socke0/round/result.json",
+      "socket_result_sha256": "8509263c51c9532efaa6add0654dd23d0e4f95802ca33ce5df76617969b67c8d",
+      "socket_elapsed": 14.200878167059273,
+      "socket_forced": [],
+      "socket_event_hashes": {
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted313/test_real_two_client_cpu_socke0/round/events-49550.jsonl": "3720e6dedc41812a0e55b38c5e31fa6553bb0f756bae7bf8ea13802d402aadf7",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted313/test_real_two_client_cpu_socke0/round/events-49552.jsonl": "97da8c66a57b61cc441318ca6db79e2e08a94d1ffe2d7ed4679c850bb854153b",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted313/test_real_two_client_cpu_socke0/round/events-49553.jsonl": "2171f0062317cfbce5122a3f6941956f3975341ae4d5a1ca5d7962a6552d2e3e"
+      },
+      "trained": [
+        {
+          "id": 1,
+          "samples": 2,
+          "pid": 49552
+        },
+        {
+          "id": 2,
+          "samples": 6,
+          "pid": 49553
+        }
+      ],
+      "maximum_weighted_reference_errors": {
+        "linear.weight": 1.4901161193847656e-08,
+        "linear.bias": 2.9103830456733704e-10
+      },
+      "artifact_hashes": {
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted313/test_real_two_client_cpu_socke0/round/models/pretrained/startup_tiny_1_49552.safetensors": "7d1b4e39fe8c20fbc8d5a1bcdaaf68d23955752149ef34cffa2e58f5e8a68961",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted313/test_real_two_client_cpu_socke0/round/models/pretrained/startup_tiny_2_49553.safetensors": "c4c686574485435175402208fbefbbdea1fe5aa735b1bca4f93d4836651becd4",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted313/test_real_two_client_cpu_socke0/round/models/pretrained/startup_tiny.safetensors": "a5a3bff8503c83d1f8b64c96494315c337dc682a2cfab1bb0b5c665176ab1632",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted313/test_real_two_client_cpu_socke0/round/checkpoints/checkpoint_startup_tiny_1.safetensors": "a5a3bff8503c83d1f8b64c96494315c337dc682a2cfab1bb0b5c665176ab1632"
+      }
+    },
+    "/tmp/plato-phase2b-runtime/review-fixes/accepted314": {
+      "records": 48,
+      "survivors": 0,
+      "result_hashes": {
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted314/test_active_edge_failure_unwin0/edge/result.json": "4bb6adad46f8e3429bc7fca287d5c001e312324b3e21d46f808cd4beb2a52576",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted314/test_active_failure_reaches_sy0/client_custom/result.json": "2669b0be6cdadda6a04e2572b6d89d5eed4331c4c914ca170959c0470b87b526",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted314/test_active_failure_reaches_sy1/ordinary/result.json": "f9e831de98a47e8ac10f65242c132bcedb2f580cc1deb1f3b9a649f7fd7a0d00",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted314/test_active_failure_reaches_sy2/central/result.json": "0ed85b24d8270d605a040839ffa054e104f38e8ce3a4c49fd0f938d417113704",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted314/test_active_failure_reaches_sy3/edge_custom/result.json": "16672b842b57512564d99221e8f02325fdd7a8f71cee677b956ba290fea35714",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted314/test_cancellation_already_fina0/cancelling/result.json": "ff1eb73bde7f4d8265d5207c4ade385bb63f6fc8f48603b43d8bb5739668281b",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted314/test_client_control_flow_keeps0/interrupt/result.json": "5cba4713d7d9ebb323a281d5ad1eafe545a18880baa1ed19d7a5ad42dec04f61",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted314/test_client_control_flow_keeps1/exit/result.json": "dfa4a02d8665fae81a3d354c6feb3213ff5e9b86ced2d1f3836d978293f2ccf4",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted314/test_closed_current_client_loo0/closed/result.json": "5513ee6346488cb3a432013aa28e1c8ec6bcb631c83e95f5e41400df0fb6f8dd",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted314/test_configure_failure_is_pres0/configure/result.json": "7b4807ff15d0a114e9943d93a2bdf56c4dd596d0b7223f05185225dbd4dd301a",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted314/test_delegating_server_consume0/delegated/result.json": "a90376500324818b81169bd9d1f3f83be791784bbf2de3f6f73c3c702100f808",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted314/test_edge_cancellation_error_k0/edge/result.json": "5c6108e25f4847c1c9af079b9a09feea630d8264ce170ac131e66fbd14e95667",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted314/test_explicitly_absent_loop_on0/ordinary/result.json": "af3c156535c0afa96c278359da59dcb3240519a67555951a46f5792053eb8569",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted314/test_explicitly_absent_loop_on1/central/result.json": "ee5fbb72862c78a2aec0e1a43cf13728e4af086360889ea5e8c9f33e13798b83",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted314/test_explicitly_absent_loop_on2/edge_default/result.json": "0f3495d472ea41c40ee4dfde444acd212939496a0792eaa74dd6d6c3022f1697",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted314/test_explicitly_absent_loop_on3/edge_custom/result.json": "a736b0c21e748cf3811066728b1821446fbf12026b5bf1f375a4ba73af2ff4a5",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted314/test_fresh_entrypoint_executes0/client_default/result.json": "790f20badda4babfe06efafe328efbc0fe5ea47e99461d4f968b1ba3986e0329",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted314/test_fresh_entrypoint_executes1/client_custom/result.json": "5612d5bad724068d8ed7463ddd094488427b18f66261d92893ef5a1ad8b95e00",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted314/test_fresh_entrypoint_executes2/ordinary/result.json": "c16f65a05b8698060ce7dac638101797ef0371b4840f573702f4467b45dd9d04",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted314/test_fresh_entrypoint_executes3/central/result.json": "3753d7bd74a8419f3fdf2afb76eb7cf1750d5e163ee8a0fb064f929301fb1388",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted314/test_fresh_entrypoint_executes4/direct/result.json": "0d26ac6f574dffdafdbdba2761bd8d16d87327c5899642ab7699069b02daa1a7",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted314/test_fresh_entrypoint_executes5/edge_default/result.json": "b7917233a629a0e146616155f2e9c63be90ae5045633c0d0b924ac255868eedd",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted314/test_fresh_entrypoint_executes6/edge_custom/result.json": "51e66c9d3af2a69cd5b02847a4112c3faebef150248b93b73b630c7796bac14d",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted314/test_independent_runtime_error0/independent/result.json": "bf5dda435ec233286ff273eee61d63dcd5df69bb326199f3de6980195c40eff2",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted314/test_missing_external_edge_cli0/edge/result.json": "b3d1d0b7038336448431b7bcf5a663d60426dbf6ce82eedf057a13bff25225c2",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted314/test_noncooperative_teardown_i0/task/result.json": "526ef9207676e15bcc7bc0b9442c9e4513804988f064f588d79ec7370896b813",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted314/test_noncooperative_teardown_i1/generator/result.json": "516effd1e06c523e9d5fae30d64d052317a073beff6c1307790c32623c9536f8",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted314/test_noncooperative_teardown_i2/executor/result.json": "98b584db1614318bca18601cf20d5f61ed2ed97a3080f8e940e4bd09f76d1772",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted314/test_noncooperative_teardown_i3/aiohttp_task/result.json": "a8f742d2ada6a5c298fa78a5ce18be4902daf578bf98444d99755d61a1410e64",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted314/test_owned_client_finalizes_ta0/client/result.json": "ab08d82cac756d092919da9e63b641842dc25e7493883384676e8812244cd5df",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted314/test_owned_client_finalizes_ta1/client/result.json": "d1bdb6a82d02254523b8263a5597eb9c11f1ed11756c6f31c94b76efa0d12cc0",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted314/test_owned_server_fallback_fin0/fallback/result.json": "099c0bd2459a82fc222da93d16aa7c94d3be65011bae7cdba11e81506b1bff55",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted314/test_owned_server_fallback_fin1/fallback/result.json": "8a05998886907c45bcc74928bb93e92fa58c8f8a9bfc422259895b99edbf607a",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted314/test_post_launch_failure_keeps0/failure/result.json": "514b87547ff8b90312e933047832dc8940ba3a3fd8cfc12626bb8e4101efb9a8",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted314/test_preconstructed_borrowed_l0/client_lifecycle/result.json": "902cfcfe9b53a3b9e9a5ffaca52d3e97546fdd0f8eea89c35d228d32fd0bd615",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted314/test_preconstructed_borrowed_l1/client_lifecycle/result.json": "108e4f8d45ad4203a1406443c6879c9c080cda775dbe172376c43ee35709eb7c",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted314/test_preconstructed_borrowed_l2/ordinary/result.json": "4f5aa198744829976bd93ecb73143d68e7e6372075ab65330f4e46981f46e96e",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted314/test_preconstructed_borrowed_l3/ordinary/result.json": "5148437d3f543045c42bb33f7345e184a2e71c03df3d44827a798c21a3344d89",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted314/test_real_two_client_cpu_socke0/round/result.json": "0f1558ae29d9928a9a3b88149f4611ffd84bf35afa892c2f603059001ab004a5",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted314/test_repeated_owned_client_ent0/client/result.json": "c18447a3fb9a77cda81e0ce388e2ee58afda5331ae96b78e9ebcc96b8b05b4dc",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted314/test_runner_cleanup_error_keep0/cleanup/result.json": "77d5a78273aff06bafa296f6385d9364a148a011d647a1f7843ea92eb5ba88fc",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted314/test_running_loop_rejected_bef0/running/result.json": "cb03edf3e2c27dd4e5e15cb8a55a53069b717fa51992b4fc8492d30da7b17deb",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted314/test_server_error_precedence_a0/server/result.json": "5ec1eec07b4f8f8b12d57998a56d6de341f78c5cb2612c0c1367325cefd58ea2",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted314/test_server_error_precedence_a1/server/result.json": "7d63429d000501cba9a6e769a3109a7e99c8f9e7acccd6dbd854dc64ba14cef7",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted314/test_server_error_precedence_a2/server/result.json": "0e1cf3f89c2d1ecc338a1039355084f7f48a84e0a81fd7166ca584dc94d08256",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted314/test_server_error_precedence_a3/server/result.json": "bc029c7e1b0e6300230a9e8be4e571adb97d9a75629f4541b881b87e88e797f4",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted314/test_server_error_precedence_a4/server/result.json": "203e45f16a90eae50948471cb897cd3ec89ec6af4174e4aa9035fb063f9990a0",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted314/test_stalled_real_client_is_co0/stalled/result.json": "2a6ae0d621ae13c74eef2b25cd923b4c7e98514029186793cfeb388cd91bc2aa"
+      },
+      "deliberate_negative_containment": [
+        {
+          "path": "/tmp/plato-phase2b-runtime/review-fixes/accepted314/test_noncooperative_teardown_i0/task/result.json",
+          "case": "client_lifecycle",
+          "options": {
+            "absent": true,
+            "stall": "task"
+          },
+          "forced": [
+            "TERM"
+          ]
+        },
+        {
+          "path": "/tmp/plato-phase2b-runtime/review-fixes/accepted314/test_noncooperative_teardown_i1/generator/result.json",
+          "case": "client_lifecycle",
+          "options": {
+            "absent": true,
+            "stall": "generator"
+          },
+          "forced": [
+            "TERM"
+          ]
+        },
+        {
+          "path": "/tmp/plato-phase2b-runtime/review-fixes/accepted314/test_noncooperative_teardown_i2/executor/result.json",
+          "case": "client_lifecycle",
+          "options": {
+            "absent": true,
+            "stall": "executor"
+          },
+          "forced": [
+            "TERM"
+          ]
+        },
+        {
+          "path": "/tmp/plato-phase2b-runtime/review-fixes/accepted314/test_noncooperative_teardown_i3/aiohttp_task/result.json",
+          "case": "ordinary",
+          "options": {
+            "absent": true,
+            "real": true,
+            "startup_fail": true,
+            "secondary": true,
+            "stall": "task"
+          },
+          "forced": [
+            "TERM",
+            "KILL"
+          ]
+        },
+        {
+          "path": "/tmp/plato-phase2b-runtime/review-fixes/accepted314/test_stalled_real_client_is_co0/stalled/result.json",
+          "case": "socket_stall",
+          "options": {},
+          "forced": [
+            "TERM"
+          ]
+        }
+      ],
+      "all_durable_events_match_results": true,
+      "socket_result": "/tmp/plato-phase2b-runtime/review-fixes/accepted314/test_real_two_client_cpu_socke0/round/result.json",
+      "socket_result_sha256": "0f1558ae29d9928a9a3b88149f4611ffd84bf35afa892c2f603059001ab004a5",
+      "socket_elapsed": 15.865072750020772,
+      "socket_forced": [],
+      "socket_event_hashes": {
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted314/test_real_two_client_cpu_socke0/round/events-49634.jsonl": "89198bf4e17499550f35d06839e921bf1cbb3b0ba3f352018f178ea68d8101ab",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted314/test_real_two_client_cpu_socke0/round/events-49633.jsonl": "0bcf1e160ef2b2302eb3b6bf20000340020d4cec2587fec042ac21c1b6ee3544",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted314/test_real_two_client_cpu_socke0/round/events-49624.jsonl": "6c5cc54b5bdf7d8b7b88802aa2c3464abd1f0c03cce0a6a55693cddfbfc85140"
+      },
+      "trained": [
+        {
+          "id": 1,
+          "samples": 2,
+          "pid": 49633
+        },
+        {
+          "id": 2,
+          "samples": 6,
+          "pid": 49634
+        }
+      ],
+      "maximum_weighted_reference_errors": {
+        "linear.weight": 1.4901161193847656e-08,
+        "linear.bias": 2.9103830456733704e-10
+      },
+      "artifact_hashes": {
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted314/test_real_two_client_cpu_socke0/round/models/pretrained/startup_tiny_1_49633.safetensors": "7d1b4e39fe8c20fbc8d5a1bcdaaf68d23955752149ef34cffa2e58f5e8a68961",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted314/test_real_two_client_cpu_socke0/round/models/pretrained/startup_tiny_2_49634.safetensors": "c4c686574485435175402208fbefbbdea1fe5aa735b1bca4f93d4836651becd4",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted314/test_real_two_client_cpu_socke0/round/models/pretrained/startup_tiny.safetensors": "a5a3bff8503c83d1f8b64c96494315c337dc682a2cfab1bb0b5c665176ab1632",
+        "/tmp/plato-phase2b-runtime/review-fixes/accepted314/test_real_two_client_cpu_socke0/round/checkpoints/checkpoint_startup_tiny_1.safetensors": "a5a3bff8503c83d1f8b64c96494315c337dc682a2cfab1bb0b5c665176ab1632"
+      }
+    }
+  },
+  "count_policy": "Author final 227 affected nodes plus 24 separate actual D combination nodes = 251 distinct per interpreter. The author 40-case correction run overlaps 16 affected nodes. Reviewer reports separate 179-node suite, 22 positive probes, 24 integration cases and one product-negative probe; repeats and intermediate harness failures are not additive acceptance counts.",
+  "handoffs_and_pending_integration": [
+    {
+      "id": "B_REVIEW_GATE",
+      "owner": "Original B author/root",
+      "status": "Not passed",
+      "requirement": "Resolve R2B-04 and obtain fresh exact-candidate review. Shared checkpoint ownership transfer to 2C remains conditioned on root PASS."
+    },
+    {
+      "id": "B_D_COMBINATION",
+      "owner": "Root",
+      "status": "Required after both owners are accepted",
+      "requirement": "Revalidate final accepted B and D combined source. Preserve/promote the actual utility writer-to-bounded-reader regression into final CI; scratch-only evidence and duplicated namespace expectations do not replace that final coverage. Current D aa232791 still awaits its separate review."
+    },
+    {
+      "id": "F07_F21_F26",
+      "owner": "2C",
+      "status": "Explicit future dependency, not new B finding",
+      "requirement": "Retain the full checkpoint writer/reader/sidecar inventory. Actual urgent snapshot decoder and epoch ordering F26 remain unqualified; this review validates runtime dispatch and ingress with inert trainer reports, not full urgent checkpoint end-to-end."
+    },
+    {
+      "id": "MLX_F17",
+      "owner": "3A",
+      "status": "Later narrow ingress validation extension",
+      "requirement": "Extend raw/transformed pre-dispatch tree validation, including zero weights and both arrival orders, after B acceptance."
+    },
+    {
+      "id": "PHASE_INTEGRATION",
+      "owner": "Root",
+      "status": "Pending",
+      "requirement": "Complete final combined full validation and phase gate; this is a component correction review."
+    }
+  ],
+  "explicit_limits": [
+    "No live cloud S3, GPU/distributed execution, production multi-silo run or whole-stack Python 3.14 support claim.",
+    "Wire limits and session binding operate within trusted peers/storage. Pickle object expansion and arbitrary execution are outside these caps; no auth/nonces/new protocol required.",
+    "Same logical identity replay during an indistinguishable fresh assignment is outside the unchanged wire contract.",
+    "Urgent runtime probes exercise production batching/dispatch/ingress/heap/round logic using trainer stubs. Actual urgent snapshot metadata decoder and epoch sorting remain F26/2C dependencies.",
+    "PORT non-mutation executed on CPU; other-device preservation follows the inspected detach().cpu() copies, not an accelerator test.",
+    "The new medium finding specifically requires general.debug=false recovery mode and physical-worker disconnect with a deferred urgent report. Default debug/unspecified mode terminates on disconnect and does not demonstrate this stall.",
+    "Initial reviewer monotonic cleanup failures lacked a configured sio stub; corrected in owned scratch. An early disconnect setup assertion counted a current non-stale report as deferred; corrected filtering and realistic max_concurrency=2/rounds=10 before the retained final behavioral reproduction. No candidate regression was inferred from harness failures.",
+    "No full eight-minute startup matrix repeated. Exact-source final author logs and retained actual runtime resources independently checked; root combined full validation remains required.",
+    "No production/test changes to candidate or other owner worktrees, no environment mutation outside owned scratch, no metadata/CI edits, commits/push/PR changes, questions or nested agents."
+  ],
+  "owned_resources": {
+    "root": "/tmp/plato-phase2b-review-2",
+    "policy": "Retain exact archive, owned 3.13/3.14 venvs, probes, raw logs, pytest bases, evidence audit and diffs for root/author. No other agent resources removed.",
+    "write_scope": "Only this root evidence/2026-refresh/phase2b-review-2.json and owned /tmp/plato-phase2b-review-2 scratch."
+  }
+}

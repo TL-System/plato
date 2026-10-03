@@ -408,26 +408,28 @@ class GradientClippingOptimizerStrategy(OptimizerStrategy):
     def create_optimizer(
         self, model: nn.Module, context: TrainingContext
     ) -> torch.optim.Optimizer:
-        """Create optimizer using base strategy."""
-        return self.base_strategy.create_optimizer(model, context)
+        """Clip the accumulated gradient immediately before each actual update."""
+        optimizer = self.base_strategy.create_optimizer(model, context)
+
+        def clip_before_step(optimizer, args, kwargs):
+            torch.nn.utils.clip_grad_norm_(
+                [parameter for group in optimizer.param_groups
+                 for parameter in group["params"]],
+                max_norm=self.max_norm,
+                norm_type=self.norm_type,
+            )
+
+        optimizer.register_step_pre_hook(clip_before_step)
+        return optimizer
+
+    def on_client_id_changed(self, context: TrainingContext) -> None:
+        """Propagate ownership changes to the wrapped strategy."""
+        self.base_strategy.on_client_id_changed(context)
 
     def on_optimizer_step(
         self, optimizer: torch.optim.Optimizer, context: TrainingContext
     ) -> None:
-        """Apply gradient clipping before optimizer step."""
-        # Clip gradients
-        model = context.model
-        if model is None:
-            raise ValueError(
-                "Training context must provide a model for gradient clipping."
-            )
-        torch.nn.utils.clip_grad_norm_(
-            model.parameters(),
-            max_norm=self.max_norm,
-            norm_type=self.norm_type,
-        )
-
-        # Call base strategy's hook if it exists
+        """Forward the completed-update notification after the clipped step."""
         self.base_strategy.on_optimizer_step(optimizer, context)
 
     def teardown(self, context: TrainingContext) -> None:

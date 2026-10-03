@@ -1,0 +1,174 @@
+{
+  "purpose": "Byte-exact retention of independent historical root reproductions and selected raw results. These are evidence scripts, not installed package modules or an additional pytest profile.",
+  "interpretation": "Use the corresponding phase2 root evidence reports for exact source revision, command, environment and expected historical outcome. Absolute scratch paths in historical scripts are preserved. Retention does not indicate a new run or a final integration pass.",
+  "files": [
+    {
+      "original_path": "/tmp/plato-phase2-root/amp_clipping_probe.py",
+      "retained_path": "evidence/2026-refresh/reproductions/phase2-root/amp_clipping_probe.py",
+      "bytes": 1865,
+      "sha256": "83b3b80ac4398ca21539c41251c4cfcbbd56ba090b68bbe345dbbfcdf9802629"
+    },
+    {
+      "original_path": "/tmp/plato-phase2-root/server_resume_rng_probe.py",
+      "retained_path": "evidence/2026-refresh/reproductions/phase2-root/server_resume_rng_probe.py",
+      "bytes": 2163,
+      "sha256": "1cc83c7015e220c11fdd63d44d955402a293453e287d809a53251aa3478a16f6"
+    },
+    {
+      "original_path": "/tmp/plato-phase2-root/merged_checkpoint_resume_probe.py",
+      "retained_path": "evidence/2026-refresh/reproductions/phase2-root/merged_checkpoint_resume_probe.py",
+      "bytes": 6315,
+      "sha256": "071cfd4c348c772eeefe9aae682048b2766895eaf2ec02e1f60c4cf990ea15a2"
+    },
+    {
+      "original_path": "/tmp/plato-phase2-root/metadata_wire_probe.py",
+      "retained_path": "evidence/2026-refresh/reproductions/phase2-root/metadata_wire_probe.py",
+      "bytes": 609,
+      "sha256": "c77d8c728541f545f33de00342e7401c020d5cd964b08d748c9544b4e484d541"
+    },
+    {
+      "original_path": "/tmp/plato-phase2-root/scaffold_numerical_probe.py",
+      "retained_path": "evidence/2026-refresh/reproductions/phase2-root/scaffold_numerical_probe.py",
+      "bytes": 1637,
+      "sha256": "758a822f3068a464fca0b763115f94e5183462e7d2af639ac2e1d7234c9f1aa8"
+    },
+    {
+      "original_path": "/tmp/plato-phase2-root/trainer_lifecycle_probe.py",
+      "retained_path": "evidence/2026-refresh/reproductions/phase2-root/trainer_lifecycle_probe.py",
+      "bytes": 2708,
+      "sha256": "6200799c86a0c6f9c8fceafedc3061c5f21aa916eb550cbd0c12fff736e34631"
+    },
+    {
+      "original_path": "/tmp/plato-phase2-root/dp_probe.py",
+      "retained_path": "evidence/2026-refresh/reproductions/phase2-root/dp_probe.py",
+      "bytes": 1538,
+      "sha256": "1c50c4fd9a475a4facc6de753d2c263c5c116bb4481e47ed03b6564ce12a4d7d"
+    },
+    {
+      "original_path": "/tmp/plato-phase2-root/dp_steps_probe.py",
+      "retained_path": "evidence/2026-refresh/reproductions/phase2-root/dp_steps_probe.py",
+      "bytes": 1467,
+      "sha256": "7d9fd88e3d04f3d78179dce354c52254f9d08a2c9f07abf531eca5fe9bf85c4e"
+    },
+    {
+      "original_path": "/tmp/plato-phase2-root/split_evaluation_probe.py",
+      "retained_path": "evidence/2026-refresh/reproductions/phase2-root/split_evaluation_probe.py",
+      "bytes": 1388,
+      "sha256": "cd126304d3eacf59739a92cd4c6d50beb3240c973e19bb83061f5c671bf7f580"
+    },
+    {
+      "original_path": "/tmp/plato-phase2-root/urgent_checkpoint_probe.py",
+      "retained_path": "evidence/2026-refresh/reproductions/phase2-root/urgent_checkpoint_probe.py",
+      "bytes": 1337,
+      "sha256": "046c13f96e9b0af91068028c698e41752cceb5eb01b36854e3c54d7d3fa77636"
+    },
+    {
+      "original_path": "/tmp/plato-phase2-root/urgent_shared_sid.py",
+      "retained_path": "evidence/2026-refresh/reproductions/phase2-root/urgent_shared_sid.py",
+      "bytes": 2012,
+      "sha256": "727e020e394d9c7b24bb2e763f3677763cb2173f483d617a487d5b6a480e04fb"
+    },
+    {
+      "original_path": "/tmp/plato-phase2-root/apfl_identity_probe.py",
+      "retained_path": "evidence/2026-refresh/reproductions/phase2-root/apfl_identity_probe.py",
+      "bytes": 1613,
+      "sha256": "114bc1919153ba346734ee5e94da8621f183547a5f245516e9d4699979b77f0d"
+    },
+    {
+      "original_path": "/tmp/plato-phase2-root/control_identity_probe.py",
+      "retained_path": "evidence/2026-refresh/reproductions/phase2-root/control_identity_probe.py",
+      "bytes": 2071,
+      "sha256": "23df1b0e85660ed514809f4ad51cf070e3154a37244f92bf866cffc863000ec4"
+    },
+    {
+      "original_path": "/tmp/plato-phase2-root/dp_checkpoint_probe.py",
+      "retained_path": "evidence/2026-refresh/reproductions/phase2-root/dp_checkpoint_probe.py",
+      "bytes": 1877,
+      "sha256": "645d57dc3c69b22c432d8ddd1c0c8e1ddc6257420427c3b5a7d9b343d18ef78b"
+    },
+    {
+      "original_path": "/tmp/plato-phase2-root/prepared_image_probe.py",
+      "retained_path": "evidence/2026-refresh/reproductions/phase2-root/prepared_image_probe.py",
+      "bytes": 1534,
+      "sha256": "231a2a53b4b0f78534362597918cf75d8b113b5c1ac118c482bf415ad3b78315"
+    },
+    {
+      "original_path": "/tmp/plato-phase2-root/amp-clipping-probe.json",
+      "retained_path": "evidence/2026-refresh/reproductions/phase2-root/amp-clipping-probe.json",
+      "bytes": 524,
+      "sha256": "c2fd334c5e7b969de71b0bbdd860a18622cfdfeacb205d485337088fcd0d8d99"
+    },
+    {
+      "original_path": "/tmp/plato-phase2-root/amp-clipping-probe-314.json",
+      "retained_path": "evidence/2026-refresh/reproductions/phase2-root/amp-clipping-probe-314.json",
+      "bytes": 524,
+      "sha256": "c2fd334c5e7b969de71b0bbdd860a18622cfdfeacb205d485337088fcd0d8d99"
+    },
+    {
+      "original_path": "/tmp/plato-phase2-root/server-resume-rng-313.json",
+      "retained_path": "evidence/2026-refresh/reproductions/phase2-root/server-resume-rng-313.json",
+      "bytes": 485,
+      "sha256": "0a3829b0855b47d5e86cf03fb4e77cef3485ac8ef1d356f49f24de7758a6725e"
+    },
+    {
+      "original_path": "/tmp/plato-phase2-root/server-resume-rng-314.json",
+      "retained_path": "evidence/2026-refresh/reproductions/phase2-root/server-resume-rng-314.json",
+      "bytes": 485,
+      "sha256": "0a3829b0855b47d5e86cf03fb4e77cef3485ac8ef1d356f49f24de7758a6725e"
+    },
+    {
+      "original_path": "/tmp/plato-phase2-root/merged-resume-313.json",
+      "retained_path": "evidence/2026-refresh/reproductions/phase2-root/merged-resume-313.json",
+      "bytes": 18106,
+      "sha256": "85a3540833f9d48ecf2749b1df8052e5b2a329283666f0b47ee466ee6f841555"
+    },
+    {
+      "original_path": "/tmp/plato-phase2-root/merged-resume-314.json",
+      "retained_path": "evidence/2026-refresh/reproductions/phase2-root/merged-resume-314.json",
+      "bytes": 18124,
+      "sha256": "d653d6a497336f3713971fde08b85e06eb05c7fc2a702207931f0d032bf890fb"
+    },
+    {
+      "original_path": "/tmp/plato-phase2-root/merged_checkpoint_resume_probe.initial.py",
+      "retained_path": "evidence/2026-refresh/reproductions/phase2-root/merged_checkpoint_resume_probe.initial.py",
+      "bytes": 6258,
+      "sha256": "67838f65d2ef3bb0a255feccb00c881aad261c407596a3ad9090e32cf0a8667d"
+    },
+    {
+      "original_path": "/tmp/plato-phase2-root/merged-resume-313.stderr",
+      "retained_path": "evidence/2026-refresh/reproductions/phase2-root/merged-resume-313.stderr",
+      "bytes": 24180,
+      "sha256": "66ff5571e0255aef053cf7c9a7fcf9063a71dc64add6c3e174b06d7b72ecd918"
+    },
+    {
+      "original_path": "/tmp/plato-phase2-root/merged-resume-314.stderr",
+      "retained_path": "evidence/2026-refresh/reproductions/phase2-root/merged-resume-314.stderr",
+      "bytes": 24180,
+      "sha256": "ea0f5cefb507c9140d1016a476f681ce9a065fc6dbfb28b7f01d790a9866d9f8"
+    },
+    {
+      "original_path": "/tmp/plato-phase2-root/merged-resume-313.initial.stderr",
+      "retained_path": "evidence/2026-refresh/reproductions/phase2-root/merged-resume-313.initial.stderr",
+      "bytes": 1827,
+      "sha256": "eccd120a5b5e8632937bd600ae6a94e5f0ad05d5593f4dd1c4008a8c024909f7"
+    },
+    {
+      "original_path": "/tmp/plato-phase2-root/merged-resume-314.initial.stderr",
+      "retained_path": "evidence/2026-refresh/reproductions/phase2-root/merged-resume-314.initial.stderr",
+      "bytes": 1596,
+      "sha256": "41be81ff2945c3713a99eb5204ad0fdfe65bcdbfb2e2cdb5f64da77af142e1b4"
+    },
+    {
+      "original_path": "/tmp/plato-phase2-root/merged-resume-old-test-313.log",
+      "retained_path": "evidence/2026-refresh/reproductions/phase2-root/merged-resume-old-test-313.log",
+      "bytes": 12747,
+      "sha256": "9701d1b3f26ef357c5b3a0014ab816673ec917377898d14091cf35d53170424b"
+    },
+    {
+      "original_path": "/tmp/plato-phase2-root/merged-resume-module-313.log",
+      "retained_path": "evidence/2026-refresh/reproductions/phase2-root/merged-resume-module-313.log",
+      "bytes": 11733,
+      "sha256": "fc5b8a56d8d21e2e47b9ef569e07debb591a7270ee8342bfd6b9306727e571b9"
+    }
+  ]
+}

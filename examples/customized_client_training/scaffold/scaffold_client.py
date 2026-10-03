@@ -9,48 +9,16 @@ in Proceedings of the 37th International Conference on Machine Learning (ICML), 
 https://arxiv.org/pdf/1910.06378.pdf
 """
 
-import logging
-import os
-import pickle
-
 from plato.clients import simple
 from plato.clients.strategies.defaults import DefaultLifecycleStrategy
-from plato.config import Config
 
 
 class ScaffoldLifecycleStrategy(DefaultLifecycleStrategy):
-    """Lifecycle strategy that initialises SCAFFOLD control variates."""
+    """The trainer strategy loads controls when configure assigns a logical ID.
 
-    def configure(self, context) -> None:
-        super().configure(context)
-
-        trainer = context.trainer
-        if trainer is None:
-            return
-
-        model_path = Config().params["model_path"]
-        model_name = Config().trainer.model_name
-        filename = f"{model_name}_{context.client_id}_control_variate.pth"
-        client_control_variate_path = f"{model_path}/{filename}"
-
-        if os.path.exists(client_control_variate_path):
-            logging.info(
-                "[Client #%d] Loading the control variate from %s.",
-                context.client_id,
-                client_control_variate_path,
-            )
-            with open(client_control_variate_path, "rb") as path:
-                client_control_variate = pickle.load(path)
-            trainer.client_control_variate = client_control_variate
-            context.state["client_control_variate"] = client_control_variate
-            if context.owner is not None:
-                context.owner.client_control_variate = client_control_variate
-        else:
-            trainer.client_control_variate = None
-            if context.owner is not None:
-                context.owner.client_control_variate = None
-
-        trainer.client_control_variate_path = client_control_variate_path
+    It is the sole control-state owner, including exact same-client legacy file
+    migration. Inbound controls arrive after configure through the processor.
+    """
 
 
 def create_client(
@@ -69,7 +37,6 @@ def create_client(
         trainer=trainer,
         callbacks=callbacks,
     )
-    setattr(client, "client_control_variate", None)
 
     payload_strategy = client.payload_strategy
     training_strategy = client.training_strategy

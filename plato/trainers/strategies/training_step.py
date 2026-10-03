@@ -8,6 +8,7 @@ the composable trainer architecture.
 from __future__ import annotations
 
 from collections.abc import Callable
+from math import ceil
 from typing import List, Optional
 
 import torch
@@ -80,6 +81,10 @@ class GradientAccumulationStepStrategy(TrainingStepStrategy):
     Gradient accumulation allows effective larger batch sizes by accumulating
     gradients over multiple batches before updating weights.
 
+    Each window averages microbatch losses equally, retaining the original
+    full-window behavior even when microbatch sizes differ. A partial window
+    uses its actual microbatch count, rather than the configured window size.
+
     Args:
         accumulation_steps: Number of steps to accumulate gradients
         create_graph: Whether to create computation graph
@@ -91,13 +96,31 @@ class GradientAccumulationStepStrategy(TrainingStepStrategy):
 
     def __init__(self, accumulation_steps: int = 1, create_graph: bool = False):
         """Initialize gradient accumulation parameters."""
+        if isinstance(accumulation_steps, bool) or not isinstance(
+            accumulation_steps, int
+        ) or accumulation_steps < 1:
+            raise ValueError("accumulation_steps must be a positive integer")
         self.accumulation_steps = accumulation_steps
         self.create_graph = create_graph
         self.current_step = 0
+        self._loss_total = None
 
     def setup(self, context: TrainingContext) -> None:
         """Reset step counter on setup."""
         self.current_step = 0
+        self._loss_total = None
+
+    def on_train_start(self, context: TrainingContext) -> None:
+        self.setup(context)
+        if context.model is not None:
+            context.model.zero_grad(set_to_none=True)
+        context.state["optimizer_step_completed"] = False
+
+    def on_train_end(self, context: TrainingContext) -> None:
+        self.on_train_start(context)
+
+    def optimizer_steps_per_epoch(self, batches: int) -> int:
+        return ceil(batches / self.accumulation_steps)
 
     def training_step(
         self,
@@ -109,6 +132,9 @@ class GradientAccumulationStepStrategy(TrainingStepStrategy):
         context: TrainingContext,
     ) -> torch.Tensor:
         """Perform training step with gradient accumulation."""
+        context.state["optimizer_step_completed"] = False
+        if self.current_step == 0:
+            optimizer.zero_grad(set_to_none=True)
         # Forward pass
         outputs = model(examples)
 
@@ -123,13 +149,40 @@ class GradientAccumulationStepStrategy(TrainingStepStrategy):
 
         # Increment step counter
         self.current_step += 1
+        detached_loss = loss.detach()
+        self._loss_total = (
+            detached_loss if self._loss_total is None
+            else self._loss_total + detached_loss
+        )
 
         # Update weights every N steps
-        if self.current_step % self.accumulation_steps == 0:
+        if self.current_step == self.accumulation_steps:
             optimizer.step()
-            optimizer.zero_grad()
+            optimizer.zero_grad(set_to_none=True)
+            self.current_step = 0
+            self._loss_total = None
+            context.state["optimizer_step_completed"] = True
 
         # Return unscaled loss for logging
+        return loss
+
+    def finalize(self, model, optimizer, context) -> torch.Tensor | None:
+        """Flush a pending window once at the epoch boundary."""
+        context.state["optimizer_step_completed"] = False
+        if self.current_step == 0:
+            return None
+        if self._loss_total is None:
+            raise RuntimeError("Pending accumulation window has no recorded loss")
+        scale = self.accumulation_steps / self.current_step
+        for parameter in model.parameters():
+            if parameter.grad is not None:
+                parameter.grad.mul_(scale)
+        loss = self._loss_total / self.current_step
+        optimizer.step()
+        optimizer.zero_grad(set_to_none=True)
+        self.current_step = 0
+        self._loss_total = None
+        context.state["optimizer_step_completed"] = True
         return loss
 
 
@@ -174,26 +227,46 @@ class MixedPrecisionStepStrategy(TrainingStepStrategy):
         context: TrainingContext,
     ) -> torch.Tensor:
         """Perform training step with mixed precision."""
+        context.state["optimizer_step_completed"] = False
         optimizer.zero_grad()
 
         if self.enabled and self.scaler is not None:
             # Mixed precision training
-            with torch.amp.autocast("cuda"):
+            with torch.amp.autocast("cuda", enabled=examples.device.type == "cuda"):
                 outputs = model(examples)
                 loss = loss_criterion(outputs, labels)
 
             # Scaled backward pass
             self.scaler.scale(loss).backward(create_graph=self.create_graph)
 
+            # Public pre-step wrappers (including clipping) must see unscaled
+            # gradients even when a fused optimizer normally unscales internally.
+            self.scaler.unscale_(optimizer)
+
             # Unscale gradients and step
-            self.scaler.step(optimizer)
+            # GradScaler can suppress optimizer.step on overflow. Observe the
+            # actual public step hook, rather than counting scaler attempts.
+            # AMP-aware fused optimizers can skip inside step itself, so the
+            # scaler's public overflow/backoff signal is checked as well.
+            def completed(*_):
+                context.state["optimizer_step_completed"] = True
+
+            handle = optimizer.register_step_post_hook(completed)
+            scale_before = self.scaler.get_scale()
+            try:
+                self.scaler.step(optimizer)
+            finally:
+                handle.remove()
             self.scaler.update()
+            if self.scaler.get_scale() < scale_before:
+                context.state["optimizer_step_completed"] = False
         else:
             # Standard precision training
             outputs = model(examples)
             loss = loss_criterion(outputs, labels)
             loss.backward(create_graph=self.create_graph)
             optimizer.step()
+            context.state["optimizer_step_completed"] = True
 
         return loss
 
@@ -428,6 +501,24 @@ class ValidateBeforeStepStrategy(TrainingStepStrategy):
         """Setup base strategy."""
         self.base_strategy.setup(context)
 
+    def on_train_start(self, context: TrainingContext) -> None:
+        self.base_strategy.on_train_start(context)
+
+    def on_train_end(self, context: TrainingContext) -> None:
+        self.base_strategy.on_train_end(context)
+
+    def on_client_id_changed(self, context: TrainingContext) -> None:
+        self.base_strategy.on_client_id_changed(context)
+
+    def optimizer_steps_per_epoch(self, batches: int) -> int:
+        return self.base_strategy.optimizer_steps_per_epoch(batches)
+
+    def _check_gradients(self, model: nn.Module) -> None:
+        if self.check_gradients:
+            for name, parameter in model.named_parameters():
+                if parameter.grad is not None:
+                    self._check_tensor(parameter.grad, f"gradient of {name}")
+
     def _check_tensor(self, tensor: torch.Tensor, name: str) -> bool:
         """Check if tensor contains NaN or Inf."""
         if torch.isnan(tensor).any():
@@ -461,28 +552,38 @@ class ValidateBeforeStepStrategy(TrainingStepStrategy):
             self._check_tensor(examples, "input examples")
             self._check_tensor(labels, "input labels")
 
-        # Perform training step
-        optimizer.zero_grad()
-        outputs = model(examples)
+        def validated_loss(outputs, targets):
+            if self.check_outputs:
+                self._check_tensor(outputs, "model outputs")
+            loss = loss_criterion(outputs, targets)
+            self._check_tensor(loss, "loss")
+            return loss
 
-        # Check outputs
-        if self.check_outputs:
-            self._check_tensor(outputs, "model outputs")
+        # Keep the selected backward/accumulation/clipping behavior. The
+        # optimizer hook checks gradients immediately before actual updates.
+        handle = optimizer.register_step_pre_hook(
+            lambda *_: self._check_gradients(model)
+        )
+        try:
+            return self.base_strategy.training_step(
+                model, optimizer, examples, labels, validated_loss, context
+            )
+        finally:
+            handle.remove()
 
-        loss = loss_criterion(outputs, labels)
-        self._check_tensor(loss, "loss")
-
-        loss.backward()
-
-        # Check gradients
-        if self.check_gradients:
-            for name, param in model.named_parameters():
-                if param.grad is not None:
-                    self._check_tensor(param.grad, f"gradient of {name}")
-
-        optimizer.step()
-
-        return loss
+    def finalize(self, model, optimizer, context) -> torch.Tensor | None:
+        """Validate and forward any pending accumulated update."""
+        finalize = getattr(self.base_strategy, "finalize", None)
+        if not callable(finalize):
+            context.state["optimizer_step_completed"] = False
+            return None
+        handle = optimizer.register_step_pre_hook(
+            lambda *_: self._check_gradients(model)
+        )
+        try:
+            return finalize(model, optimizer, context)
+        finally:
+            handle.remove()
 
     def teardown(self, context: TrainingContext) -> None:
         """Teardown base strategy."""

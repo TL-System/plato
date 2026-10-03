@@ -7,8 +7,6 @@ Samples data from a dataset, biased across modalities in an
 
 """
 
-import numpy as np
-
 from plato.config import Config
 from plato.samplers import base
 
@@ -26,7 +24,7 @@ class Sampler(base.Sampler):
             modalities_name = ["rgb"]
 
         # Different clients should have a different bias across modalities
-        np.random.seed(self.random_seed * int(client_id))
+        self.rng.seed(self.random_seed * int(client_id))
 
         # default, one sample holds only one modality
         per_client_modalties_size = (
@@ -35,10 +33,13 @@ class Sampler(base.Sampler):
             else 1
         )
 
-        assert per_client_modalties_size < len(modalities_name)
+        if not 1 <= per_client_modalties_size <= len(modalities_name):
+            raise ValueError(
+                "Modality quantity must be between 1 and the modality count."
+            )
 
         # obtain the modalities that hold for this data
-        self.subset_modalities = np.random.choice(
+        self.subset_modalities = self.rng.choice(
             modalities_name,
             per_client_modalties_size,
             replace=False,

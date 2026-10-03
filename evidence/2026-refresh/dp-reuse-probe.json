@@ -1,0 +1,58 @@
+{
+  "finding": "F21",
+  "status": "CONFIRMED; assigned to 2C trainer audit",
+  "title": "Reusing a differential-privacy trainer fails on its second training run.",
+  "baseline_commit": "fda60becedfa6236c11d415b87a868b52789a41e",
+  "python": "3.13.16",
+  "packages": {
+    "torch": "2.14.1",
+    "opacus": "1.6.0",
+    "numpy": "2.5.3"
+  },
+  "execution": "Equivalent inline Python executed with OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 uv run --no-sync python; config/runtime paths isolated in TemporaryDirectory. Exact reusable source retained below.",
+  "reproducer": "import json\nimport tempfile\nimport traceback\nfrom pathlib import Path\n\nimport torch\nfrom torch.utils.data import TensorDataset\n\nfrom plato.trainers.diff_privacy import Trainer\nfrom tests.integration.utils import build_minimal_config, configure_environment\n\nconfig = build_minimal_config(model_name=\"toy\", trainer_type=\"diff_privacy\")\nconfig[\"trainer\"].update(batch_size=8, epochs=1, max_physical_batch_size=4)\nwith tempfile.TemporaryDirectory(prefix=\"plato-dp-probe-\") as temporary:\n    with configure_environment(config, runtime_root=Path(temporary)):\n        torch.manual_seed(15)\n        trainer = Trainer(model=lambda: torch.nn.Linear(2, 2))\n        trainer.device = torch.device(\"cpu\")\n        trainer.context.device = trainer.device\n        trainer.set_client_id(1)\n        dataset = TensorDataset(torch.randn(32, 2), torch.randint(0, 2, (32,)))\n        outcomes = []\n        for number in (1, 2):\n            try:\n                trainer.train_model(\n                    {**config[\"trainer\"], \"run_id\": \"probe\"},\n                    dataset,\n                    list(range(32)),\n                )\n                outcomes.append({\"round\": number, \"outcome\": \"passed\", \"model_type\": type(trainer.model).__name__, \"keys\": list(trainer.model.state_dict())})\n            except Exception as error:\n                traceback.print_exc()\n                outcomes.append({\"round\": number, \"outcome\": \"failed\", \"type\": type(error).__name__, \"message\": str(error)})\n                break\n        print(\"PROBE_RESULT\", json.dumps(outcomes))\n",
+  "result": [
+    {
+      "round": 1,
+      "outcome": "passed",
+      "model_type": "GradSampleModule",
+      "keys": [
+        "_module.weight",
+        "_module.bias"
+      ]
+    },
+    {
+      "round": 2,
+      "outcome": "failed",
+      "type": "ValueError",
+      "message": "Trying to add hooks twice to the same model"
+    }
+  ],
+  "log_sha256": "6cec8bb69a5103869cdf00158c028321ffc44858772d88e1493c03405a77f393",
+  "cause_site": "plato/trainers/diff_privacy.py DifferentialPrivacyCallback.on_train_run_start wraps an already wrapped model after the first run.",
+  "acceptance": "Two actual consecutive train_model runs on the same trainer with changed parameters, consistent model/context ownership, no duplicate hooks; preserve Opacus accounting and model exchange/checkpoint keys. Include interrupted-run cleanup if ownership is affected. No research privacy policy redesign.",
+  "limitations": "CPU linear synthetic model, 32 samples, one epoch/run, physical batch cap 4. First run executes real Opacus make_private_with_epsilon and DP optimizer. This does not claim a privacy guarantee or that fresh worker processes always reproduce the reuse failure.",
+  "warnings": "Opacus experimental RNG and accountant alpha-range warnings plus PyTorch full backward-hook warning remained visible; no warning suppression.",
+  "checkpoint_probe": {
+    "command": "OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=. uv run --no-sync python /tmp/plato-phase2-root/dp_checkpoint_probe.py",
+    "reproducer": "import json\nimport tempfile\nimport traceback\nfrom pathlib import Path\n\nimport torch\nfrom torch.utils.data import TensorDataset\n\nfrom plato.trainers.diff_privacy import Trainer\nfrom tests.integration.utils import build_minimal_config, configure_environment\n\nconfig = build_minimal_config(model_name=\"toy\", trainer_type=\"diff_privacy\")\nconfig[\"trainer\"].update(batch_size=8, epochs=1, max_physical_batch_size=4)\nwith tempfile.TemporaryDirectory(prefix=\"plato-dp-probe-\") as temporary:\n    with configure_environment(config, runtime_root=Path(temporary)):\n        torch.manual_seed(15)\n        trainer = Trainer(model=lambda: torch.nn.Linear(2, 2))\n        trainer.device = torch.device(\"cpu\")\n        trainer.context.device = trainer.device\n        trainer.set_client_id(1)\n        dataset = TensorDataset(torch.randn(32, 2), torch.randint(0, 2, (32,)))\n        outcomes = []\n        for number in (1,):\n            try:\n                trainer.train_model(\n                    {**config[\"trainer\"], \"run_id\": \"probe\"},\n                    dataset,\n                    list(range(32)),\n                )\n                outcomes.append({\"round\": number, \"outcome\": \"passed\", \"model_type\": type(trainer.model).__name__, \"keys\": list(trainer.model.state_dict())})\n            except Exception as error:\n                traceback.print_exc()\n                outcomes.append({\"round\": number, \"outcome\": \"failed\", \"type\": type(error).__name__, \"message\": str(error)})\n                break\n        trainer.save_model(filename=\"dp.safetensors\")\n        try:\n            trainer.load_model(filename=\"dp.safetensors\")\n            outcomes.append({\"checkpoint_roundtrip\": \"passed\"})\n        except Exception as error:\n            outcomes.append({\"checkpoint_roundtrip\": \"failed\", \"type\": type(error).__name__, \"message\": str(error)})\n        print(\"PROBE_RESULT\", json.dumps(outcomes))\n",
+    "result": [
+      {
+        "round": 1,
+        "outcome": "passed",
+        "model_type": "GradSampleModule",
+        "keys": [
+          "_module.weight",
+          "_module.bias"
+        ]
+      },
+      {
+        "checkpoint_roundtrip": "failed",
+        "type": "RuntimeError",
+        "message": "Error(s) in loading state_dict for GradSampleModule:\n\tMissing key(s) in state_dict: \"_module.weight\", \"_module.bias\". \n\tUnexpected key(s) in state_dict: \"weight\", \"bias\". "
+      }
+    ],
+    "log_sha256": "23c9eb8500227c010d0862a71954608a21e4ea733adf73284095eccd1fefa9e5",
+    "scope": "Same F21 wrapped-model lifecycle: actual save_model succeeds after first training but actual load_model of its own checkpoint fails because cleaned keys do not match the retained wrapper."
+  }
+}

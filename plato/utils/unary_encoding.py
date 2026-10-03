@@ -12,6 +12,12 @@ ACM CCS 2014.
 import numpy as np
 
 
+def _inverse_odds(epsilon):
+    if not np.isfinite(epsilon) or epsilon < 0:
+        raise ValueError("Unary encoding epsilon must be finite and nonnegative.")
+    return np.exp(-epsilon)
+
+
 def encode(x: np.ndarray):
     x[x > 0] = 1
     x[x <= 0] = 0
@@ -27,14 +33,16 @@ def randomize(bit_array: np.ndarray, epsilon):
 
 
 def symmetric_unary_encoding(bit_array: np.ndarray, epsilon):
-    p = np.e ** (epsilon / 2) / (np.e ** (epsilon / 2) + 1)
-    q = 1 / (np.e ** (epsilon / 2) + 1)
+    inverse_odds = _inverse_odds(epsilon / 2)
+    p = 1 / (1 + inverse_odds)
+    q = inverse_odds / (1 + inverse_odds)
     return produce_randomized_response(bit_array, p, q)
 
 
 def optimized_unary_encoding(bit_array: np.ndarray, epsilon):
     p = 1 / 2
-    q = 1 / (np.e**epsilon + 1)
+    inverse_odds = _inverse_odds(epsilon)
+    q = inverse_odds / (1 + inverse_odds)
     return produce_randomized_response(bit_array, p, q)
 
 

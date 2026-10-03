@@ -1,0 +1,400 @@
+{
+  "schema_version": 1,
+  "written_at_utc": "2026-10-03T11:14:20.902111+00:00",
+  "reviewer_role": "Fresh independent Sol xhigh bounded review requested by root; no nested agents.",
+  "authority": "Current user assignment and root AGENTS.md; accepted design records authorize implementation and do not themselves qualify it.",
+  "constraints_observed": {
+    "shell": "zsh -lc for every shell invocation",
+    "writes": "Only assigned /tmp/plato-phase2-final-prose-review scratch and the two assigned root JSON reports.",
+    "nested_agents": false,
+    "package_installs": false,
+    "training_runs": false,
+    "pytest_suites": false,
+    "candidate_edits": false,
+    "commits": false,
+    "pushes": false,
+    "cleanup": false
+  },
+  "verdict": "PASS",
+  "verdict_scope": "Finite timeout metadata and measured rationale only; not a hosted Linux CI pass, large-suite rerun, implementation acceptance, or Phase2 closure.",
+  "candidate": {
+    "root": "/private/tmp/plato-refresh-worktrees/phase2-ci-budget-review",
+    "commit": "8d27c5c7a205299537a2835358f1d5e91a7b51c3",
+    "tree": "fa85f0b6ddc104e4fd1a2bd11a17c32619a1cc8a",
+    "base_commit": "13e38dafce476286db7e673e7f21343d54416b56",
+    "base_tree": "9fe8cfb039d0d97fc5b2c95a459de4c73c6d1b51"
+  },
+  "scope": {
+    "changed_files": [
+      ".github/workflows/pytorch_tests.yml",
+      "evidence/2026-refresh/phase2-ci-budget-validation.json"
+    ],
+    "nonowned_unchanged": true,
+    "workflow_preserved_byte_for_byte_except_four_timeout_values": true
+  },
+  "candidate_workflow_receipt": {
+    "path": "/private/tmp/plato-refresh-worktrees/phase2-ci-budget-review/.github/workflows/pytorch_tests.yml",
+    "bytes": 6944,
+    "sha256": "7c0c144730cbb0d38bb00e10c390e2ab60d6df0a6086de75fcd675bcc0fdc683"
+  },
+  "baseline_workflow_sha256": "699c768a6fdb27bc75a0bae7ba7d333ddd39570bb2070bbb800fad020fc5f42e",
+  "validation_evidence": {
+    "path": "/private/tmp/plato-refresh-worktrees/phase2-ci-budget-review/evidence/2026-refresh/phase2-ci-budget-validation.json",
+    "bytes": 20063,
+    "sha256": "3000d2ad734979877c319433aa07eac7fc909260fc4b7427e763a43986ec10ad"
+  },
+  "inputs": [
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/phase2-ci-budget-review/evidence/2026-refresh/phase2c-feddyn-validation.json",
+      "bytes": 56795,
+      "sha256": "1beca9f0465a6afa30c7aaf2ddb1334bfdcc1beccc09feb2656456c8a727e440"
+    },
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/phase2-ci-budget-review/evidence/2026-refresh/phase2c-feddyn-delivery-receipt.json",
+      "bytes": 6383,
+      "sha256": "aeb0299f3082465d8e71f1e48dceba74109fb599a9a08527620cd9b775f84058"
+    },
+    {
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2c-root-final-receipt-audit.json",
+      "bytes": 6411,
+      "sha256": "c508fed7b6ad68947686d4ef05e56c75304ff8923dbe90d84d673d9bc2235a6d"
+    }
+  ],
+  "material_findings": [],
+  "low_priority_suggestions": [],
+  "exact_timeout_changes": [
+    {
+      "path": [
+        "jobs",
+        "PyTorch-Tests",
+        "timeout-minutes"
+      ],
+      "old": 45,
+      "new": 90,
+      "line": 16
+    },
+    {
+      "path": [
+        "jobs",
+        "PyTorch-Tests",
+        "steps",
+        6,
+        "timeout-minutes"
+      ],
+      "old": 12,
+      "new": 20,
+      "line": 83
+    },
+    {
+      "path": [
+        "jobs",
+        "PyTorch-Tests",
+        "steps",
+        8,
+        "timeout-minutes"
+      ],
+      "old": 12,
+      "new": 20,
+      "line": 109
+    },
+    {
+      "path": [
+        "jobs",
+        "PyTorch-Tests",
+        "steps",
+        9,
+        "timeout-minutes"
+      ],
+      "old": 12,
+      "new": 16,
+      "line": 118
+    }
+  ],
+  "preserved_contract": "Every command, marker/profile/collection/missing-extra guard, tests, failure handling, coverage output, lint/typing guard, Python3.13/3.14 matrix, Ubuntu24.04 runner, max-parallel2/fail-fast=false, action SHA/version pins, contents:read permissions, environment, recursive submodules and artifact if:always()/retention behavior is unchanged. No modernization or timeout removal.",
+  "source_attribution": {
+    "non_runtime_source_exact": true,
+    "runtime_only_non_evidence_difference": "tests/trainers/test_personalized_state_ownership.py"
+  },
+  "measurements": [
+    {
+      "python": "3.13",
+      "profile": "mandatory",
+      "partition": "not runtime",
+      "executed_commit": "7d310b90d698a7be4aa9a184dc415f7dbb401e5b",
+      "pytest_seconds": 763.02,
+      "wall_seconds": 769.5715618338436,
+      "old_step_margin_seconds": -49.57,
+      "command": "OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2c-313/bin/python -m pytest tests --test-profile mandatory -m 'not runtime' -q --basetemp /tmp/plato-phase2c-feddyn-implementation/final-mandatory-not-runtime-313 --junitxml /tmp/plato-phase2c-feddyn-implementation/final-mandatory-not-runtime-313.xml",
+      "receipts": [
+        {
+          "kind": "log",
+          "path": "/tmp/plato-phase2c-feddyn-implementation/final-mandatory-not-runtime-313.log",
+          "bytes": 6518,
+          "sha256": "d2cd0930a7678d71b52c5a26e3ec069cbf8460580dd032808177b232847fa6ff"
+        },
+        {
+          "kind": "wall_report",
+          "path": "/tmp/plato-phase2c-feddyn-implementation/final-mandatory-not-runtime-313.json",
+          "bytes": 880,
+          "sha256": "564f794eb7134e1213c193fba4b651a669e4e9b2686c0d9e7d61ba538cd4be05"
+        },
+        {
+          "kind": "junit",
+          "path": "/tmp/plato-phase2c-feddyn-implementation/final-mandatory-not-runtime-313.xml",
+          "bytes": 189163,
+          "sha256": "9bf0de982f4e8661650d1e3922a92a98631e791edce8f40a786ff00a513984f5"
+        }
+      ]
+    },
+    {
+      "python": "3.14",
+      "profile": "mandatory",
+      "partition": "not runtime",
+      "executed_commit": "7d310b90d698a7be4aa9a184dc415f7dbb401e5b",
+      "pytest_seconds": 835.52,
+      "wall_seconds": 842.550791791873,
+      "old_step_margin_seconds": -122.55,
+      "command": "OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2c-314/bin/python -m pytest tests --test-profile mandatory -m 'not runtime' -q --basetemp /tmp/plato-phase2c-feddyn-implementation/final-mandatory-not-runtime-314 --junitxml /tmp/plato-phase2c-feddyn-implementation/final-mandatory-not-runtime-314.xml",
+      "receipts": [
+        {
+          "kind": "log",
+          "path": "/tmp/plato-phase2c-feddyn-implementation/final-mandatory-not-runtime-314.log",
+          "bytes": 6506,
+          "sha256": "4332d284c0358117b7613f0049ef4a5fbd5ca97cac9e30970467333190188a48"
+        },
+        {
+          "kind": "wall_report",
+          "path": "/tmp/plato-phase2c-feddyn-implementation/final-mandatory-not-runtime-314.json",
+          "bytes": 879,
+          "sha256": "2c6c714370305befbf55125df3001c14ef80149aab400c0a286d0d60963e3b04"
+        },
+        {
+          "kind": "junit",
+          "path": "/tmp/plato-phase2c-feddyn-implementation/final-mandatory-not-runtime-314.xml",
+          "bytes": 189164,
+          "sha256": "7fda8dc0f3a1072692e341d61fcd515fdcccb9868514ea66516edf5b0606c51f"
+        }
+      ]
+    },
+    {
+      "python": "3.13",
+      "profile": "base",
+      "partition": "not runtime",
+      "executed_commit": "7d310b90d698a7be4aa9a184dc415f7dbb401e5b",
+      "pytest_seconds": 760.02,
+      "wall_seconds": 765.3687022500671,
+      "old_step_margin_seconds": -45.37,
+      "command": "OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2c-313/bin/python -m pytest tests --test-profile base -m 'not runtime' -q --basetemp /tmp/plato-phase2c-feddyn-implementation/final-base-not-runtime-313 --junitxml /tmp/plato-phase2c-feddyn-implementation/final-base-not-runtime-313.xml",
+      "receipts": [
+        {
+          "kind": "log",
+          "path": "/tmp/plato-phase2c-feddyn-implementation/final-base-not-runtime-313.log",
+          "bytes": 6317,
+          "sha256": "7a744f507a7bf922bbe25a6fa5f03bc3e23272afa192785975e37748db4208b6"
+        },
+        {
+          "kind": "wall_report",
+          "path": "/tmp/plato-phase2c-feddyn-implementation/final-base-not-runtime-313.json",
+          "bytes": 855,
+          "sha256": "0231a67916d1c29a56229bbb3a8918cc99d9c0f4ed5522c0ac2a572fab120813"
+        },
+        {
+          "kind": "junit",
+          "path": "/tmp/plato-phase2c-feddyn-implementation/final-base-not-runtime-313.xml",
+          "bytes": 189599,
+          "sha256": "7d0ecae07bcd6e489ffe81cbe3412f074312284a949961eec0ec49f1971da9fc"
+        }
+      ]
+    },
+    {
+      "python": "3.14",
+      "profile": "base",
+      "partition": "not runtime",
+      "executed_commit": "7d310b90d698a7be4aa9a184dc415f7dbb401e5b",
+      "pytest_seconds": 833.9,
+      "wall_seconds": 839.6064041669015,
+      "old_step_margin_seconds": -119.61,
+      "command": "OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2c-314/bin/python -m pytest tests --test-profile base -m 'not runtime' -q --basetemp /tmp/plato-phase2c-feddyn-implementation/final-base-not-runtime-314 --junitxml /tmp/plato-phase2c-feddyn-implementation/final-base-not-runtime-314.xml",
+      "receipts": [
+        {
+          "kind": "log",
+          "path": "/tmp/plato-phase2c-feddyn-implementation/final-base-not-runtime-314.log",
+          "bytes": 6365,
+          "sha256": "809bc2c9d83041c2e4affbd0bec62a9ec3d3791dfb2940a514cd809d13cd3bd9"
+        },
+        {
+          "kind": "wall_report",
+          "path": "/tmp/plato-phase2c-feddyn-implementation/final-base-not-runtime-314.json",
+          "bytes": 855,
+          "sha256": "b79b971c69296d431a919778b82b8caf4f719db7a98507fd67c03f056641ceb3"
+        },
+        {
+          "kind": "junit",
+          "path": "/tmp/plato-phase2c-feddyn-implementation/final-base-not-runtime-314.xml",
+          "bytes": 189601,
+          "sha256": "ec175575fc24fd86b7b95a36b62d39afc8c521b6a242d9af1efb1c99a67f460f"
+        }
+      ]
+    },
+    {
+      "python": "3.13",
+      "profile": "mandatory",
+      "partition": "runtime",
+      "executed_commit": "05a9f00b8a4d54c233c1a9c00ef9ce2c4467480c",
+      "pytest_seconds": 659.89,
+      "wall_seconds": 668.1595383340027,
+      "old_step_margin_seconds": 51.84,
+      "command": "OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2c-313/bin/python -m pytest tests --test-profile mandatory -m runtime -q --basetemp /tmp/plato-phase2c-feddyn-implementation/combined-mandatory-runtime-313 --junitxml /tmp/plato-phase2c-feddyn-implementation/combined-mandatory-runtime-313.xml",
+      "receipts": [
+        {
+          "kind": "log",
+          "path": "/tmp/plato-phase2c-feddyn-implementation/combined-mandatory-runtime-313.log",
+          "bytes": 329,
+          "sha256": "2d11952235a5f45451102d8f1f5e5a45b66dd8f7bea843e15dd387f914009278"
+        },
+        {
+          "kind": "wall_report",
+          "path": "/tmp/plato-phase2c-feddyn-implementation/combined-mandatory-runtime-313.json",
+          "bytes": 843,
+          "sha256": "be24e9f2f150f3a8458cf58654b6f3a7d44dd6e15481a83a84e5c3a6b3f54c54"
+        },
+        {
+          "kind": "junit",
+          "path": "/tmp/plato-phase2c-feddyn-implementation/combined-mandatory-runtime-313.xml",
+          "bytes": 7971,
+          "sha256": "05fe9a1c2f125151e4f8d46296ac36d7ad3e8f3869229eed7cf7e81cf347fc1f"
+        }
+      ]
+    },
+    {
+      "python": "3.14",
+      "profile": "mandatory",
+      "partition": "runtime",
+      "executed_commit": "05a9f00b8a4d54c233c1a9c00ef9ce2c4467480c",
+      "pytest_seconds": 680.58,
+      "wall_seconds": 689.3806555839255,
+      "old_step_margin_seconds": 30.62,
+      "command": "OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2c-314/bin/python -m pytest tests --test-profile mandatory -m runtime -q --basetemp /tmp/plato-phase2c-feddyn-implementation/combined-mandatory-runtime-314 --junitxml /tmp/plato-phase2c-feddyn-implementation/combined-mandatory-runtime-314.xml",
+      "receipts": [
+        {
+          "kind": "log",
+          "path": "/tmp/plato-phase2c-feddyn-implementation/combined-mandatory-runtime-314.log",
+          "bytes": 269,
+          "sha256": "85bd0f3726317b2384719c5b9187e6f4ce5c88097eed5677fec538b6ac4a526c"
+        },
+        {
+          "kind": "wall_report",
+          "path": "/tmp/plato-phase2c-feddyn-implementation/combined-mandatory-runtime-314.json",
+          "bytes": 843,
+          "sha256": "348331878ff96537c5055f44690e2efc918e89be41f060843733721b3a04f0be"
+        },
+        {
+          "kind": "junit",
+          "path": "/tmp/plato-phase2c-feddyn-implementation/combined-mandatory-runtime-314.xml",
+          "bytes": 7971,
+          "sha256": "16a9aafb17491f502746913db7a7f7723cc73b13608e90a69276584eff829809"
+        }
+      ]
+    }
+  ],
+  "step_planning": [
+    {
+      "profile": "base",
+      "partition": "not runtime",
+      "slowest_measured_command_wall_seconds": 839.6064041669015,
+      "runner_variance_multiplier": 1.25,
+      "additional_workflow_overhead_allowance_seconds": 120,
+      "planning_seconds": 1169.51,
+      "rounding": "Ceiling to the next whole minute.",
+      "new_timeout_minutes": 20,
+      "margin_over_slowest_measured_wall_seconds": 360.39,
+      "rationale": "Collection and mandatory missing-extra probe share this step with the full base suite."
+    },
+    {
+      "profile": "mandatory",
+      "partition": "not runtime",
+      "slowest_measured_command_wall_seconds": 842.550791791873,
+      "runner_variance_multiplier": 1.25,
+      "additional_workflow_overhead_allowance_seconds": 120,
+      "planning_seconds": 1173.19,
+      "rounding": "Ceiling to the next whole minute.",
+      "new_timeout_minutes": 20,
+      "margin_over_slowest_measured_wall_seconds": 357.45,
+      "rationale": "Hosted command also enables coverage and -ra reporting; the measured author command does not enable coverage."
+    },
+    {
+      "profile": "mandatory",
+      "partition": "runtime",
+      "slowest_measured_command_wall_seconds": 689.3806555839255,
+      "runner_variance_multiplier": 1.25,
+      "additional_workflow_overhead_allowance_seconds": 60,
+      "planning_seconds": 921.73,
+      "rounding": "Ceiling to the next whole minute.",
+      "new_timeout_minutes": 16,
+      "margin_over_slowest_measured_wall_seconds": 270.62,
+      "rationale": "The 51-case partition has little margin at 720 seconds; reserve additional hosted command/reporting overhead."
+    }
+  ],
+  "job_budget": {
+    "explicit_step_minutes": 84,
+    "other_action_reserve_minutes": 6,
+    "job_minutes": 90
+  },
+  "rationale_review": {
+    "result": "PASS",
+    "non_runtime": "Four actual author pytest durations 760.02/763.02/833.90/835.52s exceed old720s; command wall765.37/769.57/839.61/842.55s. Both base and mandatory steps now20min.",
+    "runtime": "51 cases per Python, pytest659.89/680.58s and wall668.16/689.38s leave only51.84/30.62s below720. The finite16min budget adds reasonable planning margin. No runtime timeout failure was invented.",
+    "budget": "Verified 1.25*slowest wall plus120s for each non-runtime step and60s for runtime, rounded up to20/20/16min. Mandatory measurement omitted hosted coverage, and base includes collection/missing-extra work; these chosen overhead reserves are transparently planning assumptions.",
+    "whole_job": "All existing stages accounted for: explicit limits total84min (zsh3+provenance2+base sync10+base tests20+mandatory sync10+mandatory tests20+runtime16+lint/typing3), plus6min planning reserve for checkout2/Python setup2/uv setup1/artifact upload1 = job90min per matrix job. It is a finite envelope, not a guaranteed hosted duration."
+  },
+  "verification": {
+    "parser": {
+      "name": "PyYAML",
+      "version": "6.0.3",
+      "loader": "SafeLoader with copied true/false-only bool resolution and duplicate-key rejection"
+    },
+    "script": {
+      "path": "/tmp/plato-phase2-final-prose-review/ci_checks.py",
+      "bytes": 8365,
+      "sha256": "67bcb178a6b4a4726820a08508fab4ad8edf7ad85cbbc7bafa79f1e4aee9f40c"
+    },
+    "command": "zsh -lc 'PYTHONDONTWRITEBYTECODE=1 /tmp/plato-phase2c-313/bin/python -B /tmp/plato-phase2-final-prose-review/ci_checks.py > /tmp/plato-phase2-final-prose-review/ci-checks.log 2>&1'",
+    "exit_code": 0,
+    "log": {
+      "path": "/tmp/plato-phase2-final-prose-review/ci-checks.log",
+      "bytes": 1196,
+      "sha256": "eac147f330ccaf9fa3b97173e387bea338e789015127e4300d0f790885e02758"
+    },
+    "checks": [
+      "Git exact candidate commit/tree and clean status; exact two-file diff and all nonowned bytes preserved.",
+      "PyYAML6.0.3 parser preserves literal on, true/false booleans and rejects duplicate mapping keys; all three triggers and false semantics retained.",
+      "Exactly four expected semantic changes, all finite positive integers; textual diff identical after masking timeout values.",
+      "18 selected raw log/wall/JUnit receipt hashes and sizes independently verified; summaries/pytest durations, successful exits, source heads and JUnit counts/failures agree.",
+      "Non-runtime implementation7d310b source/tests/configs equal base13e; runtime05a9 source/integration/configs equal base except later unrelated personalized-state test isolation. Receipts retain their actual older execution identities.",
+      "All measured step planning arithmetic and every whole-job stage allowance independently checked.",
+      "git diff --check 13e38dafce476286db7e673e7f21343d54416b56 HEAD exits0."
+    ]
+  },
+  "hosted_linux_ci_pass_claimed": false,
+  "limits": [
+    "Timings are retained author macOS-arm64 measurements, independently inspected and hashed, not reviewer execution or Ubuntu runner qualification.",
+    "No packages installed, duplicate large suite run, invented failing CI run or hosted workflow dispatch was performed.",
+    "Root must run full merged profiles and exact-source Linux hosted CI before acceptance/publication. If tests/profiles/coverage/actions or measured source change, recheck the finite budgets against fresh timings and retain all existing guards."
+  ],
+  "final_candidate_clean_checks": [
+    {
+      "command": "zsh -lc 'git status --porcelain'",
+      "cwd": "/private/tmp/plato-refresh-worktrees/algorithm-docs-final-review",
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": "zsh -lc 'git status --porcelain'",
+      "cwd": "/private/tmp/plato-refresh-worktrees/phase2-ci-budget-review",
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ]
+}

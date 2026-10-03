@@ -7,7 +7,6 @@ Applies cosine-similarity and staleness-aware weighting for asynchronous updates
 from __future__ import annotations
 
 import asyncio
-import copy
 import logging
 import os
 from types import SimpleNamespace
@@ -17,7 +16,9 @@ import torch
 import torch.nn.functional as F
 
 from plato.config import Config
+from plato.serialization.safetensor import deserialize_tree
 from plato.servers.strategies.base import AggregationStrategy, ServerContext
+from plato.utils.checkpoint_paths import checkpoint_name, checkpoint_path
 
 
 class PortAggregationStrategy(AggregationStrategy):
@@ -116,30 +117,41 @@ class PortAggregationStrategy(AggregationStrategy):
     ) -> float:
         similarity = 1.0
         current_round = getattr(context, "current_round", 0)
-        filename = f"model_{current_round - 2}.pth"
         model_path = Config().params["model_path"]
-        checkpoint_path = f"{model_path}/{filename}"
+        historical_path = checkpoint_path(
+            model_path,
+            checkpoint_name("model", current_round - 2, suffix=".safetensors"),
+        )
+        legacy_path = checkpoint_path(
+            model_path, checkpoint_name("model", current_round - 2, suffix=".pth")
+        )
+        if not os.path.exists(historical_path):
+            historical_path = legacy_path
 
-        if staleness > 1 and os.path.exists(checkpoint_path):
+        if staleness > 1 and os.path.exists(historical_path):
             trainer = getattr(context, "trainer", None)
             if trainer is None:
                 raise RuntimeError("Port aggregation requires an attached trainer.")
 
             current_model = trainer.require_model()
-            previous_model = copy.deepcopy(current_model)
-            previous_model.load_state_dict(torch.load(checkpoint_path))
-
-            previous = torch.zeros(0)
-            for _, weight in previous_model.cpu().state_dict().items():
-                previous = torch.cat((previous, weight.view(-1)))
-
-            current = torch.zeros(0)
-            for _, weight in current_model.cpu().state_dict().items():
-                current = torch.cat((current, weight.view(-1)))
-
-            deltas = torch.zeros(0)
-            for _, delta in update_delta.items():
-                deltas = torch.cat((deltas, delta.view(-1)))
+            if historical_path.endswith(".safetensors"):
+                with open(historical_path, "rb") as checkpoint_file:
+                    previous_weights = deserialize_tree(checkpoint_file.read())
+            else:
+                previous_weights = torch.load(
+                    historical_path, map_location="cpu", weights_only=True
+                )
+            current_weights = current_model.state_dict()
+            names = list(current_weights)
+            previous = torch.cat(
+                [previous_weights[name].detach().cpu().reshape(-1) for name in names]
+            )
+            current = torch.cat(
+                [current_weights[name].detach().cpu().reshape(-1) for name in names]
+            )
+            deltas = torch.cat(
+                [update_delta[name].detach().cpu().reshape(-1) for name in names]
+            )
 
             cosine_similarity = F.cosine_similarity(current - previous, deltas, dim=0)
             similarity = float(cosine_similarity)

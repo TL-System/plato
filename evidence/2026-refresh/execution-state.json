@@ -19,16 +19,90 @@
     ],
     "phase_1a_commit": "7304703905189baf771032f1cd923a37f66ed97f",
     "phase_1b_commit": "213b321c3cfb31d0f82c0b315efe50dcbf7dee20",
-    "phase_1c_commit": "80539c3f5bfd3f56acfd67d61fba291ea3315f3b"
+    "phase_1c_commit": "80539c3f5bfd3f56acfd67d61fba291ea3315f3b",
+    "phase_2b_commit": "00eeb9dcdd2b513e64db9408969356037e09bb8e",
+    "phase_2d_commit": "96323afa094a37584844275cc04bf1e1eedfaa0d",
+    "phase_2a_commit": "79da1f97d8a12fe97402750cc32c7b3e8f5cdf6e",
+    "phase_2b_resume_commit": "a058a2ef8d230ca2e34dbf1c91e6eaac0b0205ac"
   },
-  "current_task": {
-    "id": "Phase 1 complete; Phase 2 preparation",
-    "status": "Both published Ubuntu jobs passed, including 48 runtime cases each. Ready for owned cleanup and core implementation.",
-    "pull_request": "https://github.com/TL-System/plato/pull/417",
-    "workflow_run": "https://github.com/TL-System/plato/actions/runs/37082986642"
-  },
+  "current_task": "Phase 2 integration authorized; preparing fresh combined-source qualification.",
   "phase_1_remaining": [],
   "platform_limit": "Available runtime host is Apple Silicon macOS. Linux CI execution follows reviewed phase publication; resolution alone is not runtime qualification.",
   "known_dependency_exception": "Tested NLTK 3.10.3 uv override violates Lighteval 0.13.0 exact metadata; remaining advisory is unsuppressed. See Phase 1A evidence.",
-  "evidence_note": "Acceptance artifacts distinguish reviewed design/candidate commits from implementation, root integration, and whole-phase completion."
+  "evidence_note": "Acceptance artifacts distinguish reviewed design/candidate commits from implementation, root integration, and whole-phase completion.",
+  "new_phase_2_findings": [
+    {
+      "id": "F21",
+      "owner": "2C",
+      "evidence": "dp-reuse-probe.json",
+      "summary": "Actual DP trainer reuse fails on the second training run with duplicate hooks."
+    },
+    {
+      "id": "F22",
+      "owner": "2C",
+      "evidence": "dp-step-probe.json",
+      "summary": "DP physical batching emits eight after-step notifications for four actual optimizer updates."
+    },
+    {
+      "id": "F23",
+      "owner": "2C",
+      "evidence": "trainer-lifecycle-probes.json",
+      "summary": "Actual Ditto, APFL, FedDyn and SCAFFOLD runs use construction-time client 0 persistence after assigning real logical IDs, leaking state between clients."
+    },
+    {
+      "id": "F24",
+      "owner": "2C",
+      "evidence": "trainer-lifecycle-probes.json",
+      "summary": "FedProx proximal baseline remains construction-time weights after receiving a new global model."
+    },
+    {
+      "id": "F25",
+      "owner": "2C",
+      "evidence": "trainer-lifecycle-probes.json",
+      "summary": "Split learning public evaluation fails before first training callback and divides by zero for empty partitions."
+    },
+    {
+      "id": "F26",
+      "owner": "2C",
+      "evidence": "trainer-lifecycle-probes.json",
+      "summary": "Urgent trainer checkpoint reader selects epochs lexicographically and cannot load actual tree-serialized Safetensors snapshots."
+    },
+    {
+      "id": "F27",
+      "owner": "2C; accepted design in phase2c-scaffold-acceptance.json",
+      "evidence": "scaffold-equation-probe.json",
+      "summary": "SCAFFOLD actual update/control equations disagree with advertised Algorithm1/Eq4; legacy behavior predates strategy refactor."
+    },
+    {
+      "id": "F28",
+      "owner": "Original2B author, narrow root handback of servers/base.py startup/RNG",
+      "evidence": "server-resume-rng-probe.json",
+      "summary": "Actual generic checkpoint resume restores model/round/NumPy then Server.run reseeds client-selection RNG; repeatedfirstselection instead ofnextsavedselection.",
+      "status": "Accepted correction a058a2ef after independent supplemental review; merged into C at 1fe8b639. Final integrated qualification pending."
+    },
+    {
+      "id": "B-RESUME-01",
+      "owner": "Original2B author, root-authorized narrow persistence handoff",
+      "evidence": "Runtime branch phase2b-resume-validation.json at5b1c4a5d9ed2c29e33cdd2d99c28dd83a7ce377b",
+      "summary": "Generic save captures global Python random state, which unrelated draws can advance past the selection-owned state; resumed choices differ from uninterrupted choices. Persist authoritative self.prng_state in the same existing tuple file format; correction and fresh review pending.",
+      "status": "Accepted correction a058a2ef after independent supplemental review; merged into C at 1fe8b639. Final integrated qualification pending."
+    }
+  ],
+  "phase_1_publication_confirmation": {
+    "head_commit": "fda60becedfa6236c11d415b87a868b52789a41e",
+    "workflow_run": "https://github.com/TL-System/plato/actions/runs/37084156706",
+    "result": "Both Python jobs also passed on the evidence-only delivery commit. Original detailed Linux evidence remains phase1-linux-validation.json."
+  },
+  "phase2_final_candidates": {
+    "C": "8b01bf47ca8bdf9232bffeb4e50f78d4f00c9e3b",
+    "docs": "c199ebe02831a47351a10026e64721f77c9dfe9b",
+    "CI": "8d27c5c7a205299537a2835358f1d5e91a7b51c3",
+    "proposed_combined_tree": "e866a28a50fa411b5f93223c3d828111ea07bf88"
+  },
+  "phase2_pending": "Astra gate, integration, four fresh profiles and source/build/typing checks, push and exact-source Linux qualification, then owned cleanup.",
+  "remaining_phases": [
+    "Phase 3: native MLX and supported HF/PEFT/LeRobot/Nanochat profiles",
+    "Phase 4: retained-example smokes and coherent ViT/legacy archives",
+    "Phase 5: documentation, deployment and final support/evidence reconciliation"
+  ]
 }

@@ -175,6 +175,20 @@ class FedMosOptimizer(Optimizer):
                 loss = closure()
 
         global_model_params = kwargs.get("global_model_params")
+        global_references = {}
+        if global_model_params is not None:
+            local_parameters = [
+                parameter for group in self.param_groups for parameter in group["params"]
+            ]
+            global_parameters = list(global_model_params.parameters())
+            if len(local_parameters) != len(global_parameters):
+                raise ValueError("FedMos global/local parameter counts must match")
+            for local_parameter, global_parameter in zip(
+                local_parameters, global_parameters
+            ):
+                if local_parameter.shape != global_parameter.shape:
+                    raise ValueError("FedMos global/local parameter shapes must match")
+                global_references[local_parameter] = global_parameter
         for group in self.param_groups:
             lr = group["lr"]
             mu = group["mu"]
@@ -194,12 +208,9 @@ class FedMosOptimizer(Optimizer):
 
                 # Get corresponding global parameter
                 if global_model_params is not None:
-                    # Find matching parameter in global model
-                    global_param = None
-                    for global_p in global_model_params.parameters():
-                        if global_p.shape == p.shape:
-                            global_param = global_p
-                            break
+                    # Parameters follow the same model order used to create
+                    # this optimizer. Repeated shapes are distinct parameters.
+                    global_param = global_references[p]
 
                     if global_param is not None:
                         # FedMos update: w = w - lr * m + mu * (w_global - w)

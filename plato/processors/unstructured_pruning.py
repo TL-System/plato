@@ -42,21 +42,22 @@ class Processor(model.Processor):
 
         self.model = trainer.model
 
-        if self.parameters_to_prune is None:
-            self.parameters_to_prune = []
+        parameters_to_prune = self.parameters_to_prune
+        if parameters_to_prune is None:
+            parameters_to_prune = []
             for _, module in self.model.named_modules():
                 if isinstance(module, torch.nn.Conv2d) or isinstance(
                     module, torch.nn.Linear
                 ):
-                    self.parameters_to_prune.append((module, "weight"))
+                    parameters_to_prune.append((module, "weight"))
 
         prune.global_unstructured(
-            self.parameters_to_prune,
+            parameters_to_prune,
             pruning_method=self.pruning_method,
             amount=self.amount,
         )
 
-        for module, name in self.parameters_to_prune:
+        for module, name in parameters_to_prune:
             prune.remove(module, name)
 
         output = self.model.cpu().state_dict()

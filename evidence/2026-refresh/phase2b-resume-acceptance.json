@@ -1,0 +1,21 @@
+{
+  "decision": "ACCEPTED F28 and B-RESUME-01 supplemental component; final combined integration remains",
+  "candidate": "a058a2ef8d230ca2e34dbf1c91e6eaac0b0205ac",
+  "tree": "35098e6ba5f5792052ed6b24a771aec7b2cad9bb",
+  "implementation": "4329158c20f1533301c4d9430393ff282f9cb2be",
+  "review": "phase2b-resume-review.json",
+  "review_sha256": "5e612f69922328c6c2e692af80577e0df3250ff303ddabe8c8fc4a3eacf5cd65",
+  "review_result": "PASS; no material or low findings",
+  "author_evidence": [
+    "phase2b-resume-validation.json",
+    "phase2b-selection-rng-validation.json"
+  ],
+  "validation": "Both3.13/3.14:274distinct fresh reviewer cases (212runtime+22startup+40persistence/error); all96 final author startup receipts verified; real2/6weightedreference error<=1.49e-8, naturalround completion/no survivors.",
+  "root_verification": "Exact clean authorhead/tree match independent immutable source; only base.py, focusedtests and supplemental evidence changed above accepted00e.",
+  "limits": [
+    "No independent globalPython RNG replay guarantee; existing tuple now denotes selection-ownedstate.",
+    "Old mismatched checkpoints remain readable but cannot reconstruct a lost selection boundary.",
+    "No mid-round/GPU/fullresumednetworkclaim; finalCcodec+FedDynlocalbundle integration remains."
+  ],
+  "handoff": "OriginalC author may merge exact accepted head at clean boundary after SCAFFOLD intermediate commit; preserve both B startup/persistence and C collision-safe filenames. Validate actual merged writer/readers/run with slash/long modelnames and resumed selections; all48startup and fullprofiles remain finalqualification."
+}

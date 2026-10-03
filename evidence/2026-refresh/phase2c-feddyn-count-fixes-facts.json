@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "status": "IMPLEMENTATION_FACTS_FOR_FRESH_REVIEW_AND_ASTRA_RECONCILIATION",
+  "implementation_commit": "fac9c65161f699fd94c7d264a519715fedd2bc4c",
+  "implementation_tree": "05b9c7a27e90ef10334af85041dd5a8d5cb28616",
+  "base": "13e38dafce476286db7e673e7f21343d54416b56",
+  "prior_facts": {
+    "path": "/private/tmp/plato-refresh-worktrees/training/evidence/2026-refresh/phase2c-feddyn-facts.json",
+    "bytes": 7711,
+    "sha256": "31e724a60a09d548f66621ff8d2b384670ddd22b8ff9c97cc2ebd9975cafbd7e"
+  },
+  "supersedes_only": [
+    "First-uniform worker sample-count provenance",
+    "Complete bundle nonzero-history/count cache coherence",
+    "Receive/aggregation callback count-state type preservation",
+    "Owned-source explicit ty result",
+    "SCAFFOLD V2 overview docstring description"
+  ],
+  "count_provenance": "The dedicated Trainer resolves sampler.get() once in the parent for this attempt, validates a Sized positive realized partition (including declared count agreement), and passes that same realized sampler to actual worker training. The current parent count is bound before spawn; a worker sidecar cannot replace it. Direct train_model binds the current actual sampler too. Backing dataset length, redrawing partitions and another worker count copy are not the authority.",
+  "rejection": "Worker/result count must match the independently bound current partition count as well as configured/previous server counts. A failed handoff restores known parent model/dispatch state, retains no accepted result and refuses outbound eligibility; retry with the same current dispatch is valid.",
+  "checkpoint_coherence": "Existing version1 complete bundles require a valid positive native integer count for each nonzero full-population history. Validation completes before live model/history/config/round/count or pending RNG mutation. Missing counts for zero histories remain possible; this bounded correction does not add a generalized participation ledger or claim detection of deleted counts whose histories are all zero.",
+  "callback_coherence": "Receive and aggregation guards use existing recursive type-sensitive same_state comparisons of all observed count keys and values, including inactive entries. bool/int, float/int, NumPy integer/native integer and float/integer key equivalences are rejected before accepted commit and roll back known owned state. Postcommit evaluation boundary is unchanged.",
+  "unchanged_contracts": [
+    "Accepted objective J=F+alpha_i<h,w>+alpha_i/2||w-x||\u00b2",
+    "h_next=h+y-x",
+    "Unweighted selected endpoints plus updated full-population history mean",
+    "Uniform and full-population sample weighting",
+    "Metadata wire keys/version and complete checkpoint bundle schema",
+    "Canonical collision-safe state paths and read-only legacy reader",
+    "Actual ComposableClient/default native production transport",
+    "All global/selector/NumPy/Torch CPU resume handshake semantics",
+    "Shared lifecycle/SCAFFOLD implementation and callbacks/evaluation boundary",
+    "Existing TOML values and supported bounded optimizer/model configuration"
+  ],
+  "doc_l02": "Only the strategies overview now describes SCAFFOLDUpdateStrategyV2 as a compatibility subclass using Option II; imports and executable AST are unchanged.",
+  "qualification": {
+    "313": {
+      "tests": 308,
+      "passed": 308,
+      "failed": 0,
+      "skipped": 0
+    },
+    "314": {
+      "tests": 308,
+      "passed": 308,
+      "failed": 0,
+      "skipped": 0
+    }
+  },
+  "source_check": "Reviewer explicit owned-source ty command with --python pointing at each actual environment passes; no diagnostics ignored or sources skipped.",
+  "warnings": "Both exact committed affected runs report308passed,0skipped and no pytest warnings. Child/runtime stderr notices are retained in raw logs/results. No global filters or blanket suppression added.",
+  "limits": [
+    "CPU numerical/synthetic fixtures and macOS arm64 only; no CUDA/native GPU claims",
+    "No new ledger or generalized transaction protocol",
+    "Historical 13e full profile/startup totals remain historical, never relabelled as correction runs",
+    "No whole C acceptance; fresh independent implementation review and final source-bound prose reconciliation/root gates remain"
+  ],
+  "public_prose_owner": "Original Astra writer; no standalone prose changed by implementer.",
+  "evidence": "phase2c-feddyn-count-fixes-validation.json"
+}

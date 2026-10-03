@@ -1,0 +1,99 @@
+{
+  "docs_commit": "c199ebe02831a47351a10026e64721f77c9dfe9b",
+  "ci_commit": "8d27c5c7a205299537a2835358f1d5e91a7b51c3",
+  "archive_sha256": "51f3d7ed63e8407c160fd247d57f0ba9682fc5ab9c86366ee969f89d1a942f7a",
+  "archive_bytes": 16096,
+  "files": [
+    {
+      "original": "/tmp/plato-phase2-ci-budget-validation/validate.py",
+      "member": "plato-phase2-ci-budget-validation/validate.py",
+      "bytes": 16081,
+      "sha256": "11da02a53c7f9563ec3d1cd0fee26eddb2569fb387d13be93c109f642efa9a04"
+    },
+    {
+      "original": "/tmp/plato-phase2c-scaffold-docs/count-8b01/checks.json",
+      "member": "count-8b01/checks.json",
+      "bytes": 11826,
+      "sha256": "9bdbc30270c241b848d5f99a32697912e1437dee7ba1cac4f66ebdec2101279a"
+    },
+    {
+      "original": "/tmp/plato-phase2c-scaffold-docs/count-8b01/committed-handoff.json",
+      "member": "count-8b01/committed-handoff.json",
+      "bytes": 571,
+      "sha256": "aceb3ca986794153623caf1f48dd69a54590b3aa3c9769bce261c7f990d0be92"
+    },
+    {
+      "original": "/tmp/plato-phase2c-scaffold-docs/count-8b01/diff-check.log",
+      "member": "count-8b01/diff-check.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "original": "/tmp/plato-phase2c-scaffold-docs/count-8b01/feddyn-config-examples.log",
+      "member": "count-8b01/feddyn-config-examples.log",
+      "bytes": 413,
+      "sha256": "3e2c1b264736ca93c19a35847b9695d738e05f4f7056ddba05912f7b004a1c99"
+    },
+    {
+      "original": "/tmp/plato-phase2c-scaffold-docs/count-8b01/feddyn-config-root.log",
+      "member": "count-8b01/feddyn-config-root.log",
+      "bytes": 441,
+      "sha256": "a141021dffc60f5ae8b799a7c1a216be9cf0a1d82e800cadf9811d748ab98261"
+    },
+    {
+      "original": "/tmp/plato-phase2c-scaffold-docs/count-8b01/feddyn-help.log",
+      "member": "count-8b01/feddyn-help.log",
+      "bytes": 734,
+      "sha256": "3f73a1187cb84c21c84ce0ebc1f395dce00cbecaaa25e5ea2108b2b77d6d90eb"
+    },
+    {
+      "original": "/tmp/plato-phase2c-scaffold-docs/count-8b01/mkdocs-baseline.log",
+      "member": "count-8b01/mkdocs-baseline.log",
+      "bytes": 1462,
+      "sha256": "520beec4267f0609e6604bde12b18edc41fc0810583a818e86eedb0b64f2e132"
+    },
+    {
+      "original": "/tmp/plato-phase2c-scaffold-docs/count-8b01/mkdocs-candidate.log",
+      "member": "count-8b01/mkdocs-candidate.log",
+      "bytes": 1463,
+      "sha256": "5740b4de6f6c9555e66027e12297aeb3ed84524d2f9e825a9b3b3bf859fb2814"
+    },
+    {
+      "original": "/tmp/plato-phase2c-scaffold-docs/count-8b01/scaffold-config-examples.log",
+      "member": "count-8b01/scaffold-config-examples.log",
+      "bytes": 283,
+      "sha256": "3a1330c872945f80851fa4e70d6b48a5e4d3e4194092dd8d71a5227c169f4653"
+    },
+    {
+      "original": "/tmp/plato-phase2c-scaffold-docs/count-8b01/scaffold-config-root.log",
+      "member": "count-8b01/scaffold-config-root.log",
+      "bytes": 311,
+      "sha256": "41199582e28bddfa986dd8b68aff140d12257aa5c79031a441c5f649217c3630"
+    },
+    {
+      "original": "/tmp/plato-phase2c-scaffold-docs/count-8b01/scaffold-help.log",
+      "member": "count-8b01/scaffold-help.log",
+      "bytes": 738,
+      "sha256": "338e750f208efd64f72afb9802d0c9f5b488b0257341acab78149b19970e195e"
+    },
+    {
+      "original": "/tmp/plato-phase2c-scaffold-docs/count-8b01/validate_docs.py",
+      "member": "count-8b01/validate_docs.py",
+      "bytes": 7537,
+      "sha256": "4a7f130a27d94ce70090cba2774ede167d22680ea7d32b73042fc2110e9cc710"
+    },
+    {
+      "original": "/tmp/plato-phase2c-scaffold-docs/count-8b01/validation.log",
+      "member": "count-8b01/validation.log",
+      "bytes": 1070,
+      "sha256": "275326db2cc9a8bd0d73b5ad5658babeaccdaca336b85736ca6c095d52d97f3c"
+    },
+    {
+      "original": "/tmp/plato-phase2c-scaffold-docs/count-8b01/write_receipt.py",
+      "member": "count-8b01/write_receipt.py",
+      "bytes": 9636,
+      "sha256": "ca3cb1eab5c51db35474dd5f92413291b6384a7bae732b636afca1ab79261469"
+    }
+  ],
+  "note": "Author scripts and raw receipts; strict MkDocs remains failed solely on two known baseline Nanochat links. CI historical timing inputs retained in separate 13e author bundle."
+}

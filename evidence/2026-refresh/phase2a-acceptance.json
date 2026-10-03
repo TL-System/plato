@@ -1,0 +1,47 @@
+{
+  "decision": "ACCEPTED_COMPONENT",
+  "candidate_commit": "79da1f97d8a12fe97402750cc32c7b3e8f5cdf6e",
+  "candidate_tree": "dbd5d3847797665c80ea5ca2f92da48f6576467f",
+  "latest_source_commit": "f03695692307ea1175feb4b2b8ee3ee2c4240e91",
+  "review": "phase2a-review-5.json",
+  "review_sha256": "ee3714ab192257e5c5896351c05b81101de654778da92927ed75b046f84fc488",
+  "findings": [],
+  "root_verified_clean_and_unchanged": true,
+  "scope": "Phase2A configuration, non-adapter datasources, samplers and shared archive helper with byte-preserved legacy datalib archive. Whole Phase2 root integration remains pending.",
+  "closed_review_findings": [
+    "R2A-01",
+    "R2A-02",
+    "R2A-03",
+    "R2A-04",
+    "ROOT-2A-01",
+    "ROOT-2A-02",
+    "R2A2-01",
+    "R2A2-02",
+    "R2A3-01",
+    "R2A4-01"
+  ],
+  "validation": "Fresh review5:242focused and445base passed each CPython3.13.16/3.14.8;4allowedoptional skips/48unchangedruntime deselections.16fresh transitions,99priorindependent contracts, untouchedreview3/4 and independent priorcandidate red. Counts are separate overlapping invocations, not summed.",
+  "limits": [
+    "macOS ARM64 CPU, CPython 3.13.16 and 3.14.8 only. Linux, final merged root, whole Phase 2 and whole-stack qualification remain root-owned.",
+    "Existing Python environments used read only with independently verified parent/child source pins. No fresh provisioning, installed wheel/sdist isolation, full mandatory-extra, SSL runtime or config-inventory campaign repeated.",
+    "Local synthesized raw/IDX/PNG/JSON/native annotation fixtures and localhost HTTP only; no full corpus, external service, accelerator or training/accuracy qualification.",
+    "Readiness checks filesystem existence, supported extensions, present usable classes and native annotation references; no image decode/checksum or reconstruction of loss among surviving prepared-class images without source inventory.",
+    "No full extracted-tree rollback on corrupt archive/filesystem failures, hostile unrelated concurrent destination writer, power-loss/directory-fsync durability or new provenance protocol is promised.",
+    "Normal exceptions remove private staging; SIGKILL may leave staging. No generalized scavenger or killed-ZIP-staging cleanup requirement added. Existing stable-inode flock/platform boundaries retained.",
+    "Base skips only the four allowed optional cases; 48 unchanged runtime cases explicitly deselected. Optional integrations, Windows flock and whole-tree/vendor typing remain unqualified by this report."
+  ],
+  "remaining": [
+    {
+      "owner": "root",
+      "task": "Complete training/FedDyn/SCAFFOLD code and prose acceptance, phase gate, merged local and Linux qualification/publication."
+    },
+    {
+      "owner": "Phase3",
+      "task": "Adapters remain reserved; reuse accepted archive helper for Nanochat evaluator."
+    },
+    {
+      "owner": "Phase5",
+      "task": "Consolidated archive index/public documentation."
+    }
+  ]
+}

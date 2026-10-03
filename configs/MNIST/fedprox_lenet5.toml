@@ -2,6 +2,7 @@
 
 # Type
 type = "simple"
+proximal_term_penalty_constant = 0.1
 
 # The total number of clients
 total_clients = 3
@@ -22,7 +23,7 @@ include = "mnist_iid.toml"
 [trainer]
 
 # The type of the trainer
-type = "basic"
+type = "fedprox"
 
 # The maximum number of training rounds
 rounds = 100
@@ -39,7 +40,8 @@ model_name = "lenet5"
 # Number of epoches for local training in each communication round
 epochs = 1
 batch_size = 32
-optimizer = "FedProx"
+# Proximal loss uses Plato's legacy unsquared L2 norm, unlike paper squared L2.
+optimizer = "SGD"
 
 [algorithm]
 
@@ -52,4 +54,3 @@ type = "fedavg"
 lr = 0.01
 momentum = 0.9
 weight_decay = 0.0
-mu = 0.1

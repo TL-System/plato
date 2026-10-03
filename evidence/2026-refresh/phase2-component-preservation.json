@@ -1,0 +1,201 @@
+{
+  "candidate": "e866a28a50fa411b5f93223c3d828111ea07bf88",
+  "scope": "Proposed combined tree: all prior accepted A/D owned paths remain identical; B shared changes match the previously audited C combination and accepted shared lifecycle/codec reviews. No integration execution claimed.",
+  "components": {
+    "A": {
+      "base": "fda60becedfa6236c11d415b87a868b52789a41e",
+      "accepted": "79da1f97d8a12fe97402750cc32c7b3e8f5cdf6e",
+      "unchanged_paths": [
+        "archives/legacy_datalib/LICENSE",
+        "archives/legacy_datalib/README.md",
+        "archives/legacy_datalib/__init__.py",
+        "archives/legacy_datalib/audio_extraction_tools.py",
+        "archives/legacy_datalib/data_utils.py",
+        "archives/legacy_datalib/flickr30kE_utils.py",
+        "archives/legacy_datalib/frames_extraction_tools.py",
+        "archives/legacy_datalib/gym_utils/__init__.py",
+        "archives/legacy_datalib/gym_utils/gym_trim.py",
+        "archives/legacy_datalib/modality_data_anntation_tools.py",
+        "archives/legacy_datalib/modality_extraction_base.py",
+        "archives/legacy_datalib/parse_datasets.py",
+        "archives/legacy_datalib/refer_utils/__init__.py",
+        "archives/legacy_datalib/refer_utils/referitgame_utils.py",
+        "archives/legacy_datalib/tiny_data_tools.py",
+        "archives/legacy_datalib/video_transform.py",
+        "plato/config.py",
+        "plato/datasources/_image_folder.py",
+        "plato/datasources/_vector_cache.py",
+        "plato/datasources/base.py",
+        "plato/datasources/cinic10.py",
+        "plato/datasources/purchase.py",
+        "plato/datasources/texas.py",
+        "plato/datasources/tiny_imagenet.py",
+        "plato/datasources/torchvision.py",
+        "plato/samplers/all_inclusive.py",
+        "plato/samplers/base.py",
+        "plato/samplers/dirichlet.py",
+        "plato/samplers/distribution_noniid.py",
+        "plato/samplers/iid.py",
+        "plato/samplers/label_quantity_noniid.py",
+        "plato/samplers/mixed_label_quantity_noniid.py",
+        "plato/samplers/modality_iid.py",
+        "plato/samplers/modality_quantity_noniid.py",
+        "plato/samplers/orthogonal.py",
+        "plato/samplers/sample_quantity_noniid.py",
+        "plato/samplers/sampler_utils.py",
+        "plato/utils/archive.py",
+        "tests/datasources/test_download_contracts.py",
+        "tests/datasources/test_local_datasets.py",
+        "tests/datasources/test_review2_regressions.py",
+        "tests/datasources/test_review3_regressions.py",
+        "tests/datasources/test_review4_regressions.py",
+        "tests/datasources/test_review_regressions.py",
+        "tests/samplers/test_partition_contracts.py",
+        "tests/test_config_loader.py",
+        "tests/utils/test_archive.py"
+      ],
+      "changed_paths": []
+    },
+    "B": {
+      "base": "fda60becedfa6236c11d415b87a868b52789a41e",
+      "accepted": "a058a2ef8d230ca2e34dbf1c91e6eaac0b0205ac",
+      "unchanged_paths": [
+        "plato/callbacks/handler.py",
+        "plato/clients/composable.py",
+        "plato/clients/transport.py",
+        "plato/servers/fedavg.py",
+        "plato/servers/fedavg_cs.py",
+        "plato/servers/strategies/aggregation/fedavg.py",
+        "tests/callbacks/test_handler_contract.py",
+        "tests/clients/test_checkpoint_cleanup.py",
+        "tests/clients/test_payload_limits.py",
+        "tests/servers/test_fedavg_strategy.py",
+        "tests/servers/test_lifecycle_contracts.py",
+        "tests/servers/test_port_checkpoint_flow.py",
+        "tests/servers/test_runtime_disconnect_recovery.py",
+        "tests/servers/test_runtime_review_regressions.py",
+        "tests/servers/test_runtime_transport.py",
+        "tests/servers/test_server_resume_rng.py"
+      ],
+      "changed_paths": [
+        {
+          "path": "examples/async/port/port_server.py",
+          "accepted": "100644 blob f68f372ecef7926230c1d1b99a94ec3acd34906b",
+          "candidate": "100644 blob 891f617e630bec2e9434f46e4b8c0d34935c2682"
+        },
+        {
+          "path": "plato/clients/base.py",
+          "accepted": "100644 blob 2eaebbced8eda9fffcf122c8500f8075b8860ed3",
+          "candidate": "100644 blob 57c5ba7c494fdb8dfd6268260506e49d53af64c7"
+        },
+        {
+          "path": "plato/clients/strategies/defaults.py",
+          "accepted": "100644 blob a36dc6fc68a75a322dba94096f43dbb80fda3619",
+          "candidate": "100644 blob 9cdb321a613b47d5f1d7c45150538c47721d53e5"
+        },
+        {
+          "path": "plato/servers/base.py",
+          "accepted": "100644 blob 43f017fdb88cd58d3f6779eab80344f633a39a07",
+          "candidate": "100644 blob c62b36f231708d0430f20d947f796de372e5bf20"
+        },
+        {
+          "path": "plato/servers/strategies/aggregation/port.py",
+          "accepted": "100644 blob 6896ede3bd1d3819df7b0fbb5677a6c71af92602",
+          "candidate": "100644 blob f43eb92ad208fef93888b54e8eee4dbce3fabcbd"
+        },
+        {
+          "path": "tests/clients/test_client_lifecycle_variants.py",
+          "accepted": "100644 blob c6285b52a1c06ca927fb6ecbedd9e8b7ce3fd7af",
+          "candidate": "100644 blob 30b79b9cb59e679ae460e4ea345fdb508179d750"
+        },
+        {
+          "path": "tests/servers/test_runtime_s3_contract.py",
+          "accepted": "100644 blob 782078ff1f50351effbc22b2d351d1d1bb154a6e",
+          "candidate": "100644 blob 3be64f9ed0e20a00b9cba83cb65a2b7a830b1520"
+        }
+      ]
+    },
+    "D": {
+      "base": "00eeb9dcdd2b513e64db9408969356037e09bb8e",
+      "accepted": "96323afa094a37584844275cc04bf1e1eedfaa0d",
+      "unchanged_paths": [
+        "archives/legacy_rl_env/LICENSE",
+        "archives/legacy_rl_env/README.md",
+        "archives/legacy_rl_env/rl_env.py",
+        "cleanup.py",
+        "plato/clients/strategies/mpc.py",
+        "plato/mpc/round_store.py",
+        "plato/processors/compress.py",
+        "plato/processors/decompress.py",
+        "plato/processors/feature.py",
+        "plato/processors/model_dequantize.py",
+        "plato/processors/model_dequantize_qsgd.py",
+        "plato/processors/model_quantize.py",
+        "plato/processors/model_quantize_qsgd.py",
+        "plato/processors/model_randomized_response.py",
+        "plato/processors/mpc_model_encrypt_additive.py",
+        "plato/processors/mpc_model_encrypt_shamir.py",
+        "plato/processors/unstructured_pruning.py",
+        "plato/serialization/safetensor.py",
+        "plato/servers/fedavg_he.py",
+        "plato/servers/strategies/aggregation/he.py",
+        "plato/servers/strategies/mpc.py",
+        "plato/utils/count_parameters.py",
+        "plato/utils/data_loaders.py",
+        "plato/utils/homo_enc.py",
+        "plato/utils/reinforcement_learning/policies/base.py",
+        "plato/utils/reinforcement_learning/policies/ddpg.py",
+        "plato/utils/reinforcement_learning/policies/sac.py",
+        "plato/utils/reinforcement_learning/policies/td3.py",
+        "plato/utils/s3.py",
+        "plato/utils/toml_writer.py",
+        "plato/utils/tree.py",
+        "plato/utils/unary_encoding.py",
+        "tests/clients/test_client_lifecycle_variants.py",
+        "tests/integration/test_smoke_configs.py",
+        "tests/mpc/test_mpc_regressions.py",
+        "tests/mpc/test_round_store_contracts.py",
+        "tests/processors/test_payload_regressions.py",
+        "tests/servers/test_he_payload_regressions.py",
+        "tests/servers/test_runtime_s3_contract.py",
+        "tests/utils/test_cleanup.py",
+        "tests/utils/test_rl_payload_utilities.py",
+        "tests/utils/test_s3.py",
+        "tests/utils/test_safetensor_serialization.py",
+        "tests/utils/test_shared_payload_utilities.py"
+      ],
+      "changed_paths": []
+    }
+  },
+  "source_components": {
+    "status": "Proposed exact combination; fresh corrected FedDyn and final prose reviews pending, no integration authorized yet.",
+    "C": "8b01bf47ca8bdf9232bffeb4e50f78d4f00c9e3b",
+    "docs": "c199ebe02831a47351a10026e64721f77c9dfe9b",
+    "CI": "8d27c5c7a205299537a2835358f1d5e91a7b51c3",
+    "merge_tree": "e866a28a50fa411b5f93223c3d828111ea07bf88",
+    "merge_tree_conflicts": false,
+    "changed_from_C": [
+      ".github/workflows/pytorch_tests.yml",
+      "docs/docs/examples/algorithms/5. Algorithms with Customized Client Training Loops.md",
+      "evidence/2026-refresh/phase2-ci-budget-validation.json",
+      "evidence/2026-refresh/phase2c-algorithm-docs-count-reconciliation.json",
+      "evidence/2026-refresh/phase2c-algorithm-docs-validation.json",
+      "evidence/2026-refresh/phase2c-scaffold-docs-validation.json",
+      "examples/customized_client_training/feddyn/README.md",
+      "examples/customized_client_training/scaffold/README.md"
+    ],
+    "root_evidence_overlay": "Root review, acceptance, execution and reproduction evidence will be recorded separately."
+  },
+  "changes_after_scaffold_review4": [
+    "evidence/2026-refresh/phase2c-feddyn-count-fixes-delivery-receipt.json",
+    "evidence/2026-refresh/phase2c-feddyn-count-fixes-facts.json",
+    "evidence/2026-refresh/phase2c-feddyn-count-fixes-validation.json",
+    "examples/customized_client_training/feddyn/feddyn_server.py",
+    "examples/customized_client_training/feddyn/feddyn_trainer.py",
+    "plato/trainers/strategies/algorithms/__init__.py",
+    "plato/trainers/strategies/algorithms/feddyn_strategy.py",
+    "tests/integration/feddyn_count_worker.py",
+    "tests/integration/test_feddyn_count_boundaries.py"
+  ],
+  "scope_after_review4": "Only three FedDyn modules, one algorithm overview docstring, two count regression files and three new receipts changed. Fresh FD review2 covers count fixes; SCAFFOLD/shared/general source unchanged."
+}

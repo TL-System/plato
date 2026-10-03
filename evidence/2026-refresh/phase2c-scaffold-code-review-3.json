@@ -1,0 +1,2742 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-03T08:44:20.026153+00:00",
+  "role": "Fresh independent SCAFFOLD correction review 3; no nested agents or source edits.",
+  "decision": "CHANGES_REQUIRED",
+  "acceptance": "FAIL",
+  "finding": "F27",
+  "summary": "Server callback batch atomicity and the original direct training-step end failure are corrected. Successful math/direct/spawn/ownership contracts remain intact, and ROOT-2C-02 portable historical-writer correction passes independent archive review. One medium lifecycle finding remains: direct train_model persists and exposes accepted controls before a fallible model-update cleanup completes. Reproduced on both interpreters despite 282 passing affected tests each.",
+  "finding_counts": {
+    "critical": 0,
+    "high": 0,
+    "medium": 1,
+    "low_recommendations": 1
+  },
+  "findings": [
+    {
+      "id": "F27-R3-01",
+      "severity": "medium",
+      "status": "OPEN",
+      "title": "Direct train_model still accepts canonical controls before fallible model-update cleanup completes.",
+      "related_previous_finding": "F27-R2-02: the original training-step end-hook failure is fixed; a successful end hook followed by failing model-update cleanup still produces the same rejected-call persistence/retry defect.",
+      "acceptance_contracts": [
+        "A05",
+        "A06",
+        "A10"
+      ],
+      "primary_location": {
+        "file": "plato/trainers/composable.py",
+        "line": 454
+      },
+      "supporting_locations": [
+        {
+          "file": "plato/trainers/composable.py",
+          "line": 455
+        },
+        {
+          "file": "plato/trainers/composable.py",
+          "line": 463
+        },
+        {
+          "file": "plato/trainers/composable.py",
+          "line": 428
+        },
+        {
+          "file": "plato/trainers/strategies/algorithms/scaffold_strategy.py",
+          "line": 311
+        },
+        {
+          "file": "plato/trainers/strategies/algorithms/scaffold_strategy.py",
+          "line": 330
+        },
+        {
+          "file": "tests/integration/test_scaffold_callback_lifecycle.py",
+          "line": 170
+        }
+      ],
+      "cause": "After the training-step end hook succeeds, train_model invokes on_train_result_accepted, atomically replaces the canonical ci file and marks successful=True. Its finally then invokes on_train_cleanup(context, True). A public cleanup hook which runs the real cleanup and then raises makes the public call fail after acceptance. There is no rejection handler at this direct boundary. The same failure under train_process is caught by its outer rejection handler while acceptance remains deferred.",
+      "test_gap": "The delivered cleanup_failure cases always install InterruptEnd, so the end hook has already failed and successful remains False. They verify rejection when a secondary cleanup exception follows an end failure, but omit cleanup failure after otherwise successful training/end hooks.",
+      "reproduction": {
+        "probe": {
+          "path": "/tmp/plato-phase2c-scaffold-code-review-3/reproduce_cleanup_failure.py",
+          "bytes": 1470,
+          "sha256": "fc554616f81a72ac11d0f85e9c040481678f4a4c3d5196865fb6e59464f675ea"
+        },
+        "helper": {
+          "path": "/tmp/plato-phase2c-scaffold-code-review-3/cleanup_acceptance_probe.py",
+          "bytes": 4299,
+          "sha256": "b70a501db6c586bab917ac6541afc3d08e016697b210ff099db42a9b6a0399a7"
+        },
+        "source_and_numeric_helper": {
+          "path": "/tmp/plato-phase2c-scaffold-code-review-3/independent_checks.py",
+          "bytes": 14073,
+          "sha256": "720e78a5cf4e04bf4278f5eb5495bdfe5f1b93b36ab0a8ebe663964f875f1651"
+        },
+        "commands": [
+          {
+            "label": "replay313",
+            "command": "/tmp/plato-phase2c-313/bin/python -B /tmp/plato-phase2c-scaffold-code-review-3/reproduce_cleanup_failure.py",
+            "shell": [
+              "zsh",
+              "-lc"
+            ],
+            "cwd": "/private/tmp/plato-refresh-worktrees/scaffold-review3",
+            "env_overrides": {
+              "PYTHONDONTWRITEBYTECODE": "1",
+              "PYTHONPATH": "/private/tmp/plato-refresh-worktrees/scaffold-review3",
+              "OMP_NUM_THREADS": "1",
+              "MKL_NUM_THREADS": "1",
+              "PYTEST_ADDOPTS": "",
+              "TMPDIR": "/tmp/plato-phase2c-scaffold-code-review-3/tmp",
+              "XDG_CACHE_HOME": "/tmp/plato-phase2c-scaffold-code-review-3/cache",
+              "MPLCONFIGDIR": "/tmp/plato-phase2c-scaffold-code-review-3/mpl",
+              "RUFF_CACHE_DIR": "/tmp/plato-phase2c-scaffold-code-review-3/ruff-cache"
+            },
+            "exit_code": 1,
+            "duration_seconds": 4.734783887863159,
+            "deadline_seconds": 600,
+            "raw_log": "/tmp/plato-phase2c-scaffold-code-review-3/replay313.log",
+            "raw_bytes": 13095,
+            "raw_sha256": "78b7175223a438c2212082acefac6e70ef0ae56c4ceceec2efcb3ecd812c39df"
+          },
+          {
+            "label": "replay314",
+            "command": "/tmp/plato-phase2c-314/bin/python -B /tmp/plato-phase2c-scaffold-code-review-3/reproduce_cleanup_failure.py",
+            "shell": [
+              "zsh",
+              "-lc"
+            ],
+            "cwd": "/private/tmp/plato-refresh-worktrees/scaffold-review3",
+            "env_overrides": {
+              "PYTHONDONTWRITEBYTECODE": "1",
+              "PYTHONPATH": "/private/tmp/plato-refresh-worktrees/scaffold-review3",
+              "OMP_NUM_THREADS": "1",
+              "MKL_NUM_THREADS": "1",
+              "PYTEST_ADDOPTS": "",
+              "TMPDIR": "/tmp/plato-phase2c-scaffold-code-review-3/tmp",
+              "XDG_CACHE_HOME": "/tmp/plato-phase2c-scaffold-code-review-3/cache",
+              "MPLCONFIGDIR": "/tmp/plato-phase2c-scaffold-code-review-3/mpl",
+              "RUFF_CACHE_DIR": "/tmp/plato-phase2c-scaffold-code-review-3/ruff-cache"
+            },
+            "exit_code": 1,
+            "duration_seconds": 4.98060417175293,
+            "deadline_seconds": 600,
+            "raw_log": "/tmp/plato-phase2c-scaffold-code-review-3/replay314.log",
+            "raw_bytes": 13113,
+            "raw_sha256": "d7534ff1005ffcf6bdfdbccb2c52570e8f600f4ced66193045997f6589c09e51"
+          }
+        ],
+        "exact_standalone_commands": [
+          "cd /private/tmp/plato-refresh-worktrees/scaffold-review3 && PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=/private/tmp/plato-refresh-worktrees/scaffold-review3 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 /tmp/plato-phase2c-313/bin/python -B /tmp/plato-phase2c-scaffold-code-review-3/reproduce_cleanup_failure.py",
+          "cd /private/tmp/plato-refresh-worktrees/scaffold-review3 && PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=/private/tmp/plato-refresh-worktrees/scaffold-review3 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 /tmp/plato-phase2c-314/bin/python -B /tmp/plato-phase2c-scaffold-code-review-3/reproduce_cleanup_failure.py"
+        ],
+        "shell": "Run each command with zsh -lc. The recorded commands include isolated TMPDIR/cache paths. The reusable reproduce_cleanup_failure.py creates a fresh UUID runtime directory under owned scratch on every invocation; prior results remain retained.",
+        "steps": [
+          "Load the shipped TOML through Config, overriding CPU scalar float64 quadratic model, real SGD momentum=0, lr=.1, epochs=2, two actual samples, N=3, and contained slash model-name paths. Start x=1,c=2,ci=1. Test both an existing canonical ci=1 file and absent canonical state.",
+          "Instrument only on_train_cleanup: invoke the actual SCAFFOLD cleanup first, then raise RuntimeError after a real successful training-step end hook. Initialization cleanup is allowed to complete normally. Execute actual train_model and comparison train_process.",
+          "Inspect memory ci, canonical bytes/absence, get_update_payload, optimizer pre-hook registration and context flags after the raised exception.",
+          "Run actual configure-based 1->2->1 reuse and fresh client-1 reconstruction, then the actual successful client inbound/train/outbound pipeline. Where no canonical file was accepted in the process comparison, explicitly restore the original manually injected ci=1 for the retry; no persistence of unaccepted manual state is assumed."
+        ],
+        "expected": "A call rejected by a fallible local end/cleanup hook must retain ci=1 and the exact previous canonical bytes or absence, refuse outbound success, and permit reuse/reconstruction plus explicit ci=1 retry y=.62,ci=.9,delta=-.1.",
+        "actual_direct": "Both canonical-present and canonical-absent train_model calls raise Secondary cleanup failure, but memory ci and canonical ci are .8999999999999995, get_update_payload succeeds, and the file has been replaced/created. Routine reuse and fresh reconstruction adopt .9. Successful retry yields y=.6009999999999999,ci=.895,delta=-.004999999999999449.",
+        "actual_process_comparison": "The same cleanup failure under train_process rejects the pending result, retains memory ci=1 and prior canonical bytes/absence, refuses outbound and retries at .62/.9/-.1.",
+        "current_failure_result": "The independent rejection-asserting regression returns exit 1 on each interpreter: two direct failures and two passing process comparisons. The observational 12-case probe returns zero only after recording observations; its zero exit is not acceptance.",
+        "python_versions": [
+          "3.13.16",
+          "3.14.8"
+        ],
+        "results": {
+          "313": {
+            "runtime_root": "/tmp/plato-phase2c-scaffold-code-review-3/cleanup-replay-313/7366267256574e3a86426c04c8e2eeee",
+            "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+            "assertion_cases": 4,
+            "failed": 2,
+            "passed": 2,
+            "failures": [
+              {
+                "interface": "train_model",
+                "existing": false,
+                "error": "Caller received failure but memory ci advanced: 0.8999999999999995"
+              },
+              {
+                "interface": "train_model",
+                "existing": true,
+                "error": "Caller received failure but memory ci advanced: 0.8999999999999995"
+              }
+            ],
+            "cases": [
+              {
+                "interface": "train_model",
+                "existing": false,
+                "end_failure": false,
+                "cleanup_failure": true,
+                "error": "RuntimeError: Secondary cleanup failure",
+                "exception_chain": [
+                  "RuntimeError: Secondary cleanup failure"
+                ],
+                "ci": 0.8999999999999995,
+                "persisted_ci": 0.8999999999999995,
+                "canonical_preserved": false,
+                "outbound_eligible": true,
+                "outbound_error": null,
+                "end_calls": 1,
+                "cleanup_calls": [
+                  {
+                    "successful": false,
+                    "end_calls": 0
+                  },
+                  {
+                    "successful": true,
+                    "end_calls": 1
+                  }
+                ],
+                "optimizer_hook_registered": false,
+                "context_clean": true,
+                "reconstructed_ci": 0.8999999999999995,
+                "retry": {
+                  "y": 0.6009999999999999,
+                  "ci": 0.895,
+                  "delta": -0.004999999999999449
+                }
+              },
+              {
+                "interface": "train_model",
+                "existing": true,
+                "end_failure": false,
+                "cleanup_failure": true,
+                "error": "RuntimeError: Secondary cleanup failure",
+                "exception_chain": [
+                  "RuntimeError: Secondary cleanup failure"
+                ],
+                "ci": 0.8999999999999995,
+                "persisted_ci": 0.8999999999999995,
+                "canonical_preserved": false,
+                "outbound_eligible": true,
+                "outbound_error": null,
+                "end_calls": 1,
+                "cleanup_calls": [
+                  {
+                    "successful": false,
+                    "end_calls": 0
+                  },
+                  {
+                    "successful": true,
+                    "end_calls": 1
+                  }
+                ],
+                "optimizer_hook_registered": false,
+                "context_clean": true,
+                "reconstructed_ci": 0.8999999999999995,
+                "retry": {
+                  "y": 0.6009999999999999,
+                  "ci": 0.895,
+                  "delta": -0.004999999999999449
+                }
+              },
+              {
+                "interface": "train_process",
+                "existing": false,
+                "end_failure": false,
+                "cleanup_failure": true,
+                "error": "RuntimeError: Secondary cleanup failure",
+                "exception_chain": [
+                  "RuntimeError: Secondary cleanup failure",
+                  "RuntimeError: Secondary cleanup failure"
+                ],
+                "ci": 1.0,
+                "persisted_ci": null,
+                "canonical_preserved": true,
+                "outbound_eligible": false,
+                "outbound_error": "SCAFFOLD has no successful current-round control delta.",
+                "end_calls": 1,
+                "cleanup_calls": [
+                  {
+                    "successful": false,
+                    "end_calls": 0
+                  },
+                  {
+                    "successful": true,
+                    "end_calls": 1
+                  },
+                  {
+                    "successful": false,
+                    "end_calls": 1
+                  }
+                ],
+                "optimizer_hook_registered": false,
+                "context_clean": true,
+                "reconstructed_ci": null,
+                "retry": {
+                  "y": 0.6200000000000001,
+                  "ci": 0.8999999999999995,
+                  "delta": -0.10000000000000053
+                }
+              },
+              {
+                "interface": "train_process",
+                "existing": true,
+                "end_failure": false,
+                "cleanup_failure": true,
+                "error": "RuntimeError: Secondary cleanup failure",
+                "exception_chain": [
+                  "RuntimeError: Secondary cleanup failure",
+                  "RuntimeError: Secondary cleanup failure"
+                ],
+                "ci": 1.0,
+                "persisted_ci": 1.0,
+                "canonical_preserved": true,
+                "outbound_eligible": false,
+                "outbound_error": "SCAFFOLD has no successful current-round control delta.",
+                "end_calls": 1,
+                "cleanup_calls": [
+                  {
+                    "successful": false,
+                    "end_calls": 0
+                  },
+                  {
+                    "successful": true,
+                    "end_calls": 1
+                  },
+                  {
+                    "successful": false,
+                    "end_calls": 1
+                  }
+                ],
+                "optimizer_hook_registered": false,
+                "context_clean": true,
+                "reconstructed_ci": 1.0,
+                "retry": {
+                  "y": 0.6200000000000001,
+                  "ci": 0.8999999999999995,
+                  "delta": -0.10000000000000053
+                }
+              }
+            ]
+          },
+          "314": {
+            "runtime_root": "/tmp/plato-phase2c-scaffold-code-review-3/cleanup-replay-314/9546b3f8caf14a0db751a3bdc849a90b",
+            "python": "3.14.8 (main, Sep 30 2026, 17:55:09) [Clang 21.0.0 (clang-2100.3.34.2)]",
+            "assertion_cases": 4,
+            "failed": 2,
+            "passed": 2,
+            "failures": [
+              {
+                "interface": "train_model",
+                "existing": false,
+                "error": "Caller received failure but memory ci advanced: 0.8999999999999995"
+              },
+              {
+                "interface": "train_model",
+                "existing": true,
+                "error": "Caller received failure but memory ci advanced: 0.8999999999999995"
+              }
+            ],
+            "cases": [
+              {
+                "interface": "train_model",
+                "existing": false,
+                "end_failure": false,
+                "cleanup_failure": true,
+                "error": "RuntimeError: Secondary cleanup failure",
+                "exception_chain": [
+                  "RuntimeError: Secondary cleanup failure"
+                ],
+                "ci": 0.8999999999999995,
+                "persisted_ci": 0.8999999999999995,
+                "canonical_preserved": false,
+                "outbound_eligible": true,
+                "outbound_error": null,
+                "end_calls": 1,
+                "cleanup_calls": [
+                  {
+                    "successful": false,
+                    "end_calls": 0
+                  },
+                  {
+                    "successful": true,
+                    "end_calls": 1
+                  }
+                ],
+                "optimizer_hook_registered": false,
+                "context_clean": true,
+                "reconstructed_ci": 0.8999999999999995,
+                "retry": {
+                  "y": 0.6009999999999999,
+                  "ci": 0.895,
+                  "delta": -0.004999999999999449
+                }
+              },
+              {
+                "interface": "train_model",
+                "existing": true,
+                "end_failure": false,
+                "cleanup_failure": true,
+                "error": "RuntimeError: Secondary cleanup failure",
+                "exception_chain": [
+                  "RuntimeError: Secondary cleanup failure"
+                ],
+                "ci": 0.8999999999999995,
+                "persisted_ci": 0.8999999999999995,
+                "canonical_preserved": false,
+                "outbound_eligible": true,
+                "outbound_error": null,
+                "end_calls": 1,
+                "cleanup_calls": [
+                  {
+                    "successful": false,
+                    "end_calls": 0
+                  },
+                  {
+                    "successful": true,
+                    "end_calls": 1
+                  }
+                ],
+                "optimizer_hook_registered": false,
+                "context_clean": true,
+                "reconstructed_ci": 0.8999999999999995,
+                "retry": {
+                  "y": 0.6009999999999999,
+                  "ci": 0.895,
+                  "delta": -0.004999999999999449
+                }
+              },
+              {
+                "interface": "train_process",
+                "existing": false,
+                "end_failure": false,
+                "cleanup_failure": true,
+                "error": "RuntimeError: Secondary cleanup failure",
+                "exception_chain": [
+                  "RuntimeError: Secondary cleanup failure",
+                  "RuntimeError: Secondary cleanup failure"
+                ],
+                "ci": 1.0,
+                "persisted_ci": null,
+                "canonical_preserved": true,
+                "outbound_eligible": false,
+                "outbound_error": "SCAFFOLD has no successful current-round control delta.",
+                "end_calls": 1,
+                "cleanup_calls": [
+                  {
+                    "successful": false,
+                    "end_calls": 0
+                  },
+                  {
+                    "successful": true,
+                    "end_calls": 1
+                  },
+                  {
+                    "successful": false,
+                    "end_calls": 1
+                  }
+                ],
+                "optimizer_hook_registered": false,
+                "context_clean": true,
+                "reconstructed_ci": null,
+                "retry": {
+                  "y": 0.6200000000000001,
+                  "ci": 0.8999999999999995,
+                  "delta": -0.10000000000000053
+                }
+              },
+              {
+                "interface": "train_process",
+                "existing": true,
+                "end_failure": false,
+                "cleanup_failure": true,
+                "error": "RuntimeError: Secondary cleanup failure",
+                "exception_chain": [
+                  "RuntimeError: Secondary cleanup failure",
+                  "RuntimeError: Secondary cleanup failure"
+                ],
+                "ci": 1.0,
+                "persisted_ci": 1.0,
+                "canonical_preserved": true,
+                "outbound_eligible": false,
+                "outbound_error": "SCAFFOLD has no successful current-round control delta.",
+                "end_calls": 1,
+                "cleanup_calls": [
+                  {
+                    "successful": false,
+                    "end_calls": 0
+                  },
+                  {
+                    "successful": true,
+                    "end_calls": 1
+                  },
+                  {
+                    "successful": false,
+                    "end_calls": 1
+                  }
+                ],
+                "optimizer_hook_registered": false,
+                "context_clean": true,
+                "reconstructed_ci": 1.0,
+                "retry": {
+                  "y": 0.6200000000000001,
+                  "ci": 0.8999999999999995,
+                  "delta": -0.10000000000000053
+                }
+              }
+            ]
+          }
+        },
+        "population_consequence": {
+          "inactive_ci": [
+            3,
+            2
+          ],
+          "initial_c": 2,
+          "retry_only_server_c": 1.9983333333333333,
+          "mean_retained_ci": 1.9649999999999999,
+          "interpretation": "Ordinary retry after a caller-visible failure loses the failed attempt delta. This is not a full training-round, external-side-effect or restart rollback requirement."
+        }
+      },
+      "impact": "A failed public direct call becomes durable and outbound-eligible, and routine logical-client reuse changes the next successful local update. The direct/process acceptance inconsistency remains material within the requested lifecycle scope.",
+      "bounded_correction": "Complete fallible local lifecycle cleanup before direct canonical acceptance, or provide an equivalent bounded rejection boundary preserving the last accepted controls on this error. Keep child controls provisional through model saving/current-token handoff and accept in the parent only after successful loading. Preserve the existing server commit boundary and general accepted fixes. Add this otherwise-successful cleanup failure with canonical-present/absent direct/process comparison and successful reuse/retry. No generic FedAvg redesign or transaction for external side effects is requested."
+    }
+  ],
+  "low_recommendations": [
+    {
+      "id": "F27-R3-L01",
+      "severity": "low",
+      "location": {
+        "file": "plato/trainers/composable.py",
+        "line": 429
+      },
+      "title": "Avoid a second post-run rejection cleanup for failures already cleaned by train_model.",
+      "observation": "On a training-step end failure, train_model invokes on_train_cleanup(False), then train_process invokes the same hook again in its catch. The probe excludes the separate initialization cleanup and records two post-run False calls. A combined failure raises the secondary cleanup error again; Python exception context still retains the original end error.",
+      "recommendation": "While correcting the acceptance boundary, give rejection cleanup one clear owner per failed stage and preserve useful primary/secondary exception visibility. Built-in SCAFFOLD cleanup is idempotent here; this observation is not an additional demonstrated model/control corruption finding or a demand for transactions across arbitrary composed plugins."
+    }
+  ],
+  "immutable_candidate": {
+    "path": "/private/tmp/plato-refresh-worktrees/scaffold-review3",
+    "requested_alias": "/tmp/plato-refresh-worktrees/scaffold-review3",
+    "commit": "15e0cebd78ec6752b9aae1e922b33e22e168387f",
+    "tree": "9c9ce313f88552968b487388d681eda82384abfc",
+    "implementation": "0f17708afefde13eeba1fd71578258b68c5911ee",
+    "implementation_tree": "77ad0245765227716f6fca5335bba6b67a6c0fbb",
+    "initial_status": "",
+    "final_status_including_ignored": "",
+    "detached": true,
+    "tracked_files_checked_against_git_blob_and_root_archive": 979,
+    "tracked_files_unchanged": true,
+    "own_no_git_archive_unchanged": true,
+    "only_post_implementation_files": [
+      "evidence/2026-refresh/phase2c-scaffold-review2-fixes-receipt.json",
+      "evidence/2026-refresh/phase2c-scaffold-review2-fixes-validation.json"
+    ],
+    "source_manifest": {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/source-manifest.json",
+      "bytes": 206247,
+      "sha256": "16e65b33bfc0d8cd46292fac1d1622f4d6aefdda14ca3a728dbc6f216629f0f3"
+    },
+    "receipt_audit": {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/receipt-audit.json",
+      "bytes": 19182,
+      "sha256": "d33ca24702c932eb419927f515ebbb44ee88ac623784bfbddcca177c4731cbd2"
+    },
+    "candidate_vs_f977": {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/candidate-vs-f977.diff",
+      "bytes": 365632,
+      "sha256": "2c943c85efa13f2e1e78f75dd12d36a007fc9a7b79f5f00d9eb15b64d316f966"
+    },
+    "candidate_vs_implementation": {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/candidate-vs-implementation.diff",
+      "bytes": 28997,
+      "sha256": "1b0b28f86423484cc47af1778ac7ba1b28bf584525ddd4709678757fbcbd826d"
+    }
+  },
+  "authorization_inputs": [
+    {
+      "path": "/Users/bli/Playground/plato/AGENTS.md",
+      "bytes": 3119,
+      "sha256": "b50f87f31ea3d87076952d8b7d2d8af067132fbf877d80f8780c208fb45527ec"
+    },
+    {
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/plan.md",
+      "bytes": 50719,
+      "sha256": "edb9a58cc7915a940854f16d5029fe97434703bf2f75eca0dcb96de2d0f0eb15"
+    },
+    {
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/plan-addendum.json",
+      "bytes": 28579,
+      "sha256": "5b51b0fb7ed6f68d9fce7176335b3e7be5e5f178a2788590912aa2396a487709"
+    },
+    {
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/plan-addendum-acceptance.json",
+      "bytes": 474,
+      "sha256": "5f5d5a8e22e14072b5d031c19a27be14bda9bdbc2a157d14af78845daac6c56b"
+    },
+    {
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2c-scaffold-design.json",
+      "bytes": 30634,
+      "sha256": "f323f3aa9d824df44a1043b2d6aff9c8a963c42964f6e6685108c59b25fc3a89"
+    },
+    {
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2c-scaffold-acceptance.json",
+      "bytes": 1194,
+      "sha256": "40b202708a4cfdbe6f299e75249c1a19921e410ec4ab7b5e3c6323f536ca8d37"
+    },
+    {
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2c-scaffold-code-review.json",
+      "bytes": 194941,
+      "sha256": "455f6467dd6986a1de751f0a9dea6bfef4d9ca4c16746ce38239b2b77a3bb7d7"
+    },
+    {
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2c-scaffold-code-review-2.json",
+      "bytes": 232060,
+      "sha256": "aa00c76f5e3fbe3eb2f419ed277620c32f382b8dabb99f4a3e5c190308162eb1"
+    },
+    {
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2c-general-acceptance.json",
+      "bytes": 1178,
+      "sha256": "3fb81f4f332e1a4665e0af22e99989dba19daa8fc140db99a8cab1dd78cfef2d"
+    },
+    {
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2a-acceptance.json",
+      "bytes": 2974,
+      "sha256": "21fc799903097a0424106e3792ddcdb71f6ae0c8b5f361a9276a89e6d8c973da"
+    },
+    {
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2c-root-source-archive-probe.json",
+      "bytes": 1473,
+      "sha256": "f8f8e36f7c01acdcd3efe603b8b63ed9becd10165b993738b5b38ae785c218e5"
+    },
+    {
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2c-root-intermediate-base-validation.json",
+      "bytes": 2489,
+      "sha256": "5a0b6c2e9a761e08dd8daecd32118b1e058f44fc12037280b2a3643a4b234f98"
+    },
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/scaffold-review3/evidence/2026-refresh/phase2c-scaffold-review2-fixes-validation.json",
+      "bytes": 26222,
+      "sha256": "9cfad869c3648509dcff1d76d777b4e5e35dad9678b056c3c0a880d3347f2502"
+    },
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/scaffold-review3/evidence/2026-refresh/phase2c-scaffold-review2-fixes-receipt.json",
+      "bytes": 1762,
+      "sha256": "2e5527410e4b1faab2a66de92c9131855772b64bc97a7c7a85433b7a827e63e1"
+    },
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/scaffold-review3/evidence/2026-refresh/phase2c-validation.json",
+      "bytes": 675989,
+      "sha256": "e54e4c6f3e7170f416e7b9769c0f171698d99a2278186951a3436fc6bf5cb453"
+    },
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/scaffold-review3/evidence/2026-refresh/phase2c-scaffold-facts.json",
+      "bytes": 25464,
+      "sha256": "aed07e346cd7195eac6341de9e882113e4aeffbb208b054c2df6cfdce946501e"
+    }
+  ],
+  "reviewed_source_identities": [
+    {
+      "relative_path": "examples/customized_client_training/scaffold/scaffold_server.py",
+      "path": "/private/tmp/plato-refresh-worktrees/scaffold-review3/examples/customized_client_training/scaffold/scaffold_server.py",
+      "bytes": 9162,
+      "sha256": "259e738c6408f91b43e0d195b5c4e0e609cae33499fe04ea7c22059b83b3caf8",
+      "matches_author": true
+    },
+    {
+      "relative_path": "plato/trainers/composable.py",
+      "path": "/private/tmp/plato-refresh-worktrees/scaffold-review3/plato/trainers/composable.py",
+      "bytes": 42684,
+      "sha256": "e844500f270b51d7dc72e6f927b667bb0fa7aa441e32f50d92a571533517acd3",
+      "matches_author": true
+    },
+    {
+      "relative_path": "tests/integration/test_scaffold_callback_lifecycle.py",
+      "path": "/private/tmp/plato-refresh-worktrees/scaffold-review3/tests/integration/test_scaffold_callback_lifecycle.py",
+      "bytes": 9340,
+      "sha256": "816499d3c791e5cc197d7a5a66e13359a6325b5843fefc9ec5a8ed28505b881c",
+      "matches_author": true
+    }
+  ],
+  "primary_source": {
+    "title": "SCAFFOLD: Stochastic Controlled Averaging for Federated Learning",
+    "url": "https://arxiv.org/pdf/1910.06378v4",
+    "authority": "Main Algorithm 1 and equations (3)-(5), PDF pages 4-5; independently re-opened primary PDF. Appendix displacement sign typo is not the implementation authority.",
+    "retained_pdf": {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/primary-paper-1910.06378v4.pdf",
+      "bytes": 4381988,
+      "sha256": "efe06c86acc7a06116e372a7ab6386c300f4d0dc9c7ba2dd5c82e95111a1d694"
+    },
+    "equations_checked": "y_next=y-eta*(g-ci+c); ci_new=ci-c+(x-y)/(K*eta); c_new=c+sum(delta_ci)/N. Constant vanilla SGD gives ci_new equal to the mean actually used gradients. Shipped unequal-sample model averaging and optimizer extensions remain explicitly bounded implementation choices."
+  },
+  "accepted_contract_review": [
+    {
+      "id": "A01",
+      "status": "PASS",
+      "evidence": "Independent real float64 SGD hooks for core and V2: g=0 yields y=.9,ci\u22480,delta\u2248-1; gradients [3,1] yield y=.4,ci\u22482,delta\u22481, agreeing with independent mean gradients to 1e-12. Prior baseline-red evidence is retained in the hash-verified first review; baseline was not rerun here."
+    },
+    {
+      "id": "A02",
+      "status": "PASS",
+      "evidence": "Actual shipped Config/optimizer-factory tests cover lr .1/.025 and later .05, equal reordered groups, missing optimizer, nonpositive/nonfinite/unequal and within-round changed rates, captured executed LR before post-step changes and accumulation tail. Actual optimizer publication and pre-hook capture audited; strategy/optimizer source unchanged from f977."
+    },
+    {
+      "id": "A03",
+      "status": "PASS",
+      "evidence": "Focused parameter-identity, theta/weight/bias, missing-gradient, frozen/excluded, floating/integer buffer, known historical extras and detached-input cases pass. Independent transport adds model/control cast overflow and integer-control rejection at either client position with zero or positive sample weight, plus compatible bool/integer/frozen buffer aggregation."
+    },
+    {
+      "id": "A04",
+      "status": "PASS",
+      "evidence": "Independent core/V2 accumulation window 2 with 1/3/4 microbatches gives K=1/2/2, normalized tail once and later empty delta=0. Actual CPU GradScaler overflow gives y=1,K=0,ci=1,delta=0; next successful step y=.8,K=1. No CUDA claim."
+    },
+    {
+      "id": "A05",
+      "status": "FAIL_BOUNDARY",
+      "finding": "F27-R3-01",
+      "evidence": "Normal logical-client 1->2->1/dedicated/fresh reconstruction, canonical precedence/exact supported legacy paths, buffer projection, custom/slash paths and callback/save/replace rejections pass. Direct successful-end cleanup failure still replaces/creates canonical ci for a rejected call."
+    },
+    {
+      "id": "A06",
+      "status": "FAIL_BOUNDARY",
+      "finding": "F27-R3-01",
+      "evidence": "Actual inbound/outbound processors refresh current c, rebind reused processors and clear stale/malformed inbound state. Positive spawn, missing/stale current-token handoff, model-save and parent-commit rejections pass. Original missing-worker reuse/retry probe passes. New spawned end/cleanup failures with present/absent canonical state also reject and retry correctly. Direct train_model cleanup failure remains accepted."
+    },
+    {
+      "id": "A07",
+      "status": "PASS",
+      "evidence": "Independent Fraction oracle and actual autograd gradients through shipped example pipeline/full _process_reports agree for unequal/equal direct two-round cases and real spawn. N=3, selected (1,2) then (1,3), sample counts (2,6,4), batch 6, epochs 2, real K=2. Round 1 weighted x=1.19 vs uniform 1,c=2/3; round 2 x=10209/10000,c=896/1125. Inactive ci unchanged and c=mean(all ci)."
+    },
+    {
+      "id": "A08",
+      "status": "PASS",
+      "evidence": "Raw malformed models/controls and invalid report metadata reject before staging at both client positions including zero weights. Original actual callback rejection probe passes: receive exception, metadata mutation, NaN model mutation, aggregate exception preserve x=1,c=2 and clear staging. Tracked 12 server lifecycle cases include partially failing load, arithmetic failure, pending/delta/committed-control and post-aggregation model/control mutation, stale-stage later ingress and successful retry. Additional finite control-sum/delta-arithmetic overflow and NaN receive callbacks on either zero-weight client pass. Postcommit reporting failure retains accepted x=8,c=13/3 as intended."
+    },
+    {
+      "id": "A09",
+      "status": "PASS",
+      "evidence": "Unmodified shipped SGD momentum=.9/lr=.01 and constant-rate Adam match independent raw optimizer updates followed by subtractive correction; one visible extension warning per run. V2 is the shared corrected Option II subclass. No mean-gradient/convergence equivalence claimed for optimizer extensions."
+    },
+    {
+      "id": "A10",
+      "status": "FAIL_MATERIAL_FINDING",
+      "finding": "F27-R3-01",
+      "evidence": "282 affected tests pass each on Python 3.13.16/3.14.8, zero skips, 17 visible notices; Ruff I and scoped ty pass. Exact source/tree, source receipts, old/new evidence and root archive receipts verified. Direct cleanup regression fails each interpreter. Whole C, FedDyn final math, B supplement and final prose remain separate."
+    }
+  ],
+  "previous_review_disposition": [
+    {
+      "id": "F27-R01",
+      "status": "ORIGINAL_REPRODUCTION_FIXED",
+      "evidence": "Original raw NaN/missing/broadcast cases reject with x=1,c=2 and cleared stage, both versions; delivered raw/zero-weight cases also pass."
+    },
+    {
+      "id": "F27-R02",
+      "status": "ORIGINAL_REPRODUCTION_FIXED",
+      "evidence": "Adapted original missing current-worker handoff probe preserves canonical and memory ci=1 through 1->2->1/fresh construction and retry .62/.9/-.1, both versions."
+    },
+    {
+      "id": "F27-R2-01",
+      "status": "PASS_BOUNDED_CORRECTION",
+      "evidence": "Actual callback/full-report rejections, state rollback, finite overflow, zero weights, stage cleanup, successful retry and intended postcommit retention pass. No material server issue found."
+    },
+    {
+      "id": "F27-R2-02",
+      "status": "ORIGINAL_END_HOOK_REPRODUCTION_FIXED_WITH_REMAINING_RELATED_BOUNDARY",
+      "remaining": "F27-R3-01",
+      "evidence": "Actual direct/process end failure now precedes acceptance, preserves canonical bytes/absence, refuses outbound and removes pre-hook; same fault through actual spawn also passes. Otherwise successful direct cleanup exception still accepts."
+    },
+    {
+      "id": "ROOT-2C-02",
+      "status": "PASS_PORTABLE_HISTORICAL_WRITER_CORRECTION",
+      "evidence": "Tracked full historical source/license bytes and provenance match accepted B00e exactly. Four actual writer/migration/canonical-precedence/client-zero-isolation cases pass without .git on both versions. No test runtime git show/archive/fetch dependency remains.",
+      "fixture": {
+        "archive": "/tmp/plato-phase2c-scaffold-code-review-3/candidate.tar",
+        "archive_sha256": "34132a385f814e51e76d990473f8cb0ddcea71c03686d95b026b1246ec3d2c5b",
+        "archive_no_git": true,
+        "fixture_matches_actual_accepted_b_bytes": true,
+        "license_matches": true,
+        "provenance": {
+          "source_commit": "00eeb9dcdd2b513e64db9408969356037e09bb8e",
+          "source_path": "plato/trainers/strategies/algorithms/feddyn_strategy.py",
+          "source_git_blob": "8a19b21e3ac708aa3db51b6fea7bdb08502efe72",
+          "source_sha256": "623f2ddc1cb4e30cd6e0b1320f48fc30815db855891206924cd9150a5e0a8e1a",
+          "fixture_bytes_identical_to_full_source_blob": true,
+          "license_source": "LICENSE",
+          "license_sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+          "purpose": "Execute actual historical writer without runtime git/archive/fetch dependency. Historical source is test data only, not the corrected algorithm."
+        }
+      },
+      "future_limit": "This accepts fixture correctness and portability with the candidate old automatic reader only. Future explicit readonly reader and final FedDyn mathematics require their separate owner/review."
+    }
+  ],
+  "independently_executed": [
+    {
+      "run": "affected313 / affected314",
+      "each": {
+        "passed": 282,
+        "warnings": 17,
+        "skips": 0
+      },
+      "scope": "One coherent union per interpreter, including the author 174-test selection and additional ComposableTrainer/base/loss, checkpoint/path, APFL/FedRep/SSL/GAN/pFedGraph regressions. No counts from overlapping selections are added."
+    },
+    {
+      "run": "archive313 / archive314",
+      "each": {
+        "passed": 4,
+        "deselected": 13,
+        "warnings": 0
+      },
+      "scope": "Actual historical-writer migration tests from independently extracted exact candidate archive without .git; these four are already in the 282-test selection."
+    },
+    {
+      "run": "callback313 / callback314",
+      "each": {
+        "server_scenarios": 4,
+        "trainer_scenarios": 4
+      },
+      "scope": "Adapted original reviewer callback probe; corrected expectations, not the old defect-asserting assertions."
+    },
+    {
+      "run": "numerical313 / numerical314",
+      "each": {
+        "core_and_v2_equation_cases": 4,
+        "core_and_v2_accumulation_cases": 6,
+        "raw_model_rejection_cases": 3,
+        "direct_two_round_scenarios": 2
+      },
+      "scope": "Independent numerical checks and unequal/equal configured direct flow. These are probe scenarios, not an additional pytest unique-test total."
+    },
+    {
+      "run": "spawn313 / spawn314",
+      "each": {
+        "two_round_spawn_scenarios": 1,
+        "trained_client_updates": 4
+      },
+      "scope": "Actual max_concurrency child-to-parent flow with independently recorded gradients, ci/delta/K/executed LR and current token."
+    },
+    {
+      "run": "worker313 / worker314",
+      "each": {
+        "failed_handoff_reuse_retry_scenarios": 1
+      },
+      "scope": "Adapted original missing-state worker probe, canonical ci=1 preserved and successful retry .62/.9/-.1."
+    },
+    {
+      "run": "acceptance313 / acceptance314",
+      "each": {
+        "direct_process_rejection_retry_cases": 10
+      },
+      "scope": "Original direct callback/save/atomic-replace probe with source/scratch adaptations only."
+    },
+    {
+      "run": "transport313 / transport314",
+      "each": {
+        "rejection_cases": 12,
+        "compatible_buffer_case": 1
+      },
+      "scope": "Original transport probe with source/scratch adaptations only; existing float32 tolerance preserved."
+    },
+    {
+      "run": "boundary313 / boundary314",
+      "scope": "Independent momentum/Adam composition, real skipped CPU GradScaler update/retry and unchanged legacy unsquared-L2/L1 FedProx checks."
+    },
+    {
+      "run": "arithmetic313 / arithmetic314",
+      "each": {
+        "passed_scenarios": 4
+      },
+      "scope": "Finite-input control sum overflow, finite-input model delta arithmetic overflow through supported inherited fallback, and callback NaN on either zero-weight client."
+    },
+    {
+      "run": "spawnend313 / spawnend314",
+      "each": {
+        "passed_failure_reuse_retry_scenarios": 4
+      },
+      "scope": "Actual spawn end and cleanup hook failures, canonical present/absent, fresh reconstruction and successful explicit ci=1 retry."
+    },
+    {
+      "run": "cleanup313 / cleanup314",
+      "each": {
+        "observational_scenarios": 12
+      },
+      "scope": "End-only/cleanup-only/combined faults, direct/process, canonical present/absent. Zero observational exit is not an acceptance result."
+    },
+    {
+      "run": "regression313 / regression314; reusable replay313 / replay314",
+      "each": {
+        "assertion_cases": 4,
+        "failed": 2,
+        "passed": 2,
+        "inner_exit_code": 1
+      },
+      "scope": "Rejection assertions expose the direct-only material defect. These four overlap the observational probe. The fresh-UUID replay repeats the same four assertions to verify a reusable reproducer; neither execution is counted again as unique cases."
+    }
+  ],
+  "command_records": [
+    {
+      "label": "acceptance313",
+      "command": "/tmp/plato-phase2c-313/bin/python -B /tmp/plato-phase2c-scaffold-code-review-3/direct_acceptance_probe.py",
+      "shell": [
+        "zsh",
+        "-lc"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/scaffold-review3",
+      "env_overrides": {
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONPATH": "/private/tmp/plato-refresh-worktrees/scaffold-review3",
+        "OMP_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "PYTEST_ADDOPTS": "",
+        "TMPDIR": "/tmp/plato-phase2c-scaffold-code-review-3/tmp",
+        "XDG_CACHE_HOME": "/tmp/plato-phase2c-scaffold-code-review-3/cache",
+        "MPLCONFIGDIR": "/tmp/plato-phase2c-scaffold-code-review-3/mpl",
+        "RUFF_CACHE_DIR": "/tmp/plato-phase2c-scaffold-code-review-3/ruff-cache"
+      },
+      "exit_code": 0,
+      "duration_seconds": 7.869646072387695,
+      "deadline_seconds": 600,
+      "raw_log": "/tmp/plato-phase2c-scaffold-code-review-3/acceptance313.log",
+      "raw_bytes": 25987,
+      "raw_sha256": "7621b22d314a9dbc99e58644a54af6fe766bde2d9379039f184183b5f327b1b4"
+    },
+    {
+      "label": "acceptance314",
+      "command": "/tmp/plato-phase2c-314/bin/python -B /tmp/plato-phase2c-scaffold-code-review-3/direct_acceptance_probe.py",
+      "shell": [
+        "zsh",
+        "-lc"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/scaffold-review3",
+      "env_overrides": {
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONPATH": "/private/tmp/plato-refresh-worktrees/scaffold-review3",
+        "OMP_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "PYTEST_ADDOPTS": "",
+        "TMPDIR": "/tmp/plato-phase2c-scaffold-code-review-3/tmp",
+        "XDG_CACHE_HOME": "/tmp/plato-phase2c-scaffold-code-review-3/cache",
+        "MPLCONFIGDIR": "/tmp/plato-phase2c-scaffold-code-review-3/mpl",
+        "RUFF_CACHE_DIR": "/tmp/plato-phase2c-scaffold-code-review-3/ruff-cache"
+      },
+      "exit_code": 0,
+      "duration_seconds": 8.11957311630249,
+      "deadline_seconds": 600,
+      "raw_log": "/tmp/plato-phase2c-scaffold-code-review-3/acceptance314.log",
+      "raw_bytes": 26005,
+      "raw_sha256": "68adaa0db18abcc31f9a8c2c1384ca266676f324a54b6f34f162e4ed11d1a55d"
+    },
+    {
+      "label": "affected313",
+      "command": "/tmp/plato-phase2c-313/bin/python -B -m pytest tests/trainers/test_scaffold_strategy.py tests/trainers/test_training_update_contract.py tests/trainers/test_dp_data_loader_strategy.py tests/trainers/test_personalized_state_ownership.py tests/trainers/test_review_training_boundaries.py tests/integration/test_scaffold_round_flow.py tests/integration/test_scaffold_callback_lifecycle.py tests/trainers/test_composable_trainer.py tests/trainers/strategies tests/trainers/test_checkpoint_path_contract.py tests/trainers/test_checkpointing.py tests/trainers/test_apfl_optimizer_ownership.py tests/trainers/test_fedrep_strategy.py tests/trainers/test_ssl_personalized_state.py tests/trainers/test_ssl_training_contract.py tests/trainers/test_gan_runtime.py tests/trainers/test_pfedgraph_strategy.py -q -p no:cacheprovider --basetemp /tmp/plato-phase2c-scaffold-code-review-3/pytest313",
+      "shell": [
+        "zsh",
+        "-lc"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/scaffold-review3",
+      "env_overrides": {
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONPATH": "/private/tmp/plato-refresh-worktrees/scaffold-review3",
+        "OMP_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "PYTEST_ADDOPTS": "",
+        "TMPDIR": "/tmp/plato-phase2c-scaffold-code-review-3/tmp",
+        "XDG_CACHE_HOME": "/tmp/plato-phase2c-scaffold-code-review-3/cache",
+        "MPLCONFIGDIR": "/tmp/plato-phase2c-scaffold-code-review-3/mpl",
+        "RUFF_CACHE_DIR": "/tmp/plato-phase2c-scaffold-code-review-3/ruff-cache"
+      },
+      "exit_code": 0,
+      "duration_seconds": 219.6462790966034,
+      "deadline_seconds": 600,
+      "raw_log": "/tmp/plato-phase2c-scaffold-code-review-3/affected313.log",
+      "raw_bytes": 5178,
+      "raw_sha256": "bb82dc9a741e0ee3cf468a9e2a03fa2274dc5eaa0c2131429894ae7ac28cf656"
+    },
+    {
+      "label": "affected314",
+      "command": "/tmp/plato-phase2c-314/bin/python -B -m pytest tests/trainers/test_scaffold_strategy.py tests/trainers/test_training_update_contract.py tests/trainers/test_dp_data_loader_strategy.py tests/trainers/test_personalized_state_ownership.py tests/trainers/test_review_training_boundaries.py tests/integration/test_scaffold_round_flow.py tests/integration/test_scaffold_callback_lifecycle.py tests/trainers/test_composable_trainer.py tests/trainers/strategies tests/trainers/test_checkpoint_path_contract.py tests/trainers/test_checkpointing.py tests/trainers/test_apfl_optimizer_ownership.py tests/trainers/test_fedrep_strategy.py tests/trainers/test_ssl_personalized_state.py tests/trainers/test_ssl_training_contract.py tests/trainers/test_gan_runtime.py tests/trainers/test_pfedgraph_strategy.py -q -p no:cacheprovider --basetemp /tmp/plato-phase2c-scaffold-code-review-3/pytest314",
+      "shell": [
+        "zsh",
+        "-lc"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/scaffold-review3",
+      "env_overrides": {
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONPATH": "/private/tmp/plato-refresh-worktrees/scaffold-review3",
+        "OMP_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "PYTEST_ADDOPTS": "",
+        "TMPDIR": "/tmp/plato-phase2c-scaffold-code-review-3/tmp",
+        "XDG_CACHE_HOME": "/tmp/plato-phase2c-scaffold-code-review-3/cache",
+        "MPLCONFIGDIR": "/tmp/plato-phase2c-scaffold-code-review-3/mpl",
+        "RUFF_CACHE_DIR": "/tmp/plato-phase2c-scaffold-code-review-3/ruff-cache"
+      },
+      "exit_code": 0,
+      "duration_seconds": 230.8859987258911,
+      "deadline_seconds": 600,
+      "raw_log": "/tmp/plato-phase2c-scaffold-code-review-3/affected314.log",
+      "raw_bytes": 5226,
+      "raw_sha256": "451ad8618a77018ec5ff2b95517fc46dee5fec913c558661ddaee917503286b5"
+    },
+    {
+      "label": "archive313",
+      "command": "/tmp/plato-phase2c-313/bin/python -B -m pytest tests/trainers/test_review_training_boundaries.py -k actual_accepted_b_feddyn_writer_migration -q -p no:cacheprovider --basetemp /tmp/plato-phase2c-scaffold-code-review-3/archive-pytest313",
+      "shell": [
+        "zsh",
+        "-lc"
+      ],
+      "cwd": "/tmp/plato-phase2c-scaffold-code-review-3/source-archive",
+      "env_overrides": {
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONPATH": "/tmp/plato-phase2c-scaffold-code-review-3/source-archive",
+        "OMP_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "PYTEST_ADDOPTS": "",
+        "TMPDIR": "/tmp/plato-phase2c-scaffold-code-review-3/tmp",
+        "XDG_CACHE_HOME": "/tmp/plato-phase2c-scaffold-code-review-3/cache",
+        "MPLCONFIGDIR": "/tmp/plato-phase2c-scaffold-code-review-3/mpl",
+        "RUFF_CACHE_DIR": "/tmp/plato-phase2c-scaffold-code-review-3/ruff-cache"
+      },
+      "exit_code": 0,
+      "duration_seconds": 5.140791177749634,
+      "deadline_seconds": 600,
+      "raw_log": "/tmp/plato-phase2c-scaffold-code-review-3/archive313.log",
+      "raw_bytes": 113,
+      "raw_sha256": "a020c6b2837a6fb6e4e87f8f1e4c21e68c35fc749c60929f2699a50b8c9026f4"
+    },
+    {
+      "label": "archive314",
+      "command": "/tmp/plato-phase2c-314/bin/python -B -m pytest tests/trainers/test_review_training_boundaries.py -k actual_accepted_b_feddyn_writer_migration -q -p no:cacheprovider --basetemp /tmp/plato-phase2c-scaffold-code-review-3/archive-pytest314",
+      "shell": [
+        "zsh",
+        "-lc"
+      ],
+      "cwd": "/tmp/plato-phase2c-scaffold-code-review-3/source-archive",
+      "env_overrides": {
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONPATH": "/tmp/plato-phase2c-scaffold-code-review-3/source-archive",
+        "OMP_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "PYTEST_ADDOPTS": "",
+        "TMPDIR": "/tmp/plato-phase2c-scaffold-code-review-3/tmp",
+        "XDG_CACHE_HOME": "/tmp/plato-phase2c-scaffold-code-review-3/cache",
+        "MPLCONFIGDIR": "/tmp/plato-phase2c-scaffold-code-review-3/mpl",
+        "RUFF_CACHE_DIR": "/tmp/plato-phase2c-scaffold-code-review-3/ruff-cache"
+      },
+      "exit_code": 0,
+      "duration_seconds": 5.456000089645386,
+      "deadline_seconds": 600,
+      "raw_log": "/tmp/plato-phase2c-scaffold-code-review-3/archive314.log",
+      "raw_bytes": 113,
+      "raw_sha256": "8af95d79bad1277bf0fa4a4733b4e16c28874d81a275970c93ed51043b96bc36"
+    },
+    {
+      "label": "arithmetic313",
+      "command": "/tmp/plato-phase2c-313/bin/python -B /tmp/plato-phase2c-scaffold-code-review-3/server_arithmetic_probe.py",
+      "shell": [
+        "zsh",
+        "-lc"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/scaffold-review3",
+      "env_overrides": {
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONPATH": "/private/tmp/plato-refresh-worktrees/scaffold-review3",
+        "OMP_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "PYTEST_ADDOPTS": "",
+        "TMPDIR": "/tmp/plato-phase2c-scaffold-code-review-3/tmp",
+        "XDG_CACHE_HOME": "/tmp/plato-phase2c-scaffold-code-review-3/cache",
+        "MPLCONFIGDIR": "/tmp/plato-phase2c-scaffold-code-review-3/mpl",
+        "RUFF_CACHE_DIR": "/tmp/plato-phase2c-scaffold-code-review-3/ruff-cache"
+      },
+      "exit_code": 0,
+      "duration_seconds": 4.577540874481201,
+      "deadline_seconds": 600,
+      "raw_log": "/tmp/plato-phase2c-scaffold-code-review-3/arithmetic313.log",
+      "raw_bytes": 7631,
+      "raw_sha256": "ecace2110f6307e4d5605454abe888ce8f74a790476757db22a13394eec1b09f"
+    },
+    {
+      "label": "arithmetic314",
+      "command": "/tmp/plato-phase2c-314/bin/python -B /tmp/plato-phase2c-scaffold-code-review-3/server_arithmetic_probe.py",
+      "shell": [
+        "zsh",
+        "-lc"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/scaffold-review3",
+      "env_overrides": {
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONPATH": "/private/tmp/plato-refresh-worktrees/scaffold-review3",
+        "OMP_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "PYTEST_ADDOPTS": "",
+        "TMPDIR": "/tmp/plato-phase2c-scaffold-code-review-3/tmp",
+        "XDG_CACHE_HOME": "/tmp/plato-phase2c-scaffold-code-review-3/cache",
+        "MPLCONFIGDIR": "/tmp/plato-phase2c-scaffold-code-review-3/mpl",
+        "RUFF_CACHE_DIR": "/tmp/plato-phase2c-scaffold-code-review-3/ruff-cache"
+      },
+      "exit_code": 0,
+      "duration_seconds": 4.828638315200806,
+      "deadline_seconds": 600,
+      "raw_log": "/tmp/plato-phase2c-scaffold-code-review-3/arithmetic314.log",
+      "raw_bytes": 7649,
+      "raw_sha256": "216ce4b3aa7d837cac6ef517b2c05141c46fd98aecb641067f6ee0f03931e693"
+    },
+    {
+      "label": "boundary313",
+      "command": "/tmp/plato-phase2c-313/bin/python -B /tmp/plato-phase2c-scaffold-code-review-3/boundary_checks.py",
+      "shell": [
+        "zsh",
+        "-lc"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/scaffold-review3",
+      "env_overrides": {
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONPATH": "/private/tmp/plato-refresh-worktrees/scaffold-review3",
+        "OMP_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "PYTEST_ADDOPTS": "",
+        "TMPDIR": "/tmp/plato-phase2c-scaffold-code-review-3/tmp",
+        "XDG_CACHE_HOME": "/tmp/plato-phase2c-scaffold-code-review-3/cache",
+        "MPLCONFIGDIR": "/tmp/plato-phase2c-scaffold-code-review-3/mpl",
+        "RUFF_CACHE_DIR": "/tmp/plato-phase2c-scaffold-code-review-3/ruff-cache"
+      },
+      "exit_code": 0,
+      "duration_seconds": 7.673460006713867,
+      "deadline_seconds": 600,
+      "raw_log": "/tmp/plato-phase2c-scaffold-code-review-3/boundary313.log",
+      "raw_bytes": 2833,
+      "raw_sha256": "04063ce5d28ed251a61603a7cd94a6ef741236ba2fb63c7b04bfdec3c68e7a05"
+    },
+    {
+      "label": "boundary314",
+      "command": "/tmp/plato-phase2c-314/bin/python -B /tmp/plato-phase2c-scaffold-code-review-3/boundary_checks.py",
+      "shell": [
+        "zsh",
+        "-lc"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/scaffold-review3",
+      "env_overrides": {
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONPATH": "/private/tmp/plato-refresh-worktrees/scaffold-review3",
+        "OMP_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "PYTEST_ADDOPTS": "",
+        "TMPDIR": "/tmp/plato-phase2c-scaffold-code-review-3/tmp",
+        "XDG_CACHE_HOME": "/tmp/plato-phase2c-scaffold-code-review-3/cache",
+        "MPLCONFIGDIR": "/tmp/plato-phase2c-scaffold-code-review-3/mpl",
+        "RUFF_CACHE_DIR": "/tmp/plato-phase2c-scaffold-code-review-3/ruff-cache"
+      },
+      "exit_code": 0,
+      "duration_seconds": 7.973305702209473,
+      "deadline_seconds": 600,
+      "raw_log": "/tmp/plato-phase2c-scaffold-code-review-3/boundary314.log",
+      "raw_bytes": 2859,
+      "raw_sha256": "1e3e643b7f7a570ac92c9a3674bdd409684efb5d14732bb131482be913c9c54c"
+    },
+    {
+      "label": "callback313",
+      "command": "/tmp/plato-phase2c-313/bin/python -B /tmp/plato-phase2c-scaffold-code-review-3/callback_lifecycle_probe.py",
+      "shell": [
+        "zsh",
+        "-lc"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/scaffold-review3",
+      "env_overrides": {
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONPATH": "/private/tmp/plato-refresh-worktrees/scaffold-review3",
+        "OMP_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "PYTEST_ADDOPTS": "",
+        "TMPDIR": "/tmp/plato-phase2c-scaffold-code-review-3/tmp",
+        "XDG_CACHE_HOME": "/tmp/plato-phase2c-scaffold-code-review-3/cache",
+        "MPLCONFIGDIR": "/tmp/plato-phase2c-scaffold-code-review-3/mpl",
+        "RUFF_CACHE_DIR": "/tmp/plato-phase2c-scaffold-code-review-3/ruff-cache"
+      },
+      "exit_code": 0,
+      "duration_seconds": 5.125019073486328,
+      "deadline_seconds": 600,
+      "raw_log": "/tmp/plato-phase2c-scaffold-code-review-3/callback313.log",
+      "raw_bytes": 19427,
+      "raw_sha256": "fe8d523c3e7c6f893f1cbcb23f91bd0c1b9a96ea3c77c055b995133e276c09c7"
+    },
+    {
+      "label": "callback314",
+      "command": "/tmp/plato-phase2c-314/bin/python -B /tmp/plato-phase2c-scaffold-code-review-3/callback_lifecycle_probe.py",
+      "shell": [
+        "zsh",
+        "-lc"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/scaffold-review3",
+      "env_overrides": {
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONPATH": "/private/tmp/plato-refresh-worktrees/scaffold-review3",
+        "OMP_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "PYTEST_ADDOPTS": "",
+        "TMPDIR": "/tmp/plato-phase2c-scaffold-code-review-3/tmp",
+        "XDG_CACHE_HOME": "/tmp/plato-phase2c-scaffold-code-review-3/cache",
+        "MPLCONFIGDIR": "/tmp/plato-phase2c-scaffold-code-review-3/mpl",
+        "RUFF_CACHE_DIR": "/tmp/plato-phase2c-scaffold-code-review-3/ruff-cache"
+      },
+      "exit_code": 0,
+      "duration_seconds": 5.438663959503174,
+      "deadline_seconds": 600,
+      "raw_log": "/tmp/plato-phase2c-scaffold-code-review-3/callback314.log",
+      "raw_bytes": 19445,
+      "raw_sha256": "274bb0776ce23cfbac6577cfd04f960188ba624653f83300b476749d79004058"
+    },
+    {
+      "label": "cleanup313",
+      "command": "/tmp/plato-phase2c-313/bin/python -B /tmp/plato-phase2c-scaffold-code-review-3/cleanup_acceptance_probe.py",
+      "shell": [
+        "zsh",
+        "-lc"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/scaffold-review3",
+      "env_overrides": {
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONPATH": "/private/tmp/plato-refresh-worktrees/scaffold-review3",
+        "OMP_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "PYTEST_ADDOPTS": "",
+        "TMPDIR": "/tmp/plato-phase2c-scaffold-code-review-3/tmp",
+        "XDG_CACHE_HOME": "/tmp/plato-phase2c-scaffold-code-review-3/cache",
+        "MPLCONFIGDIR": "/tmp/plato-phase2c-scaffold-code-review-3/mpl",
+        "RUFF_CACHE_DIR": "/tmp/plato-phase2c-scaffold-code-review-3/ruff-cache"
+      },
+      "exit_code": 0,
+      "duration_seconds": 4.99646782875061,
+      "deadline_seconds": 600,
+      "raw_log": "/tmp/plato-phase2c-scaffold-code-review-3/cleanup313.log",
+      "raw_bytes": 37453,
+      "raw_sha256": "ffd31167f84aff863fa8393b19aaf0c8920ebb93a268b9a2d8cc4674d66afb29"
+    },
+    {
+      "label": "cleanup314",
+      "command": "/tmp/plato-phase2c-314/bin/python -B /tmp/plato-phase2c-scaffold-code-review-3/cleanup_acceptance_probe.py",
+      "shell": [
+        "zsh",
+        "-lc"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/scaffold-review3",
+      "env_overrides": {
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONPATH": "/private/tmp/plato-refresh-worktrees/scaffold-review3",
+        "OMP_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "PYTEST_ADDOPTS": "",
+        "TMPDIR": "/tmp/plato-phase2c-scaffold-code-review-3/tmp",
+        "XDG_CACHE_HOME": "/tmp/plato-phase2c-scaffold-code-review-3/cache",
+        "MPLCONFIGDIR": "/tmp/plato-phase2c-scaffold-code-review-3/mpl",
+        "RUFF_CACHE_DIR": "/tmp/plato-phase2c-scaffold-code-review-3/ruff-cache"
+      },
+      "exit_code": 0,
+      "duration_seconds": 5.361091136932373,
+      "deadline_seconds": 600,
+      "raw_log": "/tmp/plato-phase2c-scaffold-code-review-3/cleanup314.log",
+      "raw_bytes": 37471,
+      "raw_sha256": "4188a3da599d4919adc793db4c8c18ce9982c64d7fdac9fdc35c8d44b5e65980"
+    },
+    {
+      "label": "environment313",
+      "command": "/tmp/plato-phase2c-313/bin/python -B /tmp/plato-phase2c-scaffold-code-review-3/environment_probe.py",
+      "shell": [
+        "zsh",
+        "-lc"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/scaffold-review3",
+      "env_overrides": {
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONPATH": "/private/tmp/plato-refresh-worktrees/scaffold-review3",
+        "OMP_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "PYTEST_ADDOPTS": "",
+        "TMPDIR": "/tmp/plato-phase2c-scaffold-code-review-3/tmp",
+        "XDG_CACHE_HOME": "/tmp/plato-phase2c-scaffold-code-review-3/cache",
+        "MPLCONFIGDIR": "/tmp/plato-phase2c-scaffold-code-review-3/mpl",
+        "RUFF_CACHE_DIR": "/tmp/plato-phase2c-scaffold-code-review-3/ruff-cache"
+      },
+      "exit_code": 0,
+      "duration_seconds": 4.676065921783447,
+      "deadline_seconds": 600,
+      "raw_log": "/tmp/plato-phase2c-scaffold-code-review-3/environment313.log",
+      "raw_bytes": 24510,
+      "raw_sha256": "d2644082b9e888a64366cd8bc36633d6325d981b91c53de0b1a80800f0ce66ac"
+    },
+    {
+      "label": "environment314",
+      "command": "/tmp/plato-phase2c-314/bin/python -B /tmp/plato-phase2c-scaffold-code-review-3/environment_probe.py",
+      "shell": [
+        "zsh",
+        "-lc"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/scaffold-review3",
+      "env_overrides": {
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONPATH": "/private/tmp/plato-refresh-worktrees/scaffold-review3",
+        "OMP_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "PYTEST_ADDOPTS": "",
+        "TMPDIR": "/tmp/plato-phase2c-scaffold-code-review-3/tmp",
+        "XDG_CACHE_HOME": "/tmp/plato-phase2c-scaffold-code-review-3/cache",
+        "MPLCONFIGDIR": "/tmp/plato-phase2c-scaffold-code-review-3/mpl",
+        "RUFF_CACHE_DIR": "/tmp/plato-phase2c-scaffold-code-review-3/ruff-cache"
+      },
+      "exit_code": 0,
+      "duration_seconds": 4.966922998428345,
+      "deadline_seconds": 600,
+      "raw_log": "/tmp/plato-phase2c-scaffold-code-review-3/environment314.log",
+      "raw_bytes": 24536,
+      "raw_sha256": "5843bced6a84ba06deebddce878dbce78e858753b2e645571ea945985739acab"
+    },
+    {
+      "label": "numerical313",
+      "command": "/tmp/plato-phase2c-313/bin/python -B /tmp/plato-phase2c-scaffold-code-review-3/independent_checks.py normal",
+      "shell": [
+        "zsh",
+        "-lc"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/scaffold-review3",
+      "env_overrides": {
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONPATH": "/private/tmp/plato-refresh-worktrees/scaffold-review3",
+        "OMP_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "PYTEST_ADDOPTS": "",
+        "TMPDIR": "/tmp/plato-phase2c-scaffold-code-review-3/tmp",
+        "XDG_CACHE_HOME": "/tmp/plato-phase2c-scaffold-code-review-3/cache",
+        "MPLCONFIGDIR": "/tmp/plato-phase2c-scaffold-code-review-3/mpl",
+        "RUFF_CACHE_DIR": "/tmp/plato-phase2c-scaffold-code-review-3/ruff-cache"
+      },
+      "exit_code": 0,
+      "duration_seconds": 7.806254148483276,
+      "deadline_seconds": 600,
+      "raw_log": "/tmp/plato-phase2c-scaffold-code-review-3/numerical313.log",
+      "raw_bytes": 25289,
+      "raw_sha256": "9ddfc71d0736e939f24dd61e2d1921cf1495b5f1aecf9ef58b9522c71f0cacd1"
+    },
+    {
+      "label": "numerical314",
+      "command": "/tmp/plato-phase2c-314/bin/python -B /tmp/plato-phase2c-scaffold-code-review-3/independent_checks.py normal",
+      "shell": [
+        "zsh",
+        "-lc"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/scaffold-review3",
+      "env_overrides": {
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONPATH": "/private/tmp/plato-refresh-worktrees/scaffold-review3",
+        "OMP_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "PYTEST_ADDOPTS": "",
+        "TMPDIR": "/tmp/plato-phase2c-scaffold-code-review-3/tmp",
+        "XDG_CACHE_HOME": "/tmp/plato-phase2c-scaffold-code-review-3/cache",
+        "MPLCONFIGDIR": "/tmp/plato-phase2c-scaffold-code-review-3/mpl",
+        "RUFF_CACHE_DIR": "/tmp/plato-phase2c-scaffold-code-review-3/ruff-cache"
+      },
+      "exit_code": 0,
+      "duration_seconds": 8.078503847122192,
+      "deadline_seconds": 600,
+      "raw_log": "/tmp/plato-phase2c-scaffold-code-review-3/numerical314.log",
+      "raw_bytes": 25307,
+      "raw_sha256": "e6720250f4273de9de59160820a69da1a09a05eab8faa0f2a73192556831df0a"
+    },
+    {
+      "label": "receipts-final",
+      "command": "/tmp/plato-phase2c-313/bin/python -B /tmp/plato-phase2c-scaffold-code-review-3/audit_receipts.py",
+      "shell": [
+        "zsh",
+        "-lc"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/scaffold-review3",
+      "env_overrides": {
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONPATH": "/private/tmp/plato-refresh-worktrees/scaffold-review3",
+        "OMP_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "PYTEST_ADDOPTS": "",
+        "TMPDIR": "/tmp/plato-phase2c-scaffold-code-review-3/tmp",
+        "XDG_CACHE_HOME": "/tmp/plato-phase2c-scaffold-code-review-3/cache",
+        "MPLCONFIGDIR": "/tmp/plato-phase2c-scaffold-code-review-3/mpl",
+        "RUFF_CACHE_DIR": "/tmp/plato-phase2c-scaffold-code-review-3/ruff-cache"
+      },
+      "exit_code": 0,
+      "duration_seconds": 2.7097690105438232,
+      "deadline_seconds": 600,
+      "raw_log": "/tmp/plato-phase2c-scaffold-code-review-3/receipts-final.log",
+      "raw_bytes": 506,
+      "raw_sha256": "3cbb51d97d7a080cc608e720b1191f6f7b604db1f1065562f66ef0a8ac007d05"
+    },
+    {
+      "label": "receipts",
+      "command": "/tmp/plato-phase2c-313/bin/python -B /tmp/plato-phase2c-scaffold-code-review-3/audit_receipts.py",
+      "shell": [
+        "zsh",
+        "-lc"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/scaffold-review3",
+      "env_overrides": {
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONPATH": "/private/tmp/plato-refresh-worktrees/scaffold-review3",
+        "OMP_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "PYTEST_ADDOPTS": "",
+        "TMPDIR": "/tmp/plato-phase2c-scaffold-code-review-3/tmp",
+        "XDG_CACHE_HOME": "/tmp/plato-phase2c-scaffold-code-review-3/cache",
+        "MPLCONFIGDIR": "/tmp/plato-phase2c-scaffold-code-review-3/mpl",
+        "RUFF_CACHE_DIR": "/tmp/plato-phase2c-scaffold-code-review-3/ruff-cache"
+      },
+      "exit_code": 0,
+      "duration_seconds": 2.398869037628174,
+      "deadline_seconds": 600,
+      "raw_log": "/tmp/plato-phase2c-scaffold-code-review-3/receipts.log",
+      "raw_bytes": 506,
+      "raw_sha256": "3cbb51d97d7a080cc608e720b1191f6f7b604db1f1065562f66ef0a8ac007d05"
+    },
+    {
+      "label": "regression313",
+      "command": "/tmp/plato-phase2c-313/bin/python -B /tmp/plato-phase2c-scaffold-code-review-3/cleanup_rejection_regression.py",
+      "shell": [
+        "zsh",
+        "-lc"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/scaffold-review3",
+      "env_overrides": {
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONPATH": "/private/tmp/plato-refresh-worktrees/scaffold-review3",
+        "OMP_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "PYTEST_ADDOPTS": "",
+        "TMPDIR": "/tmp/plato-phase2c-scaffold-code-review-3/tmp",
+        "XDG_CACHE_HOME": "/tmp/plato-phase2c-scaffold-code-review-3/cache",
+        "MPLCONFIGDIR": "/tmp/plato-phase2c-scaffold-code-review-3/mpl",
+        "RUFF_CACHE_DIR": "/tmp/plato-phase2c-scaffold-code-review-3/ruff-cache"
+      },
+      "exit_code": 1,
+      "duration_seconds": 4.517170190811157,
+      "deadline_seconds": 600,
+      "raw_log": "/tmp/plato-phase2c-scaffold-code-review-3/regression313.log",
+      "raw_bytes": 12864,
+      "raw_sha256": "21b152c85f255acb743facce3c20a6556a5f092aa01b3a63b3dbc1a4d95982a6"
+    },
+    {
+      "label": "regression314",
+      "command": "/tmp/plato-phase2c-314/bin/python -B /tmp/plato-phase2c-scaffold-code-review-3/cleanup_rejection_regression.py",
+      "shell": [
+        "zsh",
+        "-lc"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/scaffold-review3",
+      "env_overrides": {
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONPATH": "/private/tmp/plato-refresh-worktrees/scaffold-review3",
+        "OMP_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "PYTEST_ADDOPTS": "",
+        "TMPDIR": "/tmp/plato-phase2c-scaffold-code-review-3/tmp",
+        "XDG_CACHE_HOME": "/tmp/plato-phase2c-scaffold-code-review-3/cache",
+        "MPLCONFIGDIR": "/tmp/plato-phase2c-scaffold-code-review-3/mpl",
+        "RUFF_CACHE_DIR": "/tmp/plato-phase2c-scaffold-code-review-3/ruff-cache"
+      },
+      "exit_code": 1,
+      "duration_seconds": 4.820508003234863,
+      "deadline_seconds": 600,
+      "raw_log": "/tmp/plato-phase2c-scaffold-code-review-3/regression314.log",
+      "raw_bytes": 12882,
+      "raw_sha256": "9e6ee19d15c24856ba6819d3f76e74563100e9de2e206fdc2df949c2d92dc406"
+    },
+    {
+      "label": "replay313",
+      "command": "/tmp/plato-phase2c-313/bin/python -B /tmp/plato-phase2c-scaffold-code-review-3/reproduce_cleanup_failure.py",
+      "shell": [
+        "zsh",
+        "-lc"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/scaffold-review3",
+      "env_overrides": {
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONPATH": "/private/tmp/plato-refresh-worktrees/scaffold-review3",
+        "OMP_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "PYTEST_ADDOPTS": "",
+        "TMPDIR": "/tmp/plato-phase2c-scaffold-code-review-3/tmp",
+        "XDG_CACHE_HOME": "/tmp/plato-phase2c-scaffold-code-review-3/cache",
+        "MPLCONFIGDIR": "/tmp/plato-phase2c-scaffold-code-review-3/mpl",
+        "RUFF_CACHE_DIR": "/tmp/plato-phase2c-scaffold-code-review-3/ruff-cache"
+      },
+      "exit_code": 1,
+      "duration_seconds": 4.734783887863159,
+      "deadline_seconds": 600,
+      "raw_log": "/tmp/plato-phase2c-scaffold-code-review-3/replay313.log",
+      "raw_bytes": 13095,
+      "raw_sha256": "78b7175223a438c2212082acefac6e70ef0ae56c4ceceec2efcb3ecd812c39df"
+    },
+    {
+      "label": "replay314",
+      "command": "/tmp/plato-phase2c-314/bin/python -B /tmp/plato-phase2c-scaffold-code-review-3/reproduce_cleanup_failure.py",
+      "shell": [
+        "zsh",
+        "-lc"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/scaffold-review3",
+      "env_overrides": {
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONPATH": "/private/tmp/plato-refresh-worktrees/scaffold-review3",
+        "OMP_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "PYTEST_ADDOPTS": "",
+        "TMPDIR": "/tmp/plato-phase2c-scaffold-code-review-3/tmp",
+        "XDG_CACHE_HOME": "/tmp/plato-phase2c-scaffold-code-review-3/cache",
+        "MPLCONFIGDIR": "/tmp/plato-phase2c-scaffold-code-review-3/mpl",
+        "RUFF_CACHE_DIR": "/tmp/plato-phase2c-scaffold-code-review-3/ruff-cache"
+      },
+      "exit_code": 1,
+      "duration_seconds": 4.98060417175293,
+      "deadline_seconds": 600,
+      "raw_log": "/tmp/plato-phase2c-scaffold-code-review-3/replay314.log",
+      "raw_bytes": 13113,
+      "raw_sha256": "d7534ff1005ffcf6bdfdbccb2c52570e8f600f4ced66193045997f6589c09e51"
+    },
+    {
+      "label": "ruff313",
+      "command": "/tmp/plato-phase2c-313/bin/ruff check . --select I --no-cache",
+      "shell": [
+        "zsh",
+        "-lc"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/scaffold-review3",
+      "env_overrides": {
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONPATH": "/private/tmp/plato-refresh-worktrees/scaffold-review3",
+        "OMP_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "PYTEST_ADDOPTS": "",
+        "TMPDIR": "/tmp/plato-phase2c-scaffold-code-review-3/tmp",
+        "XDG_CACHE_HOME": "/tmp/plato-phase2c-scaffold-code-review-3/cache",
+        "MPLCONFIGDIR": "/tmp/plato-phase2c-scaffold-code-review-3/mpl",
+        "RUFF_CACHE_DIR": "/tmp/plato-phase2c-scaffold-code-review-3/ruff-cache"
+      },
+      "exit_code": 0,
+      "duration_seconds": 0.04590582847595215,
+      "deadline_seconds": 600,
+      "raw_log": "/tmp/plato-phase2c-scaffold-code-review-3/ruff313.log",
+      "raw_bytes": 19,
+      "raw_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "label": "ruff314",
+      "command": "/tmp/plato-phase2c-314/bin/ruff check . --select I --no-cache",
+      "shell": [
+        "zsh",
+        "-lc"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/scaffold-review3",
+      "env_overrides": {
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONPATH": "/private/tmp/plato-refresh-worktrees/scaffold-review3",
+        "OMP_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "PYTEST_ADDOPTS": "",
+        "TMPDIR": "/tmp/plato-phase2c-scaffold-code-review-3/tmp",
+        "XDG_CACHE_HOME": "/tmp/plato-phase2c-scaffold-code-review-3/cache",
+        "MPLCONFIGDIR": "/tmp/plato-phase2c-scaffold-code-review-3/mpl",
+        "RUFF_CACHE_DIR": "/tmp/plato-phase2c-scaffold-code-review-3/ruff-cache"
+      },
+      "exit_code": 0,
+      "duration_seconds": 0.09673285484313965,
+      "deadline_seconds": 600,
+      "raw_log": "/tmp/plato-phase2c-scaffold-code-review-3/ruff314.log",
+      "raw_bytes": 19,
+      "raw_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "label": "spawn313",
+      "command": "/tmp/plato-phase2c-313/bin/python -B /tmp/plato-phase2c-scaffold-code-review-3/independent_checks.py spawn",
+      "shell": [
+        "zsh",
+        "-lc"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/scaffold-review3",
+      "env_overrides": {
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONPATH": "/private/tmp/plato-refresh-worktrees/scaffold-review3",
+        "OMP_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "PYTEST_ADDOPTS": "",
+        "TMPDIR": "/tmp/plato-phase2c-scaffold-code-review-3/tmp",
+        "XDG_CACHE_HOME": "/tmp/plato-phase2c-scaffold-code-review-3/cache",
+        "MPLCONFIGDIR": "/tmp/plato-phase2c-scaffold-code-review-3/mpl",
+        "RUFF_CACHE_DIR": "/tmp/plato-phase2c-scaffold-code-review-3/ruff-cache"
+      },
+      "exit_code": 0,
+      "duration_seconds": 26.713459968566895,
+      "deadline_seconds": 600,
+      "raw_log": "/tmp/plato-phase2c-scaffold-code-review-3/spawn313.log",
+      "raw_bytes": 11262,
+      "raw_sha256": "9c8c59b591abe859eabd1d302fbfc007ae4babff89fc43ad6f569a4bbe830877"
+    },
+    {
+      "label": "spawn314",
+      "command": "/tmp/plato-phase2c-314/bin/python -B /tmp/plato-phase2c-scaffold-code-review-3/independent_checks.py spawn",
+      "shell": [
+        "zsh",
+        "-lc"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/scaffold-review3",
+      "env_overrides": {
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONPATH": "/private/tmp/plato-refresh-worktrees/scaffold-review3",
+        "OMP_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "PYTEST_ADDOPTS": "",
+        "TMPDIR": "/tmp/plato-phase2c-scaffold-code-review-3/tmp",
+        "XDG_CACHE_HOME": "/tmp/plato-phase2c-scaffold-code-review-3/cache",
+        "MPLCONFIGDIR": "/tmp/plato-phase2c-scaffold-code-review-3/mpl",
+        "RUFF_CACHE_DIR": "/tmp/plato-phase2c-scaffold-code-review-3/ruff-cache"
+      },
+      "exit_code": 0,
+      "duration_seconds": 27.78120183944702,
+      "deadline_seconds": 600,
+      "raw_log": "/tmp/plato-phase2c-scaffold-code-review-3/spawn314.log",
+      "raw_bytes": 11280,
+      "raw_sha256": "fb52ef45dbe8ac43d377cdd68c7a3421cc3c3939a6b589b6ef0c98bfec20cec6"
+    },
+    {
+      "label": "spawnend313",
+      "command": "/tmp/plato-phase2c-313/bin/python -B /tmp/plato-phase2c-scaffold-code-review-3/spawn_end_probe.py",
+      "shell": [
+        "zsh",
+        "-lc"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/scaffold-review3",
+      "env_overrides": {
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONPATH": "/private/tmp/plato-refresh-worktrees/scaffold-review3",
+        "OMP_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "PYTEST_ADDOPTS": "",
+        "TMPDIR": "/tmp/plato-phase2c-scaffold-code-review-3/tmp",
+        "XDG_CACHE_HOME": "/tmp/plato-phase2c-scaffold-code-review-3/cache",
+        "MPLCONFIGDIR": "/tmp/plato-phase2c-scaffold-code-review-3/mpl",
+        "RUFF_CACHE_DIR": "/tmp/plato-phase2c-scaffold-code-review-3/ruff-cache"
+      },
+      "exit_code": 0,
+      "duration_seconds": 40.646032094955444,
+      "deadline_seconds": 600,
+      "raw_log": "/tmp/plato-phase2c-scaffold-code-review-3/spawnend313.log",
+      "raw_bytes": 19163,
+      "raw_sha256": "423a9b45b71e5f96175c77c5fc550c6db3e098521d43fc9b413f900dbdccef38"
+    },
+    {
+      "label": "spawnend314",
+      "command": "/tmp/plato-phase2c-314/bin/python -B /tmp/plato-phase2c-scaffold-code-review-3/spawn_end_probe.py",
+      "shell": [
+        "zsh",
+        "-lc"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/scaffold-review3",
+      "env_overrides": {
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONPATH": "/private/tmp/plato-refresh-worktrees/scaffold-review3",
+        "OMP_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "PYTEST_ADDOPTS": "",
+        "TMPDIR": "/tmp/plato-phase2c-scaffold-code-review-3/tmp",
+        "XDG_CACHE_HOME": "/tmp/plato-phase2c-scaffold-code-review-3/cache",
+        "MPLCONFIGDIR": "/tmp/plato-phase2c-scaffold-code-review-3/mpl",
+        "RUFF_CACHE_DIR": "/tmp/plato-phase2c-scaffold-code-review-3/ruff-cache"
+      },
+      "exit_code": 0,
+      "duration_seconds": 43.35694622993469,
+      "deadline_seconds": 600,
+      "raw_log": "/tmp/plato-phase2c-scaffold-code-review-3/spawnend314.log",
+      "raw_bytes": 19285,
+      "raw_sha256": "12c6111b8c750f470d51dac3e8597cbadc979d7e5f23ff859a78fbf31af70461"
+    },
+    {
+      "label": "transport313",
+      "command": "/tmp/plato-phase2c-313/bin/python -B /tmp/plato-phase2c-scaffold-code-review-3/transport_validation_probe.py",
+      "shell": [
+        "zsh",
+        "-lc"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/scaffold-review3",
+      "env_overrides": {
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONPATH": "/private/tmp/plato-refresh-worktrees/scaffold-review3",
+        "OMP_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "PYTEST_ADDOPTS": "",
+        "TMPDIR": "/tmp/plato-phase2c-scaffold-code-review-3/tmp",
+        "XDG_CACHE_HOME": "/tmp/plato-phase2c-scaffold-code-review-3/cache",
+        "MPLCONFIGDIR": "/tmp/plato-phase2c-scaffold-code-review-3/mpl",
+        "RUFF_CACHE_DIR": "/tmp/plato-phase2c-scaffold-code-review-3/ruff-cache"
+      },
+      "exit_code": 0,
+      "duration_seconds": 7.8190929889678955,
+      "deadline_seconds": 600,
+      "raw_log": "/tmp/plato-phase2c-scaffold-code-review-3/transport313.log",
+      "raw_bytes": 7852,
+      "raw_sha256": "95a5b6a2809447432e8b94230960c76a966e48a65153bec6c1bebe3cd50e28b3"
+    },
+    {
+      "label": "transport314",
+      "command": "/tmp/plato-phase2c-314/bin/python -B /tmp/plato-phase2c-scaffold-code-review-3/transport_validation_probe.py",
+      "shell": [
+        "zsh",
+        "-lc"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/scaffold-review3",
+      "env_overrides": {
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONPATH": "/private/tmp/plato-refresh-worktrees/scaffold-review3",
+        "OMP_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "PYTEST_ADDOPTS": "",
+        "TMPDIR": "/tmp/plato-phase2c-scaffold-code-review-3/tmp",
+        "XDG_CACHE_HOME": "/tmp/plato-phase2c-scaffold-code-review-3/cache",
+        "MPLCONFIGDIR": "/tmp/plato-phase2c-scaffold-code-review-3/mpl",
+        "RUFF_CACHE_DIR": "/tmp/plato-phase2c-scaffold-code-review-3/ruff-cache"
+      },
+      "exit_code": 0,
+      "duration_seconds": 8.066784858703613,
+      "deadline_seconds": 600,
+      "raw_log": "/tmp/plato-phase2c-scaffold-code-review-3/transport314.log",
+      "raw_bytes": 7870,
+      "raw_sha256": "f07a468accc8ae6ece5b03e5fb29b624724e1b1a250cdf4ac918b7f18037e3d8"
+    },
+    {
+      "label": "ty313",
+      "command": "/tmp/plato-phase2c-313/bin/ty check plato/trainers/composable.py examples/customized_client_training/scaffold/scaffold_server.py --output-format concise",
+      "shell": [
+        "zsh",
+        "-lc"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/scaffold-review3",
+      "env_overrides": {
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONPATH": "/private/tmp/plato-refresh-worktrees/scaffold-review3",
+        "OMP_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "PYTEST_ADDOPTS": "",
+        "TMPDIR": "/tmp/plato-phase2c-scaffold-code-review-3/tmp",
+        "XDG_CACHE_HOME": "/tmp/plato-phase2c-scaffold-code-review-3/cache",
+        "MPLCONFIGDIR": "/tmp/plato-phase2c-scaffold-code-review-3/mpl",
+        "RUFF_CACHE_DIR": "/tmp/plato-phase2c-scaffold-code-review-3/ruff-cache"
+      },
+      "exit_code": 0,
+      "duration_seconds": 0.2540438175201416,
+      "deadline_seconds": 600,
+      "raw_log": "/tmp/plato-phase2c-scaffold-code-review-3/ty313.log",
+      "raw_bytes": 19,
+      "raw_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "label": "ty314",
+      "command": "/tmp/plato-phase2c-314/bin/ty check plato/trainers/composable.py examples/customized_client_training/scaffold/scaffold_server.py --output-format concise",
+      "shell": [
+        "zsh",
+        "-lc"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/scaffold-review3",
+      "env_overrides": {
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONPATH": "/private/tmp/plato-refresh-worktrees/scaffold-review3",
+        "OMP_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "PYTEST_ADDOPTS": "",
+        "TMPDIR": "/tmp/plato-phase2c-scaffold-code-review-3/tmp",
+        "XDG_CACHE_HOME": "/tmp/plato-phase2c-scaffold-code-review-3/cache",
+        "MPLCONFIGDIR": "/tmp/plato-phase2c-scaffold-code-review-3/mpl",
+        "RUFF_CACHE_DIR": "/tmp/plato-phase2c-scaffold-code-review-3/ruff-cache"
+      },
+      "exit_code": 0,
+      "duration_seconds": 0.24268865585327148,
+      "deadline_seconds": 600,
+      "raw_log": "/tmp/plato-phase2c-scaffold-code-review-3/ty314.log",
+      "raw_bytes": 19,
+      "raw_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "label": "worker313",
+      "command": "/tmp/plato-phase2c-313/bin/python -B /tmp/plato-phase2c-scaffold-code-review-3/worker_failure_reproducer.py",
+      "shell": [
+        "zsh",
+        "-lc"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/scaffold-review3",
+      "env_overrides": {
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONPATH": "/private/tmp/plato-refresh-worktrees/scaffold-review3",
+        "OMP_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "PYTEST_ADDOPTS": "",
+        "TMPDIR": "/tmp/plato-phase2c-scaffold-code-review-3/tmp",
+        "XDG_CACHE_HOME": "/tmp/plato-phase2c-scaffold-code-review-3/cache",
+        "MPLCONFIGDIR": "/tmp/plato-phase2c-scaffold-code-review-3/mpl",
+        "RUFF_CACHE_DIR": "/tmp/plato-phase2c-scaffold-code-review-3/ruff-cache"
+      },
+      "exit_code": 0,
+      "duration_seconds": 17.621161937713623,
+      "deadline_seconds": 600,
+      "raw_log": "/tmp/plato-phase2c-scaffold-code-review-3/worker313.log",
+      "raw_bytes": 4503,
+      "raw_sha256": "a22bcb085f4b1adc6c39f4d5fa0534ba2f77299eb682d544f38035ceb6b847e7"
+    },
+    {
+      "label": "worker314",
+      "command": "/tmp/plato-phase2c-314/bin/python -B /tmp/plato-phase2c-scaffold-code-review-3/worker_failure_reproducer.py",
+      "shell": [
+        "zsh",
+        "-lc"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/scaffold-review3",
+      "env_overrides": {
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONPATH": "/private/tmp/plato-refresh-worktrees/scaffold-review3",
+        "OMP_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "PYTEST_ADDOPTS": "",
+        "TMPDIR": "/tmp/plato-phase2c-scaffold-code-review-3/tmp",
+        "XDG_CACHE_HOME": "/tmp/plato-phase2c-scaffold-code-review-3/cache",
+        "MPLCONFIGDIR": "/tmp/plato-phase2c-scaffold-code-review-3/mpl",
+        "RUFF_CACHE_DIR": "/tmp/plato-phase2c-scaffold-code-review-3/ruff-cache"
+      },
+      "exit_code": 0,
+      "duration_seconds": 18.103652954101562,
+      "deadline_seconds": 600,
+      "raw_log": "/tmp/plato-phase2c-scaffold-code-review-3/worker314.log",
+      "raw_bytes": 4521,
+      "raw_sha256": "e308f1bb3ec310a6573c16362e50fa64c0807bd4a2224790f930e071ef5ed8c9"
+    }
+  ],
+  "command_wrapper_note": "run_command.py captures and hashes the inner zsh -lc exit code, log and duration. Its outer bookkeeping process can return zero while a recorded regression inner exit is 1; no wrapper zero or observational defect assertion is counted as PASS.",
+  "environment": {
+    "313": {
+      "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+      "executable": "/tmp/plato-phase2c-313/bin/python",
+      "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+      "versions": {
+        "torch": "2.14.1",
+        "torchvision": "0.29.1",
+        "timm": "1.0.30",
+        "numpy": "2.5.3",
+        "opacus": "1.6.0",
+        "pytest": "9.1.1",
+        "ruff": "0.16.10",
+        "safetensors": "0.8.0"
+      }
+    },
+    "314": {
+      "python": "3.14.8 (main, Sep 30 2026, 17:55:09) [Clang 21.0.0 (clang-2100.3.34.2)]",
+      "executable": "/private/tmp/plato-phase2c-314/bin/python",
+      "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+      "versions": {
+        "torch": "2.14.1",
+        "torchvision": "0.29.1",
+        "timm": "1.0.30",
+        "numpy": "2.5.3",
+        "opacus": "1.6.0",
+        "pytest": "9.1.1",
+        "ruff": "0.16.10",
+        "safetensors": "0.8.0"
+      }
+    }
+  },
+  "warnings": {
+    "affected_each": 17,
+    "skips_each": 0,
+    "categories": {
+      "Opacus experimental nonsecure RNG": 5,
+      "RDP largest-order notice": 3,
+      "PyTorch full backward hook inputs without gradients": 4,
+      "Repeated privacy budget spending notice": 2,
+      "Subset dataset object accounting notice": 3
+    },
+    "policy": "Visible and unsuppressed; no warning filters or global policy edits. CPU GradScaler qualification is not CUDA/AMP device qualification or a global privacy guarantee."
+  },
+  "author_evidence_audit": {
+    "new_evidence_log_receipts": [
+      {
+        "path": "/tmp/plato-phase2c-feddyn-implementation/scaffold-review2-red-final-313.log",
+        "bytes": 80245,
+        "sha256": "a4f437fc953afa60c7ac5c9f24b138a1a9368a44b98876d62264b6267e63ac12",
+        "exit_code": 1,
+        "summary": "16 failed, 4 passed, 1 warning in 0.38s"
+      },
+      {
+        "path": "/tmp/plato-phase2c-feddyn-implementation/scaffold-review2-committed-green-313.log",
+        "bytes": 5090,
+        "sha256": "179d0a62aa80b52dd11c251bc7dd0b4aba645a61eb27cdff6c0f1fe9addae1e3",
+        "exit_code": 0,
+        "summary": "174 passed, 17 warnings in 186.19s (0:03:06)"
+      },
+      {
+        "path": "/tmp/plato-phase2c-feddyn-implementation/scaffold-review2-committed-probe-clean-313.log",
+        "bytes": 19799,
+        "sha256": "3d04f000706118f28036fa22e05322a94d39703340dbf3912d3cd19770b384a2",
+        "exit_code": 0,
+        "summary": "}"
+      },
+      {
+        "path": "/tmp/plato-phase2c-feddyn-implementation/scaffold-review2-committed-checks-313.log",
+        "bytes": 38,
+        "sha256": "d63ab3df51a50c66f9c57056288c7d4faf9dce413552d89215714320ac2b748e",
+        "exit_code": 0,
+        "summary": "All checks passed!"
+      },
+      {
+        "path": "/tmp/plato-phase2c-feddyn-implementation/scaffold-review2-committed-archive-qualified-313.log",
+        "bytes": 113,
+        "sha256": "a020c6b2837a6fb6e4e87f8f1e4c21e68c35fc749c60929f2699a50b8c9026f4",
+        "exit_code": 0,
+        "summary": "4 passed, 13 deselected in 0.04s"
+      },
+      {
+        "path": "/tmp/plato-phase2c-feddyn-implementation/scaffold-review2-red-final-314.log",
+        "bytes": 80243,
+        "sha256": "3caae847f4b15711f98cea8da155fdcf6a14ef4336bc3326ddef9ee540d62cf8",
+        "exit_code": 1,
+        "summary": "16 failed, 4 passed, 1 warning in 0.36s"
+      },
+      {
+        "path": "/tmp/plato-phase2c-feddyn-implementation/scaffold-review2-committed-green-314.log",
+        "bytes": 5138,
+        "sha256": "c9c026d9373b16271073c690ada9335b59d4d1858647a869bf74c89e2802bdea",
+        "exit_code": 0,
+        "summary": "174 passed, 17 warnings in 196.62s (0:03:16)"
+      },
+      {
+        "path": "/tmp/plato-phase2c-feddyn-implementation/scaffold-review2-committed-probe-clean-314.log",
+        "bytes": 19817,
+        "sha256": "fe569b700b95f9328ebfa14eadf5bbcda9cddd1e6b510f93950b64535da07215",
+        "exit_code": 0,
+        "summary": "}"
+      },
+      {
+        "path": "/tmp/plato-phase2c-feddyn-implementation/scaffold-review2-committed-checks-314.log",
+        "bytes": 38,
+        "sha256": "d63ab3df51a50c66f9c57056288c7d4faf9dce413552d89215714320ac2b748e",
+        "exit_code": 0,
+        "summary": "All checks passed!"
+      },
+      {
+        "path": "/tmp/plato-phase2c-feddyn-implementation/scaffold-review2-committed-archive-qualified-314.log",
+        "bytes": 113,
+        "sha256": "8af95d79bad1277bf0fa4a4733b4e16c28874d81a275970c93ed51043b96bc36",
+        "exit_code": 0,
+        "summary": "4 passed, 13 deselected in 0.05s"
+      },
+      {
+        "path": "/tmp/plato-phase2c-feddyn-implementation/scaffold-review2-committed-probe-313.log",
+        "bytes": 8032,
+        "sha256": "2eb8d6364ad188dfa5757d4df1ffa3fecc1416ce67fb700bdade04c31b8200f6",
+        "exit_code": 1,
+        "summary": "AssertionError"
+      },
+      {
+        "path": "/tmp/plato-phase2c-feddyn-implementation/scaffold-review2-committed-probe-314.log",
+        "bytes": 8032,
+        "sha256": "31697e54f9670e4985649700d0d9bc0360d903fb19451567c9157f857f10e1e5",
+        "exit_code": 1,
+        "summary": "AssertionError"
+      },
+      {
+        "path": "/tmp/plato-phase2c-feddyn-implementation/scaffold-review2-committed-archive-313.log",
+        "bytes": 24,
+        "sha256": "2028ba6db36217caa7fef84beb95d2dc85a351046b3f0bba11abbd701d70c1b7",
+        "exit_code": 5,
+        "summary": "17 deselected in 0.02s"
+      }
+    ],
+    "new_source_receipts_match_candidate": true,
+    "new_evidence_body_and_receipt_hashes_match": true,
+    "author_green_each": "174 passed,17 warnings,zero skips at exact0f177; overlap with independent282, not an additional unique total.",
+    "author_red_each": "16 failed,4 passed on immutablef977;20 tracked lifecycle cases. Raw log hashes checked; not independently repeated in this review.",
+    "historical_f977_logs_and_socket_receipts": [
+      {
+        "path": "/tmp/plato-phase2c-scratch/reviewfix-validation-313.log",
+        "bytes": 5490,
+        "sha256": "a40bcd4be9944d1f13d248434c87486a6a9bf39ba6283d3ea764a75d26c5069a"
+      },
+      {
+        "path": "/tmp/plato-phase2c-scratch/reviewfix-validation-314.log",
+        "bytes": 5538,
+        "sha256": "467995bd126bd8252d67d34a778201034db21e20185a7f44c00c57594714809c"
+      },
+      {
+        "path": "/tmp/plato-phase2c-reviewfix-313/test_real_two_client_cpu_socke0/round/result.json",
+        "bytes": 16229,
+        "sha256": "b8abdbd08ff08ed0db24c00ccfd7028855152d56b5524554ccce7aaec2a1436b"
+      },
+      {
+        "path": "/tmp/plato-phase2c-reviewfix-314/test_real_two_client_cpu_socke0/round/result.json",
+        "bytes": 16274,
+        "sha256": "01ce1c1fdc1ee84b718bcf509e973de9c92445b6e8ba16fbff9fe939e84a0535"
+      }
+    ],
+    "historical_limit": "523-case f977 and48 startup receipts retained and hashed as historical evidence. Startup test/harness/probe and servers/base.py blobs are unchanged in this candidate. The48 startup cases were not rerun here; final combined qualification remains root-owned."
+  },
+  "root_additional_archive_receipt": {
+    "report": {
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2c-root-intermediate-base-validation.json",
+      "bytes": 2489,
+      "sha256": "5a0b6c2e9a761e08dd8daecd32118b1e058f44fc12037280b2a3643a4b234f98"
+    },
+    "log_and_junit_receipts": [
+      {
+        "path": "/tmp/plato-phase2-root/15e-archive-base-313.log",
+        "bytes": 7816,
+        "sha256": "032f84e1ad44a35e8ab017968a323b93c351e571f92b4ab7cf7a9507abc4e45e"
+      },
+      {
+        "path": "/tmp/plato-phase2-root/15e-archive-base-313.xml",
+        "bytes": 123776,
+        "sha256": "472a72ea20e1a37ed4bbc23379428279a997d558d46b84811866ce4da9081e36"
+      }
+    ],
+    "audited_result": {
+      "python": "3.13.16",
+      "passed": 797,
+      "expected_optional_skips": 4,
+      "allowed_runtime_deselections": 48,
+      "warnings": 0,
+      "exit_code": 0,
+      "seconds": 204.36
+    },
+    "verification": "Root log/JUnit hashes match. JUnit has801 tests,4 skips,zero failure/error entries. All979 tracked archive files match pinned candidate blobs; no .git. Four portable migration cases are included.",
+    "attribution": "Root-owned run audited, not independently rerun or added to282. No whole source-profile failure is hidden: this base profile passes, but the independent direct lifecycle boundary regression fails. No3.14 broad-base, final B/D/FedDyn/prose or whole Phase2 acceptance inferred."
+  },
+  "preservation": {
+    "accepted_A": {
+      "commit": "79da1f97d8a12fe97402750cc32c7b3e8f5cdf6e",
+      "merge": "abf27a34db3e40fc743f329d40bed5dae4dc70f7",
+      "all_48_owned_entries_unchanged": true,
+      "method": "Compared exact accepted A vs candidate ls-tree entries for every changed/deleted path relative to fda60bec. This is blob preservation, not a new A audit."
+    },
+    "accepted_general_f977": "AMP/clipping, long owned-worker cleanup, FedALA memory ownership and legacy underscore lookup fixes remain accepted by their separate root general acceptance. Their core source blobs are unchanged; actual affected AMP/general cleanup/FedALA/ownership tests were rerun within282.",
+    "preserved_source_paths": [
+      "plato/servers/base.py",
+      "tests/integration/test_event_loop_startup.py",
+      "tests/integration/startup_harness.py",
+      "tests/integration/startup_probe.py",
+      "plato/trainers/strategies/algorithms/scaffold_strategy.py",
+      "plato/trainers/strategies/algorithms/fedprox_strategy.py",
+      "plato/trainers/strategies/algorithms/fedala_strategy.py",
+      "plato/trainers/strategies/algorithms/feddyn_strategy.py",
+      "plato/trainers/strategies/training_step.py",
+      "plato/trainers/strategies/optimizer.py",
+      "plato/trainers/base.py"
+    ],
+    "SCAFFOLD_TOML_values_equal_accepted_B": true,
+    "F20": "Legacy unsquared L2 and L1 source/config preserved. Independent d=(3,4),mu=2 yields L2 loss5,gradient(.6,.8), L1 loss14,gradient(2,2); zero distance and mu=0 remain finite. No squared-norm migration.",
+    "B_resume_supplement": "Accepted a058 is not in this candidate and is not accepted or re-audited here. Original B00e remains the runtime base; later integration must preserve these checks."
+  },
+  "public_facts_for_astra_reconciliation": {
+    "input_used": "Candidate phase2c-scaffold-review2-fixes-validation.json.public_facts_for_astra_reconciliation. Older phase2c-scaffold-facts.json is historical, not final current-source authority.",
+    "server_validation": "weights_received validates every raw model/control pair and stages c+sum(delta)/N. After receive callbacks, all returned model halves, current server controls, delta membership/validity and staged control consistency are checked. Model/control snapshots restore on any failure before successful aggregate callbacks and resulting model/control validation. Stage and callback wrapper are cleared/restored in finally.",
+    "server_commit": "The successful on_weights_aggregated callback boundary plus model/control validation marks acceptance. Later evaluation/reporting failure keeps the accepted model/control state. External callback side effects and arbitrary network/in-flight state are outside this bounded rollback.",
+    "client_acceptance": "SCAFFOLD on_train_end computes provisional ci/delta without canonical write. Direct train_model now runs the training-step end hook before canonical acceptance, but still accepts before model-update cleanup; F27-R3-01 prevents claiming all failed direct calls leave canonical state unchanged.",
+    "client_persistence": "Canonical scaffold_cv_<client>.pkl atomically replaces the file only at on_train_result_accepted. Workers do not accept canonical state; train_process saves the model and current-token strategy handoff, and the parent checks token/client, loads both parts and accepts. Failed save/load/handoff/end paths checked here retain prior canonical state. Parent/current-token and direct control acceptance do not promise optimizer/RNG/full-server restart.",
+    "ownership": "Routine logical-client1->2->1 and fresh reconstruction adopt accepted canonical state. A manually injected in-memory ci with no accepted canonical file is not persisted by a rejected call; reconstruction may correctly have no ci and later zero initialization.",
+    "math_and_configuration": "No equation, TOML value, rate/K accounting, control filename or F20 objective changes since f977. Existing momentum/sample weighting extension boundaries and V2 Option II compatibility remain.",
+    "prose_status": "Standalone README/public prose is separately provisional/root-Astra-owned and was not edited or accepted by this review. Reconcile final facts after the remaining lifecycle correction and later integration."
+  },
+  "original_probe_adaptations": {
+    "receipt": {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/adaptation-receipt.json",
+      "bytes": 377,
+      "sha256": "0095fe4cf6d5bf97d96669bfa7ab13fb9d8aa83084b4503247e1a6ce36dbb0b1"
+    },
+    "notes": {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/harness-notes.json",
+      "bytes": 765,
+      "sha256": "3ab2c387896ef0869c55d91d212d09bb68d912ebc5847593d8dc47d0aee697e5"
+    },
+    "original_callback": {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/originals/callback_lifecycle_probe.py",
+      "bytes": 7848,
+      "sha256": "3f2f01caced400601f6b5f717bf7e721aac8d883df01821f236364355b3f9e05"
+    },
+    "adapted_callback": {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/callback_lifecycle_probe.py",
+      "bytes": 7575,
+      "sha256": "c8d4034e592e3a0175fffb16a164f2014b125f8d9712caad506c25ecad86ac74"
+    },
+    "callback_adaptation_diff": {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/callback_lifecycle_probe.py.adaptation.diff",
+      "bytes": 4258,
+      "sha256": "66971dff5df2fa60fc4878675a943694361d6af21311a9c30df4dc0f81fec2ae"
+    },
+    "policy": "Original reviewer sources remain byte-for-byte untouched. All copied helpers pin this candidate/owned scratch. Callback expected outcomes alone were adapted from defect assertions to rejection/state-preservation assertions, with absent-file zero-init retry distinguished from explicit manual-ci retry. Other worker/direct/transport/numerical helper adaptations only change candidate/scratch locations."
+  },
+  "reviewer_harness_limits": {
+    "receipt_audit_attempt1": {
+      "result": "KeyError: receipts",
+      "cause": "Reviewer initially used qualification.receipts instead of actual qualification.commands. Corrected read-only audit passes; no candidate change or product failure. No file write completed in the initial inline attempt."
+    },
+    "adapted_callback": "Only pinned source/scratch plus fixed expected outcomes changed. Direct/process failure now preserves memory and prior canonical bytes/absence, clears hook and outbound. Existing canonical retry .62/.9/-.1; absent canonical reconstruction None and ordinary zero-init retry .43/.85/.85. Manually injected in-memory ci1 has no durability promise without accepted canonical file. Original defect-asserting file preserved byte-for-byte."
+  },
+  "scope_limits": [
+    "macOS ARM64 CPU PyTorch3.13.16/3.14.8, synthetic scalar/quadratic and actual configured direct/spawn processor/report flows. No dataset download, CUDA/MPS/native GPU, SCAFFOLD network transport or convergence benchmark.",
+    "No generic FedAvg redesign, rollback of callback external effects/network state, or full round/evaluation rollback after an accepted server commit.",
+    "FedDyn final implementation/math, accepted B resume supplement, D integration, whole Phase2C/Phase2 and final prose are outside acceptance scope.",
+    "Broad mandatory profiles, native adapter stacks, fresh environment provisioning and full48 startup cases remain final combined root qualification. Existing author environments used read only.",
+    "No universal transaction guarantee for arbitrary composed strategies or custom callbacks. The medium finding is a concrete public direct-call canonical persistence/reuse failure through the actual SCAFFOLD cleanup and acceptance code."
+  ],
+  "required_next_step": "Return F27-R3-01 to the original C author for the bounded lifecycle correction and regression, preserving accepted server/general/portable-fixture/math behavior; then obtain another fresh independent code review. Keep scratch through root integration and delivery.",
+  "workflow": {
+    "shell": "All shell invocations zsh -lc, including subprocess commands.",
+    "agents_spawned": 0,
+    "source_edits": 0,
+    "commits": 0,
+    "cleanup": 0,
+    "environment_mutations": 0,
+    "only_root_write": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2c-scaffold-code-review-3.json",
+    "owned_scratch": "/tmp/plato-phase2c-scaffold-code-review-3",
+    "scratch_retained": true,
+    "source_clean_and_immutable": true
+  },
+  "retained_artifacts": [
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/acceptance313.command.json",
+      "bytes": 1027,
+      "sha256": "32a34ade7e1f11f36f9cf4001273bea1e10ea3a8774367aa8df6b2a94a416a19"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/acceptance313.log",
+      "bytes": 25987,
+      "sha256": "7621b22d314a9dbc99e58644a54af6fe766bde2d9379039f184183b5f327b1b4"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/acceptance314.command.json",
+      "bytes": 1026,
+      "sha256": "d0e36a8422f2822f6237f7ecff098b194eb79d06decf1226c86f41386f035cf7"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/acceptance314.log",
+      "bytes": 26005,
+      "sha256": "68adaa0db18abcc31f9a8c2c1384ca266676f324a54b6f34f162e4ed11d1a55d"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/adaptation-receipt.json",
+      "bytes": 377,
+      "sha256": "0095fe4cf6d5bf97d96669bfa7ab13fb9d8aa83084b4503247e1a6ce36dbb0b1"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/affected313.command.json",
+      "bytes": 1795,
+      "sha256": "cf103675682242e173a1beefe19646111896a9f368850bc958f8fecd80a03317"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/affected313.log",
+      "bytes": 5178,
+      "sha256": "bb82dc9a741e0ee3cf468a9e2a03fa2274dc5eaa0c2131429894ae7ac28cf656"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/affected314.command.json",
+      "bytes": 1795,
+      "sha256": "9b2062ddec259948a3c72904ac780a77885e9a4fce937d08561d067c75eb47e2"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/affected314.log",
+      "bytes": 5226,
+      "sha256": "451ad8618a77018ec5ff2b95517fc46dee5fec913c558661ddaee917503286b5"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/archive313.command.json",
+      "bytes": 1155,
+      "sha256": "d76ec6d4af4e5168d18186c2a1ab8dadb666c4e8f9fa45218aa0cdc13f78f2dd"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/archive313.log",
+      "bytes": 113,
+      "sha256": "a020c6b2837a6fb6e4e87f8f1e4c21e68c35fc749c60929f2699a50b8c9026f4"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/archive314.command.json",
+      "bytes": 1155,
+      "sha256": "55a0ca4fbed9056b44e8594ec4ddd6c88406288141541c9b09a11054960d4d34"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/archive314.log",
+      "bytes": 113,
+      "sha256": "8af95d79bad1277bf0fa4a4733b4e16c28874d81a275970c93ed51043b96bc36"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/arithmetic-313.json",
+      "bytes": 1012,
+      "sha256": "cb2acd6e3abb1dc9ba233ac9f6ae52babc954982c18633c93a7ce0685ce230b1"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/arithmetic-314.json",
+      "bytes": 1030,
+      "sha256": "837c6bd941ab7c966b6d0b13c281b191cd41604412b9adb89e2203cf3a53a89e"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/arithmetic313.command.json",
+      "bytes": 1026,
+      "sha256": "8935e2673eeb1c3eb49aeb435185766b02e7ac1cb51c2fd5baa857e201214a60"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/arithmetic313.log",
+      "bytes": 7631,
+      "sha256": "ecace2110f6307e4d5605454abe888ce8f74a790476757db22a13394eec1b09f"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/arithmetic314.command.json",
+      "bytes": 1026,
+      "sha256": "c178fc257a9ce23a5fbd5f257ddf391c9175306efa921b96cdcd56dc370bd421"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/arithmetic314.log",
+      "bytes": 7649,
+      "sha256": "216ce4b3aa7d837cac6ef517b2c05141c46fd98aecb641067f6ee0f03931e693"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/audit_receipts.py",
+      "bytes": 7393,
+      "sha256": "5d78fcab72387c50ad4a25966a30dbfac5b9342b87c1001042db7f0648b0ccf9"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/boundary-313.json",
+      "bytes": 2190,
+      "sha256": "22a08cf454e58d3346e2cf5e588fa1b6a9ffbe68d7990bdf925abc73155f9b6a"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/boundary-314.json",
+      "bytes": 2216,
+      "sha256": "a4ea1536f50beb096deb441924873f78317a71262d9d904beadf19417bcc61af"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/boundary313.command.json",
+      "bytes": 1014,
+      "sha256": "f53dc7e64b740b156582546280d8a669f5e23fe788582fc4d92d8f9cfee34578"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/boundary313.log",
+      "bytes": 2833,
+      "sha256": "04063ce5d28ed251a61603a7cd94a6ef741236ba2fb63c7b04bfdec3c68e7a05"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/boundary314.command.json",
+      "bytes": 1014,
+      "sha256": "83172652a566122dd52f5a07a20949dedbf7bb6a62359ef6034715d0bced0fa5"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/boundary314.log",
+      "bytes": 2859,
+      "sha256": "1e3e643b7f7a570ac92c9a3674bdd409684efb5d14732bb131482be913c9c54c"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/boundary_checks.py",
+      "bytes": 6529,
+      "sha256": "1796ed21e367fc5bb8a2fa5bedb467116a8b72b94ad85a3dfaaaff53ff20b9b6"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/callback-lifecycle-313.json",
+      "bytes": 4137,
+      "sha256": "deddf0d029b8e5a70d366f982b495214ec0925126a998b1d4e0c6ecb81a3c22d"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/callback-lifecycle-314.json",
+      "bytes": 4155,
+      "sha256": "df6b01e2420c29422781734f377709b351e8267dffae5882a7b31106d960d6b2"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/callback313.command.json",
+      "bytes": 1024,
+      "sha256": "f27d870d5a1458f76704d6dae0eb0941c59ba4c9e6ad798ad19322a07fab4ea1"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/callback313.log",
+      "bytes": 19427,
+      "sha256": "fe8d523c3e7c6f893f1cbcb23f91bd0c1b9a96ea3c77c055b995133e276c09c7"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/callback314.command.json",
+      "bytes": 1024,
+      "sha256": "e553c1b5bbcd26bce5771f84ce56df00fd173152b0dc2fdd3f32c4b43b082369"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/callback314.log",
+      "bytes": 19445,
+      "sha256": "274bb0776ce23cfbac6577cfd04f960188ba624653f83300b476749d79004058"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/callback_lifecycle_probe.py",
+      "bytes": 7575,
+      "sha256": "c8d4034e592e3a0175fffb16a164f2014b125f8d9712caad506c25ecad86ac74"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/callback_lifecycle_probe.py.adaptation.diff",
+      "bytes": 4258,
+      "sha256": "66971dff5df2fa60fc4878675a943694361d6af21311a9c30df4dc0f81fec2ae"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/candidate-vs-f977.diff",
+      "bytes": 365632,
+      "sha256": "2c943c85efa13f2e1e78f75dd12d36a007fc9a7b79f5f00d9eb15b64d316f966"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/candidate-vs-implementation.diff",
+      "bytes": 28997,
+      "sha256": "1b0b28f86423484cc47af1778ac7ba1b28bf584525ddd4709678757fbcbd826d"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/candidate.tar",
+      "bytes": 9144320,
+      "sha256": "34132a385f814e51e76d990473f8cb0ddcea71c03686d95b026b1246ec3d2c5b"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/cleanup-313.json",
+      "bytes": 11879,
+      "sha256": "35ad2370b5795d276e30b9bbf476eecf118911bd6efdc0ace6f908847ce3cf87"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/cleanup-314.json",
+      "bytes": 11897,
+      "sha256": "49416acc710c805c0367ace0ebed856bd0eb5d2c8396f2f571824261e3cf9737"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/cleanup-regression-313.json",
+      "bytes": 4338,
+      "sha256": "7e5250e4730e9884388bc7ce3ba5612a9229941c9ca56331320adf3ec7c7c5b2"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/cleanup-regression-314.json",
+      "bytes": 4356,
+      "sha256": "3bb920da5d5a390a7cd7dfc0ebf321ecf50f2cdc0fc9451f3a76725852d66e78"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/cleanup-replay-313.json",
+      "bytes": 4453,
+      "sha256": "eb460fef3374ffcfee12a1dc58f2a300298ac2a698f88178dbd3639d5319b84b"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/cleanup-replay-314.json",
+      "bytes": 4471,
+      "sha256": "7c4ab6068709ae8b62f0212296bef303cddca60272a275aab67b787c537e7fc9"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/cleanup313.command.json",
+      "bytes": 1021,
+      "sha256": "e616e31dd3f6b70409666503c4411d2c2223b544d78602b844e3386bb0a6e9db"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/cleanup313.log",
+      "bytes": 37453,
+      "sha256": "ffd31167f84aff863fa8393b19aaf0c8920ebb93a268b9a2d8cc4674d66afb29"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/cleanup314.command.json",
+      "bytes": 1022,
+      "sha256": "ece55268f8b4cebb706308196223d68bd7c8fc0de6c7d9d2e172fe5ee8c667d9"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/cleanup314.log",
+      "bytes": 37471,
+      "sha256": "4188a3da599d4919adc793db4c8c18ce9982c64d7fdac9fdc35c8d44b5e65980"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/cleanup_acceptance_probe.py",
+      "bytes": 4299,
+      "sha256": "b70a501db6c586bab917ac6541afc3d08e016697b210ff099db42a9b6a0399a7"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/cleanup_rejection_regression.py",
+      "bytes": 1411,
+      "sha256": "ac3323c2f97fde48708fba19b8de53b5a34deff7a77442cf3a72854541a25daf"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/direct-acceptance-313.json",
+      "bytes": 4045,
+      "sha256": "eda5e5320ead58c928007dc329e24cbde505c623b131f04fcfb30510b07a79be"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/direct-acceptance-314.json",
+      "bytes": 4063,
+      "sha256": "740c875e8afd9c3be70378de5200d6a4a53e48dd298848c73e24fbeb46f890c3"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/direct_acceptance_probe.py",
+      "bytes": 5176,
+      "sha256": "630e4ad5277cc61586b3c0a7da679a1c79d90cb6390dfa47b89fc7fc7b600b7f"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/direct_acceptance_probe.py.adaptation.diff",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/environment-313.json",
+      "bytes": 24510,
+      "sha256": "d2644082b9e888a64366cd8bc36633d6325d981b91c53de0b1a80800f0ce66ac"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/environment-314.json",
+      "bytes": 24536,
+      "sha256": "5843bced6a84ba06deebddce878dbce78e858753b2e645571ea945985739acab"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/environment313.command.json",
+      "bytes": 1023,
+      "sha256": "74d914d90cf4152cc797931e5b04e00c2783d75cc89b8f033bf28c8b5a8b5862"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/environment313.log",
+      "bytes": 24510,
+      "sha256": "d2644082b9e888a64366cd8bc36633d6325d981b91c53de0b1a80800f0ce66ac"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/environment314.command.json",
+      "bytes": 1023,
+      "sha256": "1a5e1587fe40d5474cf6fab2437fb700cdac9159ac42e6f85a55c1578d6938e6"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/environment314.log",
+      "bytes": 24536,
+      "sha256": "5843bced6a84ba06deebddce878dbce78e858753b2e645571ea945985739acab"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/environment_probe.py",
+      "bytes": 1002,
+      "sha256": "79eaa7adce3a64e7212814fa861f7a81a6d731a399ab752d05cc51f3a87d2a85"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/failed-worker-reuse-313.json",
+      "bytes": 789,
+      "sha256": "8a4ab49dfd2b4783cb1306256327d1a722893bb45ebf6b1c61ad020087b0b817"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/failed-worker-reuse-314.json",
+      "bytes": 807,
+      "sha256": "da6d5eb9d0468f8193b8af2723cca16f294317e6e9565d56e5fe89094c5f71ad"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/harness-notes.json",
+      "bytes": 765,
+      "sha256": "3ab2c387896ef0869c55d91d212d09bb68d912ebc5847593d8dc47d0aee697e5"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/independent-313-normal.json",
+      "bytes": 11030,
+      "sha256": "f4bcab60113e15031583ff51bcbedd020fa3aba72a03db684576e7a3b312d273"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/independent-313-spawn.json",
+      "bytes": 4613,
+      "sha256": "7759440cc68cfc4c2466167b59fe22acfb83e509c7ca80155289db20e5107e89"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/independent-314-normal.json",
+      "bytes": 11048,
+      "sha256": "cf9de743738a82b5c1c3a2921991722d4faffa2e1ff7421494b9dacdce872b36"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/independent-314-spawn.json",
+      "bytes": 4631,
+      "sha256": "ff1e027cbde305dd5488c88d1dbf5ec08205bdb36f44785953cbd61e2b3bb345"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/independent_checks.py",
+      "bytes": 14073,
+      "sha256": "720e78a5cf4e04bf4278f5eb5495bdfe5f1b93b36ab0a8ebe663964f875f1651"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/independent_checks.py.adaptation.diff",
+      "bytes": 799,
+      "sha256": "0b3d7959ee7531d28d057e34f04b1ef2c0985d816ec221ef66083e88fb95e1b2"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/numerical313.command.json",
+      "bytes": 1027,
+      "sha256": "5efc71b57c61a89f08da58fd28442fbc082ccf2d26d46c07b94ba04389972786"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/numerical313.log",
+      "bytes": 25289,
+      "sha256": "9ddfc71d0736e939f24dd61e2d1921cf1495b5f1aecf9ef58b9522c71f0cacd1"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/numerical314.command.json",
+      "bytes": 1027,
+      "sha256": "5d0f30c0c4db4cc874bde2d8aca7e045d697d47c283343f6a1e21db0af02a5fe"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/numerical314.log",
+      "bytes": 25307,
+      "sha256": "e6720250f4273de9de59160820a69da1a09a05eab8faa0f2a73192556831df0a"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/portable-fixture.json",
+      "bytes": 931,
+      "sha256": "81b7e18a64a608d6bbfcc56d3bf7d4560bd6fa491255130bd61f8df6f4114886"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/primary-paper-1910.06378v4.pdf",
+      "bytes": 4381988,
+      "sha256": "efe06c86acc7a06116e372a7ab6386c300f4d0dc9c7ba2dd5c82e95111a1d694"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/receipt-audit.json",
+      "bytes": 19182,
+      "sha256": "d33ca24702c932eb419927f515ebbb44ee88ac623784bfbddcca177c4731cbd2"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/receipts-final.command.json",
+      "bytes": 1019,
+      "sha256": "950ed4226bac677ff81cbba47b11dd321f4c7d147dd35b6d7ea9ed88445a5eab"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/receipts-final.log",
+      "bytes": 506,
+      "sha256": "3cbb51d97d7a080cc608e720b1191f6f7b604db1f1065562f66ef0a8ac007d05"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/receipts.command.json",
+      "bytes": 1006,
+      "sha256": "68a7e5be57b7641d5fdb6dd6012b3e0c89c0c1dc6a0772451584f101034368fd"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/receipts.log",
+      "bytes": 506,
+      "sha256": "3cbb51d97d7a080cc608e720b1191f6f7b604db1f1065562f66ef0a8ac007d05"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/regression313.command.json",
+      "bytes": 1032,
+      "sha256": "7ad2192abf2889f04e2d23f6359a9d0fd244c2db881302c448698a566b842099"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/regression313.log",
+      "bytes": 12864,
+      "sha256": "21b152c85f255acb743facce3c20a6556a5f092aa01b3a63b3dbc1a4d95982a6"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/regression314.command.json",
+      "bytes": 1032,
+      "sha256": "a3cb6b685547f91977c56242b22a8bbdac86236f52af4de54a1994e730aa7d2f"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/regression314.log",
+      "bytes": 12882,
+      "sha256": "9e6ee19d15c24856ba6819d3f76e74563100e9de2e206fdc2df949c2d92dc406"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/replay313.command.json",
+      "bytes": 1021,
+      "sha256": "f4276acd3f8a77938ef672e3f2f3591ddb28694a5931ca3451d9f427822148e1"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/replay313.log",
+      "bytes": 13095,
+      "sha256": "78b7175223a438c2212082acefac6e70ef0ae56c4ceceec2efcb3ecd812c39df"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/replay314.command.json",
+      "bytes": 1020,
+      "sha256": "a34c5834503477e1c42cac9131c7cddae7daeef935c01ef9a52d982f415e7d5d"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/replay314.log",
+      "bytes": 13113,
+      "sha256": "d7534ff1005ffcf6bdfdbccb2c52570e8f600f4ced66193045997f6589c09e51"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/reproduce_cleanup_failure.py",
+      "bytes": 1470,
+      "sha256": "fc554616f81a72ac11d0f85e9c040481678f4a4c3d5196865fb6e59464f675ea"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/ruff313.command.json",
+      "bytes": 970,
+      "sha256": "b89395d82a535520a810baece105b93713b9b2fd737af89af6b8a737dc0e942c"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/ruff313.log",
+      "bytes": 19,
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/ruff314.command.json",
+      "bytes": 970,
+      "sha256": "98fc70016c2e6d7b97d088f1cbad287ebcbea64920f514e077372ca880994b3c"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/ruff314.log",
+      "bytes": 19,
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/run_archive_command.py",
+      "bytes": 1773,
+      "sha256": "8c514d2426c13d268a9eaa8c691faa2996f9004623ea05efe9990b5eca625ba9"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/run_command.py",
+      "bytes": 1770,
+      "sha256": "ce7b70c65733be503b9af8af135d5b2ff26d5d38e2f4d0810ccb330b6326ec64"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/run_command.py.adaptation.diff",
+      "bytes": 1433,
+      "sha256": "1483b115b800cc63801b77a24dadaffe1016c5b1d57a5d34758d600b5c4b70e1"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/server_arithmetic_probe.py",
+      "bytes": 3058,
+      "sha256": "30b5bb3036bb942a83b5e37a257fc16eeb12d3096c84aa4d1ffd2cd1452345a9"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/server_reproducer.py",
+      "bytes": 2692,
+      "sha256": "6f770941815003adfb83b0dbc2a9d8ca8d5914c371aa8681f6266180b5f5ab41"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/source-manifest.json",
+      "bytes": 206247,
+      "sha256": "16e65b33bfc0d8cd46292fac1d1622f4d6aefdda14ca3a728dbc6f216629f0f3"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/spawn-end-313.json",
+      "bytes": 1439,
+      "sha256": "a621021e97e8de448e228e19ce6fb66bb67a9a2eade90b6ce4a2e19d60d705ad"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/spawn-end-314.json",
+      "bytes": 1457,
+      "sha256": "864f04160d617eb494fb613a10dbbdf825ebcbd117473decb45f3899e8e34a31"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/spawn313.command.json",
+      "bytes": 1019,
+      "sha256": "c1e91d53e44cc0a7e1c7e14ef7b26fab4a422b8b329b91943a5e35771c41004b"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/spawn313.log",
+      "bytes": 11262,
+      "sha256": "9c8c59b591abe859eabd1d302fbfc007ae4babff89fc43ad6f569a4bbe830877"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/spawn314.command.json",
+      "bytes": 1018,
+      "sha256": "51d28542cadefd7240943dd0b3249ee4977307d6d5b7b4a114504c0179a56d13"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/spawn314.log",
+      "bytes": 11280,
+      "sha256": "fb52ef45dbe8ac43d377cdd68c7a3421cc3c3939a6b589b6ef0c98bfec20cec6"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/spawn_end_probe.py",
+      "bytes": 3283,
+      "sha256": "af6257e4646b5e18a24341b48d6a56af3d913ab97eb154f22d8541d1ce366321"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/spawnend313.command.json",
+      "bytes": 1016,
+      "sha256": "d3a84a27975708bcc76ebd13027659dfa5161b1b06f33da9a662d50f97babb27"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/spawnend313.log",
+      "bytes": 19163,
+      "sha256": "423a9b45b71e5f96175c77c5fc550c6db3e098521d43fc9b413f900dbdccef38"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/spawnend314.command.json",
+      "bytes": 1015,
+      "sha256": "139a23e6cf819f3108e649003348f94860f24a49a7bb24a8d0ad75223426d0a9"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/spawnend314.log",
+      "bytes": 19285,
+      "sha256": "12c6111b8c750f470d51dac3e8597cbadc979d7e5f23ff859a78fbf31af70461"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/transport-validation-313.json",
+      "bytes": 2510,
+      "sha256": "f8a4e6cd40f76debbf33df349943828d848fe0e0bca24cda5a469db5574499fc"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/transport-validation-314.json",
+      "bytes": 2528,
+      "sha256": "48c7f08eea5648693679b166b7309f27a50b101329f87759399b1c31f01ea2c0"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/transport313.command.json",
+      "bytes": 1028,
+      "sha256": "df39228d5ff6367f84d1116e5958ee36c19f1adcbbcc34b414a10019f1d876a6"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/transport313.log",
+      "bytes": 7852,
+      "sha256": "95a5b6a2809447432e8b94230960c76a966e48a65153bec6c1bebe3cd50e28b3"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/transport314.command.json",
+      "bytes": 1027,
+      "sha256": "bc682561a3d3dab5d62047b8f48cd9f9019761202a78bc73537b7d8f7ce3f5bc"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/transport314.log",
+      "bytes": 7870,
+      "sha256": "f07a468accc8ae6ece5b03e5fb29b624724e1b1a250cdf4ac918b7f18037e3d8"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/transport_validation_probe.py",
+      "bytes": 5259,
+      "sha256": "032f17909410d91d393c0c0a3a8c8b757d282644789e4ec64f003ecfc59f609d"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/transport_validation_probe.py.adaptation.diff",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/ty313.command.json",
+      "bytes": 1056,
+      "sha256": "f61db94eec255b8a10bb3fbfcfe50fbadc49dd6e3607a0157e51f7c737fb5a21"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/ty313.log",
+      "bytes": 19,
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/ty314.command.json",
+      "bytes": 1057,
+      "sha256": "5c57f32721afe6bfb7c88a3c5c54fa9f296908b9220a3395ca927a402ae2590a"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/ty314.log",
+      "bytes": 19,
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/worker313.command.json",
+      "bytes": 1021,
+      "sha256": "ae11b692982d7be27d7acbecc35b6c7a71e1312d0760732e799e92db26c8fad8"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/worker313.log",
+      "bytes": 4503,
+      "sha256": "a22bcb085f4b1adc6c39f4d5fa0534ba2f77299eb682d544f38035ceb6b847e7"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/worker314.command.json",
+      "bytes": 1021,
+      "sha256": "481bc0fc244ec369fa16f3e6a98a032aeea5ed8c6817da1ed36618f3577bc57a"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/worker314.log",
+      "bytes": 4521,
+      "sha256": "e308f1bb3ec310a6573c16362e50fa64c0807bd4a2224790f930e071ef5ed8c9"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/worker_failure_reproducer.py",
+      "bytes": 3424,
+      "sha256": "5e05315eae4b30710c8cb7b7ba6a7cbdb3a44b92045bd6b27c3cafe0dd40bc61"
+    },
+    {
+      "path": "/tmp/plato-phase2c-scaffold-code-review-3/worker_failure_reproducer.py.adaptation.diff",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
+}

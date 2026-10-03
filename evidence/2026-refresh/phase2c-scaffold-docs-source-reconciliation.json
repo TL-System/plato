@@ -1,0 +1,13 @@
+{
+  "status": "SOURCE_SNAPSHOT_RECONCILED_PENDING_INDEPENDENT_REVIEWS",
+  "writer_candidate": "95c7218fc9801099cd7ffa3afc1be227384d8500",
+  "writer_code_base": "0dc34dd1d79d90071a0babfa6aa89f33d72a976f",
+  "training_candidate": "62d7b7d8ef75be779149a96f567779c86699edb4",
+  "changed_paths_between_code_base_and_training_candidate": [
+    "evidence/2026-refresh/phase2c-feddyn-disposition.json",
+    "evidence/2026-refresh/phase2c-scaffold-facts.json",
+    "evidence/2026-refresh/phase2c-validation.json"
+  ],
+  "production_and_tests_identical": true,
+  "limits": "Code snapshot reconciliation only. General training, SCAFFOLD code and standalone prose reviews remain. Any later C source change requires renewed reconciliation."
+}

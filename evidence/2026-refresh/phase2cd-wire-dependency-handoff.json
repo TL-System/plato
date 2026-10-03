@@ -1,0 +1,36 @@
+{
+  "scope": "Root dependency handoff for actual FedDyn wire validation",
+  "candidate_before": "1fe8b63940c21eca23b91e9f79281171e80f0cbc",
+  "accepted_D": "96323afa094a37584844275cc04bf1e1eedfaa0d",
+  "accepted_D_tree": "ffe7a04d67dca75c4f05745ee043db3cdcd6d579",
+  "source": "Pinned git archives, not evolving C source",
+  "probe": "/tmp/plato-phase2-root/metadata_wire_probe.py",
+  "results": [
+    {
+      "status": "fulfilled",
+      "value": {
+        "label": "1fe",
+        "chunk_id": "fca207",
+        "wall_time_seconds": 0.696634833,
+        "exit_code": 0,
+        "original_token_count": 85,
+        "output": "{\"source\": \"/tmp/plato-phase2-root/1fe-source-archive/plato/utils/tree.py\", \"types\": {\"version\": \"ndarray\", \"round\": \"ndarray\", \"client_id\": \"ndarray\", \"alpha\": \"ndarray\", \"run_id\": \"str\", \"token\": \"str\"}, \"values\": {\"version\": 1, \"round\": 2, \"client_id\": 1, \"alpha\": 0.1, \"run_id\": \"run\", \"token\": \"dispatch\"}, \"tensor_restored\": true}\n"
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "label": "d963",
+        "chunk_id": "9a3e58",
+        "wall_time_seconds": 0.698083166,
+        "exit_code": 0,
+        "original_token_count": 81,
+        "output": "{\"source\": \"/tmp/plato-phase2-root/d963-source-archive/plato/utils/tree.py\", \"types\": {\"version\": \"int\", \"round\": \"int\", \"client_id\": \"int\", \"alpha\": \"float\", \"run_id\": \"str\", \"token\": \"str\"}, \"values\": {\"version\": 1, \"round\": 2, \"client_id\": 1, \"alpha\": 0.1, \"run_id\": \"run\", \"token\": \"dispatch\"}, \"tensor_restored\": true}\n"
+      }
+    }
+  ],
+  "decision": "Authorize exact accepted D dependency merge into original C at a clean boundary. Its native-scalar restore is required for final production metadata contract; remove any test-only scalar coercion after merge and use the actual production codec/transport.",
+  "limits": "Python3.13 actual serializer round trip of a representative model+metadata tree. Not final FedDyn end-to-end qualification.",
+  "harness_correction": "Initial scratch import targeted plato.serialization namespace instead of plato.serialization.safetensor; corrected before valid round trips. Initial script retained. No production edits.",
+  "probe_sha256": "c77d8c728541f545f33de00342e7401c020d5cd964b08d748c9544b4e484d541"
+}

@@ -157,6 +157,8 @@ class Policy(ABC):
         self.critic_optimizer.load_state_dict(
             torch.load(model_path / f"{prefix}critic_optimizer.pth")
         )
+        self.actor_target = copy.deepcopy(self.actor)
+        self.critic_target = copy.deepcopy(self.critic)
 
     @abstractmethod
     def select_action(self, state, hidden=None, test=False):

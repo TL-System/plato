@@ -1,0 +1,100 @@
+{
+  "id": "ROOT-2C-01",
+  "severity": "medium",
+  "status": "OPEN_CONFIRMED",
+  "candidate": "62d7b7d8ef75be779149a96f567779c86699edb4",
+  "title": "Fused AMP clipping runs before GradScaler unscales gradients, making valid updates too small.",
+  "locations": [
+    {
+      "path": "plato/trainers/strategies/optimizer.py",
+      "line": 414
+    },
+    {
+      "path": "plato/trainers/strategies/training_step.py",
+      "line": 251
+    }
+  ],
+  "trigger": "Actual ComposableTrainer with MixedPrecisionStepStrategy and GradientClippingOptimizerStrategy(DefaultOptimizerStrategy), registry SGD fused=True, real CPU torch.amp.GradScaler scale65536. Single scalar parameter1, loss10*w, lr.1,max_norm1. Same CPU scaler injection as author supported overflow qualification; no CUDA runtime claim.",
+  "expected": "Clip unscaled gradient10 to10/(10+1e-6), producing weight0.900000009999999.",
+  "actual": {
+    "3.13": [
+      {
+        "fused": false,
+        "initial_scale": 65536,
+        "actual": 0.8999999761581421,
+        "expected": 0.900000009999999,
+        "error": 3.384185687238528e-08,
+        "warnings": [
+          "CUDA is not available or torch_xla is imported. Disabling autocast."
+        ]
+      },
+      {
+        "fused": true,
+        "initial_scale": 65536,
+        "actual": 0.9999984502792358,
+        "expected": 0.900000009999999,
+        "error": 0.09999844027923688,
+        "warnings": [
+          "CUDA is not available or torch_xla is imported. Disabling autocast."
+        ]
+      }
+    ],
+    "3.14": [
+      {
+        "fused": false,
+        "initial_scale": 65536,
+        "actual": 0.8999999761581421,
+        "expected": 0.900000009999999,
+        "error": 3.384185687238528e-08,
+        "warnings": [
+          "CUDA is not available or torch_xla is imported. Disabling autocast."
+        ]
+      },
+      {
+        "fused": true,
+        "initial_scale": 65536,
+        "actual": 0.9999984502792358,
+        "expected": 0.900000009999999,
+        "error": 0.09999844027923688,
+        "warnings": [
+          "CUDA is not available or torch_xla is imported. Disabling autocast."
+        ]
+      }
+    ]
+  },
+  "cause": "Public optimizer step prehook sees scaled gradient655360 for AMP-aware fused SGD because GradScaler defers unscaling into optimizer internals. Wrapper clips it to~1, then fusedSGD divides by65536. NonfusedGradScaler unscales before invoking optimizer.step, so its control passes.",
+  "scope": "Composition of newly corrected clipping wrapper and existing real AMP path. Not an objection to research math, optional packages or hardware availability.",
+  "acceptance": "Original author makes public clipping consume unscaled gradients for fused and nonfused AMP, preserves actual overflow skip/count and accumulation-tail semantics, adds actual numerical parameter-reference regression on both versions; no broad warning suppression. Fresh review after fix.",
+  "probe_source": {
+    "path": "/tmp/plato-phase2-root/amp_clipping_probe.py",
+    "sha256": "83b3b80ac4398ca21539c41251c4cfcbbd56ba090b68bbe345dbbfcdf9802629"
+  },
+  "commands": {
+    "3.13": "PYTHONPATH=/tmp/plato-refresh-worktrees/training OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 /tmp/plato-phase2-root/c-base-313/bin/python /tmp/plato-phase2-root/amp_clipping_probe.py",
+    "3.14": "PYTHONPATH=/tmp/plato-refresh-worktrees/training OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 /tmp/plato-phase2-root/c-base-314/bin/python /tmp/plato-phase2-root/amp_clipping_probe.py"
+  },
+  "exit_codes": {
+    "3.13": 0,
+    "3.14": 0
+  },
+  "shell": "zsh -lc",
+  "raw": [
+    {
+      "path": "/tmp/plato-phase2-root/amp-clipping-probe.json",
+      "sha256": "c2fd334c5e7b969de71b0bbdd860a18622cfdfeacb205d485337088fcd0d8d99"
+    },
+    {
+      "path": "/tmp/plato-phase2-root/amp-clipping-probe.stderr",
+      "sha256": "d8c354ba2e1b49174b8d2473c1c24ad443b7e5c5f4513fa8d7989dee330e3e34"
+    },
+    {
+      "path": "/tmp/plato-phase2-root/amp-clipping-probe-314.json",
+      "sha256": "c2fd334c5e7b969de71b0bbdd860a18622cfdfeacb205d485337088fcd0d8d99"
+    },
+    {
+      "path": "/tmp/plato-phase2-root/amp-clipping-probe-314.stderr",
+      "sha256": "be0deaaf19a15edeb1775328fc8f9d8e62da601ee36f0b98858189108d2f8aad"
+    }
+  ],
+  "limitations": "CPU fused and nonfused numerical qualification only; public CUDA autocast disables itself on this host and emits the recorded warning. No CUDA claim. Source candidate remains frozen while independent reviewers run."
+}

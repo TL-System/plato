@@ -1,0 +1,3288 @@
+{
+  "schema_version": 1,
+  "review": "Fresh independent Phase 2B review 3",
+  "reviewer": "plato-phase2b-review-3",
+  "requested_model": "gpt-6.1-sol",
+  "requested_reasoning_effort": "xhigh",
+  "completed_at_utc": "2026-10-03T04:00:31.170927+00:00",
+  "decision": "PASS",
+  "decision_basis": [
+    "No critical, high or medium findings remain in the reviewed B scope. R2B-04 passes independent actual-selection/batching/default-urgency/event-handler probes with usable completed work, exact accounting, identity rejection and survivor progress in both disconnect/completion orderings.",
+    "Earlier R2B-01/02/03/L01, B-local S3, F10/F11/F18 and representative lifecycle contracts remain passing on Python 3.13.16 and 3.14.8, including base-profile execution with optional extras absent.",
+    "This is B component acceptance. Final accepted B+D integration, trainer snapshot F26 and phase-wide qualification remain separate assigned work."
+  ],
+  "identities": {
+    "candidate_commit": "00eeb9dcdd2b513e64db9408969356037e09bb8e",
+    "candidate_tree": "39b6b554e833aeb5e8916e40fbc38a2fa46f6671",
+    "implementation_commit": "861c5c5ca03d8657c13ca5b93c3f9e0298172954",
+    "implementation_tree": "afa297b1c41ce84c462be0dd25512770f50c0491",
+    "previous_reviewed_candidate": "7753ca37bacbbdbcaef4192150e6532d79247011",
+    "previous_candidate_tree": "6d6b55c2d8baf566df7826b6134e88eaf7e57363",
+    "phase_base": "fda60becedfa6236c11d415b87a868b52789a41e",
+    "phase_base_tree": "11a5f04acd220db9ba6b7da4971d07895846c05e",
+    "candidate_worktree": "/private/tmp/plato-refresh-worktrees/runtime",
+    "root_worktree": "/Users/bli/Playground/plato",
+    "review_scratch": "/tmp/plato-phase2b-review-3",
+    "candidate_read_only": true,
+    "candidate_status_before_and_after": "clean",
+    "evidence_commit_boundary": "00eeb9dc is an evidence-only direct child of 861c5c5c; only phase2b-validation.json differs. 861c5c5c is a direct child of previous reviewed candidate 7753ca37.",
+    "all_changed_source_and_test_files_match_exact_git_objects": true,
+    "execution_source": "Exact git archive of 00eeb9dc for tests; original read-only worktree for clean base collection and Ruff. Added reviewer probes exist only in authorized scratch. All tracked changed files and authority files match exact candidate objects.",
+    "base_to_candidate_diff": {
+      "path": "/tmp/plato-phase2b-review-3/base-to-candidate.diff",
+      "sha256": "1f32d29cb400b5fb506b5406bbff555ce48dd5a61635f521441a7b36e2f79105"
+    },
+    "recovery_diff": {
+      "path": "/tmp/plato-phase2b-review-3/recovery.diff",
+      "sha256": "e8655263651b37741f909af9fa38bf84c9628c0b816fe875745e03e5eb3c72bc"
+    },
+    "source_sha256": {
+      "evidence/2026-refresh/phase2b-validation.json": "21df488a8716dac0214b86d99b04f547635794c4ef9eea387b67a28bc35b55a9",
+      "examples/async/port/port_server.py": "32c838c99bdf913a8092adb4ed1e410d49a860273c8260d9dcf51bb038326bb3",
+      "plato/callbacks/handler.py": "d86e707b96f6784cc8548087ec5f226ad1689157311aacadcb224ddcbc9ead67",
+      "plato/clients/base.py": "a935d2615a33ceecd0c5866ef1a2e3dd49fbee972bad457a740144ac25d2d034",
+      "plato/clients/composable.py": "25de844fe9f9b2c2b7d8e9a633c3ed1fb9831c10fae2a14404dadd5d7670fe53",
+      "plato/clients/strategies/defaults.py": "7d30f52b05df63c706a3dea20b40a02affa811c508d03ebb43b3b88b09d57c4f",
+      "plato/clients/transport.py": "c6c482ae5557641f03fb9419253c92b6c8c6dc5e028a6a6ea1525e061799df57",
+      "plato/servers/base.py": "a8d2acec980b6d888b7425ebaec290d8e31d1d32152fd994ca933313f37551f8",
+      "plato/servers/fedavg.py": "f184068a11c5be9e523f08b95e1cce76dff2e20e2fdb4e6426caf95dac0bcee5",
+      "plato/servers/fedavg_cs.py": "6998754dfc6a07732ab58a3fb398679c47390afeb4ce3859c166acae106515e0",
+      "plato/servers/strategies/aggregation/fedavg.py": "fa1e2a6bbbc8e3829b72cd0cdd47f10b0a8fffbdabdaa2dfb3efed81872877c1",
+      "plato/servers/strategies/aggregation/port.py": "27dcba80763fce77dee667934840e3d407665463c900b06725bcdf66b3d7e1ac",
+      "tests/callbacks/test_handler_contract.py": "11bdc22cc6a116b36809b1b22f9411c098565a6c97a85fd515e21c561199d3d6",
+      "tests/clients/test_checkpoint_cleanup.py": "b94b0c61b517ad6216343e605d23f4acb0baa1c36caf1bbe3e4a5d8989c95799",
+      "tests/clients/test_client_lifecycle_variants.py": "a10f28b4cbc125d67fa63a97c97050828b66c02eb7218c869adfea346f53a9dc",
+      "tests/clients/test_payload_limits.py": "07080983b9cc271bafec71477811d532dc8282a588472eb04dafa7a9a76412f8",
+      "tests/servers/test_fedavg_strategy.py": "b7b3c406d9acf42233d26a2ee9d4e80861ebb7ea18732402c5a9019532f8cc1f",
+      "tests/servers/test_lifecycle_contracts.py": "fa8d27a56707c3bbce713aa33554b5c4c77450bd33eec3a5a839e7c63fb2ce03",
+      "tests/servers/test_port_checkpoint_flow.py": "046b8b948e977bbaf79d71935f4183da92e1df924fd2f895509f893595ea0664",
+      "tests/servers/test_runtime_disconnect_recovery.py": "daf2102b528782e844c864555d5063045182a3953b7607255f828d40aef3d535",
+      "tests/servers/test_runtime_review_regressions.py": "fc0e5ed312553564e75f22fb210e7949bb63f949fe884f5e471503b4841293ab",
+      "tests/servers/test_runtime_s3_contract.py": "b66dcf24d55867ed85c0cd998db7de513c1fc0cc168d9352e187f47ad3a9a54a",
+      "tests/servers/test_runtime_transport.py": "41237fa504a5751101132f2b7e088e074e9f3237a8569ea85dae85db4fc2ac9e"
+    },
+    "authority_sha256": {
+      "AGENTS.md": "b50f87f31ea3d87076952d8b7d2d8af067132fbf877d80f8780c208fb45527ec",
+      "uv.lock": "573b10c2ba1a2317e02f9e40c6181359cafab6f6e0a0f9be12bb256cb276fe1d",
+      "pyproject.toml": "799bd7ba1865b097fdc8ca84a7b70337794e338de4aa9a6a13f6a4c1b9156246",
+      ".python-version": "02e735b3dfe1c32833eb550b7ff8ffa17f5f2bc3fa1e7bae61a8f5a3883ce398",
+      "evidence/2026-refresh/plan.md": "edb9a58cc7915a940854f16d5029fe97434703bf2f75eca0dcb96de2d0f0eb15",
+      "evidence/2026-refresh/plan-addendum.json": "5b51b0fb7ed6f68d9fce7176335b3e7be5e5f178a2788590912aa2396a487709",
+      "evidence/2026-refresh/plan-addendum-acceptance.json": "5f5d5a8e22e14072b5d031c19a27be14bda9bdbc2a157d14af78845daac6c56b",
+      "tests/conftest.py": "3eb55a1fa7c0fd5428c296c1bcd7300b23b0ade3d276f5c687af3b9bd78304c7",
+      "tests/integration/test_event_loop_startup.py": "a92c9ee2347e2113cd65b7949c922ac5bbf1846f4caeca30a128db580c79751e",
+      "tests/integration/startup_harness.py": "988f216f9367b1e9e8156bad62d3c03a813e26d32f919981ae227f5d8754642e",
+      "tests/integration/startup_probe.py": "e6c9bb2bf39616fe3a6745da528690a578e7416837e0914578ec688d2851b34f",
+      "tests/integration/startup_socket.py": "64d04c2ab0e041f35f5e5aca88aa46a436507cb76f54ef4ca3c3df702666720f",
+      "tests/integration/utils.py": "7a4af3c5bece78c256f268fb47ee31e384f14cca098d1690ebe2c05f79b21634",
+      "/Users/bli/Playground/plato/evidence/2026-refresh/phase2b-review.json": "6664ea117a5c8457551e8fb0256937297bef0012aca9c8cdd1f74cfbe5787c13",
+      "/Users/bli/Playground/plato/evidence/2026-refresh/phase2b-review-2.json": "ef7042edc6cb0c9f7ca803f584c21c1eab38b385c68d26293e96ae78c4ad46d4",
+      "/Users/bli/Playground/plato/evidence/2026-refresh/phase2b-root-probe.json": "a7c9674d09f06c36edc8d5315b5152758a6d1efb1c37a1f07e786a907b282900"
+    },
+    "independent_red_source_sha256": "da36129f67b337c6bd722bb4944c7c4aaa40b6017131e70eb5c81eaf21f6c513",
+    "independent_red_source": "/tmp/plato-phase2b-review-3/prior/plato/servers/base.py",
+    "no_nested_agents": true
+  },
+  "scope": {
+    "authorities_read": [
+      "AGENTS.md in candidate and root",
+      "accepted plan.md",
+      "plan-addendum.json and acceptance",
+      "ROOT phase2b-review.json",
+      "ROOT phase2b-review-2.json",
+      "ROOT phase2b-root-probe.json",
+      "entire candidate phase2b-validation.json, including both correction histories"
+    ],
+    "included": [
+      "Actual simulated-time async physical-worker loss with deferred urgency, both event orders, ongoing survivor batch/replacement and missing/true debug close policy.",
+      "One outstanding urgent assignment per worker; distinct workers concurrent with assignments prepared before any emit await; natural logical identities and wrong/stale/unknown-session rejection.",
+      "Heap order and monotonic time; distinct transfer-object accounting, reusable/processed/malformed/disconnected/close cleanup, legacy fields and client-specific buffer caps.",
+      "F10 own-current-client checkpoint cleanup; actual F11 PORT writer-to-history numerical weighting and live-model preservation; F18 raw/transformed/direct/legacy/delta/cross-silo pre-mutation input validation and valid zero/fractional weights.",
+      "Bounded socket/file/S3 ingress, callbacks/context/evaluation/async/buffered/split/personalized/cross-silo regression cases, exact source/log/runtime-artifact attribution."
+    ],
+    "excluded_with_owner": {
+      "2C": "F07 checkpoint naming and trainer lifecycle, accumulation, DP, personalization/SCAFFOLD and F26 time-snapshot decoder/epoch order. These future dependencies are not new B findings.",
+      "3A": "MLX aggregation-tree capability and backend qualification.",
+      "2D": "HE/MPC utility and corrected S3 utility ownership/review; no D edits demanded.",
+      "root": "Final accepted combined B+D regression promotion, execution and phase gate."
+    }
+  },
+  "findings": [],
+  "optional_low_observations": [],
+  "mandatory_contract_disposition": {
+    "R2B-04": {
+      "status": "PASS",
+      "path": "plato/servers/base.py",
+      "lines": [
+        976,
+        1281,
+        1547,
+        1555
+      ],
+      "implementation": "Reject unregistered assignment before mutation; preserve disconnected workers' completed deferred reports rather than refreshing them; resume a ready simulated-time round from disconnect when there is no subsequent completion event. Existing outstanding live urgency still delays aggregation.",
+      "independent_probe": {
+        "path": "/tmp/plato-phase2b-review-3/candidate/tests/test_review3_worker_loss.py",
+        "sha256": "546f44aabfdd034c14016e031f579b635bc72cb6c2bc1fa7bbd613d030cb3155"
+      },
+      "construction": "ServerEvents client_alive starts actual production selection. Two physical workers/max_concurrency=2, four logical clients per round, minimum_clients=1, staleness_bound=1, request_update=true, debug=false. Actual report/chunk/part/done handlers produce rounds 7/2/8/9 then 9 and 9; the default urgency predicate requests lost/7 and survivor/2, deferring lost/8. Normal sends queue completions for later events rather than completing inside _send.",
+      "matrix": "Both disconnect/completion orders x no lost transfer, report-only, partial chunk and decoded part = 8 recovery cases per interpreter; both orders x missing/true debug = 4 close-policy cases.",
+      "positive_result": "All eight recovery cases on each interpreter preserve client 8's original completed payload and bytes, clear lost active/cache state, aggregate round-3 payloads {2:2,9:9,8:8}, finish a full [7,2,8,9] batch entirely on survivor, finish the next replacement and reach round 6. Only the original two urgent requests are emitted; all subsequent assignments belong to registered survivor.",
+      "accounting_and_identity": "An independent oracle sums recorded raw report/chunk lengths for unique report objects retained by heap/cache/active transfers after every event. Initial retained bytes=380, final usable retained bytes=570, close=0. Deferred token/payload survive until aggregation; heap stays valid and time never decreases. Late lost identities 7/8, prior survivor identity 2, deferred identity 8 and unknown session reject with a fail-on-parse sentinel before parsing.",
+      "negative_reference": "Exact previous 7753ca37 source gives 11 failed/6 passed on each interpreter: 8 new recovery failures plus 3 shipped assignment/order failures, with 6 existing close-policy cases passing. Lost-first reaches a dead lost/8 emit; survivor-first remains at round 3. No red candidate mutation was performed.",
+      "stubs_and_limit": "Outbound transport is an event queue; payload/report generation is inert; aggregation records updates and yields, wrap_up records no model work, and close calls actual _close_connections. Selection, registration, batching, urgency, assignment, ingress, disconnect, heap, cleanup and round transitions are production code. No urgent trainer snapshot decoder/checkpoint retrieval or real urgent socket training claim."
+    },
+    "R2B-03": "PASS: independently rerun actual shared-worker deferred report/byte/identity flow; first and second requested responses finish and reach round 4. Distinct-worker assignments exist before immediate response within first emit; aggregation waits for both valid responses.",
+    "R2B-01": "PASS: actual ingress partial urgency restores chronological heap, selecting [20,9,28] or [20,9,28,31]. Both minimum selection and stale draining preserve wall_time=50 for earlier responses.",
+    "R2B-02": "PASS: two distinct 190-byte completions for the same logical ID across physical workers count as 380 bytes at the real selection/send await. Budget 400 rejects the next 169-byte report before parsing. Worker reuse clears its own legacy cache only; queued work survives malformed ingress/disconnect until processed; close releases all.",
+    "R2B-L01": "PASS: actual client socket/S3 buffer cap rejects at max_buffered_bytes=20 while max_payload_bytes is larger. Simulated-file cap remains consistent.",
+    "S3_B_local": "PASS: exact-once empty, nested, already-qualified and leading/trailing prefix cases pass using only the minimal existing adapter interface. The separate 24 actual immutable D writer/presigner-to-B localhost reader cases pass per interpreter; this remains provisional source-combination evidence.",
+    "F10": "PASS: actual disconnect uses current logical identity 17, removes only its time-snapshot .pth/.pth.pkl/.safetensors files, preserves former/other client artifacts, resume files, unrelated suffixes and directories.",
+    "F11": "PASS locally: actual PORT weights_aggregated writes Safetensors with sidecar; reader uses repository tree decoding or CPU weights_only legacy .pth. Shipped stale cosine 0.6 and 2/6 numerical weighting pass. Independent reversed-key two-parameter cosine 1/3 preserves values/storage/CPU device/eval mode for both formats.",
+    "F18": "PASS: raw/transformed counts/cardinality reject before ordinary/legacy/delta and cross-silo trainer/model mutation. Negative/nonfinite and overflowing finite totals reject; 12 independent callback mutations pass. Valid fractional, zero, feature and reverse-order contracts remain passing, with valid zero totals returning the baseline through normal server dispatch.",
+    "bounded_ingress_identity": "PASS in tested existing contract: wrong/unknown/stale/duplicate session identity, oversized report/chunk/payload/count/buffer, malformed/trailing/truncated/incomplete transfers, absolute deadlines, retry and S3 header/stream caps execute and preserve unrelated peers.",
+    "callbacks_selection_evaluation": "PASS: ordered callbacks/body AttributeError propagation, context synchronization, partial async replacement, FedBuff uniform mean, actual FedAsync example mixing, personalized/split selection, central-edge assignment, cross-silo validation before identity mutation and finite zero-sample reporting.",
+    "startup_runtime": "PASS retained exact-source evidence: 48 unchanged startup cases per interpreter included in author current-source 232-case runs. Verified 96 results/durable streams, zero reported survivors and five deliberate negative containment cases per interpreter. Real CPU socket rounds return naturally with separate 2/6-sample clients; received/trained/final/checkpoint tensors and independent float64 weighting agree to <=1.4901161193847656e-08."
+  },
+  "environments": [
+    {
+      "executable": "/tmp/plato-phase2b-review-3/base313/bin/python",
+      "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+      "host": "macOS-27.0-arm64-arm-64bit-Mach-O",
+      "plato_source": "/private/tmp/plato-phase2b-review-3/candidate/plato/__init__.py",
+      "versions": {
+        "pytest": "9.1.1",
+        "torch": "2.14.1",
+        "torchvision": "0.29.1",
+        "numpy": "2.5.3",
+        "aiohttp": "3.14.3",
+        "python-socketio": "5.17.0",
+        "safetensors": "0.8.0",
+        "boto3": "1.43.106",
+        "requests": "2.34.2"
+      },
+      "optional_present": {
+        "opacus": false,
+        "kazoo": false,
+        "gymnasium": false,
+        "tiktoken": false,
+        "mlx": false,
+        "lighteval": false,
+        "lightly": false
+      },
+      "artifact": {
+        "path": "/tmp/plato-phase2b-review-3/environment313.json",
+        "sha256": "227bf501a0ddcc03bca081d293735eaf3abe9e37ed209b563313d03306a14134"
+      },
+      "provision": "zsh -lc 'UV_PROJECT_ENVIRONMENT=/tmp/plato-phase2b-review-3/base313 UV_CACHE_DIR=/tmp/plato-phase2b-review-3/uv-cache PYTHONDONTWRITEBYTECODE=1 uv sync --locked --no-default-groups --group test-base --python 3.13'",
+      "provision_log": {
+        "path": "/tmp/plato-phase2b-review-3/base-sync313.log",
+        "sha256": "c8edf4845e4ecccd48f1a5e8f962fe41cb404ed1cf23743d36b18a8086bf8d41"
+      }
+    },
+    {
+      "executable": "/private/tmp/plato-phase2b-review-3/base314/bin/python",
+      "python": "3.14.8 (main, Sep 30 2026, 17:55:09) [Clang 21.0.0 (clang-2100.3.34.2)]",
+      "host": "macOS-27.0-arm64-arm-64bit-Mach-O",
+      "plato_source": "/private/tmp/plato-phase2b-review-3/candidate/plato/__init__.py",
+      "versions": {
+        "pytest": "9.1.1",
+        "torch": "2.14.1",
+        "torchvision": "0.29.1",
+        "numpy": "2.5.3",
+        "aiohttp": "3.14.3",
+        "python-socketio": "5.17.0",
+        "safetensors": "0.8.0",
+        "boto3": "1.43.106",
+        "requests": "2.34.2"
+      },
+      "optional_present": {
+        "opacus": false,
+        "kazoo": false,
+        "gymnasium": false,
+        "tiktoken": false,
+        "mlx": false,
+        "lighteval": false,
+        "lightly": false
+      },
+      "artifact": {
+        "path": "/tmp/plato-phase2b-review-3/environment314.json",
+        "sha256": "24ab1ace37b45c41592eefddb336df0b87af195e9869476db755c15715546466"
+      },
+      "provision": "zsh -lc 'UV_PROJECT_ENVIRONMENT=/tmp/plato-phase2b-review-3/base314 UV_CACHE_DIR=/tmp/plato-phase2b-review-3/uv-cache PYTHONDONTWRITEBYTECODE=1 uv sync --locked --no-default-groups --group test-base --python 3.14'",
+      "provision_log": {
+        "path": "/tmp/plato-phase2b-review-3/base-sync314.log",
+        "sha256": "e81c2dfbc2c3743aa1523909798c61bb089c902e48213f0b5332398c57940393"
+      }
+    }
+  ],
+  "commands_and_results": [
+    {
+      "check": "runtime",
+      "python": "3.13.16",
+      "command": "zsh -lc 'PYTHONDONTWRITEBYTECODE=1 OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2b-review-3/base313/bin/python -m pytest tests/clients tests/servers tests/callbacks tests/integration/test_smoke_configs.py --test-profile base -q -p no:cacheprovider --basetemp /tmp/plato-phase2b-review-3/runtime313'",
+      "cwd": "/tmp/plato-phase2b-review-3/candidate",
+      "result": "184 passed in 6.67s",
+      "exit_code": 0,
+      "log": {
+        "path": "/tmp/plato-phase2b-review-3/runtime313.log",
+        "sha256": "e0e0a974f8709f15a6c3ab42a665d85cb0210ea979af24e70aefa93290b37c23"
+      },
+      "omissions": []
+    },
+    {
+      "check": "probes",
+      "python": "3.13.16",
+      "command": "zsh -lc 'PYTHONDONTWRITEBYTECODE=1 OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2b-review-3/base313/bin/python -m pytest tests/test_review3_worker_loss.py -q -s -p no:cacheprovider --basetemp /tmp/plato-phase2b-review-3/probes313'",
+      "cwd": "/tmp/plato-phase2b-review-3/candidate",
+      "result": "12 passed in 0.19s",
+      "exit_code": 0,
+      "log": {
+        "path": "/tmp/plato-phase2b-review-3/probes313.log",
+        "sha256": "1f9bae74cb31463cd8f70926fb2828a251a72d229cec30ee0517f6bebf616d3d"
+      },
+      "omissions": []
+    },
+    {
+      "check": "retained-probes",
+      "python": "3.13.16",
+      "command": "zsh -lc 'PYTHONDONTWRITEBYTECODE=1 OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2b-review-3/base313/bin/python -m pytest tests/test_review2_probes.py tests/test_review2_disconnect_probe.py tests/test_s3_combined.py -q -s -p no:cacheprovider --basetemp /tmp/plato-phase2b-review-3/retained-probes313'",
+      "cwd": "/tmp/plato-phase2b-review-3/candidate",
+      "result": "47 passed in 13.39s",
+      "exit_code": 0,
+      "log": {
+        "path": "/tmp/plato-phase2b-review-3/retained-probes313.log",
+        "sha256": "36b50a9e8f1819d46cbeacda87f55985afcd9c0ed32f884e54a5974b64f01777"
+      },
+      "omissions": []
+    },
+    {
+      "check": "red",
+      "python": "3.13.16",
+      "command": "zsh -lc 'PYTHONDONTWRITEBYTECODE=1 OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2b-review-3/base313/bin/python -m pytest tests/test_review3_worker_loss.py tests/servers/test_runtime_disconnect_recovery.py -q -s -p no:cacheprovider --basetemp /tmp/plato-phase2b-review-3/red313'",
+      "cwd": "/tmp/plato-phase2b-review-3/prior",
+      "result": "11 failed, 6 passed in 0.77s",
+      "exit_code": 1,
+      "log": {
+        "path": "/tmp/plato-phase2b-review-3/red313.log",
+        "sha256": "f01a73e5b2e9a152620740aa8a3edfc63f954ffca4d4c035457be610e0896647"
+      },
+      "omissions": []
+    },
+    {
+      "check": "collection-detail",
+      "python": "3.13.16",
+      "command": "zsh -lc 'PYTHONDONTWRITEBYTECODE=1 OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2b-review-3/base313/bin/python -m pytest tests --test-profile base --collect-only -q -rs -p no:cacheprovider --basetemp /tmp/plato-phase2b-review-3/collection-detail313'",
+      "cwd": "/private/tmp/plato-refresh-worktrees/runtime",
+      "result": "443 tests collected in 0.42s",
+      "exit_code": 0,
+      "log": {
+        "path": "/tmp/plato-phase2b-review-3/collection-detail313.log",
+        "sha256": "32f61bba472745c89a2df4141682b05e75ebf5e143240ba42b2d1a4ccf810713"
+      },
+      "omissions": [
+        "Exactly the declared optional DP module skip: opacus absent. All 443 nodes collect; named startup and required base cases remain present."
+      ]
+    },
+    {
+      "check": "runtime",
+      "python": "3.14.8",
+      "command": "zsh -lc 'PYTHONDONTWRITEBYTECODE=1 OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2b-review-3/base314/bin/python -m pytest tests/clients tests/servers tests/callbacks tests/integration/test_smoke_configs.py --test-profile base -q -p no:cacheprovider --basetemp /tmp/plato-phase2b-review-3/runtime314'",
+      "cwd": "/tmp/plato-phase2b-review-3/candidate",
+      "result": "184 passed in 41.50s",
+      "exit_code": 0,
+      "log": {
+        "path": "/tmp/plato-phase2b-review-3/runtime314.log",
+        "sha256": "d6eb8bad4bccda557e84968dd28954f3c0c10d3dd143c8c826f28ab7c5d3aaa6"
+      },
+      "omissions": []
+    },
+    {
+      "check": "probes",
+      "python": "3.14.8",
+      "command": "zsh -lc 'PYTHONDONTWRITEBYTECODE=1 OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2b-review-3/base314/bin/python -m pytest tests/test_review3_worker_loss.py -q -s -p no:cacheprovider --basetemp /tmp/plato-phase2b-review-3/probes314'",
+      "cwd": "/tmp/plato-phase2b-review-3/candidate",
+      "result": "12 passed in 0.32s",
+      "exit_code": 0,
+      "log": {
+        "path": "/tmp/plato-phase2b-review-3/probes314.log",
+        "sha256": "c4ef75ddfb4552ebc4378808e2a87c2a8efe3d026f42c89c2d6e5bc73dd30b1b"
+      },
+      "omissions": []
+    },
+    {
+      "check": "retained-probes",
+      "python": "3.14.8",
+      "command": "zsh -lc 'PYTHONDONTWRITEBYTECODE=1 OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2b-review-3/base314/bin/python -m pytest tests/test_review2_probes.py tests/test_review2_disconnect_probe.py tests/test_s3_combined.py -q -s -p no:cacheprovider --basetemp /tmp/plato-phase2b-review-3/retained-probes314'",
+      "cwd": "/tmp/plato-phase2b-review-3/candidate",
+      "result": "47 passed in 48.39s",
+      "exit_code": 0,
+      "log": {
+        "path": "/tmp/plato-phase2b-review-3/retained-probes314.log",
+        "sha256": "eaffdb9f46d16e9e97e4daf2b5d9694319b757f7b8475671a3c4ddf8554bf7f7"
+      },
+      "omissions": []
+    },
+    {
+      "check": "red",
+      "python": "3.14.8",
+      "command": "zsh -lc 'PYTHONDONTWRITEBYTECODE=1 OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2b-review-3/base314/bin/python -m pytest tests/test_review3_worker_loss.py tests/servers/test_runtime_disconnect_recovery.py -q -s -p no:cacheprovider --basetemp /tmp/plato-phase2b-review-3/red314'",
+      "cwd": "/tmp/plato-phase2b-review-3/prior",
+      "result": "11 failed, 6 passed in 0.84s",
+      "exit_code": 1,
+      "log": {
+        "path": "/tmp/plato-phase2b-review-3/red314.log",
+        "sha256": "2cfce401d78ddfce3e81f8a779f360bf027acd1471fd3f02227d7c5633d5f4be"
+      },
+      "omissions": []
+    },
+    {
+      "check": "collection-detail",
+      "python": "3.14.8",
+      "command": "zsh -lc 'PYTHONDONTWRITEBYTECODE=1 OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2b-review-3/base314/bin/python -m pytest tests --test-profile base --collect-only -q -rs -p no:cacheprovider --basetemp /tmp/plato-phase2b-review-3/collection-detail314'",
+      "cwd": "/private/tmp/plato-refresh-worktrees/runtime",
+      "result": "443 tests collected in 0.45s",
+      "exit_code": 0,
+      "log": {
+        "path": "/tmp/plato-phase2b-review-3/collection-detail314.log",
+        "sha256": "f716afce4239a609f5363dc35c4757e95e74b12195527289c2f71abc0b3df9cd"
+      },
+      "omissions": [
+        "Exactly the declared optional DP module skip: opacus absent. All 443 nodes collect; named startup and required base cases remain present."
+      ]
+    }
+  ],
+  "additional_checks": [
+    {
+      "command": "zsh -lc 'PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=/tmp/plato-phase2b-review-3/candidate OMP_NUM_THREADS=1 /tmp/plato-phase2b-review-3/base313/bin/python /tmp/plato-phase2b-review-3/audit_evidence.py'",
+      "cwd": "/tmp/plato-phase2b-review-3/candidate",
+      "result": "All changed files match exact candidate git objects; parent boundaries and authority hashes match; 14 current/historical author logs verified; latest source hashes agree with 861c5c5c and candidate; 96 retained startup records/events and actual socket tensor artifacts verified.",
+      "source": {
+        "path": "/tmp/plato-phase2b-review-3/audit_evidence.py",
+        "sha256": "a5490c3baf4358eca40ffbdb84e7b6a1da8ad01083fafce9e5aaf7991f7bf3b5"
+      },
+      "output": {
+        "path": "/tmp/plato-phase2b-review-3/evidence-audit.json",
+        "sha256": "7f8e642dda3494c8f1fae883b29d365c80e391c674d5be59136829dc50bab49b"
+      },
+      "log": {
+        "path": "/tmp/plato-phase2b-review-3/evidence-audit.log",
+        "sha256": "2ba0ad651c9c3e41a2bda9cadf3abd3d59aadcb7535130b581fa28ebe39cd160"
+      }
+    },
+    {
+      "command": "zsh -lc '/tmp/plato-phase2b-review-3/venv313/bin/ruff check . --select I --no-cache'",
+      "cwd": "/private/tmp/plato-refresh-worktrees/runtime",
+      "result": "All checks passed!",
+      "log": {
+        "path": "/tmp/plato-phase2b-review-3/ruff.log",
+        "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+      }
+    },
+    {
+      "command": "zsh -lc 'git diff fda60becedfa6236c11d415b87a868b52789a41e..HEAD --check'",
+      "cwd": "/private/tmp/plato-refresh-worktrees/runtime",
+      "result": "Passed; final candidate remains exact and clean."
+    }
+  ],
+  "exact_author_evidence": {
+    "current_implementation": "861c5c5ca03d8657c13ca5b93c3f9e0298172954",
+    "current_candidate": "00eeb9dcdd2b513e64db9408969356037e09bb8e",
+    "logs": {
+      "/tmp/plato-phase2b-runtime/review-2-fixes/red313.log": {
+        "path": "/tmp/plato-phase2b-runtime/review-2-fixes/red313.log",
+        "sha256": "8be96781a055d505bc8129219ab9225ff8689b87eaf04eb630fbb64f57ad687a",
+        "last_line": "3 failed, 2 passed in 0.18s",
+        "failures": [
+          "FAILED tests/servers/test_runtime_disconnect_recovery.py::test_batched_urgent_loss_recovers_with_completed_reports[False]",
+          "FAILED tests/servers/test_runtime_disconnect_recovery.py::test_batched_urgent_loss_recovers_with_completed_reports[True]",
+          "FAILED tests/servers/test_runtime_disconnect_recovery.py::test_assignment_rejects_unregistered_session_before_mutation"
+        ]
+      },
+      "/tmp/plato-phase2b-runtime/review-2-fixes/green313.log": {
+        "path": "/tmp/plato-phase2b-runtime/review-2-fixes/green313.log",
+        "sha256": "8d6111dcc7ef834220b3a0179369f2983becd0bd038ce292ba3a7e9ad7105bfb",
+        "last_line": "53 passed in 0.55s"
+      },
+      "/tmp/plato-phase2b-runtime/review-2-fixes/accepted313.log": {
+        "path": "/tmp/plato-phase2b-runtime/review-2-fixes/accepted313.log",
+        "sha256": "f3357a12da60c798ef224b46310e1c918147a319b7e61b9968cff7fa8ff0d2c4",
+        "last_line": "232 passed in 434.04s (0:07:14)"
+      },
+      "/tmp/plato-phase2b-runtime/review-2-fixes/red314.log": {
+        "path": "/tmp/plato-phase2b-runtime/review-2-fixes/red314.log",
+        "sha256": "2522535e7d650aa8ea4d84431c8f460fb84586b414762d5b5543a9f8d637a5ef",
+        "last_line": "3 failed, 2 passed in 0.20s",
+        "failures": [
+          "FAILED tests/servers/test_runtime_disconnect_recovery.py::test_batched_urgent_loss_recovers_with_completed_reports[False]",
+          "FAILED tests/servers/test_runtime_disconnect_recovery.py::test_batched_urgent_loss_recovers_with_completed_reports[True]",
+          "FAILED tests/servers/test_runtime_disconnect_recovery.py::test_assignment_rejects_unregistered_session_before_mutation"
+        ]
+      },
+      "/tmp/plato-phase2b-runtime/review-2-fixes/green314.log": {
+        "path": "/tmp/plato-phase2b-runtime/review-2-fixes/green314.log",
+        "sha256": "fedd00ab04c81847496f10ec5b74b1161ef6efbe4cf0cb95369f0e4885063cef",
+        "last_line": "53 passed in 0.56s"
+      },
+      "/tmp/plato-phase2b-runtime/review-2-fixes/accepted314.log": {
+        "path": "/tmp/plato-phase2b-runtime/review-2-fixes/accepted314.log",
+        "sha256": "e7e7dab2dbd39af29480d993ba3e60813028e4c4dc6d0818c382ed9058cd8e9d",
+        "last_line": "232 passed in 483.85s (0:08:03)"
+      },
+      "/tmp/plato-phase2b-runtime/review-2-fixes/ruff.log": {
+        "path": "/tmp/plato-phase2b-runtime/review-2-fixes/ruff.log",
+        "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+      },
+      "/tmp/plato-phase2b-runtime/review-2-fixes/ty-server.log": {
+        "path": "/tmp/plato-phase2b-runtime/review-2-fixes/ty-server.log",
+        "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+      },
+      "/tmp/plato-phase2b-runtime/review-fixes/red-behavior313.log": {
+        "sha256": "da557faffe134668f39e17fc3e6185fe0993373f7ebe60db93f669b0999778f2",
+        "last_line": "22 failed, 18 passed in 18.64s",
+        "historical_source": "516da21d66472d8916ed42aa21ce462d29944f73"
+      },
+      "/tmp/plato-phase2b-runtime/review-fixes/green313.log": {
+        "sha256": "72731a6fe4dd1040c41381eb883f17f26490827ad77cc746a6deeaa44f908743",
+        "last_line": "40 passed in 18.21s",
+        "historical_source": "516da21d66472d8916ed42aa21ce462d29944f73"
+      },
+      "/tmp/plato-phase2b-runtime/review-fixes/accepted313.log": {
+        "sha256": "84038006d7002d8e3f966096db58c1eef4f5b6a61916f8ebb8e897668d8e6bf3",
+        "last_line": "227 passed in 432.09s (0:07:12)",
+        "historical_source": "516da21d66472d8916ed42aa21ce462d29944f73"
+      },
+      "/tmp/plato-phase2b-runtime/review-fixes/red-behavior314.log": {
+        "sha256": "08c527c9455f33d573b41b1345c7a37a2d986cd36f682b2a35686e421d6b63cc",
+        "last_line": "22 failed, 18 passed in 53.14s",
+        "historical_source": "516da21d66472d8916ed42aa21ce462d29944f73"
+      },
+      "/tmp/plato-phase2b-runtime/review-fixes/green314.log": {
+        "sha256": "7d2b9d0bb631306e2f6a4aa8cd5ee586da7c909274793437093513eeaa39cda6",
+        "last_line": "40 passed in 53.04s",
+        "historical_source": "516da21d66472d8916ed42aa21ce462d29944f73"
+      },
+      "/tmp/plato-phase2b-runtime/review-fixes/accepted314.log": {
+        "sha256": "efcab313a8c5e667bd7e7d4eec65b91062eae29393f0dd5fd6b5c5c41ad7d666",
+        "last_line": "227 passed in 480.55s (0:08:00)",
+        "historical_source": "516da21d66472d8916ed42aa21ce462d29944f73"
+      }
+    },
+    "current_startup_runs": {
+      "/tmp/plato-phase2b-runtime/review-2-fixes/accepted313": {
+        "records": 48,
+        "reported_survivors": 0,
+        "events_match_durable_files": true,
+        "deliberate_negative_forced_cases": 5,
+        "result_hashes": {
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted313/test_active_edge_failure_unwin0/edge/result.json": "5114009aac36fbc8d85c4c141a01d898d61975b222965e1872a63f011fa70bb1",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted313/test_active_failure_reaches_sy0/client_custom/result.json": "33c764c5a8c659413f57b6e41f73ce7f6535cdae2f4eb169223863a15252b3a1",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted313/test_active_failure_reaches_sy1/ordinary/result.json": "48b5375599dd17ff35f9acd4f1269ce530542b9f0bf6cd34407d937dbf36c781",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted313/test_active_failure_reaches_sy2/central/result.json": "843da187478e8bf7cd3ddb5007e77379cd329f502250a61361d3d6f4b5f8b6c1",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted313/test_active_failure_reaches_sy3/edge_custom/result.json": "c5b0552c3f4ce714387749c8dcd7dc1d023423f420abe85b911bc203c1dbe523",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted313/test_cancellation_already_fina0/cancelling/result.json": "ad0fb9c5a852544e5c0d432701d263cec61741989a17b9a736426613c48dc906",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted313/test_client_control_flow_keeps0/interrupt/result.json": "1a20430dfa59390d13a4e15c7e4a348b75f5cc835a4be0f40f28d24a9427528d",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted313/test_client_control_flow_keeps1/exit/result.json": "091184415259ecabb727efd9f371cfd9c3dc9c2f723ed04099fc5a268cbc960a",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted313/test_closed_current_client_loo0/closed/result.json": "e3bd6ea5655d22a82346562f72d144919944e27bad3a5efe9f0b2591e8e83787",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted313/test_configure_failure_is_pres0/configure/result.json": "4c8d702d50465bf80c4811a7c959d595c62a57355ed6ece00280f6870af510a3",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted313/test_delegating_server_consume0/delegated/result.json": "2196b3d110ecb6cfed5baa9222883131ad6b6f83c34e1444f993d449cb0bfa44",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted313/test_edge_cancellation_error_k0/edge/result.json": "d6b6dc926905e11646b28ef437a47dfa9dcf2e74a132bd61736bf786a3c6471d",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted313/test_explicitly_absent_loop_on0/ordinary/result.json": "6f1dd5cfac0ba5fcb38e2adc24c2909a64dc25804c9a7cd6687c0af8e2f0b111",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted313/test_explicitly_absent_loop_on1/central/result.json": "191616f97577f1be8b9510fdec90d722c187d4f1c4fd009acb8379a2b193452b",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted313/test_explicitly_absent_loop_on2/edge_default/result.json": "25f0e07135fc1970f61c97e56cefd383787cb2a60455e57b084fb5048219dfee",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted313/test_explicitly_absent_loop_on3/edge_custom/result.json": "118ab89e82aecec7ff04599004b88fb66829336fc481bbbe50be9a291f5777f2",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted313/test_fresh_entrypoint_executes0/client_default/result.json": "f334834e81cb3afbef18938585014f869eeaae791214967aaa5d6055e06b3d24",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted313/test_fresh_entrypoint_executes1/client_custom/result.json": "abc7caddde87a1b18776d27aaada7ae97c7b62875e20d59b338ef9689efe4985",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted313/test_fresh_entrypoint_executes2/ordinary/result.json": "decc891b40f4a9a3272ca490f8678cd7c40c0bfe9ba43f72b94871a4c704e311",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted313/test_fresh_entrypoint_executes3/central/result.json": "124bcb863c7a827375de3b9ea69e3f4bb460161ed5e0c28bc7ff94bc9c003add",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted313/test_fresh_entrypoint_executes4/direct/result.json": "bb24fd3058c521e417a46f9497af4e27a1f51f9dd21d04bc0b81393fd005e70f",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted313/test_fresh_entrypoint_executes5/edge_default/result.json": "0065db8806aa9fc2711fcd6b927199a0220f6af1fbdc787ad18094845729fd09",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted313/test_fresh_entrypoint_executes6/edge_custom/result.json": "85ccc37c5ac48755e72a55dd749f79e8b63b7310b4d7f4968a3005bade27658c",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted313/test_independent_runtime_error0/independent/result.json": "e8bba9cd2c4d5362a192f33bc9f34b88d743f61639e89ab02a31c9a0a722da50",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted313/test_missing_external_edge_cli0/edge/result.json": "69b8ca8f703efb9eb0ddbe02406b9b3a363eb0c6e714a0fa66eba5cb18a8c196",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted313/test_noncooperative_teardown_i0/task/result.json": "54603b773d9ab05ee3d1e5e38acdf3928c3107d4a3a292a16a7498fc12e04879",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted313/test_noncooperative_teardown_i1/generator/result.json": "24377af05a8a17e224946d827e6b256a630df5de2fde9e048df36652e857dd5d",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted313/test_noncooperative_teardown_i2/executor/result.json": "a4a864e0f81fe33ba318bfe2476d6d506bd03756bf03a4a6fb6a0915949aeaeb",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted313/test_noncooperative_teardown_i3/aiohttp_task/result.json": "9f1d96e0030e3dc2e48661ec68b7b9a0493d364686fce1578f529d01c137b8ec",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted313/test_owned_client_finalizes_ta0/client/result.json": "b717165687834133b5c95634b78c064d153cc637e85ea4f79a004fe64e635a2f",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted313/test_owned_client_finalizes_ta1/client/result.json": "c3787345fe7c1f4b25beebf86717c568d016d49ce7248460b50089c2359e7821",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted313/test_owned_server_fallback_fin0/fallback/result.json": "66d09d081914f4ed69904f31e80e6b8fdfd480d7d941d19abc6cd67d7fbfb147",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted313/test_owned_server_fallback_fin1/fallback/result.json": "d1c0d1d8dacc7fd36334b4732ab599667d3229cb5636f79ae2acbd6ad223931d",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted313/test_post_launch_failure_keeps0/failure/result.json": "1e91ddd8e3e75bf53085bd18c9b4619e7fc6b2e0aa9210abc7b35eefeb477fc2",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted313/test_preconstructed_borrowed_l0/client_lifecycle/result.json": "6619ae2f93867e3ff493ebe70d320a367dbe58e8c718ebaa480cd2abaeadac4a",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted313/test_preconstructed_borrowed_l1/client_lifecycle/result.json": "2b74bdf52b12050b6b2f96898fadc3765496e2bd5d0d1bf9e06aec452f042a50",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted313/test_preconstructed_borrowed_l2/ordinary/result.json": "b3e90062ccc9ac02dc07ccfe682217109fb8998f77c706d8d10942d44b1b84cd",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted313/test_preconstructed_borrowed_l3/ordinary/result.json": "c4cdf90da8c1584a7908f6f18ec06628234b8b9ae06d16cc229fb833eb2d1975",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted313/test_real_two_client_cpu_socke0/round/result.json": "e58882beede002212d320eaaa4007005f317c29057dd673b9b943e905c8af81e",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted313/test_repeated_owned_client_ent0/client/result.json": "595316a1c74dfd426edf3de663f1fe4741be48f405a8caf803d088e330c953ef",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted313/test_runner_cleanup_error_keep0/cleanup/result.json": "f394dc75484fe3cbd5624f99fed90693322a465a98ded168cf4682ba2fa716bc",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted313/test_running_loop_rejected_bef0/running/result.json": "88ce3975b40406932015848926d88156e42437b9ca6166d729a61e1afd262df9",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted313/test_server_error_precedence_a0/server/result.json": "158a997c1a6dee6c97865f9dccf8576e64c7301f0837b04222b1d1738e5db141",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted313/test_server_error_precedence_a1/server/result.json": "c523b33a79e98dde461f07b8d4fdeff589050819dee30772d078e226e697f128",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted313/test_server_error_precedence_a2/server/result.json": "67087d545736319ce2ca6bead31490759a10b39042813a8e453520ccf65333eb",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted313/test_server_error_precedence_a3/server/result.json": "b593b3d7180ae061adb63da07cf22ba0974c1914a45f39bfcb94066d1db52d9d",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted313/test_server_error_precedence_a4/server/result.json": "99e2eb60a9d40e47b0465b2a74ec916cbad2484917bd73df20a39d748e482f06",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted313/test_stalled_real_client_is_co0/stalled/result.json": "294390ace06bbb65bd2e1b525bbf9aae808c471f551df7c64462c583ae1dc109"
+        },
+        "socket_result": {
+          "path": "/tmp/plato-phase2b-runtime/review-2-fixes/accepted313/test_real_two_client_cpu_socke0/round/result.json",
+          "sha256": "e58882beede002212d320eaaa4007005f317c29057dd673b9b943e905c8af81e"
+        },
+        "socket_elapsed_seconds": 14.293718500062823,
+        "socket_returncode": 0,
+        "socket_forced": [],
+        "socket_timed_out": false,
+        "trained": [
+          {
+            "id": 1,
+            "samples": 2,
+            "pid": 53387
+          },
+          {
+            "id": 2,
+            "samples": 6,
+            "pid": 53388
+          }
+        ],
+        "weighted_reference_max_abs_error": {
+          "linear.weight": 1.4901161193847656e-08,
+          "linear.bias": 2.9103830456733704e-10
+        },
+        "tensor_hashes": {
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted313/test_real_two_client_cpu_socke0/round/models/pretrained/startup_tiny_1_53387.safetensors": "7d1b4e39fe8c20fbc8d5a1bcdaaf68d23955752149ef34cffa2e58f5e8a68961",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted313/test_real_two_client_cpu_socke0/round/models/pretrained/startup_tiny_2_53388.safetensors": "c4c686574485435175402208fbefbbdea1fe5aa735b1bca4f93d4836651becd4",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted313/test_real_two_client_cpu_socke0/round/models/pretrained/startup_tiny.safetensors": "a5a3bff8503c83d1f8b64c96494315c337dc682a2cfab1bb0b5c665176ab1632",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted313/test_real_two_client_cpu_socke0/round/checkpoints/checkpoint_startup_tiny_1.safetensors": "a5a3bff8503c83d1f8b64c96494315c337dc682a2cfab1bb0b5c665176ab1632"
+        },
+        "event_hashes": {
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted313/test_real_two_client_cpu_socke0/round/events-53387.jsonl": "a6b0680ba78e50457191009e10920ee6b73e5d7c2e47e2d4d997ad86d09d833c",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted313/test_real_two_client_cpu_socke0/round/events-53388.jsonl": "09e414d4a747fbfcb48435048ce4da5b91d18cb2cc30a4febacd35114b4f2229",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted313/test_real_two_client_cpu_socke0/round/events-53377.jsonl": "16b7753a0e706315c40acd93fcd077a8005179f08be078c2e611c378059c75ed"
+        }
+      },
+      "/tmp/plato-phase2b-runtime/review-2-fixes/accepted314": {
+        "records": 48,
+        "reported_survivors": 0,
+        "events_match_durable_files": true,
+        "deliberate_negative_forced_cases": 5,
+        "result_hashes": {
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted314/test_active_edge_failure_unwin0/edge/result.json": "a8722b11567606f47fef60dfdc6e095b4583e0abbc6c07d2d243f991230f761a",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted314/test_active_failure_reaches_sy0/client_custom/result.json": "4808042dcb4963a1638dc8618dfced2a5c12e909a20a5f786163c369da493049",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted314/test_active_failure_reaches_sy1/ordinary/result.json": "e7d1d2fb948653f0e74e39bc85bdabe5b971b4d77ebb327b5edb97111cfcdf86",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted314/test_active_failure_reaches_sy2/central/result.json": "352afc441845ad8bc304db2e4b5909f220dde0dfd22656aa09a95ae59acd25e1",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted314/test_active_failure_reaches_sy3/edge_custom/result.json": "562c192f4f23b8e74a334713b98a7a8c9c0d6a64646265c635b1ff7875cdd49e",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted314/test_cancellation_already_fina0/cancelling/result.json": "c07f177a1b896895939ae3a89cf5ee4ae32ec491d8b01541e6f0a3ab7e76a9bb",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted314/test_client_control_flow_keeps0/interrupt/result.json": "7d1725c4eda2d46fd7ebe4843f9e36b9ccf29ae1d4e4d277dcdaa4c55fc4e6c8",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted314/test_client_control_flow_keeps1/exit/result.json": "ae0bcd76704581f6dac27b7efe4a8ae63a3ef3e11e6cc828c55590e8a925c31b",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted314/test_closed_current_client_loo0/closed/result.json": "32ed1599e81465369144d1b7a1f33f8cdbba325c52307139b6a1a60d5f5547e7",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted314/test_configure_failure_is_pres0/configure/result.json": "38719a30963e7df773e57fc33fed29d296b742423d487d4794516e2c29328bb2",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted314/test_delegating_server_consume0/delegated/result.json": "14767abda742301d256b36d34565c987a20c3a1f90bcc758c02b1b3de39cfbdf",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted314/test_edge_cancellation_error_k0/edge/result.json": "21e96e93bc21fea1c679a4038c78031c8e63a62ec0e7c2778bc85089001f6a49",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted314/test_explicitly_absent_loop_on0/ordinary/result.json": "0bac083e799ffb7129ee353e1082a51e5d6bd615da21a0c715133c09696c6792",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted314/test_explicitly_absent_loop_on1/central/result.json": "4906205517e882fb8b17ceede8babc836cea15fa57434375056a9544caf3656a",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted314/test_explicitly_absent_loop_on2/edge_default/result.json": "6a42ba9f1bf7e05cab15ef0424024e642893501a71b60e3f5145daedf08e47e0",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted314/test_explicitly_absent_loop_on3/edge_custom/result.json": "9c21b69caa7fbf582bb46d51394d7e84460753ccb3902862c85c54fb5a12a1c0",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted314/test_fresh_entrypoint_executes0/client_default/result.json": "ee5c7d55d01e7b0ef575a2e771de658faa24917fa21b2c56ed477b8e23154a07",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted314/test_fresh_entrypoint_executes1/client_custom/result.json": "0a2eaf2f82c699779b6f930c3b7f543e697e03977d340c0297f5f462c3a46f5c",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted314/test_fresh_entrypoint_executes2/ordinary/result.json": "4ab74f001ee7706e14e873dad2f870dc4a1c0ab76813a3dd2e750c2aa359e5c0",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted314/test_fresh_entrypoint_executes3/central/result.json": "0e2ca8f21e3b2c1d1dfec4323624418659f3d01a640a75b48e9572caa0e72197",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted314/test_fresh_entrypoint_executes4/direct/result.json": "18c4c0510965b59fca0b4175e9707f93966dc403613effdbbdb760dd6c58ad8d",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted314/test_fresh_entrypoint_executes5/edge_default/result.json": "03d6c723f48f27d7a4118e0c28993366eeb33308043f0a6d490137ad87b468c3",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted314/test_fresh_entrypoint_executes6/edge_custom/result.json": "1071c335f3c9759965cf3c3fdd1059d10d711e2ca1de68e3506daa6787fecf24",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted314/test_independent_runtime_error0/independent/result.json": "0e9f45d4c143977fac19e246bcb924a7b9fd5d17880070ac5f7846b366bb2dea",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted314/test_missing_external_edge_cli0/edge/result.json": "20ca2325dc3223aac52a76a98eeb84c2a113b1d5efdfb6be267ba65587d61ba2",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted314/test_noncooperative_teardown_i0/task/result.json": "b042db2b019c25d01b5f4df59ddf1a865f31c35750094231b16915ea2ecb39da",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted314/test_noncooperative_teardown_i1/generator/result.json": "b8f1fcc379c5ff90180211e62be49ff967aa2588d3b18f0f17e492a93dc0c9d6",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted314/test_noncooperative_teardown_i2/executor/result.json": "4abad9633fa41d20e4e12ddd1aa14befbdb8137d1dfd539da56ce8912023ca66",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted314/test_noncooperative_teardown_i3/aiohttp_task/result.json": "09bff377a258de32eed2f93e42eff8d2198230a0aa07532c55f9c25a226465ad",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted314/test_owned_client_finalizes_ta0/client/result.json": "cd093c474aad051c8349a233d992fbee397eec2a3247c87dac6c0531712db108",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted314/test_owned_client_finalizes_ta1/client/result.json": "404339ffc255f12d5839113c07e0ff3321050f4c06daed702770146eacd506c2",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted314/test_owned_server_fallback_fin0/fallback/result.json": "5e9f9ef1bd2f639af38ebbfa93af79dd2352c579cfd867afcde876853365a7d8",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted314/test_owned_server_fallback_fin1/fallback/result.json": "fdf4fc31dcdccb0ff878c7ac5b622b444b868914b893b612fca2dcdd72ae8c2c",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted314/test_post_launch_failure_keeps0/failure/result.json": "5f0ed0871363f4f109bb3592cac27cc39cc0739693afcf4bb2a8d68ebde1e21c",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted314/test_preconstructed_borrowed_l0/client_lifecycle/result.json": "3fabfc1d029ff34f7afe5a0f5c76761ce0b3163ed1dbb4b21eaca774274bda25",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted314/test_preconstructed_borrowed_l1/client_lifecycle/result.json": "eef39669fca6fb1dfcf97430e72f48a5010bf8ec56686e76c8c7516503e9d794",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted314/test_preconstructed_borrowed_l2/ordinary/result.json": "4bbef124f3259809ab8865b0fcc92c315ad4a506b532452c9f9ad878034f134f",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted314/test_preconstructed_borrowed_l3/ordinary/result.json": "f96883fda2233a3ff3ab76581ca0d82bbc3c92da6a82a930e6ba1f910df4d4c6",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted314/test_real_two_client_cpu_socke0/round/result.json": "635dbf4b322debda4fc4814615ac29542339cd24ef7de427aeb91293fb37b19b",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted314/test_repeated_owned_client_ent0/client/result.json": "421352846f954534065e903615b23dde8f4a02fd10bd51b64d1a1c267a58328e",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted314/test_runner_cleanup_error_keep0/cleanup/result.json": "48d2e5721173f3d6ea4009fcfccea9121ad7c6877d6b985a9a7bc94a1f6ffcf4",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted314/test_running_loop_rejected_bef0/running/result.json": "2781deb70282ad59dc680513f5ad4ba0d7110dd9e062fcd74afa31705d49fe59",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted314/test_server_error_precedence_a0/server/result.json": "d679850699c2ced48fd1061220f81277b7f1063432015eba62b6114f3c9d4d30",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted314/test_server_error_precedence_a1/server/result.json": "b2f50b6295b69d84795c333d0269c81b69f473b711f2980971ed9355f39036b9",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted314/test_server_error_precedence_a2/server/result.json": "d8845e5d8303e757739f1889d5c3a47c8d67bcdf64bfa39a2b9b99ef67caac0d",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted314/test_server_error_precedence_a3/server/result.json": "e3e0dc49884cf163427956f9fd77e0d82bb3dfc15c05b1cba188c8de80f2a15a",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted314/test_server_error_precedence_a4/server/result.json": "0d9c9d267723af14f9bbedd3c635ee250274f6df87b8bf80c98e9010baadc109",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted314/test_stalled_real_client_is_co0/stalled/result.json": "874c187b512913b675494801f6c5a089941200d4e7ae6e797c151c1d2b0bae2d"
+        },
+        "socket_result": {
+          "path": "/tmp/plato-phase2b-runtime/review-2-fixes/accepted314/test_real_two_client_cpu_socke0/round/result.json",
+          "sha256": "635dbf4b322debda4fc4814615ac29542339cd24ef7de427aeb91293fb37b19b"
+        },
+        "socket_elapsed_seconds": 15.087108707986772,
+        "socket_returncode": 0,
+        "socket_forced": [],
+        "socket_timed_out": false,
+        "trained": [
+          {
+            "id": 1,
+            "samples": 2,
+            "pid": 53450
+          },
+          {
+            "id": 2,
+            "samples": 6,
+            "pid": 53451
+          }
+        ],
+        "weighted_reference_max_abs_error": {
+          "linear.weight": 1.4901161193847656e-08,
+          "linear.bias": 2.9103830456733704e-10
+        },
+        "tensor_hashes": {
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted314/test_real_two_client_cpu_socke0/round/models/pretrained/startup_tiny_1_53450.safetensors": "7d1b4e39fe8c20fbc8d5a1bcdaaf68d23955752149ef34cffa2e58f5e8a68961",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted314/test_real_two_client_cpu_socke0/round/models/pretrained/startup_tiny_2_53451.safetensors": "c4c686574485435175402208fbefbbdea1fe5aa735b1bca4f93d4836651becd4",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted314/test_real_two_client_cpu_socke0/round/models/pretrained/startup_tiny.safetensors": "a5a3bff8503c83d1f8b64c96494315c337dc682a2cfab1bb0b5c665176ab1632",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted314/test_real_two_client_cpu_socke0/round/checkpoints/checkpoint_startup_tiny_1.safetensors": "a5a3bff8503c83d1f8b64c96494315c337dc682a2cfab1bb0b5c665176ab1632"
+        },
+        "event_hashes": {
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted314/test_real_two_client_cpu_socke0/round/events-53451.jsonl": "f00520904ffe543a72669e29c5226aa7fed2d51182c8e7dfbee5c0ca01007d80",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted314/test_real_two_client_cpu_socke0/round/events-53450.jsonl": "4ffad461c71ab6db2d65b0558d107b69a07e995fce5fecbd1e16f6e4abb3e3a4",
+          "/tmp/plato-phase2b-runtime/review-2-fixes/accepted314/test_real_two_client_cpu_socke0/round/events-53445.jsonl": "8264030f9d55d35bf1267aacfd4d025206feacf31fd48dfc7a48ce199999974f"
+        }
+      }
+    },
+    "historical_attribution": "Initial 209/55 and first correction 227/40 results remain historical in phase2b-validation.json. Latest review_2_corrections identifies 861c5c5c; its green53 and affected232 results include the new recovery source. The final evidence-only child changes no implementation/test source.",
+    "startup_source": "Startup tests/helpers/fixtures are byte-identical to phase base. No unchanged eight-minute matrix rerun; retained current-source artifacts were independently verified."
+  },
+  "independent_recovery_states": {
+    "313": [
+      {
+        "survivor_first": false,
+        "lost_transfer": "none",
+        "round": 6,
+        "initial_retained_bytes": 380,
+        "final_retained_bytes": 570,
+        "urgent": [
+          [
+            "lost",
+            7
+          ],
+          [
+            "survivor",
+            2
+          ]
+        ],
+        "normal": [
+          [
+            1,
+            "lost",
+            7
+          ],
+          [
+            1,
+            "survivor",
+            2
+          ],
+          [
+            1,
+            "lost",
+            8
+          ],
+          [
+            1,
+            "survivor",
+            9
+          ],
+          [
+            2,
+            "lost",
+            9
+          ],
+          [
+            3,
+            "lost",
+            9
+          ],
+          [
+            4,
+            "survivor",
+            7
+          ],
+          [
+            4,
+            "survivor",
+            2
+          ],
+          [
+            4,
+            "survivor",
+            8
+          ],
+          [
+            4,
+            "survivor",
+            9
+          ],
+          [
+            5,
+            "survivor",
+            1
+          ],
+          [
+            6,
+            "survivor",
+            2
+          ]
+        ],
+        "aggregate": [
+          [
+            1,
+            1.0000507831573486,
+            [
+              [
+                9,
+                {
+                  "w": 9
+                },
+                0
+              ]
+            ]
+          ],
+          [
+            2,
+            2.000107765197754,
+            [
+              [
+                9,
+                {
+                  "w": 9
+                },
+                0
+              ]
+            ]
+          ],
+          [
+            3,
+            102.00005912780762,
+            [
+              [
+                2,
+                {
+                  "w": 2
+                },
+                2
+              ],
+              [
+                9,
+                {
+                  "w": 9
+                },
+                0
+              ],
+              [
+                8,
+                {
+                  "w": 8
+                },
+                2
+              ]
+            ]
+          ],
+          [
+            4,
+            103.00010800361633,
+            [
+              [
+                8,
+                {
+                  "w": 8
+                },
+                0
+              ]
+            ]
+          ],
+          [
+            5,
+            103.00010824203491,
+            [
+              [
+                2,
+                {
+                  "w": 2
+                },
+                1
+              ]
+            ]
+          ]
+        ]
+      },
+      {
+        "survivor_first": true,
+        "lost_transfer": "none",
+        "round": 6,
+        "initial_retained_bytes": 380,
+        "final_retained_bytes": 570,
+        "urgent": [
+          [
+            "lost",
+            7
+          ],
+          [
+            "survivor",
+            2
+          ]
+        ],
+        "normal": [
+          [
+            1,
+            "lost",
+            7
+          ],
+          [
+            1,
+            "survivor",
+            2
+          ],
+          [
+            1,
+            "lost",
+            8
+          ],
+          [
+            1,
+            "survivor",
+            9
+          ],
+          [
+            2,
+            "lost",
+            9
+          ],
+          [
+            3,
+            "lost",
+            9
+          ],
+          [
+            4,
+            "survivor",
+            7
+          ],
+          [
+            4,
+            "survivor",
+            2
+          ],
+          [
+            4,
+            "survivor",
+            8
+          ],
+          [
+            4,
+            "survivor",
+            9
+          ],
+          [
+            5,
+            "survivor",
+            1
+          ],
+          [
+            6,
+            "survivor",
+            9
+          ]
+        ],
+        "aggregate": [
+          [
+            1,
+            1.000046968460083,
+            [
+              [
+                9,
+                {
+                  "w": 9
+                },
+                0
+              ]
+            ]
+          ],
+          [
+            2,
+            2.0000998973846436,
+            [
+              [
+                9,
+                {
+                  "w": 9
+                },
+                0
+              ]
+            ]
+          ],
+          [
+            3,
+            102.0000512599945,
+            [
+              [
+                2,
+                {
+                  "w": 2
+                },
+                2
+              ],
+              [
+                9,
+                {
+                  "w": 9
+                },
+                0
+              ],
+              [
+                8,
+                {
+                  "w": 8
+                },
+                2
+              ]
+            ]
+          ],
+          [
+            4,
+            103.00009632110596,
+            [
+              [
+                8,
+                {
+                  "w": 8
+                },
+                0
+              ]
+            ]
+          ],
+          [
+            5,
+            103.00009727478027,
+            [
+              [
+                9,
+                {
+                  "w": 9
+                },
+                1
+              ]
+            ]
+          ]
+        ]
+      },
+      {
+        "survivor_first": false,
+        "lost_transfer": "report",
+        "round": 6,
+        "initial_retained_bytes": 380,
+        "final_retained_bytes": 570,
+        "urgent": [
+          [
+            "lost",
+            7
+          ],
+          [
+            "survivor",
+            2
+          ]
+        ],
+        "normal": [
+          [
+            1,
+            "lost",
+            7
+          ],
+          [
+            1,
+            "survivor",
+            2
+          ],
+          [
+            1,
+            "lost",
+            8
+          ],
+          [
+            1,
+            "survivor",
+            9
+          ],
+          [
+            2,
+            "lost",
+            9
+          ],
+          [
+            3,
+            "lost",
+            9
+          ],
+          [
+            4,
+            "survivor",
+            7
+          ],
+          [
+            4,
+            "survivor",
+            2
+          ],
+          [
+            4,
+            "survivor",
+            8
+          ],
+          [
+            4,
+            "survivor",
+            9
+          ],
+          [
+            5,
+            "survivor",
+            1
+          ],
+          [
+            6,
+            "survivor",
+            2
+          ]
+        ],
+        "aggregate": [
+          [
+            1,
+            1.000046968460083,
+            [
+              [
+                9,
+                {
+                  "w": 9
+                },
+                0
+              ]
+            ]
+          ],
+          [
+            2,
+            2.000098943710327,
+            [
+              [
+                9,
+                {
+                  "w": 9
+                },
+                0
+              ]
+            ]
+          ],
+          [
+            3,
+            102.00005197525024,
+            [
+              [
+                2,
+                {
+                  "w": 2
+                },
+                2
+              ],
+              [
+                9,
+                {
+                  "w": 9
+                },
+                0
+              ],
+              [
+                8,
+                {
+                  "w": 8
+                },
+                2
+              ]
+            ]
+          ],
+          [
+            4,
+            103.00009799003601,
+            [
+              [
+                2,
+                {
+                  "w": 2
+                },
+                0
+              ]
+            ]
+          ],
+          [
+            5,
+            103.00009989738464,
+            [
+              [
+                8,
+                {
+                  "w": 8
+                },
+                1
+              ]
+            ]
+          ]
+        ]
+      },
+      {
+        "survivor_first": true,
+        "lost_transfer": "report",
+        "round": 6,
+        "initial_retained_bytes": 380,
+        "final_retained_bytes": 570,
+        "urgent": [
+          [
+            "lost",
+            7
+          ],
+          [
+            "survivor",
+            2
+          ]
+        ],
+        "normal": [
+          [
+            1,
+            "lost",
+            7
+          ],
+          [
+            1,
+            "survivor",
+            2
+          ],
+          [
+            1,
+            "lost",
+            8
+          ],
+          [
+            1,
+            "survivor",
+            9
+          ],
+          [
+            2,
+            "lost",
+            9
+          ],
+          [
+            3,
+            "lost",
+            9
+          ],
+          [
+            4,
+            "survivor",
+            7
+          ],
+          [
+            4,
+            "survivor",
+            2
+          ],
+          [
+            4,
+            "survivor",
+            8
+          ],
+          [
+            4,
+            "survivor",
+            9
+          ],
+          [
+            5,
+            "survivor",
+            1
+          ],
+          [
+            6,
+            "survivor",
+            2
+          ]
+        ],
+        "aggregate": [
+          [
+            1,
+            1.000047206878662,
+            [
+              [
+                9,
+                {
+                  "w": 9
+                },
+                0
+              ]
+            ]
+          ],
+          [
+            2,
+            2.0000991821289062,
+            [
+              [
+                9,
+                {
+                  "w": 9
+                },
+                0
+              ]
+            ]
+          ],
+          [
+            3,
+            102.00005078315735,
+            [
+              [
+                2,
+                {
+                  "w": 2
+                },
+                2
+              ],
+              [
+                9,
+                {
+                  "w": 9
+                },
+                0
+              ],
+              [
+                8,
+                {
+                  "w": 8
+                },
+                2
+              ]
+            ]
+          ],
+          [
+            4,
+            103.00009655952454,
+            [
+              [
+                2,
+                {
+                  "w": 2
+                },
+                0
+              ]
+            ]
+          ],
+          [
+            5,
+            103.00009751319885,
+            [
+              [
+                8,
+                {
+                  "w": 8
+                },
+                1
+              ]
+            ]
+          ]
+        ]
+      },
+      {
+        "survivor_first": false,
+        "lost_transfer": "partial",
+        "round": 6,
+        "initial_retained_bytes": 380,
+        "final_retained_bytes": 570,
+        "urgent": [
+          [
+            "lost",
+            7
+          ],
+          [
+            "survivor",
+            2
+          ]
+        ],
+        "normal": [
+          [
+            1,
+            "lost",
+            7
+          ],
+          [
+            1,
+            "survivor",
+            2
+          ],
+          [
+            1,
+            "lost",
+            8
+          ],
+          [
+            1,
+            "survivor",
+            9
+          ],
+          [
+            2,
+            "lost",
+            9
+          ],
+          [
+            3,
+            "lost",
+            9
+          ],
+          [
+            4,
+            "survivor",
+            7
+          ],
+          [
+            4,
+            "survivor",
+            2
+          ],
+          [
+            4,
+            "survivor",
+            8
+          ],
+          [
+            4,
+            "survivor",
+            9
+          ],
+          [
+            5,
+            "survivor",
+            1
+          ],
+          [
+            6,
+            "survivor",
+            2
+          ]
+        ],
+        "aggregate": [
+          [
+            1,
+            1.0000457763671875,
+            [
+              [
+                9,
+                {
+                  "w": 9
+                },
+                0
+              ]
+            ]
+          ],
+          [
+            2,
+            2.0000977516174316,
+            [
+              [
+                9,
+                {
+                  "w": 9
+                },
+                0
+              ]
+            ]
+          ],
+          [
+            3,
+            102.0000491142273,
+            [
+              [
+                2,
+                {
+                  "w": 2
+                },
+                2
+              ],
+              [
+                9,
+                {
+                  "w": 9
+                },
+                0
+              ],
+              [
+                8,
+                {
+                  "w": 8
+                },
+                2
+              ]
+            ]
+          ],
+          [
+            4,
+            103.00009512901306,
+            [
+              [
+                8,
+                {
+                  "w": 8
+                },
+                0
+              ]
+            ]
+          ],
+          [
+            5,
+            103.00009608268738,
+            [
+              [
+                2,
+                {
+                  "w": 2
+                },
+                1
+              ]
+            ]
+          ]
+        ]
+      },
+      {
+        "survivor_first": true,
+        "lost_transfer": "partial",
+        "round": 6,
+        "initial_retained_bytes": 380,
+        "final_retained_bytes": 570,
+        "urgent": [
+          [
+            "lost",
+            7
+          ],
+          [
+            "survivor",
+            2
+          ]
+        ],
+        "normal": [
+          [
+            1,
+            "lost",
+            7
+          ],
+          [
+            1,
+            "survivor",
+            2
+          ],
+          [
+            1,
+            "lost",
+            8
+          ],
+          [
+            1,
+            "survivor",
+            9
+          ],
+          [
+            2,
+            "lost",
+            9
+          ],
+          [
+            3,
+            "lost",
+            9
+          ],
+          [
+            4,
+            "survivor",
+            7
+          ],
+          [
+            4,
+            "survivor",
+            2
+          ],
+          [
+            4,
+            "survivor",
+            8
+          ],
+          [
+            4,
+            "survivor",
+            9
+          ],
+          [
+            5,
+            "survivor",
+            1
+          ],
+          [
+            6,
+            "survivor",
+            2
+          ]
+        ],
+        "aggregate": [
+          [
+            1,
+            1.000046730041504,
+            [
+              [
+                9,
+                {
+                  "w": 9
+                },
+                0
+              ]
+            ]
+          ],
+          [
+            2,
+            2.0000977516174316,
+            [
+              [
+                9,
+                {
+                  "w": 9
+                },
+                0
+              ]
+            ]
+          ],
+          [
+            3,
+            102.00004982948303,
+            [
+              [
+                2,
+                {
+                  "w": 2
+                },
+                2
+              ],
+              [
+                9,
+                {
+                  "w": 9
+                },
+                0
+              ],
+              [
+                8,
+                {
+                  "w": 8
+                },
+                2
+              ]
+            ]
+          ],
+          [
+            4,
+            103.00009489059448,
+            [
+              [
+                8,
+                {
+                  "w": 8
+                },
+                0
+              ]
+            ]
+          ],
+          [
+            5,
+            103.0000958442688,
+            [
+              [
+                2,
+                {
+                  "w": 2
+                },
+                1
+              ]
+            ]
+          ]
+        ]
+      },
+      {
+        "survivor_first": false,
+        "lost_transfer": "part",
+        "round": 6,
+        "initial_retained_bytes": 380,
+        "final_retained_bytes": 570,
+        "urgent": [
+          [
+            "lost",
+            7
+          ],
+          [
+            "survivor",
+            2
+          ]
+        ],
+        "normal": [
+          [
+            1,
+            "lost",
+            7
+          ],
+          [
+            1,
+            "survivor",
+            2
+          ],
+          [
+            1,
+            "lost",
+            8
+          ],
+          [
+            1,
+            "survivor",
+            9
+          ],
+          [
+            2,
+            "lost",
+            9
+          ],
+          [
+            3,
+            "lost",
+            9
+          ],
+          [
+            4,
+            "survivor",
+            7
+          ],
+          [
+            4,
+            "survivor",
+            2
+          ],
+          [
+            4,
+            "survivor",
+            8
+          ],
+          [
+            4,
+            "survivor",
+            9
+          ],
+          [
+            5,
+            "survivor",
+            1
+          ],
+          [
+            6,
+            "survivor",
+            2
+          ]
+        ],
+        "aggregate": [
+          [
+            1,
+            1.0000457763671875,
+            [
+              [
+                9,
+                {
+                  "w": 9
+                },
+                0
+              ]
+            ]
+          ],
+          [
+            2,
+            2.0000970363616943,
+            [
+              [
+                9,
+                {
+                  "w": 9
+                },
+                0
+              ]
+            ]
+          ],
+          [
+            3,
+            102.00005006790161,
+            [
+              [
+                2,
+                {
+                  "w": 2
+                },
+                2
+              ],
+              [
+                9,
+                {
+                  "w": 9
+                },
+                0
+              ],
+              [
+                8,
+                {
+                  "w": 8
+                },
+                2
+              ]
+            ]
+          ],
+          [
+            4,
+            103.00009608268738,
+            [
+              [
+                2,
+                {
+                  "w": 2
+                },
+                0
+              ]
+            ]
+          ],
+          [
+            5,
+            103.00009608268738,
+            [
+              [
+                8,
+                {
+                  "w": 8
+                },
+                1
+              ]
+            ]
+          ]
+        ]
+      },
+      {
+        "survivor_first": true,
+        "lost_transfer": "part",
+        "round": 6,
+        "initial_retained_bytes": 380,
+        "final_retained_bytes": 570,
+        "urgent": [
+          [
+            "lost",
+            7
+          ],
+          [
+            "survivor",
+            2
+          ]
+        ],
+        "normal": [
+          [
+            1,
+            "lost",
+            7
+          ],
+          [
+            1,
+            "survivor",
+            2
+          ],
+          [
+            1,
+            "lost",
+            8
+          ],
+          [
+            1,
+            "survivor",
+            9
+          ],
+          [
+            2,
+            "lost",
+            9
+          ],
+          [
+            3,
+            "lost",
+            9
+          ],
+          [
+            4,
+            "survivor",
+            7
+          ],
+          [
+            4,
+            "survivor",
+            2
+          ],
+          [
+            4,
+            "survivor",
+            8
+          ],
+          [
+            4,
+            "survivor",
+            9
+          ],
+          [
+            5,
+            "survivor",
+            1
+          ],
+          [
+            6,
+            "survivor",
+            2
+          ]
+        ],
+        "aggregate": [
+          [
+            1,
+            1.0000450611114502,
+            [
+              [
+                9,
+                {
+                  "w": 9
+                },
+                0
+              ]
+            ]
+          ],
+          [
+            2,
+            2.000095844268799,
+            [
+              [
+                9,
+                {
+                  "w": 9
+                },
+                0
+              ]
+            ]
+          ],
+          [
+            3,
+            102.00004887580872,
+            [
+              [
+                2,
+                {
+                  "w": 2
+                },
+                2
+              ],
+              [
+                9,
+                {
+                  "w": 9
+                },
+                0
+              ],
+              [
+                8,
+                {
+                  "w": 8
+                },
+                2
+              ]
+            ]
+          ],
+          [
+            4,
+            103.00009512901306,
+            [
+              [
+                8,
+                {
+                  "w": 8
+                },
+                0
+              ]
+            ]
+          ],
+          [
+            5,
+            103.00009679794312,
+            [
+              [
+                2,
+                {
+                  "w": 2
+                },
+                1
+              ]
+            ]
+          ]
+        ]
+      }
+    ],
+    "314": [
+      {
+        "survivor_first": false,
+        "lost_transfer": "none",
+        "round": 6,
+        "initial_retained_bytes": 380,
+        "final_retained_bytes": 570,
+        "urgent": [
+          [
+            "lost",
+            7
+          ],
+          [
+            "survivor",
+            2
+          ]
+        ],
+        "normal": [
+          [
+            1,
+            "lost",
+            7
+          ],
+          [
+            1,
+            "survivor",
+            2
+          ],
+          [
+            1,
+            "lost",
+            8
+          ],
+          [
+            1,
+            "survivor",
+            9
+          ],
+          [
+            2,
+            "lost",
+            9
+          ],
+          [
+            3,
+            "lost",
+            9
+          ],
+          [
+            4,
+            "survivor",
+            7
+          ],
+          [
+            4,
+            "survivor",
+            2
+          ],
+          [
+            4,
+            "survivor",
+            8
+          ],
+          [
+            4,
+            "survivor",
+            9
+          ],
+          [
+            5,
+            "survivor",
+            1
+          ],
+          [
+            6,
+            "survivor",
+            2
+          ]
+        ],
+        "aggregate": [
+          [
+            1,
+            1.000058889389038,
+            [
+              [
+                9,
+                {
+                  "w": 9
+                },
+                0
+              ]
+            ]
+          ],
+          [
+            2,
+            2.000119686126709,
+            [
+              [
+                9,
+                {
+                  "w": 9
+                },
+                0
+              ]
+            ]
+          ],
+          [
+            3,
+            102.00006198883057,
+            [
+              [
+                2,
+                {
+                  "w": 2
+                },
+                2
+              ],
+              [
+                9,
+                {
+                  "w": 9
+                },
+                0
+              ],
+              [
+                8,
+                {
+                  "w": 8
+                },
+                2
+              ]
+            ]
+          ],
+          [
+            4,
+            103.00011110305786,
+            [
+              [
+                8,
+                {
+                  "w": 8
+                },
+                0
+              ]
+            ]
+          ],
+          [
+            5,
+            103.0001118183136,
+            [
+              [
+                2,
+                {
+                  "w": 2
+                },
+                1
+              ]
+            ]
+          ]
+        ]
+      },
+      {
+        "survivor_first": true,
+        "lost_transfer": "none",
+        "round": 6,
+        "initial_retained_bytes": 380,
+        "final_retained_bytes": 570,
+        "urgent": [
+          [
+            "lost",
+            7
+          ],
+          [
+            "survivor",
+            2
+          ]
+        ],
+        "normal": [
+          [
+            1,
+            "lost",
+            7
+          ],
+          [
+            1,
+            "survivor",
+            2
+          ],
+          [
+            1,
+            "lost",
+            8
+          ],
+          [
+            1,
+            "survivor",
+            9
+          ],
+          [
+            2,
+            "lost",
+            9
+          ],
+          [
+            3,
+            "lost",
+            9
+          ],
+          [
+            4,
+            "survivor",
+            7
+          ],
+          [
+            4,
+            "survivor",
+            2
+          ],
+          [
+            4,
+            "survivor",
+            8
+          ],
+          [
+            4,
+            "survivor",
+            9
+          ],
+          [
+            5,
+            "survivor",
+            1
+          ],
+          [
+            6,
+            "survivor",
+            2
+          ]
+        ],
+        "aggregate": [
+          [
+            1,
+            1.0000498294830322,
+            [
+              [
+                9,
+                {
+                  "w": 9
+                },
+                0
+              ]
+            ]
+          ],
+          [
+            2,
+            2.0001118183135986,
+            [
+              [
+                9,
+                {
+                  "w": 9
+                },
+                0
+              ]
+            ]
+          ],
+          [
+            3,
+            102.00005626678467,
+            [
+              [
+                2,
+                {
+                  "w": 2
+                },
+                2
+              ],
+              [
+                9,
+                {
+                  "w": 9
+                },
+                0
+              ],
+              [
+                8,
+                {
+                  "w": 8
+                },
+                2
+              ]
+            ]
+          ],
+          [
+            4,
+            103.00010514259338,
+            [
+              [
+                2,
+                {
+                  "w": 2
+                },
+                0
+              ]
+            ]
+          ],
+          [
+            5,
+            103.00010633468628,
+            [
+              [
+                8,
+                {
+                  "w": 8
+                },
+                1
+              ]
+            ]
+          ]
+        ]
+      },
+      {
+        "survivor_first": false,
+        "lost_transfer": "report",
+        "round": 6,
+        "initial_retained_bytes": 380,
+        "final_retained_bytes": 570,
+        "urgent": [
+          [
+            "lost",
+            7
+          ],
+          [
+            "survivor",
+            2
+          ]
+        ],
+        "normal": [
+          [
+            1,
+            "lost",
+            7
+          ],
+          [
+            1,
+            "survivor",
+            2
+          ],
+          [
+            1,
+            "lost",
+            8
+          ],
+          [
+            1,
+            "survivor",
+            9
+          ],
+          [
+            2,
+            "lost",
+            9
+          ],
+          [
+            3,
+            "lost",
+            9
+          ],
+          [
+            4,
+            "survivor",
+            7
+          ],
+          [
+            4,
+            "survivor",
+            2
+          ],
+          [
+            4,
+            "survivor",
+            8
+          ],
+          [
+            4,
+            "survivor",
+            9
+          ],
+          [
+            5,
+            "survivor",
+            1
+          ],
+          [
+            6,
+            "survivor",
+            2
+          ]
+        ],
+        "aggregate": [
+          [
+            1,
+            1.0000500679016113,
+            [
+              [
+                9,
+                {
+                  "w": 9
+                },
+                0
+              ]
+            ]
+          ],
+          [
+            2,
+            2.000107765197754,
+            [
+              [
+                9,
+                {
+                  "w": 9
+                },
+                0
+              ]
+            ]
+          ],
+          [
+            3,
+            102.00005602836609,
+            [
+              [
+                2,
+                {
+                  "w": 2
+                },
+                2
+              ],
+              [
+                9,
+                {
+                  "w": 9
+                },
+                0
+              ],
+              [
+                8,
+                {
+                  "w": 8
+                },
+                2
+              ]
+            ]
+          ],
+          [
+            4,
+            103.00010395050049,
+            [
+              [
+                2,
+                {
+                  "w": 2
+                },
+                0
+              ]
+            ]
+          ],
+          [
+            5,
+            103.0001049041748,
+            [
+              [
+                8,
+                {
+                  "w": 8
+                },
+                1
+              ]
+            ]
+          ]
+        ]
+      },
+      {
+        "survivor_first": true,
+        "lost_transfer": "report",
+        "round": 6,
+        "initial_retained_bytes": 380,
+        "final_retained_bytes": 570,
+        "urgent": [
+          [
+            "lost",
+            7
+          ],
+          [
+            "survivor",
+            2
+          ]
+        ],
+        "normal": [
+          [
+            1,
+            "lost",
+            7
+          ],
+          [
+            1,
+            "survivor",
+            2
+          ],
+          [
+            1,
+            "lost",
+            8
+          ],
+          [
+            1,
+            "survivor",
+            9
+          ],
+          [
+            2,
+            "lost",
+            9
+          ],
+          [
+            3,
+            "lost",
+            9
+          ],
+          [
+            4,
+            "survivor",
+            7
+          ],
+          [
+            4,
+            "survivor",
+            2
+          ],
+          [
+            4,
+            "survivor",
+            8
+          ],
+          [
+            4,
+            "survivor",
+            9
+          ],
+          [
+            5,
+            "survivor",
+            1
+          ],
+          [
+            6,
+            "survivor",
+            2
+          ]
+        ],
+        "aggregate": [
+          [
+            1,
+            1.0000519752502441,
+            [
+              [
+                9,
+                {
+                  "w": 9
+                },
+                0
+              ]
+            ]
+          ],
+          [
+            2,
+            2.000110149383545,
+            [
+              [
+                9,
+                {
+                  "w": 9
+                },
+                0
+              ]
+            ]
+          ],
+          [
+            3,
+            102.00005507469177,
+            [
+              [
+                2,
+                {
+                  "w": 2
+                },
+                2
+              ],
+              [
+                9,
+                {
+                  "w": 9
+                },
+                0
+              ],
+              [
+                8,
+                {
+                  "w": 8
+                },
+                2
+              ]
+            ]
+          ],
+          [
+            4,
+            103.00010275840759,
+            [
+              [
+                2,
+                {
+                  "w": 2
+                },
+                0
+              ]
+            ]
+          ],
+          [
+            5,
+            103.00010395050049,
+            [
+              [
+                7,
+                {
+                  "w": 7
+                },
+                1
+              ]
+            ]
+          ]
+        ]
+      },
+      {
+        "survivor_first": false,
+        "lost_transfer": "partial",
+        "round": 6,
+        "initial_retained_bytes": 380,
+        "final_retained_bytes": 570,
+        "urgent": [
+          [
+            "lost",
+            7
+          ],
+          [
+            "survivor",
+            2
+          ]
+        ],
+        "normal": [
+          [
+            1,
+            "lost",
+            7
+          ],
+          [
+            1,
+            "survivor",
+            2
+          ],
+          [
+            1,
+            "lost",
+            8
+          ],
+          [
+            1,
+            "survivor",
+            9
+          ],
+          [
+            2,
+            "lost",
+            9
+          ],
+          [
+            3,
+            "lost",
+            9
+          ],
+          [
+            4,
+            "survivor",
+            7
+          ],
+          [
+            4,
+            "survivor",
+            2
+          ],
+          [
+            4,
+            "survivor",
+            8
+          ],
+          [
+            4,
+            "survivor",
+            9
+          ],
+          [
+            5,
+            "survivor",
+            1
+          ],
+          [
+            6,
+            "survivor",
+            2
+          ]
+        ],
+        "aggregate": [
+          [
+            1,
+            1.0000519752502441,
+            [
+              [
+                9,
+                {
+                  "w": 9
+                },
+                0
+              ]
+            ]
+          ],
+          [
+            2,
+            2.0001070499420166,
+            [
+              [
+                9,
+                {
+                  "w": 9
+                },
+                0
+              ]
+            ]
+          ],
+          [
+            3,
+            102.00005507469177,
+            [
+              [
+                2,
+                {
+                  "w": 2
+                },
+                2
+              ],
+              [
+                9,
+                {
+                  "w": 9
+                },
+                0
+              ],
+              [
+                8,
+                {
+                  "w": 8
+                },
+                2
+              ]
+            ]
+          ],
+          [
+            4,
+            103.00010418891907,
+            [
+              [
+                2,
+                {
+                  "w": 2
+                },
+                0
+              ]
+            ]
+          ],
+          [
+            5,
+            103.0001049041748,
+            [
+              [
+                8,
+                {
+                  "w": 8
+                },
+                1
+              ]
+            ]
+          ]
+        ]
+      },
+      {
+        "survivor_first": true,
+        "lost_transfer": "partial",
+        "round": 6,
+        "initial_retained_bytes": 380,
+        "final_retained_bytes": 570,
+        "urgent": [
+          [
+            "lost",
+            7
+          ],
+          [
+            "survivor",
+            2
+          ]
+        ],
+        "normal": [
+          [
+            1,
+            "lost",
+            7
+          ],
+          [
+            1,
+            "survivor",
+            2
+          ],
+          [
+            1,
+            "lost",
+            8
+          ],
+          [
+            1,
+            "survivor",
+            9
+          ],
+          [
+            2,
+            "lost",
+            9
+          ],
+          [
+            3,
+            "lost",
+            9
+          ],
+          [
+            4,
+            "survivor",
+            7
+          ],
+          [
+            4,
+            "survivor",
+            2
+          ],
+          [
+            4,
+            "survivor",
+            8
+          ],
+          [
+            4,
+            "survivor",
+            9
+          ],
+          [
+            5,
+            "survivor",
+            1
+          ],
+          [
+            6,
+            "survivor",
+            2
+          ]
+        ],
+        "aggregate": [
+          [
+            1,
+            1.0000510215759277,
+            [
+              [
+                9,
+                {
+                  "w": 9
+                },
+                0
+              ]
+            ]
+          ],
+          [
+            2,
+            2.000105857849121,
+            [
+              [
+                9,
+                {
+                  "w": 9
+                },
+                0
+              ]
+            ]
+          ],
+          [
+            3,
+            102.00005292892456,
+            [
+              [
+                2,
+                {
+                  "w": 2
+                },
+                2
+              ],
+              [
+                9,
+                {
+                  "w": 9
+                },
+                0
+              ],
+              [
+                8,
+                {
+                  "w": 8
+                },
+                2
+              ]
+            ]
+          ],
+          [
+            4,
+            103.00010275840759,
+            [
+              [
+                2,
+                {
+                  "w": 2
+                },
+                0
+              ]
+            ]
+          ],
+          [
+            5,
+            103.0001049041748,
+            [
+              [
+                7,
+                {
+                  "w": 7
+                },
+                1
+              ]
+            ]
+          ]
+        ]
+      },
+      {
+        "survivor_first": false,
+        "lost_transfer": "part",
+        "round": 6,
+        "initial_retained_bytes": 380,
+        "final_retained_bytes": 570,
+        "urgent": [
+          [
+            "lost",
+            7
+          ],
+          [
+            "survivor",
+            2
+          ]
+        ],
+        "normal": [
+          [
+            1,
+            "lost",
+            7
+          ],
+          [
+            1,
+            "survivor",
+            2
+          ],
+          [
+            1,
+            "lost",
+            8
+          ],
+          [
+            1,
+            "survivor",
+            9
+          ],
+          [
+            2,
+            "lost",
+            9
+          ],
+          [
+            3,
+            "lost",
+            9
+          ],
+          [
+            4,
+            "survivor",
+            7
+          ],
+          [
+            4,
+            "survivor",
+            2
+          ],
+          [
+            4,
+            "survivor",
+            8
+          ],
+          [
+            4,
+            "survivor",
+            9
+          ],
+          [
+            5,
+            "survivor",
+            1
+          ],
+          [
+            6,
+            "survivor",
+            2
+          ]
+        ],
+        "aggregate": [
+          [
+            1,
+            1.0000512599945068,
+            [
+              [
+                9,
+                {
+                  "w": 9
+                },
+                0
+              ]
+            ]
+          ],
+          [
+            2,
+            2.0001063346862793,
+            [
+              [
+                9,
+                {
+                  "w": 9
+                },
+                0
+              ]
+            ]
+          ],
+          [
+            3,
+            102.00005507469177,
+            [
+              [
+                2,
+                {
+                  "w": 2
+                },
+                2
+              ],
+              [
+                9,
+                {
+                  "w": 9
+                },
+                0
+              ],
+              [
+                8,
+                {
+                  "w": 8
+                },
+                2
+              ]
+            ]
+          ],
+          [
+            4,
+            103.0001060962677,
+            [
+              [
+                2,
+                {
+                  "w": 2
+                },
+                0
+              ]
+            ]
+          ],
+          [
+            5,
+            103.00010704994202,
+            [
+              [
+                8,
+                {
+                  "w": 8
+                },
+                1
+              ]
+            ]
+          ]
+        ]
+      },
+      {
+        "survivor_first": true,
+        "lost_transfer": "part",
+        "round": 6,
+        "initial_retained_bytes": 380,
+        "final_retained_bytes": 570,
+        "urgent": [
+          [
+            "lost",
+            7
+          ],
+          [
+            "survivor",
+            2
+          ]
+        ],
+        "normal": [
+          [
+            1,
+            "lost",
+            7
+          ],
+          [
+            1,
+            "survivor",
+            2
+          ],
+          [
+            1,
+            "lost",
+            8
+          ],
+          [
+            1,
+            "survivor",
+            9
+          ],
+          [
+            2,
+            "lost",
+            9
+          ],
+          [
+            3,
+            "lost",
+            9
+          ],
+          [
+            4,
+            "survivor",
+            7
+          ],
+          [
+            4,
+            "survivor",
+            2
+          ],
+          [
+            4,
+            "survivor",
+            8
+          ],
+          [
+            4,
+            "survivor",
+            9
+          ],
+          [
+            5,
+            "survivor",
+            1
+          ],
+          [
+            6,
+            "survivor",
+            2
+          ]
+        ],
+        "aggregate": [
+          [
+            1,
+            1.000049114227295,
+            [
+              [
+                9,
+                {
+                  "w": 9
+                },
+                0
+              ]
+            ]
+          ],
+          [
+            2,
+            2.0001060962677,
+            [
+              [
+                9,
+                {
+                  "w": 9
+                },
+                0
+              ]
+            ]
+          ],
+          [
+            3,
+            102.00005316734314,
+            [
+              [
+                2,
+                {
+                  "w": 2
+                },
+                2
+              ],
+              [
+                9,
+                {
+                  "w": 9
+                },
+                0
+              ],
+              [
+                8,
+                {
+                  "w": 8
+                },
+                2
+              ]
+            ]
+          ],
+          [
+            4,
+            103.00010132789612,
+            [
+              [
+                2,
+                {
+                  "w": 2
+                },
+                0
+              ]
+            ]
+          ],
+          [
+            5,
+            103.00010323524475,
+            [
+              [
+                8,
+                {
+                  "w": 8
+                },
+                1
+              ]
+            ]
+          ]
+        ]
+      }
+    ]
+  },
+  "d_combination": {
+    "old_candidate": "a4a4733e96cf248a73db76e6b2182536b9f592ea",
+    "candidate": "aa232791f04d93eb9de09ed6c596ac714db5b605",
+    "tree": "0a6824bcfa23fa406da5e1b5835b4564161f5c3c",
+    "source_sha256": "a26d306daa6a4accd4d67c9f26dea9f9ad153e74353fe8698643987cb6f25c03",
+    "unchanged_source": true,
+    "qualification": "Provisional source combination only; root final accepted B+D remains pending.",
+    "probe": {
+      "path": "/tmp/plato-phase2b-review-3/candidate/tests/test_s3_combined.py",
+      "sha256": "f11bc92cc5c013146962d68e3eb8d45100be9aaf7b7072ec7a88b4103d711222"
+    },
+    "original_probe": {
+      "path": "/tmp/plato-phase2b-runtime/review-fixes/test_s3_combined.py",
+      "sha256": "f11bc92cc5c013146962d68e3eb8d45100be9aaf7b7072ec7a88b4103d711222"
+    },
+    "policy": "No D edits, cherry-pick, environment changes or final combined root qualification claim. Root promotes the actual combined regression and runs it on final accepted B+D source."
+  },
+  "count_policy": "Per interpreter: 184 tracked affected cases excluding 48 unchanged startup subprocess cases, 12 newly independent event-driven loss/close probes, and 47 retained independent/provisional cases (22 positive contracts + original reviewer2 disconnect + 24 D/B combinations) all pass: 243 distinct reviewer execution nodes, zero skips/warnings. The 24 D/B cases remain provisional integration evidence. The independent red run has 17 nodes (11 fail/6 pass); 5 shipped red cases overlap the green affected suite. Author green53 overlaps affected232. Full original candidate base collection contains 443 nodes plus exactly the allowed absent-opacus module skip; the 232 author affected nodes and all 48 startup cases are present. Repeated collection/count checks are not additional coverage.",
+  "handoffs_and_pending_integration": [
+    {
+      "id": "B_REVIEW_GATE",
+      "owner": "Root",
+      "status": "PASS for exact 00eeb9dc candidate",
+      "requirement": "The B review condition for serialized client/server F07 ownership transfer to C is satisfied; root controls acceptance/integration and handoff."
+    },
+    {
+      "id": "B_D_COMBINATION",
+      "owner": "Root",
+      "status": "Pending final accepted-source qualification",
+      "requirement": "Promote actual immutable D writer/presigner-to-B reader regression into tracked coverage and run on final accepted B+D tree. Current D base-test corrections and separate review are not B blockers or requests for unrelated D edits."
+    },
+    {
+      "id": "F07_TRAINER_F26",
+      "owner": "2C",
+      "status": "Assigned future dependency",
+      "requirement": "Preserve full checkpoint writer/reader/sidecar inventory. Repair/qualify urgent time-snapshot metadata decoding and epoch order within C. Trainer lifecycle/accumulation/DP/personalization/SCAFFOLD work remains C scope."
+    },
+    {
+      "id": "MLX_F17",
+      "owner": "3A",
+      "status": "Later narrow ingress capability handoff",
+      "requirement": "Extend eligible raw/transformed MLX tree validation, including zero weights and both arrival orders, after B acceptance."
+    },
+    {
+      "id": "PHASE_INTEGRATION",
+      "owner": "Root",
+      "status": "Pending",
+      "requirement": "Final combined validation and phase gate remain required; this component PASS does not replace them."
+    }
+  ],
+  "explicit_limits": [
+    "No real urgent trainer/checkpoint end-to-end claim; new liveness probes use inert report/payload generation and real runtime event handlers. Actual urgent snapshot retrieval remains C/F26.",
+    "No live cloud S3, GPU/distributed or production multi-silo run, and no whole-stack Python 3.14 support claim.",
+    "Wire limits/session binding retain the existing trusted-peer/storage contract. Arbitrary decoded pickle expansion/execution and indistinguishable same-logical-ID replay are outside it; no auth/nonce/wire redesign requested.",
+    "PORT model preservation executed on CPU; other-device preservation is source inspection of detach().cpu() copies, not an accelerator result.",
+    "Author startup matrix was not mechanically repeated. Exact current-source logs/results/events/tensors were audited; root integration repeats the accepted combination later.",
+    "Early reviewer-only harness failures were corrected in owned scratch: eager server import invoked Config argument parsing before fixtures; a later assertion incorrectly expected every asynchronous replacement round to contain four clients. The production replacement policy uses one replacement after a full batch. Those logs are retained and excluded from product findings; final probes still require the full four-client survivor batch plus genuine next-replacement progress.",
+    "No candidate edits, metadata/CI edits, other-environment mutations, commits/push/PR edits, security questionnaire or nested agents."
+  ],
+  "owned_resources": {
+    "root": "/tmp/plato-phase2b-review-3",
+    "contents": "Exact current/prior archives, owned dev and clean-base 3.13/3.14 environments, UV cache, independent/copied probes, raw red/green/collection/harness logs, pytest bases, source diffs and evidence audit/build scripts.",
+    "retention": "Keep for root acceptance and reproduction; no other agent resources removed.",
+    "write_scope": "Only /Users/bli/Playground/plato/evidence/2026-refresh/phase2b-review-3.json and /tmp/plato-phase2b-review-3."
+  }
+}

@@ -84,7 +84,10 @@ class LossTracker:
 
     def update(self, loss_batch_value: Any, batch_size: int = 1) -> None:
         """Updates the loss tracker with another loss value from a batch."""
-
+        # Metrics must not retain every batch's autograd graph for the epoch.
+        detach = getattr(loss_batch_value, "detach", None)
+        if callable(detach):
+            loss_batch_value = detach()
         self.loss_value = loss_batch_value
         self.total_loss += loss_batch_value * batch_size
         self.running_count += batch_size

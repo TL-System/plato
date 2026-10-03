@@ -1,0 +1,122 @@
+{
+  "id": "F28",
+  "severity": "medium",
+  "status": "OPEN_CONFIRMED",
+  "title": "Generic server startup reseeds and overwrites restored checkpoint client-selection RNG.",
+  "source_candidate": "62d7b7d8ef75be779149a96f567779c86699edb4",
+  "immutable_source": "/tmp/plato-refresh-worktrees/feddyn-design",
+  "locations": [
+    {
+      "path": "plato/servers/base.py",
+      "line": 353
+    },
+    {
+      "path": "plato/servers/base.py",
+      "line": 395
+    }
+  ],
+  "origin": "FD-D-R01 exposed startup ordering in FedDyn design review; root independently reproduced with actual generic checkpoint writer/reader, not a proposed FedDyn checkpoint method.",
+  "expected": "After selections [9,7], [5,6] at seed17 for N10 andper_round2, resume round2 and select [5,3].",
+  "observed": {
+    "313": {
+      "prior_selections": [
+        [
+          9,
+          7
+        ],
+        [
+          5,
+          6
+        ]
+      ],
+      "expected_next": [
+        5,
+        3
+      ],
+      "actual": {
+        "actual_next": [
+          9,
+          7
+        ],
+        "resumed": true,
+        "current_round": 2,
+        "numpy_restored": true,
+        "weights_restored": true
+      },
+      "checkpoint_files": [
+        "numpy_prng_state_2.pkl",
+        "prng_state_2.pkl",
+        "checkpoint_lenet5_2.safetensors",
+        "checkpoint_lenet5_2.safetensors.pkl",
+        "current_round.pkl"
+      ]
+    },
+    "314": {
+      "prior_selections": [
+        [
+          9,
+          7
+        ],
+        [
+          5,
+          6
+        ]
+      ],
+      "expected_next": [
+        5,
+        3
+      ],
+      "actual": {
+        "actual_next": [
+          9,
+          7
+        ],
+        "resumed": true,
+        "current_round": 2,
+        "numpy_restored": true,
+        "weights_restored": true
+      },
+      "checkpoint_files": [
+        "numpy_prng_state_2.pkl",
+        "prng_state_2.pkl",
+        "checkpoint_lenet5_2.safetensors",
+        "checkpoint_lenet5_2.safetensors.pkl",
+        "current_round.pkl"
+      ]
+    }
+  },
+  "method": "Actual FedAvg Server instance with real ComposableTrainer, save_to_checkpoint, _resume_from_checkpoint, Server.run and random-selection strategy. configure fixture preserves constructed trainer; disable clients, no-op periodic and start capture avoid datasource/network/process setup only. Model weights, round and NumPy restore correctly while Python client-selection resets.",
+  "boundary": "Does not claim full network/training continuation; actual persistence/startup/selection path verifies material ordering defect.",
+  "regression_requirement": "Actual saved checkpoint -> run/resume -> next selections with nontrivial saved seed state on both interpreters; preserve fresh-run seeding, no-configured-seed behavior, ordinary/central startup branches and the existing48startup tests. Keep checkpoints/names/format and accepted runtime transport behavior.",
+  "root_ownership_handoff": "Root reclaims plato/servers/base.py startup/RNG lifecycle only from completed C filename handoff and assigns original B author. C current correction scope does not require this file. Separate worktrees; merge reviewed supplemental B at a clean C boundary and rerun combined checkpoint/startup tests. No generic authentication/protocol redesign.",
+  "probe": {
+    "path": "/tmp/plato-phase2-root/server_resume_rng_probe.py",
+    "sha256": "1cc83c7015e220c11fdd63d44d955402a293453e287d809a53251aa3478a16f6"
+  },
+  "commands": {
+    "313": "PYTHONPATH=/tmp/plato-refresh-worktrees/feddyn-design OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 /tmp/plato-phase2-root/c-base-313/bin/python /tmp/plato-phase2-root/server_resume_rng_probe.py",
+    "314": "PYTHONPATH=/tmp/plato-refresh-worktrees/feddyn-design OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 /tmp/plato-phase2-root/c-base-314/bin/python /tmp/plato-phase2-root/server_resume_rng_probe.py"
+  },
+  "exit_codes": {
+    "313": 0,
+    "314": 0
+  },
+  "artifacts": [
+    {
+      "path": "/tmp/plato-phase2-root/server-resume-rng-313.json",
+      "sha256": "0a3829b0855b47d5e86cf03fb4e77cef3485ac8ef1d356f49f24de7758a6725e"
+    },
+    {
+      "path": "/tmp/plato-phase2-root/server-resume-rng-313.stderr",
+      "sha256": "27bfc89344df07dbf22c92c320bd52b75908a78b2843d7f69eb8f128cfa22b28"
+    },
+    {
+      "path": "/tmp/plato-phase2-root/server-resume-rng-314.json",
+      "sha256": "0a3829b0855b47d5e86cf03fb4e77cef3485ac8ef1d356f49f24de7758a6725e"
+    },
+    {
+      "path": "/tmp/plato-phase2-root/server-resume-rng-314.stderr",
+      "sha256": "75ce2191e0322fcc406e6a51bc459a4d037a7e2b2894bbf89e469cb9c8a329d3"
+    }
+  ]
+}

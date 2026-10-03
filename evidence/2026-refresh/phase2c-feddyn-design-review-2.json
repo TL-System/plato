@@ -1,0 +1,1599 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-03",
+  "written_at_utc": "2026-10-03T07:28:37.449701+00:00",
+  "role": "Fresh independent Sol xhigh design reviewer; no nested agents, read-only immutable code context.",
+  "verdict": "PASS",
+  "design_acceptance": "REVISED_DESIGN_ONLY",
+  "finding_counts": {
+    "critical": 0,
+    "high": 0,
+    "medium": 0,
+    "low": 0
+  },
+  "findings": [],
+  "low_findings": [],
+  "summary": "The narrow revision resolves FD-D-R01 and FD-D-L01. The example-local validated pending-RNG/start handshake is feasible against unchanged immutable62d, restores every promised CPU/selection field after inherited seeding, preserves fresh seeding and rejects without leaking staged state. The revised update-notification criterion matches real trainer behavior. Algebra, rational oracles,15criteria, bounded server ownership and explicit migration remain sound. No production implementation or final integration is accepted.",
+  "reviewed_artifact": {
+    "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2c-feddyn-design.json",
+    "bytes": 87391,
+    "sha256": "62c5d61805c49ccc06f99776d0da820c5b27cffeb5916754ddb16bb3135c1d5b"
+  },
+  "requested_sha256": "62c5d61805c49ccc06f99776d0da820c5b27cffeb5916754ddb16bb3135c1d5b",
+  "immutable_code_context": {
+    "path": "/private/tmp/plato-refresh-worktrees/feddyn-design",
+    "alias": "/tmp/plato-refresh-worktrees/feddyn-design",
+    "commit": "62d7b7d8ef75be779149a96f567779c86699edb4",
+    "tree": "bfc18588145c935adaf36850f909f3223b5ad058",
+    "status": "CLEAN_BEFORE_AND_AFTER_PROBES",
+    "module_source_verified": true,
+    "evolving_worktrees_read": false
+  },
+  "original_design": {
+    "path": "/tmp/plato-phase2c-feddyn-design/phase2c-feddyn-design.original-455d1447.json",
+    "bytes": 65749,
+    "sha256": "455d144736f6318246c834d679e2ca8d371160dd654bfea6bab96b7abc9c4d60"
+  },
+  "immutable_first_review": {
+    "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2c-feddyn-design-review.json",
+    "bytes": 69176,
+    "sha256": "e2b46a83c1a098e4b9d19e123b4c8c92fb1298f0a41515c4663e523aaae3522a"
+  },
+  "previous_review_verdict_preserved": "REQUEST_CHANGES; immutable first review is unchanged. This independent report accepts only the revised design.",
+  "dispositions": [
+    {
+      "id": "FD-D-R01",
+      "original_severity": "medium",
+      "status": "RESOLVED_IN_DESIGN",
+      "artifact_fields": [
+        "/stateflow/checkpoint/owner",
+        "/stateflow/checkpoint/read",
+        "/stateflow/checkpoint/scope",
+        "/stateflow/checkpoint/startup_handoff",
+        "/files/exact_owned_implementation/4/change",
+        "/testacceptance/11",
+        "/testacceptance/12"
+      ],
+      "assessment": "Whole-bundle/private-generator validation precedes owned pending publication. Successful installation sets current/context/committed round and resumed_session. The compatible synchronous start override rechecks identity, validates without live draws, installs separate Python-global and selector states, NumPy cache and Torch CPU state, then consumes pending before base start. Rejection snapshots/rollback and no-delegation rule are explicit; fresh runs directly forward.",
+      "source_evidence": [
+        {
+          "path": "plato/servers/base.py",
+          "line": 346,
+          "meaning": "Inherited run signature and synchronous ordering."
+        },
+        {
+          "path": "plato/servers/base.py",
+          "line": 353,
+          "meaning": "Resume precedes client launch and seed."
+        },
+        {
+          "path": "plato/servers/base.py",
+          "line": 398,
+          "meaning": "Seed17 replaces live Python RNG and server selection state."
+        },
+        {
+          "path": "plato/servers/base.py",
+          "line": 402,
+          "meaning": "start(port=Config().server.port) is an available local override."
+        },
+        {
+          "path": "plato/servers/base.py",
+          "line": 414,
+          "meaning": "Socket creation follows entry to inherited start."
+        },
+        {
+          "path": "plato/servers/base.py",
+          "line": 419,
+          "meaning": "Namespace registration follows socket creation."
+        },
+        {
+          "path": "plato/servers/base.py",
+          "line": 462,
+          "meaning": "resumed_session triggers round selection after registration."
+        },
+        {
+          "path": "plato/servers/base.py",
+          "line": 841,
+          "meaning": "Selection copies server state into context, then updates server from context."
+        },
+        {
+          "path": "plato/servers/strategies/client_selection/random_selection.py",
+          "line": 27,
+          "meaning": "Selector consumes saved context PRNG state."
+        }
+      ],
+      "independent_probe": "CPU3.13.16 and3.14.8 execute inherited run and real base.start body; scratch socket/run_app interception sees restored live/context fields. Actual serialized scratch bundle resumes[5,3],[9,5], all model/history states match uninterrupted control and exact reference; unrepaired path restarts[9,7].11 rejected bundle cases, injected post-model-install exception and partial RNG-install exception leave model/history/round/live RNG/pending unchanged.",
+      "production_acceptance": "FD-A12/13 still require actual production bundle and shipped run/--resume, later model/all-history state, local sockets and real spawn; direct resume/selection and intercepted scratch do not replace them."
+    },
+    {
+      "id": "FD-D-L01",
+      "original_severity": "low",
+      "status": "RESOLVED_IN_DESIGN",
+      "artifact_fields": [
+        "/testacceptance/7/expected"
+      ],
+      "assessment": "The criterion names two calls each to optimizer_strategy.on_optimizer_step, model_update_strategy.after_step and on_train_step_end. It correctly distinguishes no real scheduler object/steps from create_scheduler returningNone and the epoch-boundary step(None,context) no-op.",
+      "source_evidence": [
+        {
+          "path": "plato/trainers/composable.py",
+          "line": 626,
+          "meaning": "Normal successful update dispatches optimizer/update/callback hooks."
+        },
+        {
+          "path": "plato/trainers/composable.py",
+          "line": 698,
+          "meaning": "Finalized tail dispatches the same hooks."
+        },
+        {
+          "path": "plato/trainers/composable.py",
+          "line": 742,
+          "meaning": "LR strategy step occurs once per epoch."
+        },
+        {
+          "path": "plato/trainers/strategies/lr_scheduler.py",
+          "line": 51,
+          "meaning": "Unconfigured default scheduler returnsNone."
+        }
+      ],
+      "independent_probe": "Both versions run actual trainer/accumulation strategy with real SGD post-hooks:3batches=>2updates, y1.99005/h.49005, each named notification2, one history stage, zero real scheduler objects/steps, one epoch no-op.4divisible and1short batch cases also agree."
+    }
+  ],
+  "revision_integrity": {
+    "exact_changed_fields": [
+      "/configuration_and_metadata/actual_available_metadata",
+      "/configuration_and_metadata/available_sampler_dependency",
+      "/files/exact_owned_implementation/4/change",
+      "/stateflow/checkpoint/owner",
+      "/stateflow/checkpoint/read",
+      "/stateflow/checkpoint/scope",
+      "/stateflow/checkpoint/startup_handoff",
+      "/testacceptance/7/expected",
+      "/testacceptance/11/expected",
+      "/testacceptance/11/setup",
+      "/testacceptance/12/expected",
+      "/testacceptance/12/setup",
+      "/verdict",
+      "/revision"
+    ],
+    "independently_computed_fields": [
+      "/configuration_and_metadata/actual_available_metadata",
+      "/configuration_and_metadata/available_sampler_dependency",
+      "/files/exact_owned_implementation/4/change",
+      "/revision",
+      "/stateflow/checkpoint/owner",
+      "/stateflow/checkpoint/read",
+      "/stateflow/checkpoint/scope",
+      "/stateflow/checkpoint/startup_handoff",
+      "/testacceptance/7/expected",
+      "/testacceptance/11/expected",
+      "/testacceptance/11/setup",
+      "/testacceptance/12/expected",
+      "/testacceptance/12/setup",
+      "/verdict"
+    ],
+    "exact_set_matches": true,
+    "comparison_order_note": "JSON-pointer set is exact; list order is not a semantic diff.",
+    "all_other_original_fields_equal": true,
+    "algebra_oracles_migration_unchanged": true,
+    "all15criterion_ids_preserved": true,
+    "available_a_metadata_delta": "Narrow factual update explicitly identifies accepted-A as a later dependency, not code already in62d.",
+    "verified_declared_receipts": 55,
+    "all_declared_receipts_match": true,
+    "source_blobs_match_commit": true,
+    "detailed_receipt_audit": {
+      "path": "/tmp/plato-phase2c-feddyn-design-review-2/input-audit.json",
+      "bytes": 44626,
+      "sha256": "a73ee439617b4470da37ee2639a64e1ac15f4a7425e2baaecd3ee46178ee6cb3"
+    },
+    "author_probe_limitations_accurate": "Author probe uses actual inherited run/selector with intercepted base start and an in-memory RNG-only bundle. It does not claim full serialized/model/history/network acceptance.",
+    "initial_reviewer_harness_issue": "First input-audit invocation incorrectly compared pointer order instead of pointer set and exited1 before any ROOT report write. Corrected only own scratch assertion; final audit passes. Original log retained."
+  },
+  "scientific_assessment": {
+    "status": "PRESERVED_AND_INDEPENDENTLY_CONFIRMED",
+    "local": "J_i=F_i+alpha_i<h_i,w>+(alpha_i/2)||w-x||^2; gradient gradF_i+alpha_i*(w-x+h_i). Shifted and author linear-plus-decay forms differ only by a parameter-independent constant when clipping is inactive.",
+    "paper_mapping": "For the common-alpha scaled objective, paper signed local state g_i=-alpha*h_i and server state=-alpha*mean_population(h_i). Algorithm1 therefore gives selected unweighted endpoint mean plus full-population displacement-history mean.",
+    "weighting": "Uniform default q=1. Sample q_i=N*n_i/sum(n), alpha_i=alpha/q_i. Scaled-loss/learning-rate interpretation is an algebraic inference, not a new finite-SGD convergence theorem. No sample weighting of selected endpoints, no selected-only count normalization, no label-derived coefficient.",
+    "primary_paper": {
+      "url": "https://arxiv.org/pdf/2111.04263v1",
+      "version": "arXiv2111.04263v1,8November2021",
+      "root_receipt": {
+        "path": "/tmp/plato-phase2-root/feddyn-primary/2111.04263v1.pdf",
+        "bytes": 2779369,
+        "sha256": "395f508d4f1adf94b8509897fe1fdb40a36090d2171ea74bd15c4b59c1e2e2ff"
+      },
+      "author_receipt": {
+        "path": "/tmp/plato-phase2c-feddyn-design/2111.04263v1.pdf",
+        "bytes": 2779369,
+        "sha256": "395f508d4f1adf94b8509897fe1fdb40a36090d2171ea74bd15c4b59c1e2e2ff"
+      },
+      "read_evidence": "Web-opened primary PDF text:Section2/Algorithm1, printed pages3-4. Retained primary and author PDF bytes/hash match. Web screenshot attempt failed because tool did not expose a PDF screenshot; no screenshot or PDF-rendering success is claimed."
+    },
+    "pinned_author_sources": [
+      {
+        "commit": "48a19fac440ef079ce563da8e0c2896f8256fef9",
+        "url": "https://github.com/alpemreacar/FedDyn/blob/48a19fac440ef079ce563da8e0c2896f8256fef9/utils_general.py",
+        "root_receipt": {
+          "path": "/tmp/plato-phase2-root/feddyn-primary/utils_general.py",
+          "bytes": 12240,
+          "sha256": "6e79b259456475934b71cddc797b8dcf1e66818bd543465ad02225b6e506eca5"
+        },
+        "author_receipt": {
+          "path": "/tmp/plato-phase2c-feddyn-design/utils_general.py",
+          "bytes": 12240,
+          "sha256": "6e79b259456475934b71cddc797b8dcf1e66818bd543465ad02225b6e506eca5"
+        }
+      },
+      {
+        "commit": "48a19fac440ef079ce563da8e0c2896f8256fef9",
+        "url": "https://github.com/alpemreacar/FedDyn/blob/48a19fac440ef079ce563da8e0c2896f8256fef9/utils_methods.py",
+        "root_receipt": {
+          "path": "/tmp/plato-phase2-root/feddyn-primary/utils_methods.py",
+          "bytes": 33856,
+          "sha256": "87026e71e3826893f3176359ce45bedfde858919f304b40e4ba564e214892d4d"
+        },
+        "author_receipt": {
+          "path": "/tmp/plato-phase2c-feddyn-design/utils_methods.py",
+          "bytes": 33856,
+          "sha256": "87026e71e3826893f3176359ce45bedfde858919f304b40e4ba564e214892d4d"
+        }
+      },
+      {
+        "commit": "48a19fac440ef079ce563da8e0c2896f8256fef9",
+        "url": "https://github.com/alpemreacar/FedDyn/blob/48a19fac440ef079ce563da8e0c2896f8256fef9/README.md",
+        "root_receipt": {
+          "path": "/tmp/plato-phase2-root/feddyn-primary/README.md",
+          "bytes": 1624,
+          "sha256": "d04e9fe2e8d64dd7ec28ef785e8e428563354c32fc240fab8f2a09bb2dff2766"
+        },
+        "author_receipt": {
+          "path": "/tmp/plato-phase2c-feddyn-design/README.md",
+          "bytes": 1624,
+          "sha256": "d04e9fe2e8d64dd7ec28ef785e8e428563354c32fc240fab8f2a09bb2dff2766"
+        }
+      }
+    ],
+    "source_locations": [
+      {
+        "path": "utils_general.py@48a19fac",
+        "line": 185,
+        "meaning": "Exact train_feddyn_mdl function."
+      },
+      {
+        "path": "utils_general.py@48a19fac",
+        "line": 190,
+        "meaning": "SGD quadratic alpha term is optimizer decay."
+      },
+      {
+        "path": "utils_general.py@48a19fac",
+        "line": 219,
+        "meaning": "Linear coefficient alpha*(-cloud+history)."
+      },
+      {
+        "path": "utils_general.py@48a19fac",
+        "line": 224,
+        "meaning": "Gradient clipping precedes SGD decay; active clipping equivalence is not claimed."
+      },
+      {
+        "path": "utils_methods.py@48a19fac",
+        "line": 296,
+        "meaning": "Real label-array lengths normalized across population."
+      },
+      {
+        "path": "utils_methods.py@48a19fac",
+        "line": 387,
+        "meaning": "alpha is divided by normalized sample count."
+      },
+      {
+        "path": "utils_methods.py@48a19fac",
+        "line": 393,
+        "meaning": "History increments by endpoint minus cloud."
+      },
+      {
+        "path": "utils_methods.py@48a19fac",
+        "line": 396,
+        "meaning": "Uniform selected endpoint mean plus all-client history mean."
+      }
+    ],
+    "exact_oracle_audit": {
+      "uniform": [
+        {
+          "round": "1",
+          "client": "1",
+          "baseline": "2",
+          "alpha": "1/10",
+          "history_before": "0",
+          "local": "811/500",
+          "delta": "-189/500",
+          "h1": "-189/500",
+          "h2": "0",
+          "history_mean": "-189/1000",
+          "global_next": "1433/1000"
+        },
+        {
+          "round": "2",
+          "client": "2",
+          "baseline": "1433/1000",
+          "alpha": "1/10",
+          "history_before": "0",
+          "local": "1918163/1000000",
+          "delta": "485163/1000000",
+          "h1": "-189/500",
+          "h2": "485163/1000000",
+          "history_mean": "107163/2000000",
+          "global_next": "3943489/2000000"
+        },
+        {
+          "round": "3",
+          "client": "1",
+          "baseline": "3943489/2000000",
+          "alpha": "1/10",
+          "history_before": "-189/500",
+          "local": "3212457979/2000000000",
+          "delta": "-731031021/2000000000",
+          "h1": "-1487031021/2000000000",
+          "h2": "485163/1000000",
+          "history_mean": "-516705021/4000000000",
+          "global_next": "5908210937/4000000000"
+        }
+      ],
+      "sample": [
+        {
+          "round": "1",
+          "client": "1",
+          "baseline": "2",
+          "alpha": "1/5",
+          "history_before": "0",
+          "local": "203/125",
+          "delta": "-47/125",
+          "h1": "-47/125",
+          "h2": "0",
+          "history_mean": "-47/250",
+          "global_next": "359/250"
+        },
+        {
+          "round": "2",
+          "client": "2",
+          "baseline": "359/250",
+          "alpha": "1/15",
+          "history_before": "0",
+          "local": "90068/46875",
+          "delta": "45511/93750",
+          "h1": "-47/125",
+          "h2": "45511/93750",
+          "history_mean": "10261/187500",
+          "global_next": "123511/62500"
+        },
+        {
+          "round": "3",
+          "client": "1",
+          "baseline": "123511/62500",
+          "alpha": "1/5",
+          "history_before": "-47/125",
+          "local": "25293633/15625000",
+          "delta": "-5584117/15625000",
+          "h1": "-11459117/15625000",
+          "h2": "45511/93750",
+          "history_mean": "-11621851/93750000",
+          "global_next": "140139947/93750000"
+        }
+      ]
+    },
+    "extra_scalar_population_audit": {
+      "zero_shift": "2",
+      "shifted": "201/200",
+      "new_baseline": "599/200",
+      "new_history": "99/200",
+      "accumulation_y": "39801/20000",
+      "accumulation_h": "9801/20000"
+    },
+    "independence": "Reviewer uses an affine closed-form two-step update and paper signed state with Fraction arithmetic, imports no Plato oracle/aggregation helper for expected values, and compares every retained exact trajectory field. Independent scratch4round oracle includes all10clients. Pinned local function is executed separately on both interpreters.",
+    "limits": "Finite SGD, CPUfloat32/float64 qualification, inactive clipping comparison, no benchmark/convergence/exact author experiment claim remain unchanged."
+  },
+  "feasibility_and_boundedness": {
+    "status": "EXAMPLE_LOCAL_IMPLEMENTATION_IS_FEASIBLE",
+    "hooks": "Existing response/payload, composable training, worker state, weight-validation/aggregation/commit, checkpoint and synchronous start override hooks suffice. No base loop copy or generic protocol edit is required.",
+    "count_policy": "Realized finite sampler/loader count before optimization plus authoritative full vector in sample mode and accepted-count consistency remain necessary; accepted-A integration does not replace example-boundary validation.",
+    "server_commit": "Round dispatch and committed round stay distinct. Full fixed selected set must validate before commit; histories/counts/tokens/RNG checkpoint snapshot commit only with accepted cloud. Inactive and never-selected histories retain population denominator.",
+    "worker_commit": "Parent wrapper validates model/state pairing and restores known snapshots on every rejected handoff. Child writes remain provisional; no canonical per-client history authority.",
+    "integration_cautions": "Implementation must enforce the existing unsupported dropout/retry contract, including immutable generic debug=false disconnect recovery; keep the selected set through max_concurrency batches. This is an existing limitation/enforcement obligation, not an invented new blocker.",
+    "migration": "Retained public class names coexist with deliberate validated-round-state training requirement. Explicit exact legacy read-only inspection remains useful; unversioned client vectors cannot constitute coherent corrected FedDyn resume. Full atomic server bundle is proportionate to selected authority; O(Nd) state/history downlink cost is disclosed.",
+    "ownership": "Only listed strategy and example-local adapters/config/tests are assigned after root accepts design. Separate original-C fixes and SCAFFOLD/F20/B work remain outside this revision. No production source or prose changed.",
+    "excluded_expansions": "No paper-scale qualification, generic lifecycle/checkpoint/protocol framework, mid-round recovery, dynamic populations/counts/trainability, GPU/AMP/DP or arbitrary external datasource RNG expansion."
+  },
+  "accepted_dependencies": {
+    "phase2a": {
+      "receipt": {
+        "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2a-acceptance.json",
+        "bytes": 2974,
+        "sha256": "21fc799903097a0424106e3792ddcdb71f6ae0c8b5f361a9276a89e6d8c973da"
+      },
+      "commit": "79da1f97d8a12fe97402750cc32c7b3e8f5cdf6e",
+      "status": "ACCEPTED_COMPONENT_AVAILABLE_LATER",
+      "reviewer_scope": "Acceptance receipt verified; no evolving A source read or requalification claim. Root integrates and verifies actual sampler counts in final candidate."
+    },
+    "F28": {
+      "root_probe": {
+        "path": "/Users/bli/Playground/plato/evidence/2026-refresh/server-resume-rng-probe.json",
+        "bytes": 4602,
+        "sha256": "40f09d88509f1ebb21c6d05cde97b60ca3322e6a420ad0d71d6bc9a6a45b1c5c"
+      },
+      "status": "ROOT_CONFIRMED_GENERIC_DEFECT; separate B correction remains unreviewed for this design input.",
+      "independence": "No runtime worktree or proposed B fix was read. Local pending/start handshake is valid against immutable62d without relying on generic correction.",
+      "later_requirement": "Later accepted B integration must preserve local one-time checkpoint RNG installation and fresh-run behavior; root reruns FD-A12/13 plus accepted B startup/resume tests on combined exact candidate. Immutable-source probes establish no such integration result."
+    }
+  },
+  "criterion_reviews": [
+    {
+      "id": "FD-A01",
+      "design_assessment": "ADEQUATE",
+      "assessment": "Correct zero-shift and detached-history objective. Independent derivatives give y=2, 1.005 and 2.995; alpha=0 is task-only locally and invalid end to end.",
+      "evidence": "Independent rational audit and exact pinned author function execution; retain the immutable 2.02 red evidence.",
+      "remaining_implementation_acceptance": "Production loss, dtype fidelity and zero-alpha rejection tests remain required.",
+      "production_test_status": "REQUIRED_NOT_PASSED_BY_THIS_DESIGN_REVIEW"
+    },
+    {
+      "id": "FD-A02",
+      "design_assessment": "ADEQUATE",
+      "assessment": "All three uniform rounds and every exact endpoint/cloud/history field agree with a separately derived affine two-update formula and paper signed-state recurrence.",
+      "evidence": "input-audit.json exact_oracle_independent.uniform; original oracle unchanged.",
+      "remaining_implementation_acceptance": "Actual client/accepted worker/server._process_reports/downlink path must match at every boundary.",
+      "production_test_status": "REQUIRED_NOT_PASSED_BY_THIS_DESIGN_REVIEW"
+    },
+    {
+      "id": "FD-A03",
+      "design_assessment": "ADEQUATE",
+      "assessment": "Counts [1,3] give q=[1/2,3/2] and alpha=[1/5,1/15]. Exact unequal-count trajectory agrees. Equal counts reduce to uniform; uniform ignores unequal counts for model weighting.",
+      "evidence": "Independent rational audit; pinned train_FedDyn normalization and alpha statements at lines296-297 and387.",
+      "remaining_implementation_acceptance": "Actual realized counts and full population vector must be verified on the accepted-A merged candidate.",
+      "production_test_status": "REQUIRED_NOT_PASSED_BY_THIS_DESIGN_REVIEW"
+    },
+    {
+      "id": "FD-A04",
+      "design_assessment": "ADEQUATE",
+      "assessment": "N3 histories[-.6,-.2,2.6], selected mean2.5 and population mean.6 give cloud3.1 in both modes. N stays3 and inactive history persists.",
+      "evidence": "Independent Fraction arithmetic and pinned population correction at utils_methods.py:393-397.",
+      "remaining_implementation_acceptance": "Production aggregation and full-participation checks must retain unweighted endpoint averaging.",
+      "production_test_status": "REQUIRED_NOT_PASSED_BY_THIS_DESIGN_REVIEW"
+    },
+    {
+      "id": "FD-A05",
+      "design_assessment": "ADEQUATE",
+      "assessment": "Label values cannot enter alpha or history. A matching label/output permutation preserves the task objective. Count authority is finite realized loader cardinality, not global backing trainset.",
+      "evidence": "Equations omit labels; actual loader/report fallbacks inspected in composable.py:525-543 and defaults.py. Metadata paragraph correctly distinguishes immutable pre-A from accepted Phase2A.",
+      "remaining_implementation_acceptance": "Wrong, missing, unknown or later-changed cardinality must fail before optimization/commit; label tests remain required.",
+      "production_test_status": "REQUIRED_NOT_PASSED_BY_THIS_DESIGN_REVIEW"
+    },
+    {
+      "id": "FD-A06",
+      "design_assessment": "ADEQUATE",
+      "assessment": "Finite positive end-to-end alpha and explicit uniform/sample configuration are coherent with plain fixed-rate SGD, zero decay/momentum, no scheduler/clipping/AMP/DP/async.",
+      "evidence": "Pinned author function has separate alpha SGD decay; corrected full-loss form must use zero optimizer decay. Independent extracted function gives2 and1.99005 with inactive clipping.",
+      "remaining_implementation_acceptance": "Validate actual optimizer/configuration and negative paths without silently coercing settings.",
+      "production_test_status": "REQUIRED_NOT_PASSED_BY_THIS_DESIGN_REVIEW"
+    },
+    {
+      "id": "FD-A07",
+      "design_assessment": "ADEQUATE",
+      "assessment": "Fixed trainable names Q and exact identity ownership prevent positional or shape-based pairing. Full model schema checks and unchanged static/frozen state preserve bounded scope.",
+      "evidence": "Source supports named parameters/state_dict and local strategies; no shared aggregation or buffer policy edit is needed. Existing LeNet remains feasible.",
+      "remaining_implementation_acceptance": "Actual reversed/missing/duplicate/foreign ownership, schema, aliases and mutable-buffer cases remain required.",
+      "production_test_status": "REQUIRED_NOT_PASSED_BY_THIS_DESIGN_REVIEW"
+    },
+    {
+      "id": "FD-A08",
+      "design_assessment": "ADEQUATE",
+      "assessment": "Revised wording exactly matches the real trainer hooks. Three microbatches with a two-batch window give two actual SGD updates, y1.99005/h.49005, two optimizer/update/callback notifications and one history staging.",
+      "evidence": "Both versions execute actual ComposableTrainer and GradientAccumulationStepStrategy; actual SGD post-hooks count2. No scheduler object; one create-returning-None call and one epoch no-op. Divisible4 and short1 probes also pass.",
+      "remaining_implementation_acceptance": "Production FedDyn zero-completed/all-skipped rejection and successful-only state staging remain required; no scheduler change is authorized.",
+      "production_test_status": "REQUIRED_NOT_PASSED_BY_THIS_DESIGN_REVIEW"
+    },
+    {
+      "id": "FD-A09",
+      "design_assessment": "ADEQUATE",
+      "assessment": "Server authority and dispatch replacement preserve logical1->2->1, same-client new baseline and process-independent history. Existing worker-state hooks can carry provisional accepted state.",
+      "evidence": "Inspected trainer worker save/load and composable payload route, plus unchanged design ownership contract.",
+      "remaining_implementation_acceptance": "Actual reuse/dedicated-client/fresh-process/spawn equivalence remains required; no legacy file adoption.",
+      "production_test_status": "REQUIRED_NOT_PASSED_BY_THIS_DESIGN_REVIEW"
+    },
+    {
+      "id": "FD-A10",
+      "design_assessment": "ADEQUATE",
+      "assessment": "Transactional local Trainer.train wrapper can contain model-before-worker-state loading and later handoff exceptions. No child canonical history writes eliminates the recorded contamination route.",
+      "evidence": "composable.py:806-880 supplies real token/client validation and loads model before load_worker_state; local wrapper can snapshot and restore known tensor/strategy/context state.",
+      "remaining_implementation_acceptance": "Real spawned nonzero-after-save, absent/corrupt/stale sidecar, bad pair and callback failure must send no update, roll back and retry correctly.",
+      "production_test_status": "REQUIRED_NOT_PASSED_BY_THIS_DESIGN_REVIEW"
+    },
+    {
+      "id": "FD-A11",
+      "design_assessment": "ADEQUATE",
+      "assessment": "Full original-model and metadata validation before arithmetic, revalidation after callback transformation, fixed dispatched-set membership and staged commit are coherent.",
+      "evidence": "fedavg.py:181-248 exposes weights_received -> callback -> aggregate_weights -> model load -> weights_aggregated. Generic ingress validates report counts only, so it does not reject the local envelope before unpacking. The local weight-preference override prevents bypass.",
+      "remaining_implementation_acceptance": "Every malformed later participant, alias/callback mutation, load/staging failure and immediate valid retry must preserve all committed model/history/count/token/checkpoint state.",
+      "production_test_status": "REQUIRED_NOT_PASSED_BY_THIS_DESIGN_REVIEW"
+    },
+    {
+      "id": "FD-A12",
+      "design_assessment": "ADEQUATE",
+      "assessment": "Revised criterion explicitly demands a real saved bundle/run/--resume fixture, rounds3 and4 selection/model/all-history comparison in both modes, all CPU RNG fields, fresh seed behavior and transactional pending-state rejection.",
+      "evidence": "Both independent scratch probes serialize weights-only tensor bundles, execute inherited run and actual base start body with intercepted network, and compare later scalar training against uninterrupted and independent exact controls.11 whole-bundle rejection cases and a partial handoff failure preserve state/pending.",
+      "remaining_implementation_acceptance": "Scratch is feasibility only. Final production bundle, actual CLI/example wiring, serialization failure/atomic replace, static/frozen state and required FD-A02 continuation remain unexecuted acceptance obligations.",
+      "production_test_status": "REQUIRED_NOT_PASSED_BY_THIS_DESIGN_REVIEW"
+    },
+    {
+      "id": "FD-A13",
+      "design_assessment": "ADEQUATE",
+      "assessment": "Real default payload path, shipped wiring, local socket, real spawn, bounded successful shutdown and shared actual-entrypoint resume case remain explicit. No weakened transport requirement or duplicate counting was introduced.",
+      "evidence": "DefaultPayloadStrategy invokes training.load_payload/train directly. Real start signature/registration ordering permits the example-local handoff; scratch socket constructor observes restored states before namespace registration.",
+      "remaining_implementation_acceptance": "Run actual shipped CPU3.13/3.14 integration and later combined accepted-B/F28 regressions; these probes do not establish network/spawn/CLI acceptance.",
+      "production_test_status": "REQUIRED_NOT_PASSED_BY_THIS_DESIGN_REVIEW"
+    },
+    {
+      "id": "FD-A14",
+      "design_assessment": "ADEQUATE",
+      "assessment": "Exact receipt, independent equation, scoped diff, explicit migration and separate public-prose/code review gate remain meaningful.",
+      "evidence": "All55 declared receipts match; source identity is clean62d with matching tracked blobs; changed-field set is exact and all remaining original fields unchanged.",
+      "remaining_implementation_acceptance": "Final code/prose and root integration must still be implemented, re-pinned, tested and independently reviewed. Design PASS closes no implementation finding or phase.",
+      "production_test_status": "REQUIRED_NOT_PASSED_BY_THIS_DESIGN_REVIEW"
+    },
+    {
+      "id": "FD-A15",
+      "design_assessment": "ADEQUATE",
+      "assessment": "Explicit read-only exact legacy reader preserves accepted-B spelling/custom roots/canonical precedence/client0 exclusion/original bytes without falsely importing an incoherent old history into new training.",
+      "evidence": "Migration fields are byte-for-byte structurally unchanged from original; immutable first review retains actual accepted-B writer proof and exact7/8 fixture.",
+      "remaining_implementation_acceptance": "New reader and explicit fresh model-only warm start/migration failures remain required production tests; separate filename correction is not waived or claimed implemented by this review.",
+      "production_test_status": "REQUIRED_NOT_PASSED_BY_THIS_DESIGN_REVIEW"
+    }
+  ],
+  "reviewer_executions": [
+    {
+      "command": "zsh -lc 'PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=/private/tmp/plato-refresh-worktrees/feddyn-design TMPDIR=/tmp/plato-phase2c-feddyn-design-review-2 XDG_CACHE_HOME=/tmp/plato-phase2c-feddyn-design-review-2/cache-313 MPLCONFIGDIR=/tmp/plato-phase2c-feddyn-design-review-2/mpl-313 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 /tmp/plato-phase2c-313/bin/python /tmp/plato-phase2c-feddyn-design-review-2/reviewer_probes.py > /tmp/plato-phase2c-feddyn-design-review-2/probes-313.json 2> /tmp/plato-phase2c-feddyn-design-review-2/probes-313.stderr.log'",
+      "cwd": "/private/tmp/plato-refresh-worktrees/feddyn-design",
+      "exit_code": 0,
+      "stdout": {
+        "path": "/tmp/plato-phase2c-feddyn-design-review-2/probes-313.json",
+        "bytes": 16648,
+        "sha256": "6b4a9bfc2995d46073eb64b9c9cab8748988c634c156267bb4b134c906ef74be"
+      },
+      "stderr": {
+        "path": "/tmp/plato-phase2c-feddyn-design-review-2/probes-313.stderr.log",
+        "bytes": 4035,
+        "sha256": "40ef3aa762e2d773c755a339bed3bfc57a9a72bfb93f29a50ad1983af517d6c2"
+      },
+      "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+      "torch": "2.14.1",
+      "numpy": "2.5.3"
+    },
+    {
+      "command": "zsh -lc 'PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=/private/tmp/plato-refresh-worktrees/feddyn-design TMPDIR=/tmp/plato-phase2c-feddyn-design-review-2 XDG_CACHE_HOME=/tmp/plato-phase2c-feddyn-design-review-2/cache-314 MPLCONFIGDIR=/tmp/plato-phase2c-feddyn-design-review-2/mpl-314 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 /tmp/plato-phase2c-314/bin/python /tmp/plato-phase2c-feddyn-design-review-2/reviewer_probes.py > /tmp/plato-phase2c-feddyn-design-review-2/probes-314.json 2> /tmp/plato-phase2c-feddyn-design-review-2/probes-314.stderr.log'",
+      "cwd": "/private/tmp/plato-refresh-worktrees/feddyn-design",
+      "exit_code": 0,
+      "stdout": {
+        "path": "/tmp/plato-phase2c-feddyn-design-review-2/probes-314.json",
+        "bytes": 16666,
+        "sha256": "b780180932ea10ac8eb6d8d0784fa05f7e880a9f6061e11b1c089f89c2503550"
+      },
+      "stderr": {
+        "path": "/tmp/plato-phase2c-feddyn-design-review-2/probes-314.stderr.log",
+        "bytes": 4035,
+        "sha256": "ae1f48b078c4e9fd636f17bb9e8fc573ad7339ad568405f841264fc073b17eb0"
+      },
+      "python": "3.14.8 (main, Sep 30 2026, 17:55:09) [Clang 21.0.0 (clang-2100.3.34.2)]",
+      "torch": "2.14.1",
+      "numpy": "2.5.3"
+    },
+    {
+      "command": "zsh -lc 'PYTHONDONTWRITEBYTECODE=1 /tmp/plato-phase2c-313/bin/python /tmp/plato-phase2c-feddyn-design-review-2/audit_inputs.py > /tmp/plato-phase2c-feddyn-design-review-2/input-audit.stdout.json 2> /tmp/plato-phase2c-feddyn-design-review-2/input-audit.stderr.log'",
+      "cwd": "/private/tmp/plato-refresh-worktrees/feddyn-design",
+      "exit_code": 0,
+      "stdout": {
+        "path": "/tmp/plato-phase2c-feddyn-design-review-2/input-audit.stdout.json",
+        "bytes": 761,
+        "sha256": "0b75076d3c52235d84f180c5816d8cdd6fd3833f9a0b7bb98061b7f84429e7a6"
+      },
+      "stderr": {
+        "path": "/tmp/plato-phase2c-feddyn-design-review-2/input-audit.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "result": {
+        "path": "/tmp/plato-phase2c-feddyn-design-review-2/input-audit.json",
+        "bytes": 44626,
+        "sha256": "a73ee439617b4470da37ee2639a64e1ac15f4a7425e2baaecd3ee46178ee6cb3"
+      }
+    }
+  ],
+  "reviewer_probe_results": {
+    "313": {
+      "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+      "torch": "2.14.1",
+      "numpy": "2.5.3",
+      "module_paths": {
+        "server": "/private/tmp/plato-refresh-worktrees/feddyn-design/plato/servers/base.py",
+        "trainer": "/private/tmp/plato-refresh-worktrees/feddyn-design/plato/trainers/composable.py"
+      },
+      "base_signatures": {
+        "run": "(self, client=None, edge_server=None, edge_client=None, trainer=None)",
+        "start": "(self, port=8000)"
+      },
+      "resume_modes": {
+        "uniform": {
+          "uninterrupted_rounds": [
+            {
+              "round": 1,
+              "selected": [
+                9,
+                7
+              ],
+              "cloud": 3.3608
+            },
+            {
+              "round": 2,
+              "selected": [
+                5,
+                6
+              ],
+              "cloud": 4.07277056
+            },
+            {
+              "round": 3,
+              "selected": [
+                5,
+                3
+              ],
+              "cloud": 4.3604147252
+            },
+            {
+              "round": 4,
+              "selected": [
+                9,
+                5
+              ],
+              "cloud": 5.242961214243934
+            }
+          ],
+          "resumed_rounds": [
+            {
+              "round": 3,
+              "selected": [
+                5,
+                3
+              ],
+              "cloud": 4.3604147252
+            },
+            {
+              "round": 4,
+              "selected": [
+                9,
+                5
+              ],
+              "cloud": 5.242961214243934
+            }
+          ],
+          "all_ten_histories_equal_uninterrupted": true,
+          "independent_fraction_reference_passed": true,
+          "unrepaired_next": [
+            9,
+            7
+          ],
+          "all_promised_rng_at_socket_constructor": true,
+          "distinct_python_and_selection": true,
+          "numpy_gaussian_cache_saved": true,
+          "pending_consumed_before_socket_once": true,
+          "event_order": [
+            "configure",
+            "resume",
+            "local_start_after_inherited_seed",
+            "delegate_base_start",
+            "socket_constructed",
+            "namespace_registered",
+            "socket_attached",
+            "run_app_intercepted"
+          ],
+          "checkpoint_sha256": "12866a086ec8bf116bbf5e3a3696109eb26a17b731c3f4b45a2c3fa5fa97ab5e"
+        },
+        "sample": {
+          "uninterrupted_rounds": [
+            {
+              "round": 1,
+              "selected": [
+                9,
+                7
+              ],
+              "cloud": 3.3630761904761903
+            },
+            {
+              "round": 2,
+              "selected": [
+                5,
+                6
+              ],
+              "cloud": 4.07494350631746
+            },
+            {
+              "round": 3,
+              "selected": [
+                5,
+                3
+              ],
+              "cloud": 4.362533871715298
+            },
+            {
+              "round": 4,
+              "selected": [
+                9,
+                5
+              ],
+              "cloud": 5.251160900615979
+            }
+          ],
+          "resumed_rounds": [
+            {
+              "round": 3,
+              "selected": [
+                5,
+                3
+              ],
+              "cloud": 4.362533871715298
+            },
+            {
+              "round": 4,
+              "selected": [
+                9,
+                5
+              ],
+              "cloud": 5.251160900615979
+            }
+          ],
+          "all_ten_histories_equal_uninterrupted": true,
+          "independent_fraction_reference_passed": true,
+          "unrepaired_next": [
+            9,
+            7
+          ],
+          "all_promised_rng_at_socket_constructor": true,
+          "distinct_python_and_selection": true,
+          "numpy_gaussian_cache_saved": true,
+          "pending_consumed_before_socket_once": true,
+          "event_order": [
+            "configure",
+            "resume",
+            "local_start_after_inherited_seed",
+            "delegate_base_start",
+            "socket_constructed",
+            "namespace_registered",
+            "socket_attached",
+            "run_app_intercepted"
+          ],
+          "checkpoint_sha256": "9ec35d6a0e7b6b45b5453b8f792ee1cde3bc7d848bed45833c559912d1a77463"
+        }
+      },
+      "rejected_whole_bundle_cases": [
+        "selection",
+        "context_selection",
+        "python",
+        "numpy",
+        "torch",
+        "model",
+        "histories",
+        "alpha",
+        "version",
+        "identity",
+        "install"
+      ],
+      "rejected_handoff_rolled_back": true,
+      "fresh_run_seed_preserved": true,
+      "repeated_start_no_reapply_and_port_forwarding": true,
+      "accumulation": [
+        {
+          "batches": 3,
+          "updates": 2,
+          "y": 1.99005,
+          "h": 0.4900500000000001,
+          "events": [
+            [
+              "scheduler_strategy.create_returned_None",
+              null
+            ],
+            [
+              "actual_optimizer_step",
+              1.995
+            ],
+            [
+              "optimizer_strategy.on_optimizer_step",
+              1.995
+            ],
+            [
+              "model_update_strategy.after_step",
+              1.995
+            ],
+            [
+              "callback.on_train_step_end",
+              1
+            ],
+            [
+              "actual_optimizer_step",
+              1.99005
+            ],
+            [
+              "optimizer_strategy.on_optimizer_step",
+              1.99005
+            ],
+            [
+              "model_update_strategy.after_step",
+              1.99005
+            ],
+            [
+              "callback.on_train_step_end",
+              2
+            ],
+            [
+              "scheduler_strategy.epoch_noop",
+              1
+            ],
+            [
+              "history_staging",
+              0.4900500000000001
+            ]
+          ],
+          "real_scheduler_objects": 0,
+          "real_scheduler_steps": 0
+        },
+        {
+          "batches": 4,
+          "updates": 2,
+          "y": 1.99005,
+          "h": 0.4900500000000001,
+          "events": [
+            [
+              "scheduler_strategy.create_returned_None",
+              null
+            ],
+            [
+              "actual_optimizer_step",
+              1.995
+            ],
+            [
+              "optimizer_strategy.on_optimizer_step",
+              1.995
+            ],
+            [
+              "model_update_strategy.after_step",
+              1.995
+            ],
+            [
+              "callback.on_train_step_end",
+              1
+            ],
+            [
+              "actual_optimizer_step",
+              1.99005
+            ],
+            [
+              "optimizer_strategy.on_optimizer_step",
+              1.99005
+            ],
+            [
+              "model_update_strategy.after_step",
+              1.99005
+            ],
+            [
+              "callback.on_train_step_end",
+              3
+            ],
+            [
+              "scheduler_strategy.epoch_noop",
+              1
+            ],
+            [
+              "history_staging",
+              0.4900500000000001
+            ]
+          ],
+          "real_scheduler_objects": 0,
+          "real_scheduler_steps": 0
+        },
+        {
+          "batches": 1,
+          "updates": 1,
+          "y": 1.995,
+          "h": 0.4950000000000001,
+          "events": [
+            [
+              "scheduler_strategy.create_returned_None",
+              null
+            ],
+            [
+              "actual_optimizer_step",
+              1.995
+            ],
+            [
+              "optimizer_strategy.on_optimizer_step",
+              1.995
+            ],
+            [
+              "model_update_strategy.after_step",
+              1.995
+            ],
+            [
+              "callback.on_train_step_end",
+              0
+            ],
+            [
+              "scheduler_strategy.epoch_noop",
+              1
+            ],
+            [
+              "history_staging",
+              0.4950000000000001
+            ]
+          ],
+          "real_scheduler_objects": 0,
+          "real_scheduler_steps": 0
+        }
+      ],
+      "pinned_author_function": {
+        "source_commit": "48a19fac440ef079ce563da8e0c2896f8256fef9",
+        "source_sha256": "6e79b259456475934b71cddc797b8dcf1e66818bd543465ad02225b6e506eca5",
+        "scalar_execution": [
+          {
+            "history": 0.0,
+            "endpoint": 2.0
+          },
+          {
+            "history": 0.5,
+            "endpoint": 1.99005
+          }
+        ],
+        "limitation": "Extracted exact primary function with controlled dataset/zero-loss globals, inactive clipping, no full historical experiment."
+      },
+      "limitation": "Scratch tensor-bundle/subclass and scalar training only. Actual inherited run, start body and selector execute; AsyncServer and run_app are intercepted. No production FedDyn, real registration/network/spawn acceptance or generic B fix is tested."
+    },
+    "314": {
+      "python": "3.14.8 (main, Sep 30 2026, 17:55:09) [Clang 21.0.0 (clang-2100.3.34.2)]",
+      "torch": "2.14.1",
+      "numpy": "2.5.3",
+      "module_paths": {
+        "server": "/private/tmp/plato-refresh-worktrees/feddyn-design/plato/servers/base.py",
+        "trainer": "/private/tmp/plato-refresh-worktrees/feddyn-design/plato/trainers/composable.py"
+      },
+      "base_signatures": {
+        "run": "(self, client=None, edge_server=None, edge_client=None, trainer=None)",
+        "start": "(self, port=8000)"
+      },
+      "resume_modes": {
+        "uniform": {
+          "uninterrupted_rounds": [
+            {
+              "round": 1,
+              "selected": [
+                9,
+                7
+              ],
+              "cloud": 3.3608
+            },
+            {
+              "round": 2,
+              "selected": [
+                5,
+                6
+              ],
+              "cloud": 4.07277056
+            },
+            {
+              "round": 3,
+              "selected": [
+                5,
+                3
+              ],
+              "cloud": 4.3604147252
+            },
+            {
+              "round": 4,
+              "selected": [
+                9,
+                5
+              ],
+              "cloud": 5.242961214243934
+            }
+          ],
+          "resumed_rounds": [
+            {
+              "round": 3,
+              "selected": [
+                5,
+                3
+              ],
+              "cloud": 4.3604147252
+            },
+            {
+              "round": 4,
+              "selected": [
+                9,
+                5
+              ],
+              "cloud": 5.242961214243934
+            }
+          ],
+          "all_ten_histories_equal_uninterrupted": true,
+          "independent_fraction_reference_passed": true,
+          "unrepaired_next": [
+            9,
+            7
+          ],
+          "all_promised_rng_at_socket_constructor": true,
+          "distinct_python_and_selection": true,
+          "numpy_gaussian_cache_saved": true,
+          "pending_consumed_before_socket_once": true,
+          "event_order": [
+            "configure",
+            "resume",
+            "local_start_after_inherited_seed",
+            "delegate_base_start",
+            "socket_constructed",
+            "namespace_registered",
+            "socket_attached",
+            "run_app_intercepted"
+          ],
+          "checkpoint_sha256": "c836f3e827784643bf091b5d4878d28bb260f098495e8459b36528842795898c"
+        },
+        "sample": {
+          "uninterrupted_rounds": [
+            {
+              "round": 1,
+              "selected": [
+                9,
+                7
+              ],
+              "cloud": 3.3630761904761903
+            },
+            {
+              "round": 2,
+              "selected": [
+                5,
+                6
+              ],
+              "cloud": 4.07494350631746
+            },
+            {
+              "round": 3,
+              "selected": [
+                5,
+                3
+              ],
+              "cloud": 4.362533871715298
+            },
+            {
+              "round": 4,
+              "selected": [
+                9,
+                5
+              ],
+              "cloud": 5.251160900615979
+            }
+          ],
+          "resumed_rounds": [
+            {
+              "round": 3,
+              "selected": [
+                5,
+                3
+              ],
+              "cloud": 4.362533871715298
+            },
+            {
+              "round": 4,
+              "selected": [
+                9,
+                5
+              ],
+              "cloud": 5.251160900615979
+            }
+          ],
+          "all_ten_histories_equal_uninterrupted": true,
+          "independent_fraction_reference_passed": true,
+          "unrepaired_next": [
+            9,
+            7
+          ],
+          "all_promised_rng_at_socket_constructor": true,
+          "distinct_python_and_selection": true,
+          "numpy_gaussian_cache_saved": true,
+          "pending_consumed_before_socket_once": true,
+          "event_order": [
+            "configure",
+            "resume",
+            "local_start_after_inherited_seed",
+            "delegate_base_start",
+            "socket_constructed",
+            "namespace_registered",
+            "socket_attached",
+            "run_app_intercepted"
+          ],
+          "checkpoint_sha256": "0b4967953b33e46fcfbe19eb5cca20cc5745803e0bbc3495812daf276bbaa8ee"
+        }
+      },
+      "rejected_whole_bundle_cases": [
+        "selection",
+        "context_selection",
+        "python",
+        "numpy",
+        "torch",
+        "model",
+        "histories",
+        "alpha",
+        "version",
+        "identity",
+        "install"
+      ],
+      "rejected_handoff_rolled_back": true,
+      "fresh_run_seed_preserved": true,
+      "repeated_start_no_reapply_and_port_forwarding": true,
+      "accumulation": [
+        {
+          "batches": 3,
+          "updates": 2,
+          "y": 1.99005,
+          "h": 0.4900500000000001,
+          "events": [
+            [
+              "scheduler_strategy.create_returned_None",
+              null
+            ],
+            [
+              "actual_optimizer_step",
+              1.995
+            ],
+            [
+              "optimizer_strategy.on_optimizer_step",
+              1.995
+            ],
+            [
+              "model_update_strategy.after_step",
+              1.995
+            ],
+            [
+              "callback.on_train_step_end",
+              1
+            ],
+            [
+              "actual_optimizer_step",
+              1.99005
+            ],
+            [
+              "optimizer_strategy.on_optimizer_step",
+              1.99005
+            ],
+            [
+              "model_update_strategy.after_step",
+              1.99005
+            ],
+            [
+              "callback.on_train_step_end",
+              2
+            ],
+            [
+              "scheduler_strategy.epoch_noop",
+              1
+            ],
+            [
+              "history_staging",
+              0.4900500000000001
+            ]
+          ],
+          "real_scheduler_objects": 0,
+          "real_scheduler_steps": 0
+        },
+        {
+          "batches": 4,
+          "updates": 2,
+          "y": 1.99005,
+          "h": 0.4900500000000001,
+          "events": [
+            [
+              "scheduler_strategy.create_returned_None",
+              null
+            ],
+            [
+              "actual_optimizer_step",
+              1.995
+            ],
+            [
+              "optimizer_strategy.on_optimizer_step",
+              1.995
+            ],
+            [
+              "model_update_strategy.after_step",
+              1.995
+            ],
+            [
+              "callback.on_train_step_end",
+              1
+            ],
+            [
+              "actual_optimizer_step",
+              1.99005
+            ],
+            [
+              "optimizer_strategy.on_optimizer_step",
+              1.99005
+            ],
+            [
+              "model_update_strategy.after_step",
+              1.99005
+            ],
+            [
+              "callback.on_train_step_end",
+              3
+            ],
+            [
+              "scheduler_strategy.epoch_noop",
+              1
+            ],
+            [
+              "history_staging",
+              0.4900500000000001
+            ]
+          ],
+          "real_scheduler_objects": 0,
+          "real_scheduler_steps": 0
+        },
+        {
+          "batches": 1,
+          "updates": 1,
+          "y": 1.995,
+          "h": 0.4950000000000001,
+          "events": [
+            [
+              "scheduler_strategy.create_returned_None",
+              null
+            ],
+            [
+              "actual_optimizer_step",
+              1.995
+            ],
+            [
+              "optimizer_strategy.on_optimizer_step",
+              1.995
+            ],
+            [
+              "model_update_strategy.after_step",
+              1.995
+            ],
+            [
+              "callback.on_train_step_end",
+              0
+            ],
+            [
+              "scheduler_strategy.epoch_noop",
+              1
+            ],
+            [
+              "history_staging",
+              0.4950000000000001
+            ]
+          ],
+          "real_scheduler_objects": 0,
+          "real_scheduler_steps": 0
+        }
+      ],
+      "pinned_author_function": {
+        "source_commit": "48a19fac440ef079ce563da8e0c2896f8256fef9",
+        "source_sha256": "6e79b259456475934b71cddc797b8dcf1e66818bd543465ad02225b6e506eca5",
+        "scalar_execution": [
+          {
+            "history": 0.0,
+            "endpoint": 2.0
+          },
+          {
+            "history": 0.5,
+            "endpoint": 1.99005
+          }
+        ],
+        "limitation": "Extracted exact primary function with controlled dataset/zero-loss globals, inactive clipping, no full historical experiment."
+      },
+      "limitation": "Scratch tensor-bundle/subclass and scalar training only. Actual inherited run, start body and selector execute; AsyncServer and run_app are intercepted. No production FedDyn, real registration/network/spawn acceptance or generic B fix is tested."
+    }
+  },
+  "evidence_receipts": [
+    {
+      "path": "/tmp/plato-phase2c-feddyn-design-review-2/audit_inputs.py",
+      "bytes": 7175,
+      "sha256": "ba2f11f23f07dfe7bcbfb37fa8ef28d6357d7ddb3a2d0a8b10fd717017d7c009"
+    },
+    {
+      "path": "/tmp/plato-phase2c-feddyn-design-review-2/input-audit.json",
+      "bytes": 44626,
+      "sha256": "a73ee439617b4470da37ee2639a64e1ac15f4a7425e2baaecd3ee46178ee6cb3"
+    },
+    {
+      "path": "/tmp/plato-phase2c-feddyn-design-review-2/input-audit.stdout.json",
+      "bytes": 761,
+      "sha256": "0b75076d3c52235d84f180c5816d8cdd6fd3833f9a0b7bb98061b7f84429e7a6"
+    },
+    {
+      "path": "/tmp/plato-phase2c-feddyn-design-review-2/input-audit.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/tmp/plato-phase2c-feddyn-design-review-2/input-audit.initial.stderr.log",
+      "bytes": 747,
+      "sha256": "e4beedb5263be916202a8e30ac946a287dd0925635f7a134cbe18156f89cf753"
+    },
+    {
+      "path": "/tmp/plato-phase2c-feddyn-design-review-2/reviewer_probes.py",
+      "bytes": 23514,
+      "sha256": "e6e63d98b8a7978a402c6002351009cd40185a718c08e318165681fd778151db"
+    },
+    {
+      "path": "/tmp/plato-phase2c-feddyn-design-review-2/probes-313.json",
+      "bytes": 16648,
+      "sha256": "6b4a9bfc2995d46073eb64b9c9cab8748988c634c156267bb4b134c906ef74be"
+    },
+    {
+      "path": "/tmp/plato-phase2c-feddyn-design-review-2/probes-313.stderr.log",
+      "bytes": 4035,
+      "sha256": "40ef3aa762e2d773c755a339bed3bfc57a9a72bfb93f29a50ad1983af517d6c2"
+    },
+    {
+      "path": "/tmp/plato-phase2c-feddyn-design-review-2/probes-314.json",
+      "bytes": 16666,
+      "sha256": "b780180932ea10ac8eb6d8d0784fa05f7e880a9f6061e11b1c089f89c2503550"
+    },
+    {
+      "path": "/tmp/plato-phase2c-feddyn-design-review-2/probes-314.stderr.log",
+      "bytes": 4035,
+      "sha256": "ae1f48b078c4e9fd636f17bb9e8fc573ad7339ad568405f841264fc073b17eb0"
+    },
+    {
+      "path": "/tmp/plato-phase2c-feddyn-design-review-2/command-records.json",
+      "bytes": 3361,
+      "sha256": "957bbce2743107aa282438b9e562571174b3f63c388d7a0113fdd6f45e40205b"
+    },
+    {
+      "path": "/tmp/plato-phase2c-feddyn-design-review-2/build_review.py",
+      "bytes": 29279,
+      "sha256": "9df4f72042339ff79feccd9c9d8c4263b575e43257e6192303e327fb3c9f7733"
+    }
+  ],
+  "immutable_source_receipts": [
+    {
+      "relative_path": "examples/customized_client_training/feddyn/feddyn.py",
+      "path": "/private/tmp/plato-refresh-worktrees/feddyn-design/examples/customized_client_training/feddyn/feddyn.py",
+      "bytes": 598,
+      "sha256": "8d69597d611e4be84c8b6861b55d099c2b65a53c32d013a97c7518760a372271",
+      "matches_git_blob": true
+    },
+    {
+      "relative_path": "examples/customized_client_training/feddyn/feddyn_trainer.py",
+      "path": "/private/tmp/plato-refresh-worktrees/feddyn-design/examples/customized_client_training/feddyn/feddyn_trainer.py",
+      "bytes": 1378,
+      "sha256": "1032d49bf20a53d85a90468c1f2afb3782b3cad44bf8149bd214f800c0633354",
+      "matches_git_blob": true
+    },
+    {
+      "relative_path": "examples/customized_client_training/feddyn/feddyn_MNIST_lenet5.toml",
+      "path": "/private/tmp/plato-refresh-worktrees/feddyn-design/examples/customized_client_training/feddyn/feddyn_MNIST_lenet5.toml",
+      "bytes": 1302,
+      "sha256": "61e6f7116322cb4657cc730b5612fa3baf675d0f8e824af8eb8e4670502e8722",
+      "matches_git_blob": true
+    },
+    {
+      "relative_path": "plato/trainers/strategies/algorithms/feddyn_strategy.py",
+      "path": "/private/tmp/plato-refresh-worktrees/feddyn-design/plato/trainers/strategies/algorithms/feddyn_strategy.py",
+      "bytes": 22469,
+      "sha256": "93abaa09f8f31018ba8cfe1e6de9f507d4ec4e6abe8170d5919b41c054597d8c",
+      "matches_git_blob": true
+    },
+    {
+      "relative_path": "plato/trainers/composable.py",
+      "path": "/private/tmp/plato-refresh-worktrees/feddyn-design/plato/trainers/composable.py",
+      "bytes": 41822,
+      "sha256": "6bc4dab135cd7249346ac3ca23b0e24ea638961cda7806558ab81338dc0496a8",
+      "matches_git_blob": true
+    },
+    {
+      "relative_path": "plato/trainers/strategies/base.py",
+      "path": "/private/tmp/plato-refresh-worktrees/feddyn-design/plato/trainers/strategies/base.py",
+      "bytes": 18248,
+      "sha256": "905261bbaf05f8024110f9b0be2c29886bdc39a91c6be18aa9e83bb4868ec0d3",
+      "matches_git_blob": true
+    },
+    {
+      "relative_path": "plato/clients/simple.py",
+      "path": "/private/tmp/plato-refresh-worktrees/feddyn-design/plato/clients/simple.py",
+      "bytes": 4221,
+      "sha256": "c88220ec85ea614257648cb956a89624d11c03a944357c683aafb333e51b2a2e",
+      "matches_git_blob": true
+    },
+    {
+      "relative_path": "plato/clients/strategies/defaults.py",
+      "path": "/private/tmp/plato-refresh-worktrees/feddyn-design/plato/clients/strategies/defaults.py",
+      "bytes": 21145,
+      "sha256": "6a41108b7878113ed4b7c9555d818b1f59862f55c487524b26052a0f12c3feca",
+      "matches_git_blob": true
+    },
+    {
+      "relative_path": "plato/servers/fedavg.py",
+      "path": "/private/tmp/plato-refresh-worktrees/feddyn-design/plato/servers/fedavg.py",
+      "bytes": 15905,
+      "sha256": "f184068a11c5be9e523f08b95e1cce76dff2e20e2fdb4e6426caf95dac0bcee5",
+      "matches_git_blob": true
+    },
+    {
+      "relative_path": "plato/servers/base.py",
+      "path": "/private/tmp/plato-refresh-worktrees/feddyn-design/plato/servers/base.py",
+      "bytes": 73482,
+      "sha256": "79355c0184680eaac2ad8646a23ff79d5ef70e5797cea1e313db7948a96488db",
+      "matches_git_blob": true
+    },
+    {
+      "relative_path": "plato/servers/strategies/aggregation/fedavg.py",
+      "path": "/private/tmp/plato-refresh-worktrees/feddyn-design/plato/servers/strategies/aggregation/fedavg.py",
+      "bytes": 11663,
+      "sha256": "fa1e2a6bbbc8e3829b72cd0cdd47f10b0a8fffbdabdaa2dfb3efed81872877c1",
+      "matches_git_blob": true
+    },
+    {
+      "relative_path": "plato/algorithms/fedavg.py",
+      "path": "/private/tmp/plato-refresh-worktrees/feddyn-design/plato/algorithms/fedavg.py",
+      "bytes": 12558,
+      "sha256": "512006d85daa070cd7a7a595b849a96ba70805bc88aa41d329b340dc4edc0258",
+      "matches_git_blob": true
+    },
+    {
+      "relative_path": "plato/samplers/dirichlet.py",
+      "path": "/private/tmp/plato-refresh-worktrees/feddyn-design/plato/samplers/dirichlet.py",
+      "bytes": 3219,
+      "sha256": "c98522f22ee527d5f698b9ece68f05f87e2cb7ca5af3dc83f6b2d83c52c77e83",
+      "matches_git_blob": true
+    },
+    {
+      "relative_path": "plato/samplers/iid.py",
+      "path": "/private/tmp/plato-refresh-worktrees/feddyn-design/plato/samplers/iid.py",
+      "bytes": 1739,
+      "sha256": "e74bb8dd278025523f55526143c9f2d8ab42c4e8167cce20da730a4524fffeb9",
+      "matches_git_blob": true
+    },
+    {
+      "relative_path": "tests/trainers/test_personalized_state_ownership.py",
+      "path": "/private/tmp/plato-refresh-worktrees/feddyn-design/tests/trainers/test_personalized_state_ownership.py",
+      "bytes": 12934,
+      "sha256": "f2a808dd1c6763164283f02b8801bee7b211327570d152a91b32fb74c9d9f233",
+      "matches_git_blob": true
+    },
+    {
+      "relative_path": "tests/trainers/test_training_update_contract.py",
+      "path": "/private/tmp/plato-refresh-worktrees/feddyn-design/tests/trainers/test_training_update_contract.py",
+      "bytes": 24186,
+      "sha256": "87059fc3f336d6a9e319d372577d30ed7066fd9e1bd1f7fe3d0efb6fda92f676",
+      "matches_git_blob": true
+    },
+    {
+      "relative_path": "docs/docs/examples/algorithms/5. Algorithms with Customized Client Training Loops.md",
+      "path": "/private/tmp/plato-refresh-worktrees/feddyn-design/docs/docs/examples/algorithms/5. Algorithms with Customized Client Training Loops.md",
+      "bytes": 11152,
+      "sha256": "aaf8cc3b4ef22a19356c2e0d6f2e1ef1fee2a741ab195959754b0c18e76b1d60",
+      "matches_git_blob": true
+    },
+    {
+      "relative_path": "plato/servers/base.py",
+      "path": "/private/tmp/plato-refresh-worktrees/feddyn-design/plato/servers/base.py",
+      "bytes": 73482,
+      "sha256": "79355c0184680eaac2ad8646a23ff79d5ef70e5797cea1e313db7948a96488db",
+      "matches_git_blob": true
+    },
+    {
+      "relative_path": "plato/servers/strategies/client_selection/random_selection.py",
+      "path": "/private/tmp/plato-refresh-worktrees/feddyn-design/plato/servers/strategies/client_selection/random_selection.py",
+      "bytes": 992,
+      "sha256": "952c93808d82f458114526939d28c0879515f0a05dd9fa4fbfbe2986521f4dd7",
+      "matches_git_blob": true
+    },
+    {
+      "relative_path": "plato/trainers/composable.py",
+      "path": "/private/tmp/plato-refresh-worktrees/feddyn-design/plato/trainers/composable.py",
+      "bytes": 41822,
+      "sha256": "6bc4dab135cd7249346ac3ca23b0e24ea638961cda7806558ab81338dc0496a8",
+      "matches_git_blob": true
+    },
+    {
+      "relative_path": "plato/trainers/strategies/lr_scheduler.py",
+      "path": "/private/tmp/plato-refresh-worktrees/feddyn-design/plato/trainers/strategies/lr_scheduler.py",
+      "bytes": 20777,
+      "sha256": "4b9118641555640083fce2417774fe7cd2e96ec9975885cfaf8023b1d92f8a41",
+      "matches_git_blob": true
+    },
+    {
+      "relative_path": "AGENTS.md",
+      "path": "/private/tmp/plato-refresh-worktrees/feddyn-design/AGENTS.md",
+      "bytes": 3119,
+      "sha256": "b50f87f31ea3d87076952d8b7d2d8af067132fbf877d80f8780c208fb45527ec"
+    },
+    {
+      "relative_path": "plato/trainers/strategies/training_step.py",
+      "path": "/private/tmp/plato-refresh-worktrees/feddyn-design/plato/trainers/strategies/training_step.py",
+      "bytes": 19781,
+      "sha256": "ba912ceea97a1fe592d690cb06c9827cd988d37320a92f1dc72bbb42feea2983"
+    },
+    {
+      "relative_path": "plato/trainers/strategies/optimizer.py",
+      "path": "/private/tmp/plato-refresh-worktrees/feddyn-design/plato/trainers/strategies/optimizer.py",
+      "bytes": 14695,
+      "sha256": "ffbeab17d1a2455013871d32f4e82402f5422a6c14fc629d334b2d93c59e7957"
+    },
+    {
+      "relative_path": "plato/callbacks/trainer.py",
+      "path": "/private/tmp/plato-refresh-worktrees/feddyn-design/plato/callbacks/trainer.py",
+      "bytes": 6636,
+      "sha256": "6c8ac053150b0d5b68336d40ac8e88b531abab59d21e7a9204ceec828630fc4b"
+    },
+    {
+      "relative_path": "plato/clients/composable.py",
+      "path": "/private/tmp/plato-refresh-worktrees/feddyn-design/plato/clients/composable.py",
+      "bytes": 15444,
+      "sha256": "25de844fe9f9b2c2b7d8e9a633c3ed1fb9831c10fae2a14404dadd5d7670fe53"
+    },
+    {
+      "relative_path": "plato/utils/checkpoint_paths.py",
+      "path": "/private/tmp/plato-refresh-worktrees/feddyn-design/plato/utils/checkpoint_paths.py",
+      "bytes": 4057,
+      "sha256": "7f530a13e9dac30d4c8a6bb7c05de2ff242d12f203dbf3e4c45495442c789dfd"
+    }
+  ],
+  "accepted_plan_inputs": [
+    {
+      "field": "/sourceidentities/inputs/0",
+      "declared": {
+        "path": "/Users/bli/Playground/plato/AGENTS.md",
+        "bytes": 3119,
+        "sha256": "b50f87f31ea3d87076952d8b7d2d8af067132fbf877d80f8780c208fb45527ec"
+      },
+      "actual": {
+        "path": "/Users/bli/Playground/plato/AGENTS.md",
+        "bytes": 3119,
+        "sha256": "b50f87f31ea3d87076952d8b7d2d8af067132fbf877d80f8780c208fb45527ec"
+      },
+      "matches": true
+    },
+    {
+      "field": "/sourceidentities/inputs/1",
+      "declared": {
+        "path": "/Users/bli/Playground/plato/evidence/2026-refresh/plan.md",
+        "bytes": 50719,
+        "sha256": "edb9a58cc7915a940854f16d5029fe97434703bf2f75eca0dcb96de2d0f0eb15"
+      },
+      "actual": {
+        "path": "/Users/bli/Playground/plato/evidence/2026-refresh/plan.md",
+        "bytes": 50719,
+        "sha256": "edb9a58cc7915a940854f16d5029fe97434703bf2f75eca0dcb96de2d0f0eb15"
+      },
+      "matches": true
+    },
+    {
+      "field": "/sourceidentities/inputs/2",
+      "declared": {
+        "path": "/Users/bli/Playground/plato/evidence/2026-refresh/plan-addendum.json",
+        "bytes": 28579,
+        "sha256": "5b51b0fb7ed6f68d9fce7176335b3e7be5e5f178a2788590912aa2396a487709"
+      },
+      "actual": {
+        "path": "/Users/bli/Playground/plato/evidence/2026-refresh/plan-addendum.json",
+        "bytes": 28579,
+        "sha256": "5b51b0fb7ed6f68d9fce7176335b3e7be5e5f178a2788590912aa2396a487709"
+      },
+      "matches": true
+    }
+  ],
+  "limitations": [
+    "Design acceptance only. No production FedDyn implementation, corrected public prose, accepted-A merged counts or later B integration is passed or claimed.",
+    "Existing locked author environments used read-only:macOS ARM64 CPU, CPython3.13.16/3.14.8,Torch2.14.1,NumPy2.5.3. No provisioning, package isolation, Linux/GPU or whole-stack requalification.",
+    "Independent startup probes execute actual inherited run, actual inherited start body and real selector. Scratch subclass implements a synthetic scalar/tensor bundle; disable_clients avoids processes, AsyncServer/run_app interception avoids networking. Config.args.resume is a controlled flag fixture; actual CLI parser and shipped FedDyn wiring are not exercised.",
+    "Independent scratch scalar optimizer/model/all-history continuation demonstrates feasibility and test discrimination; it is not production FD-A12/13 acceptance. Production full-bundle atomic write failures, actual socket registration, spawned handoffs and full malformed model/count/schema cases remain required.",
+    "Trainer probes execute actual update/tail/callback code with a reviewer-written analytical loss/update spy. They do not implement or accept the future FedDyn loss/history strategies or all-skipped rejection behavior.",
+    "Pinned primary local function extraction uses controlled dataset/zero-loss globals and inactive clipping; no full historical experiment or communication-budget/convergence claim.",
+    "Preserved legacy7/8 writer evidence remains in immutable first review; reviewer did not independently repeat that unchanged legacy writer test or inspect evolving C repairs.",
+    "No nested agents, source/design/other-report edits, commits, push or cleanup. Only requested ROOT report and own retained scratch are written."
+  ],
+  "root_next_action": "Root may accept this revised design at the exact reviewed hash and assign bounded implementation to the original C author. Final code,15criteria including actual run/--resume/socket/spawn, independent code/numerical/failure/prose review and later accepted B/A combined integration remain necessary before closing2C-11 or Phase2."
+}
