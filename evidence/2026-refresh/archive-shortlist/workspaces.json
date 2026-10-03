@@ -1,0 +1,68 @@
+[
+  {
+    "family": "anycostfl",
+    "environment": "/tmp/plato-archive-author/verified-workspaces-final/anycostfl",
+    "command": [
+      "uv",
+      "sync",
+      "--locked",
+      "--python",
+      "3.13",
+      "--no-default-groups",
+      "--package",
+      "anycostfl"
+    ],
+    "sync_returncode": 0,
+    "log_sha256": "5e515292b9537bcd49e754d3222a9775f885dff7550dca305a7f777b96cdef24",
+    "import_returncode": 0,
+    "import_receipt": {
+      "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+      "ptflops": "/tmp/plato-archive-author/verified-workspaces-final/anycostfl/lib/python3.13/site-packages/ptflops/__init__.py",
+      "retired_modules_absent": true
+    }
+  },
+  {
+    "family": "fedrolex",
+    "environment": "/tmp/plato-archive-author/verified-workspaces-final/fedrolex",
+    "command": [
+      "uv",
+      "sync",
+      "--locked",
+      "--python",
+      "3.13",
+      "--no-default-groups",
+      "--package",
+      "fedrolex"
+    ],
+    "sync_returncode": 0,
+    "log_sha256": "a2412b435160df6d546faa4a80b4adffa29f5785c8af97f5614f350b6649c68f",
+    "import_returncode": 0,
+    "import_receipt": {
+      "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+      "ptflops": "/tmp/plato-archive-author/verified-workspaces-final/fedrolex/lib/python3.13/site-packages/ptflops/__init__.py",
+      "retired_modules_absent": true
+    }
+  },
+  {
+    "family": "heterofl",
+    "environment": "/tmp/plato-archive-author/verified-workspaces-final/heterofl",
+    "command": [
+      "uv",
+      "sync",
+      "--locked",
+      "--python",
+      "3.13",
+      "--no-default-groups",
+      "--package",
+      "heterofl"
+    ],
+    "sync_returncode": 0,
+    "log_sha256": "728ce8481d68182e9281501549666604de1e16a9da629a5e20e386bbd692bcc6",
+    "import_returncode": 0,
+    "import_receipt": {
+      "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+      "ptflops": "/tmp/plato-archive-author/verified-workspaces-final/heterofl/lib/python3.13/site-packages/ptflops/__init__.py",
+      "retired_modules_absent": true
+    }
+  }
+]

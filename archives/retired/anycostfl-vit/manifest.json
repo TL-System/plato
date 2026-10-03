@@ -1,0 +1,138 @@
+{
+  "schema_version": 1,
+  "backend": "anycostfl-vit",
+  "retired_at": "2026-10-03",
+  "pre_retirement_plato_commit": "477f2f1bb52a1b5a58c1f9f2d30f640039f83a8e",
+  "pre_retirement_plato_tree": "82af1367f106218d0de98f46775c011e0afd930c",
+  "plan_sha256": "c66577eac31a2eeaba68f29e2fee53760def2477184521bd1f2536e76507573f",
+  "files": [
+    {
+      "git_mode": "100644",
+      "git_blob": "3d633bb253f56fc11b5f343381ac3b664d097927",
+      "sha256": "b8197573f0b9fcc6ddbe1231037e05defe287c6cdd17502559f5fef3c7bb78bb",
+      "bytes": 1779,
+      "original_path": "examples/model_search/anycostfl/example_ViT.toml",
+      "archive_path": "archives/retired/anycostfl-vit/original/examples/model_search/anycostfl/example_ViT.toml",
+      "disposition": "moved"
+    },
+    {
+      "git_mode": "100644",
+      "git_blob": "946321934aed7c0fa242a4ebefbbc2532462220e",
+      "sha256": "4e933c919100e0c6b70e94661a9c54d63582730133bb16e9e6b0b5ad0895c550",
+      "bytes": 7266,
+      "original_path": "examples/model_search/anycostfl/vit.py",
+      "archive_path": "archives/retired/anycostfl-vit/original/examples/model_search/anycostfl/vit.py",
+      "disposition": "moved"
+    },
+    {
+      "git_mode": "100644",
+      "git_blob": "261eeb9e9f8b2b4b0d119366dda99c6fd7d35c64",
+      "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+      "bytes": 11357,
+      "original_path": "LICENSE",
+      "archive_path": "archives/retired/anycostfl-vit/original/LICENSE",
+      "disposition": "copied_context"
+    },
+    {
+      "git_mode": "100644",
+      "git_blob": "37dcea737de93d4ac5374c9e4b0c51359ad15a4a",
+      "sha256": "0d959a944fe18823b855820069073cc0291d2c142a662b279e7992df5c6dc3d7",
+      "bytes": 6071,
+      "original_path": "docs/docs/examples/algorithms/10. Algorithms based on Neural Architecture Search and Model Search.md",
+      "archive_path": "archives/retired/anycostfl-vit/original/docs/docs/examples/algorithms/10. Algorithms based on Neural Architecture Search and Model Search.md",
+      "disposition": "copied_context"
+    },
+    {
+      "git_mode": "100644",
+      "git_blob": "f7fce93616afd4289924c293b5d05e30efd20a7b",
+      "sha256": "fb99a5d0f3238618fc9e0efd5db719cab27883ac58656a02b7289819118259fc",
+      "bytes": 881,
+      "original_path": "examples/model_search/anycostfl/anycostfl.py",
+      "archive_path": "archives/retired/anycostfl-vit/original/examples/model_search/anycostfl/anycostfl.py",
+      "disposition": "copied_context"
+    },
+    {
+      "git_mode": "100644",
+      "git_blob": "5586c2aa141927ab98ada23d47073d37e21f7a0d",
+      "sha256": "e6c02606aca9780a9c4caa66ba5075e0b4083bf030dadf95ebfb72e7c7486faa",
+      "bytes": 9928,
+      "original_path": "examples/model_search/anycostfl/anycostfl_algorithm.py",
+      "archive_path": "archives/retired/anycostfl-vit/original/examples/model_search/anycostfl/anycostfl_algorithm.py",
+      "disposition": "copied_context"
+    },
+    {
+      "git_mode": "100644",
+      "git_blob": "1b6bf1612056a5a17e08c6628ec015d0bcae97ea",
+      "sha256": "4f031b374f05334a428a32f2934ea5a35b62d34bf70cf057b721c40562d5ca4e",
+      "bytes": 2576,
+      "original_path": "examples/model_search/anycostfl/anycostfl_client.py",
+      "archive_path": "archives/retired/anycostfl-vit/original/examples/model_search/anycostfl/anycostfl_client.py",
+      "disposition": "copied_context"
+    },
+    {
+      "git_mode": "100644",
+      "git_blob": "e8814963f28ae1efaa4fcd2508588d0cca353745",
+      "sha256": "686f04e00fc3844938b43910deedefddfa45ebd845ba2eba1daffa169e5cca95",
+      "bytes": 3104,
+      "original_path": "examples/model_search/anycostfl/anycostfl_server.py",
+      "archive_path": "archives/retired/anycostfl-vit/original/examples/model_search/anycostfl/anycostfl_server.py",
+      "disposition": "copied_context"
+    },
+    {
+      "git_mode": "100644",
+      "git_blob": "cd1d0d8f2b2a6f804435f902fb353c67c0b75cb4",
+      "sha256": "41f486cf2afb96336555cadfba391e8f1346557deb6aa0490f8222a0fe474c1a",
+      "bytes": 2131,
+      "original_path": "examples/model_search/anycostfl/anycostfl_trainer.py",
+      "archive_path": "archives/retired/anycostfl-vit/original/examples/model_search/anycostfl/anycostfl_trainer.py",
+      "disposition": "copied_context"
+    },
+    {
+      "git_mode": "100644",
+      "git_blob": "0217f0b11b9583b8d3a999f2f58c46324ecddd96",
+      "sha256": "4a74ee96d86be5786c935e3454cec0a1ea2861010d82112699ab01d77a07cbb5",
+      "bytes": 1664,
+      "original_path": "examples/model_search/anycostfl/example_ResNet.toml",
+      "archive_path": "archives/retired/anycostfl-vit/original/examples/model_search/anycostfl/example_ResNet.toml",
+      "disposition": "copied_context"
+    },
+    {
+      "git_mode": "100644",
+      "git_blob": "9b1b070f5e46089ad04c6b40679872ac37703d8c",
+      "sha256": "4587d5f0c81510b4c2acb149e6c02b31e0ea7d14a3c23b7b49690d0482085bfd",
+      "bytes": 301,
+      "original_path": "examples/model_search/anycostfl/pyproject.toml",
+      "archive_path": "archives/retired/anycostfl-vit/original/examples/model_search/anycostfl/pyproject.toml",
+      "disposition": "copied_context"
+    },
+    {
+      "git_mode": "100644",
+      "git_blob": "e9266157114a14737ceeaa83665054ce8db073e4",
+      "sha256": "66b3de34ce836c7493e3e6106c54828828dcaae27f0737503993892d9e8c3571",
+      "bytes": 7832,
+      "original_path": "examples/model_search/anycostfl/resnet.py",
+      "archive_path": "archives/retired/anycostfl-vit/original/examples/model_search/anycostfl/resnet.py",
+      "disposition": "copied_context"
+    },
+    {
+      "git_mode": "100644",
+      "git_blob": "d7b5b7b7ada56eefd4e54c4bc9684dbbf972f036",
+      "sha256": "2c194cf625de70ceea14b737c2b2f4c64ea68dbde23039464f97015216752edf",
+      "bytes": 4006,
+      "original_path": "pyproject.toml",
+      "archive_path": "archives/retired/anycostfl-vit/original/pyproject.toml",
+      "disposition": "copied_context"
+    },
+    {
+      "git_mode": "100644",
+      "git_blob": "1aef3c127d77d3ef96e6757ed791646a0c057557",
+      "sha256": "46236f61039c07a844bbddaa185c32582b6f4436203bd719aa8e7dcfdbd26e89",
+      "bytes": 727368,
+      "original_path": "uv.lock",
+      "archive_path": "archives/retired/anycostfl-vit/original/uv.lock",
+      "disposition": "copied_context"
+    }
+  ],
+  "vendored_upstream_revision": "unknown",
+  "supplemental_licenses": []
+}

@@ -1,0 +1,172 @@
+{
+  "family": "fedrolex",
+  "case": "budget",
+  "variant": "",
+  "command": [
+    "/tmp/plato-archive-author/environment/bin/python",
+    "-B",
+    "-m",
+    "tests.integration.model_search_retention_worker",
+    "-u",
+    "-c",
+    "/private/tmp/plato-archive-author/accepted-cases/test_retained_activated_budget1/fedrolex/config.toml",
+    "-b",
+    "/private/tmp/plato-archive-author/accepted-cases/test_retained_activated_budget1/fedrolex/runtime"
+  ],
+  "returncode": 0,
+  "timed_out": false,
+  "forced": [],
+  "survivors": [],
+  "observed_pids": [
+    9837
+  ],
+  "elapsed_seconds": 5.352044958854094,
+  "events": [
+    {
+      "event": "source_identity",
+      "pid": 9837,
+      "config_sha256": "ec28a1018283e1fe5aca80754adcf9265911c7ac43eea9213b31e2d2e937ff44",
+      "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+      "worker_sha256": "949e087b68296d4b372ebf4a2369c9b0dbaa4a5606b483a91bab8faed2683e55"
+    },
+    {
+      "event": "activated_budget",
+      "pid": 9837,
+      "limitation_activated": true,
+      "records": [
+        {
+          "candidate_rate": 1.0,
+          "profile": [
+            42.6370906829834,
+            531.2939548492432
+          ],
+          "margin": 1.03,
+          "budget": [
+            43.9162034034729,
+            547.2327734947205
+          ],
+          "selected_rate": 0.9921875,
+          "selected_profile": [
+            41.98543453216553,
+            525.4671955108643
+          ],
+          "loss": 2.1462903022766113
+        },
+        {
+          "candidate_rate": 0.75,
+          "profile": [
+            24.001992225646973,
+            299.47046852111816
+          ],
+          "margin": 1.03,
+          "budget": [
+            24.722051992416382,
+            308.4545825767517
+          ],
+          "selected_rate": 0.7578125,
+          "selected_profile": [
+            24.51242160797119,
+            307.56871223449707
+          ],
+          "loss": 2.291943073272705
+        }
+      ],
+      "queries": [
+        {
+          "model_rate": 1.0,
+          "macs": 557102090.0
+        },
+        {
+          "model_rate": 0.75,
+          "macs": 314017546.0
+        },
+        {
+          "model_rate": 0.875,
+          "macs": 426909066.0
+        },
+        {
+          "model_rate": 0.9375,
+          "macs": 489842890.0
+        },
+        {
+          "model_rate": 0.96875,
+          "macs": 522931818.0
+        },
+        {
+          "model_rate": 0.984375,
+          "macs": 539881786.0
+        },
+        {
+          "model_rate": 0.9921875,
+          "macs": 550992290.0
+        },
+        {
+          "model_rate": 0.75,
+          "macs": 314017546.0
+        },
+        {
+          "model_rate": 0.75,
+          "macs": 314017546.0
+        },
+        {
+          "model_rate": 0.875,
+          "macs": 426909066.0
+        },
+        {
+          "model_rate": 0.8125,
+          "macs": 368300618.0
+        },
+        {
+          "model_rate": 0.78125,
+          "macs": 340618410.0
+        },
+        {
+          "model_rate": 0.765625,
+          "macs": 327182810.0
+        },
+        {
+          "model_rate": 0.7578125,
+          "macs": 322509170.0
+        }
+      ]
+    },
+    {
+      "event": "success",
+      "pid": 9837
+    }
+  ],
+  "overlay": {
+    "clients": {
+      "total_clients": 2,
+      "per_round": 2,
+      "comm_simulation": false,
+      "compute_comm_time": false,
+      "do_test": false
+    },
+    "server": {
+      "port": 56522,
+      "simulate_wall_time": false,
+      "random_seed": 1234
+    },
+    "trainer": {
+      "rounds": 1,
+      "epochs": 1,
+      "batch_size": 2,
+      "max_concurrency": 2
+    },
+    "data": {
+      "download": false,
+      "sampler": "all_inclusive",
+      "testset_sampler": "all_inclusive",
+      "testset_size": 2
+    },
+    "parameters": {
+      "limitation": {
+        "activated": true
+      }
+    }
+  },
+  "supplied_config_path": "examples/model_search/fedrolex/example_ResNet.toml",
+  "supplied_config_sha256": "4a74ee96d86be5786c935e3454cec0a1ea2861010d82112699ab01d77a07cbb5",
+  "lock_sha256": "e2a53aaae9a0dd49f5446b490bb3071e86aa3a9a20d6271c9dd30b4ae2dcbff9"
+}

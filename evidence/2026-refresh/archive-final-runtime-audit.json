@@ -1,0 +1,4631 @@
+{
+  "source": "6bf8836d06072c7946cdfb5499a09e4bce459805",
+  "mandatory_cases": 1551,
+  "runtime_oracle_source_sha256": "be1021d08128f38a50d023b693acf57f304d2a623cf49f2b4bdc7e2db2c71835",
+  "core_runtime_records": [
+    {
+      "path": "pytest-tmp/test_active_edge_failure_unwin0/edge/result.json",
+      "sha256": "8d0ee75735cbf84cf0ac800acb30967cc9d150d7a6f8e0465dfe6b4e4a6d77b4",
+      "case": "edge_custom",
+      "returncode": 1,
+      "timed_out": false,
+      "forced": [],
+      "survivors": []
+    },
+    {
+      "path": "pytest-tmp/test_active_failure_reaches_sy0/client_custom/result.json",
+      "sha256": "8148e6db99efe5ace028f0d6aba08aa291ddaa0950b752851d9b9842eb1531d1",
+      "case": "client_custom",
+      "returncode": 1,
+      "timed_out": false,
+      "forced": [],
+      "survivors": []
+    },
+    {
+      "path": "pytest-tmp/test_active_failure_reaches_sy1/ordinary/result.json",
+      "sha256": "8398fab137426f17992711281cb6b61f1489673cced2c6410d72b456f7af57b3",
+      "case": "ordinary",
+      "returncode": 1,
+      "timed_out": false,
+      "forced": [],
+      "survivors": []
+    },
+    {
+      "path": "pytest-tmp/test_active_failure_reaches_sy2/central/result.json",
+      "sha256": "c39efe802ad951a90f12b1a803ccc30244a43a4ebf15d65b473742f668053c65",
+      "case": "central",
+      "returncode": 1,
+      "timed_out": false,
+      "forced": [],
+      "survivors": []
+    },
+    {
+      "path": "pytest-tmp/test_active_failure_reaches_sy3/edge_custom/result.json",
+      "sha256": "cc849d47d44b005592addd838855abe2359c0c8a110d03db80d6cdcee11f746d",
+      "case": "edge_custom",
+      "returncode": 1,
+      "timed_out": false,
+      "forced": [],
+      "survivors": []
+    },
+    {
+      "path": "pytest-tmp/test_actual_shipped_run_resume0/control/run/result.json",
+      "sha256": "9be47ac04c3fe5582896ca5b4cd962b2ab4c7f812344a46649e070ab4872ad5a",
+      "case": "feddyn_entrypoint",
+      "returncode": 0,
+      "timed_out": false,
+      "forced": false,
+      "survivors": []
+    },
+    {
+      "path": "pytest-tmp/test_actual_shipped_run_resume0/split/first/result.json",
+      "sha256": "5e2a3f84283e73562b6b1dde565a0ffe5a1e3bd70b469ba44a0d2f2d9c19f54b",
+      "case": "feddyn_entrypoint",
+      "returncode": 0,
+      "timed_out": false,
+      "forced": false,
+      "survivors": []
+    },
+    {
+      "path": "pytest-tmp/test_actual_shipped_run_resume0/split/resumed/result.json",
+      "sha256": "97ab635e91c5472221cbf393ed7464ba39d445cd842cf15190f5d91396e1664e",
+      "case": "feddyn_entrypoint",
+      "returncode": 0,
+      "timed_out": false,
+      "forced": false,
+      "survivors": []
+    },
+    {
+      "path": "pytest-tmp/test_actual_shipped_run_resume1/control/run/result.json",
+      "sha256": "d1b4d78e22696e79e1c12368f4fb022f8edf7a3554a0357089b6acf376e826bd",
+      "case": "feddyn_entrypoint",
+      "returncode": 0,
+      "timed_out": false,
+      "forced": false,
+      "survivors": []
+    },
+    {
+      "path": "pytest-tmp/test_actual_shipped_run_resume1/split/first/result.json",
+      "sha256": "d3d80bc16c832a294e4ed786c24656ca047142cc1a0780b08548de23cf7cda79",
+      "case": "feddyn_entrypoint",
+      "returncode": 0,
+      "timed_out": false,
+      "forced": false,
+      "survivors": []
+    },
+    {
+      "path": "pytest-tmp/test_actual_shipped_run_resume1/split/resumed/result.json",
+      "sha256": "374adcf6d6c05730a135f64cc2dd998b2febb438dbcaf901bd818c609d4959c7",
+      "case": "feddyn_entrypoint",
+      "returncode": 0,
+      "timed_out": false,
+      "forced": false,
+      "survivors": []
+    },
+    {
+      "path": "pytest-tmp/test_cancellation_already_fina0/cancelling/result.json",
+      "sha256": "c8d142e1f1135e9452e90d24373f27e88fa53611aa13ebc648d4ddc2cf7ce021",
+      "case": "ordinary",
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [],
+      "survivors": []
+    },
+    {
+      "path": "pytest-tmp/test_client_control_flow_keeps0/interrupt/result.json",
+      "sha256": "dade649c6a1c3ce10b954734fccd489c825d4ab39b200b37b30a28d7ffdf9ec4",
+      "case": "client_lifecycle",
+      "returncode": -2,
+      "timed_out": false,
+      "forced": [],
+      "survivors": []
+    },
+    {
+      "path": "pytest-tmp/test_client_control_flow_keeps1/exit/result.json",
+      "sha256": "1e28e9cf427e2a6b0f8a33d2637b433f965edea23180581ba856eb947569ec33",
+      "case": "client_lifecycle",
+      "returncode": 7,
+      "timed_out": false,
+      "forced": [],
+      "survivors": []
+    },
+    {
+      "path": "pytest-tmp/test_closed_current_client_loo0/closed/result.json",
+      "sha256": "08f2fe0eb590dbdf5c3b76a25c31a00fa57ef494b63ec2cd35b54835af6b0653",
+      "case": "client_custom",
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [],
+      "survivors": []
+    },
+    {
+      "path": "pytest-tmp/test_configure_failure_is_pres0/configure/result.json",
+      "sha256": "bac5f5c4e797c39984b450cb7c195b1487d6cc4ed2423f4e8b4aa41886c18619",
+      "case": "client_lifecycle",
+      "returncode": 1,
+      "timed_out": false,
+      "forced": [],
+      "survivors": []
+    },
+    {
+      "path": "pytest-tmp/test_delegating_server_consume0/delegated/result.json",
+      "sha256": "23c40f539c587246c0bdc26d4bdfbf47a73fa6342af0b992e9bf184799e2146e",
+      "case": "ordinary",
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [],
+      "survivors": []
+    },
+    {
+      "path": "pytest-tmp/test_edge_cancellation_error_k0/edge/result.json",
+      "sha256": "07c88f1a999c340bd962af7f4afaf7070190ebcaa6774f1d24ce52569c5e95e3",
+      "case": "edge_custom",
+      "returncode": 1,
+      "timed_out": false,
+      "forced": [],
+      "survivors": []
+    },
+    {
+      "path": "pytest-tmp/test_explicitly_absent_loop_on0/ordinary/result.json",
+      "sha256": "dbe207dc5ee0ca7f0595566a824064f2eff1d216764bc32b96110ef2923f9309",
+      "case": "ordinary",
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [],
+      "survivors": []
+    },
+    {
+      "path": "pytest-tmp/test_explicitly_absent_loop_on1/central/result.json",
+      "sha256": "6f9014d60e0e1dce24cc2cf8076db9ece80ae9604ddcb306ae51965492313cdb",
+      "case": "central",
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [],
+      "survivors": []
+    },
+    {
+      "path": "pytest-tmp/test_explicitly_absent_loop_on2/edge_default/result.json",
+      "sha256": "217a563344a7febad59499dca31f9328fa698af2f9736c4dd362e58ee0bff214",
+      "case": "edge_default",
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [],
+      "survivors": []
+    },
+    {
+      "path": "pytest-tmp/test_explicitly_absent_loop_on3/edge_custom/result.json",
+      "sha256": "67fb82b73951dfa8d94703df5962d13a59b5561fe038aff4a5fbc21c9984bf23",
+      "case": "edge_custom",
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [],
+      "survivors": []
+    },
+    {
+      "path": "pytest-tmp/test_fresh_entrypoint_executes0/client_default/result.json",
+      "sha256": "7b8c01f5acfd8ccba937960e84bc6f34a896106ef92da7526e410d23455f50ca",
+      "case": "client_default",
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [],
+      "survivors": []
+    },
+    {
+      "path": "pytest-tmp/test_fresh_entrypoint_executes1/client_custom/result.json",
+      "sha256": "71b01adc0f5e73faa03abb1e060a4fff403829d9baae0d9be5690cc1edf8335f",
+      "case": "client_custom",
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [],
+      "survivors": []
+    },
+    {
+      "path": "pytest-tmp/test_fresh_entrypoint_executes2/ordinary/result.json",
+      "sha256": "006214e08d1bec50f5c3c411b7e4754db5dcbb2a4e421250e8ad475538e5f48a",
+      "case": "ordinary",
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [],
+      "survivors": []
+    },
+    {
+      "path": "pytest-tmp/test_fresh_entrypoint_executes3/central/result.json",
+      "sha256": "99d0d2eff0e907707786bff1b9be15e65a052ff862283f2405f4b1d814484119",
+      "case": "central",
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [],
+      "survivors": []
+    },
+    {
+      "path": "pytest-tmp/test_fresh_entrypoint_executes4/direct/result.json",
+      "sha256": "50dd8eb124d3ecad43a18a45c83df867c9ca0263724ee9c0b53322bffcf41b29",
+      "case": "direct",
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [],
+      "survivors": []
+    },
+    {
+      "path": "pytest-tmp/test_fresh_entrypoint_executes5/edge_default/result.json",
+      "sha256": "4d4dd53fc6611e79aae68f87f0b918b5f000e91a9f0a045d7ff9b624da40d550",
+      "case": "edge_default",
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [],
+      "survivors": []
+    },
+    {
+      "path": "pytest-tmp/test_fresh_entrypoint_executes6/edge_custom/result.json",
+      "sha256": "e093816ce6b9fa64f2724730ca74402e6426cbbec9707959e7168899b28fd13f",
+      "case": "edge_custom",
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [],
+      "survivors": []
+    },
+    {
+      "path": "pytest-tmp/test_independent_runtime_error0/independent/result.json",
+      "sha256": "7f8e7ef3529bef70d361c4e0f8dca1aafef11ecbea14dc9d739738d1671c1b15",
+      "case": "ordinary",
+      "returncode": 1,
+      "timed_out": false,
+      "forced": [],
+      "survivors": []
+    },
+    {
+      "path": "pytest-tmp/test_missing_external_edge_cli0/edge/result.json",
+      "sha256": "f1f6c5e2f5083c6e307abd23af0a6feea65dc7a0cc28039fb3bbeef546ad3478",
+      "case": "edge_custom",
+      "returncode": 1,
+      "timed_out": false,
+      "forced": [],
+      "survivors": []
+    },
+    {
+      "path": "pytest-tmp/test_noncooperative_teardown_i0/task/result.json",
+      "sha256": "be404471a958e0efe7d50609cd12e2755a8fd935a365a7ae0157e9e73ae69b32",
+      "case": "client_lifecycle",
+      "returncode": -15,
+      "timed_out": true,
+      "forced": [
+        "TERM"
+      ],
+      "survivors": []
+    },
+    {
+      "path": "pytest-tmp/test_noncooperative_teardown_i1/generator/result.json",
+      "sha256": "a06f5a269390ac721fc33ebc1efc06862beef8caf98cc4cb016ac7ba2f72f0bb",
+      "case": "client_lifecycle",
+      "returncode": -15,
+      "timed_out": true,
+      "forced": [
+        "TERM"
+      ],
+      "survivors": []
+    },
+    {
+      "path": "pytest-tmp/test_noncooperative_teardown_i2/executor/result.json",
+      "sha256": "4f01fd7c8949d06a92b4def37af1538b3e8f821332e1d6f5817c8fa674ad0871",
+      "case": "client_lifecycle",
+      "returncode": -15,
+      "timed_out": true,
+      "forced": [
+        "TERM"
+      ],
+      "survivors": []
+    },
+    {
+      "path": "pytest-tmp/test_noncooperative_teardown_i3/aiohttp_task/result.json",
+      "sha256": "bfc01e52d2ac2b7e96db917375dfa9dd8b334ca7859cc311abe0900ea5d1b83e",
+      "case": "ordinary",
+      "returncode": -9,
+      "timed_out": true,
+      "forced": [
+        "TERM",
+        "KILL"
+      ],
+      "survivors": []
+    },
+    {
+      "path": "pytest-tmp/test_owned_client_finalizes_ta0/client/result.json",
+      "sha256": "4898782d3fba042b3f4f5e1f99f31aa2f0bdf59f781af40adff545ce09246468",
+      "case": "client_lifecycle",
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [],
+      "survivors": []
+    },
+    {
+      "path": "pytest-tmp/test_owned_client_finalizes_ta1/client/result.json",
+      "sha256": "afc31538399f4f3a0752273ef63a5757833a2e40b4a2fc195e7b08ebee449a29",
+      "case": "client_lifecycle",
+      "returncode": 1,
+      "timed_out": false,
+      "forced": [],
+      "survivors": []
+    },
+    {
+      "path": "pytest-tmp/test_owned_server_fallback_fin0/fallback/result.json",
+      "sha256": "59ee44c2b863841cc992aeff9ddd6be7607edc13acbc68afdbdcc910d0f52200",
+      "case": "ordinary",
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [],
+      "survivors": []
+    },
+    {
+      "path": "pytest-tmp/test_owned_server_fallback_fin1/fallback/result.json",
+      "sha256": "6ce9358be401ff91d35016c07829c59f1b1aee2ad8c99b1f41e8029e3c71a0d8",
+      "case": "ordinary",
+      "returncode": 1,
+      "timed_out": false,
+      "forced": [],
+      "survivors": []
+    },
+    {
+      "path": "pytest-tmp/test_post_launch_failure_keeps0/failure/result.json",
+      "sha256": "c551a043e4b34367914e611860bca0ffe853a857468bba9252af5ed691821860",
+      "case": "socket_failure",
+      "returncode": 1,
+      "timed_out": false,
+      "forced": [],
+      "survivors": []
+    },
+    {
+      "path": "pytest-tmp/test_preconstructed_borrowed_l0/client_lifecycle/result.json",
+      "sha256": "e274f4b2650b57a6f9001852010a3a7680b9cd9f9d6e3a323466fcbe28e152a9",
+      "case": "client_lifecycle",
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [],
+      "survivors": []
+    },
+    {
+      "path": "pytest-tmp/test_preconstructed_borrowed_l1/client_lifecycle/result.json",
+      "sha256": "cffbf8dfad0363e72227d7110402ac65b8c80174a7224772c8a32cae9d0b5e08",
+      "case": "client_lifecycle",
+      "returncode": 1,
+      "timed_out": false,
+      "forced": [],
+      "survivors": []
+    },
+    {
+      "path": "pytest-tmp/test_preconstructed_borrowed_l2/ordinary/result.json",
+      "sha256": "ae3f7cb4dfd872945167957e33169ea6213b3f0a930b53c4ab47e9dc8140ac1d",
+      "case": "ordinary",
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [],
+      "survivors": []
+    },
+    {
+      "path": "pytest-tmp/test_preconstructed_borrowed_l3/ordinary/result.json",
+      "sha256": "d38c75fc3ed0718bb269aad4db8dca98b4b839dd6051709b2859ef02dac9c35d",
+      "case": "ordinary",
+      "returncode": 1,
+      "timed_out": false,
+      "forced": [],
+      "survivors": []
+    },
+    {
+      "path": "pytest-tmp/test_real_two_client_cpu_socke0/round/result.json",
+      "sha256": "fd7225c943d5de40dbf98f4a896e0981e47d5303c9a791ce7e0d94b3961cb091",
+      "case": "socket_round",
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [],
+      "survivors": []
+    },
+    {
+      "path": "pytest-tmp/test_repeated_owned_client_ent0/client/result.json",
+      "sha256": "fa4529efa7c3cce36bdea3afd38d217510e1cfeb907021fc959f83a1af67c821",
+      "case": "client_lifecycle",
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [],
+      "survivors": []
+    },
+    {
+      "path": "pytest-tmp/test_runner_cleanup_error_keep0/cleanup/result.json",
+      "sha256": "bcba73e2e18d80dd22a759493107047b2f6ff5a90fd3b313d05ba62ed014e60e",
+      "case": "client_lifecycle",
+      "returncode": 1,
+      "timed_out": false,
+      "forced": [],
+      "survivors": []
+    },
+    {
+      "path": "pytest-tmp/test_running_loop_rejected_bef0/running/result.json",
+      "sha256": "23bb66ce9428782efcfd6034b90dad842caec1dfe0b88bb0afd4ee4e89787ff9",
+      "case": "running",
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [],
+      "survivors": []
+    },
+    {
+      "path": "pytest-tmp/test_server_error_precedence_a0/server/result.json",
+      "sha256": "382def7fdb202971e47a7b0997fd29c0e597fb0f6cb37c3719fe9f5d942a596b",
+      "case": "ordinary",
+      "returncode": 1,
+      "timed_out": false,
+      "forced": [],
+      "survivors": []
+    },
+    {
+      "path": "pytest-tmp/test_server_error_precedence_a1/server/result.json",
+      "sha256": "01b0c794be616a5fa9788f7129c679968db7af2013a6b9662177f51d7a4bc42a",
+      "case": "ordinary",
+      "returncode": 1,
+      "timed_out": false,
+      "forced": [],
+      "survivors": []
+    },
+    {
+      "path": "pytest-tmp/test_server_error_precedence_a2/server/result.json",
+      "sha256": "b49b5648a03db9d01e97df109e8a1c9eb17e6d4bdb5259ca63c883b0426846c8",
+      "case": "ordinary",
+      "returncode": 1,
+      "timed_out": false,
+      "forced": [],
+      "survivors": []
+    },
+    {
+      "path": "pytest-tmp/test_server_error_precedence_a3/server/result.json",
+      "sha256": "43ccc998e9629ddffc45901ebe20af68863f88dd6126be14f7875095158b6630",
+      "case": "ordinary",
+      "returncode": 1,
+      "timed_out": false,
+      "forced": [],
+      "survivors": []
+    },
+    {
+      "path": "pytest-tmp/test_server_error_precedence_a4/server/result.json",
+      "sha256": "8c9e9f8006f4f4b0cdea9739aabc00dc5fcb4d359ebd2c8a48da8d64ce7384dd",
+      "case": "ordinary",
+      "returncode": 1,
+      "timed_out": false,
+      "forced": [],
+      "survivors": []
+    },
+    {
+      "path": "pytest-tmp/test_shipped_mnist_shaped_lene0/lenet-run/result.json",
+      "sha256": "257b5edc7ece6a51bef89ff6a27e8f382d0ee4b828a1bc8b0b9c268c0508d0da",
+      "case": "feddyn_entrypoint",
+      "returncode": 0,
+      "timed_out": false,
+      "forced": false,
+      "survivors": []
+    },
+    {
+      "path": "pytest-tmp/test_stalled_real_client_is_co0/stalled/result.json",
+      "sha256": "25810a36914430fc8998766da892a8f0328b48cd7a43574aff2e48d474888b50",
+      "case": "socket_stall",
+      "returncode": 0,
+      "timed_out": true,
+      "forced": [
+        "TERM"
+      ],
+      "survivors": []
+    }
+  ],
+  "fedavg": {
+    "samples": [
+      2,
+      6
+    ],
+    "max_absolute_error": 1.4901161193847656e-08,
+    "per_key_error": {
+      "linear.weight": 1.4901161193847656e-08,
+      "linear.bias": 2.9103830456733704e-10
+    },
+    "natural_completion": true
+  },
+  "feddyn": [
+    {
+      "mode": "uniform",
+      "rows": [
+        {
+          "round": 1,
+          "selected": [
+            9,
+            7
+          ],
+          "cloud_exact": "4201/1250",
+          "cloud": 3.3608,
+          "histories_exact": [
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "189/200",
+            "0",
+            "1323/1000",
+            "0"
+          ]
+        },
+        {
+          "round": 2,
+          "selected": [
+            5,
+            6
+          ],
+          "cloud_exact": "1590926/390625",
+          "cloud": 4.07277056,
+          "histories_exact": [
+            "0",
+            "0",
+            "0",
+            "0",
+            "387261/1250000",
+            "623511/1250000",
+            "189/200",
+            "0",
+            "1323/1000",
+            "0"
+          ]
+        },
+        {
+          "round": 3,
+          "selected": [
+            5,
+            3
+          ],
+          "cloud_exact": "10901036813/2500000000",
+          "cloud": 4.3604147252,
+          "histories_exact": [
+            "0",
+            "0",
+            "-79200639/390625000",
+            "0",
+            "5989997223/12500000000",
+            "623511/1250000",
+            "189/200",
+            "0",
+            "1323/1000",
+            "0"
+          ]
+        },
+        {
+          "round": 4,
+          "selected": [
+            9,
+            5
+          ],
+          "cloud_exact": "3276850758902459/625000000000000",
+          "cloud": 5.242961214243935,
+          "histories_exact": [
+            "0",
+            "0",
+            "-79200639/390625000",
+            "0",
+            "73878064872003/125000000000000",
+            "623511/1250000",
+            "189/200",
+            "0",
+            "5437192292343/2500000000000",
+            "0"
+          ]
+        }
+      ],
+      "full_cpu_rng_resume_equal": true
+    },
+    {
+      "mode": "sample",
+      "rows": [
+        {
+          "round": 1,
+          "selected": [
+            9,
+            7
+          ],
+          "cloud_exact": "353123/105000",
+          "cloud": 3.3630761904761903,
+          "histories_exact": [
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "2649/2800",
+            "0",
+            "23863/18000",
+            "0"
+          ]
+        },
+        {
+          "round": 2,
+          "selected": [
+            5,
+            6
+          ],
+          "cloud_exact": "128360720449/31500000000",
+          "cloud": 4.07494350631746,
+          "histories_exact": [
+            "0",
+            "0",
+            "0",
+            "0",
+            "324675653/1050000000",
+            "628233913/1260000000",
+            "2649/2800",
+            "0",
+            "23863/18000",
+            "0"
+          ]
+        },
+        {
+          "round": 3,
+          "selected": [
+            5,
+            3
+          ],
+          "cloud_exact": "68709908479515937/15750000000000000",
+          "cloud": 4.362533871715297,
+          "histories_exact": [
+            "0",
+            "0",
+            "-38228753386921/189000000000000",
+            "0",
+            "1504228643537329/3150000000000000",
+            "628233913/1260000000",
+            "2649/2800",
+            "0",
+            "23863/18000",
+            "0"
+          ]
+        },
+        {
+          "round": 4,
+          "selected": [
+            9,
+            5
+          ],
+          "cloud_exact": "2233056172986945054199069/425250000000000000000000",
+          "cloud": 5.251160900615979,
+          "histories_exact": [
+            "0",
+            "0",
+            "-38228753386921/189000000000000",
+            "0",
+            "1852286934197154740849/3150000000000000000000",
+            "628233913/1260000000",
+            "2649/2800",
+            "0",
+            "797767729653031648129/364500000000000000000",
+            "0"
+          ]
+        }
+      ],
+      "full_cpu_rng_resume_equal": true
+    }
+  ],
+  "retained_cases": [
+    {
+      "classname": "tests.integration.test_retained_model_search",
+      "name": "test_retained_width_round[anycostfl]",
+      "time": "24.139"
+    },
+    {
+      "classname": "tests.integration.test_retained_model_search",
+      "name": "test_retained_width_round[fedrolex]",
+      "time": "24.378"
+    },
+    {
+      "classname": "tests.integration.test_retained_model_search",
+      "name": "test_retained_width_round[heterofl]",
+      "time": "24.450"
+    },
+    {
+      "classname": "tests.integration.test_retained_model_search",
+      "name": "test_retained_activated_budget[anycostfl]",
+      "time": "4.637"
+    },
+    {
+      "classname": "tests.integration.test_retained_model_search",
+      "name": "test_retained_activated_budget[fedrolex]",
+      "time": "4.601"
+    },
+    {
+      "classname": "tests.integration.test_retained_model_search",
+      "name": "test_retained_activated_budget[heterofl]",
+      "time": "4.294"
+    },
+    {
+      "classname": "tests.integration.test_retained_model_search",
+      "name": "test_sysheterofl_subnet_round",
+      "time": "6.791"
+    },
+    {
+      "classname": "tests.integration.test_retained_model_search",
+      "name": "test_dlg_model_update[lenet]",
+      "time": "1.622"
+    },
+    {
+      "classname": "tests.integration.test_retained_model_search",
+      "name": "test_dlg_model_update[resnet_18]",
+      "time": "1.801"
+    },
+    {
+      "classname": "tests.integration.test_retained_model_search",
+      "name": "test_local_retired_selection[anycostfl]",
+      "time": "3.944"
+    },
+    {
+      "classname": "tests.integration.test_retained_model_search",
+      "name": "test_local_retired_selection[fedrolex]",
+      "time": "3.866"
+    },
+    {
+      "classname": "tests.integration.test_retained_model_search",
+      "name": "test_local_retired_selection[heterofl]",
+      "time": "3.891"
+    },
+    {
+      "classname": "tests.integration.test_retained_model_search",
+      "name": "test_local_retired_selection[dlg]",
+      "time": "1.415"
+    },
+    {
+      "classname": "tests.integration.test_retained_model_search",
+      "name": "test_retained_entrypoint_import[anycostfl-root]",
+      "time": "3.828"
+    },
+    {
+      "classname": "tests.integration.test_retained_model_search",
+      "name": "test_retained_entrypoint_import[anycostfl-example]",
+      "time": "3.874"
+    },
+    {
+      "classname": "tests.integration.test_retained_model_search",
+      "name": "test_retained_entrypoint_import[fedrolex-root]",
+      "time": "3.864"
+    },
+    {
+      "classname": "tests.integration.test_retained_model_search",
+      "name": "test_retained_entrypoint_import[fedrolex-example]",
+      "time": "3.865"
+    },
+    {
+      "classname": "tests.integration.test_retained_model_search",
+      "name": "test_retained_entrypoint_import[heterofl-root]",
+      "time": "3.873"
+    },
+    {
+      "classname": "tests.integration.test_retained_model_search",
+      "name": "test_retained_entrypoint_import[heterofl-example]",
+      "time": "3.885"
+    }
+  ],
+  "retained_records": [
+    {
+      "path": "pytest-tmp/test_dlg_model_update_lenet_0/lenet/result.json",
+      "sha256": "d20b398c4f983949e027cf70719c5ae546f771e4b76837e56e8309fe76395cf1",
+      "family": "dlg",
+      "case": "update",
+      "variant": "lenet",
+      "command": [
+        "/tmp/plato-archive-integration/env/bin/python",
+        "-B",
+        "-m",
+        "tests.integration.model_search_retention_worker",
+        "-u",
+        "-c",
+        "/private/tmp/plato-archive-integration/run-mandatory/pytest-tmp/test_dlg_model_update_lenet_0/lenet/config.toml",
+        "-b",
+        "/private/tmp/plato-archive-integration/run-mandatory/pytest-tmp/test_dlg_model_update_lenet_0/lenet/runtime"
+      ],
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [],
+      "survivors": [],
+      "observed_pids": [
+        56686
+      ],
+      "elapsed_seconds": 1.6158997090533376,
+      "events": [
+        {
+          "event": "source_identity",
+          "pid": 56686,
+          "config_sha256": "da920f70b4e23e8e39af5f749e7e20b9ff51152297e606251fb0625dd68002ab",
+          "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+          "worker_sha256": "95779c99e4783cfeb4d53110a11f69c4a4529b512f4f9b0d738bb2261b24502d"
+        },
+        {
+          "event": "dlg_update",
+          "pid": 56686,
+          "model_name": "lenet",
+          "datasource_overlay": "CIFAR100",
+          "output_shape": [
+            2,
+            100
+          ],
+          "feature_shape": [
+            2,
+            768
+          ],
+          "loss": 4.42949914932251
+        },
+        {
+          "event": "success",
+          "pid": 56686
+        }
+      ],
+      "overlay": {
+        "clients": {
+          "total_clients": 2,
+          "per_round": 2,
+          "comm_simulation": false,
+          "compute_comm_time": false,
+          "do_test": false
+        },
+        "server": {
+          "port": 58506,
+          "simulate_wall_time": false,
+          "random_seed": 1234
+        },
+        "trainer": {
+          "rounds": 1,
+          "epochs": 1,
+          "batch_size": 2,
+          "max_concurrency": 2,
+          "model_type": "resnet",
+          "model_name": "lenet"
+        },
+        "data": {
+          "download": false,
+          "sampler": "all_inclusive",
+          "testset_sampler": "all_inclusive",
+          "testset_size": 2,
+          "datasource": "CIFAR100"
+        },
+        "parameters": {
+          "limitation": {
+            "activated": false
+          }
+        }
+      },
+      "supplied_config_path": "examples/gradient_leakage_attacks/fedavg_resnet18_cifar100.toml",
+      "supplied_config_sha256": "1834c972bc0a149eb76ecc52328d0c5562b0da4ff56c4cbbef3a90f651614912",
+      "lock_sha256": "e2a53aaae9a0dd49f5446b490bb3071e86aa3a9a20d6271c9dd30b4ae2dcbff9"
+    },
+    {
+      "path": "pytest-tmp/test_dlg_model_update_resnet_10/resnet_18/result.json",
+      "sha256": "490bcceb43b021839472d2c5d05939c384e92d3b070a60ac1d99da0b26b01146",
+      "family": "dlg",
+      "case": "update",
+      "variant": "resnet_18",
+      "command": [
+        "/tmp/plato-archive-integration/env/bin/python",
+        "-B",
+        "-m",
+        "tests.integration.model_search_retention_worker",
+        "-u",
+        "-c",
+        "/private/tmp/plato-archive-integration/run-mandatory/pytest-tmp/test_dlg_model_update_resnet_10/resnet_18/config.toml",
+        "-b",
+        "/private/tmp/plato-archive-integration/run-mandatory/pytest-tmp/test_dlg_model_update_resnet_10/resnet_18/runtime"
+      ],
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [],
+      "survivors": [],
+      "observed_pids": [
+        56713
+      ],
+      "elapsed_seconds": 1.7942527909763157,
+      "events": [
+        {
+          "event": "source_identity",
+          "pid": 56713,
+          "config_sha256": "665e82e42c1ec88de366cdc03abbc81e7f9a85727baf81b61601f1489edcceea",
+          "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+          "worker_sha256": "95779c99e4783cfeb4d53110a11f69c4a4529b512f4f9b0d738bb2261b24502d"
+        },
+        {
+          "event": "dlg_update",
+          "pid": 56713,
+          "model_name": "resnet_18",
+          "datasource_overlay": "Torchvision",
+          "output_shape": [
+            2,
+            100
+          ],
+          "feature_shape": [
+            2,
+            512
+          ],
+          "loss": 4.865447044372559
+        },
+        {
+          "event": "success",
+          "pid": 56713
+        }
+      ],
+      "overlay": {
+        "clients": {
+          "total_clients": 2,
+          "per_round": 2,
+          "comm_simulation": false,
+          "compute_comm_time": false,
+          "do_test": false
+        },
+        "server": {
+          "port": 58508,
+          "simulate_wall_time": false,
+          "random_seed": 1234
+        },
+        "trainer": {
+          "rounds": 1,
+          "epochs": 1,
+          "batch_size": 2,
+          "max_concurrency": 2,
+          "model_type": "resnet"
+        },
+        "data": {
+          "download": false,
+          "sampler": "all_inclusive",
+          "testset_sampler": "all_inclusive",
+          "testset_size": 2
+        },
+        "parameters": {
+          "limitation": {
+            "activated": false
+          }
+        }
+      },
+      "supplied_config_path": "examples/gradient_leakage_attacks/fedavg_resnet18_cifar100.toml",
+      "supplied_config_sha256": "1834c972bc0a149eb76ecc52328d0c5562b0da4ff56c4cbbef3a90f651614912",
+      "lock_sha256": "e2a53aaae9a0dd49f5446b490bb3071e86aa3a9a20d6271c9dd30b4ae2dcbff9"
+    },
+    {
+      "path": "pytest-tmp/test_local_retired_selection_a0/anycostfl/result.json",
+      "sha256": "cb971ed5660842bd5b90c5a3a296aae37d8d629c31d933b0f0d8627e7ea6484c",
+      "family": "anycostfl",
+      "case": "selector",
+      "variant": "",
+      "command": [
+        "/tmp/plato-archive-integration/env/bin/python",
+        "-B",
+        "-m",
+        "tests.integration.model_search_retention_worker",
+        "-u",
+        "-c",
+        "/private/tmp/plato-archive-integration/run-mandatory/pytest-tmp/test_local_retired_selection_a0/anycostfl/config.toml",
+        "-b",
+        "/private/tmp/plato-archive-integration/run-mandatory/pytest-tmp/test_local_retired_selection_a0/anycostfl/runtime"
+      ],
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [],
+      "survivors": [],
+      "observed_pids": [
+        56743
+      ],
+      "elapsed_seconds": 3.9376469999551773,
+      "events": [
+        {
+          "event": "source_identity",
+          "pid": 56743,
+          "config_sha256": "deb789dc48c7a4413976d7add43137c190ff735eb32f7b6afd48ab4dd3f444f3",
+          "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+          "worker_sha256": "95779c99e4783cfeb4d53110a11f69c4a4529b512f4f9b0d738bb2261b24502d"
+        },
+        {
+          "event": "selector_diagnostic",
+          "pid": 56743,
+          "selection": "vit",
+          "message": "The AnyCostFL ViT model was retired. Historical source and restoration instructions: archives/retired/anycostfl-vit/README.md."
+        },
+        {
+          "event": "selector_diagnostic",
+          "pid": 56743,
+          "selection": "unknown_model",
+          "message": "No such AnyCostFL model: unknown_model"
+        },
+        {
+          "event": "success",
+          "pid": 56743
+        }
+      ],
+      "overlay": {
+        "clients": {
+          "total_clients": 2,
+          "per_round": 2,
+          "comm_simulation": false,
+          "compute_comm_time": false,
+          "do_test": false
+        },
+        "server": {
+          "port": 58510,
+          "simulate_wall_time": false,
+          "random_seed": 1234
+        },
+        "trainer": {
+          "rounds": 1,
+          "epochs": 1,
+          "batch_size": 2,
+          "max_concurrency": 2
+        },
+        "data": {
+          "download": false,
+          "sampler": "all_inclusive",
+          "testset_sampler": "all_inclusive",
+          "testset_size": 2
+        },
+        "parameters": {
+          "limitation": {
+            "activated": false
+          }
+        }
+      },
+      "supplied_config_path": "examples/model_search/anycostfl/example_ResNet.toml",
+      "supplied_config_sha256": "4a74ee96d86be5786c935e3454cec0a1ea2861010d82112699ab01d77a07cbb5",
+      "lock_sha256": "e2a53aaae9a0dd49f5446b490bb3071e86aa3a9a20d6271c9dd30b4ae2dcbff9"
+    },
+    {
+      "path": "pytest-tmp/test_local_retired_selection_d0/dlg/result.json",
+      "sha256": "d8295979515763b5f3c1a320d443e753e195a51e00ca693a949c59197a20a7bb",
+      "family": "dlg",
+      "case": "selector",
+      "variant": "",
+      "command": [
+        "/tmp/plato-archive-integration/env/bin/python",
+        "-B",
+        "-m",
+        "tests.integration.model_search_retention_worker",
+        "-u",
+        "-c",
+        "/private/tmp/plato-archive-integration/run-mandatory/pytest-tmp/test_local_retired_selection_d0/dlg/config.toml",
+        "-b",
+        "/private/tmp/plato-archive-integration/run-mandatory/pytest-tmp/test_local_retired_selection_d0/dlg/runtime"
+      ],
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [],
+      "survivors": [],
+      "observed_pids": [
+        56945
+      ],
+      "elapsed_seconds": 1.4092289579566568,
+      "events": [
+        {
+          "event": "source_identity",
+          "pid": 56945,
+          "config_sha256": "c18f4f59b0fe3a5fd80c04e139496a45b8ebb5e145702a142c7528ab3954dd0b",
+          "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+          "worker_sha256": "95779c99e4783cfeb4d53110a11f69c4a4529b512f4f9b0d738bb2261b24502d"
+        },
+        {
+          "event": "selector_diagnostic",
+          "pid": 56945,
+          "selection": "vit",
+          "message": "The model 'vit' was retired. Historical source and restoration instructions: archives/retired/legacy-vit/README.md."
+        },
+        {
+          "event": "selector_diagnostic",
+          "pid": 56945,
+          "selection": "unknown_model",
+          "message": "No such model: unknown_model"
+        },
+        {
+          "event": "success",
+          "pid": 56945
+        }
+      ],
+      "overlay": {
+        "clients": {
+          "total_clients": 2,
+          "per_round": 2,
+          "comm_simulation": false,
+          "compute_comm_time": false,
+          "do_test": false
+        },
+        "server": {
+          "port": 58544,
+          "simulate_wall_time": false,
+          "random_seed": 1234
+        },
+        "trainer": {
+          "rounds": 1,
+          "epochs": 1,
+          "batch_size": 2,
+          "max_concurrency": 2,
+          "model_type": "resnet"
+        },
+        "data": {
+          "download": false,
+          "sampler": "all_inclusive",
+          "testset_sampler": "all_inclusive",
+          "testset_size": 2
+        },
+        "parameters": {
+          "limitation": {
+            "activated": false
+          }
+        }
+      },
+      "supplied_config_path": "examples/gradient_leakage_attacks/fedavg_resnet18_cifar100.toml",
+      "supplied_config_sha256": "1834c972bc0a149eb76ecc52328d0c5562b0da4ff56c4cbbef3a90f651614912",
+      "lock_sha256": "e2a53aaae9a0dd49f5446b490bb3071e86aa3a9a20d6271c9dd30b4ae2dcbff9"
+    },
+    {
+      "path": "pytest-tmp/test_local_retired_selection_f0/fedrolex/result.json",
+      "sha256": "73808fff90b1637cfd8bed8372bb5aa48f5f99e0a769b359f6782c3874eabadf",
+      "family": "fedrolex",
+      "case": "selector",
+      "variant": "",
+      "command": [
+        "/tmp/plato-archive-integration/env/bin/python",
+        "-B",
+        "-m",
+        "tests.integration.model_search_retention_worker",
+        "-u",
+        "-c",
+        "/private/tmp/plato-archive-integration/run-mandatory/pytest-tmp/test_local_retired_selection_f0/fedrolex/config.toml",
+        "-b",
+        "/private/tmp/plato-archive-integration/run-mandatory/pytest-tmp/test_local_retired_selection_f0/fedrolex/runtime"
+      ],
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [],
+      "survivors": [],
+      "observed_pids": [
+        56821
+      ],
+      "elapsed_seconds": 3.8606994999572635,
+      "events": [
+        {
+          "event": "source_identity",
+          "pid": 56821,
+          "config_sha256": "a021c2c68cc57d7e2a8bed4d6ed13cb88ade9532317b5dff1141629f6af11af6",
+          "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+          "worker_sha256": "95779c99e4783cfeb4d53110a11f69c4a4529b512f4f9b0d738bb2261b24502d"
+        },
+        {
+          "event": "selector_diagnostic",
+          "pid": 56821,
+          "selection": "vit",
+          "message": "The FedRolex ViT model was retired. Historical source and restoration instructions: archives/retired/fedrolex-vit/README.md."
+        },
+        {
+          "event": "selector_diagnostic",
+          "pid": 56821,
+          "selection": "unknown_model",
+          "message": "No such FedRolex model: unknown_model"
+        },
+        {
+          "event": "success",
+          "pid": 56821
+        }
+      ],
+      "overlay": {
+        "clients": {
+          "total_clients": 2,
+          "per_round": 2,
+          "comm_simulation": false,
+          "compute_comm_time": false,
+          "do_test": false
+        },
+        "server": {
+          "port": 58519,
+          "simulate_wall_time": false,
+          "random_seed": 1234
+        },
+        "trainer": {
+          "rounds": 1,
+          "epochs": 1,
+          "batch_size": 2,
+          "max_concurrency": 2
+        },
+        "data": {
+          "download": false,
+          "sampler": "all_inclusive",
+          "testset_sampler": "all_inclusive",
+          "testset_size": 2
+        },
+        "parameters": {
+          "limitation": {
+            "activated": false
+          }
+        }
+      },
+      "supplied_config_path": "examples/model_search/fedrolex/example_ResNet.toml",
+      "supplied_config_sha256": "4a74ee96d86be5786c935e3454cec0a1ea2861010d82112699ab01d77a07cbb5",
+      "lock_sha256": "e2a53aaae9a0dd49f5446b490bb3071e86aa3a9a20d6271c9dd30b4ae2dcbff9"
+    },
+    {
+      "path": "pytest-tmp/test_local_retired_selection_h0/heterofl/result.json",
+      "sha256": "5fe79fc2d29f7815fc3c3dea4a22d13b26e10512ecde12fe65f014a4766997c5",
+      "family": "heterofl",
+      "case": "selector",
+      "variant": "",
+      "command": [
+        "/tmp/plato-archive-integration/env/bin/python",
+        "-B",
+        "-m",
+        "tests.integration.model_search_retention_worker",
+        "-u",
+        "-c",
+        "/private/tmp/plato-archive-integration/run-mandatory/pytest-tmp/test_local_retired_selection_h0/heterofl/config.toml",
+        "-b",
+        "/private/tmp/plato-archive-integration/run-mandatory/pytest-tmp/test_local_retired_selection_h0/heterofl/runtime"
+      ],
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [],
+      "survivors": [],
+      "observed_pids": [
+        56881
+      ],
+      "elapsed_seconds": 3.885777749819681,
+      "events": [
+        {
+          "event": "source_identity",
+          "pid": 56881,
+          "config_sha256": "ec92bb0108d9292831a1845067cc8650f90ac2450b460eb4a52a3553f6b6039d",
+          "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+          "worker_sha256": "95779c99e4783cfeb4d53110a11f69c4a4529b512f4f9b0d738bb2261b24502d"
+        },
+        {
+          "event": "selector_diagnostic",
+          "pid": 56881,
+          "selection": "mobilenet_v3_large",
+          "message": "The custom HeteroFL MobileNetV3 model was retired. Historical source and restoration instructions: archives/retired/heterofl-mobilenetv3/README.md."
+        },
+        {
+          "event": "selector_diagnostic",
+          "pid": 56881,
+          "selection": "unknown_model",
+          "message": "No such HeteroFL model: unknown_model"
+        },
+        {
+          "event": "success",
+          "pid": 56881
+        }
+      ],
+      "overlay": {
+        "clients": {
+          "total_clients": 2,
+          "per_round": 2,
+          "comm_simulation": false,
+          "compute_comm_time": false,
+          "do_test": false
+        },
+        "server": {
+          "port": 58538,
+          "simulate_wall_time": false,
+          "random_seed": 1234
+        },
+        "trainer": {
+          "rounds": 1,
+          "epochs": 1,
+          "batch_size": 2,
+          "max_concurrency": 2
+        },
+        "data": {
+          "download": false,
+          "sampler": "all_inclusive",
+          "testset_sampler": "all_inclusive",
+          "testset_size": 2
+        },
+        "parameters": {
+          "limitation": {
+            "activated": false
+          }
+        }
+      },
+      "supplied_config_path": "examples/model_search/heterofl/heterofl_resnet18_dynamic.toml",
+      "supplied_config_sha256": "361563886ce2a5eca689d8d1702fb8778874614c9c5bc77d6f2775eb01fd42aa",
+      "lock_sha256": "e2a53aaae9a0dd49f5446b490bb3071e86aa3a9a20d6271c9dd30b4ae2dcbff9"
+    },
+    {
+      "path": "pytest-tmp/test_retained_activated_budget0/anycostfl/result.json",
+      "sha256": "288ac76e0a055a68103e0db84328abe9c50b696ccb71251456b20d66c3b912b6",
+      "family": "anycostfl",
+      "case": "budget",
+      "variant": "",
+      "command": [
+        "/tmp/plato-archive-integration/env/bin/python",
+        "-B",
+        "-m",
+        "tests.integration.model_search_retention_worker",
+        "-u",
+        "-c",
+        "/private/tmp/plato-archive-integration/run-mandatory/pytest-tmp/test_retained_activated_budget0/anycostfl/config.toml",
+        "-b",
+        "/private/tmp/plato-archive-integration/run-mandatory/pytest-tmp/test_retained_activated_budget0/anycostfl/runtime"
+      ],
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [],
+      "survivors": [],
+      "observed_pids": [
+        56302
+      ],
+      "elapsed_seconds": 4.630768582923338,
+      "events": [
+        {
+          "event": "source_identity",
+          "pid": 56302,
+          "config_sha256": "4788f376afe6a8d43e4a9e462ea2b5c042df0456905af08f363b831a93f47b23",
+          "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+          "worker_sha256": "95779c99e4783cfeb4d53110a11f69c4a4529b512f4f9b0d738bb2261b24502d"
+        },
+        {
+          "event": "activated_budget",
+          "pid": 56302,
+          "limitation_activated": true,
+          "records": [
+            {
+              "candidate_rate": 1.0,
+              "profile": [
+                42.6370906829834,
+                531.2939548492432
+              ],
+              "margin": 1.03,
+              "budget": [
+                43.9162034034729,
+                547.2327734947205
+              ],
+              "selected_rate": 0.9921875,
+              "selected_profile": [
+                41.98543453216553,
+                525.4671955108643
+              ],
+              "loss": 2.1462903022766113
+            },
+            {
+              "candidate_rate": 0.75,
+              "profile": [
+                24.001992225646973,
+                299.47046852111816
+              ],
+              "margin": 1.03,
+              "budget": [
+                24.722051992416382,
+                308.4545825767517
+              ],
+              "selected_rate": 0.7578125,
+              "selected_profile": [
+                24.51242160797119,
+                307.56871223449707
+              ],
+              "loss": 2.291943073272705
+            }
+          ],
+          "queries": [
+            {
+              "model_rate": 1.0,
+              "macs": 557102090.0
+            },
+            {
+              "model_rate": 0.75,
+              "macs": 314017546.0
+            },
+            {
+              "model_rate": 0.875,
+              "macs": 426909066.0
+            },
+            {
+              "model_rate": 0.9375,
+              "macs": 489842890.0
+            },
+            {
+              "model_rate": 0.96875,
+              "macs": 522931818.0
+            },
+            {
+              "model_rate": 0.984375,
+              "macs": 539881786.0
+            },
+            {
+              "model_rate": 0.9921875,
+              "macs": 550992290.0
+            },
+            {
+              "model_rate": 0.75,
+              "macs": 314017546.0
+            },
+            {
+              "model_rate": 0.75,
+              "macs": 314017546.0
+            },
+            {
+              "model_rate": 0.875,
+              "macs": 426909066.0
+            },
+            {
+              "model_rate": 0.8125,
+              "macs": 368300618.0
+            },
+            {
+              "model_rate": 0.78125,
+              "macs": 340618410.0
+            },
+            {
+              "model_rate": 0.765625,
+              "macs": 327182810.0
+            },
+            {
+              "model_rate": 0.7578125,
+              "macs": 322509170.0
+            }
+          ]
+        },
+        {
+          "event": "success",
+          "pid": 56302
+        }
+      ],
+      "overlay": {
+        "clients": {
+          "total_clients": 2,
+          "per_round": 2,
+          "comm_simulation": false,
+          "compute_comm_time": false,
+          "do_test": false
+        },
+        "server": {
+          "port": 58486,
+          "simulate_wall_time": false,
+          "random_seed": 1234
+        },
+        "trainer": {
+          "rounds": 1,
+          "epochs": 1,
+          "batch_size": 2,
+          "max_concurrency": 2
+        },
+        "data": {
+          "download": false,
+          "sampler": "all_inclusive",
+          "testset_sampler": "all_inclusive",
+          "testset_size": 2
+        },
+        "parameters": {
+          "limitation": {
+            "activated": true
+          }
+        }
+      },
+      "supplied_config_path": "examples/model_search/anycostfl/example_ResNet.toml",
+      "supplied_config_sha256": "4a74ee96d86be5786c935e3454cec0a1ea2861010d82112699ab01d77a07cbb5",
+      "lock_sha256": "e2a53aaae9a0dd49f5446b490bb3071e86aa3a9a20d6271c9dd30b4ae2dcbff9"
+    },
+    {
+      "path": "pytest-tmp/test_retained_activated_budget1/fedrolex/result.json",
+      "sha256": "0a98fff27b6fefe1bb1ddc4fbd8c7691b4d4c4d8623df195d3c5b8e3df3d1177",
+      "family": "fedrolex",
+      "case": "budget",
+      "variant": "",
+      "command": [
+        "/tmp/plato-archive-integration/env/bin/python",
+        "-B",
+        "-m",
+        "tests.integration.model_search_retention_worker",
+        "-u",
+        "-c",
+        "/private/tmp/plato-archive-integration/run-mandatory/pytest-tmp/test_retained_activated_budget1/fedrolex/config.toml",
+        "-b",
+        "/private/tmp/plato-archive-integration/run-mandatory/pytest-tmp/test_retained_activated_budget1/fedrolex/runtime"
+      ],
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [],
+      "survivors": [],
+      "observed_pids": [
+        56447
+      ],
+      "elapsed_seconds": 4.59534354112111,
+      "events": [
+        {
+          "event": "source_identity",
+          "pid": 56447,
+          "config_sha256": "2c21b5dd3781a8568db3106d5b863b21a93df2290461dcf1e99b1add01a33ff4",
+          "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+          "worker_sha256": "95779c99e4783cfeb4d53110a11f69c4a4529b512f4f9b0d738bb2261b24502d"
+        },
+        {
+          "event": "activated_budget",
+          "pid": 56447,
+          "limitation_activated": true,
+          "records": [
+            {
+              "candidate_rate": 1.0,
+              "profile": [
+                42.6370906829834,
+                531.2939548492432
+              ],
+              "margin": 1.03,
+              "budget": [
+                43.9162034034729,
+                547.2327734947205
+              ],
+              "selected_rate": 0.9921875,
+              "selected_profile": [
+                41.98543453216553,
+                525.4671955108643
+              ],
+              "loss": 2.1462903022766113
+            },
+            {
+              "candidate_rate": 0.75,
+              "profile": [
+                24.001992225646973,
+                299.47046852111816
+              ],
+              "margin": 1.03,
+              "budget": [
+                24.722051992416382,
+                308.4545825767517
+              ],
+              "selected_rate": 0.7578125,
+              "selected_profile": [
+                24.51242160797119,
+                307.56871223449707
+              ],
+              "loss": 2.291943073272705
+            }
+          ],
+          "queries": [
+            {
+              "model_rate": 1.0,
+              "macs": 557102090.0
+            },
+            {
+              "model_rate": 0.75,
+              "macs": 314017546.0
+            },
+            {
+              "model_rate": 0.875,
+              "macs": 426909066.0
+            },
+            {
+              "model_rate": 0.9375,
+              "macs": 489842890.0
+            },
+            {
+              "model_rate": 0.96875,
+              "macs": 522931818.0
+            },
+            {
+              "model_rate": 0.984375,
+              "macs": 539881786.0
+            },
+            {
+              "model_rate": 0.9921875,
+              "macs": 550992290.0
+            },
+            {
+              "model_rate": 0.75,
+              "macs": 314017546.0
+            },
+            {
+              "model_rate": 0.75,
+              "macs": 314017546.0
+            },
+            {
+              "model_rate": 0.875,
+              "macs": 426909066.0
+            },
+            {
+              "model_rate": 0.8125,
+              "macs": 368300618.0
+            },
+            {
+              "model_rate": 0.78125,
+              "macs": 340618410.0
+            },
+            {
+              "model_rate": 0.765625,
+              "macs": 327182810.0
+            },
+            {
+              "model_rate": 0.7578125,
+              "macs": 322509170.0
+            }
+          ]
+        },
+        {
+          "event": "success",
+          "pid": 56447
+        }
+      ],
+      "overlay": {
+        "clients": {
+          "total_clients": 2,
+          "per_round": 2,
+          "comm_simulation": false,
+          "compute_comm_time": false,
+          "do_test": false
+        },
+        "server": {
+          "port": 58492,
+          "simulate_wall_time": false,
+          "random_seed": 1234
+        },
+        "trainer": {
+          "rounds": 1,
+          "epochs": 1,
+          "batch_size": 2,
+          "max_concurrency": 2
+        },
+        "data": {
+          "download": false,
+          "sampler": "all_inclusive",
+          "testset_sampler": "all_inclusive",
+          "testset_size": 2
+        },
+        "parameters": {
+          "limitation": {
+            "activated": true
+          }
+        }
+      },
+      "supplied_config_path": "examples/model_search/fedrolex/example_ResNet.toml",
+      "supplied_config_sha256": "4a74ee96d86be5786c935e3454cec0a1ea2861010d82112699ab01d77a07cbb5",
+      "lock_sha256": "e2a53aaae9a0dd49f5446b490bb3071e86aa3a9a20d6271c9dd30b4ae2dcbff9"
+    },
+    {
+      "path": "pytest-tmp/test_retained_activated_budget2/heterofl/result.json",
+      "sha256": "918f585c1366e50600f37c471507782afce050d0c8698729c7c7b8f57ae62a44",
+      "family": "heterofl",
+      "case": "budget",
+      "variant": "",
+      "command": [
+        "/tmp/plato-archive-integration/env/bin/python",
+        "-B",
+        "-m",
+        "tests.integration.model_search_retention_worker",
+        "-u",
+        "-c",
+        "/private/tmp/plato-archive-integration/run-mandatory/pytest-tmp/test_retained_activated_budget2/heterofl/config.toml",
+        "-b",
+        "/private/tmp/plato-archive-integration/run-mandatory/pytest-tmp/test_retained_activated_budget2/heterofl/runtime"
+      ],
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [],
+      "survivors": [],
+      "observed_pids": [
+        56518
+      ],
+      "elapsed_seconds": 4.287745082983747,
+      "events": [
+        {
+          "event": "source_identity",
+          "pid": 56518,
+          "config_sha256": "3aa3057814fbc74424e4c14186bd73cb61d1f77af601aaa0abfb65263557b400",
+          "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+          "worker_sha256": "95779c99e4783cfeb4d53110a11f69c4a4529b512f4f9b0d738bb2261b24502d"
+        },
+        {
+          "event": "activated_budget",
+          "pid": 56518,
+          "limitation_activated": true,
+          "records": [
+            {
+              "candidate_rate": 1.0,
+              "profile": [
+                42.6370906829834,
+                531.2939548492432
+              ],
+              "margin": 1.03,
+              "budget": [
+                43.9162034034729,
+                547.2327734947205
+              ],
+              "selected_rate": 1.0,
+              "selected_profile": [
+                42.6370906829834,
+                531.2939548492432
+              ],
+              "loss": 2.176194667816162
+            },
+            {
+              "candidate_rate": 0.5,
+              "profile": [
+                10.687200546264648,
+                133.64698219299316
+              ],
+              "margin": 1.03,
+              "budget": [
+                11.007816562652588,
+                137.65639165878295
+              ],
+              "selected_rate": 0.5,
+              "selected_profile": [
+                10.687200546264648,
+                133.64698219299316
+              ],
+              "loss": 2.2059779167175293
+            }
+          ],
+          "queries": [
+            {
+              "model_rate": 1.0,
+              "macs": 557102090.0
+            },
+            {
+              "model_rate": 1.0,
+              "macs": 557102090.0
+            },
+            {
+              "model_rate": 1.0,
+              "macs": 557102090.0
+            },
+            {
+              "model_rate": 0.5,
+              "macs": 140139018.0
+            },
+            {
+              "model_rate": 0.5,
+              "macs": 140139018.0
+            },
+            {
+              "model_rate": 0.5,
+              "macs": 140139018.0
+            }
+          ]
+        },
+        {
+          "event": "success",
+          "pid": 56518
+        }
+      ],
+      "overlay": {
+        "clients": {
+          "total_clients": 2,
+          "per_round": 2,
+          "comm_simulation": false,
+          "compute_comm_time": false,
+          "do_test": false
+        },
+        "server": {
+          "port": 58497,
+          "simulate_wall_time": false,
+          "random_seed": 1234
+        },
+        "trainer": {
+          "rounds": 1,
+          "epochs": 1,
+          "batch_size": 2,
+          "max_concurrency": 2
+        },
+        "data": {
+          "download": false,
+          "sampler": "all_inclusive",
+          "testset_sampler": "all_inclusive",
+          "testset_size": 2
+        },
+        "parameters": {
+          "limitation": {
+            "activated": true
+          }
+        }
+      },
+      "supplied_config_path": "examples/model_search/heterofl/heterofl_resnet18_dynamic.toml",
+      "supplied_config_sha256": "361563886ce2a5eca689d8d1702fb8778874614c9c5bc77d6f2775eb01fd42aa",
+      "lock_sha256": "e2a53aaae9a0dd49f5446b490bb3071e86aa3a9a20d6271c9dd30b4ae2dcbff9"
+    },
+    {
+      "path": "pytest-tmp/test_retained_entrypoint_impor0/anycostfl/result.json",
+      "sha256": "a2f30e4b4bbb6aec1aca46dc65bd0e097b461d5976326d3668f9265c8aa0b69f",
+      "family": "anycostfl",
+      "case": "import",
+      "variant": "root",
+      "command": [
+        "/tmp/plato-archive-integration/env/bin/python",
+        "-B",
+        "-m",
+        "tests.integration.model_search_retention_worker",
+        "-u",
+        "-c",
+        "/private/tmp/plato-archive-integration/run-mandatory/pytest-tmp/test_retained_entrypoint_impor0/anycostfl/config.toml",
+        "-b",
+        "/private/tmp/plato-archive-integration/run-mandatory/pytest-tmp/test_retained_entrypoint_impor0/anycostfl/runtime"
+      ],
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [],
+      "survivors": [],
+      "observed_pids": [
+        56971
+      ],
+      "elapsed_seconds": 3.822593874996528,
+      "events": [
+        {
+          "event": "source_identity",
+          "pid": 56971,
+          "config_sha256": "ed9d9a894b553bd23cecbbd714cdce4abea2c6616963b6851cf545a136ec7999",
+          "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+          "worker_sha256": "95779c99e4783cfeb4d53110a11f69c4a4529b512f4f9b0d738bb2261b24502d"
+        },
+        {
+          "event": "entrypoint_import",
+          "pid": 56971,
+          "module_path": "/private/tmp/plato-refresh-worktrees/archive-integration/examples/model_search/anycostfl/anycostfl.py",
+          "cwd": "/private/tmp/plato-refresh-worktrees/archive-integration"
+        },
+        {
+          "event": "success",
+          "pid": 56971
+        }
+      ],
+      "overlay": {
+        "clients": {
+          "total_clients": 2,
+          "per_round": 2,
+          "comm_simulation": false,
+          "compute_comm_time": false,
+          "do_test": false
+        },
+        "server": {
+          "port": 58545,
+          "simulate_wall_time": false,
+          "random_seed": 1234
+        },
+        "trainer": {
+          "rounds": 1,
+          "epochs": 1,
+          "batch_size": 2,
+          "max_concurrency": 2
+        },
+        "data": {
+          "download": false,
+          "sampler": "all_inclusive",
+          "testset_sampler": "all_inclusive",
+          "testset_size": 2
+        },
+        "parameters": {
+          "limitation": {
+            "activated": false
+          }
+        }
+      },
+      "supplied_config_path": "examples/model_search/anycostfl/example_ResNet.toml",
+      "supplied_config_sha256": "4a74ee96d86be5786c935e3454cec0a1ea2861010d82112699ab01d77a07cbb5",
+      "lock_sha256": "e2a53aaae9a0dd49f5446b490bb3071e86aa3a9a20d6271c9dd30b4ae2dcbff9"
+    },
+    {
+      "path": "pytest-tmp/test_retained_entrypoint_impor1/anycostfl/result.json",
+      "sha256": "0213924535d7c0d33cd582275946b43a8fc88cd296cc71027ef730efd1555a93",
+      "family": "anycostfl",
+      "case": "import",
+      "variant": "example",
+      "command": [
+        "/tmp/plato-archive-integration/env/bin/python",
+        "-B",
+        "-m",
+        "tests.integration.model_search_retention_worker",
+        "-u",
+        "-c",
+        "/private/tmp/plato-archive-integration/run-mandatory/pytest-tmp/test_retained_entrypoint_impor1/anycostfl/config.toml",
+        "-b",
+        "/private/tmp/plato-archive-integration/run-mandatory/pytest-tmp/test_retained_entrypoint_impor1/anycostfl/runtime"
+      ],
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [],
+      "survivors": [],
+      "observed_pids": [
+        57026
+      ],
+      "elapsed_seconds": 3.8682888748589903,
+      "events": [
+        {
+          "event": "source_identity",
+          "pid": 57026,
+          "config_sha256": "39c8b84a947453e7ac879d650d66d4d477097bfaa15a21cf8bd2ff884d96b724",
+          "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+          "worker_sha256": "95779c99e4783cfeb4d53110a11f69c4a4529b512f4f9b0d738bb2261b24502d"
+        },
+        {
+          "event": "entrypoint_import",
+          "pid": 57026,
+          "module_path": "/private/tmp/plato-refresh-worktrees/archive-integration/examples/model_search/anycostfl/anycostfl.py",
+          "cwd": "/private/tmp/plato-refresh-worktrees/archive-integration/examples/model_search/anycostfl"
+        },
+        {
+          "event": "success",
+          "pid": 57026
+        }
+      ],
+      "overlay": {
+        "clients": {
+          "total_clients": 2,
+          "per_round": 2,
+          "comm_simulation": false,
+          "compute_comm_time": false,
+          "do_test": false
+        },
+        "server": {
+          "port": 58551,
+          "simulate_wall_time": false,
+          "random_seed": 1234
+        },
+        "trainer": {
+          "rounds": 1,
+          "epochs": 1,
+          "batch_size": 2,
+          "max_concurrency": 2
+        },
+        "data": {
+          "download": false,
+          "sampler": "all_inclusive",
+          "testset_sampler": "all_inclusive",
+          "testset_size": 2
+        },
+        "parameters": {
+          "limitation": {
+            "activated": false
+          }
+        }
+      },
+      "supplied_config_path": "examples/model_search/anycostfl/example_ResNet.toml",
+      "supplied_config_sha256": "4a74ee96d86be5786c935e3454cec0a1ea2861010d82112699ab01d77a07cbb5",
+      "lock_sha256": "e2a53aaae9a0dd49f5446b490bb3071e86aa3a9a20d6271c9dd30b4ae2dcbff9"
+    },
+    {
+      "path": "pytest-tmp/test_retained_entrypoint_impor2/fedrolex/result.json",
+      "sha256": "1a7c9c1b1507f3edbcc5d902e6557b54d3baf1776bdab55cd9e2f37af92a3391",
+      "family": "fedrolex",
+      "case": "import",
+      "variant": "root",
+      "command": [
+        "/tmp/plato-archive-integration/env/bin/python",
+        "-B",
+        "-m",
+        "tests.integration.model_search_retention_worker",
+        "-u",
+        "-c",
+        "/private/tmp/plato-archive-integration/run-mandatory/pytest-tmp/test_retained_entrypoint_impor2/fedrolex/config.toml",
+        "-b",
+        "/private/tmp/plato-archive-integration/run-mandatory/pytest-tmp/test_retained_entrypoint_impor2/fedrolex/runtime"
+      ],
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [],
+      "survivors": [],
+      "observed_pids": [
+        57082
+      ],
+      "elapsed_seconds": 3.8584962501190603,
+      "events": [
+        {
+          "event": "source_identity",
+          "pid": 57082,
+          "config_sha256": "08a28503bc9383e9b662a231906f2dd594881b5ed8a59636a089b587373aa352",
+          "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+          "worker_sha256": "95779c99e4783cfeb4d53110a11f69c4a4529b512f4f9b0d738bb2261b24502d"
+        },
+        {
+          "event": "entrypoint_import",
+          "pid": 57082,
+          "module_path": "/private/tmp/plato-refresh-worktrees/archive-integration/examples/model_search/fedrolex/fedrolex.py",
+          "cwd": "/private/tmp/plato-refresh-worktrees/archive-integration"
+        },
+        {
+          "event": "success",
+          "pid": 57082
+        }
+      ],
+      "overlay": {
+        "clients": {
+          "total_clients": 2,
+          "per_round": 2,
+          "comm_simulation": false,
+          "compute_comm_time": false,
+          "do_test": false
+        },
+        "server": {
+          "port": 58554,
+          "simulate_wall_time": false,
+          "random_seed": 1234
+        },
+        "trainer": {
+          "rounds": 1,
+          "epochs": 1,
+          "batch_size": 2,
+          "max_concurrency": 2
+        },
+        "data": {
+          "download": false,
+          "sampler": "all_inclusive",
+          "testset_sampler": "all_inclusive",
+          "testset_size": 2
+        },
+        "parameters": {
+          "limitation": {
+            "activated": false
+          }
+        }
+      },
+      "supplied_config_path": "examples/model_search/fedrolex/example_ResNet.toml",
+      "supplied_config_sha256": "4a74ee96d86be5786c935e3454cec0a1ea2861010d82112699ab01d77a07cbb5",
+      "lock_sha256": "e2a53aaae9a0dd49f5446b490bb3071e86aa3a9a20d6271c9dd30b4ae2dcbff9"
+    },
+    {
+      "path": "pytest-tmp/test_retained_entrypoint_impor3/fedrolex/result.json",
+      "sha256": "e3b38e3a8d5dceb1f5979fa1b747928e97ee07237346e2f6f73749d0e03e904c",
+      "family": "fedrolex",
+      "case": "import",
+      "variant": "example",
+      "command": [
+        "/tmp/plato-archive-integration/env/bin/python",
+        "-B",
+        "-m",
+        "tests.integration.model_search_retention_worker",
+        "-u",
+        "-c",
+        "/private/tmp/plato-archive-integration/run-mandatory/pytest-tmp/test_retained_entrypoint_impor3/fedrolex/config.toml",
+        "-b",
+        "/private/tmp/plato-archive-integration/run-mandatory/pytest-tmp/test_retained_entrypoint_impor3/fedrolex/runtime"
+      ],
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [],
+      "survivors": [],
+      "observed_pids": [
+        57143
+      ],
+      "elapsed_seconds": 3.859631707891822,
+      "events": [
+        {
+          "event": "source_identity",
+          "pid": 57143,
+          "config_sha256": "d66543cd14c54f124432784bc55846032a7efd91b8ad2ff02985775f925ebed7",
+          "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+          "worker_sha256": "95779c99e4783cfeb4d53110a11f69c4a4529b512f4f9b0d738bb2261b24502d"
+        },
+        {
+          "event": "entrypoint_import",
+          "pid": 57143,
+          "module_path": "/private/tmp/plato-refresh-worktrees/archive-integration/examples/model_search/fedrolex/fedrolex.py",
+          "cwd": "/private/tmp/plato-refresh-worktrees/archive-integration/examples/model_search/fedrolex"
+        },
+        {
+          "event": "success",
+          "pid": 57143
+        }
+      ],
+      "overlay": {
+        "clients": {
+          "total_clients": 2,
+          "per_round": 2,
+          "comm_simulation": false,
+          "compute_comm_time": false,
+          "do_test": false
+        },
+        "server": {
+          "port": 58558,
+          "simulate_wall_time": false,
+          "random_seed": 1234
+        },
+        "trainer": {
+          "rounds": 1,
+          "epochs": 1,
+          "batch_size": 2,
+          "max_concurrency": 2
+        },
+        "data": {
+          "download": false,
+          "sampler": "all_inclusive",
+          "testset_sampler": "all_inclusive",
+          "testset_size": 2
+        },
+        "parameters": {
+          "limitation": {
+            "activated": false
+          }
+        }
+      },
+      "supplied_config_path": "examples/model_search/fedrolex/example_ResNet.toml",
+      "supplied_config_sha256": "4a74ee96d86be5786c935e3454cec0a1ea2861010d82112699ab01d77a07cbb5",
+      "lock_sha256": "e2a53aaae9a0dd49f5446b490bb3071e86aa3a9a20d6271c9dd30b4ae2dcbff9"
+    },
+    {
+      "path": "pytest-tmp/test_retained_entrypoint_impor4/heterofl/result.json",
+      "sha256": "1b1710caa095c29e85af6419afafce797aa74ec987ebb9d034137d831ef30062",
+      "family": "heterofl",
+      "case": "import",
+      "variant": "root",
+      "command": [
+        "/tmp/plato-archive-integration/env/bin/python",
+        "-B",
+        "-m",
+        "tests.integration.model_search_retention_worker",
+        "-u",
+        "-c",
+        "/private/tmp/plato-archive-integration/run-mandatory/pytest-tmp/test_retained_entrypoint_impor4/heterofl/config.toml",
+        "-b",
+        "/private/tmp/plato-archive-integration/run-mandatory/pytest-tmp/test_retained_entrypoint_impor4/heterofl/runtime"
+      ],
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [],
+      "survivors": [],
+      "observed_pids": [
+        57199
+      ],
+      "elapsed_seconds": 3.867033707909286,
+      "events": [
+        {
+          "event": "source_identity",
+          "pid": 57199,
+          "config_sha256": "271854fbc66b81b4573ed0369d9b44445e66a7fd8758c32ff752889f3886de64",
+          "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+          "worker_sha256": "95779c99e4783cfeb4d53110a11f69c4a4529b512f4f9b0d738bb2261b24502d"
+        },
+        {
+          "event": "entrypoint_import",
+          "pid": 57199,
+          "module_path": "/private/tmp/plato-refresh-worktrees/archive-integration/examples/model_search/heterofl/heterofl.py",
+          "cwd": "/private/tmp/plato-refresh-worktrees/archive-integration"
+        },
+        {
+          "event": "success",
+          "pid": 57199
+        }
+      ],
+      "overlay": {
+        "clients": {
+          "total_clients": 2,
+          "per_round": 2,
+          "comm_simulation": false,
+          "compute_comm_time": false,
+          "do_test": false
+        },
+        "server": {
+          "port": 58563,
+          "simulate_wall_time": false,
+          "random_seed": 1234
+        },
+        "trainer": {
+          "rounds": 1,
+          "epochs": 1,
+          "batch_size": 2,
+          "max_concurrency": 2
+        },
+        "data": {
+          "download": false,
+          "sampler": "all_inclusive",
+          "testset_sampler": "all_inclusive",
+          "testset_size": 2
+        },
+        "parameters": {
+          "limitation": {
+            "activated": false
+          }
+        }
+      },
+      "supplied_config_path": "examples/model_search/heterofl/heterofl_resnet18_dynamic.toml",
+      "supplied_config_sha256": "361563886ce2a5eca689d8d1702fb8778874614c9c5bc77d6f2775eb01fd42aa",
+      "lock_sha256": "e2a53aaae9a0dd49f5446b490bb3071e86aa3a9a20d6271c9dd30b4ae2dcbff9"
+    },
+    {
+      "path": "pytest-tmp/test_retained_entrypoint_impor5/heterofl/result.json",
+      "sha256": "534aff4b16cde767f5d1b84e7d77c3651f1186871771fea98e4f8261b99b6c93",
+      "family": "heterofl",
+      "case": "import",
+      "variant": "example",
+      "command": [
+        "/tmp/plato-archive-integration/env/bin/python",
+        "-B",
+        "-m",
+        "tests.integration.model_search_retention_worker",
+        "-u",
+        "-c",
+        "/private/tmp/plato-archive-integration/run-mandatory/pytest-tmp/test_retained_entrypoint_impor5/heterofl/config.toml",
+        "-b",
+        "/private/tmp/plato-archive-integration/run-mandatory/pytest-tmp/test_retained_entrypoint_impor5/heterofl/runtime"
+      ],
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [],
+      "survivors": [],
+      "observed_pids": [
+        57258
+      ],
+      "elapsed_seconds": 3.878977542044595,
+      "events": [
+        {
+          "event": "source_identity",
+          "pid": 57258,
+          "config_sha256": "2d29698be6cfa48768722b7d0397e32bb568fff0a6f40012cf336c98c93ee450",
+          "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+          "worker_sha256": "95779c99e4783cfeb4d53110a11f69c4a4529b512f4f9b0d738bb2261b24502d"
+        },
+        {
+          "event": "entrypoint_import",
+          "pid": 57258,
+          "module_path": "/private/tmp/plato-refresh-worktrees/archive-integration/examples/model_search/heterofl/heterofl.py",
+          "cwd": "/private/tmp/plato-refresh-worktrees/archive-integration/examples/model_search/heterofl"
+        },
+        {
+          "event": "success",
+          "pid": 57258
+        }
+      ],
+      "overlay": {
+        "clients": {
+          "total_clients": 2,
+          "per_round": 2,
+          "comm_simulation": false,
+          "compute_comm_time": false,
+          "do_test": false
+        },
+        "server": {
+          "port": 58566,
+          "simulate_wall_time": false,
+          "random_seed": 1234
+        },
+        "trainer": {
+          "rounds": 1,
+          "epochs": 1,
+          "batch_size": 2,
+          "max_concurrency": 2
+        },
+        "data": {
+          "download": false,
+          "sampler": "all_inclusive",
+          "testset_sampler": "all_inclusive",
+          "testset_size": 2
+        },
+        "parameters": {
+          "limitation": {
+            "activated": false
+          }
+        }
+      },
+      "supplied_config_path": "examples/model_search/heterofl/heterofl_resnet18_dynamic.toml",
+      "supplied_config_sha256": "361563886ce2a5eca689d8d1702fb8778874614c9c5bc77d6f2775eb01fd42aa",
+      "lock_sha256": "e2a53aaae9a0dd49f5446b490bb3071e86aa3a9a20d6271c9dd30b4ae2dcbff9"
+    },
+    {
+      "path": "pytest-tmp/test_retained_width_round_anyc0/anycostfl/result.json",
+      "sha256": "d80a68952b65f9ebaa838fa7bd4c80a2c13cfb3ceddd7f280da1da5bfb2b839f",
+      "family": "anycostfl",
+      "case": "socket",
+      "variant": "",
+      "command": [
+        "/tmp/plato-archive-integration/env/bin/python",
+        "-B",
+        "-m",
+        "tests.integration.model_search_retention_worker",
+        "-u",
+        "-c",
+        "/private/tmp/plato-archive-integration/run-mandatory/pytest-tmp/test_retained_width_round_anyc0/anycostfl/config.toml",
+        "-b",
+        "/private/tmp/plato-archive-integration/run-mandatory/pytest-tmp/test_retained_width_round_anyc0/anycostfl/runtime"
+      ],
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [],
+      "survivors": [],
+      "observed_pids": [
+        55183,
+        55229,
+        55230,
+        55232,
+        55353,
+        55354,
+        55356,
+        55358,
+        55428,
+        55431
+      ],
+      "elapsed_seconds": 24.132414541905746,
+      "events": [
+        {
+          "event": "source_identity",
+          "pid": 55183,
+          "config_sha256": "243a6d013164a047a642f2304cc6f02c54cb6a0113eb59e6502d1c5b3adddca1",
+          "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+          "worker_sha256": "95779c99e4783cfeb4d53110a11f69c4a4529b512f4f9b0d738bb2261b24502d"
+        },
+        {
+          "event": "local_data",
+          "pid": 55183,
+          "client_id": 0,
+          "samples": 6
+        },
+        {
+          "event": "child_started",
+          "pid": 55183,
+          "child_pid": 55230,
+          "created": 1791064344.312821
+        },
+        {
+          "event": "child_started",
+          "pid": 55183,
+          "child_pid": 55232,
+          "created": 1791064344.317434
+        },
+        {
+          "event": "server_trainer_initialized",
+          "pid": 55183,
+          "channels": 64,
+          "model_rate_parameters": 512
+        },
+        {
+          "event": "selected_rate",
+          "pid": 55183,
+          "client_id": 2,
+          "rate": 0.5,
+          "selection_call": 1,
+          "seed": 1,
+          "rng_state_sha256": "95d9970691287f085063e90cc11c16fa228ad3243dc9fe01e2b9b865a290dec5",
+          "limitation_activated": false
+        },
+        {
+          "event": "selected_rate",
+          "pid": 55183,
+          "client_id": 1,
+          "rate": 1.0,
+          "selection_call": 2,
+          "seed": 2,
+          "rng_state_sha256": "b5c68ef98b04b8e566426cdb872faf999c435477bc69ca33b36aee76fcd7d935",
+          "limitation_activated": false
+        },
+        {
+          "event": "server_received",
+          "pid": 55183,
+          "counts": [
+            2,
+            6
+          ],
+          "payloads": 2
+        },
+        {
+          "event": "aggregation_oracle",
+          "pid": 55183,
+          "max_error": 1.1920928955078125e-07,
+          "weighting": "uniform channel average",
+          "parameter_tensors": 56
+        },
+        {
+          "event": "aggregation_rounding_and_norm_ties",
+          "pid": 55183,
+          "reordered_near_ties": []
+        },
+        {
+          "event": "channel_alignment_oracle",
+          "pid": 55183,
+          "max_error": 0.0,
+          "parameter_tensors": 56,
+          "weighting": "uniform average over clients containing each channel"
+        },
+        {
+          "event": "post_alignment_backward",
+          "pid": 55183,
+          "loss": 3.187572956085205
+        },
+        {
+          "event": "child_started",
+          "pid": 55183,
+          "child_pid": 55431,
+          "created": 1791064357.625631
+        },
+        {
+          "event": "success",
+          "pid": 55183,
+          "round": 1,
+          "real_socket": true
+        },
+        {
+          "event": "local_data",
+          "pid": 55230,
+          "client_id": 1,
+          "samples": 2
+        },
+        {
+          "event": "client_replaced_before_load",
+          "pid": 55230,
+          "client_id": 1,
+          "first_conv_channels": 64
+        },
+        {
+          "event": "client_trained",
+          "pid": 55230,
+          "client_id": 1,
+          "samples": 2,
+          "changed_parameters": 56,
+          "shapes": {
+            "conv1.weight": [
+              64,
+              3,
+              3,
+              3
+            ],
+            "layer1.0.batchnorm1.weight": [
+              64
+            ],
+            "layer1.0.batchnorm1.bias": [
+              64
+            ],
+            "layer1.0.conv1.weight": [
+              64,
+              64,
+              3,
+              3
+            ],
+            "layer1.0.batchnorm2.weight": [
+              64
+            ],
+            "layer1.0.batchnorm2.bias": [
+              64
+            ],
+            "layer1.0.conv2.weight": [
+              64,
+              64,
+              3,
+              3
+            ],
+            "layer1.1.batchnorm1.weight": [
+              64
+            ],
+            "layer1.1.batchnorm1.bias": [
+              64
+            ],
+            "layer1.1.conv1.weight": [
+              64,
+              64,
+              3,
+              3
+            ],
+            "layer1.1.batchnorm2.weight": [
+              64
+            ],
+            "layer1.1.batchnorm2.bias": [
+              64
+            ],
+            "layer1.1.conv2.weight": [
+              64,
+              64,
+              3,
+              3
+            ],
+            "layer2.0.batchnorm1.weight": [
+              64
+            ],
+            "layer2.0.batchnorm1.bias": [
+              64
+            ],
+            "layer2.0.conv1.weight": [
+              128,
+              64,
+              3,
+              3
+            ],
+            "layer2.0.batchnorm2.weight": [
+              128
+            ],
+            "layer2.0.batchnorm2.bias": [
+              128
+            ],
+            "layer2.0.conv2.weight": [
+              128,
+              128,
+              3,
+              3
+            ],
+            "layer2.0.shortcut.weight": [
+              128,
+              64,
+              1,
+              1
+            ],
+            "layer2.1.batchnorm1.weight": [
+              128
+            ],
+            "layer2.1.batchnorm1.bias": [
+              128
+            ],
+            "layer2.1.conv1.weight": [
+              128,
+              128,
+              3,
+              3
+            ],
+            "layer2.1.batchnorm2.weight": [
+              128
+            ],
+            "layer2.1.batchnorm2.bias": [
+              128
+            ],
+            "layer2.1.conv2.weight": [
+              128,
+              128,
+              3,
+              3
+            ],
+            "layer3.0.batchnorm1.weight": [
+              128
+            ],
+            "layer3.0.batchnorm1.bias": [
+              128
+            ],
+            "layer3.0.conv1.weight": [
+              256,
+              128,
+              3,
+              3
+            ],
+            "layer3.0.batchnorm2.weight": [
+              256
+            ],
+            "layer3.0.batchnorm2.bias": [
+              256
+            ],
+            "layer3.0.conv2.weight": [
+              256,
+              256,
+              3,
+              3
+            ],
+            "layer3.0.shortcut.weight": [
+              256,
+              128,
+              1,
+              1
+            ],
+            "layer3.1.batchnorm1.weight": [
+              256
+            ],
+            "layer3.1.batchnorm1.bias": [
+              256
+            ],
+            "layer3.1.conv1.weight": [
+              256,
+              256,
+              3,
+              3
+            ],
+            "layer3.1.batchnorm2.weight": [
+              256
+            ],
+            "layer3.1.batchnorm2.bias": [
+              256
+            ],
+            "layer3.1.conv2.weight": [
+              256,
+              256,
+              3,
+              3
+            ],
+            "layer4.0.batchnorm1.weight": [
+              256
+            ],
+            "layer4.0.batchnorm1.bias": [
+              256
+            ],
+            "layer4.0.conv1.weight": [
+              512,
+              256,
+              3,
+              3
+            ],
+            "layer4.0.batchnorm2.weight": [
+              512
+            ],
+            "layer4.0.batchnorm2.bias": [
+              512
+            ],
+            "layer4.0.conv2.weight": [
+              512,
+              512,
+              3,
+              3
+            ],
+            "layer4.0.shortcut.weight": [
+              512,
+              256,
+              1,
+              1
+            ],
+            "layer4.1.batchnorm1.weight": [
+              512
+            ],
+            "layer4.1.batchnorm1.bias": [
+              512
+            ],
+            "layer4.1.conv1.weight": [
+              512,
+              512,
+              3,
+              3
+            ],
+            "layer4.1.batchnorm2.weight": [
+              512
+            ],
+            "layer4.1.batchnorm2.bias": [
+              512
+            ],
+            "layer4.1.conv2.weight": [
+              512,
+              512,
+              3,
+              3
+            ],
+            "bn4.weight": [
+              512
+            ],
+            "bn4.bias": [
+              512
+            ],
+            "linear.weight": [
+              10,
+              512
+            ],
+            "linear.bias": [
+              10
+            ]
+          }
+        },
+        {
+          "event": "child_returned",
+          "pid": 55230,
+          "client_id": 1
+        },
+        {
+          "event": "local_data",
+          "pid": 55232,
+          "client_id": 2,
+          "samples": 6
+        },
+        {
+          "event": "client_replaced_before_load",
+          "pid": 55232,
+          "client_id": 2,
+          "first_conv_channels": 32
+        },
+        {
+          "event": "client_trained",
+          "pid": 55232,
+          "client_id": 2,
+          "samples": 6,
+          "changed_parameters": 56,
+          "shapes": {
+            "conv1.weight": [
+              32,
+              3,
+              3,
+              3
+            ],
+            "layer1.0.batchnorm1.weight": [
+              32
+            ],
+            "layer1.0.batchnorm1.bias": [
+              32
+            ],
+            "layer1.0.conv1.weight": [
+              32,
+              32,
+              3,
+              3
+            ],
+            "layer1.0.batchnorm2.weight": [
+              32
+            ],
+            "layer1.0.batchnorm2.bias": [
+              32
+            ],
+            "layer1.0.conv2.weight": [
+              32,
+              32,
+              3,
+              3
+            ],
+            "layer1.1.batchnorm1.weight": [
+              32
+            ],
+            "layer1.1.batchnorm1.bias": [
+              32
+            ],
+            "layer1.1.conv1.weight": [
+              32,
+              32,
+              3,
+              3
+            ],
+            "layer1.1.batchnorm2.weight": [
+              32
+            ],
+            "layer1.1.batchnorm2.bias": [
+              32
+            ],
+            "layer1.1.conv2.weight": [
+              32,
+              32,
+              3,
+              3
+            ],
+            "layer2.0.batchnorm1.weight": [
+              32
+            ],
+            "layer2.0.batchnorm1.bias": [
+              32
+            ],
+            "layer2.0.conv1.weight": [
+              64,
+              32,
+              3,
+              3
+            ],
+            "layer2.0.batchnorm2.weight": [
+              64
+            ],
+            "layer2.0.batchnorm2.bias": [
+              64
+            ],
+            "layer2.0.conv2.weight": [
+              64,
+              64,
+              3,
+              3
+            ],
+            "layer2.0.shortcut.weight": [
+              64,
+              32,
+              1,
+              1
+            ],
+            "layer2.1.batchnorm1.weight": [
+              64
+            ],
+            "layer2.1.batchnorm1.bias": [
+              64
+            ],
+            "layer2.1.conv1.weight": [
+              64,
+              64,
+              3,
+              3
+            ],
+            "layer2.1.batchnorm2.weight": [
+              64
+            ],
+            "layer2.1.batchnorm2.bias": [
+              64
+            ],
+            "layer2.1.conv2.weight": [
+              64,
+              64,
+              3,
+              3
+            ],
+            "layer3.0.batchnorm1.weight": [
+              64
+            ],
+            "layer3.0.batchnorm1.bias": [
+              64
+            ],
+            "layer3.0.conv1.weight": [
+              128,
+              64,
+              3,
+              3
+            ],
+            "layer3.0.batchnorm2.weight": [
+              128
+            ],
+            "layer3.0.batchnorm2.bias": [
+              128
+            ],
+            "layer3.0.conv2.weight": [
+              128,
+              128,
+              3,
+              3
+            ],
+            "layer3.0.shortcut.weight": [
+              128,
+              64,
+              1,
+              1
+            ],
+            "layer3.1.batchnorm1.weight": [
+              128
+            ],
+            "layer3.1.batchnorm1.bias": [
+              128
+            ],
+            "layer3.1.conv1.weight": [
+              128,
+              128,
+              3,
+              3
+            ],
+            "layer3.1.batchnorm2.weight": [
+              128
+            ],
+            "layer3.1.batchnorm2.bias": [
+              128
+            ],
+            "layer3.1.conv2.weight": [
+              128,
+              128,
+              3,
+              3
+            ],
+            "layer4.0.batchnorm1.weight": [
+              128
+            ],
+            "layer4.0.batchnorm1.bias": [
+              128
+            ],
+            "layer4.0.conv1.weight": [
+              256,
+              128,
+              3,
+              3
+            ],
+            "layer4.0.batchnorm2.weight": [
+              256
+            ],
+            "layer4.0.batchnorm2.bias": [
+              256
+            ],
+            "layer4.0.conv2.weight": [
+              256,
+              256,
+              3,
+              3
+            ],
+            "layer4.0.shortcut.weight": [
+              256,
+              128,
+              1,
+              1
+            ],
+            "layer4.1.batchnorm1.weight": [
+              256
+            ],
+            "layer4.1.batchnorm1.bias": [
+              256
+            ],
+            "layer4.1.conv1.weight": [
+              256,
+              256,
+              3,
+              3
+            ],
+            "layer4.1.batchnorm2.weight": [
+              256
+            ],
+            "layer4.1.batchnorm2.bias": [
+              256
+            ],
+            "layer4.1.conv2.weight": [
+              256,
+              256,
+              3,
+              3
+            ],
+            "bn4.weight": [
+              256
+            ],
+            "bn4.bias": [
+              256
+            ],
+            "linear.weight": [
+              10,
+              256
+            ],
+            "linear.bias": [
+              10
+            ]
+          }
+        },
+        {
+          "event": "child_returned",
+          "pid": 55232,
+          "client_id": 2
+        },
+        {
+          "event": "training_loss",
+          "pid": 55356,
+          "client_id": 2,
+          "loss": 2.305781126022339
+        },
+        {
+          "event": "training_loss",
+          "pid": 55356,
+          "client_id": 2,
+          "loss": 3.2113499641418457
+        },
+        {
+          "event": "training_loss",
+          "pid": 55356,
+          "client_id": 2,
+          "loss": 3.9776744842529297
+        },
+        {
+          "event": "training_loss",
+          "pid": 55358,
+          "client_id": 1,
+          "loss": 2.3473057746887207
+        }
+      ],
+      "overlay": {
+        "clients": {
+          "total_clients": 2,
+          "per_round": 2,
+          "comm_simulation": false,
+          "compute_comm_time": false,
+          "do_test": false
+        },
+        "server": {
+          "port": 58414,
+          "simulate_wall_time": false,
+          "random_seed": 1234
+        },
+        "trainer": {
+          "rounds": 1,
+          "epochs": 1,
+          "batch_size": 2,
+          "max_concurrency": 2
+        },
+        "data": {
+          "download": false,
+          "sampler": "all_inclusive",
+          "testset_sampler": "all_inclusive",
+          "testset_size": 2
+        },
+        "parameters": {
+          "limitation": {
+            "activated": false
+          }
+        }
+      },
+      "supplied_config_path": "examples/model_search/anycostfl/example_ResNet.toml",
+      "supplied_config_sha256": "4a74ee96d86be5786c935e3454cec0a1ea2861010d82112699ab01d77a07cbb5",
+      "lock_sha256": "e2a53aaae9a0dd49f5446b490bb3071e86aa3a9a20d6271c9dd30b4ae2dcbff9"
+    },
+    {
+      "path": "pytest-tmp/test_retained_width_round_fedr0/fedrolex/result.json",
+      "sha256": "3b9ed6cac33a21383ad51b6612f264b1dfb047072c9665f6120c2e245192328c",
+      "family": "fedrolex",
+      "case": "socket",
+      "variant": "",
+      "command": [
+        "/tmp/plato-archive-integration/env/bin/python",
+        "-B",
+        "-m",
+        "tests.integration.model_search_retention_worker",
+        "-u",
+        "-c",
+        "/private/tmp/plato-archive-integration/run-mandatory/pytest-tmp/test_retained_width_round_fedr0/fedrolex/config.toml",
+        "-b",
+        "/private/tmp/plato-archive-integration/run-mandatory/pytest-tmp/test_retained_width_round_fedr0/fedrolex/runtime"
+      ],
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [],
+      "survivors": [],
+      "observed_pids": [
+        55536,
+        55582,
+        55584,
+        55585,
+        55718,
+        55720,
+        55721,
+        55723,
+        55785,
+        55787
+      ],
+      "elapsed_seconds": 24.371938459109515,
+      "events": [
+        {
+          "event": "source_identity",
+          "pid": 55536,
+          "config_sha256": "edb26625fa4ab7012808613ee46b7dead701c73748acb8c47a5879ddc52f76b8",
+          "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+          "worker_sha256": "95779c99e4783cfeb4d53110a11f69c4a4529b512f4f9b0d738bb2261b24502d"
+        },
+        {
+          "event": "local_data",
+          "pid": 55536,
+          "client_id": 0,
+          "samples": 6
+        },
+        {
+          "event": "child_started",
+          "pid": 55536,
+          "child_pid": 55584,
+          "created": 1791064368.490602
+        },
+        {
+          "event": "child_started",
+          "pid": 55536,
+          "child_pid": 55585,
+          "created": 1791064368.495525
+        },
+        {
+          "event": "server_trainer_initialized",
+          "pid": 55536,
+          "channels": 64,
+          "model_rate_parameters": 512
+        },
+        {
+          "event": "selected_rate",
+          "pid": 55536,
+          "client_id": 2,
+          "rate": 0.5,
+          "selection_call": 1,
+          "seed": 1,
+          "rng_state_sha256": "95d9970691287f085063e90cc11c16fa228ad3243dc9fe01e2b9b865a290dec5",
+          "limitation_activated": false
+        },
+        {
+          "event": "selected_rate",
+          "pid": 55536,
+          "client_id": 1,
+          "rate": 1.0,
+          "selection_call": 2,
+          "seed": 2,
+          "rng_state_sha256": "b5c68ef98b04b8e566426cdb872faf999c435477bc69ca33b36aee76fcd7d935",
+          "limitation_activated": false
+        },
+        {
+          "event": "server_received",
+          "pid": 55536,
+          "counts": [
+            2,
+            6
+          ],
+          "payloads": 2
+        },
+        {
+          "event": "aggregation_oracle",
+          "pid": 55536,
+          "max_error": 1.1920928955078125e-07,
+          "weighting": "uniform channel average",
+          "parameter_tensors": 56
+        },
+        {
+          "event": "channel_alignment_oracle",
+          "pid": 55536,
+          "max_error": 0.0,
+          "parameter_tensors": 56,
+          "weighting": "uniform average over clients containing each channel"
+        },
+        {
+          "event": "second_rolling_alignment",
+          "pid": 55536,
+          "max_error": 0.0,
+          "first_conv_order": [
+            63,
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47,
+            48,
+            49,
+            50,
+            51,
+            52,
+            53,
+            54,
+            55,
+            56,
+            57,
+            58,
+            59,
+            60,
+            61,
+            62
+          ]
+        },
+        {
+          "event": "post_alignment_backward",
+          "pid": 55536,
+          "loss": 5.293303489685059
+        },
+        {
+          "event": "child_started",
+          "pid": 55536,
+          "child_pid": 55787,
+          "created": 1791064381.946512
+        },
+        {
+          "event": "success",
+          "pid": 55536,
+          "round": 1,
+          "real_socket": true
+        },
+        {
+          "event": "local_data",
+          "pid": 55584,
+          "client_id": 1,
+          "samples": 2
+        },
+        {
+          "event": "client_replaced_before_load",
+          "pid": 55584,
+          "client_id": 2,
+          "first_conv_channels": 32
+        },
+        {
+          "event": "client_trained",
+          "pid": 55584,
+          "client_id": 2,
+          "samples": 2,
+          "changed_parameters": 56,
+          "shapes": {
+            "conv1.weight": [
+              32,
+              3,
+              3,
+              3
+            ],
+            "layer1.0.batchnorm1.weight": [
+              32
+            ],
+            "layer1.0.batchnorm1.bias": [
+              32
+            ],
+            "layer1.0.conv1.weight": [
+              32,
+              32,
+              3,
+              3
+            ],
+            "layer1.0.batchnorm2.weight": [
+              32
+            ],
+            "layer1.0.batchnorm2.bias": [
+              32
+            ],
+            "layer1.0.conv2.weight": [
+              32,
+              32,
+              3,
+              3
+            ],
+            "layer1.1.batchnorm1.weight": [
+              32
+            ],
+            "layer1.1.batchnorm1.bias": [
+              32
+            ],
+            "layer1.1.conv1.weight": [
+              32,
+              32,
+              3,
+              3
+            ],
+            "layer1.1.batchnorm2.weight": [
+              32
+            ],
+            "layer1.1.batchnorm2.bias": [
+              32
+            ],
+            "layer1.1.conv2.weight": [
+              32,
+              32,
+              3,
+              3
+            ],
+            "layer2.0.batchnorm1.weight": [
+              32
+            ],
+            "layer2.0.batchnorm1.bias": [
+              32
+            ],
+            "layer2.0.conv1.weight": [
+              64,
+              32,
+              3,
+              3
+            ],
+            "layer2.0.batchnorm2.weight": [
+              64
+            ],
+            "layer2.0.batchnorm2.bias": [
+              64
+            ],
+            "layer2.0.conv2.weight": [
+              64,
+              64,
+              3,
+              3
+            ],
+            "layer2.0.shortcut.weight": [
+              64,
+              32,
+              1,
+              1
+            ],
+            "layer2.1.batchnorm1.weight": [
+              64
+            ],
+            "layer2.1.batchnorm1.bias": [
+              64
+            ],
+            "layer2.1.conv1.weight": [
+              64,
+              64,
+              3,
+              3
+            ],
+            "layer2.1.batchnorm2.weight": [
+              64
+            ],
+            "layer2.1.batchnorm2.bias": [
+              64
+            ],
+            "layer2.1.conv2.weight": [
+              64,
+              64,
+              3,
+              3
+            ],
+            "layer3.0.batchnorm1.weight": [
+              64
+            ],
+            "layer3.0.batchnorm1.bias": [
+              64
+            ],
+            "layer3.0.conv1.weight": [
+              128,
+              64,
+              3,
+              3
+            ],
+            "layer3.0.batchnorm2.weight": [
+              128
+            ],
+            "layer3.0.batchnorm2.bias": [
+              128
+            ],
+            "layer3.0.conv2.weight": [
+              128,
+              128,
+              3,
+              3
+            ],
+            "layer3.0.shortcut.weight": [
+              128,
+              64,
+              1,
+              1
+            ],
+            "layer3.1.batchnorm1.weight": [
+              128
+            ],
+            "layer3.1.batchnorm1.bias": [
+              128
+            ],
+            "layer3.1.conv1.weight": [
+              128,
+              128,
+              3,
+              3
+            ],
+            "layer3.1.batchnorm2.weight": [
+              128
+            ],
+            "layer3.1.batchnorm2.bias": [
+              128
+            ],
+            "layer3.1.conv2.weight": [
+              128,
+              128,
+              3,
+              3
+            ],
+            "layer4.0.batchnorm1.weight": [
+              128
+            ],
+            "layer4.0.batchnorm1.bias": [
+              128
+            ],
+            "layer4.0.conv1.weight": [
+              256,
+              128,
+              3,
+              3
+            ],
+            "layer4.0.batchnorm2.weight": [
+              256
+            ],
+            "layer4.0.batchnorm2.bias": [
+              256
+            ],
+            "layer4.0.conv2.weight": [
+              256,
+              256,
+              3,
+              3
+            ],
+            "layer4.0.shortcut.weight": [
+              256,
+              128,
+              1,
+              1
+            ],
+            "layer4.1.batchnorm1.weight": [
+              256
+            ],
+            "layer4.1.batchnorm1.bias": [
+              256
+            ],
+            "layer4.1.conv1.weight": [
+              256,
+              256,
+              3,
+              3
+            ],
+            "layer4.1.batchnorm2.weight": [
+              256
+            ],
+            "layer4.1.batchnorm2.bias": [
+              256
+            ],
+            "layer4.1.conv2.weight": [
+              256,
+              256,
+              3,
+              3
+            ],
+            "bn4.weight": [
+              256
+            ],
+            "bn4.bias": [
+              256
+            ],
+            "linear.weight": [
+              10,
+              256
+            ],
+            "linear.bias": [
+              10
+            ]
+          }
+        },
+        {
+          "event": "child_returned",
+          "pid": 55584,
+          "client_id": 1
+        },
+        {
+          "event": "local_data",
+          "pid": 55585,
+          "client_id": 2,
+          "samples": 6
+        },
+        {
+          "event": "client_replaced_before_load",
+          "pid": 55585,
+          "client_id": 1,
+          "first_conv_channels": 64
+        },
+        {
+          "event": "client_trained",
+          "pid": 55585,
+          "client_id": 1,
+          "samples": 6,
+          "changed_parameters": 56,
+          "shapes": {
+            "conv1.weight": [
+              64,
+              3,
+              3,
+              3
+            ],
+            "layer1.0.batchnorm1.weight": [
+              64
+            ],
+            "layer1.0.batchnorm1.bias": [
+              64
+            ],
+            "layer1.0.conv1.weight": [
+              64,
+              64,
+              3,
+              3
+            ],
+            "layer1.0.batchnorm2.weight": [
+              64
+            ],
+            "layer1.0.batchnorm2.bias": [
+              64
+            ],
+            "layer1.0.conv2.weight": [
+              64,
+              64,
+              3,
+              3
+            ],
+            "layer1.1.batchnorm1.weight": [
+              64
+            ],
+            "layer1.1.batchnorm1.bias": [
+              64
+            ],
+            "layer1.1.conv1.weight": [
+              64,
+              64,
+              3,
+              3
+            ],
+            "layer1.1.batchnorm2.weight": [
+              64
+            ],
+            "layer1.1.batchnorm2.bias": [
+              64
+            ],
+            "layer1.1.conv2.weight": [
+              64,
+              64,
+              3,
+              3
+            ],
+            "layer2.0.batchnorm1.weight": [
+              64
+            ],
+            "layer2.0.batchnorm1.bias": [
+              64
+            ],
+            "layer2.0.conv1.weight": [
+              128,
+              64,
+              3,
+              3
+            ],
+            "layer2.0.batchnorm2.weight": [
+              128
+            ],
+            "layer2.0.batchnorm2.bias": [
+              128
+            ],
+            "layer2.0.conv2.weight": [
+              128,
+              128,
+              3,
+              3
+            ],
+            "layer2.0.shortcut.weight": [
+              128,
+              64,
+              1,
+              1
+            ],
+            "layer2.1.batchnorm1.weight": [
+              128
+            ],
+            "layer2.1.batchnorm1.bias": [
+              128
+            ],
+            "layer2.1.conv1.weight": [
+              128,
+              128,
+              3,
+              3
+            ],
+            "layer2.1.batchnorm2.weight": [
+              128
+            ],
+            "layer2.1.batchnorm2.bias": [
+              128
+            ],
+            "layer2.1.conv2.weight": [
+              128,
+              128,
+              3,
+              3
+            ],
+            "layer3.0.batchnorm1.weight": [
+              128
+            ],
+            "layer3.0.batchnorm1.bias": [
+              128
+            ],
+            "layer3.0.conv1.weight": [
+              256,
+              128,
+              3,
+              3
+            ],
+            "layer3.0.batchnorm2.weight": [
+              256
+            ],
+            "layer3.0.batchnorm2.bias": [
+              256
+            ],
+            "layer3.0.conv2.weight": [
+              256,
+              256,
+              3,
+              3
+            ],
+            "layer3.0.shortcut.weight": [
+              256,
+              128,
+              1,
+              1
+            ],
+            "layer3.1.batchnorm1.weight": [
+              256
+            ],
+            "layer3.1.batchnorm1.bias": [
+              256
+            ],
+            "layer3.1.conv1.weight": [
+              256,
+              256,
+              3,
+              3
+            ],
+            "layer3.1.batchnorm2.weight": [
+              256
+            ],
+            "layer3.1.batchnorm2.bias": [
+              256
+            ],
+            "layer3.1.conv2.weight": [
+              256,
+              256,
+              3,
+              3
+            ],
+            "layer4.0.batchnorm1.weight": [
+              256
+            ],
+            "layer4.0.batchnorm1.bias": [
+              256
+            ],
+            "layer4.0.conv1.weight": [
+              512,
+              256,
+              3,
+              3
+            ],
+            "layer4.0.batchnorm2.weight": [
+              512
+            ],
+            "layer4.0.batchnorm2.bias": [
+              512
+            ],
+            "layer4.0.conv2.weight": [
+              512,
+              512,
+              3,
+              3
+            ],
+            "layer4.0.shortcut.weight": [
+              512,
+              256,
+              1,
+              1
+            ],
+            "layer4.1.batchnorm1.weight": [
+              512
+            ],
+            "layer4.1.batchnorm1.bias": [
+              512
+            ],
+            "layer4.1.conv1.weight": [
+              512,
+              512,
+              3,
+              3
+            ],
+            "layer4.1.batchnorm2.weight": [
+              512
+            ],
+            "layer4.1.batchnorm2.bias": [
+              512
+            ],
+            "layer4.1.conv2.weight": [
+              512,
+              512,
+              3,
+              3
+            ],
+            "bn4.weight": [
+              512
+            ],
+            "bn4.bias": [
+              512
+            ],
+            "linear.weight": [
+              10,
+              512
+            ],
+            "linear.bias": [
+              10
+            ]
+          }
+        },
+        {
+          "event": "child_returned",
+          "pid": 55585,
+          "client_id": 2
+        },
+        {
+          "event": "training_loss",
+          "pid": 55721,
+          "client_id": 2,
+          "loss": 2.2758631706237793
+        },
+        {
+          "event": "training_loss",
+          "pid": 55723,
+          "client_id": 1,
+          "loss": 2.39026141166687
+        },
+        {
+          "event": "training_loss",
+          "pid": 55723,
+          "client_id": 1,
+          "loss": 4.893094539642334
+        },
+        {
+          "event": "training_loss",
+          "pid": 55723,
+          "client_id": 1,
+          "loss": 5.425389766693115
+        }
+      ],
+      "overlay": {
+        "clients": {
+          "total_clients": 2,
+          "per_round": 2,
+          "comm_simulation": false,
+          "compute_comm_time": false,
+          "do_test": false
+        },
+        "server": {
+          "port": 58438,
+          "simulate_wall_time": false,
+          "random_seed": 1234
+        },
+        "trainer": {
+          "rounds": 1,
+          "epochs": 1,
+          "batch_size": 2,
+          "max_concurrency": 2
+        },
+        "data": {
+          "download": false,
+          "sampler": "all_inclusive",
+          "testset_sampler": "all_inclusive",
+          "testset_size": 2
+        },
+        "parameters": {
+          "limitation": {
+            "activated": false
+          }
+        }
+      },
+      "supplied_config_path": "examples/model_search/fedrolex/example_ResNet.toml",
+      "supplied_config_sha256": "4a74ee96d86be5786c935e3454cec0a1ea2861010d82112699ab01d77a07cbb5",
+      "lock_sha256": "e2a53aaae9a0dd49f5446b490bb3071e86aa3a9a20d6271c9dd30b4ae2dcbff9"
+    },
+    {
+      "path": "pytest-tmp/test_retained_width_round_hete0/heterofl/result.json",
+      "sha256": "aaab34fa37a798cc8bb7f84cbdc25568e0e3223620db24580d6785b5fd6b884b",
+      "family": "heterofl",
+      "case": "socket",
+      "variant": "",
+      "command": [
+        "/tmp/plato-archive-integration/env/bin/python",
+        "-B",
+        "-m",
+        "tests.integration.model_search_retention_worker",
+        "-u",
+        "-c",
+        "/private/tmp/plato-archive-integration/run-mandatory/pytest-tmp/test_retained_width_round_hete0/heterofl/config.toml",
+        "-b",
+        "/private/tmp/plato-archive-integration/run-mandatory/pytest-tmp/test_retained_width_round_hete0/heterofl/runtime"
+      ],
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [],
+      "survivors": [],
+      "observed_pids": [
+        55946,
+        55993,
+        55994,
+        55995,
+        56120,
+        56122,
+        56124,
+        56126,
+        56187,
+        56190
+      ],
+      "elapsed_seconds": 24.443472041981295,
+      "events": [
+        {
+          "event": "source_identity",
+          "pid": 55946,
+          "config_sha256": "24bb16e811375de9ed7c645ef8ac3daaa66e7307192e9580f349eb0e904fda93",
+          "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+          "worker_sha256": "95779c99e4783cfeb4d53110a11f69c4a4529b512f4f9b0d738bb2261b24502d"
+        },
+        {
+          "event": "explicit_server_trainer_callback",
+          "pid": 55946,
+          "before_channels": 32,
+          "after_channels": 64
+        },
+        {
+          "event": "local_data",
+          "pid": 55946,
+          "client_id": 0,
+          "samples": 6
+        },
+        {
+          "event": "child_started",
+          "pid": 55946,
+          "child_pid": 55994,
+          "created": 1791064392.939994
+        },
+        {
+          "event": "child_started",
+          "pid": 55946,
+          "child_pid": 55995,
+          "created": 1791064392.944107
+        },
+        {
+          "event": "server_trainer_initialized",
+          "pid": 55946,
+          "channels": 64,
+          "model_rate_parameters": 512
+        },
+        {
+          "event": "selected_rate",
+          "pid": 55946,
+          "client_id": 2,
+          "rate": 0.5,
+          "selection_call": 1,
+          "seed": 1,
+          "rng_state_sha256": "95d9970691287f085063e90cc11c16fa228ad3243dc9fe01e2b9b865a290dec5",
+          "limitation_activated": false
+        },
+        {
+          "event": "selected_rate",
+          "pid": 55946,
+          "client_id": 1,
+          "rate": 1.0,
+          "selection_call": 2,
+          "seed": 2,
+          "rng_state_sha256": "b5c68ef98b04b8e566426cdb872faf999c435477bc69ca33b36aee76fcd7d935",
+          "limitation_activated": false
+        },
+        {
+          "event": "server_received",
+          "pid": 55946,
+          "counts": [
+            2,
+            6
+          ],
+          "payloads": 2
+        },
+        {
+          "event": "aggregation_oracle",
+          "pid": 55946,
+          "max_error": 1.1920928955078125e-07,
+          "weighting": "uniform channel average",
+          "parameter_tensors": 56
+        },
+        {
+          "event": "channel_alignment_oracle",
+          "pid": 55946,
+          "max_error": 0.0,
+          "parameter_tensors": 56,
+          "weighting": "uniform average over clients containing each channel"
+        },
+        {
+          "event": "sbn_statistics",
+          "pid": 55946,
+          "batchnorm_modules": 17,
+          "min_batches": 6
+        },
+        {
+          "event": "post_alignment_backward",
+          "pid": 55946,
+          "loss": 5.246367454528809
+        },
+        {
+          "event": "child_started",
+          "pid": 55946,
+          "child_pid": 56190,
+          "created": 1791064406.410908
+        },
+        {
+          "event": "success",
+          "pid": 55946,
+          "round": 1,
+          "real_socket": true
+        },
+        {
+          "event": "local_data",
+          "pid": 55994,
+          "client_id": 1,
+          "samples": 2
+        },
+        {
+          "event": "client_replaced_before_load",
+          "pid": 55994,
+          "client_id": 2,
+          "first_conv_channels": 32
+        },
+        {
+          "event": "client_trained",
+          "pid": 55994,
+          "client_id": 2,
+          "samples": 2,
+          "changed_parameters": 56,
+          "shapes": {
+            "conv1.weight": [
+              32,
+              3,
+              3,
+              3
+            ],
+            "layer1.0.batchnorm1.weight": [
+              32
+            ],
+            "layer1.0.batchnorm1.bias": [
+              32
+            ],
+            "layer1.0.conv1.weight": [
+              32,
+              32,
+              3,
+              3
+            ],
+            "layer1.0.batchnorm2.weight": [
+              32
+            ],
+            "layer1.0.batchnorm2.bias": [
+              32
+            ],
+            "layer1.0.conv2.weight": [
+              32,
+              32,
+              3,
+              3
+            ],
+            "layer1.1.batchnorm1.weight": [
+              32
+            ],
+            "layer1.1.batchnorm1.bias": [
+              32
+            ],
+            "layer1.1.conv1.weight": [
+              32,
+              32,
+              3,
+              3
+            ],
+            "layer1.1.batchnorm2.weight": [
+              32
+            ],
+            "layer1.1.batchnorm2.bias": [
+              32
+            ],
+            "layer1.1.conv2.weight": [
+              32,
+              32,
+              3,
+              3
+            ],
+            "layer2.0.batchnorm1.weight": [
+              32
+            ],
+            "layer2.0.batchnorm1.bias": [
+              32
+            ],
+            "layer2.0.conv1.weight": [
+              64,
+              32,
+              3,
+              3
+            ],
+            "layer2.0.batchnorm2.weight": [
+              64
+            ],
+            "layer2.0.batchnorm2.bias": [
+              64
+            ],
+            "layer2.0.conv2.weight": [
+              64,
+              64,
+              3,
+              3
+            ],
+            "layer2.0.shortcut.weight": [
+              64,
+              32,
+              1,
+              1
+            ],
+            "layer2.1.batchnorm1.weight": [
+              64
+            ],
+            "layer2.1.batchnorm1.bias": [
+              64
+            ],
+            "layer2.1.conv1.weight": [
+              64,
+              64,
+              3,
+              3
+            ],
+            "layer2.1.batchnorm2.weight": [
+              64
+            ],
+            "layer2.1.batchnorm2.bias": [
+              64
+            ],
+            "layer2.1.conv2.weight": [
+              64,
+              64,
+              3,
+              3
+            ],
+            "layer3.0.batchnorm1.weight": [
+              64
+            ],
+            "layer3.0.batchnorm1.bias": [
+              64
+            ],
+            "layer3.0.conv1.weight": [
+              128,
+              64,
+              3,
+              3
+            ],
+            "layer3.0.batchnorm2.weight": [
+              128
+            ],
+            "layer3.0.batchnorm2.bias": [
+              128
+            ],
+            "layer3.0.conv2.weight": [
+              128,
+              128,
+              3,
+              3
+            ],
+            "layer3.0.shortcut.weight": [
+              128,
+              64,
+              1,
+              1
+            ],
+            "layer3.1.batchnorm1.weight": [
+              128
+            ],
+            "layer3.1.batchnorm1.bias": [
+              128
+            ],
+            "layer3.1.conv1.weight": [
+              128,
+              128,
+              3,
+              3
+            ],
+            "layer3.1.batchnorm2.weight": [
+              128
+            ],
+            "layer3.1.batchnorm2.bias": [
+              128
+            ],
+            "layer3.1.conv2.weight": [
+              128,
+              128,
+              3,
+              3
+            ],
+            "layer4.0.batchnorm1.weight": [
+              128
+            ],
+            "layer4.0.batchnorm1.bias": [
+              128
+            ],
+            "layer4.0.conv1.weight": [
+              256,
+              128,
+              3,
+              3
+            ],
+            "layer4.0.batchnorm2.weight": [
+              256
+            ],
+            "layer4.0.batchnorm2.bias": [
+              256
+            ],
+            "layer4.0.conv2.weight": [
+              256,
+              256,
+              3,
+              3
+            ],
+            "layer4.0.shortcut.weight": [
+              256,
+              128,
+              1,
+              1
+            ],
+            "layer4.1.batchnorm1.weight": [
+              256
+            ],
+            "layer4.1.batchnorm1.bias": [
+              256
+            ],
+            "layer4.1.conv1.weight": [
+              256,
+              256,
+              3,
+              3
+            ],
+            "layer4.1.batchnorm2.weight": [
+              256
+            ],
+            "layer4.1.batchnorm2.bias": [
+              256
+            ],
+            "layer4.1.conv2.weight": [
+              256,
+              256,
+              3,
+              3
+            ],
+            "bn4.weight": [
+              256
+            ],
+            "bn4.bias": [
+              256
+            ],
+            "linear.weight": [
+              10,
+              256
+            ],
+            "linear.bias": [
+              10
+            ]
+          }
+        },
+        {
+          "event": "child_returned",
+          "pid": 55994,
+          "client_id": 1
+        },
+        {
+          "event": "local_data",
+          "pid": 55995,
+          "client_id": 2,
+          "samples": 6
+        },
+        {
+          "event": "client_replaced_before_load",
+          "pid": 55995,
+          "client_id": 1,
+          "first_conv_channels": 64
+        },
+        {
+          "event": "client_trained",
+          "pid": 55995,
+          "client_id": 1,
+          "samples": 6,
+          "changed_parameters": 56,
+          "shapes": {
+            "conv1.weight": [
+              64,
+              3,
+              3,
+              3
+            ],
+            "layer1.0.batchnorm1.weight": [
+              64
+            ],
+            "layer1.0.batchnorm1.bias": [
+              64
+            ],
+            "layer1.0.conv1.weight": [
+              64,
+              64,
+              3,
+              3
+            ],
+            "layer1.0.batchnorm2.weight": [
+              64
+            ],
+            "layer1.0.batchnorm2.bias": [
+              64
+            ],
+            "layer1.0.conv2.weight": [
+              64,
+              64,
+              3,
+              3
+            ],
+            "layer1.1.batchnorm1.weight": [
+              64
+            ],
+            "layer1.1.batchnorm1.bias": [
+              64
+            ],
+            "layer1.1.conv1.weight": [
+              64,
+              64,
+              3,
+              3
+            ],
+            "layer1.1.batchnorm2.weight": [
+              64
+            ],
+            "layer1.1.batchnorm2.bias": [
+              64
+            ],
+            "layer1.1.conv2.weight": [
+              64,
+              64,
+              3,
+              3
+            ],
+            "layer2.0.batchnorm1.weight": [
+              64
+            ],
+            "layer2.0.batchnorm1.bias": [
+              64
+            ],
+            "layer2.0.conv1.weight": [
+              128,
+              64,
+              3,
+              3
+            ],
+            "layer2.0.batchnorm2.weight": [
+              128
+            ],
+            "layer2.0.batchnorm2.bias": [
+              128
+            ],
+            "layer2.0.conv2.weight": [
+              128,
+              128,
+              3,
+              3
+            ],
+            "layer2.0.shortcut.weight": [
+              128,
+              64,
+              1,
+              1
+            ],
+            "layer2.1.batchnorm1.weight": [
+              128
+            ],
+            "layer2.1.batchnorm1.bias": [
+              128
+            ],
+            "layer2.1.conv1.weight": [
+              128,
+              128,
+              3,
+              3
+            ],
+            "layer2.1.batchnorm2.weight": [
+              128
+            ],
+            "layer2.1.batchnorm2.bias": [
+              128
+            ],
+            "layer2.1.conv2.weight": [
+              128,
+              128,
+              3,
+              3
+            ],
+            "layer3.0.batchnorm1.weight": [
+              128
+            ],
+            "layer3.0.batchnorm1.bias": [
+              128
+            ],
+            "layer3.0.conv1.weight": [
+              256,
+              128,
+              3,
+              3
+            ],
+            "layer3.0.batchnorm2.weight": [
+              256
+            ],
+            "layer3.0.batchnorm2.bias": [
+              256
+            ],
+            "layer3.0.conv2.weight": [
+              256,
+              256,
+              3,
+              3
+            ],
+            "layer3.0.shortcut.weight": [
+              256,
+              128,
+              1,
+              1
+            ],
+            "layer3.1.batchnorm1.weight": [
+              256
+            ],
+            "layer3.1.batchnorm1.bias": [
+              256
+            ],
+            "layer3.1.conv1.weight": [
+              256,
+              256,
+              3,
+              3
+            ],
+            "layer3.1.batchnorm2.weight": [
+              256
+            ],
+            "layer3.1.batchnorm2.bias": [
+              256
+            ],
+            "layer3.1.conv2.weight": [
+              256,
+              256,
+              3,
+              3
+            ],
+            "layer4.0.batchnorm1.weight": [
+              256
+            ],
+            "layer4.0.batchnorm1.bias": [
+              256
+            ],
+            "layer4.0.conv1.weight": [
+              512,
+              256,
+              3,
+              3
+            ],
+            "layer4.0.batchnorm2.weight": [
+              512
+            ],
+            "layer4.0.batchnorm2.bias": [
+              512
+            ],
+            "layer4.0.conv2.weight": [
+              512,
+              512,
+              3,
+              3
+            ],
+            "layer4.0.shortcut.weight": [
+              512,
+              256,
+              1,
+              1
+            ],
+            "layer4.1.batchnorm1.weight": [
+              512
+            ],
+            "layer4.1.batchnorm1.bias": [
+              512
+            ],
+            "layer4.1.conv1.weight": [
+              512,
+              512,
+              3,
+              3
+            ],
+            "layer4.1.batchnorm2.weight": [
+              512
+            ],
+            "layer4.1.batchnorm2.bias": [
+              512
+            ],
+            "layer4.1.conv2.weight": [
+              512,
+              512,
+              3,
+              3
+            ],
+            "bn4.weight": [
+              512
+            ],
+            "bn4.bias": [
+              512
+            ],
+            "linear.weight": [
+              10,
+              512
+            ],
+            "linear.bias": [
+              10
+            ]
+          }
+        },
+        {
+          "event": "child_returned",
+          "pid": 55995,
+          "client_id": 2
+        },
+        {
+          "event": "training_loss",
+          "pid": 56124,
+          "client_id": 2,
+          "loss": 2.2681045532226562
+        },
+        {
+          "event": "training_loss",
+          "pid": 56126,
+          "client_id": 1,
+          "loss": 2.661602258682251
+        },
+        {
+          "event": "training_loss",
+          "pid": 56126,
+          "client_id": 1,
+          "loss": 4.8508195877075195
+        },
+        {
+          "event": "training_loss",
+          "pid": 56126,
+          "client_id": 1,
+          "loss": 5.523608207702637
+        }
+      ],
+      "overlay": {
+        "clients": {
+          "total_clients": 2,
+          "per_round": 2,
+          "comm_simulation": false,
+          "compute_comm_time": false,
+          "do_test": false
+        },
+        "server": {
+          "port": 58465,
+          "simulate_wall_time": false,
+          "random_seed": 1234
+        },
+        "trainer": {
+          "rounds": 1,
+          "epochs": 1,
+          "batch_size": 2,
+          "max_concurrency": 2
+        },
+        "data": {
+          "download": false,
+          "sampler": "all_inclusive",
+          "testset_sampler": "all_inclusive",
+          "testset_size": 2
+        },
+        "parameters": {
+          "limitation": {
+            "activated": false
+          }
+        }
+      },
+      "supplied_config_path": "examples/model_search/heterofl/heterofl_resnet18_dynamic.toml",
+      "supplied_config_sha256": "361563886ce2a5eca689d8d1702fb8778874614c9c5bc77d6f2775eb01fd42aa",
+      "lock_sha256": "e2a53aaae9a0dd49f5446b490bb3071e86aa3a9a20d6271c9dd30b4ae2dcbff9"
+    },
+    {
+      "path": "pytest-tmp/test_sysheterofl_subnet_round0/sysheterofl/result.json",
+      "sha256": "cdf3dfb63329291061f332d586819c150544cfd8056aab68cdaa8c10638fd3d4",
+      "family": "sysheterofl",
+      "case": "subnet",
+      "variant": "",
+      "command": [
+        "/tmp/plato-archive-integration/env/bin/python",
+        "-B",
+        "-m",
+        "tests.integration.model_search_retention_worker",
+        "-u",
+        "-c",
+        "/private/tmp/plato-archive-integration/run-mandatory/pytest-tmp/test_sysheterofl_subnet_round0/sysheterofl/config.toml",
+        "-b",
+        "/private/tmp/plato-archive-integration/run-mandatory/pytest-tmp/test_sysheterofl_subnet_round0/sysheterofl/runtime"
+      ],
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [],
+      "survivors": [],
+      "observed_pids": [
+        56581
+      ],
+      "elapsed_seconds": 6.78423091606237,
+      "events": [
+        {
+          "event": "source_identity",
+          "pid": 56581,
+          "config_sha256": "295e09a6d9906e78121f12f6ab7fd241f5c86c5dfd26e1cf4d1fce1f87c50fa4",
+          "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+          "worker_sha256": "95779c99e4783cfeb4d53110a11f69c4a4529b512f4f9b0d738bb2261b24502d"
+        },
+        {
+          "event": "sysheterofl_subnet",
+          "pid": 56581,
+          "selected": [
+            [
+              3,
+              8,
+              63,
+              3
+            ],
+            [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ]
+          ],
+          "budget": [
+            377.3,
+            6057.150000000001
+          ],
+          "loss": 2.377523899078369,
+          "architecture_map": {
+            "0": [
+              [
+                2,
+                2,
+                2,
+                2
+              ],
+              [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+              ]
+            ],
+            "1": [
+              [
+                3,
+                8,
+                63,
+                3
+              ],
+              [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+              ]
+            ],
+            "2": [
+              [
+                3,
+                2,
+                2,
+                2
+              ],
+              [
+                0.5,
+                0.5,
+                1.0,
+                1.0
+              ]
+            ]
+          },
+          "resources": [
+            [
+              42.6,
+              531.2,
+              0
+            ],
+            [
+              343.0,
+              5506.5,
+              1
+            ],
+            [
+              40.2,
+              333.9,
+              0
+            ]
+          ],
+          "max_loop": 1,
+          "distillation_iterations": 1
+        },
+        {
+          "event": "success",
+          "pid": 56581
+        }
+      ],
+      "overlay": {
+        "clients": {
+          "total_clients": 2,
+          "per_round": 1,
+          "comm_simulation": false,
+          "compute_comm_time": false,
+          "do_test": false
+        },
+        "server": {
+          "port": 58501,
+          "simulate_wall_time": false,
+          "random_seed": 1234
+        },
+        "trainer": {
+          "rounds": 1,
+          "epochs": 1,
+          "batch_size": 2,
+          "max_concurrency": 2
+        },
+        "data": {
+          "download": false,
+          "sampler": "all_inclusive",
+          "testset_sampler": "all_inclusive",
+          "testset_size": 2
+        },
+        "parameters": {
+          "limitation": {
+            "activated": false,
+            "max_loop": 1
+          },
+          "distillation": {
+            "iterations": 1
+          }
+        }
+      },
+      "supplied_config_path": "examples/model_search/sysheterofl/config_ResNet152.toml",
+      "supplied_config_sha256": "e4e9b28df53fa3bc78f19aa53e0753c36d67a90dbba9a2e37ec583da5b354f87",
+      "lock_sha256": "e2a53aaae9a0dd49f5446b490bb3071e86aa3a9a20d6271c9dd30b4ae2dcbff9"
+    }
+  ],
+  "limits": "Recomputed core FedAvg and FedDyn numerical oracles from saved payloads; retained model-search event assertions are checked against already reviewed worker numerical oracles. No broader family qualification implied."
+}

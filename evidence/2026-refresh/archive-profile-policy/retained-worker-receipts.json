@@ -1,0 +1,276 @@
+[
+  {
+    "family": "heterofl",
+    "case": "socket",
+    "variant": "",
+    "receipt_path": "/tmp/plato-archive-profile-evidence/model-search-tmp/test_retained_width_round_hete0/heterofl/result.json",
+    "receipt_sha256": "23cad42ff526aec03d02b446108166aa3a996c2bd77601f9f8d062d9b52ac325",
+    "elapsed_seconds": 24.940473957918584,
+    "observed_pids": [
+      32547,
+      32598,
+      32599,
+      32600,
+      32721,
+      32723,
+      32724,
+      32726,
+      32792,
+      32797
+    ],
+    "source_lock_sha256": "e2a53aaae9a0dd49f5446b490bb3071e86aa3a9a20d6271c9dd30b4ae2dcbff9",
+    "natural_success": true
+  },
+  {
+    "family": "heterofl",
+    "case": "selector",
+    "variant": "",
+    "receipt_path": "/tmp/plato-archive-profile-evidence/model-search-tmp/test_local_retired_selection_h0/heterofl/result.json",
+    "receipt_sha256": "f4ffa377c34de1ea5b5f281a7d00e424965ca52a719f177856df710dc5796591",
+    "elapsed_seconds": 3.81237508286722,
+    "observed_pids": [
+      33376
+    ],
+    "source_lock_sha256": "e2a53aaae9a0dd49f5446b490bb3071e86aa3a9a20d6271c9dd30b4ae2dcbff9",
+    "natural_success": true
+  },
+  {
+    "family": "sysheterofl",
+    "case": "subnet",
+    "variant": "",
+    "receipt_path": "/tmp/plato-archive-profile-evidence/model-search-tmp/test_sysheterofl_subnet_round0/sysheterofl/result.json",
+    "receipt_sha256": "a04d0adf8bedeb11feffb8c202507b81c29d88fb6c4fb3b98c2d48f83b57d8aa",
+    "elapsed_seconds": 6.721896165981889,
+    "observed_pids": [
+      33117
+    ],
+    "source_lock_sha256": "e2a53aaae9a0dd49f5446b490bb3071e86aa3a9a20d6271c9dd30b4ae2dcbff9",
+    "natural_success": true
+  },
+  {
+    "family": "heterofl",
+    "case": "budget",
+    "variant": "",
+    "receipt_path": "/tmp/plato-archive-profile-evidence/model-search-tmp/test_retained_activated_budget2/heterofl/result.json",
+    "receipt_sha256": "e1c959e2d3f1b5174e82d2c9cfcc9107650639f56b1eae424bdbec912d6f18d7",
+    "elapsed_seconds": 4.238460290944204,
+    "observed_pids": [
+      33050
+    ],
+    "source_lock_sha256": "e2a53aaae9a0dd49f5446b490bb3071e86aa3a9a20d6271c9dd30b4ae2dcbff9",
+    "natural_success": true
+  },
+  {
+    "family": "dlg",
+    "case": "update",
+    "variant": "resnet_18",
+    "receipt_path": "/tmp/plato-archive-profile-evidence/model-search-tmp/test_dlg_model_update_resnet_10/resnet_18/result.json",
+    "receipt_sha256": "ea5d213196161d9288d59f747bfd549a795afafa9a26a59997148a1b0665c5fb",
+    "elapsed_seconds": 1.656540541909635,
+    "observed_pids": [
+      33236
+    ],
+    "source_lock_sha256": "e2a53aaae9a0dd49f5446b490bb3071e86aa3a9a20d6271c9dd30b4ae2dcbff9",
+    "natural_success": true
+  },
+  {
+    "family": "anycostfl",
+    "case": "selector",
+    "variant": "",
+    "receipt_path": "/tmp/plato-archive-profile-evidence/model-search-tmp/test_local_retired_selection_a0/anycostfl/result.json",
+    "receipt_sha256": "c27bd0378c42949143f1f4adef4874bcd3b29ea0cc2ba47df99527298b1929d1",
+    "elapsed_seconds": 3.735697084106505,
+    "observed_pids": [
+      33265
+    ],
+    "source_lock_sha256": "e2a53aaae9a0dd49f5446b490bb3071e86aa3a9a20d6271c9dd30b4ae2dcbff9",
+    "natural_success": true
+  },
+  {
+    "family": "fedrolex",
+    "case": "selector",
+    "variant": "",
+    "receipt_path": "/tmp/plato-archive-profile-evidence/model-search-tmp/test_local_retired_selection_f0/fedrolex/result.json",
+    "receipt_sha256": "11b13d52f7ec1b1a369470c5ca3d462eaeec7b49087da0cd4451bbe4b53c5088",
+    "elapsed_seconds": 3.751690291799605,
+    "observed_pids": [
+      33320
+    ],
+    "source_lock_sha256": "e2a53aaae9a0dd49f5446b490bb3071e86aa3a9a20d6271c9dd30b4ae2dcbff9",
+    "natural_success": true
+  },
+  {
+    "family": "anycostfl",
+    "case": "import",
+    "variant": "root",
+    "receipt_path": "/tmp/plato-archive-profile-evidence/model-search-tmp/test_retained_entrypoint_impor0/anycostfl/result.json",
+    "receipt_sha256": "97c8e3d248072ef23f24224623ca82b19bdf90487475e95f05e90e6f6df96905",
+    "elapsed_seconds": 3.7735877910163254,
+    "observed_pids": [
+      33458
+    ],
+    "source_lock_sha256": "e2a53aaae9a0dd49f5446b490bb3071e86aa3a9a20d6271c9dd30b4ae2dcbff9",
+    "natural_success": true
+  },
+  {
+    "family": "anycostfl",
+    "case": "socket",
+    "variant": "",
+    "receipt_path": "/tmp/plato-archive-profile-evidence/model-search-tmp/test_retained_width_round_anyc0/anycostfl/result.json",
+    "receipt_sha256": "546a74544814cb6657e20cb18ce0f2fb57dd44dd9cbc24e1c152b4e491e48329",
+    "elapsed_seconds": 25.235907332971692,
+    "observed_pids": [
+      31674,
+      31751,
+      31753,
+      31754,
+      31934,
+      31936,
+      31939,
+      31940,
+      32020,
+      32022
+    ],
+    "source_lock_sha256": "e2a53aaae9a0dd49f5446b490bb3071e86aa3a9a20d6271c9dd30b4ae2dcbff9",
+    "natural_success": true
+  },
+  {
+    "family": "anycostfl",
+    "case": "import",
+    "variant": "example",
+    "receipt_path": "/tmp/plato-archive-profile-evidence/model-search-tmp/test_retained_entrypoint_impor1/anycostfl/result.json",
+    "receipt_sha256": "e3b403754498dd840503ab9f8fa05d4c14c7a2d1f9023d70a990283b45bba50e",
+    "elapsed_seconds": 4.00354770780541,
+    "observed_pids": [
+      33513
+    ],
+    "source_lock_sha256": "e2a53aaae9a0dd49f5446b490bb3071e86aa3a9a20d6271c9dd30b4ae2dcbff9",
+    "natural_success": true
+  },
+  {
+    "family": "anycostfl",
+    "case": "budget",
+    "variant": "",
+    "receipt_path": "/tmp/plato-archive-profile-evidence/model-search-tmp/test_retained_activated_budget0/anycostfl/result.json",
+    "receipt_sha256": "beb1a86c919b7b92944b0a1d5abb3fd748570042a6d05ff50f1738b2c7f2a449",
+    "elapsed_seconds": 4.5197851250413805,
+    "observed_pids": [
+      32915
+    ],
+    "source_lock_sha256": "e2a53aaae9a0dd49f5446b490bb3071e86aa3a9a20d6271c9dd30b4ae2dcbff9",
+    "natural_success": true
+  },
+  {
+    "family": "dlg",
+    "case": "update",
+    "variant": "lenet",
+    "receipt_path": "/tmp/plato-archive-profile-evidence/model-search-tmp/test_dlg_model_update_lenet_0/lenet/result.json",
+    "receipt_sha256": "33cfec413ad852c820f8425067b3fee23cd256409509d8d309c320d09966760b",
+    "elapsed_seconds": 1.4053187088575214,
+    "observed_pids": [
+      33215
+    ],
+    "source_lock_sha256": "e2a53aaae9a0dd49f5446b490bb3071e86aa3a9a20d6271c9dd30b4ae2dcbff9",
+    "natural_success": true
+  },
+  {
+    "family": "fedrolex",
+    "case": "budget",
+    "variant": "",
+    "receipt_path": "/tmp/plato-archive-profile-evidence/model-search-tmp/test_retained_activated_budget1/fedrolex/result.json",
+    "receipt_sha256": "bb93b957d9054b84aaa2f11a2eb3343e0000339ac6d751f507112c6187a25e35",
+    "elapsed_seconds": 4.496400165837258,
+    "observed_pids": [
+      32985
+    ],
+    "source_lock_sha256": "e2a53aaae9a0dd49f5446b490bb3071e86aa3a9a20d6271c9dd30b4ae2dcbff9",
+    "natural_success": true
+  },
+  {
+    "family": "dlg",
+    "case": "selector",
+    "variant": "",
+    "receipt_path": "/tmp/plato-archive-profile-evidence/model-search-tmp/test_local_retired_selection_d0/dlg/result.json",
+    "receipt_sha256": "67b3faaec0625ef1c65a4843b7b2cc8cd711067842a2a7854c35a4a83ae16a0a",
+    "elapsed_seconds": 1.4265498330350965,
+    "observed_pids": [
+      33432
+    ],
+    "source_lock_sha256": "e2a53aaae9a0dd49f5446b490bb3071e86aa3a9a20d6271c9dd30b4ae2dcbff9",
+    "natural_success": true
+  },
+  {
+    "family": "fedrolex",
+    "case": "import",
+    "variant": "example",
+    "receipt_path": "/tmp/plato-archive-profile-evidence/model-search-tmp/test_retained_entrypoint_impor3/fedrolex/result.json",
+    "receipt_sha256": "d1de222e5c3ceee62c6952ed6a7511411a8a91b6d29a677ebb5d5bf42ef90918",
+    "elapsed_seconds": 4.065132209099829,
+    "observed_pids": [
+      33652
+    ],
+    "source_lock_sha256": "e2a53aaae9a0dd49f5446b490bb3071e86aa3a9a20d6271c9dd30b4ae2dcbff9",
+    "natural_success": true
+  },
+  {
+    "family": "heterofl",
+    "case": "import",
+    "variant": "root",
+    "receipt_path": "/tmp/plato-archive-profile-evidence/model-search-tmp/test_retained_entrypoint_impor4/heterofl/result.json",
+    "receipt_sha256": "0073591fb2e227a5018328ac3e1ef0da95fc4b41a3a4bc0be1e9cc9fb79c30ef",
+    "elapsed_seconds": 4.189818250015378,
+    "observed_pids": [
+      33730
+    ],
+    "source_lock_sha256": "e2a53aaae9a0dd49f5446b490bb3071e86aa3a9a20d6271c9dd30b4ae2dcbff9",
+    "natural_success": true
+  },
+  {
+    "family": "heterofl",
+    "case": "import",
+    "variant": "example",
+    "receipt_path": "/tmp/plato-archive-profile-evidence/model-search-tmp/test_retained_entrypoint_impor5/heterofl/result.json",
+    "receipt_sha256": "a79458f30fff00e289b2389a7d70c242280401d9dbcf6448d2e2d4e53e83fead",
+    "elapsed_seconds": 4.29066279088147,
+    "observed_pids": [
+      33823
+    ],
+    "source_lock_sha256": "e2a53aaae9a0dd49f5446b490bb3071e86aa3a9a20d6271c9dd30b4ae2dcbff9",
+    "natural_success": true
+  },
+  {
+    "family": "fedrolex",
+    "case": "import",
+    "variant": "root",
+    "receipt_path": "/tmp/plato-archive-profile-evidence/model-search-tmp/test_retained_entrypoint_impor2/fedrolex/result.json",
+    "receipt_sha256": "cd0fa27fba5bfb97402566727da532e6feb9ec09004d812eb445bc760c6ca828",
+    "elapsed_seconds": 3.9274456249549985,
+    "observed_pids": [
+      33585
+    ],
+    "source_lock_sha256": "e2a53aaae9a0dd49f5446b490bb3071e86aa3a9a20d6271c9dd30b4ae2dcbff9",
+    "natural_success": true
+  },
+  {
+    "family": "fedrolex",
+    "case": "socket",
+    "variant": "",
+    "receipt_path": "/tmp/plato-archive-profile-evidence/model-search-tmp/test_retained_width_round_fedr0/fedrolex/result.json",
+    "receipt_sha256": "3d7e6d41add705ae246fd8cfa77fdab983ef8a494e83727c03c5a3be2941c524",
+    "elapsed_seconds": 24.93702358310111,
+    "observed_pids": [
+      32168,
+      32223,
+      32224,
+      32225,
+      32352,
+      32353,
+      32355,
+      32357,
+      32434,
+      32437
+    ],
+    "source_lock_sha256": "e2a53aaae9a0dd49f5446b490bb3071e86aa3a9a20d6271c9dd30b4ae2dcbff9",
+    "natural_success": true
+  }
+]

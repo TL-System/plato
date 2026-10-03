@@ -9,6 +9,8 @@ def raise_if_retired(name: str, *, category: str) -> None:
         "lerobot": "lerobot",
         "smolvla": "lerobot",
     }.get(name.lower())
+    if category == "model" and name.lower() == "vit":
+        backend = "legacy-vit"
     if backend is None:
         return
     message = (

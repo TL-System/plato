@@ -1,0 +1,77 @@
+{
+  "family": "anycostfl",
+  "case": "import",
+  "variant": "root",
+  "command": [
+    "/tmp/plato-archive-author/environment/bin/python",
+    "-B",
+    "-m",
+    "tests.integration.model_search_retention_worker",
+    "-u",
+    "-c",
+    "/private/tmp/plato-archive-author/accepted-cases/test_retained_entrypoint_impor0/anycostfl/config.toml",
+    "-b",
+    "/private/tmp/plato-archive-author/accepted-cases/test_retained_entrypoint_impor0/anycostfl/runtime"
+  ],
+  "returncode": 0,
+  "timed_out": false,
+  "forced": [],
+  "survivors": [],
+  "observed_pids": [
+    10333
+  ],
+  "elapsed_seconds": 4.764492416987196,
+  "events": [
+    {
+      "event": "source_identity",
+      "pid": 10333,
+      "config_sha256": "ab48d935101007bfae7e06513cdd97d5bbbe5537bf29d44b2d3e6675f727f335",
+      "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+      "worker_sha256": "949e087b68296d4b372ebf4a2369c9b0dbaa4a5606b483a91bab8faed2683e55"
+    },
+    {
+      "event": "entrypoint_import",
+      "pid": 10333,
+      "module_path": "/private/tmp/plato-refresh-worktrees/model-search-retirement/examples/model_search/anycostfl/anycostfl.py",
+      "cwd": "/private/tmp/plato-refresh-worktrees/model-search-retirement"
+    },
+    {
+      "event": "success",
+      "pid": 10333
+    }
+  ],
+  "overlay": {
+    "clients": {
+      "total_clients": 2,
+      "per_round": 2,
+      "comm_simulation": false,
+      "compute_comm_time": false,
+      "do_test": false
+    },
+    "server": {
+      "port": 56815,
+      "simulate_wall_time": false,
+      "random_seed": 1234
+    },
+    "trainer": {
+      "rounds": 1,
+      "epochs": 1,
+      "batch_size": 2,
+      "max_concurrency": 2
+    },
+    "data": {
+      "download": false,
+      "sampler": "all_inclusive",
+      "testset_sampler": "all_inclusive",
+      "testset_size": 2
+    },
+    "parameters": {
+      "limitation": {
+        "activated": false
+      }
+    }
+  },
+  "supplied_config_path": "examples/model_search/anycostfl/example_ResNet.toml",
+  "supplied_config_sha256": "4a74ee96d86be5786c935e3454cec0a1ea2861010d82112699ab01d77a07cbb5",
+  "lock_sha256": "e2a53aaae9a0dd49f5446b490bb3071e86aa3a9a20d6271c9dd30b4ae2dcbff9"
+}

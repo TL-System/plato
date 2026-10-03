@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "artifacts": [
+    {
+      "filename": "plato_learn-1.4.3-py3-none-any.whl",
+      "sha256": "eaef251bbd8ccbbdf1c68fe81bac0844526a4fc48db46bba7fb2dbf2a285bdd9",
+      "bytes": 379595,
+      "members": 213,
+      "required_registry_present": true,
+      "retired_sources_absent": true
+    },
+    {
+      "filename": "plato_learn-1.4.3.tar.gz",
+      "sha256": "aa0657d57efc614ccc3791ea81956edc1c2ecd4f929bc93cdbdd307566d110ea",
+      "bytes": 32097495,
+      "members": 1086,
+      "required_registry_present": true,
+      "retired_sources_absent": true
+    }
+  ],
+  "outside_checkout_command": [
+    "/tmp/plato-archive-author/package-environment/bin/python",
+    "-I",
+    "-c",
+    "import importlib.util, json; import plato.models.registry as r; assert \"site-packages\" in r.__file__; assert all(importlib.util.find_spec(\"plato.models.\"+n) is None for n in (\"vit\",\"dvit\",\"t2tvit\")); print(json.dumps({\"registry_path\":r.__file__,\"retired_modules_absent\":True}))"
+  ],
+  "outside_checkout_returncode": 0,
+  "outside_checkout_import": {
+    "registry_path": "/tmp/plato-archive-author/package-environment/lib/python3.13/site-packages/plato/models/registry.py",
+    "retired_modules_absent": true
+  }
+}

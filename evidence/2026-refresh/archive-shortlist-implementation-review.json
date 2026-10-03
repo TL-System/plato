@@ -1,0 +1,393 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-03",
+  "reviewer": "fresh independent implementation review agent",
+  "decision": "REQUEST_CHANGES",
+  "implementation_accepted": false,
+  "final_integrated_gates_accepted": false,
+  "scope": "Bounded author model-search retirement implementation. Documentation, serialized conftest/CI/archive-profile delivery and corrected MLX lazy registry integration remain explicitly pending with root owners.",
+  "source": {
+    "review_checkout": "/private/tmp/plato-archive-shortlist-review",
+    "author_checkout": "/tmp/plato-refresh-worktrees/model-search-retirement",
+    "reviewed_tip": "90a26f703142cddaf069f0494a940b833cdd397a",
+    "reviewed_tip_tree": "0d5d2ee82da3ca48a5b53441907cd484c886ffff",
+    "frozen_source_commit": "8a8b3db59a7cc2d1b5cc8672729c4391bbf2c8ad",
+    "frozen_source_tree": "56d7f50dbae2404f47e59004e976f8abc97fa361",
+    "pre_retirement_commit": "477f2f1bb52a1b5a58c1f9f2d30f640039f83a8e",
+    "pre_retirement_tree": "82af1367f106218d0de98f46775c011e0afd930c",
+    "review_checkout_clean": true,
+    "source_sha256": {
+      "tests/test_model_search_retirement.py": "179d3a8aafd405e2a9b7bb6f8f6e0fe47a7c1817e748664b8648e4829b103e34",
+      "tests/integration/test_retained_model_search.py": "ff902a9a34c97ce4842f0dd35b2bc396da5c2998381a66f52d4c5d1142e4fe0d",
+      "tests/integration/model_search_retention_worker.py": "949e087b68296d4b372ebf4a2369c9b0dbaa4a5606b483a91bab8faed2683e55",
+      "examples/gradient_leakage_attacks/dlg_model.py": "5aaaef167b637fe16da8b1feb9814147f44d3db8f991bcecead45913bf993823",
+      "examples/model_search/anycostfl/anycostfl.py": "59cc67240cc69bfca8d57133836093118723a26bfa5a23bc8606635cb7e3299b",
+      "examples/model_search/fedrolex/fedrolex.py": "000ec8ba529f68de778d4fef1e05533bda24829d2512ddd2f31bc4d26eb7f2f3",
+      "examples/model_search/heterofl/heterofl.py": "c7679361bf108ffb53bcdfb71e09b0e94d36b826bcfaea0bc57e8bbd5469bea0",
+      "plato/models/registry.py": "d086d04ba91001e2cea6d7031ff1c4229fb8fb7d6def46addb68bcff560c5936",
+      "plato/utils/retired_backends.py": "e71a9493bfb9e08b0e2b592d76c3ea45d7835da7c7afcfaf2508b5e5524c15fc",
+      "pyproject.toml": "0b67376a5ead6bc1a50b30303d7a4f5f2963baef82d7a3ef027d31c3f2389c46",
+      "uv.lock": "e2a53aaae9a0dd49f5446b490bb3071e86aa3a9a20d6271c9dd30b4ae2dcbff9",
+      "examples/model_search/anycostfl/pyproject.toml": "b48f4ac32d771bef0d04826675bec0b15963c1df0dcd4a084b3b7a37cdbbf5f0",
+      "examples/model_search/fedrolex/pyproject.toml": "b9fdff0edcc79f4c3e6b2546aa891dcccb5de7fc50cca00fa0c1785bfd3304c5",
+      "examples/model_search/heterofl/pyproject.toml": "c7d3bd0135626082d4ed2b22b2aba1651330baab984a7d81fbee402dcfbfc0c5"
+    },
+    "tip_differs_from_frozen_source_only_by_evidence": true
+  },
+  "accepted_plan": {
+    "path": "/tmp/plato-archive-shortlist-plan.json",
+    "sha256": "c66577eac31a2eeaba68f29e2fee53760def2477184521bd1f2536e76507573f",
+    "fresh_review_path": "/tmp/plato-archive-shortlist-plan-review3.json",
+    "fresh_review_sha256": "3fbeb6b47b5392515172b574bd9b0d11f427e5d6af4a72ba2c2d3057be8483be"
+  },
+  "author_validation": {
+    "path": "/private/tmp/plato-archive-shortlist-review/evidence/2026-refresh/archive-shortlist-validation.json",
+    "sha256": "e9c5688df3ece8064d899982a5ec50c8f1783e6f57c615393cb7524e21c9ce55",
+    "source_hashes_match": true
+  },
+  "findings": [
+    {
+      "id": "ARS-01",
+      "severity": "medium",
+      "priority": "P2",
+      "blocking": true,
+      "path": "tests/integration/model_search_retention_worker.py",
+      "lines": [
+        499,
+        502
+      ],
+      "source_sha256": "949e087b68296d4b372ebf4a2369c9b0dbaa4a5606b483a91bab8faed2683e55",
+      "title": "Type the real ptflops profiling observer with its installed dependency present.",
+      "evidence": "ty0.0.84 exits1 in the ptflops-equipped Python3.13 qualification environment: line499 invalid-argument-type for float(result[0]) where result[0] includes None; line502 invalid-assignment for assigning observe_profile to ptflops.get_model_complexity_info with its declared callable/return contract.",
+      "reproduction_command": "/Users/bli/Playground/plato/.venv/bin/ty check tests/test_model_search_retirement.py tests/integration/test_retained_model_search.py tests/integration/model_search_retention_worker.py plato/utils/retired_backends.py plato/models/registry.py examples/gradient_leakage_attacks/dlg_model.py examples/model_search/anycostfl/anycostfl.py examples/model_search/fedrolex/fedrolex.py examples/model_search/heterofl/heterofl.py --python /tmp/plato-archive-author/environment/bin/python --output-format concise",
+      "raw_diagnostics": "/tmp/plato-archive-shortlist-review-artifacts/ty.log",
+      "effect": "The new worker is not type-clean against the dependency it actually instruments. The designated core-dev environment passes because missing ptflops is covered by the pre-existing unresolved-import policy; that does not validate the observer contract with ptflops installed.",
+      "required_correction": "Original author should preserve the original ptflops callable/return contract and explicitly narrow the possibly-None MAC count before float conversion. Use an accurately typed observer or supported instrumentation mechanism; add no typing suppressions, blanket exclusions or new allowances. Keep real profiling, current assertions and all19 expected cases unchanged. Rerun dependency-present typing and the affected budget cases, then request fresh source-bound review."
+    }
+  ],
+  "independently_verified": {
+    "immutable_archives": {
+      "unique_source_records": 199,
+      "archived_originals": 171,
+      "moved": 109,
+      "copied_context": 62,
+      "upstream_files": 374,
+      "plan_inventory_exact": true,
+      "baseline_bytes_modes_git_objects_exact": true,
+      "old_archives_and_outdated_unchanged": true,
+      "retained_algorithm_bytes_unchanged": true,
+      "lock_removed": [
+        "einops",
+        "mobilenetv3",
+        "vit",
+        "yacs"
+      ],
+      "lock_added": [],
+      "lock_changed": [
+        "anycostfl",
+        "fedrolex",
+        "plato-learn"
+      ]
+    },
+    "semantic_lock_delta": {
+      "deep_lock_delta_exact": true,
+      "records_before": 268,
+      "records_after": 264,
+      "comparison_preserves_duplicate_package_name_records": true,
+      "removed_packages": [
+        "einops",
+        "mobilenetv3",
+        "vit",
+        "yacs"
+      ],
+      "removed_members": [
+        "mobilenetv3",
+        "vit"
+      ],
+      "retained_workspace_dependency_edges_removed": [
+        "anycostfl:einops",
+        "fedrolex:einops"
+      ],
+      "only_root_dependency_delta": "test-model-search group references already-locked ptflops and unchanged test prerequisites",
+      "all_retained_external_package_records_identical_including_wheels_markers": true,
+      "python_requires": ">=3.13"
+    },
+    "retained_collection_cases": 19,
+    "retained_junit_cases": 19,
+    "retained_passed": 19,
+    "retained_elapsed_seconds": 155.88,
+    "core_passed": 44,
+    "core_elapsed_seconds": 3.59,
+    "no_retained_skips_xfails_xpasses": true,
+    "all19_worker_returncodes_zero_no_timeouts_forced_termination_or_survivors": true,
+    "all_observed_pids_gone": true,
+    "all19_ports_rebound_with_SO_REUSEADDR": true,
+    "actual_width_selection_order": [
+      0.5,
+      1.0
+    ],
+    "socket_limitation_activated": false,
+    "actual_socket_client_sample_counts": [
+      2,
+      6
+    ],
+    "separate_three_activated_true_real_ptflops_budget_cases": true,
+    "dlg_real_lenet_resnet_updates_and_separate_feature_contracts": true,
+    "sysheterofl_real_subnet_resources_update_aggregation": true,
+    "independent_three_family_constant_arithmetic_oracles": [
+      {
+        "family": "anycostfl",
+        "parameter_tensors": 56,
+        "narrow_width": 0.5,
+        "wide_width": 1.0,
+        "shared_expected": 4,
+        "wide_only_expected": 6,
+        "sample_weighted_alternative": 5,
+        "max_error": 4.76837158203125e-07
+      },
+      {
+        "family": "fedrolex",
+        "parameter_tensors": 56,
+        "narrow_width": 0.5,
+        "wide_width": 1.0,
+        "shared_expected": 4,
+        "wide_only_expected": 6,
+        "sample_weighted_alternative": 5,
+        "max_error": 4.76837158203125e-07
+      },
+      {
+        "family": "heterofl",
+        "parameter_tensors": 56,
+        "narrow_width": 0.5,
+        "wide_width": 1.0,
+        "shared_expected": 4,
+        "wide_only_expected": 6,
+        "sample_weighted_alternative": 5,
+        "max_error": 4.76837158203125e-07
+      }
+    ],
+    "anycost_near_tie_review": {
+      "author_initial_red_source": "/tmp/plato-archive-author/red1/test_retained_width_round_anyc0/anycostfl",
+      "raw_receipt": "/tmp/plato-archive-shortlist-review-artifacts/author-initial-red-result.json",
+      "raw_stderr": "/tmp/plato-archive-shortlist-review-artifacts/author-initial-red-stderr.log",
+      "raw_stderr_sha256": "08e7ba0c1b232cf3f4c76d7cbae4a2dfeb0c8199817e0d27635267283e98145e",
+      "initial_failed_tensor": "layer4.0.conv2.weight",
+      "initial_worker_sha256": "bd85a69cfad8cc2f2a54183b6c01ae6f8a72450de7bb30a29e6f1f55abf35079",
+      "near_tie_receipt": "/private/tmp/plato-archive-shortlist-review/evidence/2026-refresh/archive-shortlist/development-anycostfl-norm-tie.json",
+      "near_tie_weight_error": 1.862645149230957e-09,
+      "near_tie_norm_error": 5.960464477539063e-08,
+      "minimum_adjacent_norm_gap": 0.0,
+      "final_archival_algorithms_unchanged": true,
+      "final_checks_all_parameter_tensors": 56,
+      "final_aggregation_checked_before_sort": true,
+      "final_sort_independently_indexed_from_actual_presort_tensors": true,
+      "final_tolerance": {
+        "rtol": 1e-05,
+        "atol": 1e-06
+      },
+      "independent_three_family_constant_oracle_max_error": 4.76837158203125e-07,
+      "incorrect_sample_weighted_result_rejected": true,
+      "decision": "LEGITIMATE_ORACLE_DECOMPOSITION; no production equation changes or tolerance relaxation"
+    },
+    "nine_unique_pinned_supplemental_license_URL_bytes_hashes_verified": true,
+    "supplemental_original_vendored_revisions_remain_unknown": true,
+    "upstream_tar_pax_comments_match_exact_baseline_gitlink_pins": true,
+    "distribution_and_active_closure": {
+      "distributions": [
+        {
+          "filename": "plato_learn-1.4.3-py3-none-any.whl",
+          "sha256": "eaef251bbd8ccbbdf1c68fe81bac0844526a4fc48db46bba7fb2dbf2a285bdd9",
+          "members": 213,
+          "runtime_source_matches_tip": true,
+          "retired_sources_absent": true
+        },
+        {
+          "filename": "plato_learn-1.4.3.tar.gz",
+          "sha256": "aa0657d57efc614ccc3791ea81956edc1c2ecd4f929bc93cdbdd307566d110ea",
+          "members": 1086,
+          "runtime_source_matches_tip": true,
+          "retired_sources_absent": true
+        }
+      ],
+      "outside_checkout_import": {
+        "registry_path": "/tmp/plato-archive-author/package-environment/lib/python3.13/site-packages/plato/models/registry.py",
+        "retired_modules_absent": true
+      },
+      "active_retired_imports_configs": [],
+      "gitlinks_absent": true
+    },
+    "ruff_import_order": "PASS",
+    "uv_lock_check": "PASS",
+    "specified_core_dev_owned_path_typing": "PASS",
+    "dependency_present_owned_path_typing": "FAIL: ARS-01"
+  },
+  "environment": {
+    "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+    "test_executable": "/tmp/plato-archive-author/environment/bin/python",
+    "qualification_environment_use": "Read-only reuse expressly permitted by root. No uv sync or edits in author environment/worktree.",
+    "PYTHONPATH": "/private/tmp/plato-archive-shortlist-review",
+    "OMP_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1",
+    "HF_HUB_OFFLINE": "1",
+    "TRANSFORMERS_OFFLINE": "1",
+    "ty": "0.0.84",
+    "ruff": "0.16.10"
+  },
+  "pending_root_gates": [
+    "Fresh independent implementation review.",
+    "Public/archive README prose and MkDocs review/build.",
+    "Reviewed corrected native-profile delivery and serialized conftest/CI/artifact/typing ownership handoff.",
+    "Sequential registry integration preserving reviewed MLX lazy frontdoors.",
+    "Final integrated base/mandatory/core-runtime/native/Qwen gates and19-case dedicated acceptance against final source/lock identities."
+  ],
+  "not_surprise_findings": [
+    "Archive READMEs/public docs/nav are pending assigned documentation owner.",
+    "Conftest/workflow/artifact staging and archive partition guards are pending serialized post-native-review owner.",
+    "Final registry must preserve corrected MLX lazy frontdoors from the reviewed MLX delivery; that delivery is intentionally absent from this author branch.",
+    "This bounded review does not accept final integrated base/mandatory/core-runtime/native/Qwen or entire Phase4 support."
+  ],
+  "raw_artifacts_root": "/tmp/plato-archive-shortlist-review-artifacts",
+  "artifact_manifest": {
+    "ty.log": {
+      "path": "/tmp/plato-archive-shortlist-review-artifacts/ty.log",
+      "sha256": "3bf3ee2b7feeeddd28b4a3194f2a047c53645e691aec156dfcf8f3ff76413a09",
+      "bytes": 1082
+    },
+    "collection.log": {
+      "path": "/tmp/plato-archive-shortlist-review-artifacts/collection.log",
+      "sha256": "7a1efe9d7f61126b826140f3462b20c2f9d1e7fe321cd3ee5a4ba2d1dfb81ecc",
+      "bytes": 1946
+    },
+    "independent-integrity.json": {
+      "path": "/tmp/plato-archive-shortlist-review-artifacts/independent-integrity.json",
+      "sha256": "a0ae4269616f534fdf2685163ac90d934f0b6c7cfc97fda2dde98015b9749bc3",
+      "bytes": 480
+    },
+    "author-initial-red-stderr.log": {
+      "path": "/tmp/plato-archive-shortlist-review-artifacts/author-initial-red-stderr.log",
+      "sha256": "08e7ba0c1b232cf3f4c76d7cbae4a2dfeb0c8199817e0d27635267283e98145e",
+      "bytes": 21612
+    },
+    "independent-distribution-closure.json": {
+      "path": "/tmp/plato-archive-shortlist-review-artifacts/independent-distribution-closure.json",
+      "sha256": "38ae0f5bd92780d03f851c69dce52cb8bbd93aa96247efe9f7f081cc50bcd689",
+      "bytes": 789
+    },
+    "core.log": {
+      "path": "/tmp/plato-archive-shortlist-review-artifacts/core.log",
+      "sha256": "3207a5dfb820b68dff43e456eccfdee6cd38bc04925690028e79cfc35940cb9b",
+      "bytes": 315
+    },
+    "package-import.log": {
+      "path": "/tmp/plato-archive-shortlist-review-artifacts/package-import.log",
+      "sha256": "c6a30fd096b5565f09e3a1e056b031fc75791db140f319d288f13abb15b85766",
+      "bytes": 153
+    },
+    "retained.xml": {
+      "path": "/tmp/plato-archive-shortlist-review-artifacts/retained.xml",
+      "sha256": "2bd6c0c4885d8e5e1c6ad1eaf6f5008ce09d427d5294e6e9bfd505e2d051c7e6",
+      "bytes": 2724
+    },
+    "independent-numerics.json": {
+      "path": "/tmp/plato-archive-shortlist-review-artifacts/independent-numerics.json",
+      "sha256": "3155b4fa86702260da2a7e9d9c61466c48201ee8f7c47a32e0ed89da12d1dd04",
+      "bytes": 733
+    },
+    "author-initial-red-config.toml": {
+      "path": "/tmp/plato-archive-shortlist-review-artifacts/author-initial-red-config.toml",
+      "sha256": "77c088d96b0b98a353fdf4b6d80fa702b19c8a6cbf810e0d647cabd33afd734e",
+      "bytes": 1204
+    },
+    "anycost-oracle-review.json": {
+      "path": "/tmp/plato-archive-shortlist-review-artifacts/anycost-oracle-review.json",
+      "sha256": "aa0503c969dc951de0f70581287839dee386d8bd6d185537412afc576ee20b04",
+      "bytes": 1332
+    },
+    "retained.log": {
+      "path": "/tmp/plato-archive-shortlist-review-artifacts/retained.log",
+      "sha256": "f09b5017d3c1a480cc14bc9ea76849154fd80b7768cbd9aed09c52d98f42ec66",
+      "bytes": 737
+    },
+    "author-initial-red-result.json": {
+      "path": "/tmp/plato-archive-shortlist-review-artifacts/author-initial-red-result.json",
+      "sha256": "e2978b56327b987a593b24652a792063bef18dc0a44ed418834326dcb6542cb4",
+      "bytes": 12549
+    },
+    "author-initial-red-stdout.log": {
+      "path": "/tmp/plato-archive-shortlist-review-artifacts/author-initial-red-stdout.log",
+      "sha256": "26c84f62591daad8da6849758ebf25cb5177ead4aef4201212f91ddc8b564895",
+      "bytes": 75
+    },
+    "independent-runtime-verification.json": {
+      "path": "/tmp/plato-archive-shortlist-review-artifacts/independent-runtime-verification.json",
+      "sha256": "708d1cb5012b191d25abc136eb3c4d018f7d86e327e9b91a2508c488d0cd0e0c",
+      "bytes": 75186
+    },
+    "author-initial-red-overlay.json": {
+      "path": "/tmp/plato-archive-shortlist-review-artifacts/author-initial-red-overlay.json",
+      "sha256": "5bc840cf65caabf34765cac40b35b9539ab21ffbe40c587fb8a4017c849dd549",
+      "bytes": 553
+    },
+    "ruff.log": {
+      "path": "/tmp/plato-archive-shortlist-review-artifacts/ruff.log",
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "bytes": 19
+    },
+    "numerics-anycostfl-strict-red.log": {
+      "path": "/tmp/plato-archive-shortlist-review-artifacts/numerics-anycostfl-strict-red.log",
+      "sha256": "203b0634c7d0135a447383dab82067f152876e7552b1f7eedc1792702c999652",
+      "bytes": 729
+    },
+    "numerics-anycostfl.log": {
+      "path": "/tmp/plato-archive-shortlist-review-artifacts/numerics-anycostfl.log",
+      "sha256": "de8683fc46a11b98c04a04441f0a6545218a1d1187a099d87d6377567e8278fb",
+      "bytes": 214
+    },
+    "numerics-heterofl.log": {
+      "path": "/tmp/plato-archive-shortlist-review-artifacts/numerics-heterofl.log",
+      "sha256": "136b080855ddeb6672af528d838607a93ad8a69012377568718a554bb5df15ac",
+      "bytes": 213
+    },
+    "ty-core-dev.log": {
+      "path": "/tmp/plato-archive-shortlist-review-artifacts/ty-core-dev.log",
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "bytes": 19
+    },
+    "independent-lock-delta.json": {
+      "path": "/tmp/plato-archive-shortlist-review-artifacts/independent-lock-delta.json",
+      "sha256": "795bf6491759c9c3436b953505211d0b3d4bd9a715f55e86c43d5c5169958494",
+      "bytes": 632
+    },
+    "license-url-verification.json": {
+      "path": "/tmp/plato-archive-shortlist-review-artifacts/license-url-verification.json",
+      "sha256": "99c0bc026aad7b90cde58f5567bb2507298935717fe099383e64df5bf36e0b75",
+      "bytes": 3296
+    },
+    "independent_numerics-strict-red.py": {
+      "path": "/tmp/plato-archive-shortlist-review-artifacts/independent_numerics-strict-red.py",
+      "sha256": "67d589734ce23e8f1f35e490c6f16c962ea5cacd80e0e0f9d937fa8f824be6cc",
+      "bytes": 1417
+    },
+    "independent_numerics.py": {
+      "path": "/tmp/plato-archive-shortlist-review-artifacts/independent_numerics.py",
+      "sha256": "6c57fbdad6b824bb7ad448bcfc1a9d321743f0fde77cffc9688f8b90985ed7b1",
+      "bytes": 1461
+    },
+    "core.xml": {
+      "path": "/tmp/plato-archive-shortlist-review-artifacts/core.xml",
+      "sha256": "d9268765f7685bf9f9c2d8d52a554e2c116df33fda279e45648ea141fb70df00",
+      "bytes": 6449
+    },
+    "numerics-fedrolex.log": {
+      "path": "/tmp/plato-archive-shortlist-review-artifacts/numerics-fedrolex.log",
+      "sha256": "53ca9a44944a11174f880b189b68ceca20fd8430f1010f6da22fa1a7016f4886",
+      "bytes": 213
+    },
+    "lock.log": {
+      "path": "/tmp/plato-archive-shortlist-review-artifacts/lock.log",
+      "sha256": "06bc128c5ea1f8840f96f2f7c5a35c345220a57f1f60af05a22938fe06398220",
+      "bytes": 52
+    }
+  },
+  "mutations": "Only separate detached review checkout and /tmp review artifacts. No source fixes, author changes, cleanup, PR or merge."
+}

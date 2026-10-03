@@ -48,6 +48,32 @@ _RUNTIME = {
     _STARTUP + "test_post_launch_failure_keeps_primary_error_and_contains_children",
     _STARTUP + "test_stalled_real_client_is_contained_without_round_success",
 }
+_CORE_RUNTIME = "runtime and not retained_model_search"
+_RETAINED_MODULE = "tests/integration/test_retained_model_search.py"
+_RETAINED = {
+    f"{_RETAINED_MODULE}::{name}"
+    for name in (
+        "test_retained_width_round[anycostfl]",
+        "test_retained_width_round[fedrolex]",
+        "test_retained_width_round[heterofl]",
+        "test_retained_activated_budget[anycostfl]",
+        "test_retained_activated_budget[fedrolex]",
+        "test_retained_activated_budget[heterofl]",
+        "test_sysheterofl_subnet_round",
+        "test_dlg_model_update[lenet]",
+        "test_dlg_model_update[resnet_18]",
+        "test_local_retired_selection[anycostfl]",
+        "test_local_retired_selection[fedrolex]",
+        "test_local_retired_selection[heterofl]",
+        "test_local_retired_selection[dlg]",
+        "test_retained_entrypoint_import[anycostfl-root]",
+        "test_retained_entrypoint_import[anycostfl-example]",
+        "test_retained_entrypoint_import[fedrolex-root]",
+        "test_retained_entrypoint_import[fedrolex-example]",
+        "test_retained_entrypoint_import[heterofl-root]",
+        "test_retained_entrypoint_import[heterofl-example]",
+    )
+}
 # Fixed delivered 1B cases; update only with the accepted startup test handoff.
 _STARTUP_CASES = {
     "test_fresh_entrypoint_executes_scheduled_work": 7,
@@ -218,6 +244,15 @@ class _ProfileChecks:
                 "tests/mlx_native --test-profile=mlx-native"
             )
         markexpr = config.getoption("markexpr") or ""
+        self.retained_qualification = (
+            config.getoption("test_profile") == "mandatory"
+            and markexpr == "retained_model_search"
+            and any(
+                (config.invocation_params.dir / str(arg).split("::", 1)[0]).resolve()
+                == (config.rootpath / _RETAINED_MODULE).resolve()
+                for arg in config.args
+            )
+        )
         if (
             "mlx_native" in re.findall(r"\b\w+\b", markexpr)
             and not self.native_requested
@@ -234,6 +269,30 @@ class _ProfileChecks:
                 "mlx-native qualification does not permit selection or collection "
                 "filters; use an unprofiled native filesystem path for focused checks"
             )
+        if (
+            self.qualify
+            and self.full
+            and not self.native_qualification
+            and markexpr not in {"", "runtime", "not runtime", _CORE_RUNTIME}
+        ):
+            raise pytest.UsageError(f"unapproved full-suite partition: {markexpr!r}")
+        if self.retained_qualification:
+            if (
+                self.full
+                or len(config.args) != 1
+                or "::" in str(config.args[0])
+                or config.getoption("pyargs")
+            ):
+                raise pytest.UsageError(
+                    "retained qualification requires the single complete module"
+                )
+            if any(
+                config.getoption(option)
+                for option in ("keyword", "deselect", "ignore", "ignore_glob")
+            ):
+                raise pytest.UsageError(
+                    "retained qualification does not permit filters or exclusions"
+                )
 
     def _native_path(self, path) -> bool:
         return Path(path).resolve().is_relative_to(self.native_boundary)
@@ -285,6 +344,13 @@ class _ProfileChecks:
 
     def pytest_collection_modifyitems(self, items):
         for item in items:
+            if self.retained_qualification and any(
+                item.get_closest_marker(name) is None
+                for name in ("runtime", "retained_model_search")
+            ):
+                raise pytest.UsageError(
+                    f"retained cases require both markers: {item.nodeid}"
+                )
             if self._native_path(item.path):
                 if not self.native_requested or not self.native_prerequisite_passed:
                     raise pytest.UsageError("mlx-native collection escaped preflight")
@@ -295,6 +361,15 @@ class _ProfileChecks:
                 )
 
     def pytest_collection_finish(self, session):
+        if self.retained_qualification:
+            expected = Counter(_RETAINED)
+            collected = Counter(item.nodeid for item in session.items)
+            if expected != collected:
+                self.violations.append(
+                    "retained inventory mismatch: "
+                    f"missing {dict(expected - collected)}; "
+                    f"extra or duplicate {dict(collected - expected)}"
+                )
         self.native_collected = Counter(
             item.nodeid for item in session.items if self._native_path(item.path)
         )
@@ -348,14 +423,22 @@ class _ProfileChecks:
         partition = self.config.getoption("markexpr")
         for item in items:
             runtime = item.get_closest_marker("runtime") is not None
+            retained = item.get_closest_marker("retained_model_search") is not None
             if not (
                 (partition == "runtime" and not runtime)
                 or (partition == "not runtime" and runtime)
+                or (partition == _CORE_RUNTIME and (not runtime or retained))
             ):
                 self.violations.append(f"unexpected deselection: {item.nodeid}")
 
     def pytest_sessionfinish(self, session, exitstatus):
         self.session = session
+        if self.retained_qualification and not self.config.getoption("collectonly"):
+            missing = _RETAINED - self.passed
+            if missing:
+                self.violations.append(
+                    "retained cases did not pass: " + ", ".join(sorted(missing))
+                )
         if self.native_qualification and not self.config.getoption("collectonly"):
             missing = self.native_expected.keys() - self.passed
             if missing:
@@ -370,7 +453,7 @@ class _ProfileChecks:
         if self.qualify and self.full:
             nodes = {item.nodeid for item in session.items}
             partition = self.config.getoption("markexpr")
-            runtime = partition == "runtime"
+            runtime = partition in {"runtime", _CORE_RUNTIME}
             required = _RUNTIME if runtime else _REQUIRED
             if self.base:
                 required = required - {

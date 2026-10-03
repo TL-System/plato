@@ -1,0 +1,13 @@
+[project]
+name = "fedrolex"
+version = "0.1.0"
+description = "Model-Heterogeneous Federated Learning with Rolling Sub-Model Extraction"
+requires-python = ">=3.13"
+dependencies = [
+    "plato-learn>=1.4.3",
+    "einops>=0.8.2",
+    "ptflops>=0.7.5"
+]
+
+[tool.uv.sources]
+plato-learn = { workspace = true }

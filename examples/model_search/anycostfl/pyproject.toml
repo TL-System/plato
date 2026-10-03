@@ -5,7 +5,6 @@ description = "Efficient On-Demand Federated Learning over Heterogeneous Edge De
 requires-python = ">=3.13"
 dependencies = [
     "plato-learn>=1.4.3",
-    "einops>=0.8.2",
     "ptflops>=0.7.5"
 ]
 

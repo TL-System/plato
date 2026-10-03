@@ -1,0 +1,1239 @@
+{
+  "schema_version": 1,
+  "pre_retirement_plato_commit": "477f2f1bb52a1b5a58c1f9f2d30f640039f83a8e",
+  "pre_retirement_plato_tree": "82af1367f106218d0de98f46775c011e0afd930c",
+  "plan_sha256": "c66577eac31a2eeaba68f29e2fee53760def2477184521bd1f2536e76507573f",
+  "review_sha256": "3fbeb6b47b5392515172b574bd9b0d11f427e5d6af4a72ba2c2d3057be8483be",
+  "unique_source_records_verified": 199,
+  "upstream_records_verified": 374,
+  "moved_files": 109,
+  "copied_context_files": 62,
+  "upstreams": [
+    {
+      "original_path": "plato/models/dvit",
+      "git_mode": "160000",
+      "gitlink_pin": "1ccb152cea43fcbc3cd517a45c12c65734f8ace3",
+      "url": "https://github.com/zhoudaquan/dvit_repo",
+      "archive_path": "archives/retired/legacy-vit/dvit-upstream-1ccb152cea43fcbc3cd517a45c12c65734f8ace3.tar.gz",
+      "nested_gitlinks": [],
+      "license_paths": [
+        "LICENSE",
+        "lib_deit/LICENSE",
+        "utils/progress/LICENSE"
+      ],
+      "archive_sha256": "00e3a0cdbcb2e43955127f7b79c905668e98f0d635b411e030e1e3b7ac3236ca",
+      "archive_bytes": 5234525
+    },
+    {
+      "original_path": "plato/models/t2tvit",
+      "git_mode": "160000",
+      "gitlink_pin": "0f63dc9558f4d192de926504dbddfa1b3f5db6ca",
+      "url": "https://github.com/yitu-opensource/T2T-ViT",
+      "archive_path": "archives/retired/legacy-vit/t2tvit-upstream-0f63dc9558f4d192de926504dbddfa1b3f5db6ca.tar.gz",
+      "nested_gitlinks": [],
+      "license_paths": [
+        "LICENSE"
+      ],
+      "archive_sha256": "7f9bfbc25c8d4e555580c46fbeeb4507d13ea71c0c0144bedf4751954c350aa8",
+      "archive_bytes": 3417465
+    }
+  ],
+  "all_exact_blob_byte_mode_checks_passed": true,
+  "immutable_source_inventory": {
+    "configs/ViT/fedavg_cifar10_dvit.toml": {
+      "git_mode": "100644",
+      "git_blob": "958090f3fae6f9d8693ab9333349a0d0eb1d04b3",
+      "sha256": "644ff56989e45f04923090ce2f8a027d40397fcbc513e36c35ea8846e90c7d54",
+      "bytes": 1316
+    },
+    "configs/ViT/fedavg_cifar10_swinv2.toml": {
+      "git_mode": "100644",
+      "git_blob": "190011572ab10b267956c11117c61580782a5a09",
+      "sha256": "a692ffc392a8bf87ac71ad85cedcc88d92f8472cea39744c974ec85a4b0990b6",
+      "bytes": 1330
+    },
+    "configs/ViT/fedavg_cifar10_t2tvit14.toml": {
+      "git_mode": "100644",
+      "git_blob": "e44246661832aa6819bf9a07692833b1bf7e6aa5",
+      "sha256": "968fe1e47efa22a64cded98500ef71a60dc61ffc666610fe9e3fdd1b455a9a8f",
+      "bytes": 1317
+    },
+    "configs/ViT/fedavg_tinyimagenet_levit.toml": {
+      "git_mode": "100644",
+      "git_blob": "c865459187c69ee08f460901a466541453b53c61",
+      "sha256": "c5e3a4a8d12209a0dfd70ac6f1abeeb9a5fc3dcfb435911acf8bb90be1990978",
+      "bytes": 1457
+    },
+    "plato/models/vit.py": {
+      "git_mode": "100644",
+      "git_blob": "827f67463419971dfa0647dc6ee80104208df184",
+      "sha256": "7c04e14e975df515bc72519e5a6e3da68524f5732179b31492328bee241cacca",
+      "bytes": 6009
+    },
+    ".github/workflows/pytorch_tests.yml": {
+      "git_mode": "100644",
+      "git_blob": "50213eaf852cd5c4204597ff37c162301685f716",
+      "sha256": "9901a1766341a9b9369a31ede1a5f8d94429eaf2e74c66f7a77c2520324e703b",
+      "bytes": 7345
+    },
+    ".gitmodules": {
+      "git_mode": "100644",
+      "git_blob": "377fc17b78afdc7d45a3e72528632feb984b1575",
+      "sha256": "df62d800fe0b6c27c924cdba64e6bcdd9fae3957d1efe613b01e1f51752e3428",
+      "bytes": 217
+    },
+    "LICENSE": {
+      "git_mode": "100644",
+      "git_blob": "261eeb9e9f8b2b4b0d119366dda99c6fd7d35c64",
+      "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+      "bytes": 11357
+    },
+    "docs/docs/configurations/trainer.md": {
+      "git_mode": "100644",
+      "git_blob": "071a765746266fbb8f3016fcb44cdd78f8a060c2",
+      "sha256": "50c552db89dc0c3983b84c297e6efc8589f4514199b3d5bb9e87872f4d49f3ec",
+      "bytes": 8549
+    },
+    "docs/docs/examples/algorithms/10. Algorithms based on Neural Architecture Search and Model Search.md": {
+      "git_mode": "100644",
+      "git_blob": "37dcea737de93d4ac5374c9e4b0c51359ad15a4a",
+      "sha256": "0d959a944fe18823b855820069073cc0291d2c142a662b279e7992df5c6dc3d7",
+      "bytes": 6071
+    },
+    "docs/docs/examples/algorithms/14. Gradient Leakage Attacks and Defences.md": {
+      "git_mode": "100644",
+      "git_blob": "92f5317cffdbbd0b83d7eedfc1f4d2b7930a2295",
+      "sha256": "bd618da35cb92c4077cc0f1d3c026b977b8f3acece025c8a84d3c3a626364aec",
+      "bytes": 6018
+    },
+    "evidence/2026-refresh/vit-initialization-probe.json": {
+      "git_mode": "100644",
+      "git_blob": "f0bd22dfac98b615983a0c0dda51f008d7fceea6",
+      "sha256": "d3c8fceb58d4d0fad63422bb8ce07b73d46e03d51bb7d5459b019c1ebeb5641c",
+      "bytes": 1056
+    },
+    "examples/gradient_leakage_attacks/dlg_model.py": {
+      "git_mode": "100644",
+      "git_blob": "41ab01f8a113a76e17c6e333c6a5af3d671d2253",
+      "sha256": "9e90c649a0be820e8674ec2f6501bbf2ff30f4559e4d8fafff6c573741f673e5",
+      "bytes": 888
+    },
+    "plato/models/registry.py": {
+      "git_mode": "100644",
+      "git_blob": "29d98c8a7968b4d6555401a6129bc1035a57a3aa",
+      "sha256": "56a16880680d64f6da5d2f3020aaf183228710c7946541c8604e67b2cd6482da",
+      "bytes": 4472
+    },
+    "plato/utils/retired_backends.py": {
+      "git_mode": "100644",
+      "git_blob": "8967a1f9026781c39a0ee7afe281db14d70d7002",
+      "sha256": "8f5638edaf1636734d1ae293748f6518addbf05568ffd77d24faa7f88e554d40",
+      "bytes": 782
+    },
+    "pyproject.toml": {
+      "git_mode": "100644",
+      "git_blob": "d7b5b7b7ada56eefd4e54c4bc9684dbbf972f036",
+      "sha256": "2c194cf625de70ceea14b737c2b2f4c64ea68dbde23039464f97015216752edf",
+      "bytes": 4006
+    },
+    "uv.lock": {
+      "git_mode": "100644",
+      "git_blob": "1aef3c127d77d3ef96e6757ed791646a0c057557",
+      "sha256": "46236f61039c07a844bbddaa185c32582b6f4436203bd719aa8e7dcfdbd26e89",
+      "bytes": 727368
+    },
+    "examples/model_search/fedtp/FedTP_CIFAR10_T2TVIT14_NonIID03_scratch.toml": {
+      "git_mode": "100644",
+      "git_blob": "d56e023cc9162d1a0315be455ef5f214b0695ea1",
+      "sha256": "51140db5014bbef35d4aac2ac492861c33a073d39ecdf84648f8b655386865a4",
+      "bytes": 5001
+    },
+    "examples/model_search/fedtp/FedTP_CIFAR10_ViT_NonIID03_scratch.toml": {
+      "git_mode": "100644",
+      "git_blob": "b5b7c86a330de7fcd4cb58ec92516c6510475c63",
+      "sha256": "4fb88435995c043479203fe045af8e85b2e77f8cded28c5f504804ed3aeff535",
+      "bytes": 5225
+    },
+    "examples/model_search/fedtp/fedtp.py": {
+      "git_mode": "100644",
+      "git_blob": "54a0f62940bbba6f33825c2518ec52e4f202c0c4",
+      "sha256": "365c82663d0ea97e30840ca70da7618ec2c2e27a9a7c2386a33ea2f436076314",
+      "bytes": 846
+    },
+    "examples/model_search/fedtp/fedtp_algorithm.py": {
+      "git_mode": "100644",
+      "git_blob": "b20558ae14d804125629a921078fc35d5ae26e43",
+      "sha256": "23cfb9ac5e967e51bba6503531efad770176c0a7c114001a226dfcc974c73f1c",
+      "bytes": 2180
+    },
+    "examples/model_search/fedtp/fedtp_server.py": {
+      "git_mode": "100644",
+      "git_blob": "185bd9b5f1bdcad62e467ef57305e6160eb56123",
+      "sha256": "5cfdcebf2ce2f4c89813f6a449b3f268a34ed297310a62d1ea56c39f7983862a",
+      "bytes": 5935
+    },
+    "examples/model_search/fedtp/hypernetworks.py": {
+      "git_mode": "100644",
+      "git_blob": "0555e4ecf8f0d3388390a150772fbaf411cbaaec",
+      "sha256": "83391dce478424c081ee5cf2fd85d88c3cdc36f93ac01179a6cde07da4826b7b",
+      "bytes": 8304
+    },
+    "examples/model_search/pfedrlnas/DARTS/Darts/__init__.py": {
+      "git_mode": "100644",
+      "git_blob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "examples/model_search/pfedrlnas/DARTS/Darts/architect.py": {
+      "git_mode": "100644",
+      "git_blob": "f9e5d5e6ef3aad9df54f408199f765db08aa551a",
+      "sha256": "776812ad4b9df911a0cd176de9dacfeb743846fdd66d35aeff2054e974540f12",
+      "bytes": 8630
+    },
+    "examples/model_search/pfedrlnas/DARTS/Darts/genotypes.py": {
+      "git_mode": "100644",
+      "git_blob": "10d083824416d4760ef4fa909c106e8e2e67d045",
+      "sha256": "f0c041d3aa2bb066dd4e45084de57c25f042f91bc1badb677269ba4ebbbf9302",
+      "bytes": 41145
+    },
+    "examples/model_search/pfedrlnas/DARTS/Darts/model_search.py": {
+      "git_mode": "100644",
+      "git_blob": "bcc89807c8616f07227e902815be530376fc79ce",
+      "sha256": "ce8dbaee3c42d9504d443439bff3a0923be34c1eac108ed5f5989bc97593e271",
+      "bytes": 4954
+    },
+    "examples/model_search/pfedrlnas/DARTS/Darts/model_search_local.py": {
+      "git_mode": "100644",
+      "git_blob": "4966cfc02a9cfb254f970e531f6663dc656dde5c",
+      "sha256": "0237dad319bc5725f6535a7ee8d97fbd7dfac974d0b9f5f81feac177b81c2003",
+      "bytes": 5734
+    },
+    "examples/model_search/pfedrlnas/DARTS/Darts/operations.py": {
+      "git_mode": "100644",
+      "git_blob": "48bba9a032ca06c14a921b5975b8be21daa617de",
+      "sha256": "840682fcfaffdb11dfb268fc0a022b08aef11657c255a4d88745e18c6cf252ad",
+      "bytes": 4495
+    },
+    "examples/model_search/pfedrlnas/DARTS/Darts/stale.py": {
+      "git_mode": "100644",
+      "git_blob": "8bd780c2060204c9a1d82cd59eda01a316bb6e94",
+      "sha256": "079db95aaaf2438fca6973e27f48542533370bd78b140b52982f04669c4bbde1",
+      "bytes": 1581
+    },
+    "examples/model_search/pfedrlnas/DARTS/Darts/utils.py": {
+      "git_mode": "100644",
+      "git_blob": "3393b1e57f34a79a01defe4b7ddb50760de1aeca",
+      "sha256": "4734ed350ff9ade76ff5ac3d89b83fd5cdcfb8f1b1683ae1786d3c0a7306bd2c",
+      "bytes": 3458
+    },
+    "examples/model_search/pfedrlnas/DARTS/fednas.py": {
+      "git_mode": "100644",
+      "git_blob": "740138a17ec01255dc2dcf8735ab5d05c032fd90",
+      "sha256": "9ea6d9f08ed1849b7c6c918210f93cffca0274bae8b5c6ae02984c6f050cc59a",
+      "bytes": 701
+    },
+    "examples/model_search/pfedrlnas/DARTS/fednas_algorithm.py": {
+      "git_mode": "100644",
+      "git_blob": "80a479858e703a484941bf0661c6377c37957136",
+      "sha256": "97dd750bee425bc8d4209d2a13cac391caf8b0e5295d267a8b04c876d6c3ba5a",
+      "bytes": 4602
+    },
+    "examples/model_search/pfedrlnas/DARTS/fednas_client.py": {
+      "git_mode": "100644",
+      "git_blob": "e65aa11fdeff76f1b12fbe96f879d605efbe030f",
+      "sha256": "4f41c4ed187c2cc19ee2273219c7da3580b741058454b5130a68cc45bd2fc71c",
+      "bytes": 3471
+    },
+    "examples/model_search/pfedrlnas/DARTS/fednas_server.py": {
+      "git_mode": "100644",
+      "git_blob": "7922bbe379acf4f64333a37647075c0e470cdbf2",
+      "sha256": "0939176cb69db23effe952164972d6747f52e295349791d9c0b44f18d433d724",
+      "bytes": 6388
+    },
+    "examples/model_search/pfedrlnas/DARTS/fednas_tools.py": {
+      "git_mode": "100644",
+      "git_blob": "3c868d48a9f4253ca453703287d01b2c2e7105a5",
+      "sha256": "dbca328157bac22da8f9f70d74b8d36c3501774e54657162ce813e564c71e4fe",
+      "bytes": 4690
+    },
+    "examples/model_search/pfedrlnas/MobileNetV3/fednas.py": {
+      "git_mode": "100644",
+      "git_blob": "d56141d29a9e609e7177ff5effa2c4e9032fbf9a",
+      "sha256": "a4ab05a6a6d0b27f77399e6ea9fc9c8541f9b65198d1cbbf550ed0e908e07158",
+      "bytes": 974
+    },
+    "examples/model_search/pfedrlnas/MobileNetV3/fednas_algorithm.py": {
+      "git_mode": "100644",
+      "git_blob": "fa2b5d72151aa720654f2988e7f8ab7e0cacfedb",
+      "sha256": "8ea16159ce20ccec640015f5848bea37d34d686a2c6c8a9a1c6d2bcde831fb6c",
+      "bytes": 6235
+    },
+    "examples/model_search/pfedrlnas/MobileNetV3/fednas_client.py": {
+      "git_mode": "100644",
+      "git_blob": "f3f1f76fe790f01831a08f42dd8fb53a182d67c3",
+      "sha256": "c99f621c34236a452ff639af104930a1ef4adedb60fb085b2e0fa0c8ba819d37",
+      "bytes": 4156
+    },
+    "examples/model_search/pfedrlnas/MobileNetV3/fednas_server.py": {
+      "git_mode": "100644",
+      "git_blob": "8b0101b69213fd62b8ba6b496bcb2d51eb8123a0",
+      "sha256": "5b4b51c57d31b6a5673d963e3b6d99c8e2a4b2d4105874bbb593e67649933939",
+      "bytes": 18238
+    },
+    "examples/model_search/pfedrlnas/MobileNetV3/fednas_specific.py": {
+      "git_mode": "100644",
+      "git_blob": "7be9e6fb60554e1ad59c575119e42fe86c3e0762",
+      "sha256": "92819a00eb9af748dd489d93bf7083979a139f4f027867db931e2a6f06d71500",
+      "bytes": 2261
+    },
+    "examples/model_search/pfedrlnas/MobileNetV3/fednas_trainer.py": {
+      "git_mode": "100644",
+      "git_blob": "4bae4ed4b04b20dc3bcccebcf72f43049dd3ada7",
+      "sha256": "6c3c434619e34547c40f420c57af0da9bcd0892957fb1683a54fedf182b3d8f8",
+      "bytes": 19014
+    },
+    "examples/model_search/pfedrlnas/MobileNetV3/fedtools.py": {
+      "git_mode": "100644",
+      "git_blob": "bd96167ec587c9933936d56de74b81bcc8c2e219",
+      "sha256": "a88427e3e15d2d17c2be4562a7fb10cbab02819f3b6ffffd8f9523ff40d655ee",
+      "bytes": 5457
+    },
+    "examples/model_search/pfedrlnas/MobileNetV3/model/__init__.py": {
+      "git_mode": "100644",
+      "git_blob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "examples/model_search/pfedrlnas/MobileNetV3/model/architect.py": {
+      "git_mode": "100644",
+      "git_blob": "308e553f7da88ce3271a9d2a9cd75f69f68c62d0",
+      "sha256": "bd6eaaec508082decfc17971de1747977924157c2e919e787e25190f04db79a4",
+      "bytes": 2395
+    },
+    "examples/model_search/pfedrlnas/MobileNetV3/model/config.py": {
+      "git_mode": "100644",
+      "git_blob": "9202ee0b5ebc72dad962867fdbf222e5862fcb61",
+      "sha256": "85f894f60cd6a8348ebe52a2249fe8ac26463c003cf91edb673a1f8e994ae87e",
+      "bytes": 4486
+    },
+    "examples/model_search/pfedrlnas/MobileNetV3/model/mobilenetv3_supernet.py": {
+      "git_mode": "100644",
+      "git_blob": "86bfe2f14ce924061509e3c67c5a8aac9e2b7a23",
+      "sha256": "454e8a952e6abb96776b84bec0266c26b072fbd415b7eca3fc0593286b603f56",
+      "bytes": 7306
+    },
+    "examples/model_search/pfedrlnas/MobileNetV3/pyproject.toml": {
+      "git_mode": "100644",
+      "git_blob": "9bdb633100ccc98b975a53a7f9bdcefbd80450ac",
+      "sha256": "4bcd7f54fb644ad7ce08a1700b6c5a9b8f1694d2259389d94d590914dd9e958b",
+      "bytes": 236
+    },
+    "examples/model_search/pfedrlnas/VIT/fednas.py": {
+      "git_mode": "100644",
+      "git_blob": "b5f04a92c1ad51f3c065ad8f4a1f45971c78a215",
+      "sha256": "a8e23b1d04235a474e2ba4d6c5bbfc14a4463bd9db3d684861ed32ebd505ffab",
+      "bytes": 998
+    },
+    "examples/model_search/pfedrlnas/VIT/fednas_algorithm.py": {
+      "git_mode": "100644",
+      "git_blob": "8dfcc420bad40b95fc98ea5ae0ae17a72048ce4b",
+      "sha256": "23dca9dd0e5980f1725a6086dc1ba3d4c1b7f5ec9fc5b52863e8c01a18895f6b",
+      "bytes": 5234
+    },
+    "examples/model_search/pfedrlnas/VIT/fednas_client.py": {
+      "git_mode": "100644",
+      "git_blob": "aa1b9d5ecdee6e16a4490f65e8bf1a48bc3ba1df",
+      "sha256": "35d898af12a3789fcada933a82935c88bb2ab2192dbf7c308161e59411ae9b33",
+      "bytes": 2469
+    },
+    "examples/model_search/pfedrlnas/VIT/fednas_server.py": {
+      "git_mode": "100644",
+      "git_blob": "878770e24fba053cd856789daa68e6a8e72b4bff",
+      "sha256": "532609ce96dd2fc924ff50c1a5b622d5939e77daef9d1f44042910f2c48e71aa",
+      "bytes": 6120
+    },
+    "examples/model_search/pfedrlnas/VIT/fednas_trainer.py": {
+      "git_mode": "100644",
+      "git_blob": "c9b5ef5c159d682812863a3ad5c06bd45febaeb0",
+      "sha256": "17a934de15b68df8ed25b083e91608bce11beab645eb30ac20f3d755d99ff41f",
+      "bytes": 3439
+    },
+    "examples/model_search/pfedrlnas/VIT/fednasvit_specific.py": {
+      "git_mode": "100644",
+      "git_blob": "da69e4f42f65714dc6465b0a58d431b767b169ad",
+      "sha256": "41b884eeed29b1c32ccbb64e02c595b3c2ecdee577b859db4b6aa1fb8bb5d8c1",
+      "bytes": 2240
+    },
+    "examples/model_search/pfedrlnas/VIT/fedtools.py": {
+      "git_mode": "100644",
+      "git_blob": "96cd5be07a8a35fefabe1611a24f0fde6008f769",
+      "sha256": "ec4d20065e3fbcd37fe255752601f0e1561ccf34690d86618a4f7059ee05d2b0",
+      "bytes": 3656
+    },
+    "examples/model_search/pfedrlnas/VIT/nasvit_wrapper/NASViT/CODE_OF_CONDUCT.md": {
+      "git_mode": "100644",
+      "git_blob": "08b500a221857ec3f451338e80b4a9ab1173a1af",
+      "sha256": "d4d00a8ac00c1735cd2f3fb50ca67c83960ef9123fc5656f2e69056c905ed244",
+      "bytes": 3541
+    },
+    "examples/model_search/pfedrlnas/VIT/nasvit_wrapper/NASViT/CONTRIBUTING.md": {
+      "git_mode": "100644",
+      "git_blob": "7c4e5842c28eb446668f0f834a8b95d2214a917c",
+      "sha256": "465219b34a26c982f77eb448deaba54ebacd1dc61017efbbcdaaff540b857c1c",
+      "bytes": 1246
+    },
+    "examples/model_search/pfedrlnas/VIT/nasvit_wrapper/NASViT/LICENSE": {
+      "git_mode": "100644",
+      "git_blob": "b7a0eb87d312c2edc42898856d2cc2343a541ec9",
+      "sha256": "50f03face87211373b7a447607f9ca26ad95ad339e8293ac2807958bad7b5447",
+      "bytes": 19339
+    },
+    "examples/model_search/pfedrlnas/VIT/nasvit_wrapper/NASViT/README.md": {
+      "git_mode": "100644",
+      "git_blob": "4812badf1af02cf119db2667ff65ebf5ca5bad5d",
+      "sha256": "2a39acde75afc485d842822751107e12604e4c51c0923dc8e597572fae45413d",
+      "bytes": 1295
+    },
+    "examples/model_search/pfedrlnas/VIT/nasvit_wrapper/NASViT/config.py": {
+      "git_mode": "100644",
+      "git_blob": "6606e02cd4e4e3a3904ca8427e6e3b4eda633750",
+      "sha256": "0ebdb15c7136907275ff8e8d284ef7e965f97c54e2c287a43e213099285ba611",
+      "bytes": 7733
+    },
+    "examples/model_search/pfedrlnas/VIT/nasvit_wrapper/NASViT/configs/cfg.toml": {
+      "git_mode": "100644",
+      "git_blob": "224587fe8b6c90073f0367a8037ef82b1cd20d52",
+      "sha256": "5457c7b479053c049ef6dad62e57e3c25fadb3276e681e5135b004ba3ee9ce92",
+      "bytes": 363
+    },
+    "examples/model_search/pfedrlnas/VIT/nasvit_wrapper/NASViT/logger.py": {
+      "git_mode": "100644",
+      "git_blob": "6d2d01639d4c4d83ab7aa16c8f811e85e7e676b4",
+      "sha256": "e739b74f15acd2141df74262250e7a1862e8b9852fe44c59e6a6bf22930b8544",
+      "bytes": 1572
+    },
+    "examples/model_search/pfedrlnas/VIT/nasvit_wrapper/NASViT/loss_ops.py": {
+      "git_mode": "100644",
+      "git_blob": "693719975155ff75a3f4b6a2b33ea5f0024f2e7c",
+      "sha256": "08ade68c31776658a4fde486ebfc819fd996c23e7c3e01358b4df60e350df068",
+      "bytes": 20452
+    },
+    "examples/model_search/pfedrlnas/VIT/nasvit_wrapper/NASViT/lr_scheduler.py": {
+      "git_mode": "100644",
+      "git_blob": "5531733ba5007e18b928c9c527ee939264600873",
+      "sha256": "48355d6f2896849406f7ecdfa254d32bacb7dffe1c76a81d3eb6c9a601524868",
+      "bytes": 3665
+    },
+    "examples/model_search/pfedrlnas/VIT/nasvit_wrapper/NASViT/main.py": {
+      "git_mode": "100644",
+      "git_blob": "487547209448eec26109f70dd5763e2eca182cee",
+      "sha256": "980dedd3f80a58b135541e958fbae7841a0e3c671411c995e1700365aac1cb1c",
+      "bytes": 17643
+    },
+    "examples/model_search/pfedrlnas/VIT/nasvit_wrapper/NASViT/misc/attentive_nas_eval.py": {
+      "git_mode": "100644",
+      "git_blob": "00b2281e797e67b03e400419ddb5b18461cf3ceb",
+      "sha256": "5c067333cb0a18a7995b1b6a24d322fdb3dc7332eec1fa25287b4aad96000ade",
+      "bytes": 4911
+    },
+    "examples/model_search/pfedrlnas/VIT/nasvit_wrapper/NASViT/misc/comm.py": {
+      "git_mode": "100644",
+      "git_blob": "21cf48afadfb5a2857e3b7428fb9509cdbd6a203",
+      "sha256": "1d2858566b187c510cdd2aa15d4fbdd34ff8819bbcb2f84a937bdca15083a8d8",
+      "bytes": 1724
+    },
+    "examples/model_search/pfedrlnas/VIT/nasvit_wrapper/NASViT/misc/config.py": {
+      "git_mode": "100644",
+      "git_blob": "aeb0e3fd6fb8947174554bf79d9c5dd9648a0415",
+      "sha256": "fdc0f693dc5f9e425252453e98f3c9c23e462ec54d3e7ba6f5788719381fe733",
+      "bytes": 10251
+    },
+    "examples/model_search/pfedrlnas/VIT/nasvit_wrapper/NASViT/misc/constrain_opt.py": {
+      "git_mode": "100644",
+      "git_blob": "a5205b4018ea88fe0c5b678fd8744727abd3b35e",
+      "sha256": "4f10a77565887bbbf71ee8a59751fd8723f5a9561761a1da838b518de7cdc08e",
+      "bytes": 4205
+    },
+    "examples/model_search/pfedrlnas/VIT/nasvit_wrapper/NASViT/misc/flops_counter.py": {
+      "git_mode": "100644",
+      "git_blob": "8f6ac77e8cb62458f860862aecaddf2dc386aead",
+      "sha256": "f4a39b2a2fbbc675ef51ea923fde2e0d12e66d0de9f592d7b5086d4c75bfd1e4",
+      "bytes": 2827
+    },
+    "examples/model_search/pfedrlnas/VIT/nasvit_wrapper/NASViT/misc/imagenet_eval.py": {
+      "git_mode": "100644",
+      "git_blob": "b56bf95f5fdba6048da50452e1cb5eb3da31e4f9",
+      "sha256": "f54ab7e1b1361a21e115a7e5ff65296bd0c441858f99a79f49df0dd88d1f874f",
+      "bytes": 2864
+    },
+    "examples/model_search/pfedrlnas/VIT/nasvit_wrapper/NASViT/misc/logger.py": {
+      "git_mode": "100644",
+      "git_blob": "4fa8e45ad79e43be13e56e0baf47941a276d8d03",
+      "sha256": "7e2649650dd4b0b47ad30506e7a35681a9d3773fef716e62e6c1207682083365",
+      "bytes": 2441
+    },
+    "examples/model_search/pfedrlnas/VIT/nasvit_wrapper/NASViT/misc/loss_ops.py": {
+      "git_mode": "100644",
+      "git_blob": "86d4fd58eab368e92b7aba299694fb8cce6b658b",
+      "sha256": "45a5c60d23df54bb307c238800f4db0f47679789d8fc33ca616b86146bba3a99",
+      "bytes": 18546
+    },
+    "examples/model_search/pfedrlnas/VIT/nasvit_wrapper/NASViT/misc/lr_scheduler.py": {
+      "git_mode": "100644",
+      "git_blob": "d18090b284c3238b826bf47ad51e04efba1c15c8",
+      "sha256": "4725a6724d294dbeffa506eef5aba56f46c486244ddbeaa40d13333877797fde",
+      "bytes": 3403
+    },
+    "examples/model_search/pfedrlnas/VIT/nasvit_wrapper/NASViT/misc/optimizer.py": {
+      "git_mode": "100644",
+      "git_blob": "e9edacd41b323f586035cf2c91cb03269cea9bd7",
+      "sha256": "6513414346461e6957c58011650ac8ff402dab5a9b017d7b6c1ebcf15512b068",
+      "bytes": 2283
+    },
+    "examples/model_search/pfedrlnas/VIT/nasvit_wrapper/NASViT/misc/progress.py": {
+      "git_mode": "100644",
+      "git_blob": "85c4a21849331752e85592b0ee97b096d37a82cf",
+      "sha256": "ee3ebb966a32237b1fd2716a297ec4142352c261a8dda7dc18df475485a9169f",
+      "bytes": 1964
+    },
+    "examples/model_search/pfedrlnas/VIT/nasvit_wrapper/NASViT/misc/resnet.py": {
+      "git_mode": "100644",
+      "git_blob": "43faaa958bdf36d13e25ac3c8a39e7718074106e",
+      "sha256": "f152f006860b88d4afeca044e91f025fdfdaddb640fb53b5c2d135dd32605495",
+      "bytes": 16716
+    },
+    "examples/model_search/pfedrlnas/VIT/nasvit_wrapper/NASViT/misc/utils.py": {
+      "git_mode": "100644",
+      "git_blob": "cf54cbae131fe38b8a5ed84c1d0e3da6239843ad",
+      "sha256": "fbf0fdb4c810a609bfeb1e90102a7ae6a20fbf8469d496dc0a744b97fa97be7d",
+      "bytes": 7506
+    },
+    "examples/model_search/pfedrlnas/VIT/nasvit_wrapper/NASViT/models/__init__.py": {
+      "git_mode": "100644",
+      "git_blob": "bd13b3985c13788e7fd3ea6b407c067a057833b1",
+      "sha256": "118e62598f38aae068fd8644177a8225e6bb596118b8f374c6b71e4fa2882971",
+      "bytes": 100
+    },
+    "examples/model_search/pfedrlnas/VIT/nasvit_wrapper/NASViT/models/attentive_nas_dynamic_model.py": {
+      "git_mode": "100644",
+      "git_blob": "b31694e0bf04a4824266403062e1e777cfe9f105",
+      "sha256": "c979863eccfcf25d3d9cff8b1a40737dba23d50ec36cf20168a7ce2a7cec7f69",
+      "bytes": 25407
+    },
+    "examples/model_search/pfedrlnas/VIT/nasvit_wrapper/NASViT/models/attentive_nas_static_model.py": {
+      "git_mode": "100644",
+      "git_blob": "a828e995d650d3a816a760e1f572d92ee17b5576",
+      "sha256": "86f4f3d06f68bfca7018fe9fe8bb45f797148a5fb141773ee82e6df2b329418b",
+      "bytes": 3242
+    },
+    "examples/model_search/pfedrlnas/VIT/nasvit_wrapper/NASViT/models/model_factory.py": {
+      "git_mode": "100644",
+      "git_blob": "36bfd7a1e6ca822e6e788a09d597a7e22cf40ef3",
+      "sha256": "97da6dfe9b83a88c1751c2a9bc465ab4c09245105a66f9f5ac4433a6e329598b",
+      "bytes": 1657
+    },
+    "examples/model_search/pfedrlnas/VIT/nasvit_wrapper/NASViT/models/modules/__init__.py": {
+      "git_mode": "100644",
+      "git_blob": "168f9979a4623806934b0ff1102ac166704e7dec",
+      "sha256": "9e535c45af09ac24ef8d5631a151f77febafe72a92ad6bfeb2d941f0c4a54e35",
+      "bytes": 71
+    },
+    "examples/model_search/pfedrlnas/VIT/nasvit_wrapper/NASViT/models/modules/activations.py": {
+      "git_mode": "100644",
+      "git_blob": "e1628593dfe03316e0bf59eca56ecfd1b09acfc3",
+      "sha256": "39b55ae01b098d26aaaaf6feae9b80996801ed295d8a04a4145b416212282945",
+      "bytes": 1383
+    },
+    "examples/model_search/pfedrlnas/VIT/nasvit_wrapper/NASViT/models/modules/dynamic_layers.py": {
+      "git_mode": "100644",
+      "git_blob": "a310ddf801c6c2f83766e34178219aba7fbf2ad0",
+      "sha256": "2b661569f5a51543d7744c9cf79418743076e4528afb07bb9b7670e75867442d",
+      "bytes": 17863
+    },
+    "examples/model_search/pfedrlnas/VIT/nasvit_wrapper/NASViT/models/modules/dynamic_ops.py": {
+      "git_mode": "100644",
+      "git_blob": "a5cf445a6fd38d1c8d17f75fd76a4064ac1ed22d",
+      "sha256": "861e1372ae4ac43b6b33b3c13596972f4c16935a85442e681a09cec4a47bbb02",
+      "bytes": 11086
+    },
+    "examples/model_search/pfedrlnas/VIT/nasvit_wrapper/NASViT/models/modules/nn_base.py": {
+      "git_mode": "100644",
+      "git_blob": "bfeab3df5b99d63387e57a5d1333f5add014409f",
+      "sha256": "5eb2f60acef7c0bc2340d4b288f7f880eea4fd6fc2c58e04c94f16a4cef725bc",
+      "bytes": 4880
+    },
+    "examples/model_search/pfedrlnas/VIT/nasvit_wrapper/NASViT/models/modules/nn_utils.py": {
+      "git_mode": "100644",
+      "git_blob": "23804e5652d2db215c7a1f71d40462fe72c66daf",
+      "sha256": "d59234bf16455cfc5bfd78b6a44a0b1e7e97a4080624b960196e9751d23c031d",
+      "bytes": 3500
+    },
+    "examples/model_search/pfedrlnas/VIT/nasvit_wrapper/NASViT/models/modules/static_layers.py": {
+      "git_mode": "100644",
+      "git_blob": "8dd9476d612a5fd17e8a909297ccee45e4e8aa05",
+      "sha256": "ec0e2662a9787281eb3913f08da7743977a816a04060ce54093d7bdc8112c022",
+      "bytes": 13202
+    },
+    "examples/model_search/pfedrlnas/VIT/nasvit_wrapper/NASViT/models/modules/transformer.py": {
+      "git_mode": "100644",
+      "git_blob": "fe393053686b935859ac37640ff17a6625da57fa",
+      "sha256": "6148431956ed90282a2dc7ca48fb54346f9d3ee7a67b7607d3bae88724322ec4",
+      "bytes": 34353
+    },
+    "examples/model_search/pfedrlnas/VIT/nasvit_wrapper/NASViT/optimizer.py": {
+      "git_mode": "100644",
+      "git_blob": "2f01ddd69395cdb40ef9ae24771705c440f395c2",
+      "sha256": "b7882d62bfb3b213233890678fdd1ee7e6425d378af1eed773c83719cc56d4e0",
+      "bytes": 2209
+    },
+    "examples/model_search/pfedrlnas/VIT/nasvit_wrapper/NASViT/utils.py": {
+      "git_mode": "100644",
+      "git_blob": "dd91061277268ccaaf6b85b241604091706170a0",
+      "sha256": "f0f6cba58ded78a4809eb7bcbe452be22d4f6ee583b8694fed63215040d4700e",
+      "bytes": 5216
+    },
+    "examples/model_search/pfedrlnas/VIT/nasvit_wrapper/architect.py": {
+      "git_mode": "100644",
+      "git_blob": "380d3b493347524fbafef87e4f960e6a44df8317",
+      "sha256": "93652c2b7e330d407674511c5e4317836f5a1b0808fe02cf5f996121787dd2d0",
+      "bytes": 11515
+    },
+    "examples/model_search/pfedrlnas/VIT/nasvit_wrapper/attentive_nas_dynamic_model.py": {
+      "git_mode": "100644",
+      "git_blob": "ffcbc9914676e43995de795fa78a40f0d714c299",
+      "sha256": "a20765e2a51f248d24c1a09e556d3d3a8ba436ef304cd580ddafe8b1fab815c5",
+      "bytes": 11079
+    },
+    "examples/model_search/pfedrlnas/VIT/nasvit_wrapper/config.py": {
+      "git_mode": "100644",
+      "git_blob": "2aee13a2fab3a1b9f00b1c0dfca4592b9cf01159",
+      "sha256": "80c0bf935cd10c225fdd34ea22f0a6f701a77396972af146a4986d40d927bb0c",
+      "bytes": 6244
+    },
+    "examples/model_search/pfedrlnas/VIT/nasvit_wrapper/dynamic_layers.py": {
+      "git_mode": "100644",
+      "git_blob": "87b3e9ad516fd7c4f47d11404f1f016a4087bbc5",
+      "sha256": "fd306f50898aa1cdab3f2bf661e27982790a65350a24475c973b3685a98bb103",
+      "bytes": 4259
+    },
+    "examples/model_search/pfedrlnas/VIT/pyproject.toml": {
+      "git_mode": "100644",
+      "git_blob": "a35a177158c2b67b6eb465694a4a57d20294c496",
+      "sha256": "2cc35c98ff581276dab29e518ea454f421e334f15bdae98e3aeec49d83decedf",
+      "bytes": 228
+    },
+    "examples/model_search/pfedrlnas/configs/MobileNetV3_CIFAR10_03.toml": {
+      "git_mode": "100644",
+      "git_blob": "a44c2939a3a1dd78efa7bc310e1206509a111beb",
+      "sha256": "aa09ecfa9979d91bdd7cb15bc9f795e25b6026b2e59bd4762d3f73c7cf57f80c",
+      "bytes": 1948
+    },
+    "examples/model_search/pfedrlnas/configs/MobileNetV3_CIFAR10_03_async.toml": {
+      "git_mode": "100644",
+      "git_blob": "f238cb5b90e182860580e2a21ed0f5ceacf7892a",
+      "sha256": "3ead36300cbd95a0931152ad50491678b7eb90d4df0678f90253c947f9fed1e2",
+      "bytes": 2790
+    },
+    "examples/model_search/pfedrlnas/configs/PerFedRLNAS_CIFAR10_DARTS_NonIID_03.toml": {
+      "git_mode": "100644",
+      "git_blob": "465e02f71da1d0c5e1f78b2712187ea636bac2cf",
+      "sha256": "7c09a3781fb7c03d7e7ba2e8d3c55c24f2d447550d6b4c0a20e7abb3324c0fde",
+      "bytes": 1797
+    },
+    "examples/model_search/pfedrlnas/configs/PerFedRLNAS_CIFAR10_Mobilenet_NonIID03.toml": {
+      "git_mode": "100644",
+      "git_blob": "33996741e5413d0834aa05e01ba8e684a3b2f4a1",
+      "sha256": "d09213931297f9040e0279bddba52b71cf16b4ed0e98fe8d2c9b35099c2787f6",
+      "bytes": 1876
+    },
+    "examples/model_search/pfedrlnas/configs/PerFedRLNAS_CIFAR10_NASVIT_NonIID01.toml": {
+      "git_mode": "100644",
+      "git_blob": "34a5a3b1bdc98e7ced87fbfa89d5893d954dd1f9",
+      "sha256": "b59426fb3b90a11151df3e976be2f309fe28448fd56cd59d5be33fc4c7a7a042",
+      "bytes": 2057
+    },
+    "docs/docs/references/clients.md": {
+      "git_mode": "100644",
+      "git_blob": "27327e8d425507edb819417f1480269c70419960",
+      "sha256": "7db6095669c00208d69f3e12e59eba32765b49d9542811ea09609d803cc30c89",
+      "bytes": 10042
+    },
+    "examples/model_search/fedrlnas/Darts/__init__.py": {
+      "git_mode": "100644",
+      "git_blob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "examples/model_search/fedrlnas/Darts/architect.py": {
+      "git_mode": "100644",
+      "git_blob": "22660d3a848814227f84459ec64cf1a715ccb320",
+      "sha256": "6cf49d520a4d7bee4f1310856aba617ee0915c29862bf72a8f8b780eca95284d",
+      "bytes": 6273
+    },
+    "examples/model_search/fedrlnas/Darts/genotypes.py": {
+      "git_mode": "100644",
+      "git_blob": "10d083824416d4760ef4fa909c106e8e2e67d045",
+      "sha256": "f0c041d3aa2bb066dd4e45084de57c25f042f91bc1badb677269ba4ebbbf9302",
+      "bytes": 41145
+    },
+    "examples/model_search/fedrlnas/Darts/model_search.py": {
+      "git_mode": "100644",
+      "git_blob": "bcc89807c8616f07227e902815be530376fc79ce",
+      "sha256": "ce8dbaee3c42d9504d443439bff3a0923be34c1eac108ed5f5989bc97593e271",
+      "bytes": 4954
+    },
+    "examples/model_search/fedrlnas/Darts/model_search_local.py": {
+      "git_mode": "100644",
+      "git_blob": "4966cfc02a9cfb254f970e531f6663dc656dde5c",
+      "sha256": "0237dad319bc5725f6535a7ee8d97fbd7dfac974d0b9f5f81feac177b81c2003",
+      "bytes": 5734
+    },
+    "examples/model_search/fedrlnas/Darts/operations.py": {
+      "git_mode": "100644",
+      "git_blob": "48bba9a032ca06c14a921b5975b8be21daa617de",
+      "sha256": "840682fcfaffdb11dfb268fc0a022b08aef11657c255a4d88745e18c6cf252ad",
+      "bytes": 4495
+    },
+    "examples/model_search/fedrlnas/Darts/stale.py": {
+      "git_mode": "100644",
+      "git_blob": "8bd780c2060204c9a1d82cd59eda01a316bb6e94",
+      "sha256": "079db95aaaf2438fca6973e27f48542533370bd78b140b52982f04669c4bbde1",
+      "bytes": 1581
+    },
+    "examples/model_search/fedrlnas/Darts/utils.py": {
+      "git_mode": "100644",
+      "git_blob": "3393b1e57f34a79a01defe4b7ddb50760de1aeca",
+      "sha256": "4734ed350ff9ade76ff5ac3d89b83fd5cdcfb8f1b1683ae1786d3c0a7306bd2c",
+      "bytes": 3458
+    },
+    "examples/model_search/fedrlnas/FedRLNAS_MNIST_DARTS.toml": {
+      "git_mode": "100644",
+      "git_blob": "70feac84a314532e8fbb7b55da6940e183b779d7",
+      "sha256": "c02d4f818def08dabbf3f47ba08d28aef266407963649d04778439e721006c41",
+      "bytes": 1394
+    },
+    "examples/model_search/fedrlnas/fedrlnas.py": {
+      "git_mode": "100644",
+      "git_blob": "a39d75015f57ab17b2b86ca226441a0d88fa9305",
+      "sha256": "3ec5e101038008cb8f457b118d80965143aeb9d87ce7c8971480059119e833b5",
+      "bytes": 979
+    },
+    "examples/model_search/fedrlnas/fedrlnas_algorithm.py": {
+      "git_mode": "100644",
+      "git_blob": "b653918d05bb87378d921d201a72f645530deecb",
+      "sha256": "7f791468c8a97ae7f33c478e988874022643788b17e5a52b1950a8690d499bde",
+      "bytes": 4751
+    },
+    "examples/model_search/fedrlnas/fedrlnas_client.py": {
+      "git_mode": "100644",
+      "git_blob": "39f097aeb94b11eb409430b1c0309f43f8bb6388",
+      "sha256": "f63624e938359396d301398abbcadfc9ae3d3c7d6edf2fbd19810bec76eb74ec",
+      "bytes": 3600
+    },
+    "examples/model_search/fedrlnas/fedrlnas_server.py": {
+      "git_mode": "100644",
+      "git_blob": "3d3bd88e4825e3a027b6c4d9d486daaa4b54e318",
+      "sha256": "4fd7ce9899ebbc715bafd18d889d39b5510386920af22fd750b3d2ec62d1d82c",
+      "bytes": 4890
+    },
+    "examples/model_search/fedrlnas/fedrlnas_tools.py": {
+      "git_mode": "100644",
+      "git_blob": "42fe7f5b65ae03a5a29650dca8bade6871446924",
+      "sha256": "817b549b667f67089483cc810d9c037054c8218f2463c7b0ab5fb5762d3ed236",
+      "bytes": 4984
+    },
+    "examples/model_search/anycostfl/example_ViT.toml": {
+      "git_mode": "100644",
+      "git_blob": "3d633bb253f56fc11b5f343381ac3b664d097927",
+      "sha256": "b8197573f0b9fcc6ddbe1231037e05defe287c6cdd17502559f5fef3c7bb78bb",
+      "bytes": 1779
+    },
+    "examples/model_search/anycostfl/vit.py": {
+      "git_mode": "100644",
+      "git_blob": "946321934aed7c0fa242a4ebefbbc2532462220e",
+      "sha256": "4e933c919100e0c6b70e94661a9c54d63582730133bb16e9e6b0b5ad0895c550",
+      "bytes": 7266
+    },
+    "examples/model_search/anycostfl/anycostfl.py": {
+      "git_mode": "100644",
+      "git_blob": "f7fce93616afd4289924c293b5d05e30efd20a7b",
+      "sha256": "fb99a5d0f3238618fc9e0efd5db719cab27883ac58656a02b7289819118259fc",
+      "bytes": 881
+    },
+    "examples/model_search/anycostfl/anycostfl_algorithm.py": {
+      "git_mode": "100644",
+      "git_blob": "5586c2aa141927ab98ada23d47073d37e21f7a0d",
+      "sha256": "e6c02606aca9780a9c4caa66ba5075e0b4083bf030dadf95ebfb72e7c7486faa",
+      "bytes": 9928
+    },
+    "examples/model_search/anycostfl/anycostfl_client.py": {
+      "git_mode": "100644",
+      "git_blob": "1b6bf1612056a5a17e08c6628ec015d0bcae97ea",
+      "sha256": "4f031b374f05334a428a32f2934ea5a35b62d34bf70cf057b721c40562d5ca4e",
+      "bytes": 2576
+    },
+    "examples/model_search/anycostfl/anycostfl_server.py": {
+      "git_mode": "100644",
+      "git_blob": "e8814963f28ae1efaa4fcd2508588d0cca353745",
+      "sha256": "686f04e00fc3844938b43910deedefddfa45ebd845ba2eba1daffa169e5cca95",
+      "bytes": 3104
+    },
+    "examples/model_search/anycostfl/anycostfl_trainer.py": {
+      "git_mode": "100644",
+      "git_blob": "cd1d0d8f2b2a6f804435f902fb353c67c0b75cb4",
+      "sha256": "41f486cf2afb96336555cadfba391e8f1346557deb6aa0490f8222a0fe474c1a",
+      "bytes": 2131
+    },
+    "examples/model_search/anycostfl/example_ResNet.toml": {
+      "git_mode": "100644",
+      "git_blob": "0217f0b11b9583b8d3a999f2f58c46324ecddd96",
+      "sha256": "4a74ee96d86be5786c935e3454cec0a1ea2861010d82112699ab01d77a07cbb5",
+      "bytes": 1664
+    },
+    "examples/model_search/anycostfl/pyproject.toml": {
+      "git_mode": "100644",
+      "git_blob": "9b1b070f5e46089ad04c6b40679872ac37703d8c",
+      "sha256": "4587d5f0c81510b4c2acb149e6c02b31e0ea7d14a3c23b7b49690d0482085bfd",
+      "bytes": 301
+    },
+    "examples/model_search/anycostfl/resnet.py": {
+      "git_mode": "100644",
+      "git_blob": "e9266157114a14737ceeaa83665054ce8db073e4",
+      "sha256": "66b3de34ce836c7493e3e6106c54828828dcaae27f0737503993892d9e8c3571",
+      "bytes": 7832
+    },
+    "examples/model_search/fedrolex/example_ViT.toml": {
+      "git_mode": "100644",
+      "git_blob": "3d633bb253f56fc11b5f343381ac3b664d097927",
+      "sha256": "b8197573f0b9fcc6ddbe1231037e05defe287c6cdd17502559f5fef3c7bb78bb",
+      "bytes": 1779
+    },
+    "examples/model_search/fedrolex/vit.py": {
+      "git_mode": "100644",
+      "git_blob": "64ed175cd62186f9ac0ca53cbe8bae2660f8b18f",
+      "sha256": "b115f091a4efefd237c9eb4bbb86351d9be09c44443d010bad3f1f83c2821ba7",
+      "bytes": 7234
+    },
+    "examples/model_search/fedrolex/example_ResNet.toml": {
+      "git_mode": "100644",
+      "git_blob": "0217f0b11b9583b8d3a999f2f58c46324ecddd96",
+      "sha256": "4a74ee96d86be5786c935e3454cec0a1ea2861010d82112699ab01d77a07cbb5",
+      "bytes": 1664
+    },
+    "examples/model_search/fedrolex/fedrolex.py": {
+      "git_mode": "100644",
+      "git_blob": "3bbe3f5f2812f6f4a29fa1f80b6d83e7221f084d",
+      "sha256": "ff83a2a6572734076f8b412bb50d6d0411f97022e20a40178c0c32f5c9ad9cde",
+      "bytes": 862
+    },
+    "examples/model_search/fedrolex/fedrolex_algorithm.py": {
+      "git_mode": "100644",
+      "git_blob": "5e54e7983ee44deabfa94508aa3ec72bd629efdb",
+      "sha256": "58ce0df5c4b370f2fb139137803ce82f2f9a8ca12df4c34a8bd6c33af0af4f02",
+      "bytes": 9711
+    },
+    "examples/model_search/fedrolex/fedrolex_client.py": {
+      "git_mode": "100644",
+      "git_blob": "c2771acfeed8e83018b88dbe24c2c5f24d52c018",
+      "sha256": "98afa276d7b46cd5ab6d726017a2e942a97c0980db64e7cc75105c951fb2aab2",
+      "bytes": 2569
+    },
+    "examples/model_search/fedrolex/fedrolex_server.py": {
+      "git_mode": "100644",
+      "git_blob": "5b8a4b55504fef998100350ea84f7b43617c897b",
+      "sha256": "9ec31158f69f8a0a7038f95904ca5b5e57c042998ff4881fa914ef9dd5d4b0bd",
+      "bytes": 3092
+    },
+    "examples/model_search/fedrolex/fedrolex_trainer.py": {
+      "git_mode": "100644",
+      "git_blob": "a3ac3fe62a88cbd6898c3915420bbb0a6e233654",
+      "sha256": "bfde98e2c7dbaa60ac15542c880e4703a370275ecb2463f0c838c6c9fa70331c",
+      "bytes": 2136
+    },
+    "examples/model_search/fedrolex/pyproject.toml": {
+      "git_mode": "100644",
+      "git_blob": "291e0527b8f5d3293d416863311224489c76ded4",
+      "sha256": "cc648da6c8b3cc8856fc69acebf6cbeb6bf0e8eb5b7a37bc7eeb9b5454e7a68a",
+      "bytes": 303
+    },
+    "examples/model_search/fedrolex/resnet.py": {
+      "git_mode": "100644",
+      "git_blob": "e9266157114a14737ceeaa83665054ce8db073e4",
+      "sha256": "66b3de34ce836c7493e3e6106c54828828dcaae27f0737503993892d9e8c3571",
+      "bytes": 7832
+    },
+    "examples/model_search/heterofl/mobilenetv3.py": {
+      "git_mode": "100644",
+      "git_blob": "87bf96a2d590ef14537a7ea3ece63cc445f587f8",
+      "sha256": "416bdd4eb3e53909c226fdf481eeecc9886315b9c5b70d1aadd5d047cbff168d",
+      "bytes": 18282
+    },
+    "examples/model_search/heterofl/heterofl.py": {
+      "git_mode": "100644",
+      "git_blob": "d145361b8d65799eba22243ed1eb1d343edf798b",
+      "sha256": "79e16d102ff139c27b28c88b2f6aeae26b3eedc40495d24ec0f2bc95ca049a96",
+      "bytes": 1002
+    },
+    "examples/model_search/heterofl/heterofl_algorithm.py": {
+      "git_mode": "100644",
+      "git_blob": "f2ae61e32d4562708048ce311832b65e3a652897",
+      "sha256": "0658d268eba1e803568fecd3639ed606f5da7d657416a0c3608a719984655c80",
+      "bytes": 7423
+    },
+    "examples/model_search/heterofl/heterofl_client.py": {
+      "git_mode": "100644",
+      "git_blob": "671675cc6fc55f8e7472bf8a0a1f0ee5d7b78021",
+      "sha256": "5ef46e51812fcfcf5bcbb20d55f7b2fd5c59141b4a1243e2795cb74604576f1b",
+      "bytes": 2566
+    },
+    "examples/model_search/heterofl/heterofl_resnet18_dynamic.toml": {
+      "git_mode": "100644",
+      "git_blob": "3839a9143dbc31bf6c884010fda3f50115cc9d6c",
+      "sha256": "361563886ce2a5eca689d8d1702fb8778874614c9c5bc77d6f2775eb01fd42aa",
+      "bytes": 1662
+    },
+    "examples/model_search/heterofl/heterofl_server.py": {
+      "git_mode": "100644",
+      "git_blob": "d1c88fb863ec8b64ee85a94542529688d9164b18",
+      "sha256": "c188af3df4029e6530660aced59656f02bf48b870f15526a318ffaf3e0b147ec",
+      "bytes": 4309
+    },
+    "examples/model_search/heterofl/heterofl_trainer.py": {
+      "git_mode": "100644",
+      "git_blob": "9cee02d6f4937b00ec12b5ceec70cc3070437fdd",
+      "sha256": "78e73ea1124766931c01595cdf2ef8c6041090b4d7e6f639778f9e38b616e4d2",
+      "bytes": 2126
+    },
+    "examples/model_search/heterofl/pyproject.toml": {
+      "git_mode": "100644",
+      "git_blob": "16f5b1c3c7a4c0092e2e43f9587461bac2b2dfd6",
+      "sha256": "c7d3bd0135626082d4ed2b22b2aba1651330baab984a7d81fbee402dcfbfc0c5",
+      "bytes": 236
+    },
+    "examples/model_search/heterofl/resnet.py": {
+      "git_mode": "100644",
+      "git_blob": "6479be875b671c4c7c24f5bace2234df01047d2e",
+      "sha256": "fc8bfa63c4bc849d196164f1119cc714f4041ad3cbcb51c0620175c06ea63657",
+      "bytes": 7830
+    },
+    "docs/third_party.md": {
+      "git_mode": "100644",
+      "git_blob": "746730ff6aed34083aa59884d37d7df731a8f28b",
+      "sha256": "66ff76d81de89aa3184e1dc6f8f9a4663ebf32c8b452a8fe48464a172ca7073b",
+      "bytes": 2036
+    },
+    "docs/mkdocs.yml": {
+      "git_mode": "100644",
+      "git_blob": "86c2a2eeed5a193ab07e8a5d19fab3a19eaecb1b",
+      "sha256": "00aa4144b2ca32402361f9c784e4de4f8860af3c4e15a40a7c2fa6b13b095c0f",
+      "bytes": 4096
+    },
+    "README.md": {
+      "git_mode": "100644",
+      "git_blob": "a503d0f83be9814fd64ebabed834d87b7e5b6ac5",
+      "sha256": "2ac1e6aa59e3dbb665fea326b2ed43671df88fb435a35f19c33c4c5f59e28be3",
+      "bytes": 386
+    },
+    ".github/scripts/stage_ci_artifacts.py": {
+      "git_mode": "100644",
+      "git_blob": "1f80805875c75d44e09785b85322c0577ec7d1f0",
+      "sha256": "df7030fd29802baa0fd4858deb2f4047e02a305a2862a3432d9a63764a8671c2",
+      "bytes": 9859
+    },
+    "tests/conftest.py": {
+      "git_mode": "100644",
+      "git_blob": "96fc0bf0021df5d32bc4674f3ea7063434129f71",
+      "sha256": "24798dced0175024ca57cc08c331b7671faefd6f19883ea4df4e245ba7273de5",
+      "bytes": 11205
+    },
+    "examples/model_search/sysheterofl/config_ResNet152.toml": {
+      "git_mode": "100644",
+      "git_blob": "e8a1ecc67acf5b10049fcf73ac30aa8a0dd6af9b",
+      "sha256": "e4e9b28df53fa3bc78f19aa53e0753c36d67a90dbba9a2e37ec583da5b354f87",
+      "bytes": 1831
+    },
+    "examples/model_search/sysheterofl/resnet.py": {
+      "git_mode": "100644",
+      "git_blob": "da143a804dfaee0effafe453e1ccbd2b70330497",
+      "sha256": "11c2f0302969607bf114f10b74a463adbbcdf4583c41a56aef0a6ab79ce0a9cd",
+      "bytes": 9759
+    },
+    "examples/model_search/sysheterofl/sysheterofl.py": {
+      "git_mode": "100644",
+      "git_blob": "c3a9131a03cb14080412ee135e4395eca6e64c7e",
+      "sha256": "2a1f3f81c928f47fbbd7f624a84c294a8d45a8e8f627fb01f4d0a31c7305d44a",
+      "bytes": 710
+    },
+    "examples/model_search/sysheterofl/sysheterofl_algorithm.py": {
+      "git_mode": "100644",
+      "git_blob": "9dc09fc18261e5b97cfd1a451fb045e0b419e1de",
+      "sha256": "7e48b6aba02c5a517078761fb724c1b8d2f96676175aacd3a4d27668fb66f0c0",
+      "bytes": 14529
+    },
+    "examples/model_search/sysheterofl/sysheterofl_client.py": {
+      "git_mode": "100644",
+      "git_blob": "8f67e413c077e8796c0578a0241eb9ccd6066ce7",
+      "sha256": "400e06b8997b001a02166c5ea993bec5601bff10e9cf28e18711ffd7fbe3bfab",
+      "bytes": 2775
+    },
+    "examples/model_search/sysheterofl/sysheterofl_server.py": {
+      "git_mode": "100644",
+      "git_blob": "1f245d3622886022300dfe0221d6d4b6d6f85560",
+      "sha256": "4de16c86f053a98b86f1f1f86c533428540f4137411ed3313606bf59bba50f42",
+      "bytes": 3833
+    },
+    "examples/model_search/sysheterofl/sysheterofl_trainer.py": {
+      "git_mode": "100644",
+      "git_blob": "0c8b31d37754de0d2106b3203496f3796468d529",
+      "sha256": "d864332cf7c66639d7b851304ebb06af76bb0595210a479e2d1a88bf77904745",
+      "bytes": 2950
+    },
+    ".gitattributes": {
+      "git_mode": "100644",
+      "git_blob": "1bfbc287920645e45e848552d4d14ccf7cfb0fd3",
+      "sha256": "8aa0ac639d30f11631290d009202e5d75c8036efac949b3833fd62506f484e5b",
+      "bytes": 126
+    },
+    "AGENTS.md": {
+      "git_mode": "100644",
+      "git_blob": "60d8b0793a25bfa3ad11b0a278e5be2a375543a6",
+      "sha256": "b50f87f31ea3d87076952d8b7d2d8af067132fbf877d80f8780c208fb45527ec",
+      "bytes": 3119
+    },
+    "archives/retired/lerobot/README.md": {
+      "git_mode": "100644",
+      "git_blob": "41b0ca098fa2669a9188d30a77525158246b5d4a",
+      "sha256": "6017d10b7717806f79653414b9e59e0445e492ae530bb8f9cbc8c1b5356f79d2",
+      "bytes": 2876
+    },
+    "archives/retired/lerobot/manifest.json": {
+      "git_mode": "100644",
+      "git_blob": "e7e4dcde1978c01ea70c2708361ce620fc0f0f1d",
+      "sha256": "06735f7c441f86aaec6208b5dd67fd6a36a55a6aa009267bbd8b6900bc4818f5",
+      "bytes": 9812
+    },
+    "archives/retired/nanochat/manifest.json": {
+      "git_mode": "100644",
+      "git_blob": "3c883fad303570bb3ebf3ff458ada9309eba36cf",
+      "sha256": "4f923c1a60c1153290ab0c024066a4d113a2e077059b80424f42f526ff5711e9",
+      "bytes": 35303
+    },
+    "evidence/2026-refresh/archive-candidates.json": {
+      "git_mode": "100644",
+      "git_blob": "4748210a7ac6cc00d01895f81067963a85bbf9da",
+      "sha256": "063206ca530b3cf650257a44c04348e52e8893e0879bea849ac9b0cf5259e9d0",
+      "bytes": 3144
+    },
+    "evidence/2026-refresh/plan-addendum-acceptance.json": {
+      "git_mode": "100644",
+      "git_blob": "78c097c7e72e262f3f027f1187ee561222871223",
+      "sha256": "5f5d5a8e22e14072b5d031c19a27be14bda9bdbc2a157d14af78845daac6c56b",
+      "bytes": 474
+    },
+    "evidence/2026-refresh/plan-addendum.json": {
+      "git_mode": "100644",
+      "git_blob": "0767f8dc914a7f52356a7026d97ab3d0a9248e8d",
+      "sha256": "5b51b0fb7ed6f68d9fce7176335b3e7be5e5f178a2788590912aa2396a487709",
+      "bytes": 28579
+    },
+    "evidence/2026-refresh/plan.md": {
+      "git_mode": "100644",
+      "git_blob": "5558773cc78201f231f4e570c14d5455ecb1f9f9",
+      "sha256": "edb9a58cc7915a940854f16d5029fe97434703bf2f75eca0dcb96de2d0f0eb15",
+      "bytes": 50719
+    },
+    "evidence/2026-refresh/user-scope-update-2026-10-03.json": {
+      "git_mode": "100644",
+      "git_blob": "fb1732ace43728129f0c6fab7f6aa003371de62e",
+      "sha256": "48314def908632108eb1e435f10cc082f3724a4bbd31d4e52296146c85251987",
+      "bytes": 5667
+    },
+    "plato/models/torch_hub.py": {
+      "git_mode": "100644",
+      "git_blob": "396d64ff7fd5b1cdca91e5304f1d836ba6ff6cd8",
+      "sha256": "0aab79ad209628a5a55724c7006bcb829c029e966693ef6019f79ea7922d524a",
+      "bytes": 998
+    },
+    "plato/trainers/lr_schedulers.py": {
+      "git_mode": "100644",
+      "git_blob": "edf87bd9b90b0456c1f50f2881fc85f88e25c488",
+      "sha256": "d2563ca3a6f609e91f30ca585aa00a7eae5bbe2537680d476029e219ceae372f",
+      "bytes": 9251
+    },
+    "plato/trainers/optimizers.py": {
+      "git_mode": "100644",
+      "git_blob": "2b16546c5439a52487a5ca476c91dc197f84aff4",
+      "sha256": "da613c5d2975a7cf124619233645ba8b02e6ad32218f08dd508b9b410da06e34",
+      "bytes": 2080
+    },
+    "tests/integration/test_smoke_configs.py": {
+      "git_mode": "100644",
+      "git_blob": "387dd353e1a10a35117077031449e6cb98716d55",
+      "sha256": "7c7a0f4956211d9bb07ecb4ae653cd9f7992fde7e3e34a5480bed20e9e3c5dc4",
+      "bytes": 4857
+    },
+    "tests/integration/utils.py": {
+      "git_mode": "100644",
+      "git_blob": "ca019d50b4a082a82f873bc2f3dfd7a81859fda6",
+      "sha256": "7e8700b8aaee12506e8e6f919d96165a6990d7a4a50e9a8a1af2e2214769c49b",
+      "bytes": 4180
+    },
+    "tests/models/test_model_behaviour.py": {
+      "git_mode": "100644",
+      "git_blob": "84d489d5556dff53ed3005d33879afcbf0f95797",
+      "sha256": "bd87f16bce8c611c7b2f1f12876472f2df080bef34ce1b983976eea84aa63b9c",
+      "bytes": 1958
+    },
+    "tests/models/test_model_registry.py": {
+      "git_mode": "100644",
+      "git_blob": "f0cd253f6a73ab2298c09668e0748b9edd5d466e",
+      "sha256": "d1a4cffc4068ae69d43f339ee415716b76694c10ee9caa8dd904b2170c03de68",
+      "bytes": 2757
+    },
+    "tests/test_retired_backends.py": {
+      "git_mode": "100644",
+      "git_blob": "512e4c5a26921b34f046b26b302c0e8417aec341",
+      "sha256": "ce44c103af562a9567be99fdbd5bc3696b59275ba4156a94e43a5e77550343fb",
+      "bytes": 5279
+    },
+    "examples/gradient_leakage_attacks/fedavg_resnet18_cifar100.toml": {
+      "git_mode": "100644",
+      "git_blob": "b2a01ebd9f48d14fd964abd519046febc249bc5d",
+      "sha256": "1834c972bc0a149eb76ecc52328d0c5562b0da4ff56c4cbbef3a90f651614912",
+      "bytes": 1503
+    },
+    "examples/gradient_leakage_attacks/nn/lenet.py": {
+      "git_mode": "100644",
+      "git_blob": "1749c9382e22e060b1692eb5ce45a9e774af6b66",
+      "sha256": "b2f816302a413698542244462d0a11e7958fdc75a6758990c4fb7cad3428e350",
+      "bytes": 1438
+    },
+    "examples/gradient_leakage_attacks/nn/resnet.py": {
+      "git_mode": "100644",
+      "git_blob": "01bad31cc120c997705d06890c64f0daf36e75aa",
+      "sha256": "44d0d37d31ca3e26ebb08902b1ed8f5db988eef262f82e58d17520ba91d06631",
+      "bytes": 8990
+    },
+    "examples/outdated/cs_maml/cs_maml.py": {
+      "git_mode": "100644",
+      "git_blob": "085c6aa83f2c7fcbcfb1b15241c8ae08bf0ad977",
+      "sha256": "ab2c94989ed4d8807cc524015c4e60a9dca2a73bc1ba3bd29588a9827c06b511",
+      "bytes": 732
+    },
+    "examples/outdated/cs_maml/cs_maml_MNIST_lenet5.toml": {
+      "git_mode": "100644",
+      "git_blob": "7c8b94d6a2d3bde5f7fbcc7b0d6b0f98a728259d",
+      "sha256": "71cf11ca3b040579c90987b17c0c29c0c07cbd7ea42d28bbcf6d207f133f696f",
+      "bytes": 1588
+    },
+    "examples/outdated/cs_maml/cs_maml_edge.py": {
+      "git_mode": "100644",
+      "git_blob": "063154b24b0086c8636d6428b0f096c3bb09094c",
+      "sha256": "14369de9c527863286b6f5bdce9b650d503b6e6064a012de444d0d39333f8840",
+      "bytes": 2826
+    },
+    "examples/outdated/cs_maml/cs_maml_server.py": {
+      "git_mode": "100644",
+      "git_blob": "597aebdfcc6796620d80390401b07840f2eec127",
+      "sha256": "1d7a04d3aea581ff0a01c4d5304c9498fa407720406d8ef113059d7674b30f87",
+      "bytes": 8298
+    },
+    "examples/outdated/fl_maml/fl_maml.py": {
+      "git_mode": "100644",
+      "git_blob": "0e21c16943838de56a472ebc8dc22b1c5780e97f",
+      "sha256": "02a09377aae549d301456b61b3c033d7701fa644c6852b539cb6b2db7ad04834",
+      "bytes": 669
+    },
+    "examples/outdated/fl_maml/fl_maml_MNIST_lenet5.toml": {
+      "git_mode": "100644",
+      "git_blob": "81a6a98f8b8feeadb39a99da7e34d49eaecccff3",
+      "sha256": "1633deba7db6085a6dcb6c850368758ccb86184aad15297682f4f858afc594e7",
+      "bytes": 1335
+    },
+    "examples/outdated/fl_maml/fl_maml_client.py": {
+      "git_mode": "100644",
+      "git_blob": "91aec3219d0be8c120cf4140da0aae5cd479ed7d",
+      "sha256": "c3f2937b19b9d60c5f88be3253c248afefc9350f279d78a75672eb63bf1be4f2",
+      "bytes": 3384
+    },
+    "examples/outdated/fl_maml/fl_maml_server.py": {
+      "git_mode": "100644",
+      "git_blob": "dc723ececb6e0b034585077daf50e81f8d61d0a1",
+      "sha256": "5a40e1bf7ae9cf771ce2b93dc1a6ea973917484c5624b6b021e2e455e0f71956",
+      "bytes": 5699
+    },
+    "examples/outdated/fl_maml/fl_maml_trainer.py": {
+      "git_mode": "100644",
+      "git_blob": "20d012c9df965d7617d7d8ec3964de9ba9d5897e",
+      "sha256": "19297031c138e13b501ac3acfe3ee63deb78e735db63e887271503da6f84f3a9",
+      "bytes": 10931
+    },
+    "examples/outdated/model_search/fjord/fjord.py": {
+      "git_mode": "100644",
+      "git_blob": "73e6c4f45799ed0de2430b157ce7fc815b24b4bf",
+      "sha256": "a18a8162b92a0f9f87855e35a318b8d0dc083c1de72c0bf1e7124a299ec60a24",
+      "bytes": 931
+    },
+    "examples/outdated/model_search/fjord/fjord_algorithm.py": {
+      "git_mode": "100644",
+      "git_blob": "73ba52101ac3b41bc4abce5bad5154f0e0be4794",
+      "sha256": "c929db7f5735a979b6df65ab76fdf1874a88a913c7f2f55e8c2d1accccd0fcca",
+      "bytes": 5772
+    },
+    "examples/outdated/model_search/fjord/fjord_client.py": {
+      "git_mode": "100644",
+      "git_blob": "1a580c106e76b388317a3f79f7d65e1c7586250f",
+      "sha256": "fd1d84bc537d2de13ffc6fbc15180d26791d556c4be641a050cf515072aefc7d",
+      "bytes": 2815
+    },
+    "examples/outdated/model_search/fjord/fjord_resnet18_dynamic.toml": {
+      "git_mode": "100644",
+      "git_blob": "9bbe444a94381ca060ba9f9aa1b14586de0e12fd",
+      "sha256": "e2714e100645b9d0a675ddd3f776accb20ce7011892a96087f030839daa9e9db",
+      "bytes": 1663
+    },
+    "examples/outdated/model_search/fjord/fjord_server.py": {
+      "git_mode": "100644",
+      "git_blob": "d9a3dcbd1e4b0d54a7d0666765451a40f64bfe2e",
+      "sha256": "222e9bfcb6027d178e9b85dbdfc41dc998a61a626863376a36ccfdbf250694bb",
+      "bytes": 1891
+    },
+    "examples/outdated/model_search/fjord/fjord_trainer.py": {
+      "git_mode": "100644",
+      "git_blob": "1586fed1c73fb87cdcbb9c1ad50646f1c03b8bf5",
+      "sha256": "987aa475a1df0b149f3d7ea369e52bb1101c5cabe0a83c4a556eab43755bdf22",
+      "bytes": 2379
+    },
+    "examples/outdated/model_search/fjord/resnet.py": {
+      "git_mode": "100644",
+      "git_blob": "29890e8933df65af5ca9ed13e92e58df269acc6b",
+      "sha256": "1295a4c45add3f5701b3c41900e7217cad118496e948e82951f310766ab7de31",
+      "bytes": 6975
+    },
+    "examples/outdated/model_search/fjord/vit.py": {
+      "git_mode": "100644",
+      "git_blob": "8602d4bacaff93b618c8a3c2777284d2d4ad5275",
+      "sha256": "8b7fdd72f4bf96de879b300081a1a5be09cc011475deac3d140211c8310b22cb",
+      "bytes": 6983
+    },
+    "examples/outdated/norm_bounding/norm_bounding.py": {
+      "git_mode": "100644",
+      "git_blob": "5496ed145f16698d3cc0ea086c3ed306b207ff89",
+      "sha256": "06dec2a78140e70a8cc1eff028710c77e1c2e0952f0b326def87e2760dede1b6",
+      "bytes": 395
+    },
+    "examples/outdated/norm_bounding/norm_bounding_MNIST_lenet5.toml": {
+      "git_mode": "100644",
+      "git_blob": "7cba6dbd3ea83669f3536a682611d53dffdf0d32",
+      "sha256": "4ea5851ae75450d63b23431a3a36841bc96781ba031ab932611cb05022870cb4",
+      "bytes": 1156
+    },
+    "examples/outdated/norm_bounding/norm_bounding_server.py": {
+      "git_mode": "100644",
+      "git_blob": "65868b64acb33531aebf62717705b2f6d99693a3",
+      "sha256": "d6c8589149505d3f48511bc367b5f1e7a175231b270e6669fa18f585d592a81f",
+      "bytes": 1630
+    }
+  },
+  "immutable_source_inventory_sha256": "f437fe8dd9b4c249f7357087a1d0ee6d4a204ec59b08268104af9084a4890846"
+}

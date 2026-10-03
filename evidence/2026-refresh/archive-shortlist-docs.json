@@ -1,0 +1,261 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-03T20:20:00.211841+00:00",
+  "status": "Public documentation completed and locally checked; independent review, archive/profile integration and publication remain root-owned.",
+  "scope": "Only public prose, archive READMEs and MkDocs navigation. No runtime, config, tests, manifests, packaging, lockfiles or historical originals changed.",
+  "source": {
+    "base_commit": "75d6d67739d60456f70c01f54e5481b0273644ac",
+    "docs_commit": "fb37e49183eb68c7801212343f2c7843bb4570ce",
+    "docs_tree": "610ee1f7ccc3634e935571129625ee025fa943ae",
+    "docs_sha256_before": {
+      "README.md": "2ac1e6aa59e3dbb665fea326b2ed43671df88fb435a35f19c33c4c5f59e28be3",
+      "archives/retired/README.md": null,
+      "archives/retired/anycostfl-vit/README.md": null,
+      "archives/retired/fedrlnas/README.md": null,
+      "archives/retired/fedrolex-vit/README.md": null,
+      "archives/retired/fedtp/README.md": null,
+      "archives/retired/heterofl-mobilenetv3/README.md": null,
+      "archives/retired/legacy-vit/README.md": null,
+      "archives/retired/pfedrlnas/README.md": null,
+      "docs/docs/configurations/trainer.md": "de614324e54015b2ebc15f6f39fcdcf13d4fdc9f7befdbf8046e0a86ce5848a6",
+      "docs/docs/examples/algorithms/10. Algorithms based on Neural Architecture Search and Model Search.md": "0d959a944fe18823b855820069073cc0291d2c142a662b279e7992df5c6dc3d7",
+      "docs/docs/examples/algorithms/14. Gradient Leakage Attacks and Defences.md": "bd618da35cb92c4077cc0f1d3c026b977b8f3acece025c8a84d3c3a626364aec",
+      "docs/docs/examples/archived.md": null,
+      "docs/docs/references/clients.md": "7db6095669c00208d69f3e12e59eba32765b49d9542811ea09609d803cc30c89",
+      "docs/mkdocs.yml": "7d31abad2fdd2d751ae47bf41000d1c59bb5275d90beb85b7927104efe0be3ed",
+      "docs/third_party.md": "66ff76d81de89aa3184e1dc6f8f9a4663ebf32c8b452a8fe48464a172ca7073b"
+    },
+    "docs_sha256_after": {
+      "README.md": "a58749f5836d5af83b3f5affedaa89e930e85e1db99a15fbece6b05756306f3d",
+      "archives/retired/README.md": "6421b2c2a3622757071d21be63bdda2518bf5c4ae521f1bd8a7f6827a39b9bee",
+      "archives/retired/anycostfl-vit/README.md": "5a0918b192ef7942a3d9baf641e927d75e911a4bf9d8587d32f9a9c63ae40716",
+      "archives/retired/fedrlnas/README.md": "c1248de331c3e322c65e654cf51d0537880bf88c47198fac050a3ac2af0a0ac3",
+      "archives/retired/fedrolex-vit/README.md": "e663bcc6d247767280c67996026c47c7ab7224440b5472c05ec4388c2f7c40c2",
+      "archives/retired/fedtp/README.md": "e020f56385589184a5b22733f2c937dc035aace5db0cbec8c59caa739a0c5846",
+      "archives/retired/heterofl-mobilenetv3/README.md": "809380c8a45a22718ca40edb5790aca75ff7cc54629a3df758dc9d3757a91e86",
+      "archives/retired/legacy-vit/README.md": "5028e0cdeb45740e74e15c68ec271fd76d03c9c22bbc422d0cd21f190290329f",
+      "archives/retired/pfedrlnas/README.md": "d118f37d2f9882d1224e5192a1848793f3d787fa976d1473047ddede9aa23300",
+      "docs/docs/configurations/trainer.md": "8c173b2daf5233e22fdf85fdea2bfd6296ed52f7c4539bbc9a8fe0b80c4a4fb6",
+      "docs/docs/examples/algorithms/10. Algorithms based on Neural Architecture Search and Model Search.md": "b2e2abe775d733fb218a4da81dfeb2b1985ad323393be7565510a15ce5bcdd5a",
+      "docs/docs/examples/algorithms/14. Gradient Leakage Attacks and Defences.md": "e97bcdf3b9bb75efda44c913ad46559c93750cabcf3ce0548f0e19ff1fe6e14e",
+      "docs/docs/examples/archived.md": "4e6bda781e3e29a15e3e5f56708b5fa5f8a10e360b8e5752de4c5236b7334bb6",
+      "docs/docs/references/clients.md": "58c182769113331c58bcd21a5e286f03ccc2f439df713619ac50db2d3d6a891e",
+      "docs/mkdocs.yml": "d26f6c6e7b91cf8835b4187e3b9e01125801e735122d79e7a148179b31a852ec",
+      "docs/third_party.md": "af7beb821da8021f00c3882123970cdcb4e81e8630b436cdf39d0396bbca8d64"
+    },
+    "inspected_repository_files_sha256": {
+      "evidence/2026-refresh/archive-shortlist-validation.json": "e9c5688df3ece8064d899982a5ec50c8f1783e6f57c615393cb7524e21c9ce55",
+      "pyproject.toml": "0b67376a5ead6bc1a50b30303d7a4f5f2963baef82d7a3ef027d31c3f2389c46",
+      "plato/models/registry.py": "d086d04ba91001e2cea6d7031ff1c4229fb8fb7d6def46addb68bcff560c5936",
+      "plato/utils/retired_backends.py": "e71a9493bfb9e08b0e2b592d76c3ea45d7835da7c7afcfaf2508b5e5524c15fc",
+      "examples/model_pruning/fedscr/fedscr_client.py": "efe5119b474e9ee1665893db7f7464283ba01ca29a0f3e4c1877ce3b7be42556",
+      "examples/three_layer_fl/fedsaw/fedsaw_edge.py": "606d6c102cf649a58244bf1271e289122d880dc76ecb009e418d713ae9045c2b",
+      "archives/retired/heterofl-mobilenetv3/manifest.json": "3e4787fc5ef0bcc18669f281b3364888d0ed7fcfa4e28f7b93ab628418607d47",
+      "archives/retired/lerobot/manifest.json": "06735f7c441f86aaec6208b5dd67fd6a36a55a6aa009267bbd8b6900bc4818f5",
+      "archives/retired/fedtp/manifest.json": "c56829a8207b0d9e4153cd6c1d0809aca032713565919d80c7aca6804c2d2b2a",
+      "archives/retired/pfedrlnas/manifest.json": "c16ddc679bd8a5514a08439915c91071984783f018effdea27ecc901c955c032",
+      "archives/retired/nanochat/manifest.json": "4f923c1a60c1153290ab0c024066a4d113a2e077059b80424f42f526ff5711e9",
+      "archives/retired/fedrlnas/manifest.json": "6c0647455344a6519ea5b8524ddd10b17d45bd7a8fb662c3346abdced7861113",
+      "archives/retired/anycostfl-vit/manifest.json": "4930b050b412cdb04840a127f5b51477d262357059f7d81334caafea6ddf9ebf",
+      "archives/retired/fedrolex-vit/manifest.json": "4e31c8f9db7423fc7ad3f1eefbecbbca7a3125d4e3c70a590dff0ea3184e5fd8",
+      "archives/retired/legacy-vit/manifest.json": "ed4cbcee9b9fa680fc209d8ce14c93ba761ef8628538226a925e3c26550ce758",
+      "examples/model_search/fedrolex/pyproject.toml": "b9fdff0edcc79f4c3e6b2546aa891dcccb5de7fc50cca00fa0c1785bfd3304c5",
+      "examples/model_search/fedrolex/example_ResNet.toml": "4a74ee96d86be5786c935e3454cec0a1ea2861010d82112699ab01d77a07cbb5",
+      "examples/model_search/anycostfl/pyproject.toml": "b48f4ac32d771bef0d04826675bec0b15963c1df0dcd4a084b3b7a37cdbbf5f0",
+      "examples/model_search/anycostfl/example_ResNet.toml": "4a74ee96d86be5786c935e3454cec0a1ea2861010d82112699ab01d77a07cbb5",
+      "examples/model_search/heterofl/pyproject.toml": "c7d3bd0135626082d4ed2b22b2aba1651330baab984a7d81fbee402dcfbfc0c5",
+      "examples/model_search/heterofl/heterofl_resnet18_dynamic.toml": "361563886ce2a5eca689d8d1702fb8778874614c9c5bc77d6f2775eb01fd42aa",
+      "examples/model_search/sysheterofl/config_ResNet152.toml": "e4e9b28df53fa3bc78f19aa53e0753c36d67a90dbba9a2e37ec583da5b354f87",
+      "examples/model_search/anycostfl/anycostfl.py": "59cc67240cc69bfca8d57133836093118723a26bfa5a23bc8606635cb7e3299b",
+      "examples/model_search/fedrolex/fedrolex.py": "000ec8ba529f68de778d4fef1e05533bda24829d2512ddd2f31bc4d26eb7f2f3",
+      "examples/model_search/heterofl/heterofl.py": "c7679361bf108ffb53bcdfb71e09b0e94d36b826bcfaea0bc57e8bbd5469bea0",
+      "examples/model_search/sysheterofl/sysheterofl.py": "2a1f3f81c928f47fbbd7f624a84c294a8d45a8e8f627fb01f4d0a31c7305d44a"
+    },
+    "reviewed_external_inputs_sha256": {
+      "/tmp/plato-archive-shortlist-plan.json": "c66577eac31a2eeaba68f29e2fee53760def2477184521bd1f2536e76507573f",
+      "/tmp/plato-archive-shortlist-plan-review3.json": "3fbeb6b47b5392515172b574bd9b0d11f427e5d6af4a72ba2c2d3057be8483be"
+    }
+  },
+  "validation": {
+    "interpreter": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+    "environment": "/tmp/plato-llm-integration/tooling-313 used read only; no dependency mutations",
+    "versions": {
+      "mkdocs": "1.6.1",
+      "mkdocs-material": "9.7.7",
+      "Markdown": "3.11"
+    },
+    "mkdocs": {
+      "command": [
+        "/tmp/plato-llm-integration/tooling-313/bin/python",
+        "-m",
+        "mkdocs",
+        "build",
+        "--strict",
+        "--config-file",
+        "docs/mkdocs.yml",
+        "--site-dir",
+        "/tmp/plato-model-search-docs-site"
+      ],
+      "returncode": 0,
+      "log_sha256": "5c8bebcf1cf57ec54891b7686213d572ec5831fb75eac3a9d21c12956d19dc7e",
+      "notes": "Existing Material banner and informational omitted retired Nanochat/LeRobot pages retained; no MkDocs warning/error causes strict failure."
+    },
+    "docs_checks": {
+      "files_checked": [
+        "README.md",
+        "archives/retired/README.md",
+        "archives/retired/anycostfl-vit/README.md",
+        "archives/retired/fedrlnas/README.md",
+        "archives/retired/fedrolex-vit/README.md",
+        "archives/retired/fedtp/README.md",
+        "archives/retired/heterofl-mobilenetv3/README.md",
+        "archives/retired/legacy-vit/README.md",
+        "archives/retired/pfedrlnas/README.md",
+        "docs/docs/configurations/trainer.md",
+        "docs/docs/examples/algorithms/10. Algorithms based on Neural Architecture Search and Model Search.md",
+        "docs/docs/examples/algorithms/14. Gradient Leakage Attacks and Defences.md",
+        "docs/docs/examples/archived.md",
+        "docs/docs/references/clients.md",
+        "docs/third_party.md"
+      ],
+      "link_counts": {
+        "repository_local": 131,
+        "github_repository_targets": 20,
+        "rendered_local": 292
+      },
+      "errors": [],
+      "commands": [
+        {
+          "scope": "active",
+          "cwd": "examples/model_search/heterofl",
+          "command": "uv run python heterofl.py -c heterofl_resnet18_dynamic.toml",
+          "model_name": "resnet18",
+          "targets_exist": true,
+          "executed": false
+        },
+        {
+          "scope": "active",
+          "cwd": "examples/model_search/fedrolex",
+          "command": "uv run python fedrolex.py -c example_ResNet.toml",
+          "model_name": "resnet18",
+          "targets_exist": true,
+          "executed": false
+        },
+        {
+          "scope": "active",
+          "cwd": "examples/model_search/anycostfl",
+          "command": "uv run python anycostfl.py -c example_ResNet.toml",
+          "model_name": "resnet18",
+          "targets_exist": true,
+          "executed": false
+        },
+        {
+          "scope": "active",
+          "cwd": "examples/model_search/sysheterofl",
+          "command": "uv run --with 'ptflops>=0.7.5' python sysheterofl.py -c config_ResNet152.toml",
+          "model_name": "resnet152",
+          "targets_exist": true,
+          "executed": false
+        },
+        {
+          "scope": "historical_unqualified",
+          "family": "fedtp",
+          "command": "uv run fedtp.py -c FedTP_CIFAR10_ViT_NonIID03_scratch.toml",
+          "targets_exist": true,
+          "executed": false
+        },
+        {
+          "scope": "historical_unqualified",
+          "family": "fedrlnas",
+          "command": "uv run fedrlnas.py -c FedRLNAS_MNIST_DARTS.toml",
+          "targets_exist": true,
+          "executed": false
+        },
+        {
+          "scope": "historical_unqualified",
+          "family": "anycostfl-vit",
+          "command": "uv run anycostfl.py -c example_ViT.toml",
+          "targets_exist": true,
+          "executed": false
+        },
+        {
+          "scope": "historical_unqualified",
+          "family": "fedrolex-vit",
+          "command": "uv run fedrolex.py -c example_ViT.toml",
+          "targets_exist": true,
+          "executed": false
+        },
+        {
+          "scope": "historical_unqualified",
+          "family": "pfedrlnas",
+          "cwd": "examples/model_search/pfedrlnas/VIT",
+          "command": "uv run fednas.py -c ../configs/PerFedRLNAS_CIFAR10_NASVIT_NonIID01.toml",
+          "targets_exist": true,
+          "executed": false
+        },
+        {
+          "scope": "historical_unqualified",
+          "family": "pfedrlnas",
+          "cwd": "examples/model_search/pfedrlnas/MobileNetV3",
+          "command": "uv run fednas.py -c ../configs/PerFedRLNAS_CIFAR10_Mobilenet_NonIID03.toml",
+          "targets_exist": true,
+          "executed": false
+        },
+        {
+          "scope": "historical_unqualified",
+          "family": "pfedrlnas",
+          "cwd": "examples/model_search/pfedrlnas/MobileNetV3",
+          "command": "uv run fednas.py -c ../configs/MobileNetV3_CIFAR10_03_async.toml",
+          "targets_exist": true,
+          "executed": false
+        },
+        {
+          "scope": "historical_unqualified",
+          "family": "pfedrlnas",
+          "cwd": "examples/model_search/pfedrlnas/DARTS",
+          "command": "uv run fednas.py -c ../configs/PerFedRLNAS_CIFAR10_DARTS_NonIID_03.toml",
+          "targets_exist": true,
+          "executed": false
+        }
+      ],
+      "protected_before_after": {
+        "files": 312,
+        "all_byte_identical": true,
+        "mapping_sha256": "0ba3a4377e8b32dfad499c7f3b9de3cb8c8a87ef87a918684fca40c922c7855c"
+      },
+      "new_family_manifest_originals_verified": 171,
+      "limits": "No model workloads, historical restoration, network links, or CI/profile qualification executed."
+    },
+    "diff_check": {
+      "command": [
+        "git",
+        "diff",
+        "--check",
+        "75d6d67739d60456f70c01f54e5481b0273644ac",
+        "fb37e49183eb68c7801212343f2c7843bb4570ce"
+      ],
+      "returncode": 0
+    }
+  },
+  "reproduction_artifacts": {
+    "path": "evidence/2026-refresh/reproductions/archive-shortlist-docs-validation.tar.gz",
+    "sha256": "506784e7dcbe40c4ada63c0af8988bf50fb9911f47e1dba9a0c59d338b833378",
+    "files": {
+      "before.json": "447b58329ddec1b2a4be8b7bc416f6c3d63b9518ea6049a6f0b20e1cdf83b5fe",
+      "check_docs.py": "9e369e9467cf77d8e62c4a5b3dcdbf071e0c738b296801791b440c3724133898",
+      "checks.json": "de14f467ff84e0dbc2a1284e6fe2c29a055eed88654864ec318910dde2f5486d",
+      "mkdocs.log": "5c8bebcf1cf57ec54891b7686213d572ec5831fb75eac3a9d21c12956d19dc7e",
+      "check.log": "f5a341a8bca9e91a60b66e288c23d14e7aa466f8e7e4a4cc933a358edc4676e6"
+    },
+    "note": "Contains exact checker and initial protected-file hashes. Checker uses task-owned /tmp paths shown in source; replay from this docs checkout, restoring those artifacts/paths or adapting only output paths."
+  },
+  "boundaries": [
+    "Existing MLX guide, Nanochat/LeRobot archive and Qwen reference retained; no changes to their source or accepted support boundaries.",
+    "Original archives and existing outdated sources retain historical wording; every one of 171 new-family manifest originals still matches SHA256.",
+    "Two exact ViT gitlink pins are documented; supplemental notice revisions are not called original vendored source revisions.",
+    "Four active and eight historical launch commands were checked for retained script/config targets and TOML validity, not executed.",
+    "SysHeteroFL command explicitly supplies ptflops because no local workspace manifest exists; no new SysHeteroFL behavioral qualification claimed.",
+    "No delivered archive CI/profile guard coverage claim; root follow-up remains pending.",
+    "GitHub repository destinations verified against local retained paths for publication; external networks were not fetched."
+  ]
+}

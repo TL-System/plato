@@ -1,0 +1,12 @@
+W1003 16:51:48.888000 31661 /private/tmp/plato-archive-integration/env/lib/python3.13/site-packages/torch/distributed/elastic/multiprocessing/redirects.py:35] NOTE: Redirects are currently not supported in MacOs.
+============================= test session starts ==============================
+platform darwin -- Python 3.13.16, pytest-9.1.1, pluggy-1.6.0
+rootdir: /private/tmp/plato-refresh-worktrees/archive-profile
+configfile: pyproject.toml
+collected 19 items
+
+tests/integration/test_retained_model_search.py ...................      [100%]
+
+--- generated xml file: /tmp/plato-archive-profile-evidence/model-search.xml ---
+test profile: core scope (native excluded)
+======================== 19 passed in 135.24s (0:02:15) ========================

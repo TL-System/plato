@@ -1,0 +1,29 @@
+{
+  "status": "ACCEPTED_BOUNDED_NATIVE_PROFILE_FOR_SERIALIZED_ARCHIVE_HANDOFF",
+  "mlx_commit": "6311960cdd00955d4777e269ebee460be591065e",
+  "mlx_tree": "d302b222717177d4e04bb55214df0826dc9c9ee1",
+  "native_review": {
+    "path": "/tmp/plato-mlx-final-review.json",
+    "sha256": "8d934c2c99a86e68dc93769ba757918eb6b0de0488304661abd131279ef756b2"
+  },
+  "phase_gate": {
+    "path": "/tmp/plato-mlx-delivery-gate.json",
+    "sha256": "a52849163c119ca04654925237f36f0e0ebe4c1ba326e644b63b6337279bbda1"
+  },
+  "native_hashes": {
+    "tests/conftest.py": "dcc25c17cbd872fc21b66bbc2d3f5951bf791b9f2474a71af6d9b8ac28e4356c",
+    "tests/mlx_native/cases.json": "c168dc33a4d4e7ed70079e09c3de70f5b318d543c035ec13de2826b48e1175bb",
+    "pyproject.toml": "0e62fd238c359027fae6c1b9e45c10a8f913fb8421d9300ee0a781af091f80e4",
+    ".github/workflows/pytorch_tests.yml": "1ae4bf9d5be394b77a105ab294527a27ec8f2c123e46ac179e97fc148f843b75"
+  },
+  "archive_base": "aa2c3d5cdee60863dfe2c1d389ec1e0cbe89111b",
+  "archive_hashes": {
+    "tests/conftest.py": "dcc25c17cbd872fc21b66bbc2d3f5951bf791b9f2474a71af6d9b8ac28e4356c",
+    "tests/mlx_native/cases.json": "c168dc33a4d4e7ed70079e09c3de70f5b318d543c035ec13de2826b48e1175bb",
+    "pyproject.toml": "8aaa7414717fa17841900d377d89851547677ba2ae93963afef79fc5490ba610",
+    ".github/workflows/pytorch_tests.yml": "1ae4bf9d5be394b77a105ab294527a27ec8f2c123e46ac179e97fc148f843b75"
+  },
+  "archive_combination_receipt": "/tmp/plato-archive-integration/root-initial-combination.json",
+  "owner": "/root/mlx_profile_author",
+  "handoff": "Implement only accepted archiveplanrev3 serialized partition/workflow/artifact/typing guard delta; preserve finalnative383ledger and allguard contracts. Archive workerfix reviewed separately; docsseparateowner. NativeexactsourceLinuxmergequalification stillpending; no broadfinalmergeacceptance."
+}

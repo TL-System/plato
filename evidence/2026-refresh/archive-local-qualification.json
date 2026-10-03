@@ -1,0 +1,274 @@
+{
+  "status": "LOCAL_QUALIFICATION_COMPLETE_PENDING_DELIVERY_GATE_AND_LINUX",
+  "source": "6bf8836d06072c7946cdfb5499a09e4bce459805",
+  "utc": "2026-10-03T22:27:21.156058+00:00",
+  "profiles": {
+    "mandatory": 1551,
+    "base": 1474,
+    "base_expected_optional_DP_skip": 1,
+    "mlx_native": 383
+  },
+  "bundle": {
+    "file": "archive-local-qualification.tar.gz",
+    "sha256": "847372ec51d1a0ff4008a5c3356b4285e2e5b4f8b3b87b721cc21901494e04a1",
+    "bytes": 18651825,
+    "files": 10673
+  },
+  "manifest_sha256": "e9779aacf3211f73b9d3409b0335737563cd15b3796b9bb2428c0f82a363fb11",
+  "raw_records": 10708,
+  "omitted_large_records": [
+    {
+      "path": "run-base/pytest-tmp/test_gan_explicit_normalized_p0/pairs/Discriminator_nested/pair.pth",
+      "bytes": 11075289,
+      "sha256": "62ec96bfb6822dca7b419a4934fd66a63a1a59fe9df8e1b2174afb7c5cb0e5ab",
+      "in_compact_bundle": false,
+      "omission_reason": "Large raw fixture/payload retained locally; final Linux runtime artifact is separate."
+    },
+    {
+      "path": "run-base/pytest-tmp/test_gan_explicit_normalized_p0/pairs/Discriminator_normalized.pth",
+      "bytes": 11076961,
+      "sha256": "00c878c683ff3314b82dbccd8848b2c196045e07006b4a66be2a9f59440801d5",
+      "in_compact_bundle": false,
+      "omission_reason": "Large raw fixture/payload retained locally; final Linux runtime artifact is separate."
+    },
+    {
+      "path": "run-base/pytest-tmp/test_gan_explicit_normalized_p0/pairs/Generator_nested/pair.pth",
+      "bytes": 14321403,
+      "sha256": "0c0f346c1ff80e629c257179f7c821662cf4d6922235f66d4ff930d88096161c",
+      "in_compact_bundle": false,
+      "omission_reason": "Large raw fixture/payload retained locally; final Linux runtime artifact is separate."
+    },
+    {
+      "path": "run-base/pytest-tmp/test_gan_explicit_normalized_p0/pairs/Generator_normalized.pth",
+      "bytes": 14323243,
+      "sha256": "9febe548e2bc0f9ebed36dc0c3b52e67e13bedfa0008f835310e0b469d15834e",
+      "in_compact_bundle": false,
+      "omission_reason": "Large raw fixture/payload retained locally; final Linux runtime artifact is separate."
+    },
+    {
+      "path": "run-base/pytest-tmp/test_gan_slash_names_and_expli0/gan/Discriminator_legacy.safetensors",
+      "bytes": 11076793,
+      "sha256": "4999d657c6fe350dae90b5f54ad54712e816392776ed9d839bd122c6080ea1a5",
+      "in_compact_bundle": false,
+      "omission_reason": "Large raw fixture/payload retained locally; final Linux runtime artifact is separate."
+    },
+    {
+      "path": "run-base/pytest-tmp/test_gan_slash_names_and_expli0/gan/Discriminator_pair.pth",
+      "bytes": 11076741,
+      "sha256": "71735980b397f8a4b55b820ee8d1ca4d5a661af8ad43595141ecd6479a2ea3bd",
+      "in_compact_bundle": false,
+      "omission_reason": "Large raw fixture/payload retained locally; final Linux runtime artifact is separate."
+    },
+    {
+      "path": "run-base/pytest-tmp/test_gan_slash_names_and_expli0/gan/Discriminator_~c87c0c64d2fb215b38496b07952d86526559fee390c98b0f383fef0d230107f4.pth",
+      "bytes": 11079991,
+      "sha256": "9536e7e9d1c8ba6052c96f0342ccdf85ca073694b9f96f1f8482eb046c44e7c7",
+      "in_compact_bundle": false,
+      "omission_reason": "Large raw fixture/payload retained locally; final Linux runtime artifact is separate."
+    },
+    {
+      "path": "run-base/pytest-tmp/test_gan_slash_names_and_expli0/gan/Generator_legacy.safetensors",
+      "bytes": 14323119,
+      "sha256": "af292a81605365cde7858f7cc09d7ada7d2e51ab1fed8ad66bac569dcd28d17d",
+      "in_compact_bundle": false,
+      "omission_reason": "Large raw fixture/payload retained locally; final Linux runtime artifact is separate."
+    },
+    {
+      "path": "run-base/pytest-tmp/test_gan_slash_names_and_expli0/gan/Generator_pair.pth",
+      "bytes": 14323057,
+      "sha256": "999cb7ed9a4d2c1b002ff2d45028888d63589cc9628184b032447ee22a85d8a7",
+      "in_compact_bundle": false,
+      "omission_reason": "Large raw fixture/payload retained locally; final Linux runtime artifact is separate."
+    },
+    {
+      "path": "run-base/pytest-tmp/test_gan_slash_names_and_expli0/gan/Generator_~c87c0c64d2fb215b38496b07952d86526559fee390c98b0f383fef0d230107f4.pth",
+      "bytes": 14326932,
+      "sha256": "0323fa8d330007f01614a2a1a85dacfe73e9950a0f73cc5910ceed5af67953a9",
+      "in_compact_bundle": false,
+      "omission_reason": "Large raw fixture/payload retained locally; final Linux runtime artifact is separate."
+    },
+    {
+      "path": "run-base/pytest-tmp/test_gan_slash_names_and_expli0/gan/worker.safetensors",
+      "bytes": 25395866,
+      "sha256": "e479b63ebd9159abd8310111b5c3f77ebd45953df79b884510bd0f5e03ea428d",
+      "in_compact_bundle": false,
+      "omission_reason": "Large raw fixture/payload retained locally; final Linux runtime artifact is separate."
+    },
+    {
+      "path": "run-base/pytest-tmp/test_gan_worker_history_urgent0/models/7_10_10.0.safetensors",
+      "bytes": 25395866,
+      "sha256": "d6b82ea6e6cf4693de9cc06f815509bd0fb52b8f0570a6a2b6b28d34f7a85b00",
+      "in_compact_bundle": false,
+      "omission_reason": "Large raw fixture/payload retained locally; final Linux runtime artifact is separate."
+    },
+    {
+      "path": "run-base/pytest-tmp/test_gan_worker_history_urgent0/models/7_9_9.0.safetensors",
+      "bytes": 25395866,
+      "sha256": "ea60089367d72f6b67df0867fed9bd02cff4600845682c69ae700e7597e4bfbd",
+      "in_compact_bundle": false,
+      "omission_reason": "Large raw fixture/payload retained locally; final Linux runtime artifact is separate."
+    },
+    {
+      "path": "run-base/pytest-tmp/test_gan_worker_history_urgent0/models/~c87c0c64d2fb215b38496b07952d86526559fee390c98b0f383fef0d230107f4_8_59037.safetensors",
+      "bytes": 25395866,
+      "sha256": "d6b82ea6e6cf4693de9cc06f815509bd0fb52b8f0570a6a2b6b28d34f7a85b00",
+      "in_compact_bundle": false,
+      "omission_reason": "Large raw fixture/payload retained locally; final Linux runtime artifact is separate."
+    },
+    {
+      "path": "run-base/pytest-tmp/test_impossible_shamir_coeffic0/round_info",
+      "bytes": 8506340,
+      "sha256": "240b7fa1caa5f5b07adb261e3a1d5d55a5f5e61774be183af10559bff000caa4",
+      "in_compact_bundle": false,
+      "omission_reason": "Large raw fixture/payload retained locally; final Linux runtime artifact is separate."
+    },
+    {
+      "path": "run-mandatory/pytest-tmp/test_gan_explicit_normalized_p0/pairs/Discriminator_nested/pair.pth",
+      "bytes": 11075289,
+      "sha256": "e32ed120667dcb9e07623c9f38a6482cbc2f459f7893b0960a7204cf12ef9a91",
+      "in_compact_bundle": false,
+      "omission_reason": "Large raw fixture/payload retained locally; final Linux runtime artifact is separate."
+    },
+    {
+      "path": "run-mandatory/pytest-tmp/test_gan_explicit_normalized_p0/pairs/Discriminator_normalized.pth",
+      "bytes": 11076961,
+      "sha256": "e59c26f5b8552ad138ed4be3e5390cc600b786deed3c0f06d81973280fa70e12",
+      "in_compact_bundle": false,
+      "omission_reason": "Large raw fixture/payload retained locally; final Linux runtime artifact is separate."
+    },
+    {
+      "path": "run-mandatory/pytest-tmp/test_gan_explicit_normalized_p0/pairs/Generator_nested/pair.pth",
+      "bytes": 14321403,
+      "sha256": "4b6c90b1f19d8aad92562825ac6b2848530561edbc81b2cbcb123c27aa624ad7",
+      "in_compact_bundle": false,
+      "omission_reason": "Large raw fixture/payload retained locally; final Linux runtime artifact is separate."
+    },
+    {
+      "path": "run-mandatory/pytest-tmp/test_gan_explicit_normalized_p0/pairs/Generator_normalized.pth",
+      "bytes": 14323243,
+      "sha256": "2ecad24f8b3c59c76464f2e4a1621965df75707cf2005c457aeb4a19eb24426c",
+      "in_compact_bundle": false,
+      "omission_reason": "Large raw fixture/payload retained locally; final Linux runtime artifact is separate."
+    },
+    {
+      "path": "run-mandatory/pytest-tmp/test_gan_slash_names_and_expli0/gan/Discriminator_legacy.safetensors",
+      "bytes": 11076793,
+      "sha256": "e6637c69bd67f77408644090b98f949e4dac443ff326e85c6fcee6041667da37",
+      "in_compact_bundle": false,
+      "omission_reason": "Large raw fixture/payload retained locally; final Linux runtime artifact is separate."
+    },
+    {
+      "path": "run-mandatory/pytest-tmp/test_gan_slash_names_and_expli0/gan/Discriminator_pair.pth",
+      "bytes": 11076741,
+      "sha256": "9312e22ff43e448498cf7a43073af393dbfa85a290dcc1dfdf27c19922283427",
+      "in_compact_bundle": false,
+      "omission_reason": "Large raw fixture/payload retained locally; final Linux runtime artifact is separate."
+    },
+    {
+      "path": "run-mandatory/pytest-tmp/test_gan_slash_names_and_expli0/gan/Discriminator_~c87c0c64d2fb215b38496b07952d86526559fee390c98b0f383fef0d230107f4.pth",
+      "bytes": 11079991,
+      "sha256": "df5d00b94a5b19f256710c6580fbb672ff235e9abc2dcc1561dd565fc7035fa5",
+      "in_compact_bundle": false,
+      "omission_reason": "Large raw fixture/payload retained locally; final Linux runtime artifact is separate."
+    },
+    {
+      "path": "run-mandatory/pytest-tmp/test_gan_slash_names_and_expli0/gan/Generator_legacy.safetensors",
+      "bytes": 14323119,
+      "sha256": "d9967f5270b1820fbd60e96a96299e298324f0048d6e3036057e17ff122682b7",
+      "in_compact_bundle": false,
+      "omission_reason": "Large raw fixture/payload retained locally; final Linux runtime artifact is separate."
+    },
+    {
+      "path": "run-mandatory/pytest-tmp/test_gan_slash_names_and_expli0/gan/Generator_pair.pth",
+      "bytes": 14323057,
+      "sha256": "f8ad14d4b2a50047b5a299d482a04995f5bc52fbf065ac05be24df486d3d550a",
+      "in_compact_bundle": false,
+      "omission_reason": "Large raw fixture/payload retained locally; final Linux runtime artifact is separate."
+    },
+    {
+      "path": "run-mandatory/pytest-tmp/test_gan_slash_names_and_expli0/gan/Generator_~c87c0c64d2fb215b38496b07952d86526559fee390c98b0f383fef0d230107f4.pth",
+      "bytes": 14326932,
+      "sha256": "97551cbf4c2871c3acf71d0d2882d952d9de90baf3c79d95502cca2e16a5e8e6",
+      "in_compact_bundle": false,
+      "omission_reason": "Large raw fixture/payload retained locally; final Linux runtime artifact is separate."
+    },
+    {
+      "path": "run-mandatory/pytest-tmp/test_gan_slash_names_and_expli0/gan/worker.safetensors",
+      "bytes": 25395866,
+      "sha256": "04472a85154f500f6ccf6cbba03d24564bb3cef18ceedaa5a1b7eb9b95d2559a",
+      "in_compact_bundle": false,
+      "omission_reason": "Large raw fixture/payload retained locally; final Linux runtime artifact is separate."
+    },
+    {
+      "path": "run-mandatory/pytest-tmp/test_gan_worker_history_urgent0/models/7_10_10.0.safetensors",
+      "bytes": 25395866,
+      "sha256": "5006d61398a537ba249724a8cf3e01f1a106ae8d8323ef7266835e6555a2fb66",
+      "in_compact_bundle": false,
+      "omission_reason": "Large raw fixture/payload retained locally; final Linux runtime artifact is separate."
+    },
+    {
+      "path": "run-mandatory/pytest-tmp/test_gan_worker_history_urgent0/models/7_9_9.0.safetensors",
+      "bytes": 25395866,
+      "sha256": "fc931b46d325ff4b13fb705c0335aa68df6a53298330fee48bee3bad740007ac",
+      "in_compact_bundle": false,
+      "omission_reason": "Large raw fixture/payload retained locally; final Linux runtime artifact is separate."
+    },
+    {
+      "path": "run-mandatory/pytest-tmp/test_gan_worker_history_urgent0/models/~c87c0c64d2fb215b38496b07952d86526559fee390c98b0f383fef0d230107f4_8_50754.safetensors",
+      "bytes": 25395866,
+      "sha256": "5006d61398a537ba249724a8cf3e01f1a106ae8d8323ef7266835e6555a2fb66",
+      "in_compact_bundle": false,
+      "omission_reason": "Large raw fixture/payload retained locally; final Linux runtime artifact is separate."
+    },
+    {
+      "path": "run-mandatory/pytest-tmp/test_impossible_shamir_coeffic0/round_info",
+      "bytes": 8506340,
+      "sha256": "240b7fa1caa5f5b07adb261e3a1d5d55a5f5e61774be183af10559bff000caa4",
+      "in_compact_bundle": false,
+      "omission_reason": "Large raw fixture/payload retained locally; final Linux runtime artifact is separate."
+    },
+    {
+      "path": "run-mandatory/pytest-tmp/test_retained_width_round_anyc0/anycostfl/runtime/checkpoints/checkpoint_resnet18_1.safetensors",
+      "bytes": 44702555,
+      "sha256": "1beb3b73f42ebcf7a52279628d02eb74d00ffcda5ac7d5a8d38b921460c4b763",
+      "in_compact_bundle": false,
+      "omission_reason": "Large raw fixture/payload retained locally; final Linux runtime artifact is separate."
+    },
+    {
+      "path": "run-mandatory/pytest-tmp/test_retained_width_round_anyc0/anycostfl/runtime/models/pretrained/resnet18.safetensors",
+      "bytes": 44702555,
+      "sha256": "1beb3b73f42ebcf7a52279628d02eb74d00ffcda5ac7d5a8d38b921460c4b763",
+      "in_compact_bundle": false,
+      "omission_reason": "Large raw fixture/payload retained locally; final Linux runtime artifact is separate."
+    },
+    {
+      "path": "run-mandatory/pytest-tmp/test_retained_width_round_fedr0/fedrolex/runtime/checkpoints/checkpoint_resnet18_1.safetensors",
+      "bytes": 44702555,
+      "sha256": "37636032c2a2a618a8eec842f8ce81a4dc929cacff17889e207c4c94dc3c4143",
+      "in_compact_bundle": false,
+      "omission_reason": "Large raw fixture/payload retained locally; final Linux runtime artifact is separate."
+    },
+    {
+      "path": "run-mandatory/pytest-tmp/test_retained_width_round_fedr0/fedrolex/runtime/models/pretrained/resnet18.safetensors",
+      "bytes": 44702555,
+      "sha256": "37636032c2a2a618a8eec842f8ce81a4dc929cacff17889e207c4c94dc3c4143",
+      "in_compact_bundle": false,
+      "omission_reason": "Large raw fixture/payload retained locally; final Linux runtime artifact is separate."
+    },
+    {
+      "path": "run-mandatory/pytest-tmp/test_retained_width_round_hete0/heterofl/runtime/checkpoints/checkpoint_resnet18_1.safetensors",
+      "bytes": 44747620,
+      "sha256": "840c5615bb7376d884d6651fb47723614a8a066aa34ade2063c5e90729bb2353",
+      "in_compact_bundle": false,
+      "omission_reason": "Large raw fixture/payload retained locally; final Linux runtime artifact is separate."
+    },
+    {
+      "path": "run-mandatory/pytest-tmp/test_retained_width_round_hete0/heterofl/runtime/models/pretrained/resnet18.safetensors",
+      "bytes": 44747620,
+      "sha256": "840c5615bb7376d884d6651fb47723614a8a066aa34ade2063c5e90729bb2353",
+      "in_compact_bundle": false,
+      "omission_reason": "Large raw fixture/payload retained locally; final Linux runtime artifact is separate."
+    }
+  ],
+  "limits": "Compact bundle is not all raw payload bytes. Complete originals remain untouched at raw_root; exact-source Linux qualification and artifact audit are required before merge. Global historical typing debt remains."
+}

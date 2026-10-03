@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="19" time="217.537" timestamp="2026-10-03T15:26:22.607683-04:00" hostname="miami.csl.utoronto.ca"><testcase classname="tests.integration.test_retained_model_search" name="test_retained_width_round[anycostfl]" time="92.317"><failure message="AssertionError: {'family': 'anycostfl', 'case': 'socket', 'variant': '', 'command': ['/tmp/plato-archive-author/environment/bin/python', '-B', '-m', 'tests.integration.model_search_retention_worker', '-u', '-c', ...], ...}&#10;assert (not True)">tmp_path = PosixPath('/private/tmp/plato-archive-author/red1/test_retained_width_round_anyc0')
+family = 'anycostfl'
+
+    @pytest.mark.parametrize("family", ["anycostfl", "fedrolex", "heterofl"])
+    def test_retained_width_round(tmp_path: Path, family: str) -&gt; None:
+&gt;       result = _run_case(tmp_path / family, family, "socket", 90)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/test_retained_model_search.py:190: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+directory = PosixPath('/private/tmp/plato-archive-author/red1/test_retained_width_round_anyc0/anycostfl')
+family = 'anycostfl', case = 'socket', timeout = 90, variant = ''
+
+    def _run_case(
+        directory: Path, family: str, case: str, timeout: int, *, variant: str = ""
+    ) -&gt; dict[str, Any]:
+        """Run a main-guarded worker, keeping its config, logs and containment receipt."""
+        from plato.utils import toml_writer
+    
+        directory.mkdir()
+        source = REPOSITORY / CONFIGS[family]
+        config = tomllib.loads(source.read_text())
+        with socket.socket() as listener:
+            listener.bind(("127.0.0.1", 0))
+            port = listener.getsockname()[1]
+        overlays: dict[str, Any] = {
+            "clients": {
+                "total_clients": 2,
+                "per_round": 2,
+                "comm_simulation": False,
+                "compute_comm_time": False,
+                "do_test": False,
+            },
+            "server": {"port": port, "simulate_wall_time": False, "random_seed": 1234},
+            "trainer": {
+                "rounds": 1,
+                "epochs": 1,
+                "batch_size": 2,
+                "max_concurrency": 2,
+            },
+            "data": {
+                "download": False,
+                "sampler": "all_inclusive",
+                "testset_sampler": "all_inclusive",
+                "testset_size": 2,
+            },
+            "parameters": {"limitation": {"activated": case == "budget"}},
+        }
+        if family == "sysheterofl":
+            overlays["clients"]["per_round"] = 1
+            overlays["parameters"]["limitation"].update(max_loop=1)
+            overlays["parameters"]["distillation"] = {"iterations": 2}
+        if family == "dlg":
+            overlays["trainer"]["model_type"] = "resnet"
+            if variant == "lenet":
+                overlays["trainer"]["model_name"] = "lenet"
+                overlays["data"]["datasource"] = "CIFAR100"
+    
+        def update(target: dict[str, Any], patch: dict[str, Any]) -&gt; None:
+            for key, value in patch.items():
+                if isinstance(value, dict):
+                    update(target.setdefault(key, {}), value)
+                else:
+                    target[key] = value
+    
+        update(config, overlays)
+        toml_writer.dump(config, directory / "config.toml")
+        (directory / "overlay.json").write_text(json.dumps(overlays, indent=2) + "\n")
+        env = {
+            **os.environ,
+            "PYTHONPATH": str(REPOSITORY),
+            "PYTHONDONTWRITEBYTECODE": "1",
+            "PYTHONUNBUFFERED": "1",
+            "OMP_NUM_THREADS": "1",
+            "MKL_NUM_THREADS": "1",
+            "HF_HUB_OFFLINE": "1",
+            "TRANSFORMERS_OFFLINE": "1",
+            "PLATO_RETENTION_ROOT": str(directory),
+            "PLATO_RETENTION_FAMILY": family,
+            "PLATO_RETENTION_CASE": case,
+            "PLATO_RETENTION_VARIANT": variant,
+            "config_file": str(directory / "config.toml"),
+        }
+        command = [
+            sys.executable, "-B", "-m",
+            "tests.integration.model_search_retention_worker",
+            "-u", "-c", str(directory / "config.toml"), "-b", str(directory / "runtime"),
+        ]
+        cwd = REPOSITORY
+        if case == "import" and variant == "example":
+            cwd = REPOSITORY / "examples" / "model_search" / family
+        started = time.monotonic()
+        process = subprocess.Popen(
+            command, cwd=cwd, env=env, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+            text=True, start_new_session=True,
+        )
+        observed = {process.pid}
+        finished = threading.Event()
+    
+        def observe() -&gt; None:
+            while not finished.wait(0.05):
+                observed.update(_group_members(process.pid))
+    
+        observer = threading.Thread(target=observe, daemon=True)
+        observer.start()
+        timed_out = False
+        forced = []
+        stdout = stderr = ""
+        try:
+            try:
+                stdout, stderr = process.communicate(timeout=timeout)
+            except subprocess.TimeoutExpired:
+                timed_out = True
+            natural_deadline = time.monotonic() + 5
+            while not timed_out and _group_members(process.pid):
+                if time.monotonic() &gt;= natural_deadline:
+                    break
+                time.sleep(0.05)
+            for name, number in (("TERM", signal.SIGTERM), ("KILL", signal.SIGKILL)):
+                if not _group_members(process.pid):
+                    break
+                forced.append(name)
+                os.killpg(process.pid, number)
+                deadline = time.monotonic() + 5
+                while _group_members(process.pid) and time.monotonic() &lt; deadline:
+                    time.sleep(0.05)
+            if process.poll() is None:
+                process.kill()
+            stdout, stderr = process.communicate(timeout=5)
+        finally:
+            finished.set()
+            observer.join(timeout=1)
+            if process.poll() is None:
+                process.kill()
+                process.communicate(timeout=5)
+        events = [
+            json.loads(line)
+            for path in sorted(directory.glob("events-*.jsonl"))
+            for line in path.read_text().splitlines()
+        ]
+        result = {
+            "family": family, "case": case, "variant": variant, "command": command,
+            "returncode": process.returncode, "timed_out": timed_out, "forced": forced,
+            "survivors": _group_members(process.pid), "observed_pids": sorted(observed),
+            "elapsed_seconds": time.monotonic() - started, "events": events,
+            "overlay": overlays,
+        }
+        (directory / "stdout.log").write_text(stdout)
+        (directory / "stderr.log").write_text(stderr)
+        (directory / "result.json").write_text(json.dumps(result, indent=2) + "\n")
+&gt;       assert not timed_out and not forced and not result["survivors"], result
+E       AssertionError: {'family': 'anycostfl', 'case': 'socket', 'variant': '', 'command': ['/tmp/plato-archive-author/environment/bin/python', '-B', '-m', 'tests.integration.model_search_retention_worker', '-u', '-c', ...], ...}
+E       assert (not True)
+
+tests/integration/test_retained_model_search.py:181: AssertionError</failure></testcase><testcase classname="tests.integration.test_retained_model_search" name="test_retained_width_round[fedrolex]" time="26.250" /><testcase classname="tests.integration.test_retained_model_search" name="test_retained_width_round[heterofl]" time="27.805" /><testcase classname="tests.integration.test_retained_model_search" name="test_retained_activated_budget[anycostfl]" time="5.809" /><testcase classname="tests.integration.test_retained_model_search" name="test_retained_activated_budget[fedrolex]" time="5.868" /><testcase classname="tests.integration.test_retained_model_search" name="test_retained_activated_budget[heterofl]" time="5.573" /><testcase classname="tests.integration.test_retained_model_search" name="test_sysheterofl_subnet_round" time="7.646" /><testcase classname="tests.integration.test_retained_model_search" name="test_dlg_model_update[lenet]" time="1.735" /><testcase classname="tests.integration.test_retained_model_search" name="test_dlg_model_update[resnet_18]" time="1.930" /><testcase classname="tests.integration.test_retained_model_search" name="test_local_retired_selection[anycostfl]" time="4.179" /><testcase classname="tests.integration.test_retained_model_search" name="test_local_retired_selection[fedrolex]" time="4.348" /><testcase classname="tests.integration.test_retained_model_search" name="test_local_retired_selection[heterofl]" time="4.297" /><testcase classname="tests.integration.test_retained_model_search" name="test_local_retired_selection[dlg]" time="1.606" /><testcase classname="tests.integration.test_retained_model_search" name="test_retained_entrypoint_import[anycostfl-root]" time="4.179" /><testcase classname="tests.integration.test_retained_model_search" name="test_retained_entrypoint_import[anycostfl-example]" time="4.458" /><testcase classname="tests.integration.test_retained_model_search" name="test_retained_entrypoint_import[fedrolex-root]" time="4.614" /><testcase classname="tests.integration.test_retained_model_search" name="test_retained_entrypoint_import[fedrolex-example]" time="4.749" /><testcase classname="tests.integration.test_retained_model_search" name="test_retained_entrypoint_import[heterofl-root]" time="5.105" /><testcase classname="tests.integration.test_retained_model_search" name="test_retained_entrypoint_import[heterofl-example]" time="4.982" /></testsuite></testsuites>

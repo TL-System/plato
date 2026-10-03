@@ -25,12 +25,10 @@ members = [
     "heterofl",
     "knot",
     "llm-split-learning",
-    "mobilenetv3",
     "pisces",
     "plato-learn",
     "polaris",
     "smog",
-    "vit",
 ]
 overrides = [{ name = "nltk", specifier = "==3.10.3" }]
 
@@ -265,14 +263,12 @@ name = "anycostfl"
 version = "0.1.0"
 source = { virtual = "examples/model_search/anycostfl" }
 dependencies = [
-    { name = "einops" },
     { name = "plato-learn" },
     { name = "ptflops" },
 ]
 
 [package.metadata]
 requires-dist = [
-    { name = "einops", specifier = ">=0.8.2" },
     { name = "plato-learn", editable = "." },
     { name = "ptflops", specifier = ">=0.7.5" },
 ]
@@ -908,15 +904,6 @@ wheels = [
 ]
 
 [[package]]
-name = "einops"
-version = "0.8.2"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/2c/77/850bef8d72ffb9219f0b1aac23fbc1bf7d038ee6ea666f331fa273031aa2/einops-0.8.2.tar.gz", hash = "sha256:609da665570e5e265e27283aab09e7f279ade90c4f01bcfca111f3d3e13f2827", size = 56261, upload-time = "2026-01-26T04:13:17.638Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/2a/09/f8d8f8f31e4483c10a906437b4ce31bdf3d6d417b73fe33f1a8b59e34228/einops-0.8.2-py3-none-any.whl", hash = "sha256:54058201ac7087911181bfec4af6091bb59380360f069276601256a76af08193", size = 65638, upload-time = "2026-01-26T04:13:18.546Z" },
-]
-
-[[package]]
 name = "evaluate"
 version = "0.4.6"
 source = { registry = "https://pypi.org/simple" }
@@ -969,14 +956,12 @@ name = "fedrolex"
 version = "0.1.0"
 source = { virtual = "examples/model_search/fedrolex" }
 dependencies = [
-    { name = "einops" },
     { name = "plato-learn" },
     { name = "ptflops" },
 ]
 
 [package.metadata]
 requires-dist = [
-    { name = "einops", specifier = ">=0.8.2" },
     { name = "plato-learn", editable = "." },
     { name = "ptflops", specifier = ">=0.7.5" },
 ]
@@ -2337,21 +2322,6 @@ wheels = [
 ]
 
 [[package]]
-name = "mobilenetv3"
-version = "0.1.0"
-source = { virtual = "examples/model_search/pfedrlnas/MobileNetV3" }
-dependencies = [
-    { name = "plato-learn" },
-    { name = "yacs" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "plato-learn", editable = "." },
-    { name = "yacs", specifier = ">=0.1.8" },
-]
-
-[[package]]
 name = "mosek"
 version = "11.2.5"
 source = { registry = "https://pypi.org/simple" }
@@ -3141,6 +3111,12 @@ test-base = [
     { name = "pytest" },
     { name = "pytest-cov" },
 ]
+test-model-search = [
+    { name = "plato-learn", extra = ["dp", "mpc", "rl"] },
+    { name = "ptflops" },
+    { name = "pytest" },
+    { name = "pytest-cov" },
+]
 
 [package.metadata]
 requires-dist = [
@@ -3196,6 +3172,12 @@ test = [
     { name = "pytest-cov", specifier = ">=7.1.0" },
 ]
 test-base = [
+    { name = "pytest", specifier = ">=9.1.1" },
+    { name = "pytest-cov", specifier = ">=7.1.0" },
+]
+test-model-search = [
+    { name = "plato-learn", extras = ["dp", "mpc", "rl"], editable = "." },
+    { name = "ptflops", specifier = ">=0.7.5" },
     { name = "pytest", specifier = ">=9.1.1" },
     { name = "pytest-cov", specifier = ">=7.1.0" },
 ]
@@ -4708,21 +4690,6 @@ wheels = [
 ]
 
 [[package]]
-name = "vit"
-version = "0.1.0"
-source = { virtual = "examples/model_search/pfedrlnas/VIT" }
-dependencies = [
-    { name = "plato-learn" },
-    { name = "yacs" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "plato-learn", editable = "." },
-    { name = "yacs", specifier = ">=0.1.8" },
-]
-
-[[package]]
 name = "watchdog"
 version = "6.0.0"
 source = { registry = "https://pypi.org/simple" }
@@ -4872,18 +4839,6 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/9b/8d/7eabcc8d29cce40621443cff24c07d7306ef574b8956c47ac59f21098005/xxhash-4.0.1-cp314-cp314t-win32.whl", hash = "sha256:a14578102a6081465aec9cf73c76c3cd3f79f0709bdb3b8ae7ab0b54c9d8b089", size = 35482, upload-time = "2026-08-17T08:22:32.336Z" },
     { url = "https://files.pythonhosted.org/packages/ca/89/2a4268e1971f63038b79fb75e3b9c8de942cd77acabbb0c5625352a31940/xxhash-4.0.1-cp314-cp314t-win_amd64.whl", hash = "sha256:c57963970d359a72262f7fe6be88f945e2334d4bc41462b7f08c37b0abf35ca6", size = 37490, upload-time = "2026-08-17T08:35:22.475Z" },
     { url = "https://files.pythonhosted.org/packages/90/7b/950ecab1fe4cf421d0a6211ddd9a0ac82e39e55c45a111ceb90953dc6c9a/xxhash-4.0.1-cp314-cp314t-win_arm64.whl", hash = "sha256:b659fad79c99b0238c7ad7e9d7dbf4eebfea9097c2dba65fa0a4d18a25b29a2f", size = 34596, upload-time = "2026-08-17T08:23:10.001Z" },
-]
-
-[[package]]
-name = "yacs"
-version = "0.1.8"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "pyyaml" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/44/3e/4a45cb0738da6565f134c01d82ba291c746551b5bc82e781ec876eb20909/yacs-0.1.8.tar.gz", hash = "sha256:efc4c732942b3103bea904ee89af98bcd27d01f0ac12d8d4d369f1e7a2914384", size = 11100, upload-time = "2020-08-10T16:37:47.755Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/38/4f/fe9a4d472aa867878ce3bb7efb16654c5d63672b86dc0e6e953a67018433/yacs-0.1.8-py3-none-any.whl", hash = "sha256:99f893e30497a4b66842821bac316386f7bd5c4f47ad35c9073ef089aa33af32", size = 14747, upload-time = "2020-08-10T16:37:46.4Z" },
 ]
 
 [[package]]

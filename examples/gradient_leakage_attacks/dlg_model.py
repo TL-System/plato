@@ -13,6 +13,7 @@ import torch.nn as nn
 from nn import lenet, resnet
 
 from plato.config import Config
+from plato.utils.retired_backends import raise_if_retired
 
 
 def get(model_name: str | None = None) -> Optional[Callable[[], nn.Module]]:
@@ -27,6 +28,6 @@ def get(model_name: str | None = None) -> Optional[Callable[[], nn.Module]]:
 
     # Set up model through plato's model library
     if Config().trainer.model_type == "vit":
-        return None
+        raise_if_retired("vit", category="model")
 
     raise ValueError(f"No such model: {resolved_name}")
