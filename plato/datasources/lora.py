@@ -5,13 +5,18 @@ LoRA-friendly datasource built on HuggingFace datasets.
 from __future__ import annotations
 
 import logging
-from typing import Any, Dict, List, Optional, cast
+from typing import Any, cast
 
 from datasets import Dataset, load_dataset
 from transformers import AutoTokenizer, LlamaTokenizer
 
 from plato.config import Config
 from plato.datasources import base
+from plato.utils.huggingface import (
+    artifact_identity,
+    dataset_kwargs,
+    pretrained_kwargs,
+)
 
 
 class DataSource(base.DataSource):
@@ -21,6 +26,8 @@ class DataSource(base.DataSource):
     Configuration (data section):
         dataset_name: Name on HuggingFace hub.
         dataset_config: Optional dataset subset/config name.
+        dataset_revision: Optional immutable hub revision.
+        data_files: Optional split-to-local-JSON-path mapping (dataset_name="json").
         train_split: Dataset split for training (default ``"train"``).
         validation_split: Dataset split for validation (default ``"validation"``).
         text_field: Field containing raw text (default ``"text"``).
@@ -33,7 +40,6 @@ class DataSource(base.DataSource):
 
         data_cfg = Config().data
         dataset_name = data_cfg.dataset_name
-        dataset_config = getattr(data_cfg, "dataset_config", None)
         train_split = getattr(data_cfg, "train_split", "train")
         val_split = getattr(data_cfg, "validation_split", "validation")
         text_field = getattr(data_cfg, "text_field", "text")
@@ -42,11 +48,7 @@ class DataSource(base.DataSource):
 
         logging.info("Dataset: %s", dataset_name)
 
-        dataset_kwargs: dict[str, Any] = {}
-        if dataset_config is not None:
-            dataset_kwargs["name"] = dataset_config
-
-        dataset = load_dataset(dataset_name, **dataset_kwargs)
+        dataset = load_dataset(dataset_name, **dataset_kwargs(data_cfg))
 
         train_split_dataset = dataset[train_split]
         if not isinstance(train_split_dataset, Dataset):
@@ -58,17 +60,27 @@ class DataSource(base.DataSource):
             raise AttributeError("Training split must expose 'column_names'.")
         column_names: list[str] = [str(name) for name in column_names_raw]
 
-        model_name = Config().trainer.model_name
+        identity = artifact_identity()
+        tokenizer_name = identity["tokenizer_name"]
+        tokenizer_kwargs = pretrained_kwargs(
+            revision=identity["tokenizer_revision"],
+            cache_dir=Config().params["data_path"] + "/huggingface",
+        )
         tokenizer: Any
-        if "llama" in model_name.lower():
-            tokenizer = LlamaTokenizer.from_pretrained(model_name)
+        if "llama" in tokenizer_name.lower():
+            tokenizer = LlamaTokenizer.from_pretrained(
+                tokenizer_name, **tokenizer_kwargs
+            )
         else:
-            tokenizer = AutoTokenizer.from_pretrained(model_name)
+            tokenizer = AutoTokenizer.from_pretrained(
+                tokenizer_name, **tokenizer_kwargs
+            )
         tokenizer = cast(Any, tokenizer)
 
         if tokenizer.pad_token_id is None:
             tokenizer.pad_token = tokenizer.eos_token
         tokenizer.padding_side = "left"
+        self.tokenizer = tokenizer
 
         def tokenize_function(examples: dict[str, list[str]]):
             return tokenizer(
