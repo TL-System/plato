@@ -1,0 +1,783 @@
+{
+  "schema_version": 1,
+  "reviewer": "/root/lighteval_docs_review",
+  "date_utc": "2026-10-03T23:06:29.724151+00:00",
+  "verdict": "ACCEPT",
+  "review_scope": "Fresh independent review of the six Lighteval/install documentation files at the frozen docs commit against the frozen combined evaluator/profile candidate. Source inspection, own isolated strict docs build, rendered local links/anchors, actual bounded command checks and actual complete optional CPU suite. No delegated agents, repository prose/source edits, root or candidate virtual-environment mutations, publication, PR, dispatch or Linux qualification.",
+  "unresolved_findings": {
+    "critical": 0,
+    "high": 0,
+    "medium": 0,
+    "low": 0
+  },
+  "findings": [],
+  "reviewed_sources": {
+    "documentation_commit": "3dcd7f9bfa1d32821a1544c9bcbc8b0fb80d8f78",
+    "documentation_tree": "0cef360ac14377b19ceec25a24576f365bccd8d8",
+    "documentation_evidence_commit": "efbfecaacf3d77e2932d2df9665f14d4ee4f0ca5",
+    "documentation_base": "c1bdae78456b6a8b16d2b78d16ab6ec973067b06",
+    "combined_source_commit": "d2ed4bcbc46684ac60dfdb1505ff764029ee48e9",
+    "combined_source_tree": "5a4c1d53e1715ecb38df5e7e16f9369d5c029750",
+    "candidate_status": {
+      "docs": "",
+      "combined": ""
+    },
+    "isolated_worktree_status": "M docs/docs/configurations/evaluation.md\n M docs/docs/development.md\n M \"docs/docs/examples/case-studies/4. Server-side Lighteval for SmolLM2.md\"\n M docs/docs/install.md\n M docs/docs/quickstart.md\n M docs/docs/references/evaluators.md",
+    "documentation_files": [
+      {
+        "name": "docs/docs/install.md",
+        "path": "/tmp/plato-refresh-worktrees/lighteval-docs/docs/docs/install.md",
+        "sha256": "495ac1c33737e5c9f477b8d650952840164bbb98957bc6e9ab6632fc55727eb2",
+        "bytes": 5322,
+        "blob": "76abf90038dc0b070a879254ffd3fde39c50ca68",
+        "author_declared_sha256": "495ac1c33737e5c9f477b8d650952840164bbb98957bc6e9ab6632fc55727eb2",
+        "matches_author_receipt": true,
+        "isolated_review_copy_identical": true
+      },
+      {
+        "name": "docs/docs/quickstart.md",
+        "path": "/tmp/plato-refresh-worktrees/lighteval-docs/docs/docs/quickstart.md",
+        "sha256": "6e946cfd836abfe7e87044eaaf0c64d89ed256a6e3e1c2fb47bbd2a641d5065f",
+        "bytes": 7077,
+        "blob": "5140ec6372e986e1c9e774a813ac8d0eec11e492",
+        "author_declared_sha256": "6e946cfd836abfe7e87044eaaf0c64d89ed256a6e3e1c2fb47bbd2a641d5065f",
+        "matches_author_receipt": true,
+        "isolated_review_copy_identical": true
+      },
+      {
+        "name": "docs/docs/configurations/evaluation.md",
+        "path": "/tmp/plato-refresh-worktrees/lighteval-docs/docs/docs/configurations/evaluation.md",
+        "sha256": "08dccc460ba982f8636008787344efe36285b5664dcce298cbf7f35a868dbf5c",
+        "bytes": 6522,
+        "blob": "4412356f950014abfb1c6261b8e9a2ae2d373099",
+        "author_declared_sha256": "08dccc460ba982f8636008787344efe36285b5664dcce298cbf7f35a868dbf5c",
+        "matches_author_receipt": true,
+        "isolated_review_copy_identical": true
+      },
+      {
+        "name": "docs/docs/references/evaluators.md",
+        "path": "/tmp/plato-refresh-worktrees/lighteval-docs/docs/docs/references/evaluators.md",
+        "sha256": "627cf014487123ca67b18974126c8a9873a510ef2bb7d392a5069129ce2be40b",
+        "bytes": 8929,
+        "blob": "50b66ff1f6853eda9ae3321f42f2d46b52f83e3b",
+        "author_declared_sha256": "627cf014487123ca67b18974126c8a9873a510ef2bb7d392a5069129ce2be40b",
+        "matches_author_receipt": true,
+        "isolated_review_copy_identical": true
+      },
+      {
+        "name": "docs/docs/examples/case-studies/4. Server-side Lighteval for SmolLM2.md",
+        "path": "/tmp/plato-refresh-worktrees/lighteval-docs/docs/docs/examples/case-studies/4. Server-side Lighteval for SmolLM2.md",
+        "sha256": "d20a43f6bbd0fb96b5d0bb65843b6939fe4506c928e5051d8c5b3a479a9664c7",
+        "bytes": 4733,
+        "blob": "e5d13fb3aa1c221edd7609f311a934dc54c68bf4",
+        "author_declared_sha256": "d20a43f6bbd0fb96b5d0bb65843b6939fe4506c928e5051d8c5b3a479a9664c7",
+        "matches_author_receipt": true,
+        "isolated_review_copy_identical": true
+      },
+      {
+        "name": "docs/docs/development.md",
+        "path": "/tmp/plato-refresh-worktrees/lighteval-docs/docs/docs/development.md",
+        "sha256": "9fcaa651c861444ca36220d4732a7496087bbd51aff501b6aa8de44977ddf6f0",
+        "bytes": 12090,
+        "blob": "bac055c0dcea94a9fb6417d6e81767681a9e6f40",
+        "author_declared_sha256": "9fcaa651c861444ca36220d4732a7496087bbd51aff501b6aa8de44977ddf6f0",
+        "matches_author_receipt": true,
+        "isolated_review_copy_identical": true
+      }
+    ],
+    "combined_source_files": [
+      {
+        "name": "pyproject.toml",
+        "path": "/tmp/plato-refresh-worktrees/lighteval-integration/pyproject.toml",
+        "sha256": "fcc830f9fac66f2e2f28bef0d715bea3eb1300105a4239bb33cce8f62b71b398",
+        "bytes": 4102,
+        "blob": "ff69fd39a94c2889c78611d193559856ef4e1452",
+        "isolated_review_source_identical": true
+      },
+      {
+        "name": "uv.lock",
+        "path": "/tmp/plato-refresh-worktrees/lighteval-integration/uv.lock",
+        "sha256": "66a4e4442d7b1f26d220b44ca73c44ff4f1151a86857bb3f93a594819fd08126",
+        "bytes": 755641,
+        "blob": "419ce6bf04e2ca46520dcf1e05a36ac134cdc63c",
+        "isolated_review_source_identical": true
+      },
+      {
+        "name": "tests/conftest.py",
+        "path": "/tmp/plato-refresh-worktrees/lighteval-integration/tests/conftest.py",
+        "sha256": "2d5323021b000249805712282c2ee5281eaa3c4fc65a55a65e8215acfe14a54f",
+        "bytes": 33845,
+        "blob": "77447a5478ddbafad8d265574f2b03f880af8809",
+        "isolated_review_source_identical": true
+      },
+      {
+        "name": "tests/llm_eval/cases.json",
+        "path": "/tmp/plato-refresh-worktrees/lighteval-integration/tests/llm_eval/cases.json",
+        "sha256": "557fd7e5af010e49c7a687b5632c22ef80cc0db4f6639c8ce67fda20d9b7dded",
+        "bytes": 2149,
+        "blob": "3a6967513276a1fafb8c3c9ec3f582e3448739c9",
+        "isolated_review_source_identical": true
+      },
+      {
+        "name": "tests/llm_eval/helpers.py",
+        "path": "/tmp/plato-refresh-worktrees/lighteval-integration/tests/llm_eval/helpers.py",
+        "sha256": "0a3c9f230f3de6095791f0930f7e2963aaf2a88a2190f00b8aed01d878614bf1",
+        "bytes": 5097,
+        "blob": "11431f95a624429e8eb02a0fb5a24cbf4d6f2908",
+        "isolated_review_source_identical": true
+      },
+      {
+        "name": "tests/llm_eval/test_lighteval_runtime.py",
+        "path": "/tmp/plato-refresh-worktrees/lighteval-integration/tests/llm_eval/test_lighteval_runtime.py",
+        "sha256": "923813575c9a7e588da27f4f3a1d178ee896b651829234a7306edb33bf381d44",
+        "bytes": 20862,
+        "blob": "cf3809840ad52f4a403e6ca0ddf8c44957a2ae8e",
+        "isolated_review_source_identical": true
+      },
+      {
+        "name": "plato/evaluators/lighteval.py",
+        "path": "/tmp/plato-refresh-worktrees/lighteval-integration/plato/evaluators/lighteval.py",
+        "sha256": "73a6f9f790ed1810033f4dcdc7c35bba68cd738260462e517dffd946d26b9775",
+        "bytes": 19717,
+        "blob": "b41f36e93fe3fe56f21e807dfef560d9db70777f",
+        "isolated_review_source_identical": true
+      },
+      {
+        "name": "plato/evaluators/lighteval_tasks.py",
+        "path": "/tmp/plato-refresh-worktrees/lighteval-integration/plato/evaluators/lighteval_tasks.py",
+        "sha256": "c5af11e1f9cc71d8cbd0318266690246045049701d00ddd944f45cce121c984f",
+        "bytes": 1427,
+        "blob": "686a7be1098ef003af8c74d0844224ca7ce2bc59",
+        "isolated_review_source_identical": true
+      },
+      {
+        "name": "plato/evaluators/runner.py",
+        "path": "/tmp/plato-refresh-worktrees/lighteval-integration/plato/evaluators/runner.py",
+        "sha256": "e08bae291acdcbefee340b8d7c8f41c168a0e00a2d257ff74932514a186985f3",
+        "bytes": 4019,
+        "blob": "554ec687c1350b0b6c8c231c5f935411f6f9a0bb",
+        "isolated_review_source_identical": true
+      },
+      {
+        "name": "configs/HuggingFace/fedavg_smol_smoltalk_smollm2_135m.toml",
+        "path": "/tmp/plato-refresh-worktrees/lighteval-integration/configs/HuggingFace/fedavg_smol_smoltalk_smollm2_135m.toml",
+        "sha256": "899ef9b1289c8fd08f7caafe754768cf1e13520caecc981bf24c7ac726f165fa",
+        "bytes": 1779,
+        "blob": "433300bf000cd92ea9380332d55a5d2e747a5105",
+        "isolated_review_source_identical": true
+      },
+      {
+        "name": ".github/workflows/pytorch_tests.yml",
+        "path": "/tmp/plato-refresh-worktrees/lighteval-integration/.github/workflows/pytorch_tests.yml",
+        "sha256": "cd6895c7fc62ee6f0efeff0909fc16078e31adbc61d900db8058548b86714b54",
+        "bytes": 33238,
+        "blob": "a1d44491c9b74a5aab557aab227ec6a68e707532",
+        "isolated_review_source_identical": true
+      }
+    ],
+    "external_evidence_inputs": [
+      {
+        "path": "/tmp/plato-refresh-worktrees/lighteval-docs/evidence/2026-refresh/lighteval-docs.json",
+        "sha256": "74b0b5a5e498855e5c1eee86cf15e6a0b7eed691268c49eacb7a5b856df4c4f3",
+        "bytes": 13488
+      },
+      {
+        "path": "/tmp/plato-lighteval-runtime-review.json",
+        "sha256": "f034d94fa98c7e291df33a1ad1e3bea2bb6e74d2dcc145ac7c32f9985e3c1e53",
+        "bytes": 20172
+      },
+      {
+        "path": "/tmp/plato-refresh-worktrees/lighteval-profile/evidence/2026-refresh/lighteval-profile-validation.json",
+        "sha256": "2c2e9a139240c641b328a66e7463874fcda6add4082dd2815423dc87ae34422d",
+        "bytes": 19020
+      },
+      {
+        "path": "/tmp/plato-lighteval-dependency-checks/command-semantics.json",
+        "sha256": "5085b7db4b13d5fa91569cb765a05fd01f061743e76d5af6a7bbfeac5e1dc9f9",
+        "bytes": 11867
+      }
+    ]
+  },
+  "semantic_review": {
+    "installation": "Manifest/lock provisioning is described correctly, global-package copying claim is removed, runtime extras are distinguished from dependency groups, incompatible ssl/llm_eval selection is described and independently rejected. All 13 fenced evaluator commands retain --locked and --extra llm_eval. Existing nltk==3.10.3 override and xxhash>=3.8.1,<4 constraint remain exactly the source contract; no new security claim or scope is introduced.",
+    "resources": "Explicit provision command names punkt and punkt_tab; actual fresh owned data resolves tokenizers/punkt and tokenizers/punkt_tab. Missing-resource preflight returned usage error before optional runtime-module import. Resource provisioning before offline use is correctly stated.",
+    "model_and_cache": "Current save_pretrained model/tokenizer export has priority; fallback copies each distinct resolved existing local source completely with independent files; configured source artifacts remain unchanged. Full copy/disk/time cost, ordinary Hugging Face cache exclusion, temporary model/output/response-cache cleanup, per-evaluation freshness and stable-source/concurrent-writer limits match the accepted implementation and the independent actual11 execution.",
+    "profile": "Strict llm-eval inventory/outcome requirements, no collection/runtime equivalence, rejection of selection/exclusion filters, explicit filesystem focused invocation, focused prerequisite/outcome checks, optional pyargs/cross-profile restrictions and pre-import exclusion for ordinary core/base/mandatory/mlx-native scopes match d2ed4bcbc46684ac60dfdb1505ff764029ee48e9. The optional and combined collection logs each contain exactly the 11 ledger nodeids with no native cases.",
+    "workload_and_claim_boundaries": "Supplied SmolLM2 config really selects cuda:0 and external artifacts; CPU guidance correctly requires both evaluation.device=cpu and trainer --cpu. Controlled tiny local GPT-2/parquet/one-token CPU regression fixtures preserve upstream prompt/metric rules and demonstrate integration behavior; docs expressly exclude public benchmark accuracy, downloaded model quality, performance, GPU and distributed qualification.",
+    "combined_dependencies": "test-model-search includes test and ptflops in the actual manifest. Documented combined uv invocation collected 1646 tests with the exact optional11 inventory and native scope excluded. Combined runtime execution is not claimed by this docs review."
+  },
+  "independent_validation": {
+    "environments": {
+      "snapshot": "/tmp/plato-lighteval-docs-review-worktree",
+      "snapshot_method": "Detached d2ed source with only the six frozen documentation files copied byte-for-byte; both candidate worktrees remained clean.",
+      "docs_environment": "/tmp/plato-lighteval-docs-review-docs-env",
+      "docs_provision": "UV_PROJECT_ENVIRONMENT=/tmp/plato-lighteval-docs-review-docs-env uv sync --locked --python 3.13 --only-group docs --no-install-project",
+      "eval_environment": "/tmp/plato-lighteval-docs-review-eval-env",
+      "eval_provision": "UV_PROJECT_ENVIRONMENT=/tmp/plato-lighteval-docs-review-eval-env uv sync --locked --python 3.13 --extra llm_eval --group test",
+      "runtime": {
+        "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+        "executable": "/tmp/plato-lighteval-docs-review-eval-env/bin/python",
+        "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+        "packages": {
+          "lighteval": "0.13.0",
+          "xxhash": "3.8.1",
+          "nltk": "3.10.3",
+          "langdetect": "1.0.9",
+          "torch": "2.14.1",
+          "transformers": "5.18.0",
+          "datasets": "5.0.1",
+          "pytest": "9.1.1",
+          "ptflops": "0.7.5"
+        }
+      },
+      "docs_tools": {
+        "mkdocs": "1.6.1",
+        "mkdocs-material": "9.7.7",
+        "Markdown": "3.11"
+      }
+    },
+    "strict_build": {
+      "command": "/tmp/plato-lighteval-docs-review-docs-env/bin/python -m mkdocs build --strict --config-file docs/mkdocs.yml --site-dir /tmp/plato-lighteval-docs-review-artifacts/site",
+      "returncode": 0,
+      "observation": "Existing Material advisory banner and informational unlisted retired Nanochat/LeRobot pages remain; strict build passes."
+    },
+    "rendered_link_command_audit": {
+      "files": [
+        "docs/docs/install.md",
+        "docs/docs/quickstart.md",
+        "docs/docs/configurations/evaluation.md",
+        "docs/docs/references/evaluators.md",
+        "docs/docs/examples/case-studies/4. Server-side Lighteval for SmolLM2.md",
+        "docs/docs/development.md"
+      ],
+      "rendered_local_links_checked": 412,
+      "evaluator_commands_checked": 13,
+      "commands": [
+        {
+          "page": "docs/docs/install.md",
+          "command": "uv sync --locked --python 3.13 --extra llm_eval",
+          "tokens": [
+            "uv",
+            "sync",
+            "--locked",
+            "--python",
+            "3.13",
+            "--extra",
+            "llm_eval"
+          ]
+        },
+        {
+          "page": "docs/docs/install.md",
+          "command": "uv run --locked --extra llm_eval python -m nltk.downloader punkt punkt_tab",
+          "tokens": [
+            "uv",
+            "run",
+            "--locked",
+            "--extra",
+            "llm_eval",
+            "python",
+            "-m",
+            "nltk.downloader",
+            "punkt",
+            "punkt_tab"
+          ]
+        },
+        {
+          "page": "docs/docs/quickstart.md",
+          "command": "uv sync --locked --python 3.13 --extra llm_eval",
+          "tokens": [
+            "uv",
+            "sync",
+            "--locked",
+            "--python",
+            "3.13",
+            "--extra",
+            "llm_eval"
+          ]
+        },
+        {
+          "page": "docs/docs/quickstart.md",
+          "command": "uv run --locked --extra llm_eval python -m nltk.downloader punkt punkt_tab",
+          "tokens": [
+            "uv",
+            "run",
+            "--locked",
+            "--extra",
+            "llm_eval",
+            "python",
+            "-m",
+            "nltk.downloader",
+            "punkt",
+            "punkt_tab"
+          ]
+        },
+        {
+          "page": "docs/docs/quickstart.md",
+          "command": "uv run --locked --extra llm_eval python plato.py --config configs/HuggingFace/fedavg_smol_smoltalk_smollm2_135m.toml",
+          "tokens": [
+            "uv",
+            "run",
+            "--locked",
+            "--extra",
+            "llm_eval",
+            "python",
+            "plato.py",
+            "--config",
+            "configs/HuggingFace/fedavg_smol_smoltalk_smollm2_135m.toml"
+          ]
+        },
+        {
+          "page": "docs/docs/references/evaluators.md",
+          "command": "uv sync --locked --python 3.13 --extra llm_eval --group test",
+          "tokens": [
+            "uv",
+            "sync",
+            "--locked",
+            "--python",
+            "3.13",
+            "--extra",
+            "llm_eval",
+            "--group",
+            "test"
+          ]
+        },
+        {
+          "page": "docs/docs/references/evaluators.md",
+          "command": "uv run --locked --extra llm_eval python -m nltk.downloader punkt punkt_tab",
+          "tokens": [
+            "uv",
+            "run",
+            "--locked",
+            "--extra",
+            "llm_eval",
+            "python",
+            "-m",
+            "nltk.downloader",
+            "punkt",
+            "punkt_tab"
+          ]
+        },
+        {
+          "page": "docs/docs/references/evaluators.md",
+          "command": "uv run --locked --extra llm_eval --group test python -m pytest tests/llm_eval --test-profile=llm-eval -ra",
+          "tokens": [
+            "uv",
+            "run",
+            "--locked",
+            "--extra",
+            "llm_eval",
+            "--group",
+            "test",
+            "python",
+            "-m",
+            "pytest",
+            "tests/llm_eval",
+            "--test-profile=llm-eval",
+            "-ra"
+          ]
+        },
+        {
+          "page": "docs/docs/references/evaluators.md",
+          "command": "uv run --locked --extra llm_eval --group test python -m pytest tests/llm_eval/test_lighteval_runtime.py -k model_config -ra",
+          "tokens": [
+            "uv",
+            "run",
+            "--locked",
+            "--extra",
+            "llm_eval",
+            "--group",
+            "test",
+            "python",
+            "-m",
+            "pytest",
+            "tests/llm_eval/test_lighteval_runtime.py",
+            "-k",
+            "model_config",
+            "-ra"
+          ]
+        },
+        {
+          "page": "docs/docs/references/evaluators.md",
+          "command": "uv run --locked --extra llm_eval --group test-model-search python -m pytest tests --test-profile=llm-eval -ra",
+          "tokens": [
+            "uv",
+            "run",
+            "--locked",
+            "--extra",
+            "llm_eval",
+            "--group",
+            "test-model-search",
+            "python",
+            "-m",
+            "pytest",
+            "tests",
+            "--test-profile=llm-eval",
+            "-ra"
+          ]
+        },
+        {
+          "page": "docs/docs/examples/case-studies/4. Server-side Lighteval for SmolLM2.md",
+          "command": "uv sync --locked --python 3.13 --extra llm_eval",
+          "tokens": [
+            "uv",
+            "sync",
+            "--locked",
+            "--python",
+            "3.13",
+            "--extra",
+            "llm_eval"
+          ]
+        },
+        {
+          "page": "docs/docs/examples/case-studies/4. Server-side Lighteval for SmolLM2.md",
+          "command": "uv run --locked --extra llm_eval python -m nltk.downloader punkt punkt_tab",
+          "tokens": [
+            "uv",
+            "run",
+            "--locked",
+            "--extra",
+            "llm_eval",
+            "python",
+            "-m",
+            "nltk.downloader",
+            "punkt",
+            "punkt_tab"
+          ]
+        },
+        {
+          "page": "docs/docs/examples/case-studies/4. Server-side Lighteval for SmolLM2.md",
+          "command": "uv run --locked --extra llm_eval python plato.py --config configs/HuggingFace/fedavg_smol_smoltalk_smollm2_135m.toml",
+          "tokens": [
+            "uv",
+            "run",
+            "--locked",
+            "--extra",
+            "llm_eval",
+            "python",
+            "plato.py",
+            "--config",
+            "configs/HuggingFace/fedavg_smol_smoltalk_smollm2_135m.toml"
+          ]
+        }
+      ],
+      "errors": [],
+      "external_links": "External navigation/theme links were not fetched; this audit checks built local page targets and fragments."
+    },
+    "actual_command_checks": [
+      {
+        "name": "nltk-provision-owned",
+        "command": "uv run --locked --extra llm_eval python -m nltk.downloader punkt punkt_tab",
+        "expected_returncode": 0,
+        "returncode": 0,
+        "seconds": 1.5539222499999998,
+        "log": "/tmp/plato-lighteval-docs-review-artifacts/nltk-provision-owned.log",
+        "sha256": "31faa9f9a8328c2a960d5212ab82f66ddbac7b45feef9387d0005864f0ab6867",
+        "bytes": 523
+      },
+      {
+        "name": "nltk-owned-resolution",
+        "command": "/tmp/plato-lighteval-docs-review-eval-env/bin/python -c 'import nltk; from pathlib import Path; nltk.data.path[:]=[\"/tmp/plato-lighteval-docs-review-artifacts/nltk_data\"]; print({r:str(nltk.data.find(r)) for r in (\"tokenizers/punkt\",\"tokenizers/punkt_tab\")})'",
+        "expected_returncode": 0,
+        "returncode": 0,
+        "seconds": 1.059771208,
+        "log": "/tmp/plato-lighteval-docs-review-artifacts/nltk-owned-resolution.log",
+        "sha256": "e0e2343e32044187e644f9cd5176cfed738992c812a37c64f9433c227a1544df",
+        "bytes": 195
+      },
+      {
+        "name": "reference-help",
+        "command": "uv run --locked --extra llm_eval python plato.py --config configs/HuggingFace/fedavg_smol_smoltalk_smollm2_135m.toml --help",
+        "expected_returncode": 0,
+        "returncode": 0,
+        "seconds": 19.99409275,
+        "log": "/tmp/plato-lighteval-docs-review-artifacts/reference-help.log",
+        "sha256": "ac7c87ef7f253bb1370c124fab32bbdbebab3de9d079b865c3379368d6345593",
+        "bytes": 732
+      },
+      {
+        "name": "optional-collect",
+        "command": "uv run --locked --extra llm_eval --group test python -m pytest tests/llm_eval --test-profile=llm-eval --collect-only -q -ra",
+        "expected_returncode": 0,
+        "returncode": 0,
+        "seconds": 9.131700082999998,
+        "log": "/tmp/plato-lighteval-docs-review-artifacts/optional-collect.log",
+        "sha256": "4c1a3c58dbb622ae52a49fb651656979cf07e5d92af0f5f0dc0aabb10614f597",
+        "bytes": 1486
+      },
+      {
+        "name": "focused-model-config",
+        "command": "uv run --locked --extra llm_eval --group test python -m pytest tests/llm_eval/test_lighteval_runtime.py -k model_config -ra",
+        "expected_returncode": 0,
+        "returncode": 0,
+        "seconds": 6.142367749999998,
+        "log": "/tmp/plato-lighteval-docs-review-artifacts/focused-model-config.log",
+        "sha256": "b9b3be44d0d44bea9ec23766680ae853dd6488c9d36043b1b98c5fd82dc85479",
+        "bytes": 5539
+      },
+      {
+        "name": "filtered-profile-rejection",
+        "command": "uv run --locked --extra llm_eval --group test python -m pytest tests/llm_eval --test-profile=llm-eval -k model_config --collect-only -q",
+        "expected_returncode": 4,
+        "returncode": 4,
+        "seconds": 4.368989333999998,
+        "log": "/tmp/plato-lighteval-docs-review-artifacts/filtered-profile-rejection.log",
+        "sha256": "9627d6e4363224628d719e1e9fcff15e884db23d8f0e5ef5db615ee20a8fd49a",
+        "bytes": 79
+      },
+      {
+        "name": "pyargs-rejection",
+        "command": "uv run --locked --extra llm_eval --group test python -m pytest --pyargs tests.llm_eval --collect-only -q",
+        "expected_returncode": 4,
+        "returncode": 4,
+        "seconds": 4.394126667000002,
+        "log": "/tmp/plato-lighteval-docs-review-artifacts/pyargs-rejection.log",
+        "sha256": "bd5099fd665da67cf95d58c986d4c4505d2ccc62f911f341cd769229976fbc9d",
+        "bytes": 99
+      },
+      {
+        "name": "cross-profile-rejection",
+        "command": "uv run --locked --extra llm_eval --group test python -m pytest tests/llm_eval --test-profile=mandatory --collect-only -q",
+        "expected_returncode": 4,
+        "returncode": 4,
+        "seconds": 4.397525250000001,
+        "log": "/tmp/plato-lighteval-docs-review-artifacts/cross-profile-rejection.log",
+        "sha256": "9413770351bc4ef0e38de7c49e6cea6403d8148f04ae8dfab211ba8be3a4e050",
+        "bytes": 56
+      },
+      {
+        "name": "combined-collect",
+        "command": "uv run --locked --extra llm_eval --group test-model-search python -m pytest tests --test-profile=llm-eval --collect-only -q -ra",
+        "expected_returncode": 0,
+        "returncode": 0,
+        "seconds": 7.512155125,
+        "log": "/tmp/plato-lighteval-docs-review-artifacts/combined-collect.log",
+        "sha256": "44673da8bdb9596aae2fc9528a7f71f98bb9cb21853ace8fda6befb308f5c3d9",
+        "bytes": 184907
+      },
+      {
+        "name": "all-extras-conflict",
+        "command": "uv sync --locked --python 3.13 --all-extras --dry-run",
+        "expected_returncode": 2,
+        "returncode": 2,
+        "seconds": 0.024136624999997025,
+        "log": "/tmp/plato-lighteval-docs-review-artifacts/all-extras-conflict.log",
+        "sha256": "f41b56791d58258ec5fb591d01bd218eeaf1463182aae33694c638ec09c347ec",
+        "bytes": 232
+      }
+    ],
+    "collection_ledger_audit": [
+      {
+        "name": "optional-collect",
+        "optional_collected": 11,
+        "ledger_identical": true,
+        "missing": [],
+        "extra": [],
+        "native_collected": 0
+      },
+      {
+        "name": "combined-collect",
+        "optional_collected": 11,
+        "ledger_identical": true,
+        "missing": [],
+        "extra": [],
+        "native_collected": 0
+      }
+    ],
+    "actual_optional_execution": {
+      "command": "uv run --locked --extra llm_eval --group test python -m pytest tests/llm_eval --test-profile=llm-eval -ra --basetemp=/tmp/plato-lighteval-docs-review-artifacts/optional-tmp --junitxml=/tmp/plato-lighteval-docs-review-artifacts/optional.xml",
+      "environment_overrides": {
+        "UV_PROJECT_ENVIRONMENT": "/tmp/plato-lighteval-docs-review-eval-env",
+        "NLTK_DATA": "/tmp/plato-lighteval-docs-review-artifacts/nltk_data",
+        "HF_HUB_OFFLINE": "1",
+        "HF_DATASETS_OFFLINE": "1",
+        "TOKENIZERS_PARALLELISM": "false"
+      },
+      "returncode": 0,
+      "audit": {
+        "count": 11,
+        "inventory_exact": true,
+        "failures": 0,
+        "errors": 0,
+        "skips": 0,
+        "properties_per_case": {
+          "test_real_preset_pipeline_normalizes_metrics_and_refreshes_exports[current-model]": 1,
+          "test_real_preset_pipeline_normalizes_metrics_and_refreshes_exports[configured-local]": 1,
+          "test_real_piqa_prompt_and_preset_task_contract": 0,
+          "test_real_model_config_failure_clears_stale_results_and_exports[False]": 1,
+          "test_real_model_config_failure_clears_stale_results_and_exports[True]": 1,
+          "test_real_missing_primary_metric_is_rejected": 0,
+          "test_real_readonly_local_source_ignores_old_responses[same]": 2,
+          "test_real_readonly_local_source_ignores_old_responses[separate]": 2,
+          "test_failure_after_actual_inference_cleans_local_copies[False]": 1,
+          "test_failure_after_actual_inference_cleans_local_copies[True]": 1,
+          "test_real_hub_style_response_cache_is_per_run": 1
+        },
+        "summary_lines": [
+          "  tests/llm_eval/test_lighteval_runtime.py:84: PytestWarning: record_property is incompatible with junit_family 'xunit2' (use 'legacy' or 'xunit1')",
+          "  tests/llm_eval/test_lighteval_runtime.py:273: PytestWarning: record_property is incompatible with junit_family 'xunit2' (use 'legacy' or 'xunit1')",
+          "  tests/llm_eval/test_lighteval_runtime.py:343: PytestWarning: record_property is incompatible with junit_family 'xunit2' (use 'legacy' or 'xunit1')",
+          "  tests/llm_eval/test_lighteval_runtime.py:460: PytestWarning: record_property is incompatible with junit_family 'xunit2' (use 'legacy' or 'xunit1')",
+          "  tests/llm_eval/test_lighteval_runtime.py:523: PytestWarning: record_property is incompatible with junit_family 'xunit2' (use 'legacy' or 'xunit1')",
+          "test profile: Lighteval complete qualification",
+          "================== 11 passed, 10 warnings in 77.13s (0:01:17) =================="
+        ],
+        "temp_cleanup_warning": false
+      },
+      "warnings": "10 warnings solely from reviewer-added JUnit xunit2 output conflicting with record_property; recorded properties remain present. No rm_rf or temporary cleanup warning in the owned-basetemp full11 run.",
+      "focused_earlier_observation": "The exact documented focused command passed 2 cases and deselected 9. Its default shared pytest basetemp attempted housekeeping of old read-only garbage left before the frozen LR1 correction and emitted 8 warnings. This review did not create those read-only sources. The complete owned-basetemp run of d2ed emitted no cleanup warning."
+    },
+    "missing_resource_preflight": {
+      "method": "Owned compatible interpreter, nltk.data.path cleared in process, pytest.main optional strict collect-only; no repository/environment mutation.",
+      "pytest_exit_code": 4,
+      "wrapper_returncode": 0,
+      "diagnostic": "missing NLTK resource tokenizers/punkt; provision explicitly with python -m nltk.downloader punkt punkt_tab",
+      "optional_runtime_module_imported": false
+    },
+    "nltk_provision_observation": "An initial exact command while NLTK_DATA did not yet exist reported both existing /Users/bli/nltk_data resources already up-to-date. Reviewer then created the owned directory and reran the exact command, freshly downloading/unpacking both resources into that directory and independently resolving both paths solely within it. No global Python packages or virtual environments were modified."
+  },
+  "author_handoff": {
+    "target": "/root/mlx_docs_author",
+    "prose_corrections_required": false,
+    "requested_action": "Evidence-only receipt update binding the frozen implemented profile/ledger and this fresh docs review; preserve publication gate until root accepts independent profile review and remaining Linux/integration qualification."
+  },
+  "remaining_integration_limits": [
+    "This acceptance applies to docs3dcd7f9 against combined sourced2ed4bc and the 11-case ledger hashes recorded here. If reader-facing prose or profile/runtime semantics change, review the delta on the new source.",
+    "Original docs receipt explicitly remains draft/pending implemented-profile and accepted-runtime rebinding. Original author must update evidence against the final accepted integration; no prose defect was found.",
+    "Independent combined profile/LR1 reviewer final acceptance was pending at task handoff. This docs review adds full11 CPU execution and actual command evidence but does not stand in for that code/profile review.",
+    "No Linux claim. Linux optional/combined qualification and final integration acceptance remain root gates.",
+    "Full combined1646 execution, downloaded SmolLM2 federated training, GPU/distributed behavior, benchmark accuracy/performance, external-link fetching and deployment/P2 tooling/prose are outside this bounded review.",
+    "No publication, PR, merge, workflow dispatch or external communication performed."
+  ],
+  "artifacts": [
+    {
+      "path": "/tmp/plato-lighteval-docs-review-artifacts/all-extras-conflict.log",
+      "sha256": "f41b56791d58258ec5fb591d01bd218eeaf1463182aae33694c638ec09c347ec",
+      "bytes": 232
+    },
+    {
+      "path": "/tmp/plato-lighteval-docs-review-artifacts/collection-ledger-audit.json",
+      "sha256": "deae2ecaab13157c9e162dcd8eaf3bef4f80880a78452f5eac357c048fae2559",
+      "bytes": 329
+    },
+    {
+      "path": "/tmp/plato-lighteval-docs-review-artifacts/combined-collect.log",
+      "sha256": "44673da8bdb9596aae2fc9528a7f71f98bb9cb21853ace8fda6befb308f5c3d9",
+      "bytes": 184907
+    },
+    {
+      "path": "/tmp/plato-lighteval-docs-review-artifacts/command-checks.json",
+      "sha256": "77e423939b9de8249ac984194104cf6615f9cbf522481a9e693a6c548464388e",
+      "bytes": 4520
+    },
+    {
+      "path": "/tmp/plato-lighteval-docs-review-artifacts/command_checks.py",
+      "sha256": "4679f2b7447cad8fa48c00b1d60c218194364871305354f65b5b1107ea149868",
+      "bytes": 2999
+    },
+    {
+      "path": "/tmp/plato-lighteval-docs-review-artifacts/cross-profile-rejection.log",
+      "sha256": "9413770351bc4ef0e38de7c49e6cea6403d8148f04ae8dfab211ba8be3a4e050",
+      "bytes": 56
+    },
+    {
+      "path": "/tmp/plato-lighteval-docs-review-artifacts/filtered-profile-rejection.log",
+      "sha256": "9627d6e4363224628d719e1e9fcff15e884db23d8f0e5ef5db615ee20a8fd49a",
+      "bytes": 79
+    },
+    {
+      "path": "/tmp/plato-lighteval-docs-review-artifacts/focused-model-config.log",
+      "sha256": "b9b3be44d0d44bea9ec23766680ae853dd6488c9d36043b1b98c5fd82dc85479",
+      "bytes": 5539
+    },
+    {
+      "path": "/tmp/plato-lighteval-docs-review-artifacts/interpreter-packages.json",
+      "sha256": "3b589fa03e6413b39324a1f9c0687c4a98a8020c8054a65060eda98cc3ab8e37",
+      "bytes": 439
+    },
+    {
+      "path": "/tmp/plato-lighteval-docs-review-artifacts/missing-resource-preflight.log",
+      "sha256": "b24d85bf13709567be7b63d9ff50862f30456fda9910d99c46c58e131e669851",
+      "bytes": 204
+    },
+    {
+      "path": "/tmp/plato-lighteval-docs-review-artifacts/mkdocs-strict.log",
+      "sha256": "5bd6161ed992976f0391db79fb79dffa3d59c4e600c01db69d612d5edc47bb72",
+      "bytes": 1218
+    },
+    {
+      "path": "/tmp/plato-lighteval-docs-review-artifacts/nltk-owned-resolution.log",
+      "sha256": "e0e2343e32044187e644f9cd5176cfed738992c812a37c64f9433c227a1544df",
+      "bytes": 195
+    },
+    {
+      "path": "/tmp/plato-lighteval-docs-review-artifacts/nltk-provision-owned.log",
+      "sha256": "31faa9f9a8328c2a960d5212ab82f66ddbac7b45feef9387d0005864f0ab6867",
+      "bytes": 523
+    },
+    {
+      "path": "/tmp/plato-lighteval-docs-review-artifacts/nltk-provision.log",
+      "sha256": "d163d9f8a034e3868ef79fd6b4d490b904adb90f6841f0dbc1eb9353a9e298dd",
+      "bytes": 435
+    },
+    {
+      "path": "/tmp/plato-lighteval-docs-review-artifacts/optional-collect.log",
+      "sha256": "4c1a3c58dbb622ae52a49fb651656979cf07e5d92af0f5f0dc0aabb10614f597",
+      "bytes": 1486
+    },
+    {
+      "path": "/tmp/plato-lighteval-docs-review-artifacts/optional-execution-audit.json",
+      "sha256": "f7bebe2b832c724a4d987ce450b0204d6687f0ebd7f1f655812bfa1a34733bc8",
+      "bytes": 1906
+    },
+    {
+      "path": "/tmp/plato-lighteval-docs-review-artifacts/optional-full.log",
+      "sha256": "671adb68373f24087db3d6995825f8b3e59de3998ee920243f5c34f98a620b5d",
+      "bytes": 3470
+    },
+    {
+      "path": "/tmp/plato-lighteval-docs-review-artifacts/optional.xml",
+      "sha256": "cce067242c043f459cdc16964b481092ddfa1d8cdd0967408c6c9f7150151ce8",
+      "bytes": 57506
+    },
+    {
+      "path": "/tmp/plato-lighteval-docs-review-artifacts/provision-docs.log",
+      "sha256": "2f780ba12b15197c8e014d5bc47279f3e6309e528dfa741a20bd4bc549fa1408",
+      "bytes": 767
+    },
+    {
+      "path": "/tmp/plato-lighteval-docs-review-artifacts/provision-eval.log",
+      "sha256": "40d6c59327e40c94c43ed5f396da38774220f6d935047c83b4e96cd1f28726d2",
+      "bytes": 4061
+    },
+    {
+      "path": "/tmp/plato-lighteval-docs-review-artifacts/pyargs-rejection.log",
+      "sha256": "bd5099fd665da67cf95d58c986d4c4505d2ccc62f911f341cd769229976fbc9d",
+      "bytes": 99
+    },
+    {
+      "path": "/tmp/plato-lighteval-docs-review-artifacts/reference-help.log",
+      "sha256": "ac7c87ef7f253bb1370c124fab32bbdbebab3de9d079b865c3379368d6345593",
+      "bytes": 732
+    },
+    {
+      "path": "/tmp/plato-lighteval-docs-review-artifacts/rendered-link-command-audit.json",
+      "sha256": "db828c0c83a7bbfd1d8a86c9ca438567adb957a99fa7175d6dce51515ee3e4df",
+      "bytes": 5566
+    },
+    {
+      "path": "/tmp/plato-lighteval-docs-review-artifacts/rendered_audit.py",
+      "sha256": "f770509b1650ca66db0868ded93880f53bb6b317357f854cdb839dca60014fac",
+      "bytes": 4221
+    },
+    {
+      "path": "/tmp/plato-lighteval-docs-review-artifacts/source-audit.json",
+      "sha256": "38c5dafbe539c4b9ea4d8c3548729f5a4209d75a9183b5a98d2b7961936cf490",
+      "bytes": 8794
+    },
+    {
+      "path": "/tmp/plato-lighteval-docs-review-artifacts/source_audit.py",
+      "sha256": "d961d47de4387755aa18de9fd78620aeacdad3444c330f42b88a2797770e3da5",
+      "bytes": 3500
+    }
+  ]
+}
