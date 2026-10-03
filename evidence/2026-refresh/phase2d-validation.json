@@ -6,20 +6,22 @@
   "branch": "maintenance/2026-phase2-payloads",
   "commit_identity": {
     "baseline": "fda60becedfa6236c11d415b87a868b52789a41e",
-    "final_tested_implementation_commit": "639ca69bf4eaeff868462d0b30a5fcc72218f061",
+    "final_tested_implementation_commit": "15c79d0c81ffd0e5e4873db869a2863f97fe8279",
     "implementation_commits": [
       "af695c0f0dea3032116522b0c7131393e724f30d",
       "264b422d8b96420ff3c361e69f888a656fe8f512",
       "939d93cc289c0fb12a1c4084a1bc3dd72df293a7",
       "dba6f85b8140d0159d593ad14b371ecb2caa9ee2",
       "e7c0d59571d88efd7eb1fdbf4fc63ac2a7b81395",
-      "639ca69bf4eaeff868462d0b30a5fcc72218f061"
+      "639ca69bf4eaeff868462d0b30a5fcc72218f061",
+      "15c79d0c81ffd0e5e4873db869a2863f97fe8279"
     ],
     "evidence_carrier": "A following documentation-only commit updates this sole evidence file. Its exact identity is reported in the root handoff, avoiding a self-hash; runtime and test source are unchanged from the tested implementation commit above.",
-    "source_status_before_evidence": "Clean tracked tree at 639ca69b; both scoped correction suites run at this exact implementation commit. Original full suites are retained explicitly at e7c0d595 and are not claimed as rerun at the correction commit.",
+    "source_status_before_evidence": "Clean tracked tree at 15c79d0c. Clean locked base collection and the entire base non-runtime suite ran on both Python versions at this exact source; the two corrected test modules also ran in mandatory with actual Kazoo/Gymnasium. Prior 95-case correction suites remain attributed to 639ca69b and original full mandatory suites to e7c0d595; no unchanged startup rerun is claimed.",
     "previous_reviewed_candidate_commit": "a4a4733e96cf248a73db76e6b2182536b9f592ea",
     "retained_full_matrix_commit": "e7c0d59571d88efd7eb1fdbf4fc63ac2a7b81395",
-    "final_tested_implementation_tree": "428cc666be75104986dfd7561ea42b8489ce9dfe"
+    "final_tested_implementation_tree": "de021dd747ab5b29b78f2dc34ebfff9b9e8fb262",
+    "root_base_probe_candidate_commit": "aa232791f04d93eb9de09ed6c596ac714db5b605"
   },
   "scope": {
     "owned": [
@@ -112,7 +114,42 @@
       "commit": "c75fe54aa7c1fa881701c246f9427bcbe4eee5a4",
       "command": "git submodule update --init external/nanochat",
       "result": "Initialized pinned revision only. DViT/T2TViT remain uninitialized and untouched."
-    }
+    },
+    "locked_base_profile_environments": [
+      {
+        "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+        "optional_presence": {
+          "kazoo": false,
+          "gymnasium": false,
+          "opacus": false,
+          "tiktoken": false
+        },
+        "installed_distribution_count": 85,
+        "installed_distributions_sha256": "103fbe203bb4e9e7314eab0605262b61aef583e9a9027be7cb984df85063db6b",
+        "path": "/tmp/plato-phase2-root/base-313",
+        "ownership": "Root-owned; explicitly authorized read-only reuse. Never synced, removed or reconfigured by this author; package bytecode writes disabled.",
+        "provision_command": "uv sync --project /tmp/plato-refresh-worktrees/payloads --locked --python 3.13 --no-default-groups --group test-base",
+        "provision_source": "Root report environment.profile; provisioned by root before this correction."
+      },
+      {
+        "python": "3.14.8 (main, Sep 30 2026, 17:55:09) [Clang 21.0.0 (clang-2100.3.34.2)]",
+        "optional_presence": {
+          "kazoo": false,
+          "gymnasium": false,
+          "opacus": false,
+          "tiktoken": false
+        },
+        "installed_distribution_count": 85,
+        "installed_distributions_sha256": "103fbe203bb4e9e7314eab0605262b61aef583e9a9027be7cb984df85063db6b",
+        "path": "/tmp/plato-phase2d.G3jkGH/base314",
+        "ownership": "Task-owned isolated environment retained in owned scratch.",
+        "provision_command": "UV_PROJECT_ENVIRONMENT=/tmp/plato-phase2d.G3jkGH/base314 uv sync --locked --python 3.14 --no-default-groups --group test-base",
+        "provision_log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/base-sync314.log",
+          "sha256": "a35e2bf4f2d8fa0f057f89c223588366e218129d01eb283f74382bc31694aaa6"
+        }
+      }
+    ]
   },
   "mandatory_findings": [
     {
@@ -989,13 +1026,27 @@
       "raw validation/probe/red logs with hashes above",
       "pytest basetemp runtime trees and XML/JSON/coverage artifacts",
       "exact baseline module snapshots and bounded probe/validation/evidence builder scripts",
-      "FEI scratch runtime"
+      "FEI scratch runtime",
+      "Task-owned base314 locked test-base environment and provisioning log",
+      "Source-attributed base red/green collection, full base non-runtime and mandatory affected logs/run records/JUnit artifacts; profile runner and evidence updater"
     ],
     "worktree_resources": [
       "Pinned external/nanochat checkout initialized",
       "Ignored pytest/Python/coverage cache files owned in this worktree"
     ],
-    "retention": "Retained until root acceptance; no scratch/evidence/workspace cleanup, no root .venv or other agents environments mutated."
+    "retention": "Retained until root acceptance; no scratch/evidence/workspace cleanup, no root .venv or other agents environments mutated.",
+    "borrowed_read_only_resources": [
+      {
+        "path": "/tmp/plato-phase2-root/base-313",
+        "owner": "Root",
+        "handling": "Explicitly authorized read-only reuse; never synced or removed; package bytecode writes disabled."
+      },
+      {
+        "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2d-root-base-probe.json",
+        "owner": "Root",
+        "handling": "Read-only report reference."
+      }
+    ]
   },
   "review_corrections": {
     "corrected_at_utc": "2026-10-03T02:52:32.985660+00:00",
@@ -1302,5 +1353,369 @@
       "https://docs.python.org/3.13/library/random.html#random.sample"
     ],
     "resources": "All review-fix logs/XML/JSON, pytest runtimes, commit messages and this evidence updater retained within original owned scratch. No reviewer scratch changes or cleanup."
+  },
+  "base_profile_correction": {
+    "id": "ROOT-2D-01",
+    "recorded_at_utc": "2026-10-03T03:57:28.852414+00:00",
+    "root_report": {
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2d-root-base-probe.json",
+      "sha256": "298b647370bba7ec38865f11c43755b49c8f4d9ca6f2c5b93aee615d0693d25d"
+    },
+    "root_report_handling": "Read-only reference; root report and root raw log were not edited.",
+    "reviewed_candidate": "aa232791f04d93eb9de09ed6c596ac714db5b605",
+    "implementation_commit": "15c79d0c81ffd0e5e4873db869a2863f97fe8279",
+    "status": "Corrected and source-attributed red/green validated; fresh independent review pending.",
+    "finding": "Two new optional-library imports blocked clean test-base collection. Removing only the Kazoo exception import would also leave RoundInfoStore construction blocked because KazooClient and Lock are both None without Kazoo.",
+    "correction": [
+      "Patch both fake KazooClient and fake acquired Lock before constructing the remote RoundInfoStore; retain the failed-lock, finite-wait, stop/release and no-write/service-error assertions.",
+      "Use TimeoutError as the fake timeout contract in base and import actual kazoo.exceptions.LockTimeout inside the mandatory fixture.",
+      "Use the numeric shape/float32 bounds action-space contract in base and actual gymnasium.spaces.Box in mandatory. Preserve all five active policy finite-update/checkpoint variants and every other RL assertion.",
+      "No production code, metadata, shared conftest, new skips or optional-package prerequisites changed."
+    ],
+    "source_identity_manifest": [
+      {
+        "path": "tests/mpc/test_round_store_contracts.py",
+        "git_blob": "04822893530c7338c0c0e868313b609e6fec961c",
+        "sha256": "ea4bd59d56c388ad4bf71a6af86d1d26bf2f187788c41a3e447e486b4c364878",
+        "red_git_blob": "feb97ba40948bd0335a989dda7f6d199f90bf7d5"
+      },
+      {
+        "path": "tests/utils/test_rl_payload_utilities.py",
+        "git_blob": "de5e5f3614e028d03d3cc1d7396b9ee79d7949ec",
+        "sha256": "d79abc30a10ae515a6c3231f9356cf8427c2c8de74371ac3021e8b21ee28a6df",
+        "red_git_blob": "3749717c97260a2164421ef28014b23f3b3dda5b"
+      }
+    ],
+    "red": [
+      {
+        "source_commit": "aa232791f04d93eb9de09ed6c596ac714db5b605",
+        "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+        "command": [
+          "/tmp/plato-phase2-root/base-313/bin/python",
+          "-m",
+          "pytest",
+          "tests",
+          "--collect-only",
+          "--test-profile=base",
+          "-m",
+          "not runtime",
+          "-q"
+        ],
+        "exit_code": 2,
+        "result": "373/421 tests collected, 48 runtime cases deselected; two collection errors from top-level Kazoo/Gymnasium imports. Neither test body ran.",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/base-red-collection313.log",
+          "sha256": "8ecf845c1c6f6b94f11e446dd9cebd302dcad564f231b87fbc935d7fef93b8f6"
+        }
+      },
+      {
+        "source_commit": "aa232791f04d93eb9de09ed6c596ac714db5b605",
+        "python": "3.14.8 (main, Sep 30 2026, 17:55:09) [Clang 21.0.0 (clang-2100.3.34.2)]",
+        "command": [
+          "/tmp/plato-phase2d.G3jkGH/base314/bin/python",
+          "-m",
+          "pytest",
+          "tests",
+          "--collect-only",
+          "--test-profile=base",
+          "-m",
+          "not runtime",
+          "-q"
+        ],
+        "exit_code": 2,
+        "result": "373/421 tests collected, 48 runtime cases deselected; two collection errors from top-level Kazoo/Gymnasium imports. Neither test body ran.",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/base-red-collection314.log",
+          "sha256": "1ae525d72dfc1c3110a399f620752b314aff445cdf6cd354def21e889b95cfe7"
+        }
+      }
+    ],
+    "green_collection": [
+      {
+        "source_commit": "15c79d0c81ffd0e5e4873db869a2863f97fe8279",
+        "command": [
+          "/tmp/plato-phase2-root/base-313/bin/python",
+          "-m",
+          "pytest",
+          "tests",
+          "--collect-only",
+          "--test-profile=base",
+          "-m",
+          "not runtime",
+          "-q"
+        ],
+        "exit_code": 0,
+        "elapsed_seconds": 5.97,
+        "result": "386/434 tests collected, 48 runtime cases deselected; no collection errors.",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/base-green-collection313.log",
+          "sha256": "b75e8095e638e5ad2f9364388fd8e8b9c174c5118a2eb65b8f2e3c69af00c8ef"
+        },
+        "run_record": {
+          "path": "/tmp/plato-phase2d.G3jkGH/base-green-collection313.json",
+          "sha256": "91e43a8d2b986b068fca3447bdc9dae0005017229712d0e689cddb548bae77b7"
+        }
+      },
+      {
+        "source_commit": "15c79d0c81ffd0e5e4873db869a2863f97fe8279",
+        "command": [
+          "/private/tmp/plato-phase2d.G3jkGH/base314/bin/python",
+          "-m",
+          "pytest",
+          "tests",
+          "--collect-only",
+          "--test-profile=base",
+          "-m",
+          "not runtime",
+          "-q"
+        ],
+        "exit_code": 0,
+        "elapsed_seconds": 12.22,
+        "result": "386/434 tests collected, 48 runtime cases deselected; no collection errors.",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/base-green-collection314.log",
+          "sha256": "84f031e7a9f30567efe437f86186040c8f7643ea8ee505624347c4651feb4c5c"
+        },
+        "run_record": {
+          "path": "/tmp/plato-phase2d.G3jkGH/base-green-collection314.json",
+          "sha256": "d53a840142ffe47cdba7dc3f00638a902ea48bebc069481bd0a613bd5f15e21e"
+        }
+      }
+    ],
+    "green_base_non_runtime": [
+      {
+        "source_commit": "15c79d0c81ffd0e5e4873db869a2863f97fe8279",
+        "command": [
+          "/tmp/plato-phase2-root/base-313/bin/python",
+          "-m",
+          "pytest",
+          "tests",
+          "--test-profile=base",
+          "-m",
+          "not runtime",
+          "-q",
+          "--basetemp=/tmp/plato-phase2d.G3jkGH/pytest-base-green313",
+          "--junitxml=/tmp/plato-phase2d.G3jkGH/base-green-suite313.xml"
+        ],
+        "exit_code": 0,
+        "elapsed_seconds": 24.48,
+        "result": "383 passed, four existing allowed profile skips, 48 runtime cases deselected; no new failures or skips.",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/base-green-suite313.log",
+          "sha256": "68b9c0421f32977d45cb69dabe0c37497ccb2032a32896cb2a15292d93771a0c"
+        },
+        "run_record": {
+          "path": "/tmp/plato-phase2d.G3jkGH/base-green-suite313.json",
+          "sha256": "ee6b7ffa55725783b2804aff15a2ce3d3d91dc74a7da4d4ee3caa89dea32610e"
+        },
+        "junit": {
+          "tests": 387,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 4,
+          "passed": 383
+        },
+        "junit_artifact": {
+          "path": "/tmp/plato-phase2d.G3jkGH/base-green-suite313.xml",
+          "sha256": "6d2847f8a0b8961d0b09b2440e36e75ce4b862e74e02017067b3696a3dc8568f"
+        }
+      },
+      {
+        "source_commit": "15c79d0c81ffd0e5e4873db869a2863f97fe8279",
+        "command": [
+          "/private/tmp/plato-phase2d.G3jkGH/base314/bin/python",
+          "-m",
+          "pytest",
+          "tests",
+          "--test-profile=base",
+          "-m",
+          "not runtime",
+          "-q",
+          "--basetemp=/tmp/plato-phase2d.G3jkGH/pytest-base-green314",
+          "--junitxml=/tmp/plato-phase2d.G3jkGH/base-green-suite314.xml"
+        ],
+        "exit_code": 0,
+        "elapsed_seconds": 68.58,
+        "result": "383 passed, four existing allowed profile skips, 48 runtime cases deselected; no new failures or skips.",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/base-green-suite314.log",
+          "sha256": "d331386d9b999d46eed8101e8c9356cc8eb0b9359aeb7f5c9e0646664d241fc9"
+        },
+        "run_record": {
+          "path": "/tmp/plato-phase2d.G3jkGH/base-green-suite314.json",
+          "sha256": "c741f3df7750c7b0ef37ad87adab6e00a75563a95f11079b6a17c0584cb5d027"
+        },
+        "junit": {
+          "tests": 387,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 4,
+          "passed": 383
+        },
+        "junit_artifact": {
+          "path": "/tmp/plato-phase2d.G3jkGH/base-green-suite314.xml",
+          "sha256": "e6e296884360da62017644d5abf84f52054d4ff3770e47c3aaeb4125cb80421b"
+        }
+      }
+    ],
+    "green_mandatory_affected": [
+      {
+        "source_commit": "15c79d0c81ffd0e5e4873db869a2863f97fe8279",
+        "command": [
+          "/tmp/plato-phase2d.G3jkGH/venv313/bin/python",
+          "-m",
+          "pytest",
+          "tests/mpc/test_round_store_contracts.py",
+          "tests/utils/test_rl_payload_utilities.py",
+          "--test-profile=mandatory",
+          "-q",
+          "-W",
+          "error::UserWarning",
+          "--basetemp=/tmp/plato-phase2d.G3jkGH/pytest-base-correction-mandatory313",
+          "--junitxml=/tmp/plato-phase2d.G3jkGH/base-correction-mandatory313.xml"
+        ],
+        "exit_code": 0,
+        "elapsed_seconds": 9.73,
+        "result": "13 passed, no skips; actual Kazoo LockTimeout and Gymnasium Box used, UserWarning treated as error.",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/base-correction-mandatory313.log",
+          "sha256": "ff90ce0bd08b81e966536a9f4f6592d5ecd5603799d9d5ddb430e0323d06da5c"
+        },
+        "run_record": {
+          "path": "/tmp/plato-phase2d.G3jkGH/base-correction-mandatory313.json",
+          "sha256": "85a4110695884e18d46dcb6302580ec2b53c8c1da9b7d4e8c8da6fd92f76363e"
+        },
+        "junit": {
+          "tests": 13,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "passed": 13
+        },
+        "junit_artifact": {
+          "path": "/tmp/plato-phase2d.G3jkGH/base-correction-mandatory313.xml",
+          "sha256": "cde21825cec40b2672e32160320821c50d29acc2bdb87930d0e9025a1ba1819e"
+        }
+      },
+      {
+        "source_commit": "15c79d0c81ffd0e5e4873db869a2863f97fe8279",
+        "command": [
+          "/private/tmp/plato-phase2d.G3jkGH/venv314/bin/python",
+          "-m",
+          "pytest",
+          "tests/mpc/test_round_store_contracts.py",
+          "tests/utils/test_rl_payload_utilities.py",
+          "--test-profile=mandatory",
+          "-q",
+          "-W",
+          "error::UserWarning",
+          "--basetemp=/tmp/plato-phase2d.G3jkGH/pytest-base-correction-mandatory314",
+          "--junitxml=/tmp/plato-phase2d.G3jkGH/base-correction-mandatory314.xml"
+        ],
+        "exit_code": 0,
+        "elapsed_seconds": 10.48,
+        "result": "13 passed, no skips; actual Kazoo LockTimeout and Gymnasium Box used, UserWarning treated as error.",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/base-correction-mandatory314.log",
+          "sha256": "78e83ede06547bd34008b3039a1a9c0d68fd76c480e48245c406ef7179591989"
+        },
+        "run_record": {
+          "path": "/tmp/plato-phase2d.G3jkGH/base-correction-mandatory314.json",
+          "sha256": "b4475d4cb9df3044873afe000cc40801d025d7ad497603a5401ecf7021bed9de"
+        },
+        "junit": {
+          "tests": 13,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "passed": 13
+        },
+        "junit_artifact": {
+          "path": "/tmp/plato-phase2d.G3jkGH/base-correction-mandatory314.xml",
+          "sha256": "b6d1dfb2abc8df1a41af71cb599705df6a7d0ae3097b42d13568d1e10f94da29"
+        }
+      }
+    ],
+    "source_tests_ran": {
+      "base_both_interpreters": "pytest tests --test-profile=base -m \"not runtime\" at 15c79d0c: entire selected non-runtime test tree, including all unchanged 2D-R01..R04 regressions, MPC lifecycle/registry/store/weighted reconstruction, processors, Unicode TOML, HE, active RL, S3 and existing config smokes. Hashed JUnit artifacts identify every executed case.",
+      "mandatory_both_interpreters": [
+        "tests/mpc/test_round_store_contracts.py",
+        "tests/utils/test_rl_payload_utilities.py"
+      ],
+      "mandatory_actual_library_contracts": "Real Kazoo 2.11.0 LockTimeout propagation via fake service lock; real Gymnasium 1.3.0 Box passed through actual SAC stochastic/deterministic updates and checkpoints. All 13 cases execute, no profile-based skips.",
+      "existing_base_skips_both_interpreters": [
+        {
+          "test": "tests.trainers.test_dp_data_loader_strategy",
+          "reason": "('/private/tmp/plato-refresh-worktrees/payloads/tests/trainers/test_dp_data_loader_strategy.py', 8, 'Skipped: base profile optional dp: opacus not installed')"
+        },
+        {
+          "test": "tests.test_nanochat_integration.test_nanochat_tokenizer_processor_round_trip",
+          "reason": "/private/tmp/plato-refresh-worktrees/payloads/tests/test_nanochat_integration.py:14: base profile omits optional nanochat integration"
+        },
+        {
+          "test": "tests.test_nanochat_integration.test_nanochat_trainer_smoke",
+          "reason": "/private/tmp/plato-refresh-worktrees/payloads/tests/test_nanochat_integration.py:33: base profile omits optional nanochat integration"
+        },
+        {
+          "test": "tests.test_nanochat_integration.test_nanochat_trainer_selects_core_eval_strategy",
+          "reason": "/private/tmp/plato-refresh-worktrees/payloads/tests/test_nanochat_integration.py:88: base profile omits optional nanochat integration"
+        }
+      ]
+    },
+    "execution_environment": {
+      "cwd": "/private/tmp/plato-refresh-worktrees/payloads",
+      "shell": "zsh -lc for every shell invocation.",
+      "thread_limits": {
+        "OMP_NUM_THREADS": "1",
+        "OPENBLAS_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "VECLIB_MAXIMUM_THREADS": "1"
+      },
+      "additional_environment": {
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "HF_HUB_OFFLINE": "1",
+        "HF_DATASETS_OFFLINE": "1",
+        "TOKENIZERS_PARALLELISM": "false"
+      },
+      "command_note": "Commands are exact normalized child argv; bounded runner used for green runs, with source HEAD asserted identical before/after. Raw runner JSON/logs retained. Red collection ran before any correction at aa232791.",
+      "uv_lock_sha256": "573b10c2ba1a2317e02f9e40c6181359cafab6f6e0a0f9be12bb256cb276fe1d",
+      "base_environments": "environment.locked_base_profile_environments records fingerprints, optional-library absence and ownership.",
+      "mandatory_environments": "Existing task-owned locked dev venv313/venv314; fingerprints unchanged from environment.isolated_locked_dev_environments. Both contain actual Kazoo/Gymnasium.",
+      "runner": {
+        "path": "/tmp/plato-phase2d.G3jkGH/run_profile_validation.py",
+        "sha256": "7dfdd44095448a9c5544924ef483eb729ef17021ee7bbedc7fcd4f71eb4af7b5"
+      }
+    },
+    "static_checks": [
+      {
+        "command": [
+          "/tmp/plato-phase2d.G3jkGH/venv313/bin/ruff",
+          "check",
+          "tests/mpc/test_round_store_contracts.py",
+          "tests/utils/test_rl_payload_utilities.py",
+          "--select",
+          "I"
+        ],
+        "result": "All checks passed.",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/base-correction-ruff.log",
+          "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+        }
+      },
+      {
+        "command": "git diff --check aa232791f04d93eb9de09ed6c596ac714db5b605 15c79d0c81ffd0e5e4873db869a2863f97fe8279",
+        "result": "Passed."
+      },
+      {
+        "command": "git diff --exit-code aa232791f04d93eb9de09ed6c596ac714db5b605 15c79d0c81ffd0e5e4873db869a2863f97fe8279 -- plato cleanup.py",
+        "result": "Passed; all production implementation source, including the four prior accepted corrections and S3 interface, is byte-identical."
+      }
+    ],
+    "limitations": [
+      "Base clean collection and full non-runtime execution were newly run on both interpreters. The 48 runtime/startup cases were explicitly deselected as authorized for test-only changes; retained historical full mandatory results remain at e7c0d595, not claimed at this candidate.",
+      "Mandatory execution here covers the two corrected modules only; prior 95-case review-correction checks remain attributed to 639ca69b. No new full mandatory or type-check rerun is claimed.",
+      "Kazoo behavior remains a realistic fake backend plus the real exception type, with no live ZooKeeper deployment. Gymnasium qualification uses real Box, with no complete Gym/FEI example deployment.",
+      "B-owned S3 transport normalization is untouched. Root still verifies the accepted combined utility/runtime candidate and orchestrates fresh independent review."
+    ]
   }
 }
