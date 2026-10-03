@@ -2,12 +2,12 @@
   "schema_version": 1,
   "task": "2B: Runtime lifecycle and strategy contracts",
   "date": "2026-10-03",
-  "status": "Review corrections and relevant validation complete; fresh root independent review and final combined-source integration pending.",
+  "status": "R2B-04 correction and affected validation complete; fresh root review 3 and final combined-source integration pending.",
   "identities": {
     "worktree": "/private/tmp/plato-refresh-worktrees/runtime",
     "branch": "maintenance/2026-phase2-runtime",
     "baseline_commit": "fda60becedfa6236c11d415b87a868b52789a41e",
-    "final_implementation_commit": "516da21d66472d8916ed42aa21ce462d29944f73",
+    "final_implementation_commit": "861c5c5ca03d8657c13ca5b93c3f9e0298172954",
     "evidence_commit_policy": "This record is an evidence-only direct child of final_implementation_commit. Its exact delivery hash is reported separately, avoiding a self-hash circularity.",
     "authorities": [
       "AGENTS.md",
@@ -18,10 +18,22 @@
     "excluded_paths_unchanged": "HE/MPC owner paths, trainers, algorithms, models/MLX, shared fixtures, manifests, lock, CI and startup regression sources.",
     "no_push_merge_pr_or_delegation": true,
     "previous_delivery": {
-      "implementation_commit": "759be841c2c9c6d92608c1ac7186a5e9ded42fe4",
-      "evidence_commit": "b3b038efa376b060e1c01f1da39173240768a019",
-      "review_decision": "CHANGES_REQUESTED"
-    }
+      "implementation_commit": "516da21d66472d8916ed42aa21ce462d29944f73",
+      "evidence_commit": "7753ca37bacbbdbcaef4192150e6532d79247011",
+      "review_decision": "CHANGES_REQUESTED (R2B-04 only; earlier correction and mandatory checks pass)"
+    },
+    "delivery_history": [
+      {
+        "implementation_commit": "759be841c2c9c6d92608c1ac7186a5e9ded42fe4",
+        "evidence_commit": "b3b038efa376b060e1c01f1da39173240768a019",
+        "review_decision": "CHANGES_REQUESTED"
+      },
+      {
+        "implementation_commit": "516da21d66472d8916ed42aa21ce462d29944f73",
+        "evidence_commit": "7753ca37bacbbdbcaef4192150e6532d79247011",
+        "review_decision": "CHANGES_REQUESTED (R2B-04 only; earlier correction and mandatory checks pass)"
+      }
+    ]
   },
   "findings": [
     {
@@ -469,7 +481,8 @@
     "additional": "Early focused red/green tests used pytest-managed per-run temp directories under the local pytest-of-bli root; they contain only test-owned artifacts.",
     "policy": "Retain scratch/logs until root acceptance; no workspace closure, evidence cleanup or other agent resource cleanup.",
     "process_outcome": "All 96 startup result records across final broad runs show no surviving owned descendants.",
-    "review_correction_root": "/tmp/plato-phase2b-runtime/review-fixes"
+    "review_correction_root": "/tmp/plato-phase2b-runtime/review-fixes",
+    "review_2_correction_root": "/tmp/plato-phase2b-runtime/review-2-fixes"
   },
   "review_corrections": {
     "recorded_at_utc": "2026-10-03T02:43:32.273568+00:00",
@@ -659,6 +672,392 @@
       "F23": "Ditto/APFL/FedDyn/SCAFFOLD state persistence remains with 2C; no runtime expansion.",
       "F07": "Detailed checkpoint writer/reader/temporary/resume inventory below remains the accepted serialized 2C handoff."
     },
-    "resources": "All new logs, pytest bases, pinned D source/probe and evidence-builder/commit messages remain under /tmp/plato-phase2b-runtime/review-fixes until root acceptance. Reviewer/root files and other agent environments remain read-only."
+    "resources": "All new logs, pytest bases, pinned D source/probe and evidence-builder/commit messages remain under /tmp/plato-phase2b-runtime/review-fixes until root acceptance. Reviewer/root files and other agent environments remain read-only.",
+    "implementation_commit": "516da21d66472d8916ed42aa21ce462d29944f73",
+    "scope": "Historical review-1 correction results at 516da21d, carried by 7753ca37; latest recovery acceptance is review_2_corrections."
+  },
+  "review_2_corrections": {
+    "recorded_at_utc": "2026-10-03T03:37:45.681376+00:00",
+    "review_identity": {
+      "candidate_commit": "7753ca37bacbbdbcaef4192150e6532d79247011",
+      "candidate_tree": "6d6b55c2d8baf566df7826b6134e88eaf7e57363",
+      "implementation_commit": "516da21d66472d8916ed42aa21ce462d29944f73",
+      "decision": "CHANGES_REQUESTED; one blocking medium R2B-04",
+      "review": {
+        "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2b-review-2.json",
+        "sha256": "ef7042edc6cb0c9f7ca803f584c21c1eab38b385c68d26293e96ae78c4ad46d4"
+      },
+      "read_only_probe": {
+        "path": "/tmp/plato-phase2b-review-2/candidate/tests/test_review2_disconnect_probe.py",
+        "sha256": "eeb1d72a79b9b4061e10291252cffae6da241f872e48deaa02ccf912523ecad7"
+      },
+      "read_only_helper": {
+        "path": "/tmp/plato-phase2b-review-2/candidate/tests/test_review2_probes.py",
+        "sha256": "1d3422fa6ac664c434309a4ef8303e1138f8b30c1b8adaef505cef9b7f460192"
+      }
+    },
+    "final_implementation_commit": "861c5c5ca03d8657c13ca5b93c3f9e0298172954",
+    "source_sha256": {
+      "plato/servers/base.py": "a8d2acec980b6d888b7425ebaec290d8e31d1d32152fd994ca933313f37551f8",
+      "tests/servers/test_runtime_disconnect_recovery.py": "daf2102b528782e844c864555d5063045182a3953b7607255f828d40aef3d535",
+      "tests/integration/test_event_loop_startup.py": "a92c9ee2347e2113cd65b7949c922ac5bbf1846f4caeca30a128db580c79751e",
+      "tests/integration/startup_socket.py": "64d04c2ab0e041f35f5e5aca88aa46a436507cb76f54ef4ca3c3df702666720f"
+    },
+    "finding": {
+      "id": "R2B-04",
+      "status": "Fixed",
+      "before": "Deferred urgency targets a removed sid after another worker completes, or stalls without another completion when the lost worker was last outstanding. Both actual-batching orders remain at round 3.",
+      "after": "Assignment helper rejects unregistered sessions before mutation. Urgent selection leaves disconnected workers' usable completed reports and exact transfer-byte ownership in the chronological heap. In general.debug=false, disconnect resumes a ready simulated-time round; an existing live urgent request still defers aggregation. Default/missing debug continues to close.",
+      "policy": "Recover by aggregating already-accepted completed work and continuing on registered survivors. Do not solicit a replacement snapshot from an absent worker, modify report identity, weaken ingress checks, drop usable payloads or redesign the wire protocol."
+    },
+    "regression": {
+      "file": "tests/servers/test_runtime_disconnect_recovery.py",
+      "construction": "Actual selection/max_concurrency=2 batching and ingress build round-1 clients 7/2/8/9, followed by client 9 in rounds 2 and 3. Default staleness logic concurrently requests lost/7 and survivor/2, retaining lost/8.",
+      "orders": "Lose a partially received urgent transfer before survivor response, and finish survivor response before losing the last urgent worker.",
+      "progress": "Both orders preserve the deferred report, accept survivor response, aggregate round-3 payloads {2:2,9:9,8:8}, complete a new four-client batch entirely on survivor, and reach round 5 within a two-second scenario bound.",
+      "accounting": "Independent pickle byte sizes of unique retained report/payload objects agree with ledger. Partial lost report/chunk bytes clear on disconnect; deferred token remains until its aggregation. Survivor queue/cache bytes remain exact after reuse. Close clears queues, updates, reports, assignments and buffer ledger.",
+      "negative_and_policy": "Old lost sid rejects before parsing. Unknown sid cannot be assigned. Missing debug and debug=true both close at round 3 without survivor continuation and clear retained buffers.",
+      "stubs": "Payload sends produce inert reports/payloads through real handlers; aggregate/wrap instrumentation records valid updates and time. No trainer time-snapshot decoder is invoked."
+    },
+    "results": {
+      "313": {
+        "python": "3.13.16",
+        "red": {
+          "command": "OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2b-runtime/venv313/bin/python -m pytest tests/servers/test_runtime_disconnect_recovery.py -q -s --basetemp /tmp/plato-phase2b-runtime/review-2-fixes/red313",
+          "result": "3 failed, 2 passed against unchanged 7753ca37 candidate: both event orders stall at round 3; assignment helper accepts unregistered session. Default close-policy cases already pass.",
+          "log": {
+            "path": "/tmp/plato-phase2b-runtime/review-2-fixes/red313.log",
+            "sha256": "8be96781a055d505bc8129219ab9225ff8689b87eaf04eb630fbb64f57ad687a"
+          }
+        },
+        "green": {
+          "command": "OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2b-runtime/venv313/bin/python -m pytest tests/servers/test_runtime_disconnect_recovery.py tests/servers/test_runtime_review_regressions.py tests/servers/test_runtime_transport.py -q -s --basetemp /tmp/plato-phase2b-runtime/review-2-fixes/green313",
+          "result": "53 passed; no skips/warnings/failures",
+          "log": {
+            "path": "/tmp/plato-phase2b-runtime/review-2-fixes/green313.log",
+            "sha256": "8d6111dcc7ef834220b3a0179369f2983becd0bd038ce292ba3a7e9ad7105bfb"
+          },
+          "degradation_states": [
+            {
+              "survivor_first": false,
+              "round": 5,
+              "assignments": {
+                "survivor": 9
+              },
+              "urgent_requests": [
+                [
+                  "lost",
+                  7
+                ],
+                [
+                  "survivor",
+                  2
+                ]
+              ],
+              "aggregated": [
+                [
+                  1,
+                  [
+                    9
+                  ]
+                ],
+                [
+                  2,
+                  [
+                    9
+                  ]
+                ],
+                [
+                  3,
+                  [
+                    2,
+                    9,
+                    8
+                  ]
+                ],
+                [
+                  4,
+                  [
+                    9
+                  ]
+                ]
+              ]
+            },
+            {
+              "survivor_first": true,
+              "round": 5,
+              "assignments": {
+                "survivor": 1
+              },
+              "urgent_requests": [
+                [
+                  "lost",
+                  7
+                ],
+                [
+                  "survivor",
+                  2
+                ]
+              ],
+              "aggregated": [
+                [
+                  1,
+                  [
+                    9
+                  ]
+                ],
+                [
+                  2,
+                  [
+                    9
+                  ]
+                ],
+                [
+                  3,
+                  [
+                    2,
+                    9,
+                    8
+                  ]
+                ],
+                [
+                  4,
+                  [
+                    8
+                  ]
+                ]
+              ]
+            }
+          ]
+        },
+        "final_affected_suite": {
+          "command": "OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2b-runtime/venv313/bin/python -m pytest tests/clients tests/servers tests/callbacks tests/integration/test_smoke_configs.py tests/integration/test_event_loop_startup.py -q --basetemp /tmp/plato-phase2b-runtime/review-2-fixes/accepted313",
+          "result": "232 passed; no skips/warnings/failures",
+          "elapsed_seconds": 434.04,
+          "log": {
+            "path": "/tmp/plato-phase2b-runtime/review-2-fixes/accepted313.log",
+            "sha256": "f3357a12da60c798ef224b46310e1c918147a319b7e61b9968cff7fa8ff0d2c4"
+          }
+        },
+        "startup": {
+          "cases": 48,
+          "surviving_owned_descendants": 0,
+          "deliberate_watchdog_negative_cases": 5,
+          "unchanged_source": true,
+          "natural_socket_round": {
+            "returncode": 0,
+            "timed_out": false,
+            "forced": [],
+            "elapsed_seconds": 14.293718500062823,
+            "trained_clients": [
+              {
+                "id": 1,
+                "samples": 2,
+                "pid": 53387
+              },
+              {
+                "id": 2,
+                "samples": 6,
+                "pid": 53388
+              }
+            ],
+            "independent_float64_weighted_reference_max_abs_error": {
+              "linear.weight": 1.4901161193847656e-08,
+              "linear.bias": 2.9103830456733704e-10
+            },
+            "reference": "Per parameter, sum(actual received weights * report samples) / sum(samples), using independent NumPy float64 arithmetic.",
+            "raw_result": "/tmp/plato-phase2b-runtime/review-2-fixes/accepted313/test_real_two_client_cpu_socke0/round/result.json"
+          }
+        }
+      },
+      "314": {
+        "python": "3.14.8",
+        "red": {
+          "command": "OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2b-runtime/venv314/bin/python -m pytest tests/servers/test_runtime_disconnect_recovery.py -q -s --basetemp /tmp/plato-phase2b-runtime/review-2-fixes/red314",
+          "result": "3 failed, 2 passed against unchanged 7753ca37 candidate: both event orders stall at round 3; assignment helper accepts unregistered session. Default close-policy cases already pass.",
+          "log": {
+            "path": "/tmp/plato-phase2b-runtime/review-2-fixes/red314.log",
+            "sha256": "2522535e7d650aa8ea4d84431c8f460fb84586b414762d5b5543a9f8d637a5ef"
+          }
+        },
+        "green": {
+          "command": "OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2b-runtime/venv314/bin/python -m pytest tests/servers/test_runtime_disconnect_recovery.py tests/servers/test_runtime_review_regressions.py tests/servers/test_runtime_transport.py -q -s --basetemp /tmp/plato-phase2b-runtime/review-2-fixes/green314",
+          "result": "53 passed; no skips/warnings/failures",
+          "log": {
+            "path": "/tmp/plato-phase2b-runtime/review-2-fixes/green314.log",
+            "sha256": "fedd00ab04c81847496f10ec5b74b1161ef6efbe4cf0cb95369f0e4885063cef"
+          },
+          "degradation_states": [
+            {
+              "survivor_first": false,
+              "round": 5,
+              "assignments": {
+                "survivor": 1
+              },
+              "urgent_requests": [
+                [
+                  "lost",
+                  7
+                ],
+                [
+                  "survivor",
+                  2
+                ]
+              ],
+              "aggregated": [
+                [
+                  1,
+                  [
+                    9
+                  ]
+                ],
+                [
+                  2,
+                  [
+                    9
+                  ]
+                ],
+                [
+                  3,
+                  [
+                    2,
+                    9,
+                    8
+                  ]
+                ],
+                [
+                  4,
+                  [
+                    7
+                  ]
+                ]
+              ]
+            },
+            {
+              "survivor_first": true,
+              "round": 5,
+              "assignments": {
+                "survivor": 1
+              },
+              "urgent_requests": [
+                [
+                  "lost",
+                  7
+                ],
+                [
+                  "survivor",
+                  2
+                ]
+              ],
+              "aggregated": [
+                [
+                  1,
+                  [
+                    9
+                  ]
+                ],
+                [
+                  2,
+                  [
+                    9
+                  ]
+                ],
+                [
+                  3,
+                  [
+                    2,
+                    9,
+                    8
+                  ]
+                ],
+                [
+                  4,
+                  [
+                    8
+                  ]
+                ]
+              ]
+            }
+          ]
+        },
+        "final_affected_suite": {
+          "command": "OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2b-runtime/venv314/bin/python -m pytest tests/clients tests/servers tests/callbacks tests/integration/test_smoke_configs.py tests/integration/test_event_loop_startup.py -q --basetemp /tmp/plato-phase2b-runtime/review-2-fixes/accepted314",
+          "result": "232 passed; no skips/warnings/failures",
+          "elapsed_seconds": 483.85,
+          "log": {
+            "path": "/tmp/plato-phase2b-runtime/review-2-fixes/accepted314.log",
+            "sha256": "e7e7dab2dbd39af29480d993ba3e60813028e4c4dc6d0818c382ed9058cd8e9d"
+          }
+        },
+        "startup": {
+          "cases": 48,
+          "surviving_owned_descendants": 0,
+          "deliberate_watchdog_negative_cases": 5,
+          "unchanged_source": true,
+          "natural_socket_round": {
+            "returncode": 0,
+            "timed_out": false,
+            "forced": [],
+            "elapsed_seconds": 15.087108707986772,
+            "trained_clients": [
+              {
+                "id": 1,
+                "samples": 2,
+                "pid": 53450
+              },
+              {
+                "id": 2,
+                "samples": 6,
+                "pid": 53451
+              }
+            ],
+            "independent_float64_weighted_reference_max_abs_error": {
+              "linear.weight": 1.4901161193847656e-08,
+              "linear.bias": 2.9103830456733704e-10
+            },
+            "reference": "Per parameter, sum(actual received weights * report samples) / sum(samples), using independent NumPy float64 arithmetic.",
+            "raw_result": "/tmp/plato-phase2b-runtime/review-2-fixes/accepted314/test_real_two_client_cpu_socke0/round/result.json"
+          }
+        }
+      }
+    },
+    "count_policy": "232 distinct affected cases per interpreter; the 53-case focused runs overlap those cases. Prior 227/40/24 and original 209/55 results remain historical exact-source evidence, not new counts.",
+    "checks": [
+      {
+        "command": "/tmp/plato-phase2b-runtime/venv313/bin/ruff check . --select I",
+        "result": "Passed",
+        "log": {
+          "path": "/tmp/plato-phase2b-runtime/review-2-fixes/ruff.log",
+          "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+        }
+      },
+      {
+        "command": "/tmp/plato-phase2b-runtime/venv313/bin/ty check plato/servers/base.py",
+        "result": "Passed for changed server module; no whole-repository typing claim",
+        "log": {
+          "path": "/tmp/plato-phase2b-runtime/review-2-fixes/ty-server.log",
+          "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+        }
+      },
+      {
+        "command": "git diff --check",
+        "result": "Passed before implementation commit"
+      }
+    ],
+    "handoffs": {
+      "2C": "F07 shared checkpoint edits remain deferred until B passes. Inventory remains below; F26 full urgent trainer snapshot retrieval and F23 trainer-state persistence are outside this correction. C's F27 is disjoint and unchanged here.",
+      "3A": "Existing narrow raw/transformed aggregation-tree capability handoff remains unchanged.",
+      "2D_root": {
+        "current_d_candidate": "aa232791f04d93eb9de09ed6c596ac714db5b605",
+        "s3_source_sha256": "a26d306daa6a4accd4d67c9f26dea9f9ad153e74353fe8698643987cb6f25c03",
+        "unchanged_from_previous_pinned_d": true,
+        "policy": "No D edits/cherry-pick/environment mutation. Earlier 24-case B/D source evidence remains provisional; final accepted combination validation remains with root."
+      }
+    },
+    "owned_resources": {
+      "root": "/tmp/plato-phase2b-runtime/review-2-fixes",
+      "contents": "Red/green/affected raw logs, isolated pytest bases, startup process/tensor artifacts, evidence-builder and commit-message files. Original author venv313/venv314 reused with unchanged locked dev dependencies.",
+      "retention": "Keep until root acceptance. Root/reviewer worktrees, probe sources and other environments remain read-only."
+    }
   }
 }
