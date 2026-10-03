@@ -54,6 +54,8 @@ ssl = [
 llm_eval = [
     "lighteval==0.13.0",
     "langdetect>=1.0.9,<2",
+    # Lighteval 0.13.0 hashes text directly; xxhash 4 requires bytes.
+    "xxhash>=3.8.1,<4",
 ]
 
 [project.urls]
