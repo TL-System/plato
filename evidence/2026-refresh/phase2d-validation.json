@@ -1,0 +1,992 @@
+{
+  "schema_version": 1,
+  "task": "2D: payloads, serialization, shared utilities, HE/MPC and cleanup",
+  "validation_date_local": "2026-10-02",
+  "worktree": "/private/tmp/plato-refresh-worktrees/payloads",
+  "branch": "maintenance/2026-phase2-payloads",
+  "commit_identity": {
+    "baseline": "fda60becedfa6236c11d415b87a868b52789a41e",
+    "final_tested_implementation_commit": "e7c0d59571d88efd7eb1fdbf4fc63ac2a7b81395",
+    "implementation_commits": [
+      "af695c0f0dea3032116522b0c7131393e724f30d",
+      "264b422d8b96420ff3c361e69f888a656fe8f512",
+      "939d93cc289c0fb12a1c4084a1bc3dd72df293a7",
+      "dba6f85b8140d0159d593ad14b371ecb2caa9ee2",
+      "e7c0d59571d88efd7eb1fdbf4fc63ac2a7b81395"
+    ],
+    "evidence_carrier": "A following documentation-only commit adds this file. Its exact identity is reported in the root handoff, avoiding a self-hash. The tested implementation tree is the commit above.",
+    "source_status_before_evidence": "Clean tracked tree; final full suites run at the exact final_tested_implementation_commit."
+  },
+  "scope": {
+    "owned": [
+      "plato/processors/** except nanochat_tokenizer.py",
+      "plato/serialization/**",
+      "plato/mpc/**",
+      "plato/utils/** except third_party.py and reserved new archive.py",
+      "cleanup.py",
+      "plato/servers/fedavg_he.py",
+      "plato/servers/fedavg_mpc_additive.py",
+      "plato/servers/fedavg_mpc_shamir.py",
+      "plato/servers/strategies/mpc.py",
+      "plato/servers/strategies/aggregation/he.py",
+      "plato/clients/mpc.py",
+      "plato/clients/strategies/mpc.py",
+      "focused tests",
+      "accepted legacy_rl_env archive"
+    ],
+    "untouched": [
+      "pyproject.toml",
+      "uv.lock",
+      "CI",
+      "general client/server orchestration",
+      "trainers/algorithms",
+      "MLX implementations",
+      "shared conftest",
+      "Nanochat tokenizer",
+      "third_party.py",
+      "archive.py",
+      "active FEI example source"
+    ],
+    "coordination": "No nested agents, questions, cloud credentials, pushes, merges or PR edits. Extra findings use 2D IDs; F21-F24 remain reserved for trainer findings.",
+    "accepted_addendum_sha256": "5b51b0fb7ed6f68d9fce7176335b3e7be5e5f178a2788590912aa2396a487709"
+  },
+  "environment": {
+    "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+    "uv": "0.12.22",
+    "python_default_and_minimum": "3.13, unchanged",
+    "python_version_file_sha256": "02e735b3dfe1c32833eb550b7ff8ffa17f5f2bc3fa1e7bae61a8f5a3883ce398",
+    "uv_lock_sha256": "573b10c2ba1a2317e02f9e40c6181359cafab6f6e0a0f9be12bb256cb276fe1d",
+    "isolated_locked_dev_environments": [
+      {
+        "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+        "installed_distribution_count": 110,
+        "installed_distributions_sha256": "0b59b1f36606c868d7e4989bd134178b134795c3b859a33061115285131e2ea9",
+        "path": "/tmp/plato-phase2d.G3jkGH/venv313",
+        "provision_command": "UV_PROJECT_ENVIRONMENT=/tmp/plato-phase2d.G3jkGH/venv313 uv sync --locked --group dev --python 3.13",
+        "provision_log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/sync313.log",
+          "sha256": "174d445a9f7f9ec60c70ad35ab8901ec93af1747b0200192ef88eac052b0aae3"
+        }
+      },
+      {
+        "python": "3.14.8 (main, Sep 30 2026, 17:55:09) [Clang 21.0.0 (clang-2100.3.34.2)]",
+        "installed_distribution_count": 110,
+        "installed_distributions_sha256": "0b59b1f36606c868d7e4989bd134178b134795c3b859a33061115285131e2ea9",
+        "path": "/tmp/plato-phase2d.G3jkGH/venv314",
+        "provision_command": "UV_PROJECT_ENVIRONMENT=/tmp/plato-phase2d.G3jkGH/venv314 uv sync --locked --group dev --python 3.14",
+        "provision_log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/sync314.log",
+          "sha256": "3bd77836a43f140bc2cd9678c5a1b2c88fbe39c880b26c9b8cd41b1db2d7e326"
+        }
+      }
+    ],
+    "relevant_versions_shared_by_both": {
+      "torch": "2.14.1",
+      "numpy": "2.5.3",
+      "safetensors": "0.8.0",
+      "boto3": "1.43.106",
+      "botocore": "1.43.106",
+      "requests": "2.34.2",
+      "urllib3": "2.8.0",
+      "tenseal": "0.3.18",
+      "kazoo": "2.11.0",
+      "gymnasium": "1.3.0",
+      "zstd": "1.5.7.2",
+      "pytest": "9.1.1",
+      "ruff": "0.16.10",
+      "ty": "0.0.84"
+    },
+    "thread_limits_for_tests_and_probes": {
+      "OMP_NUM_THREADS": "1",
+      "OPENBLAS_NUM_THREADS": "1",
+      "MKL_NUM_THREADS": "1",
+      "VECLIB_MAXIMUM_THREADS": "1"
+    },
+    "shell": "zsh -lc for every shell invocation; commands below are normalized inner argv, with cwd and thread environment shared here.",
+    "pinned_submodule": {
+      "path": "external/nanochat",
+      "commit": "c75fe54aa7c1fa881701c246f9427bcbe4eee5a4",
+      "command": "git submodule update --init external/nanochat",
+      "result": "Initialized pinned revision only. DViT/T2TViT remain uninitialized and untouched."
+    }
+  },
+  "mandatory_findings": [
+    {
+      "id": "F02",
+      "status": "fixed",
+      "before": "Configured prefixes were absent or applied inconsistently to storage operations.",
+      "after": "put/send/receive/delete/list share one namespace helper, including physical keys returned by list; nested/trailing-slash prefixes applied exactly once.",
+      "tests": "tests/utils/test_s3.py::test_put_send_receive_list_delete_use_one_namespace"
+    },
+    {
+      "id": "F03",
+      "status": "fixed",
+      "before": "An empty successful listing without Contents raised an error.",
+      "after": "Empty successful pages produce []; real service failures still propagate.",
+      "tests": "tests/utils/test_s3.py::test_empty_listing_succeeds_without_contents"
+    },
+    {
+      "id": "F04",
+      "status": "fixed",
+      "before": "Only a page was returned, without the configured namespace constraint.",
+      "after": "ListObjectsV2 paginator consumes every page with Prefix namespace/; five matching objects over three pages and two unrelated objects independently checked.",
+      "tests": "tests/utils/test_s3.py::test_all_pages_stay_in_namespace"
+    },
+    {
+      "id": "F05",
+      "status": "fixed",
+      "before": "Stalled real HTTP transfers exceeded the regression deadline; some errors were hidden.",
+      "after": "Botocore connect/read 5/30 seconds, standard total_max_attempts=3; presigned GET/PUT use the same timeouts and at most three attempts, bounded backoff and disabled Retry-After delays. Error/timeout propagation and transient recovery verified on actual network paths.",
+      "tests": "tests/utils/test_s3.py: ten stalled/error probes across PUT, GET, list, delete and initialization; successful GET/PUT/list recovery; 403, missing object and truncated pickle negatives",
+      "probe_limits": "Tests reduce timeouts to 0.1/0.1 seconds and attempts to two, impose a 2.5-second public-method deadline and check actual HTTP request counts."
+    },
+    {
+      "id": "F12",
+      "status": "fixed",
+      "before": "Flattened dotted/bracketed paths and reserved _tree_metadata could silently overwrite data.",
+      "after": "Actual duplicate metadata paths and reserved tensor path rejected before Safetensors save. Literal dotted PyTorch state_dict names remain supported; existing wire layout preserved.",
+      "tests": "tests/utils/test_safetensor_serialization.py: both collision insertion orders, bracket/nested collisions, empty keys, string-coerced duplicate keys, reserved tensor path; independent valid dotted/nested/dtype roundtrips"
+    }
+  ],
+  "additional_findings": [
+    {
+      "id": "2D-01",
+      "status": "fixed",
+      "finding": "Strided Safetensors leaves serialized storage order with the original logical shape; native scalar metadata returned zero-dimensional arrays.",
+      "outcome": "C-contiguous leaf serialization and native scalar restoration preserve transpose values and HE indices metadata."
+    },
+    {
+      "id": "2D-02",
+      "status": "fixed",
+      "finding": "Quantization changed integer/bool buffers; QSGD mishandled empty tensors, reset caller RNG and accepted invalid levels/trailing bytes.",
+      "outcome": "Exact buffer dtype/value preservation, finite/shape/header validation, seeded stochastic rounding and explicit levels 2..128; independent error bound max(abs(x))/(levels-1)+1e-6."
+    },
+    {
+      "id": "2D-03",
+      "status": "fixed",
+      "finding": "Feature compression failed empty batches/noncontiguous arrays and lost empty target dtype; shared headers could corrupt heterogeneous batches.",
+      "outcome": "Empty/strided/homogeneous arrays roundtrip exactly; incompatible feature shapes/dtypes fail explicitly before compression while retaining the existing shared-header wire."
+    },
+    {
+      "id": "2D-04",
+      "status": "fixed",
+      "finding": "CPU torch.device detection converted float32 feature tensors to float16 unnecessarily; randomized response mutated source tensors through a NumPy view.",
+      "outcome": "Zero-noise CPU precision and targets preserved; randomized response works on a copy."
+    },
+    {
+      "id": "2D-05",
+      "status": "fixed",
+      "finding": "Unstructured pruning reused inferred modules after trainer.model was replaced.",
+      "outcome": "Infer current model targets for each call; independent magnitude reference zeros 1..4 and retains 5..8 after replacement."
+    },
+    {
+      "id": "2D-06",
+      "status": "fixed",
+      "finding": "cleanup runtime fallback could follow a directory symlink and delete external checkpoints.",
+      "outcome": "External resolved runtime and directory symlinks excluded; clean_directory refuses symlink targets; ordinary owned runtime/cache cleanup still executes."
+    },
+    {
+      "id": "2D-07",
+      "status": "fixed",
+      "finding": "Importing count_parameters executed model downloads; empty compound loaders failed; unary epsilon=2000 overflowed.",
+      "outcome": "Demos guarded by main, loaders terminate with len=0, stable negative-exponent probabilities with finite nonnegative epsilon checks."
+    },
+    {
+      "id": "2D-08",
+      "status": "fixed",
+      "finding": "TOML Unicode keys and nested array-table paths produced invalid or misplaced output.",
+      "outcome": "Independent stdlib tomllib roundtrip validates Unicode/literal dotted keys and nested array tables; historical mixed-type-array wrapper convention retained."
+    },
+    {
+      "id": "2D-09",
+      "status": "fixed",
+      "finding": "HE accepted invalid sample accounting/masks/vector lengths, reordered caller masks and replaced model state before successful reconstruction.",
+      "outcome": "Cardinality/finite nonnegative counts, positive total, mask and vector contracts checked; zero-sample rounds return baseline, failed decode leaves encrypted_model intact; native CKKS matches independent plaintext at abs 2e-5."
+    },
+    {
+      "id": "2D-10",
+      "status": "fixed",
+      "finding": "Shamir reconstructed the wrong peer polynomial and single-client output retained sample scaling; floating polynomial arithmetic lost accuracy.",
+      "outcome": "Correct sender/target share orientation, uniform normalization, integer coefficients/float64 exact-range checks and Fraction interpolation; thresholds 1/2/4 match independent weighted sums at abs 2e-6."
+    },
+    {
+      "id": "2D-11",
+      "status": "fixed",
+      "finding": "Incomplete additive participants and inconsistent reports/shares could bias aggregates; stale writers could contaminate a later round; zero sample counts were dropped.",
+      "outcome": "Participant/contributor accounting, sample/key/shape/finiteness checks and round fences under the store lock; asynchronous training captures expected round and persists zero counts; failures leave baseline/next round untouched."
+    },
+    {
+      "id": "2D-12",
+      "status": "fixed",
+      "finding": "Interrupted local state saves destroyed the previous round; remote errors were misreported as missing rounds; failed/unbounded ZooKeeper lock acquisition leaked clients or allowed unlocked writes.",
+      "outcome": "Atomic temporary-file replacement, missing-object-only fallback, finite start/lock waits and unconditional client stop; acquire false or errors prevent writes."
+    },
+    {
+      "id": "2D-13",
+      "status": "fixed",
+      "finding": "Active DDPG/SAC/TD3 replay dimensions broadcast incorrectly; SAC Box shape construction failed; loaded target networks remained stale.",
+      "outcome": "Finite parameter-changing updates for DDPG, SAC stochastic/deterministic, TD3 plain/recurrent; detached SAC alpha, deterministic alpha zero and loaded target snapshots synchronized."
+    },
+    {
+      "id": "2D-14",
+      "status": "fixed",
+      "finding": "TD3 reused one transition target action and normalized across samples; asynchronous recurrent batch=1 failed and padding/source mutation coupled transitions.",
+      "outcome": "Every target row used; per-transition normalization, length masking and masked critic averages preserve batch isolation and source sequences."
+    },
+    {
+      "id": "2D-15",
+      "status": "handoff_phase4",
+      "location": "examples/reinforcement_learning/fei/fei_server.py::RLServer.normalize_state",
+      "finding": "Actual normalize_state([0.0, 0.0]) returns [NaN, NaN] on Python 3.13 and 3.14.",
+      "outcome": "Concrete FEI probe retained; active example unchanged per root instruction."
+    },
+    {
+      "id": "2D-16",
+      "status": "handoff_phase4",
+      "location": "examples/reinforcement_learning/fei/fei_server.py::RLServer.__init__",
+      "finding": "Actual subclass constructor forwards algorithm as datasource and trainer as algorithm; superclass trainer receives None.",
+      "outcome": "Only superclass constructor capture instrumented, explicit agent/model/algorithm/trainer objects forwarded through actual subclass on both interpreters; active example unchanged."
+    },
+    {
+      "id": "2D-17",
+      "status": "handoff_root_integration",
+      "location": "2B candidate plato/clients/transport.py::receive_s3_payload",
+      "finding": "Combining fixed S3 with exact 2B candidate succeeds for nonempty/nested/trailing-slash prefixes; with empty prefix, utility writes client_payload_7_ABC123 but bounded reader requests /client_payload_7_ABC123 and gets 404.",
+      "outcome": "Concrete actual local HTTP integration reproduced on both interpreters. Root must align bounded reader object-key composition with S3._object_key(key) after 2B acceptance; candidate under review remains unchanged."
+    }
+  ],
+  "audit_inventory": [
+    {
+      "files": "processors/{base,model,pipeline,registry,model_deepcopy,safetensor_encode,safetensor_decode}.py",
+      "outcome": "Production pipelines/registry order exercised, deep copies preserve dtype without aliasing, Safetensors encode/decode preserves nested metadata and default HE wire; initialization/export modules reviewed."
+    },
+    {
+      "files": "processors/{compress,decompress,model_compress,model_decompress,model_quantize,model_dequantize,model_quantize_qsgd,model_dequantize_qsgd}.py; utils/zstd_helpers.py",
+      "outcome": "Exact lossless and bounded lossy roundtrips, buffer dtype preservation and invalid QSGD wire/level negatives. Locked zstd backend exercised; trusted pickle boundary inventoried. No stdlib compression.zstd change: it would retain the 3.13 dependency/wire burden without demonstrated reduction."
+    },
+    {
+      "files": "processors/{feature,feature_additive_noise,model_randomized_response,structured_pruning,unstructured_pruning}.py; utils/unary_encoding.py",
+      "outcome": "CPU zero-noise precision, source immutability, zero/half pruning references, replacement-model pruning, probability stability and existing seeded unary stochastic expectations executed."
+    },
+    {
+      "files": "serialization/safetensor.py; utils/tree.py",
+      "outcome": "F12 adversarial rejection, ordinary dotted state_dict compatibility, independent NumPy/Torch bool/int/float64/bfloat16/scalar/strided/empty nested roundtrips, historical wire intact. Native MLX restoration remains outside this task qualification."
+    },
+    {
+      "files": "processors/{model_encrypt,model_decrypt}.py; utils/homo_enc.py; servers/fedavg_he.py; servers/strategies/aggregation/he.py",
+      "outcome": "Actual native CKKS partial/all/no-mask weighted aggregation and default registry Safetensors wire roundtrip; malformed/mutating masks, sample counts, lengths, zero total and model publication negatives; bitmap exact roundtrips."
+    },
+    {
+      "files": "mpc/{__init__,round_store}.py; processors/mpc_model_encrypt_{additive,shamir}.py; servers/strategies/mpc.py",
+      "outcome": "Real isolated local store, processors and aggregators independently weighted numerics, higher thresholds, single participant, zero samples, reversed reports, missing/duplicate/stale/malformed round contracts, race and atomic save failures. Kazoo startup/acquire/release cleanup and remote error contracts mocked at service boundary."
+    },
+    {
+      "files": "servers/fedavg_mpc_{additive,shamir}.py; clients/mpc.py; clients/strategies/mpc.py",
+      "outcome": "Wrapper/store/debug/threshold wiring reviewed; actual train strategy, zero samples and delayed-round fencing exercised; existing lifecycle and synthetic training smoke now use real persisted round state. Full distributed HE/MPC deployments remain Phase 4."
+    },
+    {
+      "files": "utils/s3.py; cleanup.py",
+      "outcome": "Public methods on real credential-free local HTTP service cover F02-F05, namespace ownership, all pages, stalls/status errors, successful transfers and retries; missing vs service failure distinction. Owned ordinary runtime/cache cleanup and external symlink preservation tested."
+    },
+    {
+      "files": "utils/{count_parameters,data_loaders,trainer_utils,decorators,fonts,csv_processor,toml_writer}.py",
+      "outcome": "Offline import, known trainable count=6, named-layer freeze/activate, wrapped timeit result/name, empty and normal compound loaders, invalid font selection, CSV schema growth/quoted newlines and stdlib-parsed TOML structure executed. Count table formatter alone stubbed in standalone probe."
+    },
+    {
+      "files": "utils/reinforcement_learning/{rl_agent,rl_server}.py; policies/{base,registry,ddpg,sac,td3}.py",
+      "outcome": "Actual registry FEI agent creates four variable-length replay transitions and trains; parameter-changing finite policy updates/save/load and numerical TD3 isolation references. Actual agent action event and server aggregate_deltas produce independent [4,6.5], total samples=8; action event consumed. FEI server defects 2D-15/16 deferred. Package exports reviewed."
+    },
+    {
+      "files": "former utils/rl_env.py",
+      "outcome": "No active tracked import/config closure; only this accepted unused placeholder archived unchanged, with provenance/license/local README. Active RL family and FEI retained."
+    }
+  ],
+  "validation": {
+    "cwd": "/private/tmp/plato-refresh-worktrees/payloads",
+    "red_command_note": "Normalized test invocations for captured red stages. Initial regressions were added uncommitted before their behavior fixes; snapshot invocations reproduce the exact baseline individual module against final tests. Red aggregate counts include explicitly identified early fixture/expectation issues and are not all claimed as confirmed defects.",
+    "red": [
+      {
+        "command": [
+          "/tmp/plato-phase2d.G3jkGH/venv313/bin/python",
+          "-m",
+          "pytest",
+          "tests/utils/test_s3.py",
+          "tests/utils/test_safetensor_serialization.py",
+          "-q"
+        ],
+        "stage": "Baseline S3/tree implementation before repairs",
+        "result": "24 failed, 10 passed; 43.62s",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/red-s3-tree313.log",
+          "sha256": "3ae4388d1a4ec933a8046396db67f5d3323d4b13f758a350ebe70d7c3fb1b197"
+        },
+        "interpretation": "Includes namespace, empty listing, actual stalls/errors, collision and strided tensor failures. Pagination was separated afterward."
+      },
+      {
+        "command": [
+          "/tmp/plato-phase2d.G3jkGH/venv313/bin/python",
+          "-m",
+          "pytest",
+          "tests/utils/test_s3.py::test_all_pages_stay_in_namespace",
+          "-q"
+        ],
+        "stage": "Baseline list implementation before paginator repair",
+        "result": "1 failed; 0.59s",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/red-pagination313.log",
+          "sha256": "8fb4f808efc998b5f2680b8bc93a37f2b1511afe904eae87fe6f6e90c37588da"
+        }
+      },
+      {
+        "command": [
+          "/tmp/plato-phase2d.G3jkGH/venv313/bin/python",
+          "-m",
+          "pytest",
+          "tests/processors/test_payload_regressions.py",
+          "tests/utils/test_cleanup.py",
+          "-q"
+        ],
+        "stage": "Baseline processors/cleanup before repairs",
+        "result": "15 failed, 3 passed; 0.14s",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/red-processors-cleanup313.log",
+          "sha256": "fc62be58bab32c83b5916dc53ac90b1741a7c57c583adebad51b5da7039a171e"
+        },
+        "interpretation": "Initial randomized-response fixture lacked Config.algorithm; corrected fixture reproduced actual mutation separately. Some malformed QSGD cases already raised struct.error; explicit ValueError is a contract improvement, not proof of prior unbounded allocation."
+      },
+      {
+        "command": [
+          "/tmp/plato-phase2d.G3jkGH/venv313/bin/python",
+          "/tmp/plato-phase2d.G3jkGH/run_baseline.py",
+          "plato.processors.model_randomized_response",
+          "/tmp/plato-phase2d.G3jkGH/baseline_randomized_response.py",
+          "tests/processors/test_payload_regressions.py::test_randomized_response_does_not_modify_source_model",
+          "-q"
+        ],
+        "stage": "Exact baseline randomized-response module",
+        "result": "1 failed; 0.09s",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/red-randomized313.log",
+          "sha256": "c398f1948e03c17a578356d33e7d0ab76939ab0ee8cc5752e7d2da8e502c6847"
+        },
+        "interpretation": "Observed source [-2,0.2,4] become [0,1,1].",
+        "baseline_snapshot": {
+          "source": "plato.processors.model_randomized_response",
+          "baseline": "fda60becedfa6236c11d415b87a868b52789a41e",
+          "sha256": "b07e5003dc1cd926d4dc47bab23e73c3d3f47cd92fa45442995c522633d9d3d6"
+        }
+      },
+      {
+        "command": [
+          "/tmp/plato-phase2d.G3jkGH/venv313/bin/python",
+          "-m",
+          "pytest",
+          "tests/processors/test_payload_regressions.py::test_zero_noise_feature_processor_keeps_cpu_precision_and_targets",
+          "tests/utils/test_shared_payload_utilities.py::test_toml_nested_array_tables_and_literal_keys_keep_structure",
+          "-q"
+        ],
+        "stage": "Feature CPU fix not yet applied; TOML before Unicode/nested-array repair",
+        "result": "2 failed; 0.09s",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/red-feature-toml313.log",
+          "sha256": "c138db0670c36316cd3f5582d40613d979a4482c58bba2bb7a888b2a5a6448f1"
+        }
+      },
+      {
+        "command": [
+          "/tmp/plato-phase2d.G3jkGH/venv313/bin/python",
+          "/tmp/plato-phase2d.G3jkGH/run_baseline.py",
+          "plato.utils.toml_writer",
+          "/tmp/plato-phase2d.G3jkGH/baseline_toml_writer.py",
+          "tests/utils/test_shared_payload_utilities.py::test_toml_nested_array_tables_and_literal_keys_keep_structure",
+          "-q"
+        ],
+        "stage": "Exact baseline TOML module",
+        "result": "1 failed; 0.08s",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/red-toml-baseline313.log",
+          "sha256": "bfaee4147f9c5f4e77838392a4f8a1c97c2aebaa95c8da547f8013df204b4ed4"
+        },
+        "baseline_snapshot": {
+          "source": "plato.utils.toml_writer",
+          "baseline": "fda60becedfa6236c11d415b87a868b52789a41e",
+          "sha256": "973211f1e9eb1264b00387bef6b77103122f82ba92d390a27d7c80204ea516fc"
+        }
+      },
+      {
+        "command": [
+          "/tmp/plato-phase2d.G3jkGH/venv313/bin/python",
+          "-m",
+          "pytest",
+          "tests/utils/test_shared_payload_utilities.py",
+          "-q"
+        ],
+        "stage": "Shared utility implementation before repairs",
+        "result": "5 failed, 3 passed; 0.11s",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/red-shared313.log",
+          "sha256": "eab8477cd8f1917dbce6348ff99af870091ddca4b11338a60a71840c24ea998b"
+        }
+      },
+      {
+        "command": [
+          "/tmp/plato-phase2d.G3jkGH/venv313/bin/python",
+          "-m",
+          "pytest",
+          "tests/servers/test_he_payload_regressions.py",
+          "-q"
+        ],
+        "stage": "Baseline HE before repairs",
+        "result": "13 failed, 2 passed; 0.30s",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/red-he313.log",
+          "sha256": "1f31ad0660f820728c7b1dea45863a977b43ef961a2ff6204c2312ff421c5399"
+        },
+        "interpretation": "One plain valid test initially compared different floating dtypes; corrected to double and not counted as a numerical defect. Confirmed failures are invalid counts/masks/lengths, zero-total behavior and caller mask mutation."
+      },
+      {
+        "command": [
+          "/tmp/plato-phase2d.G3jkGH/venv313/bin/python",
+          "-m",
+          "pytest",
+          "tests/utils/test_safetensor_serialization.py::test_native_scalar_types_roundtrip_in_hybrid_payload_metadata",
+          "tests/servers/test_he_payload_regressions.py::test_default_he_processor_wire_pipeline_roundtrip",
+          "-q"
+        ],
+        "stage": "Intermediate stricter HE validation exposed historical native scalar restoration",
+        "result": "2 failed; 0.12s",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/red-he-wire313.log",
+          "sha256": "70504e6bd38f3fdda7656c589e8159a76aa5dd62c05cd7c93d06d593cc33ca55"
+        },
+        "interpretation": "Compatibility probe prompted native scalar restoration; not an additional baseline HE defect."
+      },
+      {
+        "command": [
+          "/tmp/plato-phase2d.G3jkGH/venv313/bin/python",
+          "-m",
+          "pytest",
+          "tests/mpc/test_mpc_regressions.py",
+          "-q"
+        ],
+        "stage": "Baseline MPC before repairs",
+        "result": "21 failed, 3 passed; 0.28s",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/red-mpc313.log",
+          "sha256": "79820dcbfa022323dff778005bf7e4eb172366bf873b59f2ad95c090ef364208"
+        },
+        "interpretation": "Initial stale-round test used an unsupported expected-round keyword, so it was replaced by the captured real public-processor race below."
+      },
+      {
+        "command": [
+          "/tmp/plato-phase2d.G3jkGH/venv313/bin/python",
+          "-m",
+          "pytest",
+          "tests/mpc/test_mpc_regressions.py::test_stale_round_writer_cannot_contaminate_next_round",
+          "-q"
+        ],
+        "stage": "Store already repaired; processor still lacked round fence",
+        "result": "1 failed; 0.10s",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/red-mpc-race313.log",
+          "sha256": "287c7c2a157c26aceaf3adfc23aad7981c591a627baddc55f39e8c6d4d65633a"
+        },
+        "interpretation": "A real round advance during split accepted stale shares instead of raising."
+      },
+      {
+        "command": [
+          "/tmp/plato-phase2d.G3jkGH/venv313/bin/python",
+          "/tmp/plato-phase2d.G3jkGH/run_baseline.py",
+          "plato.mpc.round_store",
+          "/tmp/plato-phase2d.G3jkGH/baseline_round_store.py",
+          "tests/mpc/test_mpc_regressions.py::test_failed_state_save_keeps_last_complete_round",
+          "-q"
+        ],
+        "stage": "Exact baseline round_store",
+        "result": "1 failed; 0.08s",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/red-atomic313.log",
+          "sha256": "f50acd7e59c1347c007578b18596a61b83f2d74e2011c4d266e0875a67077f5d"
+        },
+        "interpretation": "Injected partial write destroyed prior complete state; subsequent public load raised UnpicklingError.",
+        "baseline_snapshot": {
+          "source": "plato.mpc.round_store",
+          "baseline": "fda60becedfa6236c11d415b87a868b52789a41e",
+          "sha256": "0899013e94db80ceb5f50a3965c1b56e618e8d678e5796c14e5afd7a8298ec4a"
+        }
+      },
+      {
+        "command": [
+          "/tmp/plato-phase2d.G3jkGH/venv313/bin/python",
+          "-m",
+          "pytest",
+          "tests/mpc/test_round_store_contracts.py",
+          "-q"
+        ],
+        "stage": "Before finite lock waits/cleanup; remote read already repaired",
+        "result": "2 failed, 1 passed; 0.10s",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/red-zk313.log",
+          "sha256": "71a96f27674d2c6a4a541e91e33fdcbb264585d921e0cd2a8458f42cadf07499"
+        }
+      },
+      {
+        "command": [
+          "/tmp/plato-phase2d.G3jkGH/venv313/bin/python",
+          "/tmp/plato-phase2d.G3jkGH/run_baseline.py",
+          "plato.mpc.round_store",
+          "/tmp/plato-phase2d.G3jkGH/baseline_round_store.py",
+          "tests/mpc/test_round_store_contracts.py::test_s3_read_error_is_not_reported_as_an_uninitialized_round",
+          "-q"
+        ],
+        "stage": "Exact baseline round_store",
+        "result": "1 failed; 0.09s",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/red-remote-errors313.log",
+          "sha256": "79d91ab02cfc141b414b7e2d50f5f564f0a8597aaab78f4309b3a40361df6464"
+        },
+        "interpretation": "Injected service failure swallowed and converted to uninitialized-round error.",
+        "baseline_snapshot": {
+          "source": "plato.mpc.round_store",
+          "baseline": "fda60becedfa6236c11d415b87a868b52789a41e",
+          "sha256": "0899013e94db80ceb5f50a3965c1b56e618e8d678e5796c14e5afd7a8298ec4a"
+        }
+      },
+      {
+        "command": [
+          "/tmp/plato-phase2d.G3jkGH/venv313/bin/python",
+          "-m",
+          "pytest",
+          "tests/utils/test_rl_payload_utilities.py",
+          "-q"
+        ],
+        "stage": "Baseline active RL before repairs",
+        "result": "7 failed, 1 passed, 1 broadcast warning; 0.33s",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/red-rl313.log",
+          "sha256": "9004e7642c25e9928488cf9eed26e18f52afb52f9b413b4e474c91a7e54137b6"
+        }
+      },
+      {
+        "command": [
+          "/tmp/plato-phase2d.G3jkGH/venv313/bin/python",
+          "/tmp/plato-phase2d.G3jkGH/run_baseline.py",
+          "plato.utils.reinforcement_learning.policies.td3",
+          "/tmp/plato-phase2d.G3jkGH/baseline_td3.py",
+          "tests/utils/test_rl_payload_utilities.py::test_td3_target_actions_use_every_transition",
+          "tests/utils/test_rl_payload_utilities.py::test_async_actor_ignores_padding_and_other_transitions",
+          "-q"
+        ],
+        "stage": "Exact baseline TD3",
+        "result": "2 failed; 0.12s",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/red-rl-numerical313.log",
+          "sha256": "9fd4cb63a6dd12c7c7683ec04f42af2ce6f928eb4e874490db05e887b97da66b"
+        },
+        "interpretation": "Independent per-transition action references and padding checks.",
+        "baseline_snapshot": {
+          "source": "plato.utils.reinforcement_learning.policies.td3",
+          "baseline": "fda60becedfa6236c11d415b87a868b52789a41e",
+          "sha256": "b27d984593fa30c2d03ec131d0644987315d8f73004c5dd767a0088f82bcfdfe"
+        }
+      }
+    ],
+    "focused_green": {
+      "command": [
+        "/tmp/plato-phase2d.G3jkGH/venv313/bin/python",
+        "-m",
+        "pytest",
+        "tests/utils",
+        "tests/processors",
+        "tests/mpc",
+        "tests/servers/test_he_payload_regressions.py",
+        "tests/servers/test_fedavg_he_aggregation_strategy.py",
+        "tests/datasources/test_data_loaders.py",
+        "tests/integration/test_smoke_configs.py::test_mpc_training_smoke",
+        "-q",
+        "-W",
+        "error::UserWarning"
+      ],
+      "result": "133 passed in 17.07s; no skips; user warnings treated as errors",
+      "log": {
+        "path": "/tmp/plato-phase2d.G3jkGH/green-owned313.log",
+        "sha256": "01de6a165708b9a292161935edd6af66bec6fd142f65867806727d57513b4831"
+      }
+    },
+    "initial_full_results": {
+      "commit": "dba6f85b8140d0159d593ad14b371ecb2caa9ee2",
+      "python313": {
+        "command": [
+          "/tmp/plato-phase2d.G3jkGH/venv313/bin/python",
+          "-m",
+          "pytest",
+          "tests",
+          "--test-profile",
+          "mandatory",
+          "-q",
+          "--basetemp=/tmp/plato-phase2d.G3jkGH/pytest-full313",
+          "--junitxml=/tmp/plato-phase2d.G3jkGH/full313.xml",
+          "--cov=plato.processors",
+          "--cov=plato.serialization",
+          "--cov=plato.mpc",
+          "--cov=plato.utils",
+          "--cov-report=json:/tmp/plato-phase2d.G3jkGH/coverage313.json",
+          "--cov-report=term:skip-covered"
+        ],
+        "exit_code": 1,
+        "elapsed_seconds": 474.97,
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/full313.log",
+          "sha256": "e2cc69112baae11e2921ea865c740ee85b5c42d15462984639b0ecd0ffeb3a84"
+        },
+        "junit": {
+          "tests": 413,
+          "failures": 1,
+          "errors": 0,
+          "skipped": 1,
+          "skips": [
+            {
+              "test": "test_nanochat_tokenizer_processor_round_trip",
+              "reason": "optional native nanochat tokenizer: callable rustbpe.Tokenizer absent"
+            }
+          ],
+          "passed": 411
+        }
+      },
+      "python314": {
+        "command": [
+          "/private/tmp/plato-phase2d.G3jkGH/venv314/bin/python",
+          "-m",
+          "pytest",
+          "tests",
+          "--test-profile",
+          "mandatory",
+          "-q",
+          "--basetemp=/tmp/plato-phase2d.G3jkGH/pytest-full314",
+          "--junitxml=/tmp/plato-phase2d.G3jkGH/full314.xml"
+        ],
+        "exit_code": 1,
+        "elapsed_seconds": 544.89,
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/full314.log",
+          "sha256": "a7adf0ba4fa5a39eada1befc8b9378c20fb57a8bc5ea1035a21f6be395fa9cca"
+        },
+        "junit": {
+          "tests": 413,
+          "failures": 1,
+          "errors": 0,
+          "skipped": 1,
+          "skips": [
+            {
+              "test": "test_nanochat_tokenizer_processor_round_trip",
+              "reason": "optional native nanochat tokenizer: callable rustbpe.Tokenizer absent"
+            }
+          ],
+          "passed": 411
+        }
+      },
+      "explanation": "Both 411 passed / 1 failed / 1 allowed skip. Sole failure: old DummyRoundStore lacked load_state in existing MPC client lifecycle test. Final commit replaces only that MPC fixture with a real initialized isolated store and asserts persisted samples; runtime source unchanged. Focused correction passes both versions; justified final full reruns below."
+    },
+    "lifecycle_correction": [
+      {
+        "command": [
+          "/tmp/plato-phase2d.G3jkGH/venv313/bin/python",
+          "-m",
+          "pytest",
+          "tests/clients/test_client_lifecycle_variants.py::test_mpc_training_strategy_records_samples",
+          "-q",
+          "--basetemp=/tmp/plato-phase2d.G3jkGH/pytest-lifecycle313"
+        ],
+        "exit_code": 0,
+        "elapsed_seconds": 4.9,
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/lifecycle-fix313.log",
+          "sha256": "f4c77b58e2280613a49ba18da1c4a02d440e862c49a6c8fe5daaf277333ff99d"
+        }
+      },
+      {
+        "command": [
+          "/private/tmp/plato-phase2d.G3jkGH/venv314/bin/python",
+          "-m",
+          "pytest",
+          "tests/clients/test_client_lifecycle_variants.py::test_mpc_training_strategy_records_samples",
+          "-q",
+          "--basetemp=/tmp/plato-phase2d.G3jkGH/pytest-lifecycle314"
+        ],
+        "exit_code": 0,
+        "elapsed_seconds": 5.24,
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/lifecycle-fix314.log",
+          "sha256": "f4c77b58e2280613a49ba18da1c4a02d440e862c49a6c8fe5daaf277333ff99d"
+        }
+      }
+    ],
+    "final_full_results_at_exact_implementation_commit": {
+      "python313": {
+        "command": [
+          "/tmp/plato-phase2d.G3jkGH/venv313/bin/python",
+          "-m",
+          "pytest",
+          "tests",
+          "--test-profile",
+          "mandatory",
+          "-q",
+          "--basetemp=/tmp/plato-phase2d.G3jkGH/pytest-final313",
+          "--junitxml=/tmp/plato-phase2d.G3jkGH/final-full313.xml"
+        ],
+        "exit_code": 0,
+        "elapsed_seconds": 449.13,
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/final-full313.log",
+          "sha256": "534930d61cd5a0aae98b2f52526a639352d29cc96342fb2f1393fa5c5fee0a8e"
+        },
+        "junit": {
+          "tests": 413,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 1,
+          "skips": [
+            {
+              "test": "test_nanochat_tokenizer_processor_round_trip",
+              "reason": "optional native nanochat tokenizer: callable rustbpe.Tokenizer absent"
+            }
+          ],
+          "passed": 412
+        }
+      },
+      "python314": {
+        "command": [
+          "/private/tmp/plato-phase2d.G3jkGH/venv314/bin/python",
+          "-m",
+          "pytest",
+          "tests",
+          "--test-profile",
+          "mandatory",
+          "-q",
+          "--basetemp=/tmp/plato-phase2d.G3jkGH/pytest-final314",
+          "--junitxml=/tmp/plato-phase2d.G3jkGH/final-full314.xml"
+        ],
+        "exit_code": 0,
+        "elapsed_seconds": 502.4,
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/final-full314.log",
+          "sha256": "df7678ebb6e4e74452fec8b1b2936a8ed722d2350f2d3dcc3ebb20754cc3a80f"
+        },
+        "junit": {
+          "tests": 413,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 1,
+          "skips": [
+            {
+              "test": "test_nanochat_tokenizer_processor_round_trip",
+              "reason": "optional native nanochat tokenizer: callable rustbpe.Tokenizer absent"
+            }
+          ],
+          "passed": 412
+        }
+      }
+    },
+    "standalone_probes": [
+      {
+        "script": {
+          "path": "/tmp/plato-phase2d.G3jkGH/probe_utilities.py",
+          "sha256": "903835ccc39974462e94e03503555f30af46e424e7d3c87a334577b79fc43aed"
+        },
+        "commands": [
+          "/tmp/plato-phase2d.G3jkGH/venv313/bin/python /tmp/plato-phase2d.G3jkGH/probe_utilities.py",
+          "/tmp/plato-phase2d.G3jkGH/venv314/bin/python /tmp/plato-phase2d.G3jkGH/probe_utilities.py"
+        ],
+        "results": "Both passed: count=6, freeze/activate, deepcopy alias/dtype, timeit, HE bitmap, actual RL agent/server weighted delta/event behavior; formatter alone stubbed.",
+        "logs": [
+          {
+            "path": "/tmp/plato-phase2d.G3jkGH/utilities313.log",
+            "sha256": "d6afe248e8bc616b852173b6e1f115783dec9a6b791a4a2a13ec3f3f1a1d344b"
+          },
+          {
+            "path": "/tmp/plato-phase2d.G3jkGH/utilities314.log",
+            "sha256": "d6afe248e8bc616b852173b6e1f115783dec9a6b791a4a2a13ec3f3f1a1d344b"
+          }
+        ]
+      },
+      {
+        "script": {
+          "path": "/tmp/plato-phase2d.G3jkGH/probe_fei.py",
+          "sha256": "d866e8573b188d2b84621b7ca75607362b2a06fa230dc0fb80a20e793c4ce32f"
+        },
+        "commands": [
+          "/tmp/plato-phase2d.G3jkGH/venv313/bin/python /tmp/plato-phase2d.G3jkGH/probe_fei.py",
+          "/tmp/plato-phase2d.G3jkGH/venv314/bin/python /tmp/plato-phase2d.G3jkGH/probe_fei.py"
+        ],
+        "results": {
+          "replay_transitions": 4,
+          "finite_policy_update_both_versions": true,
+          "losses_both_versions": [
+            0.23115581274032593,
+            0.23115581274032593
+          ],
+          "zero_norm_output_both_versions": [
+            "NaN",
+            "NaN"
+          ],
+          "constructor_algorithm_received_as_datasource": true,
+          "constructor_trainer_received_as_algorithm": true,
+          "constructor_trainer_received_as_none": true
+        },
+        "logs": [
+          {
+            "path": "/tmp/plato-phase2d.G3jkGH/fei313.log",
+            "sha256": "26919a5a1ec8f12399cd19e5656a37d294f481962a4491a4e7db190b6ed9649e"
+          },
+          {
+            "path": "/tmp/plato-phase2d.G3jkGH/fei314.log",
+            "sha256": "d0a0e9089c3c7541648f6f7f024c6ad03af4ca2f5fe554a518fa28dcd8a6e501"
+          }
+        ],
+        "limitation": "Actual FEI agent/policy and actual subclass normalization/constructor methods; superclass constructor instrumented solely to observe argument forwarding. No datasource downloads, sockets or example edits."
+      },
+      {
+        "script": {
+          "path": "/tmp/plato-phase2d.G3jkGH/probe_runtime_s3.py",
+          "sha256": "c18663d5adb12aa585f211705db84e6191b7b769bcaf38387964b8b8d4c271e7"
+        },
+        "commands": [
+          "/tmp/plato-phase2d.G3jkGH/venv313/bin/python /tmp/plato-phase2d.G3jkGH/probe_runtime_s3.py",
+          "/tmp/plato-phase2d.G3jkGH/venv314/bin/python /tmp/plato-phase2d.G3jkGH/probe_runtime_s3.py"
+        ],
+        "results": "Both probes completed with expected mismatch: nonempty/nested/trailing-slash prefixes transfer successfully, 44 bytes reserved by actual 2B reader; empty prefix requests an extra leading slash and receives 404. Utility send and standalone receive succeed in all four cases.",
+        "logs": [
+          {
+            "path": "/tmp/plato-phase2d.G3jkGH/runtime-s3-integration313.log",
+            "sha256": "90903e284487e3a7b1cc50556c66aede71c68b068048570304646e2c55a6d469"
+          },
+          {
+            "path": "/tmp/plato-phase2d.G3jkGH/runtime-s3-integration314.log",
+            "sha256": "90903e284487e3a7b1cc50556c66aede71c68b068048570304646e2c55a6d469"
+          }
+        ],
+        "runtime_snapshot": {
+          "path": "/tmp/plato-phase2d.G3jkGH/phase2b_transport_b3b038e.py",
+          "sha256": "631ff16e76913156fa1ad764fcd5b6b6cc375a81c777397321ddf101e874e4ad"
+        },
+        "runtime_candidate": "b3b038efa376b060e1c01f1da39173240768a019",
+        "limitation": "Pinned actual 2B source loaded read-only from scratch with the fixed utility and existing realistic local HTTP contract. No runtime worktree edits. Root integration change remains pending."
+      }
+    ],
+    "static_checks": [
+      {
+        "command": "/tmp/plato-phase2d.G3jkGH/venv313/bin/ruff check plato/processors plato/serialization plato/mpc plato/utils plato/servers/fedavg_he.py plato/servers/fedavg_mpc_additive.py plato/servers/fedavg_mpc_shamir.py plato/servers/strategies/mpc.py plato/servers/strategies/aggregation/he.py plato/clients/mpc.py plato/clients/strategies/mpc.py cleanup.py tests/utils tests/processors tests/mpc tests/servers/test_he_payload_regressions.py tests/clients/test_client_lifecycle_variants.py tests/integration/test_smoke_configs.py --select I",
+        "result": "All checks passed",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/ruff-final.log",
+          "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+        }
+      },
+      {
+        "command": "/tmp/plato-phase2d.G3jkGH/venv313/bin/ty check --python /tmp/plato-phase2d.G3jkGH/venv313/bin/python plato/processors plato/serialization plato/mpc plato/utils/s3.py plato/utils/tree.py plato/utils/homo_enc.py plato/utils/reinforcement_learning plato/servers/fedavg_he.py plato/servers/strategies/mpc.py plato/servers/strategies/aggregation/he.py plato/clients/strategies/mpc.py cleanup.py",
+        "result": "All checks passed",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/ty-final.log",
+          "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+        }
+      },
+      {
+        "command": "git diff --check fda60becedfa6236c11d415b87a868b52789a41e e7c0d59571d88efd7eb1fdbf4fc63ac2a7b81395",
+        "result": "Passed"
+      }
+    ],
+    "coverage": {
+      "source_commit": "dba6f85b8140d0159d593ad14b371ecb2caa9ee2",
+      "result": "1909/2413 executable lines (79.11%) across processors/serialization/mpc/utils in the initial full 3.13 run. Includes reserved third_party and Nanochat; not an owned-only or acceptance percentage. Runtime source identical to final commit; subsequent change only an existing lifecycle test fixture. Standalone utility/FEI probes are not part of measured pytest coverage.",
+      "artifact": {
+        "path": "/tmp/plato-phase2d.G3jkGH/coverage313.json",
+        "sha256": "bb8b1966c5f533e9ce8d6ea015c4847d569a309c1d3f7427600ead21dba0bf26"
+      }
+    }
+  },
+  "archive": {
+    "selection": "Only unused plato/utils/rl_env.py -> archives/legacy_rl_env/rl_env.py",
+    "original_code_sha256": "557fec876520d089a69c18484bcc73465eb1f52ac332442acc35427d57c7a40c",
+    "license_sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+    "baseline_provenance": "fda60becedfa6236c11d415b87a868b52789a41e",
+    "last_source_modification": "da8869512e417002975a16f818bcad7e91224279",
+    "closure_search": "rg -n \"rl_env|from plato.utils import.*env|plato.utils.rl_env\" plato examples configs tests pyproject.toml; tracked source/config review found no active imports/entrypoints. Only original module internal reset reference.",
+    "preserved_limitations": [
+      "Historical four-value Gym step",
+      "Extra state dimension",
+      "Synchronous event-loop driving",
+      "Infinite episode-limit wait"
+    ],
+    "documentation": "Local README records provenance, exact source/license hashes and historical checkout instructions. Active reinforcement_learning and FEI kept; shared archive index remains root-owned."
+  },
+  "trusted_pickle_inventory": {
+    "owned_reads": [
+      "utils/s3.py receive_from_s3: pickle.loads on fetched object bytes",
+      "processors/model_decompress.py: pickle.loads after zstd",
+      "utils/homo_enc.py bitmap_to_indices: pickle.loads after zlib",
+      "mpc/round_store.py: local pickle.load and S3 round-state pickle"
+    ],
+    "owned_writes": [
+      "S3.put_to_s3",
+      "model_compress",
+      "model.Processor size accounting",
+      "HE bitmap encoding",
+      "round_store state"
+    ],
+    "local_torch_checkpoints": "Active RL policy base load_model loads locally saved model/optimizer state_dict checkpoints using the locked PyTorch default; save/load roundtrips tested. No blanket torch.load modernization.",
+    "cross_component": "General server/client socket report/payload and checkpoint pickle paths remain in servers/base.py and clients/strategies/defaults.py (2B/general ownership); Nanochat tokenizer local pickle belongs to its assigned owner. Factual inventory only; no changes outside ownership.",
+    "boundary": "Pickles require trusted participating peers, storage writers and local files. Safetensors inside an outer pickle, compression and payload limits do not establish arbitrary untrusted-input safety. No new authentication/protocol design or questionnaire."
+  },
+  "primary_documentation_consulted": [
+    "https://docs.aws.amazon.com/botocore/latest/reference/config.html",
+    "https://docs.aws.amazon.com/AmazonS3/latest/API/API_ListObjectsV2.html",
+    "https://requests.readthedocs.io/en/latest/user/advanced/#timeouts",
+    "https://kazoo.readthedocs.io/en/latest/api/recipe/lock.html",
+    "https://kazoo.readthedocs.io/en/latest/api/client.html"
+  ],
+  "limitations": [
+    "S3 tested through actual botocore/Requests against a local S3-compatible HTTP contract, without live cloud credentials. Timeout/retry tests shorten constants; defaults are finite 5/30 seconds and three attempts. Read timeouts bound inactivity, not an absolute deadline for indefinitely trickling bodies.",
+    "ZooKeeper tests exercise real RoundInfoStore code with mocked Kazoo service contracts; no live distributed ZooKeeper or cloud deployment. HE uses native TenSEAL CKKS CPU with ephemeral n_threads=1 context; full federated HE/MPC sockets/deployments belong to later qualification.",
+    "Existing Shamir prototype uses real-valued scaled model shares, not a newly designed finite-field protocol. Exact integer interpolation inputs limited to abs <=2**53 and thresholds <=min(participants,1000), with explicit errors instead of inaccurate results. No cryptographic protocol redesign or broader security claim.",
+    "Native MLX behavior is not qualified by these PyTorch/NumPy payload tests; leave platform/backend qualification to its owner.",
+    "Shared feature compression header continues to require homogeneous feature shapes/dtypes. Heterogeneous inputs now fail explicitly; no wire format redesign.",
+    "Parameter counting numerical probe stubs only optional table formatting. CLI demo downloads were not executed; runtime import is offline.",
+    "FEI agent replay/update and inherited adaptive aggregation run in isolation; complete FEI example remains Phase 4, with concrete zero-norm and constructor findings retained. Archived placeholder is historical unsupported code."
+  ],
+  "root_followups": [
+    {
+      "id": "2D-17 / T2B-S3-PREFIX",
+      "owner": "root after 2B acceptance",
+      "action": "2D canonical key_prefix strips leading/trailing slashes; logical key K maps to P/K when P is nonempty and K when empty, and already-qualified P/K stays unchanged. Replace 2B receive_s3_payload object_key = storage.key_prefix + \"/\" + key with equivalent exactly-once normalization (reuse storage._object_key(key)). Current actual 2B/2D integration works for configured s3://bucket/prefix and nested/trailing slash variants but empty prefix fails with 404. Verify the combined actual bounded reader, fixed send/put and prefixed/unprefixed roundtrips; preserve B deadlines/byte caps. Historical malformed double-prefixed objects are not migrated."
+    },
+    {
+      "id": "2D-15",
+      "owner": "Phase 4 FEI",
+      "action": "Bounded zero-norm normalization regression/fix; concrete [NaN,NaN] evidence retained."
+    },
+    {
+      "id": "2D-16",
+      "owner": "Phase 4 FEI",
+      "action": "Constructor keyword/dependency handoff regression/fix; concrete argument capture retained."
+    },
+    {
+      "owner": "root",
+      "action": "Fresh independent review of the exact evidence-carrier commit and root-owned archive index update."
+    }
+  ],
+  "owned_temporary_resources": {
+    "root": "/tmp/plato-phase2d.G3jkGH",
+    "contents": [
+      "venv313 and venv314 locked dev environments",
+      "raw validation/probe/red logs with hashes above",
+      "pytest basetemp runtime trees and XML/JSON/coverage artifacts",
+      "exact baseline module snapshots and bounded probe/validation/evidence builder scripts",
+      "FEI scratch runtime"
+    ],
+    "worktree_resources": [
+      "Pinned external/nanochat checkout initialized",
+      "Ignored pytest/Python/coverage cache files owned in this worktree"
+    ],
+    "retention": "Retained until root acceptance; no scratch/evidence/workspace cleanup, no root .venv or other agents environments mutated."
+  }
+}
