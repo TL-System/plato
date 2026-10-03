@@ -412,3 +412,111 @@ def test_toml_loader_detects_circular_includes(tmp_path: Path):
     loader = TomlConfigLoader(first)
     with pytest.raises(ValueError, match="Circular include detected"):
         _ = loader.load()
+
+
+def test_config_reload_discards_optional_sections_in_both_orders(tmp_path, monkeypatch):
+    """Exercise successive production loads within one fixture lifetime (F13)."""
+    required = {
+        "clients": {"total_clients": 2, "per_round": 1},
+        "server": {"address": "127.0.0.1", "port": 8000},
+        "data": {"datasource": "MNIST"},
+        "trainer": {"rounds": 1},
+        "algorithm": {"type": "fedavg"},
+    }
+    optional = {
+        "general": {"base_path": str(tmp_path / "from_config")},
+        "evaluation": {"type": "nanochat_core"},
+        "results": {"types": "round, loss", "result_path": "custom_results"},
+        "parameters": {"optimizer": {"lr": 0.02}},
+    }
+    paths = [tmp_path / "minimal.toml", tmp_path / "optional.toml"]
+    toml_writer.dump(required, paths[0])
+    toml_writer.dump({**required, **optional}, paths[1])
+    monkeypatch.delenv("config_file", raising=False)
+
+    for reset_mode in ("legacy", "public"):
+        for has_optional in (False, True, False, True, True, False):
+            monkeypatch.setattr(
+                sys, "argv", ["plato", "-c", str(paths[int(has_optional)]),
+                              "--base", str(tmp_path / "cli")]
+            )
+            # No fixture runs between these transitions. Cover both the public
+            # reset and historical callers which invalidate _instance directly.
+            if reset_mode == "legacy":
+                Config._instance = None
+            else:
+                Config.reset()
+                assert all(not hasattr(Config, key) for key in optional)
+                assert Config._cli_overrides == {}
+                assert Config.client_sleep_times is None
+            config = Config()
+            assert all(hasattr(config, key) == has_optional for key in optional)
+            assert Config.params["base_path"] == str(tmp_path / "cli")
+            expected = (
+                "round, loss" if has_optional else "round, accuracy, elapsed_time"
+            )
+            assert Config.params["result_types"] == expected
+            assert Config.args.port is None
+
+
+def test_speed_simulation_preserves_rng_and_seeded_values(temp_config):
+    import numpy as np
+
+    Config.clients.random_seed = 7
+    Config.clients.max_sleep_time = 60
+    Config.clients.simulation_distribution = Config.node_from_dict(
+        {"distribution": "uniform", "low": 2.0, "high": 3.0}
+    )
+    before = np.random.get_state()
+    actual = Config.simulate_client_speed()
+    after = np.random.get_state()
+    np.testing.assert_array_equal(before[1], after[1])
+    assert before[2:] == after[2:]
+    # Independent fixed reference for NumPy's historical seed-7 draws.
+    np.testing.assert_allclose(actual, [2.076308289373957, 2.7799187922401147])
+    np.testing.assert_array_equal(Config.simulate_client_speed(), actual)
+
+
+def test_nested_include_order_deep_overrides_and_list_concatenation(tmp_path):
+    included = tmp_path / "included"
+    included.mkdir()
+    (included / "base.toml").write_text(
+        'items = [1]\n[nested]\nkeep = 3\nreplace = 4\n'
+    )
+    (included / "second.toml").write_text(
+        'include = "base.toml"\nitems = [2]\n[nested]\nreplace = 5\n'
+    )
+    root = tmp_path / "config.toml"
+    root.write_text(
+        'include = "included/second.toml"\nitems = [3]\n[nested]\nreplace = 6\n'
+    )
+    assert TomlConfigLoader(root).load() == {
+        "items": [1, 2, 3], "nested": {"keep": 3, "replace": 6}
+    }
+
+
+@pytest.mark.parametrize("directive", ['include = 3', 'include = "missing.toml"'])
+def test_invalid_include_fails_usefully(tmp_path, directive):
+    root = tmp_path / "config.toml"
+    root.write_text(directive)
+    if directive.endswith("3"):
+        with pytest.raises(TypeError, match="string or list"):
+            TomlConfigLoader(root).load()
+    else:
+        with pytest.raises(FileNotFoundError, match="missing.toml"):
+            TomlConfigLoader(root).load()
+
+
+def test_environment_config_and_client_cli_overrides(temp_config, monkeypatch):
+    # config_file is the established worker-process config channel, even when
+    # --config also appears. Client --id keeps the edge-server --port visible.
+    monkeypatch.setenv("config_file", str(Config.config_path))
+    monkeypatch.setattr(sys, "argv", ["plato", "-c", "missing.toml", "-i", "2",
+                                     "-p", "9001", "--server", "127.0.0.2:9002",
+                                     "--base", Config.params["base_path"]])
+    Config.reset()
+    config = Config()
+    assert Config.args.id == 2
+    assert Config.args.port == 9001
+    assert config.server.port == 9002
+    assert config.server.address == "127.0.0.2"

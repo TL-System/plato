@@ -238,6 +238,13 @@ def _dataset_defaults(dataset_name: str, data_cfg) -> dict[str, Any]:
     return {}
 
 
+class _MetadataSubset(Subset):
+    """A selected dataset retaining class and target metadata when available."""
+
+    classes: list[Any]
+    targets: list[Any]
+
+
 class DataSource(base.DataSource):
     """A datasource capable of loading any dataset exposed by torchvision."""
 
@@ -248,7 +255,11 @@ class DataSource(base.DataSource):
         data_cfg = config.data
 
         dataset_name_override = kwargs.pop("dataset_name", None)
-        dataset_name = getattr(data_cfg, "dataset_name", dataset_name_override)
+        dataset_name = (
+            dataset_name_override
+            if dataset_name_override is not None
+            else getattr(data_cfg, "dataset_name", None)
+        )
         if dataset_name is None:
             raise ValueError(
                 "`dataset_name` must be specified for the Torchvision datasource."
@@ -615,7 +626,7 @@ class DataSource(base.DataSource):
             indices = torch.randperm(total_examples, generator=generator).tolist()
 
         selected_indices = indices[start:stop]
-        subset = Subset(dataset, selected_indices)
+        subset = _MetadataSubset(dataset, selected_indices)
 
         classes = self._dataset_classes(dataset)
         if classes is not None:

@@ -49,11 +49,11 @@ class Sampler(base.Sampler):
     and biased partition size."""
 
     def __init__(self, datasource, client_id, testing):
-        super().__init__()
+        super().__init__(client_id)
         self.client_id = client_id
 
         # set the random seed based on client id
-        np.random.seed(self.random_seed * int(client_id))
+        self.rng.seed(self.random_seed * int(client_id))
 
         # obtain the dataset information
         if testing:
@@ -90,6 +90,7 @@ class Sampler(base.Sampler):
             concentration=client_quantity_concentration,
             min_partition_size=None,
             number_partitions=total_clients,
+            rng=self.rng,
         )[client_id - 1]
 
         self.client_partition_size = int(total_data_size * self.client_partition)
@@ -100,6 +101,7 @@ class Sampler(base.Sampler):
             concentration=label_concentration,
             min_partition_size=None,
             number_partitions=len(class_list),
+            rng=self.rng,
         )
 
         self.sample_weights = self.client_label_proportions[target_list]

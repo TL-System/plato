@@ -22,7 +22,9 @@ class DataSource(base.DataSource):
         super().__init__()
         _path = Config().params["data_path"]
 
-        if not os.path.exists(_path):
+        if not all(
+            os.path.isdir(os.path.join(_path, split)) for split in ("train", "test")
+        ):
             logging.info("Downloading the CINIC-10 dataset. This may take a while.")
             url = (
                 Config().data.download_url
@@ -54,9 +56,3 @@ class DataSource(base.DataSource):
         self.testset = datasets.ImageFolder(
             root=os.path.join(_path, "test"), transform=test_transform
         )
-
-    def num_train_examples(self):
-        return 90000
-
-    def num_test_examples(self):
-        return 90000
