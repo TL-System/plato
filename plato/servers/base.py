@@ -114,8 +114,8 @@ class Server:
         self.transport_limits = TransportLimits.from_config()
         self._session_assignments: dict[str, int] = {}
         self._inbound_transfers: dict[str, InboundTransfer] = {}
-        self._queued_payload_bytes: dict[int, int] = {}
-        self._completed_payload_bytes: dict[str, tuple[int, int]] = {}
+        self._queued_payload_bytes: dict[object, int] = {}
+        self._completed_payload_bytes: dict[str, tuple[object, int]] = {}
         self.s3_client = None
         self.outbound_processor = None
         self.inbound_processor = None
@@ -554,6 +554,8 @@ class Server:
             self._clear_inbound_transfer(sid)
         self._session_assignments.clear()
         self._queued_payload_bytes.clear()
+        self.reported_clients.clear()
+        self.updates.clear()
         for client_id, client in dict(self.clients).items():
             logging.info("Closing the connection to client #%d.", client_id)
             await self._require_sio().emit("disconnect", room=client["sid"])
@@ -963,10 +965,10 @@ class Server:
         self.client_payload.pop(sid, None)
         self._completed_payload_bytes.pop(sid, None)
 
-    def _complete_inbound_transfer(self, sid: str, client_id: int) -> None:
+    def _complete_inbound_transfer(self, sid: str, transfer_id: object) -> None:
         """Keep completed values available to legacy completion hooks, within budget."""
         transfer = self._inbound_transfers.pop(sid)
-        self._completed_payload_bytes[sid] = (client_id, transfer.buffered_bytes)
+        self._completed_payload_bytes[sid] = (transfer_id, transfer.buffered_bytes)
         transfer.close()
 
     def _assign_client(self, sid: str, client_id: int) -> None:
@@ -1011,14 +1013,14 @@ class Server:
             + sum(self._queued_payload_bytes.values())
             + sum(
                 count
-                for client_id, count in self._completed_payload_bytes.values()
-                if client_id not in self._queued_payload_bytes
+                for transfer_id, count in self._completed_payload_bytes.values()
+                if transfer_id not in self._queued_payload_bytes
             )
         )
 
     def _release_processed_payloads(self) -> None:
         for update in self.updates:
-            self._queued_payload_bytes.pop(update.client_id, None)
+            self._queued_payload_bytes.pop(getattr(update, "transfer_id", None), None)
 
     async def _client_report_arrived(self, sid, client_id, report):
         """Upon receiving a report from a client."""
@@ -1190,6 +1192,7 @@ class Server:
         if Config().is_central_server():
             self.comm_overhead += self.reports[sid].edge_server_comm_overhead
 
+        transfer_id = object()
         client_info = (
             finish_time,  # sorted by the client's finish time
             client_id,  # in case two or more clients have the same finish time
@@ -1200,6 +1203,7 @@ class Server:
                 "start_time": start_time,
                 "report": self.reports[sid],
                 "payload": self.client_payload[sid],
+                "transfer_id": transfer_id,
             },
         )
 
@@ -1209,9 +1213,11 @@ class Server:
         del self.training_clients[client_id]
 
         self.training_sids.remove(client_info[2]["sid"])
-        self._queued_payload_bytes[client_id] = self._inbound_transfers[sid].buffered_bytes
+        self._queued_payload_bytes[transfer_id] = self._inbound_transfers[
+            sid
+        ].buffered_bytes
         self._session_assignments.pop(sid, None)
-        self._complete_inbound_transfer(sid, client_id)
+        self._complete_inbound_transfer(sid, transfer_id)
 
         await self._process_clients(client_info)
 
@@ -1247,7 +1253,7 @@ class Server:
                     if client_data["update_requested"]:
                         return
 
-                request_sent = False
+                requests = []
                 for client_info in list(self.reported_clients):
                     client = client_info[2]
                     client_staleness = self.current_round - client["starting_round"]
@@ -1265,6 +1271,11 @@ class Server:
                         # Sending an urgent request to the client for a model update at the
                         # currently simulated wall clock time
                         client_id = client["client_id"]
+                        sid = client["sid"]
+                        # Retain other reports from this worker until its current
+                        # urgent response completes. Distinct workers remain concurrent.
+                        if sid in self.training_sids:
+                            continue
 
                         logging.info(
                             "[Server #%s] Requesting urgent model update from client #%s.",
@@ -1276,7 +1287,8 @@ class Server:
                         # this client will report again soon with another model update upon
                         # receiving the request from the server
                         self.reported_clients.remove(client_info)
-                        self._queued_payload_bytes.pop(client_id, None)
+                        heapq.heapify(self.reported_clients)
+                        self._queued_payload_bytes.pop(client.get("transfer_id"), None)
 
                         self.training_clients[client_id] = {
                             "id": client_id,
@@ -1285,24 +1297,27 @@ class Server:
                             "update_requested": True,
                         }
 
-                        sid = client["sid"]
                         self._assign_client(sid, client_id)
 
                         self.training_sids.append(sid)
 
-                        await self._require_sio().emit(
-                            "request_update",
-                            {
-                                "client_id": client_id,
-                                "time": self.wall_time - client["start_time"],
-                            },
-                            room=sid,
-                        )
-                        request_sent = True
+                        requests.append((sid, client_id, client["start_time"]))
+
+                # Establish all distinct-worker assignments before yielding to any
+                # response. Each deferred same-worker report stays in the valid heap.
+                for sid, client_id, start_time in requests:
+                    await self._require_sio().emit(
+                        "request_update",
+                        {
+                            "client_id": client_id,
+                            "time": self.wall_time - start_time,
+                        },
+                        room=sid,
+                    )
 
                 # If an urgent request was sent, we will wait until the client gets back to proceed
                 # with aggregation.
-                if request_sent:
+                if requests:
                     return
 
             # Step 2: Processing clients in chronological order of finish times in wall clock time
@@ -1317,7 +1332,7 @@ class Server:
                 self.current_processed_clients[client["client_id"]] = True
 
                 # Update the simulated wall clock time to be the finish time of this client
-                self.wall_time = client_info[0]
+                self.wall_time = max(self.wall_time, client_info[0])
 
                 # Add the report and payload of the extracted reporting client into updates
                 logging.info(
@@ -1332,6 +1347,7 @@ class Server:
                         client_id=client["client_id"],
                         report=client["report"],
                         payload=client["payload"],
+                        transfer_id=client.get("transfer_id"),
                         staleness=client_staleness,
                     )
                 )
@@ -1359,7 +1375,7 @@ class Server:
                     for __ in range(0, len(possibly_stale_clients)):
                         stale_client_info = heapq.heappop(possibly_stale_clients)
                         # Update the simulated wall clock time to be the finish time of this client
-                        self.wall_time = stale_client_info[0]
+                        self.wall_time = max(self.wall_time, stale_client_info[0])
                         client = stale_client_info[2]
 
                         # Add the report and payload of the extracted reporting client into updates
@@ -1376,6 +1392,7 @@ class Server:
                                 client_id=client["client_id"],
                                 report=client["report"],
                                 payload=client["payload"],
+                                transfer_id=client.get("transfer_id"),
                                 staleness=client_staleness,
                             )
                         )
@@ -1405,6 +1422,7 @@ class Server:
                     client_id=client["client_id"],
                     report=client["report"],
                     payload=client["payload"],
+                    transfer_id=client.get("transfer_id"),
                     staleness=client_staleness,
                 )
             )

@@ -89,6 +89,8 @@ class InboundTransfer:
         self.check_active()
         if self.byte_count + count > self.limits.max_payload_bytes:
             raise ValueError("Payload exceeds maximum byte limit.")
+        if self.buffered_bytes + count > self.limits.max_buffered_bytes:
+            raise ValueError("Payload buffered byte limit exceeded.")
         self.byte_count += count
 
     def append(self, data: bytes) -> None:
@@ -145,7 +147,9 @@ async def receive_s3_payload(
     unbounded receive_from_s3 is not used by runtime ingress.
     """
     transfer.check_active()
-    object_key = storage.key_prefix + "/" + key
+    prefix = storage.key_prefix.strip("/")
+    namespace = prefix + "/"
+    object_key = key if not prefix or key.startswith(namespace) else namespace + key
     url = storage.s3_client.generate_presigned_url(
         ClientMethod="get_object",
         Params={"Bucket": storage.bucket, "Key": object_key},
