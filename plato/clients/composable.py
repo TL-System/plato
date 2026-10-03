@@ -26,6 +26,7 @@ from plato.clients.strategies import (
     ReportingStrategy,
     TrainingStrategy,
 )
+from plato.clients.transport import TransportLimits, load_pickle
 from plato.config import Config
 from plato.utils import s3
 
@@ -52,6 +53,7 @@ class ComposableClientEvents(socketio.AsyncClientNamespace):
             )
             if not should_handle:
                 return
+            self.core.payload_strategy.teardown(self.core.context)
             if disconnect_reason is not None:
                 LOGGER.info(
                     "[Client #%d] The server disconnected the connection (%s).",
@@ -324,8 +326,15 @@ class ComposableClient:
 
         if self.context.comm_simulation:
             payload_filename = response["payload_filename"]
+            size = os.path.getsize(payload_filename)
+            limits = TransportLimits.from_config()
+            if size > min(limits.max_payload_bytes, limits.max_buffered_bytes):
+                raise ValueError("Simulated server payload exceeds byte limit.")
             with open(payload_filename, "rb") as payload_file:
-                self.context.server_payload = pickle.load(payload_file)
+                raw = payload_file.read(size + 1)
+            if len(raw) != size:
+                raise ValueError("Simulated server payload changed during transfer.")
+            self.context.server_payload = load_pickle(raw)
 
             payload_size = sys.getsizeof(pickle.dumps(self.context.server_payload))
 

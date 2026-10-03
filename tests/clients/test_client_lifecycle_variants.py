@@ -145,6 +145,26 @@ def dummy_client(
     return client, payload_strategy, training_strategy
 
 
+def test_simulated_server_payload_limit_precedes_deserialization(
+    dummy_client, tmp_path, monkeypatch
+):
+    from plato.clients import composable
+
+    client, _, _ = dummy_client
+    Config().server.max_payload_bytes = 32
+    payload = tmp_path / "oversized.pkl"
+    payload.write_bytes(b"x" * 33)
+    monkeypatch.setattr(
+        composable, "load_pickle", lambda data: pytest.fail("parsed oversized file")
+    )
+    with pytest.raises(ValueError, match="Simulated server payload exceeds byte limit"):
+        asyncio.run(client._payload_to_arrive({
+            "id": client.client_id, "current_round": 1,
+            "payload_filename": str(payload),
+        }))
+    assert client.server_payload is None
+
+
 def test_base_client_lifecycle_sets_attributes(
     dummy_client,
 ):
