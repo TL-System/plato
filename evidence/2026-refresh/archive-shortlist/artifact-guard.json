@@ -1,0 +1,46 @@
+{
+  "positive_exact_19_accepted": true,
+  "negative_artifact_fixtures": [
+    {
+      "fixture": "missing-collection",
+      "rejected": true,
+      "reason": "collection inventory mismatch"
+    },
+    {
+      "fixture": "duplicate-collection",
+      "rejected": true,
+      "reason": "collection inventory mismatch"
+    },
+    {
+      "fixture": "missing-junit",
+      "rejected": true,
+      "reason": "JUnit inventory mismatch"
+    },
+    {
+      "fixture": "duplicate-junit",
+      "rejected": true,
+      "reason": "JUnit inventory mismatch"
+    },
+    {
+      "fixture": "skipped-junit",
+      "rejected": true,
+      "reason": "non-passing JUnit case"
+    },
+    {
+      "fixture": "failed-junit",
+      "rejected": true,
+      "reason": "non-passing JUnit case"
+    },
+    {
+      "fixture": "xfail-log",
+      "rejected": true,
+      "reason": "non-passing terminal outcome"
+    },
+    {
+      "fixture": "xpass-log",
+      "rejected": true,
+      "reason": "non-passing terminal outcome"
+    }
+  ],
+  "boundary": "Temporary stdlib verifier fixtures only. Production CI/profile ownership remains with the assigned native-profile owner."
+}

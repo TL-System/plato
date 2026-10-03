@@ -1,0 +1,84 @@
+{
+  "family": "dlg",
+  "case": "selector",
+  "variant": "",
+  "command": [
+    "/tmp/plato-archive-author/environment/bin/python",
+    "-B",
+    "-m",
+    "tests.integration.model_search_retention_worker",
+    "-u",
+    "-c",
+    "/private/tmp/plato-archive-author/accepted-cases/test_local_retired_selection_d0/dlg/config.toml",
+    "-b",
+    "/private/tmp/plato-archive-author/accepted-cases/test_local_retired_selection_d0/dlg/runtime"
+  ],
+  "returncode": 0,
+  "timed_out": false,
+  "forced": [],
+  "survivors": [],
+  "observed_pids": [
+    10311
+  ],
+  "elapsed_seconds": 1.8531235000118613,
+  "events": [
+    {
+      "event": "source_identity",
+      "pid": 10311,
+      "config_sha256": "8ae143d07301739d163bd56b445ce956e08682996a335c70125a990418f4644b",
+      "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+      "worker_sha256": "949e087b68296d4b372ebf4a2369c9b0dbaa4a5606b483a91bab8faed2683e55"
+    },
+    {
+      "event": "selector_diagnostic",
+      "pid": 10311,
+      "selection": "vit",
+      "message": "The model 'vit' was retired. Historical source and restoration instructions: archives/retired/legacy-vit/README.md."
+    },
+    {
+      "event": "selector_diagnostic",
+      "pid": 10311,
+      "selection": "unknown_model",
+      "message": "No such model: unknown_model"
+    },
+    {
+      "event": "success",
+      "pid": 10311
+    }
+  ],
+  "overlay": {
+    "clients": {
+      "total_clients": 2,
+      "per_round": 2,
+      "comm_simulation": false,
+      "compute_comm_time": false,
+      "do_test": false
+    },
+    "server": {
+      "port": 56809,
+      "simulate_wall_time": false,
+      "random_seed": 1234
+    },
+    "trainer": {
+      "rounds": 1,
+      "epochs": 1,
+      "batch_size": 2,
+      "max_concurrency": 2,
+      "model_type": "resnet"
+    },
+    "data": {
+      "download": false,
+      "sampler": "all_inclusive",
+      "testset_sampler": "all_inclusive",
+      "testset_size": 2
+    },
+    "parameters": {
+      "limitation": {
+        "activated": false
+      }
+    }
+  },
+  "supplied_config_path": "examples/gradient_leakage_attacks/fedavg_resnet18_cifar100.toml",
+  "supplied_config_sha256": "1834c972bc0a149eb76ecc52328d0c5562b0da4ff56c4cbbef3a90f651614912",
+  "lock_sha256": "e2a53aaae9a0dd49f5446b490bb3071e86aa3a9a20d6271c9dd30b4ae2dcbff9"
+}

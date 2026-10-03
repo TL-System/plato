@@ -1,0 +1,61 @@
+[clients]
+type = "simple"
+total_clients = 2
+per_round = 2
+do_test = false
+comm_simulation = false
+compute_comm_time = false
+
+[server]
+address = "127.0.0.1"
+port = 56725
+checkpoint_path = "checkpoints/resnet18_cifar100_0.8"
+model_path = "models/resnet18_cifar100_0.8"
+simulate_wall_time = false
+random_seed = 1234
+
+[data]
+datasource = "CIFAR100"
+dataset_name = "CIFAR100"
+download = false
+partition_size = 6000
+sampler = "all_inclusive"
+testset_sampler = "all_inclusive"
+testset_size = 2
+
+[trainer]
+type = "basic"
+rounds = 1
+max_concurrency = 2
+target_accuracy = 0.8
+model_name = "lenet"
+epochs = 1
+batch_size = 2
+optimizer = "SGD"
+lr_scheduler = "LambdaLR"
+model_type = "resnet"
+
+[algorithm]
+type = "fedavg"
+
+[parameters]
+
+[parameters.model]
+num_classes = 100
+
+[parameters.optimizer]
+lr = 0.1
+momentum = 0.9
+weight_decay = 0.0001
+
+[parameters.learning_rate]
+gamma = 0.1
+milestone_steps = "80ep,120ep"
+
+[parameters.limitation]
+activated = false
+
+[results]
+result_path = "results/pretraining/resnet18_cifar100_0.8/"
+types = "round, accuracy, elapsed_time, round_time"
+plot = "round-accuracy, elapsed_time-accuracy"
