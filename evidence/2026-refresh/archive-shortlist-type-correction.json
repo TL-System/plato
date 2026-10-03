@@ -1,0 +1,427 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-03",
+  "status": "ARS-01 corrected; bounded author checks passed; fresh independent review and final integration pending.",
+  "finding": "ARS-01",
+  "prior_review": {
+    "path": "evidence/2026-refresh/archive-shortlist-type-correction/prior-review.json",
+    "sha256": "efda9df7ad2fd12c4f38d8a3113749fc39a93f1dfbb4399c48998204bcb70dbd",
+    "reviewed_tip": "90a26f703142cddaf069f0494a940b833cdd397a"
+  },
+  "before": {
+    "worker_sha256": "949e087b68296d4b372ebf4a2369c9b0dbaa4a5606b483a91bab8faed2683e55",
+    "command": "/Users/bli/Playground/plato/.venv/bin/ty check tests/test_model_search_retirement.py tests/integration/test_retained_model_search.py tests/integration/model_search_retention_worker.py examples/model_search/anycostfl/anycostfl.py examples/model_search/fedrolex/fedrolex.py examples/model_search/heterofl/heterofl.py examples/gradient_leakage_attacks/dlg_model.py plato/models/registry.py plato/utils/retired_backends.py --python /tmp/plato-archive-author/environment/bin/python --output-format concise",
+    "returncode": 1,
+    "diagnostics": [
+      "invalid-argument-type: possibly-None MAC count passed to float",
+      "invalid-assignment: typed ptflops callable overwritten directly"
+    ],
+    "raw_diagnostics": "evidence/2026-refresh/archive-shortlist-type-correction/ty-before.log"
+  },
+  "corrected_source": {
+    "commit": "5fcad661d804b2b1bb8c9697ca2f668d4a12cf7d",
+    "tree": "bd8dbb1248a93c2e811b69c74694092557771674",
+    "source_sha256": {
+      "tests/test_model_search_retirement.py": "179d3a8aafd405e2a9b7bb6f8f6e0fe47a7c1817e748664b8648e4829b103e34",
+      "tests/integration/test_retained_model_search.py": "ff902a9a34c97ce4842f0dd35b2bc396da5c2998381a66f52d4c5d1142e4fe0d",
+      "tests/integration/model_search_retention_worker.py": "95779c99e4783cfeb4d53110a11f69c4a4529b512f4f9b0d738bb2261b24502d",
+      "examples/model_search/anycostfl/anycostfl.py": "59cc67240cc69bfca8d57133836093118723a26bfa5a23bc8606635cb7e3299b",
+      "examples/model_search/fedrolex/fedrolex.py": "000ec8ba529f68de778d4fef1e05533bda24829d2512ddd2f31bc4d26eb7f2f3",
+      "examples/model_search/heterofl/heterofl.py": "c7679361bf108ffb53bcdfb71e09b0e94d36b826bcfaea0bc57e8bbd5469bea0",
+      "examples/gradient_leakage_attacks/dlg_model.py": "5aaaef167b637fe16da8b1feb9814147f44d3db8f991bcecead45913bf993823",
+      "plato/models/registry.py": "d086d04ba91001e2cea6d7031ff1c4229fb8fb7d6def46addb68bcff560c5936",
+      "plato/utils/retired_backends.py": "e71a9493bfb9e08b0e2b592d76c3ea45d7835da7c7afcfaf2508b5e5524c15fc"
+    },
+    "lock_sha256": "e2a53aaae9a0dd49f5446b490bb3071e86aa3a9a20d6271c9dd30b4ae2dcbff9",
+    "only_path_changed_since_review": "tests/integration/model_search_retention_worker.py",
+    "diff": "evidence/2026-refresh/archive-shortlist-type-correction/source.diff",
+    "only_modified_function": [
+      "activated_budget"
+    ],
+    "all_original_assertions_ast_identical": true,
+    "literal_width_call_order_and_all_other_functions_ast_identical": true,
+    "real_ptflops_callable_saved_called_and_original_result_returned": true,
+    "supported_instrumentation": "unittest.mock.patch.object context restores the original callable",
+    "mac_validation": "reject None, nonfinite or nonpositive values before recording; no profiling values fabricated",
+    "new_typing_suppressions_or_allowances": [],
+    "production_algorithm_equations_and_archive_metadata_unchanged": true
+  },
+  "environment": {
+    "ptflops": {
+      "executable": "/tmp/plato-archive-author/environment/bin/python",
+      "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+      "packages": {
+        "pytest": "9.1.1",
+        "torch": "2.14.1",
+        "torchvision": "0.29.1",
+        "ptflops": "0.7.5",
+        "numpy": "2.5.3"
+      },
+      "ptflops_callable": {
+        "signature": "(model: torch.nn.modules.module.Module, input_res: Tuple[int, ...], print_per_layer_stat: bool = True, as_strings: bool = True, input_constructor: Optional[Callable[[Tuple], Dict]] = None, ost: <class 'TextIO'> = <_io.TextIOWrapper name='<stdout>' mode='w' encoding='utf-8'>, verbose: bool = False, ignore_modules: List[Union[torch.nn.modules.module.Module, Any]] = [], custom_modules_hooks: Dict[Union[torch.nn.modules.module.Module, Any], Any] = {}, backend: Union[str, ptflops.flops_counter.FLOPS_BACKEND] = <FLOPS_BACKEND.PYTORCH: 'pytorch'>, flops_units: Optional[str] = None, param_units: Optional[str] = None, output_precision: int = 2, backend_specific_config: Dict = {}) -> Tuple[Union[str, int, NoneType], Union[str, int, NoneType]]",
+        "path": "/tmp/plato-archive-author/environment/lib/python3.13/site-packages/ptflops/flops_counter.py",
+        "sha256": "35063d57e223ed41940130eaf83330379f48dcf25b1a26a830194c9488c850b7"
+      }
+    },
+    "core-dev": {
+      "executable": "/Users/bli/Playground/plato/.venv/bin/python",
+      "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+      "packages": {
+        "pytest": "9.1.1",
+        "torch": "2.14.1",
+        "torchvision": "0.29.1",
+        "ptflops": null,
+        "numpy": "2.5.3"
+      }
+    }
+  },
+  "tools": {
+    "ty": "ty 0.0.84 (8dd9a7f7f 2026-09-24)",
+    "ruff": "ruff 0.16.10"
+  },
+  "executed_checks": {
+    "dependency_present_ty": {
+      "command": "/Users/bli/Playground/plato/.venv/bin/ty check tests/test_model_search_retirement.py tests/integration/test_retained_model_search.py tests/integration/model_search_retention_worker.py examples/model_search/anycostfl/anycostfl.py examples/model_search/fedrolex/fedrolex.py examples/model_search/heterofl/heterofl.py examples/gradient_leakage_attacks/dlg_model.py plato/models/registry.py plato/utils/retired_backends.py --python /tmp/plato-archive-author/environment/bin/python --output-format concise",
+      "returncode": 0,
+      "owned_python_paths": 9,
+      "raw": "evidence/2026-refresh/archive-shortlist-type-correction/ty-ptflops.log"
+    },
+    "core_dev_ty": {
+      "command": "/Users/bli/Playground/plato/.venv/bin/ty check tests/test_model_search_retirement.py tests/integration/test_retained_model_search.py tests/integration/model_search_retention_worker.py examples/model_search/anycostfl/anycostfl.py examples/model_search/fedrolex/fedrolex.py examples/model_search/heterofl/heterofl.py examples/gradient_leakage_attacks/dlg_model.py plato/models/registry.py plato/utils/retired_backends.py --python /Users/bli/Playground/plato/.venv/bin/python --output-format concise",
+      "returncode": 0,
+      "owned_python_paths": 9,
+      "raw": "evidence/2026-refresh/archive-shortlist-type-correction/ty-core-dev.log"
+    },
+    "ruff": {
+      "command": "/Users/bli/Playground/plato/.venv/bin/ruff check . --select I",
+      "returncode": 0,
+      "raw": "evidence/2026-refresh/archive-shortlist-type-correction/ruff.log"
+    },
+    "retained_collection": {
+      "command": "/tmp/plato-archive-author/environment/bin/python -m pytest tests/integration/test_retained_model_search.py --collect-only -q --test-profile=mandatory -m retained_model_search",
+      "returncode": 0,
+      "count": 19,
+      "exact_original_nodeids": true,
+      "nodeids": [
+        "tests/integration/test_retained_model_search.py::test_retained_width_round[anycostfl]",
+        "tests/integration/test_retained_model_search.py::test_retained_width_round[fedrolex]",
+        "tests/integration/test_retained_model_search.py::test_retained_width_round[heterofl]",
+        "tests/integration/test_retained_model_search.py::test_retained_activated_budget[anycostfl]",
+        "tests/integration/test_retained_model_search.py::test_retained_activated_budget[fedrolex]",
+        "tests/integration/test_retained_model_search.py::test_retained_activated_budget[heterofl]",
+        "tests/integration/test_retained_model_search.py::test_sysheterofl_subnet_round",
+        "tests/integration/test_retained_model_search.py::test_dlg_model_update[lenet]",
+        "tests/integration/test_retained_model_search.py::test_dlg_model_update[resnet_18]",
+        "tests/integration/test_retained_model_search.py::test_local_retired_selection[anycostfl]",
+        "tests/integration/test_retained_model_search.py::test_local_retired_selection[fedrolex]",
+        "tests/integration/test_retained_model_search.py::test_local_retired_selection[heterofl]",
+        "tests/integration/test_retained_model_search.py::test_local_retired_selection[dlg]",
+        "tests/integration/test_retained_model_search.py::test_retained_entrypoint_import[anycostfl-root]",
+        "tests/integration/test_retained_model_search.py::test_retained_entrypoint_import[anycostfl-example]",
+        "tests/integration/test_retained_model_search.py::test_retained_entrypoint_import[fedrolex-root]",
+        "tests/integration/test_retained_model_search.py::test_retained_entrypoint_import[fedrolex-example]",
+        "tests/integration/test_retained_model_search.py::test_retained_entrypoint_import[heterofl-root]",
+        "tests/integration/test_retained_model_search.py::test_retained_entrypoint_import[heterofl-example]"
+      ],
+      "raw": "evidence/2026-refresh/archive-shortlist-type-correction/collection.log"
+    },
+    "affected_real_budgets": {
+      "command": "OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 /tmp/plato-archive-author/environment/bin/python -m pytest 'tests/integration/test_retained_model_search.py::test_retained_activated_budget[anycostfl]' 'tests/integration/test_retained_model_search.py::test_retained_activated_budget[fedrolex]' 'tests/integration/test_retained_model_search.py::test_retained_activated_budget[heterofl]' --test-profile=mandatory -m retained_model_search -ra --basetemp=/tmp/plato-archive-author/type-correction/final/cases --junitxml=/tmp/plato-archive-author/type-correction/final/budgets.xml",
+      "returncode": 0,
+      "passed": 3,
+      "elapsed_seconds": 13.63,
+      "exact_nodeids": [
+        "tests/integration/test_retained_model_search.py::test_retained_activated_budget[anycostfl]",
+        "tests/integration/test_retained_model_search.py::test_retained_activated_budget[fedrolex]",
+        "tests/integration/test_retained_model_search.py::test_retained_activated_budget[heterofl]"
+      ],
+      "junit_exact": true,
+      "no_skips_xfails_xpasses_failures_errors": true,
+      "all_workers_natural_success_no_forced_shutdown_or_survivors": true,
+      "all_observed_pids_gone_and_ports_rebound": true,
+      "junit": "evidence/2026-refresh/archive-shortlist-type-correction/budgets.xml",
+      "raw": "evidence/2026-refresh/archive-shortlist-type-correction/budgets.log"
+    },
+    "core": {
+      "command": "OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 /tmp/plato-archive-author/environment/bin/python -m pytest tests/test_model_search_retirement.py tests/test_retired_backends.py -q -ra --test-profile=mandatory --junitxml=/tmp/plato-archive-author/type-correction/final/core.xml",
+      "returncode": 0,
+      "passed": 44,
+      "elapsed_seconds": 3.47,
+      "exact_original_junit_cases": true,
+      "nodeids": [
+        "tests/test_model_search_retirement.py::test_archive_matches_reviewed_inventory_and_immutable_source[anycostfl-vit]",
+        "tests/test_model_search_retirement.py::test_archive_matches_reviewed_inventory_and_immutable_source[fedrlnas]",
+        "tests/test_model_search_retirement.py::test_archive_matches_reviewed_inventory_and_immutable_source[fedrolex-vit]",
+        "tests/test_model_search_retirement.py::test_archive_matches_reviewed_inventory_and_immutable_source[fedtp]",
+        "tests/test_model_search_retirement.py::test_archive_matches_reviewed_inventory_and_immutable_source[heterofl-mobilenetv3]",
+        "tests/test_model_search_retirement.py::test_archive_matches_reviewed_inventory_and_immutable_source[legacy-vit]",
+        "tests/test_model_search_retirement.py::test_archive_matches_reviewed_inventory_and_immutable_source[pfedrlnas]",
+        "tests/test_model_search_retirement.py::test_exact_pinned_upstream_snapshots_and_embedded_notices",
+        "tests/test_model_search_retirement.py::test_generic_torchvision_category_still_delegates[mobilenet_v3_small]",
+        "tests/test_model_search_retirement.py::test_generic_torchvision_category_still_delegates[vit_b_16]",
+        "tests/test_model_search_retirement.py::test_independent_huggingface_category_delegates",
+        "tests/test_model_search_retirement.py::test_independent_torchvision_mobilenet_backward",
+        "tests/test_model_search_retirement.py::test_registry_imports_in_fresh_process_without_submodules",
+        "tests/test_model_search_retirement.py::test_retired_category_fails_before_factory_activity[deepvit]",
+        "tests/test_model_search_retirement.py::test_retired_category_fails_before_factory_activity[google@vit-base-patch16-224]",
+        "tests/test_model_search_retirement.py::test_retired_category_fails_before_factory_activity[t2tvit14]",
+        "tests/test_model_search_retirement.py::test_retired_runtime_modules_absent[dvit]",
+        "tests/test_model_search_retirement.py::test_retired_runtime_modules_absent[t2tvit]",
+        "tests/test_model_search_retirement.py::test_retired_runtime_modules_absent[vit]",
+        "tests/test_model_search_retirement.py::test_verifier_rejects_temporary_copied_file_mutation[byte]",
+        "tests/test_model_search_retirement.py::test_verifier_rejects_temporary_copied_file_mutation[mode]",
+        "tests/test_retired_backends.py::test_nanochat_upstream_archive_preserves_pinned_source_and_notice",
+        "tests/test_retired_backends.py::test_retired_datasource_selection_fails_with_archive_guidance[False-LeRobot]",
+        "tests/test_retired_backends.py::test_retired_datasource_selection_fails_with_archive_guidance[False-Nanochat]",
+        "tests/test_retired_backends.py::test_retired_datasource_selection_fails_with_archive_guidance[True-LeRobot]",
+        "tests/test_retired_backends.py::test_retired_datasource_selection_fails_with_archive_guidance[True-Nanochat]",
+        "tests/test_retired_backends.py::test_retired_evaluator_cannot_run_via_override",
+        "tests/test_retired_backends.py::test_retired_evaluator_cannot_silently_disappear[False]",
+        "tests/test_retired_backends.py::test_retired_evaluator_cannot_silently_disappear[True]",
+        "tests/test_retired_backends.py::test_retired_model_selection_fails_with_archive_guidance[nanochat]",
+        "tests/test_retired_backends.py::test_retired_model_selection_fails_with_archive_guidance[smolvla]",
+        "tests/test_retired_backends.py::test_retired_runtime_modules_are_unavailable[plato.datasources.lerobot]",
+        "tests/test_retired_backends.py::test_retired_runtime_modules_are_unavailable[plato.datasources.nanochat]",
+        "tests/test_retired_backends.py::test_retired_runtime_modules_are_unavailable[plato.evaluators.nanochat_core]",
+        "tests/test_retired_backends.py::test_retired_runtime_modules_are_unavailable[plato.models.nanochat]",
+        "tests/test_retired_backends.py::test_retired_runtime_modules_are_unavailable[plato.models.smolvla]",
+        "tests/test_retired_backends.py::test_retired_runtime_modules_are_unavailable[plato.processors.nanochat_tokenizer]",
+        "tests/test_retired_backends.py::test_retired_runtime_modules_are_unavailable[plato.trainers.lerobot]",
+        "tests/test_retired_backends.py::test_retired_runtime_modules_are_unavailable[plato.trainers.nanochat]",
+        "tests/test_retired_backends.py::test_retired_runtime_modules_are_unavailable[plato.utils.third_party]",
+        "tests/test_retired_backends.py::test_retired_trainer_selection_fails_with_archive_guidance[lerobot]",
+        "tests/test_retired_backends.py::test_retired_trainer_selection_fails_with_archive_guidance[nanochat]",
+        "tests/test_retired_backends.py::test_retirement_archive_preserves_original_bytes[lerobot]",
+        "tests/test_retired_backends.py::test_retirement_archive_preserves_original_bytes[nanochat]"
+      ],
+      "junit": "evidence/2026-refresh/archive-shortlist-type-correction/core.xml",
+      "raw": "evidence/2026-refresh/archive-shortlist-type-correction/core.log"
+    }
+  },
+  "cases": [
+    {
+      "nodeid": "tests/integration/test_retained_model_search.py::test_retained_activated_budget[anycostfl]",
+      "family": "anycostfl",
+      "raw_result": "evidence/2026-refresh/archive-shortlist-type-correction/cases/anycostfl/result.json",
+      "worker_sha256": "95779c99e4783cfeb4d53110a11f69c4a4529b512f4f9b0d738bb2261b24502d",
+      "returncode": 0,
+      "natural_success": true,
+      "observed_pids": [
+        25869
+      ],
+      "observed_pids_gone": true,
+      "port": 53479,
+      "port_rebound": true,
+      "elapsed_seconds": 4.893378166947514,
+      "profiling_queries": 14,
+      "selected_rates": [
+        0.9921875,
+        0.7578125
+      ],
+      "all_real_mac_queries_finite_positive": true,
+      "all_selected_profiles_satisfy_budget": true,
+      "all_numerical_records_and_queries_match_original_execution": true
+    },
+    {
+      "nodeid": "tests/integration/test_retained_model_search.py::test_retained_activated_budget[fedrolex]",
+      "family": "fedrolex",
+      "raw_result": "evidence/2026-refresh/archive-shortlist-type-correction/cases/fedrolex/result.json",
+      "worker_sha256": "95779c99e4783cfeb4d53110a11f69c4a4529b512f4f9b0d738bb2261b24502d",
+      "returncode": 0,
+      "natural_success": true,
+      "observed_pids": [
+        25938
+      ],
+      "observed_pids_gone": true,
+      "port": 53484,
+      "port_rebound": true,
+      "elapsed_seconds": 4.529128042049706,
+      "profiling_queries": 14,
+      "selected_rates": [
+        0.9921875,
+        0.7578125
+      ],
+      "all_real_mac_queries_finite_positive": true,
+      "all_selected_profiles_satisfy_budget": true,
+      "all_numerical_records_and_queries_match_original_execution": true
+    },
+    {
+      "nodeid": "tests/integration/test_retained_model_search.py::test_retained_activated_budget[heterofl]",
+      "family": "heterofl",
+      "raw_result": "evidence/2026-refresh/archive-shortlist-type-correction/cases/heterofl/result.json",
+      "worker_sha256": "95779c99e4783cfeb4d53110a11f69c4a4529b512f4f9b0d738bb2261b24502d",
+      "returncode": 0,
+      "natural_success": true,
+      "observed_pids": [
+        26040
+      ],
+      "observed_pids_gone": true,
+      "port": 53490,
+      "port_rebound": true,
+      "elapsed_seconds": 4.17597679188475,
+      "profiling_queries": 6,
+      "selected_rates": [
+        1.0,
+        0.5
+      ],
+      "all_real_mac_queries_finite_positive": true,
+      "all_selected_profiles_satisfy_budget": true,
+      "all_numerical_records_and_queries_match_original_execution": true
+    }
+  ],
+  "bounded_rerun_scope": {
+    "authority": "Root relayed fresh reviewer acceptance of rerunning the three real activated-budget cases and dependency-present typing after this bounded correction; unchanged semantics need no repeat of all19.",
+    "full19_execution_rerun_on_this_commit": false,
+    "previous_independent_retained_passed": 19,
+    "previous_independent_core_passed": 44,
+    "previous_independent_source_inventory": {
+      "unique_source_records": 199,
+      "archived_originals": 171,
+      "upstream_files": 374
+    },
+    "unchanged_other16_and_socket_call_order_proof": "Only activated_budget function AST changed; exact full19 collection unchanged; every original assertion AST remains identical.",
+    "previous_source_bound_validation": "evidence/2026-refresh/archive-shortlist-validation.json"
+  },
+  "raw_artifacts": {
+    "evidence/2026-refresh/archive-shortlist-type-correction/budgets.exit": {
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    "evidence/2026-refresh/archive-shortlist-type-correction/budgets.log": {
+      "sha256": "2e2d95feef77c73f80f8fbcb7306bacd71c9fc5849a7edecada2ea9fb6a6aa0a",
+      "bytes": 754
+    },
+    "evidence/2026-refresh/archive-shortlist-type-correction/budgets.xml": {
+      "sha256": "f7502f782ddad8489f3589422c79d06c1cf8a96da0af221806224be78017a3e6",
+      "bytes": 649
+    },
+    "evidence/2026-refresh/archive-shortlist-type-correction/cases/anycostfl/config.toml": {
+      "sha256": "0a1f13ecc00d19b7084fb9fbb15144fe56433fbc22471771c606d3fe9084db2f",
+      "bytes": 1203
+    },
+    "evidence/2026-refresh/archive-shortlist-type-correction/cases/anycostfl/overlay.json": {
+      "sha256": "9306c6c5bb7fde58fdcaa65d3342b051595a3e016f631620222499fed08f185a",
+      "bytes": 552
+    },
+    "evidence/2026-refresh/archive-shortlist-type-correction/cases/anycostfl/result.json": {
+      "sha256": "f69c48b46978f6f203fa77238a010b854ec934cdeb121b53fe5dea11d184dd77",
+      "bytes": 4154
+    },
+    "evidence/2026-refresh/archive-shortlist-type-correction/cases/anycostfl/stderr.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "evidence/2026-refresh/archive-shortlist-type-correction/cases/anycostfl/stdout.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "evidence/2026-refresh/archive-shortlist-type-correction/cases/fedrolex/config.toml": {
+      "sha256": "197c9bd8263b7fb134108d0523147c3c0a6b94c1bf24b92c95c996e1bf29910d",
+      "bytes": 1203
+    },
+    "evidence/2026-refresh/archive-shortlist-type-correction/cases/fedrolex/overlay.json": {
+      "sha256": "5b4928a0707743d8976ec55ccfca9a11e71d22df3c2a7ec5f14d52165ca79fee",
+      "bytes": 552
+    },
+    "evidence/2026-refresh/archive-shortlist-type-correction/cases/fedrolex/result.json": {
+      "sha256": "6543eb3bb9ef946a3b1fa2132e488fd7b0692dcba59f8a01c8eda5bde9aede14",
+      "bytes": 4150
+    },
+    "evidence/2026-refresh/archive-shortlist-type-correction/cases/fedrolex/stderr.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "evidence/2026-refresh/archive-shortlist-type-correction/cases/fedrolex/stdout.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "evidence/2026-refresh/archive-shortlist-type-correction/cases/heterofl/config.toml": {
+      "sha256": "3bbd924c58e53d7bb44cb3f78e794ae0e3fb5d8243ff547bd4832e1236ec4bc2",
+      "bytes": 1198
+    },
+    "evidence/2026-refresh/archive-shortlist-type-correction/cases/heterofl/overlay.json": {
+      "sha256": "93be5cabedbf8cafb06ee07c8aba93c333a4ca8f36e6b8109540869f3c0aedf5",
+      "bytes": 552
+    },
+    "evidence/2026-refresh/archive-shortlist-type-correction/cases/heterofl/result.json": {
+      "sha256": "a642e0ff220bc5cd2adab806883a1937cb3d2f8a425eada9e7bd324040439a70",
+      "bytes": 3465
+    },
+    "evidence/2026-refresh/archive-shortlist-type-correction/cases/heterofl/stderr.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "evidence/2026-refresh/archive-shortlist-type-correction/cases/heterofl/stdout.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "evidence/2026-refresh/archive-shortlist-type-correction/collection.exit": {
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    "evidence/2026-refresh/archive-shortlist-type-correction/collection.log": {
+      "sha256": "ca7de69c6c6ec3a8b4bed07d2f3969791988f484748beaebc5f1150185060799",
+      "bytes": 1946
+    },
+    "evidence/2026-refresh/archive-shortlist-type-correction/core.exit": {
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    "evidence/2026-refresh/archive-shortlist-type-correction/core.log": {
+      "sha256": "5b931a8531e3e4b7734dcd0552caf595c468800e8fe6f2fef3b13ba342d82b86",
+      "bytes": 315
+    },
+    "evidence/2026-refresh/archive-shortlist-type-correction/core.xml": {
+      "sha256": "e60040324126a2aaa9c74817097542251642e0966f6a80058a8eeda4989268c2",
+      "bytes": 6449
+    },
+    "evidence/2026-refresh/archive-shortlist-type-correction/environment-core-dev.json": {
+      "sha256": "b7fc3c0556390809dfa5349824f7bad41a611f39b2f0430182a66d0df0d0a699",
+      "bytes": 274
+    },
+    "evidence/2026-refresh/archive-shortlist-type-correction/environment-ptflops.json": {
+      "sha256": "038e11ae4799ca8ac02b9e6fb82f578d640bbd969c5915e74f329bb394760c35",
+      "bytes": 1261
+    },
+    "evidence/2026-refresh/archive-shortlist-type-correction/prior-review.json": {
+      "sha256": "efda9df7ad2fd12c4f38d8a3113749fc39a93f1dfbb4399c48998204bcb70dbd",
+      "bytes": 19551
+    },
+    "evidence/2026-refresh/archive-shortlist-type-correction/ruff.exit": {
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    "evidence/2026-refresh/archive-shortlist-type-correction/ruff.log": {
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "bytes": 19
+    },
+    "evidence/2026-refresh/archive-shortlist-type-correction/source.diff": {
+      "sha256": "c3e88bc060af7a3641271f3cd50a998c7ff3afc03544c32be91905c3eeab47df",
+      "bytes": 4507
+    },
+    "evidence/2026-refresh/archive-shortlist-type-correction/ty-before.exit": {
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+      "bytes": 2
+    },
+    "evidence/2026-refresh/archive-shortlist-type-correction/ty-before.log": {
+      "sha256": "3bf3ee2b7feeeddd28b4a3194f2a047c53645e691aec156dfcf8f3ff76413a09",
+      "bytes": 1082
+    },
+    "evidence/2026-refresh/archive-shortlist-type-correction/ty-core-dev.exit": {
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    "evidence/2026-refresh/archive-shortlist-type-correction/ty-core-dev.log": {
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "bytes": 19
+    },
+    "evidence/2026-refresh/archive-shortlist-type-correction/ty-ptflops.exit": {
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    "evidence/2026-refresh/archive-shortlist-type-correction/ty-ptflops.log": {
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "bytes": 19
+    }
+  }
+}
