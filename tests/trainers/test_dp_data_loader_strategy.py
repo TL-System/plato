@@ -7,7 +7,7 @@ from torch.utils.data import SubsetRandomSampler, TensorDataset
 if importlib.util.find_spec("opacus") is None:
     pytest.skip("base profile optional dp: opacus not installed", allow_module_level=True)
 
-from plato.trainers.diff_privacy import DPDataLoaderStrategy
+from plato.trainers.diff_privacy import DPDataLoaderStrategy, DPOptimizerStrategy
 from plato.trainers.strategies.base import TrainingContext
 
 
@@ -26,8 +26,11 @@ def test_dp_actual_time_snapshot_writer_to_plain_urgent_reader(tmp_path):
     with configure_environment(config, runtime_root=tmp_path):
         torch.manual_seed(21)
         trainer = Trainer(model=torch.nn.Linear(2, 2))
+        assert isinstance(trainer.model, torch.nn.Linear)
+        assert isinstance(trainer.optimizer_strategy, DPOptimizerStrategy)
         trainer.set_client_id(7)
-        trainer.device = trainer.context.device = torch.device("cpu")
+        trainer.device = "cpu"
+        trainer.context.device = torch.device("cpu")
         data = TensorDataset(torch.randn(16, 2), torch.arange(16) % 2)
         trainer.train_model(
             {**config["trainer"], "run_id": "dp-snapshot"}, data, list(range(16))
@@ -36,11 +39,13 @@ def test_dp_actual_time_snapshot_writer_to_plain_urgent_reader(tmp_path):
         assert len(snapshots) == 2
         for path in snapshots:
             assert set(deserialize_tree(path.read_bytes())) == {"weight", "bias"}
+        assert isinstance(trainer.model, torch.nn.Linear)
         historical = trainer.obtain_model_at_time(7, float("inf"))
         for name, value in historical.state_dict().items():
             torch.testing.assert_close(value, trainer.model.state_dict()[name])
         assert trainer.model_state_dict is None
         assert not hasattr(trainer.model, "autograd_grad_sample_hooks")
+        assert trainer.optimizer_strategy.privacy_engine is not None
         history = trainer.optimizer_strategy.privacy_engine.accountant.history
         assert sum(item[2] for item in history) == 8
 
@@ -56,11 +61,15 @@ def test_actual_spawned_dp_rounds_return_accounting_and_isolate_clients(tmp_path
     with configure_environment(config, runtime_root=tmp_path):
         torch.manual_seed(7)
         trainer = Trainer(model=torch.nn.Linear(2, 2))
-        trainer.device = trainer.context.device = torch.device("cpu")
+        assert isinstance(trainer.model, torch.nn.Linear)
+        assert isinstance(trainer.optimizer_strategy, DPOptimizerStrategy)
+        trainer.device = "cpu"
+        trainer.context.device = torch.device("cpu")
         trainer.set_client_id(1)
         dataset = TensorDataset(torch.randn(16, 2), torch.arange(16) % 2)
 
         def steps():
+            assert isinstance(trainer.optimizer_strategy, DPOptimizerStrategy)
             engine = trainer.optimizer_strategy.privacy_engine
             assert engine is not None
             return sum(entry[2] for entry in engine.accountant.history)
@@ -70,6 +79,7 @@ def test_actual_spawned_dp_rounds_return_accounting_and_isolate_clients(tmp_path
                 key: value.clone() for key, value in trainer.model.state_dict().items()
             }
             trainer.train(dataset, list(range(16)))
+            assert isinstance(trainer.model, torch.nn.Linear)
             assert steps() == expected_steps
             assert not hasattr(trainer.model, "autograd_grad_sample_hooks")
             assert any(
@@ -142,7 +152,10 @@ def test_actual_dp_consecutive_training_exchange_checkpoint_and_accounting(tmp_p
     with configure_environment(config, runtime_root=tmp_path):
         torch.manual_seed(17)
         trainer = Trainer(model=torch.nn.Linear(2, 2))
-        trainer.device = trainer.context.device = torch.device("cpu")
+        assert isinstance(trainer.model, torch.nn.Linear)
+        assert isinstance(trainer.optimizer_strategy, DPOptimizerStrategy)
+        trainer.device = "cpu"
+        trainer.context.device = torch.device("cpu")
         dataset = TensorDataset(torch.randn(16, 2), torch.arange(16) % 2)
         run = {**config["trainer"], "run_id": "dp"}
         initial = {k: v.clone() for k, v in trainer.model.state_dict().items()}
@@ -150,12 +163,15 @@ def test_actual_dp_consecutive_training_exchange_checkpoint_and_accounting(tmp_p
         for round_id in (1, 2):
             before = {k: v.clone() for k, v in trainer.model.state_dict().items()}
             trainer.train_model(run, dataset, list(range(16)))
+            assert isinstance(trainer.model, torch.nn.Linear)
+            assert isinstance(trainer.context.model, torch.nn.Linear)
             assert trainer.context.model is trainer.model
             assert not hasattr(trainer.model, "autograd_grad_sample_hooks")
             current = trainer.model.state_dict()
             assert set(current) == set(initial)
             assert any(not torch.equal(before[k], current[k]) for k in current)
             actual_engine = trainer.optimizer_strategy.privacy_engine
+            assert actual_engine is not None
             if engine is not None:
                 assert actual_engine is engine
             engine = actual_engine
@@ -197,10 +213,10 @@ def test_actual_dp_physical_batches_only_report_real_updates_and_cleanup(tmp_pat
 
             base_optimizer.step = observed_step
 
-        def on_train_step_start(self, trainer, config, **kwargs):
+        def on_train_step_start(self, trainer, config, batch=None, **kwargs):
             self.physical_batches += 1
 
-        def on_train_step_end(self, trainer, config, **kwargs):
+        def on_train_step_end(self, trainer, config, batch=None, loss=None, **kwargs):
             assert trainer.context.state["optimizer_step_completed"] is True
             assert trainer.optimizer._is_last_step_skipped is False
             self.reported_updates += 1
@@ -213,10 +229,13 @@ def test_actual_dp_physical_batches_only_report_real_updates_and_cleanup(tmp_pat
         torch.manual_seed(17)
         observer = Observe()
         trainer = Trainer(model=torch.nn.Linear(2, 2), callbacks=[observer])
-        trainer.device = trainer.context.device = torch.device("cpu")
+        assert isinstance(trainer.optimizer_strategy, DPOptimizerStrategy)
+        trainer.device = "cpu"
+        trainer.context.device = torch.device("cpu")
         data = TensorDataset(torch.randn(16, 2), torch.arange(16) % 2)
         run = {**config["trainer"], "run_id": "dp-count"}
         trainer.train_model(run, data, list(range(16)))
+        assert trainer.optimizer_strategy.privacy_engine is not None
         history = trainer.optimizer_strategy.privacy_engine.accountant.history
         assert observer.physical_batches > 4
         assert observer.actual_updates == observer.reported_updates == 4
@@ -225,6 +244,8 @@ def test_actual_dp_physical_batches_only_report_real_updates_and_cleanup(tmp_pat
         with pytest.raises(RuntimeError, match="interrupt DP"):
             trainer.train_model(run, data, list(range(16)))
         assert not hasattr(trainer.model, "autograd_grad_sample_hooks")
+        assert isinstance(trainer.model, torch.nn.Linear)
+        assert isinstance(trainer.context.model, torch.nn.Linear)
         assert trainer.context.model is trainer.model
         assert sum(entry[2] for entry in history) == 5
         observer.interrupt = False
@@ -236,7 +257,7 @@ def test_dp_memory_splitting_matches_logical_batch_parameter_reference():
     """All fixed samples contribute once, with real clipping and accountant steps."""
     import copy
 
-    from opacus import PrivacyEngine
+    from opacus import GradSampleModule, PrivacyEngine
     from opacus.utils.batch_memory_manager import BatchMemoryManager
     from torch.utils.data import DataLoader
 
@@ -251,11 +272,14 @@ def test_dp_memory_splitting_matches_logical_batch_parameter_reference():
     results = []
     for model, physical_size in ((reference, 4), (split_model, 2)):
         engine = PrivacyEngine(accountant="rdp", secure_mode=False)
-        private_model, optimizer, loader = engine.make_private(
+        private_result = engine.make_private(
             module=model, optimizer=torch.optim.SGD(model.parameters(), lr=0.1),
             data_loader=DataLoader(dataset, batch_size=4), noise_multiplier=0.,
             max_grad_norm=1., poisson_sampling=False,
         )
+        assert len(private_result) == 3
+        private_model, optimizer, loader = private_result
+        assert isinstance(private_model, GradSampleModule)
         flags = []
         observed_samples = 0
         with BatchMemoryManager(data_loader=loader, max_physical_batch_size=physical_size,
