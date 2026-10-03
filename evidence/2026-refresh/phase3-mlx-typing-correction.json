@@ -1,0 +1,158 @@
+{
+  "archive": {
+    "all_members_verified": true,
+    "bytes": 65627,
+    "manifest_sha256": "338c4d4cde0b4c0815eedab9c4da25cd6d3b3673ce181e93e8926a17756d7974",
+    "members": 32,
+    "path": "evidence/2026-refresh/reproductions/phase3-mlx-typing-correction.tar.gz",
+    "sha256": "52aed1bdfac2e88044ee9679b2c838068f79e31515ece43c8c5c54a04b6653f2"
+  },
+  "assertion_preservation": {
+    "plato/servers/fedavg.py": {
+      "assert_statements": 0,
+      "numpy_testing_calls": 0,
+      "parameter_decorators_unchanged": true
+    },
+    "tests/mlx_native/benchmark.py": {
+      "assert_statements": 6,
+      "numpy_testing_calls": 0,
+      "parameter_decorators_unchanged": true
+    },
+    "tests/mlx_native/seed_probe.py": {
+      "assert_statements": 0,
+      "numpy_testing_calls": 0,
+      "parameter_decorators_unchanged": true
+    },
+    "tests/mlx_native/socket_harness.py": {
+      "assert_statements": 0,
+      "numpy_testing_calls": 0,
+      "parameter_decorators_unchanged": true
+    },
+    "tests/mlx_native/socket_probe.py": {
+      "assert_statements": 0,
+      "numpy_testing_calls": 0,
+      "parameter_decorators_unchanged": true
+    },
+    "tests/mlx_native/test_phase3_controls.py": {
+      "assert_statements": 27,
+      "numpy_testing_calls": 8,
+      "parameter_decorators_unchanged": true
+    },
+    "tests/mlx_native/test_phase3_rng.py": {
+      "assert_statements": 17,
+      "numpy_testing_calls": 2,
+      "parameter_decorators_unchanged": true
+    },
+    "tests/mlx_native/test_phase3_runtime.py": {
+      "assert_statements": 9,
+      "numpy_testing_calls": 1,
+      "parameter_decorators_unchanged": true
+    },
+    "tests/mlx_native/test_phase3_tree_contract.py": {
+      "assert_statements": 2,
+      "numpy_testing_calls": 1,
+      "parameter_decorators_unchanged": true
+    }
+  },
+  "changes": [
+    "Production change is only optional-algorithm narrowing: algorithm is not None and callable(validator). Generic count validation still runs first; no unconditional require_algorithm call or missing-algorithm behavior change.",
+    "Explicit heterogeneous config and two-array batch tuple annotations; native fixture model/loss/RNG-state casts preserve original objects and values.",
+    "Callback and aggregation observer signatures match their bases; the process observer accepts BaseProcess, and the client observer matches the actual runner signature. Dynamic replacement of an imported module binding uses setattr.",
+    "The existing no-op clients_processed fixture lambda becomes an identically returning subclass override, making its method contract explicit. All native numerical and rejection assertions remain.",
+    "Duck-typed no-model algorithm fixtures remain the same SimpleNamespace objects, with explicit base-Trainer casts; sampler-registry instrumentation uses the class-valued mutable mapping contract."
+  ],
+  "e8": {
+    "explanation": "Annotation/signature/fixture typing changes are disclosed after the historical measured source; no measured numerical algorithm or eager policy changed. Original exact E8 snapshots and receipts remain unchanged.",
+    "historical_source_binding_preserved": true,
+    "new_performance_claim": false,
+    "rerun": false
+  },
+  "frozen_inventory": {
+    "IDs_parameters_and_E1_E7_criteria_unchanged": true,
+    "cases_json_edited": false,
+    "handoff_sha256": "26da4791e33fc4ea14a46cfa061bfcd228609caa988a35f255209dd9f3e46d82",
+    "nodes": 383,
+    "profile_author_notified": true,
+    "updated_module_hashes": "node-handoff.json"
+  },
+  "quality": {
+    "git_diff_check": "pass",
+    "ruff_I_F": "pass",
+    "shell": "zsh -lc"
+  },
+  "root_gate_log": {
+    "other_owners": "Profile author owns the seven remaining original diagnostics.",
+    "owned_diagnostics": 50,
+    "path": "/tmp/plato-mlx-integration/checks/scoped-typing.log",
+    "root_total_diagnostics": 57,
+    "sha256": "352cfcd66f50eb80aec9d2d0b902f0e9fe79a4e3c539534135e7bf49080de831"
+  },
+  "schema_version": 1,
+  "scope": {
+    "before_after_files_verified": true,
+    "integration0929_edited": false,
+    "nested_agents": 0,
+    "owned_files": 9,
+    "registry_tree_profile_manifest_lock_CI_changes": false,
+    "remote_actions": 0
+  },
+  "source": {
+    "after_sha256": {
+      "plato/servers/fedavg.py": "97a077f5aac8d23cb945b12af3a4c998c2b6cd2e98a0ad97fdefeb4e23e26713",
+      "tests/mlx_native/benchmark.py": "4d84e40e99754cd533670aadd103b57f8adb1e323859957936d4e252f9d3c042",
+      "tests/mlx_native/seed_probe.py": "ef12f16104913a853f66748a50238560add36d31fd91f59d6109d9e4eb8dca45",
+      "tests/mlx_native/socket_harness.py": "a50a6f4278fb8b567a834f181eeef59663a2f2a7534fd5e9e3c9d30fb7f145e9",
+      "tests/mlx_native/socket_probe.py": "ad9612b76c99fec5bf126f822ebafe64cd633db2cee6a0b39feeffbbb15b925d",
+      "tests/mlx_native/test_phase3_controls.py": "486bb96caf4bc00ab82bd8a1ec966700dee0dfdc677d97565357c32286b74af8",
+      "tests/mlx_native/test_phase3_rng.py": "c007293e24c26b0d17ba85b82841b38df17fc32db26df17b8c87ed7bf3657917",
+      "tests/mlx_native/test_phase3_runtime.py": "545de1c7eb23829990860610dde0c370e6dce0312c514dd4be4d69f4d75c092f",
+      "tests/mlx_native/test_phase3_tree_contract.py": "ce43ba9517e16ad3a4df5018ff00779f849d70ab6ef38344abf8c12be78ee4c8"
+    },
+    "before_sha256": {
+      "plato/servers/fedavg.py": "026225563a04beaf2536b026850e089f82a4378341506fefe4ccb4ba117ba0d8",
+      "tests/mlx_native/benchmark.py": "d06a39ba31c96623ce6492c97110f3aaf5337a5b48ee5d7242160d8496c11beb",
+      "tests/mlx_native/seed_probe.py": "8b73af203727be6751e4caf7050fce178b1bf232d266fa6235656ca396c4f700",
+      "tests/mlx_native/socket_harness.py": "1034c4d0b2e9c0f52d61ab2343923d9f019d1ef5d2ce7f949b612cfc0d5ce928",
+      "tests/mlx_native/socket_probe.py": "c8b071c5e3e69c9014770da0d65295a8598bfde4dde673f420eab0ac9b118209",
+      "tests/mlx_native/test_phase3_controls.py": "9d25d316df0482e3cb705c82b34a06ab8b1b03aa94c985505e38670b595ce633",
+      "tests/mlx_native/test_phase3_rng.py": "9ff37ccf9e97291ea752d25e845cff0a840187e2ef68a4289bdb9442459f4df3",
+      "tests/mlx_native/test_phase3_runtime.py": "946706274e10bae70aa60fe0b7267366e5f77c95fc610f127661d1f6eefd2a6f",
+      "tests/mlx_native/test_phase3_tree_contract.py": "923f280aecf4b151545e177048a9490f9b94c3772d79f60bdd683542b30b1389"
+    },
+    "commit": "b9e511677fe20e913412737fb3781076570ff7f6",
+    "parent": "9745697b27b246b0c5a18f54137a2498d4694e58",
+    "tree": "e1c11c0685e3e1bec467959a9b03afabfb7f0ec1"
+  },
+  "status": "Original-author typing correction locally qualified; root owns combined-candidate review and delivery.",
+  "tests": {
+    "actual_socket_entrypoints": "Passed actual native 8/24 socket/codecs/changing training/numerical reference; socket-result.json retained, natural zero exit, no timeout/forced cleanup/survivors.",
+    "affected_server_passed": 70,
+    "command": "PYTHONDONTWRITEBYTECODE=1 /tmp/plato-phase3-mlx/env/bin/python -m pytest tests/mlx_native tests/servers/test_fedavg_strategy.py -q --basetemp=/tmp/plato-phase3-mlx/typing-correction/focused-tests --junitxml=/tmp/plato-phase3-mlx/typing-correction/focused-tests.xml",
+    "failed": 0,
+    "logs": [
+      "focused-tests.log",
+      "focused-tests.xml"
+    ],
+    "native_passed": 383,
+    "seconds": 39.46,
+    "skipped": 0,
+    "total_passed": 453,
+    "warnings": 0
+  },
+  "typing": {
+    "after_diagnostics": 0,
+    "before_diagnostics": 50,
+    "command": "/tmp/plato-phase3-mlx/env/bin/ty check plato/servers/fedavg.py tests/mlx_native/benchmark.py tests/mlx_native/seed_probe.py tests/mlx_native/socket_harness.py tests/mlx_native/socket_probe.py tests/mlx_native/test_phase3_controls.py tests/mlx_native/test_phase3_rng.py tests/mlx_native/test_phase3_runtime.py tests/mlx_native/test_phase3_tree_contract.py --output-format concise",
+    "ignores_suppressions_exclusions_added": false,
+    "logs": [
+      "before-typing.log",
+      "after-typing.log"
+    ],
+    "mlx": "0.32.3",
+    "mlx-metal": "0.32.3",
+    "native_dependencies": true,
+    "python": "3.13.16",
+    "ty": "0.0.84"
+  },
+  "utc": "2026-10-03T20:10:04.999501+00:00"
+}
