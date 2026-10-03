@@ -18,6 +18,7 @@ import torch.nn.functional as F
 from plato.config import Config
 from plato.serialization.safetensor import deserialize_tree
 from plato.servers.strategies.base import AggregationStrategy, ServerContext
+from plato.utils.checkpoint_paths import checkpoint_name, checkpoint_path
 
 
 class PortAggregationStrategy(AggregationStrategy):
@@ -117,25 +118,28 @@ class PortAggregationStrategy(AggregationStrategy):
         similarity = 1.0
         current_round = getattr(context, "current_round", 0)
         model_path = Config().params["model_path"]
-        checkpoint_path = os.path.join(
-            model_path, f"model_{current_round - 2}.safetensors"
+        historical_path = checkpoint_path(
+            model_path,
+            checkpoint_name("model", current_round - 2, suffix=".safetensors"),
         )
-        legacy_path = os.path.join(model_path, f"model_{current_round - 2}.pth")
-        if not os.path.exists(checkpoint_path):
-            checkpoint_path = legacy_path
+        legacy_path = checkpoint_path(
+            model_path, checkpoint_name("model", current_round - 2, suffix=".pth")
+        )
+        if not os.path.exists(historical_path):
+            historical_path = legacy_path
 
-        if staleness > 1 and os.path.exists(checkpoint_path):
+        if staleness > 1 and os.path.exists(historical_path):
             trainer = getattr(context, "trainer", None)
             if trainer is None:
                 raise RuntimeError("Port aggregation requires an attached trainer.")
 
             current_model = trainer.require_model()
-            if checkpoint_path.endswith(".safetensors"):
-                with open(checkpoint_path, "rb") as checkpoint_file:
+            if historical_path.endswith(".safetensors"):
+                with open(historical_path, "rb") as checkpoint_file:
                     previous_weights = deserialize_tree(checkpoint_file.read())
             else:
                 previous_weights = torch.load(
-                    checkpoint_path, map_location="cpu", weights_only=True
+                    historical_path, map_location="cpu", weights_only=True
                 )
             current_weights = current_model.state_dict()
             names = list(current_weights)

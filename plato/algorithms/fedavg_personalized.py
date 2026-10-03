@@ -58,8 +58,30 @@ class Algorithm(fedavg.Algorithm):
 
     def save_local_layers(self, local_layers, filename):
         """
-        Save local layers to a file with the filename provided.
+        Save local layers within the configured model root.
+
+        The legacy client supplies an assembled logical-name path. Recognize
+        that exact default and encode it here, keeping naming authority with
+        the matching reader. Other explicit paths retain their spelling.
         """
+        model_path = Config().params["model_path"]
+        model_name = Config().trainer.model_name
+        legacy_default = (
+            f"{model_path}/{model_name}_{self.client_id}_local_layers.safetensors"
+        )
+        joined_default = os.path.join(
+            model_path, f"{model_name}_{self.client_id}_local_layers.safetensors"
+        )
+        if os.fspath(filename) in {legacy_default, joined_default}:
+            relative = checkpoint_name(
+                model_name, self.client_id, "local_layers", suffix=".safetensors"
+            )
+        else:
+            relative = (
+                os.path.relpath(filename, model_path)
+                if os.path.isabs(filename) else filename
+            )
+        filename = checkpoint_path(model_path, relative)
         os.makedirs(os.path.dirname(filename), exist_ok=True)
 
         if not filename.endswith(".safetensors"):

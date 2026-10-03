@@ -9,6 +9,7 @@ Reference:
 
 from plato.servers import fedavg
 from plato.servers.strategies import PortAggregationStrategy
+from plato.utils.checkpoint_paths import checkpoint_name
 
 
 class Server(fedavg.Server):
@@ -36,6 +37,6 @@ class Server(fedavg.Server):
         Method called at the end of aggregating received weights.
         """
         # Save the current model for later retrieval when cosine similarity needs to be computed
-        filename = f"model_{self.current_round}.safetensors"
+        filename = checkpoint_name("model", self.current_round, suffix=".safetensors")
         trainer = self.require_trainer()
         trainer.save_model(filename)

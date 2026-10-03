@@ -27,13 +27,16 @@ def checkpoint_name(*components: str | int, suffix: str = "") -> str:
     if not components or not re.fullmatch(r"(?:\.[A-Za-z0-9]+)*", suffix):
         raise ValueError("Checkpoint names require components and a file suffix")
     name = "_".join(checkpoint_component(item) for item in components) + suffix
-    if len(name.encode("utf-8")) > 255:
+    # Model writers append '.pkl' for history. Reserve that space when naming
+    # the primary file, rather than discovering an overlong sidecar afterward.
+    limit = 251 if suffix in {".safetensors", ".pth"} else 255
+    if len(name.encode("utf-8")) > limit:
         # Preserve long logical names without exceeding ordinary filesystem
         # component limits. Include boundaries, so distinct component tuples
         # cannot collide just because they share an underscore spelling.
         logical = json.dumps([str(item) for item in components], ensure_ascii=False)
         name = "~t" + hashlib.sha256(logical.encode("utf-8")).hexdigest() + suffix
-        if len(name.encode("utf-8")) > 255:
+        if len(name.encode("utf-8")) > limit:
             raise ValueError("Checkpoint suffix exceeds the filename component limit")
     return name
 
@@ -53,3 +56,19 @@ def checkpoint_path(root: str | PathLike, filename: str | PathLike) -> str:
     if not path.is_relative_to(base) or path == base:
         raise ValueError("Checkpoint filename must stay within its root")
     return str(path)
+
+
+def snapshot_details(filename: str) -> tuple[int, int, float] | None:
+    """Identify owned epoch/time snapshots, including historical cleanup sidecars.
+
+    Safetensors readers still select their supported format explicitly. This
+    recognizes historical Torch names for cleanup without broadening readers.
+    """
+    match = re.fullmatch(
+        r"(?P<client>\d+)_(?P<epoch>\d+)_"
+        r"(?P<time>\d+(?:\.\d+)?(?:[eE][+-]?\d+)?)"
+        r"\.(?:safetensors|pth)(?:\.pkl)?", filename,
+    )
+    if match is None:
+        return None
+    return int(match["client"]), int(match["epoch"]), float(match["time"])

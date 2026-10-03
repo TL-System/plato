@@ -5,7 +5,6 @@ The base class for all federated learning clients on edge devices or edge server
 import logging
 import os
 import pickle
-import re
 import sys
 import uuid
 from abc import abstractmethod
@@ -19,6 +18,11 @@ from plato.callbacks.handler import CallbackHandler
 from plato.clients.composable import ComposableClient
 from plato.clients.strategies import ClientContext
 from plato.config import Config
+from plato.utils.checkpoint_paths import (
+    checkpoint_name,
+    checkpoint_path,
+    snapshot_details,
+)
 
 
 class Client:
@@ -269,12 +273,10 @@ class Client:
                 else "custom"
             )
 
-            if "/" in model_name:
-                model_name = model_name.replace("/", "_")
-
-            checkpoint_path = Config().params["checkpoint_path"]
-            payload_filename = (
-                f"{checkpoint_path}/{model_name}_client_{self.client_id}.pkl"
+            checkpoint_root = Config().params["checkpoint_path"]
+            payload_filename = checkpoint_path(
+                checkpoint_root,
+                checkpoint_name(model_name, "client", self.client_id, suffix=".pkl"),
             )
 
             with open(payload_filename, "wb") as payload_file:
@@ -324,11 +326,8 @@ class Client:
         if not os.path.isdir(model_path):
             return
         for filename in os.listdir(model_path):
-            match = re.fullmatch(
-                r"(?P<client_id>\d+)_\d+_\d+\.\d+\.(?:safetensors|pth)(?:\.pkl)?",
-                filename,
-            )
-            if match is not None and int(match["client_id"]) == self.client_id:
+            details = snapshot_details(filename)
+            if details is not None and details[0] == self.client_id:
                 file_path = os.path.join(model_path, filename)
                 if not os.path.isdir(file_path):
                     os.remove(file_path)

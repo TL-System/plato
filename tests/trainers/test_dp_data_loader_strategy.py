@@ -11,6 +11,48 @@ from plato.trainers.diff_privacy import DPDataLoaderStrategy
 from plato.trainers.strategies.base import TrainingContext
 
 
+def test_actual_spawned_dp_rounds_return_accounting_and_isolate_clients(tmp_path):
+    from plato.trainers.diff_privacy import Trainer
+    from tests.integration.utils import build_minimal_config, configure_environment
+
+    config = build_minimal_config(trainer_type="diff_privacy")
+    config["trainer"].update(
+        batch_size=4, epochs=1, max_physical_batch_size=2, max_concurrency=1,
+    )
+    with configure_environment(config, runtime_root=tmp_path):
+        torch.manual_seed(7)
+        trainer = Trainer(model=torch.nn.Linear(2, 2))
+        trainer.device = trainer.context.device = torch.device("cpu")
+        trainer.set_client_id(1)
+        dataset = TensorDataset(torch.randn(16, 2), torch.arange(16) % 2)
+
+        def steps():
+            engine = trainer.optimizer_strategy.privacy_engine
+            assert engine is not None
+            return sum(entry[2] for entry in engine.accountant.history)
+
+        for expected_steps in (4, 8):
+            before = {
+                key: value.clone() for key, value in trainer.model.state_dict().items()
+            }
+            trainer.train(dataset, list(range(16)))
+            assert steps() == expected_steps
+            assert not hasattr(trainer.model, "autograd_grad_sample_hooks")
+            assert any(
+                not torch.equal(value, before[key])
+                for key, value in trainer.model.state_dict().items()
+            )
+            trainer.save_model()
+            trainer.load_model()
+            assert set(trainer.model.state_dict()) == {"weight", "bias"}
+        trainer.set_client_id(2)
+        assert trainer.optimizer_strategy.privacy_engine is None
+        trainer.train(dataset, list(range(16)))
+        assert steps() == 4
+        trainer.set_client_id(1)
+        assert steps() == 8
+
+
 class _FakePlatoSampler:
     """Minimal stub to mimic Plato sampler behaviour with subset indices."""
 

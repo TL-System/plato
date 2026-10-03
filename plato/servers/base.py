@@ -38,6 +38,7 @@ from plato.config import Config
 from plato.servers.strategies.base import ServerContext
 from plato.servers.strategies.client_selection import RandomSelectionStrategy
 from plato.utils import fonts, s3
+from plato.utils.checkpoint_paths import checkpoint_name, checkpoint_path
 
 if TYPE_CHECKING:
     from plato.algorithms.base import Algorithm
@@ -773,13 +774,12 @@ class Server:
                         if hasattr(Config().trainer, "model_name")
                         else "custom"
                     )
-                    if "/" in model_name:
-                        model_name = model_name.replace("/", "_")
-
-                    checkpoint_path = Config().params["checkpoint_path"]
-
-                    payload_filename = (
-                        f"{checkpoint_path}/{model_name}_{self.selected_client_id}.pkl"
+                    checkpoint_root = Config().params["checkpoint_path"]
+                    payload_filename = checkpoint_path(
+                        checkpoint_root,
+                        checkpoint_name(
+                            model_name, self.selected_client_id, suffix=".pkl"
+                        ),
                     )
 
                     with open(payload_filename, "wb") as payload_file:
@@ -1055,10 +1055,11 @@ class Server:
                 if hasattr(Config().trainer, "model_name")
                 else "custom"
             )
-            if "/" in model_name:
-                model_name = model_name.replace("/", "_")
-            checkpoint_path = Config().params["checkpoint_path"]
-            payload_filename = f"{checkpoint_path}/{model_name}_client_{client_id}.pkl"
+            checkpoint_root = Config().params["checkpoint_path"]
+            payload_filename = checkpoint_path(
+                checkpoint_root,
+                checkpoint_name(model_name, "client", client_id, suffix=".pkl"),
+            )
             try:
                 size = os.path.getsize(payload_filename)
                 self._reserve_inbound_bytes(sid, size)
@@ -1564,28 +1565,30 @@ class Server:
 
     def save_to_checkpoint(self) -> None:
         """Saves a checkpoint for resuming the training session."""
-        checkpoint_path = Config.params["checkpoint_path"]
+        checkpoint_root = Config.params["checkpoint_path"]
 
         model_name = (
             Config().trainer.model_name
             if hasattr(Config().trainer, "model_name")
             else "custom"
         )
-        if "/" in model_name:
-            model_name = model_name.replace("/", "_")
-        filename = f"checkpoint_{model_name}_{self.current_round}.safetensors"
+        filename = checkpoint_name(
+            "checkpoint", model_name, self.current_round, suffix=".safetensors"
+        )
         logging.info(
             "[%s] Saving the checkpoint to %s/%s.",
             self,
-            checkpoint_path,
+            checkpoint_root,
             filename,
         )
         trainer = self.require_trainer()
-        trainer.save_model(filename, checkpoint_path)
-        self._save_random_states(self.current_round, checkpoint_path)
+        trainer.save_model(filename, checkpoint_root)
+        self._save_random_states(self.current_round, checkpoint_root)
 
         # Saving the current round in the server for resuming its session later on
-        with open(f"{checkpoint_path}/current_round.pkl", "wb") as checkpoint_file:
+        with open(
+            checkpoint_path(checkpoint_root, "current_round.pkl"), "wb"
+        ) as checkpoint_file:
             pickle.dump(self.current_round, checkpoint_file)
 
     def _resume_from_checkpoint(self):
@@ -1596,12 +1599,14 @@ class Server:
         )
 
         # Loading important data in the server for resuming its session
-        checkpoint_path = Config.params["checkpoint_path"]
+        checkpoint_root = Config.params["checkpoint_path"]
 
-        with open(f"{checkpoint_path}/current_round.pkl", "rb") as checkpoint_file:
+        with open(
+            checkpoint_path(checkpoint_root, "current_round.pkl"), "rb"
+        ) as checkpoint_file:
             self.current_round = pickle.load(checkpoint_file)
 
-        self._restore_random_states(self.current_round, checkpoint_path)
+        self._restore_random_states(self.current_round, checkpoint_root)
         self.resumed_session = True
 
         model_name = (
@@ -1609,11 +1614,13 @@ class Server:
             if hasattr(Config().trainer, "model_name")
             else "custom"
         )
-        filename = f"checkpoint_{model_name}_{self.current_round}.safetensors"
+        filename = checkpoint_name(
+            "checkpoint", model_name, self.current_round, suffix=".safetensors"
+        )
         trainer = self.require_trainer()
-        trainer.load_model(filename, checkpoint_path)
+        trainer.load_model(filename, checkpoint_root)
 
-    def _save_random_states(self, round_to_save, checkpoint_path):
+    def _save_random_states(self, round_to_save, checkpoint_root):
         """Saves the random states in the server for resuming its session later on."""
         states_to_save = [
             f"numpy_prng_state_{round_to_save}",
@@ -1626,10 +1633,12 @@ class Server:
         ]
 
         for i, state in enumerate(states_to_save):
-            with open(f"{checkpoint_path}/{state}.pkl", "wb") as checkpoint_file:
+            with open(
+                checkpoint_path(checkpoint_root, state + ".pkl"), "wb"
+            ) as checkpoint_file:
                 pickle.dump(variables_to_save[i], checkpoint_file)
 
-    def _restore_random_states(self, round_to_restore, checkpoint_path):
+    def _restore_random_states(self, round_to_restore, checkpoint_root):
         """Restors the numpy.random and random states from previously saved checkpoints
         for a particular round.
         """
@@ -1638,7 +1647,10 @@ class Server:
 
         for i, state in enumerate(states_to_load):
             with open(
-                f"{checkpoint_path}/{state}_{round_to_restore}.pkl", "rb"
+                checkpoint_path(
+                    checkpoint_root,
+                    checkpoint_name(state, round_to_restore, suffix=".pkl"),
+                ), "rb"
             ) as checkpoint_file:
                 variables_to_load[i] = pickle.load(checkpoint_file)
 

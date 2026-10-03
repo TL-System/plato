@@ -23,7 +23,6 @@ import logging
 import multiprocessing as mp
 import os
 import pickle
-import re
 import time
 import uuid
 from collections import OrderedDict
@@ -62,7 +61,11 @@ from plato.trainers.strategies.model_update import NoOpUpdateStrategy
 from plato.trainers.strategies.optimizer import DefaultOptimizerStrategy
 from plato.trainers.strategies.testing import DefaultTestingStrategy
 from plato.trainers.strategies.training_step import DefaultTrainingStepStrategy
-from plato.utils.checkpoint_paths import checkpoint_name, checkpoint_path
+from plato.utils.checkpoint_paths import (
+    checkpoint_name,
+    checkpoint_path,
+    snapshot_details,
+)
 
 
 class ComposableTrainer(base.Trainer):
@@ -756,8 +759,9 @@ class ComposableTrainer(base.Trainer):
                 model = self._require_model()
                 model.cpu()
                 training_time = time.perf_counter() - tic
-                filename = (
-                    f"{self.client_id}_{self.current_epoch}_{training_time}.safetensors"
+                filename = checkpoint_name(
+                    self.client_id, self.current_epoch, str(training_time),
+                    suffix=".safetensors",
                 )
                 self.save_model(filename)
                 model.to(self.device)
@@ -1028,16 +1032,15 @@ class ComposableTrainer(base.Trainer):
         candidates = []
         if os.path.isdir(root):
             for filename in os.listdir(root):
-                match = re.fullmatch(
-                    r"(?P<client>\d+)_(?P<epoch>\d+)_"
-                    r"(?P<time>\d+(?:\.\d+)?(?:[eE][+-]?\d+)?)\.safetensors",
-                    filename,
-                )
-                if match is None or int(match["client"]) != client_id:
+                details = snapshot_details(filename)
+                if (
+                    details is None or details[0] != client_id
+                    or not filename.endswith(".safetensors")
+                ):
                     continue
-                finished = float(match["time"])
+                _, epoch, finished = details
                 if finished < requested_time:
-                    candidates.append((finished, int(match["epoch"]), filename))
+                    candidates.append((finished, epoch, filename))
         if candidates:
             finished, epoch, filename = max(candidates)
             with open(checkpoint_path(root, filename), "rb") as checkpoint:

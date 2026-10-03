@@ -5,10 +5,11 @@ This module provides a differential privacy trainer that uses the composable
 trainer pattern with custom strategies and callbacks instead of inheritance.
 """
 
+import copy
 import logging
 import time
 from collections.abc import Callable, Iterable
-from typing import Optional
+from typing import Any, Optional
 
 import torch
 import torch.nn as nn
@@ -24,10 +25,12 @@ from plato.config import Config
 from plato.trainers.composable import ComposableTrainer
 from plato.trainers.strategies.base import (
     DataLoaderStrategy,
+    ModelUpdateStrategy,
     OptimizerStrategy,
     TrainingContext,
     TrainingStepStrategy,
 )
+from plato.utils.checkpoint_paths import checkpoint_name
 
 
 class DifferentialPrivacyCallback(TrainerCallback):
@@ -238,6 +241,49 @@ class DPOptimizerStrategy(OptimizerStrategy):
         return private_optimizer
 
 
+class DPAccountingStateStrategy(ModelUpdateStrategy):
+    """Return Opacus accounting from successful workers to their logical client.
+
+    This preserves the library ledger in memory across runs and reassignment.
+    Calibration remains per run; this is not a global privacy-budget promise or
+    a durable ledger for interrupted child processes or application restarts.
+    """
+
+    def __init__(self, optimizer_strategy: DPOptimizerStrategy):
+        self.optimizer_strategy = optimizer_strategy
+        self._client_id = 0
+        self._client_states: dict[int, Any] = {}
+
+    @property
+    def requires_worker_state(self) -> bool:
+        return True
+
+    def get_worker_state(self, context: TrainingContext) -> Any:
+        engine = self.optimizer_strategy.privacy_engine
+        if engine is None:
+            raise RuntimeError("DP worker has no privacy accountant.")
+        return copy.deepcopy(engine.accountant.state_dict())
+
+    def load_worker_state(self, state: Any, context: TrainingContext) -> None:
+        if not isinstance(state, dict):
+            raise ValueError("DP worker accounting state is missing.")
+        engine = self.optimizer_strategy.privacy_engine
+        if engine is None:
+            engine = PrivacyEngine(accountant="rdp", secure_mode=False)
+            self.optimizer_strategy.privacy_engine = engine
+        # Use Opacus' supported decoder, including its mechanism check.
+        engine.accountant.load_state_dict(copy.deepcopy(state))
+
+    def on_client_id_changed(self, context: TrainingContext) -> None:
+        if self.optimizer_strategy.privacy_engine is not None:
+            self._client_states[self._client_id] = self.get_worker_state(context)
+        self.optimizer_strategy.privacy_engine = None
+        self._client_id = context.client_id
+        context.state.pop("privacy_engine_metadata", None)
+        if context.client_id in self._client_states:
+            self.load_worker_state(self._client_states[context.client_id], context)
+
+
 class DPTrainingStepStrategy(TrainingStepStrategy):
     """
     Training step strategy for differential privacy.
@@ -343,7 +389,7 @@ class Trainer(ComposableTrainer):
             optimizer_strategy=dp_optimizer_strategy,
             training_step_strategy=dp_training_step_strategy,
             lr_scheduler_strategy=None,  # Uses DefaultLRSchedulerStrategy
-            model_update_strategy=None,  # Uses NoOpUpdateStrategy
+            model_update_strategy=DPAccountingStateStrategy(dp_optimizer_strategy),
             data_loader_strategy=dp_data_loader_strategy,
         )
 
@@ -555,8 +601,9 @@ class Trainer(ComposableTrainer):
             ):
                 model.cpu()
                 training_time = time.perf_counter() - tic
-                filename = (
-                    f"{self.client_id}_{self.current_epoch}_{training_time}.safetensors"
+                filename = checkpoint_name(
+                    self.client_id, self.current_epoch, str(training_time),
+                    suffix=".safetensors",
                 )
                 self.save_model(filename)
                 model.to(self.device)

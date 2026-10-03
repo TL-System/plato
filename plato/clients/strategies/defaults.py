@@ -10,7 +10,6 @@ clients.
 from __future__ import annotations
 
 import logging
-import os
 import pickle
 import re
 import sys
@@ -39,6 +38,7 @@ from plato.processors import registry as processor_registry
 from plato.samplers import registry as samplers_registry
 from plato.trainers import registry as trainers_registry
 from plato.utils import fonts
+from plato.utils.checkpoint_paths import checkpoint_name, checkpoint_path
 
 LOGGER = logging.getLogger(__name__)
 
@@ -520,11 +520,10 @@ class DefaultCommunicationStrategy(CommunicationStrategy):
                 if hasattr(Config().trainer, "model_name")
                 else "custom"
             )
-            model_name = model_name.replace("/", "_")
-
-            checkpoint_path = Config().params["checkpoint_path"]
-            payload_filename = os.path.join(
-                checkpoint_path, f"{model_name}_client_{client_id}.pkl"
+            checkpoint_root = Config().params["checkpoint_path"]
+            payload_filename = checkpoint_path(
+                checkpoint_root,
+                checkpoint_name(model_name, "client", client_id, suffix=".pkl"),
             )
 
             with open(payload_filename, "wb") as payload_file:

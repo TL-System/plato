@@ -63,7 +63,9 @@ def test_logical_name_codec_has_no_slash_underscore_or_reserved_collision():
     )
 
 
-@pytest.mark.parametrize("name", ["org/" + "model" * 80, "ordinary_" + "model" * 80])
+@pytest.mark.parametrize(
+    "name", ["org/" + "model" * 80, "ordinary_" + "model" * 80, "x" * 240]
+)
 def test_long_logical_model_name_default_save_load_stays_in_filename_limit(
     tmp_path, name
 ):
