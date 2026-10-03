@@ -5,10 +5,23 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 import torch
-from gymnasium import spaces
 
 from plato.config import Config
 from plato.utils.reinforcement_learning.policies import ddpg, sac, td3
+
+
+@pytest.fixture
+def action_space(request):
+    """Keep the numeric contract in base and qualify real Box in mandatory."""
+    if request.config.getoption("test_profile") == "mandatory":
+        from gymnasium import spaces
+
+        return spaces.Box(-1, 1, shape=(2,), dtype=np.float32)
+    return SimpleNamespace(
+        shape=(2,),
+        low=np.full(2, -1, dtype=np.float32),
+        high=np.full(2, 1, dtype=np.float32),
+    )
 
 
 @pytest.fixture
@@ -38,7 +51,9 @@ def rl_config(temp_config, monkeypatch):
 
 
 @pytest.mark.parametrize("kind", ["ddpg", "td3", "sac", "td3_rnn", "sac_deterministic"])
-def test_active_policy_finite_update_and_saved_weight_roundtrip(rl_config, kind):
+def test_active_policy_finite_update_and_saved_weight_roundtrip(
+    rl_config, action_space, kind
+):
     torch.manual_seed(17)
     np.random.seed(17)
     if kind == "sac_deterministic":
@@ -46,7 +61,7 @@ def test_active_policy_finite_update_and_saved_weight_roundtrip(rl_config, kind)
     if kind == "td3_rnn":
         rl_config.recurrent_actor = True
     if kind.startswith("sac"):
-        policy = sac.Policy(4, spaces.Box(-1, 1, shape=(2,), dtype=np.float32))
+        policy = sac.Policy(4, action_space)
     else:
         policy = (ddpg if kind == "ddpg" else td3).Policy(4, 2)
     for idx in range(6):
