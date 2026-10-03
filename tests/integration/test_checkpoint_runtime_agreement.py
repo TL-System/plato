@@ -45,18 +45,30 @@ def make_server():
     return server
 
 
-@pytest.mark.parametrize("name", ["lenet5", "org/model", "org_model", "../model"])
+@pytest.mark.parametrize(
+    "name", ["lenet5", "org/model", "org_model", "../model", "x" * 240]
+)
 def test_server_save_resume_restores_round_rng_weights_and_history(tmp_path, name):
-    config = build_minimal_config(model_name=name, total_clients=1)
+    config = build_minimal_config(model_name=name, total_clients=10)
+    config["clients"]["per_round"] = 2
     with configure_environment(config, runtime_root=tmp_path):
         server = make_server()
         server.current_round = 10
         expected = copy.deepcopy(server.trainer.model.state_dict())
         server.trainer.run_history.update_metric("round_marker", 10)
-        random.seed(9)
+        selector = random.Random(9)
+        server.prng_state = selector.getstate()
+        pool = list(range(1, 11))
+        first = server.choose_clients(pool, 2)
+        assert first == selector.sample(pool, 2)
+        expected_selections = [selector.sample(pool, 2) for _ in range(5)]
+        # Global draws after construction are unrelated to the selector stream.
+        random.seed(71)
+        for _ in range(7):
+            random.random()
         np.random.seed(19)
         server.save_to_checkpoint()
-        expected_random = random.random(), np.random.random()
+        expected_numpy = np.random.RandomState(19).random_sample()
         server.trainer.model.weight.data.zero_()
         server.trainer.run_history.reset()
         server.current_round = 0
@@ -64,7 +76,12 @@ def test_server_save_resume_restores_round_rng_weights_and_history(tmp_path, nam
         np.random.seed(30)
         server._resume_from_checkpoint()
         assert server.current_round == 10 and server.resumed_session
-        assert (random.random(), np.random.random()) == expected_random
+        assert np.random.random() == expected_numpy
+        actual_selections = []
+        for _ in range(5):
+            random.random()
+            actual_selections.append(server.choose_clients(pool, 2))
+        assert actual_selections == expected_selections
         for key, value in server.trainer.model.state_dict().items():
             torch.testing.assert_close(value, expected[key])
         assert server.trainer.run_history.get_metric_values("round_marker") == [10]
