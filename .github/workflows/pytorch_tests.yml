@@ -13,7 +13,7 @@ jobs:
   PyTorch-Tests:
     name: Python ${{ matrix.python }} / ${{ matrix.profile }}
     runs-on: ubuntu-24.04
-    timeout-minutes: 45
+    timeout-minutes: 90
     strategy:
       fail-fast: false
       max-parallel: 2
@@ -80,7 +80,7 @@ jobs:
           uv pip freeze --python "$UV_PROJECT_ENVIRONMENT/bin/python" > ci-artifacts/base-packages.txt
 
       - name: Base collection, suite and missing-extra probe
-        timeout-minutes: 12
+        timeout-minutes: 20
         env:
           UV_PROJECT_ENVIRONMENT: ${{ runner.temp }}/plato-base
           HF_HUB_OFFLINE: "1"
@@ -106,7 +106,7 @@ jobs:
           uv pip freeze --python "$UV_PROJECT_ENVIRONMENT/bin/python" > ci-artifacts/mandatory-packages.txt
 
       - name: Mandatory initialized core suite
-        timeout-minutes: 12
+        timeout-minutes: 20
         env:
           HF_HUB_OFFLINE: "1"
           HF_DATASETS_OFFLINE: "1"
@@ -115,7 +115,7 @@ jobs:
           uv run --no-sync --python "${{ matrix.python }}" python -m pytest tests --test-profile=mandatory -m "not runtime" -ra --basetemp=ci-artifacts/mandatory-tmp --junitxml=ci-artifacts/mandatory.xml --cov=plato --cov-report=term --cov-report=json:ci-artifacts/coverage.json > ci-artifacts/mandatory.log 2>&1
 
       - name: Fresh startup, real CPU socket round and failure containment
-        timeout-minutes: 12
+        timeout-minutes: 16
         env:
           HF_HUB_OFFLINE: "1"
           HF_DATASETS_OFFLINE: "1"
