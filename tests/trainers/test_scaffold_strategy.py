@@ -10,6 +10,7 @@ import pytest
 import torch
 from torch.utils.data import TensorDataset
 
+from plato.callbacks.trainer import TrainerCallback
 from plato.config import Config
 from plato.trainers.composable import ComposableTrainer
 from plato.trainers.strategies.algorithms.scaffold_strategy import (
@@ -72,6 +73,7 @@ def test_independent_main_equations(
             context.state["optimizer_step_completed"] = True
             strategy.after_step(context)
         strategy.on_train_end(context)
+        strategy.on_train_result_accepted(context)
         assert model.theta.item() == pytest.approx(expected_y, abs=1e-12)
         assert strategy.client_control_variate["theta"].item() == pytest.approx(
             expected_ci, abs=1e-12
@@ -152,6 +154,7 @@ def test_skipped_update_is_not_corrected(tmp_path):
         context.state["optimizer_step_completed"] = False
         strategy.after_step(context)
         strategy.on_train_end(context)
+        strategy.on_train_result_accepted(context)
         assert context.model.theta.item() == 1.0
         assert strategy.local_steps == 0
         assert strategy.client_control_variate["theta"].item() == 1.0
@@ -288,6 +291,7 @@ def test_parameter_identity_reordered_equal_groups_buffers_and_exclusions(tmp_pa
         optimizer.step()
         strategy.after_step(context)
         strategy.on_train_end(context)
+        strategy.on_train_result_accepted(context)
         for parameter in (model.theta, model.weight, model.bias, model.unused):
             assert parameter.item() == pytest.approx(0.9)
         assert model.excluded.item() == model.frozen.item() == 1.0
@@ -366,6 +370,7 @@ def test_generic_optimizer_composition_matches_independent_raw_updates(
                 optimizer.step()
                 strategy.after_step(context)
             strategy.on_train_end(context)
+            strategy.on_train_result_accepted(context)
         torch.testing.assert_close(
             context.model.theta, reference.theta, atol=1e-12, rtol=1e-12
         )
@@ -424,10 +429,12 @@ def test_persistence_and_worker_state_failures_cannot_emit_old_delta(tmp_path):
         optimizer = torch.optim.SGD(context.model.parameters(), lr=0.1)
         prepare(context, strategy, optimizer)
         strategy.on_train_end(context)
+        strategy.on_train_result_accepted(context)
         strategy.on_train_start(context)
         strategy.client_control_variate_path = str(tmp_path)  # directory, not a file
         with pytest.raises(OSError):
             strategy.on_train_end(context)
+            strategy.on_train_result_accepted(context)
         with pytest.raises(RuntimeError, match="successful"):
             strategy.get_update_payload(context)
         with pytest.raises(ValueError, match="missing"):
@@ -436,3 +443,44 @@ def test_persistence_and_worker_state_failures_cannot_emit_old_delta(tmp_path):
         context.client_id = 2
         with pytest.raises(pickle.UnpicklingError):
             strategy.on_client_id_changed(context)
+
+
+@pytest.mark.parametrize("existing_checkpoint", [False, True])
+def test_direct_callback_failure_keeps_only_accepted_controls(
+    tmp_path, existing_checkpoint
+):
+    class InterruptAtEnd(TrainerCallback):
+        def on_train_run_end(self, trainer, config, **kwargs):
+            raise RuntimeError("Deliberate post-training callback interruption")
+
+    config = build_minimal_config()
+    config["trainer"].update(batch_size=2, epochs=2)
+    with configure_environment(config, runtime_root=tmp_path):
+        strategy = SCAFFOLDUpdateStrategy()
+        trainer = ComposableTrainer(
+            model=ScalarModel(), callbacks=[InterruptAtEnd()],
+            model_update_strategy=strategy,
+            loss_strategy=MSELossStrategy(),
+        )
+        trainer.loss_strategy.compute_loss = (
+            lambda outputs, labels, context: quadratic_loss(outputs, labels)
+        )
+        trainer.set_client_id(1)
+        trainer.device = trainer.context.device = torch.device("cpu")
+        strategy.client_control_variate = scalar_controls(1.0)
+        trainer.context.state["server_control_variate"] = scalar_controls(2.0)
+        canonical = Path(strategy.client_control_variate_path)
+        if existing_checkpoint:
+            canonical.write_bytes(pickle.dumps(scalar_controls(1.0)))
+        original = canonical.read_bytes() if existing_checkpoint else None
+        data = TensorDataset(torch.ones(2, 1).double(), torch.zeros(2, 1).double())
+        with pytest.raises(RuntimeError, match="callback interruption"):
+            trainer.train_model({**config["trainer"], "run_id": "direct-failure"},
+                                data, [0, 1])
+        assert strategy.client_control_variate["theta"].item() == 1.0
+        assert canonical.exists() is existing_checkpoint
+        if existing_checkpoint:
+            assert canonical.read_bytes() == original
+        with pytest.raises(RuntimeError, match="successful"):
+            strategy.get_update_payload(trainer.context)
+        assert not list(canonical.parent.glob(".scaffold_cv_*"))

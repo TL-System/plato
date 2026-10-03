@@ -16,6 +16,7 @@ import logging
 import math
 import os
 import pickle
+import tempfile
 from collections import OrderedDict
 from collections.abc import Mapping
 from typing import Any
@@ -91,6 +92,9 @@ class SCAFFOLDUpdateStrategy(ModelUpdateStrategy):
         self._parameter_names: dict[int, str] = {}
         self._executed_rate: float | None = None
         self._run_completed = False
+        self._result_accepted = False
+        self._has_pending_controls = False
+        self._controls_before_acceptance: OrderedDict[str, torch.Tensor] | None = None
 
     @staticmethod
     def _model(context: TrainingContext) -> nn.Module:
@@ -276,7 +280,7 @@ class SCAFFOLDUpdateStrategy(ModelUpdateStrategy):
         self._executed_rate = None
 
     def on_train_end(self, context: TrainingContext) -> None:
-        """Persist ci_old-c+(x-y)/(K*eta), then publish delta against ci_old."""
+        """Stage ci_old-c+(x-y)/(K*eta) until the whole result is accepted."""
         model = self._model(context)
         old = self.client_control_variate
         server = self.server_control_variate
@@ -297,15 +301,42 @@ class SCAFFOLDUpdateStrategy(ModelUpdateStrategy):
                     )
         new = validate_control_variates(model, new)
         delta = OrderedDict((name, new[name] - value) for name, value in old.items())
-        path = self.client_control_variate_path
-        if path is None:
-            raise RuntimeError("SCAFFOLD client state path is not initialized.")
-        # I/O errors must surface before a successful update can be emitted.
-        with open(path, "wb") as state_file:
-            pickle.dump(new, state_file)
+        self._controls_before_acceptance = old
+        self._has_pending_controls = True
         self.client_control_variate = new
         context.state["client_control_variate_delta"] = delta
         self._run_completed = True
+        self._result_accepted = False
+
+    def on_train_result_accepted(self, context: TrainingContext) -> None:
+        """Atomically persist controls only after model/result acceptance.
+
+        Workers export provisional controls without touching the canonical
+        file. Direct training commits after callbacks; the parent commits a
+        spawned result after validating its current token and loading both parts.
+        """
+        if not self._run_completed or not self._has_pending_controls:
+            raise RuntimeError("SCAFFOLD has no current result to accept.")
+        path = self.client_control_variate_path
+        if path is None:
+            raise RuntimeError("SCAFFOLD client state path is not initialized.")
+        temporary = None
+        try:
+            descriptor, temporary = tempfile.mkstemp(
+                prefix=".scaffold_cv_", dir=os.path.dirname(path)
+            )
+            with os.fdopen(descriptor, "wb") as state_file:
+                pickle.dump(self.client_control_variate, state_file)
+            os.replace(temporary, path)
+        except BaseException:
+            self.on_train_cleanup(context, successful=False)
+            raise
+        finally:
+            if temporary is not None and os.path.exists(temporary):
+                os.remove(temporary)
+        self._has_pending_controls = False
+        self._controls_before_acceptance = None
+        self._result_accepted = True
 
     def on_train_cleanup(self, context: TrainingContext, successful: bool) -> None:
         if self._step_hook is not None:
@@ -313,15 +344,20 @@ class SCAFFOLDUpdateStrategy(ModelUpdateStrategy):
         self._step_hook = None
         self._optimizer = None
         if not successful:
+            if self._has_pending_controls:
+                self.client_control_variate = self._controls_before_acceptance
+            self._has_pending_controls = False
+            self._controls_before_acceptance = None
             context.state.pop("client_control_variate_delta", None)
             self._run_completed = False
+            self._result_accepted = False
         self._executed_rate = None
         self._participating = OrderedDict()
         self._parameter_names = {}
 
     def get_update_payload(self, context: TrainingContext) -> dict[str, Any]:
         delta = context.state.get("client_control_variate_delta")
-        if not self._run_completed or delta is None:
+        if not self._run_completed or not self._result_accepted or delta is None:
             raise RuntimeError(
                 "SCAFFOLD has no successful current-round control delta."
             )
@@ -332,9 +368,12 @@ class SCAFFOLDUpdateStrategy(ModelUpdateStrategy):
         return True
 
     def get_worker_state(self, context: TrainingContext) -> dict[str, Any]:
+        delta = context.state.get("client_control_variate_delta")
+        if not self._run_completed or delta is None:
+            raise RuntimeError("SCAFFOLD worker has no completed current result.")
         return {
             "client_control_variate": self.client_control_variate,
-            "delta": self.get_update_payload(context)["control_variate_delta"],
+            "delta": delta,
             "local_steps": self.local_steps,
             "learning_rate": self.learning_rate,
         }
@@ -360,10 +399,13 @@ class SCAFFOLDUpdateStrategy(ModelUpdateStrategy):
             )
         ):
             raise ValueError("SCAFFOLD worker update counters are invalid.")
+        self._controls_before_acceptance = self.client_control_variate
+        self._has_pending_controls = True
         self.client_control_variate = controls
         context.state["client_control_variate_delta"] = delta
         self.local_steps, self.learning_rate = steps, rate
         self._run_completed = True
+        self._result_accepted = False
 
     def teardown(self, context: TrainingContext) -> None:
         self.on_train_cleanup(context, successful=False)

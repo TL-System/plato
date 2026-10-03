@@ -232,12 +232,16 @@ class MixedPrecisionStepStrategy(TrainingStepStrategy):
 
         if self.enabled and self.scaler is not None:
             # Mixed precision training
-            with torch.amp.autocast("cuda"):
+            with torch.amp.autocast("cuda", enabled=examples.device.type == "cuda"):
                 outputs = model(examples)
                 loss = loss_criterion(outputs, labels)
 
             # Scaled backward pass
             self.scaler.scale(loss).backward(create_graph=self.create_graph)
+
+            # Public pre-step wrappers (including clipping) must see unscaled
+            # gradients even when a fused optimizer normally unscales internally.
+            self.scaler.unscale_(optimizer)
 
             # Unscale gradients and step
             # GradScaler can suppress optimizer.step on overflow. Observe the

@@ -1,0 +1,10 @@
+{
+  "source_commit": "00eeb9dcdd2b513e64db9408969356037e09bb8e",
+  "source_path": "plato/trainers/strategies/algorithms/feddyn_strategy.py",
+  "source_git_blob": "8a19b21e3ac708aa3db51b6fea7bdb08502efe72",
+  "source_sha256": "623f2ddc1cb4e30cd6e0b1320f48fc30815db855891206924cd9150a5e0a8e1a",
+  "fixture_bytes_identical_to_full_source_blob": true,
+  "license_source": "LICENSE",
+  "license_sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+  "purpose": "Execute actual historical writer without runtime git/archive/fetch dependency. Historical source is test data only, not the corrected algorithm."
+}

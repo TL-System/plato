@@ -19,6 +19,9 @@ from torch.utils.data import TensorDataset
 
 from plato.config import Config
 from plato.serialization.safetensor import deserialize_tree, serialize_tree
+from plato.trainers.strategies.algorithms.scaffold_strategy import (
+    SCAFFOLDUpdateStrategy,
+)
 from plato.trainers.strategies.loss_criterion import DefaultLossCriterionStrategy
 from tests.integration.utils import configure_environment, isolated_config_state
 from tests.trainers.test_scaffold_strategy import (
@@ -85,6 +88,16 @@ class StaleStateTrainer(QuadraticTrainer):
         state = pickle.loads(path.read_bytes())
         state["token"] = "previous-attempt"
         path.write_bytes(pickle.dumps(state))
+
+
+class ModelSaveFailureTrainer(QuadraticTrainer):
+    def save_model(self, filename=None, location=None):
+        raise OSError("Deliberate worker model-save failure")
+
+
+class ControlCommitFailureStrategy(SCAFFOLDUpdateStrategy):
+    def on_train_result_accepted(self, context):
+        raise OSError("Deliberate parent control-commit failure")
 
 
 class CaptureResult:
@@ -297,9 +310,18 @@ def run_failed_worker_scenario(root, mode):
             target=0.0,
             samples=2,
         )
-        client.trainer.__class__ = (
-            MissingStateTrainer if mode == "missing" else StaleStateTrainer
-        )
+        strategy = client.trainer.model_update_strategy
+        canonical = Path(strategy.client_control_variate_path)
+        accepted_bytes = canonical.read_bytes()
+        accepted_ci = copy.deepcopy(strategy.client_control_variate)
+        if mode == "commit":
+            strategy.__class__ = ControlCommitFailureStrategy
+        else:
+            client.trainer.__class__ = {
+                "missing": MissingStateTrainer,
+                "stale": StaleStateTrainer,
+                "model-save": ModelSaveFailureTrainer,
+            }[mode]
         with pytest.raises(RuntimeError, match="successful"):
             local_round(
                 client,
@@ -314,10 +336,32 @@ def run_failed_worker_scenario(root, mode):
         assert isinstance(client._context.state.get("training_error"), ValueError)
         with pytest.raises(RuntimeError, match="successful"):
             SendControlVariateProcessor(1, client.trainer).process(scalar_controls(1.0))
+        assert canonical.read_bytes() == accepted_bytes
+        client.trainer.__class__ = QuadraticTrainer
+        strategy.__class__ = SCAFFOLDUpdateStrategy
+        for client_id in (2, 1):
+            client.client_id = client._context.client_id = client_id
+            client.configure()
+        reconstructed = create_client(1)
+        for actual in (strategy, reconstructed.trainer.model_update_strategy):
+            torch.testing.assert_close(
+                actual.client_control_variate["theta"], accepted_ci["theta"]
+            )
+        _, retry_payload = local_round(
+            client, [scalar_controls(1.0), scalar_controls(3.0)],
+            round_id=3, target=0.0, samples=2,
+        )
+        # ci=.9 from the successful first round. Independent quadratic steps:
+        # 1 -> .69 -> .411; Option II .9-3+(1-.411)/.2 = .845.
+        assert client.trainer.model.theta.item() == pytest.approx(.411, abs=1e-12)
+        assert strategy.client_control_variate["theta"].item() == pytest.approx(
+            .845, abs=1e-12
+        )
+        assert retry_payload[1]["theta"].item() == pytest.approx(-.055, abs=1e-12)
     return {"failure_mode": mode, "outbound_refused": True}
 
 
-@pytest.mark.parametrize("mode", ["missing", "stale"])
+@pytest.mark.parametrize("mode", ["missing", "stale", "model-save", "commit"])
 def test_actual_failed_worker_handoff_refuses_previous_delta(tmp_path, mode):
     output = tmp_path / "result.json"
     command = [
@@ -628,3 +672,87 @@ def test_server_buffer_payloads_keep_inherited_aggregation_policy(tmp_path):
         assert server.trainer.model.floating.item() == pytest.approx(6.0)
         assert server.trainer.model.integer.item() == 4
         assert "integer" not in server.server_control_variate
+
+
+@pytest.mark.parametrize("bad_position", [0, 1])
+@pytest.mark.parametrize("bad_count", [0, 2])
+@pytest.mark.parametrize(
+    "defect", ["nan", "missing", "broadcast", "unknown", "non-tensor",
+               "frozen", "buffer"]
+)
+def test_actual_report_path_rejects_every_malformed_model_before_commit(
+    tmp_path, bad_position, bad_count, defect
+):
+    with configure_environment(shipped_config(), runtime_root=tmp_path):
+        client = create_client(1)
+        report, _ = local_round(
+            client, [scalar_controls(1.0), scalar_controls(2.0)],
+            round_id=1, target=0.0, samples=2,
+        )
+        server = make_server(MixedParameters)
+        server.customize_server_payload(server.algorithm.extract_weights())
+        before_model = copy.deepcopy(server.trainer.model.state_dict())
+        before_controls = copy.deepcopy(server.server_control_variate)
+        payloads = []
+        for count in (2, 6):
+            weights = copy.deepcopy(before_model)
+            controls = copy.deepcopy(before_controls)
+            for value in controls.values():
+                value.fill_(3.0)
+            payloads.append(SimpleNamespace(
+                report=copy.copy(report), payload=[weights, controls]
+            ))
+            payloads[-1].report.num_samples = count
+        bad = payloads[bad_position]
+        bad.report.num_samples = bad_count
+        weights = bad.payload[0]
+        if defect == "nan":
+            weights["theta"].fill_(float("nan"))
+        elif defect == "missing":
+            del weights["theta"]
+        elif defect == "broadcast":
+            weights["theta"] = weights["theta"].squeeze()
+        elif defect == "unknown":
+            weights["unknown"] = torch.ones(1)
+        elif defect == "non-tensor":
+            weights["theta"] = "invalid"
+        elif defect == "frozen":
+            weights["frozen"].fill_(float("inf"))
+        else:
+            weights["integer"] = torch.ones(2, dtype=torch.long)
+        original = [serialize_tree(update.payload) for update in payloads]
+        server.updates = payloads
+        with pytest.raises((ValueError, TypeError), match="SCAFFOLD"):
+            asyncio.run(server._process_reports())
+        for name, value in before_model.items():
+            torch.testing.assert_close(server.trainer.model.state_dict()[name], value)
+        for name, value in before_controls.items():
+            torch.testing.assert_close(server.server_control_variate[name], value)
+        assert server._pending_control_variate is None
+        assert server.received_client_control_variates is None
+        assert [serialize_tree(update.payload) for update in payloads] == original
+
+
+@pytest.mark.parametrize("bad_position", [0, 1])
+@pytest.mark.parametrize("count", [-1, float("nan"), float("inf")])
+def test_actual_report_path_validates_samples_before_control_staging(
+    tmp_path, bad_position, count
+):
+    with configure_environment(shipped_config(), runtime_root=tmp_path):
+        client = create_client(1)
+        report, _ = local_round(
+            client, [scalar_controls(1.0), scalar_controls(2.0)],
+            round_id=1, target=0.0, samples=2,
+        )
+        server = make_server()
+        server.server_control_variate = scalar_controls(2.0)
+        server.updates = [SimpleNamespace(
+            report=copy.copy(report),
+            payload=[scalar_controls(7.0), scalar_controls(3.0)],
+        ) for _ in range(2)]
+        server.updates[bad_position].report.num_samples = count
+        with pytest.raises(ValueError, match="sample weights"):
+            asyncio.run(server._process_reports())
+        assert server.trainer.model.theta.item() == 1.0
+        assert server.server_control_variate["theta"].item() == 2.0
+        assert server._pending_control_variate is None

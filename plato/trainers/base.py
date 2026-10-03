@@ -84,12 +84,15 @@ class Trainer(ABC):
         if hasattr(Config().trainer, "max_concurrency"):
             model_name = Config().trainer.model_name
             model_path = Config().params["model_path"]
-            worker_name = checkpoint_name(
-                model_name, self.client_id, Config().params["run_id"]
+            components = (model_name, self.client_id, Config().params["run_id"])
+            primary = checkpoint_name(*components, suffix=".safetensors")
+            filenames = [primary, primary + ".pkl"]
+            filenames.extend(
+                checkpoint_name(*components, suffix=suffix)
+                for suffix in (".acc", ".eval.pkl", ".train.pkl")
             )
-            for suffix in (".safetensors", ".safetensors.pkl", ".acc", ".eval.pkl",
-                           ".train.pkl"):
-                path = checkpoint_path(model_path, worker_name + suffix)
+            for filename in filenames:
+                path = checkpoint_path(model_path, filename)
                 if os.path.exists(path):
                     os.remove(path)
 

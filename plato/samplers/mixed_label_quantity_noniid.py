@@ -38,15 +38,13 @@ class Sampler(base.Sampler):
     dataset, biased across classes according to the parameter per_client_classes_size."""
 
     def __init__(self, datasource, client_id, testing):
-        super().__init__()
+        super().__init__(client_id)
         self.client_id = client_id
 
         # Different clients should share the randomness
         #  as the assignment of classes is completed in each
         #  sampling process.
         # Thus, they share the clients_dataidx_map
-        np.random.seed(self.random_seed)
-
         per_client_classes_size = Config().data.per_client_classes_size
         anchor_classes = Config().data.anchor_classes
         keep_anchor_classes_size = Config().data.keep_anchor_classes_size
@@ -58,7 +56,7 @@ class Sampler(base.Sampler):
             self.consistent_clients = Config().data.consistent_clients
         else:
             consistent_clients_size = Config().data.consistent_clients_size
-            self.consistent_clients = np.random.choice(
+            self.consistent_clients = self.rng.choice(
                 list(range(total_clients)),
                 size=consistent_clients_size,
                 replace=False,
@@ -114,6 +112,7 @@ class Sampler(base.Sampler):
                 anchor_classes=self.anchor_classes,
                 consistent_clients=self.consistent_clients,
                 keep_anchor_classes_size=self.keep_anchor_classes_size,
+                rng=self.rng,
             )
 
     def get(self):

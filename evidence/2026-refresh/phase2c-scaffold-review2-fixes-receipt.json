@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "status": "Clean intermediate candidate for fresh SCAFFOLD review3; Phase2C remains open.",
+  "implementation_commit": "0f17708afefde13eeba1fd71578258b68c5911ee",
+  "implementation_tree": "77ad0245765227716f6fca5335bba6b67a6c0fbb",
+  "evidence_body_commit": "6ab40f735266c060fe47a13406109cc7360b8599",
+  "evidence_body_tree": "243d6458a4385eb6e906c3b09d0accca2b57ef62",
+  "evidence_file": "evidence/2026-refresh/phase2c-scaffold-review2-fixes-validation.json",
+  "evidence_sha256": "9cfad869c3648509dcff1d76d777b4e5e35dad9678b056c3c0a880d3347f2502",
+  "source_immutability": "No production or test changes after committed0f177 dual-version qualification; subsequent commits contain only these new owned evidence JSON files.",
+  "final_candidate_receipt": "The following receipt commit is the final candidate; exact final head/tree are given externally in the user handoff to avoid self-referential commit hashes.",
+  "red_each": "16failed4passed on immutablef977;20 cases",
+  "green_each": "174passed17visiblewarnings; no skips; Python3.13.16 and3.14.8",
+  "portable_archive_each": "4passed13deselected without .git",
+  "fed_dyn_draft": {
+    "original_path": "tests/trainers/test_feddyn_strategy.py",
+    "preserved_path": "/tmp/plato-phase2c-feddyn-implementation/preserved-feddyn-test-draft.py",
+    "sha256": "d7595d180ec24be5ec1e1c754af48b5f29686b7484813f7c2bcfad95f01f72c9",
+    "bytes": 3904,
+    "status": "Untracked independent FedDyn red test draft; no FedDyn production edits; restore on next turn."
+  },
+  "queued_next_turn": "Merge acceptedB a058a2ef8d230ca2e34dbf1c91e6eaac0b0205ac, preserveC paths/B seeding and ownedselection persistence, then continue acceptedFedDyn implementation and finalcombined qualification."
+}

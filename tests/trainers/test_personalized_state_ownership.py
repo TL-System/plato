@@ -161,7 +161,7 @@ def test_feddyn_exact_legacy_prefix_load_is_same_client_and_canonical_wins(tmp_p
     with configure_environment(build_minimal_config(), runtime_root=tmp_path):
         custom = tmp_path / "personal"
         custom.mkdir()
-        legacy = Path(str(custom) + "feddyn_grad_1.pth")
+        legacy = Path(str(custom) + "_feddyn_grad_1.pth")
         saved = {
             name: torch.full_like(value, 3.0)
             for name, value in model().named_parameters()
@@ -172,7 +172,7 @@ def test_feddyn_exact_legacy_prefix_load_is_same_client_and_canonical_wins(tmp_p
                 name: torch.full_like(value, 99.0)
                 for name, value in model().named_parameters()
             },
-            Path(str(custom) + "feddyn_grad_0.pth"),
+            Path(str(custom) + "_feddyn_grad_0.pth"),
         )
         original = legacy.read_bytes()
         strategy = FedDynUpdateStrategy(save_path=str(custom))

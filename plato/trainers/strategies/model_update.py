@@ -133,6 +133,11 @@ class CompositeUpdateStrategy(ModelUpdateStrategy):
         for strategy in self.strategies:
             strategy.on_train_cleanup(context, successful)
 
+    def on_train_result_accepted(self, context: TrainingContext) -> None:
+        """Commit each component's staged successful result."""
+        for strategy in self.strategies:
+            strategy.on_train_result_accepted(context)
+
     @property
     def requires_worker_state(self) -> bool:
         return any(strategy.requires_worker_state for strategy in self.strategies)
