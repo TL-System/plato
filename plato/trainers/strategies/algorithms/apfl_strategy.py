@@ -61,7 +61,7 @@ class APFLUpdateStrategy(ModelUpdateStrategy):
 
     Args:
         alpha: Initial mixing parameter (default: 0.5).
-               0 = fully personalized, 1 = fully global
+               0 = fully global, 1 = fully personalized
         adaptive_alpha: If True, learns α adaptively (default: True)
         model_fn: Optional callable to create personalized model.
                   If None, uses models_registry.get()

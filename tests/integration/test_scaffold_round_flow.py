@@ -594,8 +594,14 @@ def test_all_server_deltas_validated_before_model_or_control_commit(
         server.server_control_variate = scalar_controls(2.0)
         before = server.algorithm.extract_weights()
         server.updates = [
-            SimpleNamespace(payload=[scalar_controls(7.0), scalar_controls(3.0)]),
-            SimpleNamespace(payload=[scalar_controls(9.0), malformed]),
+            SimpleNamespace(
+                report=SimpleNamespace(num_samples=2),
+                payload=[scalar_controls(7.0), scalar_controls(3.0)],
+            ),
+            SimpleNamespace(
+                report=SimpleNamespace(num_samples=6),
+                payload=[scalar_controls(9.0), malformed],
+            ),
         ]
         with pytest.raises(ValueError, match="SCAFFOLD"):
             asyncio.run(server._process_reports())
