@@ -9,7 +9,7 @@ import stat
 from pathlib import Path
 
 MANIFEST = "artifact-selection.json"
-UNIT_PARTITIONS = {"base-tmp", "mandatory-tmp"}
+UNIT_PARTITIONS = {"base-tmp", "mandatory-tmp", "llm-eval-tmp"}
 DIAGNOSTIC_SUFFIXES = {
     ".csv",
     ".json",
@@ -47,6 +47,15 @@ EXPECTED_RECORDS = (
     "ruff.log",
     "ty.log",
     "ty-stager.log",
+    "llm-eval-packages.txt",
+    "llm-eval-prerequisites.json",
+    "llm-eval-collection.log",
+    "llm-eval.log",
+    "llm-eval.xml",
+    "llm-eval-acceptance.json",
+    "llm-eval-source-ledger.json",
+    "llm-eval-ty.log",
+    "llm-eval-interpreter.json",
 )
 
 

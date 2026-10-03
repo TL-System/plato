@@ -167,6 +167,7 @@ norecursedirs = [
 ]
 addopts = "--strict-markers"
 markers = [
+    "llm_eval: explicit real CPU Lighteval qualification cases.",
     "mlx_native: explicit Apple Silicon native MLX qualification cases.",
     "retained_model_search: isolated retained model-search behavior requiring ptflops.",
     "runtime: fresh startup, CPU socket rounds and containment regressions.",
