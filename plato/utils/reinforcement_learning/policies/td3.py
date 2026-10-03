@@ -18,6 +18,27 @@ from plato.config import Config
 from plato.utils.reinforcement_learning.policies import base
 
 
+def _pad_states(state, action_dim):
+    """Pad variable client sequences without modifying the sampled transitions."""
+    sequences = list(state)
+    lengths = [len(sequence) for sequence in sequences]
+    if not lengths or any(length <= 0 or length > action_dim for length in lengths):
+        raise ValueError(
+            "RL client sequence length must be within the action dimension."
+        )
+    padded = pad_sequence(sequences, batch_first=True)
+    padded = F.pad(padded, (0, 0, 0, action_dim - padded.shape[1]))
+    return padded, lengths
+
+
+def _sequence_mean(values, lengths):
+    """Average each transition over its real clients, excluding padding."""
+    positions = torch.arange(values.shape[1], device=values.device)[None, :]
+    counts = torch.as_tensor(lengths, device=values.device)
+    mask = (positions < counts[:, None]).unsqueeze(-1)
+    return (values * mask).sum(dim=1) / counts[:, None]
+
+
 class RNNReplayMemory:
     def __init__(self, state_dim, action_dim, hidden_size, capacity, seed):
         random.seed(seed)
@@ -113,7 +134,7 @@ class TD3Actor(base.Actor):
         x = self.max_action * torch.tanh(self.l3(x))
         # Normalize/Scaling aggregation weights so that the sum is 1
         x += 1  # [-1, 1] -> [0, 2]
-        x /= x.sum()
+        x = x / x.sum(dim=-1, keepdim=True)
         return x
 
 
@@ -164,28 +185,7 @@ class RNNActor(nn.Module):
 
     def forward(self, state, hidden=None):
         if hasattr(Config().server, "synchronous") and not Config().server.synchronous:
-            # Pad the first state to full dims
-            if len(state) == 1:
-                pilot = state
-            else:
-                pilot = state[0]
-            pilot = F.pad(
-                input=pilot,
-                pad=(0, 0, 0, self.action_dim - pilot.shape[-2]),
-                mode="constant",
-                value=0,
-            )
-            if len(state) == 1:
-                state = pilot
-            else:
-                state[0] = pilot
-            # Pad variable states
-            # Get the length explicitly for later packing sequences
-            lens = list(map(len, state))
-            if len(state) == 1:
-                state = [torch.squeeze(state)]
-            # Pad and pack
-            padded = pad_sequence(state, batch_first=True)
+            padded, lens = _pad_states(state, self.action_dim)
             state = pack_padded_sequence(
                 padded, lengths=lens, batch_first=True, enforce_sorted=False
             )
@@ -193,19 +193,23 @@ class RNNActor(nn.Module):
         a, h = self.l1(state, hidden)
 
         # mini-batch update
-        if (
-            hasattr(Config().server, "synchronous")
-            and not Config().server.synchronous
-            and len(state) != 1
-        ):
-            a, _ = pad_packed_sequence(a, batch_first=True)
+        if hasattr(Config().server, "synchronous") and not Config().server.synchronous:
+            a, _ = pad_packed_sequence(
+                a, batch_first=True, total_length=self.action_dim
+            )
 
         a = F.relu(self.l2(a))
         a = self.max_action * torch.tanh(self.l3(a))
 
         # Normalize/Scaling aggregation weights so that the sum is 1
         a += 1  # [-1, 1] -> [0, 2]
-        a /= a.sum()
+        if hasattr(Config().server, "synchronous") and not Config().server.synchronous:
+            positions = torch.arange(a.shape[1], device=a.device)[None, :]
+            lengths = torch.as_tensor(lens, device=a.device)
+            a = a * (positions < lengths[:, None]).unsqueeze(-1)
+            a = a / a.sum(dim=(1, 2), keepdim=True)
+        else:
+            a = a / a.sum(dim=-1, keepdim=True)
 
         return a, h
 
@@ -233,29 +237,8 @@ class RNNCritic(nn.Module):
 
     def forward(self, state, action, hidden1, hidden2):
         if hasattr(Config().server, "synchronous") and not Config().server.synchronous:
-            # Pad the first state to full dims
-            if len(state) == 1:
-                pilot = state
-            else:
-                pilot = state[0]
-            pilot = F.pad(
-                input=pilot,
-                pad=(0, 0, 0, self.action_dim - pilot.shape[-2]),
-                mode="constant",
-                value=0,
-            )
-            if len(state) == 1:
-                state = pilot
-            else:
-                state[0] = pilot
-            # Pad variable states
-            # Get the length explicitly for later packing sequences
-            lens = list(map(len, state))
-            if len(state) == 1:
-                state = [torch.squeeze(state)]
-            # Pad and pack
-            padded = pad_sequence(state, batch_first=True)
-            state = padded
+            state, lens = _pad_states(state, self.action_dim)
+            action = F.pad(action, (0, 0, 0, self.action_dim - action.shape[1]))
         sa = torch.cat([state, action], -1)
 
         if hasattr(Config().server, "synchronous") and not Config().server.synchronous:
@@ -268,27 +251,30 @@ class RNNCritic(nn.Module):
         q2, hidden2 = self.l4(sa, hidden2)
 
         if hasattr(Config().server, "synchronous") and not Config().server.synchronous:
-            q1, _ = pad_packed_sequence(q1, batch_first=True)
-            q2, _ = pad_packed_sequence(q2, batch_first=True)
+            q1, _ = pad_packed_sequence(
+                q1, batch_first=True, total_length=self.action_dim
+            )
+            q2, _ = pad_packed_sequence(
+                q2, batch_first=True, total_length=self.action_dim
+            )
 
         q1 = F.relu(self.l2(q1))
         q1 = self.l3(q1)
-        q1 = torch.mean(q1.reshape(q1.shape[0], -1, 1), 1)
 
         q2 = F.relu(self.l5(q2))
         q2 = self.l6(q2)
-        q2 = torch.mean(q2.reshape(q2.shape[0], -1, 1), 1)
+        if hasattr(Config().server, "synchronous") and not Config().server.synchronous:
+            q1, q2 = _sequence_mean(q1, lens), _sequence_mean(q2, lens)
+        else:
+            q1 = q1.mean(dim=1)
+            q2 = q2.mean(dim=1)
 
         return q1, q2
 
     def Q1(self, state, action, hidden1):
         if hasattr(Config().server, "synchronous") and not Config().server.synchronous:
-            # Pad variable states
-            # Get the length explicitly for later packing sequences
-            lens = list(map(len, state))
-            # Pad and pack
-            padded = pad_sequence(state, batch_first=True)
-            state = padded
+            state, lens = _pad_states(state, self.action_dim)
+            action = F.pad(action, (0, 0, 0, self.action_dim - action.shape[1]))
 
         sa = torch.cat([state, action], -1)
 
@@ -300,11 +286,16 @@ class RNNCritic(nn.Module):
         q1, hidden1 = self.l1(sa, hidden1)
 
         if hasattr(Config().server, "synchronous") and not Config().server.synchronous:
-            q1, _ = pad_packed_sequence(q1, batch_first=True)
+            q1, _ = pad_packed_sequence(
+                q1, batch_first=True, total_length=self.action_dim
+            )
 
         q1 = F.relu(self.l2(q1))
         q1 = self.l3(q1)
-        q1 = torch.mean(q1.reshape(q1.shape[0], -1, 1), 1)
+        if hasattr(Config().server, "synchronous") and not Config().server.synchronous:
+            q1 = _sequence_mean(q1, lens)
+        else:
+            q1 = q1.mean(dim=1)
 
         return q1
 
@@ -414,10 +405,15 @@ class Policy(base.Policy):
                 and not Config().server.synchronous
             ):
                 # Pad variable actions
-                padded = pad_sequence(action, batch_first=True)
-                action = padded
-            reward = torch.FloatTensor(reward).to(self.device).unsqueeze(1)
-            done = torch.FloatTensor(done).to(self.device).unsqueeze(1)
+                action = pad_sequence(action, batch_first=True)
+                action_dim = cast(RNNActor, self.actor).action_dim
+                action = F.pad(action, (0, 0, 0, action_dim - action.shape[1]))
+            reward = torch.as_tensor(
+                reward, dtype=torch.float32, device=self.device
+            ).reshape(-1, 1)
+            done = torch.as_tensor(
+                done, dtype=torch.float32, device=self.device
+            ).reshape(-1, 1)
             hidden = (h, c)
             next_hidden = (nh, nc)
         else:
@@ -435,7 +431,10 @@ class Policy(base.Policy):
                 -self.noise_clip, self.noise_clip
             )
 
-            next_action = (self.actor_target(next_state, next_hidden)[0] + noise).clamp(
+            actor_output = self.actor_target(next_state, next_hidden)
+            if Config().algorithm.recurrent_actor:
+                actor_output = actor_output[0]
+            next_action = (actor_output + noise).clamp(
                 -self.max_action, self.max_action
             )
 
