@@ -1,0 +1,4 @@
+{
+  "accepted": false,
+  "error": "Sdist source members absent from frozen Git tree: ['unrelated-research-output.json']"
+}

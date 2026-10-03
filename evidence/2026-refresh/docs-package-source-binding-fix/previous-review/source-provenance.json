@@ -1,0 +1,38 @@
+{
+  "workflow": {
+    "source_commit": "f1963eb906228c287f9787251f4319339ca7ee78",
+    "sdist_sha256": "74ceec3e74f18a51cef73285d271daa16dedf2a03a6076405621bd2c0b3d68b1",
+    "sdist_member_count": 1211,
+    "git_tree_bound_members_verified": 1210,
+    "generated_metadata_allowlist": [
+      "PKG-INFO"
+    ],
+    "tracked_blob_content_mismatches": [],
+    "non_git_members_outside_metadata_allowlist": []
+  },
+  "release": {
+    "source_commit": "f1963eb906228c287f9787251f4319339ca7ee78",
+    "sdist_sha256": "74ceec3e74f18a51cef73285d271daa16dedf2a03a6076405621bd2c0b3d68b1",
+    "sdist_member_count": 1211,
+    "git_tree_bound_members_verified": 1210,
+    "generated_metadata_allowlist": [
+      "PKG-INFO"
+    ],
+    "tracked_blob_content_mismatches": [],
+    "non_git_members_outside_metadata_allowlist": []
+  },
+  "negative": {
+    "source_commit": "f1963eb906228c287f9787251f4319339ca7ee78",
+    "sdist_sha256": "a86ca7cea9a2e51fdeeab7d5ffb08fe9c458c8cf3fd1b7af85d032bfef657c5a",
+    "sdist_member_count": 1213,
+    "git_tree_bound_members_verified": 1210,
+    "generated_metadata_allowlist": [
+      "PKG-INFO"
+    ],
+    "tracked_blob_content_mismatches": [],
+    "non_git_members_outside_metadata_allowlist": [
+      "arbitrary-generated-output/acceptance.json",
+      "arbitrary-generated-output/existing-source.txt"
+    ]
+  }
+}

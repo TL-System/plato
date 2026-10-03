@@ -1,0 +1,172 @@
+{
+  "schema_version": 1,
+  "recorded_at_utc": "2026-10-03T23:38:51.502561+00:00",
+  "scope": "P2-M2 original-author repair execution; another fresh independent reviewer is required before acceptance.",
+  "finding": "P2-M2",
+  "review_sha256": "80063d45b7a11395d28721adb83d39819c2230f45ccc90cede01206d6b800718",
+  "previous_source_commit": "f1963eb906228c287f9787251f4319339ca7ee78",
+  "previous_evidence_commit": "d6ac767364298aec4b8ebd21f9b5966d570ef2ba",
+  "frozen_source_commit": "63f0d2000f0370708b9afe1e2e6a2dc8559b72e1",
+  "source_files_sha256": {
+    ".github/scripts/check_distribution.py": "1b3ea71a1eef084f602092de35a97ceed04beb4ab47da2074690dc89c5c34c3f",
+    "pyproject.toml": "2ff99eef16f4105af2810f58b1778c7ba131fe894f379837d2b65c7729724a7d",
+    "uv.lock": "e2a53aaae9a0dd49f5446b490bb3071e86aa3a9a20d6271c9dd30b4ae2dcbff9",
+    ".python-version": "02e735b3dfe1c32833eb550b7ff8ffa17f5f2bc3fa1e7bae61a8f5a3883ce398",
+    "netlify.toml": "9ae1049a54d5edc1a29b5f34ba7c235c7f0bf3e63802fb8a9f1d421ca79ead0b",
+    "docs/build.sh": "e21f333201ce75ea7e4a820d505e7b230a5a6048f279b56b0758f1a6cfc338b7",
+    "docs/requirements.txt": "9c33555b3d0cbc983d6dd59f261a242a92d136f2bb1364f300a01824f9eff665",
+    "docs/mkdocs.yml": "d26f6c6e7b91cf8835b4187e3b9e01125801e735122d79e7a148179b31a852ec",
+    ".github/workflows/docs_package_checks.yml": "3bd50449d468b4f6606648a66edc9d54e8710577ccd7878f291704391057aa64",
+    ".github/workflows/pypi_publish.yml": "44d20d3daa8e953546acf7e5b01ee61cf54d056b96b09b799ad3cfa65b105062"
+  },
+  "source_changes": {
+    ".github/scripts/check_distribution.py": [
+      "Invalid and existing output errors leave output directories untouched.",
+      "Only a successfully created validated invocation-owned output can receive an error receipt.",
+      "Every regular sdist source member SHA256 must match bytes from its blob in the frozen Git tree.",
+      "PKG-INFO is the sole generated exception and must match the built wheel METADATA bytes.",
+      "Duplicate and non-regular sdist source members are rejected.",
+      "Track-only source status is identified explicitly; it is not the clean-source acceptance gate."
+    ],
+    "metadata_dependency_lock_marker_or_lint_policy_changes": false
+  },
+  "host": {
+    "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+    "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+    "machine": "arm64"
+  },
+  "actual_default_paths": {
+    "source_commit": "63f0d2000f0370708b9afe1e2e6a2dc8559b72e1",
+    "accepted": true,
+    "builds": {
+      "workflow": {
+        "source_commit": "63f0d2000f0370708b9afe1e2e6a2dc8559b72e1",
+        "accepted": true,
+        "checkout": "/tmp/plato-refresh-worktrees/docs-package-binding-workflow",
+        "command": [
+          "/tmp/plato-p2-source-binding-fix/controller-env/bin/python",
+          ".github/scripts/check_distribution.py"
+        ],
+        "sdist_sha256": "a6b70edef64f1b1defc5bd6aac40a37976e57f49d29cc280c0c4033c0bb552b3",
+        "wheel_sha256": "d00d2c2acd5e5867e6a818fe3bc4132db8f92e00f47017da35e5a3159a60ba96",
+        "git_tree_bound_members": 1246,
+        "only_generated_exception": {
+          "PKG-INFO": "08e03ffe8434783a17ca65294fd3c65c5f189a2ec3e0d70e1590a1b553654a7a"
+        },
+        "requires_dist_extras_and_requires_python_parity": true,
+        "clean_rebuild_and_installed_wheel_proof": true
+      },
+      "release": {
+        "source_commit": "63f0d2000f0370708b9afe1e2e6a2dc8559b72e1",
+        "accepted": true,
+        "checkout": "/tmp/plato-refresh-worktrees/docs-package-binding-release",
+        "command": [
+          "/tmp/plato-p2-source-binding-fix/controller-env/bin/python",
+          ".github/scripts/check_distribution.py"
+        ],
+        "sdist_sha256": "a6b70edef64f1b1defc5bd6aac40a37976e57f49d29cc280c0c4033c0bb552b3",
+        "wheel_sha256": "d00d2c2acd5e5867e6a818fe3bc4132db8f92e00f47017da35e5a3159a60ba96",
+        "git_tree_bound_members": 1246,
+        "only_generated_exception": {
+          "PKG-INFO": "08e03ffe8434783a17ca65294fd3c65c5f189a2ec3e0d70e1590a1b553654a7a"
+        },
+        "requires_dist_extras_and_requires_python_parity": true,
+        "clean_rebuild_and_installed_wheel_proof": true
+      }
+    },
+    "fresh_docs_requirement_parity": true,
+    "docs_dependency_count": 29,
+    "workflow_and_netlify_syntax_and_publication_boundary": true
+  },
+  "ownership_checks": {
+    "source_commit": "63f0d2000f0370708b9afe1e2e6a2dc8559b72e1",
+    "accepted": true,
+    "results": [
+      {
+        "name": "existing-unsupported-tracked-directory",
+        "exit_code": 1,
+        "command": [
+          "/tmp/plato-p2-source-binding-fix/controller-env/bin/python",
+          ".github/scripts/check_distribution.py",
+          "--output-dir",
+          "/private/tmp/plato-refresh-worktrees/docs-package-binding-workflow/docs"
+        ],
+        "directory_unchanged": true,
+        "snapshot_entries": 61,
+        "snapshot_sha256": "1b635f23d158fbfc7f900384e6d3d6b716febc3b5ee0450b792e1fa0aaf0a211"
+      },
+      {
+        "name": "existing-external-directory",
+        "exit_code": 1,
+        "command": [
+          "/tmp/plato-p2-source-binding-fix/controller-env/bin/python",
+          ".github/scripts/check_distribution.py",
+          "--output-dir",
+          "/tmp/plato-p2-source-binding-fix/existing-external-output"
+        ],
+        "directory_unchanged": true,
+        "snapshot_entries": 2,
+        "snapshot_sha256": "f9d774e8bb89d73f6c169986b797083f94c40ff47cdff2f4e27d6d7930e257a9"
+      },
+      {
+        "name": "checkout-root",
+        "exit_code": 1,
+        "command": [
+          "/tmp/plato-p2-source-binding-fix/controller-env/bin/python",
+          ".github/scripts/check_distribution.py",
+          "--output-dir",
+          "/private/tmp/plato-refresh-worktrees/docs-package-binding-workflow"
+        ],
+        "directory_unchanged": true,
+        "snapshot_entries": 2119,
+        "snapshot_sha256": "4364b53470cb1ac103801defceb79071e5333632ba397b49e87257395c9a8de3"
+      }
+    ]
+  },
+  "source_binding_and_negative_check_count": 19,
+  "total_focused_checks_with_ownership": 22,
+  "executed_checks": [
+    "Existing unsupported tracked directory, existing external directory and checkout-root rejection preserve bytes, paths, file modes, sizes and mtimes; no acceptance receipt is created there.",
+    "Existing unsupported arbitrary caller-owned directory and pre-existing valid ci-artifacts output are also unchanged on rejection.",
+    "Actual docs build followed by dirty generated outputs and default package checker passes after the ownership rejection probes.",
+    "Separate actual release-default checker without prior docs output passes with the same wheel/sdist hashes.",
+    "Each green archive has 1246 Git-tree-bound file payloads plus one PKG-INFO record whose bytes equal wheel METADATA.",
+    "Actual unrelated untracked input and altered tracked plato/config.py builds fail source binding with failure receipts only in their newly created owned output.",
+    "Real reviewer leaked-receipt red sdist is rejected against its original frozen f196 Git tree, without relying on newer-source byte differences.",
+    "Injected untracked, altered tracked, unverified PKG-INFO, other generated metadata, duplicate and symlink sdist members are rejected.",
+    "Actual build fault propagates through the CLI and creates accepted=false only in a new validated ci-artifacts output.",
+    "Generated docs/CI, archive, environment, cache and reproduction manifest gates still reject injected actual tar payloads.",
+    "Both defaults retain clean extracted-sdist wheel rebuild, all member hashes, locked runtime wheel installation, outside-checkout imports, CPU tensor/NMS and uv pip check.",
+    "Mandatory and optional dependency metadata, extras and Requires-Python match pyproject; all retained workspace manifests are present.",
+    "Fresh strict docs, requirements byte parity, docs-only absence of runtime/project packages, workflow/TOML/embedded syntax, lock, Ruff and whitespace checks pass."
+  ],
+  "red_artifact": {
+    "historical_review_path": "/tmp/plato-p2-fix-independent-review/negative-source/ci-artifacts/docs-package/distributions/plato_learn-1.4.3.tar.gz",
+    "sha256": "a86ca7cea9a2e51fdeeab7d5ffb08fe9c458c8cf3fd1b7af85d032bfef657c5a",
+    "preserved_in_commit": "evidence/2026-refresh/reproductions/docs-package-source-binding-fix/red/plato_learn-1.4.3.tar.gz",
+    "current_source_binding_rejects": true,
+    "original_frozen_git_tree_checked": "f1963eb906228c287f9787251f4319339ca7ee78",
+    "historical_accepted_receipt_retained_as_failure_evidence": true
+  },
+  "retained_green_distributions": {
+    "workflow": "/tmp/plato-refresh-worktrees/docs-package-binding-workflow/ci-artifacts/docs-package/distributions",
+    "release": "/tmp/plato-refresh-worktrees/docs-package-binding-release/ci-artifacts/docs-package/distributions",
+    "sdist_sha256": "a6b70edef64f1b1defc5bd6aac40a37976e57f49d29cc280c0c4033c0bb552b3",
+    "wheel_sha256": "d00d2c2acd5e5867e6a818fe3bc4132db8f92e00f47017da35e5a3159a60ba96",
+    "source_binding_sha256": "de386904613a0172286924f92ca634f8359da468bd7e48008ea5aa1d1996cc4f"
+  },
+  "limits": [
+    "Local macOS arm64 Python 3.13.16 execution only; GitHub Linux and hosted Netlify qualification were not dispatched or executed.",
+    "These receipts bind corrected frozen source 63f0d200 only; final integrated and evidence-bearing trees need their own binding.",
+    "No push, PR, release, publication or hosted deployment occurred; release.created/token publication intent remains unchanged.",
+    "All environments are dedicated author-owned temporary environments. No root .venv or frozen application/archive/evaluator environment was invoked or changed.",
+    "Root native/core/retained gates were not rerun or weakened by this focused package repair.",
+    "Extracted-source and installed-wheel environments are removed by the checker after proof; raw distributions and receipts remain available.",
+    "Reproduction helpers name retained author-local worktrees and artifacts; a new reviewer must independently execute against a fresh source checkout."
+  ],
+  "artifact_manifest_sha256": "cdfb3085acf50c91b44888a925575a1462bdf06e793f2ed8f45925729458781f",
+  "reproduction_commands_in_commit": [
+    "evidence/2026-refresh/reproductions/docs-package-source-binding-fix/workflow-command.zsh",
+    "evidence/2026-refresh/reproductions/docs-package-source-binding-fix/release-command.zsh"
+  ]
+}

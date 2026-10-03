@@ -1,0 +1,43 @@
+{
+  "source_commit": "63f0d2000f0370708b9afe1e2e6a2dc8559b72e1",
+  "accepted": true,
+  "builds": {
+    "workflow": {
+      "source_commit": "63f0d2000f0370708b9afe1e2e6a2dc8559b72e1",
+      "accepted": true,
+      "checkout": "/tmp/plato-refresh-worktrees/docs-package-binding-workflow",
+      "command": [
+        "/tmp/plato-p2-source-binding-fix/controller-env/bin/python",
+        ".github/scripts/check_distribution.py"
+      ],
+      "sdist_sha256": "a6b70edef64f1b1defc5bd6aac40a37976e57f49d29cc280c0c4033c0bb552b3",
+      "wheel_sha256": "d00d2c2acd5e5867e6a818fe3bc4132db8f92e00f47017da35e5a3159a60ba96",
+      "git_tree_bound_members": 1246,
+      "only_generated_exception": {
+        "PKG-INFO": "08e03ffe8434783a17ca65294fd3c65c5f189a2ec3e0d70e1590a1b553654a7a"
+      },
+      "requires_dist_extras_and_requires_python_parity": true,
+      "clean_rebuild_and_installed_wheel_proof": true
+    },
+    "release": {
+      "source_commit": "63f0d2000f0370708b9afe1e2e6a2dc8559b72e1",
+      "accepted": true,
+      "checkout": "/tmp/plato-refresh-worktrees/docs-package-binding-release",
+      "command": [
+        "/tmp/plato-p2-source-binding-fix/controller-env/bin/python",
+        ".github/scripts/check_distribution.py"
+      ],
+      "sdist_sha256": "a6b70edef64f1b1defc5bd6aac40a37976e57f49d29cc280c0c4033c0bb552b3",
+      "wheel_sha256": "d00d2c2acd5e5867e6a818fe3bc4132db8f92e00f47017da35e5a3159a60ba96",
+      "git_tree_bound_members": 1246,
+      "only_generated_exception": {
+        "PKG-INFO": "08e03ffe8434783a17ca65294fd3c65c5f189a2ec3e0d70e1590a1b553654a7a"
+      },
+      "requires_dist_extras_and_requires_python_parity": true,
+      "clean_rebuild_and_installed_wheel_proof": true
+    }
+  },
+  "fresh_docs_requirement_parity": true,
+  "docs_dependency_count": 29,
+  "workflow_and_netlify_syntax_and_publication_boundary": true
+}

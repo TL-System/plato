@@ -1,0 +1,45 @@
+{
+  "source_commit": "63f0d2000f0370708b9afe1e2e6a2dc8559b72e1",
+  "accepted": true,
+  "results": [
+    {
+      "name": "existing-unsupported-tracked-directory",
+      "exit_code": 1,
+      "command": [
+        "/tmp/plato-p2-source-binding-fix/controller-env/bin/python",
+        ".github/scripts/check_distribution.py",
+        "--output-dir",
+        "/private/tmp/plato-refresh-worktrees/docs-package-binding-workflow/docs"
+      ],
+      "directory_unchanged": true,
+      "snapshot_entries": 61,
+      "snapshot_sha256": "1b635f23d158fbfc7f900384e6d3d6b716febc3b5ee0450b792e1fa0aaf0a211"
+    },
+    {
+      "name": "existing-external-directory",
+      "exit_code": 1,
+      "command": [
+        "/tmp/plato-p2-source-binding-fix/controller-env/bin/python",
+        ".github/scripts/check_distribution.py",
+        "--output-dir",
+        "/tmp/plato-p2-source-binding-fix/existing-external-output"
+      ],
+      "directory_unchanged": true,
+      "snapshot_entries": 2,
+      "snapshot_sha256": "f9d774e8bb89d73f6c169986b797083f94c40ff47cdff2f4e27d6d7930e257a9"
+    },
+    {
+      "name": "checkout-root",
+      "exit_code": 1,
+      "command": [
+        "/tmp/plato-p2-source-binding-fix/controller-env/bin/python",
+        ".github/scripts/check_distribution.py",
+        "--output-dir",
+        "/private/tmp/plato-refresh-worktrees/docs-package-binding-workflow"
+      ],
+      "directory_unchanged": true,
+      "snapshot_entries": 2119,
+      "snapshot_sha256": "4364b53470cb1ac103801defceb79071e5333632ba397b49e87257395c9a8de3"
+    }
+  ]
+}

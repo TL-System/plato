@@ -1,0 +1,3 @@
+Using CPython 3.13.16
+Resolved 264 packages in 14ms
+{"accepted": true, "source_commit": "63f0d2000f0370708b9afe1e2e6a2dc8559b72e1", "sdist_sha256": "a6b70edef64f1b1defc5bd6aac40a37976e57f49d29cc280c0c4033c0bb552b3", "git_tree_bound_members": 1246}
