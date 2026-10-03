@@ -1,0 +1,250 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-03",
+  "status": "PASS",
+  "baseline_candidate": "d3569ec98e64fb83ef43c2b50db4543cfe6a3bc6",
+  "branch": "maintenance/2026-qwen-reference",
+  "review_finding": {
+    "id": "QWEN-01",
+    "severity": "medium",
+    "review_path": "/tmp/plato-qwen-review/qwen-reference-review-d3569ec.json",
+    "review_sha256": "4f8766af24b117f84f48bf63c8500b60ebc7e442351ae8c0993bf7c468e61a11",
+    "trigger": "Caller expands a supplied PEFT model before constructing Trainer(model=model).",
+    "old_behavior": "Input/output embedding matrices were omitted from adapter payload and checkpoint.",
+    "new_behavior": "Trainer compares the current embedding size against the already pinned original AutoConfig vocabulary, retaining resized input/output embedding state even when the caller performed the resize.",
+    "additional_hub_lookups": 0
+  },
+  "source_sha256": {
+    "plato/algorithms/lora.py": "e1247014cbb04e9ded2255c5656d73b1225d36decc70c9ab8d8c328aae614cf1",
+    "plato/models/huggingface.py": "9e6f97fbf6a9eee00794868ab0aade6ad34dd153793f689c2e9c9f6315cc5f50",
+    "plato/datasources/lora.py": "ebb9b28c64811bde575dd9834240348afc5cc602d2dffa7d462de3f4f48713a8",
+    "plato/datasources/huggingface.py": "a50701c37c680c07ff35e43cd9b6ad9a3650364a14697f06e4329b6c1db7629d",
+    "plato/trainers/huggingface.py": "cde9f121c4358be7da12f34167a9b313debc2969fd598b743acf022adaef3102",
+    "plato/utils/huggingface.py": "91b687453fc318a8fdfc27d75ac432b83a1ac04b1fcbdc67426b820efb683c9b",
+    "tests/test_huggingface_artifacts.py": "872a798ee7a4b2c50c0bc52931b54ca7c24a72694a784a158d0a5d352744858d",
+    "tests/test_utils/qwen3.py": "6e9aac5dab0dfb3133da450683681f60ef27c4d79fd15830c98acd73a52842a1",
+    "tests/integration/test_qwen3_lora.py": "dfb7b2bd0ec532fc5093e3a800fedf0539ebec2fa8f5853fab7fe477951766c9",
+    "tests/trainers/test_huggingface_accumulation.py": "cbd9dbf88147085e2ea4b08dec0f8b971c86d706a56b4c2fe9532d8a1f6086bc",
+    "examples/huggingface/qualify_qwen3.py": "2e1d3b6f9fa04ecdf2ddbf5e04957f39a00f7599c6ca4bf14d8f3af7ae8490c8",
+    "configs/HuggingFace/fedavg_qwen3_06b_lora.toml": "17347b1c0c3e8d297baf174581a09f0db18f97948303d3137b43cfb7f822dbf1",
+    "tests/fixtures/qwen3/train.json": "88cc392157d66d757cb1efad53e41859b782f0f8637e611fb0bebf8c422c2748",
+    "tests/fixtures/qwen3/validation.json": "149d0717e6c88626ad9eb5927c82e66508c160e2e228f0b54edce79e646d83cc",
+    "tests/fixtures/qwen3/PROVENANCE.txt": "aa890d67099e9ec249c14bc22df241a5d040158f9185e3e02636a80585520a3c"
+  },
+  "changed_source_paths": [
+    "plato/trainers/huggingface.py",
+    "tests/integration/test_qwen3_lora.py"
+  ],
+  "red_green": {
+    "new_test": "tests/integration/test_qwen3_lora.py::test_supplied_preexpanded_peft_model_preserves_embedding_snapshots_and_logits",
+    "red": "1 failed on d3569ec: missing embed_tokens payload key.",
+    "red_log_sha256": "fb8acc77854a9f8ac12b903da24cc96d9afe390db941efb728bb730b26ec44e3",
+    "green": "New supplied-model regression and existing in-trainer expansion regression: 2 passed.",
+    "green_log_sha256": "0a97b591ab7ce9644866a9aea8e19c37ff6647585418c546d0481e0cb92bfbc7",
+    "actual_peft_checks": [
+      "Original pinned config remains vocabulary256 while supplied model config becomes257.",
+      "Both input and output embedding matrices occur in actual payload and checkpoint.",
+      "Payload hash stays unchanged after mutations of live added-token embedding rows.",
+      "Algorithm.load_weights restores logits exactly after row mutations.",
+      "Trainer.load_model restores logits exactly after row mutations.",
+      "PEFT extraction/save/load cannot reread base configuration implicitly."
+    ]
+  },
+  "focused_validation": {
+    "env": {
+      "PYTHONPATH": "/tmp/plato-refresh-worktrees/qwen-reference",
+      "HF_HUB_OFFLINE": "1",
+      "HF_DATASETS_OFFLINE": "1"
+    },
+    "argv": [
+      "/tmp/plato-phase2-integration/final-mandatory-313/bin/python",
+      "-m",
+      "pytest",
+      "tests/test_huggingface_artifacts.py",
+      "tests/trainers/test_huggingface_trainer.py",
+      "tests/datasources/test_huggingface_datasource.py",
+      "tests/integration/test_qwen3_lora.py",
+      "tests/trainers/test_huggingface_accumulation.py",
+      "tests/integration/test_huggingface_smollm_smoke.py",
+      "tests/algorithms/test_fedavg_algorithm.py",
+      "-q"
+    ],
+    "result": "48 passed,10 visible warnings; no skips,xfails,deselections.",
+    "log_sha256": "bf82f921e74220a06a657a200142b2a40d599c9b67d2ee8c3ed86b93fdf8ab5f",
+    "ledger": {
+      "new_nodes_relative_to_d3569ec": 1,
+      "removed_nodes": 0,
+      "total_new_nodes_relative_to_preimplementation_baseline": 25
+    },
+    "ruff": "All11 owned Python files pass import-order checks.",
+    "ty": "All11 owned Python files pass without diagnostics.",
+    "ty_log_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+  },
+  "fresh_real_pretrained_qualification": {
+    "result": {
+      "model_class": "Qwen3ForCausalLM",
+      "configured_artifacts": {
+        "model_name": "Qwen/Qwen3-0.6B-Base",
+        "model_revision": "da87bfb608c14b7cf20ba1ce41287e8de496c0cd",
+        "tokenizer_name": "Qwen/Qwen3-0.6B-Base",
+        "tokenizer_revision": "da87bfb608c14b7cf20ba1ce41287e8de496c0cd"
+      },
+      "device": "cpu",
+      "dtype": "torch.float32",
+      "seed": 17,
+      "max_length": 64,
+      "trainable_parameters": 573440,
+      "total_parameters": 596623360,
+      "optimizer_updates": 5,
+      "client_sample_counts": [
+        2,
+        3
+      ],
+      "client_train_losses": [
+        5.03812313079834,
+        5.50519323348999
+      ],
+      "before_perplexity": 133.13561616044146,
+      "global_perplexity": 130.5305123025955,
+      "before_adapter_sha256": "ce48664afb003bfea5401d278722bfc828572a0b1a14171497ca4659b9503a76",
+      "after_adapter_sha256": "935a7defc6170d2d57b7e2a31f9bc6475b61ba2652e5d8aa8ce24379b352cece",
+      "frozen_base_sha256": "01a101efc877aa13198937c42a8b136c7c80f4675e9ec5d1f3350bb923eb3199",
+      "frozen_base_unchanged": true,
+      "finite_nonzero_gradients": true,
+      "payloads_independent": true,
+      "adapter_only_checkpoint": true,
+      "reload_logits_match": true,
+      "weighted_oracle_all_tensors": true,
+      "weighted_vs_unweighted_max_difference": 5.005608545616269e-05,
+      "elapsed_seconds": 14.041988417040557,
+      "resolved_model_revision": "da87bfb608c14b7cf20ba1ce41287e8de496c0cd",
+      "resolved_checkpoint_directory": "/private/tmp/plato-qwen-validation/real-pretrained/models/huggingface/models--Qwen--Qwen3-0.6B-Base/snapshots/da87bfb608c14b7cf20ba1ce41287e8de496c0cd",
+      "status": "PASS",
+      "scope": "Real official pretrained Qwen3; serial CPU 2/3-client update, production server aggregation, held-out perplexity, adapter checkpoint/reload.",
+      "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+      "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+      "package_versions": {
+        "torch": "2.14.1",
+        "transformers": "5.18.0",
+        "peft": "0.21.2",
+        "datasets": "5.0.1",
+        "huggingface-hub": "1.33.0",
+        "safetensors": "0.8.0"
+      },
+      "peak_rss_bytes": 4259299328,
+      "peak_rss_scope": "Single qualification process with one shared frozen base, serial logical clients and the production server object."
+    },
+    "argv": [
+      "/tmp/plato-phase2-integration/final-mandatory-313/bin/python",
+      "examples/huggingface/qualify_qwen3.py",
+      "--output",
+      "/tmp/plato-qwen-validation/preexpanded-fix-real"
+    ],
+    "env": {
+      "PYTHONPATH": "/tmp/plato-refresh-worktrees/qwen-reference",
+      "HF_HOME": "/tmp/plato-qwen-validation/huggingface"
+    },
+    "qualification_sha256": "10c9b5957121bf6ce2fc616df706145786f89b2aef8fb428cb9e296f823e7799",
+    "log_sha256": "5e671dead8eab43b39d6d76476b419a0c148a47aab42d3e4ae3784689317d895",
+    "network_trace": "No /resolve/main/ or /revision/main entries."
+  },
+  "unchanged_shipped_reference": {
+    "reference_config_sha256": "17347b1c0c3e8d297baf174581a09f0db18f97948303d3137b43cfb7f822dbf1",
+    "reference_config_and_other12_source_hashes_match_original_candidate": true,
+    "original_vocabulary_size": 151936,
+    "predicate": "Unmodified Qwen input embeddings have the original vocabulary size 151936; embedding_size != original_vocab_size is false, so the correction does not add embedding tensors to the reference.",
+    "fresh_qualification_fields_exactly_equal_original": [
+      "configured_artifacts",
+      "seed",
+      "dtype",
+      "device",
+      "trainable_parameters",
+      "total_parameters",
+      "optimizer_updates",
+      "client_sample_counts",
+      "before_adapter_sha256",
+      "after_adapter_sha256",
+      "frozen_base_sha256",
+      "before_perplexity",
+      "global_perplexity",
+      "weighted_oracle_all_tensors",
+      "payloads_independent",
+      "adapter_only_checkpoint",
+      "reload_logits_match",
+      "frozen_base_unchanged"
+    ],
+    "before_and_after_adapter_hashes_exactly_equal_original": true,
+    "frozen_base_hash_exactly_equal_original": true,
+    "finite_perplexity_and_optimizer_updates_exactly_equal_original": true
+  },
+  "historical_d3569ec_observations": {
+    "original_receipt_path": "evidence/2026-refresh/qwen-reference-validation.json",
+    "original_receipt_sha256": "3d351576d92a9302237b10c6f223de172a8b2cc7cbc40b1b2b4cf8e7e734fe06",
+    "original_receipt_and_original_run_files_modified": false,
+    "actual_transport_cli": {
+      "command": [
+        "/tmp/plato-phase2-integration/final-mandatory-313/bin/python",
+        "plato.py",
+        "--config",
+        "configs/HuggingFace/fedavg_qwen3_06b_lora.toml",
+        "--cpu",
+        "--base",
+        "/tmp/plato-qwen-validation/cli-transport",
+        "--port",
+        "53648"
+      ],
+      "cwd": "/tmp/plato-refresh-worktrees/qwen-reference",
+      "port": 53648,
+      "returncode": 0,
+      "watchdog_containment": false,
+      "natural_exit": true,
+      "elapsed_seconds": 48.70834687515162,
+      "peak_combined_rss_bytes_observed": 11497668608,
+      "rss_sampling_seconds": 0.5,
+      "maximum_group_processes": 4,
+      "survivors_after_exit": [],
+      "descendant_shutdown_grace_seconds": 10,
+      "log": "/tmp/plato-qwen-validation/cli-transport/plato.log",
+      "status": "PASS",
+      "clients_comm_simulation": false,
+      "server_comm_simulation": false,
+      "logical_clients": 2,
+      "rounds": 1,
+      "server_perplexity_logged": 131.19,
+      "transport": "Actual socket payloads using safetensor_encode/safetensor_decode.",
+      "payload_size_logged_mb_each_direction_each_client": 2.22,
+      "actual_transfer_log_lines": [
+        "[INFO][13:16:49]: [Server #60524] Sent 2.22 MB of payload data to client #2.",
+        "[INFO][13:16:51]: [Client #2] Received 2.22 MB of payload data from the server.",
+        "[INFO][13:16:57]: [Client #2] Sent 2.22 MB of payload data to the server.",
+        "[INFO][13:16:57]: [Server #60524] Received 2.22 MB of payload data from client #2.",
+        "[INFO][13:16:57]: [Server #60524] Sent 2.22 MB of payload data to client #1.",
+        "[INFO][13:16:57]: [Client #1] Received 2.22 MB of payload data from the server.",
+        "[INFO][13:17:02]: [Client #1] Sent 2.22 MB of payload data to the server.",
+        "[INFO][13:17:02]: [Server #60524] Received 2.22 MB of payload data from client #1."
+      ],
+      "env": {
+        "PYTHONPATH": "/tmp/plato-refresh-worktrees/qwen-reference",
+        "HF_HOME": "/tmp/plato-qwen-validation/huggingface",
+        "OMP_NUM_THREADS": "4",
+        "MKL_NUM_THREADS": "4",
+        "TOKENIZERS_PARALLELISM": "false"
+      },
+      "rss_scope": "Observed sum of RSS for the CLI process group at 0.5s intervals, including server/client/worker/tracker processes. Not an exact global peak.",
+      "log_sha256": "e3ce0a1bce746fc131bb97d9ef53c0381fdee94bb6c719f95b7b60e674b13693",
+      "wrapper_sha256": "63066deb5f4e98747f8e374378f5722cefe142400e51ec3765e4415e9b9a1992"
+    },
+    "cli_rerun_for_correction": false,
+    "scope": "Actual transport CLI observations remain bound to d3569ec. The reference config,transport/checkpoint interfaces and all other source hashes are unchanged; the correction condition is false for the shipped pretrained vocabulary. Fresh actual qualification confirms exact tensor hashes/metrics, preserving the applicability of the historical observation without presenting it as a new CLI run."
+  },
+  "limitations": [
+    "Fixture metrics establish integration behavior only; no benchmark/convergence/quality claim.",
+    "Single-process numerical qualification and normal CLI RSS are different measurement scopes.",
+    "CLI logs contain one multiprocessing resource_tracker semaphore-cleanup warning at shutdown. No process survivors or forced containment. Changed HF/LoRA sources allocate no semaphore/queue; the warning cause is not conclusively attributed and is not suppressed.",
+    "Two explicit tied-embedding compatibility tests emit PEFT tied-weight warnings; corpus mapping emits multiprocess fork deprecation warnings. Tests passed without masking.",
+    "Full integrated repository suites and packaging/CI checks remain root integration work.",
+    "Python 3.13 is qualified here; no Python 3.14 probe or CI-matrix claim.",
+    "This is the author correction receipt; fresh independent review remains root-owned.",
+    "Source changes are limited to Trainer embedding-preservation detection and one actual PEFT regression. No integrated checkout,shared registry,packaging,docs or retired archive files were edited."
+  ]
+}

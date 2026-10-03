@@ -639,14 +639,24 @@ class Trainer(ComposableTrainer):
                 tokenizer_vocab_size = None
         embedding_getter = getattr(model_instance, "get_input_embeddings", None)
         embedding_resizer = getattr(model_instance, "resize_token_embeddings", None)
-        if (
-            tokenizer_vocab_size is not None
-            and callable(embedding_getter)
-            and callable(embedding_resizer)
-        ):
+        if callable(embedding_getter):
             embeddings = embedding_getter()
             embedding_size = getattr(embeddings, "num_embeddings", None)
-            if embedding_size is not None and embedding_size < tokenizer_vocab_size:
+            original_vocab_size = getattr(self.config, "vocab_size", None)
+            if (
+                isinstance(embedding_size, int)
+                and isinstance(original_vocab_size, int)
+                and embedding_size != original_vocab_size
+            ):
+                # A supplied PEFT model may already have been resized. Its own
+                # config then holds the new size; use the pinned original config.
+                setattr(model_instance, "plato_save_embedding_layers", True)
+            if (
+                tokenizer_vocab_size is not None
+                and callable(embedding_resizer)
+                and embedding_size is not None
+                and embedding_size < tokenizer_vocab_size
+            ):
                 embedding_resizer(tokenizer_vocab_size)
                 setattr(model_instance, "plato_save_embedding_layers", True)
 

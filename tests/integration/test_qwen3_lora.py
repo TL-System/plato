@@ -156,3 +156,69 @@ def test_configured_seed_reproduces_actual_lora_initialization(tmp_path):
         torch.manual_seed(999)
         second = Algorithm(Trainer(model=Model.get())).extract_weights()
         assert tensor_digest(first) == tensor_digest(second)
+
+
+def test_supplied_preexpanded_peft_model_preserves_embedding_snapshots_and_logits(
+    tmp_path,
+    monkeypatch,
+):
+    from transformers import AutoTokenizer
+
+    from plato.algorithms.lora import Algorithm
+    from plato.models.huggingface import Model
+    from plato.serialization.safetensor import deserialize_tree
+    from plato.trainers.huggingface import Trainer
+    from tests.test_utils.qwen3 import tensor_digest
+
+    directory = create_tiny_qwen3(tmp_path / "model")
+    tokenizer = AutoTokenizer.from_pretrained(directory)
+    assert tokenizer is not None
+    tokenizer.add_tokens([f"added-token-{index}" for index in range(128)])
+    tokenizer.save_pretrained(tmp_path / "expanded-tokenizer")
+    config = reference_config(directory)
+    config["trainer"]["tokenizer_name"] = str(tmp_path / "expanded-tokenizer")
+    with configure_environment(config):
+        model = Model.get()
+        original_vocabulary = model.config.vocab_size
+        assert len(tokenizer) > original_vocabulary
+        # The caller already resized the model and changed model.config.vocab_size.
+        # Trainer must compare with its independently pinned original AutoConfig.
+        model.resize_token_embeddings(len(tokenizer), mean_resizing=False)
+        trainer = Trainer(model=model)
+        assert trainer.config.vocab_size == original_vocabulary
+        assert model.config.vocab_size == len(tokenizer)
+        algorithm = Algorithm(trainer)
+
+        def forbidden(*args, **kwargs):
+            pytest.fail("Embedding export must not reload an unpinned base config.")
+
+        monkeypatch.setattr(type(model.config), "from_pretrained", forbidden)
+        payload = algorithm.extract_weights()
+        before = tensor_digest(payload)
+        assert any(key.endswith("embed_tokens.weight") for key in payload)
+        assert any(key.endswith("lm_head.weight") for key in payload)
+        trainer.save_model("preexpanded.safetensors", str(tmp_path))
+        saved = deserialize_tree((tmp_path / "preexpanded.safetensors").read_bytes())
+        assert any(key.endswith("embed_tokens.weight") for key in saved)
+        assert any(key.endswith("lm_head.weight") for key in saved)
+        model.eval()
+        inputs = torch.tensor([[1, len(tokenizer) - 1, 4]])
+        with torch.no_grad():
+            expected = model(input_ids=inputs).logits.detach().clone()
+            model.get_input_embeddings().weight[-1].add_(0.5)
+            model.get_output_embeddings().weight[-1].add_(0.3)
+        assert tensor_digest(payload) == before
+        with torch.no_grad():
+            assert not torch.allclose(model(input_ids=inputs).logits, expected)
+        algorithm.load_weights(payload)
+        with torch.no_grad():
+            torch.testing.assert_close(
+                model(input_ids=inputs).logits, expected, rtol=0, atol=0
+            )
+            model.get_input_embeddings().weight[-1].add_(0.5)
+            model.get_output_embeddings().weight[-1].add_(0.3)
+        trainer.load_model("preexpanded.safetensors", str(tmp_path))
+        with torch.no_grad():
+            torch.testing.assert_close(
+                model(input_ids=inputs).logits, expected, rtol=0, atol=0
+            )
