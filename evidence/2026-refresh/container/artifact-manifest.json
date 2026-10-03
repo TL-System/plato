@@ -1,0 +1,82 @@
+{
+  "code_commit": "da2ffde66e8ae5d893ceed9bb73d801680c150b6",
+  "files": {
+    "qualification.json": {
+      "bytes": 7032,
+      "sha256": "d9f41e886d38842b46d5150cac388392c52150bc26fd378dfdf2cbe14c86331d"
+    },
+    "local-degradation-checks.py": {
+      "bytes": 5297,
+      "sha256": "58f1e3091698d2805235f6ec6f5d4f1005bd7c159ebc30ca946e1056eb98910a"
+    },
+    "actionlint-source.json": {
+      "bytes": 323,
+      "sha256": "b7ab009e4692a8fbca119d0b235fdc900f815260ab003880fcfc71d504a8de54"
+    },
+    "local/commands.json": {
+      "bytes": 2748,
+      "sha256": "dc66262111f08ea3e66e55e5ff928ef6345ed7fd4467fe9d43d140369e80fff4"
+    },
+    "local/degradation.log": {
+      "bytes": 61,
+      "sha256": "cd29c6637d211af6b88b1accc5469310c3cbc6b5c79b3a2f69da7be138c971d4"
+    },
+    "local/tool-versions.log": {
+      "bytes": 151,
+      "sha256": "4aaae4ea4fa2773842f88a79527c90e5317b679a051c08324da5e60567e24909"
+    },
+    "local/ruff-format.log": {
+      "bytes": 25,
+      "sha256": "fd2299c9f1c6dc869070883e281051bfe93aacf66c1a3b0069f45b4aa410ca50"
+    },
+    "local/ruff.log": {
+      "bytes": 19,
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    "local/static.log": {
+      "bytes": 120,
+      "sha256": "22f95c1a48cb001470011bf69e4daef421b1d4a9dcd681cae929cea5b793a7ad"
+    },
+    "local/diff.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "local/actionlint.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "local/degradation/local-linux-refusal.log": {
+      "bytes": 1115,
+      "sha256": "b3976e92db59ed6d9e81d27b9b777f3689bc88db394963ea24d82f9a5f9f1afb"
+    },
+    "local/degradation/negative-checks.json": {
+      "bytes": 4364,
+      "sha256": "75a0b904915beafc1a2c5d70ec167b2641cd76cdf8794cde9e4bb3c68b9423e0"
+    },
+    "local/static/source.json": {
+      "bytes": 1300,
+      "sha256": "eb40d1deaa798b4f70c25ed00401d78577e46395f8ec588cb2cd5ee929525a48"
+    },
+    "local/static/static-acceptance.json": {
+      "bytes": 3363,
+      "sha256": "d76ade861e7bbfb4eb56aebaf0142c5d7d4c2475657b4b41dd7e7e74a08c4e98"
+    },
+    "local/degradation/simulated-resource-gate/hosted-sdk-reclamation.json": {
+      "bytes": 102,
+      "sha256": "d26fb8ee004992f3ffefb38c305637024b3b7cde35b56bd2e5318aff9b316a85"
+    },
+    "local/degradation/simulated-resource-gate/resources-before.json": {
+      "bytes": 506,
+      "sha256": "acaacf477693e68e392485b800df4c8f90ab68e120b9eff4dad4f9f387483a89"
+    },
+    "local/degradation/local-linux-refusal/source.json": {
+      "bytes": 1300,
+      "sha256": "eb40d1deaa798b4f70c25ed00401d78577e46395f8ec588cb2cd5ee929525a48"
+    },
+    "local/degradation/local-linux-refusal/linux-acceptance.json": {
+      "bytes": 178,
+      "sha256": "a896d73225a816ea0d6333550b662a627ff44da73c093a77fc6caf032d06f06e"
+    }
+  },
+  "scope": "Local static/helper evidence only; simulated resource records are under local/degradation/simulated-resource-gate"
+}

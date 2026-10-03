@@ -1,0 +1,5 @@
+{
+  "reason": "Never remove SDKs outside a GitHub-hosted runner.",
+  "removed": [],
+  "skipped": []
+}

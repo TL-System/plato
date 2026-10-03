@@ -1,0 +1,7 @@
+{
+  "accepted": false,
+  "elapsed_seconds": 0.013,
+  "error": "RuntimeError: Actual image checks run only on Linux amd64 CI.",
+  "gpu_compute_tested": false,
+  "mode": "linux"
+}
