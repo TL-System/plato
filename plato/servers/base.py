@@ -374,7 +374,10 @@ class Server:
                 )
 
                 with _startup_task(loop, self._periodic(self.periodic_interval)):
-                    if hasattr(Config().server, "random_seed"):
+                    # A resume override owns the restored selection state.
+                    if not Config().args.resume and hasattr(
+                        Config().server, "random_seed"
+                    ):
                         seed = Config().server.random_seed
                         logging.info(
                             "Setting the random seed for selecting clients: %s", seed
@@ -389,7 +392,9 @@ class Server:
                 else:
                     Server._start_clients(client=self.client, client_kwargs=client_kwargs)
                 with _startup_task(loop, self._periodic(self.periodic_interval)):
-                    if hasattr(Config().server, "random_seed"):
+                    if not Config().args.resume and hasattr(
+                        Config().server, "random_seed"
+                    ):
                         seed = Config().server.random_seed
                         logging.info(
                             "Setting the random seed for selecting clients: %s", seed
