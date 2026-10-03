@@ -161,7 +161,15 @@ jobs:
       - name: Stage qualification outputs without pytest aliases
         if: always()
         timeout-minutes: 2
-        run: python .github/scripts/stage_ci_artifacts.py
+        env:
+          QUALIFICATION_STATUS: ${{ job.status }}
+        run: |
+          set -eu
+          staging_flags=()
+          if [[ "$QUALIFICATION_STATUS" == "success" ]]; then
+            staging_flags+=(--require-complete)
+          fi
+          python .github/scripts/stage_ci_artifacts.py "${staging_flags[@]}"
 
       - name: Upload qualification outputs
         if: always()

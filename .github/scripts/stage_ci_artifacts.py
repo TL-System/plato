@@ -232,11 +232,16 @@ def stage_artifacts(source: Path, destination: Path) -> dict[str, object]:
     return manifest
 
 
-def main() -> None:
-    """Stage records for the pinned upload action and print collection gaps."""
+def main() -> int:
+    """Stage records and fail for read issues or required evidence gaps."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--source", type=Path, default=Path("ci-artifacts"))
     parser.add_argument("--destination", type=Path, default=Path("ci-artifacts-upload"))
+    parser.add_argument(
+        "--require-complete",
+        action="store_true",
+        help="Require every expected record after successful qualification.",
+    )
     arguments = parser.parse_args()
     manifest = stage_artifacts(arguments.source, arguments.destination)
     print(
@@ -254,7 +259,11 @@ def main() -> None:
             indent=2,
         )
     )
+    return int(
+        bool(manifest["read_issues"])
+        or (arguments.require_complete and bool(manifest["missing_expected_records"]))
+    )
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())
