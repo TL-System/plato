@@ -321,14 +321,17 @@ class Client:
     def _clear_checkpoint_files(self):
         """Delete all the temporary checkpoint files created by the client."""
         model_path = Config().params["model_path"]
+        if not os.path.isdir(model_path):
+            return
         for filename in os.listdir(model_path):
-            split = re.match(
-                r"(?P<client_id>\d+)_(?P<epoch>\d+)_(?P<training_time>\d+.\d+)\.(?:safetensors|pth)",
+            match = re.fullmatch(
+                r"(?P<client_id>\d+)_\d+_\d+\.\d+\.(?:safetensors|pth)(?:\.pkl)?",
                 filename,
             )
-            if split is not None:
-                file_path = f"{model_path}/{filename}"
-                os.remove(file_path)
+            if match is not None and int(match["client_id"]) == self.client_id:
+                file_path = os.path.join(model_path, filename)
+                if not os.path.isdir(file_path):
+                    os.remove(file_path)
 
     def add_callbacks(self, callbacks):
         """Adds a list of callbacks to the client callback handler."""

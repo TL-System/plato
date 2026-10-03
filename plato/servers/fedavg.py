@@ -13,6 +13,7 @@ from plato.processors import registry as processor_registry
 from plato.samplers import all_inclusive
 from plato.servers import base, evaluation_logging
 from plato.servers.strategies.aggregation import FedAvgAggregationStrategy
+from plato.servers.strategies.aggregation.fedavg import validate_aggregation_inputs
 from plato.trainers import registry as trainers_registry
 from plato.utils import csv_processor, fonts
 
@@ -153,12 +154,17 @@ class Server(base.Server):
         elif self.algorithm is None and self.custom_algorithm is not None:
             self.algorithm = self.custom_algorithm(trainer=self.trainer)
 
+    def _validate_aggregation_inputs(self, updates: list, payloads: list) -> None:
+        """Validate ingress before dispatch; backends may extend tree validation."""
+        validate_aggregation_inputs(updates, payloads)
+
     async def aggregate_deltas(self, updates, deltas_received):
         """Aggregate weight updates from the clients using federated averaging.
 
         This method now delegates to the aggregation_strategy for extensibility.
         Subclasses can still override this method for backward compatibility.
         """
+        self._validate_aggregation_inputs(updates, deltas_received)
         # Delegate to aggregation strategy
         self.context.updates = updates
         self.context.current_round = self.current_round
@@ -175,9 +181,11 @@ class Server(base.Server):
     async def _process_reports(self):
         """Process the client reports by aggregating their weights."""
         weights_received = [update.payload for update in self.updates]
+        self._validate_aggregation_inputs(self.updates, weights_received)
 
         weights_received = self.weights_received(weights_received)
         self.callback_handler.call_event("on_weights_received", self, weights_received)
+        self._validate_aggregation_inputs(self.updates, weights_received)
 
         # Notify client selection strategy about received reports
         self.context.updates = self.updates
@@ -354,6 +362,8 @@ class Server(base.Server):
         """Compute the accuracy mean and standard deviation across clients."""
         # Get total number of samples
         total_samples = sum(update.report.num_samples for update in updates)
+        if total_samples == 0:
+            return 0.0, 0.0
 
         # Perform weighted averaging
         updates_accuracy = [update.report.accuracy for update in updates]

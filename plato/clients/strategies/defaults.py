@@ -12,6 +12,7 @@ from __future__ import annotations
 import logging
 import os
 import pickle
+import re
 import sys
 import time
 import uuid
@@ -26,6 +27,11 @@ from plato.clients.strategies.base import (
     PayloadStrategy,
     ReportingStrategy,
     TrainingStrategy,
+)
+from plato.clients.transport import (
+    InboundTransfer,
+    TransportLimits,
+    receive_s3_payload,
 )
 from plato.config import Config
 from plato.datasources import registry as datasources_registry
@@ -143,6 +149,45 @@ class DefaultLifecycleStrategy(LifecycleStrategy):
 class DefaultPayloadStrategy(PayloadStrategy):
     """Default payload processing, mirroring `Client._handle_payload`."""
 
+    def reset_payload(self, context: ClientContext) -> None:
+        self._clear_transfer(context)
+        super().reset_payload(context)
+        if not context.comm_simulation:
+            transfer = InboundTransfer(
+                TransportLimits.from_config(), lambda: self._clear_transfer(context)
+            )
+            context.state["inbound_transfer"] = transfer
+            context.chunks = transfer.chunks
+
+    @staticmethod
+    def _clear_transfer(context: ClientContext) -> None:
+        transfer = context.state.pop("inbound_transfer", None)
+        if transfer is not None:
+            transfer.close()
+        context.chunks.clear()
+        context.server_payload = None
+        if context.owner is not None:
+            context.owner.chunks = context.chunks
+            context.owner.server_payload = None
+
+    def teardown(self, context: ClientContext) -> None:
+        self._clear_transfer(context)
+
+    @staticmethod
+    def _require_transfer(context: ClientContext) -> InboundTransfer:
+        transfer = context.state.get("inbound_transfer")
+        if transfer is None:
+            raise ValueError("No active server payload transfer.")
+        transfer.check_active()
+        return transfer
+
+    async def accumulate_chunk(self, context: ClientContext, chunk: bytes) -> None:
+        try:
+            self._require_transfer(context).append(chunk)
+        except Exception:
+            self._clear_transfer(context)
+            raise
+
     def inbound_received(self, context: ClientContext) -> None:
         """Invoke legacy hook on the owning client."""
         owner = context.owner
@@ -168,23 +213,13 @@ class DefaultPayloadStrategy(PayloadStrategy):
         client_id: int,
     ) -> None:
         """Commit buffered chunks similarly to `_payload_arrived`."""
-        if client_id != context.client_id:
-            raise ValueError("Chunk group client ID does not match the active client.")
-
-        if not context.chunks:
-            return
-
-        payload_bytes = b"".join(context.chunks)
-        data = pickle.loads(payload_bytes)
-        context.chunks.clear()
-
-        if context.server_payload is None:
-            context.server_payload = data
-        elif isinstance(context.server_payload, list):
-            context.server_payload.append(data)
-        else:
-            context.server_payload = [context.server_payload]
-            context.server_payload.append(data)
+        try:
+            if client_id != context.client_id:
+                raise ValueError("Chunk group client ID does not match the active client.")
+            context.server_payload = self._require_transfer(context).commit()
+        except Exception:
+            self._clear_transfer(context)
+            raise
 
     async def finalise_inbound_payload(
         self,
@@ -194,27 +229,35 @@ class DefaultPayloadStrategy(PayloadStrategy):
         s3_key: str | None = None,
     ) -> Any:
         """Reconstruct inbound payload and log payload statistics."""
-        if client_id != context.client_id:
-            raise ValueError(
-                "Payload completion client ID does not match the active client."
-            )
-
-        if s3_key is not None:
-            if context.s3_client is None:
-                raise RuntimeError("S3 client not initialised for payload.")
-            context.server_payload = context.s3_client.receive_from_s3(s3_key)
-            payload_size = sys.getsizeof(pickle.dumps(context.server_payload))
-        else:
-            payload_size = 0
-
-            if isinstance(context.server_payload, list):
-                for item in context.server_payload:
-                    payload_size += sys.getsizeof(pickle.dumps(item))
-            elif isinstance(context.server_payload, dict):
-                for key, value in context.server_payload.items():
-                    payload_size += sys.getsizeof(pickle.dumps({key: value}))
-            elif context.server_payload is not None:
-                payload_size = sys.getsizeof(pickle.dumps(context.server_payload))
+        try:
+            if client_id != context.client_id:
+                raise ValueError(
+                    "Payload completion client ID does not match the active client."
+                )
+            transfer = self._require_transfer(context)
+            if s3_key is not None:
+                if context.s3_client is None:
+                    raise RuntimeError("S3 client not initialised for payload.")
+                if (
+                    not isinstance(s3_key, str)
+                    or re.fullmatch(
+                        rf"server_payload_\d+_{context.current_round}", s3_key
+                    ) is None
+                ):
+                    raise ValueError("S3 payload key does not match the current round.")
+                if transfer.chunk_count or transfer.part_count:
+                    raise ValueError("S3 payload cannot replace an active socket payload.")
+                payload = await receive_s3_payload(
+                    context.s3_client, s3_key, transfer, transfer.reserve
+                )
+            else:
+                payload = transfer.finish()
+            payload_size = transfer.byte_count
+        except BaseException:
+            self._clear_transfer(context)
+            raise
+        self._clear_transfer(context)
+        context.server_payload = payload
 
         LOGGER.info(
             "[Client #%d] Received %.2f MB of payload data from the server.",
@@ -445,16 +488,32 @@ class DefaultCommunicationStrategy(CommunicationStrategy):
     def __init__(self, chunk_size: int = 1024**2) -> None:
         self.chunk_size = chunk_size
 
+    async def send_report_and_payload(
+        self, context: ClientContext, report: Any, payload: Any
+    ) -> None:
+        # Urgent responses can refer to an earlier logical client on this worker.
+        context.state["outbound_client_id"] = getattr(
+            report, "client_id", context.client_id
+        )
+        try:
+            await super().send_report_and_payload(context, report, payload)
+        finally:
+            context.state.pop("outbound_client_id", None)
+
     async def send_report(self, context: ClientContext, report: Any) -> None:
         if context.sio is None:
             raise RuntimeError("Socket client not initialised.")
 
         await context.sio.emit(
             "client_report",
-            {"id": context.client_id, "report": pickle.dumps(report)},
+            {
+                "id": context.state.get("outbound_client_id", context.client_id),
+                "report": pickle.dumps(report),
+            },
         )
 
     async def send_payload(self, context: ClientContext, payload: Any) -> None:
+        client_id = context.state.get("outbound_client_id", context.client_id)
         if context.comm_simulation:
             model_name = (
                 Config().trainer.model_name
@@ -465,7 +524,7 @@ class DefaultCommunicationStrategy(CommunicationStrategy):
 
             checkpoint_path = Config().params["checkpoint_path"]
             payload_filename = os.path.join(
-                checkpoint_path, f"{model_name}_client_{context.client_id}.pkl"
+                checkpoint_path, f"{model_name}_client_{client_id}.pkl"
             )
 
             with open(payload_filename, "wb") as payload_file:
@@ -483,11 +542,11 @@ class DefaultCommunicationStrategy(CommunicationStrategy):
         if context.sio is None:
             raise RuntimeError("Socket client not initialised.")
 
-        metadata: dict[str, Any] = {"id": context.client_id}
+        metadata: dict[str, Any] = {"id": client_id}
 
         if context.s3_client is not None:
             unique_key = uuid.uuid4().hex[:6].upper()
-            s3_key = f"client_payload_{context.client_id}_{unique_key}"
+            s3_key = f"client_payload_{client_id}_{unique_key}"
             context.s3_client.send_to_s3(s3_key, payload)
             data_size = sys.getsizeof(pickle.dumps(payload))
             metadata["s3_key"] = s3_key
@@ -519,4 +578,7 @@ class DefaultCommunicationStrategy(CommunicationStrategy):
             chunk = data[start : start + self.chunk_size]
             await context.sio.emit("chunk", {"data": chunk})
 
-        await context.sio.emit("client_payload", {"id": context.client_id})
+        await context.sio.emit(
+            "client_payload",
+            {"id": context.state.get("outbound_client_id", context.client_id)},
+        )
