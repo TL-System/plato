@@ -1,0 +1,66 @@
+name: Container CPU Checks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  container:
+    # Measure disk, reclaim fixed unused SDKs only on disposable hosted Ubuntu
+    # VMs if needed, then require the build floor. Standard storage is 14 GB.
+    # This optional variable may name an available larger Linux x64 runner.
+    runs-on: ${{ vars.PLATO_CONTAINER_RUNNER || 'ubuntu-24.04' }}
+    timeout-minutes: 60
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.13"
+
+      - name: Check container inputs and launcher arguments
+        shell: python {0}
+        timeout-minutes: 3
+        env:
+          CONTAINER_ARTIFACTS: ${{ runner.temp }}/plato-container-artifacts
+        run: |
+          import os
+          import subprocess
+          import sys
+          subprocess.run([
+              sys.executable, ".github/scripts/check_container.py", "static",
+              "--artifacts", os.environ["CONTAINER_ARTIFACTS"],
+          ], check=True)
+
+      - name: Build and qualify the actual Linux amd64 image
+        shell: python {0}
+        timeout-minutes: 55
+        env:
+          CONTAINER_ARTIFACTS: ${{ runner.temp }}/plato-container-artifacts
+        run: |
+          import os
+          import subprocess
+          import sys
+          subprocess.run([
+              sys.executable, ".github/scripts/check_container.py", "linux",
+              "--artifacts", os.environ["CONTAINER_ARTIFACTS"],
+          ], check=True)
+
+      - name: Upload build, disk and CPU qualification records
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: container-cpu-${{ github.sha }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/plato-container-artifacts/
+          retention-days: 14
+          if-no-files-found: error
