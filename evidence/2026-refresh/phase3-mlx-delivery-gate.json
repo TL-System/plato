@@ -1,0 +1,191 @@
+{
+  "schema_version": 1,
+  "reviewer": "/root/mlx_delivery_gate",
+  "gate": "Phase 3A bounded MLX prepublication design and evidence gate",
+  "reviewed_at_utc": "2026-10-03T20:32:17.337965+00:00",
+  "decision": "ACCEPTED_FOR_PR_PUBLICATION_WITH_PREMERGE_GATES_OUTSTANDING",
+  "publication_ready": true,
+  "merge_accepted": false,
+  "findings": [],
+  "severity_counts": {
+    "critical": 0,
+    "high": 0,
+    "medium": 0
+  },
+  "summary": "Selected A1/A2/P1 and bounded E1-E8 work is ready for publication. Fresh final independent review closes the remaining scoped typing gate without weakening runtime assertions. Historical benchmark and full-core evidence retain their source identities. Actual final published-source Linux qualification remains required before merge.",
+  "implementation": {
+    "worktree": "/tmp/plato-refresh-worktrees/mlx-final",
+    "commit": "6311960cdd00955d4777e269ebee460be591065e",
+    "tree": "d302b222717177d4e04bb55214df0826dc9c9ee1",
+    "clean_worktree_verified": true,
+    "candidate_manifest_paths_verified": 1038,
+    "candidate_manifest_mismatches": [],
+    "fresh_review_source_hashes_verified": 28,
+    "fresh_review_source_mismatches": [],
+    "source_sha256": {
+      "plato/algorithms/mlx_fedavg.py": "469021332340cadf9c58b2349b3bb2ab856edb03aba4ab76136e6620066748f3",
+      "plato/algorithms/registry.py": "c28cd649d77b3bffab14e7f7b01e87c2b0b652d0b538ae7d0ad0bab0be5e2d58",
+      "plato/models/registry.py": "21e3eef31c433802aa042f430cdd869571ced0c6f421ac7e48863fd5f2385a8e",
+      "plato/servers/fedavg.py": "dc7deda9e07d758fd7e9b81b6bb59cbf43e3f3d5197b2b550273b163f450e087",
+      "plato/trainers/mlx.py": "bdd405bec5ca7255b585e7a99118699dc52e1dfcb939beef6e5fc0296381cb5e",
+      "plato/trainers/registry.py": "8e2c03428b45e14fc33fb919d1684fff1ed3d57810167f461f697371ee0fb9a1",
+      "plato/utils/tree.py": "33a02e8fe70eb62daa97b40c7edea19b0fb9fed1b41c2d64b5146242143b0ef6",
+      "tests/conftest.py": "dcc25c17cbd872fc21b66bbc2d3f5951bf791b9f2474a71af6d9b8ac28e4356c",
+      "tests/mlx_import_audit_runner.py": "62a6509de2b389d1ab143cc06a526745a132f035f978b18f8b78d183ec80d296",
+      "tests/mlx_native/__init__.py": "1a04a0e5e228220a93c51d9b3e52a231525e5bc660150ba8737024a2f2df1ca2",
+      "tests/mlx_native/benchmark.py": "4d84e40e99754cd533670aadd103b57f8adb1e323859957936d4e252f9d3c042",
+      "tests/mlx_native/helpers.py": "dc035bf36f25013ad729b166067c8667e87ff8b408a928a4362ca8c21a6f41be",
+      "tests/mlx_native/seed_probe.py": "ef12f16104913a853f66748a50238560add36d31fd91f59d6109d9e4eb8dca45",
+      "tests/mlx_native/socket_harness.py": "a50a6f4278fb8b567a834f181eeef59663a2f2a7534fd5e9e3c9d30fb7f145e9",
+      "tests/mlx_native/socket_probe.py": "ad9612b76c99fec5bf126f822ebafe64cd633db2cee6a0b39feeffbbb15b925d",
+      "tests/mlx_native/test_phase3_controls.py": "486bb96caf4bc00ab82bd8a1ec966700dee0dfdc677d97565357c32286b74af8",
+      "tests/mlx_native/test_phase3_dispatch.py": "f1a6929ef580c4220c833cb2b1d17a04489266ac5554f23fb20b37fa7165ff88",
+      "tests/mlx_native/test_phase3_rng.py": "c007293e24c26b0d17ba85b82841b38df17fc32db26df17b8c87ed7bf3657917",
+      "tests/mlx_native/test_phase3_runtime.py": "545de1c7eb23829990860610dde0c370e6dce0312c514dd4be4d69f4d75c092f",
+      "tests/mlx_native/test_phase3_selection.py": "aec3efc41b2473c23dec71662902d8f97c093158eb296809b3e3dbd62f2fd13b",
+      "tests/mlx_native/test_phase3_socket.py": "e4fcad87330ce9923eba2f7b05e87e6cf3eeb4fbe06ed0089742d0d53d3797a7",
+      "tests/mlx_native/test_phase3_tree_contract.py": "ce43ba9517e16ad3a4df5018ff00779f849d70ab6ef38344abf8c12be78ee4c8",
+      "tests/test_mlx_import_contract.py": "6c9eb81ab656a8695f34579fd590a02d51480c85a3353fcc57a33597f972be77",
+      "tests/test_mlx_profile_contract.py": "c26c766a599d235f6841aafe82f178b7fd8a3ae02d8362420d0d4f7e95dd8088",
+      "pyproject.toml": "0e62fd238c359027fae6c1b9e45c10a8f913fb8421d9300ee0a781af091f80e4",
+      ".github/workflows/pytorch_tests.yml": "1ae4bf9d5be394b77a105ab294527a27ec8f2c123e46ac179e97fc148f843b75",
+      "uv.lock": "46236f61039c07a844bbddaa185c32582b6f4436203bd719aa8e7dcfdbd26e89",
+      "tests/mlx_native/cases.json": "c168dc33a4d4e7ed70079e09c3de70f5b318d543c035ec13de2826b48e1175bb"
+    }
+  },
+  "authority": {
+    "scope": "Accepted plan Phase3A plus accepted revised MLX roadmap and addenda; root task transmits latest user restriction to Python3.13 only, overriding older3.14 forward-compatibility text.",
+    "accepted_roadmap_sha256": "76093b75c76e304117bd32f59d0eabf59bf726a2aaff051d82aa429761945ea9",
+    "design_acceptance_hash_bindings_verified": true,
+    "old_roadmap_review": "Historical CHANGES_REQUESTED review is retained; revised roadmap/design acceptance resolves planning findings. It is not treated as the current acceptance decision."
+  },
+  "criteria": {
+    "A1_E1_E2": "Accepted: raw and final-hook eligible-tree/count/pairing validation, all direct/legacy/delta paths, both orders and zero-weight inputs. Historical late-selector finding closed by semantic correction review; final review independently re-exercised dispatch and found no regression. Valid independently trained8/24 trees retain float64 leaf-reference weighting.",
+    "A2_E3": "Accepted within float32 training, float16 host transport and explicit bfloat16 rejection boundaries; owned snapshots, real codec/checkpoint predictions and continued training are covered. Weight-only restoration remains explicit.",
+    "A2_E4": "Accepted: real native two-client8/24 socket qualification and final native socket case; natural process exit and port cleanup are covered. Shipped MNIST simulated one-worker smoke remains separately described.",
+    "A2_E5": "Accepted: native no-flag/caller-stream, CPU, Metal and CPU-precedence routing, train/eval mode restoration and explicit backend failures. Final profile checks include real-valued CPU/Metal preflight and import isolation.",
+    "P1_E6_E7": "Accepted: native clipping and aliases, independent reference updates, logical-client/round seed replay and caller RNG restoration. Same-environment limits remain.",
+    "E8": "Accepted as bounded historical measurement evidence only: original benchmark source,18 numerical runs/27 workers,8/32/64 batches,three repetitions,100 measured steps after10 warmups,10-round retention and concurrent worker overlap, plus nine real socket sessions. Existing review audited raw evidence and disclosed later source deltas. No final-source timing or speedup claim; eager remains default.",
+    "native_qualification": "Exact final candidate383/383 native tests pass with zero failures/errors/skips; independently compared all383 JUnit identities to cases.json with exact set equality.",
+    "static_quality": "Required Ruff import policy and24 changed Python paths pass installed-MLX and absent-MLX static targets. Full repository typing has classified legacy diagnostics; Linux static targeting on macOS is not Linux runtime execution.",
+    "independent_review": "Fresh final6311 review ACCEPTED_BOUNDED_REVIEW, zero critical/high/medium findings. Three unchanged unused typing imports are optional expanded-Ruff low advisories only.",
+    "docs": "Accepted documentation review retained; no later docs delta reported or shown in final correction review. Published prose preserves supported-path and checkpoint/performance limitations.",
+    "packaging": "Narrow exclusion of evidence reproduction bundles from distributions is independently reviewed, with ordinary source/test/config/docs/evidence retained. Root final package checks remain delivery work; this gate does not assert their completion."
+  },
+  "pr_description_assessment": {
+    "path": "/tmp/plato-mlx-final/pr-description-draft.md",
+    "accepted": true,
+    "mandatory_edits": [],
+    "reason": "Accurate concrete problem and behavior,383 final native tests,24-path typing coverage, historical1440 mandatory/1382 base distinction, expected DP skip, no speedup/3.14/MLX-LM/full-resume overclaim, and explicit final Linux merge gate.",
+    "publication_receipt_requirement": "Root must retain/link the finalized source-bound acceptance and reproduction receipts when publishing, so the short narrative remains auditable."
+  },
+  "remaining_delivery_gates": [
+    {
+      "stage": "Before publication",
+      "requirement": "Finish already-running package/artifact checks and finalize receipt/review reproduction bundles; preserve original author commit reachability. Bind published source to reviewed candidate, distinguishing evidence-only commits from active-source changes.",
+      "status": "ROOT_OWNED_PENDING"
+    },
+    {
+      "stage": "Before merge",
+      "requirement": "Run actual Linux Python3.13 base, mandatory and runtime CI on exact published source; audit collection, executed cases, allowed skip disposition, required extras, numerical/runtime and cleanup artifacts, warning/coverage and typing classification results. Historical0929 full-core runs and macOS Linux-static-target checks cannot substitute.",
+      "status": "REQUIRED_PENDING"
+    },
+    {
+      "stage": "If active source changes",
+      "requirement": "Revalidate affected source/tests and obtain corresponding independent review; this gate is bound to6311 active-source hashes and cannot silently cover runtime changes.",
+      "status": "CONDITIONAL"
+    },
+    {
+      "stage": "After required gates",
+      "requirement": "Root records exact-source Linux acceptance and only then merges and cleans owned task resources.",
+      "status": "ROOT_OWNED_PENDING"
+    }
+  ],
+  "limits": [
+    "This is prepublication acceptance, not merge approval, full refresh completion, package release or deployment authorization.",
+    "No new test execution or benchmarks by this gate; review relies on inspected independently reviewed receipts plus fresh source/hash/JUnit-ledger verification.",
+    "Historical0929 mandatory1440/base1382 runs remain historical; final native383 run is bound to6311.",
+    "Historical E8 benchmark data retains its original source and all disclosed later deltas; no final-source performance claim.",
+    "Python3.13/native Apple arm64 CPU and Metal only; actual final Linux execution pending.",
+    "Metadata-only Transformers find_spec(mlx) is permitted; MLX backend code before prerequisite validation remains forbidden.",
+    "No new architecture, MLX-LM, broad conversion, full optimizer/RNG resume, compile feature, sustained Apple CI service or Python3.14 support qualification.",
+    "Hook preflight prevents subsequent aggregation/load mutation, not rollback of mutations already performed by arbitrary user hooks; unlabeled copied same-schema trees retain positional semantics."
+  ],
+  "evidence": [
+    {
+      "path": "/tmp/plato-refresh-worktrees/mlx-final/evidence/2026-refresh/plan.md",
+      "sha256": "edb9a58cc7915a940854f16d5029fe97434703bf2f75eca0dcb96de2d0f0eb15"
+    },
+    {
+      "path": "/tmp/plato-refresh-worktrees/mlx-final/evidence/2026-refresh/mlx-roadmap.json",
+      "sha256": "76093b75c76e304117bd32f59d0eabf59bf726a2aaff051d82aa429761945ea9"
+    },
+    {
+      "path": "/tmp/plato-refresh-worktrees/mlx-final/evidence/2026-refresh/mlx-roadmap-review.json",
+      "sha256": "a6861265a4a8e2235fa43e511034503e490e2e39c18fdb1c5c5979a56306be40"
+    },
+    {
+      "path": "/tmp/plato-refresh-worktrees/mlx-final/evidence/2026-refresh/design-revision-review.json",
+      "sha256": "0535b3ccbac91a264317bd8fb9314465a0379155bc7113de99a27a9b66b7be39"
+    },
+    {
+      "path": "/tmp/plato-refresh-worktrees/mlx-final/evidence/2026-refresh/design-acceptance.json",
+      "sha256": "ff4d6acde0d0312b49b9767be5210b55fb4db0e8fb5727203c148b63d123693a"
+    },
+    {
+      "path": "/tmp/plato-refresh-worktrees/mlx-final/evidence/2026-refresh/plan-addendum.json",
+      "sha256": "5b51b0fb7ed6f68d9fce7176335b3e7be5e5f178a2788590912aa2396a487709"
+    },
+    {
+      "path": "/tmp/plato-refresh-worktrees/mlx-final/evidence/2026-refresh/plan-addendum-review.json",
+      "sha256": "cdece905ec46179d9332c4167d4cc6fec3ab17632ebadccba5614160197be0c2"
+    },
+    {
+      "path": "/tmp/plato-refresh-worktrees/mlx-final/evidence/2026-refresh/plan-addendum-acceptance.json",
+      "sha256": "5f5d5a8e22e14072b5d031c19a27be14bda9bdbc2a157d14af78845daac6c56b"
+    },
+    {
+      "path": "/tmp/plato-mlx-final-review.json",
+      "sha256": "8d934c2c99a86e68dc93769ba757918eb6b0de0488304661abd131279ef756b2"
+    },
+    {
+      "path": "/tmp/plato-mlx-corrected-review.json",
+      "sha256": "c4aa98a1cc8e7dfd4bd0029066fc5830bd63d816bcca6599e2949b65dd6ffa28"
+    },
+    {
+      "path": "/tmp/plato-mlx-native-review.json",
+      "sha256": "3c53678c9b4b719a4559a15db8f7706ad9dd524f00690936528e71e671ca4462"
+    },
+    {
+      "path": "/tmp/plato-mlx-docs-review.json",
+      "sha256": "1c1ef93989bac38ad001ae51beec5969fc5dcedcb2888332c06d61d1afa1018e"
+    },
+    {
+      "path": "/tmp/plato-mlx-profile-contract-clarification.json",
+      "sha256": "c4f4ba8a69e59aefa3f9ded0aafd3ea91bc42f761a734f9641cfa902202c7add"
+    },
+    {
+      "path": "/tmp/plato-mlx-final/local-qualification-candidate.json",
+      "sha256": "acf66acbaf08322bd115c4b3edc750d8a39f5f654b3c96a502fa9bbf3431b460"
+    },
+    {
+      "path": "/tmp/plato-mlx-final/run-mlx-native/receipt.json",
+      "sha256": "b7c5cf658062f6946d0fc706cae60771428a958dcfcd3cbf48c522d31dea39e7"
+    },
+    {
+      "path": "/tmp/plato-mlx-final/run-mlx-native/tests.xml",
+      "sha256": "ce10686ce46ba50113372bf2032f5280111f02eb417520c5cf54e480de6ee2c0"
+    },
+    {
+      "path": "/tmp/plato-mlx-final/pr-description-draft.md",
+      "sha256": "6e17643da983fa081bde1783ec66464a11a1358c9b11ad63d5b2ab8d655caf9f"
+    }
+  ],
+  "integrity": {
+    "no_source_edits": true,
+    "no_nested_agents": true,
+    "no_remote_actions": true,
+    "no_environment_changes": true,
+    "sole_output": "/tmp/plato-mlx-delivery-gate.json"
+  }
+}
