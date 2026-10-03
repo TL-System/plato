@@ -1,0 +1,12 @@
+W1003 16:29:54.805000 25846 /private/tmp/plato-archive-author/environment/lib/python3.13/site-packages/torch/distributed/elastic/multiprocessing/redirects.py:35] NOTE: Redirects are currently not supported in MacOs.
+============================= test session starts ==============================
+platform darwin -- Python 3.13.16, pytest-9.1.1, pluggy-1.6.0
+rootdir: /private/tmp/plato-refresh-worktrees/model-search-retirement
+configfile: pyproject.toml
+plugins: cov-7.1.0, anyio-4.15.1
+collected 3 items
+
+tests/integration/test_retained_model_search.py ...                      [100%]
+
+- generated xml file: /tmp/plato-archive-author/type-correction/final/budgets.xml -
+============================== 3 passed in 13.63s ==============================

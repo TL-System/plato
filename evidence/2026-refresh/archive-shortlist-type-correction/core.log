@@ -1,0 +1,3 @@
+W1003 16:29:54.805000 25847 /private/tmp/plato-archive-author/environment/lib/python3.13/site-packages/torch/distributed/elastic/multiprocessing/redirects.py:35] NOTE: Redirects are currently not supported in MacOs.
+............................................                             [100%]
+44 passed in 3.47s

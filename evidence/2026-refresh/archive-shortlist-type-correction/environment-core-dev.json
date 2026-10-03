@@ -1,0 +1,11 @@
+{
+  "executable": "/Users/bli/Playground/plato/.venv/bin/python",
+  "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+  "packages": {
+    "pytest": "9.1.1",
+    "torch": "2.14.1",
+    "torchvision": "0.29.1",
+    "ptflops": null,
+    "numpy": "2.5.3"
+  }
+}
