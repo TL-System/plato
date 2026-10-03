@@ -18,8 +18,8 @@
     "dependency_merge_tree": "6421b546579a0bafe3e2fc0796291ab662cbc04a",
     "implementation_commit": "0dc34dd1d79d90071a0babfa6aa89f33d72a976f",
     "implementation_tree": "0345bbeafe814bc33fa9bc2f845edf1043a13b53",
-    "evidence_body_commit": null,
-    "evidence_commit_receipt": "The next receipt commit records the exact body commit; resolve the final receipt with git log -1 --format=%H -- evidence/2026-refresh/phase2c-validation.json. A commit cannot embed its own hash.",
+    "evidence_body_commit": "adb6b3ad02519c16a25ba6204e9d0606968cf1ae",
+    "evidence_commit_receipt": "This receipt commit records the exact evidence body commit and its validation JSON hash. Resolve the final receipt commit with git log -1 --format=%H -- evidence/2026-refresh/phase2c-validation.json; the final handoff supplies its exact identity externally. A commit cannot embed its own hash.",
     "implementation_owned_diff": {
       "path": "/tmp/plato-phase2c-scratch/implementation-owned.diff",
       "bytes": 346932,
@@ -32,7 +32,10 @@
       "bd325e2e2394386c6535e1bd44a22dd21b2791aa Completed runtime checkpoint agreement and private worker accounting.",
       "4f826a79f8c1ee1f6219a55527c4c7ee18cd321d Integrated the accepted Phase 2B runtime dependency.",
       "c1e23fa7c5e25240b3d18461a8d63fe541c183b1 Corrected training updates, personalization ownership, and model checkpoints."
-    ]
+    ],
+    "evidence_body_validation_sha256": "0fcb2ba466a5b2636956bfdaccfbb3f3ce942b072ae94d75fa532e653dde7817",
+    "source_changes_after_qualification": [],
+    "source_immutability_check": "git diff --name-only 0dc34dd1d79d90071a0babfa6aa89f33d72a976f HEAD shows only the three owned evidence JSON files. Public SCAFFOLD constraints/state paths/semantics unchanged from writer snapshot."
   },
   "authorization": [
     {
