@@ -1,0 +1,41 @@
+{
+  "artifact": "/tmp/plato-p2-preliminary/package-second/distributions/plato_learn-1.4.3.tar.gz",
+  "sha256": "12b99c494d1fb82ab414ae433827602fb71d5e8f7141cb991281159e0e7c29b2",
+  "archive_gate": "REJECT",
+  "archived_files": [
+    "plato_learn-1.4.3/archives/legacy_datalib/LICENSE",
+    "plato_learn-1.4.3/archives/legacy_datalib/README.md",
+    "plato_learn-1.4.3/archives/legacy_datalib/__init__.py",
+    "plato_learn-1.4.3/archives/legacy_datalib/audio_extraction_tools.py",
+    "plato_learn-1.4.3/archives/legacy_datalib/data_utils.py",
+    "plato_learn-1.4.3/archives/legacy_datalib/flickr30kE_utils.py",
+    "plato_learn-1.4.3/archives/legacy_datalib/frames_extraction_tools.py",
+    "plato_learn-1.4.3/archives/legacy_datalib/modality_data_anntation_tools.py",
+    "plato_learn-1.4.3/archives/legacy_datalib/modality_extraction_base.py",
+    "plato_learn-1.4.3/archives/legacy_datalib/parse_datasets.py",
+    "plato_learn-1.4.3/archives/legacy_datalib/tiny_data_tools.py",
+    "plato_learn-1.4.3/archives/legacy_datalib/video_transform.py",
+    "plato_learn-1.4.3/archives/legacy_datalib/gym_utils/__init__.py",
+    "plato_learn-1.4.3/archives/legacy_datalib/gym_utils/gym_trim.py",
+    "plato_learn-1.4.3/archives/legacy_datalib/refer_utils/__init__.py",
+    "plato_learn-1.4.3/archives/legacy_datalib/refer_utils/referitgame_utils.py",
+    "plato_learn-1.4.3/archives/legacy_rl_env/LICENSE",
+    "plato_learn-1.4.3/archives/legacy_rl_env/README.md",
+    "plato_learn-1.4.3/archives/legacy_rl_env/rl_env.py"
+  ],
+  "source": {
+    "source_commit": "6bf8836d06072c7946cdfb5499a09e4bce459805",
+    "source_status": " M .github/workflows/pypi_publish.yml\n M docs/requirements.txt\n M netlify.toml\n",
+    "source_files": {
+      "pyproject.toml": "8aaa7414717fa17841900d377d89851547677ba2ae93963afef79fc5490ba610",
+      "uv.lock": "e2a53aaae9a0dd49f5446b490bb3071e86aa3a9a20d6271c9dd30b4ae2dcbff9",
+      ".python-version": "02e735b3dfe1c32833eb550b7ff8ffa17f5f2bc3fa1e7bae61a8f5a3883ce398",
+      ".github/scripts/check_distribution.py": "6f747e9e2e25dc78f08998634f50a1b66a885852b22bcc5fc6f51ea5aad09564",
+      ".github/workflows/docs_package_checks.yml": "3bd50449d468b4f6606648a66edc9d54e8710577ccd7878f291704391057aa64",
+      ".github/workflows/pypi_publish.yml": "44d20d3daa8e953546acf7e5b01ee61cf54d056b96b09b799ad3cfa65b105062"
+    },
+    "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+    "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+    "uv": "uv 0.12.22 (70fe1196a 2026-10-01 aarch64-apple-darwin)"
+  }
+}
