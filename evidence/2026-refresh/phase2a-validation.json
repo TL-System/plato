@@ -1,0 +1,546 @@
+{
+  "schema_version": 1,
+  "task": "2A: configuration, active non-adapter datasources and samplers",
+  "date": "2026-10-02",
+  "status": "Implementation and scoped validation complete; independent root review pending.",
+  "identity": {
+    "worktree": "/private/tmp/plato-refresh-worktrees/data",
+    "branch": "maintenance/2026-phase2-data",
+    "baseline_commit": "fda60becedfa6236c11d415b87a868b52789a41e",
+    "implementation_commits": [
+      {
+        "sha": "6bb27818f8d7fface0277947ae47aca1dfd67196",
+        "subject": "Fixed configuration, datasource, and sampler correctness."
+      },
+      {
+        "sha": "eb8342da4a6e6ee2c816acdb8d9e2610a1778118",
+        "subject": "Archived the unused legacy multimodal datasource helpers."
+      },
+      {
+        "sha": "53a60a7514b71e8098fe8c0f335547725d1e269e",
+        "subject": "Corrected EMNIST training and evaluation split selection."
+      }
+    ],
+    "final_implementation_commit": "53a60a7514b71e8098fe8c0f335547725d1e269e",
+    "final_implementation_tree": "3b85e0835066742ba0c145d8657708a8064b7721",
+    "baseline_to_final_binary_diff_sha256": "7a85d21a4c6dd9a106f5c4c3b228d68b0789513b18199bf24e3c664428c1cbd1",
+    "evidence_commit_contract": "This JSON is committed in an evidence-only child of final_implementation_commit. Its containing commit cannot embed its own SHA; the exact terminal commit is supplied in the final root handoff. All runtime/test/archive content and recorded validation identify the exact implementation commit above.",
+    "tracked_tree_before_evidence": "clean",
+    "shared_metadata": "pyproject.toml, uv.lock, CI and shared conftest unchanged; no push, merge, PR edit, submodule update or other worktree/environment mutation."
+  },
+  "environment": {
+    "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+    "uv": "uv 0.12.22 (70fe1196a 2026-10-01 aarch64-apple-darwin)",
+    "python_default_and_minimum": "3.13, unchanged",
+    "interpreters": {
+      "3.13": "3.13.16 (uv-managed)",
+      "3.14": "3.14.8 (Homebrew)"
+    },
+    "isolated_environments": [
+      "/tmp/plato-phase2a-lZqbqj/venv-3.13",
+      "/tmp/plato-phase2a-lZqbqj/venv-3.14",
+      "/tmp/plato-phase2a-lZqbqj/venv-ssl-3.13",
+      "/tmp/plato-phase2a-lZqbqj/venv-ssl-3.14"
+    ],
+    "provision_commands": [
+      "UV_PROJECT_ENVIRONMENT=/tmp/plato-phase2a-lZqbqj/venv-{python} uv sync --locked --group dev --python {python}",
+      "UV_PROJECT_ENVIRONMENT=/tmp/plato-phase2a-lZqbqj/venv-ssl-{python} uv sync --locked --group dev --extra ssl --python {python}"
+    ],
+    "provision_results": "Both commands succeeded for 3.13 and 3.14. Sync logs are in owned scratch; locked metadata remained unchanged.",
+    "metadata_sha256": {
+      "uv.lock": "573b10c2ba1a2317e02f9e40c6181359cafab6f6e0a0f9be12bb256cb276fe1d",
+      "pyproject.toml": "799bd7ba1865b097fdc8ca84a7b70337794e338de4aa9a6a13f6a4c1b9156246",
+      ".python-version": "02e735b3dfe1c32833eb550b7ff8ffa17f5f2bc3fa1e7bae61a8f5a3883ce398"
+    },
+    "selected_locked_versions": {
+      "numpy": "2.5.3",
+      "torch": "2.14.1",
+      "torchvision": "0.29.1",
+      "scipy": "1.18.1",
+      "requests": "2.34.2",
+      "pytest": "9.1.1",
+      "ruff": "0.16.10",
+      "ty": "0.0.84"
+    },
+    "ssl_dependency": "Lightly 1.5.26",
+    "cpu_test_environment": "OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1",
+    "shell_contract": "Every shell call used zsh -lc (exec_command shell=zsh, login=true).",
+    "submodules": "No submodules required for this ownership; none initialized or revisions changed."
+  },
+  "audit_coverage": [
+    {
+      "inventory": "plato/config.py: singleton lifecycle, TOML includes, optional sections, CLI/environment overrides, speed simulation",
+      "outcome": "F13 fixed. One production regression exercises public reset and legacy singleton invalidation with absent/present/absent/present/present/absent sections, without fixture resets between loads. Existing defaults and CLI tests plus new nested/deep/list/invalid include tests pass. Speed simulation retains legacy seeded values and caller RNG state."
+    },
+    {
+      "inventory": "All 160 tracked configs/examples/test experiment TOMLs, excluding pyproject metadata",
+      "command": "OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 PYTHONPATH=. /tmp/plato-phase2a-lZqbqj/venv-3.13/bin/python /tmp/plato-phase2a-lZqbqj/config-inventory.py",
+      "outcome": {
+        "loaded": 160,
+        "load_errors": 0,
+        "unknown_configured_datasources": 0,
+        "unknown_configured_samplers": 0
+      },
+      "qualification": "Includes and selections audited only; this is not 160 executed experiments. Adapter selections were recognized, not qualified."
+    },
+    {
+      "inventory": "All 16 plato/samplers Python files; all 11 registered samplers",
+      "outcome": "All 11 construct repeatably without mutating caller NumPy, Python or Torch RNG. Count/loader membership, valid IID golden padding, full-class partition coverage, anchor pools, training/testing targets, client IDs, eligible orthogonal samples, empty inputs and infeasible minima/pools covered. F15/F16 and additional confirmed findings below fixed."
+    },
+    {
+      "inventory": "base.py, purchase.py, texas.py download/extraction entrypoints",
+      "outcome": "Actual localhost HTTP archives exercise base TAR/ZIP; injected local urlretrieve files exercise Purchase/Texas preprocessing. Safe archives work. Absolute/traversal names, TAR link escapes and preexisting destination symlinks reject before outside writes, first safe member extraction, completion sentinel or NPZ cache. Archive/artifact symlinks, HTTP errors and interrupted streams have explicit negative paths. Dead-owner and live-owner subprocesses prove lock recovery and exclusion."
+    },
+    {
+      "inventory": "torchvision.py and registry.py: seven dataset aliases, constructor/subset metadata and split selection",
+      "outcome": "Registry/constructor tests cover aliases, overrides, unknown names, subsets and loaders. Real local MNIST/FashionMNIST IDX files prove aliases do not inherit stale configured dataset names. Real EMNIST balanced/digits IDX files prove distinct train/test labels, flags and counts. Installed constructor/source and current official API docs were checked. CIFAR/STL/CelebA external corpora were not downloaded."
+    },
+    {
+      "inventory": "cinic10.py and tiny_imagenet.py",
+      "outcome": "Local images prove incomplete-root recovery, actual counts, official Tiny ImageNet validation annotation-to-training-class mapping for nested and direct native layouts, and preservation of prepared labeled train/test directories."
+    },
+    {
+      "inventory": "purchase.py, texas.py and femnist.py IDs/counts/local caches",
+      "outcome": "Cache-only seven-row fixtures work without network, including empty test tensors and actual counts. Complete raw data preprocesses without download. A 40,001-row reference preserves baseline shuffle and 20,000/20,000 split counts without global RNG mutation. FEMNIST packaged JSON fixtures exercise server ID 0 and client IDs 1/2 with exact lengths and labels."
+    },
+    {
+      "inventory": "feature.py, feature_dataset.py, self_supervised_learning.py and __init__.py",
+      "outcome": "Existing focused feature/subset/data-loader tests pass. All 13 registered Lightly transform attributes exist; actual transforms from eight tracked SSL configurations produce finite (3,32,32) views on both supported interpreters. No behavior fix needed in these paths; no SSL training claim."
+    },
+    {
+      "inventory": "All 14 former plato/datasources/datalib files",
+      "outcome": "Rechecked import/config/example/test/doc/dynamic-name closure: only internal callers. Archived unchanged with license, provenance and known REFER limitations. No active imports from archives; preservation rechecked after commits.",
+      "archive": "archives/legacy_datalib/",
+      "mapping": "plato/datasources/datalib/<relative-path> -> archives/legacy_datalib/<relative-path>",
+      "preserved_original_files": 14,
+      "manifest_sha256": "b0d51bfb72fc6910a4316fe574ace8ce5784da3a767ff3773c1e298de21996af",
+      "license_sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+      "closure_commands": [
+        "rg -n 'datalib|referItGame|REFER|audio_extraction_tools|data_utils|flickr30kE_utils|gym_trim|kinetics|parse_datasets|tiny_data_tools|video_extraction_tools|yi_utils' plato examples configs tests docs pyproject.toml .github",
+        "rg -n 'plato\\.datasources\\.datalib|from .*datalib|import .*datalib|archives\\.legacy_datalib|from archives|import archives' plato examples tests configs docs pyproject.toml .github",
+        "git log --follow fda60bec -- plato/datasources/datalib/<relative-path>"
+      ],
+      "raw_evidence": [
+        "datalib-closure.log",
+        "datalib-provenance.log",
+        "active-archive-references.log",
+        "archive-preservation.json",
+        "refer-probe.json"
+      ]
+    }
+  ],
+  "confirmed_findings": [
+    {
+      "id": "F13",
+      "status": "fixed",
+      "observed": "Optional general/evaluation/results/parameters from config A survived loading config B without them.",
+      "resolution": "Config.reset clears annotated runtime sections and reset state; new singleton construction honors the same lifecycle.",
+      "red": [
+        "red-3.13.log",
+        "red-3.14.log"
+      ],
+      "green_test": "tests/test_config_loader.py::test_config_reload_discards_optional_sections_in_both_orders"
+    },
+    {
+      "id": "F15",
+      "status": "fixed",
+      "observed": "Dirichlet num_samples redrew variable counts and consumed randomness; reported count could disagree with actual loader.",
+      "resolution": "Realize count once with private seeded RNG; repeated reads preserve weights and private/global RNG. Seeded reconstructed membership matches actual DataLoader.",
+      "red": [
+        "red-3.13.log",
+        "red-3.14.log"
+      ],
+      "green_test": "tests/samplers/test_partition_contracts.py::test_dirichlet_realized_count_is_stable_and_matches_loader"
+    },
+    {
+      "id": "F16",
+      "status": "fixed",
+      "observed": "Original IID loop never expanded an empty source and exceeded a five-second subprocess deadline on both interpreters.",
+      "resolution": "Reject empty IID input with useful ValueError; keep fixed nonempty shuffle/padding/partition membership.",
+      "red": [
+        "red-iid-3.13.log",
+        "red-iid-3.14.log"
+      ],
+      "green_test": "tests/samplers/test_partition_contracts.py::test_empty_iid_fails_promptly_in_subprocess"
+    },
+    {
+      "id": "2A-01",
+      "status": "fixed",
+      "observed": "All 11 registered sampler constructors and speed simulation changed caller RNG state.",
+      "resolution": "Use private RandomState generators without changing default legacy seeded references.",
+      "red": [
+        "red-3.13.log",
+        "red-3.14.log",
+        "red-speed-3.13.log",
+        "baseline-vector-seed.json"
+      ]
+    },
+    {
+      "id": "2A-02",
+      "status": "fixed",
+      "observed": "Full-class label partitions used inconsistent IDs; no-anchor paths failed; excluded-anchor pool selected label 1 instead of only {2,3}; infeasible class pools hung.",
+      "resolution": "Consistent zero-based partition slots, allowed-pool selection, useful bounded infeasibility errors.",
+      "red": [
+        "red-3.13.log",
+        "baseline-vector-seed.json",
+        "red-label-pool-3.13.log"
+      ]
+    },
+    {
+      "id": "2A-03",
+      "status": "fixed",
+      "observed": "Sample-quantity get_sampled_data_condition treated datasource.targets method as labels.",
+      "resolution": "Use actual training/testing target sequence for sampled labels.",
+      "red": [
+        "red-3.13.log"
+      ]
+    },
+    {
+      "id": "2A-04",
+      "status": "fixed",
+      "observed": "Out-of-range partition client IDs returned wrong data or failed later; orthogonal no-replacement sampling exceeded eligible class membership and selected zero-weight wrong-class samples.",
+      "resolution": "Validate partition IDs and requested size against positive-weight eligibility.",
+      "red": [
+        "red-invalid-3.13.log"
+      ]
+    },
+    {
+      "id": "2A-05",
+      "status": "fixed",
+      "observed": "Empty padding and infeasible Dirichlet minima hung; zero minimum raised UnboundLocalError; one-modality fallback raised invalid randint bounds.",
+      "resolution": "Bound invalid empty/minimum/concentration/pool input; permit zero minimum, full-dataset single partition and single-modality fallback.",
+      "red": [
+        "red-3.13.log",
+        "baseline-utils-probe.json",
+        "red-invalid-3.13.log",
+        "red-fallback-3.13.log"
+      ],
+      "implementation_regression_caught": "Overstrict minimum validation initially rejected the valid singleton/full-dataset case. red-single-partition-3.13.log captured it; corrected before final commit."
+    },
+    {
+      "id": "2A-06",
+      "status": "fixed",
+      "observed": "Active raw TAR/ZIP extraction violated containment or silently accepted unsafe paths; preexisting destination symlinks wrote outside on both versions and marked completion.",
+      "resolution": "Shared whole-manifest TAR/ZIP preflight and explicit TAR data filter, consistent on 3.13/3.14. Safe internal TAR links work; escaping names/links, symlink parents/chains, ZIP symlinks and devices reject.",
+      "red": [
+        "red-3.13.log",
+        "red-3.14.log",
+        "evidence/2026-refresh/archive-containment-probe.json"
+      ]
+    },
+    {
+      "id": "2A-07",
+      "status": "fixed",
+      "observed": "Exclusive-create download lock survived owner death and permanently stalled the next downloader.",
+      "resolution": "Stable POSIX flock inode releases on process exit or exceptions, stays mutually exclusive with a live owner, and intentionally remains as an inert lock file.",
+      "red": [
+        "red-3.13.log",
+        "red-3.14.log"
+      ]
+    },
+    {
+      "id": "2A-08",
+      "status": "fixed",
+      "observed": "Archive/sentinel/gzip/tmp/lock symlinks could write outside; HTTP error responses were not closed; interrupted streams left partial data; unsupported extensions exited successfully.",
+      "resolution": "Reject artifact symlinks, close each response, retry bounded streaming failures with partial cleanup and propagate useful unsupported-format errors.",
+      "red": [
+        "red-artifact-3.13.log",
+        "red-http-3.13.log",
+        "red-stream-3.13.log",
+        "red-vector-artifact-3.13.log",
+        "red-fallback-3.13.log"
+      ]
+    },
+    {
+      "id": "2A-09",
+      "status": "fixed",
+      "observed": "Purchase/Texas checked deleted raw files instead of NPZ readiness, redownloaded usable caches/raw data, mutated global RNG and reported hardcoded counts/failed empty test tensor shapes.",
+      "resolution": "Cache-aware serialized download/preprocessing, local legacy shuffle, vectorized empty-safe tensors and actual split lengths.",
+      "red": [
+        "red-local-3.13.log",
+        "baseline-vector-seed.json"
+      ]
+    },
+    {
+      "id": "2A-10",
+      "status": "fixed",
+      "observed": "CINIC treated an empty root as downloaded; official Tiny ImageNet nested/native layout failed or classified unlabeled test/images as one class; both used hardcoded counts.",
+      "resolution": "Check concrete split readiness, use labeled Tiny validation annotations and training class IDs, preserve prepared labeled layouts and report actual lengths.",
+      "red": [
+        "red-local-3.13.log",
+        "red-native-layout-3.13.log"
+      ]
+    },
+    {
+      "id": "2A-11",
+      "status": "fixed",
+      "observed": "FashionMNIST registry alias after configured MNIST loaded MNIST labels [0,1,2] instead of [7,8,9].",
+      "resolution": "Explicit alias/constructor dataset_name takes precedence over config dataset_name.",
+      "red": [
+        "red-alias-3.13.log"
+      ]
+    },
+    {
+      "id": "2A-12",
+      "status": "fixed",
+      "observed": "EMNIST split denotes its variant; inherited train=True caused evaluation to load train labels [0,1,2] instead of test labels [7,8] for balanced and digits.",
+      "resolution": "Dataset defaults explicitly set train=True and test train=False while preserving variant and user per-split kwargs overrides.",
+      "red": [
+        "red-emnist-3.13.log",
+        "red-emnist-3.14.log"
+      ]
+    },
+    {
+      "id": "2A-13",
+      "status": "archived, intentionally unfixed",
+      "observed": "Executed REFER image filter raised TypeError on nested-list indexing; annotation reference filter returned [11,22] instead of [11]. self.data was an actual dict, so the separate typing observation alone was not a runtime defect.",
+      "resolution": "Accepted internal-only closure permits historical archival; original code and known limitations retained without API modernization.",
+      "red": [
+        "refer-probe.json"
+      ]
+    }
+  ],
+  "red_green": {
+    "raw_log_root": "/tmp/plato-phase2a-lZqbqj",
+    "command_convention": "Normalized executable selections are given below; logs are frozen outputs from staged pre-fix trees, not claimed to be a single pristine-baseline suite. Expand {python} to each stated interpreter. Green commands ran against content committed in final_implementation_commit.",
+    "initial_red": {
+      "command": "OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2a-lZqbqj/venv-{python}/bin/python -m pytest tests/test_config_loader.py::test_config_reload_discards_optional_sections_in_both_orders tests/samplers/test_partition_contracts.py tests/datasources/test_download_contracts.py -q",
+      "source_state": "Baseline production code plus newly written regressions.",
+      "3.13": {
+        "log": "red-3.13.log",
+        "failed": 43,
+        "passed": 4,
+        "warnings": 19,
+        "seconds": 9.74
+      },
+      "3.14": {
+        "log": "red-3.14.log",
+        "failed": 43,
+        "passed": 4,
+        "warnings": 0,
+        "seconds": 44.66
+      },
+      "harness_correction": "The initial F16 subprocess used object() as the singleton and failed with AttributeError; that node is excluded as hang evidence. The corrected harness uses object.__new__(Config). Original baseline IID code was then temporarily restored and the identical corrected regression failed from actual five-second nontermination on BOTH interpreters; restored final file afterward."
+    },
+    "iid_corrected_red": {
+      "command": "OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2a-lZqbqj/venv-{python}/bin/python -m pytest tests/samplers/test_partition_contracts.py::test_empty_iid_fails_promptly_in_subprocess -q",
+      "production_restore": "git show fda60becedfa6236c11d415b87a868b52789a41e:plato/samplers/iid.py; only this owned source temporarily restored, then recovered from scratch/iid-fixed.py.",
+      "results": {
+        "3.13": "red-iid-3.13.log: 1 failed, 5.16s, five-second timeout",
+        "3.14": "red-iid-3.14.log: 1 failed, 5.16s, five-second timeout"
+      }
+    },
+    "additional_red": [
+      {
+        "log": "red-local-3.13.log",
+        "normalized_command": "OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2a-lZqbqj/venv-3.13/bin/python -m pytest tests/datasources/test_local_datasets.py -q",
+        "result": "6 failed, 1 passed, 0.14s",
+        "source_state": "Pre-fix owned implementation; frozen raw log retained."
+      },
+      {
+        "log": "red-speed-3.13.log",
+        "normalized_command": "OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2a-lZqbqj/venv-3.13/bin/python -m pytest tests/test_config_loader.py::test_speed_simulation_preserves_rng_and_seeded_values -q",
+        "result": "1 failed, 0.08s",
+        "source_state": "Pre-fix owned implementation; frozen raw log retained."
+      },
+      {
+        "log": "red-invalid-3.13.log",
+        "normalized_command": "OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2a-lZqbqj/venv-3.13/bin/python -m pytest tests/samplers/test_partition_contracts.py -k 'orthogonal_rejects or out_of_range or zero_minimum' -q",
+        "result": "14 failed, 2 passed, 20 deselected, 0.16s",
+        "source_state": "Pre-fix owned implementation; frozen raw log retained."
+      },
+      {
+        "log": "red-fallback-3.13.log",
+        "normalized_command": "OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2a-lZqbqj/venv-3.13/bin/python -m pytest tests/samplers/test_partition_contracts.py::test_modality_quantity_single_modality_fallback tests/datasources/test_download_contracts.py::test_unsupported_download_format_raises_useful_error -q",
+        "result": "2 failed, 0.12s",
+        "source_state": "Pre-fix owned implementation; frozen raw log retained."
+      },
+      {
+        "log": "red-artifact-3.13.log",
+        "normalized_command": "OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2a-lZqbqj/venv-3.13/bin/python -m pytest tests/datasources/test_download_contracts.py::test_download_artifact_symlinks_cannot_write_outside -q",
+        "result": "3 failed, 0.15s",
+        "source_state": "Pre-fix owned implementation; frozen raw log retained."
+      },
+      {
+        "log": "red-http-3.13.log",
+        "normalized_command": "OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2a-lZqbqj/venv-3.13/bin/python -m pytest tests/datasources/test_download_contracts.py::test_http_error_closes_each_response_before_retry -q",
+        "result": "1 failed, 0.08s",
+        "source_state": "Pre-fix owned implementation; frozen raw log retained."
+      },
+      {
+        "log": "red-stream-3.13.log",
+        "normalized_command": "OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2a-lZqbqj/venv-3.13/bin/python -m pytest tests/datasources/test_download_contracts.py::test_interrupted_download_retries_closes_and_removes_partial_file -q",
+        "result": "1 failed, 0.08s",
+        "source_state": "After earlier response-lifetime fix; partial cleanup still failed."
+      },
+      {
+        "log": "red-label-pool-3.13.log",
+        "normalized_command": "OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2a-lZqbqj/venv-3.13/bin/python -m pytest tests/samplers/test_partition_contracts.py::test_infeasible_label_pool_fails_promptly -q",
+        "result": "1 failed, 5.12s, actual five-second hang",
+        "source_state": "Pre-fix owned implementation; frozen raw log retained."
+      },
+      {
+        "log": "red-vector-artifact-3.13.log",
+        "normalized_command": "OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2a-lZqbqj/venv-3.13/bin/python -m pytest tests/datasources/test_download_contracts.py -k 'dangling_lock or vector_download_archive_symlink' -q",
+        "result": "3 failed, 32 deselected, 0.14s",
+        "source_state": "Pre-fix owned implementation; frozen raw log retained."
+      },
+      {
+        "log": "red-alias-3.13.log",
+        "normalized_command": "OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2a-lZqbqj/venv-3.13/bin/python -m pytest tests/datasources/test_local_datasets.py::test_torchvision_alias_selection_with_real_local_idx_files -q",
+        "result": "1 failed, 0.09s",
+        "source_state": "Pre-fix owned implementation; frozen raw log retained."
+      },
+      {
+        "log": "red-native-layout-3.13.log",
+        "normalized_command": "OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2a-lZqbqj/venv-3.13/bin/python -m pytest tests/datasources/test_local_datasets.py -k tiny_imagenet -q",
+        "result": "1 failed, 2 passed, 7 deselected, 0.13s",
+        "source_state": "After nested official-layout fix; direct native-root layout still failed."
+      },
+      {
+        "log": "red-single-partition-3.13.log",
+        "normalized_command": "OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2a-lZqbqj/venv-3.13/bin/python -m pytest tests/samplers/test_partition_contracts.py::test_single_dirichlet_partition_can_use_entire_dataset -q",
+        "result": "1 failed, 0.08s",
+        "source_state": "Introduced overstrict minimum check; corrected before delivery."
+      }
+    ],
+    "emnist_red": {
+      "command": "OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2a-lZqbqj/venv-{python}/bin/python -m pytest tests/datasources/test_local_datasets.py::test_emnist_variant_keeps_distinct_training_and_test_data -q",
+      "source_state": "Exact implementation parent eb8342da4a6e6ee2c816acdb8d9e2610a1778118 plus new regressions; EMNIST code unchanged from baseline.",
+      "results": {
+        "3.13": "red-emnist-3.13.log: 2 failed, 0.10s, wrong evaluation labels",
+        "3.14": "red-emnist-3.14.log: 2 failed, 0.10s, wrong evaluation labels"
+      }
+    },
+    "independent_references": {
+      "iid_membership": "Seed-1 shuffle [2,1,4,0,3], explicit repeated padding and two-client stride => [2,4,3,1] and [1,0,2,4].",
+      "vector_shuffle": "Executing baseline Purchase/Texas on 40,001 rows yielded first rows [12836,10913,4214,8198,31403], exactly 20,000 train and test rows; final tests assert these literal values and corresponding row labels.",
+      "tiny_labels": "Local annotations first.png->n002, second.png->n001 with sorted training classes [n001,n002] imply literal targets [1,0].",
+      "idx_labels": "Independent raw IDX headers and label bytes specify different dataset/variant/split labels; tests read actual torchvision datasets.",
+      "baseline_probe_results": [
+        "baseline-utils-probe.json",
+        "baseline-vector-seed.json",
+        "refer-probe.json"
+      ]
+    },
+    "green": {
+      "command": "OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2a-lZqbqj/venv-{python}/bin/python -m pytest tests/test_config_loader.py tests/samplers tests/datasources/test_registry.py tests/datasources/test_torchvision_datasource.py tests/datasources/test_feature_dataset.py tests/datasources/test_feature_datasource.py tests/datasources/test_data_loaders.py tests/datasources/test_download_contracts.py tests/datasources/test_local_datasets.py tests/utils/test_archive.py -q",
+      "3.13": {
+        "log": "green-delivery-3.13.log",
+        "passed": 150,
+        "failed": 0,
+        "skipped": 0,
+        "warnings": 0,
+        "seconds": 2.43
+      },
+      "3.14": {
+        "log": "green-delivery-3.14.log",
+        "passed": 150,
+        "failed": 0,
+        "skipped": 0,
+        "warnings": 0,
+        "seconds": 37.68
+      },
+      "negative_paths": "Five-second IID/empty-padding/class-pool/minimum subprocess guards; dead-lock three-second retry guard; live-lock contender must emit ready before waiting; inert local HTTP/archive failures and no-outside-write/no-completion assertions.",
+      "no_weakened_checks": "No broad suppressions, blanket API modernization, mirror-only tests, changed shared fixtures or dropped existing assertions."
+    },
+    "ssl_transform_smoke": {
+      "command": "OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 LIGHTLY_DID_VERSION_CHECK=True PYTHONPATH=. /tmp/plato-phase2a-lZqbqj/venv-ssl-{python}/bin/python /tmp/plato-phase2a-lZqbqj/ssl-smoke.py /tmp/plato-phase2a-lZqbqj/ssl-runtime-{python}",
+      "configs": [
+        "simclr",
+        "simsiam",
+        "byol",
+        "fedema",
+        "mocov2",
+        "smog",
+        "swav",
+        "calibre"
+      ],
+      "results": "8/8 pass on each of 3.13 and 3.14; all finite (3,32,32); SwaV eight views, others two.",
+      "logs": [
+        "ssl-api-probe.log",
+        "ssl-smoke-3.13.log",
+        "ssl-smoke-3.14.log"
+      ],
+      "environment_note": "Lightly background version check disabled for local transform probe; no warnings/tests suppressed."
+    },
+    "static_checks": [
+      {
+        "command": "/tmp/plato-phase2a-lZqbqj/venv-3.13/bin/ruff check plato/config.py plato/datasources plato/samplers tests/test_config_loader.py tests/samplers/test_partition_contracts.py tests/datasources/test_download_contracts.py tests/datasources/test_local_datasets.py plato/utils/archive.py tests/utils/test_archive.py --select I",
+        "result": "All checks passed",
+        "log": "ruff-delivery.log"
+      },
+      {
+        "command": "/tmp/plato-phase2a-lZqbqj/venv-3.13/bin/ty check plato/config.py plato/datasources/base.py plato/datasources/cinic10.py plato/datasources/purchase.py plato/datasources/texas.py plato/datasources/tiny_imagenet.py plato/datasources/feature.py plato/datasources/feature_dataset.py plato/datasources/femnist.py plato/datasources/registry.py plato/datasources/self_supervised_learning.py plato/datasources/torchvision.py plato/samplers plato/utils/archive.py --output-format concise",
+        "result": "All checks passed; no suppressions",
+        "log": "typing-delivery.log"
+      },
+      {
+        "command": "git diff --check",
+        "result": "clean"
+      }
+    ],
+    "harness_notes": "Before the controlled cache-red rerun, a preliminary test omitted network interception and its owned pytest process (PID 43177) was terminated when external URL retrieval stalled. Final cache tests fail any unexpected download. Early SSL argv/base harness was corrected before recorded successful probes. Neither preliminary harness outcome is claimed as production evidence."
+  },
+  "primary_documentation_consulted": [
+    {
+      "url": "https://docs.python.org/3.13/library/tarfile.html",
+      "use": "Extraction-filter behavior and explicit data filter on both supported versions."
+    },
+    {
+      "url": "https://docs.python.org/3.14/library/zipfile.html",
+      "use": "ZIP extractall behavior requires preflight for existing destination symlinks."
+    },
+    {
+      "url": "https://docs.python.org/3.13/library/fcntl.html",
+      "use": "POSIX flock lifecycle."
+    },
+    {
+      "url": "https://docs.pytorch.org/vision/stable/generated/torchvision.datasets.ImageFolder.html",
+      "use": "ImageFolder class-directory behavior and validation label interpretation."
+    },
+    {
+      "url": "https://docs.pytorch.org/vision/stable/generated/torchvision.datasets.EMNIST.html",
+      "use": "Variant split parameter differs from inherited training/test flag; installed source agrees."
+    },
+    {
+      "url": "https://github.com/lightly-ai/lightly/blob/v1.5.26/lightly/transforms/simclr_transform.py",
+      "use": "Pinned current transform constructor; installed transform registrations and actual outputs probed."
+    }
+  ],
+  "root_handoffs": [
+    {
+      "owner": "Phase 3B Nanochat evaluator",
+      "action": "Reuse plato.utils.archive.extract_archive(source, destination) for evaluator TAR/ZIP extraction. Typed helper uses UnsafeArchiveError(ValueError), whole-manifest preflight and explicit data filter on both versions. No adapter/evaluator files were edited."
+    },
+    {
+      "owner": "Root / Phase 4B / Phase 5",
+      "action": "Create shared archive index and consolidated archive typing/build exclusions. In particular archived datalib is intentionally outside active plato and must not regain active typing repair assignments or imports. No pyproject/uv.lock/CI/shared conftest edits made by 2A."
+    },
+    {
+      "owner": "Phase 5 documentation",
+      "action": "Update docs/docs/configurations/data.md for native Tiny ImageNet labeled validation versus prepared labeled directories, actual sample counts, EMNIST variant versus train flag, empty IID error, stable Dirichlet count and private-seed/ID contracts. Add legacy_datalib provenance/license/status to shared archive index."
+    },
+    {
+      "owner": "Root qualification",
+      "action": "Fresh independent review of exact terminal commit and Linux Phase 2 qualification remain root gates."
+    }
+  ],
+  "limitations": [
+    "Concrete source/config/local-data audits and scoped tests only; no claim that every external corpus downloaded or every experiment trained. Full Phase 1 qualification is the accepted baseline and was not redone.",
+    "Phase 2 results here are macOS ARM64 CPU Python 3.13/3.14; Ubuntu reruns remain with root. POSIX flock is qualified on macOS, not Windows.",
+    "HuggingFace/LoRA/LeRobot/Nanochat adapter implementations and trainer findings F21-F24 were reserved and not modified or qualified.",
+    "Archive helper assumes no concurrent external writer mutates destination during preflight/extraction; no rollback guarantee for corrupt-data or filesystem failures. Safe TAR links point inside the root; ZIP symlink entries are intentionally rejected.",
+    "Archived multimedia helpers need external historical tools/data and remain unqualified; observed REFER defects are preserved, not repaired.",
+    "SSL validation covers constructor and tensor transform behavior, not training, accelerator execution or full external dataset downloads."
+  ],
+  "owned_temporary_resources": {
+    "scratch_root": "/tmp/plato-phase2a-lZqbqj",
+    "contents": "Four isolated uv environments; raw red/green/static/sync logs; deterministic local baseline/cache/image/SSL probes; archive manifest; temporary source restore and commit-message files.",
+    "retention": "Keep scratch and committed evidence until root acceptance; no cleanup or workspace closure performed.",
+    "processes": "No intentionally retained subprocesses or HTTP workers. Tests join/terminate owned children. Preliminary stalled owned pytest PID 43177 was terminated.",
+    "pytest_fixtures": "Pytest-managed per-run directories under system temporary storage; shared pytest temporary parent not claimed or manually cleaned.",
+    "evidence_file": "evidence/2026-refresh/phase2a-validation.json"
+  },
+  "unresolved_conflicts": []
+}
