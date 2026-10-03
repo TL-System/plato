@@ -2,7 +2,11 @@
 
 import asyncio
 import copy
+import json
 import pickle
+import shlex
+import subprocess
+import sys
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -159,8 +163,9 @@ class InterruptEnd(GradientAccumulationStepStrategy):
 @pytest.mark.parametrize("interface", ["train_model", "train_process"])
 @pytest.mark.parametrize("existing", [False, True])
 @pytest.mark.parametrize("cleanup_failure", [False, True])
+@pytest.mark.parametrize("end_failure", [False, True])
 def test_fallible_end_hook_rejects_before_acceptance_and_releases_ownership(
-    tmp_path, monkeypatch, interface, existing, cleanup_failure
+    tmp_path, monkeypatch, interface, existing, cleanup_failure, end_failure
 ):
     config = shipped_config()
     with configure_environment(config, runtime_root=tmp_path):
@@ -173,23 +178,50 @@ def test_fallible_end_hook_rejects_before_acceptance_and_releases_ownership(
             canonical.write_bytes(pickle.dumps(scalar_controls(1)))
         before = canonical.read_bytes() if existing else None
         ending = trainer.training_step_strategy = InterruptEnd()
+        if not end_failure:
+
+            def successful_end(context):
+                ending.end_calls += 1
+                GradientAccumulationStepStrategy.on_train_end(ending, context)
+
+            monkeypatch.setattr(ending, "on_train_end", successful_end)
         original_cleanup = strategy.on_train_cleanup
-        if cleanup_failure:
+        cleanup_calls = []
 
-            def failing_cleanup(context, successful):
-                original_cleanup(context, successful)
-                if ending.end_calls:
-                    raise RuntimeError("Deliberate secondary cleanup failure")
+        def recording_cleanup(context, successful):
+            if ending.end_calls:
+                cleanup_calls.append(successful)
+            original_cleanup(context, successful)
+            if cleanup_failure and ending.end_calls:
+                raise RuntimeError("Deliberate secondary cleanup failure")
 
-            monkeypatch.setattr(strategy, "on_train_cleanup", failing_cleanup)
+        monkeypatch.setattr(strategy, "on_train_cleanup", recording_cleanup)
         data = TensorDataset(torch.ones(2, 1).double(), torch.zeros(2, 1).double())
+        if not cleanup_failure and not end_failure:
+            getattr(trainer, interface)(
+                {**config["trainer"], "run_id": "successful-end"}, data, [0, 1]
+            )
+            assert ending.end_calls == 1
+            assert strategy.client_control_variate["theta"].item() == pytest.approx(0.9)
+            assert strategy.get_update_payload(trainer.context)[
+                "control_variate_delta"
+            ]["theta"].item() == pytest.approx(-0.1)
+            assert not trainer.optimizer._optimizer_step_pre_hooks
+            assert cleanup_calls == [True]
+            return
         with pytest.raises(
-            RuntimeError, match=("cleanup" if cleanup_failure else "training step end")
-        ):
+            (RuntimeError, BaseExceptionGroup),
+            match=("cleanup" if cleanup_failure else "training step end"),
+        ) as failure:
             getattr(trainer, interface)(
                 {**config["trainer"], "run_id": "end-failure"}, data, [0, 1]
             )
         assert ending.end_calls == 1
+        assert cleanup_calls == ([False] if end_failure else [True, False])
+        if end_failure and cleanup_failure:
+            assert isinstance(failure.value, BaseExceptionGroup)
+            assert "training step end failure" in str(failure.value.exceptions[0])
+            assert "secondary cleanup failure" in str(failure.value.exceptions[1])
         assert strategy.client_control_variate["theta"].item() == 1
         assert canonical.exists() is existing
         if existing:
@@ -224,3 +256,24 @@ def test_fallible_end_hook_rejects_before_acceptance_and_releases_ownership(
             0.9, abs=1e-12
         )
         assert retry[1]["theta"].item() == pytest.approx(-0.1, abs=1e-12)
+
+
+@pytest.mark.parametrize("existing", [False, True])
+def test_actual_spawned_successful_run_cleanup_rejects_before_parent_acceptance(
+    tmp_path, existing
+):
+    output = tmp_path / "result.json"
+    command = [
+        sys.executable,
+        "-m",
+        "tests.integration.scaffold_cleanup_worker",
+        str(tmp_path / "runtime"),
+        str(output),
+        "1" if existing else "0",
+    ]
+    completed = subprocess.run(
+        ["zsh", "-lc", shlex.join(command)], capture_output=True, text=True, timeout=90
+    )
+    assert completed.returncode == 0, completed.stdout + completed.stderr
+    result = json.loads(output.read_text())
+    assert result == pytest.approx(dict(y=0.62, ci=0.9, delta=-0.1), abs=1e-12)
