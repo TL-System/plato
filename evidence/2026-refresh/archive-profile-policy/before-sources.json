@@ -1,0 +1,14 @@
+{
+  "commit": "aa2c3d5cdee60863dfe2c1d389ec1e0cbe89111b",
+  "sha256": {
+    "tests/conftest.py": "dcc25c17cbd872fc21b66bbc2d3f5951bf791b9f2474a71af6d9b8ac28e4356c",
+    "tests/mlx_native/cases.json": "c168dc33a4d4e7ed70079e09c3de70f5b318d543c035ec13de2826b48e1175bb",
+    ".github/workflows/pytorch_tests.yml": "1ae4bf9d5be394b77a105ab294527a27ec8f2c123e46ac179e97fc148f843b75",
+    ".github/scripts/stage_ci_artifacts.py": "df7030fd29802baa0fd4858deb2f4047e02a305a2862a3432d9a63764a8671c2",
+    "pyproject.toml": "8aaa7414717fa17841900d377d89851547677ba2ae93963afef79fc5490ba610",
+    "uv.lock": "e2a53aaae9a0dd49f5446b490bb3071e86aa3a9a20d6271c9dd30b4ae2dcbff9",
+    "tests/integration/test_retained_model_search.py": "ff902a9a34c97ce4842f0dd35b2bc396da5c2998381a66f52d4c5d1142e4fe0d",
+    "tests/integration/model_search_retention_worker.py": "95779c99e4783cfeb4d53110a11f69c4a4529b512f4f9b0d738bb2261b24502d"
+  },
+  "accepted_native_commit": "6311960cdd00955d4777e269ebee460be591065e"
+}
