@@ -1,0 +1,86 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-03",
+  "status": "PASS_DOCUMENTATION_CORRECTION_SCOPE",
+  "documentation_source_identity": {
+    "parent_commit": "39f58144ffe5aa7ba4b940f76c984f991f93d6ab",
+    "guide_path": "docs/docs/examples/case-studies/6. Qwen3 Federated LoRA.md",
+    "guide_sha256": "0e6c10676a580e6135cc65c5708840a97069b2133aac7d4576495786dc5f7dae"
+  },
+  "finding_closed": {
+    "id": "DOCS-ADDENDUM-L01",
+    "review_path": "/tmp/plato-llm-docs-review/addendum-review.json",
+    "review_sha256": "5868990ab9dffc53119c4a1069b542ffa263b29f3e8483c7cf4ccac4ec783e44",
+    "correction": "Local training resets the global Torch RNG to 17 + client_id; the IID sampler separately seeds its explicit generator from data.random_seed=17.",
+    "source_sha256": {
+      "plato/trainers/huggingface.py": "cde9f121c4358be7da12f34167a9b313debc2969fd598b743acf022adaef3102",
+      "plato/samplers/iid.py": "d23cbd92dd4ea1c036bee07d543dea581921d887bc4954729e44f49833831d13",
+      "plato/samplers/base.py": "a555b10d4c4ea4513e91926064acbd52e5f5230cc079488db4417d29fdf18298",
+      "configs/HuggingFace/fedavg_qwen3_06b_lora.toml": "17347b1c0c3e8d297baf174581a09f0db18f97948303d3137b43cfb7f822dbf1"
+    }
+  },
+  "current_implementation": {
+    "commit": "bca1f6ec3541090dccb838197206fee2d6412516",
+    "receipt_path": "evidence/2026-refresh/qwen-reference-expanded-embeddings-validation.json",
+    "receipt_sha256": "741816d489fe473159eb84e26760d7704ed6cf2cec7b9814fe1d4256d41fe64c",
+    "clean_worktree": true,
+    "all_receipt_source_hashes_verified": true
+  },
+  "fresh_qualifier": {
+    "implementation_commit": "bca1f6ec3541090dccb838197206fee2d6412516",
+    "raw_receipt_path": "/tmp/plato-qwen-validation/preexpanded-fix-real/qualification.json",
+    "raw_receipt_sha256": "10c9b5957121bf6ce2fc616df706145786f89b2aef8fb428cb9e296f823e7799",
+    "matches_committed_correction_receipt": true,
+    "elapsed_seconds": 14.041988417040557,
+    "peak_rss_bytes": 4259299328,
+    "scope": "Single qualification process with one shared frozen base, serial logical clients and the production server object.",
+    "status": "PASS",
+    "frozen_base_unchanged": true,
+    "adapter_only_checkpoint": true,
+    "reload_logits_match": true,
+    "weighted_oracle_all_tensors": true
+  },
+  "historical_launcher": {
+    "implementation_commit": "d3569ec98e64fb83ef43c2b50db4543cfe6a3bc6",
+    "receipt_path": "evidence/2026-refresh/qwen-reference-validation.json",
+    "receipt_sha256": "3d351576d92a9302237b10c6f223de172a8b2cc7cbc40b1b2b4cf8e7e734fe06",
+    "raw_receipt_sha256": "aae32de8c790fa785e980479073786567c29aa19e35a613b9cd5ff1975f3bc43",
+    "log_sha256": "e3ce0a1bce746fc131bb97d9ef53c0381fdee94bb6c719f95b7b60e674b13693",
+    "rerun_for_correction": false,
+    "guide_explicitly_names_original_revision": true,
+    "measurement_source": "Existing actual-transport CLI result, unchanged; not claimed as a new launch of the corrected implementation.",
+    "shutdown_warning": "One semaphore cleanup warning remains acknowledged, with no causal attribution."
+  },
+  "validation": {
+    "strict_mkdocs": {
+      "command": [
+        "/tmp/plato-llm-docs-venv/bin/python",
+        "-m",
+        "mkdocs",
+        "build",
+        "--strict",
+        "--config-file",
+        "docs/mkdocs.yml",
+        "--site-dir",
+        "/tmp/plato-llm-docs-final-site"
+      ],
+      "exit_code": 0,
+      "log_path": "/tmp/plato-llm-docs-final-build.log",
+      "log_sha256": "c5f4ce9faaf335476dbfcb5fcf8b742600e3d54e3aa079c9f2360865fb827eb9"
+    },
+    "whitespace": {
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit_code": 0
+    }
+  },
+  "limitations": [
+    "Only the guide and this new binding receipt were edited; original validation receipts remain immutable.",
+    "Runtime results were read and source-correlated, not independently executed by the documentation author.",
+    "Fresh qualification is a shared-base single-process run; the historical normal CLI measurement is sampled aggregate RSS over a process group.",
+    "Combined integration tests and final independent acceptance remain root-owned."
+  ]
+}
