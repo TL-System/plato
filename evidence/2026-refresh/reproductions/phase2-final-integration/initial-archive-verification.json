@@ -1,0 +1,15 @@
+{
+  "manifest": {
+    "path": "/Users/bli/Playground/plato/evidence/2026-refresh/reproductions/phase2-initial-integration-2633-evidence-manifest.json",
+    "sha256": "c168868dbd3296379375abafe22b548550145de5ddd427a2bdbc14efe7d1d339"
+  },
+  "archive": {
+    "path": "/Users/bli/Playground/plato/evidence/2026-refresh/reproductions/phase2-initial-integration-2633-evidence.tar.gz",
+    "sha256": "b6b24cd0a585ef31f264091ae0392aeda3e1c05ba48268addc25e42128237242"
+  },
+  "members_verified": 111,
+  "source_status": "PASS",
+  "source_records": 1562,
+  "source_before_after_equal": true,
+  "qualification": "INITIAL_RUN_FAIL_RETAINED"
+}

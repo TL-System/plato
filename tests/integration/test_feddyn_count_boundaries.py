@@ -58,10 +58,35 @@ def test_actual_spawn_wrong_first_count_rejected_and_retry(tmp_path, mode):
 
 @pytest.mark.parametrize("spawn", [False, True])
 def test_parent_realizes_partition_once_without_using_backing_length(tmp_path, spawn):
+    if spawn:
+        # Full collection replaces example module names. Keep real spawn in
+        # the same guarded interpreter pattern as the other FedDyn workers.
+        output = tmp_path / "partition-result.json"
+        command = [
+            sys.executable, "-m", "tests.integration.feddyn_partition_worker",
+            str(tmp_path / "run"), str(output),
+        ]
+        completed = subprocess.run(
+            ["zsh", "-lc", shlex.join(command)],
+            capture_output=True, text=True, timeout=90,
+        )
+        assert completed.returncode == 0, completed.stdout + completed.stderr
+        result = json.loads(output.read_text())
+        assert result["calls"] == 1
+        assert result["report_count"] == result["worker_count"] == 2
+        assert result["endpoint"] == pytest.approx(1.622, abs=1e-12)
+        assert result["worker_epochs"] == 2 and result["no_active_children"]
+        return
+    _run_single_partition(tmp_path, spawn=False)
+
+
+def _run_single_partition(tmp_path, spawn, observer=None):
     # The parent object records get() calls; the worker must receive this
     # same realized two-index partition, not draw a new partition itself.
     with configure_environment(configuration(spawn=spawn), runtime_root=tmp_path):
         s, c = server(), client(1)
+        if observer is not None:
+            c.trainer.callback_handler.add_callback(observer)
         response, payload = dispatch(s, [1])[1]
         c.current_round = c._context.current_round = response["current_round"]
         c.lifecycle_strategy.process_server_response(c._context, response)
@@ -77,6 +102,12 @@ def test_parent_realizes_partition_once_without_using_backing_length(tmp_path, s
         assert report.num_samples == weights[1]["num_samples"] == 2
         assert c.trainer.model_update_strategy.result["num_samples"] == 2
         assert weights[0]["theta"].item() == pytest.approx(1.622, abs=1e-12)
+        return {
+            "calls": context.sampler.calls,
+            "report_count": report.num_samples,
+            "worker_count": c.trainer.model_update_strategy.result["num_samples"],
+            "endpoint": weights[0]["theta"].item(),
+        }
 
 
 @pytest.mark.parametrize("mode", ["uniform", "sample"])

@@ -1,0 +1,9 @@
+{
+  "status": "ROOT_ACCEPTED_BOUNDED_TEST_CORRECTION",
+  "finding": "ROOT-2C-TYPING-01",
+  "candidate": "f342a5a6021cee938e0b880eca5919e09ace1981",
+  "tree": "3d0aebd30e1d4adfcdf835bad758eb72d3179c1e",
+  "review_sha256": "d1c06f792fb68b1c81a45f56f01cd39702d1eeb7e73bc584c206d25b062e6393",
+  "validation": "Independent scoped ty/Ruff and7 actualDP tests per interpreter;35 original assertions and3 numerical checks preserved, same17 notices; no production orCI guard changes.",
+  "remaining": "Separate count-collection correction, phase-gate addendum, final combined profiles and hostedCI remain required; initial2633fullrun remains failed."
+}

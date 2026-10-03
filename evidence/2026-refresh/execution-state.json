@@ -25,7 +25,7 @@
     "phase_2a_commit": "79da1f97d8a12fe97402750cc32c7b3e8f5cdf6e",
     "phase_2b_resume_commit": "a058a2ef8d230ca2e34dbf1c91e6eaac0b0205ac"
   },
-  "current_task": "Phase 2 integration authorized; preparing fresh combined-source qualification.",
+  "current_task": "Phase 2 corrected integration authorized; fresh four-profile final qualification starting.",
   "phase_1_remaining": [],
   "platform_limit": "Available runtime host is Apple Silicon macOS. Linux CI execution follows reviewed phase publication; resolution alone is not runtime qualification.",
   "known_dependency_exception": "Tested NLTK 3.10.3 uv override violates Lighteval 0.13.0 exact metadata; remaining advisory is unsuppressed. See Phase 1A evidence.",
@@ -104,5 +104,10 @@
     "Phase 3: native MLX and supported HF/PEFT/LeRobot/Nanochat profiles",
     "Phase 4: retained-example smokes and coherent ViT/legacy archives",
     "Phase 5: documentation, deployment and final support/evidence reconciliation"
-  ]
+  ],
+  "phase2_integration_corrections": {
+    "candidate": "0fbc1162994c05041105b1860fc8cb02582d21f3",
+    "gate": "phase2-gate-corrections.json",
+    "initial_run": "2633 full suite remains FAIL;1301pass/1skip/1collectionfailure; final rerun required."
+  }
 }
