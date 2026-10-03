@@ -64,11 +64,11 @@ receive no control correction.
 `ScaffoldCallback` installs processors that extract `[weights, server_controls]`
 before training and attach `[weights, delta_ci]` afterward. The federated example
 requires a valid current server control payload. Direct training accepts the
-result and saves client controls only after training callbacks and end hooks
-succeed. Spawned training returns provisional client controls, delta, update
-count, and rate to the parent alongside the saved model. The parent checks the
+result and saves client controls only after training callbacks, end hooks, and
+cleanup succeed. Spawned training returns provisional client controls, delta,
+update count, and rate to the parent alongside the saved model. The parent checks the
 current model/control handoff before accepting and persisting the controls.
-Rejected end hooks or worker handoffs retain the previously accepted client
+Failed end hooks, cleanup, or worker handoffs retain the previously accepted client
 controls and cannot supply a successful outbound delta; the child does not
 overwrite the canonical control file.
 
