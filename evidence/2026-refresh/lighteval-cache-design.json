@@ -1,0 +1,209 @@
+{
+  "schema_version": 1,
+  "revision": 1,
+  "status": "FROZEN_BOUNDED_DESIGN_PENDING_FRESH_SOL_REVIEW_BEFORE_IMPLEMENTATION",
+  "date": "2026-10-03",
+  "owner": "Runtime author /root/lighteval_completion after root receives fresh Sol design acceptance; root owns dependency/lock/docs/profile integration.",
+  "inspected_head": "237c5ce8c91c31d3ec2174dec7f95773edbcc964",
+  "receipts": [
+    {
+      "path": "/tmp/plato-refresh-worktrees/lighteval-runtime/plato/evaluators/lighteval.py",
+      "sha256": "ef7054f80022d0cbbfaab1721c6386a0fbecdf9734373ca1d919c33ffe353b76",
+      "bytes": 17716
+    },
+    {
+      "path": "/tmp/plato-refresh-worktrees/lighteval-runtime/plato/evaluators/runner.py",
+      "sha256": "e08bae291acdcbefee340b8d7c8f41c168a0e00a2d257ff74932514a186985f3",
+      "bytes": 4019
+    },
+    {
+      "path": "/tmp/plato-refresh-worktrees/lighteval-runtime/.venv/lib/python3.13/site-packages/lighteval/utils/cache_management.py",
+      "sha256": "cfcefa97ab153fec086f7bfcd6f46cfb2caf2addb666b647df68eaf535945a06",
+      "bytes": 17885
+    },
+    {
+      "path": "/tmp/plato-refresh-worktrees/lighteval-runtime/.venv/lib/python3.13/site-packages/lighteval/models/transformers/transformers_model.py",
+      "sha256": "bc69dfde1759500dd4adfb03b776c28397ef9577d4ab8d8fb8101637decef130",
+      "bytes": 59970
+    },
+    {
+      "path": "/tmp/plato-refresh-worktrees/lighteval-runtime/.venv/lib/python3.13/site-packages/lighteval/pipeline.py",
+      "sha256": "644bd0def1dfc0e8a258be455954da40c8603df5110fb52a89da1ea10fcd8fa7",
+      "bytes": 18670
+    },
+    {
+      "path": "/tmp/plato-lighteval-cache-probe.py",
+      "sha256": "ad3c5a67779ca0fed465b151df0ab2ca20fe45079633ab083058e927f8763ed6",
+      "bytes": 2297
+    },
+    {
+      "path": "/tmp/plato-lighteval-cache-red.log",
+      "sha256": "849482b20363d3d85027df7923e31bcd4dd81dda926c8bea73a7112766412568",
+      "bytes": 17869
+    },
+    {
+      "path": "/tmp/plato-lighteval-dependency-checks/command-semantics.json",
+      "sha256": "5085b7db4b13d5fa91569cb765a05fd01f061743e76d5af6a7bbfeac5e1dc9f9",
+      "bytes": 11867
+    },
+    {
+      "path": "/Users/bli/.local/share/uv/python/cpython-3.13.16-macos-aarch64-none/lib/python3.13/tempfile.py",
+      "sha256": "7350d7f75ca8d6e4752c377777a315dc26eb4ecd3b6c9c0951bffddc576f030f",
+      "reason": "Python3.13 TemporaryDirectory._rmtree handles owned read-only cleanup with _resetperms; preserve default strict cleanup."
+    }
+  ],
+  "red_fact": "Actual public evaluator runner, configured persistent local model reference fallback (model=object()), all five real task pipelines: changing safetensor bytes A->B changed model hash but reused15response rows; reported2/3 again rather than independent1/3. Root guarded probe and full log retained. This is an internal correctness defect, not external prerequisite.",
+  "upstream_facts": [
+    "Installed Lighteval0.13 SampleCache.__init__ sets cache_dir = Path(config.cache_dir) / config.model_name / hash(config.model_dump()), immediately mkdir and loads existing cached rows.",
+    "Absolute model_name discards the cache_dir prefix by pathlib semantics. Hash identifies model config, not local checkpoint weight bytes.",
+    "TransformersModel initialization constructs SampleCache before returning. Pipeline.__init__ then unconditionally calls model._cache._init_registry. Cached decorator supports _cache=None, but disabling after construction cannot prevent source directory I/O/read-only failure.",
+    "Inspected0.13 ModelConfig exposes public cache_dir but no public response-cache-disable field. Production evaluator currently always builds fresh Pipeline from TransformersModelConfig; already exported current model/tokenizer live under owned TemporaryDirectory.",
+    "SampleCache hash includes entire model_config.model_dump(), including model_name and cache_dir. Unique materialized/output paths therefore produce a fresh cache hash even if faithfully copied local tree contains old response-cache directories; no guessed pruning required."
+  ],
+  "decision": {
+    "approach": "Use owned temporary local artifact copies for configured local-directory fallbacks, and public per-evaluation cache_dir for every reference. Keep current-model export path unchanged. No private _cache access, global monkeypatch, upstream source patch, copied upstream constructor or model-loader rewrite.",
+    "why_copy": "Correctness-first narrow fallback. Full independent copies avoid hardlink write-through, symlinked-directory cache writes, filesystem-specific link support and any need to assume Transformers never modifies an artifact file. Root explicitly permits rare-fallback disk cost rather than a larger compatibility adapter.",
+    "cost": "Configured local fallback copies model/tokenizer directory content once per evaluation (deduplicate equal directories). This may be expensive for large checkpoints and copies historical cache artifacts if present. Do not claim constant-time or optimized caching. Typical federated runtime passes current model/tokenizer with save_pretrained and already pays explicit export; it does not get an extra copy. Future optimization requires separately measured need and reviewed fidelity.",
+    "model_path_meaning": "Do not rename, modify, delete or add directories/files under configured source path. Keep original resolved reference available for diagnostic provenance. The Lighteval loader gets a temporary owned copy path; this is intentional internal materialization, not editing the configured path or persistent model. No current-model source bytes are altered."
+  },
+  "implementation_steps": [
+    "In existing _materialize_model_reference contextmanager, retain first branch for save_pretrained-capable model+tokenizer exactly: export under owned TemporaryDirectory, yield reference, cleanup on every exit. Do not copy that export again.",
+    "For configured fallback resolve original LightevalModelReference first. Classify existing local directories using pathlib.Path on the actual configured string relative to caller cwd (expanduser consistently with current loader only if existing behavior is demonstrated). Hub names that are not local directories remain unchanged. Existing invalid references keep helpful upstream errors; do not create or repair a missing source path.",
+    "If model or tokenizer reference is an existing local directory, create one outer TemporaryDirectory for fallback materialization. Resolve source directory identities and copy each distinct directory to a fixed owned child such as model or tokenizer via shutil.copytree with independent file copies (default copy2, symlinks=False). Use the same destination for model/tokenizer when canonical source directories match. This is a small helper/contextmanager, not a generic snapshot framework.",
+    "Copytree symlinks=False dereferences source file links, supporting local HF cache snapshots whose weight files point to blob storage; creates real directories in destination. Do not use hardlinks, directory symlinks, change process cwd, mutate environment HOME, or maintain a source cache cleanup routine. Unsupported/broken/cyclic source links or copy/storage errors propagate normally and owned temporary partial tree is cleaned.",
+    "shutil.copytree preserves source directory mode. After successful copy, make ONLY owned copied model root owner-writable/searchable with mode | stat.S_IWUSR | stat.S_IXUSR; never chmod source. This permits upstream SampleCache fresh hash mkdir for a read-only source. Keep TemporaryDirectory default strict cleanup (ignore_cleanup_errors=False); inspected Python3.13 implementation already repairs owned read-only tree permissions on deletion. Do not build a new recursive permission-cleanup helper. Tests must exercise nested read-only artifacts and partial-copy failure to verify this actual cleanup path.",
+    "Yield a reference pointing each copied local component at owned destination; any Hub component stays original. Exit context removes materialized copies on success, invalid model config, initialization, inference or metric failure. Context nesting covers copy errors as well as evaluation errors.",
+    "Inside existing evaluation output TemporaryDirectory pass cache_dir=str(Path(output_dir)/\"sample-cache\") to actual TransformersModelConfig. This scopes Hub-relative model names beneath owned output. For absolute materialized/exported local names, upstream still ignores prefix but writes only under owned copy/export, which remains live through Pipeline.evaluate/get_results and is removed by outer context.",
+    "Preserve existing mode/gradient/source-state restoration, runner stale-context clearing and original error semantics. Do not catch a failed copy and silently fall back to source path. Preserve task params, quantization/device/default precision, model/tokenizer contents, tracker flow and normalized metrics."
+  ],
+  "reference_matrix": [
+    {
+      "kind": "current model+tokenizer export",
+      "materialization": "Existing save_pretrained temporary export; no extra copy.",
+      "response_cache": "Upstream absolute name selects export/hash; entire export owned and removed.",
+      "source": "Training model stays unchanged by evaluation."
+    },
+    {
+      "kind": "configured absolute/relative local model and same tokenizer directory",
+      "materialization": "One independent copy; both references point there.",
+      "response_cache": "Owned copied-model/hash with fresh config identity.",
+      "source": "Original weights, tokenizer, directory listing, modes and any stale cache unchanged."
+    },
+    {
+      "kind": "configured local model plus separate local tokenizer",
+      "materialization": "Two distinct copies, same ownership lifetime.",
+      "response_cache": "Owned copied model tree; tokenizer read from owned copy.",
+      "source": "Both source directory trees remain unchanged."
+    },
+    {
+      "kind": "configured local model plus Hub tokenizer",
+      "materialization": "Copy model only; Hub tokenizer identity unchanged.",
+      "response_cache": "Owned copied-model/hash.",
+      "source": "HF artifact cache remains loader-owned standard behavior; no response-cache persistence promised."
+    },
+    {
+      "kind": "configured Hub model plus local tokenizer",
+      "materialization": "Copy tokenizer only; Hub model identity unchanged.",
+      "response_cache": "Public cache_dir under evaluation output/Hub name/hash.",
+      "source": "Configured tokenizer source unchanged; usual downloaded-model cache semantics retained."
+    },
+    {
+      "kind": "configured Hub model/tokenizer",
+      "materialization": "No artifact copy; original Hub IDs passed unchanged.",
+      "response_cache": "Fresh output/sample-cache/Hub ID/hash.",
+      "source": "Response cache isolated; ordinary HF model download/cache outside this response-cache scope unchanged."
+    }
+  ],
+  "not_selected": [
+    {
+      "approach": "cache_dir only",
+      "reason": "Does not contain absolute local model_name; red persists/source writes."
+    },
+    {
+      "approach": "postconstructor _cache=None or cache.cache_dir/existing_indices mutation",
+      "reason": "Private API and too late for constructor I/O; read-only local source still fails."
+    },
+    {
+      "approach": "config nonce only",
+      "reason": "Changes hash but still creates cache directories inside persistent source."
+    },
+    {
+      "approach": "hardlink/symlink artifact farm",
+      "reason": "Adds link/cross-filesystem/source mutation assumptions and traversal policy. Independent full copy is simpler for this rare fallback."
+    },
+    {
+      "approach": "custom Pipeline/TransformersModel/SampleCache subclass or global monkeypatch",
+      "reason": "Larger/private version-specific surface than public config plus owned artifact materialization."
+    },
+    {
+      "approach": "purge or rewrite old source caches",
+      "reason": "Would mutate user-owned persistent directories and could destroy unrelated results; unnecessary for isolation."
+    },
+    {
+      "approach": "guess cache directories by16hex names and omit them while copying",
+      "reason": "Could omit legitimate artifacts and adds undocumented filesystem filtering. Copy faithfully; optimize only with later evidence."
+    }
+  ],
+  "concurrency_and_limits": [
+    "Requires stable source model/tokenizer files while each fallback copy occurs, as existing from_pretrained loading does. No atomic filesystem snapshot, checkpoint-writer coordination or concurrent in-place source update guarantee; changes between completed evaluations are supported and tested.",
+    "Two evaluations use separate TemporaryDirectory roots and public cache_dir values, so response caches cannot intentionally share. No cross-call resume/cache reuse feature is promised by Plato evaluator.",
+    "Disk-space/copy/permissions failure is explicit and cleans only owned temporary paths. Large configured local checkpoints may incur significant disk/time costs; no new arbitrary artifact-count/byte limit silently drops content.",
+    "CPU bounded tests qualify integration. No added GPU/distributed/concurrent model publication guarantee. No broad backend framework changes."
+  ],
+  "required_red_green": [
+    {
+      "id": "LC1",
+      "case": "Rerun exact guarded public-runner persistent-source fallback reproducer with A->B safetensor replacement and all5real tasks.",
+      "oracle": "A scores2/3, B scores1/3; each run performs fresh actual generation/logprobs, zero reused prior-run rows. Distinct owned cache paths, original source weights hash changed only by explicit test write. Preserve red log and compare green on exact current source."
+    },
+    {
+      "id": "LC2",
+      "case": "Seed original persistent source with known stale response cache/sentinel; snapshot full tree names/content/modes before evaluation.",
+      "oracle": "Original tree exactly unchanged after success and after real pipeline failure; stale rows ignored; model/tokenizer refs in Pipeline are owned copy paths, config itself untouched."
+    },
+    {
+      "id": "LC3",
+      "case": "Read-only source model/tokenizer directories, including nested artifact directory and file symlink consistent with local HF cache layout; actual Pipeline inference.",
+      "oracle": "Success without any source write, copied model root permits its cache, all owned trees removed. Verify process permissions actually enforce read-only where available; supplement path-event/snapshot proof without pretending chmod proves behavior under elevated privileges."
+    },
+    {
+      "id": "LC4",
+      "case": "Retain existing actual current-model export A->B case.",
+      "oracle": "No double copy; current model state/mode/grad preserved, expected real metric change, temporary exports/cache/output removed."
+    },
+    {
+      "id": "LC5",
+      "case": "Real invalid TransformersModelConfig fatal/nonfatal runner path plus failure after cache creation/inference begins.",
+      "oracle": "Original exception/error policy preserved; both result context keys cleared; partial copied model/output/cache removed; source unchanged. Instrument actual method to raise after genuine work only for cleanup branch, distinguish from full actual-metric pass."
+    },
+    {
+      "id": "LC6",
+      "case": "Real SampleCache with actual TransformersModelConfig for Hub-style relative ID and unique public cache_dir; no Hub network/model download necessary for this path arithmetic test.",
+      "oracle": "Cache contained under each separate temporary output; no reads from other run. This validates cache-path mechanism only, not downloaded Hub-model inference; retain local real Pipeline proof separately."
+    },
+    {
+      "id": "LC7",
+      "case": "Same-directory copy dedup, separate local tokenizer, relative model path, copy/permission/disk failure at owned destination; unrelated external sentinel.",
+      "oracle": "Exactly expected materialized references; partial owned work removed, source/unrelated paths never deleted, original cause propagated. Bounded helper tests may instrument copy failure, not replace inference acceptance."
+    }
+  ],
+  "test_and_profile_handoff": "Actual-runtime author updates precise tests/llm_eval case inventory with local fallback/cache and missing-primary cases. Root binds accepted IDs to optional profile ledger after fresh implementation review. Existing fake core evaluator tests may need narrow expected cache_dir forwarding support, without replacing genuine runtime tests.",
+  "dependency_command_contract": {
+    "evidence": "/tmp/plato-lighteval-dependency-checks/command-semantics.json",
+    "fact": "After llm_eval provisioning, a syncing uv run WITHOUT --extra llm_eval can retain installed Lighteval while replacing xxhash3.8.1 with incompatible4.0.1. Presence is not compatible environment proof.",
+    "docs_rule": "EVERY syncing Lighteval command must include --extra llm_eval, preferably --locked --python3.13. Alternatively documented two-step locked uv sync --extra llm_eval followed by uv run --no-sync or direct owned interpreter is valid. Do not show plain syncing uv run after install.",
+    "examples": [
+      "uv sync --locked --python 3.13 --no-default-groups --group dev --extra llm_eval",
+      "uv run --no-sync --python 3.13 python -m pytest tests/llm_eval --test-profile=llm-eval",
+      "uv run --locked --python 3.13 --extra llm_eval python <actual-evaluator-entrypoint>"
+    ],
+    "ownership": "Root metadata/docs owner serializes accepted xxhash cap and exact lock; runtime/cache author does not broaden dependency scope."
+  },
+  "acceptance": "Fresh Sol design acceptance before source implementation; then actual LC1-LC7 appropriately scoped, source-bound raw red/green, import/typing/style regression and independent code review. This artifact itself is not implementation or passing runtime evidence.",
+  "planning_actions": {
+    "repo_edits": false,
+    "runtime_tests": false,
+    "installed_source_read": true,
+    "only_output_written": "/tmp/plato-lighteval-cache-design.json"
+  }
+}

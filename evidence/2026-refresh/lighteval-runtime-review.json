@@ -1,0 +1,359 @@
+{
+  "schema_version": 1,
+  "reviewer": "/root/lighteval_runtime_review",
+  "date_utc": "2026-10-03T21:59:44.493050+00:00",
+  "review_type": "Fresh independent source, dependency, installed-library and bounded actual-runtime review; no repository source edits or delegated agents.",
+  "verdict": "ACCEPT",
+  "unresolved_findings": {
+    "critical": 0,
+    "high": 0,
+    "medium": 0,
+    "low": 1
+  },
+  "findings": [
+    {
+      "id": "LR1",
+      "severity": "low",
+      "path": "tests/llm_eval/test_lighteval_runtime.py",
+      "lines": "369-373",
+      "finding": "Synthetic caller-owned source trees are made read-only for the immutable-source oracle and retained afterward; subsequent shared pytest temporary-directory garbage collection can emit rm_rf Directory not empty warnings on this macOS host.",
+      "evidence": {
+        "path": "/tmp/plato-lighteval-reviewer-absent-unit.log",
+        "sha256": "7761687bbb7e8975ccf15a4023a9ec55e5ce2d519095d8d5b7a8c49b81696043",
+        "bytes": 6726
+      },
+      "impact": "Nonfatal fixture housekeeping. Independent core tests passed 19 cases despite 10 warnings from previous read-only pytest garbage trees. Evaluator-owned copies/exports/output/response caches were all removed and no production cleanup defect was observed.",
+      "suggested_followup": "Optionally restore permissions on synthetic source fixtures after the final source-preservation assertions to allow pytest-managed teardown. No source change is required for this bounded runtime acceptance.",
+      "author_acknowledgement": "Original author acknowledged the observed fixture warning and retained frozen source; no broad test temporary-directory cleanup claim is made."
+    }
+  ],
+  "reviewed_sources": {
+    "author_frozen_implementation": "e079df6228f9529472c7b3c3d9a2db46a42636a8",
+    "author_frozen_tree": "15c0affa2223017c83f173999f5c662766d43215",
+    "author_evidence_commit": "c13a21a6e7a21fbac3b4450750fa940cbe27b8db",
+    "author_evidence": {
+      "path": "/tmp/plato-refresh-worktrees/lighteval-runtime/evidence/2026-refresh/lighteval-runtime-qualification.json",
+      "sha256": "dce1aef82b4ab7c02603c6b4d9eb8a4953cba4ae34be1d315da9c353de32d0be",
+      "bytes": 277328
+    },
+    "integrated_commit": "c1bdae78456b6a8b16d2b78d16ab6ec973067b06",
+    "integrated_archive_base": "6bf8836d06072c7946cdfb5499a09e4bce459805",
+    "all_seven_changed_evaluator_test_blobs_match_author": true,
+    "source_rebind": [
+      {
+        "path": "plato/evaluators/lighteval.py",
+        "author_blob": "b41f36e93fe3fe56f21e807dfef560d9db70777f",
+        "integrated_blob": "b41f36e93fe3fe56f21e807dfef560d9db70777f",
+        "sha256": "73a6f9f790ed1810033f4dcdc7c35bba68cd738260462e517dffd946d26b9775",
+        "identical": true
+      },
+      {
+        "path": "plato/evaluators/lighteval_tasks.py",
+        "author_blob": "686a7be1098ef003af8c74d0844224ca7ce2bc59",
+        "integrated_blob": "686a7be1098ef003af8c74d0844224ca7ce2bc59",
+        "sha256": "c5af11e1f9cc71d8cbd0318266690246045049701d00ddd944f45cce121c984f",
+        "identical": true
+      },
+      {
+        "path": "tests/evaluators/test_lighteval.py",
+        "author_blob": "9d47d7abf7edf82750f6ba0728a32a98443ce844",
+        "integrated_blob": "9d47d7abf7edf82750f6ba0728a32a98443ce844",
+        "sha256": "2eeab12061ee21c5998ae2de33922f807e832b0852a3ed22e348ae6b6534309e",
+        "identical": true
+      },
+      {
+        "path": "tests/evaluators/test_lighteval_materialization.py",
+        "author_blob": "50edf6ea806e24467b7bc9576f97c61cb18da63d",
+        "integrated_blob": "50edf6ea806e24467b7bc9576f97c61cb18da63d",
+        "sha256": "8bca619ee48202357a77a1def751cd10426fd26c6a63c6ed3bd6d2bf5daf4844",
+        "identical": true
+      },
+      {
+        "path": "tests/llm_eval/__init__.py",
+        "author_blob": "bc1ff6493d92d1aa0099e31cbb24f8fb1c0c0dba",
+        "integrated_blob": "bc1ff6493d92d1aa0099e31cbb24f8fb1c0c0dba",
+        "sha256": "50f6badeb74c56f691f86099db5363ab7ce0f551b0ad9dda09e5ca0d762bcabf",
+        "identical": true
+      },
+      {
+        "path": "tests/llm_eval/helpers.py",
+        "author_blob": "11431f95a624429e8eb02a0fb5a24cbf4d6f2908",
+        "integrated_blob": "11431f95a624429e8eb02a0fb5a24cbf4d6f2908",
+        "sha256": "0a3c9f230f3de6095791f0930f7e2963aaf2a88a2190f00b8aed01d878614bf1",
+        "identical": true
+      },
+      {
+        "path": "tests/llm_eval/test_lighteval_runtime.py",
+        "author_blob": "b2805ca7c91d0244751226f24d2652ac7687a269",
+        "integrated_blob": "b2805ca7c91d0244751226f24d2652ac7687a269",
+        "sha256": "1f55137024bbc8fdfcf894aef97088ef07ca545c63f518e4e1d5ae4db5faaa14",
+        "identical": true
+      }
+    ],
+    "author_receipt_validation": {
+      "path": "/tmp/plato-lighteval-reviewer-author-receipt-audit.json",
+      "sha256": "6538ea7ed4a0eda532a2cbaed9c002ad19b8a8bb969159d4041cd078a289aa56",
+      "bytes": 5096
+    },
+    "author_receipt_validation_counts": {
+      "tracked_hashes": 14,
+      "installed_library_hashes": 8,
+      "physical_artifacts_and_embedded_text": 19
+    },
+    "receipt_text_convention": "Declared SHA256/bytes refer to original physical files. Embedded text uses read_text universal-newline normalization; all normalized embedded text and original physical hashes independently verified.",
+    "author_full11_source_precision": "Full suite ran immediately before e079df6 freeze. Runtime tests/helpers and semantic implementation match frozen source; subsequent edits restored formatting of the pre-existing progress log statement and core fake tests. Exact guarded public reproducer and installed core/style/typing/absence checks were rerun on frozen e079df6. Fresh reviewer validates frozen source independently."
+  },
+  "code_review": {
+    "implemented_design": "Existing current-model save_pretrained export remains first. Configured existing local directory references are resolved relative to caller cwd, copied independently with symlink dereference into one owned TemporaryDirectory, and deduplicated by resolved directory identity. Only the copied model root gains owner write/search permissions. Every Pipeline model config receives a public per-run cache_dir within the owned output directory.",
+    "why_cache_is_fresh": "Installed SampleCache combines cache_dir/model_name/config hash and immediately creates/loads its cache. Absolute local names discard cache_dir prefix, so copied/exported absolute model roots contain those writes. Model name and cache_dir are part of the hashed config, isolating each run even when historical cache directories are faithfully copied. Hub-style relative names remain under the public owned cache_dir.",
+    "no_source_mutation_or_private_production_patch": true,
+    "current_export_has_no_extra_copy": true,
+    "copy_failure_propagates_without_source_fallback": true,
+    "strict_standard_temporary_directory_cleanup": true,
+    "context_lifetime": "Owned model/tokenizer materialization surrounds initialization/evaluate/get_results, including exceptions. Output/cache context surrounds public pipeline construction and metric collection.",
+    "task_and_metric_scope": "Public installed Pipeline final keys already use task:0 and were previously handled; additional task|fewshot support is compatibility only. em preferences recognize original exact-match task metrics. Controlled fixtures preserve original upstream prompts/metric implementations and task names, changing local data references/splits and bounded generation size only.",
+    "backend_scope": "Real CPU Transformers/Accelerate path only; no GPU/distributed/Hub inference qualification or atomic checkpoint writer guarantee."
+  },
+  "lc_contract_verdicts": {
+    "LC1": {
+      "verdict": "PASS",
+      "evidence": "Exact guarded same-script source-bound red at 237c5ce8: differing A/B weights but 15 stale response rows reused and 2/3 -> 2/3. Green at frozen e079: differing weights, zero original-source parquet files, no cached-prior-run log lines, fresh 15 rows per run, and 2/3 -> 1/3. Independently repeated configured-local all-five-task two rounds at integrated c1bdae78."
+    },
+    "LC2": {
+      "verdict": "PASS",
+      "evidence": "Actual old cached A responses seeded in persistent source; B weights evaluated from owned copy. Full source names, hashes, modes and link targets unchanged. Independent separate-tokenizer case reproduced successful inference with old source cache ignored; author fatal/nonfatal post-inference failures preserve source."
+    },
+    "LC3": {
+      "verdict": "PASS",
+      "evidence": "Actual nonroot read-only source-write PermissionError, nested read-only artifacts and weight symlink to outside blob; independent copied regular file avoids write-through, owned model root permits cache creation, source/blob unchanged, all evaluator-owned paths removed. Same and separate tokenizer author cases passed; reviewer repeated separate case."
+    },
+    "LC4": {
+      "verdict": "PASS",
+      "evidence": "Independent actual current-model A/B exports change all six normalized metrics 2/3 -> 1/3; tensor state and train mode unchanged, no extra copy calls, distinct export paths, owned export/output/cache removed. Gradient restoration also independently verified for both enabled/disabled states in absent-dependency runner paths; actual author failure paths assert restoration."
+    },
+    "LC5": {
+      "verdict": "PASS",
+      "evidence": "Author actual Pydantic max_length=0 fatal/nonfatal cases plus exceptions injected only after 5 genuine responses/5 written parquet caches; source preservation, stale-context clearing, cleanup and original error identity checked. Reviewer repeated fatal post-inference path and genuine Pipeline missing-primary rejection."
+    },
+    "LC6": {
+      "verdict": "PASS",
+      "evidence": "Reviewer repeated actual TransformersModelConfig/SampleCache Hub-style relative ID path isolation beneath separate public cache_dir roots and empty existing indices. No downloaded Hub-model inference is claimed."
+    },
+    "LC7": {
+      "verdict": "PASS",
+      "evidence": "Independent seven filesystem helper cases passed: relative paths, same/separate/Hub tokenizer references, dedup, independent file copies, nested read-only cleanup, genuine broken-link partial copy, injected ENOSPC/EACCES destination failure with original exception identity, unchanged Hub reference and external sentinel/source preservation."
+    }
+  },
+  "runtime_inventory_acceptance": {
+    "accepted_for_subsequent_optional_profile_ledger": true,
+    "node_count": 11,
+    "nodes": [
+      "tests/llm_eval/test_lighteval_runtime.py::test_real_preset_pipeline_normalizes_metrics_and_refreshes_exports[current-model]",
+      "tests/llm_eval/test_lighteval_runtime.py::test_real_preset_pipeline_normalizes_metrics_and_refreshes_exports[configured-local]",
+      "tests/llm_eval/test_lighteval_runtime.py::test_real_piqa_prompt_and_preset_task_contract",
+      "tests/llm_eval/test_lighteval_runtime.py::test_real_model_config_failure_clears_stale_results_and_exports[False]",
+      "tests/llm_eval/test_lighteval_runtime.py::test_real_model_config_failure_clears_stale_results_and_exports[True]",
+      "tests/llm_eval/test_lighteval_runtime.py::test_real_missing_primary_metric_is_rejected",
+      "tests/llm_eval/test_lighteval_runtime.py::test_real_readonly_local_source_ignores_old_responses[same]",
+      "tests/llm_eval/test_lighteval_runtime.py::test_real_readonly_local_source_ignores_old_responses[separate]",
+      "tests/llm_eval/test_lighteval_runtime.py::test_failure_after_actual_inference_cleans_local_copies[False]",
+      "tests/llm_eval/test_lighteval_runtime.py::test_failure_after_actual_inference_cleans_local_copies[True]",
+      "tests/llm_eval/test_lighteval_runtime.py::test_real_hub_style_response_cache_is_per_run"
+    ],
+    "inventory_artifact": {
+      "path": "/tmp/plato-lighteval-frozen-runtime-inventory.json",
+      "sha256": "76870273324386895bbecf9c1353f4209a0053023926c8d43b3942681b32dce0",
+      "bytes": 3457
+    },
+    "author_full11_xml_exact_inventory_zero_failures_errors_skips": true,
+    "author_full11": {
+      "path": "/tmp/plato-lighteval-runtime-final.xml",
+      "sha256": "4a79fd5c092245201fba7c98beccd07272ead2b70bec07c0560895c308fe15ab",
+      "bytes": 58088
+    },
+    "reviewer_owned_actual_subset": {
+      "cases": 6,
+      "result": "6 passed, 1 upstream Hugging Face Hub deprecation warning in 74.26s.",
+      "source": "c1bdae78456b6a8b16d2b78d16ab6ec973067b06",
+      "interpreter": "Agreed idle author .venv/bin/python, direct invocation; no synchronization or environment mutation.",
+      "log": {
+        "path": "/tmp/plato-lighteval-reviewer-pipeline.log",
+        "sha256": "d84f868d1b45cf82a17fa28f2ded0f48522baa03022bb2c6062f53ffcfe0418d",
+        "bytes": 752
+      },
+      "xml": {
+        "path": "/tmp/plato-lighteval-reviewer-pipeline.xml",
+        "sha256": "7a826e3d297d56727d27c495385a3ed84e99ac0ac7d3b2134e6f3cf8f8c97b82",
+        "bytes": 49536
+      }
+    }
+  },
+  "independent_checks": [
+    {
+      "name": "optional_absence_unit_tests",
+      "result": "19 passed in 0.14s (low fixture housekeeping warnings) plus 9 registry/runner cases passed in 0.05s.",
+      "logs": [
+        {
+          "path": "/tmp/plato-lighteval-reviewer-absent-unit.log",
+          "sha256": "7761687bbb7e8975ccf15a4023a9ec55e5ce2d519095d8d5b7a8c49b81696043",
+          "bytes": 6726
+        },
+        {
+          "path": "/tmp/plato-lighteval-reviewer-registry-unit.log",
+          "sha256": "299e12bfaf247db0497c3781d803663485b8eca14e1e9431d8ce4b67dff15fc0",
+          "bytes": 141
+        }
+      ]
+    },
+    {
+      "name": "optional_absence_real_import_runner",
+      "result": "Lighteval/langdetect metadata and module specs absent. Lazy adapter registration imports no optional module; four fatal/nonfatal and grad-enabled/disabled combinations preserve gradient mode and clear stale context.",
+      "receipt": {
+        "path": "/tmp/plato-lighteval-reviewer-core-import.json",
+        "sha256": "1c4a608a451b5a521d2832e07dc5635f611f1de34620be1b8a03c2293e1d97bb",
+        "bytes": 1288
+      }
+    },
+    {
+      "name": "installed_owned_type_check",
+      "scope": "plato/evaluators tests/evaluators tests/llm_eval; explicit installed Python3.13 interpreter",
+      "result": "All checks passed.",
+      "log": {
+        "path": "/tmp/plato-lighteval-reviewer-installed-ty.log",
+        "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+        "bytes": 19
+      }
+    },
+    {
+      "name": "absent_owned_type_check",
+      "scope": "plato/evaluators tests/evaluators; explicit optional-absent Python3.13 interpreter",
+      "result": "All checks passed.",
+      "log": {
+        "path": "/tmp/plato-lighteval-reviewer-absent-ty.log",
+        "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+        "bytes": 19
+      }
+    },
+    {
+      "name": "Ruff_import_order",
+      "scope": "Changed evaluator source, core tests and tests/llm_eval",
+      "result": "All checks passed.",
+      "log": {
+        "path": "/tmp/plato-lighteval-reviewer-ruff.log",
+        "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+        "bytes": 19
+      }
+    },
+    {
+      "name": "root_lock_consistency",
+      "command": "uv lock --check --offline",
+      "result": "Passed, 265 package records.",
+      "log": {
+        "path": "/tmp/plato-lighteval-reviewer-lock-check.log",
+        "sha256": "6dacb778c162ca592bdbb01c2ce5ea925c1bb6037efbb57c8714087f878922ee",
+        "bytes": 51
+      }
+    },
+    {
+      "name": "root_lock_selection",
+      "result": "Independent dry-run core selects xxhash4.0.1, evaluation extra selects xxhash3.8.1 plus Lighteval0.13.0/langdetect1.0.9.",
+      "logs": [
+        {
+          "path": "/tmp/plato-lighteval-reviewer-core-dry.log",
+          "sha256": "99ebfe628feaf452600767aecec5f814b03d795aefeae11e4a65952569ad0b92",
+          "bytes": 1927
+        },
+        {
+          "path": "/tmp/plato-lighteval-reviewer-eval-dry.log",
+          "sha256": "b881855e3670d0bea951052a4d3e323223341d3047af75ab0f8039b9c9fd20fa",
+          "bytes": 3748
+        }
+      ]
+    },
+    {
+      "name": "installed_distribution_metadata",
+      "result": "Actual installed versions and xxhash text input support independently confirmed; NLTK metadata conflict remains the existing explicitly authorized 3.10.3 override of upstream 3.9.1 pin.",
+      "receipt": {
+        "path": "/tmp/plato-lighteval-reviewer-metadata.json",
+        "sha256": "259c2a0463665f1592a1c391dc9d76ed9f20d59504714549f30f1037cc99e16f",
+        "bytes": 3115
+      }
+    }
+  ],
+  "dependency_rebind": {
+    "sha256": "66a4e4442d7b1f26d220b44ca73c44ff4f1151a86857bb3f93a594819fd08126",
+    "prior_package_count": 264,
+    "package_count": 265,
+    "added": [
+      [
+        "xxhash",
+        "3.8.1",
+        "{\"registry\": \"https://pypi.org/simple\"}"
+      ]
+    ],
+    "removed": [],
+    "changed_records": [
+      [
+        "datasets",
+        "5.0.1"
+      ],
+      [
+        "evaluate",
+        "0.4.6"
+      ],
+      [
+        "plato-learn",
+        "1.4.3"
+      ],
+      [
+        "xxhash",
+        "4.0.1"
+      ]
+    ],
+    "all_retained_versions_sources_sdists_wheels_unchanged": true,
+    "manifest_only_delta": "llm_eval xxhash>=3.8.1,<4",
+    "nltk_override_retained": true,
+    "retired_workspaces_not_reintroduced": true
+  },
+  "dependency_command_rule": {
+    "verified_receipt": {
+      "path": "/tmp/plato-lighteval-dependency-checks/command-semantics.json",
+      "sha256": "5085b7db4b13d5fa91569cb765a05fd01f061743e76d5af6a7bbfeac5e1dc9f9",
+      "bytes": 11867
+    },
+    "rule": "Every syncing Lighteval runtime command must retain --extra llm_eval. Alternatively provision with locked uv sync --extra llm_eval then use direct owned interpreter or uv run --no-sync.",
+    "reason": "Actual root command-semantic receipt shows plain syncing uv run leaves Lighteval installed but replaces compatible xxhash3.8.1 with default4.0.1. Author source-bound actual Pipeline red raised TypeError at DetailsLogger text hashing."
+  },
+  "limits_and_remaining_integration": {
+    "runtime_metrics": "Controlled offline rows validate installed API integration and cache freshness, not public benchmark accuracy or performance.",
+    "storage": "Configured local fallback copies whole distinct source directories once per evaluation; large checkpoints can require substantial temporary storage/time. Current-model export is not double-copied.",
+    "source_stability": "Stable source during copy is assumed. No atomic filesystem snapshot, concurrent in-place checkpoint publication, GPU/distributed or Python3.14 guarantee.",
+    "cache_scope": "Owned Lighteval response caches are isolated; ordinary Hugging Face artifact/download caches retain upstream behavior.",
+    "profile": "Optional shared collection guard/CI/profile ledger and documentation are explicitly pending accepted separate-plan root integration. This bounded evaluator review accepts the precise 11-node inventory and does not claim those profile gates have been implemented.",
+    "whole_repository": "No full merged-suite result or final merge acceptance is claimed by this component review."
+  },
+  "audit_artifacts": [
+    {
+      "path": "/tmp/plato-lighteval-reviewer-source-lock-audit.py",
+      "sha256": "de75f2b7de2c94eb4beaf33eff578da8135b891f06f81137753963e0666a6521",
+      "bytes": 5948
+    },
+    {
+      "path": "/tmp/plato-lighteval-reviewer-source-lock-audit.json",
+      "sha256": "16b73eefd1ed5142c9eff7f9d4d8844ec3ddd8d19bd4409340bbe5ff92877278",
+      "bytes": 3516
+    },
+    {
+      "path": "/tmp/plato-lighteval-reviewer-author-receipt-audit.json",
+      "sha256": "6538ea7ed4a0eda532a2cbaed9c002ad19b8a8bb969159d4041cd078a289aa56",
+      "bytes": 5096
+    }
+  ],
+  "actions": {
+    "repository_source_edits": false,
+    "nested_agents": false,
+    "environment_sync": false,
+    "all_shell_commands": "zsh -lc",
+    "outputs": "Reviewer-owned /tmp artifacts only; pytest source bytecode/cache writing disabled."
+  }
+}

@@ -1,0 +1,508 @@
+{
+  "schema_version": 1,
+  "revision": 2,
+  "status": "CORRECTED_DESIGN_PENDING_FRESH_SOL_REVIEW; LP-P1-01/02 addressed in design, not implementation",
+  "date": "2026-10-03",
+  "output": "/tmp/plato-lighteval-profile-plan.json",
+  "scope": "Narrow optional CPU Lighteval collection/profile/CI integration. No repository edits, dependencies installed, behavioral runs, commits, PRs or nested agents. Existing core, accepted native383 and retained19 guards stay authoritative.",
+  "authority": [
+    {
+      "path": "/tmp/plato-mlx-profile-plan.json",
+      "sha256": "81a5a557b1ad018384da9b9290e0648048696af244c486849c653a09f0bea32b",
+      "bytes": 42420
+    },
+    {
+      "path": "/tmp/plato-mlx-profile-plan-review2.json",
+      "sha256": "f7ed47c61715d649c4fe905bf13a1797e42a706c32ead03aa5d7e871d0169c00",
+      "bytes": 11336
+    },
+    {
+      "path": "/tmp/plato-archive-shortlist-plan.json",
+      "sha256": "c66577eac31a2eeaba68f29e2fee53760def2477184521bd1f2536e76507573f",
+      "bytes": 303416
+    },
+    {
+      "path": "/tmp/plato-archive-shortlist-plan-review3.json",
+      "sha256": "3fbeb6b47b5392515172b574bd9b0d11f427e5d6af4a72ba2c2d3057be8483be",
+      "bytes": 15141
+    }
+  ],
+  "observed_snapshots": {
+    "archive_profile": {
+      "path": "/tmp/plato-refresh-worktrees/archive-profile",
+      "head": "aa2c3d5cdee60863dfe2c1d389ec1e0cbe89111b",
+      "tree": "2998cd72ba43f46f4585c3642c03160982a14416",
+      "dirty": "M .github/scripts/stage_ci_artifacts.py\n M .github/workflows/pytorch_tests.yml\n M tests/conftest.py\n?? tests/test_model_search_profile_contract.py",
+      "use": "Mutable work-in-progress observation, NEVER implementation base or accepted-delivery claim."
+    },
+    "runtime_author": {
+      "path": "/tmp/plato-refresh-worktrees/lighteval-runtime",
+      "head": "a8bdf23d775ce159ad44f6737309057acb1ff0a4",
+      "tree": "87e57de47463bed19c54de548b749798f17dcf09",
+      "dirty": "M plato/evaluators/lighteval.py\n M plato/evaluators/lighteval_tasks.py\n M tests/evaluators/test_lighteval.py\n?? tests/llm_eval/",
+      "use": "Active evaluator author remains owner; current node names/resources provisional."
+    }
+  },
+  "inspected_sources": [
+    {
+      "path": "/tmp/plato-refresh-worktrees/archive-profile/AGENTS.md",
+      "sha256": "b50f87f31ea3d87076952d8b7d2d8af067132fbf877d80f8780c208fb45527ec",
+      "bytes": 3119
+    },
+    {
+      "path": "/tmp/plato-refresh-worktrees/archive-profile/tests/conftest.py",
+      "sha256": "cf5bbbd976dd977396177892bc4997d7ad84c7e6e2f2163c6852d19c9aa65aee",
+      "bytes": 24659
+    },
+    {
+      "path": "/tmp/plato-refresh-worktrees/archive-profile/pyproject.toml",
+      "sha256": "8aaa7414717fa17841900d377d89851547677ba2ae93963afef79fc5490ba610",
+      "bytes": 3942
+    },
+    {
+      "path": "/tmp/plato-refresh-worktrees/archive-profile/uv.lock",
+      "sha256": "e2a53aaae9a0dd49f5446b490bb3071e86aa3a9a20d6271c9dd30b4ae2dcbff9",
+      "bytes": 725560
+    },
+    {
+      "path": "/tmp/plato-refresh-worktrees/archive-profile/.github/workflows/pytorch_tests.yml",
+      "sha256": "9a437109c310734107229a85cb24b3912ed19b7a428c8818e72f4c00945dbc12",
+      "bytes": 14902
+    },
+    {
+      "path": "/tmp/plato-refresh-worktrees/archive-profile/.github/scripts/stage_ci_artifacts.py",
+      "sha256": "f9142f03c92469aceed4aa06ae5b8bb04699c89042dd156f0b4783392ca85b24",
+      "bytes": 10070
+    },
+    {
+      "path": "/tmp/plato-refresh-worktrees/archive-profile/tests/mlx_native/cases.json",
+      "sha256": "c168dc33a4d4e7ed70079e09c3de70f5b318d543c035ec13de2826b48e1175bb",
+      "bytes": 88187
+    },
+    {
+      "path": "/tmp/plato-refresh-worktrees/archive-profile/tests/test_mlx_profile_contract.py",
+      "sha256": "c26c766a599d235f6841aafe82f178b7fd8a3ae02d8362420d0d4f7e95dd8088",
+      "bytes": 24793
+    },
+    {
+      "path": "/tmp/plato-refresh-worktrees/archive-profile/tests/test_model_search_profile_contract.py",
+      "sha256": "fc8f8b300afab10bf5cc6f97b670aeba0e996b708202e14aeaeee015f5712e92",
+      "bytes": 18041
+    },
+    {
+      "path": "/tmp/plato-refresh-worktrees/archive-profile/tests/evaluators/test_lighteval.py",
+      "sha256": "950fc311e80cf7e7a9750a5048b590725e6d72cc262e4d4094b3ffd9cd568927",
+      "bytes": 20708
+    },
+    {
+      "path": "/tmp/plato-refresh-worktrees/archive-profile/tests/mpc/test_round_store_contracts.py",
+      "sha256": "3f443669807fd3ebe6e6d6224ae7d6d1ccf0b7d8696cc29b6c5e496ae5eb23cb",
+      "bytes": 4752
+    },
+    {
+      "path": "/tmp/plato-refresh-worktrees/archive-profile/tests/utils/test_rl_payload_utilities.py",
+      "sha256": "c7542d050edcb30ea370241b13b4efb676988530677d16c192451bbcef415388",
+      "bytes": 7594
+    },
+    {
+      "path": "/tmp/plato-refresh-worktrees/lighteval-runtime/tests/llm_eval/test_lighteval_runtime.py",
+      "sha256": "c1b8844ac97db80eccc4b6ed61973a825255641c74293d55066ada1f8b9920ad",
+      "bytes": 5774
+    },
+    {
+      "path": "/tmp/plato-refresh-worktrees/lighteval-runtime/tests/llm_eval/helpers.py",
+      "sha256": "5b4e6c14380039baf547066534d03fc9edb56ed53e42fbc433bb6945c8420f96",
+      "bytes": 4524
+    },
+    {
+      "path": "/tmp/plato-refresh-worktrees/lighteval-runtime/plato/evaluators/lighteval.py",
+      "sha256": "833a6f6ff50c889edee3cb2e267f2b3d5c688c3d54e10aa11b4c55886fd7fc4d",
+      "bytes": 17651
+    },
+    {
+      "path": "/tmp/plato-refresh-worktrees/lighteval-runtime/plato/evaluators/runner.py",
+      "sha256": "e08bae291acdcbefee340b8d7c8f41c168a0e00a2d257ff74932514a186985f3",
+      "bytes": 4019
+    }
+  ],
+  "required_implementation_base": {
+    "binding_status": "DEFERRED_INTENTIONALLY",
+    "sequence": [
+      "Root accepts completed archive-profile author/fresh-review delivery.",
+      "Root records accepted commit/tree and SHA256 of tests/conftest.py, workflow, artifact stager, pyproject.toml, uv.lock, tests/mlx_native/cases.json, test_mlx_profile_contract.py and test_model_search_profile_contract.py plus guard review/receipt.",
+      "Root integrates accepted evaluator runtime/source and serialized xxhash metadata correction with independent review; binds final tests/llm_eval source, case/prerequisite inventory, raw evidence and exact lock.",
+      "Root gives profile implementer a single accepted integrated base and exclusive shared-file handoff. This plan is reviewed before implementation; unresolved contract conflict returns to root for bounded amendment."
+    ]
+  },
+  "decisions": {
+    "directory": "tests/llm_eval/ is the sole new optional collection boundary; __init__.py and any child conftest/subpackage initializers remain inert. Existing fake/unit evaluator tests in tests/evaluators stay core and keep their current meaning.",
+    "profile": "Add --test-profile=llm-eval to existing option and llm_eval marker. Named profile is additive over mandatory DP/MPC/RL prerequisite contract, like accepted mlx-native. Optional-only directory requires only full Lighteval ledger; full roots require both core and Lighteval ledgers.",
+    "default": "Ordinary tests/testpaths/root, base/mandatory, retained and mlx-native requests exclude tests/llm_eval before importing tests, regardless of whether optional dependencies are installed. No package-presence autodetection.",
+    "focused": "Explicit filesystem optional directory/file/node without profile requests real optional preflight and strict optional skip/xfail/xpass checking, but no whole-ledger claim. -k/-m focused filtering allowed. Preserve existing effective mandatory semantics if mixed with full core roots.",
+    "routing": "Optional --pyargs unsupported for canonical tests.llm_eval namespace and aliases resolving to optional boundary; reject early canonical selector and pre-yield file hook backstop. Core --pyargs stays supported. Mixed MLX/Lighteval focused selection and either cross-profile optional target rejected before preflight.",
+    "minimal_change": "Extend existing _ProfileChecks and existing public hooks with llm_eval state. Reuse Counter/path/report pattern, extracting at most small pure helpers when necessary. No plugin registry/framework, pytest config split, runtime bypass, blanket skip or broad backend redesign."
+  },
+  "command_contract": [
+    {
+      "command": "python -m pytest tests",
+      "expected": "Existing implicit mandatory core, excludes both optional directories before test-module import; no Lighteval import/probe."
+    },
+    {
+      "command": "python -m pytest",
+      "expected": "Same using configured testpaths."
+    },
+    {
+      "command": "python -m pytest .",
+      "expected": "Same full-root core behavior; preserve archive exclusions."
+    },
+    {
+      "command": "python -m pytest tests --test-profile=base -m \"not runtime\"",
+      "expected": "Existing base partition, only existing absent-Opacus exact omission; excludes llm_eval and native."
+    },
+    {
+      "command": "python -m pytest tests --test-profile=mandatory -m \"runtime and not retained_model_search\"",
+      "expected": "Exact accepted core runtime partition; unchanged startup48/FedDyn and no optional Lighteval import."
+    },
+    {
+      "command": "python -m pytest tests/integration/test_retained_model_search.py --test-profile=mandatory -m retained_model_search",
+      "expected": "Exact accepted retained19 qualification, no Lighteval prerequisite or changed marker grammar."
+    },
+    {
+      "command": "python -m pytest tests/llm_eval --test-profile=llm-eval -ra",
+      "expected": "Full Lighteval-only qualification: actual extra/resources + inherited mandatory imports + exact complete ledger; no native."
+    },
+    {
+      "command": "python -m pytest tests --test-profile=llm-eval -ra",
+      "expected": "Combined core+Lighteval qualification: all existing full core ledgers and full Lighteval ledger; native excluded. Actual installed ptflops remains necessary if unfiltered root core includes retained runtime tests; use test-model-search group for this combined verification."
+    },
+    {
+      "command": "python -m pytest tests/llm_eval --test-profile=llm-eval --collect-only -q",
+      "expected": "Same actual prerequisites and complete collected-node Counter; summary explicitly no behavioral qualification."
+    },
+    {
+      "command": "python -m pytest tests/llm_eval/test_lighteval_runtime.py -k model_config -ra",
+      "expected": "Focused explicit filesystem run: actual llm_eval preflight + strict optional outcomes; filters allowed and no full-ledger claim. No unrelated mandatory extras newly required unless existing full-root/explicit-profile semantics require them."
+    },
+    {
+      "command": "python -m pytest tests/llm_eval/test_lighteval_runtime.py::test_real_preset_pipeline_normalizes_metrics_and_refreshes_exports -ra",
+      "expected": "Focused actual-runtime case; same prerequisite/outcome policy, not full qualification. Author may rename; final command must bind to accepted inventory."
+    },
+    {
+      "command": "python -m pytest tests/llm_eval --test-profile=mandatory",
+      "expected": "UsageError before optional module import: conflicts with core-only profile."
+    },
+    {
+      "command": "python -m pytest tests/llm_eval --test-profile=base",
+      "expected": "Same conflict; no optional skip allowance."
+    },
+    {
+      "command": "python -m pytest tests --test-profile=llm-eval -m runtime",
+      "expected": "UsageError before imports: named qualification forbids effective filters."
+    },
+    {
+      "command": "python -m pytest tests -m llm_eval",
+      "expected": "UsageError: marker alone cannot request optional import; use explicit filesystem target or named profile."
+    },
+    {
+      "command": "python -m pytest --pyargs tests.llm_eval.test_lighteval_runtime",
+      "expected": "Reject canonical optional dotted namespace before optional module import; use filesystem paths."
+    },
+    {
+      "command": "python -m pytest --pyargs tests",
+      "expected": "Core package traversal preserved, omits optional directories before import."
+    },
+    {
+      "command": "python -m pytest --pyargs tests.test_config_loader",
+      "expected": "Existing core module route unchanged; no Lighteval import."
+    },
+    {
+      "command": "python -m pytest tests/mlx_native --test-profile=mlx-native",
+      "expected": "Existing native383 qualification unchanged; excludes Lighteval and does not require llm_eval extras/resources."
+    },
+    {
+      "command": "python -m pytest tests/llm_eval tests/mlx_native",
+      "expected": "UsageError for mixed optional families in one focused invocation; execute separate bounded commands."
+    },
+    {
+      "command": "python -m pytest tests/llm_eval --test-profile=mlx-native",
+      "expected": "UsageError before either optional preflight/import: incompatible family/profile."
+    },
+    {
+      "command": "python -m pytest tests/mlx_native --test-profile=llm-eval",
+      "expected": "Symmetric UsageError; no accidental cross-profile mandatory import."
+    }
+  ],
+  "hook_contract": {
+    "configure": "Keep pytest_configure callable, plugin registration name plato-profile-checks, qualify/base fields, _full_suite and Config/RNG fixtures unchanged. Derive new eval_requested/eval_qualification/eval_prerequisite_passed using canonical resolved paths only, no imports, hardware/model probes, resource reads/downloads or subprocesses from configure. Existing actual Config.fromdictargs helper callers must remain green.",
+    "path_identity": "Boundary is (config.rootpath / tests/llm_eval).resolve(). Parse arg before :: relative to invocation_params.dir; compare containment, not substring. Under --pyargs lexically recognize only tests.llm_eval and dot descendants. Do not implement custom Python module resolver.",
+    "preimport": "Extend existing parent pytest_ignore_collect returning True only for unrequested optional boundary, otherwise None. Extend existing tryfirst wrapper pytest_collect_file to validate boundary/allowed selector/preflight flag BEFORE yielding; preserve native behavior and yield exactly once for allowed/nonoptional files. Consistency assertion in collection_modifyitems is additional, never sole protection. Inert package initializers are mandatory because find_spec may import parents before file hooks.",
+    "conflicts": "Before session preflight, reject explicit llm_eval targets with base/mandatory/mlx-native, explicit native targets with llm-eval, any focused mixed native+eval target, and marker-only llm_eval without eval request. Named llm-eval rejects any effective -k, any -m, --deselect, --ignore, --ignore-glob and --pyargs, including addopts/environment injected options. Subset/core-only paths with named profile fail missing-ledger check rather than pass a small qualification.",
+    "sessionstart": "For requested eval: execute bounded real prerequisite checks first, set eval_prerequisite_passed only on success; then preserve existing qualify and not base mandatory opacus/kazoo/gymnasium imports; named eval loads reviewed ledger. Focused optional-only requests do not become mandatory merely from directory identity. Existing native/retained order and diagnostics stay unchanged.",
+    "markers": "Automatically mark by directory membership with llm_eval. Reject llm_eval marker outside directory. Do not give these tests runtime or retained_model_search markers; optional boundary governs scope and existing runtime partitions keep accepted meaning.",
+    "collection": "On EVERY named llm-eval session compare actual full optional node Counter to independently reviewed cases.json: no missing, extra or duplicate nodes, regardless of full-suite detection or collect-only. Full roots retain unchanged core ledgers. Case IDs include exact parametrization strings.",
+    "outcomes": "Extend strict checking to all optional collect/setup/call/teardown reports even when focused unqualified. Optional collection skips, skip/importorskip, strict/nonstrict xfail and xpass are violations; never grant base DP exemption inside optional directory. Full named execution requires every expected call pass and overall exit success including setup/teardown/interruption. Preserve original nonzero exits; policy can turn success into failure, never reverse failure.",
+    "summary": "Report core scope (native and Lighteval excluded), existing native focused/complete state, Lighteval focused (not complete), successful collection-only (no execution claim), successful complete or failed qualification. No complete claim if ledger absent, collection-only or pytest status nonzero. Native383 exact ledger/content remain unchanged."
+  },
+  "prerequisites": {
+    "resource_handoff": "Runtime author reports actual upstream Registry imports IFEval and concretely checks tokenizers/punkt and tokenizers/punkt_tab at import. Provisional required NLTK resource IDs punkt and punkt_tab; no stopwords/wordnet/omw or unrelated corpora. Final accepted author import trace binds exact resource lookup names.",
+    "order": [
+      "Import nltk and langdetect via actual environment imports and read installed distribution metadata. Do not inspect fake modules as proof.",
+      "Check exact required NLTK resources with nltk.data.find before importing lighteval.pipeline/task Registry, so upstream import cannot trigger a surprise resource download when missing. Missing resource raises scoped UsageError naming resource and provision command.",
+      "Import actual lighteval.pipeline and the model/task APIs the accepted real tests use; record actual module origin/distribution/version. No heavyweight model loading, inference or benchmark in preflight. Actual pipeline inference belongs to tests.",
+      "Any import/ABI/resource/API failure reports original cause with llm-eval prerequisite failed; no broad exception suppression or importorskip. No model/network fetch in collection/preflight."
+    ],
+    "minimal_imports_provisional": [
+      "nltk",
+      "langdetect",
+      "lighteval.pipeline",
+      "transformers (actual GPT2 / PreTrainedTokenizerFast classes as used by author)",
+      "datasets",
+      "torch",
+      "tokenizers"
+    ],
+    "versions": "Respect accepted lighteval==0.13.0, authorized NLTK3.10.3 override and reviewed core Transformers stack. Root owns proposed xxhash>=3.8.1,<4 delta after runtime red/green review because current xxhash4 rejects Lighteval string hashing. Do not invent new package pins or mutate lock in profile implementation.",
+    "cpu": "No Apple/CUDA/Metal requirement. Actual qualification runs CPU float32 tiny model with ACCELERATE_USE_CPU=true and CUDA_VISIBLE_DEVICES empty; no Config.device mutation in preflight. Existing Config behavior/fixtures remain authoritative.",
+    "no_fabricated_dependency": "langdetect is an installed extra prerequisite even if chosen keyword IFEval fixture does not call language detection; no broader langdetect accuracy or multilingual benchmark claim. Resource preflight minimal to actual import chain, not every possible IFEval instruction.",
+    "missing_resource_negative_contract": {
+      "scope": "Test harness only, in fresh isolated children using actual installed NLTK and production profile preflight. No production-global search-path override or download monkeypatch is added.",
+      "setup": [
+        "Create owned fixture root. For each required resource in turn, prepare verified real content for the OTHER required resource only; deliberately omit the target resource and any zip alternatives. Include a both-missing case if useful, but it cannot replace each single-missing case.",
+        "Start child using exact compatible llm_eval interpreter. Import real nltk; replace nltk.data.path[:] with [str(owned_fixture_root)] and clear NLTK data cache. Do not rely on NLTK_DATA alone and do not mock nltk.data.find.",
+        "Before invoking actual profile preflight, record effective paths and assert they equal the prepared root list. Assert actual nltk.data.find(omitted_lookup) raises LookupError; assert actual find(other_lookup) succeeds within fixture root. An absent-lookup assertion that fails invalidates the test fixture and must fail the test, not skip.",
+        "Invoke actual production preflight or pytest sessionstart via production hooks in the SAME child, preserving restricted data.path. Capture scoped missing-resource UsageError and original resource name/cause.",
+        "Install test-only import/download sentinels before this invocation; assert no import attempt of lighteval.pipeline/task Registry and no nltk.download/network callback. Do not manufacture the missing-resource exception in a fake function. Record actual outcome/order."
+      ],
+      "receipt_fields": [
+        "child sys.executable/sys.prefix",
+        "installed nltk version and data.py hash",
+        "effective nltk.data.path",
+        "fixture resource identities/hashes",
+        "target actual LookupError before preflight",
+        "other actual lookup path",
+        "production preflight source hash and scoped error",
+        "pipeline/Registry import/download sentinel event counts"
+      ],
+      "preservation": "Owned child mutation dies with child; user/home/system NLTK resources never deleted or modified. Ordinary successful preflight continues to respect real installed search-path behavior."
+    }
+  },
+  "runtime_author_handoff": {
+    "owner": "/root/lighteval_completion exclusively owns plato/evaluators/**, tests/llm_eval/test_lighteval_runtime.py and helpers.py until accepted handoff; plan/profile author may read only.",
+    "provisional_nodeids": [
+      "tests/llm_eval/test_lighteval_runtime.py::test_real_preset_pipeline_normalizes_metrics_and_refreshes_exports",
+      "tests/llm_eval/test_lighteval_runtime.py::test_real_model_config_failure_clears_stale_results_and_exports[False]",
+      "tests/llm_eval/test_lighteval_runtime.py::test_real_model_config_failure_clears_stale_results_and_exports[True]"
+    ],
+    "inventory_status": "Not a frozen ledger or approved count. Author may add local-reference cache and missing-primary tests; root must obtain exact accepted node IDs and all criteria before producing final cases.json.",
+    "actual_behavior": "Tiny GPT2 one layer/eight hidden units and real WordLevel tokenizer; three local Parquet rows per five preset tasks, original task names/prompts/metric implementations, generation_size=1. Actual Pipeline executes twice after controlled model preference A->B: expected metrics2/3->1/3; normalize task|fewshot keys, primary/context, export and isolated cache lifecycle, mode/gradient preservation. Real Pydantic max_length failure fatal/nonfatal clears stale context and removes exports.",
+    "real_proof_boundary": "Local deterministic task data and controlled model logits are allowed; replacing Pipeline, model inference, task metrics, underlying validator or evaluator runner with fake return values is not behavioral qualification. A recorder wrapping the actual method and returning its actual result is acceptable with source review.",
+    "budget": "Author estimates warm<30sec and cold imports about30sec on AppleCPU. Initial hard subprocess budget120sec, CI execution step10minutes including fresh-resource checks; measure Linux before finalizing. No paper-scale benchmarking or accuracy claim."
+  },
+  "ledger_contract": {
+    "path": "tests/llm_eval/cases.json",
+    "owner": "Root serialized profile owner after accepted runtime author inventory",
+    "schema": {
+      "schema_version": 1,
+      "cases": [
+        {
+          "nodeid": "<exact accepted full parameterized node ID>",
+          "criteria": [
+            "LE1"
+          ]
+        }
+      ]
+    },
+    "criteria": {
+      "LE1": "Actual installed Pipeline on CPU with real task prompts/metrics and local model/data; finite nontrivial independent expected outputs.",
+      "LE2": "Public evaluator registry/runner, versioned task-key normalization, primary metric and context state.",
+      "LE3": "Model/reference freshness across changed weights; export/cache isolation, source nonmutation and successful cleanup.",
+      "LE4": "Actual failure propagation/fatal-vs-nonfatal contract, stale-result clearing and cleanup."
+    },
+    "validation": "Nonempty object schema1; case list nonempty, unique exact string IDs under tests/llm_eval/ with ::, no traversal/absolute paths; each nonempty criteria subset LE1..LE4; collective criteria cover LE1..LE4. Root/reviewer check real code meaning, not just labels. Ledger is never generated from collection at acceptance runtime; author draft inventory may be compared and reviewed before freeze.",
+    "freeze_receipt": "Accepted runtime commit/tree, source/tests/helper hashes, profile integration base, packages/lock, criteria mapping, ledger SHA256, exact collect output and full outcome receipt. Final node count is derived from frozen ledger only after independent review."
+  },
+  "ownership": {
+    "profile_author_exclusive_after_root_handoff": [
+      "tests/conftest.py",
+      "tests/test_llm_eval_profile_contract.py",
+      "tests/llm_eval/cases.json",
+      "tests/llm_eval/__init__.py (inert only; coordinate author existing content)",
+      "evidence/2026-refresh/lighteval-profile-validation.json"
+    ],
+    "root_serialized_ci_metadata_owner": [
+      "pyproject.toml (llm_eval marker only; dependency cap separately authorized)",
+      "uv.lock (only separately reviewed xxhash edge)",
+      ".github/workflows/pytorch_tests.yml (optional step + typing owned-set addition)",
+      ".github/scripts/stage_ci_artifacts.py (exact extra records/unit partition only)"
+    ],
+    "existing_owner_preservation": [
+      "plato/evaluators/** and runtime tests stay evaluator author-owned",
+      "tests/mlx_native/cases.json and native implementation untouched",
+      "tests/test_mlx_profile_contract.py reused; minimal necessary fixture extension only with root handoff and recorded reason",
+      "tests/test_model_search_profile_contract.py and archive guard not overwritten from stale snapshot"
+    ],
+    "handoff_rule": "Root assigns shared CI/stager edits to one owner after accepted archive delivery. Do not concurrently edit while original archive-profile author is active. Before/after diff/hash required; no broad refactor."
+  },
+  "ci": {
+    "placement": "Add one scoped Lighteval CPU qualification step in existing required Python3.13 job after retained qualification and before typing. Separate fresh environment under runner.temp; keep existing base/mandatory/runtime/native/retained commands, timeout and gate counts. No all-extras, no SSL, no new matrix platform/version.",
+    "sync_command": "uv sync --locked --python 3.13 --no-default-groups --group dev --extra llm_eval",
+    "env": {
+      "CUDA_VISIBLE_DEVICES": "",
+      "ACCELERATE_USE_CPU": "true",
+      "OMP_NUM_THREADS": "1",
+      "MKL_NUM_THREADS": "1",
+      "OPENBLAS_NUM_THREADS": "1",
+      "TOKENIZERS_PARALLELISM": "false",
+      "NLTK_DATA": "<runner.temp>/plato-llm-eval-nltk",
+      "HF_HOME": "<runner.temp>/plato-llm-eval-hf",
+      "UV_PROJECT_ENVIRONMENT": "${{ runner.temp }}/plato-llm-eval"
+    },
+    "provision": "Use isolated NLTK_DATA path. A bounded explicit provisioning Python step downloads ONLY accepted punkt and punkt_tab via nltk.download(resource, download_dir=..., raise_on_error=True), or reuses a verified resource cache. Record exact resource/package IDs, resolved files and hashes, origin, package versions and cache hit/download. Network/resource failure is nonzero infrastructure failure, not skip or green profile. No download inside tests/preflight. Run provisioning with uv run --no-sync --python 3.13 python under persistent ci.env.UV_PROJECT_ENVIRONMENT. NLTK_DATA prepends search paths; it does NOT prove other locations are absent. Record actual nltk.data.path and the resolved required resource paths. For CI provenance, verify provisioned resource paths are beneath the intended NLTK_DATA directory. Missing-resource negative tests must use the separate explicit child-path isolation contract below.",
+    "execution": [
+      "Under persistent ci.env.UV_PROJECT_ENVIRONMENT, run/check llm-eval-interpreter.json first. Then record source/lock/Python/uv and installed package list with that exact interpreter plus ledger/source hashes. Every remaining execution command below inherits that SAME step-level environment.",
+      "After explicit resource provisioning set HF_HUB_OFFLINE=1 and HF_DATASETS_OFFLINE=1. Use local author model/data construction; verify no runtime downloader needed.",
+      "uv run --no-sync --python 3.13 python -m pytest tests/llm_eval --test-profile=llm-eval --collect-only -q > ci-artifacts/llm-eval-collection.log 2>&1",
+      "uv run --no-sync --python 3.13 python -m pytest tests/llm_eval --test-profile=llm-eval -ra --basetemp=ci-artifacts/llm-eval-tmp --junitxml=ci-artifacts/llm-eval.xml > ci-artifacts/llm-eval.log 2>&1",
+      "CI independent artifact verifier reads same frozen reviewed cases.json and compares exact collected node Counter + exact JUnit names/classnames/parameterIDs, zero skips/failures/errors and actual pass count. It checks overall pytest success, no xpass/xfail text/outcomes and writes llm-eval-acceptance.json including ledger/source/lock hashes. Do not duplicate hardcoded expected IDs/count in workflow. Existing retained verifier unchanged. Execute verifier with uv run --no-sync --python 3.13 python under the same persistent step environment and verify llm-eval-interpreter.json. No bare/default-project Python selection."
+    ],
+    "limits": "No dependency cap until root-approved metadata handoff. Maintain job110minute current limit unless measured final job data justifies bounded change. Optional extra means separate dependency/profile scope, not optional success: this CI step must fail the job on provision/test/artifact failure, with no continue-on-error or changed-path bypass.",
+    "combined_local": "One bounded combined collection and, where appropriate for final integration, combined execution using --group dev --group test-model-search --extra llm_eval validates additive core+eval contract. Prefer existing core accepted source proof plus focused affected guards over repeatedly rerunning whole core suite during author iteration.",
+    "environment_scope": "Set ci.env.UV_PROJECT_ENVIRONMENT at the GitHub Actions Lighteval qualification STEP env level, not inline for sync. Every shell command in that step inherits the exact same isolated path: sync, package metadata, resource provision, preflight, collection, execution, artifact verification and dependency-present typing. If implementation splits these into steps, repeat the identical step-level UV_PROJECT_ENVIRONMENT on EACH step, including steps that write/finalize optional evidence. Do not change the job-level core environment or rely on the prior command assignment persisting. Use uv run --no-sync --python 3.13 python (or the exact $UV_PROJECT_ENVIRONMENT/bin/python) for all post-sync Python operations; never bare python for optional environment metadata/provision/verifier. Sync retains --extra llm_eval; no syncing uv run without that extra.",
+    "interpreter_identity_receipt": {
+      "path": "ci-artifacts/llm-eval-interpreter.json",
+      "command": "uv run --no-sync --python 3.13 python <stdlib-only identity receipt/check script>",
+      "checks": [
+        "Record configured UV_PROJECT_ENVIRONMENT, sys.executable, sys.prefix, sys.exec_prefix, sys.base_prefix and Python version.",
+        "Assert Path(sys.prefix).resolve() and Path(sys.exec_prefix).resolve() both equal Path(os.environ[\"UV_PROJECT_ENVIRONMENT\"]).resolve(); assert Python3.13 and venv prefix differs from base prefix.",
+        "On selected Linux/macOS layout, verify lexical absolute sys.executable points inside the owned env bin directory. Do not require Path(sys.executable).resolve() under env: venv Python may legitimately symlink to external interpreter binary.",
+        "Write receipt and fail before optional imports if any identity check fails. Log the same configured environment/executable/prefix tuple in prerequisite, pytest/runtime and dependency-present typing evidence; compare against this receipt."
+      ],
+      "execution_rule": "Run directly after sync, before resource/package preflight. Artifact acceptance checks receipt identity and final source/lock; mismatch prevents qualification even if tests otherwise pass."
+    }
+  },
+  "artifact_guard": {
+    "additional_required_records": [
+      "llm-eval-packages.txt",
+      "llm-eval-prerequisites.json",
+      "llm-eval-collection.log",
+      "llm-eval.log",
+      "llm-eval.xml",
+      "llm-eval-acceptance.json",
+      "llm-eval-source-ledger.json",
+      "llm-eval-ty.log",
+      "llm-eval-interpreter.json"
+    ],
+    "stager": "Extend accepted EXPECTED_RECORDS with exact Lighteval outputs for successful existing job; add llm-eval-tmp to existing unit-fixture exclusion partition so model weights/Parquet/cache fixtures are not uploaded accidentally. Preserve existing allowlisted diagnostic suffix/size limits, no-follow symlink behavior, current pytest aliases, race checks, missing-required/success logic and all retained artifacts.",
+    "raw_evidence": "Retain small raw metric/response summaries and numeric oracle errors with source/task/model/seed identity, not entire synthetic HF caches. If author requires response artifacts, write explicit small receipt outside omitted fixture tree and include it in source-ledger receipt.",
+    "failure": "always upload sanitized logs/staging receipt on failure. require-complete only when job status success, as currently accepted. Missing/invalid/duplicate JUnit or ledger artifacts prevent success. A missing/mismatching interpreter receipt is a failed success artifact gate. Keep core/retained artifact requirements unchanged."
+  },
+  "typing_guard": {
+    "core_environment": "Add all new/edited profile/runtime/helper/evaluator paths to existing classified no-diagnostic owned set; preserve exact historical allowances and unresolved-import policy. Core dev typing remains useful even without optional packages.",
+    "dependency_present": "Run task-scoped ty --error-on-warning in llm_eval dev environment on actual modified evaluator/profile/test/helper code, without creating new baseline allowances. Record llm-eval-ty.log. Any real optional installed API diagnostics must be fixed/reviewed, not hidden behind missing-import defaults. Execute uv run --no-sync --python 3.13 ty check <exact-owned-paths> --error-on-warning in the SAME persistent step-level UV_PROJECT_ENVIRONMENT as sync and pytest. If a separate typing step is used, repeat the identical step env and recheck interpreter receipt before running ty; do not fall back to default .venv.",
+    "stager": "Keep existing explicit dot-directory ty command. Add profile contract tests and inert initializer to owned set. Preserve native/archive owned guards byte-for-byte where no necessary small delta."
+  },
+  "validation_matrix": [
+    {
+      "id": "LP01",
+      "proof": "Actual production conftest miniature harness via existing profile_source pattern; inspect copied hook source identity. Default tests, testpaths, ., base, mandatory, runtime, retained, native and core --pyargs routes never load real Lighteval with both extra absent and installed. Real package origin/audit traces distinguish core unit fake sys.modules from real optional imports."
+    },
+    {
+      "id": "LP02",
+      "proof": "Explicit relative/absolute directory/file/node, invocation from tests/, mixed core+eval roots; correct preflight only when selected. Marker-only, incompatible profile/mixed optional, canonical dotted and resolved-alias --pyargs rejected before optional-module import sentinel. Preserve core dotted path success."
+    },
+    {
+      "id": "LP03",
+      "proof": "Real absent extra and missing langdetect still fail before pipeline/model side effects. For each NLTK resource absence use prerequisites.missing_resource_negative_contract: fresh child restricts actual nltk.data.path to owned fixtures, prepares the other real resource, proves actual omitted find raises LookupError BEFORE actual production preflight, then verifies scoped failure with zero pipeline/Registry imports/downloads. Empty NLTK_DATA alone is explicitly insufficient. Record effective paths and lookup evidence. Installed actual preflight succeeds. Policy-harness stubs remain nonqualification evidence."
+    },
+    {
+      "id": "LP04",
+      "proof": "Named-profile filters/addopts/PYTEST_ADDOPTS, ignore/glob/deselect, subset target, zero cases, missing/extra/duplicate/malformed/traversal ledger nodes all fail. Any -m is forbidden even llm_eval alone. Collect-only requires real prerequisites and ledger, reports no execution qualification."
+    },
+    {
+      "id": "LP05",
+      "proof": "Full/focused collection skip, setup/call skip, importorskip, xfail strict/nonstrict, xpass strict/nonstrict, setup/teardown failure, interruption and artificial zero-call pass cannot qualify. Focused -k ordinary subset may pass strictly without complete label."
+    },
+    {
+      "id": "LP06",
+      "proof": "Actual pytest.Config.fromdictargs callers tests/mpc/test_round_store_contracts.py and tests/utils/test_rl_payload_utilities.py remain valid. Default Config singleton/RNG fixtures and registration name/qualify/base semantics unchanged."
+    },
+    {
+      "id": "LP07",
+      "proof": "Accepted native383 case ledger hash unchanged, existing test_mlx_profile_contract.py passes and focused real native preflight remains intact on available platform; exact retained19/module-marker/runtime partition tests and artifact negatives remain green. No need to retrain all native cases absent affected source, root decides final rebind."
+    },
+    {
+      "id": "LP08",
+      "proof": "Final accepted real installed evaluator ledger executes naturally in frozen Linux Python3.13 CPU CI profile with raw independent metrics/failure/cache evidence and source hashes. No mock-only acceptance, missing primary or cache-freshness unresolved bug cannot be profile-blocked. First verify every CI phase inherits the same persistent owned environment; compare resource/preflight, pytest and typing interpreter evidence with llm-eval-interpreter.json."
+    },
+    {
+      "id": "LP09",
+      "proof": "Artifact stager synthetic sentinel matrices verify required Lighteval records present once, missing outputs fail success staging, weights/cache omitted, symlink/alias nonfollow and existing retained outputs preserved. Workflow verifier mutations reject duplicate/substituted/extra/missing/xfail cases without executing expensive models."
+    },
+    {
+      "id": "LP10",
+      "proof": "Ruff imports, focused typing in core and dependency-present environments, uv lock --check, exact allowed metadata delta and source-bound fresh independent review complete."
+    },
+    {
+      "id": "LP11",
+      "proof": "LP-P1-01 regression: exercise actual uv --no-sync environment selection with persistent step env against a distinguishable default .venv using stdlib-only identity probes, no sync/mutation needed. Correct inherited env produces expected prefix; intentionally omitted/wrong env produces mismatching prefix and identity guard fails BEFORE optional imports. Verify workflow step-level env covers sync, provisioning, metadata, pytest, artifact verifier and optional typing, including any split steps. Installed package-presence alone never establishes environment identity."
+    }
+  ],
+  "support_limits": [
+    "Qualifies real installed Lighteval0.13 CPU adapter pipeline on bounded synthetic fixtures and selected preset task prompt/metric paths, not benchmark accuracy, all IFEval instructions/languages, GPU/distributed inference, every upstream task or external corpus downloads.",
+    "Named full profile is strict and optional only in dependency scope; focused pass not complete qualification.",
+    "Author runtime cache freshness/task|fewshot defects and xxhash compatibility remain internal work and must close with actual red/green before support accepted.",
+    "Authorized NLTK override and recorded upstream metadata/advisory boundary persist; no new security question or claim of security-clean environment.",
+    "Python3.13 only; no all-extras provisioning due accepted SSL/Lighteval ANTLR conflict."
+  ],
+  "acceptance_gate": [
+    "Fresh Sol reviews exact plan before profile implementation.",
+    "Root binds accepted archive profile/base and runtime inventory/resources/source/lock; no stale-file replacement.",
+    "Real optional import boundary and strict profile matrix accepted with current core/native383/retained19 unchanged.",
+    "All frozen Lighteval real cases and necessary failure paths pass on CPU Linux3.13; exact evidence/ledger/CI/artifact/typing checks accepted.",
+    "Root records final source-integrated qualified state and honest bounded support; docs follow final interfaces."
+  ],
+  "deferred_bindings": [
+    "Accepted archive-profile commit/tree/guards/workflow/stager hashes",
+    "Accepted evaluator commit/tree and expanded exact node IDs",
+    "Final author-used NLTK lookup paths/resource hash receipt",
+    "Root-approved xxhash cap and uv.lock hash",
+    "Measured Linux cold runtime budget and actual complete profile node count"
+  ],
+  "planning_validation": {
+    "repository_edits": false,
+    "full_suites_or_runtime_tests_executed": false,
+    "dependencies_installed": false,
+    "ledger_count_fabricated": false,
+    "note": "Read-only source/design inspection and direct author handoff only; observed active worktree hashes are provenance, not final implementation baseline.",
+    "revision2": "Design-only correction of two accepted review findings; no implementation/provision/test run. Original rev1 preserved exactly; existing mutable inspected-source snapshots intentionally remain original provenance rather than being silently rebound."
+  },
+  "revision_history": [
+    {
+      "revision": 1,
+      "path": "/tmp/plato-lighteval-profile-plan.v1.json",
+      "sha256": "7d61abae346522ecde23dde6b1c23abd65fa909fc99e989876a5c07fdf2d46ab"
+    },
+    {
+      "revision": 2,
+      "basis_review": "/tmp/plato-lighteval-profile-plan-review.json",
+      "basis_review_sha256": "7f5a0d599b8b4ee65519cc329723f994f6a49d121abdb523992ce1daa259f342",
+      "changes": [
+        "LP-P1-01 persistent environment, interpreter receipt and regression/CI artifact binding",
+        "LP-P1-02 real NLTK search-path isolation and absence-before-preflight evidence"
+      ],
+      "unchanged": "All optional/core/native/retained semantics, final deferred inventory/source bindings, ownership and accepted cache plan stay unchanged."
+    }
+  ],
+  "correction_source_bindings": [
+    {
+      "path": "/tmp/plato-lighteval-profile-plan-review.json",
+      "sha256": "7f5a0d599b8b4ee65519cc329723f994f6a49d121abdb523992ce1daa259f342",
+      "role": "Fresh independent actual uv/NLTK empirical review evidence; both medium findings preserved."
+    },
+    {
+      "path": "/tmp/plato-refresh-worktrees/lighteval-runtime/.venv/lib/python3.13/site-packages/nltk/data.py",
+      "sha256": "cda75896c3639541f3c3b811d647354dc5829774c2f201a7c942896f5cb99dc8",
+      "lines": "150-169",
+      "role": "Read source confirms NLTK_DATA prepends without removing home/prefix/system fallbacks."
+    }
+  ]
+}
