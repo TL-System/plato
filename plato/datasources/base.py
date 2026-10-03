@@ -10,6 +10,7 @@ import logging
 import os
 import sys
 import tarfile
+import tempfile
 import time
 import zipfile
 from collections.abc import Callable
@@ -81,7 +82,7 @@ class DataSource:
         if sentinel.exists() and (ready is None or ready()):
             return
 
-        with DataSource._download_guard(data_path):
+        with DataSource._download_guard(data_path), contextlib.ExitStack() as resources:
             if sentinel.exists():
                 if ready is None or ready():
                     return
@@ -89,6 +90,15 @@ class DataSource:
                 # under the same lock used by download/extraction and recheck
                 # after acquiring it so a competing recovery can finish first.
                 sentinel.unlink()
+
+            download_file = file_name
+            if suffix == ".zip":
+                # Retain the prior canonical ZIP through failed replacement
+                # attempts. Publish only after the new archive extracts safely.
+                temporary = resources.enter_context(
+                    tempfile.TemporaryDirectory(prefix=".download-", dir=data_path)
+                )
+                download_file = os.path.join(temporary, os.path.basename(file_name))
 
             max_attempts = 3
             for attempt in range(1, max_attempts + 1):
@@ -107,7 +117,7 @@ class DataSource:
                         res.raise_for_status()
                         total_size = int(res.headers.get("Content-Length", 0))
                         downloaded_size = 0
-                        with open(file_name, "wb+") as file:
+                        with open(download_file, "wb+") as file:
                             for chunk in res.iter_content(chunk_size=1024):
                                 if not chunk:
                                     continue
@@ -123,7 +133,7 @@ class DataSource:
                                 sys.stdout.write("\n")
                 except requests.RequestException as exc:
                     logging.warning("Download failed for %s: %s", url, exc)
-                    Path(file_name).unlink(missing_ok=True)
+                    Path(download_file).unlink(missing_ok=True)
                     if attempt == max_attempts:
                         raise
                     time.sleep(1)
@@ -136,8 +146,8 @@ class DataSource:
                         total_size,
                         downloaded_size,
                     )
-                    if os.path.exists(file_name):
-                        os.remove(file_name)
+                    if os.path.exists(download_file):
+                        os.remove(download_file)
                     if attempt == max_attempts:
                         raise RuntimeError(
                             f"Incomplete download for {url}. Please retry."
@@ -153,8 +163,9 @@ class DataSource:
                         extract_archive(file_name, data_path)
                         os.remove(file_name)
                     elif suffix == ".zip":
-                        logging.info("Extracting %s to %s.", file_name, data_path)
-                        extract_archive(file_name, data_path)
+                        logging.info("Extracting %s to %s.", download_file, data_path)
+                        extract_archive(download_file, data_path)
+                        os.replace(download_file, file_name)
                     elif suffix == ".gz":
                         with gzip.open(file_name, "rb") as zipped_file:
                             with open(name, "wb") as unzipped_file:
@@ -162,8 +173,8 @@ class DataSource:
                         os.remove(file_name)
                 except (OSError, tarfile.ReadError, zipfile.BadZipFile) as exc:
                     logging.warning("Failed to extract %s: %s", file_name, exc)
-                    if os.path.exists(file_name):
-                        os.remove(file_name)
+                    if os.path.exists(download_file):
+                        os.remove(download_file)
                     if attempt == max_attempts:
                         raise
                     time.sleep(1)
