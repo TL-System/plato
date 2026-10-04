@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "decision": "accept_publication_pending_fresh_hosted_checks",
+  "reviewer": "/root/fast_typing_publication_gate",
+  "reviewed_commit": "8c245cc525b385cfd8dcf7cb3b0261b8be275a8e",
+  "validated_source_commit": "76d716e28f978b1ae66bfe7e046f219494527e2b",
+  "reviewed_base": "3232843bb08628e91a2400ee634f2ddb2a08fe27",
+  "worktree": "/private/tmp/plato-refresh-worktrees/deployment-integration",
+  "material_findings": [],
+  "verified": {
+    "tracked_tree_clean": true,
+    "post_validation_delta": "Only five recorded evidence JSON files; source, workflow and lock unchanged after76d716e2.",
+    "review_composition": "Every changed source path since3232843 is covered by accepted CI or typing source review. Deployment source hashes match exactly. Seven CI/typing overlap files match frozen typing AST after removing only accepted slow decorators/True-parameter markers. Remaining reviewed typing hashes match exactly; four final correction hashes match; pyproject delta consists only of accepted historical exclusions.",
+    "artifact_binding": "Independently verified every SHA256 in fast-ci-local-acceptance.json against six raw files; commit.txt identifies76d716e2.",
+    "junit": {
+      "passed": 1588,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "logs": "Mandatory log reports1588 passed,105 deselected,30 warnings,217.17s; ty.log and ruff.log each report All checks passed!.",
+    "fatal_gates": "Automatic and manual workflows invoke direct fatal configured ty and Ruff with set -euo pipefail; no status-1 waiver, continue-on-error, or new type suppression.",
+    "typing_scope": "Only archives/evidence historical exclusions broadened; active examples/tests retained and inherited unresolved-import rule unchanged.",
+    "qualification_preserved": "One automatic Python3.13 locked dev mandatory fast suite; existing full base/mandatory, runtime containment, retained model-search, Lighteval and focused installed typing remain workflow_dispatch-only with safe artifact staging. Required DP/MPC passing enforcement and exact full/runtime ownership remain preserved.",
+    "automatic_deployment_checks": "Container and docs/package workflows still run for main push/PR/manual; PR-only concurrency cancellation leaves main and manual runs uncancelled.",
+    "scope_boundaries": "plato/,configs/,uv.lock,archives unchanged since3232843; FEI retirement, Phase4 harness and remaining docs/retirements stay separate."
+  },
+  "evidence_sha256": {
+    "fast-ci-local-acceptance.json": "53de7ca0624e0a3abcc14211bc7829c017aa54b7cc18836c1952922ef263ace7",
+    "fast-ci-implementation-review.json": "7843b01770b94f97da40506be57fd3b2058e3332f4f7e4cd5bf04c4e699c7204",
+    "ty-active-review.json": "1b007075dd9b3c60e21a08f6708fe4d19d1bc30f038b43ae62d647595607585f",
+    "deployment-typing-review.json": "a27c20f267eaaeddcf1842bb7721df9f337c21f8237caf07d411c1352b22787a",
+    "ci-ty-plan-review.json": "12bb65f954fad1f57b33ec4e2995679830f9f4195539ddc45e7cad1ce0afc57f"
+  },
+  "publication_conditions": [
+    "Push reviewed final head and require successful fresh hosted Linux fast CI, container and docs/package checks before merge;3232843 hosted passes do not qualify final source.",
+    "Measure hosted fast CI latency from actual final run; local217.17s is not hosted latency."
+  ],
+  "limits": [
+    "No full-suite or manual qualification rerun by this gate; existing accepted independent implementation and behavioral reviews used.",
+    "Configured typing success retains inherited unresolved-import policy; strict optional/native installed import/API qualification is not newly certified.",
+    "FedDF custom aggregation strategy remains restricted to FedDFAggregationStrategy subclasses as accepted by the implementation review."
+  ],
+  "untracked_handling": "Existing owned ci-artifacts/ retained unchanged and excluded from commits; report written only outside repository."
+}
