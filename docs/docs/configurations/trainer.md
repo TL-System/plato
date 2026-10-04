@@ -110,17 +110,18 @@ below describe the PyTorch path unless stated otherwise. See
     - `CyclicLR`
     - `CosineAnnealingWarmRestarts`
 
-    Alternatively, all four schedulers from [timm](https://timm.fast.ai/schedulers) are supported if `lr_scheduler` is specified as `timm` and `trainer -> type` is specified as `timm_basic`. For example, to use the `SGDR` scheduler, we specify `cosine` as `sched` in its arguments (`parameters -> learning_rate`):
+    Alternatively, all four schedulers from [timm](https://timm.fast.ai/schedulers) are supported if `lr_scheduler` is specified as `timm` and `trainer -> type` is specified as `timm_basic`. For example, to use the `SGDR` scheduler, we specify `cosine` as `sched` in its arguments (`parameters -> learning_rate`) in this configuration fragment:
 
     ```toml
     [trainer]
     type = "timm_basic"
+    lr_scheduler = "timm"
 
     [parameters]
 
     [parameters.learning_rate]
-    sched = cosine
-    min_lr = 1.e-6
+    sched = "cosine"
+    min_lr = 1.0e-6
     warmup_lr = 0.0001
     warmup_epochs = 3
     cooldown_epochs = 10
