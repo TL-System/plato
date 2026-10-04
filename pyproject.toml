@@ -78,6 +78,8 @@ lint.select = ["I"]
 
 [tool.hatch.build]
 exclude = [
+    ".venv-docs/**",
+    ".venv-docs-bootstrap/**",
     "archives/**",
     "ci-artifacts/**",
     "docs/site/**",
