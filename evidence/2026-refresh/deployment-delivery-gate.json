@@ -1,0 +1,116 @@
+{
+  "schema_version": 1,
+  "reviewer": "independent deployment publication gate",
+  "utc": "2026-10-04T00:23:37.870822+00:00",
+  "verdict": "ACCEPT_LOCAL_PUBLICATION_READINESS_SUBJECT_TO_FINAL_HEAD_CHECKS",
+  "publication_review_accepted": true,
+  "publication_conditions_pending": true,
+  "merge_accepted": false,
+  "deployment_qualified": false,
+  "source": {
+    "head": "90f629c7f20cf23612532cfcbeea8d100ff14da9",
+    "tree": "3422633752dcd8e960675a024c57e5bd24b77eb0",
+    "qualified_production_docs_source": "8f852a338a1f99f81963bd32584e5f663ea9e942",
+    "evidence_only_diff": [
+      "evidence/2026-refresh/deployment-component-acceptance.json",
+      "evidence/2026-refresh/deployment-docs-review.json",
+      "evidence/2026-refresh/deployment-docs.json",
+      "evidence/2026-refresh/llm-final-cleanup-inventory.json",
+      "evidence/2026-refresh/llm-final-worktree-cleanup.json"
+    ],
+    "component_owned_files_verified": 14,
+    "final_docs_review_source_hashes_verified": 23,
+    "review_artifacts_verified": 225,
+    "missing_artifacts": [],
+    "lock_sha256": "66a4e4442d7b1f26d220b44ca73c44ff4f1151a86857bb3f93a594819fd08126",
+    "lock_packages": 265,
+    "package_bytes_independent_recheck": {
+      "sdist_source": "8f852a338a1f99f81963bd32584e5f663ea9e942",
+      "sdist_git_bytes_verified": 1364,
+      "pkg_info_matches_wheel_metadata": true,
+      "archives_and_generated_excluded": true,
+      "wheel_sha256": "5e300e5a00b575557cd0ca5c948d956772fb7229a470bdbead2ac1333ced79dd",
+      "sdist_sha256": "58c184f10dbcebb47643fc92d94c97d1553c36000d744c6dfed26e093d9e7fa1"
+    }
+  },
+  "review_bindings": [
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/deployment-integration/evidence/2026-refresh/deployment-component-acceptance.json",
+      "sha256": "574eef3ee1fc100afeadb09df09973d529e4443ec196e67868745bef38e69006"
+    },
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/deployment-integration/evidence/2026-refresh/plato-deployment-refresh-plan.json",
+      "sha256": "6d9eca53b96e1e70d6f89617fce2f2a1234fb5d8fc94fa79e387ade605c4fe9e"
+    },
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/deployment-integration/evidence/2026-refresh/plato-deployment-refresh-plan-review.json",
+      "sha256": "98b845c6dd3d1562a327239f4dd96c909b4d8bc6c9db2f24240393423dfb976b"
+    },
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/deployment-integration/evidence/2026-refresh/plato-container-review.json",
+      "sha256": "9239f4fc003134f47c21b8defecc533b3f796319200ca94120b861b3e82fd974"
+    },
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/deployment-integration/evidence/2026-refresh/plato-docs-package-binding-review.json",
+      "sha256": "c42c4deea9bf414388711069c34b48238f6ead704ed5dadce38e605b5e5b1075"
+    },
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/deployment-integration/evidence/2026-refresh/deployment-docs-review.json",
+      "sha256": "a98cc1fce776dc36620d7630253bb19b465253212f163322bd970d1cdf592c97"
+    }
+  ],
+  "unresolved_findings_by_severity": {
+    "critical": 0,
+    "high": 0,
+    "medium": 0,
+    "low": 0
+  },
+  "findings": [],
+  "component_conclusions": {
+    "P1": "Accepted source-bound local static/container-launcher implementation and degradation proof. No local Docker runtime qualification; exact Linux CPU image/build/mount/library/CLI/resource checks remain mandatory.",
+    "P2": "Accepted corrected package/docs implementation. P2-M1 and P2-M2 are resolved by fresh source-bound review and actual default/release sequences, output-ownership refusal, source/metadata negatives, clean sdist rebuild and installed-wheel CPU proof. All169 P2 artifact hashes rechecked.",
+    "P3": "Accepted final prose source8f852a3 and actual strict-docs/default-package review:417 local rendered links,25 owned shell blocks,13 exact evaluator commands. All46 artifact hashes rechecked. Six evaluator/MLX/Qwen sections remain bound by accepted final review.",
+    "integration": "All14 component-owned files and23 final-review source hashes match. Lock hash66a4e444... and265 packages match accepted integrated evaluator metadata. Only evidence differs from P3 qualified source."
+  },
+  "actual_negative_evidence": {
+    "verified_and_read": [
+      "Actual untracked sdist input rejects with accepted=false.",
+      "Actual tracked plato/config.py byte alteration rejects.",
+      "Generated PKG-INFO mismatch against wheel METADATA rejects.",
+      "Owned build subprocess failure47 produces rejecting owned receipt.",
+      "Existing/unsupported output directories reject without bytes changed; repeated successful default output remains preserved.",
+      "Actual strict-docs missing-navigation target aborts with warning.",
+      "Dirty uncommitted prose rejected and failed archives retained."
+    ],
+    "scope": "Reused independently executed unchanged controls after verifying raw hashes; no mock-only replacement of actual build negatives."
+  },
+  "publication_conditions": [
+    {
+      "id": "DEPLOY-PUB-FINAL-HEAD",
+      "required": "After committing gate/evidence, execute actual strict docs build, static container checker, and full package checker against final publication HEAD. Preserve documented actual-default output behavior by using a fresh owned checkout/output; never delete or overwrite a preexisting rejected directory to make a check pass.",
+      "receipt_requirements": "Bind exact HEAD/tree, lock, commands, exit codes, package hashes, Git bytes/PKG-INFO proof, clean sdist rebuild, installed-wheel CPU/import provenance and strict docs/static results. Store final receipts externally if committing them would change package source; evidence JSON can alter sdist bytes.",
+      "discharge": "Root may discharge this condition without another review if all checks pass and source differences are evidence-only. Any behavioral/build-policy/dependency change or failure requires applicable fresh review."
+    }
+  ],
+  "mandatory_before_merge": [
+    "Evaluator PR421 parent merged first; reconcile ancestry with source-equivalence proof or qualify changed integration.",
+    "Exact final Linux PyTorch profile jobs pass, preserving required core51/retained19 and evaluator/native source-bound gates; independently audit raw inventories, failures/skips, source and environment artifacts.",
+    "Exact final Linux container CPU job completes actual image build and all mounted/unmounted environment, native-library/torchvision/CLI, launcher exit/removal and resource checks. Recording stubs do not satisfy this condition.",
+    "Exact final Linux docs/package job passes strict docs and complete package provenance/build/rebuild/import checks, with source-bound artifacts audited.",
+    "Hosted Netlify preview succeeds and serves updated docs; verify effective root base, Python3.13, docs/site output and actual hosted content. If access blocks it, report blocked condition rather than infer success."
+  ],
+  "claim_limits": [
+    "Local publication readiness only; not merge, deployment or entire modernization completion.",
+    "No actual local Docker, GPU computation or arm64-container qualification.",
+    "No PyPI release, container-registry publication or production deployment authorized/performed.",
+    "No Python3.14 qualification.",
+    "Phase4 behavioral harness and historical archive prose are not integrated by this gate.",
+    "Cleanup receipts are evidence-only; active/root worktrees, environments and caches are outside this gate mutation scope."
+  ],
+  "pr_description": {
+    "path": "/tmp/plato-deployment-integration/pr-description.md",
+    "sha256": "11eb60e6197151d1e59dba241f42f0e63690c08f3b3374a5c2e1bd317f4dc5bc",
+    "assessment": "Accurately distinguishes local checks from required remote/container/preview gates and preserves release/publication limits."
+  },
+  "mutations": "Only requested external audit/gate JSON outputs. No source/environment modification, sync, full training, nested agents, push or PR."
+}
