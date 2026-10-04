@@ -1,0 +1,90 @@
+{
+  "schema_version": 1,
+  "utc": "2026-10-04T01:04:02.833706+00:00",
+  "reviewer": "independent deployment publication gate addendum",
+  "verdict": "ACCEPT_SCOPED_CORRECTION_CONDITIONAL_FINAL_INTEGRATED_CHECKS",
+  "publication_review_accepted": true,
+  "publication_conditions_pending": true,
+  "merge_accepted": false,
+  "prior_gate": {
+    "path": "/tmp/plato-deployment-delivery-gate.json",
+    "sha256": "7f721c9946fe524a8f15c3d406b394bb3091b11964fc33f291ec328b00514438",
+    "preserved_unmodified": true
+  },
+  "source": {
+    "head": "2779404ee5a9c5120e33267eee221bb84d46658e",
+    "tree": "aff168933a5273eda1add92ad8e165d6da17e6ad",
+    "prior_gate_sha256": "7f721c9946fe524a8f15c3d406b394bb3091b11964fc33f291ec328b00514438",
+    "review_sha256": "7a69dd496378fd9452e1f89344331b867ca16023de03ee859269e20123c90271",
+    "reviewer_artifacts_verified": 154,
+    "committed_author_artifacts_verified": 126,
+    "original_failure_artifacts_verified": 8,
+    "only_source_delta": "Two reviewed Hatch environment exclusion lines",
+    "prior14_component_hashes_unchanged": true,
+    "lock_sha256": "66a4e4442d7b1f26d220b44ca73c44ff4f1151a86857bb3f93a594819fd08126",
+    "merged_parent_is_ancestor": true,
+    "three_builds_each_git_bound_files": 1298,
+    "all_three_archives_identical": true,
+    "tracked_status": "",
+    "untracked_status": "?? ci-artifacts/"
+  },
+  "correction": {
+    "finding": "ROOT-P2-M3",
+    "status": "Narrow author correction and independent proof accepted; final integrated sequence pending",
+    "author_source": "06ba679690f090aacf7e6a95a6dffd74b81ffad3",
+    "author_evidence": "24b5e154bd43795ea6b2a47b6c9458fdf3a587ea",
+    "integrated_source": "57d67c91bc44be04021e0c642afb1cc93b91a2fe",
+    "review": {
+      "path": "/tmp/plato-docs-package-environment-review.json",
+      "sha256": "7a69dd496378fd9452e1f89344331b867ca16023de03ee859269e20123c90271"
+    },
+    "delta": "Only .venv-docs/** and .venv-docs-bootstrap/** added to Hatch exclusions; checker, docs, workflows and dependency/version/marker/lock bytes unchanged."
+  },
+  "findings": [],
+  "unresolved_findings_by_severity": {
+    "critical": 0,
+    "high": 0,
+    "medium": 0,
+    "low": 0
+  },
+  "prior_claim_correction": "Prior package/source/output-boundary checks remain valid in their externally located docs environments. They did not cover the documented default in-checkout docs environment followed by packaging. The original conditional gate did not authorize publishing after its final-head condition failed. The failure remains preserved; this addendum does not relabel that failed run as success.",
+  "actual_proof": {
+    "independent_default_docs_then_default_package": "PASS at06ba6796 with in-checkout .venv-docs preserved",
+    "independent_uv_absent_default_bootstrap_then_default_package": "PASS at06ba6796 with both .venv-docs and .venv-docs-bootstrap preserved",
+    "fresh_release_default": "PASS; wheel and sdist identical to both preceding sequences",
+    "gate_read_only_rechecks": "All154 reviewer artifact hashes,126 committed author artifact hashes and8 root failure artifact hashes verified. Independently verified1298 Git-bound sdist source files in each of3 builds, exact PKG-INFO/wheel METADATA equality and no environment/archive/generated payloads.",
+    "regression_controls": "Fresh independent16 ownership/source/metadata/degradation guards passed, including rejection of preserved original root red archive. No checker weakening or new output writes on refused paths."
+  },
+  "parent": {
+    "pr": 421,
+    "merged_commit": "3d4e08b26972e114d87ef39795e01f4dfa554b94",
+    "ancestry_independently_verified": true,
+    "receipt": "evidence/2026-refresh/lighteval-final-linux-acceptance.json",
+    "receipt_sha256": "4418c97e3a5f7d676abd24e48c9f43da21a1f2cde39a52c126bf270e622eacc4",
+    "scope": "Recorded accepted/merged parent Linux qualification; not final deployment delta Linux qualification."
+  },
+  "publication_conditions": [
+    "Commit this addendum and any pending evidence-only cleanup records, then freeze and record exact final HEAD/tree.",
+    "Before reusing default ci-artifacts output path, preserve previous ci-artifacts via reversible relocation with a complete hash-bound old-to-new mapping; do not delete old failure evidence. Retain original in-checkout .venv-docs to exercise corrected exclusion.",
+    "On final frozen integration, run actual documented strict docs with explicit Python3.13 and default .venv-docs, static container check, then full package checker at fresh default ci-artifacts/docs-package. Verify actual exclusions, all sdist Git bytes/PKG-INFO metadata, rebuild and outside-checkout installed-wheel CPU proof. No claim these final checks have already passed.",
+    "Record final source-bound receipts externally if another evidence commit would change package bytes. If additional evidence commits occur, rebind package qualification to the actual final source."
+  ],
+  "pending_before_merge": [
+    "Exact final deployment Linux PyTorch, actual container CPU and docs/package jobs pass with independently audited source-bound artifacts.",
+    "Hosted Netlify preview succeeds and serves updated docs with effective root/Python3.13/docs-site configuration verified.",
+    "Preserve all core51/retained19/native383/evaluator qualification requirements with source-equivalence or actual final execution as applicable."
+  ],
+  "limits": [
+    "No actual Docker/GPU/arm64-container, PyPI, registry or production-deployment acceptance.",
+    "No Phase4 harness or historical archive prose integrated.",
+    "No unchanged broad-suite reruns requested; source-changing failures require applicable review.",
+    "Tracked worktree clean; existing untracked ci-artifacts is deliberate preserved evidence, not a new clean-output claim."
+  ],
+  "mutations": "Only external addendum and audit JSON files. Original gate, source, environments, failure artifacts and PR draft unmodified.",
+  "pr_wording_rechecked": {
+    "path": "/tmp/plato-deployment-integration/pr-description.md",
+    "sha256": "3120ba7da58fbe165c818e769d1ef9a7ab511e044b64ed21800b0c21ed7f30f9",
+    "assessment": "Updated draft accurately names environment exclusions, fresh default/bootstrap/release proof,16 failure-path checks and merged parent, while leaving exact final checks pending."
+  },
+  "evidence_only_cleanup_followup": "Root will include completed evaluator cleanup receipts with addendum before freezing final checks; this report does not independently accept cleanup mutations."
+}

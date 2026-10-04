@@ -1,0 +1,283 @@
+{
+  "status": "COMPLETE_OWNED_MERGED_EVALUATOR_CLEANUP_WITH_FINAL_PAIR_DEFERRED",
+  "merged_main": "3d4e08b26972e114d87ef39795e01f4dfa554b94",
+  "inventory": "/tmp/plato-evaluator-worktree-cleanup-inventory.json",
+  "inventory_sha256": "263f3e2cd11910c77620a643b20bf7db8c5c270925a22fbdb8bbc2f920bb08b3",
+  "evidence_directory": "/tmp/plato-evaluator-cleanup-evidence-20261004T005443Z",
+  "removed_worktrees": [
+    "/tmp/plato-refresh-worktrees/lighteval-dependencies",
+    "/tmp/plato-refresh-worktrees/lighteval-docs",
+    "/tmp/plato-refresh-worktrees/lighteval-integration",
+    "/tmp/plato-refresh-worktrees/lighteval-profile",
+    "/tmp/plato-refresh-worktrees/lighteval-runtime",
+    "/tmp/plato-lighteval-docs-review-worktree"
+  ],
+  "removed_idle_owned_environments": [
+    "/private/tmp/plato-lighteval-dependency-checks/eval-env",
+    "/private/tmp/plato-lighteval-docs-review-eval-env",
+    "/private/tmp/plato-lighteval-integration/env",
+    "/private/tmp/plato-lighteval-profile-cleanup-review-evidence/env-absent",
+    "/private/tmp/plato-lighteval-profile-cleanup-review-evidence/env-no-langdetect",
+    "/private/tmp/plato-lighteval-profile/base-env",
+    "/private/tmp/plato-lighteval-profile/env",
+    "/private/tmp/plato-lighteval-profile/missing-langdetect-env",
+    "/private/tmp/plato-lighteval-profile/native-env",
+    "/private/tmp/plato-refresh-worktrees/lighteval-runtime/.venv",
+    "/private/tmp/plato-refresh-worktrees/lighteval-runtime/.venv-core"
+  ],
+  "removed_local_branches": [
+    "maintenance/2026-lighteval-dependencies",
+    "maintenance/2026-lighteval-docs",
+    "maintenance/2026-lighteval-integration",
+    "maintenance/2026-lighteval-profile",
+    "maintenance/2026-lighteval-runtime"
+  ],
+  "removal_receipts": [
+    {
+      "kind": "idle_attributable_evaluator_env_remove",
+      "path": "/private/tmp/plato-lighteval-dependency-checks/eval-env",
+      "activity": {
+        "command_matches": [],
+        "open_files": []
+      }
+    },
+    {
+      "kind": "idle_attributable_evaluator_env_remove",
+      "path": "/private/tmp/plato-lighteval-docs-review-eval-env",
+      "activity": {
+        "command_matches": [],
+        "open_files": []
+      }
+    },
+    {
+      "kind": "idle_attributable_evaluator_env_remove",
+      "path": "/private/tmp/plato-lighteval-integration/env",
+      "activity": {
+        "command_matches": [],
+        "open_files": []
+      }
+    },
+    {
+      "kind": "idle_attributable_evaluator_env_remove",
+      "path": "/private/tmp/plato-lighteval-profile-cleanup-review-evidence/env-absent",
+      "activity": {
+        "command_matches": [],
+        "open_files": []
+      }
+    },
+    {
+      "kind": "idle_attributable_evaluator_env_remove",
+      "path": "/private/tmp/plato-lighteval-profile-cleanup-review-evidence/env-no-langdetect",
+      "activity": {
+        "command_matches": [],
+        "open_files": []
+      }
+    },
+    {
+      "kind": "idle_attributable_evaluator_env_remove",
+      "path": "/private/tmp/plato-lighteval-profile/base-env",
+      "activity": {
+        "command_matches": [],
+        "open_files": []
+      }
+    },
+    {
+      "kind": "idle_attributable_evaluator_env_remove",
+      "path": "/private/tmp/plato-lighteval-profile/env",
+      "activity": {
+        "command_matches": [],
+        "open_files": []
+      }
+    },
+    {
+      "kind": "idle_attributable_evaluator_env_remove",
+      "path": "/private/tmp/plato-lighteval-profile/missing-langdetect-env",
+      "activity": {
+        "command_matches": [],
+        "open_files": []
+      }
+    },
+    {
+      "kind": "idle_attributable_evaluator_env_remove",
+      "path": "/private/tmp/plato-lighteval-profile/native-env",
+      "activity": {
+        "command_matches": [],
+        "open_files": []
+      }
+    },
+    {
+      "kind": "idle_attributable_evaluator_env_remove",
+      "path": "/private/tmp/plato-refresh-worktrees/lighteval-runtime/.venv",
+      "activity": {
+        "command_matches": [],
+        "open_files": []
+      }
+    },
+    {
+      "kind": "idle_attributable_evaluator_env_remove",
+      "path": "/private/tmp/plato-refresh-worktrees/lighteval-runtime/.venv-core",
+      "activity": {
+        "command_matches": [],
+        "open_files": []
+      }
+    },
+    {
+      "kind": "ordinary_git_worktree_remove",
+      "path": "/tmp/plato-refresh-worktrees/lighteval-dependencies",
+      "head": "e39be2490871c50d93f2a361ab6cbaefa09ea06f",
+      "activity": {
+        "command_matches": [],
+        "open_files": []
+      },
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "kind": "ordinary_git_worktree_remove",
+      "path": "/tmp/plato-refresh-worktrees/lighteval-docs",
+      "head": "376ff4fe74d9cbdff074df3c321525db96f868c9",
+      "activity": {
+        "command_matches": [],
+        "open_files": []
+      },
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "kind": "ordinary_git_worktree_remove",
+      "path": "/tmp/plato-refresh-worktrees/lighteval-integration",
+      "head": "d2ed4bcbc46684ac60dfdb1505ff764029ee48e9",
+      "activity": {
+        "command_matches": [],
+        "open_files": []
+      },
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "kind": "ordinary_git_worktree_remove",
+      "path": "/tmp/plato-refresh-worktrees/lighteval-profile",
+      "head": "8eabc52d9f6c9462660a05f0225c70fa06b30046",
+      "activity": {
+        "command_matches": [],
+        "open_files": []
+      },
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "kind": "ordinary_git_worktree_remove",
+      "path": "/tmp/plato-refresh-worktrees/lighteval-runtime",
+      "head": "db6bb4097193bfc37fa8590f318d8410cbb108f5",
+      "activity": {
+        "command_matches": [],
+        "open_files": []
+      },
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "kind": "git_worktree_force_after_known_accepted_docs_backup_and_recovery",
+      "path": "/tmp/plato-lighteval-docs-review-worktree",
+      "head": "d2ed4bcbc46684ac60dfdb1505ff764029ee48e9",
+      "activity": {
+        "command_matches": [],
+        "open_files": []
+      },
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "kind": "merged_local_branch_delete",
+      "branch": "maintenance/2026-lighteval-dependencies",
+      "stdout": "Deleted branch maintenance/2026-lighteval-dependencies (was e39be249).\n"
+    },
+    {
+      "kind": "verified_equivalent_and_backed_up_local_branch_delete",
+      "branch": "maintenance/2026-lighteval-docs",
+      "stdout": "Deleted branch maintenance/2026-lighteval-docs (was 376ff4fe).\n"
+    },
+    {
+      "kind": "merged_local_branch_delete",
+      "branch": "maintenance/2026-lighteval-integration",
+      "stdout": "Deleted branch maintenance/2026-lighteval-integration (was d2ed4bcb).\n"
+    },
+    {
+      "kind": "merged_local_branch_delete",
+      "branch": "maintenance/2026-lighteval-profile",
+      "stdout": "Deleted branch maintenance/2026-lighteval-profile (was 8eabc52d).\n"
+    },
+    {
+      "kind": "merged_local_branch_delete",
+      "branch": "maintenance/2026-lighteval-runtime",
+      "stdout": "Deleted branch maintenance/2026-lighteval-runtime (was db6bb409).\n"
+    }
+  ],
+  "exclusions": [
+    "Root .venv and shared caches",
+    "lighteval-final worktree and root-active /tmp/plato-lighteval-final/env",
+    "/tmp/plato-archive-integration/docs-env",
+    "all deployment/P2/phase4 and other historical worktrees/environments",
+    "/tmp/plato-lighteval-linux raw artifacts and delivery files",
+    "all raw task scratch parents/payloads",
+    "all remote branches, including maintenance/2026-lighteval-final"
+  ],
+  "protected_worktrees_preserved": [
+    "/Users/bli/Playground/plato",
+    "/private/tmp/plato-deployment-docs-review/worktree",
+    "/private/tmp/plato-p2-environment-independent-review/bootstrap-source",
+    "/private/tmp/plato-p2-environment-independent-review/default-source",
+    "/private/tmp/plato-p2-environment-independent-review/negative-source",
+    "/private/tmp/plato-p2-environment-independent-review/release-source",
+    "/private/tmp/plato-p2-fix-independent-review/negative-source",
+    "/private/tmp/plato-p2-fix-independent-review/release-source",
+    "/private/tmp/plato-p2-fix-independent-review/workflow-source",
+    "/private/tmp/plato-refresh-worktrees/container-refresh",
+    "/private/tmp/plato-refresh-worktrees/deployment-docs",
+    "/private/tmp/plato-refresh-worktrees/deployment-integration",
+    "/private/tmp/plato-refresh-worktrees/docs-package-binding-negative",
+    "/private/tmp/plato-refresh-worktrees/docs-package-binding-release",
+    "/private/tmp/plato-refresh-worktrees/docs-package-binding-workflow",
+    "/private/tmp/plato-refresh-worktrees/docs-package-env-bootstrap",
+    "/private/tmp/plato-refresh-worktrees/docs-package-env-default",
+    "/private/tmp/plato-refresh-worktrees/docs-package-env-negative",
+    "/private/tmp/plato-refresh-worktrees/docs-package-env-release",
+    "/private/tmp/plato-refresh-worktrees/docs-package-fix-negative",
+    "/private/tmp/plato-refresh-worktrees/docs-package-fix-release",
+    "/private/tmp/plato-refresh-worktrees/docs-package-fix-workflow",
+    "/private/tmp/plato-refresh-worktrees/docs-package-negative",
+    "/private/tmp/plato-refresh-worktrees/docs-package-refresh",
+    "/private/tmp/plato-refresh-worktrees/historical-archive-docs",
+    "/private/tmp/plato-refresh-worktrees/lighteval-final",
+    "/private/tmp/plato-refresh-worktrees/phase4-harness",
+    "/private/tmp/plato-refresh-worktrees/phase4-harness-fix",
+    "/private/tmp/plato-refresh-worktrees/phase4-harness-fix2"
+  ],
+  "final_worktree_and_active_helper_deferred": true,
+  "remote_final_branch_preserved_no_remote_actions": true,
+  "raw_linux_delivery_hashes_unchanged": true,
+  "root_checkout_and_protected_environment_hashes_unchanged": true,
+  "raw_scratch_receipts_and_shared_caches_preserved": true,
+  "no_source_edits_commits_publishing_or_herdr_actions": true,
+  "post_cleanup_audit": {
+    "path": "/tmp/plato-evaluator-cleanup-evidence-20261004T005443Z/post-cleanup-audit.json",
+    "sha256": "c3818d2561d173119df2f12257c3a671fecba5e50d88ad1c40d8ff229efb148e"
+  },
+  "remaining_editable_bindings_to_removed_sources": [],
+  "verified_snapshot_files": 10768,
+  "verified_snapshot_bytes": 856260145,
+  "backup_history_bundle": {
+    "path": "/tmp/plato-evaluator-cleanup-evidence-20261004T005443Z/source-history.bundle",
+    "bytes": 307152996,
+    "sha256": "1910cb039b5d8654b9d87e8cdca4f4f0e5af18006df7d0ef136da0eabbd3d6dc"
+  },
+  "review_recovery_tree": "d6a480d8ff67ceaa1c5c5a4eae88f86163e82a98",
+  "original_docs_rebinding_commit_preserved": "376ff4fe74d9cbdff074df3c321525db96f868c9",
+  "equivalent_docs_rebinding_commit_in_merged_main": "825c10f29af63bf261e17eb5730e4556017812b8",
+  "retained_remote_final_branch_verified": "86ecc56b1239930bcf57512b08877e0999edf95c\trefs/heads/maintenance/2026-lighteval-final",
+  "restore_instructions": {
+    "path": "/tmp/plato-evaluator-cleanup-evidence-20261004T005443Z/RESTORE.txt",
+    "sha256": "2955af4285cce4738e6678c8032f9e58b469659d61271d23ac5261ff44582e82"
+  },
+  "limitations": "The global binding scan could not access unrelated other-user daemon/socket scratch directories; all owned eligible/protected assets were accessible. Final worktree/helper and remote final branch are intentionally deferred."
+}
