@@ -1,0 +1,332 @@
+{
+  "schema_version": 1,
+  "review_type": "fresh independent bounded FEI retirement implementation review",
+  "reviewer": "/root/fei_retirement_implementation_review; inherited model/effort; no nested agents",
+  "recorded_at_utc": "2026-10-04T03:42:26.415220+00:00",
+  "verdict": "APPROVE_IMPLEMENTATION",
+  "source_binding": {
+    "worktree": "/private/tmp/plato-refresh-worktrees/fei-retirement",
+    "implementation_commit": "c1359992f70533c0f2a47d30742f9b14295da882",
+    "implementation_tree": "9e75b3b2f306677fabc6f9214658bfeacd152dc5",
+    "base_commit": "e81248dae1844fb5bc66a8d880c9a17b485606ac",
+    "base_tree": "ff5fcc51936fdca4e324ffc9aadd878522832291",
+    "original_commit": "3d4e08b26972e114d87ef39795e01f4dfa554b94",
+    "original_tree": "16602a4bd057c30ec2bf195b926d6f2d405774dd",
+    "clean_before_and_after": true
+  },
+  "accepted_plan": {
+    "path": "/tmp/plato-fei-retirement-plan.json",
+    "sha256": "2d46ccccaa35c1753c44c1974d226405d49d04cdd3178812f816879320ed6667",
+    "review_path": "/tmp/plato-fei-retirement-plan-review.json",
+    "review_sha256": "2bc7f5a374040880b18f29026881dc91b822d3815cf09ea9b7d73da74cebe303"
+  },
+  "unresolved_findings": {
+    "critical": 0,
+    "high": 0,
+    "medium": 0,
+    "low": 0
+  },
+  "findings": [],
+  "independent_checks": {
+    "original_six_files": "All six archived sources byte-exact to original 3d4e08b26972e114d87ef39795e01f4dfa554b94 and integration base e81248dae1844fb5bc66a8d880c9a17b485606ac. Independently compared source and archive commit Git blobs/modes plus on-disk bytes/SHA256/size; all modes 100644; all six active originals absent. Byte and executable-mode mutation rejection tests pass.",
+    "license_and_reproduction": "Original Apache-2.0 LICENSE, original pyproject.toml and uv.lock preserved byte-exact with source commit metadata. Historical restoration uses exact original detached Git checkout, preserving compatible shared-code source context without claiming successful execution or current dependency compatibility. Separate base ledger preserves seven historical frozen FEI cases and failed qualification history.",
+    "active_ledger": "Reconstructed active ledger independently from archived base ledger by removing exactly P4-fei, six source rows and two config bindings, recomputing only path/binding digests and adding reviewed amendment/status. Exact object equality verified; all eleven remaining task objects and 393 remaining inventory rows unchanged. Four original authority hashes unchanged and external pinned authority files independently hashed. No FEI active family or task; all remaining owners remain draft with empty cases.",
+    "qualification_guards": "Only twelve-to-eleven count/message changes in tests/conftest.py. Schema, duplicate owner/module/worker/family, frozen/nonempty, authored case digest, explicit-module, exact-node, selector/filter, serial-execution and failure/skip qualification guards remain. Fresh 100-test Phase4 contract run exercises synthetic successful frozen case, invalid scope/selectors, absent/extra/duplicate/substituted nodes and ordinary collection exclusion. Retirement tests reject absent FEI owner and missing/extra/duplicate ownership.",
+    "reference_audit": "Case-insensitive rg scan of plato, examples, configs, docs, .github, pyproject.toml and README.md returned zero matches. Tracked FEI references are archive, explicit retirement tests/amendment, and historical freeze evidence; no active example/runtime/docs/workflow reference remains. No new FEI CI step or FEI-specific dependency/workspace removal needed.",
+    "generic_rl_and_dependencies": "git diff confirms plato/utils/reinforcement_learning, tests/utils/test_rl_payload_utilities.py, active pyproject.toml and uv.lock untouched. rl extra retains gymnasium>=1.3.0 and public shared RL code. All 14 RL payload utility tests pass in independent run.",
+    "archive_collection_and_packages": "Fresh base collection found 1743 nodes, zero archives or tests/examples_phase4 worker nodes. Fresh uv wheel and sdist build succeeded; inspecting every member found no archives/** or obsolete examples/reinforcement_learning/fei path. Package hashes exactly reproduce implementation receipt.",
+    "research_and_evidence": "Archived retirement plan, approved review and rejected-repair review match external byte identities and manifest hashes. README accurately attributes unresolved state mismatch and separate strict rounded-state failure to existing review; it claims no accepted repair, accuracy improvement, benchmark reproduction or fresh FEI qualification. Abandoned dc93e49f and 7a2da68e resolve but are not ancestors of retirement commit.",
+    "external_pdf": "Raw review tarball independently matches external SHA256; Git contains no tracked PDF or tgz. Manifest records external non-distribution status and README explains third-party PDF is not redistributed.",
+    "receipt_integrity": "All seven implementation-validation source hashes independently verified. Receipt transparently records initial fixture setup errors, fixture correction and scoped affected-module rerun; this review separately achieved a clean combined 122-test run."
+  },
+  "validation": {
+    "focused_tests": {
+      "interpreter": "/tmp/plato-lighteval-final/env/bin/python",
+      "command": "/tmp/plato-lighteval-final/env/bin/python -m pytest tests/test_fei_retirement.py tests/test_examples_phase4_contract.py tests/utils/test_rl_payload_utilities.py -q --basetemp=/tmp/plato-fei-retirement-independent-review-tests -p no:cacheprovider",
+      "exit_code": 0,
+      "passed": 122,
+      "failed": 0,
+      "errors": 0,
+      "seconds": 90.05,
+      "breakdown": {
+        "retirement": 8,
+        "phase4_contract": 100,
+        "generic_rl_payload": 14
+      }
+    },
+    "ordinary_collection": {
+      "command": "/tmp/plato-lighteval-final/env/bin/python -m pytest tests --test-profile=base --collect-only -q -p no:cacheprovider",
+      "exit_code": 0,
+      "collected": 1743,
+      "seconds": 0.98,
+      "phase4_worker_nodes": 0,
+      "archive_nodes": 0,
+      "execution_qualification": false
+    },
+    "package_build": {
+      "command": "uv build --sdist --wheel --out-dir /tmp/plato-fei-retirement-independent-review-dist",
+      "exit_code": 0,
+      "distributions": [
+        {
+          "path": "/tmp/plato-fei-retirement-independent-review-dist/plato_learn-1.4.3-py3-none-any.whl",
+          "sha256": "5e300e5a00b575557cd0ca5c948d956772fb7229a470bdbead2ac1333ced79dd",
+          "members": 213,
+          "archive_or_obsolete_fei_members": []
+        },
+        {
+          "path": "/tmp/plato-fei-retirement-independent-review-dist/plato_learn-1.4.3.tar.gz",
+          "sha256": "c0e3442c290b2122ec6e9603177faeb4e4c99daa05720be96dbcec167c9feea5",
+          "members": 1530,
+          "archive_or_obsolete_fei_members": []
+        }
+      ]
+    },
+    "lint": {
+      "command": "/tmp/plato-lighteval-final/env/bin/python -m ruff check tests/test_fei_retirement.py tests/test_examples_phase4_contract.py tests/conftest.py --select I",
+      "exit_code": 0,
+      "new_test_format_check": 0,
+      "git_diff_check": 0,
+      "note": "Bare ruff was absent from shell PATH; existing environment module invocation passed without environment mutation."
+    },
+    "logs": {
+      "/tmp/plato-fei-retirement-independent-review-tests.log": {
+        "sha256": "f609e20cc0e0e12fd321086e5d713551a6f422ced28f2f1de189b6e182cd5a0c",
+        "bytes": 254
+      },
+      "/tmp/plato-fei-retirement-independent-review-collection.log": {
+        "sha256": "305f74ffac13c07c0e84cb219f24d1b633a1affa35053ec80e6a9e875c30e1db",
+        "bytes": 195759
+      },
+      "/tmp/plato-fei-retirement-independent-review-build.log": {
+        "sha256": "06ff59fcab561edcc0679414a41d521de4ddbf01e2648eab6ec09009248115e6",
+        "bytes": 248
+      }
+    }
+  },
+  "exact_hashes": {
+    "active_path_map_sha256": "84daa8d2da6a48241781cf008c6fd10e9333792433c2d9c37eb52f0d7f271cd1",
+    "active_config_bindings_sha256": "8f85172fd1c7acd9174ca54df4872c038516ac53564f3f8edce01adc54daba35",
+    "files": [
+      {
+        "original_path": "examples/reinforcement_learning/fei/fei.py",
+        "archive_path": "archives/retired/fei/original/examples/reinforcement_learning/fei/fei.py",
+        "disposition": "moved",
+        "git_mode": "100644",
+        "git_blob": "539228a3210f30cd7b21d779b3fdef070d348252",
+        "sha256": "d624ac5d2ebaedc1c6c2e6262678314531376db16b81ed775d3014a0dc21f870",
+        "bytes": 456,
+        "source_commit": "3d4e08b26972e114d87ef39795e01f4dfa554b94"
+      },
+      {
+        "original_path": "examples/reinforcement_learning/fei/fei_CIFAR10_resnet18.toml",
+        "archive_path": "archives/retired/fei/original/examples/reinforcement_learning/fei/fei_CIFAR10_resnet18.toml",
+        "disposition": "moved",
+        "git_mode": "100644",
+        "git_blob": "4a005d46c97ae1bf925d440ba6d028348af91316",
+        "sha256": "2a03ce665614c0a2b2a667801d5600aa1ae2ad4974601b5c7b2211dcc744562c",
+        "bytes": 3185,
+        "source_commit": "3d4e08b26972e114d87ef39795e01f4dfa554b94"
+      },
+      {
+        "original_path": "examples/reinforcement_learning/fei/fei_FashionMNIST_lenet5.toml",
+        "archive_path": "archives/retired/fei/original/examples/reinforcement_learning/fei/fei_FashionMNIST_lenet5.toml",
+        "disposition": "moved",
+        "git_mode": "100644",
+        "git_blob": "1b536666ea801570835735f5c437e94d0e34e649",
+        "sha256": "6b7dfae3c2c4ac3bdee861adac0d183b950c119f20b5fb0635afcafbeafd2bb3",
+        "bytes": 3103,
+        "source_commit": "3d4e08b26972e114d87ef39795e01f4dfa554b94"
+      },
+      {
+        "original_path": "examples/reinforcement_learning/fei/fei_agent.py",
+        "archive_path": "archives/retired/fei/original/examples/reinforcement_learning/fei/fei_agent.py",
+        "disposition": "moved",
+        "git_mode": "100644",
+        "git_blob": "6b5ba75b58b33fa94a2707da964a7ca683ca48d4",
+        "sha256": "ee186f5858e3362576d35bad2a3f4c7bf48f7a08ba1daab7f64895194c77da34",
+        "bytes": 11089,
+        "source_commit": "3d4e08b26972e114d87ef39795e01f4dfa554b94"
+      },
+      {
+        "original_path": "examples/reinforcement_learning/fei/fei_client.py",
+        "archive_path": "archives/retired/fei/original/examples/reinforcement_learning/fei/fei_client.py",
+        "disposition": "moved",
+        "git_mode": "100644",
+        "git_blob": "603924c0991ac53c83327e40b42bf72b36145072",
+        "sha256": "2dd8fa26e9d505537c0fd660ff40f37fc84954c626e0efba84ac0490b22b5e71",
+        "bytes": 2890,
+        "source_commit": "3d4e08b26972e114d87ef39795e01f4dfa554b94"
+      },
+      {
+        "original_path": "examples/reinforcement_learning/fei/fei_server.py",
+        "archive_path": "archives/retired/fei/original/examples/reinforcement_learning/fei/fei_server.py",
+        "disposition": "moved",
+        "git_mode": "100644",
+        "git_blob": "38c13a579fe13e21da8ce49d27407cd0769c21b7",
+        "sha256": "8493f3859b862d28214e34a5c5c3edea26bc01febc9752e09c343f65caa19a74",
+        "bytes": 3642,
+        "source_commit": "3d4e08b26972e114d87ef39795e01f4dfa554b94"
+      },
+      {
+        "original_path": "LICENSE",
+        "source_commit": "3d4e08b26972e114d87ef39795e01f4dfa554b94",
+        "git_mode": "100644",
+        "git_blob": "261eeb9e9f8b2b4b0d119366dda99c6fd7d35c64",
+        "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+        "bytes": 11357,
+        "archive_path": "archives/retired/fei/original/LICENSE",
+        "disposition": "copied_context"
+      },
+      {
+        "original_path": "pyproject.toml",
+        "source_commit": "3d4e08b26972e114d87ef39795e01f4dfa554b94",
+        "git_mode": "100644",
+        "git_blob": "ff69fd39a94c2889c78611d193559856ef4e1452",
+        "sha256": "fcc830f9fac66f2e2f28bef0d715bea3eb1300105a4239bb33cce8f62b71b398",
+        "bytes": 4102,
+        "archive_path": "archives/retired/fei/original/pyproject.toml",
+        "disposition": "copied_context"
+      },
+      {
+        "original_path": "uv.lock",
+        "source_commit": "3d4e08b26972e114d87ef39795e01f4dfa554b94",
+        "git_mode": "100644",
+        "git_blob": "419ce6bf04e2ca46520dcf1e05a36ac134cdc63c",
+        "sha256": "66a4e4442d7b1f26d220b44ca73c44ff4f1151a86857bb3f93a594819fd08126",
+        "bytes": 755641,
+        "archive_path": "archives/retired/fei/original/uv.lock",
+        "disposition": "copied_context"
+      },
+      {
+        "original_path": "tests/examples_phase4/cases.json",
+        "source_commit": "e81248dae1844fb5bc66a8d880c9a17b485606ac",
+        "git_mode": "100644",
+        "git_blob": "29d2d903bc64a7492a4f9f3a55df904aa1091552",
+        "sha256": "3e2aaca8daf3343ec4e7d31960185606f86992653b0772b0255adca47834a44d",
+        "bytes": 307132,
+        "archive_path": "archives/retired/fei/original/tests/examples_phase4/cases.json",
+        "disposition": "copied_context"
+      }
+    ],
+    "evidence": [
+      {
+        "archive_path": "archives/retired/fei/evidence/retirement-plan.json",
+        "sha256": "2d46ccccaa35c1753c44c1974d226405d49d04cdd3178812f816879320ed6667",
+        "bytes": 9986
+      },
+      {
+        "archive_path": "archives/retired/fei/evidence/retirement-plan-review.json",
+        "sha256": "2bc7f5a374040880b18f29026881dc91b822d3815cf09ea9b7d73da74cebe303",
+        "bytes": 13050
+      },
+      {
+        "archive_path": "archives/retired/fei/evidence/rejected-repair-review.json",
+        "sha256": "80094b3cec8272a8f44456ef2df4244579f9076990885e299b83b09d4e1f11d1",
+        "bytes": 28238
+      }
+    ],
+    "external_raw_evidence": {
+      "path": "/tmp/plato-phase4-fei-code-review-artifacts.tgz",
+      "sha256": "3061941926be598c454532b62b909fbb5bc3ba17bc780004767514967d6db44e",
+      "distributed": false,
+      "reason": "Contains third-party research PDF; retained externally as an audit artifact."
+    },
+    "changed_file_sha256": {
+      "archives/retired/README.md": "a33214bf234e07ce9dc75d9314fce2e5c4ea0b7dc15ed80b7c08687a4e21f0c2",
+      "archives/retired/fei/README.md": "11079329904c9aaa6bf3255ab5c34eb14fa53daa15d1c3f820ed52dd443d993c",
+      "archives/retired/fei/evidence/implementation-validation.json": "a397b046dcde8af195c676564936307b1be5a409560dabcd9a549844c49e8a7b",
+      "archives/retired/fei/evidence/rejected-repair-review.json": "80094b3cec8272a8f44456ef2df4244579f9076990885e299b83b09d4e1f11d1",
+      "archives/retired/fei/evidence/retirement-plan-review.json": "2bc7f5a374040880b18f29026881dc91b822d3815cf09ea9b7d73da74cebe303",
+      "archives/retired/fei/evidence/retirement-plan.json": "2d46ccccaa35c1753c44c1974d226405d49d04cdd3178812f816879320ed6667",
+      "archives/retired/fei/evidence/retirement-tests.txt": "972f7568fb901b7678945e9d0cd0bbffabce0ef35dd68282a3660689b67836e1",
+      "archives/retired/fei/manifest.json": "8a3c9f73a4a47d1c72034e2116ebe224e6d35c1051f25cebace0cf7cc97b28e9",
+      "archives/retired/fei/original/LICENSE": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+      "archives/retired/fei/original/examples/reinforcement_learning/fei/fei.py": "d624ac5d2ebaedc1c6c2e6262678314531376db16b81ed775d3014a0dc21f870",
+      "archives/retired/fei/original/examples/reinforcement_learning/fei/fei_CIFAR10_resnet18.toml": "2a03ce665614c0a2b2a667801d5600aa1ae2ad4974601b5c7b2211dcc744562c",
+      "archives/retired/fei/original/examples/reinforcement_learning/fei/fei_FashionMNIST_lenet5.toml": "6b7dfae3c2c4ac3bdee861adac0d183b950c119f20b5fb0635afcafbeafd2bb3",
+      "archives/retired/fei/original/examples/reinforcement_learning/fei/fei_agent.py": "ee186f5858e3362576d35bad2a3f4c7bf48f7a08ba1daab7f64895194c77da34",
+      "archives/retired/fei/original/examples/reinforcement_learning/fei/fei_client.py": "2dd8fa26e9d505537c0fd660ff40f37fc84954c626e0efba84ac0490b22b5e71",
+      "archives/retired/fei/original/examples/reinforcement_learning/fei/fei_server.py": "8493f3859b862d28214e34a5c5c3edea26bc01febc9752e09c343f65caa19a74",
+      "archives/retired/fei/original/pyproject.toml": "fcc830f9fac66f2e2f28bef0d715bea3eb1300105a4239bb33cce8f62b71b398",
+      "archives/retired/fei/original/tests/examples_phase4/cases.json": "3e2aaca8daf3343ec4e7d31960185606f86992653b0772b0255adca47834a44d",
+      "archives/retired/fei/original/uv.lock": "66a4e4442d7b1f26d220b44ca73c44ff4f1151a86857bb3f93a594819fd08126",
+      "tests/conftest.py": "81190a72e82dd3486f09098c4aca4adea1dd520b9bede132fc0600705776b800",
+      "tests/examples_phase4/cases.json": "7d18beab505f3f23cb6b14785c35b4d7a3b5b425b9dd541769e43bcd7b80167a",
+      "tests/test_examples_phase4_contract.py": "ce386d9ee7466a022ac6a59a26ff63d650f416d96c0695589d7152a72f82be9b",
+      "tests/test_fei_retirement.py": "c0673993f98da0a8da42ff0de134296884167e875be1d12ae30bedfce1086ffb"
+    },
+    "historical_authority_artifacts": {
+      "/tmp/plato-phase4-harness-design-review.json": "e97e3149a52639c9d13c7507d2e946eec50e1b0c775675255579ad25bc8b62f0",
+      "/tmp/plato-phase4-family-plan.json": "07d90034e89b83283c9b592550ebe17a1ea3a28a9fa2fbc292cc328db4977e4b",
+      "/tmp/plato-phase4-family-plan-review.json": "1fb78cdc19f530f9e17258d5e8481e54703f846b1aa8b7160112a9af18e477aa",
+      "/tmp/plato-phase4-harness-design.json": "0b01acff4e03d725f239af1fcc8d6f778fb1817ce69cb313f947391fcd14d502"
+    }
+  },
+  "active_counts": {
+    "tasks": 11,
+    "paths": 393,
+    "families": 57,
+    "config_bindings": 134
+  },
+  "retirement_amendment": {
+    "family": "fei",
+    "retired_task_id": "P4-fei",
+    "plan_sha256": "2d46ccccaa35c1753c44c1974d226405d49d04cdd3178812f816879320ed6667",
+    "plan_review_sha256": "2bc7f5a374040880b18f29026881dc91b822d3815cf09ea9b7d73da74cebe303",
+    "archive_manifest": "archives/retired/fei/manifest.json",
+    "archive_manifest_sha256": "8a3c9f73a4a47d1c72034e2116ebe224e6d35c1051f25cebace0cf7cc97b28e9",
+    "prior_ledger": "archives/retired/fei/original/tests/examples_phase4/cases.json",
+    "prior_ledger_sha256": "3e2aaca8daf3343ec4e7d31960185606f86992653b0772b0255adca47834a44d",
+    "prior_counts": {
+      "tasks": 12,
+      "paths": 399,
+      "families": 58,
+      "config_bindings": 136
+    },
+    "prior_path_map_sha256": "b278daad89b02a6157b24a61b533b8b5098fbc6211cb70cecf46042dc0d19808",
+    "prior_config_bindings_sha256": "c5c34c7f6f2f1149df9e8894303f48489698d64b657228bd65a3a1c43ee2a3bb",
+    "removed_paths": [
+      "examples/reinforcement_learning/fei/fei.py",
+      "examples/reinforcement_learning/fei/fei_CIFAR10_resnet18.toml",
+      "examples/reinforcement_learning/fei/fei_FashionMNIST_lenet5.toml",
+      "examples/reinforcement_learning/fei/fei_agent.py",
+      "examples/reinforcement_learning/fei/fei_client.py",
+      "examples/reinforcement_learning/fei/fei_server.py"
+    ],
+    "removed_config_bindings": [
+      {
+        "config": "examples/reinforcement_learning/fei/fei_CIFAR10_resnet18.toml",
+        "owner": "P4-fei",
+        "entrypoint_candidates": [
+          "examples/reinforcement_learning/fei/fei.py"
+        ],
+        "include_consumers": [],
+        "kind": "leaf-or-multi-mode-config",
+        "assignment": "Author resolves any multiple candidates into explicit case branches; all listed utilities/entrypoints remain inventoried. Include-only fragments inherit consuming leaf behavioral proof."
+      },
+      {
+        "config": "examples/reinforcement_learning/fei/fei_FashionMNIST_lenet5.toml",
+        "owner": "P4-fei",
+        "entrypoint_candidates": [
+          "examples/reinforcement_learning/fei/fei.py"
+        ],
+        "include_consumers": [],
+        "kind": "leaf-or-multi-mode-config",
+        "assignment": "Author resolves any multiple candidates into explicit case branches; all listed utilities/entrypoints remain inventoried. Include-only fragments inherit consuming leaf behavioral proof."
+      }
+    ],
+    "active_counts": {
+      "tasks": 11,
+      "paths": 393,
+      "families": 57,
+      "config_bindings": 134
+    },
+    "authority_disposition": "Original authority hashes retain their historical pre-retirement meaning; this reviewed amendment changes only active FEI inventory."
+  },
+  "limits": [
+    "Approval binds exact reviewed implementation commit/tree and plan hashes; it is retirement acceptance only, not FEI research correctness or revival approval.",
+    "No code, dependency, environment or repository edits; only independent review artifacts in /tmp. No subagents.",
+    "No full training suite, benchmark, accuracy experiment, research oracle repair, paper revalidation, socket deployment, publication or merge performed.",
+    "Raw paper-containing tarball remains external; only existing review evidence was used to assess attribution and retirement disposition."
+  ]
+}
