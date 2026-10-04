@@ -96,8 +96,8 @@ def test_preprocess_split_dispatches_by_mode(temp_config):
 
     datasource = DataSource.__new__(DataSource)
     datasource.preprocessing_mode = "corpus_lm"
-    datasource.preprocess_corpus_lm = lambda split: "corpus-result"
-    datasource.preprocess_chat_sft = lambda split: "chat-result"
+    setattr(datasource, "preprocess_corpus_lm", lambda split: "corpus-result")
+    setattr(datasource, "preprocess_chat_sft", lambda split: "chat-result")
 
     assert datasource.preprocess_split(object()) == "corpus-result"
 

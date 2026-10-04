@@ -244,7 +244,10 @@ def test_aggregation_rejects_cardinality_mismatch(temp_config, direct, payload_c
 def _dispatch_server(kind):
     from plato.servers import fedavg
 
-    class LegacyServer(fedavg.Server):
+    class InstrumentedServer(fedavg.Server):
+        legacy_calls: int = 0
+
+    class LegacyServer(InstrumentedServer):
         async def aggregate_weights(self, updates, baseline, weights):
             self.legacy_calls += 1
             result = await FedAvgAggregationStrategy().aggregate_weights(
@@ -255,7 +258,7 @@ def _dispatch_server(kind):
     server = (
         LegacyServer(aggregation_strategy=DeltaOnlyStrategy())
         if kind == "legacy"
-        else fedavg.Server(
+        else InstrumentedServer(
             aggregation_strategy=DeltaOnlyStrategy() if kind == "delta" else None
         )
     )
@@ -263,7 +266,7 @@ def _dispatch_server(kind):
     server.algorithm = DummyAlgorithm({"weight": torch.tensor([10.0])})
     server.context.algorithm = server.algorithm
     server.context.server = server
-    server.clients_processed = lambda: None
+    setattr(server, "clients_processed", lambda: None)
     server.updates = [
         SimpleNamespace(
             client_id=index,
@@ -360,6 +363,7 @@ def test_feature_samples_do_not_dilute_fractional_weight_reference(
             updates, {"w": torch.tensor([0.0])}, payloads, ServerContext()
         )
     )
+    assert result is not None
     assert result["w"].item() == pytest.approx(3.25)
 
 

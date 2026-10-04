@@ -14,7 +14,7 @@ from plato.config import Config
 from plato.samplers import dirichlet, iid, orthogonal, registry, sampler_utils
 
 
-class Dataset:
+class Dataset(torch.utils.data.Dataset):
     def __init__(self, targets):
         self.targets = targets
         self.classes = list(range(4))
@@ -395,7 +395,9 @@ def test_real_cross_silo_configure_accepts_assigned_edge_evaluation_id(
     assert_numpy_state_equal(before)
     assert trainer.client_id == edge_id
     sampler = server.testset_sampler
+    assert sampler is not None
     assert sampler.num_samples() == 600
+    assert sampler is not None
     indices = list(sampler.get())
     assert len(indices) == len(set(indices)) == 600
     assert all(0 <= index < 1000 for index in indices)

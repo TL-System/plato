@@ -135,7 +135,7 @@ def counted_archive_server(payload):
             self.end_headers()
             self.wfile.write(payload)
 
-        def log_message(self, *args):
+        def log_message(self, format, *args):
             pass
 
     server = http.server.HTTPServer(("127.0.0.1", 0), Handler)

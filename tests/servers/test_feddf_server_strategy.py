@@ -95,7 +95,7 @@ def test_feddf_server_process_reports_distills_global_model(temp_config):
 
     trainer = SimpleNamespace(model=TinyStudent(), device="cpu")
     algorithm = feddf_algorithm.Algorithm(trainer=trainer)
-    strategy = feddf_server_strategy.FedDFAggregationStrategy(
+    strategy = feddf_server.FedDFAggregationStrategy(
         proxy_set_size=4,
         proxy_seed=1,
         temperature=1.0,

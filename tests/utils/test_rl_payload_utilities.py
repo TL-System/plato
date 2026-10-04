@@ -12,8 +12,7 @@ from plato.utils.reinforcement_learning.policies import ddpg, sac, td3
 from tests.conftest import pytest_configure
 
 
-@pytest.fixture
-def action_space(request):
+def resolve_action_space(request):
     """Use effective mandatory Box or the optional numeric contract."""
     profile = request.config.pluginmanager.get_plugin("plato-profile-checks")
     if profile.qualify and not profile.base:
@@ -26,6 +25,10 @@ def action_space(request):
         high=np.full(2, 1, dtype=np.float32),
     )
 
+
+@pytest.fixture
+def action_space(request):
+    return resolve_action_space(request)
 
 @pytest.mark.parametrize(
     "scope, options, required",
@@ -54,9 +57,9 @@ def test_action_space_follows_effective_pytest_profile(
         probe_request = SimpleNamespace(config=config)
         if required and find_spec("gymnasium") is None:
             with pytest.raises(ModuleNotFoundError, match="gymnasium"):
-                action_space.__wrapped__(probe_request)
+                resolve_action_space(probe_request)
             return
-        space = action_space.__wrapped__(probe_request)
+        space = resolve_action_space(probe_request)
         if required:
             from gymnasium.spaces import Box
 
@@ -121,6 +124,7 @@ def test_active_policy_finite_update_and_saved_weight_roundtrip(
             float(idx == 5),
         )
         if kind == "td3_rnn":
+            assert isinstance(policy, td3.Policy)
             h, c = policy.get_initial_states()
             record += (h, c, h, c)
         policy.replay_buffer.push(record)
@@ -132,6 +136,7 @@ def test_active_policy_finite_update_and_saved_weight_roundtrip(
     )
     assert all(torch.isfinite(p).all() for p in policy.actor.parameters())
     if kind == "sac_deterministic":
+        assert isinstance(policy, sac.Policy)
         assert policy.alpha == 0
     saved = {name: p.detach().clone() for name, p in policy.actor.named_parameters()}
     policy.save_model(1)

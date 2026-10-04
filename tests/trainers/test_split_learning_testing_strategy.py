@@ -54,7 +54,9 @@ def test_fresh_public_split_evaluation_and_empty_partition(tmp_path):
         with torch.no_grad():
             model.weight.copy_(torch.eye(2))
         trainer = Trainer(model=model)
-        trainer.device = trainer.context.device = torch.device("cpu")
+        trainer.device = "cpu"
+        trainer.context.device = torch.device("cpu")
+        assert trainer.model is not None
         dataset = TensorDataset(torch.eye(2), torch.tensor([0, 1]))
         assert trainer.test(dataset) == 1.0
         empty = TensorDataset(torch.empty(0, 2), torch.empty(0, dtype=torch.long))

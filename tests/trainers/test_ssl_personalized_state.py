@@ -46,7 +46,9 @@ def test_ssl_public_spawn_returns_private_head_and_isolates_identity(tmp_path):
         trainer = Trainer(model=EncoderModel())
         template = copy.deepcopy(trainer.local_layers.state_dict())
         trainer.set_client_id(7)
-        trainer.device = trainer.context.device = torch.device("cpu")
+        trainer.device = "cpu"
+        trainer.context.device = torch.device("cpu")
+        assert trainer.model is not None
         trainer.current_round = 2
         encoder = copy.deepcopy(trainer.model.encoder.state_dict())
         reference = copy.deepcopy(trainer.local_layers)
@@ -92,16 +94,20 @@ def test_ssl_personalization_freezes_encoder_buffers_gradients_and_preserves_mod
     config = personal_config()
     with configure_environment(config, runtime_root=tmp_path):
         model = EncoderModel()
-        model.encoder = torch.nn.Sequential(
+        class FeatureEncoder(torch.nn.Sequential):
+            encoding_dim: int = 2
+
+        model.encoder = FeatureEncoder(
             torch.nn.Linear(2, 2),
             torch.nn.BatchNorm1d(2),
             torch.nn.Dropout(0.5),
         )
-        model.encoder.encoding_dim = 2
         trainer = Trainer(model=model)
         trainer.set_client_id(7)
         trainer.current_round = 2
-        trainer.device = trainer.context.device = torch.device("cpu")
+        trainer.device = "cpu"
+        trainer.context.device = torch.device("cpu")
+        assert trainer.model is not None
         before = copy.deepcopy(model.encoder.state_dict())
         requires_grad = [
             parameter.requires_grad for parameter in model.encoder.parameters()
@@ -115,7 +121,7 @@ def test_ssl_personalization_freezes_encoder_buffers_gradients_and_preserves_mod
             def fail(*_):
                 raise RuntimeError("interrupted SSL head update")
 
-            trainer.loss_strategy.compute_loss = fail
+            setattr(trainer.loss_strategy, "compute_loss", fail)
             with pytest.raises(RuntimeError, match="interrupted SSL"):
                 trainer.train_model(
                     {**config["trainer"], "run_id": "head"}, data, [0, 1, 2, 3]

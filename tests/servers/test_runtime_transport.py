@@ -510,6 +510,7 @@ def test_s3_ingress_uses_bounded_actual_http_reader(temp_config, kind):
         await runner.setup()
         site = web.TCPSite(runner, "127.0.0.1", 0)
         await site.start()
+        assert isinstance(site._server, asyncio.Server)
         port = site._server.sockets[0].getsockname()[1]
         seen = []
 

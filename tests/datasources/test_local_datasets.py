@@ -131,8 +131,11 @@ def test_tiny_imagenet_canonical_validation_labels(
     else:
         monkeypatch.setattr(tiny_imagenet.DataSource, "download", download)
     source = tiny_imagenet.DataSource()
+    assert source.trainset is not None
+    assert source.testset is not None
     assert source.num_train_examples() == source.num_test_examples() == 2
     assert source.classes() == ["n001", "n002"]
+    assert source.testset is not None
     assert source.testset.targets == [1, 0]
     assert [label for _, label in source.testset] == [1, 0]
     assert source.testset[0][0].shape[0] == 3
@@ -143,6 +146,8 @@ def test_tiny_imagenet_preserves_prepared_labeled_test_tree(temp_config, tmp_pat
     image_file(tmp_path / "train/n001/one.png")
     image_file(tmp_path / "test/n001/one.png")
     source = tiny_imagenet.DataSource()
+    assert source.trainset is not None
+    assert source.testset is not None
     assert source.num_train_examples() == source.num_test_examples() == 1
     assert source.classes() == ["n001"]
     assert source.testset[0][1] == 0
@@ -159,6 +164,8 @@ def test_prepartitioned_femnist_ids_and_counts(temp_config, tmp_path):
             )
         )
         source = femnist.DataSource(client_id=client_id, train_transform=lambda x: x)
+        assert source.trainset is not None
+        assert source.testset is not None
         assert source.num_train_examples() == source.num_test_examples() == count
         assert source.trainset[0][1] == 0
 

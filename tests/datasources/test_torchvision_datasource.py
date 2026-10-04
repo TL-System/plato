@@ -238,8 +238,10 @@ def test_torchvision_datasource_supports_deterministic_non_overlapping_subsets(
     expected_indices = torch.randperm(
         10, generator=torch.Generator().manual_seed(7)
     ).tolist()
+    assert datasource.trainset is not None
     assert datasource.trainset.indices == expected_indices[2:6]
     assert datasource.get_unlabeled_set().indices == expected_indices[:2]
+    assert datasource.trainset is not None
     assert set(datasource.trainset.indices).isdisjoint(
         datasource.get_unlabeled_set().indices
     )

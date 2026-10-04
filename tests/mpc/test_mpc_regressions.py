@@ -14,6 +14,7 @@ import torch
 from plato.mpc import RoundInfoStore
 from plato.processors.mpc_model_encrypt_additive import Processor as AdditiveProcessor
 from plato.processors.mpc_model_encrypt_shamir import Processor as ShamirProcessor
+from plato.servers.strategies.base import ServerContext
 from plato.servers.strategies.mpc import (
     MPCAdditiveAggregationStrategy,
     MPCShamirAggregationStrategy,
@@ -30,11 +31,6 @@ def round_pipeline(tmp_path, kind, clients, counts, threshold=None):
         for idx in range(len(clients))
     ]
     processor_cls = AdditiveProcessor if kind == "additive" else ShamirProcessor
-    strategy_cls = (
-        MPCAdditiveAggregationStrategy
-        if kind == "additive"
-        else MPCShamirAggregationStrategy
-    )
     kwargs = {} if kind == "additive" else {"threshold": threshold}
     payloads = [
         processor_cls(
@@ -49,7 +45,11 @@ def round_pipeline(tmp_path, kind, clients, counts, threshold=None):
     context = SimpleNamespace(
         trainer=SimpleNamespace(zeros=torch.zeros), current_round=7
     )
-    return store, strategy_cls(store, **kwargs), weights, payloads, updates, context
+    strategy = (
+        MPCAdditiveAggregationStrategy(store) if kind == "additive"
+        else MPCShamirAggregationStrategy(store, threshold=threshold)
+    )
+    return store, strategy, weights, payloads, updates, context
 
 
 @pytest.mark.parametrize(
@@ -260,8 +260,11 @@ def test_configured_shamir_client_lifecycle_matches_server_reconstruction(
             contexts.append(context)
 
         baseline = {"w": torch.zeros(2, dtype=torch.float64)}
+        aggregation_context = ServerContext()
+        aggregation_context.current_round = 9
+        assert isinstance(server.aggregation_strategy, MPCShamirAggregationStrategy)
         actual = asyncio.run(server.aggregation_strategy.aggregate_weights(
-            updates[::-1], baseline, payloads[::-1], SimpleNamespace(current_round=9)
+            updates[::-1], baseline, payloads[::-1], aggregation_context
         ))
         torch.testing.assert_close(actual["w"], expected, atol=2e-6, rtol=0)
         # Protocol parameters from server config take precedence over local

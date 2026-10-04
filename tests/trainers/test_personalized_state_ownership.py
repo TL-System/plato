@@ -52,41 +52,50 @@ def test_identity_reassignment_isolates_and_reloads_actual_personal_state(
             strategy = DittoUpdateStrategy(
                 model_fn=model, personalization_epochs=1, save_path=str(custom)
             )
-            extra = {}
+            training_step_strategy = None
+            loss_strategy = None
             path_attr = "personalized_model_path"
         elif family == "apfl":
             strategy = APFLUpdateStrategy(model_fn=model, save_path=str(custom))
-            extra = {"training_step_strategy": APFLStepStrategy()}
+            training_step_strategy = APFLStepStrategy()
+            loss_strategy = None
             path_attr = "personalized_model_path"
         elif family == "feddyn":
             strategy = FedDynUpdateStrategy(save_path=str(custom))
-            extra = {"loss_strategy": FedDynLossStrategy()}
+            training_step_strategy = None
+            loss_strategy = FedDynLossStrategy()
             path_attr = "grad_vector_path"
         elif family == "scaffold":
             strategy = SCAFFOLDUpdateStrategy(save_path=str(custom))
-            extra = {}
+            training_step_strategy = None
+            loss_strategy = None
             path_attr = "client_control_variate_path"
         else:
             strategy = FedALAUpdateStrategy(max_ala_epochs=2, rand_percent=100)
-            extra = {}
+            training_step_strategy = None
+            loss_strategy = None
             path_attr = "_local_model_path"
         trainer = ComposableTrainer(
             model=model,
             model_update_strategy=(
                 CompositeUpdateStrategy([strategy]) if name == "org/model" else strategy
             ),
-            **extra,
+            training_step_strategy=training_step_strategy,
+            loss_strategy=loss_strategy,
         )
-        trainer.device = trainer.context.device = torch.device("cpu")
+        trainer.device = "cpu"
+        trainer.context.device = torch.device("cpu")
+        assert trainer.model is not None
         torch.manual_seed(17)
         data = TensorDataset(torch.eye(2), torch.tensor([0, 1]))
         run = {**config["trainer"], "run_id": "personal"}
         trainer.set_client_id(1)
         trainer.train_model(run, data, [0, 1])
-        if family == "fedala":
+        if isinstance(strategy, FedALAUpdateStrategy):
             # A new global model in a second real run learns ALA weights.
             trainer.current_round = 2
             with torch.no_grad():
+                assert isinstance(trainer.model, torch.nn.Linear)
                 trainer.model.weight.add_(0.2)
             trainer.train_model(run, data, [0, 1])
             assert strategy.weights is not None
@@ -96,43 +105,51 @@ def test_identity_reassignment_isolates_and_reloads_actual_personal_state(
         root = tmp_path / "models" if family == "fedala" else custom
         assert first_path.parent == root
         first_bytes = first_path.read_bytes()
-        if family in {"ditto", "apfl"}:
+        if isinstance(strategy, (DittoUpdateStrategy, APFLUpdateStrategy)):
+            assert isinstance(strategy.personalized_model, torch.nn.Linear)
             first_state = {
                 k: v.clone()
                 for k, v in strategy.personalized_model.state_dict().items()
             }
-            if family == "apfl":
+            if isinstance(strategy, APFLUpdateStrategy):
                 torch.save(0.23, strategy.alpha_path)
-        elif family == "feddyn":
+        elif isinstance(strategy, FedDynUpdateStrategy):
+            assert strategy.cumulative_grad_vector is not None
             first_state = {
                 k: v.clone() for k, v in strategy.cumulative_grad_vector.items()
             }
-        elif family == "scaffold":
+        elif isinstance(strategy, SCAFFOLDUpdateStrategy):
+            assert strategy.client_control_variate is not None
             first_state = {
                 k: v.clone() for k, v in strategy.client_control_variate.items()
             }
         else:
+            assert isinstance(strategy, FedALAUpdateStrategy)
+            assert strategy.local_model_state is not None
             first_state = {k: v.clone() for k, v in strategy.local_model_state.items()}
         trainer.set_client_id(2)
         second_path = Path(getattr(strategy, path_attr))
         assert second_path != first_path
         assert not second_path.exists()
-        if family in {"ditto", "apfl"}:
+        if isinstance(strategy, (DittoUpdateStrategy, APFLUpdateStrategy)):
+            assert isinstance(strategy.personalized_model, torch.nn.Linear)
             torch.testing.assert_close(
                 strategy.personalized_model.weight, model().weight
             )
             assert not torch.equal(
                 strategy.personalized_model.weight, first_state["weight"]
             )
-            if family == "apfl":
+            if isinstance(strategy, APFLUpdateStrategy):
                 assert strategy.alpha == 0.5
                 assert "apfl_personalized_optimizer" not in trainer.context.state
-        elif family == "feddyn":
+        elif isinstance(strategy, FedDynUpdateStrategy):
+            assert isinstance(trainer.loss_strategy, FedDynLossStrategy)
             assert strategy.cumulative_grad_vector is None
             assert trainer.loss_strategy.cumulative_grad_vector is None
-        elif family == "scaffold":
+        elif isinstance(strategy, SCAFFOLDUpdateStrategy):
             assert strategy.client_control_variate is None
         else:
+            assert isinstance(strategy, FedALAUpdateStrategy)
             assert strategy.local_model_state is None
             assert strategy.weights is None
             assert strategy.start_phase is True
@@ -141,9 +158,10 @@ def test_identity_reassignment_isolates_and_reloads_actual_personal_state(
         assert first_path.read_bytes() == first_bytes
         trainer.set_client_id(1)
         strategy.on_train_start(trainer.context)
-        if family in {"ditto", "apfl"}:
+        if isinstance(strategy, (DittoUpdateStrategy, APFLUpdateStrategy)):
+            assert isinstance(strategy.personalized_model, torch.nn.Linear)
             actual_state = strategy.personalized_model.state_dict()
-            if family == "apfl":
+            if isinstance(strategy, APFLUpdateStrategy):
                 assert strategy.alpha == pytest.approx(0.23)
                 # Repeating assignment for the same client preserves optimizer/state.
                 trainer.context.state["apfl_personalized_optimizer"] = "same client"
@@ -152,14 +170,17 @@ def test_identity_reassignment_isolates_and_reloads_actual_personal_state(
                     trainer.context.state["apfl_personalized_optimizer"]
                     == "same client"
                 )
-        elif family == "feddyn":
+        elif isinstance(strategy, FedDynUpdateStrategy):
+            assert isinstance(trainer.loss_strategy, FedDynLossStrategy)
             actual_state = strategy.cumulative_grad_vector
             trainer.loss_strategy.on_train_start(trainer.context)
             assert trainer.loss_strategy.cumulative_grad_vector is actual_state
-        elif family == "scaffold":
+        elif isinstance(strategy, SCAFFOLDUpdateStrategy):
             actual_state = strategy.client_control_variate
         else:
+            assert isinstance(strategy, FedALAUpdateStrategy)
             actual_state = strategy.local_model_state
+        assert actual_state is not None
         for key, value in actual_state.items():
             torch.testing.assert_close(value, first_state[key])
 
@@ -233,19 +254,25 @@ def test_actual_spawn_returns_personal_state_and_optimizer_across_rounds(tmp_pat
     config["parameters"]["optimizer"]["momentum"] = .9
     with configure_environment(config, runtime_root=tmp_path):
         def create(label):
-            extra = {}
+            training_step_strategy = None
+            loss_strategy = None
             if family == "ditto":
                 strategy = DittoUpdateStrategy(model_fn=model, personalization_epochs=1,
                                                save_path=str(tmp_path / label))
             elif family == "apfl":
                 strategy = APFLUpdateStrategy(model_fn=model, save_path=str(tmp_path / label))
-                extra["training_step_strategy"] = APFLStepStrategy()
+                training_step_strategy = APFLStepStrategy()
             elif family == "feddyn":
                 strategy = FedDynUpdateStrategy(save_path=str(tmp_path / label))
-                extra["loss_strategy"] = FedDynLossStrategy()
+                loss_strategy = FedDynLossStrategy()
             else:
                 strategy = FedALAUpdateStrategy(save_state=False, max_ala_epochs=2, rand_percent=100)
-            trainer = ComposableTrainer(model=model, model_update_strategy=strategy, **extra)
+            trainer = ComposableTrainer(
+                model=model,
+                model_update_strategy=strategy,
+                training_step_strategy=training_step_strategy,
+                loss_strategy=loss_strategy,
+            )
             trainer.set_client_id(1)
             return trainer, strategy
         worker, actual_strategy = create("worker-personal")
@@ -254,6 +281,7 @@ def test_actual_spawn_returns_personal_state_and_optimizer_across_rounds(tmp_pat
         for round_id in (1, 2):
             for trainer in (worker, reference):
                 trainer.current_round = round_id
+                assert isinstance(trainer.model, torch.nn.Linear)
                 trainer.model.weight.data.fill_(float(round_id))
                 trainer.model.bias.data.zero_()
             worker.train(data, torch.utils.data.SequentialSampler(data))

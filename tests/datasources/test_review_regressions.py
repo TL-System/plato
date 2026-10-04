@@ -245,6 +245,8 @@ def test_tiny_default_evaluation_is_deterministic_and_training_stays_augmented(
     Image.fromarray(pixels).save(target)
     Image.fromarray(pixels).save(tmp_path / "train/n001/images/train.png")
     source = tiny_imagenet.DataSource()
+    assert source.trainset is not None
+    assert source.testset is not None
     torch.manual_seed(27)
     first, second = source.testset[0][0], source.testset[0][0]
     assert torch.equal(first, second)
@@ -260,6 +262,8 @@ def test_tiny_default_evaluation_normalizes_known_constant_pixels(
     Config.params["data_path"] = str(tmp_path)
     tiny_layout(tmp_path, native)
     source = tiny_imagenet.DataSource()
+    assert source.trainset is not None
+    assert source.testset is not None
     tensor = source.testset[0][0]
     expected = torch.tensor(
         [
@@ -281,7 +285,9 @@ def test_tiny_explicit_train_and_test_transforms_remain_independent(
         train_transform=lambda image: "training",
         test_transform=lambda image: "evaluation",
     )
+    assert source.trainset is not None
     assert source.trainset[0] == ("training", 0)
+    assert source.testset is not None
     assert source.testset[0] == ("evaluation", 0)
 
 
