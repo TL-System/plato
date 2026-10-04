@@ -5,8 +5,11 @@ import copy
 import hashlib
 import json
 import os
+import socket
 import subprocess
 import sys
+import threading
+import time
 from collections import Counter
 from pathlib import Path
 from types import SimpleNamespace
@@ -545,11 +548,25 @@ def _unrelated_process_probe(worker_repo, tmp_path, timestamp):
             "emit(directory, 'success')\n"
         )
         worker = _worker(worker_repo, body)
-        result = common.run_case(
-            tmp_path / "unrelated",
-            worker=worker,
-            spec=_spec(config="leaf.toml", entrypoint="entry.py"),
-        )
+        directory = tmp_path / "unrelated"
+        if timestamp == "valid":
+            with pytest.raises(AssertionError, match="Phase4 case failed"):
+                common.run_case(
+                    directory,
+                    worker=worker,
+                    spec=_spec(config="leaf.toml", entrypoint="entry.py"),
+                )
+            result = json.loads((directory / "result.json").read_text())
+            assert result["registration_errors"] and result["unresolved_child_hints"]
+            failure = next(e for e in result["events"] if e["event"] == "failure")
+            assert failure["local_child_owned"] is False
+            assert failure["local_cleanup"]["forced"] == []
+        else:
+            result = common.run_case(
+                directory,
+                worker=worker,
+                spec=_spec(config="leaf.toml", entrypoint="entry.py"),
+            )
         assert unrelated.poll() is None
         processes = result["processes"]
         assert isinstance(processes, dict)
@@ -617,7 +634,10 @@ def test_original_nonzero_exit_and_serial_execution_guard(policy):
     assert any("original exit was nonzero" in error for error in checks.violations)
 
 
-@pytest.mark.parametrize("corruption", ["undecodable", "unreadable"])
+@pytest.mark.parametrize(
+    "corruption",
+    ["undecodable", "unreadable", "huge-created", "huge-monotonic", "deep-json"],
+)
 def test_bad_event_files_cannot_bypass_cleanup(worker_repo, tmp_path, corruption):
     import psutil
 
@@ -626,11 +646,24 @@ def test_bad_event_files_cannot_bypass_cleanup(worker_repo, tmp_path, corruption
         "child = subprocess.Popen([sys.executable, '-c', 'import time; time.sleep(30)'])\n"
         "emit(directory, 'child_started', child_pid=child.pid, child_created=psutil.Process(child.pid).create_time())\n"
         "print('owned child started', flush=True)\n"
+        "print('owned child diagnostic', file=sys.stderr, flush=True)\n"
         "bad = directory / 'events-bad.jsonl'\n"
         + (
             "bad.write_bytes(bytes([255]))\n"
             if corruption == "undecodable"
             else "bad.write_text('unreadable event')\nbad.chmod(0)\n"
+            if corruption == "unreadable"
+            else "bad.write_text('[' * 3000 + ']' * 3000)\n"
+            if corruption == "deep-json"
+            else "bad.write_text(json.dumps({'pid':os.getpid(), 'created':"
+            + (
+                "10**1000"
+                if corruption == "huge-created"
+                else "psutil.Process().create_time()"
+            )
+            + ", 'monotonic':"
+            + ("10**1000" if corruption == "huge-monotonic" else "time.monotonic()")
+            + ", 'event':'numeric', 'case_id':spec['case_id']}))\n"
         )
         + "time.sleep(30)\n"
     )
@@ -649,7 +682,7 @@ def test_bad_event_files_cannot_bypass_cleanup(worker_repo, tmp_path, corruption
         assert result["timed_out"] and result["forced"] and result["survivors"] == []
         assert result["malformed_events"]
         assert "owned child started" in (directory / "stdout.log").read_text()
-        assert (directory / "stderr.log").exists()
+        assert "owned child diagnostic" in (directory / "stderr.log").read_text()
         assert len(result["processes"]) >= 2
         for pid, created in result["processes"].items():
             try:
@@ -710,3 +743,362 @@ def test_genuine_child_identity_is_observed_and_exits_naturally(
     child = next(e for e in events if e["event"] == "child_started")
     assert processes[child["child_pid"]] == child["child_created"]
     assert result["forced"] == [] and result["survivors"] == []
+    registrations, environment = result["child_registrations"], result["environment"]
+    assert isinstance(registrations, list) and isinstance(environment, dict)
+    receipt = registrations[0]
+    assert receipt["registration_id"] == child["registration_id"]
+    assert receipt["reporter_pid"] == child["pid"]
+    assert receipt["reporter_created"] == child["created"]
+    assert receipt["child_pid"] == child["child_pid"]
+    assert receipt["disposition"] == "registered"
+    assert "token" not in receipt and "PLATO_PHASE4_REGISTRATION" not in environment
+
+
+@pytest.mark.parametrize("attempt", [1, 2])
+def test_fast_detached_child_cannot_escape_owned_cleanup(
+    worker_repo, tmp_path, attempt
+):
+    import psutil
+
+    worker = _worker(
+        worker_repo,
+        (
+            "with configured_case(spec, directory):\n    import entry\n"
+            "import subprocess, psutil\n"
+            "child = subprocess.Popen([sys.executable, '-c', 'import time; time.sleep(30)'], start_new_session=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)\n"
+            "identity = {'pid':child.pid, 'created':psutil.Process(child.pid).create_time()}\n"
+            "(directory / 'controlled-child.json').write_text(json.dumps(identity))\n"
+            "emit(directory, 'child_started', child_pid=identity['pid'], child_created=identity['created'])\n"
+            "emit(directory, 'success')\nos._exit(0)\n"
+        ),
+    )
+    directory = tmp_path / f"fast-child-{attempt}"
+    try:
+        with pytest.raises(AssertionError, match="Phase4 case failed"):
+            common.run_case(
+                directory,
+                worker=worker,
+                spec=_spec(
+                    config="leaf.toml", entrypoint="entry.py", timeout_seconds=10
+                ),
+            )
+        result = json.loads((directory / "result.json").read_text())
+        identity = json.loads((directory / "controlled-child.json").read_text())
+        assert str(identity["pid"]) in result["processes"]
+        assert result["forced"] and result["survivors"] == []
+        assert result["unresolved_child_hints"] == []
+        assert result["child_registrations"][0]["child_pid"] == identity["pid"]
+        try:
+            child = psutil.Process(identity["pid"])
+            assert (
+                child.create_time() != identity["created"]
+                or child.status() == psutil.STATUS_ZOMBIE
+            )
+        except psutil.NoSuchProcess:
+            pass
+    finally:
+        # The probe itself knows exactly which genuine child it spawned.
+        path = directory / "controlled-child.json"
+        if path.exists():
+            identity = json.loads(path.read_text())
+            try:
+                child = psutil.Process(identity["pid"])
+                if (
+                    child.create_time() == identity["created"]
+                    and child.status() != psutil.STATUS_ZOMBIE
+                ):
+                    child.kill()
+            except psutil.NoSuchProcess:
+                pass
+
+
+@pytest.mark.parametrize(
+    "hint", ["detached", "partial-request", "unrelated", "malformed-id"]
+)
+def test_direct_child_hint_cannot_qualify_or_authorize_signals(
+    worker_repo, tmp_path, hint
+):
+    import psutil
+
+    unrelated = subprocess.Popen([sys.executable, "-c", "import time; time.sleep(30)"])
+    directory = tmp_path / "direct-hint"
+    created = psutil.Process(unrelated.pid).create_time()
+    spawn = (
+        "import subprocess, psutil, time\n"
+        + (
+            "child = subprocess.Popen([sys.executable, '-c', 'import time; time.sleep(30)'], start_new_session=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)\n"
+            "identity = {'pid':child.pid, 'created':psutil.Process(child.pid).create_time()}\n"
+            if hint in {"detached", "partial-request"}
+            else f"identity = {{'pid':{unrelated.pid}, 'created':{created}}}\n"
+        )
+        + "(directory / 'controlled-child.json').write_text(json.dumps(identity))\n"
+        "event = {'event':'child_started', 'case_id':spec['case_id'], 'pid':os.getpid(), 'created':psutil.Process().create_time(), 'monotonic':time.monotonic(), 'child_pid':identity['pid'], 'child_created':identity['created']}\n"
+        + ("event['registration_id'] = []\n" if hint == "malformed-id" else "")
+        + "with (directory / f'events-{os.getpid()}.jsonl').open('a') as stream:\n    stream.write(json.dumps(event)+'\\n')\n"
+        + (
+            "import socket\nendpoint = json.loads(os.environ['PLATO_PHASE4_REGISTRATION'])\n"
+            "connection = socket.create_connection(('127.0.0.1', endpoint['port']), timeout=1)\n"
+            "connection.sendall(b'{')\nconnection.close()\n"
+            if hint == "partial-request"
+            else ""
+        )
+        + "emit(directory, 'success')\nos._exit(0)\n"
+    )
+    worker = _worker(
+        worker_repo,
+        "with configured_case(spec, directory):\n    import entry\n" + spawn,
+    )
+    try:
+        with pytest.raises(AssertionError, match="Phase4 case failed"):
+            common.run_case(
+                directory,
+                worker=worker,
+                spec=_spec(config="leaf.toml", entrypoint="entry.py"),
+            )
+        result = json.loads((directory / "result.json").read_text())
+        identity = json.loads((directory / "controlled-child.json").read_text())
+        assert result["child_registrations"] == []
+        if hint == "partial-request":
+            assert result["registration_errors"]
+        assert any("lacks matching acknowledged" in e for e in result["errors"])
+        assert (
+            unrelated.poll() is None and str(unrelated.pid) not in result["processes"]
+        )
+        if str(identity["pid"]) not in result["processes"]:
+            assert identity in result["unresolved_child_hints"]
+            assert psutil.Process(identity["pid"]).create_time() == identity["created"]
+        else:
+            assert result["forced"] and result["survivors"] == []
+    finally:
+        if (
+            hint in {"detached", "partial-request"}
+            and (directory / "controlled-child.json").exists()
+        ):
+            identity = json.loads((directory / "controlled-child.json").read_text())
+            try:
+                child = psutil.Process(identity["pid"])
+                if child.create_time() == identity["created"]:
+                    child.kill()
+            except psutil.NoSuchProcess:
+                pass
+        unrelated.terminate()
+        unrelated.communicate(timeout=5)
+
+
+def test_rejected_registration_failure_cannot_be_suppressed(worker_repo, tmp_path):
+    worker = _worker(
+        worker_repo,
+        "with configured_case(spec, directory):\n    import entry\n"
+        "import subprocess, psutil\n"
+        "child = subprocess.Popen([sys.executable, '-c', 'import time; time.sleep(30)'], start_new_session=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)\n"
+        "endpoint = json.loads(os.environ['PLATO_PHASE4_REGISTRATION'])\n"
+        "endpoint['token'] = 'wrong-run-token'\nos.environ['PLATO_PHASE4_REGISTRATION'] = json.dumps(endpoint)\n"
+        "try:\n    emit(directory, 'child_started', child_pid=child.pid, child_created=psutil.Process(child.pid).create_time())\n"
+        "except RuntimeError:\n    pass\n"
+        "emit(directory, 'success')\n",
+    )
+    directory = tmp_path / "rejected"
+    with pytest.raises(AssertionError, match="Phase4 case failed"):
+        common.run_case(
+            directory,
+            worker=worker,
+            spec=_spec(config="leaf.toml", entrypoint="entry.py"),
+        )
+    result = json.loads((directory / "result.json").read_text())
+    failure = next(e for e in result["events"] if e["event"] == "failure")
+    assert failure["local_child_owned"] and failure["local_cleanup"]["forced"]
+    assert failure["local_cleanup"]["survivors"] == []
+    assert result["registration_errors"] and result["child_registrations"] == []
+    assert result["survivors"] == []
+
+
+def test_self_registration_fails_without_child_cleanup_authority(worker_repo, tmp_path):
+    worker = _worker(
+        worker_repo,
+        "with configured_case(spec, directory):\n    import entry\n"
+        "import psutil\n"
+        "try:\n    emit(directory, 'child_started', child_pid=os.getpid(), child_created=psutil.Process().create_time())\n"
+        "except RuntimeError:\n    pass\n"
+        "emit(directory, 'success')\n",
+    )
+    directory = tmp_path / "self-registration"
+    with pytest.raises(AssertionError, match="Phase4 case failed"):
+        common.run_case(
+            directory,
+            worker=worker,
+            spec=_spec(config="leaf.toml", entrypoint="entry.py"),
+        )
+    result = json.loads((directory / "result.json").read_text())
+    failure = next(e for e in result["events"] if e["event"] == "failure")
+    assert failure["local_child_owned"] is False
+    assert failure["local_cleanup"]["forced"] == []
+    assert result["child_registrations"] == []
+    assert result["forced"] == [] and result["survivors"] == []
+
+
+@pytest.mark.parametrize(
+    "failure", ["missing", "invalid", "mismatch", "never-ack", "partial-ack"]
+)
+def test_failed_acknowledgment_is_bounded_and_cleans_only_local_descendants(
+    tmp_path, monkeypatch, failure
+):
+    import psutil
+
+    child = subprocess.Popen([sys.executable, "-c", "import time; time.sleep(30)"])
+    created = psutil.Process(child.pid).create_time()
+    listener, thread = None, None
+    stopped = threading.Event()
+    requests = []
+    monkeypatch.setenv("PLATO_PHASE4_CASE", "contract-case")
+    if failure == "missing":
+        monkeypatch.delenv("PLATO_PHASE4_REGISTRATION", raising=False)
+    elif failure == "invalid":
+        monkeypatch.setenv(
+            "PLATO_PHASE4_REGISTRATION", json.dumps({"port": [], "token": "fake"})
+        )
+    else:
+        listener = socket.socket()
+        listener.bind(("127.0.0.1", 0))
+        listener.listen(1)
+        listener.settimeout(2)
+        monkeypatch.setenv(
+            "PLATO_PHASE4_REGISTRATION",
+            json.dumps({"port": listener.getsockname()[1], "token": "fake"}),
+        )
+
+        def serve():
+            with listener.accept()[0] as connection:
+                request = dict(common._receive(connection, time.monotonic() + 1))
+                requests.append(request)
+                if failure == "mismatch":
+                    request.pop("token")
+                    request["registration_id"] = "wrong-request"
+                    request["disposition"] = "registered"
+                    common._send(connection, request, time.monotonic() + 1)
+                elif failure == "partial-ack":
+                    connection.sendall(b"{")
+                    stopped.wait(6)
+                else:
+                    stopped.wait(6)
+
+        thread = threading.Thread(target=serve)
+        thread.start()
+    started = time.monotonic()
+    try:
+        with pytest.raises(RuntimeError, match="child registration failed"):
+            common.emit(
+                tmp_path, "child_started", child_pid=child.pid, child_created=created
+            )
+        assert time.monotonic() - started < 7.5
+        child.communicate(timeout=2)
+        assert child.returncode is not None
+        events = [
+            json.loads(line)
+            for path in tmp_path.glob("events-*.jsonl")
+            for line in path.read_text().splitlines()
+        ]
+        assert events[-1]["event"] == "failure"
+        assert events[-1]["local_child_owned"]
+        assert events[-1]["local_cleanup"]["forced"] == ["TERM"]
+        assert events[-1]["local_cleanup"]["survivors"] == []
+        if requests:
+            assert requests[0]["reporter_pid"] == os.getpid()
+    finally:
+        stopped.set()
+        if thread:
+            thread.join(timeout=2)
+            assert not thread.is_alive()
+        if listener:
+            listener.close()
+        if child.poll() is None:
+            child.kill()
+        child.communicate(timeout=2)
+
+
+def test_supervisor_termination_before_acknowledgment_cleans_local_child(
+    tmp_path, monkeypatch
+):
+    import psutil
+
+    server = subprocess.Popen(
+        [
+            sys.executable,
+            "-c",
+            "import socket,time; s=socket.socket(); s.bind(('127.0.0.1',0)); s.listen(1); print(s.getsockname()[1],flush=True); c,_=s.accept(); c.recv(8192); print('received',flush=True); time.sleep(30)",
+        ],
+        stdout=subprocess.PIPE,
+        text=True,
+    )
+    assert server.stdout is not None
+    output = server.stdout
+    port = int(output.readline())
+    child = subprocess.Popen([sys.executable, "-c", "import time; time.sleep(30)"])
+    created = psutil.Process(child.pid).create_time()
+    monkeypatch.setenv("PLATO_PHASE4_CASE", "contract-case")
+    monkeypatch.setenv(
+        "PLATO_PHASE4_REGISTRATION", json.dumps({"port": port, "token": "fake"})
+    )
+
+    def terminate():
+        assert output.readline().strip() == "received"
+        server.terminate()
+
+    killer = threading.Thread(target=terminate)
+    killer.start()
+    started = time.monotonic()
+    try:
+        with pytest.raises(RuntimeError, match="child registration failed"):
+            common.emit(
+                tmp_path, "child_started", child_pid=child.pid, child_created=created
+            )
+        assert time.monotonic() - started < 7.5
+        child.communicate(timeout=2)
+        events = [
+            json.loads(line)
+            for path in tmp_path.glob("events-*.jsonl")
+            for line in path.read_text().splitlines()
+        ]
+        assert events[-1]["event"] == "failure" and events[-1]["local_child_owned"]
+        assert events[-1]["local_cleanup"]["survivors"] == []
+    finally:
+        if server.poll() is None:
+            server.kill()
+        server.communicate(timeout=2)
+        if child.poll() is None:
+            child.kill()
+        child.communicate(timeout=2)
+        killer.join(timeout=2)
+        assert not killer.is_alive()
+
+
+def test_partial_registration_request_obeys_total_server_deadline():
+    left, right = socket.socketpair()
+    try:
+        right.sendall(b"{")
+        started = time.monotonic()
+        with pytest.raises(TimeoutError):
+            common._receive(left, started + 0.15)
+        assert 0.1 < time.monotonic() - started < 0.8
+    finally:
+        left.close()
+        right.close()
+
+
+@pytest.mark.parametrize(
+    "payload",
+    [b"[]\n", b"\xff\n", b"[" * 3000 + b"]" * 3000 + b"\n", b"x" * 8193],
+    ids=["not-mapping", "invalid-utf8", "deep-json", "oversize"],
+)
+def test_malformed_registration_requests_are_bounded(payload):
+    left, right = socket.socketpair()
+    right.settimeout(1)
+    sender = threading.Thread(target=right.sendall, args=(payload,))
+    try:
+        sender.start()
+        with pytest.raises(ValueError):
+            common._receive(left, time.monotonic() + 0.5)
+    finally:
+        left.close()
+        right.close()
+        sender.join(timeout=1)
+        assert not sender.is_alive()

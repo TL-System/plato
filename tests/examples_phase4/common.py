@@ -2,6 +2,8 @@
 
 Workers read PLATO_PHASE4_SPEC and use its authored fields with configured_case.
 Runtime paths/ports are supplied separately in the spec file's runtime object.
+Spawners synchronously emit child_started before exiting or reparenting. Raw
+unacknowledged hints fail qualification; an unproven orphan cannot be signaled.
 """
 
 from __future__ import annotations
@@ -13,6 +15,7 @@ import json
 import math
 import os
 import random
+import secrets
 import signal
 import socket
 import subprocess
@@ -125,12 +128,101 @@ def source_snapshot(repo: Path, explicit_paths: Sequence[str]) -> dict[str, obje
     }
 
 
-def emit(directory: Path, event: str, **fields: object) -> None:
-    """Append a durable per-process event; reserved identity fields cannot change."""
+def _identity(pid: object, created: object) -> tuple[int, float]:
+    if type(pid) is not int or not 0 < pid < 2**31 or type(created) not in (int, float):
+        raise ValueError("invalid process identity")
+    try:
+        timestamp = float(cast(int | float, created))
+    except OverflowError as exc:
+        raise ValueError("process creation timestamp overflow") from exc
+    if not math.isfinite(timestamp) or timestamp <= 0:
+        raise ValueError("invalid process creation timestamp")
+    return pid, timestamp
+
+
+def _receive(connection: socket.socket, deadline: float) -> Mapping[str, object]:
+    data = bytearray()
+    while b"\n" not in data:
+        remaining = deadline - time.monotonic()
+        if remaining <= 0:
+            raise TimeoutError("child registration deadline expired")
+        connection.settimeout(remaining)
+        chunk = connection.recv(min(4096, 8193 - len(data)))
+        if not chunk:
+            raise ConnectionError("child registration closed before acknowledgment")
+        data.extend(chunk)
+        if len(data) > 8192:
+            raise ValueError("child registration message exceeds 8192 bytes")
+    line, _, extra = data.partition(b"\n")
+    if extra:
+        raise ValueError("unexpected trailing registration data")
+    try:
+        return _mapping(json.loads(line.decode("utf-8")))
+    except (UnicodeError, RecursionError) as exc:
+        raise ValueError("malformed child registration JSON") from exc
+
+
+def _send(connection: socket.socket, message: object, deadline: float) -> None:
+    remaining = deadline - time.monotonic()
+    if remaining <= 0:
+        raise TimeoutError("child registration deadline expired")
+    connection.settimeout(remaining)
+    payload = json.dumps(message, allow_nan=False).encode() + b"\n"
+    if len(payload) > 8192:
+        raise ValueError("child registration message exceeds 8192 bytes")
+    connection.sendall(payload)
+
+
+def _local_descendant(pid: int, created: float) -> bool:
     import psutil
 
-    if any(k in fields for k in ("pid", "created", "monotonic", "event")):
-        raise ValueError("reserved event identity field")
+    try:
+        child = psutil.Process(pid)
+        reporter = psutil.Process()
+        return child.create_time() == created and any(
+            parent.pid == reporter.pid
+            and parent.create_time() == reporter.create_time()
+            for parent in child.parents()
+        )
+    except psutil.Error:
+        return False
+
+
+def _local_cleanup(pid: int, created: float) -> dict[str, object]:
+    import psutil
+
+    forced, errors = [], []
+    live = False
+    for action, sig in (("TERM", signal.SIGTERM), ("KILL", signal.SIGKILL)):
+        try:
+            child = psutil.Process(pid)
+            live = (
+                child.create_time() == created
+                and child.status() != psutil.STATUS_ZOMBIE
+            )
+            if not live:
+                break
+            forced.append(action)
+            child.send_signal(sig)
+            deadline = time.monotonic() + 1
+            while time.monotonic() < deadline:
+                if not child.is_running() or child.status() == psutil.STATUS_ZOMBIE:
+                    live = False
+                    break
+                time.sleep(0.02)
+        except psutil.NoSuchProcess:
+            live = False
+            break
+        except psutil.Error as exc:
+            errors.append(f"{action}: {type(exc).__name__}: {exc}")
+    return {"forced": forced, "survivors": [pid] if live else [], "errors": errors}
+
+
+def _write_event(
+    directory: Path, event: str, fields: Mapping[str, object]
+) -> dict[str, object]:
+    import psutil
+
     directory.mkdir(parents=True, exist_ok=True)
     record = {
         **fields,
@@ -143,6 +235,78 @@ def emit(directory: Path, event: str, **fields: object) -> None:
     with (directory / f"events-{os.getpid()}.jsonl").open("a") as stream:
         stream.write(json.dumps(record, allow_nan=False) + "\n")
         stream.flush()
+    return record
+
+
+def emit(directory: Path, event: str, **fields: object) -> None:
+    """Record an event; child registration waits for independently verified ownership.
+
+    The spawning process must register immediately and cannot exit before this
+    call returns. A rejected/expired registration is fatal worker evidence.
+    """
+    if any(
+        k in fields for k in ("pid", "created", "monotonic", "event", "registration_id")
+    ):
+        raise ValueError("reserved event identity field")
+    if event != "child_started":
+        _write_event(directory, event, fields)
+        return
+    request_id = secrets.token_hex(16)
+    record = _write_event(directory, event, {**fields, "registration_id": request_id})
+    local_identity = None
+    try:
+        pid, created = _identity(fields.get("child_pid"), fields.get("child_created"))
+        if pid == os.getpid():
+            raise ValueError("a process cannot register itself as its child")
+        if _local_descendant(pid, created):
+            local_identity = (pid, created)
+        endpoint = _mapping(json.loads(os.environ["PLATO_PHASE4_REGISTRATION"]))
+        port, token = endpoint.get("port"), endpoint.get("token")
+        if type(port) is not int or not 0 < port < 65536 or not isinstance(token, str):
+            raise ValueError("invalid child registration endpoint")
+        request = {
+            "token": token,
+            "case_id": record["case_id"],
+            "registration_id": request_id,
+            "reporter_pid": record["pid"],
+            "reporter_created": record["created"],
+            "child_pid": pid,
+            "child_created": created,
+        }
+        deadline = time.monotonic() + 5
+        with socket.create_connection(("127.0.0.1", port), timeout=5) as connection:
+            _send(connection, request, deadline)
+            response = _receive(connection, deadline)
+        if any(
+            response.get(k) != v for k, v in request.items() if k != "token"
+        ) or response.get("disposition") not in {"registered", "already_gone"}:
+            raise RuntimeError("child registration was rejected or mismatched")
+    except (
+        KeyError,
+        ValueError,
+        TypeError,
+        OSError,
+        RuntimeError,
+        RecursionError,
+    ) as exc:
+        cleanup = (
+            _local_cleanup(*local_identity)
+            if local_identity
+            else {"forced": [], "survivors": []}
+        )
+        _write_event(
+            directory,
+            "failure",
+            {
+                "case_id": record["case_id"],
+                "type": "ChildRegistrationError",
+                "message": f"child registration failed: {type(exc).__name__}: {exc}",
+                "registration_id": request_id,
+                "local_child_owned": local_identity is not None,
+                "local_cleanup": cleanup,
+            },
+        )
+        raise RuntimeError("child registration failed") from exc
 
 
 def _leaves(value: Mapping, prefix: str = "") -> Iterator[tuple[str, object]]:
@@ -429,6 +593,17 @@ def run_case(
     }
     command = [executable, "-B", "-m", worker]
     started = time.monotonic()
+    listener = socket.socket()
+    listener.bind(("127.0.0.1", 0))
+    listener.listen(8)
+    listener.settimeout(0.05)
+    registration_token = secrets.token_hex(32)
+    environment["PLATO_PHASE4_REGISTRATION"] = json.dumps(
+        {
+            "port": listener.getsockname()[1],
+            "token": registration_token,
+        }
+    )
     proc = subprocess.Popen(
         command,
         cwd=cwd,
@@ -440,6 +615,11 @@ def run_case(
     )
     identities = {proc.pid: psutil.Process(proc.pid).create_time()}
     finished = threading.Event()
+    registration_closed = threading.Event()
+    registration_lock = threading.RLock()
+    connections: set[socket.socket] = set()
+    registrations: dict[str, dict[str, object]] = {}
+    registration_errors: list[str] = []
     malformed = []
 
     def read_events():
@@ -500,7 +680,7 @@ def run_case(
                         ):
                             raise ValueError("invalid provenance snapshot")
                     events.append(event)
-                except (ValueError, TypeError) as exc:
+                except (ValueError, TypeError, OverflowError, RecursionError) as exc:
                     malformed.append(f"{path.name}: {exc}")
         return events
 
@@ -519,7 +699,12 @@ def run_case(
             if same_session or parent_owned:
                 identities[process.pid] = created
                 return True
-        except (ProcessLookupError, psutil.NoSuchProcess, psutil.AccessDenied):
+        except (
+            ProcessLookupError,
+            PermissionError,
+            psutil.NoSuchProcess,
+            psutil.AccessDenied,
+        ):
             pass
         return False
 
@@ -549,6 +734,95 @@ def run_case(
             except psutil.NoSuchProcess:
                 pass
         return live
+
+    def serve_registrations():
+        while not registration_closed.is_set():
+            try:
+                connection, _ = listener.accept()
+            except socket.timeout:
+                continue
+            except OSError:
+                break
+            with connection:
+                with registration_lock:
+                    if registration_closed.is_set():
+                        break
+                    connections.add(connection)
+                deadline = time.monotonic() + 1
+                try:
+                    request = _receive(connection, deadline)
+                    token = request.get("token")
+                    if not isinstance(token, str) or not secrets.compare_digest(
+                        token, registration_token
+                    ):
+                        raise ValueError("child registration authentication failed")
+                    request_id = request.get("registration_id")
+                    if (
+                        request.get("case_id") != spec["case_id"]
+                        or not isinstance(request_id, str)
+                        or len(request_id) != 32
+                    ):
+                        raise ValueError("invalid registration request identity")
+                    reporter_pid, reporter_created = _identity(
+                        request.get("reporter_pid"), request.get("reporter_created")
+                    )
+                    child_pid, child_created = _identity(
+                        request.get("child_pid"), request.get("child_created")
+                    )
+                    with registration_lock:
+                        if registration_closed.is_set() or request_id in registrations:
+                            raise ValueError("child registration closed or duplicate")
+                        reporter = psutil.Process(reporter_pid)
+                        if (
+                            reporter.create_time() != reporter_created
+                            or reporter.status() == psutil.STATUS_ZOMBIE
+                            or not register_owned(reporter)
+                            or child_pid == reporter_pid
+                        ):
+                            raise ValueError("unowned registration reporter")
+                        try:
+                            child = psutil.Process(child_pid)
+                            gone = (
+                                child.create_time() != child_created
+                                or child.status() == psutil.STATUS_ZOMBIE
+                            )
+                        except psutil.NoSuchProcess:
+                            gone = True
+                        if not gone and not register_owned(child):
+                            raise ValueError(
+                                "child has no independently proven owned lineage/session"
+                            )
+                        response = {
+                            k: request[k]
+                            for k in (
+                                "case_id",
+                                "registration_id",
+                                "reporter_pid",
+                                "reporter_created",
+                                "child_pid",
+                                "child_created",
+                            )
+                        }
+                        response["disposition"] = (
+                            "already_gone" if gone else "registered"
+                        )
+                        # Persist proof before acknowledgment releases the spawning parent.
+                        registrations[request_id] = response
+                    _send(connection, response, deadline)
+                except (
+                    ValueError,
+                    TypeError,
+                    OverflowError,
+                    OSError,
+                    psutil.Error,
+                ) as exc:
+                    registration_errors.append(f"{type(exc).__name__}: {exc}")
+                finally:
+                    with registration_lock:
+                        connections.discard(connection)
+
+    registrar = threading.Thread(target=serve_registrations, daemon=True)
+    registrar.start()
 
     timed_out, forced, errors = False, [], []
     stdout = stderr = ""
@@ -581,6 +855,20 @@ def run_case(
     except BaseException as exc:
         errors.append(f"containment error: {type(exc).__name__}: {exc}")
     finally:
+        # Freeze registration before the final containment snapshot. Active partial
+        # requests cannot delay shutdown or add ownership after this point.
+        with registration_lock:
+            registration_closed.set()
+            listener.close()
+            for connection in list(connections):
+                try:
+                    connection.shutdown(socket.SHUT_RDWR)
+                except OSError:
+                    pass
+                connection.close()
+        registrar.join(timeout=1.1)
+        if registrar.is_alive():
+            errors.append("child registration thread did not stop")
         # The fallback also records forced actions; it cannot produce success.
         for process in survivors():
             forced.append(f"finally-KILL:{process.pid}")
@@ -596,6 +884,46 @@ def run_case(
         observer.join(timeout=1)
     events = read_events()
     events.sort(key=lambda e: e["monotonic"])
+    unresolved_hints = []
+    observed_registrations = set()
+    for event in events:
+        if event["event"] != "child_started":
+            continue
+        request_id = event.get("registration_id")
+        receipt = registrations.get(request_id) if isinstance(request_id, str) else None
+        if isinstance(request_id, str):
+            if request_id in observed_registrations:
+                errors.append("duplicate child_started registration identity")
+            observed_registrations.add(request_id)
+        if receipt is None or any(
+            receipt.get(k) != event.get(source)
+            for k, source in (
+                ("case_id", "case_id"),
+                ("reporter_pid", "pid"),
+                ("reporter_created", "created"),
+                ("child_pid", "child_pid"),
+                ("child_created", "child_created"),
+            )
+        ):
+            errors.append("child_started lacks matching acknowledged registration")
+        try:
+            pid, created = _identity(event.get("child_pid"), event.get("child_created"))
+            child = psutil.Process(pid)
+            if (
+                child.create_time() == created
+                and child.status() != psutil.STATUS_ZOMBIE
+                and identities.get(pid) != created
+            ):
+                unresolved_hints.append({"pid": pid, "created": created})
+        except psutil.NoSuchProcess:
+            pass
+        except (ValueError, OverflowError, psutil.Error) as exc:
+            errors.append(f"invalid or unclassifiable child hint: {exc}")
+    if unresolved_hints:
+        errors.append(
+            "unresolved live child hints; ownership unproven and no signal authorized"
+        )
+    errors.extend("child registration error: " + e for e in registration_errors)
     live = [p.pid for p in survivors()]
     if proc.returncode != 0 or timed_out or forced or live or malformed:
         errors.append("worker did not exit naturally with valid evidence")
@@ -674,6 +1002,9 @@ def run_case(
         "processes": identities,
         "events": events,
         "malformed_events": sorted(set(malformed)),
+        "child_registrations": list(registrations.values()),
+        "registration_errors": registration_errors,
+        "unresolved_child_hints": unresolved_hints,
         "errors": errors,
         "elapsed": time.monotonic() - started,
     }
