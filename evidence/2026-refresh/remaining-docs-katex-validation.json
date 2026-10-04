@@ -1,0 +1,3268 @@
+{
+  "schema_version": 1,
+  "status": "VALIDATED_PENDING_INDEPENDENT_REVIEW",
+  "package": "D3 remaining documentation KaTeX assets and actual browser defect closure",
+  "recorded_at_utc": "2026-10-04T02:22:29.878654+00:00",
+  "plan": {
+    "path": "/tmp/plato-remaining-docs-plan.json",
+    "sha256": "a2b52a4a471870e24d87e06b3045fa737a5d90a9ec392dbcd73ccc911b22b60c",
+    "bytes": 20304
+  },
+  "plan_review": {
+    "path": "/tmp/plato-remaining-docs-plan-review-v2.json",
+    "sha256": "04802455c581e1f8fccab86277f9a5ae885acaf6646bcf9d517e1a5adcd56276",
+    "bytes": 13136
+  },
+  "source": {
+    "worktree": "/tmp/plato-refresh-worktrees/remaining-docs-katex",
+    "branch": "maintenance/2026-remaining-docs-katex",
+    "baseline_commit": "408070278122988e31ed676852a0e7b0bd6f15bd",
+    "baseline_tree": "26d2bc551e19d95f78068dfdd39b2f75db3ecee4",
+    "asset_pin_commit": "dd0b3df13f228f1c40aec820e012f67319c3b693",
+    "tex_repair_commit": "c172c6160893ced74179481110495e5920e8b7ab",
+    "validated_source_commit": "c172c6160893ced74179481110495e5920e8b7ab",
+    "validated_source_tree": "5d7af0e6b2268d8f8a710af80e029455a9e0e0b1",
+    "changed_source_paths": [
+      "docs/docs/examples/algorithms/5. Algorithms with Customized Client Training Loops.md",
+      "docs/mkdocs.yml"
+    ],
+    "baseline_file_sha256": {
+      "docs/mkdocs.yml": "d26f6c6e7b91cf8835b4187e3b9e01125801e735122d79e7a148179b31a852ec",
+      "docs/docs/javascripts/katex.js": "cf7c285fc05b98d7044da650406d3a7f02ad74ff5b30bbfb0c0ffb7b59462ada",
+      "pyproject.toml": "4c68adebeb88bba969a5d5c08a874644b1d40ccff241761dd7f2bd201b6ba3d3",
+      "uv.lock": "66a4e4442d7b1f26d220b44ca73c44ff4f1151a86857bb3f93a594819fd08126",
+      "docs/build.sh": "e21f333201ce75ea7e4a820d505e7b230a5a6048f279b56b0758f1a6cfc338b7",
+      "docs/docs/examples/algorithms/5. Algorithms with Customized Client Training Loops.md": "4083e29d1d4797b005e9deb1f1fce4d516e4a997da92cc78983a17f15b9e743d",
+      "docs/docs/examples/algorithms/10. Algorithms based on Neural Architecture Search and Model Search.md": "b2e2abe775d733fb218a4da81dfeb2b1985ad323393be7565510a15ce5bcdd5a",
+      "docs/docs/examples/algorithms/6. Client Selection Algorithms.md": "caa28ac4d7b6ba3232864d97951d98d6548b46ee5eba2cd9f92def5448aa7d8b",
+      "docs/docs/examples/algorithms/1. Server Aggregation Algorithms.md": "7d96b14625e3d943b46a82ca29a4b535effe7b9e44bb46ac09c8410c004ebb8a"
+    },
+    "validated_file_sha256": {
+      "docs/mkdocs.yml": "e957896c9f3f62d1932fa0ba0c76d8f33fa193751d727a707006a6a33d1dcbb2",
+      "docs/docs/javascripts/katex.js": "cf7c285fc05b98d7044da650406d3a7f02ad74ff5b30bbfb0c0ffb7b59462ada",
+      "pyproject.toml": "4c68adebeb88bba969a5d5c08a874644b1d40ccff241761dd7f2bd201b6ba3d3",
+      "uv.lock": "66a4e4442d7b1f26d220b44ca73c44ff4f1151a86857bb3f93a594819fd08126",
+      "docs/build.sh": "e21f333201ce75ea7e4a820d505e7b230a5a6048f279b56b0758f1a6cfc338b7",
+      "docs/docs/examples/algorithms/5. Algorithms with Customized Client Training Loops.md": "18ffa471f5fe1fa4a396631bc37edf2e12f624aacf75c75127a8d4dbd26e7487",
+      "docs/docs/examples/algorithms/10. Algorithms based on Neural Architecture Search and Model Search.md": "b2e2abe775d733fb218a4da81dfeb2b1985ad323393be7565510a15ce5bcdd5a",
+      "docs/docs/examples/algorithms/6. Client Selection Algorithms.md": "caa28ac4d7b6ba3232864d97951d98d6548b46ee5eba2cd9f92def5448aa7d8b",
+      "docs/docs/examples/algorithms/1. Server Aggregation Algorithms.md": "7d96b14625e3d943b46a82ca29a4b535effe7b9e44bb46ac09c8410c004ebb8a"
+    },
+    "local_katex_callback_unchanged": true,
+    "manifests_lockfile_and_build_tooling_unchanged": true,
+    "tex_scope_extension_authority": "Root's 2026-10-04 task message expressly authorized a separate narrow technical-syntax correction solely to escape the underscore in the page5 TeX texttt expression after the actual red browser reproduction."
+  },
+  "release_review": {
+    "exact_version": "0.19.0",
+    "latest_upstream_release_verified": true,
+    "upstream_records": [
+      {
+        "name": "browser-docs",
+        "url": "https://katex.org/docs/browser",
+        "final_url": "https://katex.org/docs/browser",
+        "status": 200,
+        "content_type": "text/html; charset=UTF-8",
+        "sha256": "7f590710023db1a198da68e96d44908fc3c08e37ea0fccac47978eaf197b2aff",
+        "bytes": 37564,
+        "retrieved_at_utc": "2026-10-04T02:09:30.958683+00:00",
+        "artifact": "/tmp/plato-remaining-docs-katex-validation/browser-docs.response"
+      },
+      {
+        "name": "release",
+        "url": "https://api.github.com/repos/KaTeX/KaTeX/releases/latest",
+        "final_url": "https://api.github.com/repos/KaTeX/KaTeX/releases/latest",
+        "status": 200,
+        "content_type": "application/json; charset=utf-8",
+        "sha256": "b35b92c2c38e85abceea70127a672e5f4e5a925097dff364663c447869e2fd7a",
+        "bytes": 5492,
+        "retrieved_at_utc": "2026-10-04T02:09:31.174962+00:00",
+        "artifact": "/tmp/plato-remaining-docs-katex-validation/release.response",
+        "release_summary": {
+          "tag_name": "v0.19.0",
+          "published_at": "2026-10-01T16:50:49Z",
+          "html_url": "https://github.com/KaTeX/KaTeX/releases/tag/v0.19.0",
+          "target_commitish": "main"
+        }
+      },
+      {
+        "name": "changelog",
+        "url": "https://raw.githubusercontent.com/KaTeX/KaTeX/v0.19.0/CHANGELOG.md",
+        "final_url": "https://raw.githubusercontent.com/KaTeX/KaTeX/v0.19.0/CHANGELOG.md",
+        "status": 200,
+        "content_type": "text/plain; charset=utf-8",
+        "sha256": "1ba07501bc4db50960731cd47c7dc95425f59bd33e52cd5863fc0ecee06ef173",
+        "bytes": 72791,
+        "retrieved_at_utc": "2026-10-04T02:09:31.266310+00:00",
+        "artifact": "/tmp/plato-remaining-docs-katex-validation/changelog.response"
+      },
+      {
+        "name": "core-js",
+        "url": "https://unpkg.com/katex@0.19.0/dist/katex.min.js",
+        "final_url": "https://unpkg.com/katex@0.19.0/dist/katex.min.js",
+        "status": 200,
+        "content_type": "text/javascript; charset=utf-8",
+        "sha256": "103a53763cc033bba8d175bf3f0ba597c3505c9b6747dd3f2c7bc2a6bfcc8ae7",
+        "bytes": 272868,
+        "retrieved_at_utc": "2026-10-04T02:09:31.291347+00:00",
+        "artifact": "/tmp/plato-remaining-docs-katex-validation/core-js.response",
+        "sha384_sri": "sha384-QFFtAGzvvj+bfgCGxXJlNZZR1nXEZgvG8tDLCCY1F19xl20WlfTYgguB4VcNdxYk",
+        "matches_official_browser_documentation_sri": true
+      },
+      {
+        "name": "auto-render-js",
+        "url": "https://unpkg.com/katex@0.19.0/dist/contrib/auto-render.min.js",
+        "final_url": "https://unpkg.com/katex@0.19.0/dist/contrib/auto-render.min.js",
+        "status": 200,
+        "content_type": "text/javascript; charset=utf-8",
+        "sha256": "e5372d199bcdae8b4de71d0f7ceba72a4ba12774a27c60a6f1f77d03b3228ee4",
+        "bytes": 3486,
+        "retrieved_at_utc": "2026-10-04T02:09:31.310888+00:00",
+        "artifact": "/tmp/plato-remaining-docs-katex-validation/auto-render-js.response",
+        "sha384_sri": "sha384-bjyGPfbij8/NDKJhSGZNP/khQVgtHUE5exjm4Ydllo42FwIgYsdLO2lXGmRBf5Mz",
+        "matches_official_browser_documentation_sri": true
+      },
+      {
+        "name": "css",
+        "url": "https://unpkg.com/katex@0.19.0/dist/katex.min.css",
+        "final_url": "https://unpkg.com/katex@0.19.0/dist/katex.min.css",
+        "status": 200,
+        "content_type": "text/css; charset=utf-8",
+        "sha256": "d4ab5b8ee16989b070cdb0ea24bd6ad48fc8df1b787f280f29d3ae4f959f2c00",
+        "bytes": 24793,
+        "retrieved_at_utc": "2026-10-04T02:09:31.332417+00:00",
+        "artifact": "/tmp/plato-remaining-docs-katex-validation/css.response",
+        "sha384_sri": "sha384-3rdsX6e5mueWyoweR9NIVmtEsUkokpBT/0ALqKKIBMr9j4qhHkaIkAcGgsE6uVlp",
+        "matches_official_browser_documentation_sri": true
+      }
+    ],
+    "reviewed_release_change": "Version 0.19.0 documents strict handling of missing character metrics introduced in 0.18.11: strict callbacks and error mode now receive that condition. The site has no custom strict callbacks or strict error setting. Existing custom styles do not target KaTeX internal classes, whose prefix changed in 0.18.0. Real browser observations are the compatibility evidence.",
+    "baseline_observed_version": "0.19.0",
+    "pin_effect": "Freeze the existing three floating @0 references to the reviewed exact release on the existing unpkg host."
+  },
+  "strict_build": {
+    "baseline_exit_code": 0,
+    "candidate_exit_code": 0,
+    "working_directory": "/tmp/plato-refresh-worktrees/remaining-docs-katex",
+    "argv": [
+      "zsh",
+      "-lc",
+      "PLATO_DOCS_PYTHON=/Users/bli/.local/share/uv/python/cpython-3.13-macos-aarch64-none/bin/python3.13 PLATO_DOCS_ENVIRONMENT=/tmp/plato-remaining-docs-katex-docs-env PLATO_DOCS_BOOTSTRAP_ENVIRONMENT=/tmp/plato-remaining-docs-katex-bootstrap-env PLATO_DOCS_ARTIFACT_DIR=/tmp/plato-remaining-docs-katex-validation sh docs/build.sh"
+    ],
+    "environment": {
+      "PLATO_DOCS_PYTHON": "/Users/bli/.local/share/uv/python/cpython-3.13-macos-aarch64-none/bin/python3.13",
+      "PLATO_DOCS_ENVIRONMENT": "/tmp/plato-remaining-docs-katex-docs-env",
+      "PLATO_DOCS_BOOTSTRAP_ENVIRONMENT": "/tmp/plato-remaining-docs-katex-bootstrap-env",
+      "PLATO_DOCS_ARTIFACT_DIR": "/tmp/plato-remaining-docs-katex-validation"
+    },
+    "baseline_log": {
+      "path": "/tmp/plato-remaining-docs-katex-validation/baseline-build.log",
+      "sha256": "0c045f7de4f39f93261872a00d0fb46ccbee01ffb30e83ddc49e37557b6353d7",
+      "bytes": 3271
+    },
+    "candidate_log": {
+      "path": "/tmp/plato-remaining-docs-katex-validation/candidate-build.log",
+      "sha256": "fd251abb671a9bd388681b5bdd8b538a178a17c60d2085135591feeb6f1ddc22",
+      "bytes": 2544
+    },
+    "candidate_log_text": "Resolved 265 packages in 4ms\nResolved 265 packages in 4ms\nChecked 29 packages in 0.91ms\nUsing Python 3.13.16 environment at: /tmp/plato-remaining-docs-katex-docs-env\nChecked 29 packages in 0.44ms\nAll installed packages are compatible\n{\n  \"python\": \"3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]\",\n  \"executable\": \"/tmp/plato-remaining-docs-katex-docs-env/bin/python\",\n  \"prefix\": \"/tmp/plato-remaining-docs-katex-docs-env\",\n  \"packages\": {\n    \"babel\": \"2.18.0\",\n    \"backrefs\": \"8.0\",\n    \"certifi\": \"2026.7.22\",\n    \"charset-normalizer\": \"3.5.2\",\n    \"click\": \"8.5.0\",\n    \"colorama\": \"0.4.6\",\n    \"ghp-import\": \"2.1.0\",\n    \"idna\": \"3.20\",\n    \"jinja2\": \"3.1.6\",\n    \"markdown\": \"3.11\",\n    \"markupsafe\": \"3.0.3\",\n    \"mergedeep\": \"1.3.4\",\n    \"mkdocs\": \"1.6.1\",\n    \"mkdocs-get-deps\": \"0.2.2\",\n    \"mkdocs-material\": \"9.7.7\",\n    \"mkdocs-material-extensions\": \"1.3.1\",\n    \"packaging\": \"26.3\",\n    \"paginate\": \"0.5.7\",\n    \"pathspec\": \"1.1.1\",\n    \"platformdirs\": \"4.12.2\",\n    \"pygments\": \"2.21.0\",\n    \"pymdown-extensions\": \"12.1\",\n    \"python-dateutil\": \"2.9.0.post0\",\n    \"pyyaml\": \"6.0.3\",\n    \"pyyaml-env-tag\": \"1.1\",\n    \"requests\": \"2.34.2\",\n    \"six\": \"1.17.0\",\n    \"urllib3\": \"2.8.0\",\n    \"watchdog\": \"6.0.0\"\n  },\n  \"requirements_parity\": true,\n  \"runtime_and_project_absent\": true\n}\n\n\u001b[31m \u2502  \u26a0  Warning from the Material for MkDocs team\u001b[0m\n\u001b[31m \u2502\u001b[0m\n\u001b[31m \u2502\u001b[0m  MkDocs 2.0, the underlying framework of Material for MkDocs,\n\u001b[31m \u2502\u001b[0m  will introduce backward-incompatible changes, including:\n\u001b[31m \u2502\u001b[0m\n\u001b[31m \u2502  \u00d7 \u001b[0mAll plugins will stop working \u2013 the plugin system has been removed\n\u001b[31m \u2502  \u00d7 \u001b[0mAll theme overrides will break \u2013 the theming system has been rewritten\n\u001b[31m \u2502  \u00d7 \u001b[0mNo migration path exists \u2013 existing projects cannot be upgraded\n\u001b[31m \u2502  \u00d7 \u001b[0mClosed contribution model \u2013 community members can't report bugs\n\u001b[31m \u2502  \u00d7 \u001b[0mCurrently unlicensed \u2013 unsuitable for production use\n\u001b[31m \u2502\u001b[0m\n\u001b[31m \u2502\u001b[0m  Our full analysis:\n\u001b[31m \u2502\u001b[0m\n\u001b[31m \u2502\u001b[0m  \u001b[4mhttps://squidfunk.github.io/mkdocs-material/blog/2026/02/18/mkdocs-2.0/\u001b[0m\n\u001b[0m\nINFO    -  Cleaning site directory\nINFO    -  Building documentation to directory: /private/tmp/plato-refresh-worktrees/remaining-docs-katex/docs/site\nINFO    -  The following pages exist in the docs directory, but are not included in the \"nav\" configuration:\n  - examples/case-studies/3. SmolVLA Trainer with LeRobot.md\n  - examples/case-studies/5. Nanochat in Plato.md\nINFO    -  Documentation built in 0.47 seconds\n",
+    "environment_receipt": {
+      "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+      "executable": "/tmp/plato-remaining-docs-katex-docs-env/bin/python",
+      "prefix": "/tmp/plato-remaining-docs-katex-docs-env",
+      "packages": {
+        "babel": "2.18.0",
+        "backrefs": "8.0",
+        "certifi": "2026.7.22",
+        "charset-normalizer": "3.5.2",
+        "click": "8.5.0",
+        "colorama": "0.4.6",
+        "ghp-import": "2.1.0",
+        "idna": "3.20",
+        "jinja2": "3.1.6",
+        "markdown": "3.11",
+        "markupsafe": "3.0.3",
+        "mergedeep": "1.3.4",
+        "mkdocs": "1.6.1",
+        "mkdocs-get-deps": "0.2.2",
+        "mkdocs-material": "9.7.7",
+        "mkdocs-material-extensions": "1.3.1",
+        "packaging": "26.3",
+        "paginate": "0.5.7",
+        "pathspec": "1.1.1",
+        "platformdirs": "4.12.2",
+        "pygments": "2.21.0",
+        "pymdown-extensions": "12.1",
+        "python-dateutil": "2.9.0.post0",
+        "pyyaml": "6.0.3",
+        "pyyaml-env-tag": "1.1",
+        "requests": "2.34.2",
+        "six": "1.17.0",
+        "urllib3": "2.8.0",
+        "watchdog": "6.0.0"
+      },
+      "requirements_parity": true,
+      "runtime_and_project_absent": true
+    },
+    "baseline_built_file_sha256": {
+      "examples/case-studies/6. Qwen3 Federated LoRA/index.html": "35d0d7ec758524e25fe1dad5915ea6192cb2f524923ba4afeb2e0531faa68381",
+      "examples/case-studies/1. LoRA/index.html": "51ef4bf81083e0b2786e75ec2638fa4c74358ad7a66eb0207d8d91c20abdfa4f",
+      "examples/case-studies/5. Nanochat in Plato/index.html": "88be26e63ed09f16dc970db3fdcec3ee8745ca1926f479619ac504e7e895c47a",
+      "examples/algorithms/10. Algorithms based on Neural Architecture Search and Model Search/index.html": "cc3377a7d91b39757eb21843975b250da3b49d0b9ec5c239abfa2f8d38cd7edf",
+      "examples/algorithms/6. Client Selection Algorithms/index.html": "6a3055a8a6d746139a8699e0422c3142ef1f4032d406bc005d0da663540ca40a",
+      "examples/algorithms/5. Algorithms with Customized Client Training Loops/index.html": "e071b3ebfd337fd6f8bbe612a47dc0c28b8b27dc2cf285912670700bfebb4906",
+      "examples/algorithms/1. Server Aggregation Algorithms/index.html": "6312887cf700de5b654e728da6eb93129909e7891b4c8d04b74478226d15e090",
+      "javascripts/katex.js": "cf7c285fc05b98d7044da650406d3a7f02ad74ff5b30bbfb0c0ffb7b59462ada",
+      "sitemap.xml": "51ef922101a59ab92407d8cbccde256f52f0dff56c88afc69d4d24c9e889534f"
+    },
+    "candidate_built_file_sha256": {
+      "examples/case-studies/6. Qwen3 Federated LoRA/index.html": "f8ad1af7cb8a578cf50e76c6e3fcee143cfed3ff433e83c833657fc7dcfe6b93",
+      "examples/case-studies/1. LoRA/index.html": "66a8a37ca97f2f062bfcda3c2f0aa3348e6ae9b5ecc8d03ec1e0ebe481c5d195",
+      "examples/case-studies/5. Nanochat in Plato/index.html": "8a0864a0722b580ce7be4295adf71752e34fcfd3c68c9bd4dd4623a52e83ae8c",
+      "examples/algorithms/10. Algorithms based on Neural Architecture Search and Model Search/index.html": "4c2f26fd340a5861a1d6c33fa81a8e984590ec07b4bd60cb49b3afe51b78e2a6",
+      "examples/algorithms/6. Client Selection Algorithms/index.html": "b9c40460d423865d4546f6633c975c486360f4dd62cd972c7d5446b3db3d4ecc",
+      "examples/algorithms/5. Algorithms with Customized Client Training Loops/index.html": "364d05326bd7b6393dae81eb9661f2291284350963ab5986e0e08fc3e0d8072a",
+      "examples/algorithms/1. Server Aggregation Algorithms/index.html": "1a9be801aa824216a386c50ea8e736396e9c498f9ebc8e11e8c246cb3aa2e4ba",
+      "javascripts/katex.js": "cf7c285fc05b98d7044da650406d3a7f02ad74ff5b30bbfb0c0ffb7b59462ada",
+      "sitemap.xml": "51ef922101a59ab92407d8cbccde256f52f0dff56c88afc69d4d24c9e889534f"
+    },
+    "known_build_info": "Two pre-existing case-study pages are outside nav. Material emits an upstream MkDocs 2.0 migration notice; strict build exits zero."
+  },
+  "browser_qualification": {
+    "candidate_argv": [
+      "zsh",
+      "-lc",
+      "PLAYWRIGHT_BROWSERS_PATH=/tmp/plato-remaining-docs-katex-browsers /tmp/plato-remaining-docs-katex-browser-env/bin/python /tmp/plato-remaining-docs-katex-validation/browser_check.py --site docs/site --output /tmp/plato-remaining-docs-katex-validation/candidate-browser --label exact-pins-and-escaped-tex"
+    ],
+    "harness": {
+      "path": "/tmp/plato-remaining-docs-katex-validation/browser_check.py",
+      "sha256": "c4df461b54924a79bfe8225e2884cd274ff109389b3b96fed850a7222100623b",
+      "bytes": 15337,
+      "python_source": "\"\"\"Exercise the real built site; fixtures are separately labeled browser-only HTML.\"\"\"\n\nimport argparse\nimport hashlib\nimport importlib.metadata\nimport json\nimport threading\nimport urllib.parse\nfrom functools import partial\nfrom http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer\nfrom pathlib import Path\n\nfrom playwright.sync_api import sync_playwright\n\n\nPAGES = [\n    \"5. Algorithms with Customized Client Training Loops\",\n    \"10. Algorithms based on Neural Architecture Search and Model Search\",\n    \"6. Client Selection Algorithms\",\n    \"1. Server Aggregation Algorithms\",\n]\nFIXTURE = r\"\"\"\n<aside id=\"plato-browser-math-fixture\" data-validation-fixture=\"synthetic\">\n<p>Browser validation inline probe: <span class=\"arithmatex\">\\(x^2+y^2\\)</span>.</p>\n<div class=\"arithmatex\">\\[\\sum_{i=1}^{n} i = \\frac{n(n+1)}{2}\\]</div>\n<div class=\"arithmatex\">$$\\int_0^1 x^2\\,dx = \\frac{1}{3}$$</div>\n</aside>\n\"\"\"\nSNAPSHOT = r\"\"\"() => {\n  const article = document.querySelector('.md-content__inner');\n  const fixture = document.querySelector('#plato-browser-math-fixture');\n  const original = [...article.querySelectorAll('.arithmatex')]\n    .filter(node => !node.closest('#plato-browser-math-fixture'));\n  const rendered = original.filter(node => node.querySelector('.katex'));\n  const rects = rendered.map(node => {\n    const rect = node.querySelector('.katex').getBoundingClientRect();\n    return { width: rect.width, height: rect.height };\n  });\n  const fonts = [...document.fonts].filter(font => font.family.startsWith('KaTeX'));\n  return {\n    url: location.href, title: document.title,\n    article_heading: article.querySelector('h1')?.textContent,\n    identity: window.__platoDocumentIdentity,\n    katex_version: window.katex?.version,\n    renderer_type: typeof window.renderMathInElement,\n    material_document_stream_type: typeof window.document$,\n    original_math_nodes: original.length,\n    original_rendered_math_nodes: rendered.length,\n    original_unrendered: original.filter(node => !node.querySelector('.katex'))\n      .map(node => node.textContent),\n    original_mathml_nodes: rendered.filter(node => node.querySelector('math')).length,\n    original_nonzero_rects: rects.filter(rect => rect.width > 0 && rect.height > 0).length,\n    original_samples: rendered.slice(0, 3).map(node => ({\n      tex: node.querySelector('annotation')?.textContent,\n      text: node.textContent,\n      html: node.outerHTML.slice(0, 1800)\n    })),\n    display_math_nodes: article.querySelectorAll('.katex-display').length,\n    katex_error_nodes: article.querySelectorAll('.katex-error').length,\n    fixture: fixture ? {\n      math_nodes: fixture.querySelectorAll('.arithmatex').length,\n      rendered_math_nodes: fixture.querySelectorAll('.katex').length,\n      display_nodes: fixture.querySelectorAll('.katex-display').length,\n      inline_nodes: [...fixture.querySelectorAll('.katex')]\n        .filter(node => !node.closest('.katex-display')).length,\n      display_styles: [...fixture.querySelectorAll('.katex-display')]\n        .map(node => ({ display: getComputedStyle(node).display,\n          width: node.getBoundingClientRect().width,\n          height: node.getBoundingClientRect().height })),\n      source_tex: [...fixture.querySelectorAll('annotation')].map(node => node.textContent)\n    } : null,\n    font_status: document.fonts.status,\n    katex_fonts: fonts.map(font => ({ family: font.family, status: font.status })),\n    source_script_urls: [...document.scripts].map(script => script.src).filter(Boolean),\n    source_stylesheet_urls: [...document.querySelectorAll('link[rel=stylesheet]')]\n      .map(link => link.href)\n  };\n}\"\"\"\n\n\nclass Handler(SimpleHTTPRequestHandler):\n    def log_message(self, format, *args):\n        pass\n\n\ndef main():\n    parser = argparse.ArgumentParser()\n    parser.add_argument(\"--site\", type=Path, required=True)\n    parser.add_argument(\"--output\", type=Path, required=True)\n    parser.add_argument(\"--label\", required=True)\n    args = parser.parse_args()\n    args.output.mkdir(parents=True, exist_ok=True)\n    server = ThreadingHTTPServer((\"127.0.0.1\", 0), partial(Handler, directory=args.site))\n    thread = threading.Thread(target=server.serve_forever, daemon=True)\n    thread.start()\n    transport = f\"http://127.0.0.1:{server.server_port}/\"\n    base = \"https://platodocs.netlify.app/\"\n    results = {\n        \"label\": args.label, \"site\": str(args.site), \"base_url\": base,\n        \"local_transport\": transport,\n        \"origin_mapping\": \"Browser requests to configured site_url are served by the owned local static server; original sitemap and HTML are preserved. CDN requests use their real URLs.\",\n        \"playwright_version\": importlib.metadata.version(\"playwright\"),\n        \"fixture_html\": FIXTURE, \"checks\": [], \"events\": [], \"failures\": [],\n        \"assets\": [], \"browser_tls_validation\": \"default; no ignore_https_errors\",\n    }\n    paths = [\"examples/algorithms/\" + urllib.parse.quote(name) + \"/\" for name in PAGES]\n    try:\n        with sync_playwright() as playwright:\n            executable = \"/tmp/plato-remaining-docs-katex-browsers/chromium_headless_shell-1243/chrome-headless-shell-mac-arm64/chrome-headless-shell\"\n            browser = playwright.chromium.launch(headless=True, executable_path=executable)\n            results[\"browser_version\"] = browser.version\n            results[\"browser_executable\"] = executable\n            for mode in (\"untouched_page\", \"synthetic_display_fixture\"):\n                context = browser.new_context(viewport={\"width\": 1440, \"height\": 1080})\n                context.add_init_script(\"window.__platoDocumentIdentity = crypto.randomUUID()\")\n                def serve_local(route):\n                    response = route.fetch(url=transport + route.request.url.removeprefix(base))\n                    if mode == \"synthetic_display_fixture\" and \"text/html\" in response.headers.get(\"content-type\", \"\"):\n                        body = response.text()\n                        if \"/examples/algorithms/\" in route.request.url:\n                            assert \"</article>\" in body\n                            body = body.replace(\"</article>\", FIXTURE + \"</article>\", 1)\n                        route.fulfill(response=response, body=body)\n                    else:\n                        route.fulfill(response=response)\n                context.route(base + \"**\", serve_local)\n                page = context.new_page()\n                expected_headers = {}\n                expected_rendered = {}\n                phase = {\"mode\": mode, \"action\": \"setup\"}\n                page.on(\"console\", lambda msg: results[\"events\"].append({\n                    **phase, \"event\": \"console\", \"type\": msg.type, \"text\": msg.text,\n                    \"location\": msg.location,\n                }))\n                page.on(\"pageerror\", lambda error: results[\"events\"].append({\n                    **phase, \"event\": \"pageerror\", \"text\": str(error),\n                }))\n                page.on(\"requestfailed\", lambda req: results[\"events\"].append({\n                    **phase, \"event\": \"requestfailed\", \"url\": req.url,\n                    \"failure\": req.failure, \"resource_type\": req.resource_type,\n                }))\n                page.on(\"request\", lambda req: results[\"events\"].append({\n                    **phase, \"event\": \"document_request\", \"url\": req.url,\n                    \"resource_type\": req.resource_type,\n                    \"navigation_request\": req.is_navigation_request(),\n                }) if req.url.startswith(base) and req.resource_type in (\"document\", \"fetch\", \"xhr\") else None)\n\n                def capture_response(response):\n                    if \"unpkg.com/katex@\" in response.url and response.url.endswith((\".js\", \".css\")):\n                        try:\n                            body = response.body()\n                            results[\"assets\"].append({\n                                **phase, \"url\": response.url, \"status\": response.status,\n                                \"content_type\": response.headers.get(\"content-type\"),\n                                \"sha256\": hashlib.sha256(body).hexdigest(), \"bytes\": len(body),\n                            })\n                        except Exception as error:\n                            results[\"events\"].append({**phase, \"event\": \"asset_capture_error\", \"text\": str(error)})\n                page.on(\"response\", capture_response)\n\n                def collect(action, name, prior_identity=None):\n                    if action == \"instant\":\n                        # The URL changes before the fetched content is injected.\n                        # Wait for the actual target article and production rendering.\n                        page.wait_for_function(\"expected => document.querySelector('.md-content__inner h1')?.textContent === expected\", arg=expected_headers[name])\n                        page.wait_for_function(\"expected => [...document.querySelectorAll('.md-content__inner .arithmatex')].filter(node => !node.closest('#plato-browser-math-fixture') && node.querySelector('.katex')).length === expected\", arg=expected_rendered[name])\n                        if mode == \"synthetic_display_fixture\":\n                            page.wait_for_selector(\"#plato-browser-math-fixture .katex-display\")\n                    page.wait_for_load_state(\"networkidle\")\n                    page.evaluate(\"async () => { await document.fonts.ready; }\")\n                    # No manual renderer call: production document$ subscriber owns rendering.\n                    row = {\"mode\": mode, \"action\": action, \"page\": name, **page.evaluate(SNAPSHOT)}\n                    if action == \"direct\":\n                        expected_headers[name] = row[\"article_heading\"]\n                        expected_rendered[name] = row[\"original_rendered_math_nodes\"]\n                    if prior_identity is not None:\n                        row[\"same_document_identity\"] = row[\"identity\"] == prior_identity\n                    screenshot = args.output / f\"{mode}-{action}-{name.split('.')[0]}.png\"\n                    if mode == \"synthetic_display_fixture\":\n                        page.locator(\"#plato-browser-math-fixture\").screenshot(path=screenshot)\n                    elif name == PAGES[0]:\n                        page.locator(\".arithmatex\").first.scroll_into_view_if_needed()\n                        page.screenshot(path=screenshot)\n                    if screenshot.exists():\n                        row[\"screenshot\"] = str(screenshot)\n                        row[\"screenshot_sha256\"] = hashlib.sha256(screenshot.read_bytes()).hexdigest()\n                    results[\"checks\"].append(row)\n                    failures = []\n                    if row[\"original_math_nodes\"] == 0:\n                        failures.append(\"no original arithmatex nodes\")\n                    if row[\"original_rendered_math_nodes\"] != row[\"original_math_nodes\"]:\n                        failures.append(\"original math not fully rendered\")\n                    if row[\"original_nonzero_rects\"] != row[\"original_math_nodes\"]:\n                        failures.append(\"original math has zero-sized boxes\")\n                    if row[\"original_mathml_nodes\"] != row[\"original_math_nodes\"]:\n                        failures.append(\"missing MathML output\")\n                    if row[\"katex_error_nodes\"]:\n                        failures.append(\"KaTeX error nodes\")\n                    if row[\"katex_version\"] != \"0.19.0\" or row[\"renderer_type\"] != \"function\":\n                        failures.append(\"unexpected KaTeX version or missing renderer\")\n                    if prior_identity is not None and not row[\"same_document_identity\"]:\n                        failures.append(\"Material click performed a full document reload\")\n                    if mode == \"synthetic_display_fixture\":\n                        fixture = row[\"fixture\"]\n                        if not fixture or fixture[\"rendered_math_nodes\"] != 3 or fixture[\"display_nodes\"] != 2 or fixture[\"inline_nodes\"] != 1:\n                            failures.append(\"synthetic inline/display probes not fully rendered\")\n                        elif any(style[\"display\"] != \"block\" or style[\"width\"] <= 0 or style[\"height\"] <= 0 for style in fixture[\"display_styles\"]):\n                            failures.append(\"synthetic display probe layout failed\")\n                    if failures:\n                        results[\"failures\"].append({\"mode\": mode, \"action\": action, \"page\": name, \"failures\": failures})\n\n                for name, path in zip(PAGES, paths):\n                    phase[\"action\"] = \"direct-load-\" + name.split(\".\")[0]\n                    response = page.goto(base + path, wait_until=\"networkidle\")\n                    assert response.status == 200\n                    collect(\"direct\", name)\n                phase[\"action\"] = \"instant-start-home\"\n                page.goto(base, wait_until=\"networkidle\")\n                identity = page.evaluate(\"window.__platoDocumentIdentity\")\n                for name, path in zip(PAGES, paths):\n                    phase[\"action\"] = \"instant-click-\" + name.split(\".\")[0]\n                    links = page.locator(\"a.md-nav__link\")\n                    target = None\n                    for index in range(links.count()):\n                        candidate = links.nth(index)\n                        if candidate.evaluate(\"a => a.href\") == base + path:\n                            target = candidate\n                            break\n                    assert target is not None, name\n                    toggles = target.evaluate(\"\"\"a => {\n                      const toggles = [];\n                      for (let li = a.closest('li'); li; li = li.parentElement.closest('li')) {\n                        const input = li.querySelector(':scope > input.md-nav__toggle');\n                        if (input && !input.checked) toggles.push(input.id);\n                      }\n                      return toggles.reverse();\n                    }\"\"\")\n                    for toggle in toggles:\n                        page.locator(f'label[for=\"{toggle}\"]').first.click()\n                    # Real visible click on the built site's existing navigation link.\n                    # Material may serve a prior page from its own in-memory cache.\n                    target.click()\n                    page.wait_for_url(base + path)\n                    collect(\"instant\", name, identity)\n                context.close()\n            browser.close()\n    except Exception as error:\n        results[\"failures\"].append({\"exception\": repr(error)})\n    finally:\n        server.shutdown()\n        server.server_close()\n    console_failures = [event for event in results[\"events\"] if event[\"event\"] == \"pageerror\" or (event[\"event\"] == \"console\" and event[\"type\"] == \"error\")]\n    results[\"console_errors\"] = console_failures\n    if console_failures:\n        results[\"failures\"].append({\"browser_console_errors\": len(console_failures)})\n    results[\"status\"] = \"PASS\" if not results[\"failures\"] else \"FAIL\"\n    (args.output / \"browser-results.json\").write_text(json.dumps(results, indent=2) + \"\\n\")\n    print(json.dumps({\"label\": args.label, \"status\": results[\"status\"], \"checks\": len(results[\"checks\"]), \"failures\": results[\"failures\"]}, indent=2))\n    raise SystemExit(bool(results[\"failures\"]))\n\n\nif __name__ == \"__main__\":\n    main()\n"
+    },
+    "browser_provision_log": {
+      "path": "/tmp/plato-remaining-docs-katex-validation/browser-provision.log",
+      "sha256": "ff969a08c6aba6ba6ca494a653ff8b7c47144afb64677412991dab2e99e6d1f7",
+      "bytes": 6838
+    },
+    "environment_isolation": "Task-owned browser Python environment, downloaded Chromium and docs environment are all outside the project and root runtime environment. No source dependency, lockfile, node workspace or tooling changes.",
+    "measurement_method": "Direct loads and real visible nav-link clicks on four math-bearing algorithm pages. Instant navigation requires both retained per-document random identity and non-navigation XHR requests for each target. The harness waits for the target article, not only the URL change. No manual renderer call, document$ trigger, JS alteration or CDN response mock is used. Source math must produce KaTeX/MathML output with nonzero boxes; console/page errors and failed requests are captured.",
+    "display_fixture_boundary": "The four frozen algorithm pages have no display-math source blocks. A separate browser context injects a clearly labeled aside into each locally served built algorithm HTML response before the existing production subscriber renders it. It contains one inline probe, one \\[...\\] display probe and one $$...$$ display probe. Actual untouched built-page results remain separate. The fixture is never written to Markdown, compiled site files or production source.",
+    "baseline_before": {
+      "raw_artifact": {
+        "path": "/tmp/plato-remaining-docs-katex-validation/baseline-browser-final/browser-results.json",
+        "sha256": "f0708b87768733f3c1021e3ddc93e1e3263692297cff1ecd5fe9d9e0aff5eb9e",
+        "bytes": 136160
+      },
+      "label": "original-floating-assets",
+      "status": "FAIL",
+      "browser_version": "153.0.8010.12",
+      "browser_executable": "/tmp/plato-remaining-docs-katex-browsers/chromium_headless_shell-1243/chrome-headless-shell-mac-arm64/chrome-headless-shell",
+      "playwright_version": "1.63.0",
+      "browser_tls_validation": "default; no ignore_https_errors",
+      "configured_browser_origin": "https://platodocs.netlify.app/",
+      "local_transport": "http://127.0.0.1:63193/",
+      "origin_mapping": "Browser requests to configured site_url are served by the owned local static server; original sitemap and HTML are preserved. CDN requests use their real URLs.",
+      "check_count": 16,
+      "checks": [
+        {
+          "mode": "untouched_page",
+          "action": "direct",
+          "page": "5. Algorithms with Customized Client Training Loops",
+          "url": "https://platodocs.netlify.app/examples/algorithms/5.%20Algorithms%20with%20Customized%20Client%20Training%20Loops/",
+          "title": "Customized Client Training Loops - Plato",
+          "article_heading": "Customized Client Training Loops",
+          "katex_version": "0.19.0",
+          "renderer_type": "function",
+          "material_document_stream_type": "object",
+          "original_math_nodes": 33,
+          "original_rendered_math_nodes": 32,
+          "original_unrendered": [
+            "\\(N = \\texttt{clients.total_clients}\\)"
+          ],
+          "original_mathml_nodes": 32,
+          "original_nonzero_rects": 32,
+          "display_math_nodes": 0,
+          "katex_error_nodes": 0,
+          "fixture": null,
+          "font_status": "loaded",
+          "screenshot": "/tmp/plato-remaining-docs-katex-validation/baseline-browser-final/untouched_page-direct-5.png",
+          "screenshot_sha256": "1a0a0be8556ed4d839e122a9ad39a5db85ae1e3d9518abd044e9c705e0e3c145",
+          "original_sample_tex": [
+            "x",
+            "y",
+            "c"
+          ],
+          "loaded_katex_fonts": [
+            "KaTeX_Main",
+            "KaTeX_Math",
+            "KaTeX_Size1"
+          ],
+          "document_identity_sha256": "0851b9b8b384713d4c33cec6e7d7e67c4bf1db7dac0a40b7c1b3c6ed015d01f9"
+        },
+        {
+          "mode": "untouched_page",
+          "action": "direct",
+          "page": "10. Algorithms based on Neural Architecture Search and Model Search",
+          "url": "https://platodocs.netlify.app/examples/algorithms/10.%20Algorithms%20based%20on%20Neural%20Architecture%20Search%20and%20Model%20Search/",
+          "title": "Model Search - Plato",
+          "article_heading": "Model Search",
+          "katex_version": "0.19.0",
+          "renderer_type": "function",
+          "material_document_stream_type": "object",
+          "original_math_nodes": 1,
+          "original_rendered_math_nodes": 1,
+          "original_unrendered": [],
+          "original_mathml_nodes": 1,
+          "original_nonzero_rects": 1,
+          "display_math_nodes": 0,
+          "katex_error_nodes": 0,
+          "fixture": null,
+          "font_status": "loaded",
+          "original_sample_tex": [
+            "l_2"
+          ],
+          "loaded_katex_fonts": [
+            "KaTeX_Main",
+            "KaTeX_Math"
+          ],
+          "document_identity_sha256": "f68c185dae6e970c3dfec34aec52d341edcb2acd1d25663801cd0849e035fe1a"
+        },
+        {
+          "mode": "untouched_page",
+          "action": "direct",
+          "page": "6. Client Selection Algorithms",
+          "url": "https://platodocs.netlify.app/examples/algorithms/6.%20Client%20Selection%20Algorithms/",
+          "title": "Client Selection Algorithms - Plato",
+          "article_heading": "Client Selection Algorithms",
+          "katex_version": "0.19.0",
+          "renderer_type": "function",
+          "material_document_stream_type": "object",
+          "original_math_nodes": 2,
+          "original_rendered_math_nodes": 2,
+          "original_unrendered": [],
+          "original_mathml_nodes": 2,
+          "original_nonzero_rects": 2,
+          "display_math_nodes": 0,
+          "katex_error_nodes": 0,
+          "fixture": null,
+          "font_status": "loaded",
+          "original_sample_tex": [
+            "v_k = \\frac{1}{\\sqrt{n_k}} \\mathcal{L}(w, x_k, y_k)",
+            "|B_i| \\sqrt{\\overline{\\text{loss}^2}}"
+          ],
+          "loaded_katex_fonts": [
+            "KaTeX_Caligraphic",
+            "KaTeX_Main",
+            "KaTeX_Math"
+          ],
+          "document_identity_sha256": "1cbe37acf2550cfea3e69696a78628eab932a0f23a20d931607a73c29e53c7ed"
+        },
+        {
+          "mode": "untouched_page",
+          "action": "direct",
+          "page": "1. Server Aggregation Algorithms",
+          "url": "https://platodocs.netlify.app/examples/algorithms/1.%20Server%20Aggregation%20Algorithms/",
+          "title": "Server Aggregation Algorithms - Plato",
+          "article_heading": "Server Aggregation Algorithms",
+          "katex_version": "0.19.0",
+          "renderer_type": "function",
+          "material_document_stream_type": "object",
+          "original_math_nodes": 2,
+          "original_rendered_math_nodes": 2,
+          "original_unrendered": [],
+          "original_mathml_nodes": 2,
+          "original_nonzero_rects": 2,
+          "display_math_nodes": 0,
+          "katex_error_nodes": 0,
+          "fixture": null,
+          "font_status": "loaded",
+          "original_sample_tex": [
+            "\\epsilon",
+            "\\beta"
+          ],
+          "loaded_katex_fonts": [
+            "KaTeX_Main",
+            "KaTeX_Math",
+            "KaTeX_Size1"
+          ],
+          "document_identity_sha256": "8d8a16d0763c629771b64ef51d888a7694525d7f2aecee1a7ce25e9bada0ee05"
+        },
+        {
+          "mode": "untouched_page",
+          "action": "instant",
+          "page": "5. Algorithms with Customized Client Training Loops",
+          "url": "https://platodocs.netlify.app/examples/algorithms/5.%20Algorithms%20with%20Customized%20Client%20Training%20Loops/",
+          "title": "Customized Client Training Loops - Plato",
+          "article_heading": "Customized Client Training Loops",
+          "katex_version": "0.19.0",
+          "renderer_type": "function",
+          "material_document_stream_type": "object",
+          "original_math_nodes": 33,
+          "original_rendered_math_nodes": 32,
+          "original_unrendered": [
+            "\\(N = \\texttt{clients.total_clients}\\)"
+          ],
+          "original_mathml_nodes": 32,
+          "original_nonzero_rects": 32,
+          "display_math_nodes": 0,
+          "katex_error_nodes": 0,
+          "fixture": null,
+          "font_status": "loaded",
+          "same_document_identity": true,
+          "screenshot": "/tmp/plato-remaining-docs-katex-validation/baseline-browser-final/untouched_page-instant-5.png",
+          "screenshot_sha256": "2e5027623dca5667cca0aa1b0e87f2faead870a80ab5c2987705cc29654d0cfb",
+          "original_sample_tex": [
+            "x",
+            "y",
+            "c"
+          ],
+          "loaded_katex_fonts": [
+            "KaTeX_Main",
+            "KaTeX_Math",
+            "KaTeX_Size1"
+          ],
+          "document_identity_sha256": "7b0bdfd08af98e2aa3a4d083ef02665660f4a558401f651144c61e89dd6f0874"
+        },
+        {
+          "mode": "untouched_page",
+          "action": "instant",
+          "page": "10. Algorithms based on Neural Architecture Search and Model Search",
+          "url": "https://platodocs.netlify.app/examples/algorithms/10.%20Algorithms%20based%20on%20Neural%20Architecture%20Search%20and%20Model%20Search/",
+          "title": "Model Search - Plato",
+          "article_heading": "Model Search",
+          "katex_version": "0.19.0",
+          "renderer_type": "function",
+          "material_document_stream_type": "object",
+          "original_math_nodes": 1,
+          "original_rendered_math_nodes": 1,
+          "original_unrendered": [],
+          "original_mathml_nodes": 1,
+          "original_nonzero_rects": 1,
+          "display_math_nodes": 0,
+          "katex_error_nodes": 0,
+          "fixture": null,
+          "font_status": "loaded",
+          "same_document_identity": true,
+          "original_sample_tex": [
+            "l_2"
+          ],
+          "loaded_katex_fonts": [
+            "KaTeX_Main",
+            "KaTeX_Math",
+            "KaTeX_Size1"
+          ],
+          "document_identity_sha256": "7b0bdfd08af98e2aa3a4d083ef02665660f4a558401f651144c61e89dd6f0874"
+        },
+        {
+          "mode": "untouched_page",
+          "action": "instant",
+          "page": "6. Client Selection Algorithms",
+          "url": "https://platodocs.netlify.app/examples/algorithms/6.%20Client%20Selection%20Algorithms/",
+          "title": "Client Selection Algorithms - Plato",
+          "article_heading": "Client Selection Algorithms",
+          "katex_version": "0.19.0",
+          "renderer_type": "function",
+          "material_document_stream_type": "object",
+          "original_math_nodes": 2,
+          "original_rendered_math_nodes": 2,
+          "original_unrendered": [],
+          "original_mathml_nodes": 2,
+          "original_nonzero_rects": 2,
+          "display_math_nodes": 0,
+          "katex_error_nodes": 0,
+          "fixture": null,
+          "font_status": "loaded",
+          "same_document_identity": true,
+          "original_sample_tex": [
+            "v_k = \\frac{1}{\\sqrt{n_k}} \\mathcal{L}(w, x_k, y_k)",
+            "|B_i| \\sqrt{\\overline{\\text{loss}^2}}"
+          ],
+          "loaded_katex_fonts": [
+            "KaTeX_Caligraphic",
+            "KaTeX_Main",
+            "KaTeX_Math",
+            "KaTeX_Size1"
+          ],
+          "document_identity_sha256": "7b0bdfd08af98e2aa3a4d083ef02665660f4a558401f651144c61e89dd6f0874"
+        },
+        {
+          "mode": "untouched_page",
+          "action": "instant",
+          "page": "1. Server Aggregation Algorithms",
+          "url": "https://platodocs.netlify.app/examples/algorithms/1.%20Server%20Aggregation%20Algorithms/",
+          "title": "Server Aggregation Algorithms - Plato",
+          "article_heading": "Server Aggregation Algorithms",
+          "katex_version": "0.19.0",
+          "renderer_type": "function",
+          "material_document_stream_type": "object",
+          "original_math_nodes": 2,
+          "original_rendered_math_nodes": 2,
+          "original_unrendered": [],
+          "original_mathml_nodes": 2,
+          "original_nonzero_rects": 2,
+          "display_math_nodes": 0,
+          "katex_error_nodes": 0,
+          "fixture": null,
+          "font_status": "loaded",
+          "same_document_identity": true,
+          "original_sample_tex": [
+            "\\epsilon",
+            "\\beta"
+          ],
+          "loaded_katex_fonts": [
+            "KaTeX_Caligraphic",
+            "KaTeX_Main",
+            "KaTeX_Math",
+            "KaTeX_Size1"
+          ],
+          "document_identity_sha256": "7b0bdfd08af98e2aa3a4d083ef02665660f4a558401f651144c61e89dd6f0874"
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "direct",
+          "page": "5. Algorithms with Customized Client Training Loops",
+          "url": "https://platodocs.netlify.app/examples/algorithms/5.%20Algorithms%20with%20Customized%20Client%20Training%20Loops/",
+          "title": "Customized Client Training Loops - Plato",
+          "article_heading": "Customized Client Training Loops",
+          "katex_version": "0.19.0",
+          "renderer_type": "function",
+          "material_document_stream_type": "object",
+          "original_math_nodes": 33,
+          "original_rendered_math_nodes": 32,
+          "original_unrendered": [
+            "\\(N = \\texttt{clients.total_clients}\\)"
+          ],
+          "original_mathml_nodes": 32,
+          "original_nonzero_rects": 32,
+          "display_math_nodes": 2,
+          "katex_error_nodes": 0,
+          "fixture": {
+            "math_nodes": 3,
+            "rendered_math_nodes": 3,
+            "display_nodes": 2,
+            "inline_nodes": 1,
+            "display_styles": [
+              {
+                "display": "block",
+                "width": 688,
+                "height": 56.703125
+              },
+              {
+                "display": "block",
+                "width": 688,
+                "height": 47.921875
+              }
+            ],
+            "source_tex": [
+              "x^2+y^2",
+              "\\sum_{i=1}^{n} i = \\frac{n(n+1)}{2}",
+              "\\int_0^1 x^2\\,dx = \\frac{1}{3}"
+            ]
+          },
+          "font_status": "loaded",
+          "screenshot": "/tmp/plato-remaining-docs-katex-validation/baseline-browser-final/synthetic_display_fixture-direct-5.png",
+          "screenshot_sha256": "819cc1a0ff502b59acacef9f76b18dbdc9e39755a37facc98ec7ae76985a5b72",
+          "original_sample_tex": [
+            "x",
+            "y",
+            "c"
+          ],
+          "loaded_katex_fonts": [
+            "KaTeX_Main",
+            "KaTeX_Math",
+            "KaTeX_Size1",
+            "KaTeX_Size2"
+          ],
+          "document_identity_sha256": "95a7d9b02868ee1ef7245491d6de139d118462eb479536693e71d6b499e17695"
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "direct",
+          "page": "10. Algorithms based on Neural Architecture Search and Model Search",
+          "url": "https://platodocs.netlify.app/examples/algorithms/10.%20Algorithms%20based%20on%20Neural%20Architecture%20Search%20and%20Model%20Search/",
+          "title": "Model Search - Plato",
+          "article_heading": "Model Search",
+          "katex_version": "0.19.0",
+          "renderer_type": "function",
+          "material_document_stream_type": "object",
+          "original_math_nodes": 1,
+          "original_rendered_math_nodes": 1,
+          "original_unrendered": [],
+          "original_mathml_nodes": 1,
+          "original_nonzero_rects": 1,
+          "display_math_nodes": 2,
+          "katex_error_nodes": 0,
+          "fixture": {
+            "math_nodes": 3,
+            "rendered_math_nodes": 3,
+            "display_nodes": 2,
+            "inline_nodes": 1,
+            "display_styles": [
+              {
+                "display": "block",
+                "width": 688,
+                "height": 56.703125
+              },
+              {
+                "display": "block",
+                "width": 688,
+                "height": 47.921875
+              }
+            ],
+            "source_tex": [
+              "x^2+y^2",
+              "\\sum_{i=1}^{n} i = \\frac{n(n+1)}{2}",
+              "\\int_0^1 x^2\\,dx = \\frac{1}{3}"
+            ]
+          },
+          "font_status": "loaded",
+          "screenshot": "/tmp/plato-remaining-docs-katex-validation/baseline-browser-final/synthetic_display_fixture-direct-10.png",
+          "screenshot_sha256": "9695f2fcbfa257e0818a4dc8c49f636f90fb9ff49bec3c9c5dc208faddb1dcb1",
+          "original_sample_tex": [
+            "l_2"
+          ],
+          "loaded_katex_fonts": [
+            "KaTeX_Main",
+            "KaTeX_Math",
+            "KaTeX_Size2"
+          ],
+          "document_identity_sha256": "d81cfa35389af56addcb3f91a909da942c2eeb1ce8b2c8fdeeeb36e8726f6f23"
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "direct",
+          "page": "6. Client Selection Algorithms",
+          "url": "https://platodocs.netlify.app/examples/algorithms/6.%20Client%20Selection%20Algorithms/",
+          "title": "Client Selection Algorithms - Plato",
+          "article_heading": "Client Selection Algorithms",
+          "katex_version": "0.19.0",
+          "renderer_type": "function",
+          "material_document_stream_type": "object",
+          "original_math_nodes": 2,
+          "original_rendered_math_nodes": 2,
+          "original_unrendered": [],
+          "original_mathml_nodes": 2,
+          "original_nonzero_rects": 2,
+          "display_math_nodes": 2,
+          "katex_error_nodes": 0,
+          "fixture": {
+            "math_nodes": 3,
+            "rendered_math_nodes": 3,
+            "display_nodes": 2,
+            "inline_nodes": 1,
+            "display_styles": [
+              {
+                "display": "block",
+                "width": 688,
+                "height": 56.703125
+              },
+              {
+                "display": "block",
+                "width": 688,
+                "height": 47.921875
+              }
+            ],
+            "source_tex": [
+              "x^2+y^2",
+              "\\sum_{i=1}^{n} i = \\frac{n(n+1)}{2}",
+              "\\int_0^1 x^2\\,dx = \\frac{1}{3}"
+            ]
+          },
+          "font_status": "loaded",
+          "screenshot": "/tmp/plato-remaining-docs-katex-validation/baseline-browser-final/synthetic_display_fixture-direct-6.png",
+          "screenshot_sha256": "d33ceefd93c6e9f2c8dc8e28a8a453c67c44c8823fd4950b69ccc64ad03669c1",
+          "original_sample_tex": [
+            "v_k = \\frac{1}{\\sqrt{n_k}} \\mathcal{L}(w, x_k, y_k)",
+            "|B_i| \\sqrt{\\overline{\\text{loss}^2}}"
+          ],
+          "loaded_katex_fonts": [
+            "KaTeX_Caligraphic",
+            "KaTeX_Main",
+            "KaTeX_Math",
+            "KaTeX_Size2"
+          ],
+          "document_identity_sha256": "db79c356bbc648a86e1b9343aa113cb2e08df3c946f771f0149d28c9ab9b61e7"
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "direct",
+          "page": "1. Server Aggregation Algorithms",
+          "url": "https://platodocs.netlify.app/examples/algorithms/1.%20Server%20Aggregation%20Algorithms/",
+          "title": "Server Aggregation Algorithms - Plato",
+          "article_heading": "Server Aggregation Algorithms",
+          "katex_version": "0.19.0",
+          "renderer_type": "function",
+          "material_document_stream_type": "object",
+          "original_math_nodes": 2,
+          "original_rendered_math_nodes": 2,
+          "original_unrendered": [],
+          "original_mathml_nodes": 2,
+          "original_nonzero_rects": 2,
+          "display_math_nodes": 2,
+          "katex_error_nodes": 0,
+          "fixture": {
+            "math_nodes": 3,
+            "rendered_math_nodes": 3,
+            "display_nodes": 2,
+            "inline_nodes": 1,
+            "display_styles": [
+              {
+                "display": "block",
+                "width": 688,
+                "height": 56.703125
+              },
+              {
+                "display": "block",
+                "width": 688,
+                "height": 47.921875
+              }
+            ],
+            "source_tex": [
+              "x^2+y^2",
+              "\\sum_{i=1}^{n} i = \\frac{n(n+1)}{2}",
+              "\\int_0^1 x^2\\,dx = \\frac{1}{3}"
+            ]
+          },
+          "font_status": "loaded",
+          "screenshot": "/tmp/plato-remaining-docs-katex-validation/baseline-browser-final/synthetic_display_fixture-direct-1.png",
+          "screenshot_sha256": "37735b236e16955aa80fc4a4e9be3f52b104ec14a7cd7ebcb55ff1a67f086e06",
+          "original_sample_tex": [
+            "\\epsilon",
+            "\\beta"
+          ],
+          "loaded_katex_fonts": [
+            "KaTeX_Main",
+            "KaTeX_Math",
+            "KaTeX_Size1",
+            "KaTeX_Size2"
+          ],
+          "document_identity_sha256": "c3f32b150289bfdc1b338a201fda3e7d8afc4cb202ca17ffd5533c4d7d42822e"
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "instant",
+          "page": "5. Algorithms with Customized Client Training Loops",
+          "url": "https://platodocs.netlify.app/examples/algorithms/5.%20Algorithms%20with%20Customized%20Client%20Training%20Loops/",
+          "title": "Customized Client Training Loops - Plato",
+          "article_heading": "Customized Client Training Loops",
+          "katex_version": "0.19.0",
+          "renderer_type": "function",
+          "material_document_stream_type": "object",
+          "original_math_nodes": 33,
+          "original_rendered_math_nodes": 32,
+          "original_unrendered": [
+            "\\(N = \\texttt{clients.total_clients}\\)"
+          ],
+          "original_mathml_nodes": 32,
+          "original_nonzero_rects": 32,
+          "display_math_nodes": 2,
+          "katex_error_nodes": 0,
+          "fixture": {
+            "math_nodes": 3,
+            "rendered_math_nodes": 3,
+            "display_nodes": 2,
+            "inline_nodes": 1,
+            "display_styles": [
+              {
+                "display": "block",
+                "width": 688,
+                "height": 56.703125
+              },
+              {
+                "display": "block",
+                "width": 688,
+                "height": 47.921875
+              }
+            ],
+            "source_tex": [
+              "x^2+y^2",
+              "\\sum_{i=1}^{n} i = \\frac{n(n+1)}{2}",
+              "\\int_0^1 x^2\\,dx = \\frac{1}{3}"
+            ]
+          },
+          "font_status": "loaded",
+          "same_document_identity": true,
+          "screenshot": "/tmp/plato-remaining-docs-katex-validation/baseline-browser-final/synthetic_display_fixture-instant-5.png",
+          "screenshot_sha256": "819cc1a0ff502b59acacef9f76b18dbdc9e39755a37facc98ec7ae76985a5b72",
+          "original_sample_tex": [
+            "x",
+            "y",
+            "c"
+          ],
+          "loaded_katex_fonts": [
+            "KaTeX_Main",
+            "KaTeX_Math",
+            "KaTeX_Size1",
+            "KaTeX_Size2"
+          ],
+          "document_identity_sha256": "8bf4a269bb003c9e28b320a333d567f8bcdb49c38b5c0d0ab468ab2b3342cd11"
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "instant",
+          "page": "10. Algorithms based on Neural Architecture Search and Model Search",
+          "url": "https://platodocs.netlify.app/examples/algorithms/10.%20Algorithms%20based%20on%20Neural%20Architecture%20Search%20and%20Model%20Search/",
+          "title": "Model Search - Plato",
+          "article_heading": "Model Search",
+          "katex_version": "0.19.0",
+          "renderer_type": "function",
+          "material_document_stream_type": "object",
+          "original_math_nodes": 1,
+          "original_rendered_math_nodes": 1,
+          "original_unrendered": [],
+          "original_mathml_nodes": 1,
+          "original_nonzero_rects": 1,
+          "display_math_nodes": 2,
+          "katex_error_nodes": 0,
+          "fixture": {
+            "math_nodes": 3,
+            "rendered_math_nodes": 3,
+            "display_nodes": 2,
+            "inline_nodes": 1,
+            "display_styles": [
+              {
+                "display": "block",
+                "width": 688,
+                "height": 56.703125
+              },
+              {
+                "display": "block",
+                "width": 688,
+                "height": 47.921875
+              }
+            ],
+            "source_tex": [
+              "x^2+y^2",
+              "\\sum_{i=1}^{n} i = \\frac{n(n+1)}{2}",
+              "\\int_0^1 x^2\\,dx = \\frac{1}{3}"
+            ]
+          },
+          "font_status": "loaded",
+          "same_document_identity": true,
+          "screenshot": "/tmp/plato-remaining-docs-katex-validation/baseline-browser-final/synthetic_display_fixture-instant-10.png",
+          "screenshot_sha256": "9695f2fcbfa257e0818a4dc8c49f636f90fb9ff49bec3c9c5dc208faddb1dcb1",
+          "original_sample_tex": [
+            "l_2"
+          ],
+          "loaded_katex_fonts": [
+            "KaTeX_Main",
+            "KaTeX_Math",
+            "KaTeX_Size1",
+            "KaTeX_Size2"
+          ],
+          "document_identity_sha256": "8bf4a269bb003c9e28b320a333d567f8bcdb49c38b5c0d0ab468ab2b3342cd11"
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "instant",
+          "page": "6. Client Selection Algorithms",
+          "url": "https://platodocs.netlify.app/examples/algorithms/6.%20Client%20Selection%20Algorithms/",
+          "title": "Client Selection Algorithms - Plato",
+          "article_heading": "Client Selection Algorithms",
+          "katex_version": "0.19.0",
+          "renderer_type": "function",
+          "material_document_stream_type": "object",
+          "original_math_nodes": 2,
+          "original_rendered_math_nodes": 2,
+          "original_unrendered": [],
+          "original_mathml_nodes": 2,
+          "original_nonzero_rects": 2,
+          "display_math_nodes": 2,
+          "katex_error_nodes": 0,
+          "fixture": {
+            "math_nodes": 3,
+            "rendered_math_nodes": 3,
+            "display_nodes": 2,
+            "inline_nodes": 1,
+            "display_styles": [
+              {
+                "display": "block",
+                "width": 688,
+                "height": 56.703125
+              },
+              {
+                "display": "block",
+                "width": 688,
+                "height": 47.921875
+              }
+            ],
+            "source_tex": [
+              "x^2+y^2",
+              "\\sum_{i=1}^{n} i = \\frac{n(n+1)}{2}",
+              "\\int_0^1 x^2\\,dx = \\frac{1}{3}"
+            ]
+          },
+          "font_status": "loaded",
+          "same_document_identity": true,
+          "screenshot": "/tmp/plato-remaining-docs-katex-validation/baseline-browser-final/synthetic_display_fixture-instant-6.png",
+          "screenshot_sha256": "544424846bc87a2ce7f862036c4f415eb9b664d0426683a779fb9378f2d76293",
+          "original_sample_tex": [
+            "v_k = \\frac{1}{\\sqrt{n_k}} \\mathcal{L}(w, x_k, y_k)",
+            "|B_i| \\sqrt{\\overline{\\text{loss}^2}}"
+          ],
+          "loaded_katex_fonts": [
+            "KaTeX_Caligraphic",
+            "KaTeX_Main",
+            "KaTeX_Math",
+            "KaTeX_Size1",
+            "KaTeX_Size2"
+          ],
+          "document_identity_sha256": "8bf4a269bb003c9e28b320a333d567f8bcdb49c38b5c0d0ab468ab2b3342cd11"
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "instant",
+          "page": "1. Server Aggregation Algorithms",
+          "url": "https://platodocs.netlify.app/examples/algorithms/1.%20Server%20Aggregation%20Algorithms/",
+          "title": "Server Aggregation Algorithms - Plato",
+          "article_heading": "Server Aggregation Algorithms",
+          "katex_version": "0.19.0",
+          "renderer_type": "function",
+          "material_document_stream_type": "object",
+          "original_math_nodes": 2,
+          "original_rendered_math_nodes": 2,
+          "original_unrendered": [],
+          "original_mathml_nodes": 2,
+          "original_nonzero_rects": 2,
+          "display_math_nodes": 2,
+          "katex_error_nodes": 0,
+          "fixture": {
+            "math_nodes": 3,
+            "rendered_math_nodes": 3,
+            "display_nodes": 2,
+            "inline_nodes": 1,
+            "display_styles": [
+              {
+                "display": "block",
+                "width": 688,
+                "height": 56.703125
+              },
+              {
+                "display": "block",
+                "width": 688,
+                "height": 47.921875
+              }
+            ],
+            "source_tex": [
+              "x^2+y^2",
+              "\\sum_{i=1}^{n} i = \\frac{n(n+1)}{2}",
+              "\\int_0^1 x^2\\,dx = \\frac{1}{3}"
+            ]
+          },
+          "font_status": "loaded",
+          "same_document_identity": true,
+          "screenshot": "/tmp/plato-remaining-docs-katex-validation/baseline-browser-final/synthetic_display_fixture-instant-1.png",
+          "screenshot_sha256": "37735b236e16955aa80fc4a4e9be3f52b104ec14a7cd7ebcb55ff1a67f086e06",
+          "original_sample_tex": [
+            "\\epsilon",
+            "\\beta"
+          ],
+          "loaded_katex_fonts": [
+            "KaTeX_Caligraphic",
+            "KaTeX_Main",
+            "KaTeX_Math",
+            "KaTeX_Size1",
+            "KaTeX_Size2"
+          ],
+          "document_identity_sha256": "8bf4a269bb003c9e28b320a333d567f8bcdb49c38b5c0d0ab468ab2b3342cd11"
+        }
+      ],
+      "failures": [
+        {
+          "mode": "untouched_page",
+          "action": "direct",
+          "page": "5. Algorithms with Customized Client Training Loops",
+          "failures": [
+            "original math not fully rendered",
+            "original math has zero-sized boxes",
+            "missing MathML output"
+          ]
+        },
+        {
+          "mode": "untouched_page",
+          "action": "instant",
+          "page": "5. Algorithms with Customized Client Training Loops",
+          "failures": [
+            "original math not fully rendered",
+            "original math has zero-sized boxes",
+            "missing MathML output"
+          ]
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "direct",
+          "page": "5. Algorithms with Customized Client Training Loops",
+          "failures": [
+            "original math not fully rendered",
+            "original math has zero-sized boxes",
+            "missing MathML output"
+          ]
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "instant",
+          "page": "5. Algorithms with Customized Client Training Loops",
+          "failures": [
+            "original math not fully rendered",
+            "original math has zero-sized boxes",
+            "missing MathML output"
+          ]
+        },
+        {
+          "browser_console_errors": 4
+        }
+      ],
+      "console_errors": [
+        {
+          "mode": "untouched_page",
+          "action": "direct-load-5",
+          "event": "console",
+          "type": "error",
+          "text": "KaTeX auto-render: Failed to parse `N = \\texttt{clients.total_clients}` with  ParseError: KaTeX parse error: Expected 'EOF', got '_' at position 26: \u2026t{clients.total_\u0332clients}\n    at co.expect (https://unpkg.com/katex@0/dist/katex.min.js:1:260710)\n    at co.parseArgumentGroup (https://unpkg.com/katex@0/dist/katex.min.js:1:267928)\n    at co.parseGroupOfType (https://unpkg.com/katex@0/dist/katex.min.js:1:265575)\n    at co.parseArguments (https://unpkg.com/katex@0/dist/katex.min.js:1:265215)\n    at co.parseFunction (https://unpkg.com/katex@0/dist/katex.min.js:1:264648)\n    at co.parseGroup (https://unpkg.com/katex@0/dist/katex.min.js:1:268412)\n    at co.parseAtom (https://unpkg.com/katex@0/dist/katex.min.js:1:262808)\n    at co.parseExpression (https://unpkg.com/katex@0/dist/katex.min.js:1:261671)\n    at co.parse (https://unpkg.com/katex@0/dist/katex.min.js:1:261134)\n    at ho (https://unpkg.com/katex@0/dist/katex.min.js:1:271366)",
+          "location": {
+            "url": "https://unpkg.com/katex@0/dist/contrib/auto-render.min.js",
+            "line": 0,
+            "column": 2005,
+            "lineNumber": 0,
+            "columnNumber": 2005
+          }
+        },
+        {
+          "mode": "untouched_page",
+          "action": "instant-click-5",
+          "event": "console",
+          "type": "error",
+          "text": "KaTeX auto-render: Failed to parse `N = \\texttt{clients.total_clients}` with  ParseError: KaTeX parse error: Expected 'EOF', got '_' at position 26: \u2026t{clients.total_\u0332clients}\n    at co.expect (https://unpkg.com/katex@0/dist/katex.min.js:1:260710)\n    at co.parseArgumentGroup (https://unpkg.com/katex@0/dist/katex.min.js:1:267928)\n    at co.parseGroupOfType (https://unpkg.com/katex@0/dist/katex.min.js:1:265575)\n    at co.parseArguments (https://unpkg.com/katex@0/dist/katex.min.js:1:265215)\n    at co.parseFunction (https://unpkg.com/katex@0/dist/katex.min.js:1:264648)\n    at co.parseGroup (https://unpkg.com/katex@0/dist/katex.min.js:1:268412)\n    at co.parseAtom (https://unpkg.com/katex@0/dist/katex.min.js:1:262808)\n    at co.parseExpression (https://unpkg.com/katex@0/dist/katex.min.js:1:261671)\n    at co.parse (https://unpkg.com/katex@0/dist/katex.min.js:1:261134)\n    at ho (https://unpkg.com/katex@0/dist/katex.min.js:1:271366)",
+          "location": {
+            "url": "https://unpkg.com/katex@0/dist/contrib/auto-render.min.js",
+            "line": 0,
+            "column": 2005,
+            "lineNumber": 0,
+            "columnNumber": 2005
+          }
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "direct-load-5",
+          "event": "console",
+          "type": "error",
+          "text": "KaTeX auto-render: Failed to parse `N = \\texttt{clients.total_clients}` with  ParseError: KaTeX parse error: Expected 'EOF', got '_' at position 26: \u2026t{clients.total_\u0332clients}\n    at co.expect (https://unpkg.com/katex@0/dist/katex.min.js:1:260710)\n    at co.parseArgumentGroup (https://unpkg.com/katex@0/dist/katex.min.js:1:267928)\n    at co.parseGroupOfType (https://unpkg.com/katex@0/dist/katex.min.js:1:265575)\n    at co.parseArguments (https://unpkg.com/katex@0/dist/katex.min.js:1:265215)\n    at co.parseFunction (https://unpkg.com/katex@0/dist/katex.min.js:1:264648)\n    at co.parseGroup (https://unpkg.com/katex@0/dist/katex.min.js:1:268412)\n    at co.parseAtom (https://unpkg.com/katex@0/dist/katex.min.js:1:262808)\n    at co.parseExpression (https://unpkg.com/katex@0/dist/katex.min.js:1:261671)\n    at co.parse (https://unpkg.com/katex@0/dist/katex.min.js:1:261134)\n    at ho (https://unpkg.com/katex@0/dist/katex.min.js:1:271366)",
+          "location": {
+            "url": "https://unpkg.com/katex@0/dist/contrib/auto-render.min.js",
+            "line": 0,
+            "column": 2005,
+            "lineNumber": 0,
+            "columnNumber": 2005
+          }
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "instant-click-5",
+          "event": "console",
+          "type": "error",
+          "text": "KaTeX auto-render: Failed to parse `N = \\texttt{clients.total_clients}` with  ParseError: KaTeX parse error: Expected 'EOF', got '_' at position 26: \u2026t{clients.total_\u0332clients}\n    at co.expect (https://unpkg.com/katex@0/dist/katex.min.js:1:260710)\n    at co.parseArgumentGroup (https://unpkg.com/katex@0/dist/katex.min.js:1:267928)\n    at co.parseGroupOfType (https://unpkg.com/katex@0/dist/katex.min.js:1:265575)\n    at co.parseArguments (https://unpkg.com/katex@0/dist/katex.min.js:1:265215)\n    at co.parseFunction (https://unpkg.com/katex@0/dist/katex.min.js:1:264648)\n    at co.parseGroup (https://unpkg.com/katex@0/dist/katex.min.js:1:268412)\n    at co.parseAtom (https://unpkg.com/katex@0/dist/katex.min.js:1:262808)\n    at co.parseExpression (https://unpkg.com/katex@0/dist/katex.min.js:1:261671)\n    at co.parse (https://unpkg.com/katex@0/dist/katex.min.js:1:261134)\n    at ho (https://unpkg.com/katex@0/dist/katex.min.js:1:271366)",
+          "location": {
+            "url": "https://unpkg.com/katex@0/dist/contrib/auto-render.min.js",
+            "line": 0,
+            "column": 2005,
+            "lineNumber": 0,
+            "columnNumber": 2005
+          }
+        }
+      ],
+      "raw_events": [
+        {
+          "mode": "untouched_page",
+          "action": "direct-load-5",
+          "event": "document_request",
+          "url": "https://platodocs.netlify.app/examples/algorithms/5.%20Algorithms%20with%20Customized%20Client%20Training%20Loops/",
+          "resource_type": "document",
+          "navigation_request": true
+        },
+        {
+          "mode": "untouched_page",
+          "action": "direct-load-5",
+          "event": "asset_capture_error",
+          "text": "Response.body: Response body is unavailable for redirect responses"
+        },
+        {
+          "mode": "untouched_page",
+          "action": "direct-load-5",
+          "event": "asset_capture_error",
+          "text": "Response.body: Response body is unavailable for redirect responses"
+        },
+        {
+          "mode": "untouched_page",
+          "action": "direct-load-5",
+          "event": "asset_capture_error",
+          "text": "Response.body: Response body is unavailable for redirect responses"
+        },
+        {
+          "mode": "untouched_page",
+          "action": "direct-load-5",
+          "event": "document_request",
+          "url": "https://platodocs.netlify.app/sitemap.xml",
+          "resource_type": "xhr",
+          "navigation_request": false
+        },
+        {
+          "mode": "untouched_page",
+          "action": "direct-load-5",
+          "event": "document_request",
+          "url": "https://platodocs.netlify.app/search/search_index.json",
+          "resource_type": "xhr",
+          "navigation_request": false
+        },
+        {
+          "mode": "untouched_page",
+          "action": "direct-load-5",
+          "event": "console",
+          "type": "error",
+          "text": "KaTeX auto-render: Failed to parse `N = \\texttt{clients.total_clients}` with  ParseError: KaTeX parse error: Expected 'EOF', got '_' at position 26: \u2026t{clients.total_\u0332clients}\n    at co.expect (https://unpkg.com/katex@0/dist/katex.min.js:1:260710)\n    at co.parseArgumentGroup (https://unpkg.com/katex@0/dist/katex.min.js:1:267928)\n    at co.parseGroupOfType (https://unpkg.com/katex@0/dist/katex.min.js:1:265575)\n    at co.parseArguments (https://unpkg.com/katex@0/dist/katex.min.js:1:265215)\n    at co.parseFunction (https://unpkg.com/katex@0/dist/katex.min.js:1:264648)\n    at co.parseGroup (https://unpkg.com/katex@0/dist/katex.min.js:1:268412)\n    at co.parseAtom (https://unpkg.com/katex@0/dist/katex.min.js:1:262808)\n    at co.parseExpression (https://unpkg.com/katex@0/dist/katex.min.js:1:261671)\n    at co.parse (https://unpkg.com/katex@0/dist/katex.min.js:1:261134)\n    at ho (https://unpkg.com/katex@0/dist/katex.min.js:1:271366)",
+          "location": {
+            "url": "https://unpkg.com/katex@0/dist/contrib/auto-render.min.js",
+            "line": 0,
+            "column": 2005,
+            "lineNumber": 0,
+            "columnNumber": 2005
+          }
+        },
+        {
+          "mode": "untouched_page",
+          "action": "direct-load-10",
+          "event": "document_request",
+          "url": "https://platodocs.netlify.app/examples/algorithms/10.%20Algorithms%20based%20on%20Neural%20Architecture%20Search%20and%20Model%20Search/",
+          "resource_type": "document",
+          "navigation_request": true
+        },
+        {
+          "mode": "untouched_page",
+          "action": "direct-load-10",
+          "event": "asset_capture_error",
+          "text": "Response.body: Response body is unavailable for redirect responses"
+        },
+        {
+          "mode": "untouched_page",
+          "action": "direct-load-10",
+          "event": "asset_capture_error",
+          "text": "Response.body: Response body is unavailable for redirect responses"
+        },
+        {
+          "mode": "untouched_page",
+          "action": "direct-load-10",
+          "event": "asset_capture_error",
+          "text": "Response.body: Response body is unavailable for redirect responses"
+        },
+        {
+          "mode": "untouched_page",
+          "action": "direct-load-10",
+          "event": "document_request",
+          "url": "https://platodocs.netlify.app/sitemap.xml",
+          "resource_type": "xhr",
+          "navigation_request": false
+        },
+        {
+          "mode": "untouched_page",
+          "action": "direct-load-10",
+          "event": "document_request",
+          "url": "https://platodocs.netlify.app/search/search_index.json",
+          "resource_type": "xhr",
+          "navigation_request": false
+        },
+        {
+          "mode": "untouched_page",
+          "action": "direct-load-6",
+          "event": "document_request",
+          "url": "https://platodocs.netlify.app/examples/algorithms/6.%20Client%20Selection%20Algorithms/",
+          "resource_type": "document",
+          "navigation_request": true
+        },
+        {
+          "mode": "untouched_page",
+          "action": "direct-load-6",
+          "event": "asset_capture_error",
+          "text": "Response.body: Response body is unavailable for redirect responses"
+        },
+        {
+          "mode": "untouched_page",
+          "action": "direct-load-6",
+          "event": "asset_capture_error",
+          "text": "Response.body: Response body is unavailable for redirect responses"
+        },
+        {
+          "mode": "untouched_page",
+          "action": "direct-load-6",
+          "event": "asset_capture_error",
+          "text": "Response.body: Response body is unavailable for redirect responses"
+        },
+        {
+          "mode": "untouched_page",
+          "action": "direct-load-6",
+          "event": "document_request",
+          "url": "https://platodocs.netlify.app/sitemap.xml",
+          "resource_type": "xhr",
+          "navigation_request": false
+        },
+        {
+          "mode": "untouched_page",
+          "action": "direct-load-6",
+          "event": "document_request",
+          "url": "https://platodocs.netlify.app/search/search_index.json",
+          "resource_type": "xhr",
+          "navigation_request": false
+        },
+        {
+          "mode": "untouched_page",
+          "action": "direct-load-1",
+          "event": "document_request",
+          "url": "https://platodocs.netlify.app/examples/algorithms/1.%20Server%20Aggregation%20Algorithms/",
+          "resource_type": "document",
+          "navigation_request": true
+        },
+        {
+          "mode": "untouched_page",
+          "action": "direct-load-1",
+          "event": "asset_capture_error",
+          "text": "Response.body: Response body is unavailable for redirect responses"
+        },
+        {
+          "mode": "untouched_page",
+          "action": "direct-load-1",
+          "event": "asset_capture_error",
+          "text": "Response.body: Response body is unavailable for redirect responses"
+        },
+        {
+          "mode": "untouched_page",
+          "action": "direct-load-1",
+          "event": "asset_capture_error",
+          "text": "Response.body: Response body is unavailable for redirect responses"
+        },
+        {
+          "mode": "untouched_page",
+          "action": "direct-load-1",
+          "event": "document_request",
+          "url": "https://platodocs.netlify.app/sitemap.xml",
+          "resource_type": "xhr",
+          "navigation_request": false
+        },
+        {
+          "mode": "untouched_page",
+          "action": "direct-load-1",
+          "event": "document_request",
+          "url": "https://platodocs.netlify.app/search/search_index.json",
+          "resource_type": "xhr",
+          "navigation_request": false
+        },
+        {
+          "mode": "untouched_page",
+          "action": "instant-start-home",
+          "event": "document_request",
+          "url": "https://platodocs.netlify.app/",
+          "resource_type": "document",
+          "navigation_request": true
+        },
+        {
+          "mode": "untouched_page",
+          "action": "instant-start-home",
+          "event": "asset_capture_error",
+          "text": "Response.body: Response body is unavailable for redirect responses"
+        },
+        {
+          "mode": "untouched_page",
+          "action": "instant-start-home",
+          "event": "asset_capture_error",
+          "text": "Response.body: Response body is unavailable for redirect responses"
+        },
+        {
+          "mode": "untouched_page",
+          "action": "instant-start-home",
+          "event": "asset_capture_error",
+          "text": "Response.body: Response body is unavailable for redirect responses"
+        },
+        {
+          "mode": "untouched_page",
+          "action": "instant-start-home",
+          "event": "document_request",
+          "url": "https://platodocs.netlify.app/sitemap.xml",
+          "resource_type": "xhr",
+          "navigation_request": false
+        },
+        {
+          "mode": "untouched_page",
+          "action": "instant-start-home",
+          "event": "document_request",
+          "url": "https://platodocs.netlify.app/search/search_index.json",
+          "resource_type": "xhr",
+          "navigation_request": false
+        },
+        {
+          "mode": "untouched_page",
+          "action": "instant-click-5",
+          "event": "document_request",
+          "url": "https://platodocs.netlify.app/examples/algorithms/5.%20Algorithms%20with%20Customized%20Client%20Training%20Loops/",
+          "resource_type": "xhr",
+          "navigation_request": false
+        },
+        {
+          "mode": "untouched_page",
+          "action": "instant-click-5",
+          "event": "console",
+          "type": "error",
+          "text": "KaTeX auto-render: Failed to parse `N = \\texttt{clients.total_clients}` with  ParseError: KaTeX parse error: Expected 'EOF', got '_' at position 26: \u2026t{clients.total_\u0332clients}\n    at co.expect (https://unpkg.com/katex@0/dist/katex.min.js:1:260710)\n    at co.parseArgumentGroup (https://unpkg.com/katex@0/dist/katex.min.js:1:267928)\n    at co.parseGroupOfType (https://unpkg.com/katex@0/dist/katex.min.js:1:265575)\n    at co.parseArguments (https://unpkg.com/katex@0/dist/katex.min.js:1:265215)\n    at co.parseFunction (https://unpkg.com/katex@0/dist/katex.min.js:1:264648)\n    at co.parseGroup (https://unpkg.com/katex@0/dist/katex.min.js:1:268412)\n    at co.parseAtom (https://unpkg.com/katex@0/dist/katex.min.js:1:262808)\n    at co.parseExpression (https://unpkg.com/katex@0/dist/katex.min.js:1:261671)\n    at co.parse (https://unpkg.com/katex@0/dist/katex.min.js:1:261134)\n    at ho (https://unpkg.com/katex@0/dist/katex.min.js:1:271366)",
+          "location": {
+            "url": "https://unpkg.com/katex@0/dist/contrib/auto-render.min.js",
+            "line": 0,
+            "column": 2005,
+            "lineNumber": 0,
+            "columnNumber": 2005
+          }
+        },
+        {
+          "mode": "untouched_page",
+          "action": "instant-click-10",
+          "event": "document_request",
+          "url": "https://platodocs.netlify.app/examples/algorithms/10.%20Algorithms%20based%20on%20Neural%20Architecture%20Search%20and%20Model%20Search/",
+          "resource_type": "xhr",
+          "navigation_request": false
+        },
+        {
+          "mode": "untouched_page",
+          "action": "instant-click-6",
+          "event": "document_request",
+          "url": "https://platodocs.netlify.app/examples/algorithms/6.%20Client%20Selection%20Algorithms/",
+          "resource_type": "xhr",
+          "navigation_request": false
+        },
+        {
+          "mode": "untouched_page",
+          "action": "instant-click-1",
+          "event": "document_request",
+          "url": "https://platodocs.netlify.app/examples/algorithms/1.%20Server%20Aggregation%20Algorithms/",
+          "resource_type": "xhr",
+          "navigation_request": false
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "direct-load-5",
+          "event": "document_request",
+          "url": "https://platodocs.netlify.app/examples/algorithms/5.%20Algorithms%20with%20Customized%20Client%20Training%20Loops/",
+          "resource_type": "document",
+          "navigation_request": true
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "direct-load-5",
+          "event": "asset_capture_error",
+          "text": "Response.body: Response body is unavailable for redirect responses"
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "direct-load-5",
+          "event": "asset_capture_error",
+          "text": "Response.body: Response body is unavailable for redirect responses"
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "direct-load-5",
+          "event": "asset_capture_error",
+          "text": "Response.body: Response body is unavailable for redirect responses"
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "direct-load-5",
+          "event": "document_request",
+          "url": "https://platodocs.netlify.app/sitemap.xml",
+          "resource_type": "xhr",
+          "navigation_request": false
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "direct-load-5",
+          "event": "document_request",
+          "url": "https://platodocs.netlify.app/search/search_index.json",
+          "resource_type": "xhr",
+          "navigation_request": false
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "direct-load-5",
+          "event": "console",
+          "type": "error",
+          "text": "KaTeX auto-render: Failed to parse `N = \\texttt{clients.total_clients}` with  ParseError: KaTeX parse error: Expected 'EOF', got '_' at position 26: \u2026t{clients.total_\u0332clients}\n    at co.expect (https://unpkg.com/katex@0/dist/katex.min.js:1:260710)\n    at co.parseArgumentGroup (https://unpkg.com/katex@0/dist/katex.min.js:1:267928)\n    at co.parseGroupOfType (https://unpkg.com/katex@0/dist/katex.min.js:1:265575)\n    at co.parseArguments (https://unpkg.com/katex@0/dist/katex.min.js:1:265215)\n    at co.parseFunction (https://unpkg.com/katex@0/dist/katex.min.js:1:264648)\n    at co.parseGroup (https://unpkg.com/katex@0/dist/katex.min.js:1:268412)\n    at co.parseAtom (https://unpkg.com/katex@0/dist/katex.min.js:1:262808)\n    at co.parseExpression (https://unpkg.com/katex@0/dist/katex.min.js:1:261671)\n    at co.parse (https://unpkg.com/katex@0/dist/katex.min.js:1:261134)\n    at ho (https://unpkg.com/katex@0/dist/katex.min.js:1:271366)",
+          "location": {
+            "url": "https://unpkg.com/katex@0/dist/contrib/auto-render.min.js",
+            "line": 0,
+            "column": 2005,
+            "lineNumber": 0,
+            "columnNumber": 2005
+          }
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "direct-load-10",
+          "event": "document_request",
+          "url": "https://platodocs.netlify.app/examples/algorithms/10.%20Algorithms%20based%20on%20Neural%20Architecture%20Search%20and%20Model%20Search/",
+          "resource_type": "document",
+          "navigation_request": true
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "direct-load-10",
+          "event": "asset_capture_error",
+          "text": "Response.body: Response body is unavailable for redirect responses"
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "direct-load-10",
+          "event": "asset_capture_error",
+          "text": "Response.body: Response body is unavailable for redirect responses"
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "direct-load-10",
+          "event": "asset_capture_error",
+          "text": "Response.body: Response body is unavailable for redirect responses"
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "direct-load-10",
+          "event": "document_request",
+          "url": "https://platodocs.netlify.app/sitemap.xml",
+          "resource_type": "xhr",
+          "navigation_request": false
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "direct-load-10",
+          "event": "document_request",
+          "url": "https://platodocs.netlify.app/search/search_index.json",
+          "resource_type": "xhr",
+          "navigation_request": false
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "direct-load-6",
+          "event": "document_request",
+          "url": "https://platodocs.netlify.app/examples/algorithms/6.%20Client%20Selection%20Algorithms/",
+          "resource_type": "document",
+          "navigation_request": true
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "direct-load-6",
+          "event": "asset_capture_error",
+          "text": "Response.body: Response body is unavailable for redirect responses"
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "direct-load-6",
+          "event": "asset_capture_error",
+          "text": "Response.body: Response body is unavailable for redirect responses"
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "direct-load-6",
+          "event": "asset_capture_error",
+          "text": "Response.body: Response body is unavailable for redirect responses"
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "direct-load-6",
+          "event": "document_request",
+          "url": "https://platodocs.netlify.app/sitemap.xml",
+          "resource_type": "xhr",
+          "navigation_request": false
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "direct-load-6",
+          "event": "document_request",
+          "url": "https://platodocs.netlify.app/search/search_index.json",
+          "resource_type": "xhr",
+          "navigation_request": false
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "direct-load-1",
+          "event": "document_request",
+          "url": "https://platodocs.netlify.app/examples/algorithms/1.%20Server%20Aggregation%20Algorithms/",
+          "resource_type": "document",
+          "navigation_request": true
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "direct-load-1",
+          "event": "asset_capture_error",
+          "text": "Response.body: Response body is unavailable for redirect responses"
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "direct-load-1",
+          "event": "asset_capture_error",
+          "text": "Response.body: Response body is unavailable for redirect responses"
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "direct-load-1",
+          "event": "asset_capture_error",
+          "text": "Response.body: Response body is unavailable for redirect responses"
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "direct-load-1",
+          "event": "document_request",
+          "url": "https://platodocs.netlify.app/sitemap.xml",
+          "resource_type": "xhr",
+          "navigation_request": false
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "direct-load-1",
+          "event": "document_request",
+          "url": "https://platodocs.netlify.app/search/search_index.json",
+          "resource_type": "xhr",
+          "navigation_request": false
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "instant-start-home",
+          "event": "document_request",
+          "url": "https://platodocs.netlify.app/",
+          "resource_type": "document",
+          "navigation_request": true
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "instant-start-home",
+          "event": "asset_capture_error",
+          "text": "Response.body: Response body is unavailable for redirect responses"
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "instant-start-home",
+          "event": "asset_capture_error",
+          "text": "Response.body: Response body is unavailable for redirect responses"
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "instant-start-home",
+          "event": "asset_capture_error",
+          "text": "Response.body: Response body is unavailable for redirect responses"
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "instant-start-home",
+          "event": "document_request",
+          "url": "https://platodocs.netlify.app/sitemap.xml",
+          "resource_type": "xhr",
+          "navigation_request": false
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "instant-start-home",
+          "event": "document_request",
+          "url": "https://platodocs.netlify.app/search/search_index.json",
+          "resource_type": "xhr",
+          "navigation_request": false
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "instant-click-5",
+          "event": "document_request",
+          "url": "https://platodocs.netlify.app/examples/algorithms/5.%20Algorithms%20with%20Customized%20Client%20Training%20Loops/",
+          "resource_type": "xhr",
+          "navigation_request": false
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "instant-click-5",
+          "event": "console",
+          "type": "error",
+          "text": "KaTeX auto-render: Failed to parse `N = \\texttt{clients.total_clients}` with  ParseError: KaTeX parse error: Expected 'EOF', got '_' at position 26: \u2026t{clients.total_\u0332clients}\n    at co.expect (https://unpkg.com/katex@0/dist/katex.min.js:1:260710)\n    at co.parseArgumentGroup (https://unpkg.com/katex@0/dist/katex.min.js:1:267928)\n    at co.parseGroupOfType (https://unpkg.com/katex@0/dist/katex.min.js:1:265575)\n    at co.parseArguments (https://unpkg.com/katex@0/dist/katex.min.js:1:265215)\n    at co.parseFunction (https://unpkg.com/katex@0/dist/katex.min.js:1:264648)\n    at co.parseGroup (https://unpkg.com/katex@0/dist/katex.min.js:1:268412)\n    at co.parseAtom (https://unpkg.com/katex@0/dist/katex.min.js:1:262808)\n    at co.parseExpression (https://unpkg.com/katex@0/dist/katex.min.js:1:261671)\n    at co.parse (https://unpkg.com/katex@0/dist/katex.min.js:1:261134)\n    at ho (https://unpkg.com/katex@0/dist/katex.min.js:1:271366)",
+          "location": {
+            "url": "https://unpkg.com/katex@0/dist/contrib/auto-render.min.js",
+            "line": 0,
+            "column": 2005,
+            "lineNumber": 0,
+            "columnNumber": 2005
+          }
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "instant-click-10",
+          "event": "document_request",
+          "url": "https://platodocs.netlify.app/examples/algorithms/10.%20Algorithms%20based%20on%20Neural%20Architecture%20Search%20and%20Model%20Search/",
+          "resource_type": "xhr",
+          "navigation_request": false
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "instant-click-6",
+          "event": "document_request",
+          "url": "https://platodocs.netlify.app/examples/algorithms/6.%20Client%20Selection%20Algorithms/",
+          "resource_type": "xhr",
+          "navigation_request": false
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "instant-click-1",
+          "event": "document_request",
+          "url": "https://platodocs.netlify.app/examples/algorithms/1.%20Server%20Aggregation%20Algorithms/",
+          "resource_type": "xhr",
+          "navigation_request": false
+        }
+      ],
+      "network_asset_observations": [
+        {
+          "mode": "untouched_page",
+          "action": "direct-load-5",
+          "url": "https://unpkg.com/katex@0.19.0/dist/katex.min.css",
+          "status": 200,
+          "content_type": "text/css; charset=utf-8",
+          "sha256": "d4ab5b8ee16989b070cdb0ea24bd6ad48fc8df1b787f280f29d3ae4f959f2c00",
+          "bytes": 24793
+        },
+        {
+          "mode": "untouched_page",
+          "action": "direct-load-5",
+          "url": "https://unpkg.com/katex@0.19.0/dist/contrib/auto-render.min.js",
+          "status": 200,
+          "content_type": "text/javascript; charset=utf-8",
+          "sha256": "e5372d199bcdae8b4de71d0f7ceba72a4ba12774a27c60a6f1f77d03b3228ee4",
+          "bytes": 3486
+        },
+        {
+          "mode": "untouched_page",
+          "action": "direct-load-5",
+          "url": "https://unpkg.com/katex@0.19.0/dist/katex.min.js",
+          "status": 200,
+          "content_type": "text/javascript; charset=utf-8",
+          "sha256": "103a53763cc033bba8d175bf3f0ba597c3505c9b6747dd3f2c7bc2a6bfcc8ae7",
+          "bytes": 272868
+        },
+        {
+          "mode": "untouched_page",
+          "action": "direct-load-10",
+          "url": "https://unpkg.com/katex@0.19.0/dist/contrib/auto-render.min.js",
+          "status": 200,
+          "content_type": "text/javascript; charset=utf-8",
+          "sha256": "e5372d199bcdae8b4de71d0f7ceba72a4ba12774a27c60a6f1f77d03b3228ee4",
+          "bytes": 3486
+        },
+        {
+          "mode": "untouched_page",
+          "action": "direct-load-10",
+          "url": "https://unpkg.com/katex@0.19.0/dist/katex.min.css",
+          "status": 200,
+          "content_type": "text/css; charset=utf-8",
+          "sha256": "d4ab5b8ee16989b070cdb0ea24bd6ad48fc8df1b787f280f29d3ae4f959f2c00",
+          "bytes": 24793
+        },
+        {
+          "mode": "untouched_page",
+          "action": "direct-load-10",
+          "url": "https://unpkg.com/katex@0.19.0/dist/katex.min.js",
+          "status": 200,
+          "content_type": "text/javascript; charset=utf-8",
+          "sha256": "103a53763cc033bba8d175bf3f0ba597c3505c9b6747dd3f2c7bc2a6bfcc8ae7",
+          "bytes": 272868
+        },
+        {
+          "mode": "untouched_page",
+          "action": "direct-load-6",
+          "url": "https://unpkg.com/katex@0.19.0/dist/katex.min.css",
+          "status": 200,
+          "content_type": "text/css; charset=utf-8",
+          "sha256": "d4ab5b8ee16989b070cdb0ea24bd6ad48fc8df1b787f280f29d3ae4f959f2c00",
+          "bytes": 24793
+        },
+        {
+          "mode": "untouched_page",
+          "action": "direct-load-6",
+          "url": "https://unpkg.com/katex@0.19.0/dist/contrib/auto-render.min.js",
+          "status": 200,
+          "content_type": "text/javascript; charset=utf-8",
+          "sha256": "e5372d199bcdae8b4de71d0f7ceba72a4ba12774a27c60a6f1f77d03b3228ee4",
+          "bytes": 3486
+        },
+        {
+          "mode": "untouched_page",
+          "action": "direct-load-6",
+          "url": "https://unpkg.com/katex@0.19.0/dist/katex.min.js",
+          "status": 200,
+          "content_type": "text/javascript; charset=utf-8",
+          "sha256": "103a53763cc033bba8d175bf3f0ba597c3505c9b6747dd3f2c7bc2a6bfcc8ae7",
+          "bytes": 272868
+        },
+        {
+          "mode": "untouched_page",
+          "action": "direct-load-1",
+          "url": "https://unpkg.com/katex@0.19.0/dist/contrib/auto-render.min.js",
+          "status": 200,
+          "content_type": "text/javascript; charset=utf-8",
+          "sha256": "e5372d199bcdae8b4de71d0f7ceba72a4ba12774a27c60a6f1f77d03b3228ee4",
+          "bytes": 3486
+        },
+        {
+          "mode": "untouched_page",
+          "action": "direct-load-1",
+          "url": "https://unpkg.com/katex@0.19.0/dist/katex.min.css",
+          "status": 200,
+          "content_type": "text/css; charset=utf-8",
+          "sha256": "d4ab5b8ee16989b070cdb0ea24bd6ad48fc8df1b787f280f29d3ae4f959f2c00",
+          "bytes": 24793
+        },
+        {
+          "mode": "untouched_page",
+          "action": "direct-load-1",
+          "url": "https://unpkg.com/katex@0.19.0/dist/katex.min.js",
+          "status": 200,
+          "content_type": "text/javascript; charset=utf-8",
+          "sha256": "103a53763cc033bba8d175bf3f0ba597c3505c9b6747dd3f2c7bc2a6bfcc8ae7",
+          "bytes": 272868
+        },
+        {
+          "mode": "untouched_page",
+          "action": "instant-start-home",
+          "url": "https://unpkg.com/katex@0.19.0/dist/katex.min.css",
+          "status": 200,
+          "content_type": "text/css; charset=utf-8",
+          "sha256": "d4ab5b8ee16989b070cdb0ea24bd6ad48fc8df1b787f280f29d3ae4f959f2c00",
+          "bytes": 24793
+        },
+        {
+          "mode": "untouched_page",
+          "action": "instant-start-home",
+          "url": "https://unpkg.com/katex@0.19.0/dist/contrib/auto-render.min.js",
+          "status": 200,
+          "content_type": "text/javascript; charset=utf-8",
+          "sha256": "e5372d199bcdae8b4de71d0f7ceba72a4ba12774a27c60a6f1f77d03b3228ee4",
+          "bytes": 3486
+        },
+        {
+          "mode": "untouched_page",
+          "action": "instant-start-home",
+          "url": "https://unpkg.com/katex@0.19.0/dist/katex.min.js",
+          "status": 200,
+          "content_type": "text/javascript; charset=utf-8",
+          "sha256": "103a53763cc033bba8d175bf3f0ba597c3505c9b6747dd3f2c7bc2a6bfcc8ae7",
+          "bytes": 272868
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "direct-load-5",
+          "url": "https://unpkg.com/katex@0.19.0/dist/contrib/auto-render.min.js",
+          "status": 200,
+          "content_type": "text/javascript; charset=utf-8",
+          "sha256": "e5372d199bcdae8b4de71d0f7ceba72a4ba12774a27c60a6f1f77d03b3228ee4",
+          "bytes": 3486
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "direct-load-5",
+          "url": "https://unpkg.com/katex@0.19.0/dist/katex.min.css",
+          "status": 200,
+          "content_type": "text/css; charset=utf-8",
+          "sha256": "d4ab5b8ee16989b070cdb0ea24bd6ad48fc8df1b787f280f29d3ae4f959f2c00",
+          "bytes": 24793
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "direct-load-5",
+          "url": "https://unpkg.com/katex@0.19.0/dist/katex.min.js",
+          "status": 200,
+          "content_type": "text/javascript; charset=utf-8",
+          "sha256": "103a53763cc033bba8d175bf3f0ba597c3505c9b6747dd3f2c7bc2a6bfcc8ae7",
+          "bytes": 272868
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "direct-load-10",
+          "url": "https://unpkg.com/katex@0.19.0/dist/katex.min.css",
+          "status": 200,
+          "content_type": "text/css; charset=utf-8",
+          "sha256": "d4ab5b8ee16989b070cdb0ea24bd6ad48fc8df1b787f280f29d3ae4f959f2c00",
+          "bytes": 24793
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "direct-load-10",
+          "url": "https://unpkg.com/katex@0.19.0/dist/contrib/auto-render.min.js",
+          "status": 200,
+          "content_type": "text/javascript; charset=utf-8",
+          "sha256": "e5372d199bcdae8b4de71d0f7ceba72a4ba12774a27c60a6f1f77d03b3228ee4",
+          "bytes": 3486
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "direct-load-10",
+          "url": "https://unpkg.com/katex@0.19.0/dist/katex.min.js",
+          "status": 200,
+          "content_type": "text/javascript; charset=utf-8",
+          "sha256": "103a53763cc033bba8d175bf3f0ba597c3505c9b6747dd3f2c7bc2a6bfcc8ae7",
+          "bytes": 272868
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "direct-load-6",
+          "url": "https://unpkg.com/katex@0.19.0/dist/contrib/auto-render.min.js",
+          "status": 200,
+          "content_type": "text/javascript; charset=utf-8",
+          "sha256": "e5372d199bcdae8b4de71d0f7ceba72a4ba12774a27c60a6f1f77d03b3228ee4",
+          "bytes": 3486
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "direct-load-6",
+          "url": "https://unpkg.com/katex@0.19.0/dist/katex.min.css",
+          "status": 200,
+          "content_type": "text/css; charset=utf-8",
+          "sha256": "d4ab5b8ee16989b070cdb0ea24bd6ad48fc8df1b787f280f29d3ae4f959f2c00",
+          "bytes": 24793
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "direct-load-6",
+          "url": "https://unpkg.com/katex@0.19.0/dist/katex.min.js",
+          "status": 200,
+          "content_type": "text/javascript; charset=utf-8",
+          "sha256": "103a53763cc033bba8d175bf3f0ba597c3505c9b6747dd3f2c7bc2a6bfcc8ae7",
+          "bytes": 272868
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "direct-load-1",
+          "url": "https://unpkg.com/katex@0.19.0/dist/katex.min.css",
+          "status": 200,
+          "content_type": "text/css; charset=utf-8",
+          "sha256": "d4ab5b8ee16989b070cdb0ea24bd6ad48fc8df1b787f280f29d3ae4f959f2c00",
+          "bytes": 24793
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "direct-load-1",
+          "url": "https://unpkg.com/katex@0.19.0/dist/contrib/auto-render.min.js",
+          "status": 200,
+          "content_type": "text/javascript; charset=utf-8",
+          "sha256": "e5372d199bcdae8b4de71d0f7ceba72a4ba12774a27c60a6f1f77d03b3228ee4",
+          "bytes": 3486
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "direct-load-1",
+          "url": "https://unpkg.com/katex@0.19.0/dist/katex.min.js",
+          "status": 200,
+          "content_type": "text/javascript; charset=utf-8",
+          "sha256": "103a53763cc033bba8d175bf3f0ba597c3505c9b6747dd3f2c7bc2a6bfcc8ae7",
+          "bytes": 272868
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "instant-start-home",
+          "url": "https://unpkg.com/katex@0.19.0/dist/katex.min.css",
+          "status": 200,
+          "content_type": "text/css; charset=utf-8",
+          "sha256": "d4ab5b8ee16989b070cdb0ea24bd6ad48fc8df1b787f280f29d3ae4f959f2c00",
+          "bytes": 24793
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "instant-start-home",
+          "url": "https://unpkg.com/katex@0.19.0/dist/contrib/auto-render.min.js",
+          "status": 200,
+          "content_type": "text/javascript; charset=utf-8",
+          "sha256": "e5372d199bcdae8b4de71d0f7ceba72a4ba12774a27c60a6f1f77d03b3228ee4",
+          "bytes": 3486
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "instant-start-home",
+          "url": "https://unpkg.com/katex@0.19.0/dist/katex.min.js",
+          "status": 200,
+          "content_type": "text/javascript; charset=utf-8",
+          "sha256": "103a53763cc033bba8d175bf3f0ba597c3505c9b6747dd3f2c7bc2a6bfcc8ae7",
+          "bytes": 272868
+        }
+      ]
+    },
+    "candidate_after": {
+      "raw_artifact": {
+        "path": "/tmp/plato-remaining-docs-katex-validation/candidate-browser/browser-results.json",
+        "sha256": "e30b6b1df8d7c3d352e456b84e975d65edd13bc532b6668e8d587a9aed32fe40",
+        "bytes": 118182
+      },
+      "label": "exact-pins-and-escaped-tex",
+      "status": "PASS",
+      "browser_version": "153.0.8010.12",
+      "browser_executable": "/tmp/plato-remaining-docs-katex-browsers/chromium_headless_shell-1243/chrome-headless-shell-mac-arm64/chrome-headless-shell",
+      "playwright_version": "1.63.0",
+      "browser_tls_validation": "default; no ignore_https_errors",
+      "configured_browser_origin": "https://platodocs.netlify.app/",
+      "local_transport": "http://127.0.0.1:63441/",
+      "origin_mapping": "Browser requests to configured site_url are served by the owned local static server; original sitemap and HTML are preserved. CDN requests use their real URLs.",
+      "check_count": 16,
+      "checks": [
+        {
+          "mode": "untouched_page",
+          "action": "direct",
+          "page": "5. Algorithms with Customized Client Training Loops",
+          "url": "https://platodocs.netlify.app/examples/algorithms/5.%20Algorithms%20with%20Customized%20Client%20Training%20Loops/",
+          "title": "Customized Client Training Loops - Plato",
+          "article_heading": "Customized Client Training Loops",
+          "katex_version": "0.19.0",
+          "renderer_type": "function",
+          "material_document_stream_type": "object",
+          "original_math_nodes": 33,
+          "original_rendered_math_nodes": 33,
+          "original_unrendered": [],
+          "original_mathml_nodes": 33,
+          "original_nonzero_rects": 33,
+          "display_math_nodes": 0,
+          "katex_error_nodes": 0,
+          "fixture": null,
+          "font_status": "loaded",
+          "screenshot": "/tmp/plato-remaining-docs-katex-validation/candidate-browser/untouched_page-direct-5.png",
+          "screenshot_sha256": "7a48c3856aad8a3dfd9d96e0ab8a8a1a0b8afb48003367e83046e2ed7a78db50",
+          "original_sample_tex": [
+            "x",
+            "y",
+            "c"
+          ],
+          "loaded_katex_fonts": [
+            "KaTeX_Main",
+            "KaTeX_Math",
+            "KaTeX_Size1",
+            "KaTeX_Typewriter"
+          ],
+          "document_identity_sha256": "b89a66e9e3e93c5a76a7526116e18d8ff20af49d6a08215d9fc091f98e871389"
+        },
+        {
+          "mode": "untouched_page",
+          "action": "direct",
+          "page": "10. Algorithms based on Neural Architecture Search and Model Search",
+          "url": "https://platodocs.netlify.app/examples/algorithms/10.%20Algorithms%20based%20on%20Neural%20Architecture%20Search%20and%20Model%20Search/",
+          "title": "Model Search - Plato",
+          "article_heading": "Model Search",
+          "katex_version": "0.19.0",
+          "renderer_type": "function",
+          "material_document_stream_type": "object",
+          "original_math_nodes": 1,
+          "original_rendered_math_nodes": 1,
+          "original_unrendered": [],
+          "original_mathml_nodes": 1,
+          "original_nonzero_rects": 1,
+          "display_math_nodes": 0,
+          "katex_error_nodes": 0,
+          "fixture": null,
+          "font_status": "loaded",
+          "original_sample_tex": [
+            "l_2"
+          ],
+          "loaded_katex_fonts": [
+            "KaTeX_Main",
+            "KaTeX_Math"
+          ],
+          "document_identity_sha256": "fbf525e2ea7bccc5762591f2af37985af0c2b67b367e7c6d8eaec064e46d0b9a"
+        },
+        {
+          "mode": "untouched_page",
+          "action": "direct",
+          "page": "6. Client Selection Algorithms",
+          "url": "https://platodocs.netlify.app/examples/algorithms/6.%20Client%20Selection%20Algorithms/",
+          "title": "Client Selection Algorithms - Plato",
+          "article_heading": "Client Selection Algorithms",
+          "katex_version": "0.19.0",
+          "renderer_type": "function",
+          "material_document_stream_type": "object",
+          "original_math_nodes": 2,
+          "original_rendered_math_nodes": 2,
+          "original_unrendered": [],
+          "original_mathml_nodes": 2,
+          "original_nonzero_rects": 2,
+          "display_math_nodes": 0,
+          "katex_error_nodes": 0,
+          "fixture": null,
+          "font_status": "loaded",
+          "original_sample_tex": [
+            "v_k = \\frac{1}{\\sqrt{n_k}} \\mathcal{L}(w, x_k, y_k)",
+            "|B_i| \\sqrt{\\overline{\\text{loss}^2}}"
+          ],
+          "loaded_katex_fonts": [
+            "KaTeX_Caligraphic",
+            "KaTeX_Main",
+            "KaTeX_Math"
+          ],
+          "document_identity_sha256": "5c6f635a609708234f7a10ebd461325f0260fef8999c3095ebc6b2e9e9d6f829"
+        },
+        {
+          "mode": "untouched_page",
+          "action": "direct",
+          "page": "1. Server Aggregation Algorithms",
+          "url": "https://platodocs.netlify.app/examples/algorithms/1.%20Server%20Aggregation%20Algorithms/",
+          "title": "Server Aggregation Algorithms - Plato",
+          "article_heading": "Server Aggregation Algorithms",
+          "katex_version": "0.19.0",
+          "renderer_type": "function",
+          "material_document_stream_type": "object",
+          "original_math_nodes": 2,
+          "original_rendered_math_nodes": 2,
+          "original_unrendered": [],
+          "original_mathml_nodes": 2,
+          "original_nonzero_rects": 2,
+          "display_math_nodes": 0,
+          "katex_error_nodes": 0,
+          "fixture": null,
+          "font_status": "loaded",
+          "original_sample_tex": [
+            "\\epsilon",
+            "\\beta"
+          ],
+          "loaded_katex_fonts": [
+            "KaTeX_Main",
+            "KaTeX_Math",
+            "KaTeX_Size1"
+          ],
+          "document_identity_sha256": "bb9f007eba5ed69cb6a1f0efc093141c6a68a55c29f28a87c20f40e8ff2dc9af"
+        },
+        {
+          "mode": "untouched_page",
+          "action": "instant",
+          "page": "5. Algorithms with Customized Client Training Loops",
+          "url": "https://platodocs.netlify.app/examples/algorithms/5.%20Algorithms%20with%20Customized%20Client%20Training%20Loops/",
+          "title": "Customized Client Training Loops - Plato",
+          "article_heading": "Customized Client Training Loops",
+          "katex_version": "0.19.0",
+          "renderer_type": "function",
+          "material_document_stream_type": "object",
+          "original_math_nodes": 33,
+          "original_rendered_math_nodes": 33,
+          "original_unrendered": [],
+          "original_mathml_nodes": 33,
+          "original_nonzero_rects": 33,
+          "display_math_nodes": 0,
+          "katex_error_nodes": 0,
+          "fixture": null,
+          "font_status": "loaded",
+          "same_document_identity": true,
+          "screenshot": "/tmp/plato-remaining-docs-katex-validation/candidate-browser/untouched_page-instant-5.png",
+          "screenshot_sha256": "a883d6e907fc88b952303d054aa852ef79e779983d59d9a3051b065531826fde",
+          "original_sample_tex": [
+            "x",
+            "y",
+            "c"
+          ],
+          "loaded_katex_fonts": [
+            "KaTeX_Main",
+            "KaTeX_Math",
+            "KaTeX_Size1",
+            "KaTeX_Typewriter"
+          ],
+          "document_identity_sha256": "5c72bb097bd391a7f64cd0b23a09d3d0d794ee5fb97732ff46f373d6549e64b5"
+        },
+        {
+          "mode": "untouched_page",
+          "action": "instant",
+          "page": "10. Algorithms based on Neural Architecture Search and Model Search",
+          "url": "https://platodocs.netlify.app/examples/algorithms/10.%20Algorithms%20based%20on%20Neural%20Architecture%20Search%20and%20Model%20Search/",
+          "title": "Model Search - Plato",
+          "article_heading": "Model Search",
+          "katex_version": "0.19.0",
+          "renderer_type": "function",
+          "material_document_stream_type": "object",
+          "original_math_nodes": 1,
+          "original_rendered_math_nodes": 1,
+          "original_unrendered": [],
+          "original_mathml_nodes": 1,
+          "original_nonzero_rects": 1,
+          "display_math_nodes": 0,
+          "katex_error_nodes": 0,
+          "fixture": null,
+          "font_status": "loaded",
+          "same_document_identity": true,
+          "original_sample_tex": [
+            "l_2"
+          ],
+          "loaded_katex_fonts": [
+            "KaTeX_Main",
+            "KaTeX_Math",
+            "KaTeX_Size1",
+            "KaTeX_Typewriter"
+          ],
+          "document_identity_sha256": "5c72bb097bd391a7f64cd0b23a09d3d0d794ee5fb97732ff46f373d6549e64b5"
+        },
+        {
+          "mode": "untouched_page",
+          "action": "instant",
+          "page": "6. Client Selection Algorithms",
+          "url": "https://platodocs.netlify.app/examples/algorithms/6.%20Client%20Selection%20Algorithms/",
+          "title": "Client Selection Algorithms - Plato",
+          "article_heading": "Client Selection Algorithms",
+          "katex_version": "0.19.0",
+          "renderer_type": "function",
+          "material_document_stream_type": "object",
+          "original_math_nodes": 2,
+          "original_rendered_math_nodes": 2,
+          "original_unrendered": [],
+          "original_mathml_nodes": 2,
+          "original_nonzero_rects": 2,
+          "display_math_nodes": 0,
+          "katex_error_nodes": 0,
+          "fixture": null,
+          "font_status": "loaded",
+          "same_document_identity": true,
+          "original_sample_tex": [
+            "v_k = \\frac{1}{\\sqrt{n_k}} \\mathcal{L}(w, x_k, y_k)",
+            "|B_i| \\sqrt{\\overline{\\text{loss}^2}}"
+          ],
+          "loaded_katex_fonts": [
+            "KaTeX_Caligraphic",
+            "KaTeX_Main",
+            "KaTeX_Math",
+            "KaTeX_Size1",
+            "KaTeX_Typewriter"
+          ],
+          "document_identity_sha256": "5c72bb097bd391a7f64cd0b23a09d3d0d794ee5fb97732ff46f373d6549e64b5"
+        },
+        {
+          "mode": "untouched_page",
+          "action": "instant",
+          "page": "1. Server Aggregation Algorithms",
+          "url": "https://platodocs.netlify.app/examples/algorithms/1.%20Server%20Aggregation%20Algorithms/",
+          "title": "Server Aggregation Algorithms - Plato",
+          "article_heading": "Server Aggregation Algorithms",
+          "katex_version": "0.19.0",
+          "renderer_type": "function",
+          "material_document_stream_type": "object",
+          "original_math_nodes": 2,
+          "original_rendered_math_nodes": 2,
+          "original_unrendered": [],
+          "original_mathml_nodes": 2,
+          "original_nonzero_rects": 2,
+          "display_math_nodes": 0,
+          "katex_error_nodes": 0,
+          "fixture": null,
+          "font_status": "loaded",
+          "same_document_identity": true,
+          "original_sample_tex": [
+            "\\epsilon",
+            "\\beta"
+          ],
+          "loaded_katex_fonts": [
+            "KaTeX_Caligraphic",
+            "KaTeX_Main",
+            "KaTeX_Math",
+            "KaTeX_Size1",
+            "KaTeX_Typewriter"
+          ],
+          "document_identity_sha256": "5c72bb097bd391a7f64cd0b23a09d3d0d794ee5fb97732ff46f373d6549e64b5"
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "direct",
+          "page": "5. Algorithms with Customized Client Training Loops",
+          "url": "https://platodocs.netlify.app/examples/algorithms/5.%20Algorithms%20with%20Customized%20Client%20Training%20Loops/",
+          "title": "Customized Client Training Loops - Plato",
+          "article_heading": "Customized Client Training Loops",
+          "katex_version": "0.19.0",
+          "renderer_type": "function",
+          "material_document_stream_type": "object",
+          "original_math_nodes": 33,
+          "original_rendered_math_nodes": 33,
+          "original_unrendered": [],
+          "original_mathml_nodes": 33,
+          "original_nonzero_rects": 33,
+          "display_math_nodes": 2,
+          "katex_error_nodes": 0,
+          "fixture": {
+            "math_nodes": 3,
+            "rendered_math_nodes": 3,
+            "display_nodes": 2,
+            "inline_nodes": 1,
+            "display_styles": [
+              {
+                "display": "block",
+                "width": 688,
+                "height": 56.703125
+              },
+              {
+                "display": "block",
+                "width": 688,
+                "height": 47.921875
+              }
+            ],
+            "source_tex": [
+              "x^2+y^2",
+              "\\sum_{i=1}^{n} i = \\frac{n(n+1)}{2}",
+              "\\int_0^1 x^2\\,dx = \\frac{1}{3}"
+            ]
+          },
+          "font_status": "loaded",
+          "screenshot": "/tmp/plato-remaining-docs-katex-validation/candidate-browser/synthetic_display_fixture-direct-5.png",
+          "screenshot_sha256": "9695f2fcbfa257e0818a4dc8c49f636f90fb9ff49bec3c9c5dc208faddb1dcb1",
+          "original_sample_tex": [
+            "x",
+            "y",
+            "c"
+          ],
+          "loaded_katex_fonts": [
+            "KaTeX_Main",
+            "KaTeX_Math",
+            "KaTeX_Size1",
+            "KaTeX_Size2",
+            "KaTeX_Typewriter"
+          ],
+          "document_identity_sha256": "2899adf2436bd3019bd5b669abe355a5c0e7ba093eec0f13b5fc598299b27e59"
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "direct",
+          "page": "10. Algorithms based on Neural Architecture Search and Model Search",
+          "url": "https://platodocs.netlify.app/examples/algorithms/10.%20Algorithms%20based%20on%20Neural%20Architecture%20Search%20and%20Model%20Search/",
+          "title": "Model Search - Plato",
+          "article_heading": "Model Search",
+          "katex_version": "0.19.0",
+          "renderer_type": "function",
+          "material_document_stream_type": "object",
+          "original_math_nodes": 1,
+          "original_rendered_math_nodes": 1,
+          "original_unrendered": [],
+          "original_mathml_nodes": 1,
+          "original_nonzero_rects": 1,
+          "display_math_nodes": 2,
+          "katex_error_nodes": 0,
+          "fixture": {
+            "math_nodes": 3,
+            "rendered_math_nodes": 3,
+            "display_nodes": 2,
+            "inline_nodes": 1,
+            "display_styles": [
+              {
+                "display": "block",
+                "width": 688,
+                "height": 56.703125
+              },
+              {
+                "display": "block",
+                "width": 688,
+                "height": 47.921875
+              }
+            ],
+            "source_tex": [
+              "x^2+y^2",
+              "\\sum_{i=1}^{n} i = \\frac{n(n+1)}{2}",
+              "\\int_0^1 x^2\\,dx = \\frac{1}{3}"
+            ]
+          },
+          "font_status": "loaded",
+          "screenshot": "/tmp/plato-remaining-docs-katex-validation/candidate-browser/synthetic_display_fixture-direct-10.png",
+          "screenshot_sha256": "9695f2fcbfa257e0818a4dc8c49f636f90fb9ff49bec3c9c5dc208faddb1dcb1",
+          "original_sample_tex": [
+            "l_2"
+          ],
+          "loaded_katex_fonts": [
+            "KaTeX_Main",
+            "KaTeX_Math",
+            "KaTeX_Size2"
+          ],
+          "document_identity_sha256": "c5ff64bdae66cbe13eeec69fcf3f872b55b6b2a7d3ecaa78aa5a01e8e7f35e70"
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "direct",
+          "page": "6. Client Selection Algorithms",
+          "url": "https://platodocs.netlify.app/examples/algorithms/6.%20Client%20Selection%20Algorithms/",
+          "title": "Client Selection Algorithms - Plato",
+          "article_heading": "Client Selection Algorithms",
+          "katex_version": "0.19.0",
+          "renderer_type": "function",
+          "material_document_stream_type": "object",
+          "original_math_nodes": 2,
+          "original_rendered_math_nodes": 2,
+          "original_unrendered": [],
+          "original_mathml_nodes": 2,
+          "original_nonzero_rects": 2,
+          "display_math_nodes": 2,
+          "katex_error_nodes": 0,
+          "fixture": {
+            "math_nodes": 3,
+            "rendered_math_nodes": 3,
+            "display_nodes": 2,
+            "inline_nodes": 1,
+            "display_styles": [
+              {
+                "display": "block",
+                "width": 688,
+                "height": 56.703125
+              },
+              {
+                "display": "block",
+                "width": 688,
+                "height": 47.921875
+              }
+            ],
+            "source_tex": [
+              "x^2+y^2",
+              "\\sum_{i=1}^{n} i = \\frac{n(n+1)}{2}",
+              "\\int_0^1 x^2\\,dx = \\frac{1}{3}"
+            ]
+          },
+          "font_status": "loaded",
+          "screenshot": "/tmp/plato-remaining-docs-katex-validation/candidate-browser/synthetic_display_fixture-direct-6.png",
+          "screenshot_sha256": "544424846bc87a2ce7f862036c4f415eb9b664d0426683a779fb9378f2d76293",
+          "original_sample_tex": [
+            "v_k = \\frac{1}{\\sqrt{n_k}} \\mathcal{L}(w, x_k, y_k)",
+            "|B_i| \\sqrt{\\overline{\\text{loss}^2}}"
+          ],
+          "loaded_katex_fonts": [
+            "KaTeX_Caligraphic",
+            "KaTeX_Main",
+            "KaTeX_Math",
+            "KaTeX_Size2"
+          ],
+          "document_identity_sha256": "2f60c2806c741f7cfaa8c874b9cf588880eab8b32dd25beecd1f6f4d63e65e8d"
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "direct",
+          "page": "1. Server Aggregation Algorithms",
+          "url": "https://platodocs.netlify.app/examples/algorithms/1.%20Server%20Aggregation%20Algorithms/",
+          "title": "Server Aggregation Algorithms - Plato",
+          "article_heading": "Server Aggregation Algorithms",
+          "katex_version": "0.19.0",
+          "renderer_type": "function",
+          "material_document_stream_type": "object",
+          "original_math_nodes": 2,
+          "original_rendered_math_nodes": 2,
+          "original_unrendered": [],
+          "original_mathml_nodes": 2,
+          "original_nonzero_rects": 2,
+          "display_math_nodes": 2,
+          "katex_error_nodes": 0,
+          "fixture": {
+            "math_nodes": 3,
+            "rendered_math_nodes": 3,
+            "display_nodes": 2,
+            "inline_nodes": 1,
+            "display_styles": [
+              {
+                "display": "block",
+                "width": 688,
+                "height": 56.703125
+              },
+              {
+                "display": "block",
+                "width": 688,
+                "height": 47.921875
+              }
+            ],
+            "source_tex": [
+              "x^2+y^2",
+              "\\sum_{i=1}^{n} i = \\frac{n(n+1)}{2}",
+              "\\int_0^1 x^2\\,dx = \\frac{1}{3}"
+            ]
+          },
+          "font_status": "loaded",
+          "screenshot": "/tmp/plato-remaining-docs-katex-validation/candidate-browser/synthetic_display_fixture-direct-1.png",
+          "screenshot_sha256": "37735b236e16955aa80fc4a4e9be3f52b104ec14a7cd7ebcb55ff1a67f086e06",
+          "original_sample_tex": [
+            "\\epsilon",
+            "\\beta"
+          ],
+          "loaded_katex_fonts": [
+            "KaTeX_Main",
+            "KaTeX_Math",
+            "KaTeX_Size1",
+            "KaTeX_Size2"
+          ],
+          "document_identity_sha256": "e7e714ff1ca7dab2191dd60495c3bbc4f98733a076ebbb8ce0391b2a5f5ca713"
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "instant",
+          "page": "5. Algorithms with Customized Client Training Loops",
+          "url": "https://platodocs.netlify.app/examples/algorithms/5.%20Algorithms%20with%20Customized%20Client%20Training%20Loops/",
+          "title": "Customized Client Training Loops - Plato",
+          "article_heading": "Customized Client Training Loops",
+          "katex_version": "0.19.0",
+          "renderer_type": "function",
+          "material_document_stream_type": "object",
+          "original_math_nodes": 33,
+          "original_rendered_math_nodes": 33,
+          "original_unrendered": [],
+          "original_mathml_nodes": 33,
+          "original_nonzero_rects": 33,
+          "display_math_nodes": 2,
+          "katex_error_nodes": 0,
+          "fixture": {
+            "math_nodes": 3,
+            "rendered_math_nodes": 3,
+            "display_nodes": 2,
+            "inline_nodes": 1,
+            "display_styles": [
+              {
+                "display": "block",
+                "width": 688,
+                "height": 56.703125
+              },
+              {
+                "display": "block",
+                "width": 688,
+                "height": 47.921875
+              }
+            ],
+            "source_tex": [
+              "x^2+y^2",
+              "\\sum_{i=1}^{n} i = \\frac{n(n+1)}{2}",
+              "\\int_0^1 x^2\\,dx = \\frac{1}{3}"
+            ]
+          },
+          "font_status": "loaded",
+          "same_document_identity": true,
+          "screenshot": "/tmp/plato-remaining-docs-katex-validation/candidate-browser/synthetic_display_fixture-instant-5.png",
+          "screenshot_sha256": "9695f2fcbfa257e0818a4dc8c49f636f90fb9ff49bec3c9c5dc208faddb1dcb1",
+          "original_sample_tex": [
+            "x",
+            "y",
+            "c"
+          ],
+          "loaded_katex_fonts": [
+            "KaTeX_Main",
+            "KaTeX_Math",
+            "KaTeX_Size1",
+            "KaTeX_Size2",
+            "KaTeX_Typewriter"
+          ],
+          "document_identity_sha256": "e83759b2d6001a75d56c3a968124973a30bda15d36247c50e26fcf37bc66c5b1"
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "instant",
+          "page": "10. Algorithms based on Neural Architecture Search and Model Search",
+          "url": "https://platodocs.netlify.app/examples/algorithms/10.%20Algorithms%20based%20on%20Neural%20Architecture%20Search%20and%20Model%20Search/",
+          "title": "Model Search - Plato",
+          "article_heading": "Model Search",
+          "katex_version": "0.19.0",
+          "renderer_type": "function",
+          "material_document_stream_type": "object",
+          "original_math_nodes": 1,
+          "original_rendered_math_nodes": 1,
+          "original_unrendered": [],
+          "original_mathml_nodes": 1,
+          "original_nonzero_rects": 1,
+          "display_math_nodes": 2,
+          "katex_error_nodes": 0,
+          "fixture": {
+            "math_nodes": 3,
+            "rendered_math_nodes": 3,
+            "display_nodes": 2,
+            "inline_nodes": 1,
+            "display_styles": [
+              {
+                "display": "block",
+                "width": 688,
+                "height": 56.703125
+              },
+              {
+                "display": "block",
+                "width": 688,
+                "height": 47.921875
+              }
+            ],
+            "source_tex": [
+              "x^2+y^2",
+              "\\sum_{i=1}^{n} i = \\frac{n(n+1)}{2}",
+              "\\int_0^1 x^2\\,dx = \\frac{1}{3}"
+            ]
+          },
+          "font_status": "loaded",
+          "same_document_identity": true,
+          "screenshot": "/tmp/plato-remaining-docs-katex-validation/candidate-browser/synthetic_display_fixture-instant-10.png",
+          "screenshot_sha256": "9695f2fcbfa257e0818a4dc8c49f636f90fb9ff49bec3c9c5dc208faddb1dcb1",
+          "original_sample_tex": [
+            "l_2"
+          ],
+          "loaded_katex_fonts": [
+            "KaTeX_Main",
+            "KaTeX_Math",
+            "KaTeX_Size1",
+            "KaTeX_Size2",
+            "KaTeX_Typewriter"
+          ],
+          "document_identity_sha256": "e83759b2d6001a75d56c3a968124973a30bda15d36247c50e26fcf37bc66c5b1"
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "instant",
+          "page": "6. Client Selection Algorithms",
+          "url": "https://platodocs.netlify.app/examples/algorithms/6.%20Client%20Selection%20Algorithms/",
+          "title": "Client Selection Algorithms - Plato",
+          "article_heading": "Client Selection Algorithms",
+          "katex_version": "0.19.0",
+          "renderer_type": "function",
+          "material_document_stream_type": "object",
+          "original_math_nodes": 2,
+          "original_rendered_math_nodes": 2,
+          "original_unrendered": [],
+          "original_mathml_nodes": 2,
+          "original_nonzero_rects": 2,
+          "display_math_nodes": 2,
+          "katex_error_nodes": 0,
+          "fixture": {
+            "math_nodes": 3,
+            "rendered_math_nodes": 3,
+            "display_nodes": 2,
+            "inline_nodes": 1,
+            "display_styles": [
+              {
+                "display": "block",
+                "width": 688,
+                "height": 56.703125
+              },
+              {
+                "display": "block",
+                "width": 688,
+                "height": 47.921875
+              }
+            ],
+            "source_tex": [
+              "x^2+y^2",
+              "\\sum_{i=1}^{n} i = \\frac{n(n+1)}{2}",
+              "\\int_0^1 x^2\\,dx = \\frac{1}{3}"
+            ]
+          },
+          "font_status": "loaded",
+          "same_document_identity": true,
+          "screenshot": "/tmp/plato-remaining-docs-katex-validation/candidate-browser/synthetic_display_fixture-instant-6.png",
+          "screenshot_sha256": "544424846bc87a2ce7f862036c4f415eb9b664d0426683a779fb9378f2d76293",
+          "original_sample_tex": [
+            "v_k = \\frac{1}{\\sqrt{n_k}} \\mathcal{L}(w, x_k, y_k)",
+            "|B_i| \\sqrt{\\overline{\\text{loss}^2}}"
+          ],
+          "loaded_katex_fonts": [
+            "KaTeX_Caligraphic",
+            "KaTeX_Main",
+            "KaTeX_Math",
+            "KaTeX_Size1",
+            "KaTeX_Size2",
+            "KaTeX_Typewriter"
+          ],
+          "document_identity_sha256": "e83759b2d6001a75d56c3a968124973a30bda15d36247c50e26fcf37bc66c5b1"
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "instant",
+          "page": "1. Server Aggregation Algorithms",
+          "url": "https://platodocs.netlify.app/examples/algorithms/1.%20Server%20Aggregation%20Algorithms/",
+          "title": "Server Aggregation Algorithms - Plato",
+          "article_heading": "Server Aggregation Algorithms",
+          "katex_version": "0.19.0",
+          "renderer_type": "function",
+          "material_document_stream_type": "object",
+          "original_math_nodes": 2,
+          "original_rendered_math_nodes": 2,
+          "original_unrendered": [],
+          "original_mathml_nodes": 2,
+          "original_nonzero_rects": 2,
+          "display_math_nodes": 2,
+          "katex_error_nodes": 0,
+          "fixture": {
+            "math_nodes": 3,
+            "rendered_math_nodes": 3,
+            "display_nodes": 2,
+            "inline_nodes": 1,
+            "display_styles": [
+              {
+                "display": "block",
+                "width": 688,
+                "height": 56.703125
+              },
+              {
+                "display": "block",
+                "width": 688,
+                "height": 47.921875
+              }
+            ],
+            "source_tex": [
+              "x^2+y^2",
+              "\\sum_{i=1}^{n} i = \\frac{n(n+1)}{2}",
+              "\\int_0^1 x^2\\,dx = \\frac{1}{3}"
+            ]
+          },
+          "font_status": "loaded",
+          "same_document_identity": true,
+          "screenshot": "/tmp/plato-remaining-docs-katex-validation/candidate-browser/synthetic_display_fixture-instant-1.png",
+          "screenshot_sha256": "37735b236e16955aa80fc4a4e9be3f52b104ec14a7cd7ebcb55ff1a67f086e06",
+          "original_sample_tex": [
+            "\\epsilon",
+            "\\beta"
+          ],
+          "loaded_katex_fonts": [
+            "KaTeX_Caligraphic",
+            "KaTeX_Main",
+            "KaTeX_Math",
+            "KaTeX_Size1",
+            "KaTeX_Size2",
+            "KaTeX_Typewriter"
+          ],
+          "document_identity_sha256": "e83759b2d6001a75d56c3a968124973a30bda15d36247c50e26fcf37bc66c5b1"
+        }
+      ],
+      "failures": [],
+      "console_errors": [],
+      "raw_events": [
+        {
+          "mode": "untouched_page",
+          "action": "direct-load-5",
+          "event": "document_request",
+          "url": "https://platodocs.netlify.app/examples/algorithms/5.%20Algorithms%20with%20Customized%20Client%20Training%20Loops/",
+          "resource_type": "document",
+          "navigation_request": true
+        },
+        {
+          "mode": "untouched_page",
+          "action": "direct-load-5",
+          "event": "document_request",
+          "url": "https://platodocs.netlify.app/sitemap.xml",
+          "resource_type": "xhr",
+          "navigation_request": false
+        },
+        {
+          "mode": "untouched_page",
+          "action": "direct-load-5",
+          "event": "document_request",
+          "url": "https://platodocs.netlify.app/search/search_index.json",
+          "resource_type": "xhr",
+          "navigation_request": false
+        },
+        {
+          "mode": "untouched_page",
+          "action": "direct-load-10",
+          "event": "document_request",
+          "url": "https://platodocs.netlify.app/examples/algorithms/10.%20Algorithms%20based%20on%20Neural%20Architecture%20Search%20and%20Model%20Search/",
+          "resource_type": "document",
+          "navigation_request": true
+        },
+        {
+          "mode": "untouched_page",
+          "action": "direct-load-10",
+          "event": "document_request",
+          "url": "https://platodocs.netlify.app/sitemap.xml",
+          "resource_type": "xhr",
+          "navigation_request": false
+        },
+        {
+          "mode": "untouched_page",
+          "action": "direct-load-10",
+          "event": "document_request",
+          "url": "https://platodocs.netlify.app/search/search_index.json",
+          "resource_type": "xhr",
+          "navigation_request": false
+        },
+        {
+          "mode": "untouched_page",
+          "action": "direct-load-6",
+          "event": "document_request",
+          "url": "https://platodocs.netlify.app/examples/algorithms/6.%20Client%20Selection%20Algorithms/",
+          "resource_type": "document",
+          "navigation_request": true
+        },
+        {
+          "mode": "untouched_page",
+          "action": "direct-load-6",
+          "event": "document_request",
+          "url": "https://platodocs.netlify.app/sitemap.xml",
+          "resource_type": "xhr",
+          "navigation_request": false
+        },
+        {
+          "mode": "untouched_page",
+          "action": "direct-load-6",
+          "event": "document_request",
+          "url": "https://platodocs.netlify.app/search/search_index.json",
+          "resource_type": "xhr",
+          "navigation_request": false
+        },
+        {
+          "mode": "untouched_page",
+          "action": "direct-load-1",
+          "event": "document_request",
+          "url": "https://platodocs.netlify.app/examples/algorithms/1.%20Server%20Aggregation%20Algorithms/",
+          "resource_type": "document",
+          "navigation_request": true
+        },
+        {
+          "mode": "untouched_page",
+          "action": "direct-load-1",
+          "event": "document_request",
+          "url": "https://platodocs.netlify.app/sitemap.xml",
+          "resource_type": "xhr",
+          "navigation_request": false
+        },
+        {
+          "mode": "untouched_page",
+          "action": "direct-load-1",
+          "event": "document_request",
+          "url": "https://platodocs.netlify.app/search/search_index.json",
+          "resource_type": "xhr",
+          "navigation_request": false
+        },
+        {
+          "mode": "untouched_page",
+          "action": "instant-start-home",
+          "event": "document_request",
+          "url": "https://platodocs.netlify.app/",
+          "resource_type": "document",
+          "navigation_request": true
+        },
+        {
+          "mode": "untouched_page",
+          "action": "instant-start-home",
+          "event": "document_request",
+          "url": "https://platodocs.netlify.app/sitemap.xml",
+          "resource_type": "xhr",
+          "navigation_request": false
+        },
+        {
+          "mode": "untouched_page",
+          "action": "instant-start-home",
+          "event": "document_request",
+          "url": "https://platodocs.netlify.app/search/search_index.json",
+          "resource_type": "xhr",
+          "navigation_request": false
+        },
+        {
+          "mode": "untouched_page",
+          "action": "instant-click-5",
+          "event": "document_request",
+          "url": "https://platodocs.netlify.app/examples/algorithms/5.%20Algorithms%20with%20Customized%20Client%20Training%20Loops/",
+          "resource_type": "xhr",
+          "navigation_request": false
+        },
+        {
+          "mode": "untouched_page",
+          "action": "instant-click-10",
+          "event": "document_request",
+          "url": "https://platodocs.netlify.app/examples/algorithms/10.%20Algorithms%20based%20on%20Neural%20Architecture%20Search%20and%20Model%20Search/",
+          "resource_type": "xhr",
+          "navigation_request": false
+        },
+        {
+          "mode": "untouched_page",
+          "action": "instant-click-6",
+          "event": "document_request",
+          "url": "https://platodocs.netlify.app/examples/algorithms/6.%20Client%20Selection%20Algorithms/",
+          "resource_type": "xhr",
+          "navigation_request": false
+        },
+        {
+          "mode": "untouched_page",
+          "action": "instant-click-1",
+          "event": "document_request",
+          "url": "https://platodocs.netlify.app/examples/algorithms/1.%20Server%20Aggregation%20Algorithms/",
+          "resource_type": "xhr",
+          "navigation_request": false
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "direct-load-5",
+          "event": "document_request",
+          "url": "https://platodocs.netlify.app/examples/algorithms/5.%20Algorithms%20with%20Customized%20Client%20Training%20Loops/",
+          "resource_type": "document",
+          "navigation_request": true
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "direct-load-5",
+          "event": "document_request",
+          "url": "https://platodocs.netlify.app/sitemap.xml",
+          "resource_type": "xhr",
+          "navigation_request": false
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "direct-load-5",
+          "event": "document_request",
+          "url": "https://platodocs.netlify.app/search/search_index.json",
+          "resource_type": "xhr",
+          "navigation_request": false
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "direct-load-10",
+          "event": "document_request",
+          "url": "https://platodocs.netlify.app/examples/algorithms/10.%20Algorithms%20based%20on%20Neural%20Architecture%20Search%20and%20Model%20Search/",
+          "resource_type": "document",
+          "navigation_request": true
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "direct-load-10",
+          "event": "document_request",
+          "url": "https://platodocs.netlify.app/sitemap.xml",
+          "resource_type": "xhr",
+          "navigation_request": false
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "direct-load-10",
+          "event": "document_request",
+          "url": "https://platodocs.netlify.app/search/search_index.json",
+          "resource_type": "xhr",
+          "navigation_request": false
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "direct-load-6",
+          "event": "document_request",
+          "url": "https://platodocs.netlify.app/examples/algorithms/6.%20Client%20Selection%20Algorithms/",
+          "resource_type": "document",
+          "navigation_request": true
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "direct-load-6",
+          "event": "document_request",
+          "url": "https://platodocs.netlify.app/sitemap.xml",
+          "resource_type": "xhr",
+          "navigation_request": false
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "direct-load-6",
+          "event": "document_request",
+          "url": "https://platodocs.netlify.app/search/search_index.json",
+          "resource_type": "xhr",
+          "navigation_request": false
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "direct-load-1",
+          "event": "document_request",
+          "url": "https://platodocs.netlify.app/examples/algorithms/1.%20Server%20Aggregation%20Algorithms/",
+          "resource_type": "document",
+          "navigation_request": true
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "direct-load-1",
+          "event": "document_request",
+          "url": "https://platodocs.netlify.app/sitemap.xml",
+          "resource_type": "xhr",
+          "navigation_request": false
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "direct-load-1",
+          "event": "document_request",
+          "url": "https://platodocs.netlify.app/search/search_index.json",
+          "resource_type": "xhr",
+          "navigation_request": false
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "instant-start-home",
+          "event": "document_request",
+          "url": "https://platodocs.netlify.app/",
+          "resource_type": "document",
+          "navigation_request": true
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "instant-start-home",
+          "event": "document_request",
+          "url": "https://platodocs.netlify.app/sitemap.xml",
+          "resource_type": "xhr",
+          "navigation_request": false
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "instant-start-home",
+          "event": "document_request",
+          "url": "https://platodocs.netlify.app/search/search_index.json",
+          "resource_type": "xhr",
+          "navigation_request": false
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "instant-click-5",
+          "event": "document_request",
+          "url": "https://platodocs.netlify.app/examples/algorithms/5.%20Algorithms%20with%20Customized%20Client%20Training%20Loops/",
+          "resource_type": "xhr",
+          "navigation_request": false
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "instant-click-10",
+          "event": "document_request",
+          "url": "https://platodocs.netlify.app/examples/algorithms/10.%20Algorithms%20based%20on%20Neural%20Architecture%20Search%20and%20Model%20Search/",
+          "resource_type": "xhr",
+          "navigation_request": false
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "instant-click-6",
+          "event": "document_request",
+          "url": "https://platodocs.netlify.app/examples/algorithms/6.%20Client%20Selection%20Algorithms/",
+          "resource_type": "xhr",
+          "navigation_request": false
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "instant-click-1",
+          "event": "document_request",
+          "url": "https://platodocs.netlify.app/examples/algorithms/1.%20Server%20Aggregation%20Algorithms/",
+          "resource_type": "xhr",
+          "navigation_request": false
+        }
+      ],
+      "network_asset_observations": [
+        {
+          "mode": "untouched_page",
+          "action": "direct-load-5",
+          "url": "https://unpkg.com/katex@0.19.0/dist/katex.min.css",
+          "status": 200,
+          "content_type": "text/css; charset=utf-8",
+          "sha256": "d4ab5b8ee16989b070cdb0ea24bd6ad48fc8df1b787f280f29d3ae4f959f2c00",
+          "bytes": 24793
+        },
+        {
+          "mode": "untouched_page",
+          "action": "direct-load-5",
+          "url": "https://unpkg.com/katex@0.19.0/dist/contrib/auto-render.min.js",
+          "status": 200,
+          "content_type": "text/javascript; charset=utf-8",
+          "sha256": "e5372d199bcdae8b4de71d0f7ceba72a4ba12774a27c60a6f1f77d03b3228ee4",
+          "bytes": 3486
+        },
+        {
+          "mode": "untouched_page",
+          "action": "direct-load-5",
+          "url": "https://unpkg.com/katex@0.19.0/dist/katex.min.js",
+          "status": 200,
+          "content_type": "text/javascript; charset=utf-8",
+          "sha256": "103a53763cc033bba8d175bf3f0ba597c3505c9b6747dd3f2c7bc2a6bfcc8ae7",
+          "bytes": 272868
+        },
+        {
+          "mode": "untouched_page",
+          "action": "direct-load-10",
+          "url": "https://unpkg.com/katex@0.19.0/dist/katex.min.css",
+          "status": 200,
+          "content_type": "text/css; charset=utf-8",
+          "sha256": "d4ab5b8ee16989b070cdb0ea24bd6ad48fc8df1b787f280f29d3ae4f959f2c00",
+          "bytes": 24793
+        },
+        {
+          "mode": "untouched_page",
+          "action": "direct-load-10",
+          "url": "https://unpkg.com/katex@0.19.0/dist/contrib/auto-render.min.js",
+          "status": 200,
+          "content_type": "text/javascript; charset=utf-8",
+          "sha256": "e5372d199bcdae8b4de71d0f7ceba72a4ba12774a27c60a6f1f77d03b3228ee4",
+          "bytes": 3486
+        },
+        {
+          "mode": "untouched_page",
+          "action": "direct-load-10",
+          "url": "https://unpkg.com/katex@0.19.0/dist/katex.min.js",
+          "status": 200,
+          "content_type": "text/javascript; charset=utf-8",
+          "sha256": "103a53763cc033bba8d175bf3f0ba597c3505c9b6747dd3f2c7bc2a6bfcc8ae7",
+          "bytes": 272868
+        },
+        {
+          "mode": "untouched_page",
+          "action": "direct-load-6",
+          "url": "https://unpkg.com/katex@0.19.0/dist/contrib/auto-render.min.js",
+          "status": 200,
+          "content_type": "text/javascript; charset=utf-8",
+          "sha256": "e5372d199bcdae8b4de71d0f7ceba72a4ba12774a27c60a6f1f77d03b3228ee4",
+          "bytes": 3486
+        },
+        {
+          "mode": "untouched_page",
+          "action": "direct-load-6",
+          "url": "https://unpkg.com/katex@0.19.0/dist/katex.min.css",
+          "status": 200,
+          "content_type": "text/css; charset=utf-8",
+          "sha256": "d4ab5b8ee16989b070cdb0ea24bd6ad48fc8df1b787f280f29d3ae4f959f2c00",
+          "bytes": 24793
+        },
+        {
+          "mode": "untouched_page",
+          "action": "direct-load-6",
+          "url": "https://unpkg.com/katex@0.19.0/dist/katex.min.js",
+          "status": 200,
+          "content_type": "text/javascript; charset=utf-8",
+          "sha256": "103a53763cc033bba8d175bf3f0ba597c3505c9b6747dd3f2c7bc2a6bfcc8ae7",
+          "bytes": 272868
+        },
+        {
+          "mode": "untouched_page",
+          "action": "direct-load-1",
+          "url": "https://unpkg.com/katex@0.19.0/dist/katex.min.css",
+          "status": 200,
+          "content_type": "text/css; charset=utf-8",
+          "sha256": "d4ab5b8ee16989b070cdb0ea24bd6ad48fc8df1b787f280f29d3ae4f959f2c00",
+          "bytes": 24793
+        },
+        {
+          "mode": "untouched_page",
+          "action": "direct-load-1",
+          "url": "https://unpkg.com/katex@0.19.0/dist/contrib/auto-render.min.js",
+          "status": 200,
+          "content_type": "text/javascript; charset=utf-8",
+          "sha256": "e5372d199bcdae8b4de71d0f7ceba72a4ba12774a27c60a6f1f77d03b3228ee4",
+          "bytes": 3486
+        },
+        {
+          "mode": "untouched_page",
+          "action": "direct-load-1",
+          "url": "https://unpkg.com/katex@0.19.0/dist/katex.min.js",
+          "status": 200,
+          "content_type": "text/javascript; charset=utf-8",
+          "sha256": "103a53763cc033bba8d175bf3f0ba597c3505c9b6747dd3f2c7bc2a6bfcc8ae7",
+          "bytes": 272868
+        },
+        {
+          "mode": "untouched_page",
+          "action": "instant-start-home",
+          "url": "https://unpkg.com/katex@0.19.0/dist/katex.min.css",
+          "status": 200,
+          "content_type": "text/css; charset=utf-8",
+          "sha256": "d4ab5b8ee16989b070cdb0ea24bd6ad48fc8df1b787f280f29d3ae4f959f2c00",
+          "bytes": 24793
+        },
+        {
+          "mode": "untouched_page",
+          "action": "instant-start-home",
+          "url": "https://unpkg.com/katex@0.19.0/dist/contrib/auto-render.min.js",
+          "status": 200,
+          "content_type": "text/javascript; charset=utf-8",
+          "sha256": "e5372d199bcdae8b4de71d0f7ceba72a4ba12774a27c60a6f1f77d03b3228ee4",
+          "bytes": 3486
+        },
+        {
+          "mode": "untouched_page",
+          "action": "instant-start-home",
+          "url": "https://unpkg.com/katex@0.19.0/dist/katex.min.js",
+          "status": 200,
+          "content_type": "text/javascript; charset=utf-8",
+          "sha256": "103a53763cc033bba8d175bf3f0ba597c3505c9b6747dd3f2c7bc2a6bfcc8ae7",
+          "bytes": 272868
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "direct-load-5",
+          "url": "https://unpkg.com/katex@0.19.0/dist/katex.min.css",
+          "status": 200,
+          "content_type": "text/css; charset=utf-8",
+          "sha256": "d4ab5b8ee16989b070cdb0ea24bd6ad48fc8df1b787f280f29d3ae4f959f2c00",
+          "bytes": 24793
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "direct-load-5",
+          "url": "https://unpkg.com/katex@0.19.0/dist/contrib/auto-render.min.js",
+          "status": 200,
+          "content_type": "text/javascript; charset=utf-8",
+          "sha256": "e5372d199bcdae8b4de71d0f7ceba72a4ba12774a27c60a6f1f77d03b3228ee4",
+          "bytes": 3486
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "direct-load-5",
+          "url": "https://unpkg.com/katex@0.19.0/dist/katex.min.js",
+          "status": 200,
+          "content_type": "text/javascript; charset=utf-8",
+          "sha256": "103a53763cc033bba8d175bf3f0ba597c3505c9b6747dd3f2c7bc2a6bfcc8ae7",
+          "bytes": 272868
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "direct-load-10",
+          "url": "https://unpkg.com/katex@0.19.0/dist/katex.min.css",
+          "status": 200,
+          "content_type": "text/css; charset=utf-8",
+          "sha256": "d4ab5b8ee16989b070cdb0ea24bd6ad48fc8df1b787f280f29d3ae4f959f2c00",
+          "bytes": 24793
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "direct-load-10",
+          "url": "https://unpkg.com/katex@0.19.0/dist/contrib/auto-render.min.js",
+          "status": 200,
+          "content_type": "text/javascript; charset=utf-8",
+          "sha256": "e5372d199bcdae8b4de71d0f7ceba72a4ba12774a27c60a6f1f77d03b3228ee4",
+          "bytes": 3486
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "direct-load-10",
+          "url": "https://unpkg.com/katex@0.19.0/dist/katex.min.js",
+          "status": 200,
+          "content_type": "text/javascript; charset=utf-8",
+          "sha256": "103a53763cc033bba8d175bf3f0ba597c3505c9b6747dd3f2c7bc2a6bfcc8ae7",
+          "bytes": 272868
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "direct-load-6",
+          "url": "https://unpkg.com/katex@0.19.0/dist/contrib/auto-render.min.js",
+          "status": 200,
+          "content_type": "text/javascript; charset=utf-8",
+          "sha256": "e5372d199bcdae8b4de71d0f7ceba72a4ba12774a27c60a6f1f77d03b3228ee4",
+          "bytes": 3486
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "direct-load-6",
+          "url": "https://unpkg.com/katex@0.19.0/dist/katex.min.css",
+          "status": 200,
+          "content_type": "text/css; charset=utf-8",
+          "sha256": "d4ab5b8ee16989b070cdb0ea24bd6ad48fc8df1b787f280f29d3ae4f959f2c00",
+          "bytes": 24793
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "direct-load-6",
+          "url": "https://unpkg.com/katex@0.19.0/dist/katex.min.js",
+          "status": 200,
+          "content_type": "text/javascript; charset=utf-8",
+          "sha256": "103a53763cc033bba8d175bf3f0ba597c3505c9b6747dd3f2c7bc2a6bfcc8ae7",
+          "bytes": 272868
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "direct-load-1",
+          "url": "https://unpkg.com/katex@0.19.0/dist/contrib/auto-render.min.js",
+          "status": 200,
+          "content_type": "text/javascript; charset=utf-8",
+          "sha256": "e5372d199bcdae8b4de71d0f7ceba72a4ba12774a27c60a6f1f77d03b3228ee4",
+          "bytes": 3486
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "direct-load-1",
+          "url": "https://unpkg.com/katex@0.19.0/dist/katex.min.css",
+          "status": 200,
+          "content_type": "text/css; charset=utf-8",
+          "sha256": "d4ab5b8ee16989b070cdb0ea24bd6ad48fc8df1b787f280f29d3ae4f959f2c00",
+          "bytes": 24793
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "direct-load-1",
+          "url": "https://unpkg.com/katex@0.19.0/dist/katex.min.js",
+          "status": 200,
+          "content_type": "text/javascript; charset=utf-8",
+          "sha256": "103a53763cc033bba8d175bf3f0ba597c3505c9b6747dd3f2c7bc2a6bfcc8ae7",
+          "bytes": 272868
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "instant-start-home",
+          "url": "https://unpkg.com/katex@0.19.0/dist/katex.min.css",
+          "status": 200,
+          "content_type": "text/css; charset=utf-8",
+          "sha256": "d4ab5b8ee16989b070cdb0ea24bd6ad48fc8df1b787f280f29d3ae4f959f2c00",
+          "bytes": 24793
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "instant-start-home",
+          "url": "https://unpkg.com/katex@0.19.0/dist/contrib/auto-render.min.js",
+          "status": 200,
+          "content_type": "text/javascript; charset=utf-8",
+          "sha256": "e5372d199bcdae8b4de71d0f7ceba72a4ba12774a27c60a6f1f77d03b3228ee4",
+          "bytes": 3486
+        },
+        {
+          "mode": "synthetic_display_fixture",
+          "action": "instant-start-home",
+          "url": "https://unpkg.com/katex@0.19.0/dist/katex.min.js",
+          "status": 200,
+          "content_type": "text/javascript; charset=utf-8",
+          "sha256": "103a53763cc033bba8d175bf3f0ba597c3505c9b6747dd3f2c7bc2a6bfcc8ae7",
+          "bytes": 272868
+        }
+      ]
+    },
+    "reproduced_defect": {
+      "path": "docs/docs/examples/algorithms/5. Algorithms with Customized Client Training Loops.md",
+      "line": 47,
+      "before_tex": "N = \\texttt{clients.total_clients}",
+      "after_tex": "N = \\texttt{clients.total\\_clients}",
+      "before_result": "One of 33 original math nodes stays raw; KaTeX auto-render logs a ParseError at the underscore on direct and instant loads.",
+      "after_result": "All 33 original math nodes render on direct and true instant loads, with zero console/page errors.",
+      "initialization_defect_reproduced": false,
+      "local_javascript_fix": false
+    },
+    "visual_inspection": [
+      {
+        "artifact": {
+          "path": "/tmp/plato-remaining-docs-katex-validation/baseline-browser-final/untouched_page-direct-5.png",
+          "sha256": "1a0a0be8556ed4d839e122a9ad39a5db85ae1e3d9518abd044e9c705e0e3c145",
+          "bytes": 269981
+        },
+        "observation": "Existing SCAFFOLD equations render, but the client-count texttt formula stays visibly raw before the TeX repair."
+      },
+      {
+        "artifact": {
+          "path": "/tmp/plato-remaining-docs-katex-validation/candidate-browser/untouched_page-direct-5.png",
+          "sha256": "7a48c3856aad8a3dfd9d96e0ab8a8a1a0b8afb48003367e83046e2ed7a78db50",
+          "bytes": 270376
+        },
+        "observation": "After repair the client-count formula renders in line with the paragraph and the other equations."
+      },
+      {
+        "artifact": {
+          "path": "/tmp/plato-remaining-docs-katex-validation/candidate-browser/synthetic_display_fixture-instant-5.png",
+          "sha256": "9695f2fcbfa257e0818a4dc8c49f636f90fb9ff49bec3c9c5dc208faddb1dcb1",
+          "bytes": 10955
+        },
+        "observation": "Synthetic summation and integral probes show centered display layout with one inline probe after a real Material instant click."
+      }
+    ],
+    "earlier_harness_attempts": {
+      "scope": "Retained raw debugging attempts; excluded from authoritative before/after results above.",
+      "notes": [
+        "Initial force-click/wait attempt did not open collapsed nav sections.",
+        "A random localhost port makes sitemap membership differ from configured production URLs; production-origin routing resolves the qualification harness issue without source edits.",
+        "Full Chrome for Testing crashed while creating a second context in this headless macOS session. The authoritative matrices use the task-owned Chromium Headless Shell executable, version 153.0.8010.12, which completes both contexts.",
+        "Initial instant snapshots used URL readiness before content injection; authoritative matrices explicitly wait for the target article and rendering."
+      ],
+      "artifacts": [
+        {
+          "path": "/tmp/plato-remaining-docs-katex-validation/baseline-browser/browser-results.json",
+          "sha256": "bfd882c83005691730275328f46691ae14bcdf704da956c0e703be146496d6a2",
+          "bytes": 35317
+        },
+        {
+          "path": "/tmp/plato-remaining-docs-katex-validation/baseline-browser-complete/browser-results.json",
+          "sha256": "652f764f8da76004e1aab9e2391d60df01687b388a92ccb01be435a2d835a5e1",
+          "bytes": 76773
+        },
+        {
+          "path": "/tmp/plato-remaining-docs-katex-validation/baseline-browser-origin/browser-results.json",
+          "sha256": "36cbb30ac62afb2b7c67c6656a73eba09685a14c3c371205ed4a770e3c552563",
+          "bytes": 122414
+        }
+      ]
+    }
+  },
+  "limits": [
+    "Chromium browser qualification of this frozen locally served build; no live deployment or Safari/Firefox qualification.",
+    "Display-math qualification uses an explicitly separate synthetic browser-only fixture because the current algorithm pages contain inline math only.",
+    "External CDN availability was observed during this run; exact pinning does not provide offline hosting or guarantee future network availability.",
+    "Documentation browser/build results do not establish federated algorithm, optional profile or family runtime support."
+  ],
+  "scope_checks": {
+    "shell": "All shell tool invocations use zsh -lc.",
+    "git_diff_check": "PASS",
+    "nested_agents": false,
+    "root_runtime_environment_mutated": false,
+    "production_write_merge_pr_or_publish": false,
+    "family_configuration_commands_and_algorithm_claims_changed": false
+  }
+}
