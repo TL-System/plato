@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "status": "Draft ownership inventory; no family is qualified.",
+  "status": "FEI case inventory frozen for qualification; no family is yet accepted. Other eleven ownership rows remain draft.",
   "authority": {
     "family_plan_sha256": "07d90034e89b83283c9b592550ebe17a1ea3a28a9fa2fbc292cc328db4977e4b",
     "family_review_sha256": "1fb78cdc19f530f9e17258d5e8481e54703f846b1aa8b7160112a9af18e477aa",
@@ -4328,9 +4328,1482 @@
         "fei"
       ],
       "authority_sha256": "07d90034e89b83283c9b592550ebe17a1ea3a28a9fa2fbc292cc328db4977e4b",
-      "inventory_revision": 1,
-      "state": "draft",
-      "cases": [],
+      "inventory_revision": 2,
+      "state": "frozen",
+      "cases": [
+        {
+          "nodeid": "tests/examples_phase4/test_fei.py::test_normalize_state",
+          "case_id": "normalize-state",
+          "family": "fei",
+          "config_paths": [
+            "examples/reinforcement_learning/fei/fei_FashionMNIST_lenet5.toml"
+          ],
+          "include_consumers": [],
+          "entrypoint_paths": [
+            "examples/reinforcement_learning/fei/fei.py"
+          ],
+          "branch_labels": [
+            "fashionmnist",
+            "normalize-state"
+          ],
+          "proof_kind": "real-execution",
+          "required_distributions": [
+            "torch",
+            "torchvision",
+            "gymnasium",
+            "numpy"
+          ],
+          "overlay_allowed_paths_with_rationale": {
+            "clients.total_clients": "Two real clients bound CPU work.",
+            "clients.per_round": "Two unequal sample reports exercise weighting.",
+            "clients.speed_simulation": "Measure actual local optimizer work.",
+            "clients.sleep_simulation": "Measure actual training without simulated delay.",
+            "server.minimum_clients_aggregated": "Both bounded clients participate.",
+            "data.download": "Use faithful generated local dataset files.",
+            "data.partition_size": "Eight training records bound local data.",
+            "data.random_seed": "Real Dirichlet samplers realize 2/6 sample counts.",
+            "data.partition_distribution.distribution": "Bound real partition sizes.",
+            "data.partition_distribution.low": "Real samplers realize unequal 2/6 counts.",
+            "data.partition_distribution.high": "Keep partitions inside eight records.",
+            "trainer.rounds": "Two six-round RL episodes bound stateful work.",
+            "trainer.epochs": "At least two optimizer steps per client training call.",
+            "trainer.batch_size": "Two-image batches retain BatchNorm semantics.",
+            "trainer.max_concurrency": "Run one genuine spawned trainer at a time.",
+            "algorithm.max_episode": "Two terminal episodes exercise reset and finish.",
+            "algorithm.batch_size": "Two real transitions bound policy optimization.",
+            "algorithm.hidden_size": "Small real LSTM retains recurrent architecture.",
+            "algorithm.start_steps": "One warmup step then actual policy actions.",
+            "algorithm.replay_size": "Bound real replay allocation.",
+            "algorithm.log_interval": "Exercise actual policy checkpoint persistence."
+          },
+          "timeout_seconds": 60,
+          "explicit_source_paths": [
+            "examples/reinforcement_learning/fei/fei.py",
+            "examples/reinforcement_learning/fei/fei_agent.py",
+            "examples/reinforcement_learning/fei/fei_client.py",
+            "examples/reinforcement_learning/fei/fei_server.py"
+          ],
+          "authored_spec_sha256": "36ec0bb10608873d2310fe2f9a0db616b37df1ff745c6e1fe1ae8fd33dd13f06",
+          "expected_fixtures": {
+            "dataset": "FashionMNIST",
+            "format": "idx-ubyte",
+            "train_records": 8,
+            "test_records": 10,
+            "channels": 1,
+            "image_size": 28,
+            "client_sample_counts": [
+              2,
+              6
+            ],
+            "test_labels": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9
+            ],
+            "identical_test_images": true,
+            "public_spawned_test_calls": 1,
+            "repeated_evaluation": "Real test_model; no cached or supplied accuracy.",
+            "no_network_processing_time": 0.0,
+            "fresh_training_rounds_per_episode": [
+              1,
+              2
+            ],
+            "report_processing_rounds_per_episode": 6,
+            "episodes": 2
+          },
+          "authored_spec": {
+            "case_id": "normalize-state",
+            "family": "fei",
+            "config": "examples/reinforcement_learning/fei/fei_FashionMNIST_lenet5.toml",
+            "entrypoint": "examples/reinforcement_learning/fei/fei.py",
+            "cwd": ".",
+            "seed": 7,
+            "branch": "fashionmnist",
+            "overlays": {
+              "clients": {
+                "total_clients": 2,
+                "per_round": 2,
+                "speed_simulation": false,
+                "sleep_simulation": false
+              },
+              "server": {
+                "minimum_clients_aggregated": 2
+              },
+              "data": {
+                "download": false,
+                "partition_size": 8,
+                "random_seed": 37,
+                "partition_distribution": {
+                  "distribution": "uniform",
+                  "low": 0.25,
+                  "high": 1.0
+                }
+              },
+              "trainer": {
+                "rounds": 12,
+                "epochs": 2,
+                "batch_size": 2,
+                "max_concurrency": 1
+              },
+              "algorithm": {
+                "max_episode": 2,
+                "batch_size": 2,
+                "hidden_size": 8,
+                "start_steps": 1,
+                "replay_size": 32,
+                "log_interval": 1
+              }
+            },
+            "allowed_overlay_paths": {
+              "clients.total_clients": "Two real clients bound CPU work.",
+              "clients.per_round": "Two unequal sample reports exercise weighting.",
+              "clients.speed_simulation": "Measure actual local optimizer work.",
+              "clients.sleep_simulation": "Measure actual training without simulated delay.",
+              "server.minimum_clients_aggregated": "Both bounded clients participate.",
+              "data.download": "Use faithful generated local dataset files.",
+              "data.partition_size": "Eight training records bound local data.",
+              "data.random_seed": "Real Dirichlet samplers realize 2/6 sample counts.",
+              "data.partition_distribution.distribution": "Bound real partition sizes.",
+              "data.partition_distribution.low": "Real samplers realize unequal 2/6 counts.",
+              "data.partition_distribution.high": "Keep partitions inside eight records.",
+              "trainer.rounds": "Two six-round RL episodes bound stateful work.",
+              "trainer.epochs": "At least two optimizer steps per client training call.",
+              "trainer.batch_size": "Two-image batches retain BatchNorm semantics.",
+              "trainer.max_concurrency": "Run one genuine spawned trainer at a time.",
+              "algorithm.max_episode": "Two terminal episodes exercise reset and finish.",
+              "algorithm.batch_size": "Two real transitions bound policy optimization.",
+              "algorithm.hidden_size": "Small real LSTM retains recurrent architecture.",
+              "algorithm.start_steps": "One warmup step then actual policy actions.",
+              "algorithm.replay_size": "Bound real replay allocation.",
+              "algorithm.log_interval": "Exercise actual policy checkpoint persistence."
+            },
+            "required_distributions": [
+              "torch",
+              "torchvision",
+              "gymnasium",
+              "numpy"
+            ],
+            "source_paths": [
+              "examples/reinforcement_learning/fei/fei.py",
+              "examples/reinforcement_learning/fei/fei_agent.py",
+              "examples/reinforcement_learning/fei/fei_client.py",
+              "examples/reinforcement_learning/fei/fei_server.py"
+            ],
+            "timeout_seconds": 60,
+            "transport": "in-process",
+            "execution_boundary": {
+              "training": "Actual public trainer.train with registered spawned children.",
+              "testing": "One public spawned trainer.test; repeated real test_model calls.",
+              "ingress": "Actual client report; processing_time=0 for no-network ingress.",
+              "episode": "Train two rounds per episode, then reuse final client payloads."
+            },
+            "expected_fixtures": {
+              "dataset": "FashionMNIST",
+              "format": "idx-ubyte",
+              "train_records": 8,
+              "test_records": 10,
+              "channels": 1,
+              "image_size": 28,
+              "client_sample_counts": [
+                2,
+                6
+              ],
+              "test_labels": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9
+              ],
+              "identical_test_images": true,
+              "public_spawned_test_calls": 1,
+              "repeated_evaluation": "Real test_model; no cached or supplied accuracy.",
+              "no_network_processing_time": 0.0,
+              "fresh_training_rounds_per_episode": [
+                1,
+                2
+              ],
+              "report_processing_rounds_per_episode": 6,
+              "episodes": 2
+            }
+          }
+        },
+        {
+          "nodeid": "tests/examples_phase4/test_fei.py::test_real_constructor_factories",
+          "case_id": "constructor-factories",
+          "family": "fei",
+          "config_paths": [
+            "examples/reinforcement_learning/fei/fei_FashionMNIST_lenet5.toml"
+          ],
+          "include_consumers": [],
+          "entrypoint_paths": [
+            "examples/reinforcement_learning/fei/fei.py"
+          ],
+          "branch_labels": [
+            "fashionmnist",
+            "constructor-factories"
+          ],
+          "proof_kind": "real-execution",
+          "required_distributions": [
+            "torch",
+            "torchvision",
+            "gymnasium",
+            "numpy"
+          ],
+          "overlay_allowed_paths_with_rationale": {
+            "clients.total_clients": "Two real clients bound CPU work.",
+            "clients.per_round": "Two unequal sample reports exercise weighting.",
+            "clients.speed_simulation": "Measure actual local optimizer work.",
+            "clients.sleep_simulation": "Measure actual training without simulated delay.",
+            "server.minimum_clients_aggregated": "Both bounded clients participate.",
+            "data.download": "Use faithful generated local dataset files.",
+            "data.partition_size": "Eight training records bound local data.",
+            "data.random_seed": "Real Dirichlet samplers realize 2/6 sample counts.",
+            "data.partition_distribution.distribution": "Bound real partition sizes.",
+            "data.partition_distribution.low": "Real samplers realize unequal 2/6 counts.",
+            "data.partition_distribution.high": "Keep partitions inside eight records.",
+            "trainer.rounds": "Two six-round RL episodes bound stateful work.",
+            "trainer.epochs": "At least two optimizer steps per client training call.",
+            "trainer.batch_size": "Two-image batches retain BatchNorm semantics.",
+            "trainer.max_concurrency": "Run one genuine spawned trainer at a time.",
+            "algorithm.max_episode": "Two terminal episodes exercise reset and finish.",
+            "algorithm.batch_size": "Two real transitions bound policy optimization.",
+            "algorithm.hidden_size": "Small real LSTM retains recurrent architecture.",
+            "algorithm.start_steps": "One warmup step then actual policy actions.",
+            "algorithm.replay_size": "Bound real replay allocation.",
+            "algorithm.log_interval": "Exercise actual policy checkpoint persistence."
+          },
+          "timeout_seconds": 60,
+          "explicit_source_paths": [
+            "examples/reinforcement_learning/fei/fei.py",
+            "examples/reinforcement_learning/fei/fei_agent.py",
+            "examples/reinforcement_learning/fei/fei_client.py",
+            "examples/reinforcement_learning/fei/fei_server.py"
+          ],
+          "authored_spec_sha256": "ae291ea54121fa111548d65fee5e3d42f44b6be92f170192700eef7587abec14",
+          "expected_fixtures": {
+            "dataset": "FashionMNIST",
+            "format": "idx-ubyte",
+            "train_records": 8,
+            "test_records": 10,
+            "channels": 1,
+            "image_size": 28,
+            "client_sample_counts": [
+              2,
+              6
+            ],
+            "test_labels": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9
+            ],
+            "identical_test_images": true,
+            "public_spawned_test_calls": 1,
+            "repeated_evaluation": "Real test_model; no cached or supplied accuracy.",
+            "no_network_processing_time": 0.0,
+            "fresh_training_rounds_per_episode": [
+              1,
+              2
+            ],
+            "report_processing_rounds_per_episode": 6,
+            "episodes": 2
+          },
+          "authored_spec": {
+            "case_id": "constructor-factories",
+            "family": "fei",
+            "config": "examples/reinforcement_learning/fei/fei_FashionMNIST_lenet5.toml",
+            "entrypoint": "examples/reinforcement_learning/fei/fei.py",
+            "cwd": ".",
+            "seed": 7,
+            "branch": "fashionmnist",
+            "overlays": {
+              "clients": {
+                "total_clients": 2,
+                "per_round": 2,
+                "speed_simulation": false,
+                "sleep_simulation": false
+              },
+              "server": {
+                "minimum_clients_aggregated": 2
+              },
+              "data": {
+                "download": false,
+                "partition_size": 8,
+                "random_seed": 37,
+                "partition_distribution": {
+                  "distribution": "uniform",
+                  "low": 0.25,
+                  "high": 1.0
+                }
+              },
+              "trainer": {
+                "rounds": 12,
+                "epochs": 2,
+                "batch_size": 2,
+                "max_concurrency": 1
+              },
+              "algorithm": {
+                "max_episode": 2,
+                "batch_size": 2,
+                "hidden_size": 8,
+                "start_steps": 1,
+                "replay_size": 32,
+                "log_interval": 1
+              }
+            },
+            "allowed_overlay_paths": {
+              "clients.total_clients": "Two real clients bound CPU work.",
+              "clients.per_round": "Two unequal sample reports exercise weighting.",
+              "clients.speed_simulation": "Measure actual local optimizer work.",
+              "clients.sleep_simulation": "Measure actual training without simulated delay.",
+              "server.minimum_clients_aggregated": "Both bounded clients participate.",
+              "data.download": "Use faithful generated local dataset files.",
+              "data.partition_size": "Eight training records bound local data.",
+              "data.random_seed": "Real Dirichlet samplers realize 2/6 sample counts.",
+              "data.partition_distribution.distribution": "Bound real partition sizes.",
+              "data.partition_distribution.low": "Real samplers realize unequal 2/6 counts.",
+              "data.partition_distribution.high": "Keep partitions inside eight records.",
+              "trainer.rounds": "Two six-round RL episodes bound stateful work.",
+              "trainer.epochs": "At least two optimizer steps per client training call.",
+              "trainer.batch_size": "Two-image batches retain BatchNorm semantics.",
+              "trainer.max_concurrency": "Run one genuine spawned trainer at a time.",
+              "algorithm.max_episode": "Two terminal episodes exercise reset and finish.",
+              "algorithm.batch_size": "Two real transitions bound policy optimization.",
+              "algorithm.hidden_size": "Small real LSTM retains recurrent architecture.",
+              "algorithm.start_steps": "One warmup step then actual policy actions.",
+              "algorithm.replay_size": "Bound real replay allocation.",
+              "algorithm.log_interval": "Exercise actual policy checkpoint persistence."
+            },
+            "required_distributions": [
+              "torch",
+              "torchvision",
+              "gymnasium",
+              "numpy"
+            ],
+            "source_paths": [
+              "examples/reinforcement_learning/fei/fei.py",
+              "examples/reinforcement_learning/fei/fei_agent.py",
+              "examples/reinforcement_learning/fei/fei_client.py",
+              "examples/reinforcement_learning/fei/fei_server.py"
+            ],
+            "timeout_seconds": 60,
+            "transport": "in-process",
+            "execution_boundary": {
+              "training": "Actual public trainer.train with registered spawned children.",
+              "testing": "One public spawned trainer.test; repeated real test_model calls.",
+              "ingress": "Actual client report; processing_time=0 for no-network ingress.",
+              "episode": "Train two rounds per episode, then reuse final client payloads."
+            },
+            "expected_fixtures": {
+              "dataset": "FashionMNIST",
+              "format": "idx-ubyte",
+              "train_records": 8,
+              "test_records": 10,
+              "channels": 1,
+              "image_size": 28,
+              "client_sample_counts": [
+                2,
+                6
+              ],
+              "test_labels": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9
+              ],
+              "identical_test_images": true,
+              "public_spawned_test_calls": 1,
+              "repeated_evaluation": "Real test_model; no cached or supplied accuracy.",
+              "no_network_processing_time": 0.0,
+              "fresh_training_rounds_per_episode": [
+                1,
+                2
+              ],
+              "report_processing_rounds_per_episode": 6,
+              "episodes": 2
+            }
+          }
+        },
+        {
+          "nodeid": "tests/examples_phase4/test_fei.py::test_zero_gradient_correlation",
+          "case_id": "zero-gradient-correlation",
+          "family": "fei",
+          "config_paths": [
+            "examples/reinforcement_learning/fei/fei_FashionMNIST_lenet5.toml"
+          ],
+          "include_consumers": [],
+          "entrypoint_paths": [
+            "examples/reinforcement_learning/fei/fei.py"
+          ],
+          "branch_labels": [
+            "fashionmnist",
+            "zero-gradient-correlation"
+          ],
+          "proof_kind": "real-execution",
+          "required_distributions": [
+            "torch",
+            "torchvision",
+            "gymnasium",
+            "numpy"
+          ],
+          "overlay_allowed_paths_with_rationale": {
+            "clients.total_clients": "Two real clients bound CPU work.",
+            "clients.per_round": "Two unequal sample reports exercise weighting.",
+            "clients.speed_simulation": "Measure actual local optimizer work.",
+            "clients.sleep_simulation": "Measure actual training without simulated delay.",
+            "server.minimum_clients_aggregated": "Both bounded clients participate.",
+            "data.download": "Use faithful generated local dataset files.",
+            "data.partition_size": "Eight training records bound local data.",
+            "data.random_seed": "Real Dirichlet samplers realize 2/6 sample counts.",
+            "data.partition_distribution.distribution": "Bound real partition sizes.",
+            "data.partition_distribution.low": "Real samplers realize unequal 2/6 counts.",
+            "data.partition_distribution.high": "Keep partitions inside eight records.",
+            "trainer.rounds": "Two six-round RL episodes bound stateful work.",
+            "trainer.epochs": "At least two optimizer steps per client training call.",
+            "trainer.batch_size": "Two-image batches retain BatchNorm semantics.",
+            "trainer.max_concurrency": "Run one genuine spawned trainer at a time.",
+            "algorithm.max_episode": "Two terminal episodes exercise reset and finish.",
+            "algorithm.batch_size": "Two real transitions bound policy optimization.",
+            "algorithm.hidden_size": "Small real LSTM retains recurrent architecture.",
+            "algorithm.start_steps": "One warmup step then actual policy actions.",
+            "algorithm.replay_size": "Bound real replay allocation.",
+            "algorithm.log_interval": "Exercise actual policy checkpoint persistence."
+          },
+          "timeout_seconds": 60,
+          "explicit_source_paths": [
+            "examples/reinforcement_learning/fei/fei.py",
+            "examples/reinforcement_learning/fei/fei_agent.py",
+            "examples/reinforcement_learning/fei/fei_client.py",
+            "examples/reinforcement_learning/fei/fei_server.py"
+          ],
+          "authored_spec_sha256": "57451e9c5dde3a74e536805a9a9e83d1e2f7d2eadc417946a53f703f1eb18604",
+          "expected_fixtures": {
+            "dataset": "FashionMNIST",
+            "format": "idx-ubyte",
+            "train_records": 8,
+            "test_records": 10,
+            "channels": 1,
+            "image_size": 28,
+            "client_sample_counts": [
+              2,
+              6
+            ],
+            "test_labels": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9
+            ],
+            "identical_test_images": true,
+            "public_spawned_test_calls": 1,
+            "repeated_evaluation": "Real test_model; no cached or supplied accuracy.",
+            "no_network_processing_time": 0.0,
+            "fresh_training_rounds_per_episode": [
+              1,
+              2
+            ],
+            "report_processing_rounds_per_episode": 6,
+            "episodes": 2
+          },
+          "authored_spec": {
+            "case_id": "zero-gradient-correlation",
+            "family": "fei",
+            "config": "examples/reinforcement_learning/fei/fei_FashionMNIST_lenet5.toml",
+            "entrypoint": "examples/reinforcement_learning/fei/fei.py",
+            "cwd": ".",
+            "seed": 7,
+            "branch": "fashionmnist",
+            "overlays": {
+              "clients": {
+                "total_clients": 2,
+                "per_round": 2,
+                "speed_simulation": false,
+                "sleep_simulation": false
+              },
+              "server": {
+                "minimum_clients_aggregated": 2
+              },
+              "data": {
+                "download": false,
+                "partition_size": 8,
+                "random_seed": 37,
+                "partition_distribution": {
+                  "distribution": "uniform",
+                  "low": 0.25,
+                  "high": 1.0
+                }
+              },
+              "trainer": {
+                "rounds": 12,
+                "epochs": 2,
+                "batch_size": 2,
+                "max_concurrency": 1
+              },
+              "algorithm": {
+                "max_episode": 2,
+                "batch_size": 2,
+                "hidden_size": 8,
+                "start_steps": 1,
+                "replay_size": 32,
+                "log_interval": 1
+              }
+            },
+            "allowed_overlay_paths": {
+              "clients.total_clients": "Two real clients bound CPU work.",
+              "clients.per_round": "Two unequal sample reports exercise weighting.",
+              "clients.speed_simulation": "Measure actual local optimizer work.",
+              "clients.sleep_simulation": "Measure actual training without simulated delay.",
+              "server.minimum_clients_aggregated": "Both bounded clients participate.",
+              "data.download": "Use faithful generated local dataset files.",
+              "data.partition_size": "Eight training records bound local data.",
+              "data.random_seed": "Real Dirichlet samplers realize 2/6 sample counts.",
+              "data.partition_distribution.distribution": "Bound real partition sizes.",
+              "data.partition_distribution.low": "Real samplers realize unequal 2/6 counts.",
+              "data.partition_distribution.high": "Keep partitions inside eight records.",
+              "trainer.rounds": "Two six-round RL episodes bound stateful work.",
+              "trainer.epochs": "At least two optimizer steps per client training call.",
+              "trainer.batch_size": "Two-image batches retain BatchNorm semantics.",
+              "trainer.max_concurrency": "Run one genuine spawned trainer at a time.",
+              "algorithm.max_episode": "Two terminal episodes exercise reset and finish.",
+              "algorithm.batch_size": "Two real transitions bound policy optimization.",
+              "algorithm.hidden_size": "Small real LSTM retains recurrent architecture.",
+              "algorithm.start_steps": "One warmup step then actual policy actions.",
+              "algorithm.replay_size": "Bound real replay allocation.",
+              "algorithm.log_interval": "Exercise actual policy checkpoint persistence."
+            },
+            "required_distributions": [
+              "torch",
+              "torchvision",
+              "gymnasium",
+              "numpy"
+            ],
+            "source_paths": [
+              "examples/reinforcement_learning/fei/fei.py",
+              "examples/reinforcement_learning/fei/fei_agent.py",
+              "examples/reinforcement_learning/fei/fei_client.py",
+              "examples/reinforcement_learning/fei/fei_server.py"
+            ],
+            "timeout_seconds": 60,
+            "transport": "in-process",
+            "execution_boundary": {
+              "training": "Actual public trainer.train with registered spawned children.",
+              "testing": "One public spawned trainer.test; repeated real test_model calls.",
+              "ingress": "Actual client report; processing_time=0 for no-network ingress.",
+              "episode": "Train two rounds per episode, then reuse final client payloads."
+            },
+            "expected_fixtures": {
+              "dataset": "FashionMNIST",
+              "format": "idx-ubyte",
+              "train_records": 8,
+              "test_records": 10,
+              "channels": 1,
+              "image_size": 28,
+              "client_sample_counts": [
+                2,
+                6
+              ],
+              "test_labels": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9
+              ],
+              "identical_test_images": true,
+              "public_spawned_test_calls": 1,
+              "repeated_evaluation": "Real test_model; no cached or supplied accuracy.",
+              "no_network_processing_time": 0.0,
+              "fresh_training_rounds_per_episode": [
+                1,
+                2
+              ],
+              "report_processing_rounds_per_episode": 6,
+              "episodes": 2
+            }
+          }
+        },
+        {
+          "nodeid": "tests/examples_phase4/test_fei.py::test_agent_boundaries",
+          "case_id": "agent-boundaries",
+          "family": "fei",
+          "config_paths": [
+            "examples/reinforcement_learning/fei/fei_FashionMNIST_lenet5.toml"
+          ],
+          "include_consumers": [],
+          "entrypoint_paths": [
+            "examples/reinforcement_learning/fei/fei.py"
+          ],
+          "branch_labels": [
+            "fashionmnist",
+            "agent-boundaries"
+          ],
+          "proof_kind": "real-execution",
+          "required_distributions": [
+            "torch",
+            "torchvision",
+            "gymnasium",
+            "numpy"
+          ],
+          "overlay_allowed_paths_with_rationale": {
+            "clients.total_clients": "Two real clients bound CPU work.",
+            "clients.per_round": "Two unequal sample reports exercise weighting.",
+            "clients.speed_simulation": "Measure actual local optimizer work.",
+            "clients.sleep_simulation": "Measure actual training without simulated delay.",
+            "server.minimum_clients_aggregated": "Both bounded clients participate.",
+            "data.download": "Use faithful generated local dataset files.",
+            "data.partition_size": "Eight training records bound local data.",
+            "data.random_seed": "Real Dirichlet samplers realize 2/6 sample counts.",
+            "data.partition_distribution.distribution": "Bound real partition sizes.",
+            "data.partition_distribution.low": "Real samplers realize unequal 2/6 counts.",
+            "data.partition_distribution.high": "Keep partitions inside eight records.",
+            "trainer.rounds": "Two six-round RL episodes bound stateful work.",
+            "trainer.epochs": "At least two optimizer steps per client training call.",
+            "trainer.batch_size": "Two-image batches retain BatchNorm semantics.",
+            "trainer.max_concurrency": "Run one genuine spawned trainer at a time.",
+            "algorithm.max_episode": "Two terminal episodes exercise reset and finish.",
+            "algorithm.batch_size": "Two real transitions bound policy optimization.",
+            "algorithm.hidden_size": "Small real LSTM retains recurrent architecture.",
+            "algorithm.start_steps": "One warmup step then actual policy actions.",
+            "algorithm.replay_size": "Bound real replay allocation.",
+            "algorithm.log_interval": "Exercise actual policy checkpoint persistence."
+          },
+          "timeout_seconds": 60,
+          "explicit_source_paths": [
+            "examples/reinforcement_learning/fei/fei.py",
+            "examples/reinforcement_learning/fei/fei_agent.py",
+            "examples/reinforcement_learning/fei/fei_client.py",
+            "examples/reinforcement_learning/fei/fei_server.py"
+          ],
+          "authored_spec_sha256": "71f5b89bbfd3d68a01975ab3ce91747d08b541230d72eb606b76928e7f4a167a",
+          "expected_fixtures": {
+            "dataset": "FashionMNIST",
+            "format": "idx-ubyte",
+            "train_records": 8,
+            "test_records": 10,
+            "channels": 1,
+            "image_size": 28,
+            "client_sample_counts": [
+              2,
+              6
+            ],
+            "test_labels": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9
+            ],
+            "identical_test_images": true,
+            "public_spawned_test_calls": 1,
+            "repeated_evaluation": "Real test_model; no cached or supplied accuracy.",
+            "no_network_processing_time": 0.0,
+            "fresh_training_rounds_per_episode": [
+              1,
+              2
+            ],
+            "report_processing_rounds_per_episode": 6,
+            "episodes": 2
+          },
+          "authored_spec": {
+            "case_id": "agent-boundaries",
+            "family": "fei",
+            "config": "examples/reinforcement_learning/fei/fei_FashionMNIST_lenet5.toml",
+            "entrypoint": "examples/reinforcement_learning/fei/fei.py",
+            "cwd": ".",
+            "seed": 7,
+            "branch": "fashionmnist",
+            "overlays": {
+              "clients": {
+                "total_clients": 2,
+                "per_round": 2,
+                "speed_simulation": false,
+                "sleep_simulation": false
+              },
+              "server": {
+                "minimum_clients_aggregated": 2
+              },
+              "data": {
+                "download": false,
+                "partition_size": 8,
+                "random_seed": 37,
+                "partition_distribution": {
+                  "distribution": "uniform",
+                  "low": 0.25,
+                  "high": 1.0
+                }
+              },
+              "trainer": {
+                "rounds": 12,
+                "epochs": 2,
+                "batch_size": 2,
+                "max_concurrency": 1
+              },
+              "algorithm": {
+                "max_episode": 2,
+                "batch_size": 2,
+                "hidden_size": 8,
+                "start_steps": 1,
+                "replay_size": 32,
+                "log_interval": 1
+              }
+            },
+            "allowed_overlay_paths": {
+              "clients.total_clients": "Two real clients bound CPU work.",
+              "clients.per_round": "Two unequal sample reports exercise weighting.",
+              "clients.speed_simulation": "Measure actual local optimizer work.",
+              "clients.sleep_simulation": "Measure actual training without simulated delay.",
+              "server.minimum_clients_aggregated": "Both bounded clients participate.",
+              "data.download": "Use faithful generated local dataset files.",
+              "data.partition_size": "Eight training records bound local data.",
+              "data.random_seed": "Real Dirichlet samplers realize 2/6 sample counts.",
+              "data.partition_distribution.distribution": "Bound real partition sizes.",
+              "data.partition_distribution.low": "Real samplers realize unequal 2/6 counts.",
+              "data.partition_distribution.high": "Keep partitions inside eight records.",
+              "trainer.rounds": "Two six-round RL episodes bound stateful work.",
+              "trainer.epochs": "At least two optimizer steps per client training call.",
+              "trainer.batch_size": "Two-image batches retain BatchNorm semantics.",
+              "trainer.max_concurrency": "Run one genuine spawned trainer at a time.",
+              "algorithm.max_episode": "Two terminal episodes exercise reset and finish.",
+              "algorithm.batch_size": "Two real transitions bound policy optimization.",
+              "algorithm.hidden_size": "Small real LSTM retains recurrent architecture.",
+              "algorithm.start_steps": "One warmup step then actual policy actions.",
+              "algorithm.replay_size": "Bound real replay allocation.",
+              "algorithm.log_interval": "Exercise actual policy checkpoint persistence."
+            },
+            "required_distributions": [
+              "torch",
+              "torchvision",
+              "gymnasium",
+              "numpy"
+            ],
+            "source_paths": [
+              "examples/reinforcement_learning/fei/fei.py",
+              "examples/reinforcement_learning/fei/fei_agent.py",
+              "examples/reinforcement_learning/fei/fei_client.py",
+              "examples/reinforcement_learning/fei/fei_server.py"
+            ],
+            "timeout_seconds": 60,
+            "transport": "in-process",
+            "execution_boundary": {
+              "training": "Actual public trainer.train with registered spawned children.",
+              "testing": "One public spawned trainer.test; repeated real test_model calls.",
+              "ingress": "Actual client report; processing_time=0 for no-network ingress.",
+              "episode": "Train two rounds per episode, then reuse final client payloads."
+            },
+            "expected_fixtures": {
+              "dataset": "FashionMNIST",
+              "format": "idx-ubyte",
+              "train_records": 8,
+              "test_records": 10,
+              "channels": 1,
+              "image_size": 28,
+              "client_sample_counts": [
+                2,
+                6
+              ],
+              "test_labels": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9
+              ],
+              "identical_test_images": true,
+              "public_spawned_test_calls": 1,
+              "repeated_evaluation": "Real test_model; no cached or supplied accuracy.",
+              "no_network_processing_time": 0.0,
+              "fresh_training_rounds_per_episode": [
+                1,
+                2
+              ],
+              "report_processing_rounds_per_episode": 6,
+              "episodes": 2
+            }
+          }
+        },
+        {
+          "nodeid": "tests/examples_phase4/test_fei.py::test_bounded_episode[fashionmnist]",
+          "case_id": "episode-fashionmnist",
+          "family": "fei",
+          "config_paths": [
+            "examples/reinforcement_learning/fei/fei_FashionMNIST_lenet5.toml"
+          ],
+          "include_consumers": [],
+          "entrypoint_paths": [
+            "examples/reinforcement_learning/fei/fei.py"
+          ],
+          "branch_labels": [
+            "fashionmnist",
+            "bounded-real-episode"
+          ],
+          "proof_kind": "real-execution",
+          "required_distributions": [
+            "torch",
+            "torchvision",
+            "gymnasium",
+            "numpy"
+          ],
+          "overlay_allowed_paths_with_rationale": {
+            "clients.total_clients": "Two real clients bound CPU work.",
+            "clients.per_round": "Two unequal sample reports exercise weighting.",
+            "clients.speed_simulation": "Measure actual local optimizer work.",
+            "clients.sleep_simulation": "Measure actual training without simulated delay.",
+            "server.minimum_clients_aggregated": "Both bounded clients participate.",
+            "data.download": "Use faithful generated local dataset files.",
+            "data.partition_size": "Eight training records bound local data.",
+            "data.random_seed": "Real Dirichlet samplers realize 2/6 sample counts.",
+            "data.partition_distribution.distribution": "Bound real partition sizes.",
+            "data.partition_distribution.low": "Real samplers realize unequal 2/6 counts.",
+            "data.partition_distribution.high": "Keep partitions inside eight records.",
+            "trainer.rounds": "Two six-round RL episodes bound stateful work.",
+            "trainer.epochs": "At least two optimizer steps per client training call.",
+            "trainer.batch_size": "Two-image batches retain BatchNorm semantics.",
+            "trainer.max_concurrency": "Run one genuine spawned trainer at a time.",
+            "algorithm.max_episode": "Two terminal episodes exercise reset and finish.",
+            "algorithm.batch_size": "Two real transitions bound policy optimization.",
+            "algorithm.hidden_size": "Small real LSTM retains recurrent architecture.",
+            "algorithm.start_steps": "One warmup step then actual policy actions.",
+            "algorithm.replay_size": "Bound real replay allocation.",
+            "algorithm.log_interval": "Exercise actual policy checkpoint persistence."
+          },
+          "timeout_seconds": 180,
+          "explicit_source_paths": [
+            "examples/reinforcement_learning/fei/fei.py",
+            "examples/reinforcement_learning/fei/fei_agent.py",
+            "examples/reinforcement_learning/fei/fei_client.py",
+            "examples/reinforcement_learning/fei/fei_server.py"
+          ],
+          "authored_spec_sha256": "ff299eb33302e711c97f2cbea8c5f8bbb855cc35a37ad8964bcbe6fc11f932c3",
+          "expected_fixtures": {
+            "dataset": "FashionMNIST",
+            "format": "idx-ubyte",
+            "train_records": 8,
+            "test_records": 10,
+            "channels": 1,
+            "image_size": 28,
+            "client_sample_counts": [
+              2,
+              6
+            ],
+            "test_labels": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9
+            ],
+            "identical_test_images": true,
+            "public_spawned_test_calls": 1,
+            "repeated_evaluation": "Real test_model; no cached or supplied accuracy.",
+            "no_network_processing_time": 0.0,
+            "fresh_training_rounds_per_episode": [
+              1,
+              2
+            ],
+            "report_processing_rounds_per_episode": 6,
+            "episodes": 2
+          },
+          "authored_spec": {
+            "case_id": "episode-fashionmnist",
+            "family": "fei",
+            "config": "examples/reinforcement_learning/fei/fei_FashionMNIST_lenet5.toml",
+            "entrypoint": "examples/reinforcement_learning/fei/fei.py",
+            "cwd": ".",
+            "seed": 7,
+            "branch": "fashionmnist",
+            "overlays": {
+              "clients": {
+                "total_clients": 2,
+                "per_round": 2,
+                "speed_simulation": false,
+                "sleep_simulation": false
+              },
+              "server": {
+                "minimum_clients_aggregated": 2
+              },
+              "data": {
+                "download": false,
+                "partition_size": 8,
+                "random_seed": 37,
+                "partition_distribution": {
+                  "distribution": "uniform",
+                  "low": 0.25,
+                  "high": 1.0
+                }
+              },
+              "trainer": {
+                "rounds": 12,
+                "epochs": 2,
+                "batch_size": 2,
+                "max_concurrency": 1
+              },
+              "algorithm": {
+                "max_episode": 2,
+                "batch_size": 2,
+                "hidden_size": 8,
+                "start_steps": 1,
+                "replay_size": 32,
+                "log_interval": 1
+              }
+            },
+            "allowed_overlay_paths": {
+              "clients.total_clients": "Two real clients bound CPU work.",
+              "clients.per_round": "Two unequal sample reports exercise weighting.",
+              "clients.speed_simulation": "Measure actual local optimizer work.",
+              "clients.sleep_simulation": "Measure actual training without simulated delay.",
+              "server.minimum_clients_aggregated": "Both bounded clients participate.",
+              "data.download": "Use faithful generated local dataset files.",
+              "data.partition_size": "Eight training records bound local data.",
+              "data.random_seed": "Real Dirichlet samplers realize 2/6 sample counts.",
+              "data.partition_distribution.distribution": "Bound real partition sizes.",
+              "data.partition_distribution.low": "Real samplers realize unequal 2/6 counts.",
+              "data.partition_distribution.high": "Keep partitions inside eight records.",
+              "trainer.rounds": "Two six-round RL episodes bound stateful work.",
+              "trainer.epochs": "At least two optimizer steps per client training call.",
+              "trainer.batch_size": "Two-image batches retain BatchNorm semantics.",
+              "trainer.max_concurrency": "Run one genuine spawned trainer at a time.",
+              "algorithm.max_episode": "Two terminal episodes exercise reset and finish.",
+              "algorithm.batch_size": "Two real transitions bound policy optimization.",
+              "algorithm.hidden_size": "Small real LSTM retains recurrent architecture.",
+              "algorithm.start_steps": "One warmup step then actual policy actions.",
+              "algorithm.replay_size": "Bound real replay allocation.",
+              "algorithm.log_interval": "Exercise actual policy checkpoint persistence."
+            },
+            "required_distributions": [
+              "torch",
+              "torchvision",
+              "gymnasium",
+              "numpy"
+            ],
+            "source_paths": [
+              "examples/reinforcement_learning/fei/fei.py",
+              "examples/reinforcement_learning/fei/fei_agent.py",
+              "examples/reinforcement_learning/fei/fei_client.py",
+              "examples/reinforcement_learning/fei/fei_server.py"
+            ],
+            "timeout_seconds": 180,
+            "transport": "in-process",
+            "execution_boundary": {
+              "training": "Actual public trainer.train with registered spawned children.",
+              "testing": "One public spawned trainer.test; repeated real test_model calls.",
+              "ingress": "Actual client report; processing_time=0 for no-network ingress.",
+              "episode": "Train two rounds per episode, then reuse final client payloads."
+            },
+            "expected_fixtures": {
+              "dataset": "FashionMNIST",
+              "format": "idx-ubyte",
+              "train_records": 8,
+              "test_records": 10,
+              "channels": 1,
+              "image_size": 28,
+              "client_sample_counts": [
+                2,
+                6
+              ],
+              "test_labels": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9
+              ],
+              "identical_test_images": true,
+              "public_spawned_test_calls": 1,
+              "repeated_evaluation": "Real test_model; no cached or supplied accuracy.",
+              "no_network_processing_time": 0.0,
+              "fresh_training_rounds_per_episode": [
+                1,
+                2
+              ],
+              "report_processing_rounds_per_episode": 6,
+              "episodes": 2
+            }
+          }
+        },
+        {
+          "nodeid": "tests/examples_phase4/test_fei.py::test_bounded_episode[cifar10]",
+          "case_id": "episode-cifar10",
+          "family": "fei",
+          "config_paths": [
+            "examples/reinforcement_learning/fei/fei_CIFAR10_resnet18.toml"
+          ],
+          "include_consumers": [],
+          "entrypoint_paths": [
+            "examples/reinforcement_learning/fei/fei.py"
+          ],
+          "branch_labels": [
+            "cifar10",
+            "bounded-real-episode"
+          ],
+          "proof_kind": "real-execution",
+          "required_distributions": [
+            "torch",
+            "torchvision",
+            "gymnasium",
+            "numpy"
+          ],
+          "overlay_allowed_paths_with_rationale": {
+            "clients.total_clients": "Two real clients bound CPU work.",
+            "clients.per_round": "Two unequal sample reports exercise weighting.",
+            "clients.speed_simulation": "Measure actual local optimizer work.",
+            "clients.sleep_simulation": "Measure actual training without simulated delay.",
+            "server.minimum_clients_aggregated": "Both bounded clients participate.",
+            "data.download": "Use faithful generated local dataset files.",
+            "data.partition_size": "Eight training records bound local data.",
+            "data.random_seed": "Real Dirichlet samplers realize 2/6 sample counts.",
+            "data.partition_distribution.distribution": "Bound real partition sizes.",
+            "data.partition_distribution.low": "Real samplers realize unequal 2/6 counts.",
+            "data.partition_distribution.high": "Keep partitions inside eight records.",
+            "trainer.rounds": "Two six-round RL episodes bound stateful work.",
+            "trainer.epochs": "At least two optimizer steps per client training call.",
+            "trainer.batch_size": "Two-image batches retain BatchNorm semantics.",
+            "trainer.max_concurrency": "Run one genuine spawned trainer at a time.",
+            "algorithm.max_episode": "Two terminal episodes exercise reset and finish.",
+            "algorithm.batch_size": "Two real transitions bound policy optimization.",
+            "algorithm.hidden_size": "Small real LSTM retains recurrent architecture.",
+            "algorithm.start_steps": "One warmup step then actual policy actions.",
+            "algorithm.replay_size": "Bound real replay allocation.",
+            "algorithm.log_interval": "Exercise actual policy checkpoint persistence."
+          },
+          "timeout_seconds": 180,
+          "explicit_source_paths": [
+            "examples/reinforcement_learning/fei/fei.py",
+            "examples/reinforcement_learning/fei/fei_agent.py",
+            "examples/reinforcement_learning/fei/fei_client.py",
+            "examples/reinforcement_learning/fei/fei_server.py"
+          ],
+          "authored_spec_sha256": "52e047c93e2ca11205fa5bf2e3cde4e1e07f7e0a0ec9cb37c23e8cdc2785473f",
+          "expected_fixtures": {
+            "dataset": "CIFAR10",
+            "format": "cifar-python-pickle",
+            "train_records": 8,
+            "test_records": 10,
+            "channels": 3,
+            "image_size": 32,
+            "client_sample_counts": [
+              2,
+              6
+            ],
+            "test_labels": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9
+            ],
+            "identical_test_images": true,
+            "public_spawned_test_calls": 1,
+            "repeated_evaluation": "Real test_model; no cached or supplied accuracy.",
+            "no_network_processing_time": 0.0,
+            "fresh_training_rounds_per_episode": [
+              1,
+              2
+            ],
+            "report_processing_rounds_per_episode": 6,
+            "episodes": 2
+          },
+          "authored_spec": {
+            "case_id": "episode-cifar10",
+            "family": "fei",
+            "config": "examples/reinforcement_learning/fei/fei_CIFAR10_resnet18.toml",
+            "entrypoint": "examples/reinforcement_learning/fei/fei.py",
+            "cwd": ".",
+            "seed": 7,
+            "branch": "cifar10",
+            "overlays": {
+              "clients": {
+                "total_clients": 2,
+                "per_round": 2,
+                "speed_simulation": false,
+                "sleep_simulation": false
+              },
+              "server": {
+                "minimum_clients_aggregated": 2
+              },
+              "data": {
+                "download": false,
+                "partition_size": 8,
+                "random_seed": 15,
+                "partition_distribution": {
+                  "distribution": "uniform",
+                  "low": 0.25,
+                  "high": 1.0
+                }
+              },
+              "trainer": {
+                "rounds": 12,
+                "epochs": 2,
+                "batch_size": 2,
+                "max_concurrency": 1
+              },
+              "algorithm": {
+                "max_episode": 2,
+                "batch_size": 2,
+                "hidden_size": 8,
+                "start_steps": 1,
+                "replay_size": 32,
+                "log_interval": 1
+              }
+            },
+            "allowed_overlay_paths": {
+              "clients.total_clients": "Two real clients bound CPU work.",
+              "clients.per_round": "Two unequal sample reports exercise weighting.",
+              "clients.speed_simulation": "Measure actual local optimizer work.",
+              "clients.sleep_simulation": "Measure actual training without simulated delay.",
+              "server.minimum_clients_aggregated": "Both bounded clients participate.",
+              "data.download": "Use faithful generated local dataset files.",
+              "data.partition_size": "Eight training records bound local data.",
+              "data.random_seed": "Real Dirichlet samplers realize 2/6 sample counts.",
+              "data.partition_distribution.distribution": "Bound real partition sizes.",
+              "data.partition_distribution.low": "Real samplers realize unequal 2/6 counts.",
+              "data.partition_distribution.high": "Keep partitions inside eight records.",
+              "trainer.rounds": "Two six-round RL episodes bound stateful work.",
+              "trainer.epochs": "At least two optimizer steps per client training call.",
+              "trainer.batch_size": "Two-image batches retain BatchNorm semantics.",
+              "trainer.max_concurrency": "Run one genuine spawned trainer at a time.",
+              "algorithm.max_episode": "Two terminal episodes exercise reset and finish.",
+              "algorithm.batch_size": "Two real transitions bound policy optimization.",
+              "algorithm.hidden_size": "Small real LSTM retains recurrent architecture.",
+              "algorithm.start_steps": "One warmup step then actual policy actions.",
+              "algorithm.replay_size": "Bound real replay allocation.",
+              "algorithm.log_interval": "Exercise actual policy checkpoint persistence."
+            },
+            "required_distributions": [
+              "torch",
+              "torchvision",
+              "gymnasium",
+              "numpy"
+            ],
+            "source_paths": [
+              "examples/reinforcement_learning/fei/fei.py",
+              "examples/reinforcement_learning/fei/fei_agent.py",
+              "examples/reinforcement_learning/fei/fei_client.py",
+              "examples/reinforcement_learning/fei/fei_server.py"
+            ],
+            "timeout_seconds": 180,
+            "transport": "in-process",
+            "execution_boundary": {
+              "training": "Actual public trainer.train with registered spawned children.",
+              "testing": "One public spawned trainer.test; repeated real test_model calls.",
+              "ingress": "Actual client report; processing_time=0 for no-network ingress.",
+              "episode": "Train two rounds per episode, then reuse final client payloads."
+            },
+            "expected_fixtures": {
+              "dataset": "CIFAR10",
+              "format": "cifar-python-pickle",
+              "train_records": 8,
+              "test_records": 10,
+              "channels": 3,
+              "image_size": 32,
+              "client_sample_counts": [
+                2,
+                6
+              ],
+              "test_labels": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9
+              ],
+              "identical_test_images": true,
+              "public_spawned_test_calls": 1,
+              "repeated_evaluation": "Real test_model; no cached or supplied accuracy.",
+              "no_network_processing_time": 0.0,
+              "fresh_training_rounds_per_episode": [
+                1,
+                2
+              ],
+              "report_processing_rounds_per_episode": 6,
+              "episodes": 2
+            }
+          }
+        },
+        {
+          "nodeid": "tests/examples_phase4/test_fei.py::test_bounded_episode[synchronous]",
+          "case_id": "episode-synchronous",
+          "family": "fei",
+          "config_paths": [
+            "examples/reinforcement_learning/fei/fei_FashionMNIST_lenet5.toml"
+          ],
+          "include_consumers": [],
+          "entrypoint_paths": [
+            "examples/reinforcement_learning/fei/fei.py"
+          ],
+          "branch_labels": [
+            "additional-synchronous-nonrecurrent-base2",
+            "bounded-real-episode"
+          ],
+          "proof_kind": "real-execution",
+          "required_distributions": [
+            "torch",
+            "torchvision",
+            "gymnasium",
+            "numpy"
+          ],
+          "overlay_allowed_paths_with_rationale": {
+            "clients.total_clients": "Two real clients bound CPU work.",
+            "clients.per_round": "Two unequal sample reports exercise weighting.",
+            "clients.speed_simulation": "Measure actual local optimizer work.",
+            "clients.sleep_simulation": "Measure actual training without simulated delay.",
+            "server.minimum_clients_aggregated": "Both bounded clients participate.",
+            "data.download": "Use faithful generated local dataset files.",
+            "data.partition_size": "Eight training records bound local data.",
+            "data.random_seed": "Real Dirichlet samplers realize 2/6 sample counts.",
+            "data.partition_distribution.distribution": "Bound real partition sizes.",
+            "data.partition_distribution.low": "Real samplers realize unequal 2/6 counts.",
+            "data.partition_distribution.high": "Keep partitions inside eight records.",
+            "trainer.rounds": "Two six-round RL episodes bound stateful work.",
+            "trainer.epochs": "At least two optimizer steps per client training call.",
+            "trainer.batch_size": "Two-image batches retain BatchNorm semantics.",
+            "trainer.max_concurrency": "Run one genuine spawned trainer at a time.",
+            "algorithm.max_episode": "Two terminal episodes exercise reset and finish.",
+            "algorithm.batch_size": "Two real transitions bound policy optimization.",
+            "algorithm.hidden_size": "Small real LSTM retains recurrent architecture.",
+            "algorithm.start_steps": "One warmup step then actual policy actions.",
+            "algorithm.replay_size": "Bound real replay allocation.",
+            "algorithm.log_interval": "Exercise actual policy checkpoint persistence.",
+            "server.synchronous": "Additional synchronous branch probe.",
+            "algorithm.recurrent_actor": "Additional feedforward policy probe.",
+            "algorithm.base": "Additional feedforward probe avoids observed base1000 tanh saturation; supplied recurrent configs retain base1000."
+          },
+          "timeout_seconds": 180,
+          "explicit_source_paths": [
+            "examples/reinforcement_learning/fei/fei.py",
+            "examples/reinforcement_learning/fei/fei_agent.py",
+            "examples/reinforcement_learning/fei/fei_client.py",
+            "examples/reinforcement_learning/fei/fei_server.py"
+          ],
+          "authored_spec_sha256": "1512350f0a94d9e82088064bdada436f43126a6ff944179664fcddfb2ea7df01",
+          "expected_fixtures": {
+            "dataset": "FashionMNIST",
+            "format": "idx-ubyte",
+            "train_records": 8,
+            "test_records": 10,
+            "channels": 1,
+            "image_size": 28,
+            "client_sample_counts": [
+              2,
+              6
+            ],
+            "test_labels": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9
+            ],
+            "identical_test_images": true,
+            "public_spawned_test_calls": 1,
+            "repeated_evaluation": "Real test_model; no cached or supplied accuracy.",
+            "no_network_processing_time": 0.0,
+            "fresh_training_rounds_per_episode": [
+              1,
+              2
+            ],
+            "report_processing_rounds_per_episode": 6,
+            "episodes": 2
+          },
+          "authored_spec": {
+            "case_id": "episode-synchronous",
+            "family": "fei",
+            "config": "examples/reinforcement_learning/fei/fei_FashionMNIST_lenet5.toml",
+            "entrypoint": "examples/reinforcement_learning/fei/fei.py",
+            "cwd": ".",
+            "seed": 7,
+            "branch": "synchronous",
+            "overlays": {
+              "clients": {
+                "total_clients": 2,
+                "per_round": 2,
+                "speed_simulation": false,
+                "sleep_simulation": false
+              },
+              "server": {
+                "minimum_clients_aggregated": 2,
+                "synchronous": true
+              },
+              "data": {
+                "download": false,
+                "partition_size": 8,
+                "random_seed": 37,
+                "partition_distribution": {
+                  "distribution": "uniform",
+                  "low": 0.25,
+                  "high": 1.0
+                }
+              },
+              "trainer": {
+                "rounds": 12,
+                "epochs": 2,
+                "batch_size": 2,
+                "max_concurrency": 1
+              },
+              "algorithm": {
+                "max_episode": 2,
+                "batch_size": 2,
+                "hidden_size": 8,
+                "start_steps": 1,
+                "replay_size": 32,
+                "log_interval": 1,
+                "recurrent_actor": false,
+                "base": 2
+              }
+            },
+            "allowed_overlay_paths": {
+              "clients.total_clients": "Two real clients bound CPU work.",
+              "clients.per_round": "Two unequal sample reports exercise weighting.",
+              "clients.speed_simulation": "Measure actual local optimizer work.",
+              "clients.sleep_simulation": "Measure actual training without simulated delay.",
+              "server.minimum_clients_aggregated": "Both bounded clients participate.",
+              "data.download": "Use faithful generated local dataset files.",
+              "data.partition_size": "Eight training records bound local data.",
+              "data.random_seed": "Real Dirichlet samplers realize 2/6 sample counts.",
+              "data.partition_distribution.distribution": "Bound real partition sizes.",
+              "data.partition_distribution.low": "Real samplers realize unequal 2/6 counts.",
+              "data.partition_distribution.high": "Keep partitions inside eight records.",
+              "trainer.rounds": "Two six-round RL episodes bound stateful work.",
+              "trainer.epochs": "At least two optimizer steps per client training call.",
+              "trainer.batch_size": "Two-image batches retain BatchNorm semantics.",
+              "trainer.max_concurrency": "Run one genuine spawned trainer at a time.",
+              "algorithm.max_episode": "Two terminal episodes exercise reset and finish.",
+              "algorithm.batch_size": "Two real transitions bound policy optimization.",
+              "algorithm.hidden_size": "Small real LSTM retains recurrent architecture.",
+              "algorithm.start_steps": "One warmup step then actual policy actions.",
+              "algorithm.replay_size": "Bound real replay allocation.",
+              "algorithm.log_interval": "Exercise actual policy checkpoint persistence.",
+              "server.synchronous": "Additional synchronous branch probe.",
+              "algorithm.recurrent_actor": "Additional feedforward policy probe.",
+              "algorithm.base": "Additional feedforward probe avoids observed base1000 tanh saturation; supplied recurrent configs retain base1000."
+            },
+            "required_distributions": [
+              "torch",
+              "torchvision",
+              "gymnasium",
+              "numpy"
+            ],
+            "source_paths": [
+              "examples/reinforcement_learning/fei/fei.py",
+              "examples/reinforcement_learning/fei/fei_agent.py",
+              "examples/reinforcement_learning/fei/fei_client.py",
+              "examples/reinforcement_learning/fei/fei_server.py"
+            ],
+            "timeout_seconds": 180,
+            "transport": "in-process",
+            "execution_boundary": {
+              "training": "Actual public trainer.train with registered spawned children.",
+              "testing": "One public spawned trainer.test; repeated real test_model calls.",
+              "ingress": "Actual client report; processing_time=0 for no-network ingress.",
+              "episode": "Train two rounds per episode, then reuse final client payloads."
+            },
+            "expected_fixtures": {
+              "dataset": "FashionMNIST",
+              "format": "idx-ubyte",
+              "train_records": 8,
+              "test_records": 10,
+              "channels": 1,
+              "image_size": 28,
+              "client_sample_counts": [
+                2,
+                6
+              ],
+              "test_labels": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9
+              ],
+              "identical_test_images": true,
+              "public_spawned_test_calls": 1,
+              "repeated_evaluation": "Real test_model; no cached or supplied accuracy.",
+              "no_network_processing_time": 0.0,
+              "fresh_training_rounds_per_episode": [
+                1,
+                2
+              ],
+              "report_processing_rounds_per_episode": 6,
+              "episodes": 2
+            }
+          }
+        }
+      ],
       "owned_paths": [
         "examples/reinforcement_learning/fei/fei.py",
         "examples/reinforcement_learning/fei/fei_CIFAR10_resnet18.toml",
