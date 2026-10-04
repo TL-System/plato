@@ -1,0 +1,174 @@
+{
+  "schema_version": 1,
+  "backend": "older-split-llm-recipes",
+  "retired_at": "2026-10-04",
+  "pre_retirement_plato_commit": "c1359992f70533c0f2a47d30742f9b14295da882",
+  "pre_retirement_plato_tree": "9e75b3b2f306677fabc6f9214658bfeacd152dc5",
+  "plan_sha256": "a49502dca7146305f37c94a404ff7735c7507d79d3968b5a813f09e304442716",
+  "plan_review_sha256": "a93502a267b86617ff3bde0d30462179c219f0bbc279354d0c049dfddcd0ecb8",
+  "files": [
+    {
+      "original_path": "examples/split_learning/llm_split_learning/split_learning_wikitext2_llama2.toml",
+      "archive_path": "archives/retired/older-split-llm-recipes/original/examples/split_learning/llm_split_learning/split_learning_wikitext2_llama2.toml",
+      "disposition": "moved",
+      "git_mode": "100644",
+      "git_blob": "de20503e0fa714b7f6d450bfc4b934776e7343cb",
+      "sha256": "fcf12991d3e5e5c6a0afad4eef8bd9bec234a2bf1dcb6a6dfc5f4ab7dd1eda6a",
+      "bytes": 1507,
+      "source_commit": "c1359992f70533c0f2a47d30742f9b14295da882"
+    },
+    {
+      "original_path": "examples/split_learning/llm_split_learning/split_learning_wikitext2_opt350m.toml",
+      "archive_path": "archives/retired/older-split-llm-recipes/original/examples/split_learning/llm_split_learning/split_learning_wikitext2_opt350m.toml",
+      "disposition": "moved",
+      "git_mode": "100644",
+      "git_blob": "f51508b07126c8e3336e397f7e65259eed40d247",
+      "sha256": "d05e8c3c2b668e16a9b48ee8e9a1771e37410e39c89810bbeea0101a976f085e",
+      "bytes": 1438,
+      "source_commit": "c1359992f70533c0f2a47d30742f9b14295da882"
+    },
+    {
+      "original_path": "examples/split_learning/llm_split_learning/split_learning_llm_model.py",
+      "archive_path": "archives/retired/older-split-llm-recipes/original/examples/split_learning/llm_split_learning/split_learning_llm_model.py",
+      "disposition": "copied-context",
+      "git_mode": "100644",
+      "git_blob": "4767e44a52cf2dd887821f2ec3ce583c81306dc6",
+      "sha256": "d11ebddf0cf1372aa0abe1d4bc07838f7f78b945b4c7f7ddb9cb24fc24d9e87f",
+      "bytes": 8038,
+      "source_commit": "c1359992f70533c0f2a47d30742f9b14295da882"
+    },
+    {
+      "original_path": "examples/split_learning/llm_split_learning/split_learning_llm_model_attack.py",
+      "archive_path": "archives/retired/older-split-llm-recipes/original/examples/split_learning/llm_split_learning/split_learning_llm_model_attack.py",
+      "disposition": "copied-context",
+      "git_mode": "100644",
+      "git_blob": "9036722e6eb5f1ea314864ff860c2508a4430702",
+      "sha256": "b1629761fd9ff902c7595e74fe76d2428498c5de542a1a7b7ca9f1855545f4ef",
+      "bytes": 3554,
+      "source_commit": "c1359992f70533c0f2a47d30742f9b14295da882"
+    },
+    {
+      "original_path": "examples/split_learning/llm_split_learning/split_learning_lora_algorithm.py",
+      "archive_path": "archives/retired/older-split-llm-recipes/original/examples/split_learning/llm_split_learning/split_learning_lora_algorithm.py",
+      "disposition": "copied-context",
+      "git_mode": "100644",
+      "git_blob": "61c77d2715e459f99fdbc0284c98058b8640bdca",
+      "sha256": "ee0995e90db77f19a1010da880281789a99b71abf87f548ecae8b381d7f2bc08",
+      "bytes": 1370,
+      "source_commit": "c1359992f70533c0f2a47d30742f9b14295da882"
+    },
+    {
+      "original_path": "examples/split_learning/llm_split_learning/split_learning_main.py",
+      "archive_path": "archives/retired/older-split-llm-recipes/original/examples/split_learning/llm_split_learning/split_learning_main.py",
+      "disposition": "copied-context",
+      "git_mode": "100644",
+      "git_blob": "51f87184330bb00f002bb2d6ca0c20e1e9fde50e",
+      "sha256": "26c0c673cfcf432e25e34a04f46801a362612608265052e5725ce1de2a59e974",
+      "bytes": 841,
+      "source_commit": "c1359992f70533c0f2a47d30742f9b14295da882"
+    },
+    {
+      "original_path": "examples/split_learning/llm_split_learning/split_learning_main_attack.py",
+      "archive_path": "archives/retired/older-split-llm-recipes/original/examples/split_learning/llm_split_learning/split_learning_main_attack.py",
+      "disposition": "copied-context",
+      "git_mode": "100644",
+      "git_blob": "a1f3559086a47c1d7b8c2b0a2297ad820abd0b0b",
+      "sha256": "2dc3584cf09d61579556953451bd060fcac76059a5214fa235378b8fa05f5005",
+      "bytes": 1333,
+      "source_commit": "c1359992f70533c0f2a47d30742f9b14295da882"
+    },
+    {
+      "original_path": "examples/split_learning/llm_split_learning/split_learning_server_attack.py",
+      "archive_path": "archives/retired/older-split-llm-recipes/original/examples/split_learning/llm_split_learning/split_learning_server_attack.py",
+      "disposition": "copied-context",
+      "git_mode": "100644",
+      "git_blob": "7aa9b068ecdb639c6c8686a58f7f9da3d6aecb1f",
+      "sha256": "e7600e6bc895a3c3ab54ede0eeab8403861f4ed2a01999491f202c8855636349",
+      "bytes": 4721,
+      "source_commit": "c1359992f70533c0f2a47d30742f9b14295da882"
+    },
+    {
+      "original_path": "examples/split_learning/llm_split_learning/split_learning_trainer.py",
+      "archive_path": "archives/retired/older-split-llm-recipes/original/examples/split_learning/llm_split_learning/split_learning_trainer.py",
+      "disposition": "copied-context",
+      "git_mode": "100644",
+      "git_blob": "df3f7c2e17e7468ee3e16085f91200dbffe28dac",
+      "sha256": "189e94080b8af3d2bd6d18773b3739803b7c7dc505cc0fe229fa38069bd68767",
+      "bytes": 12237,
+      "source_commit": "c1359992f70533c0f2a47d30742f9b14295da882"
+    },
+    {
+      "original_path": "examples/split_learning/llm_split_learning/split_learning_trainer_attack.py",
+      "archive_path": "archives/retired/older-split-llm-recipes/original/examples/split_learning/llm_split_learning/split_learning_trainer_attack.py",
+      "disposition": "copied-context",
+      "git_mode": "100644",
+      "git_blob": "ea39a8d4ce83f419f861c48924d9965478b073cd",
+      "sha256": "8fb416c6bfbdc7989004bb25ad930fde25c6ac27c28e864ec7bd24fce4f5fd2f",
+      "bytes": 7332,
+      "source_commit": "c1359992f70533c0f2a47d30742f9b14295da882"
+    },
+    {
+      "original_path": "examples/split_learning/llm_split_learning/pyproject.toml",
+      "archive_path": "archives/retired/older-split-llm-recipes/original/examples/split_learning/llm_split_learning/pyproject.toml",
+      "disposition": "copied-context",
+      "git_mode": "100644",
+      "git_blob": "281007d8bb0e604e2236683f53d10639d5486047",
+      "sha256": "19a50a6625a5daa195bbdde1ac4c64a7c39bfe81630f6389add8a1b1769c436e",
+      "bytes": 290,
+      "source_commit": "c1359992f70533c0f2a47d30742f9b14295da882"
+    },
+    {
+      "original_path": "LICENSE",
+      "archive_path": "archives/retired/older-split-llm-recipes/original/LICENSE",
+      "disposition": "copied-context",
+      "git_mode": "100644",
+      "git_blob": "261eeb9e9f8b2b4b0d119366dda99c6fd7d35c64",
+      "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+      "bytes": 11357,
+      "source_commit": "c1359992f70533c0f2a47d30742f9b14295da882"
+    },
+    {
+      "original_path": "pyproject.toml",
+      "archive_path": "archives/retired/older-split-llm-recipes/original/pyproject.toml",
+      "disposition": "copied-context",
+      "git_mode": "100644",
+      "git_blob": "42601adc31e213a0ab008361ef53223826fcd770",
+      "sha256": "4c68adebeb88bba969a5d5c08a874644b1d40ccff241761dd7f2bd201b6ba3d3",
+      "bytes": 4189,
+      "source_commit": "c1359992f70533c0f2a47d30742f9b14295da882"
+    },
+    {
+      "original_path": "uv.lock",
+      "archive_path": "archives/retired/older-split-llm-recipes/original/uv.lock",
+      "disposition": "copied-context",
+      "git_mode": "100644",
+      "git_blob": "419ce6bf04e2ca46520dcf1e05a36ac134cdc63c",
+      "sha256": "66a4e4442d7b1f26d220b44ca73c44ff4f1151a86857bb3f93a594819fd08126",
+      "bytes": 755641,
+      "source_commit": "c1359992f70533c0f2a47d30742f9b14295da882"
+    },
+    {
+      "original_path": "tests/examples_phase4/cases.json",
+      "archive_path": "archives/retired/older-split-llm-recipes/original/tests/examples_phase4/cases.json",
+      "disposition": "copied-context",
+      "git_mode": "100644",
+      "git_blob": "e232ca35c0f024a6aa79b6c0362d412fa8b331f3",
+      "sha256": "7d18beab505f3f23cb6b14785c35b4d7a3b5b425b9dd541769e43bcd7b80167a",
+      "bytes": 240990,
+      "source_commit": "c1359992f70533c0f2a47d30742f9b14295da882"
+    }
+  ],
+  "inventory_sha256": "f33344ed3fa4884099f994b72f2b6a5c54e01bdc9fe3efd5312b9788b99a6654",
+  "evidence": [
+    {
+      "archive_path": "archives/retired/older-split-llm-recipes/evidence/plato-next-retirements-plan.json",
+      "sha256": "a49502dca7146305f37c94a404ff7735c7507d79d3968b5a813f09e304442716",
+      "bytes": 50862
+    },
+    {
+      "archive_path": "archives/retired/older-split-llm-recipes/evidence/plato-next-retirements-plan-review.json",
+      "sha256": "a93502a267b86617ff3bde0d30462179c219f0bbc279354d0c049dfddcd0ecb8",
+      "bytes": 2498
+    }
+  ]
+}

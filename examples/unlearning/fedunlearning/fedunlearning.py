@@ -2,7 +2,8 @@
 Federated unlearning allows clients to proactively erase their data from a trained model. The model
 will be retrained from scratch during the unlearning process.
 
-If the AdaHessian optimizer is used, it will reflect what the following paper proposed:
+This generic retraining workflow is related to the following paper. The historical
+AdaHessian variant is preserved in archives/retired/adahessian/README.md:
 
 Liu et al., "The Right to be Forgotten in Federated Learning: An Efficient Realization with Rapid
 Retraining," in Proc. INFOCOM, 2022.

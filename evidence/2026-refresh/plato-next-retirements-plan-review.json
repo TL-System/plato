@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "decision": "accepted",
+  "scope": "Independent plan review only; no implementation acceptance or whole-codebase pass.",
+  "reviewed_plan": "/tmp/plato-next-retirements-plan.json",
+  "reviewed_plan_sha256": "a49502dca7146305f37c94a404ff7735c7507d79d3968b5a813f09e304442716",
+  "source_binding": {
+    "base_path": "/tmp/plato-refresh-worktrees/fei-retirement",
+    "base_commit": "c1359992f70533c0f2a47d30742f9b14295da882",
+    "base_tree": "9e75b3b2f306677fabc6f9214658bfeacd152dc5",
+    "original_integration_commit": "e81248dae1844fb5bc66a8d880c9a17b485606ac",
+    "base_dirty": "",
+    "dependency": "FEI independent implementation review accepted separately at /tmp/plato-fei-retirement-implementation-review.json; preserve its evidence."
+  },
+  "findings": [],
+  "evidence": [
+    "All 60 source inventory entries independently matched immutable base git show bytes/SHA256/length and git ls-tree mode/blob.",
+    "All eleven proposed replacement TOML hashes independently reproduced from the narrowly stated text changes.",
+    "Active-reference scan found ten torch_hub configs (six core and four retained model-search) plus expected factory spies; planned migration covers them, while outdated FjORD remains historical.",
+    "AdaHessian is the sole registered torch_optimizer consumer; plan retains generic unlearning/Knot and preserves Adam recipe options except AdaHessian-only create_graph/hessian_power.",
+    "Recipe-only BERT/Llama2/OPT scope preserves generic HF and split code/workspaces, ordinary OPT LoRA and retained GPT2 configurations.",
+    "Tiny offline random BERT probe source and result support only default is_decoder=False future-token influence; plan accurately bounds this rationale.",
+    "Ledger starts at eleven tasks/393 paths; three config row removals and two count-preserving replacements are consistent with proposed 11/390/57/131 and bounded source-hash/revision updates."
+  ],
+  "implementation_requirements": [
+    "Complete planned independent archive identity checks, ledger delta assertion and targeted diagnostics/migration behavior checks before implementation acceptance.",
+    "Preserve historical archive/authority evidence and review FEI separately; this acceptance does not substitute for implementation qualification.",
+    "Actual torchvision CPU behavior and retained model-search profile must verify installed factory compatibility; preserved default heads are intentional, not a training improvement claim."
+  ]
+}

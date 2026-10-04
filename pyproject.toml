@@ -27,7 +27,6 @@ dependencies = [
     "tenseal>=0.3.18",
     "timm>=1.0.30",
     "torch>=2.14.1",
-    "torch-optimizer>=0.3.0",
     "torchvision>=0.29.1",
     "transformers>=5.18.0",
     "zstd>=1.5.7.2",

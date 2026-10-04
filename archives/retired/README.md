@@ -22,6 +22,12 @@ wording and paths.
 | [LeRobot / SmolVLA](lerobot/README.md) | Original robotics integration and runbook; no maintained robotics replacement. |
 | [FEI](fei/README.md) | Original reinforcement-learning experiment and both configs; unresolved research semantics and an unaccepted repair are documented. |
 
+| [AdaHessian unlearning variant](adahessian/README.md) | The AdaHessian optimizer registration, dependency and its sole unlearning recipe are retired. Generic federated unlearning and Knot remain active. The replacement Adam recipe is ordinary retraining; it does not reproduce the retired AdaHessian variant of Liu et al., INFOCOM 2022. |
+| [Legacy modality-mask samplers](modality-samplers/README.md) | These samplers return modality names, whereas maintained training loaders consume dataset indices. No maintained datasource or example uses their modality API. Ordinary data partition samplers remain active. |
+| [PyTorch Hub model adapter](torch-hub/README.md) | The unpinned network-backed pytorch/vision adapter is retired. The maintained torchvision factory uses torchvision.models.get_model from the installed dependency. Model architectures and constructor defaults remain available. |
+| [BERT Shakespeare recipe](bert-shakespeare/README.md) | Only the bert-base-uncased Shakespeare recipe is retired. Default non-decoder BERT allows future-token influence on earlier logits. The preserved offline random tiny-BERT diagnostic does not establish failure of a complete pretrained experiment. Generic Hugging Face support remains active. |
+| [Older Llama2 and OPT split recipes](older-split-llm-recipes/README.md) | The Llama2-7B and OPT350m split configurations are historical recipes removed by the approved consolidation. Shared split-learning and attack code, all three GPT2 recipes, and ordinary OPT federated LoRA remain active. This does not assert that the model families or split learning are intrinsically obsolete. |
+
 Each manifest distinguishes moved source from copied context and records its
 own pre-retirement commit. Upstream tarballs are inert snapshots. Vendored code
 without a recorded upstream revision is labeled unknown; supplemental license

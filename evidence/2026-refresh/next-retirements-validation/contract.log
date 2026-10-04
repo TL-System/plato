@@ -1,0 +1,47 @@
+W1004 00:00:43.818000 53630 .venv/lib/python3.13/site-packages/torch/distributed/elastic/multiprocessing/redirects.py:35] NOTE: Redirects are currently not supported in MacOs.
+........................................................................ [ 72%]
+............................                                             [100%]
+=============================== warnings summary ===============================
+.venv/lib/python3.13/site-packages/_pytest/pathlib.py:95
+  /private/tmp/plato-refresh-worktrees/additional-retirements/.venv/lib/python3.13/site-packages/_pytest/pathlib.py:95: PytestWarning: (rm_rf) error removing /private/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/pytest-of-bli/garbage-7c4ae24f-3cca-44dc-af57-e9fcead55146/test_real_readonly_local_sourc0/persistent-model
+  <class 'OSError'>: [Errno 66] Directory not empty: '/private/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/pytest-of-bli/garbage-7c4ae24f-3cca-44dc-af57-e9fcead55146/test_real_readonly_local_sourc0/persistent-model'
+    warnings.warn(
+
+.venv/lib/python3.13/site-packages/_pytest/pathlib.py:95
+  /private/tmp/plato-refresh-worktrees/additional-retirements/.venv/lib/python3.13/site-packages/_pytest/pathlib.py:95: PytestWarning: (rm_rf) error removing /private/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/pytest-of-bli/garbage-7c4ae24f-3cca-44dc-af57-e9fcead55146/test_real_readonly_local_sourc0
+  <class 'OSError'>: [Errno 66] Directory not empty: '/private/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/pytest-of-bli/garbage-7c4ae24f-3cca-44dc-af57-e9fcead55146/test_real_readonly_local_sourc0'
+    warnings.warn(
+
+.venv/lib/python3.13/site-packages/_pytest/pathlib.py:95
+  /private/tmp/plato-refresh-worktrees/additional-retirements/.venv/lib/python3.13/site-packages/_pytest/pathlib.py:95: PytestWarning: (rm_rf) error removing /private/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/pytest-of-bli/garbage-7c4ae24f-3cca-44dc-af57-e9fcead55146/test_real_readonly_local_sourc1/persistent-model
+  <class 'OSError'>: [Errno 66] Directory not empty: '/private/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/pytest-of-bli/garbage-7c4ae24f-3cca-44dc-af57-e9fcead55146/test_real_readonly_local_sourc1/persistent-model'
+    warnings.warn(
+
+.venv/lib/python3.13/site-packages/_pytest/pathlib.py:95
+  /private/tmp/plato-refresh-worktrees/additional-retirements/.venv/lib/python3.13/site-packages/_pytest/pathlib.py:95: PytestWarning: (rm_rf) error removing /private/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/pytest-of-bli/garbage-7c4ae24f-3cca-44dc-af57-e9fcead55146/test_real_readonly_local_sourc1
+  <class 'OSError'>: [Errno 66] Directory not empty: '/private/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/pytest-of-bli/garbage-7c4ae24f-3cca-44dc-af57-e9fcead55146/test_real_readonly_local_sourc1'
+    warnings.warn(
+
+.venv/lib/python3.13/site-packages/_pytest/pathlib.py:95
+  /private/tmp/plato-refresh-worktrees/additional-retirements/.venv/lib/python3.13/site-packages/_pytest/pathlib.py:95: PytestWarning: (rm_rf) error removing /private/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/pytest-of-bli/garbage-7c4ae24f-3cca-44dc-af57-e9fcead55146
+  <class 'OSError'>: [Errno 66] Directory not empty: '/private/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/pytest-of-bli/garbage-7c4ae24f-3cca-44dc-af57-e9fcead55146'
+    warnings.warn(
+
+.venv/lib/python3.13/site-packages/_pytest/pathlib.py:95
+  /private/tmp/plato-refresh-worktrees/additional-retirements/.venv/lib/python3.13/site-packages/_pytest/pathlib.py:95: PytestWarning: (rm_rf) error removing /private/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/pytest-of-bli/garbage-6b362752-7a13-4a23-b8a7-d4341c99f60b/test_real_readonly_local_sourc0/persistent-model
+  <class 'OSError'>: [Errno 66] Directory not empty: '/private/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/pytest-of-bli/garbage-6b362752-7a13-4a23-b8a7-d4341c99f60b/test_real_readonly_local_sourc0/persistent-model'
+    warnings.warn(
+
+.venv/lib/python3.13/site-packages/_pytest/pathlib.py:95
+  /private/tmp/plato-refresh-worktrees/additional-retirements/.venv/lib/python3.13/site-packages/_pytest/pathlib.py:95: PytestWarning: (rm_rf) error removing /private/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/pytest-of-bli/garbage-6b362752-7a13-4a23-b8a7-d4341c99f60b/test_real_readonly_local_sourc0
+  <class 'OSError'>: [Errno 66] Directory not empty: '/private/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/pytest-of-bli/garbage-6b362752-7a13-4a23-b8a7-d4341c99f60b/test_real_readonly_local_sourc0'
+    warnings.warn(
+
+.venv/lib/python3.13/site-packages/_pytest/pathlib.py:95
+  /private/tmp/plato-refresh-worktrees/additional-retirements/.venv/lib/python3.13/site-packages/_pytest/pathlib.py:95: PytestWarning: (rm_rf) error removing /private/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/pytest-of-bli/garbage-6b362752-7a13-4a23-b8a7-d4341c99f60b
+  <class 'OSError'>: [Errno 66] Directory not empty: '/private/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/pytest-of-bli/garbage-6b362752-7a13-4a23-b8a7-d4341c99f60b'
+    warnings.warn(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+test profile: core scope (native excluded); Lighteval excluded
+100 passed, 8 warnings in 99.36s (0:01:39)

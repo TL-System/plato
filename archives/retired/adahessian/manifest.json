@@ -1,0 +1,154 @@
+{
+  "schema_version": 1,
+  "backend": "adahessian",
+  "retired_at": "2026-10-04",
+  "pre_retirement_plato_commit": "c1359992f70533c0f2a47d30742f9b14295da882",
+  "pre_retirement_plato_tree": "9e75b3b2f306677fabc6f9214658bfeacd152dc5",
+  "plan_sha256": "a49502dca7146305f37c94a404ff7735c7507d79d3968b5a813f09e304442716",
+  "plan_review_sha256": "a93502a267b86617ff3bde0d30462179c219f0bbc279354d0c049dfddcd0ecb8",
+  "files": [
+    {
+      "original_path": "examples/unlearning/fedunlearning/fedunlearning_adahessian_MNIST_lenet5.toml",
+      "archive_path": "archives/retired/adahessian/original/examples/unlearning/fedunlearning/fedunlearning_adahessian_MNIST_lenet5.toml",
+      "disposition": "moved",
+      "git_mode": "100644",
+      "git_blob": "833ea0fa9806320cc8da533f3bf3515db39361fb",
+      "sha256": "2b60e6f67866c2836417893ab0653543a0af3fa201d5d4a96e80e7592a0a0944",
+      "bytes": 1665,
+      "source_commit": "c1359992f70533c0f2a47d30742f9b14295da882"
+    },
+    {
+      "original_path": "plato/trainers/optimizers.py",
+      "archive_path": "archives/retired/adahessian/original/plato/trainers/optimizers.py",
+      "disposition": "copied-context",
+      "git_mode": "100644",
+      "git_blob": "2b16546c5439a52487a5ca476c91dc197f84aff4",
+      "sha256": "da613c5d2975a7cf124619233645ba8b02e6ad32218f08dd508b9b410da06e34",
+      "bytes": 2080,
+      "source_commit": "c1359992f70533c0f2a47d30742f9b14295da882"
+    },
+    {
+      "original_path": "examples/unlearning/fedunlearning/fedunlearning.py",
+      "archive_path": "archives/retired/adahessian/original/examples/unlearning/fedunlearning/fedunlearning.py",
+      "disposition": "copied-context",
+      "git_mode": "100644",
+      "git_blob": "19d158af6aa89862f941c9250c6ebf4609b2e956",
+      "sha256": "8010b92fa99a7251859870f0e722283c62ce878f5bc7bb4237d60bead0119fa4",
+      "bytes": 738,
+      "source_commit": "c1359992f70533c0f2a47d30742f9b14295da882"
+    },
+    {
+      "original_path": "examples/unlearning/fedunlearning/fedunlearning_client.py",
+      "archive_path": "archives/retired/adahessian/original/examples/unlearning/fedunlearning/fedunlearning_client.py",
+      "disposition": "copied-context",
+      "git_mode": "100644",
+      "git_blob": "bd0b61e79d2b04f39a882f249846b930ceb05329",
+      "sha256": "202fc99ef59a458fce1387e95b4c42ef95ee7454b6f4ede1ce872b79714d14bb",
+      "bytes": 3040,
+      "source_commit": "c1359992f70533c0f2a47d30742f9b14295da882"
+    },
+    {
+      "original_path": "examples/unlearning/fedunlearning/fedunlearning_server.py",
+      "archive_path": "archives/retired/adahessian/original/examples/unlearning/fedunlearning/fedunlearning_server.py",
+      "disposition": "copied-context",
+      "git_mode": "100644",
+      "git_blob": "0c2f2d83fbde61d2e5ae8f5e37ef7497c4c4504a",
+      "sha256": "0a5e4496a555cbddfe4f87c763e1ca74ec792de4cac958094d9fd15458518aaf",
+      "bytes": 7528,
+      "source_commit": "c1359992f70533c0f2a47d30742f9b14295da882"
+    },
+    {
+      "original_path": "examples/unlearning/fedunlearning/unlearning_iid.py",
+      "archive_path": "archives/retired/adahessian/original/examples/unlearning/fedunlearning/unlearning_iid.py",
+      "disposition": "copied-context",
+      "git_mode": "100644",
+      "git_blob": "f886253db429f2d73908afa48f7d3eac43734368",
+      "sha256": "ec241fe7e55dec86aafada28126008d57f2eb2dcd3c8e784bbf1fb9b8e175a32",
+      "bytes": 2622,
+      "source_commit": "c1359992f70533c0f2a47d30742f9b14295da882"
+    },
+    {
+      "original_path": "examples/unlearning/knot/fedunlearning_server.py",
+      "archive_path": "archives/retired/adahessian/original/examples/unlearning/knot/fedunlearning_server.py",
+      "disposition": "copied-context",
+      "git_mode": "100644",
+      "git_blob": "cdb45f3df66a70c287791e1ce4613c078dda67ab",
+      "sha256": "1d3ca2c12e974f40be3bcdc349fe797477fcce99d8065ff22682e495dad2c478",
+      "bytes": 6570,
+      "source_commit": "c1359992f70533c0f2a47d30742f9b14295da882"
+    },
+    {
+      "original_path": "examples/unlearning/knot/unlearning_iid.py",
+      "archive_path": "archives/retired/adahessian/original/examples/unlearning/knot/unlearning_iid.py",
+      "disposition": "copied-context",
+      "git_mode": "100644",
+      "git_blob": "4e267fadfbf5dabc9267ce19adb8a04c46e0a309",
+      "sha256": "f413b67450f71174787edab71a7273bd1c53ab6956d82d646f4c0154ad21f18d",
+      "bytes": 2203,
+      "source_commit": "c1359992f70533c0f2a47d30742f9b14295da882"
+    },
+    {
+      "original_path": "docs/docs/examples/algorithms/4. Federated Unlearning.md",
+      "archive_path": "archives/retired/adahessian/original/docs/docs/examples/algorithms/4. Federated Unlearning.md",
+      "disposition": "copied-context",
+      "git_mode": "100644",
+      "git_blob": "2a7de6c89f016858879b7302fbd86d63111e501b",
+      "sha256": "b52380f387fb86a0cc84e4e4fa111a4ae022544cd39f6f160f227fd73002f2ae",
+      "bytes": 4818,
+      "source_commit": "c1359992f70533c0f2a47d30742f9b14295da882"
+    },
+    {
+      "original_path": "LICENSE",
+      "archive_path": "archives/retired/adahessian/original/LICENSE",
+      "disposition": "copied-context",
+      "git_mode": "100644",
+      "git_blob": "261eeb9e9f8b2b4b0d119366dda99c6fd7d35c64",
+      "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+      "bytes": 11357,
+      "source_commit": "c1359992f70533c0f2a47d30742f9b14295da882"
+    },
+    {
+      "original_path": "pyproject.toml",
+      "archive_path": "archives/retired/adahessian/original/pyproject.toml",
+      "disposition": "copied-context",
+      "git_mode": "100644",
+      "git_blob": "42601adc31e213a0ab008361ef53223826fcd770",
+      "sha256": "4c68adebeb88bba969a5d5c08a874644b1d40ccff241761dd7f2bd201b6ba3d3",
+      "bytes": 4189,
+      "source_commit": "c1359992f70533c0f2a47d30742f9b14295da882"
+    },
+    {
+      "original_path": "uv.lock",
+      "archive_path": "archives/retired/adahessian/original/uv.lock",
+      "disposition": "copied-context",
+      "git_mode": "100644",
+      "git_blob": "419ce6bf04e2ca46520dcf1e05a36ac134cdc63c",
+      "sha256": "66a4e4442d7b1f26d220b44ca73c44ff4f1151a86857bb3f93a594819fd08126",
+      "bytes": 755641,
+      "source_commit": "c1359992f70533c0f2a47d30742f9b14295da882"
+    },
+    {
+      "original_path": "tests/examples_phase4/cases.json",
+      "archive_path": "archives/retired/adahessian/original/tests/examples_phase4/cases.json",
+      "disposition": "copied-context",
+      "git_mode": "100644",
+      "git_blob": "e232ca35c0f024a6aa79b6c0362d412fa8b331f3",
+      "sha256": "7d18beab505f3f23cb6b14785c35b4d7a3b5b425b9dd541769e43bcd7b80167a",
+      "bytes": 240990,
+      "source_commit": "c1359992f70533c0f2a47d30742f9b14295da882"
+    }
+  ],
+  "inventory_sha256": "881c73121e4954de495accb96dd8b6c24ab0516217c2e9e9d991e258f3008af6",
+  "evidence": [
+    {
+      "archive_path": "archives/retired/adahessian/evidence/plato-next-retirements-plan.json",
+      "sha256": "a49502dca7146305f37c94a404ff7735c7507d79d3968b5a813f09e304442716",
+      "bytes": 50862
+    },
+    {
+      "archive_path": "archives/retired/adahessian/evidence/plato-next-retirements-plan-review.json",
+      "sha256": "a93502a267b86617ff3bde0d30462179c219f0bbc279354d0c049dfddcd0ecb8",
+      "bytes": 2498
+    }
+  ]
+}
