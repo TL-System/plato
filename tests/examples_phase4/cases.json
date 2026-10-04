@@ -7,7 +7,7 @@
     "harness_design_sha256": "0b01acff4e03d725f239af1fcc8d6f778fb1817ce69cb313f947391fcd14d502",
     "harness_review_sha256": "e97e3149a52639c9d13c7507d2e946eec50e1b0c775675255579ad25bc8b62f0"
   },
-  "path_map_sha256": "b05b74ba9eddcd201f82d33edb2737e5969d613486deadf496cf91db2df224a4",
+  "path_map_sha256": "404a1b8a1ef79bcf21c027d263ee93d81870df1b2dba4a80b71ee8c816988e91",
   "config_bindings_sha256": "eb9c21afc4a9b9b8d9047e8c8e4eeac7802bbe0104a8b56faf2377d15ddfae39",
   "source_inventory": [
     {
@@ -2478,7 +2478,7 @@
     },
     {
       "path": "examples/server_aggregation/feddf/feddf_algorithm.py",
-      "sha256": "889c814c5dc3a11429544083a06d75aa71aa04955fcbc6be725bf74214a8b6b5",
+      "sha256": "3dfb4994d350b21abc9670aee6bbe442bc99506dedc42446509a8efd38a2d7ca",
       "family": "feddf",
       "owner": "P4-aggregation",
       "consumer_owner": "P4-aggregation",
@@ -2496,7 +2496,7 @@
     },
     {
       "path": "examples/server_aggregation/feddf/feddf_server.py",
-      "sha256": "2cd59f81ff09e00d28ae875dd0ae9750ccb5fbe2ebfeb2b62f148ceb73282ed8",
+      "sha256": "eecfca152f45ddfa09537dc5d226a0912da92c06184b4f2fd9ef9afcfd373627",
       "family": "feddf",
       "owner": "P4-aggregation",
       "consumer_owner": "P4-aggregation",
@@ -2514,7 +2514,7 @@
     },
     {
       "path": "examples/server_aggregation/feddf/feddf_utils.py",
-      "sha256": "49b04feaf155549475f92bd626649f5306558ce65c0c8489f30d3ea54d5724c9",
+      "sha256": "67dc4870212318ef9ddbb841d88faff80a4ef7ed60b68df83377efe8ea27dfdb",
       "family": "feddf",
       "owner": "P4-aggregation",
       "consumer_owner": "P4-aggregation",
@@ -3459,7 +3459,7 @@
     },
     {
       "path": "examples/unlearning/knot/knot_server.py",
-      "sha256": "00bc13a25d203632c6752f127240eb178f7458f95f50f791ba3088bcbd84a758",
+      "sha256": "08d5497406074a8e4adcf45a7fff42b4bc5d473d14bd22566a7a1c0871b9d46a",
       "family": "knot",
       "owner": "P4-unlearning",
       "consumer_owner": "P4-unlearning",
@@ -3539,7 +3539,7 @@
         "moon"
       ],
       "authority_sha256": "07d90034e89b83283c9b592550ebe17a1ea3a28a9fa2fbc292cc328db4977e4b",
-      "inventory_revision": 1,
+      "inventory_revision": 2,
       "state": "draft",
       "cases": [],
       "owned_paths": [
@@ -5436,7 +5436,7 @@
         "knot"
       ],
       "authority_sha256": "07d90034e89b83283c9b592550ebe17a1ea3a28a9fa2fbc292cc328db4977e4b",
-      "inventory_revision": 2,
+      "inventory_revision": 3,
       "state": "draft",
       "cases": [],
       "owned_paths": [
@@ -5966,5 +5966,103 @@
       "bert-shakespeare": "30fcff33e48db04fd3ecac62e61ecea1589413d01d9df20a75e1d6c03245f4e8",
       "older-split-llm-recipes": "e074566d04f46ee5eccc3dd6bc80bde7066ebac96af6cc9207bbed13a26620a0"
     }
+  },
+  "typing_amendment": {
+    "prior_ledger_sha256": "b654540d190c58e69e0a7d223b3fd59ab39d3d0f18b38fa7cffbe599f8e8f458",
+    "source_commit": "dd1cedee6e317af860a5e0ae34ae471774b36743",
+    "review_sha256": "1b007075dd9b3c60e21a08f6708fe4d19d1bc30f038b43ae62d647595607585f",
+    "source_changes": [
+      {
+        "before": {
+          "path": "examples/server_aggregation/feddf/feddf_algorithm.py",
+          "sha256": "889c814c5dc3a11429544083a06d75aa71aa04955fcbc6be725bf74214a8b6b5",
+          "family": "feddf",
+          "owner": "P4-aggregation",
+          "consumer_owner": "P4-aggregation",
+          "role": "source/support",
+          "status": "internal-fix pending"
+        },
+        "after": {
+          "path": "examples/server_aggregation/feddf/feddf_algorithm.py",
+          "sha256": "3dfb4994d350b21abc9670aee6bbe442bc99506dedc42446509a8efd38a2d7ca",
+          "family": "feddf",
+          "owner": "P4-aggregation",
+          "consumer_owner": "P4-aggregation",
+          "role": "source/support",
+          "status": "internal-fix pending"
+        }
+      },
+      {
+        "before": {
+          "path": "examples/server_aggregation/feddf/feddf_server.py",
+          "sha256": "2cd59f81ff09e00d28ae875dd0ae9750ccb5fbe2ebfeb2b62f148ceb73282ed8",
+          "family": "feddf",
+          "owner": "P4-aggregation",
+          "consumer_owner": "P4-aggregation",
+          "role": "source/support",
+          "status": "internal-fix pending"
+        },
+        "after": {
+          "path": "examples/server_aggregation/feddf/feddf_server.py",
+          "sha256": "eecfca152f45ddfa09537dc5d226a0912da92c06184b4f2fd9ef9afcfd373627",
+          "family": "feddf",
+          "owner": "P4-aggregation",
+          "consumer_owner": "P4-aggregation",
+          "role": "source/support",
+          "status": "internal-fix pending"
+        }
+      },
+      {
+        "before": {
+          "path": "examples/server_aggregation/feddf/feddf_utils.py",
+          "sha256": "49b04feaf155549475f92bd626649f5306558ce65c0c8489f30d3ea54d5724c9",
+          "family": "feddf",
+          "owner": "P4-aggregation",
+          "consumer_owner": "P4-aggregation",
+          "role": "source/support",
+          "status": "internal-fix pending"
+        },
+        "after": {
+          "path": "examples/server_aggregation/feddf/feddf_utils.py",
+          "sha256": "67dc4870212318ef9ddbb841d88faff80a4ef7ed60b68df83377efe8ea27dfdb",
+          "family": "feddf",
+          "owner": "P4-aggregation",
+          "consumer_owner": "P4-aggregation",
+          "role": "source/support",
+          "status": "internal-fix pending"
+        }
+      },
+      {
+        "before": {
+          "path": "examples/unlearning/knot/knot_server.py",
+          "sha256": "00bc13a25d203632c6752f127240eb178f7458f95f50f791ba3088bcbd84a758",
+          "family": "knot",
+          "owner": "P4-unlearning",
+          "consumer_owner": "P4-unlearning",
+          "role": "source/support",
+          "status": "internal-fix pending"
+        },
+        "after": {
+          "path": "examples/unlearning/knot/knot_server.py",
+          "sha256": "08d5497406074a8e4adcf45a7fff42b4bc5d473d14bd22566a7a1c0871b9d46a",
+          "family": "knot",
+          "owner": "P4-unlearning",
+          "consumer_owner": "P4-unlearning",
+          "role": "source/support",
+          "status": "internal-fix pending"
+        }
+      }
+    ],
+    "inventory_revision_deltas": {
+      "P4-aggregation": {
+        "before": 1,
+        "after": 2
+      },
+      "P4-unlearning": {
+        "before": 2,
+        "after": 3
+      }
+    },
+    "scope": "Reviewed maintained typing/input-boundary corrections; ownership, configuration bindings and all draft qualification states unchanged."
   }
 }
