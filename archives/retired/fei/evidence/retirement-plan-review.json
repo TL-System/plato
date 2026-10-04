@@ -1,0 +1,180 @@
+{
+  "schema_version": 1,
+  "review_type": "fresh independent bounded retirement-plan review",
+  "reviewer": "/root/fei_retirement_plan_review; inherited Sol/high; no nested agents",
+  "recorded_at_utc": "2026-10-04T03:03:27.636226+00:00",
+  "artifact": {
+    "path": "/tmp/plato-fei-retirement-plan.json",
+    "sha256": "2d46ccccaa35c1753c44c1974d226405d49d04cdd3178812f816879320ed6667"
+  },
+  "source_binding": {
+    "original_commit": "3d4e08b26972e114d87ef39795e01f4dfa554b94",
+    "original_tree": "16602a4bd057c30ec2bf195b926d6f2d405774dd",
+    "integration_commit": "e81248dae1844fb5bc66a8d880c9a17b485606ac",
+    "integration_tree": "ff5fcc51936fdca4e324ffc9aadd878522832291",
+    "integration_path": "/private/tmp/plato-refresh-worktrees/phase4-integration",
+    "dirty": ""
+  },
+  "verdict": "APPROVE_PLAN",
+  "unresolved_findings": {
+    "critical": 0,
+    "high": 0,
+    "medium": 0,
+    "low": 0
+  },
+  "findings": [],
+  "authorization": "Parent states user explicitly authorized FEI retirement and autonomous retirement of clearly outdated future examples. This review accepts that supplied authority and reviews its concrete narrow plan; it does not independently reconstruct user conversation history.",
+  "independent_checks": {
+    "immutable_source_archive": "All six files match plan mode/blob/SHA256/bytes at original commit 3d4e08b26972e114d87ef39795e01f4dfa554b94 and byte-for-byte match current integration e81248dae1844fb5bc66a8d880c9a17b485606ac. All six original modes are 100644. Exact original checkout restoration and no inferred upstream revision fit existing archive policy.",
+    "license_environment": "Original Apache-2.0 LICENSE, pyproject.toml and uv.lock are identified separately from the integration-era pre-retirement ledger. Independently pinned copied-context rows below provide exact source commits, blobs, modes, hashes and byte counts. Preserved manifests do not assert current compatibility or successful execution.",
+    "ledger_counts": {
+      "prior": {
+        "tasks": 12,
+        "paths": 399,
+        "families": 58,
+        "config_bindings": 136
+      },
+      "proposed_active": {
+        "tasks": 11,
+        "paths": 393,
+        "families": 57,
+        "config_bindings": 134
+      },
+      "removed_owner": "P4-fei",
+      "removed_frozen_cases": 7,
+      "remaining_draft_owners": 11
+    },
+    "ledger_delta": "FEI owned_paths and both config_binding objects equal the exact plan removal lists. Removing only that owner and its six source inventory rows yields the stated active counts, and all other task objects/inventory entries remain unchanged. Four independently located authority artifacts match the ledger authority hashes; preserve them and their historical 12/399/58 audit meaning. Archive integration ledger byte-exact and bind amendment to its SHA256; recompute active inventory/binding digests only.",
+    "qualification_guard_probe": "Read actual _load_phase4_ledger AST and executed only an in-memory prospective twelve-to-eleven count/message edit. All eleven remaining draft owners reject as draft/empty; removed test_fei.py rejects for no owner; ten/twelve ownership rows reject; duplicated ownership rejects. A valid synthetic frozen case under one remaining real owner passes. No source files or repository worktrees changed. Existing explicit-module, exact-node, filters, serial execution, nonempty/frozen and duplicate guards remain outside the necessary count edit.",
+    "draft_contract": "Current draft inventory contract assumes twelve wholly draft owners despite present FEI frozen inventory. Its scoped eleven-owner update becomes true after FEI removal; exact archived-ledger delta and owner mutation tests in plan address retirement without accepting historical failed FEI cases.",
+    "reference_audit": "Case-insensitive FEI reference scan of active plato/examples/configs/docs/.github/pyproject.toml found no external references after excluding six FEI sources. Whole repository scan finds historical evidence references, which should remain historical. Generic RL library and its public gymnasium Box API/tests remain; retaining rl extra and shared code is correct for this narrow retirement.",
+    "archive_patterns": "Existing FedRolex archive manifest/README and archive index distinguish moved sources, copied shared context, original commits, exact hashes, unverified reconstruction commands and unknown upstream origins. Proposed FEI archive follows these conventions.",
+    "distribution_policy": "Current Hatch exclude archives/**, wheel packages=[plato], Ruff and ty archive exclusions, and pytest norecursedirs cover proposed destination. Actual post-change wheel/sdist content inspection and collection checks remain implementation validations, not claims made by this plan review.",
+    "research_evidence": "Review JSON and raw tarball hashes match plan. Read review conclusions: unaccepted repaired strict profile 6 passed/1 failed and independently probed research state mismatch. README may accurately attribute those findings while preserving original source, no accepted repair and no accuracy/benchmark claim. No fresh paper correctness or experiment claim made here.",
+    "third_party_artifact": "Raw artifact tar listing contains plato-phase4-fei-code-review-artifacts/feiwang-ieeenetwork22.pdf. Plan explicitly keeps raw artifacts external and records SHA256/non-distribution status rather than copying PDF/tarball into Git. Byte-exact review JSON is suitable archival evidence.",
+    "abandoned_work": "dc93e49fde8930587b2a1d5108e1ba14a6dc6c33 and 7a2da68e3cb1c485f63d3b489788d221cc1bc692 remain resolvable Git objects and are not ancestors of current integration. Preserve as unaccepted recoverable history; do not merge source or CI repairs.",
+    "ownership": "Narrow FEI archive, ledger amendment and contract changes are sufficient. Broad workflow simplification/type cleanup remains separate ownership and no dependency or config churn is needed."
+  },
+  "sourcehashes": {
+    "moved_files": [
+      {
+        "original_path": "examples/reinforcement_learning/fei/fei.py",
+        "archive_path": "archives/retired/fei/original/examples/reinforcement_learning/fei/fei.py",
+        "disposition": "moved",
+        "git_mode": "100644",
+        "git_blob": "539228a3210f30cd7b21d779b3fdef070d348252",
+        "sha256": "d624ac5d2ebaedc1c6c2e6262678314531376db16b81ed775d3014a0dc21f870",
+        "bytes": 456
+      },
+      {
+        "original_path": "examples/reinforcement_learning/fei/fei_CIFAR10_resnet18.toml",
+        "archive_path": "archives/retired/fei/original/examples/reinforcement_learning/fei/fei_CIFAR10_resnet18.toml",
+        "disposition": "moved",
+        "git_mode": "100644",
+        "git_blob": "4a005d46c97ae1bf925d440ba6d028348af91316",
+        "sha256": "2a03ce665614c0a2b2a667801d5600aa1ae2ad4974601b5c7b2211dcc744562c",
+        "bytes": 3185
+      },
+      {
+        "original_path": "examples/reinforcement_learning/fei/fei_FashionMNIST_lenet5.toml",
+        "archive_path": "archives/retired/fei/original/examples/reinforcement_learning/fei/fei_FashionMNIST_lenet5.toml",
+        "disposition": "moved",
+        "git_mode": "100644",
+        "git_blob": "1b536666ea801570835735f5c437e94d0e34e649",
+        "sha256": "6b7dfae3c2c4ac3bdee861adac0d183b950c119f20b5fb0635afcafbeafd2bb3",
+        "bytes": 3103
+      },
+      {
+        "original_path": "examples/reinforcement_learning/fei/fei_agent.py",
+        "archive_path": "archives/retired/fei/original/examples/reinforcement_learning/fei/fei_agent.py",
+        "disposition": "moved",
+        "git_mode": "100644",
+        "git_blob": "6b5ba75b58b33fa94a2707da964a7ca683ca48d4",
+        "sha256": "ee186f5858e3362576d35bad2a3f4c7bf48f7a08ba1daab7f64895194c77da34",
+        "bytes": 11089
+      },
+      {
+        "original_path": "examples/reinforcement_learning/fei/fei_client.py",
+        "archive_path": "archives/retired/fei/original/examples/reinforcement_learning/fei/fei_client.py",
+        "disposition": "moved",
+        "git_mode": "100644",
+        "git_blob": "603924c0991ac53c83327e40b42bf72b36145072",
+        "sha256": "2dd8fa26e9d505537c0fd660ff40f37fc84954c626e0efba84ac0490b22b5e71",
+        "bytes": 2890
+      },
+      {
+        "original_path": "examples/reinforcement_learning/fei/fei_server.py",
+        "archive_path": "archives/retired/fei/original/examples/reinforcement_learning/fei/fei_server.py",
+        "disposition": "moved",
+        "git_mode": "100644",
+        "git_blob": "38c13a579fe13e21da8ce49d27407cd0769c21b7",
+        "sha256": "8493f3859b862d28214e34a5c5c3edea26bc01febc9752e09c343f65caa19a74",
+        "bytes": 3642
+      }
+    ],
+    "copied_context": [
+      {
+        "original_path": "LICENSE",
+        "source_commit": "3d4e08b26972e114d87ef39795e01f4dfa554b94",
+        "git_mode": "100644",
+        "git_blob": "261eeb9e9f8b2b4b0d119366dda99c6fd7d35c64",
+        "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+        "bytes": 11357
+      },
+      {
+        "original_path": "pyproject.toml",
+        "source_commit": "3d4e08b26972e114d87ef39795e01f4dfa554b94",
+        "git_mode": "100644",
+        "git_blob": "ff69fd39a94c2889c78611d193559856ef4e1452",
+        "sha256": "fcc830f9fac66f2e2f28bef0d715bea3eb1300105a4239bb33cce8f62b71b398",
+        "bytes": 4102
+      },
+      {
+        "original_path": "uv.lock",
+        "source_commit": "3d4e08b26972e114d87ef39795e01f4dfa554b94",
+        "git_mode": "100644",
+        "git_blob": "419ce6bf04e2ca46520dcf1e05a36ac134cdc63c",
+        "sha256": "66a4e4442d7b1f26d220b44ca73c44ff4f1151a86857bb3f93a594819fd08126",
+        "bytes": 755641
+      },
+      {
+        "original_path": "tests/examples_phase4/cases.json",
+        "source_commit": "e81248dae1844fb5bc66a8d880c9a17b485606ac",
+        "git_mode": "100644",
+        "git_blob": "29d2d903bc64a7492a4f9f3a55df904aa1091552",
+        "sha256": "3e2aaca8daf3343ec4e7d31960185606f86992653b0772b0255adca47834a44d",
+        "bytes": 307132
+      }
+    ],
+    "reviewed_existing_sources": {
+      "tests/conftest.py": "765fd2c96a67118f78b0a6c7f7fe134f9a73dfc5ecce25e35e684686da2bfd81",
+      "tests/test_examples_phase4_contract.py": "8e57817c9191e7139949366b025c47a13f1e8145805fd04106c483acd864bddd",
+      "tests/examples_phase4/common.py": "4972ffc23cc0a552e78c48477e7e7921c4ecbfd8a429961d898b226602a4cfc0",
+      "archives/retired/fedrolex-vit/manifest.json": "4e31c8f9db7423fc7ad3f1eefbecbbca7a3125d4e3c70a590dff0ea3184e5fd8",
+      "archives/retired/fedrolex-vit/README.md": "e663bcc6d247767280c67996026c47c7ab7224440b5472c05ec4388c2f7c40c2",
+      "archives/retired/README.md": "6421b2c2a3622757071d21be63bdda2518bf5c4ae521f1bd8a7f6827a39b9bee",
+      "pyproject.toml": "4c68adebeb88bba969a5d5c08a874644b1d40ccff241761dd7f2bd201b6ba3d3",
+      "tests/utils/test_rl_payload_utilities.py": "c7542d050edcb30ea370241b13b4efb676988530677d16c192451bbcef415388"
+    },
+    "historical_authority_artifacts": {
+      "/tmp/plato-phase4-harness-design-review.json": "e97e3149a52639c9d13c7507d2e946eec50e1b0c775675255579ad25bc8b62f0",
+      "/tmp/plato-phase4-family-plan.json": "07d90034e89b83283c9b592550ebe17a1ea3a28a9fa2fbc292cc328db4977e4b",
+      "/tmp/plato-phase4-family-plan-review.json": "1fb78cdc19f530f9e17258d5e8481e54703f846b1aa8b7160112a9af18e477aa",
+      "/tmp/plato-phase4-harness-design.json": "0b01acff4e03d725f239af1fcc8d6f778fb1817ce69cb313f947391fcd14d502"
+    },
+    "review_json": "80094b3cec8272a8f44456ef2df4244579f9076990885e299b83b09d4e1f11d1",
+    "external_raw_artifacts": "3061941926be598c454532b62b909fbb5bc3ba17bc780004767514967d6db44e"
+  },
+  "implementation_acceptance_requirements": [
+    "Verify archive files byte/mode/Git-blob/SHA256 against independently pinned inventory; test byte and mode mutations fail and six originals absent.",
+    "Verify copied license/context per source commit and prior ledger identity; exact active ledger delta, recomputed digests, no FEI family in qualification.",
+    "Run focused pytest tests/test_fei_retirement.py tests/test_examples_phase4_contract.py and tests/utils/test_rl_payload_utilities.py in existing suitable environment; execute Phase4 collection/selector contract tests, no 65-minute whole-suite rerun.",
+    "Build local wheel and sdist using existing build tooling and inspect archive/source exclusions; inspect ordinary collection excluding archives and Phase4 workers.",
+    "Run focused Ruff import checks; independent fresh code review after implementation before root integration/publication."
+  ],
+  "limits": [
+    "Plan review only: no retirement implementation, source fixes, copied paper, dependency/workflow edits, publication or runtime qualification.",
+    "No full test suite, all-history audit, whole-family benchmark, model accuracy, socket deployment or future FEI acceptance claim.",
+    "Approval is for byte-exact reviewed plan SHA256 only. Completed implementation requires a different fresh independent code review before integration/publication."
+  ]
+}

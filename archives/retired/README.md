@@ -20,6 +20,7 @@ wording and paths.
 | [HeteroFL custom MobileNetV3](heterofl-mobilenetv3/README.md) | The custom `mobilenetv3.py` branch; shared runtime files and the ResNet config are copied only as historical context. |
 | [Nanochat](nanochat/README.md) | Plato integration and exact upstream snapshot; current text reference is Qwen3 LoRA. |
 | [LeRobot / SmolVLA](lerobot/README.md) | Original robotics integration and runbook; no maintained robotics replacement. |
+| [FEI](fei/README.md) | Original reinforcement-learning experiment and both configs; unresolved research semantics and an unaccepted repair are documented. |
 
 Each manifest distinguishes moved source from copied context and records its
 own pre-retirement commit. Upstream tarballs are inert snapshots. Vendored code

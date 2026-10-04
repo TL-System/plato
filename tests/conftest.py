@@ -289,8 +289,8 @@ def _load_phase4_ledger(path: Path, module: str) -> tuple[dict, Counter]:
         if ledger.get("schema_version") != 1:
             raise ValueError("expected schema_version 1")
         rows = ledger["tasks"]
-        if not isinstance(rows, list) or len(rows) != 12:
-            raise ValueError("expected exactly twelve ownership rows")
+        if not isinstance(rows, list) or len(rows) != 11:
+            raise ValueError("expected exactly eleven ownership rows")
         owners, modules, workers, families = set(), set(), set(), set()
         selected = None
         for row in rows:

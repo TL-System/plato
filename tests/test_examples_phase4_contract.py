@@ -135,15 +135,15 @@ def test_inert_import_and_standard_library_helpers():
 
 
 def test_draft_ownership_matches_frozen_authority(policy):
-    assert len(LEDGER["tasks"]) == 12
+    assert len(LEDGER["tasks"]) == 11
     assert all(r["state"] == "draft" and r["cases"] == [] for r in LEDGER["tasks"])
     inventory = LEDGER["source_inventory"]
-    assert len(inventory) == len({r["path"] for r in inventory}) == 399
+    assert len(inventory) == len({r["path"] for r in inventory}) == 393
     assert common._digest(inventory) == LEDGER["path_map_sha256"]
     paths = [p for row in LEDGER["tasks"] for p in row["owned_paths"]]
     assert len(paths) == len(set(paths))
     bindings = [b for row in LEDGER["tasks"] for b in row["config_bindings"]]
-    assert len(bindings) == len({b["config"] for b in bindings}) == 136
+    assert len(bindings) == len({b["config"] for b in bindings}) == 134
     assert all(r["families"] for r in LEDGER["tasks"])
     for row in LEDGER["tasks"]:
         with pytest.raises(pytest.UsageError, match="draft or empty"):
