@@ -17,7 +17,6 @@ jobs:
       run:
         shell: zsh -lc ". {0}"
     env:
-      PLATO_DOCS_ENVIRONMENT: ${{ runner.temp }}/plato-docs/.venv-docs
       PLATO_DOCS_ARTIFACT_DIR: ${{ github.workspace }}/ci-artifacts/docs
       CUDA_VISIBLE_DEVICES: ""
       OMP_NUM_THREADS: "1"
@@ -68,6 +67,8 @@ jobs:
           PY
 
       - name: Build strict docs and verify locked requirements parity
+        env:
+          PLATO_DOCS_ENVIRONMENT: ${{ runner.temp }}/plato-docs/.venv-docs
         run: ./docs/build.sh > ci-artifacts/docs/build.log 2>&1
 
       - name: Build and validate distributions
