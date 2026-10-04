@@ -1,0 +1,80 @@
+{
+  "schema_version": 1,
+  "status": "CORRECTION_REQUIRED",
+  "reviewer": "/root/remaining_docs_plan_review — fresh independent Sol plan review",
+  "subject": {
+    "path": "/tmp/plato-remaining-docs-plan.json",
+    "sha256": "c64d803ae6447e108bc4ac8648ecbce6c4aa25936b9ecbd708b8eddeda46c4ca",
+    "source_commit": "484853ed2eef50899b062dc7d273ff85e814e4bc",
+    "source_tree": "f55c1b950bf745c340539cfea1ee2d8a0ad8b4dd",
+    "phase4_plan_sha256": "07d90034e89b83283c9b592550ebe17a1ea3a28a9fa2fbc292cc328db4977e4b",
+    "bindings_verified": true
+  },
+  "decision": "The three-package scope and validation approach are sound, but correct the canonical README owner and explicitly reconcile the stale timeout recommendation before assigning implementation. A materially revised plan requires a fresh different independent review on its new exact hash.",
+  "findings": [
+    {
+      "id": "R01",
+      "severity": "medium",
+      "blocking": true,
+      "location": "/tmp/plato-remaining-docs-plan.json:208-209,290",
+      "problem": "DOC10 and the family handoff name P4-gradient-leakage, which is not the owner in the exact Phase 4 plan being cited.",
+      "evidence": "/tmp/plato-phase4-family-plan.json at verified SHA 07d90034e89b83283c9b592550ebe17a1ea3a28a9fa2fbc292cc328db4977e4b assigns family gradient-leakage, examples/gradient_leakage_attacks/README.md, and task/evidence ownership to P4-leakage. Its tasks[].id is P4-leakage.",
+      "required_correction": "Change every DOC10/family handoff reference to the existing canonical P4-leakage owner. Retain that owner's README path and source-bound runtime acceptance; do not create a separate owner or duplicate README task."
+    },
+    {
+      "id": "R02",
+      "severity": "medium",
+      "blocking": true,
+      "location": "/tmp/plato-remaining-docs-plan.json:110; frozen docs/docs/misc.md:15-17",
+      "problem": "DOC03 plans to correct the default from 360 to 3600 but does not address the immediately following claim that a particular CIFAR-10/ResNet-18 workload needs 360 seconds and larger workloads should use an even larger value. Leaving this recommendation beside the new default makes the troubleshooting guidance misleading and retains an unqualified workload sizing claim outside the family receipt handoff.",
+      "evidence": "At source 484853ed2eef50899b062dc7d273ff85e814e4bc, plato/servers/base.py:200-201 sets both defaults to 3600. docs/docs/misc.md:17 states ping_timeout needs to be 360 for ten clients and recommends an even larger number for larger workloads. The plan records no behavioral evidence for this sizing claim.",
+      "required_correction": "Explicitly include misc.md:17 in the bounded DOC03 repair: remove the obsolete fixed 360-second recommendation or clearly retain it only as an unqualified historical observation, and use generic measurement-based timeout guidance beside the current 3600-second default. Keep the ccdb.md link repair and avoid claiming a newly qualified workload or changing runtime defaults.",
+      "validation": "Check both repaired timeout passages and the adjacent recommendation together; no outdated 360-second default or asserted current workload sizing result should remain."
+    }
+  ],
+  "nonblocking_notes": [
+    {
+      "id": "N01",
+      "severity": "low",
+      "location": "/tmp/plato-remaining-docs-plan.json:46",
+      "note": "An existing docs/docs/examples/archived.md is present in the frozen source. The accepted cbe6cce expansion is absent from that version, as confirmed by its 121 added/13 removed lines. Clarify the status wording to say the accepted expansion is not yet integrated, so file presence is not confused with prose integration. This does not change the reserved archive ownership."
+    }
+  ],
+  "accepted_plan_properties": [
+    "The five declared inspected-file hashes, source tree, Phase 4 plan hash, and 399-path/58-family inventory match their exact referenced inputs.",
+    "The ten defect categories have concrete source support. The missing test targets, docs build/output drift, timeout default, malformed TOML snippets, DataSource attribution, processor token, index omissions, Python 3.12 cluster recipes, floating KaTeX references, and case mismatch in the gradient leakage URL are real bounded findings.",
+    "The mandatory core command uses the valid mandatory profile and test-model-search group. That group includes test-base, mandatory DP/MPC/RL dependencies, and ptflops. tests/conftest.py separates MLX and Lighteval collection, so the plan correctly avoids calling the core command complete optional qualification. Keep explicit Python 3.13 provisioning and preserve the focused scheduler target.",
+    "D1 reuses accepted install/build tooling and requires a real focused scheduler run, TOML parsing, strict build, exact serve-command smoke, local links, and rendering checks. Full core evidence may be reused for a prose-only slice within its actual source bounds.",
+    "D2 is a conservative 3.13 preparation/submission template. Shell syntax and local target checks can validate the template, while actual module, wheel, CUDA, network, model cache, account, and cluster execution remain unqualified. No credentials or submission are needed for this correction.",
+    "D3 confines dependency changes to three exact CDN references and permits local initialization edits only after reproduction. Direct-load and Material instant-navigation browser evidence remain required before D3 browser acceptance; a strict build or HTTP fetch alone cannot meet that gate.",
+    "Existing deployment/tooling/CI/manifests, archived source and accepted archive prose, family runtime/config files, and family READMEs remain with their existing owners. Generated docs/site output is a validation artifact, not authored source. No placeholder README, archive command modernization, unapproved retirement, or unrelated dependency churn is authorized.",
+    "The plan leaves wider example and chapter support claims pending until accepted source-bound family receipts; TOML parsing, imports, and docs builds are not behavioral support evidence."
+  ],
+  "primary_source_checks": [
+    {
+      "url": "https://katex.org/docs/browser",
+      "result": "Official page retrieved during review. It shows exact 0.19.0 CSS, core JS, and auto-render assets and documents availability after loading/defer. This supports a candidate exact pin, not current-site browser compatibility."
+    },
+    {
+      "url": "https://github.com/KaTeX/KaTeX/releases/tag/v0.19.0",
+      "result": "Official release retrieved during review; release dated 2026-10-01. It records changed strict handling of missing character metrics. The implementation should record this release/changelog review and still execute the proposed browser checks."
+    },
+    {
+      "url": "https://docs.alliancecan.ca/wiki/Available_software",
+      "result": "Official indexed metadata retrieved during review lists Python 3.13.2 and per-site/software-environment differences. Old indexed metadata supports discovery-based instructions only, not a claim that the target cluster has a current compatible module or Plato wheel stack."
+    },
+    {
+      "url": "https://docs.alliancecan.ca/mediawiki/images/7/77/Managing_jobs.pdf",
+      "result": "Official indexed training metadata retrieved during review identifies sbatch, squeue, sacct, and scancel roles. It supports cancellation of an identified job without establishing cluster submission qualification."
+    }
+  ],
+  "review_limits": {
+    "reviewed_source_via": "git show/cat-file/ls-tree of the frozen Git object, not current deployment worktree content",
+    "shell": "All shell commands used zsh -lc.",
+    "source_writes": false,
+    "environment_provisioning_or_mutation": false,
+    "runtime_tests_browser_cluster_execution": false,
+    "implementation_pr_merge_or_nested_agents": false,
+    "artifact_writes": ["/tmp/plato-remaining-docs-plan-review.json"]
+  }
+}
