@@ -1,0 +1,12 @@
+{
+  "status": "REVIEWED_ENVIRONMENT_FIX_INTEGRATED_PENDING_REBOUND_GATE_AND_FINAL_CHECK",
+  "source": "57d67c91bc44be04021e0c642afb1cc93b91a2fe",
+  "source_fix": "06ba679690f090aacf7e6a95a6dffd74b81ffad3",
+  "review_sha256": "7a69dd496378fd9452e1f89344331b867ca16023de03ee859269e20123c90271",
+  "prior14_component_hashes_unchanged": true,
+  "metadata": "Only reviewed Hatch exclusions differ from merged421; all dependency/version/marker fields and lock unchanged.",
+  "merged_parent": "3d4e08b26972e114d87ef39795e01f4dfa554b94",
+  "root_previous_failure": "Old in-checkout .venv-docs and ci-artifacts preserved. Final checker must use a new owned output directory at default path after preserving old output with hash-bound relocation mapping.",
+  "qualification": "Fresh independent actual default docs and uv-absent bootstrap both pass with Git-bound sdist, exact metadata, rebuild and installed-wheel checks. Full final integrated source sequence remains required.",
+  "scope": "No historical archive prose or Phase4 harness source included."
+}
