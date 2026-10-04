@@ -282,10 +282,90 @@ def _load_eval_ledger(path: Path) -> Counter:
         raise pytest.UsageError(f"llm-eval ledger invalid: {path}: {exc}") from exc
 
 
+def _load_phase4_ledger(path: Path, module: str) -> tuple[dict, Counter]:
+    """Require a reviewed, frozen task inventory independent of collection."""
+    try:
+        ledger = json.loads(path.read_text())
+        if ledger.get("schema_version") != 1:
+            raise ValueError("expected schema_version 1")
+        rows = ledger["tasks"]
+        if not isinstance(rows, list) or len(rows) != 12:
+            raise ValueError("expected exactly twelve ownership rows")
+        owners, modules, workers, families = set(), set(), set(), set()
+        selected = None
+        for row in rows:
+            task, test, worker = (
+                row["task_id"],
+                row["test_module"],
+                row["worker_module"],
+            )
+            if (
+                not isinstance(task, str)
+                or task in owners
+                or not re.fullmatch(r"tests/examples_phase4/test_[a-z_]+\.py", test)
+                or test in modules
+                or not re.fullmatch(r"tests\.examples_phase4\.[a-z_]+_worker", worker)
+                or worker in workers
+                or not re.fullmatch(r"[0-9a-f]{64}", row["authority_sha256"])
+                or type(row["inventory_revision"]) is not int
+                or row["inventory_revision"] < 1
+                or row["state"] not in {"draft", "frozen"}
+                or not isinstance(row["cases"], list)
+                or not isinstance(row["families"], list)
+                or not row["families"]
+                or any(not isinstance(f, str) or f in families for f in row["families"])
+                or len(set(row["families"])) != len(row["families"])
+            ):
+                raise ValueError("invalid or duplicate task ownership")
+            owners.add(task)
+            modules.add(test)
+            workers.add(worker)
+            families.update(row["families"])
+            if test == module:
+                selected = row
+        if selected is None:
+            raise ValueError(f"module has no task owner: {module}")
+        if selected["state"] != "frozen" or not selected["cases"]:
+            raise ValueError("draft or empty task cannot qualify")
+        nodes, case_ids = [], set()
+        for case in selected["cases"]:
+            node = case["nodeid"]
+            if (
+                not isinstance(node, str)
+                or not node.startswith(module + "::")
+                or case["case_id"] in case_ids
+                or case["family"] not in selected["families"]
+                or case["proof_kind"]
+                not in {"real-execution", "prior-proof-reconciliation"}
+                or not re.fullmatch(r"[0-9a-f]{64}", case["authored_spec_sha256"])
+                or not isinstance(case["overlay_allowed_paths_with_rationale"], dict)
+                or not 0 < case["timeout_seconds"] <= 180
+            ):
+                raise ValueError("invalid case identity or qualification policy")
+            for field in (
+                "config_paths",
+                "include_consumers",
+                "entrypoint_paths",
+                "branch_labels",
+                "required_distributions",
+                "explicit_source_paths",
+            ):
+                if not isinstance(case[field], list):
+                    raise ValueError(f"invalid case field: {field}")
+            case_ids.add(case["case_id"])
+            nodes.append(node)
+        expected = Counter(nodes)
+        if any(count != 1 for count in expected.values()):
+            raise ValueError("duplicate nodeids")
+        return selected, expected
+    except (OSError, ValueError, TypeError, KeyError, AttributeError) as exc:
+        raise pytest.UsageError(f"Phase4 ledger invalid: {path}: {exc}") from exc
+
+
 def pytest_addoption(parser):
     parser.addoption(
         "--test-profile",
-        choices=("base", "mandatory", "mlx-native", "llm-eval"),
+        choices=("base", "mandatory", "mlx-native", "llm-eval", "examples-phase4"),
         default=None,
         help=(
             "base permits named optional omissions; unfiltered suites default "
@@ -295,6 +375,9 @@ def pytest_addoption(parser):
 
 
 def pytest_configure(config):
+    config.addinivalue_line(
+        "markers", "examples_phase4: isolated Phase4 example cases."
+    )
     config.pluginmanager.register(_ProfileChecks(config), "plato-profile-checks")
 
 
@@ -311,6 +394,73 @@ class _ProfileChecks:
             self.full and not selected
         )
         self.base = config.getoption("test_profile") == "base"
+        self.phase4_boundary = (config.rootpath / "tests/examples_phase4").resolve()
+        self.phase4_qualification = (
+            config.getoption("test_profile") == "examples-phase4"
+        )
+        targets = [
+            config.invocation_params.dir / str(a).split("::", 1)[0] for a in config.args
+        ]
+        explicit_phase4 = any(self._phase4_path(p) for p in targets)
+        self.phase4_requested = self.phase4_qualification or explicit_phase4
+        self.phase4_expected = Counter()
+        self.phase4_passed = Counter()
+        self.phase4_task = None
+        self.phase4_previous_env = None
+        if config.getoption("pyargs") and (
+            self.phase4_requested
+            or any(str(a).startswith("tests.examples_phase4") for a in config.args)
+            or config.invocation_params.dir.resolve().is_relative_to(
+                self.phase4_boundary
+            )
+            or any(str(a).startswith("examples_phase4") for a in config.args)
+        ):
+            raise pytest.UsageError("Phase4 selector unsupported: use filesystem paths")
+        if explicit_phase4 and config.getoption("test_profile") not in {
+            None,
+            "examples-phase4",
+        }:
+            raise pytest.UsageError("Phase4 target conflicts with selected profile")
+        if explicit_phase4 and any(not self._phase4_path(p) for p in targets):
+            raise pytest.UsageError("Phase4 targets cannot be mixed with other scopes")
+        if self.phase4_qualification:
+            if (
+                len(config.args) != 1
+                or "::" in str(config.args[0])
+                or not re.fullmatch(r"test_[a-z_]+\.py", targets[0].name)
+                or not self._phase4_path(targets[0])
+            ):
+                raise pytest.UsageError(
+                    "Phase4 requires one complete explicit task module"
+                )
+            if any(
+                config.getoption(o)
+                for o in (
+                    "keyword",
+                    "markexpr",
+                    "deselect",
+                    "ignore",
+                    "ignore_glob",
+                    "pyargs",
+                )
+            ):
+                raise pytest.UsageError("Phase4 qualification does not permit filters")
+            self.phase4_module = (
+                targets[0].resolve().relative_to(config.rootpath.resolve()).as_posix()
+            )
+        if self.phase4_requested and (
+            config.getoption("numprocesses", default=None)
+            or config.getoption("dist", default="no") != "no"
+        ):
+            raise pytest.UsageError("Phase4 workers require serial execution")
+        if (
+            "examples_phase4"
+            in re.findall(r"\b\w+\b", config.getoption("markexpr") or "")
+            and not explicit_phase4
+        ):
+            raise pytest.UsageError(
+                "examples_phase4 marker requires explicit filesystem target"
+            )
         self.native_boundary = (config.rootpath / "tests/mlx_native").resolve()
         self.native_qualification = config.getoption("test_profile") == "mlx-native"
         explicit_native = any(
@@ -437,6 +587,12 @@ class _ProfileChecks:
                     "retained qualification does not permit filters or exclusions"
                 )
 
+    def _phase4_path(self, path) -> bool:
+        return Path(path).resolve().is_relative_to(self.phase4_boundary)
+
+    def _phase4_node(self, nodeid: str) -> bool:
+        return self._phase4_path(self.config.rootpath / nodeid.split("::", 1)[0])
+
     def _eval_path(self, path) -> bool:
         return Path(path).resolve().is_relative_to(self.eval_boundary)
 
@@ -464,6 +620,8 @@ class _ProfileChecks:
         )
 
     def pytest_ignore_collect(self, collection_path):
+        if not self.phase4_requested and self._phase4_path(collection_path):
+            return True
         if not self.eval_requested and self._eval_path(collection_path):
             return True
         if not self.native_requested and self._native_path(collection_path):
@@ -472,6 +630,13 @@ class _ProfileChecks:
 
     @pytest.hookimpl(wrapper=True, tryfirst=True)
     def pytest_collect_file(self, file_path, parent):
+        if self._phase4_path(file_path):
+            if self.config.getoption("pyargs"):
+                raise pytest.UsageError(
+                    "Phase4 selector unsupported: use filesystem paths"
+                )
+            if not self.phase4_requested:
+                raise pytest.UsageError("Phase4 explicit filesystem target required")
         if self._eval_path(file_path):
             if self.config.getoption("pyargs"):
                 raise pytest.UsageError(self._eval_unsupported_selector())
@@ -491,6 +656,16 @@ class _ProfileChecks:
         return (yield)
 
     def pytest_sessionstart(self):
+        if self.phase4_qualification:
+            self.phase4_task, self.phase4_expected = _load_phase4_ledger(
+                self.phase4_boundary / "cases.json", self.phase4_module
+            )
+            import os
+
+            names = ("PLATO_PHASE4_STRICT_TASK", "PLATO_PHASE4_LEDGER")
+            self.phase4_previous_env = {name: os.environ.get(name) for name in names}
+            os.environ[names[0]] = self.phase4_task["task_id"]
+            os.environ[names[1]] = str(self.phase4_boundary / "cases.json")
         if self.eval_requested:
             _eval_prerequisites()
             self.eval_prerequisite_passed = True
@@ -515,6 +690,16 @@ class _ProfileChecks:
 
     def pytest_collection_modifyitems(self, items):
         for item in items:
+            if self._phase4_path(item.path):
+                if not self.phase4_requested:
+                    raise pytest.UsageError(
+                        "Phase4 collection escaped explicit boundary"
+                    )
+                item.add_marker("examples_phase4")
+            elif item.get_closest_marker("examples_phase4") is not None:
+                raise pytest.UsageError(
+                    f"examples_phase4 marker outside boundary: {item.nodeid}"
+                )
             if self._eval_path(item.path):
                 if not self.eval_requested or not self.eval_prerequisite_passed:
                     raise pytest.UsageError("llm-eval collection escaped preflight")
@@ -540,6 +725,15 @@ class _ProfileChecks:
                 )
 
     def pytest_collection_finish(self, session):
+        if self.phase4_qualification:
+            collected = Counter(item.nodeid for item in session.items)
+            if collected != self.phase4_expected:
+                self.violations.append(
+                    "Phase4 ledger mismatch: "
+                    f"missing {dict(self.phase4_expected - collected)}; "
+                    f"extra or duplicate {dict(collected - self.phase4_expected)}"
+                )
+                pytest.exit("Phase4 ledger mismatch before execution", returncode=1)
         self.eval_collected = Counter(
             item.nodeid for item in session.items if self._eval_path(item.path)
         )
@@ -582,6 +776,7 @@ class _ProfileChecks:
                 self.qualify
                 or self._native_node(report.nodeid)
                 or self._eval_node(report.nodeid)
+                or self._phase4_node(report.nodeid)
             )
             or not report.skipped
         ):
@@ -608,14 +803,19 @@ class _ProfileChecks:
             self.qualify
             or self._native_node(report.nodeid)
             or self._eval_node(report.nodeid)
+            or self._phase4_node(report.nodeid)
         ):
             return
         if hasattr(report, "wasxfail"):
             self.violations.append(f"unexpected xfail/xpass: {report.nodeid}")
         else:
             self._check_skip(report)
+        if self._phase4_node(report.nodeid) and report.failed:
+            self.violations.append(f"Phase4 {report.when} failed: {report.nodeid}")
         if report.when == "call" and report.passed:
             self.passed.add(report.nodeid)
+            if self._phase4_node(report.nodeid):
+                self.phase4_passed[report.nodeid] += 1
 
     def pytest_deselected(self, items):
         if not self.qualify:
@@ -633,6 +833,26 @@ class _ProfileChecks:
 
     def pytest_sessionfinish(self, session, exitstatus):
         self.session = session
+        if self.phase4_qualification:
+            if (
+                not self.config.getoption("collectonly")
+                and self.phase4_passed != self.phase4_expected
+            ):
+                self.violations.append(
+                    "Phase4 expected calls did not pass exactly once"
+                )
+            if exitstatus != pytest.ExitCode.OK:
+                self.violations.append(
+                    f"Phase4 original exit was nonzero: {exitstatus}"
+                )
+            if self.phase4_previous_env is not None:
+                import os
+
+                for name, value in self.phase4_previous_env.items():
+                    if value is None:
+                        os.environ.pop(name, None)
+                    else:
+                        os.environ[name] = value
         if self.eval_qualification and not self.config.getoption("collectonly"):
             missing = self.eval_expected.keys() - self.passed
             if missing:
@@ -718,6 +938,22 @@ class _ProfileChecks:
                 scope = "Lighteval complete qualification"
             else:
                 scope = "Lighteval qualification failed"
+        if self.phase4_requested:
+            if not self.phase4_qualification:
+                scope = "Phase4 focused execution (not complete task qualification)"
+            elif (
+                success
+                and self.phase4_task is not None
+                and self.config.getoption("collectonly")
+            ):
+                scope = f"Phase4 {self.phase4_task['task_id']} collection-only validation (no execution qualification)"
+            elif success and self.phase4_task is not None and self.phase4_expected:
+                scope = (
+                    f"Phase4 {self.phase4_task['task_id']} complete task qualification"
+                )
+            else:
+                task = self.phase4_task["task_id"] if self.phase4_task else "task"
+                scope = f"Phase4 {task} qualification failed"
         terminalreporter.write_line(f"test profile: {scope}")
         if self.violations:
             terminalreporter.section("test profile violations", red=True)
