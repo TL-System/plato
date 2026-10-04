@@ -14,6 +14,17 @@ import tomllib
 import zipfile
 from email.parser import BytesParser
 from pathlib import Path, PurePosixPath
+from typing import TypedDict
+
+
+class DistributionManifest(TypedDict):
+    """Inspected package contents used by the source and rebuild checks."""
+
+    filename: str
+    sha256: str
+    bytes: int
+    metadata: dict[str, object]
+    files: dict[str, str]
 
 UV_VERSION = "0.12.22"
 SOURCE_FILES = (
@@ -134,7 +145,7 @@ def check_metadata(payload: bytes, project: dict) -> dict[str, object]:
 
 def inspect_distribution(
     path: Path, project: dict, expected_sources: set[str]
-) -> dict[str, object]:
+) -> DistributionManifest:
     """Inspect the actual distribution file manifest and core source coverage."""
     files = {}
     metadata_payloads = []
@@ -157,7 +168,11 @@ def inspect_distribution(
                 relative = PurePosixPath(*name.parts[1:]).as_posix()
                 if relative in files:
                     raise ValueError(f"Duplicate sdist source member: {relative}")
-                payload = archive.extractfile(member).read()
+                stream = archive.extractfile(member)
+                if stream is None:
+                    raise ValueError(f"Unreadable sdist source member: {member.name}")
+                with stream:
+                    payload = stream.read()
                 files[relative] = hashlib.sha256(payload).hexdigest()
                 if relative == "PKG-INFO":
                     metadata_payloads.append(payload)
@@ -193,8 +208,8 @@ def inspect_distribution(
 def bind_sdist_source(
     repository: Path,
     source_commit: str,
-    sdist: dict[str, object],
-    wheel: dict[str, object],
+    sdist: DistributionManifest,
+    wheel: DistributionManifest,
 ) -> dict[str, object]:
     """Require each sdist source file to match its frozen Git blob bytes."""
     files = sdist["files"]
