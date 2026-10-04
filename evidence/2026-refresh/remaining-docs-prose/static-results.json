@@ -1,0 +1,124 @@
+{
+  "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+  "changed_paths": [
+    "AGENTS.md",
+    "docs/README.md",
+    "docs/docs/ccdb.md",
+    "docs/docs/configurations/server.md",
+    "docs/docs/configurations/trainer.md",
+    "docs/docs/development.md",
+    "docs/docs/examples/Getting Started.md",
+    "docs/docs/examples/algorithms/1. Server Aggregation Algorithms.md",
+    "docs/docs/index.md",
+    "docs/docs/misc.md"
+  ],
+  "toml": [
+    {
+      "path": "docs/docs/configurations/trainer.md",
+      "parsed": {
+        "trainer": {
+          "type": "timm_basic",
+          "lr_scheduler": "timm"
+        },
+        "parameters": {
+          "learning_rate": {
+            "sched": "cosine",
+            "min_lr": 1e-06,
+            "warmup_lr": 0.0001,
+            "warmup_epochs": 3,
+            "cooldown_epochs": 10
+          }
+        }
+      },
+      "fragment": "[trainer]\ntype = \"timm_basic\"\nlr_scheduler = \"timm\"\n\n[parameters]\n\n[parameters.learning_rate]\nsched = \"cosine\"\nmin_lr = 1.0e-6\nwarmup_lr = 0.0001\nwarmup_epochs = 3\ncooldown_epochs = 10\n",
+      "capture_uncomment_parse": false
+    },
+    {
+      "path": "docs/docs/examples/algorithms/1. Server Aggregation Algorithms.md",
+      "parsed": {
+        "algorithm": {
+          "type": "fedavg",
+          "scaling_factor": 10,
+          "attention_model_path": "./attention_model.pt",
+          "pca_components": 10,
+          "threshold": 0.005,
+          "attention_loops": 5,
+          "attention_hidden": 32
+        }
+      },
+      "fragment": "[algorithm]\n\n# Aggregation algorithm\ntype = \"fedavg\"\n\n# Scaling factor (temperature) used by the attention module\nscaling_factor = 10\n\n# Path to the trained attention model shipped with the attack-adaptive paper.\n# Provide your own checkpoint before running the example.\nattention_model_path = \"./attention_model.pt\"\n\n# Number of PCA components per layer before feeding into attention.\npca_components = 10\n\n# Threshold applied after the softmax step (epsilon in the paper).\nthreshold = 0.005\n\n# Attention network hyperparameters from the reference implementation.\nattention_loops = 5\nattention_hidden = 32\n\n# Optional: set to capture per-round tensors for pretraining the attention module.\n# dataset_capture_dir = \"./attack_adaptive_dataset\"\n",
+      "capture_uncomment_parse": true
+    }
+  ],
+  "shell": [
+    {
+      "index": 0,
+      "template": "ssh <username>@<cluster-hostname>\ncd <approved-project-directory>\ngit clone https://github.com/TL-System/plato.git\ncd plato\n",
+      "substituted": "ssh INERT_PLACEHOLDER@INERT_PLACEHOLDER\ncd INERT_PLACEHOLDER\ngit clone https://github.com/TL-System/plato.git\ncd plato\n",
+      "bash_n_exit": 0
+    },
+    {
+      "index": 1,
+      "template": "module avail python\nmodule spider python\n",
+      "substituted": "module avail python\nmodule spider python\n",
+      "bash_n_exit": 0
+    },
+    {
+      "index": 2,
+      "template": "module load <site-python-3.13-module>\npython -c 'import sys; assert sys.version_info[:2] == (3, 13), sys.version'\n",
+      "substituted": "module load INERT_PLACEHOLDER\npython -c 'import sys; assert sys.version_info[:2] == (3, 13), sys.version'\n",
+      "bash_n_exit": 0
+    },
+    {
+      "index": 3,
+      "template": "uv --version\nPLATO_CLUSTER_PYTHON=\"$(command -v python)\"\nUV_PYTHON_DOWNLOADS=never uv sync --locked --python \"$PLATO_CLUSTER_PYTHON\"\n.venv/bin/python -c 'import sys; assert sys.version_info[:2] == (3, 13), sys.version'\n",
+      "substituted": "uv --version\nPLATO_CLUSTER_PYTHON=\"$(command -v python)\"\nUV_PYTHON_DOWNLOADS=never uv sync --locked --python \"$PLATO_CLUSTER_PYTHON\"\n.venv/bin/python -c 'import sys; assert sys.version_info[:2] == (3, 13), sys.version'\n",
+      "bash_n_exit": 0
+    },
+    {
+      "index": 4,
+      "template": "#!/bin/bash\n#SBATCH --time=01:00:00\n#SBATCH --nodes=1\n#SBATCH --cpus-per-task=2\n#SBATCH --mem=8G\n#SBATCH --account=<allocation-account>\n#SBATCH --output=plato-%j.out\n\nset -euo pipefail\nmodule load <site-python-3.13-module>\ncd <absolute-path-to-plato-checkout>\n.venv/bin/python -c 'import sys; assert sys.version_info[:2] == (3, 13), sys.version'\nexec .venv/bin/python plato.py --config configs/MNIST/fedavg_lenet5.toml --cpu\n",
+      "substituted": "#!/bin/bash\n#SBATCH --time=01:00:00\n#SBATCH --nodes=1\n#SBATCH --cpus-per-task=2\n#SBATCH --mem=8G\n#SBATCH --account=INERT_PLACEHOLDER\n#SBATCH --output=plato-%j.out\n\nset -euo pipefail\nmodule load INERT_PLACEHOLDER\ncd INERT_PLACEHOLDER\n.venv/bin/python -c 'import sys; assert sys.version_info[:2] == (3, 13), sys.version'\nexec .venv/bin/python plato.py --config configs/MNIST/fedavg_lenet5.toml --cpu\n",
+      "bash_n_exit": 0
+    },
+    {
+      "index": 5,
+      "template": "sbatch plato_job.sh\n",
+      "substituted": "sbatch plato_job.sh\n",
+      "bash_n_exit": 0
+    },
+    {
+      "index": 6,
+      "template": "squeue --jobs=<job-id>\nsacct --jobs=<job-id>\ntail -f plato-<job-id>.out\n",
+      "substituted": "squeue --jobs=INERT_PLACEHOLDER\nsacct --jobs=INERT_PLACEHOLDER\ntail -f plato-INERT_PLACEHOLDER.out\n",
+      "bash_n_exit": 0
+    },
+    {
+      "index": 7,
+      "template": "scancel <job-id>\n",
+      "substituted": "scancel INERT_PLACEHOLDER\n",
+      "bash_n_exit": 0
+    }
+  ],
+  "rendered_links": {
+    "html_pages": 45,
+    "links_checked": 2973,
+    "broken": []
+  },
+  "markdown_links": {
+    "checked": 84,
+    "broken": []
+  },
+  "source_sha256": {
+    "AGENTS.md": "6e90438d39c96ac8906cc3d834e17d7f2f1638c85682d98df1b48ba2d6bafdbc",
+    "docs/README.md": "097157e4156372a6fe7b449720355e094e5b50d2e68af0f24a968c86674eb17e",
+    "docs/docs/ccdb.md": "c843a5626a08864ebafac8878e1524aa4e6412fad17bd83f4fc038c8f2fddf6d",
+    "docs/docs/configurations/server.md": "392505c133a23aa97f93f9261fed662695a5b0073d9b905c49f5fb5987cd482e",
+    "docs/docs/configurations/trainer.md": "f2f59461e3987c909f243533f39f14ac2b79058a66d7d25794dbf055ac3c5a0f",
+    "docs/docs/development.md": "5e7983f94a1fe6e4516d1148985960074834629cb6b6402a94962d3e09e6b862",
+    "docs/docs/examples/Getting Started.md": "736689288c791f3e0913eb35549f18413478468a62caff5d7e8755acad192bb1",
+    "docs/docs/examples/algorithms/1. Server Aggregation Algorithms.md": "83d3eed11013db4aacdb63d7e38a53a0a5867d54a16eeda25b58d3cb7034f73d",
+    "docs/docs/index.md": "e3a0b876519936cd31baee48730b80edf571c08b3968f25300444376e7409970",
+    "docs/docs/misc.md": "f115a2f879ff4f5f70de81505b6cb5958ad633a18f04f7cd9c4f3e84f26ac2b0"
+  }
+}
