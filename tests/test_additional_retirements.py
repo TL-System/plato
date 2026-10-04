@@ -27,6 +27,9 @@ PLAN = json.loads(
     (REPO / "evidence/2026-refresh/plato-next-retirements-plan.json").read_text()
 )
 SCOPES = {scope["archive"]: scope for scope in PLAN["scopes"]}
+POST_RETIREMENT_LEDGER_SHA256 = (
+    "b654540d190c58e69e0a7d223b3fd59ab39d3d0f18b38fa7cffbe599f8e8f458"
+)
 
 
 def _verify_file(path, entry):
@@ -107,7 +110,7 @@ def test_archive_identity_verifier_rejects_damage(tmp_path, damage):
         _verify_file(path, entry)
 
 
-def test_active_ledger_is_exact_reviewed_additional_delta():
+def test_historical_ledger_is_exact_reviewed_additional_delta():
     delta = PLAN["phase4_ledger"]
     prior_path = REPO / "evidence/2026-refresh/fei-post-retirement-ledger.json"
     assert (
@@ -115,7 +118,11 @@ def test_active_ledger_is_exact_reviewed_additional_delta():
         == delta["base_ledger"]["sha256"]
     )
     prior = json.loads(prior_path.read_text())
-    current = json.loads((REPO / "tests/examples_phase4/cases.json").read_text())
+    snapshot = REPO / "evidence/2026-refresh/additional-retirements-ledger.json"
+    assert hashlib.sha256(snapshot.read_bytes()).hexdigest() == (
+        POST_RETIREMENT_LEDGER_SHA256
+    )
+    current = json.loads(snapshot.read_text())
     amendment = current["additional_retirement_amendment"]
     assert amendment["prior_ledger_sha256"] == delta["base_ledger"]["sha256"]
     assert amendment["plan_sha256"] == PLAN_SHA256
@@ -135,10 +142,6 @@ def test_active_ledger_is_exact_reviewed_additional_delta():
             change = changes[row["path"]]
             assert row == change["before"]
             after = change["after"]
-            assert (
-                after["sha256"]
-                == hashlib.sha256((REPO / after["path"]).read_bytes()).hexdigest()
-            )
             row.update(after)
     for after in delta["exact_config_rows_after"]:
         assert (
@@ -194,6 +197,30 @@ def test_active_ledger_is_exact_reviewed_additional_delta():
             ).hexdigest()
             == sha256
         )
+
+
+def test_live_ledger_keeps_retired_paths_out_and_retained_sources_current():
+    current = json.loads((REPO / "tests/examples_phase4/cases.json").read_text())
+    paths = {row["path"] for row in current["source_inventory"]}
+    retired = {path for scope in SCOPES.values() for path in scope["moved"]}
+    assert paths.isdisjoint(retired)
+    assert set(PLAN["phase4_ledger"]["path_renames"].values()) <= paths
+    for row in current["source_inventory"]:
+        assert (
+            row["sha256"]
+            == hashlib.sha256((REPO / row["path"]).read_bytes()).hexdigest()
+        ), row["path"]
+    assert _digest(current["source_inventory"]) == current["path_map_sha256"]
+    assert (
+        _digest(
+            [
+                binding
+                for task in current["tasks"]
+                for binding in task["config_bindings"]
+            ]
+        )
+        == current["config_bindings_sha256"]
+    )
 
 
 def test_retired_torch_hub_fails_before_factory(temp_config, monkeypatch):
