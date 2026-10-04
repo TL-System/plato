@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "decision": "accepted",
+  "source_commit": "959ed3793cc4a2fab003a7f4d29bf33faa951b85",
+  "base_commit": "3232843bb08628e91a2400ee634f2ddb2a08fe27",
+  "scope": "Independent review of two deployment-check script typing fixes only; no whole-codebase or actual Linux container qualification.",
+  "changed_sources": {
+    ".github/scripts/check_container.py": "345c3bb10c5d1e27511197cb61de43f85cd280204e48513a04ba29f12003b28b",
+    ".github/scripts/check_distribution.py": "c1f889ae43ab076dc1080e15a722824f2496214021202cdc8772e775cb2684b4"
+  },
+  "findings": [],
+  "semantic_assessment": [
+    "TypedDict declarations refine existing record shapes without changing serialized payloads; additional probe fields are preserved.",
+    "Valid module paths, direct_url.json strings, tensor predicates and distribution archive members preserve previous successful behavior. bool(item()) matches prior truthiness; Path(str(locate_file(...))).resolve() preserves filesystem distribution path handling.",
+    "Malformed probe records now fail explicitly before cleanup, missing imported source locations and direct_url metadata fail explicitly, and unreadable sdist members raise ValueError with member identity. These are appropriate failing error paths, without suppressed failures.",
+    "No added type ignores or typing-rule relaxations; only the two requested CI scripts changed."
+  ],
+  "independent_validation": [
+    "ty 0.0.84 check of both changed scripts passed.",
+    "Ruff check of both changed scripts passed.",
+    "Fresh static qualification passed on committed frozen source 959ed379; receipt at /tmp/plato-deployment-typing-review-static/static-acceptance.json.",
+    "Read-probe valid extra-payload round-trip plus six rejection cases rerun successfully using root supplied probe script.",
+    "Package provenance and fresh static source hashes independently compared to immutable Git blobs.",
+    "Wheel/sdist file hashes, constraints hashes and source binding receipt hash verified against acceptance receipt.",
+    "All 1486 sdist source member hashes independently matched Git blobs and actual tar payload; generated PKG-INFO verified against recorded generated metadata.",
+    "Actual built and rebuilt wheel payload hashes independently matched both manifests and each other.",
+    "Reviewed existing accepted build/rebuild/install logs and installed-wheel import provenance receipt; full package workflow not repeated."
+  ],
+  "receipts": {
+    "package": "/tmp/plato-deployment-typing-package/acceptance.json",
+    "package_provenance": "/tmp/plato-deployment-typing-package/provenance.json",
+    "independent_static": "/tmp/plato-deployment-typing-review-static/static-acceptance.json",
+    "independent_static_source": "/tmp/plato-deployment-typing-review-static/source.json",
+    "artifact_verification": "/tmp/plato-deployment-typing-review-artifacts.json",
+    "probe_validation": "/tmp/plato-deployment-typing-validation.json"
+  },
+  "limits": [
+    "Original static receipt was generated before commit and reports base commit with changed source hashes; fresh independent static receipt removes that provenance ambiguity.",
+    "No actual Linux amd64 Docker build/CPU-image runtime or GPU execution was performed in this review.",
+    "Native inside-probe failure branches for missing module __file__/direct_url are inspected, not executed against a broken installed container."
+  ]
+}

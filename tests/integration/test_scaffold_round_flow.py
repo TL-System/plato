@@ -41,6 +41,7 @@ def load_example(name):
     spec = importlib.util.spec_from_file_location(
         name, CONFIG_PATH.parent / f"{name}.py"
     )
+    assert spec is not None and spec.loader is not None
     module = importlib.util.module_from_spec(spec)
     sys.modules[name] = module
     spec.loader.exec_module(module)
@@ -274,6 +275,7 @@ def test_shipped_configuration_two_round_independent_rational_oracle(tmp_path):
     run_two_round_scenario(tmp_path)
 
 
+@pytest.mark.slow
 def test_shipped_spawn_pipeline_parent_control_return_with_deadline(tmp_path):
     output = tmp_path / "result.json"
     command = [
@@ -362,6 +364,7 @@ def run_failed_worker_scenario(root, mode):
 
 
 @pytest.mark.parametrize("mode", ["missing", "stale", "model-save", "commit"])
+@pytest.mark.slow
 def test_actual_failed_worker_handoff_refuses_previous_delta(tmp_path, mode):
     output = tmp_path / "result.json"
     command = [

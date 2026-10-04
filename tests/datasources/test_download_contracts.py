@@ -26,7 +26,7 @@ def serve(payload, filename):
             self.end_headers()
             self.wfile.write(payload)
 
-        def log_message(self, *args):
+        def log_message(self, format, *args):
             pass
 
     server = http.server.HTTPServer(("127.0.0.1", 0), Handler)
@@ -74,10 +74,11 @@ def invoke_download(entrypoint, payload, destination, tmp_path, monkeypatch):
             "urlretrieve",
             lambda url, target: shutil.copyfile(archive, target),
         )
-        source = module.DataSource.__new__(module.DataSource)
         if entrypoint == "purchase":
+            source = purchase.DataSource.__new__(purchase.DataSource)
             source.download_dataset(str(destination), destination / "dataset_purchase")
         else:
+            source = texas.DataSource.__new__(texas.DataSource)
             source.download_dataset(
                 str(destination),
                 destination / "texas/100/feats",
@@ -323,6 +324,7 @@ with DataSource._download_guard(sys.argv[1]):
                 stderr=subprocess.PIPE,
             )
             with selectors.DefaultSelector() as selector:
+                assert child.stdout is not None
                 selector.register(child.stdout, selectors.EVENT_READ)
                 assert selector.select(timeout=5), "Download contender did not start"
                 assert child.stdout.readline() == b"ready\n"

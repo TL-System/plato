@@ -145,10 +145,10 @@ def test_real_pyargs_alias_backstop_precedes_optional_import(
 @pytest.fixture(scope="module")
 def optional_ci():
     workflow = (
-        Path(__file__).parents[1] / ".github/workflows/pytorch_tests.yml"
+        Path(__file__).parents[1] / ".github/workflows/pytorch_qualification.yml"
     ).read_text()
     step = workflow.split("- name: Lighteval CPU qualification", 1)[1].split(
-        "- name: Ruff and classified typing baseline", 1
+        "- name: Ruff and fatal configured typing", 1
     )[0]
     snippets = step.split("python - <<'PY'\n")[1:]
     source = textwrap.dedent(snippets[2].split("\n          PY", 1)[0])
@@ -276,7 +276,7 @@ def test_actual_uv_selects_persistent_environment_before_import(
     )
     # The same exact workflow identity function is executed in the chosen child.
     workflow = (
-        Path(__file__).parents[1] / ".github/workflows/pytorch_tests.yml"
+        Path(__file__).parents[1] / ".github/workflows/pytorch_qualification.yml"
     ).read_text()
     step = workflow.split("- name: Lighteval CPU qualification", 1)[1]
     source = textwrap.dedent(

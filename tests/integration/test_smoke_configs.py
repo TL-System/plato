@@ -112,7 +112,7 @@ def test_split_learning_smoke(monkeypatch):
         trainer = trainer_mod.Trainer(model=lambda: SimpleNamespace())
         trainer.context.client_id = 0
         trainer.gradients = []
-        trainer.cut_layer_grad = None
+        setattr(trainer, "cut_layer_grad", None)
 
         trainer.callback_handler.call_event("on_train_run_start", trainer, {})
         trainer.callback_handler.call_event(

@@ -5,9 +5,11 @@ federated unlearning.
 
 import copy
 import logging
+import math
 import os
 import random
 from collections import deque
+from numbers import Real
 from typing import Any
 
 import fedunlearning_server
@@ -131,7 +133,7 @@ class Server(fedunlearning_server.Server):
 
         # A dictionary that maps client IDs to the cluster IDs
         self.num_clusters = 0
-        self.clusters = {}
+        self.clusters: dict[int, int | None] = {}
 
         # If HuggingFace models are used, set the initial accuracy to a very large value
         if hasattr(Config().trainer, "target_perplexity"):
@@ -167,7 +169,7 @@ class Server(fedunlearning_server.Server):
 
         # A dictionary that maps client ids and its cos similarity compared with
         # pre-trained server model
-        self.clients_similarity = {}
+        self.clients_similarity: dict[int, float | None] = {}
 
         # Whether we are using random clustering or optimized clustering
         self.initialize_optimization = False
@@ -399,7 +401,8 @@ class Server(fedunlearning_server.Server):
         cluster_id = self.clusters[client_id]
 
         if (
-            cluster_id in self.clustered_retraining
+            cluster_id is not None
+            and cluster_id in self.clustered_retraining
             and self.clustered_retraining[cluster_id]
         ):
             # Each cluster has its own round number that it needs to roll back to during the
@@ -768,8 +771,22 @@ class Server(fedunlearning_server.Server):
     def _convert_to_solver(self, client_training_times):
         """Transform useful dictionaries to solvable matrix."""
         # Transfer the values of dic to list.
-        training_time_list = list(client_training_times.values())
-        similarity_list = list(self.clients_similarity.values())
+        if not client_training_times or not self.clients_similarity:
+            raise ValueError("KNOT clustering requires a nonempty client population.")
+        if self.num_clusters <= 0:
+            raise ValueError("KNOT clustering requires a positive cluster count.")
+
+        training_time_list: list[float] = []
+        for value in client_training_times.values():
+            if not isinstance(value, Real) or not math.isfinite(value):
+                raise ValueError("KNOT training times must be finite numeric values.")
+            training_time_list.append(float(value))
+
+        similarity_list: list[float] = []
+        for value in self.clients_similarity.values():
+            if not isinstance(value, Real) or not math.isfinite(value):
+                raise ValueError("KNOT requires a finite similarity for every client.")
+            similarity_list.append(float(value))
 
         # Anchor intervals between clusters: (max value - min value) / the number of clusters
         similarity_interval = (
@@ -884,7 +901,10 @@ class Server(fedunlearning_server.Server):
 
         index_of_value_1 = numpy.array(numpy.argwhere(assignment_array == 1))
 
-        self.clusters = dict(zip(index_of_value_1[:, 1] + 1, index_of_value_1[:, 0]))
+        self.clusters = {
+            int(client_id) + 1: int(cluster_id)
+            for cluster_id, client_id in index_of_value_1
+        }
         algorithm = self._require_algorithm()
         algorithm.init_clusters(self.clusters)
 

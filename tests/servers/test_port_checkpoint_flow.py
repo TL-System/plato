@@ -21,6 +21,7 @@ def test_actual_port_hook_to_stale_similarity_and_aggregation(
 ):
     path = Path(__file__).resolve().parents[2] / "examples/async/port/port_server.py"
     spec = importlib.util.spec_from_file_location("phase2b_port_server", path)
+    assert spec is not None and spec.loader is not None
     port_server = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(port_server)
     Config.params["model_path"] = str(tmp_path)

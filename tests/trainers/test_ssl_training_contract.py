@@ -11,11 +11,15 @@ from plato.trainers.strategies.base import TrainingContext
 from tests.integration.utils import build_minimal_config, configure_environment
 
 
+class LinearEncoder(torch.nn.Linear):
+    encoding_dim: int = 2
+
+
 class EncoderModel(torch.nn.Module):
+    encoder: torch.nn.Module
     def __init__(self):
         super().__init__()
-        self.encoder = torch.nn.Linear(2, 2)
-        self.encoder.encoding_dim = 2
+        self.encoder = LinearEncoder(2, 2)
 
     def forward(self, samples):
         return self.encoder(samples)
@@ -42,12 +46,15 @@ def test_ssl_model_instance_and_personalization_batch_config(tmp_path):
         model = EncoderModel()
         trainer = Trainer(model=model)
         assert trainer.model is model
-        trainer.device = trainer.context.device = torch.device("cpu")
+        trainer.device = "cpu"
+        trainer.context.device = torch.device("cpu")
+        assert trainer.model is not None
         trainer.current_round = 2
         data = TensorDataset(torch.eye(2).repeat(2, 1), torch.tensor([0, 1, 0, 1]))
         before = copy.deepcopy(trainer.local_layers.state_dict())
         before_encoder = copy.deepcopy(model.encoder.state_dict())
         trainer.train_model({**config["trainer"], "run_id": "ssl"}, data, [0, 1, 2, 3])
+        assert trainer.train_loader is not None
         assert trainer.train_loader.batch_size == 2
         assert any(
             not torch.equal(value, before[key])

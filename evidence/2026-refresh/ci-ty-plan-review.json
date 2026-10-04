@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "status": "accepted_for_implementation",
+  "ci_plan_verdict": "accepted",
+  "typing_plan_verdict": "accepted_for_configured_fatal_typing_with_scope_clarifications",
+  "reviewed_source": {
+    "root": "/tmp/plato-refresh-worktrees/phase4-integration",
+    "commit": "e81248dae1844fb5bc66a8d880c9a17b485606ac",
+    "plans": [
+      "/tmp/plato-ci-simplification-plan.json",
+      "/tmp/plato-ty-cleanup-plan.json"
+    ],
+    "pending_fei_retirement": "c135999",
+    "fei_note": "Rebase against the accepted FEI retirement before touching conftest. Preserve its registry cardinality correction; do not restore FEI or its rejected workflow proposal.",
+    "source_edits": false
+  },
+  "blocking_findings": [],
+  "evidence": {
+    "existing_automatic_workflow": "One singleton Python 3.13 matrix currently repeats base and mandatory suites, then runs runtime/containment, retained model-search and Lighteval qualifications. The classified typing step explicitly accepts status 1 for unowned diagnostics.",
+    "independent_junit_recalculation": {
+      "artifact": "/tmp/plato-deployment-linux/313/mandatory.xml",
+      "mandatory_cases": 1565,
+      "matched_slow_cases": 35,
+      "matched_slow_seconds": 990.929,
+      "remaining_cases": 1530,
+      "remaining_case_seconds": 314.688,
+      "method": "Match exact planned function names and, for the three mixed functions, only the True spawn parameter. No filename-wide removal."
+    },
+    "required_core_checks": "The planned slow set does not contain any of conftest._REQUIRED's six mandatory DP/MPC cases. Non-spawn False variants remain in fast CI; existing in-process trainer and contract tests remain automatic.",
+    "manual_relocation": "Existing retained/Lighteval contract tests load actual embedded verifier/interpreter snippets from pytorch_tests.yml. They must point to the relocated qualification file; Lighteval's source ledger must hash the actual full workflow and any fast workflow claimed as provenance.",
+    "archive_evidence": "archives/legacy_datalib/README.md explicitly documents byte-preserved, unshipped, unimported historical code with preserved defects. Excluding archives and sealed historical evidence from maintained-source typing is justified.",
+    "latest_ty": {
+      "version": "0.0.84",
+      "verified_date": "2026-10-03",
+      "source": "https://pypi.org/pypi/ty/json",
+      "release_upload_date": "2026-09-24",
+      "note": "The manifest already requires ty>=0.0.84. Verify the resolved lock/runtime version; no artificial dependency upgrade is needed if the lock already resolves this latest release."
+    },
+    "typing_inventory": "The plan's maintained-source partitions total 285 configured diagnostics. A separately reproduced strict import run adds 43 unresolved imports in a different optional dependency environment. Those are not interchangeable baselines."
+  },
+  "bounded_clarifications": [
+    {
+      "id": "TY-ENV",
+      "priority": "P2",
+      "issue": "The normal dev environment and strict-import inventory environment are different. The phrase every declared Python/platform profile must not imply an unspecified union of all optional environments.",
+      "implementation_resolution": "Fast CI runs the exact locked Python 3.13 dev sync and direct configured ty command from repository root. Manual core uses the same configured fatal gate in its stated dev environment; its existing focused Lighteval typing gate remains in the installed Lighteval environment. Keep native Apple Silicon qualification explicit. Do not install all workspace/SSL/Lighteval dependencies into the fast test environment simply to reproduce a stricter optional inventory.",
+      "acceptance": "Record runtime ty version, dependency profile and target platform with the passing configured check. The direct command must return 0 and produce no configured diagnostics. Do not substitute the old helper-environment output for exact CI environment evidence."
+    },
+    {
+      "id": "TY-IMPORT-SCOPE",
+      "priority": "P2",
+      "issue": "The current global unresolved-import ignore is inherited configuration, not a new suppression. Retaining it makes a zero-diagnostic result configured typing success, not strict optional import/API qualification.",
+      "implementation_resolution": "Fix all 285 maintained configured diagnostics and use legitimate archive/evidence exclusions. Retain or narrow the inherited optional-import policy; do not add suppressions, widen it, introduce blanket rule/file ignores, exclude active tests/examples, or erase types with new Any/object annotations. Label the separate 43-import strict inventory as follow-up until concrete installed environments and commands are defined. Preserve focused installed-profile typing gates.",
+      "acceptance": "Latest ty must report zero maintained configured diagnostics under the inherited optional-import policy with exit 0. No added suppressions. The review distinguishes inherited optional-import policy from strict import/API qualification; claim the latter only after its installed-profile checks actually pass."
+    },
+    {
+      "id": "CI-SCOPE-LABEL",
+      "priority": "P2",
+      "issue": "The integration conftest already treats native, Lighteval and examples_phase4 task modules as explicit optional scopes. The historical 1530-case projection predates some accepted integration changes.",
+      "implementation_resolution": "Recompute final inventories on the rebased source and document automatic fast core versus manual existing PyTorch qualifications. Preserve the existing explicit examples-phase4 gates and do not advertise manual PyTorch qualification as every optional example/native task qualification. Keep these pre-existing boundaries visible in the development documentation.",
+      "acceptance": "The final full mandatory non-runtime inventory differs only by accepted source additions and deliberate policy tests, with exactly the reviewed slow cases removed from fast. Final counts/timings are measured rather than forced to historical constants."
+    }
+  ],
+  "implementation_acceptance": [
+    "One automatic mandatory suite uses precisely not runtime and not slow; approve that partition only for mandatory. Preserve required DP/MPC presence and pass enforcement and rejection of unexpected skip/xfail/xpass or forbidden selectors.",
+    "Mark only the reviewed functions/True parameters. All old full partition commands continue to include slow tests. Existing runtime 48-case enforcement remains unchanged for full/runtime partitions.",
+    "Keep stable automatic job ID/name, direct fatal Ruff/ty handling, lock check, compact logs/JUnit/coverage/provenance and external basetemp. Do not carry status-1 acceptance, continue-on-error or exit-zero into either workflow.",
+    "Move full existing qualifications to workflow_dispatch only with their fresh environments, exact gates, embedded-verifier regression coverage and safe artifact staging preserved. Do not claim a new full 64-minute run unless it occurs.",
+    "PR cancellation must leave main and manual runs uncancelled; retain automatic docs/package and container checks without path-filter complexity.",
+    "Use TypedDicts, concrete fixtures/subclasses, signature corrections, guarded optional values and explicit narrowing for typing repairs. Do not weaken production APIs for inaccurate fixtures or silently change intended negative tests.",
+    "Run exact latest-ty configured command in the final locked dev environment, one full fast mandatory suite and focused behavioral checks for changed typing guards/harnesses. Rerun relevant spawned/containment qualifications if typing edits change their runtime behavior.",
+    "A fresh implementation review and real hosted Linux automatic run establish the final pass and latency. The 6-8 minute estimate and <=10 minute target are credible projections, not results already achieved."
+  ],
+  "conclusion": "Proceed with the CI author and maintained diagnostic owners. The design reduces duplicated/expensive execution without removing meaningful in-process core coverage, and a direct fatal latest configured ty check replaces the misleading baseline allowance. No additional CI architecture or blanket optional dependency installation is required."
+}

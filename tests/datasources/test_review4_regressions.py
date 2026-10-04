@@ -3,6 +3,7 @@
 import contextlib
 import http.server
 import threading
+from typing import TypedDict
 
 import pytest
 
@@ -16,9 +17,18 @@ from tests.datasources.test_review3_regressions import (
 )
 
 
+class FailureState(TypedDict):
+    payload: bytes
+    status: int
+    truncated: bool
+    hits: list[tuple[str, int]]
+
+
 @contextlib.contextmanager
 def failing_source(payload):
-    state = {"payload": payload, "status": 200, "truncated": False, "hits": []}
+    state: FailureState = {
+        "payload": payload, "status": 200, "truncated": False, "hits": []
+    }
 
     class Handler(http.server.BaseHTTPRequestHandler):
         def do_GET(self):
@@ -31,7 +41,7 @@ def failing_source(payload):
             self.end_headers()
             self.wfile.write(body)
 
-        def log_message(self, *args):
+        def log_message(self, format, *args):
             pass
 
     server = http.server.ThreadingHTTPServer(("127.0.0.1", 0), Handler)

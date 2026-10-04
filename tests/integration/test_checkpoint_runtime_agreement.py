@@ -13,7 +13,6 @@ import pytest
 import torch
 
 from plato.algorithms import fedavg, fedavg_personalized
-from plato.clients.base import Client
 from plato.clients.strategies.base import ClientContext
 from plato.clients.strategies.defaults import DefaultCommunicationStrategy
 from plato.clients.strategies.fedavg_personalized import (
@@ -24,6 +23,7 @@ from plato.trainers.composable import ComposableTrainer
 from plato.utils.checkpoint_paths import checkpoint_name
 from tests.integration.utils import build_minimal_config, configure_environment
 from tests.test_utils.fakes import (
+    BoundaryClient,
     IdentityLifecycleStrategy,
     InMemoryReportingStrategy,
     NoOpCommunicationStrategy,
@@ -36,12 +36,13 @@ def make_server():
     from plato.servers.fedavg import Server
 
     trainer = ComposableTrainer(model=torch.nn.Linear(2, 2))
-    trainer.device = trainer.context.device = torch.device("cpu")
+    trainer.device = "cpu"
+    trainer.context.device = torch.device("cpu")
     server = Server()
     server.trainer = trainer
     server.algorithm = fedavg.Algorithm(trainer)
     server.clients = {100: {"sid": "worker", "client_id": 1}}
-    server.sio = SimpleNamespace(emit=AsyncMock())
+    setattr(server, "sio", SimpleNamespace(emit=AsyncMock()))
     return server
 
 
@@ -101,7 +102,7 @@ def test_server_simulated_writer_to_actual_supplied_filename_reader(tmp_path):
         filename = Path(response["payload_filename"])
         assert filename.parent == Path(Config.params["checkpoint_path"])
         expected = copy.deepcopy(server.trainer.model.state_dict())
-        client = Client()
+        client = BoundaryClient()
         client._configure_composable(
             lifecycle_strategy=IdentityLifecycleStrategy(),
             payload_strategy=RecordingPayloadStrategy(),
@@ -110,6 +111,7 @@ def test_server_simulated_writer_to_actual_supplied_filename_reader(tmp_path):
             communication_strategy=NoOpCommunicationStrategy(),
         )
         asyncio.run(client._payload_to_arrive(response))
+        assert client.server_payload is not None
         for key, value in client.server_payload.items():
             torch.testing.assert_close(value, expected[key])
         assert client.client_id == 1
@@ -131,7 +133,7 @@ def test_client_simulated_writers_and_server_reader_do_not_alias_names(
             context.client_id = 2
             context.state["outbound_client_id"] = 1
             if legacy_sender:
-                client = Client()
+                client = BoundaryClient()
                 client.client_id = 1
                 asyncio.run(client._send(payload))
             else:
@@ -171,6 +173,7 @@ def test_actual_personalized_outbound_hook_to_local_layer_reader(
         trainer.set_client_id(7)
         algorithm = fedavg_personalized.Algorithm(trainer)
         algorithm.set_client_id(7)
+        assert trainer.model is not None
         trainer.model.bias.data.fill_(4)
         context = ClientContext()
         context.client_id = 7
@@ -203,6 +206,7 @@ def test_urgent_snapshot_numeric_selection_and_owned_cleanup_agree(tmp_path):
         trainer.set_client_id(7)
         root = Path(Config.params["model_path"])
         for epoch, time, weight in [(9, "9e-06", 9), (10, "1e-05", 10)]:
+            assert trainer.model is not None
             trainer.model.weight.data.fill_(weight)
             trainer.save_model(checkpoint_name(7, epoch, time, suffix=".safetensors"))
         assert trainer.obtain_model_at_time(7, 11e-06).weight.item() == 10
@@ -211,7 +215,7 @@ def test_urgent_snapshot_numeric_selection_and_owned_cleanup_agree(tmp_path):
         (root / (legacy.name + ".pkl")).write_bytes(b"history")
         other = root / "8_10_1e-05.safetensors"
         other.write_bytes(b"other client")
-        client = Client()
+        client = BoundaryClient()
         client.client_id = 7
         client._clear_checkpoint_files()
         assert list(root.iterdir()) == [other]

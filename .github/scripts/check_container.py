@@ -19,6 +19,27 @@ import tempfile
 import time
 import tomllib
 from pathlib import Path
+from typing import NotRequired, TypedDict
+
+
+class ProbeRecord(TypedDict):
+    """Common fields consumed from a marked container result."""
+
+    hostname: str
+    args: NotRequired[list[str]]
+
+
+class ResourceRecord(TypedDict):
+    """Host measurements used to decide whether disk reclamation is needed."""
+
+    phase: str
+    disks: dict[str, dict[str, int]]
+    minimum_free_bytes: int
+    base_compressed_bytes: int
+    standard_runner_documented_storage_gb: int
+    runner_os: str
+    docker_os: str
+    docker_arch: str
 
 BASE_IMAGE = (
     "nvidia/cuda:13.0.3-devel-ubuntu24.04@sha256:"
@@ -75,7 +96,7 @@ def require(condition: bool, message: str) -> None:
         raise RuntimeError(message)
 
 
-def read_probe(output: str) -> dict[str, object]:
+def read_probe(output: str) -> ProbeRecord:
     # NVIDIA's normal entrypoint prints a CUDA banner before executing commands.
     records = [
         line[len(PROBE_PREFIX) :]
@@ -83,7 +104,10 @@ def read_probe(output: str) -> dict[str, object]:
         if line.startswith(PROBE_PREFIX)
     ]
     require(len(records) == 1, "Expected one marked container probe record.")
-    return json.loads(records[0])
+    record = json.loads(records[0])
+    if not isinstance(record, dict) or not isinstance(record.get("hostname"), str):
+        raise RuntimeError("Container probe must report its hostname.")
+    return record
 
 
 def ignored(path: str, patterns: list[str]) -> bool:
@@ -274,7 +298,12 @@ def inside_probe(expected_lock: str, mounted: bool) -> dict[str, object]:
         "timm",
         "zstd",
     ]
-    imports = {name: importlib.import_module(name).__file__ for name in modules}
+    imports: dict[str, str] = {}
+    for name in modules:
+        location = importlib.import_module(name).__file__
+        if location is None:
+            raise RuntimeError(f"Imported module has no source location: {name}")
+        imports[name] = location
     for name in ("torch", "torchvision", "numpy"):
         require(
             Path(imports[name]).is_relative_to(environment),
@@ -298,7 +327,10 @@ def inside_probe(expected_lock: str, mounted: bool) -> dict[str, object]:
             "location": str(distribution.locate_file("")),
             "direct_url": distribution.read_text("direct_url.json"),
         }
-    origin = json.loads(distributions["plato-learn"]["direct_url"])
+    direct_url = distributions["plato-learn"]["direct_url"]
+    if direct_url is None:
+        raise RuntimeError("Project installation has no direct_url.json record.")
+    origin = json.loads(direct_url)
     require(origin["url"] == "file:///root/plato", "Wrong project install origin.")
     require(origin["dir_info"]["editable"], "Development install must be editable.")
     import torch
@@ -310,7 +342,7 @@ def inside_probe(expected_lock: str, mounted: bool) -> dict[str, object]:
     )
     tensor = torch.tensor([1.0, 2.0, 3.0])
     require(
-        (tensor.square() == torch.tensor([1.0, 4.0, 9.0])).all().item(),
+        bool((tensor.square() == torch.tensor([1.0, 4.0, 9.0])).all().item()),
         "CPU tensor operation failed.",
     )
     boxes = torch.tensor([[0.0, 0.0, 1.0, 1.0], [0.0, 0.0, 1.0, 1.0]])
@@ -331,7 +363,7 @@ def inside_probe(expected_lock: str, mounted: bool) -> dict[str, object]:
     )
     cudnn_distribution = importlib.metadata.distribution("nvidia-cudnn-cu13")
     cudnn_files = {
-        str(cudnn_distribution.locate_file(file).resolve())
+        str(Path(str(cudnn_distribution.locate_file(file))).resolve())
         for file in cudnn_distribution.files or []
         if "libcudnn" in str(file)
     }
@@ -422,7 +454,7 @@ class LinuxCheck:
             record["log"] = output.name
             save(self.artifacts / "commands.json", self.commands)
 
-    def resources(self, phase: str) -> dict[str, object]:
+    def resources(self, phase: str) -> ResourceRecord:
         info = json.loads(
             self.run(
                 ["docker", "info", "--format", "{{json .}}"], f"docker-info-{phase}"
@@ -432,7 +464,7 @@ class LinuxCheck:
         disks = {str(path): shutil.disk_usage(path)._asdict() for path in paths}
         self.run(["df", "-h", *map(str, paths)], f"df-{phase}")
         self.run(["docker", "system", "df"], f"docker-disk-{phase}")
-        record = {
+        record: ResourceRecord = {
             "phase": phase,
             "disks": disks,
             "minimum_free_bytes": MIN_FREE_BYTES,
@@ -464,7 +496,7 @@ class LinuxCheck:
         )
         require("No such" in output, "Container removal was not proved.")
 
-    def reclaim_hosted_sdks(self, initial: dict[str, object]) -> None:
+    def reclaim_hosted_sdks(self, initial: ResourceRecord) -> None:
         """Reclaim only unused documented SDKs on a disposable hosted runner."""
         record: dict[str, object] = {"removed": [], "skipped": []}
         if all(disk["free"] >= MIN_FREE_BYTES for disk in initial["disks"].values()):

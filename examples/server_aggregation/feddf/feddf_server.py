@@ -42,7 +42,10 @@ class Server(fedavg.Server):
 
     def customize_server_payload(self, payload):
         """Send weights together with the shared proxy inputs for FedDF."""
-        proxy_dataset = self.aggregation_strategy._resolve_proxy_dataset(self.context)
+        strategy = self.aggregation_strategy
+        if not isinstance(strategy, FedDFAggregationStrategy):
+            raise TypeError("FedDF requires a FedDFAggregationStrategy.")
+        proxy_dataset = strategy._resolve_proxy_dataset(self.context)
         proxy_inputs = self.context.state.get("feddf_proxy_inputs")
         if proxy_inputs is None:
             proxy_inputs = stack_proxy_inputs(proxy_dataset)

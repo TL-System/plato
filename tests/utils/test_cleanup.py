@@ -8,6 +8,7 @@ import pytest
 _SPEC = importlib.util.spec_from_file_location(
     "plato_cleanup", Path(__file__).parents[2] / "cleanup.py"
 )
+assert _SPEC is not None and _SPEC.loader is not None
 cleanup = importlib.util.module_from_spec(_SPEC)
 _SPEC.loader.exec_module(cleanup)
 

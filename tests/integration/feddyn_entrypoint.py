@@ -92,11 +92,13 @@ class Partition:
         return len(self.indices)
 
 
-registry.registered_samplers["feddyn_fixture"] = Partition
+setattr(registry, "registered_samplers",
+        {**registry.registered_samplers, "feddyn_fixture": Partition})
 
 
 class Observe(ServerCallback):
-    def on_weights_received(self, server, weights):
+    def on_weights_received(self, server, weights_received):
+        weights = weights_received
         payloads = copy.deepcopy(weights)
         torch.save(
             dict(
@@ -116,7 +118,7 @@ class Observe(ServerCallback):
         np.random.standard_normal()
         torch.rand(3)
 
-    def on_clients_processed(self, server):
+    def on_clients_processed(self, server, **kwargs):
         server.save_to_checkpoint()
         torch.save(
             server._committed_snapshot, ROOT / f"committed-{server.committed_round}.pth"
@@ -188,11 +190,9 @@ def main():
         )
 
     feddyn_client.create_client, feddyn_server.Server = client_factory, server_factory
-    server_base.Server.start, server_base.run, mp.Process.start = (
-        start,
-        observe_client_run,
-        process_start,
-    )
+    setattr(server_base.Server, "start", start)
+    setattr(server_base, "run", observe_client_run)
+    setattr(mp.Process, "start", process_start)
     feddyn.main()
     emit("main_returned")
 

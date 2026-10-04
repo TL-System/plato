@@ -46,9 +46,9 @@ def test_accumulation_matches_mean_of_microbatch_losses(sizes, window):
     for start in range(0, len(batches), window):
         chunk = batches[start : start + window]
         reference_optimizer.zero_grad()
-        reference_loss = sum(
-            torch.nn.functional.mse_loss(reference(x), y) for x, y in chunk
-        ) / len(chunk)
+        reference_loss = torch.stack(
+            [torch.nn.functional.mse_loss(reference(x), y) for x, y in chunk]
+        ).mean()
         reference_loss.backward()
         reference_optimizer.step()
     flags = []
@@ -88,7 +88,9 @@ def test_accumulation_run_epoch_and_exception_cleanup(tmp_path):
             loss_strategy=MSELossStrategy(),
             optimizer_strategy=SGDOptimizerStrategy(lr=0.01),
         )
-        trainer.device = trainer.context.device = torch.device("cpu")
+        trainer.device = "cpu"
+        trainer.context.device = torch.device("cpu")
+        assert trainer.model is not None
         dataset = TensorDataset(torch.ones(5, 2), torch.zeros(5, 1))
         run = {**config["trainer"], "run_id": "updates"}
         for _ in range(2):
@@ -104,7 +106,7 @@ def test_accumulation_run_epoch_and_exception_cleanup(tmp_path):
                 raise RuntimeError("interrupted accumulation")
             return original(outputs, labels, context)
 
-        trainer.loss_strategy.compute_loss = interrupt
+        setattr(trainer.loss_strategy, "compute_loss", interrupt)
         with pytest.raises(RuntimeError, match="interrupted accumulation"):
             trainer.train_model(run, dataset, list(range(5)))
         assert strategy.current_step == 0
@@ -112,7 +114,7 @@ def test_accumulation_run_epoch_and_exception_cleanup(tmp_path):
             p.grad is None or torch.count_nonzero(p.grad) == 0
             for p in trainer.model.parameters()
         )
-        trainer.loss_strategy.compute_loss = original
+        setattr(trainer.loss_strategy, "compute_loss", original)
         trainer.train_model(run, dataset, list(range(5)))
         assert recorder.updates[-4:] == [(1, 1), (1, 2), (2, 1), (2, 2)]
 
@@ -174,7 +176,9 @@ def test_fedprox_refreshes_received_weights_each_run(tmp_path, composed):
             model=torch.nn.Linear(2, 2),
             loss_strategy=(CompositeLossStrategy([strategy]) if composed else strategy),
         )
-        trainer.device = trainer.context.device = torch.device("cpu")
+        trainer.device = "cpu"
+        trainer.context.device = torch.device("cpu")
+        assert trainer.model is not None
         data = TensorDataset(torch.eye(2).repeat(2, 1), torch.tensor([0, 1, 0, 1]))
         for value in (2.0, 3.0):
             with torch.no_grad():
@@ -218,7 +222,9 @@ def test_timm_real_lr_sequence_epochs_rounds_and_accumulation(
     with configure_environment(config, runtime_root=tmp_path):
         trainer = TrainerWithTimmScheduler(model=torch.nn.Linear(2, 2))
         trainer.training_step_strategy = GradientAccumulationStepStrategy(window)
-        trainer.device = trainer.context.device = torch.device("cpu")
+        trainer.device = "cpu"
+        trainer.context.device = torch.device("cpu")
+        assert trainer.model is not None
         data = TensorDataset(torch.ones(batches * 2, 2), torch.arange(batches * 2) % 2)
         for round_id in (1, 3):
             trainer.current_round = round_id
@@ -309,6 +315,7 @@ def test_validation_wrapper_retains_accumulation_and_checks_tail_gradients():
         torch.nn.functional.mse_loss,
         context,
     )
+    assert model.weight.grad is not None
     model.weight.grad.fill_(float("nan"))
     with pytest.raises(ValueError, match="gradient"):
         strategy.finalize(model, optimizer, context)
@@ -383,6 +390,7 @@ def test_loss_metrics_preserve_sample_weighting_without_retaining_batch_graphs()
         assert tracker.total_loss.grad_fn is None
         assert tracker.loss_value.grad_fn is None
     assert tracker.average == pytest.approx((4 * 2 + 1 * 3 + 4 * 1) / 6)
+    assert parameter.grad is not None
     assert parameter.grad.item() == pytest.approx(2.0)
 
 
@@ -407,17 +415,20 @@ def test_personalization_freezes_restore_model_ownership_after_failure(
             name: parameter.requires_grad
             for name, parameter in model.named_parameters()
         }
-        extra = {}
+        model_update_strategy = None
+        training_step_strategy = None
         if family == "fedper":
-            extra["model_update_strategy"] = FedPerUpdateStrategy(["0."])
+            model_update_strategy = FedPerUpdateStrategy(["0."])
         elif family == "fedrep":
-            extra["model_update_strategy"] = FedRepUpdateStrategy(
+            model_update_strategy = FedRepUpdateStrategy(
                 ["0."], ["1."], local_epochs=1
             )
         else:
-            extra["training_step_strategy"] = LGFedAvgStepStrategy(["0."], ["1."])
+            training_step_strategy = LGFedAvgStepStrategy(["0."], ["1."])
         trainer = ComposableTrainer(
-            model=model, loss_strategy=MSELossStrategy(), **extra
+            model=model, loss_strategy=MSELossStrategy(),
+            model_update_strategy=model_update_strategy,
+            training_step_strategy=training_step_strategy,
         )
         trainer.current_round = 2 if family == "fedper" else 1
         original = trainer.loss_strategy.compute_loss
@@ -425,7 +436,7 @@ def test_personalization_freezes_restore_model_ownership_after_failure(
         def interrupt(*args):
             raise RuntimeError("interrupted freeze")
 
-        trainer.loss_strategy.compute_loss = interrupt
+        setattr(trainer.loss_strategy, "compute_loss", interrupt)
         data = TensorDataset(torch.ones(2, 2), torch.zeros(2, 1))
         run = {**config["trainer"], "run_id": "freeze"}
         with pytest.raises(RuntimeError, match="interrupted freeze"):
@@ -434,7 +445,7 @@ def test_personalization_freezes_restore_model_ownership_after_failure(
             name: parameter.requires_grad
             for name, parameter in model.named_parameters()
         } == before
-        trainer.loss_strategy.compute_loss = original
+        setattr(trainer.loss_strategy, "compute_loss", original)
         weights = copy.deepcopy(model.state_dict())
         trainer.train_model(run, data, [0, 1])
         assert {
@@ -442,6 +453,7 @@ def test_personalization_freezes_restore_model_ownership_after_failure(
             for name, parameter in model.named_parameters()
         } == before
         torch.testing.assert_close(model[0].bias, weights["0.bias"])
+        assert isinstance(model[1], torch.nn.Linear)
         assert not torch.equal(model[1].weight, weights["1.weight"])
 
 
@@ -529,9 +541,10 @@ def test_real_grad_scaler_overflow_does_not_dispatch_optimizer_update(tmp_path, 
         strategy.enabled = True
         strategy.scaler = torch.amp.GradScaler("cpu")
         factor = [float("inf")]
-        trainer.loss_strategy.compute_loss = (
+        setattr(
+            trainer.loss_strategy, "compute_loss",
             lambda output, labels, context:
-            torch.nn.functional.mse_loss(output, labels) * factor[0]
+            torch.nn.functional.mse_loss(output, labels) * factor[0],
         )
         data = TensorDataset(torch.ones(1, 1), torch.zeros(1, 1))
         run = {**config["trainer"], "run_id": "amp"}
@@ -544,6 +557,7 @@ def test_real_grad_scaler_overflow_does_not_dispatch_optimizer_update(tmp_path, 
         trainer.train_model(run, data, [0])
         assert len(recorder.updates) == 1
         assert model.weight.item() == pytest.approx(0.98)
+        assert model.weight.grad is not None
         assert not model.weight.grad.isnan().any()
 
 
@@ -564,6 +578,7 @@ def test_feddyn_all_zero_labels_leave_zero_origin_regularizer(tmp_path):
         loss = strategy.compute_loss(model(torch.ones(2, 1).double()), labels, context)
         loss.backward()
         assert torch.isfinite(loss)
+        assert model.weight.grad is not None
         assert model.weight.grad.item() == 0
         coefficient = strategy._get_alpha_coefficient(torch.tensor([0, 1]), context)
         assert coefficient == pytest.approx(0.1)
