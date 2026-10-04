@@ -1102,3 +1102,128 @@ def test_malformed_registration_requests_are_bounded(payload):
         right.close()
         sender.join(timeout=1)
         assert not sender.is_alive()
+
+
+@pytest.mark.parametrize(
+    "damage",
+    [
+        "huge-created-1",
+        "huge-created-2",
+        "unserializable-field",
+        "unserializable-case",
+        "reserved-field",
+        "stale-owned",
+    ],
+)
+def test_first_child_event_failure_is_durable_and_cannot_be_suppressed(
+    worker_repo, tmp_path, damage
+):
+    import psutil
+
+    fields = (
+        "child_created=10**5000"
+        if damage.startswith("huge-created")
+        else "child_created=identity['created']+1"
+        if damage == "stale-owned"
+        else "child_created=identity['created']"
+    )
+    extra = {
+        "unserializable-field": ", details=object()",
+        "unserializable-case": ", case_id=object()",
+        "reserved-field": ", pid=10**5000",
+    }.get(damage, "")
+    worker = _worker(
+        worker_repo,
+        "with configured_case(spec, directory):\n    import entry\n"
+        "import subprocess, psutil\n"
+        "child = subprocess.Popen([sys.executable, '-c', 'import time; time.sleep(30)'], start_new_session=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)\n"
+        "identity = {'pid':child.pid, 'created':psutil.Process(child.pid).create_time()}\n"
+        "(directory / 'controlled-child.json').write_text(json.dumps(identity))\n"
+        f"try:\n    emit(directory, 'child_started', child_pid=identity['pid'], {fields}{extra})\n"
+        "except (RuntimeError, ValueError, TypeError):\n    print('suppressed registration error', flush=True)\n"
+        "emit(directory, 'success')\nos._exit(0)\n",
+    )
+    directory = tmp_path / "first-write"
+    try:
+        with pytest.raises(AssertionError, match="Phase4 case failed"):
+            common.run_case(
+                directory,
+                worker=worker,
+                spec=_spec(config="leaf.toml", entrypoint="entry.py"),
+            )
+        result = json.loads((directory / "result.json").read_text())
+        identity = json.loads((directory / "controlled-child.json").read_text())
+        failure = next(e for e in result["events"] if e["event"] == "failure")
+        assert failure["case_id"] == _spec()["case_id"]
+        assert (
+            failure["local_child_owned"] and failure["local_child_identity"] == identity
+        )
+        assert (
+            failure["local_cleanup"]["forced"]
+            and failure["local_cleanup"]["survivors"] == []
+        )
+        assert len(failure["message"]) <= 600
+        assert "suppressed registration error" in (directory / "stdout.log").read_text()
+        assert (directory / "stderr.log").exists()
+        assert result["child_registrations"] == [] and result["survivors"] == []
+        try:
+            child = psutil.Process(identity["pid"])
+            assert (
+                child.create_time() != identity["created"]
+                or child.status() == psutil.STATUS_ZOMBIE
+            )
+        except psutil.NoSuchProcess:
+            pass
+    finally:
+        path = directory / "controlled-child.json"
+        if path.exists():
+            identity = json.loads(path.read_text())
+            try:
+                child = psutil.Process(identity["pid"])
+                if child.create_time() == identity["created"]:
+                    child.kill()
+            except psutil.NoSuchProcess:
+                pass
+
+
+@pytest.mark.parametrize("damage", ["huge-created", "unserializable-case"])
+def test_first_write_failure_never_signals_an_unrelated_hint(
+    worker_repo, tmp_path, damage
+):
+    import psutil
+
+    unrelated = subprocess.Popen([sys.executable, "-c", "import time; time.sleep(30)"])
+    try:
+        created = psutil.Process(unrelated.pid).create_time()
+        fields = (
+            "child_created=10**5000"
+            if damage == "huge-created"
+            else f"child_created={created}, case_id=object()"
+        )
+        worker = _worker(
+            worker_repo,
+            "with configured_case(spec, directory):\n    import entry\n"
+            f"try:\n    emit(directory, 'child_started', child_pid={unrelated.pid}, {fields})\n"
+            "except (RuntimeError, ValueError, TypeError):\n    pass\n"
+            "emit(directory, 'success')\nos._exit(0)\n",
+        )
+        directory = tmp_path / "unrelated-first-write"
+        with pytest.raises(AssertionError, match="Phase4 case failed"):
+            common.run_case(
+                directory,
+                worker=worker,
+                spec=_spec(config="leaf.toml", entrypoint="entry.py"),
+            )
+        result = json.loads((directory / "result.json").read_text())
+        failure = next(e for e in result["events"] if e["event"] == "failure")
+        assert (
+            failure["local_child_owned"] is False
+            and failure["local_child_identity"] is None
+        )
+        assert failure["local_cleanup"]["forced"] == []
+        assert (
+            unrelated.poll() is None and str(unrelated.pid) not in result["processes"]
+        )
+    finally:
+        unrelated.terminate()
+        unrelated.communicate(timeout=5)

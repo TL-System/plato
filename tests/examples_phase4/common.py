@@ -244,22 +244,37 @@ def emit(directory: Path, event: str, **fields: object) -> None:
     The spawning process must register immediately and cannot exit before this
     call returns. A rejected/expired registration is fatal worker evidence.
     """
-    if any(
-        k in fields for k in ("pid", "created", "monotonic", "event", "registration_id")
-    ):
-        raise ValueError("reserved event identity field")
+    reserved = ("pid", "created", "monotonic", "event", "registration_id")
     if event != "child_started":
+        if any(k in fields for k in reserved):
+            raise ValueError("reserved event identity field")
         _write_event(directory, event, fields)
         return
+    import psutil
+
     request_id = secrets.token_hex(16)
-    record = _write_event(directory, event, {**fields, "registration_id": request_id})
     local_identity = None
     try:
+        # Caller metadata may not even be serializable. Cleanup authority comes
+        # from current OS lineage and creation time before validating that data.
+        candidate_pid = fields.get("child_pid")
+        if type(candidate_pid) is int and 0 < candidate_pid < 2**31:
+            try:
+                actual_created = psutil.Process(candidate_pid).create_time()
+                if _local_descendant(candidate_pid, actual_created):
+                    local_identity = (candidate_pid, actual_created)
+            except psutil.Error:
+                pass
+        if any(k in fields for k in reserved):
+            raise ValueError("reserved event identity field")
         pid, created = _identity(fields.get("child_pid"), fields.get("child_created"))
         if pid == os.getpid():
             raise ValueError("a process cannot register itself as its child")
-        if _local_descendant(pid, created):
-            local_identity = (pid, created)
+        if local_identity is not None and local_identity != (pid, created):
+            raise ValueError("child identity differs from independently proven child")
+        record = _write_event(
+            directory, event, {**fields, "registration_id": request_id}
+        )
         endpoint = _mapping(json.loads(os.environ["PLATO_PHASE4_REGISTRATION"]))
         port, token = endpoint.get("port"), endpoint.get("token")
         if type(port) is not int or not 0 < port < 65536 or not isinstance(token, str):
@@ -288,6 +303,7 @@ def emit(directory: Path, event: str, **fields: object) -> None:
         OSError,
         RuntimeError,
         RecursionError,
+        psutil.Error,
     ) as exc:
         cleanup = (
             _local_cleanup(*local_identity)
@@ -298,11 +314,20 @@ def emit(directory: Path, event: str, **fields: object) -> None:
             directory,
             "failure",
             {
-                "case_id": record["case_id"],
+                # Never retry serialization of caller-provided failure fields.
+                "case_id": os.environ.get("PLATO_PHASE4_CASE"),
                 "type": "ChildRegistrationError",
-                "message": f"child registration failed: {type(exc).__name__}: {exc}",
+                "message": (
+                    f"child registration failed: {type(exc).__name__}: {str(exc)[:512]}"
+                ),
                 "registration_id": request_id,
                 "local_child_owned": local_identity is not None,
+                "local_child_identity": {
+                    "pid": local_identity[0],
+                    "created": local_identity[1],
+                }
+                if local_identity
+                else None,
                 "local_cleanup": cleanup,
             },
         )
