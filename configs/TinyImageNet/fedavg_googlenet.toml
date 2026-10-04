@@ -45,7 +45,7 @@ max_concurrency = 2
 target_accuracy = 0.88
 
 # The machine learning model
-model_type = "torch_hub"
+model_type = "torchvision"
 model_name = "googlenet"
 
 # Number of epoches for local training in each communication round

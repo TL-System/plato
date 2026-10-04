@@ -16,7 +16,7 @@ from plato.models import (
     lenet5,
     multilayer,
     resnet,
-    torch_hub,
+    torchvision,
     vgg,
 )
 from plato.utils.retired_backends import raise_if_retired
@@ -61,7 +61,7 @@ registered_factories = {
     "vgg": vgg.Model,
     "cnn_encoder": cnn_encoder.Model,
     "general_multilayer": general_multilayer.Model,
-    "torch_hub": torch_hub.Model,
+    "torchvision": torchvision.Model,
     "huggingface": huggingface.Model,
 }
 

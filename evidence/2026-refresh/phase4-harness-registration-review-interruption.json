@@ -1,0 +1,42 @@
+{
+  "status": "INCOMPLETE_REVIEW_WITH_REPRODUCED_MATERIAL_FINDING",
+  "recorded_by": "root orchestration; not a completed independent review receipt",
+  "reviewer": "/root/phase4_harness_registration_review",
+  "source": "7c44ecdfe8c09c4569b927bb647f0b36a9202c33",
+  "evidence": "35ed9be16493a60b0e1e03b9873940744f7c2041",
+  "interruption": "Agent finalization stopped by automatic content filter reporting possible cybersecurity risk. No acceptance is inferred, no blocked action retried or bypassed.",
+  "finding": {
+    "severity": "high",
+    "title": "Initial child event serialization occurs outside guarded failure path.",
+    "observed": "Reviewer twice observed false success with a detached live child after unrepresentable numeric identity caused the first event write to raise and worker suppressed that exception. Raw source hash matches frozenhelper. Exact reviewer-created children were recovered.",
+    "source_location": "tests/examples_phase4/common.py first _write_event before registration try",
+    "original_author_handoff": "Minimal guard validation/serialization and durable failure record fix in separate phase4-harness-fix3; another different review required."
+  },
+  "liveness": {
+    "checked": 99,
+    "live": []
+  },
+  "artifacts": [
+    {
+      "path": "/tmp/plato-phase4-harness-registration-review/artifacts/unserializable-child-identity.json",
+      "sha256": "d504d34792e87937247e12c0a284d8cc8ca61c372f8af4b4e2ee4459800d6126",
+      "bytes": 60736
+    },
+    {
+      "path": "/tmp/plato-phase4-harness-registration-review/artifacts/reviewer-final-liveness.json",
+      "sha256": "d469b2a8a5a6a4ec2eac27786711cece22b75406f3a34f41a4bfb7fbd1849aa4",
+      "bytes": 60929
+    },
+    {
+      "path": "/tmp/plato-phase4-harness-registration-review/artifacts/audit.json",
+      "sha256": "cdd9e6890b5d7826ec203fdcf456de5adb815f42b0bdb2cd70a74d4849f4e2b4",
+      "bytes": 221263
+    },
+    {
+      "path": "/tmp/plato-phase4-harness-registration-review/edge_probe.py",
+      "sha256": "972df590cfda3eeef74633df6b088ca2ac5c1f16ee8202fa2ab1d26b7dd8eeac",
+      "bytes": 1829
+    }
+  ],
+  "limits": "Independent reviewer reported92/contracts/typing/sourceinventory and earlier probes green before new finding; this record preserves raw results but does not upgrade incomplete review to acceptance."
+}

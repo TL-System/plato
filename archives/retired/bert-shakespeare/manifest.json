@@ -1,0 +1,104 @@
+{
+  "schema_version": 1,
+  "backend": "bert-shakespeare",
+  "retired_at": "2026-10-04",
+  "pre_retirement_plato_commit": "c1359992f70533c0f2a47d30742f9b14295da882",
+  "pre_retirement_plato_tree": "9e75b3b2f306677fabc6f9214658bfeacd152dc5",
+  "plan_sha256": "a49502dca7146305f37c94a404ff7735c7507d79d3968b5a813f09e304442716",
+  "plan_review_sha256": "a93502a267b86617ff3bde0d30462179c219f0bbc279354d0c049dfddcd0ecb8",
+  "files": [
+    {
+      "original_path": "configs/HuggingFace/fedavg_shakespeare_bert.toml",
+      "archive_path": "archives/retired/bert-shakespeare/original/configs/HuggingFace/fedavg_shakespeare_bert.toml",
+      "disposition": "moved",
+      "git_mode": "100644",
+      "git_blob": "5785281a45ac575196e89fc4270ba8c7a281701a",
+      "sha256": "1aa5b3c151fc76742a316ca2a5fefb455c5d7fb0ed074fcba4ce8870fde81f87",
+      "bytes": 1301,
+      "source_commit": "c1359992f70533c0f2a47d30742f9b14295da882"
+    },
+    {
+      "original_path": "plato/models/huggingface.py",
+      "archive_path": "archives/retired/bert-shakespeare/original/plato/models/huggingface.py",
+      "disposition": "copied-context",
+      "git_mode": "100644",
+      "git_blob": "bc25e97100a24dd9aced9dc1575b8604186cfa87",
+      "sha256": "9e6f97fbf6a9eee00794868ab0aade6ad34dd153793f689c2e9c9f6315cc5f50",
+      "bytes": 3600,
+      "source_commit": "c1359992f70533c0f2a47d30742f9b14295da882"
+    },
+    {
+      "original_path": "plato/trainers/huggingface.py",
+      "archive_path": "archives/retired/bert-shakespeare/original/plato/trainers/huggingface.py",
+      "disposition": "copied-context",
+      "git_mode": "100644",
+      "git_blob": "dab2d2b6291e83952cd1ecbb5eec2ca6a6805f1e",
+      "sha256": "cde9f121c4358be7da12f34167a9b313debc2969fd598b743acf022adaef3102",
+      "bytes": 44363,
+      "source_commit": "c1359992f70533c0f2a47d30742f9b14295da882"
+    },
+    {
+      "original_path": "LICENSE",
+      "archive_path": "archives/retired/bert-shakespeare/original/LICENSE",
+      "disposition": "copied-context",
+      "git_mode": "100644",
+      "git_blob": "261eeb9e9f8b2b4b0d119366dda99c6fd7d35c64",
+      "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+      "bytes": 11357,
+      "source_commit": "c1359992f70533c0f2a47d30742f9b14295da882"
+    },
+    {
+      "original_path": "pyproject.toml",
+      "archive_path": "archives/retired/bert-shakespeare/original/pyproject.toml",
+      "disposition": "copied-context",
+      "git_mode": "100644",
+      "git_blob": "42601adc31e213a0ab008361ef53223826fcd770",
+      "sha256": "4c68adebeb88bba969a5d5c08a874644b1d40ccff241761dd7f2bd201b6ba3d3",
+      "bytes": 4189,
+      "source_commit": "c1359992f70533c0f2a47d30742f9b14295da882"
+    },
+    {
+      "original_path": "uv.lock",
+      "archive_path": "archives/retired/bert-shakespeare/original/uv.lock",
+      "disposition": "copied-context",
+      "git_mode": "100644",
+      "git_blob": "419ce6bf04e2ca46520dcf1e05a36ac134cdc63c",
+      "sha256": "66a4e4442d7b1f26d220b44ca73c44ff4f1151a86857bb3f93a594819fd08126",
+      "bytes": 755641,
+      "source_commit": "c1359992f70533c0f2a47d30742f9b14295da882"
+    },
+    {
+      "original_path": "tests/examples_phase4/cases.json",
+      "archive_path": "archives/retired/bert-shakespeare/original/tests/examples_phase4/cases.json",
+      "disposition": "copied-context",
+      "git_mode": "100644",
+      "git_blob": "e232ca35c0f024a6aa79b6c0362d412fa8b331f3",
+      "sha256": "7d18beab505f3f23cb6b14785c35b4d7a3b5b425b9dd541769e43bcd7b80167a",
+      "bytes": 240990,
+      "source_commit": "c1359992f70533c0f2a47d30742f9b14295da882"
+    }
+  ],
+  "inventory_sha256": "db5c4216faa5b46c89a482df5408fdedceb4cabdb6694da91f7d4a48aa17659f",
+  "evidence": [
+    {
+      "archive_path": "archives/retired/bert-shakespeare/evidence/plato-next-retirements-plan.json",
+      "sha256": "a49502dca7146305f37c94a404ff7735c7507d79d3968b5a813f09e304442716",
+      "bytes": 50862
+    },
+    {
+      "archive_path": "archives/retired/bert-shakespeare/evidence/plato-next-retirements-plan-review.json",
+      "sha256": "a93502a267b86617ff3bde0d30462179c219f0bbc279354d0c049dfddcd0ecb8",
+      "bytes": 2498
+    },
+    {
+      "archive_path": "archives/retired/bert-shakespeare/evidence/plato-bert-recipe-probe.py",
+      "sha256": "98ab6fd51b46b9ce503a6935978bf8d48825ac1bc504787332ac75995dac7377",
+      "bytes": 1093
+    },
+    {
+      "archive_path": "archives/retired/bert-shakespeare/evidence/plato-bert-recipe-probe.json",
+      "sha256": "4b930477249b5b7667dfeb17704379b8411d42514f8c1253066f401bb3543fa9",
+      "bytes": 230
+    }
+  ]
+}

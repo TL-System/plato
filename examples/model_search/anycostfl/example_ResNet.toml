@@ -60,7 +60,7 @@ loss_criterion = "CrossEntropyLoss"
 optimizer = "SGD"
 global_lr_scheduler = true
 lr_scheduler = "MultiStepLR"
-model_type = "torch_hub"
+model_type = "torchvision"
 model_name = "resnet18"
 
 [algorithm]

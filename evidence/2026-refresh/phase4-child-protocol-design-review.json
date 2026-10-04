@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "reviewer": "/root/phase4_child_protocol_review",
+  "review_type": "Independent bounded child-registration protocol design review; no implementation qualification",
+  "recorded_at_utc": "2026-10-04T00:44:52.444514+00:00",
+  "artifact": {
+    "path": "/tmp/plato-phase4-harness-fix2-design.json",
+    "sha256": "d0dc41d4412659f6b3b3591f8ea9d2821332e90076e0660f53d0edf6aba8092a",
+    "bytes": 7316
+  },
+  "authority_verified": [
+    {
+      "path": "/tmp/plato-phase4-harness-design.json",
+      "sha256": "0b01acff4e03d725f239af1fcc8d6f778fb1817ce69cb313f947391fcd14d502"
+    },
+    {
+      "path": "/tmp/plato-phase4-harness-design-review.json",
+      "sha256": "e97e3149a52639c9d13c7507d2e946eec50e1b0c775675255579ad25bc8b62f0"
+    },
+    {
+      "path": "/tmp/plato-phase4-harness-fix-review.json",
+      "sha256": "4324c5a434eabba49452c3c1ff3e64822c56d3ab7a2eb04c3611c6b7501c0531"
+    }
+  ],
+  "verdict": "ACCEPT",
+  "unresolved_findings": {
+    "critical": 0,
+    "high": 0,
+    "medium": 0,
+    "low": 0
+  },
+  "findings": [],
+  "assessment": {
+    "spawn_race": "The creating process synchronously emits immediately after spawn and remains alive until a matching acknowledgment. A detached child retains its OS parent during this interval; the supervisor records independently verified pid/create_time plus OS lineage/session before release. The exact reviewed emit followed by os._exit trigger therefore cannot erase ownership before acknowledgment.",
+    "ownership": "The run token and reporter/request fields correlate requests; neither token possession nor child hints authorize signaling. Both supervisor acceptance and optional worker failure cleanup require independent live OS ownership proof and exact creation identity. Retained ownership permits later cleanup after legitimate reparenting. Stale and valid unrelated claims cannot become signaling authority.",
+    "already_gone": "An absent/zombie or changed-creation candidate has no live matching identity to contain. This disposition deliberately adds no owned identity. It is acceptable for naturally short-lived children and stale claims, subject to no PID-only signaling or later reclassification on the reporter assertion.",
+    "bounds": "One client deadline of five seconds, one server connection deadline of one second, request size 8192 bytes, bounded worker cleanup and existing authored case bound keep this a small controlled-worker handshake. The four public helpers remain unchanged; one private per-run listener does not introduce a general scheduler or production lifecycle change.",
+    "rejection_and_termination": "Rejection, EOF, missing listener or deadline expiry emits failure and raises. Only the exact independently observed local descendant may be cleaned by emit. Supervisor disappearance is therefore handled while the reporting worker remains alive. If the reporter itself dies before independent registration, an unknown orphan may remain unowned; the design explicitly fails unresolved live hints and never invents cleanup authority.",
+    "direct_event_bypass": "Raw child_started writes do not count as accepted registration. Post-containment classification must fail any live exact candidate without accepted registration or independently retained OS ownership. This closes false qualification for the direct-file bypass without restoring the unrelated-PID kill bug.",
+    "durability": "Existing OS observation/cleanup remains independent of event parsing. Registration receipts, errors and local failure events must be retained with final output. The separate oversized numeric repair is correctly scoped to rejection and durable failure, not weakening process checks."
+  },
+  "implementation_acceptance_requirements": [
+    "Demonstrate repeated original rapid detached DEVNULL spawn plus synchronous emit and immediate os._exit, without polling delays or monkeypatches: owned identity retained, forced cleanup reported, no survivor, qualification fails.",
+    "Demonstrate valid/stale unrelated identities remain alive and outside owned identities; exercise attached/detached natural and stalled genuine children.",
+    "Enforce total monotonic IO deadlines across every connect/send/read operation rather than resetting full timeouts on partial data. Bound malformed, oversized, partial and unanswered registrations; exceptions in the listener must not disable cleanup or final durable evidence.",
+    "Bind response and stored receipt to the run/request/reporter/child identity. Retain independent ownership before sending acknowledgment; do not let listener shutdown races add ownership after the final containment/result snapshot.",
+    "Exercise wrong token, mismatched response, rejection, missing listener, no acknowledgment and supervisor/reporter termination. Record failure and any locally forced action; signaling must always recheck the exact retained creation identity.",
+    "Exercise raw-event bypass and reporter disappearance before ownership is known: unresolved live candidates cause explicit failed qualification and remain distinct from verified owned survivors. Only the controlled regression fixture may recover its own independently proven unknown child.",
+    "Demonstrate oversized created/monotonic and ordinary malformed, unreadable and undecodable events retain stdout/stderr/result after bounded cleanup. Preserve existing policy/collection/type/import checks and source authority without qualifying draft families."
+  ],
+  "acceptance_boundary": "Accept this exact protocol addendum for implementation. No implementation, runtime containment or family qualification is approved by this design review. Full arbitrary descendant containment after an unobserved creator dies is not promised; unresolved live claims must fail and cannot be described as clean containment. A fresh different implementation reviewer must verify the correction and required red/green regressions.",
+  "review_execution": {
+    "source_edits": false,
+    "environment_mutations": false,
+    "process_probes": false,
+    "nested_agents": false,
+    "publication": false,
+    "artifact_only_write": "/tmp/plato-phase4-child-protocol-review.json"
+  }
+}

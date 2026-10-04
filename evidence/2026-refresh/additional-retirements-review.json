@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "decision": "accepted",
+  "scope": "Fresh independent implementation review of the approved five bounded retirement scopes. No whole-repository typing, full experiment, or Phase4 family qualification claim.",
+  "reviewer": "/root/additional_retirements_implementation_review",
+  "source_binding": {
+    "worktree": "/tmp/plato-refresh-worktrees/additional-retirements",
+    "base_commit": "c1359992f70533c0f2a47d30742f9b14295da882",
+    "base_tree": "9e75b3b2f306677fabc6f9214658bfeacd152dc5",
+    "source_commit": "35e251f388ef14a688764106f71e340dc3ccc952",
+    "source_tree": "d6237c0e9187f70ae01cd7442ad7df99f6e6fc37",
+    "delivery_commit": "410a3f30003c1b8a2a7f6bef1e0d287c6862e413",
+    "delivery_changes": "Only successful validation evidence and receipt added after source commit.",
+    "dirty": ""
+  },
+  "plan": {
+    "path": "/tmp/plato-next-retirements-plan.json",
+    "sha256": "a49502dca7146305f37c94a404ff7735c7507d79d3968b5a813f09e304442716",
+    "review": "/tmp/plato-next-retirements-plan-review.json",
+    "decision": "accepted"
+  },
+  "author_receipt": {
+    "path": "evidence/2026-refresh/next-retirements-validation.json",
+    "sha256": "1611164a1bbf051f8d3e25f1141017b4c868aa9038e8d3e4819295d6b93a9d68",
+    "changed_source_hashes_verified": 38,
+    "retained_raw_outputs_verified": 10,
+    "unique_passing_cases_verified": 237,
+    "case_count_note": "The renamed exact-ledger proof is counted once across initial and final runs."
+  },
+  "findings": [],
+  "independent_evidence": [
+    "All 60 source/context entries matched immutable base git show bytes, SHA256, git ls-tree blob/mode and actual regular file types/executable bits. Moved paths are absent. Five LICENSE/pyproject/lock snapshots and manifests retain provenance.",
+    "All ten active torchvision TOMLs are exact parsed model_type-only migrations, including count-preserving CIFAR filename replacement. Adam recipe differs only by optimizer Adam and removal of create_graph/hessian_power.",
+    "Generic HF model/trainer source is byte-unchanged; shared split-learning source/workspace is unchanged and only two approved older recipes disappear. Ordinary unlearning/Knot source changes are header claims only.",
+    "Active source scan found no removed dependency or backend imports. Historical names occur only in retirement diagnostics/tests/documentation and outdated FjORD. Ordinary sampler registry remains active.",
+    "Lock comparison removed exactly torch-optimizer0.3.0 and pytorch-ranger0.1.1; all other package records apart from root metadata are identical. uv lock --check and git diff --check passed.",
+    "Reviewer mandatory targeted test run passed105 cases covering final additional/FEI/model-search retirement tests, sampler partition contracts and model registry. Final history/live-ledger rerun passed2 cases.",
+    "Actual installed torchvision constructed resnet18/alexnet/googlenet/inception_v3/shufflenet_v2_x1_0/squeezenet1_1/resnet152 on CPU with intended default1000-class heads. pretrained=False and explicit weights=None avoided downloader activity. pretrained=True and weights DEFAULT reached exact ResNet18 DEFAULT URL through intercepted installed downloader with sockets prohibited.",
+    "Targeted tests exercised actual torchvision registry CPU forward/backward/parameter update and actual Adam LeNet5 step, weights precedence/options forwarding, generic ViT/MobileNet factory delegation, retired categories before factories, missing recipe guidance and existing custom historical-name recipe loading.",
+    "Sealed historical ledger snapshot SHA256b654540d190c58e69e0a7d223b3fd59ab39d3d0f18b38fa7cffbe599f8e8f458 proves approved17-row source changes, three removals, two renames and four owner revision updates, retaining11/390/57/131. Separate live guard verifies current390 hashes and digests without pinning future retained-source hashes to the historical snapshot.",
+    "FEI exact historical delta proof now reads its own sealed post-FEI snapshot while live FEI absence checks remain. Existing historical authority/archive evidence was preserved.",
+    "Author final31 retirement/FEI,100 contract and19 retained-model-search test XMLs have zero failures/errors and matching receipt hashes; selected237 unique passing cases reproduced from initial/final XML union. Initial23 miniature worker dependency failures have explicit repaired real dependency copy and successful entire contract rerun.",
+    "Final wheel/sdist hashes and entry counts matched receipt. Neither contains retired archives/modules; wheel new adapter and sdist final new tests/sealed ledger match source bytes. Reviewed docs/archive guidance bounds Adam semantics and BERT diagnostic without full obsolete experiment claims.",
+    "Configured ty0.0.84 passes new adapter/additional-retirement tests and modified FEI/model-search retirement tests. Expanded sampler check retains three preexisting diagnostics outside edited retirement lines."
+  ],
+  "artifacts": [
+    "/tmp/plato-additional-review-static.json",
+    "/tmp/plato-additional-review-static.py",
+    "/tmp/plato-additional-review-focused.xml",
+    "/tmp/plato-additional-review-focused.log",
+    "/tmp/plato-additional-review-ledger.xml",
+    "/tmp/plato-additional-review-ledger.log",
+    "/tmp/plato-additional-review-models.json",
+    "/tmp/plato-additional-review-models.py",
+    "/tmp/plato-additional-review-models.log",
+    "/tmp/plato-additional-review-evidence.json",
+    "/tmp/plato-additional-review-evidence.py",
+    "/tmp/plato-additional-review-new-source-ty.log",
+    "/tmp/plato-additional-review-ty.log"
+  ],
+  "limitations": [
+    "Author19-case retained model-search behavior was evidence-audited rather than repeated; reviewer independently exercised installed architectures/weights plus105 targeted cases.",
+    "Default1000-class heads are intentionally preserved; this acceptance does not claim dataset-specific head improvements.",
+    "No BERT/Llama2/OPT pretrained experiment downloads, complete unlearning/SSL/detector family qualification or Docker run performed.",
+    "Root later typing/example edits must update active source ledger hashes and digests and pass relevant checks; historical snapshots and evidence remain sealed.",
+    "Three existing sampler typing diagnostics are outside retirement changes and belong to separate root typing reconciliation."
+  ]
+}

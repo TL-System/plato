@@ -1,0 +1,1022 @@
+{
+  "schema_version": 1,
+  "status": "Proposed plan; no implementation changes.",
+  "authorization": "Parent reports explicit user approval Retire all of them; four primary scopes plus two older split recipes.",
+  "source_binding": {
+    "base_path": "/tmp/plato-refresh-worktrees/fei-retirement",
+    "base_commit": "c1359992f70533c0f2a47d30742f9b14295da882",
+    "base_tree": "9e75b3b2f306677fabc6f9214658bfeacd152dc5",
+    "original_integration_commit": "e81248dae1844fb5bc66a8d880c9a17b485606ac",
+    "base_dirty": "",
+    "dependency": "FEI independent implementation review accepted separately at /tmp/plato-fei-retirement-implementation-review.json; preserve its evidence."
+  },
+  "scopes": [
+    {
+      "archive": "adahessian",
+      "moved": [
+        "examples/unlearning/fedunlearning/fedunlearning_adahessian_MNIST_lenet5.toml"
+      ],
+      "context": [
+        "plato/trainers/optimizers.py",
+        "examples/unlearning/fedunlearning/fedunlearning.py",
+        "examples/unlearning/fedunlearning/fedunlearning_client.py",
+        "examples/unlearning/fedunlearning/fedunlearning_server.py",
+        "examples/unlearning/fedunlearning/unlearning_iid.py",
+        "examples/unlearning/knot/fedunlearning_server.py",
+        "examples/unlearning/knot/unlearning_iid.py",
+        "docs/docs/examples/algorithms/4. Federated Unlearning.md"
+      ],
+      "actions": [
+        "Remove torch_optimizer import/AdaHessian entry/root dependency; regenerate lock without unrelated upgrades. Remove orphan pytorch-ranger if resolver permits.",
+        "Add examples/unlearning/fedunlearning/fedunlearning_MNIST_lenet5.toml copied from original recipe with optimizer Adam; delete create_graph and hessian_power only. Keep lr=0.001, eps, weight_decay, betas. Label ordinary retraining, not AdaHessian paper equivalence.",
+        "Retain generic unlearning/Knot code/workspace. Update six conditional AdaHessian header claims; archive originals and bibliography. Update launch command/alignment text.",
+        "Remove torch_optimizer from .github/scripts/check_container.py import inventory only."
+      ],
+      "source_inventory": [
+        {
+          "path": "examples/unlearning/fedunlearning/fedunlearning_adahessian_MNIST_lenet5.toml",
+          "git_mode": "100644",
+          "git_blob": "833ea0fa9806320cc8da533f3bf3515db39361fb",
+          "sha256": "2b60e6f67866c2836417893ab0653543a0af3fa201d5d4a96e80e7592a0a0944",
+          "bytes": 1665,
+          "archive_path": "archives/retired/adahessian/original/examples/unlearning/fedunlearning/fedunlearning_adahessian_MNIST_lenet5.toml",
+          "disposition": "moved"
+        },
+        {
+          "path": "plato/trainers/optimizers.py",
+          "git_mode": "100644",
+          "git_blob": "2b16546c5439a52487a5ca476c91dc197f84aff4",
+          "sha256": "da613c5d2975a7cf124619233645ba8b02e6ad32218f08dd508b9b410da06e34",
+          "bytes": 2080,
+          "archive_path": "archives/retired/adahessian/original/plato/trainers/optimizers.py",
+          "disposition": "copied-context"
+        },
+        {
+          "path": "examples/unlearning/fedunlearning/fedunlearning.py",
+          "git_mode": "100644",
+          "git_blob": "19d158af6aa89862f941c9250c6ebf4609b2e956",
+          "sha256": "8010b92fa99a7251859870f0e722283c62ce878f5bc7bb4237d60bead0119fa4",
+          "bytes": 738,
+          "archive_path": "archives/retired/adahessian/original/examples/unlearning/fedunlearning/fedunlearning.py",
+          "disposition": "copied-context"
+        },
+        {
+          "path": "examples/unlearning/fedunlearning/fedunlearning_client.py",
+          "git_mode": "100644",
+          "git_blob": "bd0b61e79d2b04f39a882f249846b930ceb05329",
+          "sha256": "202fc99ef59a458fce1387e95b4c42ef95ee7454b6f4ede1ce872b79714d14bb",
+          "bytes": 3040,
+          "archive_path": "archives/retired/adahessian/original/examples/unlearning/fedunlearning/fedunlearning_client.py",
+          "disposition": "copied-context"
+        },
+        {
+          "path": "examples/unlearning/fedunlearning/fedunlearning_server.py",
+          "git_mode": "100644",
+          "git_blob": "0c2f2d83fbde61d2e5ae8f5e37ef7497c4c4504a",
+          "sha256": "0a5e4496a555cbddfe4f87c763e1ca74ec792de4cac958094d9fd15458518aaf",
+          "bytes": 7528,
+          "archive_path": "archives/retired/adahessian/original/examples/unlearning/fedunlearning/fedunlearning_server.py",
+          "disposition": "copied-context"
+        },
+        {
+          "path": "examples/unlearning/fedunlearning/unlearning_iid.py",
+          "git_mode": "100644",
+          "git_blob": "f886253db429f2d73908afa48f7d3eac43734368",
+          "sha256": "ec241fe7e55dec86aafada28126008d57f2eb2dcd3c8e784bbf1fb9b8e175a32",
+          "bytes": 2622,
+          "archive_path": "archives/retired/adahessian/original/examples/unlearning/fedunlearning/unlearning_iid.py",
+          "disposition": "copied-context"
+        },
+        {
+          "path": "examples/unlearning/knot/fedunlearning_server.py",
+          "git_mode": "100644",
+          "git_blob": "cdb45f3df66a70c287791e1ce4613c078dda67ab",
+          "sha256": "1d3ca2c12e974f40be3bcdc349fe797477fcce99d8065ff22682e495dad2c478",
+          "bytes": 6570,
+          "archive_path": "archives/retired/adahessian/original/examples/unlearning/knot/fedunlearning_server.py",
+          "disposition": "copied-context"
+        },
+        {
+          "path": "examples/unlearning/knot/unlearning_iid.py",
+          "git_mode": "100644",
+          "git_blob": "4e267fadfbf5dabc9267ce19adb8a04c46e0a309",
+          "sha256": "f413b67450f71174787edab71a7273bd1c53ab6956d82d646f4c0154ad21f18d",
+          "bytes": 2203,
+          "archive_path": "archives/retired/adahessian/original/examples/unlearning/knot/unlearning_iid.py",
+          "disposition": "copied-context"
+        },
+        {
+          "path": "docs/docs/examples/algorithms/4. Federated Unlearning.md",
+          "git_mode": "100644",
+          "git_blob": "2a7de6c89f016858879b7302fbd86d63111e501b",
+          "sha256": "b52380f387fb86a0cc84e4e4fa111a4ae022544cd39f6f160f227fd73002f2ae",
+          "bytes": 4818,
+          "archive_path": "archives/retired/adahessian/original/docs/docs/examples/algorithms/4. Federated Unlearning.md",
+          "disposition": "copied-context"
+        },
+        {
+          "path": "LICENSE",
+          "git_mode": "100644",
+          "git_blob": "261eeb9e9f8b2b4b0d119366dda99c6fd7d35c64",
+          "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+          "bytes": 11357,
+          "archive_path": "archives/retired/adahessian/original/LICENSE",
+          "disposition": "copied-context"
+        },
+        {
+          "path": "pyproject.toml",
+          "git_mode": "100644",
+          "git_blob": "42601adc31e213a0ab008361ef53223826fcd770",
+          "sha256": "4c68adebeb88bba969a5d5c08a874644b1d40ccff241761dd7f2bd201b6ba3d3",
+          "bytes": 4189,
+          "archive_path": "archives/retired/adahessian/original/pyproject.toml",
+          "disposition": "copied-context"
+        },
+        {
+          "path": "uv.lock",
+          "git_mode": "100644",
+          "git_blob": "419ce6bf04e2ca46520dcf1e05a36ac134cdc63c",
+          "sha256": "66a4e4442d7b1f26d220b44ca73c44ff4f1151a86857bb3f93a594819fd08126",
+          "bytes": 755641,
+          "archive_path": "archives/retired/adahessian/original/uv.lock",
+          "disposition": "copied-context"
+        },
+        {
+          "path": "tests/examples_phase4/cases.json",
+          "git_mode": "100644",
+          "git_blob": "e232ca35c0f024a6aa79b6c0362d412fa8b331f3",
+          "sha256": "7d18beab505f3f23cb6b14785c35b4d7a3b5b425b9dd541769e43bcd7b80167a",
+          "bytes": 240990,
+          "archive_path": "archives/retired/adahessian/original/tests/examples_phase4/cases.json",
+          "disposition": "copied-context"
+        }
+      ]
+    },
+    {
+      "archive": "modality-samplers",
+      "moved": [
+        "plato/samplers/modality_iid.py",
+        "plato/samplers/modality_quantity_noniid.py"
+      ],
+      "context": [
+        "plato/samplers/registry.py",
+        "tests/samplers/test_partition_contracts.py"
+      ],
+      "actions": [
+        "Remove both imports and registered names; retain ordinary partition samplers/base API.",
+        "Replace synthetic fallback test with parametrized retirement failures; remove unused get_modality_name helper if now dead.",
+        "Document orphan modality-mask return values incompatible with ordinary retained dataset-index loaders; no current datasource/examples implement them."
+      ],
+      "source_inventory": [
+        {
+          "path": "plato/samplers/modality_iid.py",
+          "git_mode": "100644",
+          "git_blob": "9c13ab845f093c3ad373991e921137c2bb9db1d6",
+          "sha256": "99ace5dc9b594a87032eb5721bbf4ed2f90f4f8a24d28009a3b70f7e933b86ee",
+          "bytes": 1187,
+          "archive_path": "archives/retired/modality-samplers/original/plato/samplers/modality_iid.py",
+          "disposition": "moved"
+        },
+        {
+          "path": "plato/samplers/modality_quantity_noniid.py",
+          "git_mode": "100644",
+          "git_blob": "5110d90b0381366e50436cbab697007e6f6031db",
+          "sha256": "0aca2d6b833392748877f6b596e6919dcef4165a0f2da0918d60e484544438b9",
+          "bytes": 1855,
+          "archive_path": "archives/retired/modality-samplers/original/plato/samplers/modality_quantity_noniid.py",
+          "disposition": "moved"
+        },
+        {
+          "path": "plato/samplers/registry.py",
+          "git_mode": "100644",
+          "git_blob": "fd0c43cd3a63ff11ba878e91ebe9b6afcf3e45c2",
+          "sha256": "301af46f7ce7b14be4e0f34f61c0844f9383978b6dc7c9a134136b4b6e90ad24",
+          "bytes": 1993,
+          "archive_path": "archives/retired/modality-samplers/original/plato/samplers/registry.py",
+          "disposition": "copied-context"
+        },
+        {
+          "path": "tests/samplers/test_partition_contracts.py",
+          "git_mode": "100644",
+          "git_blob": "9c040cf1f06189efe8f14f21320351523d7e9114",
+          "sha256": "f167c48a81e6c23e20ec3568735e08421c6cc9dc6535259ccd4a66d09a5dfd10",
+          "bytes": 14466,
+          "archive_path": "archives/retired/modality-samplers/original/tests/samplers/test_partition_contracts.py",
+          "disposition": "copied-context"
+        },
+        {
+          "path": "LICENSE",
+          "git_mode": "100644",
+          "git_blob": "261eeb9e9f8b2b4b0d119366dda99c6fd7d35c64",
+          "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+          "bytes": 11357,
+          "archive_path": "archives/retired/modality-samplers/original/LICENSE",
+          "disposition": "copied-context"
+        },
+        {
+          "path": "pyproject.toml",
+          "git_mode": "100644",
+          "git_blob": "42601adc31e213a0ab008361ef53223826fcd770",
+          "sha256": "4c68adebeb88bba969a5d5c08a874644b1d40ccff241761dd7f2bd201b6ba3d3",
+          "bytes": 4189,
+          "archive_path": "archives/retired/modality-samplers/original/pyproject.toml",
+          "disposition": "copied-context"
+        },
+        {
+          "path": "uv.lock",
+          "git_mode": "100644",
+          "git_blob": "419ce6bf04e2ca46520dcf1e05a36ac134cdc63c",
+          "sha256": "66a4e4442d7b1f26d220b44ca73c44ff4f1151a86857bb3f93a594819fd08126",
+          "bytes": 755641,
+          "archive_path": "archives/retired/modality-samplers/original/uv.lock",
+          "disposition": "copied-context"
+        },
+        {
+          "path": "tests/examples_phase4/cases.json",
+          "git_mode": "100644",
+          "git_blob": "e232ca35c0f024a6aa79b6c0362d412fa8b331f3",
+          "sha256": "7d18beab505f3f23cb6b14785c35b4d7a3b5b425b9dd541769e43bcd7b80167a",
+          "bytes": 240990,
+          "archive_path": "archives/retired/modality-samplers/original/tests/examples_phase4/cases.json",
+          "disposition": "copied-context"
+        }
+      ]
+    },
+    {
+      "archive": "torch-hub",
+      "moved": [
+        "plato/models/torch_hub.py",
+        "configs/CIFAR10/fedavg_resnet18_torchhub.toml"
+      ],
+      "context": [
+        "plato/models/registry.py",
+        "configs/TinyImageNet/fedavg_alexnet.toml",
+        "configs/TinyImageNet/fedavg_googlenet.toml",
+        "configs/TinyImageNet/fedavg_inceptionv3.toml",
+        "configs/TinyImageNet/fedavg_shufflenet.toml",
+        "configs/TinyImageNet/fedavg_squeezenet.toml",
+        "examples/model_search/anycostfl/example_ResNet.toml",
+        "examples/model_search/fedrolex/example_ResNet.toml",
+        "examples/model_search/heterofl/heterofl_resnet18_dynamic.toml",
+        "examples/model_search/sysheterofl/config_ResNet152.toml",
+        "docs/docs/configurations/trainer.md"
+      ],
+      "actions": [
+        "Implement new typed plato/models/torchvision.py Model.get using installed torchvision.models.get_model(model_name, **kwargs). No such generic direct factory exists on base.",
+        "Preserve pretrained bool->weights DEFAULT/None normalization and explicit weights precedence, forwarded options and default head semantics. No torch.hub.load.",
+        "Register model_type torchvision; retire model_type torch_hub with archive/replacement diagnostics; generic torchvision ViT/MobileNet names remain valid.",
+        "Migrate all ten listed active TOMLs. Rename CIFAR torchhub recipe to configs/CIFAR10/fedavg_resnet18_torchvision.toml; other settings/paths unchanged. Four retained model-search configs remain active.",
+        "Update retirement factory spies and trainer docs/direct active references. Leave outdated FjORD/earlier archives unchanged."
+      ],
+      "source_inventory": [
+        {
+          "path": "plato/models/torch_hub.py",
+          "git_mode": "100644",
+          "git_blob": "396d64ff7fd5b1cdca91e5304f1d836ba6ff6cd8",
+          "sha256": "0aab79ad209628a5a55724c7006bcb829c029e966693ef6019f79ea7922d524a",
+          "bytes": 998,
+          "archive_path": "archives/retired/torch-hub/original/plato/models/torch_hub.py",
+          "disposition": "moved"
+        },
+        {
+          "path": "configs/CIFAR10/fedavg_resnet18_torchhub.toml",
+          "git_mode": "100644",
+          "git_blob": "db74cd002e403de392de77e7064f33eb8595a502",
+          "sha256": "2ca99bb45498a605dcd2b202aa4e5aee30a23e517a5d318288db11ffa5230483",
+          "bytes": 1123,
+          "archive_path": "archives/retired/torch-hub/original/configs/CIFAR10/fedavg_resnet18_torchhub.toml",
+          "disposition": "moved"
+        },
+        {
+          "path": "plato/models/registry.py",
+          "git_mode": "100644",
+          "git_blob": "ab6c4274e6ab48df406ce2a2bdb7696a4e1c03de",
+          "sha256": "da678f995c7e9cae467999168c754c763314e58021bfa4e8a7818772a994e781",
+          "bytes": 5924,
+          "archive_path": "archives/retired/torch-hub/original/plato/models/registry.py",
+          "disposition": "copied-context"
+        },
+        {
+          "path": "configs/TinyImageNet/fedavg_alexnet.toml",
+          "git_mode": "100644",
+          "git_blob": "ecb237f1f7af5a6da4675f3793e1a141f9d685c4",
+          "sha256": "f635d90fc2b0b0e5534ed60cd832a13340478a8e74ecf521bce1ee2f16babbca",
+          "bytes": 1133,
+          "archive_path": "archives/retired/torch-hub/original/configs/TinyImageNet/fedavg_alexnet.toml",
+          "disposition": "copied-context"
+        },
+        {
+          "path": "configs/TinyImageNet/fedavg_googlenet.toml",
+          "git_mode": "100644",
+          "git_blob": "4eee7e77fd9192e2184f0e40a0893c5d8012dec4",
+          "sha256": "1c4d0d931b5ae326c4497882b3f1b131580f65bfada2b09e9f120920f16faea2",
+          "bytes": 1135,
+          "archive_path": "archives/retired/torch-hub/original/configs/TinyImageNet/fedavg_googlenet.toml",
+          "disposition": "copied-context"
+        },
+        {
+          "path": "configs/TinyImageNet/fedavg_inceptionv3.toml",
+          "git_mode": "100644",
+          "git_blob": "c2e04b786f6438440adca3d8b5d3153b5f34b4bf",
+          "sha256": "8f9bba13b7279f0da0df2b0ab68a2767770f96c4485ecc2ec92942f339c87aa0",
+          "bytes": 1138,
+          "archive_path": "archives/retired/torch-hub/original/configs/TinyImageNet/fedavg_inceptionv3.toml",
+          "disposition": "copied-context"
+        },
+        {
+          "path": "configs/TinyImageNet/fedavg_shufflenet.toml",
+          "git_mode": "100644",
+          "git_blob": "aa896496e09afd105347f01f6efb2fd68370aad1",
+          "sha256": "343ad1fe87cda2dfde085afbf7f468c0c5a560cb5bf4fc897693ed8a41b95a6f",
+          "bytes": 1144,
+          "archive_path": "archives/retired/torch-hub/original/configs/TinyImageNet/fedavg_shufflenet.toml",
+          "disposition": "copied-context"
+        },
+        {
+          "path": "configs/TinyImageNet/fedavg_squeezenet.toml",
+          "git_mode": "100644",
+          "git_blob": "a891fd0a4382bc0f6c9b56d84f38c04f234d6ce8",
+          "sha256": "14b43298f97ccdfb196b324c31eb887c5fe136e77642d87da7746698431a7fc1",
+          "bytes": 1139,
+          "archive_path": "archives/retired/torch-hub/original/configs/TinyImageNet/fedavg_squeezenet.toml",
+          "disposition": "copied-context"
+        },
+        {
+          "path": "examples/model_search/anycostfl/example_ResNet.toml",
+          "git_mode": "100644",
+          "git_blob": "0217f0b11b9583b8d3a999f2f58c46324ecddd96",
+          "sha256": "4a74ee96d86be5786c935e3454cec0a1ea2861010d82112699ab01d77a07cbb5",
+          "bytes": 1664,
+          "archive_path": "archives/retired/torch-hub/original/examples/model_search/anycostfl/example_ResNet.toml",
+          "disposition": "copied-context"
+        },
+        {
+          "path": "examples/model_search/fedrolex/example_ResNet.toml",
+          "git_mode": "100644",
+          "git_blob": "0217f0b11b9583b8d3a999f2f58c46324ecddd96",
+          "sha256": "4a74ee96d86be5786c935e3454cec0a1ea2861010d82112699ab01d77a07cbb5",
+          "bytes": 1664,
+          "archive_path": "archives/retired/torch-hub/original/examples/model_search/fedrolex/example_ResNet.toml",
+          "disposition": "copied-context"
+        },
+        {
+          "path": "examples/model_search/heterofl/heterofl_resnet18_dynamic.toml",
+          "git_mode": "100644",
+          "git_blob": "3839a9143dbc31bf6c884010fda3f50115cc9d6c",
+          "sha256": "361563886ce2a5eca689d8d1702fb8778874614c9c5bc77d6f2775eb01fd42aa",
+          "bytes": 1662,
+          "archive_path": "archives/retired/torch-hub/original/examples/model_search/heterofl/heterofl_resnet18_dynamic.toml",
+          "disposition": "copied-context"
+        },
+        {
+          "path": "examples/model_search/sysheterofl/config_ResNet152.toml",
+          "git_mode": "100644",
+          "git_blob": "e8a1ecc67acf5b10049fcf73ac30aa8a0dd6af9b",
+          "sha256": "e4e9b28df53fa3bc78f19aa53e0753c36d67a90dbba9a2e37ec583da5b354f87",
+          "bytes": 1831,
+          "archive_path": "archives/retired/torch-hub/original/examples/model_search/sysheterofl/config_ResNet152.toml",
+          "disposition": "copied-context"
+        },
+        {
+          "path": "docs/docs/configurations/trainer.md",
+          "git_mode": "100644",
+          "git_blob": "5e48a63615fbcdcfe1576fdac1248d2d8d7acd26",
+          "sha256": "f2f59461e3987c909f243533f39f14ac2b79058a66d7d25794dbf055ac3c5a0f",
+          "bytes": 9214,
+          "archive_path": "archives/retired/torch-hub/original/docs/docs/configurations/trainer.md",
+          "disposition": "copied-context"
+        },
+        {
+          "path": "LICENSE",
+          "git_mode": "100644",
+          "git_blob": "261eeb9e9f8b2b4b0d119366dda99c6fd7d35c64",
+          "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+          "bytes": 11357,
+          "archive_path": "archives/retired/torch-hub/original/LICENSE",
+          "disposition": "copied-context"
+        },
+        {
+          "path": "pyproject.toml",
+          "git_mode": "100644",
+          "git_blob": "42601adc31e213a0ab008361ef53223826fcd770",
+          "sha256": "4c68adebeb88bba969a5d5c08a874644b1d40ccff241761dd7f2bd201b6ba3d3",
+          "bytes": 4189,
+          "archive_path": "archives/retired/torch-hub/original/pyproject.toml",
+          "disposition": "copied-context"
+        },
+        {
+          "path": "uv.lock",
+          "git_mode": "100644",
+          "git_blob": "419ce6bf04e2ca46520dcf1e05a36ac134cdc63c",
+          "sha256": "66a4e4442d7b1f26d220b44ca73c44ff4f1151a86857bb3f93a594819fd08126",
+          "bytes": 755641,
+          "archive_path": "archives/retired/torch-hub/original/uv.lock",
+          "disposition": "copied-context"
+        },
+        {
+          "path": "tests/examples_phase4/cases.json",
+          "git_mode": "100644",
+          "git_blob": "e232ca35c0f024a6aa79b6c0362d412fa8b331f3",
+          "sha256": "7d18beab505f3f23cb6b14785c35b4d7a3b5b425b9dd541769e43bcd7b80167a",
+          "bytes": 240990,
+          "archive_path": "archives/retired/torch-hub/original/tests/examples_phase4/cases.json",
+          "disposition": "copied-context"
+        }
+      ]
+    },
+    {
+      "archive": "bert-shakespeare",
+      "moved": [
+        "configs/HuggingFace/fedavg_shakespeare_bert.toml"
+      ],
+      "context": [
+        "plato/models/huggingface.py",
+        "plato/trainers/huggingface.py"
+      ],
+      "actions": [
+        "Archive recipe only; keep generic HF loader/distilgpt2/GPT2/Qwen. No global bert name prohibition.",
+        "Bind /tmp/plato-bert-recipe-probe.py/json if rationale used: offline random tiny BERT default is_decoder=False allows future token influence. No pretrained/full experiment failure claim."
+      ],
+      "source_inventory": [
+        {
+          "path": "configs/HuggingFace/fedavg_shakespeare_bert.toml",
+          "git_mode": "100644",
+          "git_blob": "5785281a45ac575196e89fc4270ba8c7a281701a",
+          "sha256": "1aa5b3c151fc76742a316ca2a5fefb455c5d7fb0ed074fcba4ce8870fde81f87",
+          "bytes": 1301,
+          "archive_path": "archives/retired/bert-shakespeare/original/configs/HuggingFace/fedavg_shakespeare_bert.toml",
+          "disposition": "moved"
+        },
+        {
+          "path": "plato/models/huggingface.py",
+          "git_mode": "100644",
+          "git_blob": "bc25e97100a24dd9aced9dc1575b8604186cfa87",
+          "sha256": "9e6f97fbf6a9eee00794868ab0aade6ad34dd153793f689c2e9c9f6315cc5f50",
+          "bytes": 3600,
+          "archive_path": "archives/retired/bert-shakespeare/original/plato/models/huggingface.py",
+          "disposition": "copied-context"
+        },
+        {
+          "path": "plato/trainers/huggingface.py",
+          "git_mode": "100644",
+          "git_blob": "dab2d2b6291e83952cd1ecbb5eec2ca6a6805f1e",
+          "sha256": "cde9f121c4358be7da12f34167a9b313debc2969fd598b743acf022adaef3102",
+          "bytes": 44363,
+          "archive_path": "archives/retired/bert-shakespeare/original/plato/trainers/huggingface.py",
+          "disposition": "copied-context"
+        },
+        {
+          "path": "LICENSE",
+          "git_mode": "100644",
+          "git_blob": "261eeb9e9f8b2b4b0d119366dda99c6fd7d35c64",
+          "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+          "bytes": 11357,
+          "archive_path": "archives/retired/bert-shakespeare/original/LICENSE",
+          "disposition": "copied-context"
+        },
+        {
+          "path": "pyproject.toml",
+          "git_mode": "100644",
+          "git_blob": "42601adc31e213a0ab008361ef53223826fcd770",
+          "sha256": "4c68adebeb88bba969a5d5c08a874644b1d40ccff241761dd7f2bd201b6ba3d3",
+          "bytes": 4189,
+          "archive_path": "archives/retired/bert-shakespeare/original/pyproject.toml",
+          "disposition": "copied-context"
+        },
+        {
+          "path": "uv.lock",
+          "git_mode": "100644",
+          "git_blob": "419ce6bf04e2ca46520dcf1e05a36ac134cdc63c",
+          "sha256": "66a4e4442d7b1f26d220b44ca73c44ff4f1151a86857bb3f93a594819fd08126",
+          "bytes": 755641,
+          "archive_path": "archives/retired/bert-shakespeare/original/uv.lock",
+          "disposition": "copied-context"
+        },
+        {
+          "path": "tests/examples_phase4/cases.json",
+          "git_mode": "100644",
+          "git_blob": "e232ca35c0f024a6aa79b6c0362d412fa8b331f3",
+          "sha256": "7d18beab505f3f23cb6b14785c35b4d7a3b5b425b9dd541769e43bcd7b80167a",
+          "bytes": 240990,
+          "archive_path": "archives/retired/bert-shakespeare/original/tests/examples_phase4/cases.json",
+          "disposition": "copied-context"
+        }
+      ]
+    },
+    {
+      "archive": "older-split-llm-recipes",
+      "moved": [
+        "examples/split_learning/llm_split_learning/split_learning_wikitext2_llama2.toml",
+        "examples/split_learning/llm_split_learning/split_learning_wikitext2_opt350m.toml"
+      ],
+      "context": [
+        "examples/split_learning/llm_split_learning/split_learning_llm_model.py",
+        "examples/split_learning/llm_split_learning/split_learning_llm_model_attack.py",
+        "examples/split_learning/llm_split_learning/split_learning_lora_algorithm.py",
+        "examples/split_learning/llm_split_learning/split_learning_main.py",
+        "examples/split_learning/llm_split_learning/split_learning_main_attack.py",
+        "examples/split_learning/llm_split_learning/split_learning_server_attack.py",
+        "examples/split_learning/llm_split_learning/split_learning_trainer.py",
+        "examples/split_learning/llm_split_learning/split_learning_trainer_attack.py",
+        "examples/split_learning/llm_split_learning/pyproject.toml"
+      ],
+      "actions": [
+        "Archive exactly Llama2 and OPT350m split TOMLs. Retain shared split/attack Python, GPT2 normal/LoRA/attack configs, workspace/dependencies.",
+        "Retain configs/HuggingFace/fedavg_opt_lora.toml, not shortlisted. No global Llama/OPT name guards.",
+        "Describe authorized historical recipe consolidation; no intrinsic obsolescence/family failure assertion."
+      ],
+      "source_inventory": [
+        {
+          "path": "examples/split_learning/llm_split_learning/split_learning_wikitext2_llama2.toml",
+          "git_mode": "100644",
+          "git_blob": "de20503e0fa714b7f6d450bfc4b934776e7343cb",
+          "sha256": "fcf12991d3e5e5c6a0afad4eef8bd9bec234a2bf1dcb6a6dfc5f4ab7dd1eda6a",
+          "bytes": 1507,
+          "archive_path": "archives/retired/older-split-llm-recipes/original/examples/split_learning/llm_split_learning/split_learning_wikitext2_llama2.toml",
+          "disposition": "moved"
+        },
+        {
+          "path": "examples/split_learning/llm_split_learning/split_learning_wikitext2_opt350m.toml",
+          "git_mode": "100644",
+          "git_blob": "f51508b07126c8e3336e397f7e65259eed40d247",
+          "sha256": "d05e8c3c2b668e16a9b48ee8e9a1771e37410e39c89810bbeea0101a976f085e",
+          "bytes": 1438,
+          "archive_path": "archives/retired/older-split-llm-recipes/original/examples/split_learning/llm_split_learning/split_learning_wikitext2_opt350m.toml",
+          "disposition": "moved"
+        },
+        {
+          "path": "examples/split_learning/llm_split_learning/split_learning_llm_model.py",
+          "git_mode": "100644",
+          "git_blob": "4767e44a52cf2dd887821f2ec3ce583c81306dc6",
+          "sha256": "d11ebddf0cf1372aa0abe1d4bc07838f7f78b945b4c7f7ddb9cb24fc24d9e87f",
+          "bytes": 8038,
+          "archive_path": "archives/retired/older-split-llm-recipes/original/examples/split_learning/llm_split_learning/split_learning_llm_model.py",
+          "disposition": "copied-context"
+        },
+        {
+          "path": "examples/split_learning/llm_split_learning/split_learning_llm_model_attack.py",
+          "git_mode": "100644",
+          "git_blob": "9036722e6eb5f1ea314864ff860c2508a4430702",
+          "sha256": "b1629761fd9ff902c7595e74fe76d2428498c5de542a1a7b7ca9f1855545f4ef",
+          "bytes": 3554,
+          "archive_path": "archives/retired/older-split-llm-recipes/original/examples/split_learning/llm_split_learning/split_learning_llm_model_attack.py",
+          "disposition": "copied-context"
+        },
+        {
+          "path": "examples/split_learning/llm_split_learning/split_learning_lora_algorithm.py",
+          "git_mode": "100644",
+          "git_blob": "61c77d2715e459f99fdbc0284c98058b8640bdca",
+          "sha256": "ee0995e90db77f19a1010da880281789a99b71abf87f548ecae8b381d7f2bc08",
+          "bytes": 1370,
+          "archive_path": "archives/retired/older-split-llm-recipes/original/examples/split_learning/llm_split_learning/split_learning_lora_algorithm.py",
+          "disposition": "copied-context"
+        },
+        {
+          "path": "examples/split_learning/llm_split_learning/split_learning_main.py",
+          "git_mode": "100644",
+          "git_blob": "51f87184330bb00f002bb2d6ca0c20e1e9fde50e",
+          "sha256": "26c0c673cfcf432e25e34a04f46801a362612608265052e5725ce1de2a59e974",
+          "bytes": 841,
+          "archive_path": "archives/retired/older-split-llm-recipes/original/examples/split_learning/llm_split_learning/split_learning_main.py",
+          "disposition": "copied-context"
+        },
+        {
+          "path": "examples/split_learning/llm_split_learning/split_learning_main_attack.py",
+          "git_mode": "100644",
+          "git_blob": "a1f3559086a47c1d7b8c2b0a2297ad820abd0b0b",
+          "sha256": "2dc3584cf09d61579556953451bd060fcac76059a5214fa235378b8fa05f5005",
+          "bytes": 1333,
+          "archive_path": "archives/retired/older-split-llm-recipes/original/examples/split_learning/llm_split_learning/split_learning_main_attack.py",
+          "disposition": "copied-context"
+        },
+        {
+          "path": "examples/split_learning/llm_split_learning/split_learning_server_attack.py",
+          "git_mode": "100644",
+          "git_blob": "7aa9b068ecdb639c6c8686a58f7f9da3d6aecb1f",
+          "sha256": "e7600e6bc895a3c3ab54ede0eeab8403861f4ed2a01999491f202c8855636349",
+          "bytes": 4721,
+          "archive_path": "archives/retired/older-split-llm-recipes/original/examples/split_learning/llm_split_learning/split_learning_server_attack.py",
+          "disposition": "copied-context"
+        },
+        {
+          "path": "examples/split_learning/llm_split_learning/split_learning_trainer.py",
+          "git_mode": "100644",
+          "git_blob": "df3f7c2e17e7468ee3e16085f91200dbffe28dac",
+          "sha256": "189e94080b8af3d2bd6d18773b3739803b7c7dc505cc0fe229fa38069bd68767",
+          "bytes": 12237,
+          "archive_path": "archives/retired/older-split-llm-recipes/original/examples/split_learning/llm_split_learning/split_learning_trainer.py",
+          "disposition": "copied-context"
+        },
+        {
+          "path": "examples/split_learning/llm_split_learning/split_learning_trainer_attack.py",
+          "git_mode": "100644",
+          "git_blob": "ea39a8d4ce83f419f861c48924d9965478b073cd",
+          "sha256": "8fb416c6bfbdc7989004bb25ad930fde25c6ac27c28e864ec7bd24fce4f5fd2f",
+          "bytes": 7332,
+          "archive_path": "archives/retired/older-split-llm-recipes/original/examples/split_learning/llm_split_learning/split_learning_trainer_attack.py",
+          "disposition": "copied-context"
+        },
+        {
+          "path": "examples/split_learning/llm_split_learning/pyproject.toml",
+          "git_mode": "100644",
+          "git_blob": "281007d8bb0e604e2236683f53d10639d5486047",
+          "sha256": "19a50a6625a5daa195bbdde1ac4c64a7c39bfe81630f6389add8a1b1769c436e",
+          "bytes": 290,
+          "archive_path": "archives/retired/older-split-llm-recipes/original/examples/split_learning/llm_split_learning/pyproject.toml",
+          "disposition": "copied-context"
+        },
+        {
+          "path": "LICENSE",
+          "git_mode": "100644",
+          "git_blob": "261eeb9e9f8b2b4b0d119366dda99c6fd7d35c64",
+          "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+          "bytes": 11357,
+          "archive_path": "archives/retired/older-split-llm-recipes/original/LICENSE",
+          "disposition": "copied-context"
+        },
+        {
+          "path": "pyproject.toml",
+          "git_mode": "100644",
+          "git_blob": "42601adc31e213a0ab008361ef53223826fcd770",
+          "sha256": "4c68adebeb88bba969a5d5c08a874644b1d40ccff241761dd7f2bd201b6ba3d3",
+          "bytes": 4189,
+          "archive_path": "archives/retired/older-split-llm-recipes/original/pyproject.toml",
+          "disposition": "copied-context"
+        },
+        {
+          "path": "uv.lock",
+          "git_mode": "100644",
+          "git_blob": "419ce6bf04e2ca46520dcf1e05a36ac134cdc63c",
+          "sha256": "66a4e4442d7b1f26d220b44ca73c44ff4f1151a86857bb3f93a594819fd08126",
+          "bytes": 755641,
+          "archive_path": "archives/retired/older-split-llm-recipes/original/uv.lock",
+          "disposition": "copied-context"
+        },
+        {
+          "path": "tests/examples_phase4/cases.json",
+          "git_mode": "100644",
+          "git_blob": "e232ca35c0f024a6aa79b6c0362d412fa8b331f3",
+          "sha256": "7d18beab505f3f23cb6b14785c35b4d7a3b5b425b9dd541769e43bcd7b80167a",
+          "bytes": 240990,
+          "archive_path": "archives/retired/older-split-llm-recipes/original/tests/examples_phase4/cases.json",
+          "disposition": "copied-context"
+        }
+      ]
+    }
+  ],
+  "archive_policy": [
+    "README/manifest/original tree per scope, exact Git mode/blob/SHA256/bytes identities above; independently verify against immutable git show. Preserve original license/root manifests/lock/base ledger and bibliography.",
+    "Reproduction in separate detached checkout of recorded base; no current compatibility/success claim. Source archive does not bundle external data/checkpoints.",
+    "Existing wheel/sdist/pytest/ruff/ty exclusions retained and checked; previous archives/manifests/history immutable."
+  ],
+  "runtime_diagnostics": {
+    "categories": "Extend existing category-scoped helper for model torch_hub, optimizer AdaHessian and sampler modality_iid/modality_quantity_noniid; call before factory/dependency activity. Keep unknown-name failures.",
+    "recipe_paths": "For missing known retired recipe filenames only, add fixed archive/replacement mapping before Config existing missing-file error. Include four moved recipe filenames and old CIFAR renamed config. Existing user files valid; no global BERT/Llama/OPT restrictions."
+  },
+  "phase4_ledger": {
+    "base_ledger": {
+      "path": "tests/examples_phase4/cases.json",
+      "git_mode": "100644",
+      "git_blob": "e232ca35c0f024a6aa79b6c0362d412fa8b331f3",
+      "sha256": "7d18beab505f3f23cb6b14785c35b4d7a3b5b425b9dd541769e43bcd7b80167a",
+      "bytes": 240990
+    },
+    "prior_counts": {
+      "tasks": 11,
+      "paths": 393,
+      "families": 57,
+      "config_bindings": 134
+    },
+    "proposed_counts": {
+      "tasks": 11,
+      "paths": 390,
+      "families": 57,
+      "config_bindings": 131
+    },
+    "removed_source_rows": [
+      {
+        "path": "configs/HuggingFace/fedavg_shakespeare_bert.toml",
+        "sha256": "1aa5b3c151fc76742a316ca2a5fefb455c5d7fb0ed074fcba4ce8870fde81f87",
+        "family": "configs/HuggingFace/fedavg_shakespeare_bert.toml",
+        "owner": "P4-split-hf",
+        "consumer_owner": "P4-split-hf",
+        "role": "config",
+        "status": "internal-fix pending"
+      },
+      {
+        "path": "examples/split_learning/llm_split_learning/split_learning_wikitext2_llama2.toml",
+        "sha256": "fcf12991d3e5e5c6a0afad4eef8bd9bec234a2bf1dcb6a6dfc5f4ab7dd1eda6a",
+        "family": "split-llm",
+        "owner": "P4-split-hf",
+        "consumer_owner": "P4-split-hf",
+        "role": "config",
+        "status": "internal-fix pending"
+      },
+      {
+        "path": "examples/split_learning/llm_split_learning/split_learning_wikitext2_opt350m.toml",
+        "sha256": "d05e8c3c2b668e16a9b48ee8e9a1771e37410e39c89810bbeea0101a976f085e",
+        "family": "split-llm",
+        "owner": "P4-split-hf",
+        "consumer_owner": "P4-split-hf",
+        "role": "config",
+        "status": "internal-fix pending"
+      }
+    ],
+    "removed_config_bindings": [
+      {
+        "config": "configs/HuggingFace/fedavg_shakespeare_bert.toml",
+        "owner": "P4-split-hf",
+        "entrypoint_candidates": [
+          "plato.py"
+        ],
+        "include_consumers": [],
+        "kind": "leaf-or-multi-mode-config",
+        "assignment": "Author resolves any multiple candidates into explicit case branches; all listed utilities/entrypoints remain inventoried. Include-only fragments inherit consuming leaf behavioral proof."
+      },
+      {
+        "config": "examples/split_learning/llm_split_learning/split_learning_wikitext2_llama2.toml",
+        "owner": "P4-split-hf",
+        "entrypoint_candidates": [
+          "examples/split_learning/llm_split_learning/split_learning_main.py",
+          "examples/split_learning/llm_split_learning/split_learning_main_attack.py"
+        ],
+        "include_consumers": [],
+        "kind": "leaf-or-multi-mode-config",
+        "assignment": "Author resolves any multiple candidates into explicit case branches; all listed utilities/entrypoints remain inventoried. Include-only fragments inherit consuming leaf behavioral proof."
+      },
+      {
+        "config": "examples/split_learning/llm_split_learning/split_learning_wikitext2_opt350m.toml",
+        "owner": "P4-split-hf",
+        "entrypoint_candidates": [
+          "examples/split_learning/llm_split_learning/split_learning_main.py",
+          "examples/split_learning/llm_split_learning/split_learning_main_attack.py"
+        ],
+        "include_consumers": [],
+        "kind": "leaf-or-multi-mode-config",
+        "assignment": "Author resolves any multiple candidates into explicit case branches; all listed utilities/entrypoints remain inventoried. Include-only fragments inherit consuming leaf behavioral proof."
+      }
+    ],
+    "path_renames": {
+      "examples/unlearning/fedunlearning/fedunlearning_adahessian_MNIST_lenet5.toml": "examples/unlearning/fedunlearning/fedunlearning_MNIST_lenet5.toml",
+      "configs/CIFAR10/fedavg_resnet18_torchhub.toml": "configs/CIFAR10/fedavg_resnet18_torchvision.toml"
+    },
+    "exact_config_rows_before": [
+      {
+        "path": "configs/CIFAR10/fedavg_resnet18_torchhub.toml",
+        "sha256": "2ca99bb45498a605dcd2b202aa4e5aee30a23e517a5d318288db11ffa5230483",
+        "family": "configs/CIFAR10/fedavg_resnet18_torchhub.toml",
+        "owner": "P4-core",
+        "consumer_owner": "P4-core",
+        "role": "config",
+        "status": "internal-fix pending"
+      },
+      {
+        "path": "configs/TinyImageNet/fedavg_alexnet.toml",
+        "sha256": "f635d90fc2b0b0e5534ed60cd832a13340478a8e74ecf521bce1ee2f16babbca",
+        "family": "configs/TinyImageNet/fedavg_alexnet.toml",
+        "owner": "P4-core",
+        "consumer_owner": "P4-core",
+        "role": "config",
+        "status": "internal-fix pending"
+      },
+      {
+        "path": "configs/TinyImageNet/fedavg_googlenet.toml",
+        "sha256": "1c4d0d931b5ae326c4497882b3f1b131580f65bfada2b09e9f120920f16faea2",
+        "family": "configs/TinyImageNet/fedavg_googlenet.toml",
+        "owner": "P4-core",
+        "consumer_owner": "P4-core",
+        "role": "config",
+        "status": "internal-fix pending"
+      },
+      {
+        "path": "configs/TinyImageNet/fedavg_inceptionv3.toml",
+        "sha256": "8f9bba13b7279f0da0df2b0ab68a2767770f96c4485ecc2ec92942f339c87aa0",
+        "family": "configs/TinyImageNet/fedavg_inceptionv3.toml",
+        "owner": "P4-core",
+        "consumer_owner": "P4-core",
+        "role": "config",
+        "status": "internal-fix pending"
+      },
+      {
+        "path": "configs/TinyImageNet/fedavg_shufflenet.toml",
+        "sha256": "343ad1fe87cda2dfde085afbf7f468c0c5a560cb5bf4fc897693ed8a41b95a6f",
+        "family": "configs/TinyImageNet/fedavg_shufflenet.toml",
+        "owner": "P4-core",
+        "consumer_owner": "P4-core",
+        "role": "config",
+        "status": "internal-fix pending"
+      },
+      {
+        "path": "configs/TinyImageNet/fedavg_squeezenet.toml",
+        "sha256": "14b43298f97ccdfb196b324c31eb887c5fe136e77642d87da7746698431a7fc1",
+        "family": "configs/TinyImageNet/fedavg_squeezenet.toml",
+        "owner": "P4-core",
+        "consumer_owner": "P4-core",
+        "role": "config",
+        "status": "internal-fix pending"
+      },
+      {
+        "path": "examples/model_search/anycostfl/example_ResNet.toml",
+        "sha256": "4a74ee96d86be5786c935e3454cec0a1ea2861010d82112699ab01d77a07cbb5",
+        "family": "anycostfl",
+        "owner": "P4-proof-reconcile",
+        "consumer_owner": "P4-proof-reconcile",
+        "role": "config",
+        "status": "validated-source-bound"
+      },
+      {
+        "path": "examples/model_search/fedrolex/example_ResNet.toml",
+        "sha256": "4a74ee96d86be5786c935e3454cec0a1ea2861010d82112699ab01d77a07cbb5",
+        "family": "fedrolex",
+        "owner": "P4-proof-reconcile",
+        "consumer_owner": "P4-proof-reconcile",
+        "role": "config",
+        "status": "validated-source-bound"
+      },
+      {
+        "path": "examples/model_search/heterofl/heterofl_resnet18_dynamic.toml",
+        "sha256": "361563886ce2a5eca689d8d1702fb8778874614c9c5bc77d6f2775eb01fd42aa",
+        "family": "heterofl",
+        "owner": "P4-proof-reconcile",
+        "consumer_owner": "P4-proof-reconcile",
+        "role": "config",
+        "status": "validated-source-bound"
+      },
+      {
+        "path": "examples/model_search/sysheterofl/config_ResNet152.toml",
+        "sha256": "e4e9b28df53fa3bc78f19aa53e0753c36d67a90dbba9a2e37ec583da5b354f87",
+        "family": "sysheterofl",
+        "owner": "P4-proof-reconcile",
+        "consumer_owner": "P4-proof-reconcile",
+        "role": "config",
+        "status": "validated-source-bound"
+      },
+      {
+        "path": "examples/unlearning/fedunlearning/fedunlearning_adahessian_MNIST_lenet5.toml",
+        "sha256": "2b60e6f67866c2836417893ab0653543a0af3fa201d5d4a96e80e7592a0a0944",
+        "family": "fedunlearning",
+        "owner": "P4-unlearning",
+        "consumer_owner": "P4-unlearning",
+        "role": "config",
+        "status": "internal-fix pending"
+      }
+    ],
+    "exact_config_rows_after": [
+      {
+        "path": "configs/CIFAR10/fedavg_resnet18_torchvision.toml",
+        "sha256": "33e218cd7bdedccc9f836b53edd7e28a6b4e9e842816e10fe15cb0aee1daf71a",
+        "family": "configs/CIFAR10/fedavg_resnet18_torchvision.toml",
+        "owner": "P4-core",
+        "consumer_owner": "P4-core",
+        "role": "config",
+        "status": "internal-fix pending"
+      },
+      {
+        "path": "configs/TinyImageNet/fedavg_alexnet.toml",
+        "sha256": "7208d88d3c919ba9e17a12a4c6f11dbb2b3552326a8be4e7acb052a1a3b54f53",
+        "family": "configs/TinyImageNet/fedavg_alexnet.toml",
+        "owner": "P4-core",
+        "consumer_owner": "P4-core",
+        "role": "config",
+        "status": "internal-fix pending"
+      },
+      {
+        "path": "configs/TinyImageNet/fedavg_googlenet.toml",
+        "sha256": "79882247bfcfa4e502408b318b48cef83369dbadac9f811148487e8798a9f242",
+        "family": "configs/TinyImageNet/fedavg_googlenet.toml",
+        "owner": "P4-core",
+        "consumer_owner": "P4-core",
+        "role": "config",
+        "status": "internal-fix pending"
+      },
+      {
+        "path": "configs/TinyImageNet/fedavg_inceptionv3.toml",
+        "sha256": "7576bced855fa9b9ea72ac920836edd354d6a8296dc3952eab1b31cf83418125",
+        "family": "configs/TinyImageNet/fedavg_inceptionv3.toml",
+        "owner": "P4-core",
+        "consumer_owner": "P4-core",
+        "role": "config",
+        "status": "internal-fix pending"
+      },
+      {
+        "path": "configs/TinyImageNet/fedavg_shufflenet.toml",
+        "sha256": "d6006168835f7b91e5224449a9c6feb723d159cc6100b0d7619007c87fcb7044",
+        "family": "configs/TinyImageNet/fedavg_shufflenet.toml",
+        "owner": "P4-core",
+        "consumer_owner": "P4-core",
+        "role": "config",
+        "status": "internal-fix pending"
+      },
+      {
+        "path": "configs/TinyImageNet/fedavg_squeezenet.toml",
+        "sha256": "a2b4a753b0b78db1fd8b72749683e3738837693185e23d29de56a2b9dd8b2d4e",
+        "family": "configs/TinyImageNet/fedavg_squeezenet.toml",
+        "owner": "P4-core",
+        "consumer_owner": "P4-core",
+        "role": "config",
+        "status": "internal-fix pending"
+      },
+      {
+        "path": "examples/model_search/anycostfl/example_ResNet.toml",
+        "sha256": "f6ae45c764ecaee6d925ee76303b64afacf5f100448c32bde7851481014511f8",
+        "family": "anycostfl",
+        "owner": "P4-proof-reconcile",
+        "consumer_owner": "P4-proof-reconcile",
+        "role": "config",
+        "status": "validated-source-bound"
+      },
+      {
+        "path": "examples/model_search/fedrolex/example_ResNet.toml",
+        "sha256": "f6ae45c764ecaee6d925ee76303b64afacf5f100448c32bde7851481014511f8",
+        "family": "fedrolex",
+        "owner": "P4-proof-reconcile",
+        "consumer_owner": "P4-proof-reconcile",
+        "role": "config",
+        "status": "validated-source-bound"
+      },
+      {
+        "path": "examples/model_search/heterofl/heterofl_resnet18_dynamic.toml",
+        "sha256": "1da0ef4948816d777a038381145bd433649a37c022b784e33396f3dcc0272f23",
+        "family": "heterofl",
+        "owner": "P4-proof-reconcile",
+        "consumer_owner": "P4-proof-reconcile",
+        "role": "config",
+        "status": "validated-source-bound"
+      },
+      {
+        "path": "examples/model_search/sysheterofl/config_ResNet152.toml",
+        "sha256": "b132e201ef12cce0345353278e49e511f64dacc5964f47aac5293574f4311dc9",
+        "family": "sysheterofl",
+        "owner": "P4-proof-reconcile",
+        "consumer_owner": "P4-proof-reconcile",
+        "role": "config",
+        "status": "validated-source-bound"
+      },
+      {
+        "path": "examples/unlearning/fedunlearning/fedunlearning_MNIST_lenet5.toml",
+        "sha256": "7d66615ab124863b2efedc05bde97d755a2cba1745e2144e82b23506e3c27356",
+        "family": "fedunlearning",
+        "owner": "P4-unlearning",
+        "consumer_owner": "P4-unlearning",
+        "role": "config",
+        "status": "internal-fix pending"
+      }
+    ],
+    "owners_with_config_deltas": [
+      "P4-core",
+      "P4-proof-reconcile",
+      "P4-split-hf",
+      "P4-unlearning"
+    ],
+    "additional_source_hash_updates": [
+      "examples/unlearning/fedunlearning/fedunlearning.py",
+      "examples/unlearning/fedunlearning/fedunlearning_client.py",
+      "examples/unlearning/fedunlearning/fedunlearning_server.py",
+      "examples/unlearning/fedunlearning/unlearning_iid.py",
+      "examples/unlearning/knot/fedunlearning_server.py",
+      "examples/unlearning/knot/unlearning_iid.py"
+    ],
+    "policy": [
+      "Archive exact base ledger and publish bounded amendment. Preserve four historical authority files/hashes and previous evidence unchanged.",
+      "Remove three obsolete config rows/bindings. AdaHessian->Adam and CIFAR rename are count-preserving replacements. Keep all eleven owners/draft states/empty cases and unaffected content.",
+      "Refresh hashes for all ten migrated model configs/new Adam config and six modified header files. Changed-source rows must exactly match git diff; increment every affected owner inventory_revision, including P4-unlearning headers.",
+      "Recompute path_map_sha256 and config_bindings_sha256 using existing common._digest after final content. Update draft contract 393/134 to 390/131, retain eleven owners and all strict source/profile/draft/duplicate guards.",
+      "One focused exact archived-ledger delta assertion; no family freeze/qualification/new massive harness."
+    ],
+    "inventory_revision_deltas": {
+      "P4-core": {
+        "before": 1,
+        "after": 2
+      },
+      "P4-proof-reconcile": {
+        "before": 1,
+        "after": 2
+      },
+      "P4-split-hf": {
+        "before": 1,
+        "after": 2
+      },
+      "P4-unlearning": {
+        "before": 1,
+        "after": 2
+      }
+    }
+  },
+  "validation": [
+    "Archive independent byte/blob/mode checks and active-source closure scan; historical evidence/outdated/archive references preserved.",
+    "Focused tests: tests/models/test_model_registry.py, test_model_behaviour.py, tests/samplers, test_model_search_retirement.py, test_examples_phase4_contract.py, compact new additional-retirement/archive diagnostics tests.",
+    "Actual registry torchvision resnet18(weights=None) tiny CPU forward/backward with torch.hub.load/network prohibited; finite loss/parameter update. Spies for weights precedence, pretrained normalization, num_classes forwarding, generic ViT/MobileNet delegation.",
+    "Parse new Adam unlearning TOML and run actual tiny CPU LeNet5 optimizer step; no generic unlearning behavioral qualification claim.",
+    "Reuse existing retained model-search profile for four migrated configs: uv run --group test-model-search pytest tests/integration/test_retained_model_search.py --test-profile=mandatory -m retained_model_search; no new socket harness.",
+    "uv lock --check; relevant uv sync --frozen; touched Python Ruff import check; docs build/link check; standard wheel/sdist exclusions; active lock removes torch-optimizer/orphan pytorch-ranger with unrelated versions unchanged.",
+    "Mandatory/base collection guards once; broaden tests only for failures/new shared concerns. No obsolete BERT/Llama2/OPT model downloads/full experiments.",
+    "Fresh independent implementation review with final source/hash and ledger delta receipts; integrate only after this retirement review accepted; FEI review already accepted separately."
+  ],
+  "interactions": {
+    "ty": "Pending type cleanup separate; removed modules may reduce diagnostics, no full ty-clean claim/settings edits. Reconcile shared config/registry/optimizer/helper/tests before integrating typing branch.",
+    "ci": "Only required container import inventory change here; root deployment-typing fixes committed 959ed3793cc4a2fab003a7f4d29bf33faa951b85; dependency import removal must reconcile after those fixes merge. CI workflow/slowmarker/conftest author and active tests/examples typing author remain separate and must rebase. No new Docker qualification claimed.",
+    "protected": "Generic HF/split/GPT2/Qwen, ordinary OPT LoRA, retained model-search algorithms, other unlearning/Knot, FEI history/shared RL, earlier archives/evidence unchanged.",
+    "lock": "Existing ssl/llm_eval conflicts/extras/overrides unchanged.",
+    "docs": "Archive index/trainer/unlearning and direct active refs only; preserve bibliography and Adam-vs-AdaHessian semantics."
+  }
+}

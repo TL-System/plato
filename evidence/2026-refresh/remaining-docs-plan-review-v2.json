@@ -1,0 +1,187 @@
+{
+  "schema_version": 1,
+  "status": "ACCEPTED_FOR_IMPLEMENTATION",
+  "verdict": "ACCEPT",
+  "reviewer": "/root/remaining_docs_plan_review_v2 \u2014 fresh different independent Sol plan reviewer",
+  "reviewed_at_utc": "2026-10-04T02:07:03.001870+00:00",
+  "subject": {
+    "path": "/tmp/plato-remaining-docs-plan.json",
+    "sha256": "a2b52a4a471870e24d87e06b3045fa737a5d90a9ec392dbcd73ccc911b22b60c",
+    "plan_revision": 2,
+    "source_commit": "484853ed2eef50899b062dc7d273ff85e814e4bc",
+    "source_tree": "f55c1b950bf745c340539cfea1ee2d8a0ad8b4dd",
+    "inspected_file_sha256": {
+      "AGENTS.md": "b50f87f31ea3d87076952d8b7d2d8af067132fbf877d80f8780c208fb45527ec",
+      "docs/README.md": "36b8ef60acc65768d2ff7800f6e4faf50b90257b2c35b17c54872597d4114821",
+      "docs/docs/ccdb.md": "e864ec16b0673d2d2f52f9252a435946659f9b7eadb302633e564a5a07fc1622",
+      "docs/mkdocs.yml": "d26f6c6e7b91cf8835b4187e3b9e01125801e735122d79e7a148179b31a852ec",
+      "tests/conftest.py": "2d5323021b000249805712282c2ee5281eaa3c4fc65a55a65e8215acfe14a54f"
+    },
+    "phase4_plan_path": "/tmp/plato-phase4-family-plan.json",
+    "phase4_plan_sha256": "07d90034e89b83283c9b592550ebe17a1ea3a28a9fa2fbc292cc328db4977e4b",
+    "previous_plan_sha256": "c64d803ae6447e108bc4ac8648ecbce6c4aa25936b9ecbd708b8eddeda46c4ca",
+    "previous_review_sha256": "714155b6cb2b26b65e6a15b864bf57153b2e3980ef255cb75bade31031eaf460",
+    "bindings_verified": true
+  },
+  "finding_counts": {
+    "critical": 0,
+    "high": 0,
+    "medium": 0,
+    "low": 0,
+    "blocking": 0
+  },
+  "findings": [],
+  "decision": "Accept this exact revised plan for the three bounded documentation packages. Implementation and family support claims still require their separate source-bound acceptance evidence.",
+  "prior_review_resolution": [
+    {
+      "id": "R01",
+      "result": "RESOLVED",
+      "checked": "DOC10 and the family handoff both use canonical P4-leakage. Its README remains exclusively assigned to that existing Phase 4 owner."
+    },
+    {
+      "id": "R02",
+      "result": "RESOLVED",
+      "checked": "DOC03 explicitly removes misc.md:17 fixed 360-second workload sizing advice, replaces it with measurement-based guidance beside the 3600-second default, and requires checking both timeout passages plus the adjacent recommendation."
+    },
+    {
+      "id": "N01",
+      "result": "RESOLVED",
+      "checked": "Archive status now distinguishes the existing frozen-source page from the accepted cbe6cce expansion. The expansion is present without changes in Phase 4 integration 408070278122988e31ed676852a0e7b0bd6f15bd; it remains reserved from these writers."
+    }
+  ],
+  "checked_findings": [
+    {
+      "id": "DOC01",
+      "result": "SUPPORTED",
+      "evidence": "Frozen AGENTS.md names two absent test targets; misc.md names absent lr_schedule_tests.py. The scheduler target exists. .python-version is 3.13; test-model-search includes test-base and DP/MPC/RL test dependencies plus ptflops. conftest accepts mandatory and separately collects MLX/Lighteval profiles. The proposed full command accurately names mandatory core, with separate optional qualification links."
+    },
+    {
+      "id": "DOC02",
+      "result": "SUPPORTED",
+      "evidence": "docs/README.md installs unpinned mkdocs-material, gives cwd-dependent bare commands and wrong /sites output. Accepted docs/build.sh uses locked Python 3.13, isolated docs/bootstrap environments, root cwd, explicit docs/mkdocs.yml and strict build. The accepted install guide gives the exact build invocation and docs/site output."
+    },
+    {
+      "id": "DOC03",
+      "result": "SUPPORTED",
+      "evidence": "plato/servers/base.py:200-201 defaults ping interval and timeout to 3600; misc.md and ccdb.md still say 360. misc.md links absent docs/Running.md and has unqualified fixed 360-second workload sizing. Both pages recommend blanket pkill python. D1/D2 split the two pages and now remove the stale recommendation without runtime changes."
+    },
+    {
+      "id": "DOC04",
+      "result": "SUPPORTED",
+      "evidence": "Python 3.13.16 tomllib independently reproduces both fenced-fragment failures. In-memory proposed syntax repairs parse, preserve numeric parameters, and parse with the capture line uncommented. Adding trainer.lr_scheduler=\"timm\" matches lr_schedulers.py:38-41. The aggregation chapter changes remain syntax only; capture/pretraining behavior stays with family acceptance."
+    },
+    {
+      "id": "DOC05",
+      "result": "SUPPORTED",
+      "evidence": "examples/custom_model.py is absent. The displayed DataSource uses the existing examples/basic/basic.py implementation. server.md:110 is an orphaned outdented token between inbound processor bullets. These are bounded attribution/rendering edits."
+    },
+    {
+      "id": "DOC06",
+      "result": "SUPPORTED",
+      "evidence": "Getting Started promises automatic preparation for all examples and attributes dependencies solely to local projects. Root pyproject has shared ssl/llm_eval extras, their conflict and 12 workspace members. The duplicated M4 chip list supplies no backend qualification. The proposed authority links and asset/support limits correct these claims without qualifying pending families."
+    },
+    {
+      "id": "DOC07",
+      "result": "SUPPORTED",
+      "evidence": "The gradient leakage chapter is already in nav/homepage but absent from Getting Started. Archived Research is in nav and its page exists, while homepage/Getting Started lack archive links. Existing case-sensitive targets can be linked without restructuring."
+    },
+    {
+      "id": "DOC08",
+      "result": "SUPPORTED",
+      "evidence": "ccdb.md repeatedly loads Python 3.12 despite the Python 3.13 project/default contract, omits entering the cloned checkout, downloads uv in its batch script, claims compute-node networking is unavailable, and presents an HF preparation recipe whose batch command is a FedBuff CIFAR-10 command from unstated cwd. A discovery-based 3.13 preparation/submission template is justified; pending family commands and login-node train/interruption caching are correctly removed from endorsement."
+    },
+    {
+      "id": "DOC09",
+      "result": "SUPPORTED",
+      "evidence": "Three KaTeX references float at @0. Official browser docs and v0.19.0 release support the candidate exact pin. All three unpkg 0.19.0 assets returned 200 with expected JS/CSS content types. Callback ordering is a browser validation target, not a reproduced defect in this review."
+    },
+    {
+      "id": "DOC10",
+      "result": "SUPPORTED",
+      "evidence": "The existing README URL lowercases the chapter name while MkDocs references its capitalized filename. This proves source/output path mismatch without claiming a live HTTP 404. Canonical P4-leakage retains the README and any behavioral commands."
+    }
+  ],
+  "ownership_and_scope_checks": [
+    "The three documentation packages have disjoint authored paths and no intersection with canonical Phase 4 owned_existing_paths. DOC03 explicitly splits misc.md and ccdb.md between D1 and D2.",
+    "D1 aggregation chapter changes are syntax only. Root serializes the later behavioral chapter handoff with P4-aggregation; no family runtime/config changes belong in this documentation slice.",
+    "D3 receives docs/mkdocs.yml from root and touches local KaTeX initialization only after a reproduced browser defect. Accepted build tooling, manifests, lockfile, deployment/install/quickstart and current CI/container changes remain reserved.",
+    "The 399-active-path/58-family counts match the exact canonical Phase 4 plan. Family support is pending within the stated earlier accepted limits; imports, parsing and docs builds do not establish support.",
+    "Independent manifest/source audit found exactly 12 active workspaces: 10 have neither README nor README declarations; detector/leakage have existing declared READMEs. No placeholders or metadata reinstatement is authorized.",
+    "User zsh/uv/style/test/commit instructions remain explicit authority. Root README has documentation/archive pointers and no mandatory rewrite was established. Historical commands and accepted archive prose remain outside reauthoring scope."
+  ],
+  "validation_feasibility": [
+    {
+      "package": "D1",
+      "assessment": "FEASIBLE",
+      "checks": "Use a newly owned locked Python 3.13 test environment for the actual focused scheduler command; verify the full mandatory-core recipe against the source/profile contract and reuse accepted full-suite evidence only within its original scope. Parse both TOML fragments and the uncommented capture line. Run the documented isolated docs build and exact serve-command smoke, strict links/anchors and visual checks. No new prose-mirroring tests or broader runtime rerun is needed."
+    },
+    {
+      "package": "D2",
+      "assessment": "FEASIBLE_WITH_EXPLICIT_CLUSTER_LIMITS",
+      "checks": "Extract templates, substitute inert placeholders, run bash -n, verify interpreter/cwd/config references and absence of job-time downloads, then integrated strict/link checks. Module availability, wheel/CUDA compatibility, offline assets, site policy/account and actual Slurm execution remain unexecuted. Credentials and submissions are unnecessary for this correction."
+    },
+    {
+      "package": "D3",
+      "assessment": "FEASIBLE_REQUIRES_REAL_BROWSER_BEFORE_IMPLEMENTATION_ACCEPTANCE",
+      "checks": "Record reviewed exact release/changelog and three fetched asset hashes/content types; strict build plus actual direct-load and Material instant-navigation browser evidence must show inline/display math rendering without undefined globals or KaTeX console errors. This environment has Safari, but no existing Playwright/Selenium/pyppeteer in the inspected Python environment; task-owned automation/browser provisioning or an actual browser check remains necessary. Asset retrieval/static builds cannot replace the browser gate."
+    }
+  ],
+  "primary_source_checks": [
+    {
+      "url": "https://katex.org/docs/browser",
+      "result": "Retrieved official page. Its starter template names 0.19.0 CSS/core/auto-render and documents when globals become available. This supports pin selection and loading checks, not site compatibility."
+    },
+    {
+      "url": "https://github.com/KaTeX/KaTeX/releases/tag/v0.19.0",
+      "result": "Retrieved official release, dated 2026-10-01. It documents changed strict handling of missing character metrics. The implementation must retain changelog review and the actual browser gate."
+    },
+    {
+      "url": "https://docs.alliancecan.ca/wiki/Available_software",
+      "result": "Direct retrieval hit BotStopper Access Denied. Official indexed metadata lists Python 3.13.2 and module/software-environment differences; its old crawl cannot qualify current host availability or Plato dependencies."
+    },
+    {
+      "url": "https://docs.alliancecan.ca/wiki/Python",
+      "result": "Direct retrieval hit BotStopper Access Denied. Preserve the official reference and discover/verify locally; no current Alliance uv/wheel procedure was inferred."
+    },
+    {
+      "url": "https://docs.alliancecan.ca/wiki/Running_jobs",
+      "result": "Direct retrieval hit BotStopper Access Denied. No universal networking policy or actual job execution is qualified."
+    },
+    {
+      "url": "https://docs.alliancecan.ca/mediawiki/images/7/77/Managing_jobs.pdf",
+      "result": "Official indexed material identifies sbatch, squeue, sacct and scancel roles. This supports describing cancellation of a particular job without claiming submission qualification."
+    }
+  ],
+  "katex_candidate_asset_checks": [
+    {
+      "url": "https://unpkg.com/katex@0.19.0/dist/katex.min.js",
+      "status": 200,
+      "content_type": "text/javascript; charset=utf-8",
+      "sha256": "103a53763cc033bba8d175bf3f0ba597c3505c9b6747dd3f2c7bc2a6bfcc8ae7"
+    },
+    {
+      "url": "https://unpkg.com/katex@0.19.0/dist/contrib/auto-render.min.js",
+      "status": 200,
+      "content_type": "text/javascript; charset=utf-8",
+      "sha256": "e5372d199bcdae8b4de71d0f7ceba72a4ba12774a27c60a6f1f77d03b3228ee4"
+    },
+    {
+      "url": "https://unpkg.com/katex@0.19.0/dist/katex.min.css",
+      "status": 200,
+      "content_type": "text/css; charset=utf-8",
+      "sha256": "d4ab5b8ee16989b070cdb0ea24bd6ad48fc8df1b787f280f29d3ae4f959f2c00"
+    }
+  ],
+  "review_limits": {
+    "source_read_method": "Read-only git show/rev-parse/ls-tree/diff on frozen Git objects; read-only accepted archive comparison in /tmp/plato-refresh-worktrees/phase4-integration.",
+    "static_execution": "Existing Python 3.13.16 used only for stdlib TOML parsing, manifest inspection and in-memory asset retrieval; source fragments repaired in memory only.",
+    "shell": "All shell commands used zsh -lc.",
+    "source_or_active_worktree_writes": false,
+    "environment_provisioning_or_mutation": false,
+    "runtime_tests_docs_build_browser_cluster_execution": false,
+    "production_changes_pr_merge_or_nested_agents": false,
+    "artifact_writes": [
+      "/tmp/plato-remaining-docs-plan-review-v2.json"
+    ]
+  }
+}

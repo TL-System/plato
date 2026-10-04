@@ -1,0 +1,858 @@
+{
+  "schema_version": 1,
+  "status": "ACCEPTED_FOR_ROOT_INTEGRATION",
+  "verdict": "ACCEPT",
+  "reviewer": "/root/remaining_docs_katex_review \u2014 fresh independent reviewer",
+  "reviewed_at_utc": "2026-10-04T02:33:22.049407+00:00",
+  "subject": {
+    "worktree": "/tmp/plato-refresh-worktrees/remaining-docs-katex",
+    "branch": "maintenance/2026-remaining-docs-katex",
+    "baseline_commit": "408070278122988e31ed676852a0e7b0bd6f15bd",
+    "baseline_tree": "26d2bc551e19d95f78068dfdd39b2f75db3ecee4",
+    "asset_pin_commit": "dd0b3df13f228f1c40aec820e012f67319c3b693",
+    "asset_pin_tree": "839ad9277a1832b5c6a15a1b98939eb9afc88285",
+    "tex_repair_commit": "c172c6160893ced74179481110495e5920e8b7ab",
+    "validated_source_commit": "c172c6160893ced74179481110495e5920e8b7ab",
+    "validated_source_tree": "5d7af0e6b2268d8f8a710af80e029455a9e0e0b1",
+    "evidence_commit": "bd8dae15489c0743e8ee4de3fec2b0c938f5f1ca",
+    "evidence_tree": "24146d94090a461959bf76654ab77081294bce11",
+    "evidence": {
+      "path": "/tmp/plato-refresh-worktrees/remaining-docs-katex/evidence/2026-refresh/remaining-docs-katex-validation.json",
+      "sha256": "ad544c5adb0859649496d7a1048803a70d1d2afb04e7753a523f3eae3d9ba40a",
+      "bytes": 160904
+    },
+    "accepted_plan": {
+      "path": "/tmp/plato-remaining-docs-plan.json",
+      "sha256": "a2b52a4a471870e24d87e06b3045fa737a5d90a9ec392dbcd73ccc911b22b60c",
+      "bytes": 20304
+    },
+    "accepted_plan_review": {
+      "path": "/tmp/plato-remaining-docs-plan-review-v2.json",
+      "sha256": "04802455c581e1f8fccab86277f9a5ae885acaf6646bcf9d517e1a5adcd56276",
+      "bytes": 13136
+    },
+    "changed_source_paths": [
+      "docs/docs/examples/algorithms/5. Algorithms with Customized Client Training Loops.md",
+      "docs/mkdocs.yml"
+    ],
+    "baseline_file_sha256": {
+      "docs/mkdocs.yml": "d26f6c6e7b91cf8835b4187e3b9e01125801e735122d79e7a148179b31a852ec",
+      "docs/docs/javascripts/katex.js": "cf7c285fc05b98d7044da650406d3a7f02ad74ff5b30bbfb0c0ffb7b59462ada",
+      "pyproject.toml": "4c68adebeb88bba969a5d5c08a874644b1d40ccff241761dd7f2bd201b6ba3d3",
+      "uv.lock": "66a4e4442d7b1f26d220b44ca73c44ff4f1151a86857bb3f93a594819fd08126",
+      "docs/build.sh": "e21f333201ce75ea7e4a820d505e7b230a5a6048f279b56b0758f1a6cfc338b7",
+      "docs/docs/examples/algorithms/5. Algorithms with Customized Client Training Loops.md": "4083e29d1d4797b005e9deb1f1fce4d516e4a997da92cc78983a17f15b9e743d",
+      "docs/docs/examples/algorithms/10. Algorithms based on Neural Architecture Search and Model Search.md": "b2e2abe775d733fb218a4da81dfeb2b1985ad323393be7565510a15ce5bcdd5a",
+      "docs/docs/examples/algorithms/6. Client Selection Algorithms.md": "caa28ac4d7b6ba3232864d97951d98d6548b46ee5eba2cd9f92def5448aa7d8b",
+      "docs/docs/examples/algorithms/1. Server Aggregation Algorithms.md": "7d96b14625e3d943b46a82ca29a4b535effe7b9e44bb46ac09c8410c004ebb8a"
+    },
+    "candidate_file_sha256": {
+      "docs/mkdocs.yml": "e957896c9f3f62d1932fa0ba0c76d8f33fa193751d727a707006a6a33d1dcbb2",
+      "docs/docs/javascripts/katex.js": "cf7c285fc05b98d7044da650406d3a7f02ad74ff5b30bbfb0c0ffb7b59462ada",
+      "pyproject.toml": "4c68adebeb88bba969a5d5c08a874644b1d40ccff241761dd7f2bd201b6ba3d3",
+      "uv.lock": "66a4e4442d7b1f26d220b44ca73c44ff4f1151a86857bb3f93a594819fd08126",
+      "docs/build.sh": "e21f333201ce75ea7e4a820d505e7b230a5a6048f279b56b0758f1a6cfc338b7",
+      "docs/docs/examples/algorithms/5. Algorithms with Customized Client Training Loops.md": "18ffa471f5fe1fa4a396631bc37edf2e12f624aacf75c75127a8d4dbd26e7487",
+      "docs/docs/examples/algorithms/10. Algorithms based on Neural Architecture Search and Model Search.md": "b2e2abe775d733fb218a4da81dfeb2b1985ad323393be7565510a15ce5bcdd5a",
+      "docs/docs/examples/algorithms/6. Client Selection Algorithms.md": "caa28ac4d7b6ba3232864d97951d98d6548b46ee5eba2cd9f92def5448aa7d8b",
+      "docs/docs/examples/algorithms/1. Server Aggregation Algorithms.md": "7d96b14625e3d943b46a82ca29a4b535effe7b9e44bb46ac09c8410c004ebb8a"
+    },
+    "bindings_verified": true,
+    "commits_form_exact_baseline_pin_tex_evidence_chain": true,
+    "worktree_clean": true
+  },
+  "finding_counts": {
+    "critical": 0,
+    "high": 0,
+    "medium": 0,
+    "low": 0,
+    "blocking": 0
+  },
+  "findings": [],
+  "decision": "Accept the exact three KaTeX 0.19.0 pins, separately authorized one-character TeX escape, and source-bound browser evidence. The actual parse error is closed and the unchanged production callback works on direct and genuine Material instant loads. Root retains integration and merge authority.",
+  "scope_checks": [
+    "Source diff has only the three existing unpkg URL version pins in docs/mkdocs.yml and clients.total\\_clients in the page5 formula. The latter is within root's explicit narrow repair authorization after the browser reproduction.",
+    "Local katex.js is byte-identical to baseline; no initialization defect or callback change is claimed.",
+    "pyproject.toml, uv.lock, docs/build.sh and algorithm parameters/behavior/prose claims are unchanged. D1/D2 remain separate packages.",
+    "Evidence commit adds only its review-bound JSON receipt; git diff --check passes."
+  ],
+  "author_evidence_review": {
+    "all_declared_existing_artifact_hashes_and_byte_sizes_verified": true,
+    "source_and_built_file_sha256_verified": true,
+    "raw_baseline": {
+      "path": "/tmp/plato-remaining-docs-katex-validation/baseline-browser-final/browser-results.json",
+      "sha256": "f0708b87768733f3c1021e3ddc93e1e3263692297cff1ecd5fe9d9e0aff5eb9e",
+      "bytes": 136160
+    },
+    "raw_candidate": {
+      "path": "/tmp/plato-remaining-docs-katex-validation/candidate-browser/browser-results.json",
+      "sha256": "e30b6b1df8d7c3d352e456b84e975d65edd13bc532b6668e8d587a9aed32fe40",
+      "bytes": 118182
+    },
+    "raw_to_committed_receipt_projection_verified": true,
+    "projection_details": "Shared browser-check values match raw results; document_identity_sha256 matches raw identity SHA, original_sample_tex matches raw annotation samples, and loaded_katex_fonts matches raw loaded-font records. Console errors, failures, events and network asset observations match exactly.",
+    "candidate_matrix_checks": 16,
+    "candidate_console_page_request_errors": 0,
+    "candidate_instant_clicks": 8,
+    "candidate_instant_navigation": "Each recorded click retains per-document identity and requests the target through non-navigation XHR.",
+    "baseline_browser_defect": "Page5 renders 32 of 33 original formulas with a ParseError at the unescaped underscore, on direct and instant loads; the other sampled original page math renders.",
+    "baseline_capture_limit": "The authoritative author baseline contains 30 asset_capture_error observations for redirected floating CDN response-body capture. These are harness body-capture errors rather than browser request failures; baseline version 0.19.0 and the actual parse error are observed, and the independent replay captured real baseline CDN bodies successfully.",
+    "fixture_boundary": "Untouched page results contain no synthetic nodes. Display math appears only in a separate labeled browser-only HTML fixture; the source pages are inline-only."
+  },
+  "independent_validation": {
+    "strict_builds": {
+      "baseline": {
+        "commit": "408070278122988e31ed676852a0e7b0bd6f15bd",
+        "args": [
+          "/tmp/plato-remaining-docs-katex-docs-env/bin/python",
+          "-B",
+          "-m",
+          "mkdocs",
+          "build",
+          "--strict",
+          "--config-file",
+          "/tmp/plato-remaining-docs-katex-review-artifacts/baseline/docs/mkdocs.yml",
+          "--site-dir",
+          "/tmp/plato-remaining-docs-katex-review-artifacts/baseline/site"
+        ],
+        "exit_code": 0,
+        "log": "/tmp/plato-remaining-docs-katex-review-artifacts/baseline-strict-build.log",
+        "sha256": "8dbe8643a5327cbfb0ac8f286ecaeaf32ade26065f041f8a605154c0a1d66ec9"
+      },
+      "candidate": {
+        "commit": "c172c6160893ced74179481110495e5920e8b7ab",
+        "args": [
+          "/tmp/plato-remaining-docs-katex-docs-env/bin/python",
+          "-B",
+          "-m",
+          "mkdocs",
+          "build",
+          "--strict",
+          "--config-file",
+          "/tmp/plato-remaining-docs-katex-review-artifacts/candidate/docs/mkdocs.yml",
+          "--site-dir",
+          "/tmp/plato-remaining-docs-katex-review-artifacts/candidate/site"
+        ],
+        "exit_code": 0,
+        "log": "/tmp/plato-remaining-docs-katex-review-artifacts/candidate-strict-build.log",
+        "sha256": "64d377bd811c60ebf65095fdafe210e6de44ccffec9479ba98b371359c114c1d"
+      }
+    },
+    "fresh_build_source_method": "Read-only git archives of exact baseline and candidate docs into distinct owned scratch directories; read-only existing docs interpreter runs strict MkDocs with site outputs confined to reviewer scratch.",
+    "fresh_build_hash_parity": "All recorded selected baseline/candidate HTML, local callback and sitemap SHA256 values match independently generated build outputs.",
+    "build_receipt": {
+      "path": "/tmp/plato-remaining-docs-katex-review-artifacts/independent-builds.json",
+      "sha256": "c1911d54afdab4bc73e186aa5702f2b273ad7e1c98e54619ea25e32dfad1f7b9",
+      "bytes": 1339
+    },
+    "browser_harness": {
+      "path": "/tmp/plato-remaining-docs-katex-review-artifacts/independent_browser.py",
+      "sha256": "f067724f9accf738d01e4fca52889f203629e9efbc4a819af4e0216af24e8850",
+      "bytes": 9421
+    },
+    "browser_results": {
+      "path": "/tmp/plato-remaining-docs-katex-review-artifacts/independent-browser-results.json",
+      "sha256": "a93b43558cc53b7ce0c6ffaf5d79eb9abb548ccf36209bc7ab6c843c4dda6bb2",
+      "bytes": 122827
+    },
+    "browser_version": "153.0.8010.12",
+    "browser_executable": "/tmp/plato-remaining-docs-katex-browsers/chromium_headless_shell-1243/chrome-headless-shell-mac-arm64/chrome-headless-shell",
+    "playwright_version": "1.63.0",
+    "browser_checks": 18,
+    "baseline_checks": 2,
+    "candidate_checks": 16,
+    "baseline_parse_errors": 2,
+    "candidate_console_page_request_errors": 0,
+    "harness_errors": [],
+    "genuine_candidate_instant_clicks": 8,
+    "render_counts": "Candidate original math on the four sampled pages is 33/33, 1/1, 2/2, 2/2 for both direct and instant loads, in untouched and separate fixture contexts. MathML counts and nonzero rendered boxes agree.",
+    "checks": [
+      {
+        "label": "baseline",
+        "fixture": null,
+        "action": "direct",
+        "page": "5. Algorithms with Customized Client Training Loops",
+        "math": 33,
+        "rendered": 32,
+        "mathml": 32,
+        "nonzero": 32,
+        "raw": [
+          "\\(N = \\texttt{clients.total_clients}\\)"
+        ],
+        "version": "0.19.0",
+        "loadedFonts": [
+          "KaTeX_Main",
+          "KaTeX_Math",
+          "KaTeX_Size1"
+        ]
+      },
+      {
+        "label": "baseline",
+        "fixture": null,
+        "action": "instant",
+        "page": "5. Algorithms with Customized Client Training Loops",
+        "math": 33,
+        "rendered": 32,
+        "mathml": 32,
+        "nonzero": 32,
+        "raw": [
+          "\\(N = \\texttt{clients.total_clients}\\)"
+        ],
+        "version": "0.19.0",
+        "loadedFonts": [
+          "KaTeX_Main",
+          "KaTeX_Math",
+          "KaTeX_Size1"
+        ],
+        "retains_document": true
+      },
+      {
+        "label": "candidate",
+        "fixture": null,
+        "action": "direct",
+        "page": "5. Algorithms with Customized Client Training Loops",
+        "math": 33,
+        "rendered": 33,
+        "mathml": 33,
+        "nonzero": 33,
+        "raw": [],
+        "version": "0.19.0",
+        "loadedFonts": [
+          "KaTeX_Main",
+          "KaTeX_Math",
+          "KaTeX_Size1",
+          "KaTeX_Typewriter"
+        ]
+      },
+      {
+        "label": "candidate",
+        "fixture": null,
+        "action": "direct",
+        "page": "10. Algorithms based on Neural Architecture Search and Model Search",
+        "math": 1,
+        "rendered": 1,
+        "mathml": 1,
+        "nonzero": 1,
+        "raw": [],
+        "version": "0.19.0",
+        "loadedFonts": [
+          "KaTeX_Main",
+          "KaTeX_Math"
+        ]
+      },
+      {
+        "label": "candidate",
+        "fixture": null,
+        "action": "direct",
+        "page": "6. Client Selection Algorithms",
+        "math": 2,
+        "rendered": 2,
+        "mathml": 2,
+        "nonzero": 2,
+        "raw": [],
+        "version": "0.19.0",
+        "loadedFonts": [
+          "KaTeX_Caligraphic",
+          "KaTeX_Main",
+          "KaTeX_Math"
+        ]
+      },
+      {
+        "label": "candidate",
+        "fixture": null,
+        "action": "direct",
+        "page": "1. Server Aggregation Algorithms",
+        "math": 2,
+        "rendered": 2,
+        "mathml": 2,
+        "nonzero": 2,
+        "raw": [],
+        "version": "0.19.0",
+        "loadedFonts": [
+          "KaTeX_Main",
+          "KaTeX_Math",
+          "KaTeX_Size1"
+        ]
+      },
+      {
+        "label": "candidate",
+        "fixture": null,
+        "action": "instant",
+        "page": "5. Algorithms with Customized Client Training Loops",
+        "math": 33,
+        "rendered": 33,
+        "mathml": 33,
+        "nonzero": 33,
+        "raw": [],
+        "version": "0.19.0",
+        "loadedFonts": [
+          "KaTeX_Main",
+          "KaTeX_Math",
+          "KaTeX_Size1",
+          "KaTeX_Typewriter"
+        ],
+        "retains_document": true
+      },
+      {
+        "label": "candidate",
+        "fixture": null,
+        "action": "instant",
+        "page": "10. Algorithms based on Neural Architecture Search and Model Search",
+        "math": 1,
+        "rendered": 1,
+        "mathml": 1,
+        "nonzero": 1,
+        "raw": [],
+        "version": "0.19.0",
+        "loadedFonts": [
+          "KaTeX_Main",
+          "KaTeX_Math",
+          "KaTeX_Size1",
+          "KaTeX_Typewriter"
+        ],
+        "retains_document": true
+      },
+      {
+        "label": "candidate",
+        "fixture": null,
+        "action": "instant",
+        "page": "6. Client Selection Algorithms",
+        "math": 2,
+        "rendered": 2,
+        "mathml": 2,
+        "nonzero": 2,
+        "raw": [],
+        "version": "0.19.0",
+        "loadedFonts": [
+          "KaTeX_Caligraphic",
+          "KaTeX_Main",
+          "KaTeX_Math",
+          "KaTeX_Size1",
+          "KaTeX_Typewriter"
+        ],
+        "retains_document": true
+      },
+      {
+        "label": "candidate",
+        "fixture": null,
+        "action": "instant",
+        "page": "1. Server Aggregation Algorithms",
+        "math": 2,
+        "rendered": 2,
+        "mathml": 2,
+        "nonzero": 2,
+        "raw": [],
+        "version": "0.19.0",
+        "loadedFonts": [
+          "KaTeX_Caligraphic",
+          "KaTeX_Main",
+          "KaTeX_Math",
+          "KaTeX_Size1",
+          "KaTeX_Typewriter"
+        ],
+        "retains_document": true
+      },
+      {
+        "label": "candidate",
+        "fixture": {
+          "rendered": 3,
+          "display": 2,
+          "inline": 1,
+          "layout": [
+            {
+              "width": 688,
+              "height": 59.59375,
+              "display": "block"
+            },
+            {
+              "width": 688,
+              "height": 47.921875,
+              "display": "block"
+            }
+          ]
+        },
+        "action": "direct",
+        "page": "5. Algorithms with Customized Client Training Loops",
+        "math": 33,
+        "rendered": 33,
+        "mathml": 33,
+        "nonzero": 33,
+        "raw": [],
+        "version": "0.19.0",
+        "loadedFonts": [
+          "KaTeX_Main",
+          "KaTeX_Math",
+          "KaTeX_Size1",
+          "KaTeX_Size2",
+          "KaTeX_Typewriter"
+        ],
+        "fixture_rendering": {
+          "rendered": 3,
+          "display": 2,
+          "inline": 1,
+          "layout": [
+            {
+              "width": 688,
+              "height": 59.59375,
+              "display": "block"
+            },
+            {
+              "width": 688,
+              "height": 47.921875,
+              "display": "block"
+            }
+          ]
+        }
+      },
+      {
+        "label": "candidate",
+        "fixture": {
+          "rendered": 3,
+          "display": 2,
+          "inline": 1,
+          "layout": [
+            {
+              "width": 688,
+              "height": 59.59375,
+              "display": "block"
+            },
+            {
+              "width": 688,
+              "height": 47.921875,
+              "display": "block"
+            }
+          ]
+        },
+        "action": "direct",
+        "page": "10. Algorithms based on Neural Architecture Search and Model Search",
+        "math": 1,
+        "rendered": 1,
+        "mathml": 1,
+        "nonzero": 1,
+        "raw": [],
+        "version": "0.19.0",
+        "loadedFonts": [
+          "KaTeX_Main",
+          "KaTeX_Math",
+          "KaTeX_Size2"
+        ],
+        "fixture_rendering": {
+          "rendered": 3,
+          "display": 2,
+          "inline": 1,
+          "layout": [
+            {
+              "width": 688,
+              "height": 59.59375,
+              "display": "block"
+            },
+            {
+              "width": 688,
+              "height": 47.921875,
+              "display": "block"
+            }
+          ]
+        }
+      },
+      {
+        "label": "candidate",
+        "fixture": {
+          "rendered": 3,
+          "display": 2,
+          "inline": 1,
+          "layout": [
+            {
+              "width": 688,
+              "height": 59.59375,
+              "display": "block"
+            },
+            {
+              "width": 688,
+              "height": 47.921875,
+              "display": "block"
+            }
+          ]
+        },
+        "action": "direct",
+        "page": "6. Client Selection Algorithms",
+        "math": 2,
+        "rendered": 2,
+        "mathml": 2,
+        "nonzero": 2,
+        "raw": [],
+        "version": "0.19.0",
+        "loadedFonts": [
+          "KaTeX_Caligraphic",
+          "KaTeX_Main",
+          "KaTeX_Math",
+          "KaTeX_Size2"
+        ],
+        "fixture_rendering": {
+          "rendered": 3,
+          "display": 2,
+          "inline": 1,
+          "layout": [
+            {
+              "width": 688,
+              "height": 59.59375,
+              "display": "block"
+            },
+            {
+              "width": 688,
+              "height": 47.921875,
+              "display": "block"
+            }
+          ]
+        }
+      },
+      {
+        "label": "candidate",
+        "fixture": {
+          "rendered": 3,
+          "display": 2,
+          "inline": 1,
+          "layout": [
+            {
+              "width": 688,
+              "height": 59.59375,
+              "display": "block"
+            },
+            {
+              "width": 688,
+              "height": 47.921875,
+              "display": "block"
+            }
+          ]
+        },
+        "action": "direct",
+        "page": "1. Server Aggregation Algorithms",
+        "math": 2,
+        "rendered": 2,
+        "mathml": 2,
+        "nonzero": 2,
+        "raw": [],
+        "version": "0.19.0",
+        "loadedFonts": [
+          "KaTeX_Main",
+          "KaTeX_Math",
+          "KaTeX_Size1",
+          "KaTeX_Size2"
+        ],
+        "fixture_rendering": {
+          "rendered": 3,
+          "display": 2,
+          "inline": 1,
+          "layout": [
+            {
+              "width": 688,
+              "height": 59.59375,
+              "display": "block"
+            },
+            {
+              "width": 688,
+              "height": 47.921875,
+              "display": "block"
+            }
+          ]
+        }
+      },
+      {
+        "label": "candidate",
+        "fixture": {
+          "rendered": 3,
+          "display": 2,
+          "inline": 1,
+          "layout": [
+            {
+              "width": 688,
+              "height": 59.59375,
+              "display": "block"
+            },
+            {
+              "width": 688,
+              "height": 47.921875,
+              "display": "block"
+            }
+          ]
+        },
+        "action": "instant",
+        "page": "5. Algorithms with Customized Client Training Loops",
+        "math": 33,
+        "rendered": 33,
+        "mathml": 33,
+        "nonzero": 33,
+        "raw": [],
+        "version": "0.19.0",
+        "loadedFonts": [
+          "KaTeX_Main",
+          "KaTeX_Math",
+          "KaTeX_Size1",
+          "KaTeX_Size2",
+          "KaTeX_Typewriter"
+        ],
+        "retains_document": true,
+        "fixture_rendering": {
+          "rendered": 3,
+          "display": 2,
+          "inline": 1,
+          "layout": [
+            {
+              "width": 688,
+              "height": 59.59375,
+              "display": "block"
+            },
+            {
+              "width": 688,
+              "height": 47.921875,
+              "display": "block"
+            }
+          ]
+        }
+      },
+      {
+        "label": "candidate",
+        "fixture": {
+          "rendered": 3,
+          "display": 2,
+          "inline": 1,
+          "layout": [
+            {
+              "width": 688,
+              "height": 59.59375,
+              "display": "block"
+            },
+            {
+              "width": 688,
+              "height": 47.921875,
+              "display": "block"
+            }
+          ]
+        },
+        "action": "instant",
+        "page": "10. Algorithms based on Neural Architecture Search and Model Search",
+        "math": 1,
+        "rendered": 1,
+        "mathml": 1,
+        "nonzero": 1,
+        "raw": [],
+        "version": "0.19.0",
+        "loadedFonts": [
+          "KaTeX_Main",
+          "KaTeX_Math",
+          "KaTeX_Size1",
+          "KaTeX_Size2",
+          "KaTeX_Typewriter"
+        ],
+        "retains_document": true,
+        "fixture_rendering": {
+          "rendered": 3,
+          "display": 2,
+          "inline": 1,
+          "layout": [
+            {
+              "width": 688,
+              "height": 59.59375,
+              "display": "block"
+            },
+            {
+              "width": 688,
+              "height": 47.921875,
+              "display": "block"
+            }
+          ]
+        }
+      },
+      {
+        "label": "candidate",
+        "fixture": {
+          "rendered": 3,
+          "display": 2,
+          "inline": 1,
+          "layout": [
+            {
+              "width": 688,
+              "height": 59.59375,
+              "display": "block"
+            },
+            {
+              "width": 688,
+              "height": 47.921875,
+              "display": "block"
+            }
+          ]
+        },
+        "action": "instant",
+        "page": "6. Client Selection Algorithms",
+        "math": 2,
+        "rendered": 2,
+        "mathml": 2,
+        "nonzero": 2,
+        "raw": [],
+        "version": "0.19.0",
+        "loadedFonts": [
+          "KaTeX_Caligraphic",
+          "KaTeX_Main",
+          "KaTeX_Math",
+          "KaTeX_Size1",
+          "KaTeX_Size2",
+          "KaTeX_Typewriter"
+        ],
+        "retains_document": true,
+        "fixture_rendering": {
+          "rendered": 3,
+          "display": 2,
+          "inline": 1,
+          "layout": [
+            {
+              "width": 688,
+              "height": 59.59375,
+              "display": "block"
+            },
+            {
+              "width": 688,
+              "height": 47.921875,
+              "display": "block"
+            }
+          ]
+        }
+      },
+      {
+        "label": "candidate",
+        "fixture": {
+          "rendered": 3,
+          "display": 2,
+          "inline": 1,
+          "layout": [
+            {
+              "width": 688,
+              "height": 59.59375,
+              "display": "block"
+            },
+            {
+              "width": 688,
+              "height": 47.921875,
+              "display": "block"
+            }
+          ]
+        },
+        "action": "instant",
+        "page": "1. Server Aggregation Algorithms",
+        "math": 2,
+        "rendered": 2,
+        "mathml": 2,
+        "nonzero": 2,
+        "raw": [],
+        "version": "0.19.0",
+        "loadedFonts": [
+          "KaTeX_Caligraphic",
+          "KaTeX_Main",
+          "KaTeX_Math",
+          "KaTeX_Size1",
+          "KaTeX_Size2",
+          "KaTeX_Typewriter"
+        ],
+        "retains_document": true,
+        "fixture_rendering": {
+          "rendered": 3,
+          "display": 2,
+          "inline": 1,
+          "layout": [
+            {
+              "width": 688,
+              "height": 59.59375,
+              "display": "block"
+            },
+            {
+              "width": 688,
+              "height": 47.921875,
+              "display": "block"
+            }
+          ]
+        }
+      }
+    ],
+    "routing_integrity": "Only requests under configured https://platodocs.netlify.app/ are mapped to an owned localhost static server. Eighteen HTML transport-response hashes equal exact freshly built disk bytes before optional fixture insertion; unpkg scripts/CSS/fonts are never intercepted. The sitemap and page links retain configured production-origin bytes.",
+    "navigation_integrity": "Real visible existing nav links are clicked after opening their existing collapsed groups. Each candidate instant request is XHR and is_navigation_request=False; per-document UUID persists; the expected heading and rendered article are awaited. No manual renderer call, document$ event, library replacement, response-render count mocking or injected product JavaScript.",
+    "network_js_css_sha256_parity": true,
+    "network_asset_observations": 81,
+    "network_font_observations": 45,
+    "network_fonts": "Six unique KaTeX WOFF2 font URLs returned 200 from actual unpkg; loaded KaTeX font records are observed in all candidate snapshots. Default browser TLS is retained.",
+    "visual_inspection": [
+      {
+        "artifact": {
+          "path": "/tmp/plato-remaining-docs-katex-review-artifacts/baseline-False-direct.png",
+          "sha256": "1a0a0be8556ed4d839e122a9ad39a5db85ae1e3d9518abd044e9c705e0e3c145",
+          "bytes": 269981
+        },
+        "result": "The client-count formula is visibly raw beside otherwise rendered SCAFFOLD formulas."
+      },
+      {
+        "artifact": {
+          "path": "/tmp/plato-remaining-docs-katex-review-artifacts/candidate-False-direct.png",
+          "sha256": "7a48c3856aad8a3dfd9d96e0ab8a8a1a0b8afb48003367e83046e2ed7a78db50",
+          "bytes": 270376
+        },
+        "result": "The client-count formula now displays N = clients.total_clients in the paragraph; surrounding equations continue to render."
+      },
+      {
+        "artifact": {
+          "path": "/tmp/plato-remaining-docs-katex-review-artifacts/candidate-True-instant.png",
+          "sha256": "20ed4c4ea66e8d0163e6738edde8fd4f841a917fd99b5ec7a478a6cfc602ceaa",
+          "bytes": 6711
+        },
+        "result": "Browser-only inline, bracket display, and dollar display probes render after a genuine instant click, with centered nonzero block display formulas."
+      }
+    ],
+    "upstream_receipt": {
+      "path": "/tmp/plato-remaining-docs-katex-review-artifacts/independent-upstream.json",
+      "sha256": "50cf4a922a6ec905576e3dfb48e62472499df0fd8af7a1fc4f2d3b036cd0e1b2",
+      "bytes": 641
+    },
+    "official_sources": [
+      {
+        "url": "https://api.github.com/repos/KaTeX/KaTeX/releases/latest",
+        "status": 200,
+        "content_type": "application/json; charset=utf-8",
+        "sha256": "b35b92c2c38e85abceea70127a672e5f4e5a925097dff364663c447869e2fd7a",
+        "path": "/tmp/plato-remaining-docs-katex-review-artifacts/release-latest.response",
+        "tag_name": "v0.19.0"
+      },
+      {
+        "url": "https://katex.org/docs/browser",
+        "status": 200,
+        "content_type": "text/html; charset=UTF-8",
+        "sha256": "7f590710023db1a198da68e96d44908fc3c08e37ea0fccac47978eaf197b2aff",
+        "path": "/tmp/plato-remaining-docs-katex-review-artifacts/browser-docs.response"
+      }
+    ],
+    "latest_release": "Fresh official GitHub latest-release API identifies v0.19.0; official browser documentation names the same core/auto-render/CSS version and its SHA384 values match the fetched asset bytes.",
+    "changelog_review": "Official v0.19.0 changelog documents changed strict handling of missing metrics and earlier prefixed internal CSS classes. The site has no custom strict callback/error option or internal-class CSS selector. Actual browser results establish the bounded compatibility observation.",
+    "official_urls": [
+      "https://katex.org/docs/browser",
+      "https://github.com/KaTeX/KaTeX/releases/tag/v0.19.0",
+      "https://raw.githubusercontent.com/KaTeX/KaTeX/v0.19.0/CHANGELOG.md"
+    ],
+    "asset_pin_effect": "The floating baseline resolves 0.19.0 during review; the candidate freezes that observed release at the same host, rather than claiming a different observed runtime version."
+  },
+  "limits": [
+    "Chromium Headless Shell 153.0.8010.12 with Playwright 1.63.0 only; Safari, Firefox, physical device and other-browser execution are untested.",
+    "The frozen local built site is qualified under a production-origin route mapping. No live deployment, server/CDN production configuration, publication or production-write behavior is tested.",
+    "Display-math evidence is from separately labeled synthetic browser-only fixtures because these four real algorithm pages contain no display math. It is not claimed as existing source-page coverage.",
+    "Real external CDN assets and fonts were observed at review time; the pins are not offline hosting, SRI enforcement in page markup, or a guarantee of future availability.",
+    "No federated algorithm, optional profile, family runtime, cluster or full core suite qualification follows from this documentation review."
+  ],
+  "review_environment": {
+    "shell": "All shell tool invocations use zsh -lc.",
+    "source_edits": false,
+    "author_root_active_environment_mutation": false,
+    "environment_use": "Existing task-owned docs/browser interpreters and Chromium binary read-only; PYTHONDONTWRITEBYTECODE=1 or -B. Browser contexts and server ports are fresh and owned by this review.",
+    "nested_agents": false,
+    "full_core_tests": false,
+    "merge_pr_publish_deployment": false,
+    "artifact_root": "/tmp/plato-remaining-docs-katex-review-artifacts",
+    "artifact_writes": [
+      "/tmp/plato-remaining-docs-katex-review.json",
+      "/tmp/plato-remaining-docs-katex-review-artifacts"
+    ]
+  }
+}

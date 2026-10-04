@@ -1,0 +1,595 @@
+{
+  "schema_version": 1,
+  "status": "ACCEPTED_FOR_ROOT_INTEGRATION",
+  "created_at_utc": "2026-10-04T02:35:17.950908+00:00",
+  "reviewer": {
+    "role": "Fresh independent code/prose reviewer; did not author the source or its validation evidence.",
+    "task": "/root/remaining_docs_prose_review",
+    "method": "Read the accepted plan/review, full ten-path source diff and runtime/build/test contracts; independently hash Git objects and receipts, archive frozen source, execute bounded commands in isolated environments, and inspect rendered evidence.",
+    "production_source_edits": false,
+    "nested_agents": false,
+    "pr_merge_or_publication": false
+  },
+  "scope": "D1+D2 documentation slice only: contributor/testing recipes, docs build/serve instructions, timeout and cleanup guidance, two TOML fragments, attribution/processor rendering, example indexes and Alliance preparation/Slurm templates.",
+  "finding_counts": {
+    "critical": 0,
+    "high": 0,
+    "medium": 0,
+    "low": 0,
+    "blocking": 0
+  },
+  "findings": [],
+  "decision": "Accept the exact source commit 87ca5bb7098d62c0a1aebde1999e7155a975d336 and evidence commit 89f7c1531cb76969e102100c2185f3487ea1b48d for root integration. No material finding was found. This accepts the documentation corrections and their bounded evidence, not broader workload, device, cluster or family support.",
+  "authority": {
+    "plan_path": "/tmp/plato-remaining-docs-plan.json",
+    "plan_sha256": "a2b52a4a471870e24d87e06b3045fa737a5d90a9ec392dbcd73ccc911b22b60c",
+    "plan_review_path": "/tmp/plato-remaining-docs-plan-review-v2.json",
+    "plan_review_sha256": "04802455c581e1f8fccab86277f9a5ae885acaf6646bcf9d517e1a5adcd56276",
+    "plan_review_status": "ACCEPTED_FOR_IMPLEMENTATION; zero findings",
+    "policy": "User shell/uv/style/test/commit rules and accepted remaining-docs ownership; accepted install/quickstart/tooling/archive and separately owned D3 remain reserved. Root owns integration and publication."
+  },
+  "bindings": {
+    "base_commit": "408070278122988e31ed676852a0e7b0bd6f15bd",
+    "source_commit": "87ca5bb7098d62c0a1aebde1999e7155a975d336",
+    "source_tree": "c1a063ee9fbf62392509ca0ae1693a412d67a415",
+    "evidence_commit": "89f7c1531cb76969e102100c2185f3487ea1b48d",
+    "evidence_tree": "97fd6ea43afa8344b6479aa97b3cdee546b5eec9",
+    "receipt_sha256": "e8ff0d2a8725989db55c126c972e68fd7f9e330649c32fca06ad1b0c7dd88068",
+    "changed_paths": [
+      "AGENTS.md",
+      "docs/README.md",
+      "docs/docs/ccdb.md",
+      "docs/docs/configurations/server.md",
+      "docs/docs/configurations/trainer.md",
+      "docs/docs/development.md",
+      "docs/docs/examples/Getting Started.md",
+      "docs/docs/examples/algorithms/1. Server Aggregation Algorithms.md",
+      "docs/docs/index.md",
+      "docs/docs/misc.md"
+    ],
+    "source_diff_sha256": "4611730674695d8cc89ec63747111760978f140be75f4c253d12d35ed6f966ca",
+    "changed_file_sha256": {
+      "AGENTS.md": "6e90438d39c96ac8906cc3d834e17d7f2f1638c85682d98df1b48ba2d6bafdbc",
+      "docs/README.md": "097157e4156372a6fe7b449720355e094e5b50d2e68af0f24a968c86674eb17e",
+      "docs/docs/ccdb.md": "c843a5626a08864ebafac8878e1524aa4e6412fad17bd83f4fc038c8f2fddf6d",
+      "docs/docs/configurations/server.md": "392505c133a23aa97f93f9261fed662695a5b0073d9b905c49f5fb5987cd482e",
+      "docs/docs/configurations/trainer.md": "f2f59461e3987c909f243533f39f14ac2b79058a66d7d25794dbf055ac3c5a0f",
+      "docs/docs/development.md": "5e7983f94a1fe6e4516d1148985960074834629cb6b6402a94962d3e09e6b862",
+      "docs/docs/examples/Getting Started.md": "736689288c791f3e0913eb35549f18413478468a62caff5d7e8755acad192bb1",
+      "docs/docs/examples/algorithms/1. Server Aggregation Algorithms.md": "83d3eed11013db4aacdb63d7e38a53a0a5867d54a16eeda25b58d3cb7034f73d",
+      "docs/docs/index.md": "e3a0b876519936cd31baee48730b80edf571c08b3968f25300444376e7409970",
+      "docs/docs/misc.md": "f115a2f879ff4f5f70de81505b6cb5958ad633a18f04f7cd9c4f3e84f26ac2b0"
+    },
+    "read_only_contract_file_sha256": {
+      "pyproject.toml": "4c68adebeb88bba969a5d5c08a874644b1d40ccff241761dd7f2bd201b6ba3d3",
+      "uv.lock": "66a4e4442d7b1f26d220b44ca73c44ff4f1151a86857bb3f93a594819fd08126",
+      ".python-version": "02e735b3dfe1c32833eb550b7ff8ffa17f5f2bc3fa1e7bae61a8f5a3883ce398",
+      "docs/build.sh": "e21f333201ce75ea7e4a820d505e7b230a5a6048f279b56b0758f1a6cfc338b7",
+      "docs/requirements.txt": "9c33555b3d0cbc983d6dd59f261a242a92d136f2bb1364f300a01824f9eff665",
+      "docs/mkdocs.yml": "d26f6c6e7b91cf8835b4187e3b9e01125801e735122d79e7a148179b31a852ec",
+      "tests/conftest.py": "765fd2c96a67118f78b0a6c7f7fe134f9a73dfc5ecce25e35e684686da2bfd81",
+      "tests/trainers/test_lr_scheduler_registry.py": "d54a93e472270f88b7a39582b6bc748a844f5ece0aaf602ff6d61ffc23939ef6",
+      "tests/servers/test_fedavg_strategy.py": "b7b3c406d9acf42233d26a2ee9d4e80861ebb7ea18732402c5a9019532f8cc1f",
+      "tests/examples_phase4/cases.json": "972adcc85aa4d64d31dc9049b72e323a124846a01965ba3171c04b591e11b3d7",
+      "plato/servers/base.py": "80eb69f6af6602747e37264540aed3c989731a6c76c2c4a9bf6cc6692d32b918",
+      "plato/trainers/lr_schedulers.py": "d2563ca3a6f609e91f30ca585aa00a7eae5bbe2537680d476029e219ceae372f",
+      "examples/basic/basic.py": "7837e1d01a6c8ae07c08200bc82edb531b9000bfba6a0312f286e93656f4581c",
+      "configs/MNIST/fedavg_lenet5.toml": "0e6aec7afa2eebbccf6186d487cb782352fbfbeeebf12287040c5680edb33db3"
+    },
+    "artifact_sha256": {
+      "browser-check.log": "55eb55f7f99c748d75d81fafb0e9b1043558d2a69d3e3fd2994494e1cda7f07a",
+      "browser-install.log": "27a0c4d2d3b97051cc73178eae48c014a209e0fc42e3c99a8d6a9dc04d5c7ebf",
+      "browser-results.json": "b428eff01ac7bd4cfdf131c4674a796783b8ab4e43a50616dbae50d5253ae181",
+      "browser_check.py": "f5eb6534f230c28526b4b9341e8a6ce8b54fad35df2da5203706337aa2582738",
+      "ccdb-0.sh": "c363189cbc223ad45a50fc14f23eb475875204f24c86724a051d2a09e7ea6769",
+      "ccdb-1.sh": "90c733837ef8d19810056e587510ef235fe3db79b70137931d26d2200782d6b9",
+      "ccdb-2.sh": "80d2f0419c54c688c77f198ab49d7631096c355e03d4b6bb32f341efcb1bf42f",
+      "ccdb-3.sh": "485e57b89f71848c2b1c1f86e72089fb22d13537112d7d23a999d2b1ab4f73e0",
+      "ccdb-4.sh": "ef8d172e7d4dc38c41889da4dece0cd9992993e260c458e19f2bfcde54a70c1f",
+      "ccdb-5.sh": "1eabbece1463ebf61d0f93984d3b1064badeaf2e7977652a30a7cd32cb50f6e1",
+      "ccdb-6.sh": "953c6580f99cce51721550d9222412e3bd60799fc4f351d5222e4f949eec41d6",
+      "ccdb-7.sh": "083fbb1b8b27fce4a7eeac4ec7be07cbb1c2b30f54ea013b105723b0749986a2",
+      "docs-build-final.log": "35b8089a87ab519360572103b18118a4a6f4266163323fc92e9a0a9b4f8d0ffa",
+      "docs-build.log": "2fffe1611d2af59ada474f09548dd2ed8cbe7882a6b422261437ba9cee93a01e",
+      "docs-environment.json": "1436e78deff841b7e91d511c6c247ec2c604f80c56b592d3cbbe960be1ee51a1",
+      "docs-serve.log": "0b54a218a5d99622be26f8e8633fb22c64b76cb92c52556a74442982a13880c8",
+      "rendered-aggregation-fragment.png": "7540b262ac9c21c876aa37b3c63cce26845218526418f5cb82d6ec4ca1025933",
+      "rendered-ccdb-batch.png": "7621de70f7ada2ca966387ea2f953967e9b959a5defe88321b2df0fcaec2ae20",
+      "rendered-development-attribution.png": "a5339af459b8738a338d0344126069a6a92624b06255e0ccb1fc79daaa70ced3",
+      "rendered-server-processors.png": "03bbbedb68705c30e491f97642e11bb396e95ca62336df38e6c634378b889dbc",
+      "rendered-trainer-fragment.png": "2660fc3846adc0fe668710d1f4ff00a98db3724c08db4da136b27be88c53d3ea",
+      "scheduler.log": "86a500378fad15daff059959db358992ecdc164cf51fff91e8544c62a4fa2e4b",
+      "serve-shutdown.json": "27bc03e5d5ded18c4cdbcfba2b3ecd84aad0db095614b2077cb2a33e75ab6fcf",
+      "source.diff": "4611730674695d8cc89ec63747111760978f140be75f4c253d12d35ed6f966ca",
+      "static-results.json": "bb1fff21244cd6380eddc7b119cdcf09c533e162bc9906e36650a0a85e30d132",
+      "static_check.py": "8941ea369ad86287ddc800099212777135e6fce281e2af4385aa40ea140e906c",
+      "stop_preview.py": "ef3860f898effb3b7bc8ebb538f361f42ecfa96bffae6f98ea207312ed568246",
+      "test-packages.txt": "879fd00822e68f8a4f79b610cd9447763fd8b5d607e38aba2eb4c9190be1c88f",
+      "test-pip-check.log": "e6c70927fad428909538e4723d89a6218b0fe615ae27e31a6e725a09dd5662e8",
+      "test-sync.log": "85cc7ad5c705ebdd7461a1314f3d0c19c09a4d9c232a53bed0986b114ecd755a"
+    },
+    "source_bindings_pass": true,
+    "artifact_bindings_pass": true,
+    "reserved_contracts_unchanged": true
+  },
+  "binding_details": {
+    "receipt_path": "evidence/2026-refresh/remaining-docs-prose-validation.json",
+    "author_head": "89f7c1531cb76969e102100c2185f3487ea1b48d",
+    "author_worktree": "/tmp/plato-refresh-worktrees/remaining-docs-prose",
+    "author_worktree_clean_before_and_after": true,
+    "commit_parent_chain": "base -> source -> evidence independently verified",
+    "source_change_count": 10,
+    "source_scope_exact": true,
+    "evidence_change_count": 31,
+    "evidence_commit_scope": "Only the receipt and its 30 enumerated committed proof artifacts; every SHA256 independently checked.",
+    "source_diff": "Committed source.diff equals fresh git diff --binary base source byte-for-byte.",
+    "base_and_contract_hashes": "All receipt base_changed_file_sha256, changed_file_sha256 and read_only_contract_file_sha256 values were checked against the specified Git objects; read-only contracts equal the base.",
+    "historical_full_suite_receipt_sha256": "8dd517b666e48c45df3d925e1ee12fd805c5bf4d6d7bd1f8339a525cc663e926",
+    "historical_full_suite_reuse": "Hash checked only; original source/environment limits retained. No transfer of the historical 1302-test result to this prose commit.",
+    "additional_local_screenshot_hashes": {
+      "/tmp/plato-remaining-docs-prose-proof/rendered-aggregation.png": "06475ea03a8b1ca1b4683f7e42b66652149c79d46eb40c1d28e5e4602b735dad",
+      "/tmp/plato-remaining-docs-prose-proof/rendered-ccdb.png": "78ae64ee89ef2f9f506c9c6401631f63579ae73d32abd0174fa1a6eec660407a",
+      "/tmp/plato-remaining-docs-prose-proof/rendered-development.png": "ad8060162807d921527c6887d5bef841ffd0337f363d52050acab9427a9e8d98",
+      "/tmp/plato-remaining-docs-prose-proof/rendered-getting-started.png": "256c6c407b33ff21711f233d78bf7995e7b5139d8b9f113fc5ff91f6a5ac7437",
+      "/tmp/plato-remaining-docs-prose-proof/rendered-index.png": "ca68ab41e8d565b04f3ccc3ef21934b58b3f35d12198387c04b97c2e584e58d5",
+      "/tmp/plato-remaining-docs-prose-proof/rendered-misc.png": "2c4ecd26fcce9fc556dce83196acbac50bc72f5691be63fc4c7a662c060b043d",
+      "/tmp/plato-remaining-docs-prose-proof/rendered-server.png": "a80b12b9ff6122872f481a7c6d4d84cfc528592a0746daa462073256eb0f11b9",
+      "/tmp/plato-remaining-docs-prose-proof/rendered-trainer.png": "ef5686ce609a13d53edfdf669ee1e8139d3f2f29a424188e330a9b07f678332f"
+    }
+  },
+  "plan_resolution_checks": [
+    {
+      "id": "DOC01",
+      "result": "PASS",
+      "paths": [
+        "AGENTS.md",
+        "docs/docs/misc.md"
+      ],
+      "checked": "Locked Python 3.13 and real scheduler/server test targets replace absent targets. test-model-search includes test-base, DP/MPC/RL and ptflops. conftest supports the named mandatory core profile and excludes MLX/Lighteval/Phase4 directories unless explicitly requested. Linked native/evaluator anchors exist. The focused command ran 3 actual tests; prose does not label one command as all optional qualification. User zsh, Ruff/style, deterministic-test and sentence-style commit/PR instructions remain."
+    },
+    {
+      "id": "DOC02",
+      "result": "PASS",
+      "paths": [
+        "docs/README.md"
+      ],
+      "checked": "README points to the reserved accepted install guide, uses the existing isolated strict builder from root, names docs/site output and conditional uv 0.12.22 bootstrap accurately, and supplies the provisioned-interpreter serve command with explicit config path. The builder was independently executed with the same resolved Python 3.13 interpreter; the exact documented serve command ran on port 8000 and was stopped."
+    },
+    {
+      "id": "DOC03",
+      "result": "PASS",
+      "paths": [
+        "docs/docs/misc.md",
+        "docs/docs/ccdb.md"
+      ],
+      "checked": "Both passages use 3600 seconds, matching unchanged plato/servers/base.py. The adjacent fixed ten-client 360-second recommendation is removed and overrides use observed delays. The broken Running.md reference is replaced by the built ccdb page; broad pkill python advice is replaced by identified session/specific job-ID cleanup. The manage-the-job anchor resolves."
+    },
+    {
+      "id": "DOC04",
+      "result": "PASS",
+      "paths": [
+        "docs/docs/configurations/trainer.md",
+        "docs/docs/examples/algorithms/1. Server Aggregation Algorithms.md"
+      ],
+      "checked": "Both fragments independently parse under Python 3.13 tomllib. String/path quotes, equals assignment, valid exponent literal and the trainer.lr_scheduler=\"timm\" selector match the actual scheduler contract. Existing numeric values are preserved and asserted. The capture path also parses after uncommenting. Fragment wording is present; algorithm commands and behavioral claims receive no new qualification."
+    },
+    {
+      "id": "DOC05",
+      "result": "PASS",
+      "paths": [
+        "docs/docs/development.md",
+        "docs/docs/configurations/server.md"
+      ],
+      "checked": "DataSource attribution points to the existing matching examples/basic/basic.py implementation. Only the orphaned token was removed from server.md. Independently built HTML keeps the three inbound processors together in one admonition in the expected order; screenshot inspection agrees. The attribution edit is not general development-snippet execution evidence."
+    },
+    {
+      "id": "DOC06",
+      "result": "PASS",
+      "paths": [
+        "docs/docs/examples/Getting Started.md"
+      ],
+      "checked": "Preparation now distinguishes root dependencies, workspace member additions and incompatible root extras using the accepted installation guide. It preserves the selected extra on syncing run commands, delegates working directories/assets to family recipes, and uses bounded CPU/CUDA/Apple Silicon language linked to accepted Quick Start/MLX limits. It explicitly avoids equating chapter/config presence with support qualification."
+    },
+    {
+      "id": "DOC07",
+      "result": "PASS",
+      "paths": [
+        "docs/docs/examples/Getting Started.md",
+        "docs/docs/index.md"
+      ],
+      "checked": "Gradient leakage and archive links point to existing case-sensitive source and built paths. Both rendered indexes contain the archive link; Getting Started also contains gradient leakage. Existing chapter order and reserved archive prose remain intact."
+    },
+    {
+      "id": "DOC08",
+      "result": "PASS",
+      "paths": [
+        "docs/docs/ccdb.md"
+      ],
+      "checked": "The guide is explicitly a Python 3.13 discovery/adaptation template, with no invented fixed module or cluster qualification. It enters the checkout, requires the same site module stack and checks interpreter version, provisions locked dependencies/assets before submission, and runs an existing illustrative MNIST config with the prepared interpreter directly from root. No uv/pip/curl/wget or dependency resolution occurs in the batch template. Login-node training/interruption caching and pending FedBuff/HF/wideresnet endorsement are removed. Specific scheduler job-ID commands match upstream Slurm documentation; no SSH/submission/cancellation was executed."
+    }
+  ],
+  "independent_execution": {
+    "isolation": {
+      "source": "/tmp/plato-remaining-docs-prose-independent-review/source",
+      "method": "git archive of exact source commit; independent scratch environments and artifacts; no author/root/active worktree/helper-environment mutation",
+      "shell": "All tool shell invocations used zsh -lc. Verification Python invoked read-only git, bash -n and the MkDocs interpreter directly without shell expansion.",
+      "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+      "uv": "0.12.22"
+    },
+    "bindings_and_static": {
+      "command": "/Users/bli/.local/share/uv/python/cpython-3.13-macos-aarch64-none/bin/python3.13 /tmp/plato-remaining-docs-prose-independent-review/verify_bindings.py",
+      "exit_code": 0,
+      "toml": [
+        {
+          "path": "docs/docs/configurations/trainer.md",
+          "value": {
+            "trainer": {
+              "type": "timm_basic",
+              "lr_scheduler": "timm"
+            },
+            "parameters": {
+              "learning_rate": {
+                "sched": "cosine",
+                "min_lr": 1e-06,
+                "warmup_lr": 0.0001,
+                "warmup_epochs": 3,
+                "cooldown_epochs": 10
+              }
+            }
+          },
+          "capture_uncommented": false
+        },
+        {
+          "path": "docs/docs/examples/algorithms/1. Server Aggregation Algorithms.md",
+          "value": {
+            "algorithm": {
+              "type": "fedavg",
+              "scaling_factor": 10,
+              "attention_model_path": "./attention_model.pt",
+              "pca_components": 10,
+              "threshold": 0.005,
+              "attention_loops": 5,
+              "attention_hidden": 32
+            }
+          },
+          "capture_uncommented": true
+        }
+      ],
+      "shell_templates": [
+        {
+          "index": 0,
+          "exit_code": 0,
+          "sha256": "2bde1821619c6424952b49e9ee5c78fb8dfa1dbbffe4b79051ae9a7e56bab63c"
+        },
+        {
+          "index": 1,
+          "exit_code": 0,
+          "sha256": "90c733837ef8d19810056e587510ef235fe3db79b70137931d26d2200782d6b9"
+        },
+        {
+          "index": 2,
+          "exit_code": 0,
+          "sha256": "3f81f9a427cae3d4e9608606db1abc579be22d31ef43e1660b5e7f5d237066f5"
+        },
+        {
+          "index": 3,
+          "exit_code": 0,
+          "sha256": "485e57b89f71848c2b1c1f86e72089fb22d13537112d7d23a999d2b1ab4f73e0"
+        },
+        {
+          "index": 4,
+          "exit_code": 0,
+          "sha256": "d43bcf005d42b7c94379717c74ca154e566ed75c15373570869b40f9c64ca51b"
+        },
+        {
+          "index": 5,
+          "exit_code": 0,
+          "sha256": "1eabbece1463ebf61d0f93984d3b1064badeaf2e7977652a30a7cd32cb50f6e1"
+        },
+        {
+          "index": 6,
+          "exit_code": 0,
+          "sha256": "c430a9f805cfcc333653da91fc5428751051e549f41030baf44186089e75c5a3"
+        },
+        {
+          "index": 7,
+          "exit_code": 0,
+          "sha256": "d703ad36a6450d9ff9146817772fba34e4c17a5bddcb594ec99d93c8bc0e8243"
+        }
+      ],
+      "shell_scope": "Syntax checks after inert angle-bracket substitution; no cluster commands were run."
+    },
+    "focused_scheduler": {
+      "sync_command": "UV_PROJECT_ENVIRONMENT=/tmp/plato-remaining-docs-prose-independent-review/test-env uv sync --locked --python 3.13 --group test-model-search",
+      "run_command": "UV_PROJECT_ENVIRONMENT=/tmp/plato-remaining-docs-prose-independent-review/test-env uv run --locked --group test-model-search python -m pytest tests/trainers/test_lr_scheduler_registry.py -ra",
+      "exit_code": 0,
+      "passed": 3,
+      "failed": 0,
+      "skipped": 0,
+      "python": "3.13.16",
+      "pytest": "9.1.1",
+      "new_environment": "/tmp/plato-remaining-docs-prose-independent-review/test-env",
+      "pip_check": "94 packages checked; compatible; exit 0",
+      "full_mandatory_suite_executed": false,
+      "full_mandatory_recipe": "uv run --locked --group test-model-search python -m pytest tests --test-profile=mandatory -ra",
+      "full_recipe_assessment": "Verified against manifest dependency groups and actual conftest collection/profile enforcement; not executed or claimed as a fresh full-suite result."
+    },
+    "docs_build": {
+      "command": "PLATO_DOCS_ARTIFACT_DIR=/tmp/plato-remaining-docs-prose-independent-review/build-proof PLATO_DOCS_PYTHON=/Users/bli/.local/share/uv/python/cpython-3.13-macos-aarch64-none/bin/python3.13 ./docs/build.sh",
+      "cwd": "/tmp/plato-remaining-docs-prose-independent-review/source",
+      "exit_code": 0,
+      "readme_interpreter_resolution_verified": "uv python find 3.13 returned the same managed interpreter in the isolated source.",
+      "strict": true,
+      "output": "docs/site",
+      "new_environment": "/tmp/plato-remaining-docs-prose-independent-review/source/.venv-docs",
+      "environment_receipt": {
+        "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+        "executable": "/private/tmp/plato-remaining-docs-prose-independent-review/source/.venv-docs/bin/python",
+        "prefix": "/private/tmp/plato-remaining-docs-prose-independent-review/source/.venv-docs",
+        "packages": {
+          "babel": "2.18.0",
+          "backrefs": "8.0",
+          "certifi": "2026.7.22",
+          "charset-normalizer": "3.5.2",
+          "click": "8.5.0",
+          "colorama": "0.4.6",
+          "ghp-import": "2.1.0",
+          "idna": "3.20",
+          "jinja2": "3.1.6",
+          "markdown": "3.11",
+          "markupsafe": "3.0.3",
+          "mergedeep": "1.3.4",
+          "mkdocs": "1.6.1",
+          "mkdocs-get-deps": "0.2.2",
+          "mkdocs-material": "9.7.7",
+          "mkdocs-material-extensions": "1.3.1",
+          "packaging": "26.3",
+          "paginate": "0.5.7",
+          "pathspec": "1.1.1",
+          "platformdirs": "4.12.2",
+          "pygments": "2.21.0",
+          "pymdown-extensions": "12.1",
+          "python-dateutil": "2.9.0.post0",
+          "pyyaml": "6.0.3",
+          "pyyaml-env-tag": "1.1",
+          "requests": "2.34.2",
+          "six": "1.17.0",
+          "urllib3": "2.8.0",
+          "watchdog": "6.0.0"
+        },
+        "requirements_parity": true,
+        "runtime_and_project_absent": true
+      },
+      "notes": "Build succeeds; Material emits its upstream MkDocs 2 notice and MkDocs lists two existing archived redirect pages outside nav. These do not produce strict-build validation failures."
+    },
+    "docs_links_and_serve": {
+      "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+      "html_pages": 45,
+      "local_links_checked": 2973,
+      "broken_local_links": [],
+      "markdown_links_checked": 84,
+      "broken_markdown_links": [],
+      "inbound_processor_admonition": [
+        "model_decompress",
+        "model_dequantize",
+        "model_dequantize_qsgd"
+      ],
+      "archive_gradient_index_links": true,
+      "serve": {
+        "command": [
+          ".venv-docs/bin/python",
+          "-m",
+          "mkdocs",
+          "serve",
+          "--strict",
+          "-f",
+          "docs/mkdocs.yml"
+        ],
+        "cwd": "/tmp/plato-remaining-docs-prose-independent-review/source",
+        "port": 8000,
+        "exact_documented_command": true,
+        "pid": 28528,
+        "returncode": 0,
+        "pages": [
+          {
+            "path": "/",
+            "status": 200,
+            "article_present": true
+          },
+          {
+            "path": "/misc/",
+            "status": 200,
+            "article_present": true
+          },
+          {
+            "path": "/development/",
+            "status": 200,
+            "article_present": true
+          },
+          {
+            "path": "/ccdb/",
+            "status": 200,
+            "article_present": true
+          },
+          {
+            "path": "/configurations/trainer/",
+            "status": 200,
+            "article_present": true
+          },
+          {
+            "path": "/configurations/server/",
+            "status": 200,
+            "article_present": true
+          },
+          {
+            "path": "/examples/Getting%20Started/",
+            "status": 200,
+            "article_present": true
+          },
+          {
+            "path": "/examples/algorithms/1.%20Server%20Aggregation%20Algorithms/",
+            "status": 200,
+            "article_present": true
+          }
+        ],
+        "process_exited": true,
+        "port_closed": true,
+        "scope": "Local HTTP and article structure; no browser/JS/CDN execution in this smoke."
+      },
+      "source_file_hashes_unchanged": true
+    },
+    "visual_evidence_review": {
+      "committed_screenshots_viewed": [
+        "rendered-ccdb-batch.png",
+        "rendered-server-processors.png",
+        "rendered-trainer-fragment.png",
+        "rendered-aggregation-fragment.png",
+        "rendered-development-attribution.png"
+      ],
+      "additional_bound_screenshots_viewed": [
+        "rendered-index.png",
+        "rendered-getting-started.png"
+      ],
+      "assessment": "Correct fragments and attribution are readable, inbound processor bullets remain together, and CCDB preparation/batch limits are visible with expected code scrolling. Index and preparation prose render normally. No material layout regression observed.",
+      "author_browser_evidence_checked": "Bound browser_check.py, browser-results.json, logs and screenshot hashes record Chromium 153.0.8010.12, eight HTTP 200 pages and visible articles. The author probe explicitly limits itself to prose rendering.",
+      "fresh_browser_execution_by_reviewer": false
+    },
+    "diff_check": {
+      "command": "git diff --check base source",
+      "exit_code": 0
+    }
+  },
+  "primary_source_checks": [
+    {
+      "url": "https://docs.alliancecan.ca/wiki/Available_software",
+      "result": "Fresh direct web retrieval returned BotStopper Access Denied b3728715388cb593; no current module availability inferred."
+    },
+    {
+      "url": "https://docs.alliancecan.ca/wiki/Python",
+      "result": "Fresh direct web retrieval returned BotStopper Access Denied b3728715388cb593; no current site installation/wheel policy inferred."
+    },
+    {
+      "url": "https://docs.alliancecan.ca/wiki/Running_jobs",
+      "result": "Fresh direct web retrieval returned BotStopper Access Denied b3728715388cb593; no actual job or networking policy inferred."
+    },
+    {
+      "url": "https://docs.alliancecan.ca/mediawiki/images/7/77/Managing_jobs.pdf",
+      "result": "Fresh direct web retrieval returned an access-denied page. The reference is retained; command semantics were independently verified from upstream Slurm."
+    },
+    {
+      "url": "https://slurm.schedmd.com/sbatch.html",
+      "result": "Official documentation supports batch submission and %j as job ID in the configured output filename. Resource/time numbers remain illustrative."
+    },
+    {
+      "url": "https://slurm.schedmd.com/squeue.html",
+      "result": "Official documentation confirms --jobs=<job_id_list> for the selected job IDs."
+    },
+    {
+      "url": "https://slurm.schedmd.com/sacct.html",
+      "result": "Official documentation confirms --jobs selection for accounting inspection."
+    },
+    {
+      "url": "https://slurm.schedmd.com/scancel.html",
+      "result": "Official documentation confirms a specific job_id argument cancels that job when no signal override is used."
+    }
+  ],
+  "limits_and_reserved_work": [
+    "Actual Alliance module names, accounts/allocation policy, wheel/package/CUDA compatibility, dataset/model/offline preparation, compute networking policy and Slurm execution remain unverified. No credentials, SSH, sbatch or scancel were used.",
+    "Only the three focused scheduler tests ran. No fresh whole mandatory core suite, native MLX, Lighteval runtime, MNIST training, CUDA/GPU workload or distributed execution was performed by this reviewer.",
+    "The 58-family/399-active-path broader Phase4 support qualification is not established by prose, imports, parsing, link checks, docs builds or these focused tests. The aggregation edit remains syntax-only.",
+    "The reviewer independently built and served pages and inspected bound screenshots; did not execute a new browser/JavaScript/CDN/KaTeX direct-load or instant-navigation qualification. D3 KaTeX pin and separately fixed page-5 TeX work remain separately owned and neither rejected nor accepted by this D1+D2 report.",
+    "External link/anchor availability is not established by the local link check. Three Alliance pages and its job-management PDF were access denied during fresh retrieval; only generic scheduler semantics were checked from official upstream Slurm documentation.",
+    "Accepted install/quickstart/build tooling, manifest/lock, archive prose, root README, D3 paths and behavioral family handoffs were not authored or changed in this slice. Root retains final integration, combined gates and publication."
+  ],
+  "artifacts": {
+    "directory": "/tmp/plato-remaining-docs-prose-independent-review",
+    "sha256": {
+      "verify_bindings.py": "ba644954ba4ac5c465a96f4f458b4b1c010aef40b0e25a6c1d19a6af3f0f2bf2",
+      "bindings-static-results.json": "1df7974ffe84ce2876fa602de016611f10ca26d963cc9cb6bcf2e56952d5e35e",
+      "verify_docs.py": "14a74001cda3394b9136f08ea7b2f8187486dba5541ae74e387342ab6358fd69",
+      "docs-results.json": "1e11c13a482b2e199d7c3b728bd5129a53ae3e4b4d3dcf2f33c8fb29a714864b",
+      "docs-check.log": "1e11c13a482b2e199d7c3b728bd5129a53ae3e4b4d3dcf2f33c8fb29a714864b",
+      "docs-build.log": "dd305e5c88812b928a7b2ac829f8045db8d3e33a754eec685d6950fc47417c7e",
+      "docs-serve.log": "7e358f7f131747ffe434edff2d0f71e62b8c1ad85cce9de721d89acc4176b7b8",
+      "test-sync.log": "7710003a9c961b2ce340fcaf51fbc16836c1964fde77f876b7a9a76a9d51de25",
+      "scheduler.log": "243f7a9e805365b4ef3f5370fe1220bdfc173c46680ee0b3511e12c921d182e2",
+      "test-pip-check.log": "8fcfac5cfd9a23bc62e044daadbfa538f4ad49953c4418a6f8227334d015d3a8",
+      "build-proof/docs-environment.json": "fbb44fb6e454985fa8a382eaa47477bc03273600726563cdf13a30b47a263df8",
+      "cluster-template-0.sh": "2bde1821619c6424952b49e9ee5c78fb8dfa1dbbffe4b79051ae9a7e56bab63c",
+      "cluster-template-1.sh": "90c733837ef8d19810056e587510ef235fe3db79b70137931d26d2200782d6b9",
+      "cluster-template-2.sh": "3f81f9a427cae3d4e9608606db1abc579be22d31ef43e1660b5e7f5d237066f5",
+      "cluster-template-3.sh": "485e57b89f71848c2b1c1f86e72089fb22d13537112d7d23a999d2b1ab4f73e0",
+      "cluster-template-4.sh": "d43bcf005d42b7c94379717c74ca154e566ed75c15373570869b40f9c64ca51b",
+      "cluster-template-5.sh": "1eabbece1463ebf61d0f93984d3b1064badeaf2e7977652a30a7cd32cb50f6e1",
+      "cluster-template-6.sh": "c430a9f805cfcc333653da91fc5428751051e549f41030baf44186089e75c5a3",
+      "cluster-template-7.sh": "d703ad36a6450d9ff9146817772fba34e4c17a5bddcb594ec99d93c8bc0e8243"
+    },
+    "retained_environment_paths": [
+      "/tmp/plato-remaining-docs-prose-independent-review/source/.venv-docs",
+      "/tmp/plato-remaining-docs-prose-independent-review/test-env"
+    ],
+    "production_source_written": false,
+    "owned_preview_cleanup": {
+      "command": [
+        ".venv-docs/bin/python",
+        "-m",
+        "mkdocs",
+        "serve",
+        "--strict",
+        "-f",
+        "docs/mkdocs.yml"
+      ],
+      "cwd": "/tmp/plato-remaining-docs-prose-independent-review/source",
+      "port": 8000,
+      "exact_documented_command": true,
+      "pid": 28528,
+      "returncode": 0,
+      "pages": [
+        {
+          "path": "/",
+          "status": 200,
+          "article_present": true
+        },
+        {
+          "path": "/misc/",
+          "status": 200,
+          "article_present": true
+        },
+        {
+          "path": "/development/",
+          "status": 200,
+          "article_present": true
+        },
+        {
+          "path": "/ccdb/",
+          "status": 200,
+          "article_present": true
+        },
+        {
+          "path": "/configurations/trainer/",
+          "status": 200,
+          "article_present": true
+        },
+        {
+          "path": "/configurations/server/",
+          "status": 200,
+          "article_present": true
+        },
+        {
+          "path": "/examples/Getting%20Started/",
+          "status": 200,
+          "article_present": true
+        },
+        {
+          "path": "/examples/algorithms/1.%20Server%20Aggregation%20Algorithms/",
+          "status": 200,
+          "article_present": true
+        }
+      ],
+      "process_exited": true,
+      "port_closed": true,
+      "scope": "Local HTTP and article structure; no browser/JS/CDN execution in this smoke."
+    },
+    "author_preview_shutdown_receipt_verified": "Bound serve-shutdown.json records its identified preview process no longer alive and port 8000 closed; independent preview also exited and port closed after this review."
+  }
+}

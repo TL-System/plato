@@ -1,0 +1,124 @@
+{
+  "status": "FROZEN_FEI_INVENTORY_FOR_STRICT_QUALIFICATION_NOT_FAMILY_ACCEPTANCE",
+  "base": "408070278122988e31ed676852a0e7b0bd6f15bd",
+  "author_source": "4f6e9f0b61a276d8687abd2d6e23b3a0ea46d8e4",
+  "proposal_sha256": "695b29470a602b5abda381280c7cfa8fb7d2682bf24cc680ed5dfe96f03a8fa4",
+  "ledger_sha256": "3e2aaca8daf3343ec4e7d31960185606f86992653b0772b0255adca47834a44d",
+  "inventory_revision": 2,
+  "cases": 7,
+  "authored_spec_hashes": {
+    "normalize-state": "36ec0bb10608873d2310fe2f9a0db616b37df1ff745c6e1fe1ae8fd33dd13f06",
+    "constructor-factories": "ae291ea54121fa111548d65fee5e3d42f44b6be92f170192700eef7587abec14",
+    "zero-gradient-correlation": "57451e9c5dde3a74e536805a9a9e83d1e2f7d2eadc417946a53f703f1eb18604",
+    "agent-boundaries": "71f5b89bbfd3d68a01975ab3ce91747d08b541230d72eb606b76928e7f4a167a",
+    "episode-fashionmnist": "ff299eb33302e711c97f2cbea8c5f8bbb855cc35a37ad8964bcbe6fc11f932c3",
+    "episode-cifar10": "52e047c93e2ca11205fa5bf2e3cde4e1e07f7e0a0ec9cb37c23e8cdc2785473f",
+    "episode-synchronous": "1512350f0a94d9e82088064bdada436f43126a6ff944179664fcddfb2ea7df01"
+  },
+  "measured_budgets": [
+    {
+      "case_id": "episode-fashionmnist",
+      "path": "/tmp/plato-phase4-fei-artifacts/provisional3/episode-fashionmnist/result.json",
+      "sha256": "cc21dacfe813e175aacb16ae605aa67b6315de4a8276209904fbf3d10d5f1fab",
+      "elapsed_seconds": 92.85265766712837,
+      "registered_children": 9,
+      "live_exact_identities": [],
+      "numerical": {
+        "branch": "fashionmnist",
+        "rounds": 12,
+        "training_calls": 8,
+        "sample_counts": [
+          2,
+          6
+        ],
+        "terminal_episodes": 2,
+        "reset_checks": 1,
+        "replay_size": 10,
+        "policy_updates": 2,
+        "actor_changed": true,
+        "critic_changed": true,
+        "checkpoint_restored": true,
+        "case_id": "episode-fashionmnist",
+        "pid": 26101,
+        "created": 1791080321.925715,
+        "monotonic": 1943108.729341666,
+        "event": "numeric"
+      },
+      "scope": "Provisional timing/fixture feasibility only; final frozen profile and fresh review pending."
+    },
+    {
+      "case_id": "episode-cifar10",
+      "path": "/tmp/plato-phase4-fei-artifacts/provisional3/episode-cifar10/result.json",
+      "sha256": "dc6c896ee9869ca06c8146e9d3bf78ffa1f98fe0a754a290f0e05824903c7844",
+      "elapsed_seconds": 96.78781141596846,
+      "registered_children": 9,
+      "live_exact_identities": [],
+      "numerical": {
+        "branch": "cifar10",
+        "rounds": 12,
+        "training_calls": 8,
+        "sample_counts": [
+          2,
+          6
+        ],
+        "terminal_episodes": 2,
+        "reset_checks": 1,
+        "replay_size": 10,
+        "policy_updates": 2,
+        "actor_changed": true,
+        "critic_changed": true,
+        "checkpoint_restored": true,
+        "case_id": "episode-cifar10",
+        "pid": 26354,
+        "created": 1791080415.054875,
+        "monotonic": 1943205.784735958,
+        "event": "numeric"
+      },
+      "scope": "Provisional timing/fixture feasibility only; final frozen profile and fresh review pending."
+    },
+    {
+      "case_id": "episode-synchronous",
+      "path": "/tmp/plato-phase4-fei-artifacts/provisional5/episode-synchronous/result.json",
+      "sha256": "7f49592bb0d75d0f8c7c139fc20bc465d4621941ecf819c99a3440e0b1ee21be",
+      "elapsed_seconds": 93.86574520799331,
+      "registered_children": 9,
+      "live_exact_identities": [],
+      "numerical": {
+        "branch": "synchronous",
+        "rounds": 12,
+        "training_calls": 8,
+        "sample_counts": [
+          2,
+          6
+        ],
+        "terminal_episodes": 2,
+        "reset_checks": 1,
+        "replay_size": 10,
+        "policy_updates": 2,
+        "actor_changed": true,
+        "critic_changed": true,
+        "checkpoint_restored": true,
+        "case_id": "episode-synchronous",
+        "pid": 28495,
+        "created": 1791080988.493124,
+        "monotonic": 1943776.284815083,
+        "event": "numeric"
+      },
+      "scope": "Provisional timing/fixture feasibility only; final frozen profile and fresh review pending."
+    }
+  ],
+  "provisional3_source_reconstruction": {
+    "path": "/tmp/plato-phase4-fei-artifacts/provisional3-fei_server.py",
+    "sha256": "4587dd20a65eaad8860dc4c333f549690d618c1c0dcd377e7fc9b7cec30c9414",
+    "method": "Author reconstructed exact previously captured bytes; root verified SHA against both original receipts and independently compared Python ASTs after removing the sole reset return annotation. Other differences are formatting. Not an original source snapshot or prior commit.",
+    "same_executable_ast": true
+  },
+  "unchanged_other_tasks": 11,
+  "unchanged_original_audit_source_inventory": true,
+  "boundaries": [
+    "Supplied recurrent/asynchronous configurations retain base1000.",
+    "Additional synchronous/feedforward branch uses explicitly boundedbase2; defaultbase1000 feedforward learning remains unqualified with preserved saturation red.",
+    "Four fresh training rounds plus eight controlled reused-payload report steps per episode pair. Nine natural children: eighttrain, onepublictest. Repeated evaluation delegates to actualtest_model in isolatedworker, no fabricated scores.",
+    "Full strict seven-case profile and different fresh review required; inventory freeze is not source acceptance."
+  ]
+}

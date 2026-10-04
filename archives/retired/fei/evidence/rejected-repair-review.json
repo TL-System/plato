@@ -1,0 +1,631 @@
+{
+  "schema_version": 1,
+  "reviewer": "/root/phase4_fei_code_review",
+  "review_type": "Independent frozen FEI production/research/runtime review",
+  "recorded_at_utc": "2026-10-04T02:54:24.439107+00:00",
+  "verdict": "REQUEST_CHANGES",
+  "implementation_accepted": false,
+  "retirement_authorized_by_user": true,
+  "retirement_instruction": "Root reports user explicitly elected to retire FEI; end implementation qualification without corrections or new full-profile runs, preserve review findings.",
+  "unresolved_findings": 2,
+  "acceptance_boundary": "No FEI family acceptance; known current strict profile failed and an independently confirmed research-state mismatch remains unresolved. Retirement is authorized, not an implementation repair.",
+  "source_binding": {
+    "review_worktree": "/private/tmp/plato-refresh-worktrees/phase4-fei-code-review",
+    "source_head": "dc93e49fde8930587b2a1d5108e1ba14a6dc6c33",
+    "author_code_commit": "4f6e9f0b61a276d8687abd2d6e23b3a0ea46d8e4",
+    "root_ledger_commit": "6732d8900dd112b73b93a33a13bf21c3dee034b1",
+    "base_commit": "408070278122988e31ed676852a0e7b0bd6f15bd",
+    "source_hashes": {
+      "examples/reinforcement_learning/fei/fei.py": "d624ac5d2ebaedc1c6c2e6262678314531376db16b81ed775d3014a0dc21f870",
+      "examples/reinforcement_learning/fei/fei_client.py": "2dd8fa26e9d505537c0fd660ff40f37fc84954c626e0efba84ac0490b22b5e71",
+      "examples/reinforcement_learning/fei/fei_agent.py": "b2c3780f33a6a3a93c87bc40d60db86d2fc9a8de78a9443ffd5e29a9d5ec9358",
+      "examples/reinforcement_learning/fei/fei_server.py": "bcb9d0d7fa77add8b488d241a2b9bd5d7e0cbc8437f5dd75fb3c559471cf4857",
+      "examples/reinforcement_learning/fei/fei_FashionMNIST_lenet5.toml": "6b7dfae3c2c4ac3bdee861adac0d183b950c119f20b5fb0635afcafbeafd2bb3",
+      "examples/reinforcement_learning/fei/fei_CIFAR10_resnet18.toml": "2a03ce665614c0a2b2a667801d5600aa1ae2ad4974601b5c7b2211dcc744562c",
+      "tests/examples_phase4/test_fei.py": "59a1d796ed75ab97d62b22f6a6c28b76bc4730d029e1a9bb234a420bf830aaed",
+      "tests/examples_phase4/fei_worker.py": "0ad3b7bf91c3a96718d2c978d0b0ee24b8e0c82b3e72e90f6d91669d0df0e58d",
+      "tests/examples_phase4/common.py": "4972ffc23cc0a552e78c48477e7e7921c4ecbfd8a429961d898b226602a4cfc0",
+      "tests/examples_phase4/cases.json": "3e2aaca8daf3343ec4e7d31960185606f86992653b0772b0255adca47834a44d",
+      "tests/conftest.py": "765fd2c96a67118f78b0a6c7f7fe134f9a73dfc5ecce25e35e684686da2bfd81",
+      "pyproject.toml": "4c68adebeb88bba969a5d5c08a874644b1d40ccff241761dd7f2bd201b6ba3d3",
+      "uv.lock": "66a4e4442d7b1f26d220b44ca73c44ff4f1151a86857bb3f93a594819fd08126"
+    },
+    "worktree_status": "",
+    "dynamic_source_files_verified": 192,
+    "dynamic_source_hash_errors": [],
+    "source_mutations_by_reviewer": false
+  },
+  "authority": {
+    "accepted_plan": {
+      "path": "/tmp/plato-phase4-family-plan.json",
+      "sha256": "07d90034e89b83283c9b592550ebe17a1ea3a28a9fa2fbc292cc328db4977e4b"
+    },
+    "inventory_freeze": {
+      "path": "/private/tmp/plato-refresh-worktrees/phase4-fei-code-review/evidence/2026-refresh/phase4-fei-inventory-freeze.json",
+      "sha256": "60248cb650c1317bdd63ff38ebe63388b68a82daf9e9f5a07c783b8e99b4a861"
+    },
+    "ledger": {
+      "path": "/private/tmp/plato-refresh-worktrees/phase4-fei-code-review/tests/examples_phase4/cases.json",
+      "sha256": "3e2aaca8daf3343ec4e7d31960185606f86992653b0772b0255adca47834a44d",
+      "cases": 7,
+      "revision": 2
+    },
+    "proposal": {
+      "path": "/tmp/plato-phase4-fei-ledger-proposal.json",
+      "sha256": "695b29470a602b5abda381280c7cfa8fb7d2682bf24cc680ed5dfe96f03a8fa4"
+    },
+    "design_followups": {
+      "path": "/tmp/plato-phase4-design-followups.json",
+      "sha256": "32f1961d201334aeefeff186332e21500a4f433faac26db6e135e1a16a8725c2"
+    },
+    "research_primary_source": {
+      "title": "Quality-Oriented Federated Learning on the Fly",
+      "authors": [
+        "Fei Wang",
+        "Baochun Li",
+        "Bo Li"
+      ],
+      "doi": "10.1109/MNET.001.2200235",
+      "url": "https://iqua.ece.toronto.edu/papers/feiwang-ieeenetwork22.pdf",
+      "local_pdf": "/tmp/plato-phase4-fei-code-review-artifacts/feiwang-ieeenetwork22.pdf",
+      "sha256": "acdd4a4469610eaea8cab730ca8967711921080fb6c990c044bd25b8cb474922",
+      "location": "IEEE Network September/October 2022, printed p.155, State subsection, local/global-gradient definitions and cosine equation.",
+      "derivation": "Equal learning rate eta=1; subtract each payload from baseline to obtain local gradients [0,-1] and [-1,0]. Counts 2/6 produce global gradient [-0.75,-0.25]. Their exact cosines are 1/sqrt(10) and 3/sqrt(10)."
+    }
+  },
+  "findings": [
+    {
+      "id": "FEI-REVIEW-01",
+      "severity": "high",
+      "status": "open_at_retirement",
+      "scope": "Production FEI state construction for both shipped FashionMNIST and CIFAR10 branches",
+      "location": "examples/reinforcement_learning/fei/fei_server.py:96",
+      "title": "Raw parameter correlation does not implement the paper gradient correlation.",
+      "evidence": [
+        {
+          "baseline": [
+            [
+              0.0,
+              0.0
+            ]
+          ],
+          "preceding_global": [
+            [
+              -1.0,
+              0.0
+            ]
+          ],
+          "payloads": [
+            [
+              [
+                0.0,
+                1.0
+              ]
+            ],
+            [
+              [
+                1.0,
+                0.0
+              ]
+            ]
+          ],
+          "sample_counts": [
+            2,
+            6
+          ],
+          "actual_correlations": [
+            0.0,
+            1.0
+          ],
+          "actual_state": [
+            [
+              8.8855,
+              132.2271,
+              132.2271,
+              1.0
+            ],
+            [
+              701.5359,
+              132.2271,
+              132.2271,
+              1000.0
+            ]
+          ],
+          "client_ids": [
+            1,
+            2
+          ],
+          "paper_gradient_correlations": [
+            0.31622776601683794,
+            0.9486832980505138
+          ],
+          "paper_normalized_state_correlation_column": [
+            8.8855,
+            701.5359
+          ],
+          "state_max_absolute_difference": 298.46410000000003
+        },
+        {
+          "baseline": [
+            [
+              100.0,
+              0.0
+            ]
+          ],
+          "preceding_global": [
+            [
+              99.0,
+              0.0
+            ]
+          ],
+          "payloads": [
+            [
+              [
+                100.0,
+                1.0
+              ]
+            ],
+            [
+              [
+                101.0,
+                0.0
+              ]
+            ]
+          ],
+          "sample_counts": [
+            2,
+            6
+          ],
+          "actual_correlations": [
+            0.9999500299629497,
+            1.0
+          ],
+          "actual_state": [
+            [
+              8.8855,
+              132.2271,
+              132.2271,
+              132.2109
+            ],
+            [
+              701.5359,
+              132.2271,
+              132.2271,
+              132.2432
+            ]
+          ],
+          "client_ids": [
+            1,
+            2
+          ],
+          "paper_gradient_correlations": [
+            0.31622776601683794,
+            0.9486832980505138
+          ],
+          "paper_normalized_state_correlation_column": [
+            8.8855,
+            701.5359
+          ],
+          "state_max_absolute_difference": 569.2927
+        }
+      ],
+      "primary_source": {
+        "title": "Quality-Oriented Federated Learning on the Fly",
+        "authors": [
+          "Fei Wang",
+          "Baochun Li",
+          "Bo Li"
+        ],
+        "doi": "10.1109/MNET.001.2200235",
+        "url": "https://iqua.ece.toronto.edu/papers/feiwang-ieeenetwork22.pdf",
+        "local_pdf": "/tmp/plato-phase4-fei-code-review-artifacts/feiwang-ieeenetwork22.pdf",
+        "sha256": "acdd4a4469610eaea8cab730ca8967711921080fb6c990c044bd25b8cb474922",
+        "location": "IEEE Network September/October 2022, printed p.155, State subsection, local/global-gradient definitions and cosine equation.",
+        "derivation": "Equal learning rate eta=1; subtract each payload from baseline to obtain local gradients [0,-1] and [-1,0]. Counts 2/6 produce global gradient [-0.75,-0.25]. Their exact cosines are 1/sqrt(10) and 3/sqrt(10)."
+      },
+      "analysis": "The actual code computes current-global minus previous-global and compares it with each local parameter vector. The paper computes corresponding local gradients from local weight changes and a sample-weighted global gradient. Equal local deltas at different common parameter offsets produce different actual correlations and normalized states; the mismatch is not a floating-point issue.",
+      "maximum_demonstrated_state_error": 569.2927,
+      "requested_disposition": "Retain as unresolved retirement rationale. Any future revival requires an explicit research disposition and author correction followed by a different independent reviewer.",
+      "limits": "No claim of trained aggregation-weight difference, accuracy effect or benchmark reproduction. No source correction made."
+    },
+    {
+      "id": "FEI-REVIEW-02",
+      "severity": "medium",
+      "status": "open_at_retirement",
+      "scope": "Authored strict numerical oracle / FashionMNIST full branch qualification",
+      "location": "tests/examples_phase4/fei_worker.py:499",
+      "title": "Exact rounded-state equality rejects a one-quantization-unit difference.",
+      "actual": 356.6651,
+      "expected": 356.6652,
+      "absolute_difference": 0.0001,
+      "cell": [
+        1,
+        3
+      ],
+      "evidence": {
+        "stderr": "/tmp/plato-phase4-fei-code-review-artifacts/author-bound-dc93e49f/qualified/episode-fashionmnist/stderr.log",
+        "sha256": "ff22dee0cf1c8f4ac74d0981f675f45eeb1a27bc66eab49b6b12b4e8df933065",
+        "suite_log": "/tmp/plato-phase4-fei-code-review-artifacts/author-bound-dc93e49f/qualification-final.log",
+        "suite_log_sha256": "eea0ce4c30453be6177346dd385a6c20c72af32b318424dc2fa2408a5d520c34"
+      },
+      "analysis": "Independent cosine comparison passed, but equivalent flatten/dot/norm operation ordering amplified the last floating-point bits through base1000 and changed one state cell after rounding to four decimals. The strict seven-case profile consequently failed; this is separate from the large research-semantic discrepancy.",
+      "proposed_author_correction_before_retirement": "Worker-only state comparison rtol=0, atol=1.0001e-4 while preserving independent cosine and full-tensor aggregation checks. It was proposed by the author/root and not applied or accepted by this reviewer.",
+      "requested_disposition": "Preserve failed profile and do not cite it as complete execution qualification. No corrected run is required after authorized retirement."
+    }
+  ],
+  "positive_assessment": {
+    "original_2d15_2d16_independently_reconfirmed": {
+      "original_source_sha256": "8493f3859b862d28214e34a5c5c3edea26bc01febc9752e09c343f65caa19a74",
+      "original_zero_nonfinite": true,
+      "original_2x15_zero_nonfinite": true,
+      "current_zero": [
+        0.0,
+        0.0
+      ],
+      "current_2x15_zero_finite": true,
+      "nonzero_reference": [
+        0.015848931924611138,
+        1.0,
+        251.1886431509581
+      ],
+      "real_original_superclass_identities": {
+        "agent": true,
+        "model": true,
+        "algorithm": false,
+        "trainer": false,
+        "datasource_is_algorithm": true,
+        "algorithm_is_trainer": true
+      },
+      "real_current_superclass_identities": {
+        "agent": true,
+        "model": true,
+        "algorithm": true,
+        "trainer": true,
+        "datasource_is_none": true
+      },
+      "original_single_matrix_flatten_shape": [
+        2,
+        3
+      ],
+      "current_single_matrix_flatten_shape": [
+        6
+      ]
+    },
+    "keyword_constructor": "Current FEI old positional API forwards current real superclass dependencies by keyword; actual bound object identities are correct. Author constructor row also invokes real configure and verifies trainer/algorithm/datasource factories in order.",
+    "dispatcher": "FEI-local prefer-delta override restores inherited RL aggregate_deltas in real _process_reports without altering shared FedAvg semantics.",
+    "zero_and_boundaries": "Explicit zero normalization, zero cosine, single-matrix flatten, positive sample-count requirement, finite exact reward endpoints and server reset-history clearing are sensible implementation repairs. Existing nonzero normalization is preserved.",
+    "checkpoint_supplement": {
+      "path": "/tmp/plato-phase4-fei-code-review-artifacts/checkpoint-result.json",
+      "sha256": "45566d8c7b8f3c9a68995de4d58dabc6ba429993c1863a78d8748265ce953562",
+      "changed_before_load": {
+        "actor": true,
+        "critic": true,
+        "actor_target": true,
+        "critic_target": true
+      },
+      "exactly_restored": {
+        "actor": true,
+        "critic": true,
+        "actor_target": true,
+        "critic_target": true
+      },
+      "scope": "Independent actual save/load method probe. No training or complete FEI family qualification claim."
+    },
+    "checkpoint_regression_gap": "Author worker compares a reload to the unchanged live actor, which by itself cannot detect a no-op loader. Independent already-running supplemental probe deliberately changed actor, critic and both targets before actual load and verified exact restoration."
+  },
+  "validation": {
+    "author_complete_profile_attempt": {
+      "passed": 6,
+      "failed": 1,
+      "collected": 7,
+      "elapsed_seconds": 287.44,
+      "result": "qualification_failed",
+      "source_head": "dc93e49fde8930587b2a1d5108e1ba14a6dc6c33",
+      "log": "/tmp/plato-phase4-fei-code-review-artifacts/author-bound-dc93e49f/qualification-final.log",
+      "log_sha256": "eea0ce4c30453be6177346dd385a6c20c72af32b318424dc2fa2408a5d520c34",
+      "junit": "/tmp/plato-phase4-fei-code-review-artifacts/author-bound-dc93e49f/qualification-final.xml",
+      "junit_sha256": "8b5bd01f57dae00e00ec73cd830621ee4f8f2e68ce73fbad3303dfbe85643dc9"
+    },
+    "author_strict_collection": {
+      "collected": 7,
+      "result": "collection_only_passed",
+      "log": "/tmp/plato-phase4-fei-code-review-artifacts/author-bound-dc93e49f/strict-collection.log",
+      "sha256": "9d413de15f31d55e26e5ed9f83f35ab1557b41cee04459034c456d49ba25dafb"
+    },
+    "rows": [
+      {
+        "case_id": "agent-boundaries",
+        "result": "/tmp/plato-phase4-fei-code-review-artifacts/author-bound-dc93e49f/qualified/agent-boundaries/result.json",
+        "result_sha256": "59e43c8071ac757c2ee3fe6da86c39f4bd20738239919f78d94015d583f83391",
+        "source_head": "dc93e49fde8930587b2a1d5108e1ba14a6dc6c33",
+        "ledger_sha256": "3e2aaca8daf3343ec4e7d31960185606f86992653b0772b0255adca47834a44d",
+        "authored_spec_sha256": "71f5b89bbfd3d68a01975ab3ce91747d08b541230d72eb606b76928e7f4a167a",
+        "returncode": 0,
+        "elapsed_seconds": 9.513896249933168,
+        "errors": [],
+        "registered_children": 0,
+        "optimizer_steps": 0,
+        "report_steps": 0,
+        "numeric": [
+          {
+            "rewards": {
+              "0.0": -721.873067782343,
+              "0.25": -22.972245773362197,
+              "0.5": -1.0,
+              "0.75": 20.972245773362197,
+              "1.0": 719.873067782343
+            },
+            "replay_underflow_update_count": 0,
+            "undersized_replay_count": 1,
+            "case_id": "agent-boundaries",
+            "pid": 30675,
+            "created": 1791081821.871174,
+            "monotonic": 1944527.311594375,
+            "event": "numeric"
+          }
+        ],
+        "forced": [],
+        "survivors": [],
+        "source_hash_comparisons": 354
+      },
+      {
+        "case_id": "constructor-factories",
+        "result": "/tmp/plato-phase4-fei-code-review-artifacts/author-bound-dc93e49f/qualified/constructor-factories/result.json",
+        "result_sha256": "75667dec8a31bf03e9396b89b1819ba3cf944e131d76cafcc82f895e7cc1ee3a",
+        "source_head": "dc93e49fde8930587b2a1d5108e1ba14a6dc6c33",
+        "ledger_sha256": "3e2aaca8daf3343ec4e7d31960185606f86992653b0772b0255adca47834a44d",
+        "authored_spec_sha256": "ae291ea54121fa111548d65fee5e3d42f44b6be92f170192700eef7587abec14",
+        "returncode": 0,
+        "elapsed_seconds": 9.5364063330926,
+        "errors": [],
+        "registered_children": 0,
+        "optimizer_steps": 0,
+        "report_steps": 0,
+        "numeric": [
+          {
+            "real_factory_order": [
+              "trainer",
+              "algorithm",
+              "datasource"
+            ],
+            "bound_identities": true,
+            "case_id": "constructor-factories",
+            "pid": 30613,
+            "created": 1791081802.2664,
+            "monotonic": 1944507.712487791,
+            "event": "numeric"
+          }
+        ],
+        "forced": [],
+        "survivors": [],
+        "source_hash_comparisons": 354
+      },
+      {
+        "case_id": "episode-cifar10",
+        "result": "/tmp/plato-phase4-fei-code-review-artifacts/author-bound-dc93e49f/qualified/episode-cifar10/result.json",
+        "result_sha256": "ad54f00a799a12e28b2baee97c7f018ecb06f3284f1202926b80cdadd274b683",
+        "source_head": "dc93e49fde8930587b2a1d5108e1ba14a6dc6c33",
+        "ledger_sha256": "3e2aaca8daf3343ec4e7d31960185606f86992653b0772b0255adca47834a44d",
+        "authored_spec_sha256": "52e047c93e2ca11205fa5bf2e3cde4e1e07f7e0a0ec9cb37c23e8cdc2785473f",
+        "returncode": 0,
+        "elapsed_seconds": 98.0131565828342,
+        "errors": [],
+        "registered_children": 9,
+        "optimizer_steps": 32,
+        "report_steps": 12,
+        "numeric": [
+          {
+            "branch": "cifar10",
+            "rounds": 12,
+            "training_calls": 8,
+            "sample_counts": [
+              2,
+              6
+            ],
+            "terminal_episodes": 2,
+            "reset_checks": 1,
+            "replay_size": 10,
+            "policy_updates": 2,
+            "actor_changed": true,
+            "critic_changed": true,
+            "checkpoint_restored": true,
+            "case_id": "episode-cifar10",
+            "pid": 30858,
+            "created": 1791081888.57141,
+            "monotonic": 1944680.508596625,
+            "event": "numeric"
+          }
+        ],
+        "forced": [],
+        "survivors": [],
+        "source_hash_comparisons": 874
+      },
+      {
+        "case_id": "episode-fashionmnist",
+        "result": "/tmp/plato-phase4-fei-code-review-artifacts/author-bound-dc93e49f/qualified/episode-fashionmnist/result.json",
+        "result_sha256": "34c5f5515f6468b46c4d57eee51d3f3783a82889cdd4085700b96eb7457c0cc4",
+        "source_head": "dc93e49fde8930587b2a1d5108e1ba14a6dc6c33",
+        "ledger_sha256": "3e2aaca8daf3343ec4e7d31960185606f86992653b0772b0255adca47834a44d",
+        "authored_spec_sha256": "ff299eb33302e711c97f2cbea8c5f8bbb855cc35a37ad8964bcbe6fc11f932c3",
+        "returncode": 1,
+        "elapsed_seconds": 56.4540079170838,
+        "errors": [
+          "worker did not exit naturally with valid evidence",
+          "missing unique final parent success event",
+          "failed, skipped, or mismatched case event",
+          "worker traceback or asynchronous diagnostic"
+        ],
+        "registered_children": 5,
+        "optimizer_steps": 16,
+        "report_steps": 3,
+        "numeric": [],
+        "forced": [],
+        "survivors": [],
+        "source_hash_comparisons": 614
+      },
+      {
+        "case_id": "episode-synchronous",
+        "result": "/tmp/plato-phase4-fei-code-review-artifacts/author-bound-dc93e49f/qualified/episode-synchronous/result.json",
+        "result_sha256": "b5b13be48f4097a0ca74b4dc76ecad56bd1246a0ae187f50fe19edfd907a1178",
+        "source_head": "dc93e49fde8930587b2a1d5108e1ba14a6dc6c33",
+        "ledger_sha256": "3e2aaca8daf3343ec4e7d31960185606f86992653b0772b0255adca47834a44d",
+        "authored_spec_sha256": "1512350f0a94d9e82088064bdada436f43126a6ff944179664fcddfb2ea7df01",
+        "returncode": 0,
+        "elapsed_seconds": 92.47202224982902,
+        "errors": [],
+        "registered_children": 9,
+        "optimizer_steps": 32,
+        "report_steps": 12,
+        "numeric": [
+          {
+            "branch": "synchronous",
+            "rounds": 12,
+            "training_calls": 8,
+            "sample_counts": [
+              2,
+              6
+            ],
+            "terminal_episodes": 2,
+            "reset_checks": 1,
+            "replay_size": 10,
+            "policy_updates": 2,
+            "actor_changed": true,
+            "critic_changed": true,
+            "checkpoint_restored": true,
+            "case_id": "episode-synchronous",
+            "pid": 31099,
+            "created": 1791081986.876048,
+            "monotonic": 1944773.2905375,
+            "event": "numeric"
+          }
+        ],
+        "forced": [],
+        "survivors": [],
+        "source_hash_comparisons": 874
+      },
+      {
+        "case_id": "normalize-state",
+        "result": "/tmp/plato-phase4-fei-code-review-artifacts/author-bound-dc93e49f/qualified/normalize-state/result.json",
+        "result_sha256": "c9b8fc52ac01fb40518a37f866dc33b61834f5d30354efed52ed8981c18de24a",
+        "source_head": "dc93e49fde8930587b2a1d5108e1ba14a6dc6c33",
+        "ledger_sha256": "3e2aaca8daf3343ec4e7d31960185606f86992653b0772b0255adca47834a44d",
+        "authored_spec_sha256": "36ec0bb10608873d2310fe2f9a0db616b37df1ff745c6e1fe1ae8fd33dd13f06",
+        "returncode": 0,
+        "elapsed_seconds": 9.750632333103567,
+        "errors": [],
+        "registered_children": 0,
+        "optimizer_steps": 0,
+        "report_steps": 0,
+        "numeric": [
+          {
+            "zeros": [
+              0.0,
+              0.0
+            ],
+            "mixed": [
+              0.015848931924611138,
+              1.0,
+              251.1886431509581
+            ],
+            "reference": [
+              0.015848931924611138,
+              1.0,
+              251.1886431509581
+            ],
+            "case_id": "normalize-state",
+            "pid": 30574,
+            "created": 1791081792.221634,
+            "monotonic": 1944497.931559916,
+            "event": "numeric"
+          }
+        ],
+        "forced": [],
+        "survivors": [],
+        "source_hash_comparisons": 354
+      },
+      {
+        "case_id": "zero-gradient-correlation",
+        "result": "/tmp/plato-phase4-fei-code-review-artifacts/author-bound-dc93e49f/qualified/zero-gradient-correlation/result.json",
+        "result_sha256": "036a762e02ea845807d7abd05d7366cbe8ffc10619fb722ac9b4b05495ea1522",
+        "source_head": "dc93e49fde8930587b2a1d5108e1ba14a6dc6c33",
+        "ledger_sha256": "3e2aaca8daf3343ec4e7d31960185606f86992653b0772b0255adca47834a44d",
+        "authored_spec_sha256": "57451e9c5dde3a74e536805a9a9e83d1e2f7d2eadc417946a53f703f1eb18604",
+        "returncode": 0,
+        "elapsed_seconds": 9.487076875055209,
+        "errors": [],
+        "registered_children": 0,
+        "optimizer_steps": 0,
+        "report_steps": 0,
+        "numeric": [
+          {
+            "cosine": [
+              0.0,
+              1.0
+            ],
+            "case_id": "zero-gradient-correlation",
+            "pid": 30645,
+            "created": 1791081812.090466,
+            "monotonic": 1944517.503519708,
+            "event": "numeric"
+          }
+        ],
+        "forced": [],
+        "survivors": [],
+        "source_hash_comparisons": 354
+      }
+    ],
+    "author_guard_rejections": "Wrong profile, filtering, broad/mixed target and pyargs logs each reject qualification; collection-only evidence is not execution acceptance.",
+    "initial_invocation_failure": "Original seven setup errors from absent basetemp parent preserved in qualification.log/.xml. Invocation-only issue; no source-change finding inferred.",
+    "independent_full_profile": "Not run. Root explicitly waived another full7 on this known-failed worker, then user authorized retirement. Controlled semantic and original red/current green probes suffice for REQUEST_CHANGES.",
+    "independent_semantic_probe": {
+      "path": "/tmp/plato-phase4-fei-code-review-artifacts/independent_semantics_probe.py",
+      "sha256": "0c48896bdf1328387f8a3cbfef7a5f0f0030276e74687417a54341513b120396",
+      "result": "/tmp/plato-phase4-fei-code-review-artifacts/independent-semantics-result.json",
+      "result_sha256": "dae6305871fc5d2ef5cbd4f18719592671f67e036491e4ec421ee92a1a65d3a3",
+      "log": "/tmp/plato-phase4-fei-code-review-artifacts/independent-semantics.log",
+      "log_sha256": "bf21a5dd1094a5f33a9005cac2072de221a5d6584e7e69672529daa8e26941d0",
+      "exit_code": 0
+    }
+  },
+  "profile_and_scope": {
+    "supplied_branches": "Actual FashionMNIST LeNet5 and CIFAR10 ResNet18 classes, noniid samplers, real dataset readers/transforms, asynchronous recurrent TD3, base1000 remain selected.",
+    "additional_branch": "Synchronous feedforward probe intentionally uses base2 after retained base1000 saturation red; no default-base1000 feedforward learning claim.",
+    "execution_boundary": "Four fresh training rounds across two episodes plus eight explicit reused-payload report steps. Per completed branch: nine natural children,32 optimizer steps,12 reports,two terminals,one server/client reset,10 replay transitions,two policy updates with actor/critic parameter changes.",
+    "accuracy": "Author uses ten identical test images labeled0\u20139 through actual public test and repeated actual test_model; scores are evaluated rather than supplied. Semantic probe does not evaluate model accuracy or claim an episode.",
+    "transport": "In-process existing report path, processing_time0; no FEI-specific socket deployment qualification claimed.",
+    "collection_classifications": "383 native /51 runtime /19 retained /11 eval unchanged; no whole-core rerun required for this failed FEI review."
+  },
+  "environment": {
+    "owned_env": "/tmp/plato-phase4-fei-code-review-env",
+    "provisioning_command": "UV_PROJECT_ENVIRONMENT=/tmp/plato-phase4-fei-code-review-env uv sync --locked --python 3.13 --no-default-groups --group test",
+    "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+    "executable": "/tmp/plato-phase4-fei-code-review-env/bin/python",
+    "lock_sha256": "66a4e4442d7b1f26d220b44ca73c44ff4f1151a86857bb3f93a594819fd08126",
+    "required_distributions": {
+      "numpy": "2.5.3",
+      "torch": "2.14.1",
+      "plato-learn": "1.4.3",
+      "torchvision": "0.29.1",
+      "pytest": "9.1.1",
+      "gymnasium": "1.3.0",
+      "psutil": "7.2.2"
+    },
+    "all_shell_commands": "Executed via /bin/zsh with login=true (zsh -lc); no author/root/helper environment mutations."
+  },
+  "additional_unpursued_observation": "Paper terminal reward specifies EWMA with coefficient0.9 and its displayed terminal formula omits the continuing -1 penalty, while current code uses an arithmetic mean of five and retains -1. This source-level observation was messaged to root, but no new numerical probe or disposition was pursued after retirement instruction; it is not counted as an independently confirmed new finding.",
+  "review_raw_archive": {
+    "path": "/tmp/plato-phase4-fei-code-review-artifacts.tgz",
+    "sha256": "3061941926be598c454532b62b909fbb5bc3ba17bc780004767514967d6db44e"
+  },
+  "review_artifact_manifest": {
+    "path": "/tmp/plato-phase4-fei-code-review-artifacts/artifact-manifest.json",
+    "sha256": "7748c2be2c961450928ec1a5aa8d908a4ebc21c6d5076e27695fa9f8ec4034e0",
+    "file_count": 288
+  },
+  "limits": [
+    "No implementation or family acceptance.",
+    "No source fixes or nested agents.",
+    "No full research benchmark, full58-family audit, socket deployment or whole-core-suite claim.",
+    "Any future corrected FEI implementation requires requalification at its new source and a different fresh independent reviewer."
+  ]
+}

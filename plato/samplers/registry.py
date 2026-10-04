@@ -17,11 +17,10 @@ from plato.samplers import (
     label_quantity_noniid,
     mixed,
     mixed_label_quantity_noniid,
-    modality_iid,
-    modality_quantity_noniid,
     orthogonal,
     sample_quantity_noniid,
 )
+from plato.utils.retired_backends import raise_if_retired
 
 registered_samplers = OrderedDict(
     [
@@ -34,8 +33,6 @@ registered_samplers = OrderedDict(
         ("label_quantity_noniid", label_quantity_noniid.Sampler),
         ("mixed_label_quantity_noniid", mixed_label_quantity_noniid.Sampler),
         ("sample_quantity_noniid", sample_quantity_noniid.Sampler),
-        ("modality_iid", modality_iid.Sampler),
-        ("modality_quantity_noniid", modality_quantity_noniid.Sampler),
     ]
 )
 
@@ -50,6 +47,7 @@ def get(datasource, client_id, testing=False, **kwargs):
         if testing and hasattr(Config().data, "testset_sampler")
         else Config().data.sampler
     )
+    raise_if_retired(sampler_type, category="sampler")
     if testing:
         logging.info("[Client #%d] Test set sampler: %s", client_id, sampler_type)
     else:

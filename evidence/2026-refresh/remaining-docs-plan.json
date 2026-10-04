@@ -1,0 +1,348 @@
+{
+ "schema_version": 1,
+ "status": "PROPOSED_REQUIRES_FRESH_INDEPENDENT_SOL_PLAN_REVIEW",
+ "source": {
+  "commit": "484853ed2eef50899b062dc7d273ff85e814e4bc",
+  "method": "git show and git archive into /tmp/plato-remaining-docs-frozen; no source worktree or runtime environment mutation",
+  "authority": "evidence/2026-refresh/plan.md section 8; current user instructions override old Python 3.14/herdr/retirement text.",
+  "inspected_file_sha256": {
+   "AGENTS.md": "b50f87f31ea3d87076952d8b7d2d8af067132fbf877d80f8780c208fb45527ec",
+   "docs/README.md": "36b8ef60acc65768d2ff7800f6e4faf50b90257b2c35b17c54872597d4114821",
+   "docs/docs/ccdb.md": "e864ec16b0673d2d2f52f9252a435946659f9b7eadb302633e564a5a07fc1622",
+   "docs/mkdocs.yml": "d26f6c6e7b91cf8835b4187e3b9e01125801e735122d79e7a148179b31a852ec",
+   "tests/conftest.py": "2d5323021b000249805712282c2ee5281eaa3c4fc65a55a65e8215acfe14a54f"
+  },
+  "tree": "f55c1b950bf745c340539cfea1ee2d8a0ad8b4dd",
+  "phase4_plan_sha256": "07d90034e89b83283c9b592550ebe17a1ea3a28a9fa2fbc292cc328db4977e4b"
+ },
+ "boundaries": [
+  "Planning only; no implementation, PR, merge, nested agents or runtime qualification.",
+  "Root obtains fresh independent Sol plan review on this exact JSON hash before assigning implementation. Astra writing/planning; Sol independent review; root integration/publication.",
+  "Preserve Python 3.13-only default/CI and approved retirements/model shortlist. No new retirements, dependency churn, credential requests, security redesign or placeholder READMEs.",
+  "58-family/399-active-path Phase4 inventory remains behaviorally pending; imports, parsing and docs builds are not support evidence."
+ ],
+ "already_handled": [
+  {
+   "area": "Deployment/install/quickstart/build/package/CI",
+   "status": "Accepted source at bound deployment commit; P1 container cleanup fix review remains separate.",
+   "reserved_paths": [
+    "Dockerfile",
+    "dockerrun.sh",
+    "dockerrun_gpu.sh",
+    ".github/**",
+    "docs/build.sh",
+    "docs/requirements.txt",
+    "netlify.toml",
+    "pyproject.toml",
+    "uv.lock",
+    "docs/docs/install.md",
+    "docs/docs/quickstart.md",
+    "docs/docs/deployment.md"
+   ],
+   "action": "Read as authority; do not duplicate accepted work or current P1/P2 changes."
+  },
+  {
+   "area": "Historical archive",
+   "status": "ACCEPTED_FOR_ROOT_INTEGRATION; archived.md exists in the bound source, but the accepted cbe6cce expansion is not yet integrated.",
+   "prose_commit": "cbe6cce325cec88a056ba7af222171b533eb24b3",
+   "evidence_commit": "9b89f6d8a94638b74579345ba18fb314f4517c11",
+   "review": "/tmp/plato-historical-archive-docs-review.json",
+   "reserved_paths": [
+    "docs/docs/examples/archived.md"
+   ],
+   "action": "Root integrates accepted prose/receipt; final build checks links. No reauthoring or historical execution claim."
+  },
+  {
+   "area": "Root README and templates",
+   "status": "Inspected; no concrete mandatory edit found",
+   "action": "README already links current docs/archive. Templates have no demonstrated broken runtime command; leave unchanged."
+  },
+  {
+   "area": "Workspace README metadata",
+   "status": "Already reconciled",
+   "action": "12 active workspaces, 10 no README, invalid declarations removed; detector/gradient leakage have README. No placeholders or declaration reinstatement. Useful new docs require concrete family need."
+  },
+  {
+   "area": "Core/MLX/Qwen/evaluator/model search",
+   "status": "Accepted earlier qualification in root evidence and PRs 417/418/419/420/421",
+   "action": "Reuse accepted boundaries/profile guides; do not rerun or expand to unrelated families."
+  }
+ ],
+ "findings": [
+  {
+   "id": "DOC01",
+   "severity": "medium",
+   "locations": [
+    "AGENTS.md:7",
+    "AGENTS.md:10",
+    "AGENTS.md:18",
+    "docs/docs/misc.md:38"
+   ],
+   "proof": "AGENTS names absent tests/test_strategies_simple.py and tests/test_strategies_integration.py; misc names absent lr_schedule_tests.py. tests/conftest.py:285-293 and optional-directory hooks distinguish mandatory core, mlx-native and llm-eval; pyproject test-model-search adds ptflops. Ordinary pytest does not cover all optional profiles.",
+   "proposed_change": "Preserve user zsh/uv/style/PR instructions. Update only command accuracy: locked Python 3.13, explicit test-model-search group for mandatory core (uv run --locked --group test-model-search python -m pytest tests --test-profile=mandatory -ra), existing tests/trainers/test_lr_scheduler_registry.py focused target, and links to accepted MLX/Lighteval qualification commands. Do not claim one command covers every optional profile.",
+   "owner": "D1",
+   "family_dependency": null
+  },
+  {
+   "id": "DOC02",
+   "severity": "medium",
+   "locations": [
+    "docs/README.md:1",
+    "docs/README.md:12",
+    "docs/README.md:22"
+   ],
+   "proof": "README creates unpinned .venv and uv pip installs mkdocs-material; bare mkdocs assumes unspecified cwd; /sites is not output. Accepted docs/build.sh:5,19,29-33,70 builds docs/mkdocs.yml from root lock into docs/site with isolated docs environment.",
+   "proposed_change": "Replace obsolete recipe with root-cwd pointer to accepted installation guide build section and exact invocation. Provide development serve command using already provisioned docs interpreter and explicit docs/mkdocs.yml; state docs/site output. Reuse existing build script unchanged.",
+   "owner": "D1",
+   "family_dependency": null
+  },
+  {
+   "id": "DOC03",
+   "severity": "medium",
+   "locations": [
+    "docs/docs/misc.md:15",
+    "docs/docs/misc.md:17",
+    "docs/docs/misc.md:22",
+    "docs/docs/ccdb.md:179",
+    "docs/docs/ccdb.md:184"
+   ],
+   "proof": "plato/servers/base.py:200-201 initializes timeout/interval to 3600; troubleshooting says 360. misc links to absent repository docs/Running.md. pkill python targets unrelated Python processes as well as the session. The adjacent misc.md:17 claim that a ten-client CIFAR-10/ResNet-18 workload needs 360 seconds has no current behavioral evidence.",
+   "proposed_change": "Correct timeout default, link misc to ccdb.md, and replace blanket pkill with stopping the identified session/job (Ctrl-C or a particular scheduler job ID). Do not execute cleanup or change runtime behavior. D1 edits misc; D2 owns ccdb counterparts. Remove that obsolete fixed 360-second recommendation; give generic guidance to measure observed session delays before overriding the 3600-second default. Do not retain it as a current workload-sizing result or change runtime defaults.",
+   "owner": "D1+D2",
+   "family_dependency": null
+  },
+  {
+   "id": "DOC04",
+   "severity": "medium",
+   "locations": [
+    "docs/docs/configurations/trainer.md:115",
+    "docs/docs/configurations/trainer.md:122",
+    "docs/docs/examples/algorithms/1. Server Aggregation Algorithms.md:152",
+    "docs/docs/examples/algorithms/1. Server Aggregation Algorithms.md:163",
+    "docs/docs/examples/algorithms/1. Server Aggregation Algorithms.md:176"
+   ],
+   "proof": "Python 3.13 tomllib.loads on dedented TOML fences fails at sched = cosine and type = fedavg respectively. Trainer also has min_lr = 1.e-6. Aggregation has attention_model_path: ./attention_model.pt and an unquoted commented capture path. plato/trainers/lr_schedulers.py:38-41 reads trainer.lr_scheduler, omitted in the timm snippet.",
+   "proposed_change": "Quote strings/paths, use equals for attention_model_path and valid exponent literal, add lr_scheduler = \"timm\" to trainer fragment, and fix commented path so uncommenting is valid. Keep explicitly configuration fragments. Preserve all numeric values, commands and algorithm claims. Root reserves syntax-only aggregation page edit separately from P4-aggregation.",
+   "owner": "D1",
+   "family_dependency": null
+  },
+  {
+   "id": "DOC05",
+   "severity": "low",
+   "locations": [
+    "docs/docs/development.md:235",
+    "docs/docs/configurations/server.md:110"
+   ],
+   "proof": "examples/custom_model.py is absent; DataSource excerpt matches examples/basic/basic.py:30-45. Server reference has orphaned outdented outbound_feature_ndarrays token between inbound bullets.",
+   "proposed_change": "Correct excerpt attribution; remove only orphaned token. Preserve API prose; attribution/rendering correction does not qualify all development snippets.",
+   "owner": "D1",
+   "family_dependency": null
+  },
+  {
+   "id": "DOC06",
+   "severity": "medium",
+   "locations": [
+    "docs/docs/examples/Getting Started.md:7",
+    "docs/docs/examples/Getting Started.md:9",
+    "docs/docs/examples/Getting Started.md:11",
+    "docs/docs/examples/Getting Started.md:16"
+   ],
+   "proof": "Intro promises automatic dataset preparation for all examples and says example packages live locally rather than root. Root pyproject declares shared ssl/llm_eval extras, their conflict, and 12 workspaces; other examples inherit root dependencies. GPU list duplicates M4 and is not a backend qualification matrix.",
+   "proposed_change": "Refer asset preparation to family recipes and shared extras/workspaces to accepted install guide. Use locked 3.13 generic commands. Replace chip enumeration with precise CPU/CUDA/Apple Silicon language linked to accepted MLX limits. State chapter/config presence does not establish validated support; do not fabricate 58 statuses or READMEs.",
+   "owner": "D1",
+   "family_dependency": null
+  },
+  {
+   "id": "DOC07",
+   "severity": "low",
+   "locations": [
+    "docs/docs/examples/Getting Started.md:20",
+    "docs/docs/examples/Getting Started.md:46",
+    "docs/docs/index.md:17",
+    "docs/mkdocs.yml:70"
+   ],
+   "proof": "MkDocs nav and homepage list gradient leakage, omitted in Getting Started. Archive is in nav but absent from homepage and Getting Started indexes.",
+   "proposed_change": "Add existing gradient-leakage and archive links to Getting Started and archive link to homepage. Preserve case-sensitive filenames and navigation order; no restructure or new support table.",
+   "owner": "D1",
+   "family_dependency": null
+  },
+  {
+   "id": "DOC08",
+   "severity": "medium",
+   "locations": [
+    "docs/docs/ccdb.md:25",
+    "docs/docs/ccdb.md:36",
+    "docs/docs/ccdb.md:73",
+    "docs/docs/ccdb.md:110",
+    "docs/docs/ccdb.md:113",
+    "docs/docs/ccdb.md:189",
+    "docs/docs/ccdb.md:209",
+    "docs/docs/ccdb.md:212"
+   ],
+   "proof": "Repeated Python 3.12 environment conflicts with pyproject >=3.13/default 3.13. Batch installs uv via network while later prose says compute networking unavailable. Clone recipe omits entering checkout. HuggingFace batch example runs FedBuff CIFAR-10 from unstated cwd.",
+   "proposed_change": "Rewrite stale recipe as a 3.13 template: discover/select available module, verify interpreter, enter checkout, provision locked environment/assets before submission, then execute existing config from root without job-time resolution. Remove login-node train-then-interrupt cache recipe. Link accepted Qwen3/evaluator preparation and official Alliance docs without inventing offline HF procedure or cluster qualification. Use generic <config-path> or accepted core MNIST for illustrative job; do not promote pending wideresnet/FedBuff/HF family commands. Include DOC03 corrections. Keep useful scheduler/resource links; identify site module/account/GPU/actual execution prerequisites as unverified.",
+   "owner": "D2",
+   "family_dependency": null
+  },
+  {
+   "id": "DOC09",
+   "severity": "low",
+   "locations": [
+    "docs/mkdocs.yml:43",
+    "docs/mkdocs.yml:44",
+    "docs/mkdocs.yml:46",
+    "docs/docs/javascripts/katex.js:1"
+   ],
+   "proof": "Three KaTeX URLs float at @0, allowing different assets for same frozen source. Official browser docs demonstrate exact 0.19.0 assets. Callback precedes libraries in config; no browser failure reproduced, so ordering is validation target only.",
+   "proposed_change": "Pin three existing CDN assets to one reviewed exact release, initially 0.19.0 after official changelog review. Preserve CDN host and rendering unless browser reproduction requires narrow initialization/order fix. No npm workspace or broad frontend/dependency changes.",
+   "owner": "D3",
+   "family_dependency": null
+  },
+  {
+   "id": "DOC10",
+   "severity": "low",
+   "locations": [
+    "examples/gradient_leakage_attacks/README.md:5"
+   ],
+   "proof": "Docs URL lowercases chapter path, while MkDocs selects 14. Gradient Leakage Attacks and Defences.md and emitted paths preserve case. Source/output mismatch; no live HTTP 404 measured.",
+   "proposed_change": "Existing P4-leakage owner repairs to exact built URL or valid relative source link during README handoff. Mechanical link fix needs no behavior qualification but full README commands do; avoid duplicate ownership.",
+   "owner": "P4-leakage",
+   "family_dependency": "Existing P4 README ownership; runtime claims await family acceptance."
+  }
+ ],
+ "work_packages": [
+  {
+   "id": "D1",
+   "description": "Contributor/test recipes, references, narrow TOML/index repairs",
+   "owned_paths": [
+    "AGENTS.md",
+    "docs/README.md",
+    "docs/docs/misc.md",
+    "docs/docs/development.md",
+    "docs/docs/configurations/trainer.md",
+    "docs/docs/configurations/server.md",
+    "docs/docs/examples/Getting Started.md",
+    "docs/docs/index.md",
+    "docs/docs/examples/algorithms/1. Server Aggregation Algorithms.md"
+   ],
+   "findings": [
+    "DOC01",
+    "DOC02",
+    "DOC03 misc only",
+    "DOC04",
+    "DOC05",
+    "DOC06",
+    "DOC07"
+   ],
+   "dependencies": "Fresh Sol plan acceptance. Root reserves aggregation-page syntax-only edit separately from P4-aggregation; no family acceptance required for bounded fixes.",
+   "validation": [
+    "Bind source and exact changed-file hashes; diff stays prose/TOML examples only.",
+    "Extract two corrected TOML fences and parse with Python 3.13 tomllib; also uncomment capture line and parse. Check timm scheduler selection and preserved numerical parameters.",
+    "Resolve all documented test targets and execute new focused scheduler pytest command in a newly provisioned owned locked 3.13 test environment. Full core command must match accepted profile contract; reuse prior full-suite evidence rather than repeat suite for prose.",
+    "Run documented docs build in owned isolated docs/bootstrap environments; briefly start exact serve command, fetch local page, stop owned server. Check docs/site output.",
+    "Strict MkDocs build and local Markdown/HTML links/anchors; visually inspect touched pages and repaired processor list. Do not add tests that mirror prose.",
+    "Read both repaired timeout passages and the adjacent misc recommendation together: no obsolete 360-second default or asserted workload-sizing result remains."
+   ]
+  },
+  {
+   "id": "D2",
+   "description": "CCDB 3.13 recipe correction",
+   "owned_paths": [
+    "docs/docs/ccdb.md"
+   ],
+   "findings": [
+    "DOC08",
+    "DOC03 ccdb only"
+   ],
+   "dependencies": "Fresh Sol plan acceptance. Official-source retrieval limits below must be retained. No cluster access or family acceptance needed to correct stale 3.12/network-inside-job instructions.",
+   "validation": [
+    "Extract shell templates, substitute inert placeholders and run bash -n. Inspect cwd/interpreter paths, absence of job-time downloads, existing config targets and corrected timeout.",
+    "No sbatch, credential requests or cluster acceptance claim. Site package/wheel/CUDA/offline-model compatibility remains explicitly unexecuted.",
+    "Strict docs/link validation on integrated prose."
+   ]
+  },
+  {
+   "id": "D3",
+   "description": "Exact KaTeX asset references",
+   "owned_paths": [
+    "docs/mkdocs.yml",
+    "docs/docs/javascripts/katex.js only if reproduced initialization defect requires change"
+   ],
+   "findings": [
+    "DOC09"
+   ],
+   "dependencies": "Fresh Sol plan acceptance and root handoff of MkDocs config. No P2 tooling/manifest edits.",
+   "validation": [
+    "Record official release/changelog, exact version and fetched core JS/auto-render JS/CSS hashes; verify versions/content types.",
+    "Strict build, then real browser direct load and Material instant navigation of math-bearing algorithm pages; verify inline/display math renders without KaTeX or undefined-global console errors.",
+    "Retain before/after browser reproduction if initialization fix needed; otherwise keep local JS unchanged. Static build alone cannot establish browser acceptance."
+   ]
+  }
+ ],
+ "family_dependent_followup": {
+  "authority": "/tmp/plato-phase4-family-plan.json; reference exact inventory rather than mirror it",
+  "counts": {
+   "active_paths": 399,
+   "families": 58
+  },
+  "status": "Behavior qualification pending, with earlier accepted family-specific evidence preserved at its actual limits.",
+  "ownership": "P4 owners retain runtime/config and their listed example README paths. Later root-assigned docs writer reconciles public chapters after source-bound family receipt acceptance; root serializes overlaps.",
+  "handoffs": [
+   "DOC10 to P4-leakage. Detector README can gain clickable link when existing P4-detector owner edits it; no standalone placeholder task.",
+   "Attack-adaptive chapter 1:144-188 capture/pretraining claims remain P4-aggregation dependent. DOC04 changes syntax only.",
+   "Algorithm chapters 2-9 and 11-14, LoRA case study 1, composable case study 2 and remaining example recipes require command/asset/mode reconciliation with corresponding accepted family receipts; preserve citations/research semantics.",
+   "Model-search chapter 10, Qwen3 case study 6, MLX and evaluator pages already have accepted boundaries; change only for new specific findings or integration changes."
+  ],
+  "acceptance": "Retain exact executed bounded command/environment/result for each revised family claim; report pending/internal-fix/external-prerequisite honestly. Supported families need meaningful behavior and internal-defect closure. No umbrella claim all examples run automatically."
+ },
+ "primary_sources": [
+  {
+   "url": "https://docs.alliancecan.ca/wiki/Available_software",
+   "observed": "Official indexed list includes Python 3.13.2 and module access/per-site differences; indexed data is old, not proof of current target-cluster module or Plato wheel compatibility.",
+   "use": "Discovery-based 3.13 guidance with actual host module/interpreter check."
+  },
+  {
+   "url": "https://docs.alliancecan.ca/wiki/Python",
+   "observed": "Direct retrieval Access Denied via BotStopper on 2026-10-04 UTC.",
+   "use": "Preserve authoritative link; do not invent current Alliance uv/wheel procedure."
+  },
+  {
+   "url": "https://docs.alliancecan.ca/wiki/Running_jobs",
+   "observed": "Direct retrieval Access Denied; official job-management PDF indexed.",
+   "use": "Preserve link; do not claim tested submission or universal networking policy."
+  },
+  {
+   "url": "https://docs.alliancecan.ca/mediawiki/images/7/77/Managing_jobs.pdf",
+   "observed": "Official indexed training material identifies sbatch/squeue/sacct/scancel roles.",
+   "use": "Describe cancellation of a specific job rather than blanket Python termination."
+  },
+  {
+   "url": "https://katex.org/docs/browser",
+   "observed": "Retrieved 2026-10-04 UTC: exact 0.19.0 core JS/auto-render/CSS examples and script availability rules.",
+   "use": "Candidate pin and browser checks; inspect linked upstream changelog before implementation, not a compatibility guarantee."
+  }
+ ],
+ "planning_validation": {
+  "shell": "All shell commands through zsh -lc.",
+  "source_edits": false,
+  "environments_mutated": false,
+  "relative_markdown_targets_checked": 123,
+  "missing_relative_markdown_targets": [],
+  "toml_failures": 2,
+  "limits": "Local link scan handles angle-wrapped filenames but does not prove all external URLs or anchors. No test suite, browser, cluster or family runtime executed. Initial system python3 lacked tomllib; subsequent static checks used existing Python 3.13 read-only. No environment provisioned."
+ },
+ "plan_revision": 2,
+ "previous_plan": {
+  "path": "/tmp/plato-remaining-docs-plan.c64d803a.json",
+  "sha256": "c64d803ae6447e108bc4ac8648ecbce6c4aa25936b9ecbd708b8eddeda46c4ca"
+ },
+ "addressed_review": {
+  "path": "/tmp/plato-remaining-docs-plan-review.json",
+  "sha256": "714155b6cb2b26b65e6a15b864bf57153b2e3980ef255cb75bade31031eaf460",
+  "findings": [
+   "R01",
+   "R02",
+   "N01"
+  ]
+ }
+}

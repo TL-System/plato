@@ -281,7 +281,7 @@ model = partial(
 
 If a custom `DataSource` is needed for a custom training session, one can subclass from the `base.DataSource` class.
 
-Example excerpt from `examples/custom_model.py`:
+Example excerpt from `examples/basic/basic.py`:
 
 ```python
 from pathlib import Path

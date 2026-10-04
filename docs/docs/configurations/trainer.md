@@ -84,7 +84,6 @@ below describe the PyTorch path unless stated otherwise. See
     - `Adam`
     - `Adadelta`
     - `Adagrad`
-    - `AdaHessian` (from the `torch_optimizer` package)
     - `AdamW`
     - `SparseAdam`
     - `Adamax`
@@ -110,17 +109,18 @@ below describe the PyTorch path unless stated otherwise. See
     - `CyclicLR`
     - `CosineAnnealingWarmRestarts`
 
-    Alternatively, all four schedulers from [timm](https://timm.fast.ai/schedulers) are supported if `lr_scheduler` is specified as `timm` and `trainer -> type` is specified as `timm_basic`. For example, to use the `SGDR` scheduler, we specify `cosine` as `sched` in its arguments (`parameters -> learning_rate`):
+    Alternatively, all four schedulers from [timm](https://timm.fast.ai/schedulers) are supported if `lr_scheduler` is specified as `timm` and `trainer -> type` is specified as `timm_basic`. For example, to use the `SGDR` scheduler, we specify `cosine` as `sched` in its arguments (`parameters -> learning_rate`) in this configuration fragment:
 
     ```toml
     [trainer]
     type = "timm_basic"
+    lr_scheduler = "timm"
 
     [parameters]
 
     [parameters.learning_rate]
-    sched = cosine
-    min_lr = 1.e-6
+    sched = "cosine"
+    min_lr = 1.0e-6
     warmup_lr = 0.0001
     warmup_epochs = 3
     cooldown_epochs = 10
@@ -168,7 +168,7 @@ below describe the PyTorch path unless stated otherwise. See
     - `cnn_encoder` (for generating various encoders by extracting from CNN models such as ResNet models)
     - `general_multilayer` (for generating a multi-layer perceptron using a provided configuration)
     - `huggingface` (for [HuggingFace](https://huggingface.co/models) causal language models)
-    - `torch_hub` (for models from [PyTorch Hub](https://pytorch.org/hub/))
+    - `torchvision` (for models from the installed [Torchvision model library](https://docs.pytorch.org/vision/stable/models.html))
 
     The name of the model should be specified below, in `model_name`.
 
@@ -222,3 +222,5 @@ below describe the PyTorch path unless stated otherwise. See
 !!! example "clip_grad_norm (MLX)"
     Optional global gradient norm limit for the default native training step.
     Must be finite and nonnegative; omitted means no clipping. Zero is valid.
+
+The former PyTorch Hub model adapter and AdaHessian optimizer variant are retired. Use the installed torchvision factory and the ordinary Adam unlearning recipe for the retained paths. Historical source and environments are in the [Torch Hub archive](https://github.com/TL-System/plato/tree/main/archives/retired/torch-hub) and [AdaHessian archive](https://github.com/TL-System/plato/tree/main/archives/retired/adahessian).

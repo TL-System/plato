@@ -1,0 +1,19 @@
+{
+  "status": "ACCEPTED_HARNESS_AND_HISTORICAL_DOCS_INTEGRATED_FAMILY_QUALIFICATION_PENDING",
+  "source": "5b513197e880b4a364563f37ec286fae7a676d3d",
+  "base": "3232843bb08628e91a2400ee634f2ddb2a08fe27",
+  "harness_source": "04129d5aca7d0f35896279f56903c24f8c80eb1f",
+  "harness_review_sha256": "e7ea0526231cd7ea2d9a572d2c284ba742800e2e7e378364fb3611057671cd05",
+  "harness_paths": {
+    "tests/conftest.py": "765fd2c96a67118f78b0a6c7f7fe134f9a73dfc5ecce25e35e684686da2bfd81",
+    "tests/examples_phase4/__init__.py": "5daf9fad2d7bcc3373fe3650e4e46e7cbc286c109d98e63f1f81ac75454873a7",
+    "tests/examples_phase4/common.py": "4972ffc23cc0a552e78c48477e7e7921c4ecbfd8a429961d898b226602a4cfc0",
+    "tests/examples_phase4/cases.json": "972adcc85aa4d64d31dc9049b72e323a124846a01965ba3171c04b591e11b3d7",
+    "tests/test_examples_phase4_contract.py": "8e57817c9191e7139949366b025c47a13f1e8145805fd04106c483acd864bddd"
+  },
+  "historical_docs_source": "cbe6cce325cec88a056ba7af222171b533eb24b3",
+  "historical_docs_review_sha256": "b11ca6c306c980d3cd895e0530b93be727575e4bea7c59a1d90f62902e9981f3",
+  "unchanged_source_inventory_count": 399,
+  "policy": "FourhelperAPI and profile frozen. Root alone updates cases.json and sharedconftest; familyauthors onlytheiracceptedpaths. All12familiesdraft currently, no qualified family claim. FirstFEI authorizedperacceptedplan; proposeexact cases/specs before serializedrootledger update.",
+  "publication": "PR422 base stillqualifying; thisbranchunpublished. No mergeuntilbaseandrequired familyreviews/CI pass."
+}

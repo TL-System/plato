@@ -1,0 +1,1684 @@
+{
+  "schema_version": 1,
+  "recorded_at_utc": "2026-10-04T01:34:51.912779+00:00",
+  "status": "Original-author first-write repair; pending different fresh implementation review; no family qualification",
+  "source_binding": {
+    "worktree": "/private/tmp/plato-refresh-worktrees/phase4-harness-fix3",
+    "base_commit": "35ed9be16493a60b0e1e03b9873940744f7c2041",
+    "source_commit": "04129d5aca7d0f35896279f56903c24f8c80eb1f",
+    "source_tree": "510c1736fbb0731f520f2c712deb6c10453745f4",
+    "changed_source_files": [
+      "tests/examples_phase4/common.py",
+      "tests/test_examples_phase4_contract.py"
+    ],
+    "source_manifest": [
+      {
+        "path": "tests/examples_phase4/__init__.py",
+        "sha256": "5daf9fad2d7bcc3373fe3650e4e46e7cbc286c109d98e63f1f81ac75454873a7",
+        "bytes": 72
+      },
+      {
+        "path": "tests/examples_phase4/common.py",
+        "sha256": "4972ffc23cc0a552e78c48477e7e7921c4ecbfd8a429961d898b226602a4cfc0",
+        "bytes": 41040
+      },
+      {
+        "path": "tests/examples_phase4/cases.json",
+        "sha256": "972adcc85aa4d64d31dc9049b72e323a124846a01965ba3171c04b591e11b3d7",
+        "bytes": 242040
+      },
+      {
+        "path": "tests/test_examples_phase4_contract.py",
+        "sha256": "8e57817c9191e7139949366b025c47a13f1e8145805fd04106c483acd864bddd",
+        "bytes": 49967
+      },
+      {
+        "path": "tests/conftest.py",
+        "sha256": "765fd2c96a67118f78b0a6c7f7fe134f9a73dfc5ecce25e35e684686da2bfd81",
+        "bytes": 44832
+      }
+    ],
+    "execution_binding": "Complete100 and existing245 gates plus exact collections ran on committed04129d5a. Focused17 green ran on the same source content before commit; original red8 fixture copies bind the immutable rejected7c44 helper.",
+    "frozen_previous_candidates": [
+      {
+        "worktree": "/tmp/plato-refresh-worktrees/phase4-harness",
+        "head": "30060ed1cc44527312a5ec260b4fac5cd74058de",
+        "status_porcelain": "",
+        "common_sha256": "b0bbc2b9971122e7f39bb9fd572e0a27a042c315ea0227b4cb01f0dde4132327",
+        "unchanged": true
+      },
+      {
+        "worktree": "/tmp/plato-refresh-worktrees/phase4-harness-fix",
+        "head": "0ac9afc8d9a625a6c34855d6859c3d2808786bfd",
+        "status_porcelain": "",
+        "common_sha256": "aa4769d06c41dc170bff5a5abe36b78a9ea4f326c0f2657d6adfd86a555ab65d",
+        "unchanged": true
+      },
+      {
+        "worktree": "/tmp/plato-refresh-worktrees/phase4-harness-fix2",
+        "head": "35ed9be16493a60b0e1e03b9873940744f7c2041",
+        "status_porcelain": "",
+        "common_sha256": "faaa14e45103a419549baa53c9c32ec2b277c05bae72b818c20144f9b1a3f0cd",
+        "unchanged": true
+      }
+    ]
+  },
+  "review_provenance": {
+    "interrupted_review": {
+      "path": "/tmp/plato-phase4-harness-registration-review-interruption.json",
+      "sha256": "5403d311f760d5f2d1d0bb25b93fe30ec19de8e94f05440eda5863330c0cc3f3",
+      "bytes": 2325
+    },
+    "committed_copy": {
+      "path": "/private/tmp/plato-refresh-worktrees/phase4-harness-fix3/evidence/2026-refresh/phase4-harness-registration-review-interruption.json",
+      "sha256": "5403d311f760d5f2d1d0bb25b93fe30ec19de8e94f05440eda5863330c0cc3f3",
+      "bytes": 2325
+    },
+    "review_was_not_accepted_or_completed": true,
+    "root_authorized_narrow_original_author_repair": true,
+    "preserved_material_finding": {
+      "path": "/tmp/plato-phase4-harness-registration-review/artifacts/unserializable-child-identity.json",
+      "sha256": "d504d34792e87937247e12c0a284d8cc8ca61c372f8af4b4e2ee4459800d6126",
+      "bytes": 60736
+    },
+    "preserved_reviewer_artifacts": [
+      {
+        "path": "/tmp/plato-phase4-harness-registration-review/artifacts/unserializable-child-identity.json",
+        "sha256": "d504d34792e87937247e12c0a284d8cc8ca61c372f8af4b4e2ee4459800d6126",
+        "bytes": 60736
+      },
+      {
+        "path": "/tmp/plato-phase4-harness-registration-review/artifacts/reviewer-final-liveness.json",
+        "sha256": "d469b2a8a5a6a4ec2eac27786711cece22b75406f3a34f41a4bfb7fbd1849aa4",
+        "bytes": 60929
+      },
+      {
+        "path": "/tmp/plato-phase4-harness-registration-review/artifacts/audit.json",
+        "sha256": "cdd9e6890b5d7826ec203fdcf456de5adb815f42b0bdb2cd70a74d4849f4e2b4",
+        "bytes": 221263
+      },
+      {
+        "path": "/tmp/plato-phase4-harness-registration-review/edge_probe.py",
+        "sha256": "972df590cfda3eeef74633df6b088ca2ac5c1f16ee8202fa2ab1d26b7dd8eeac",
+        "bytes": 1829
+      }
+    ]
+  },
+  "accepted_protocol_authority": {
+    "design": {
+      "path": "/private/tmp/plato-refresh-worktrees/phase4-harness-fix3/evidence/2026-refresh/phase4-child-protocol-design.json",
+      "sha256": "d0dc41d4412659f6b3b3591f8ea9d2821332e90076e0660f53d0edf6aba8092a",
+      "bytes": 7316
+    },
+    "independent_design_review": {
+      "path": "/private/tmp/plato-refresh-worktrees/phase4-harness-fix3/evidence/2026-refresh/phase4-child-protocol-design-review.json",
+      "sha256": "061a3d2bd78c577c2a2d569651c7920d74d6e5ff9b1b77754d0124cbedbf83e0",
+      "bytes": 6191
+    },
+    "public_helper_or_protocol_framework_change": false
+  },
+  "change": "Move child reserved-field validation, identity normalization and first serialization into guarded registration failure handling. Derive local exact cleanup identity solely from independent current OS descendant proof before inspecting potentially invalid caller metadata. Refuse stale identity for a locally proven live child. Durable failure uses trusted run/reporter identity, bounded error text and independently derived optional local identity; no invalid caller data is serialized again.",
+  "red_green": {
+    "red_status": 1,
+    "red_log": {
+      "path": "/tmp/plato-phase4-harness-fix3-author/artifacts/first-write-red.log",
+      "sha256": "eae8e65077a043c0f27ee21f0b42050243459e003e8345a1a86cde1aa084d413",
+      "bytes": 18710
+    },
+    "red_junit": {
+      "path": "/tmp/plato-phase4-harness-fix3-author/artifacts/first-write-red.xml",
+      "sha256": "6da7d13fac50aba07acf1181b016999d2db0d444063fd0b0a3ccc5ae6ed9046f",
+      "bytes": 18808
+    },
+    "red_helper_copies": [
+      {
+        "path": "/tmp/plato-phase4-harness-fix3-author/red-temp/test_first_child_event_failure3/repo/tests/examples_phase4/common.py",
+        "sha256": "faaa14e45103a419549baa53c9c32ec2b277c05bae72b818c20144f9b1a3f0cd",
+        "bytes": 39842
+      },
+      {
+        "path": "/tmp/plato-phase4-harness-fix3-author/red-temp/test_first_child_event_failure4/repo/tests/examples_phase4/common.py",
+        "sha256": "faaa14e45103a419549baa53c9c32ec2b277c05bae72b818c20144f9b1a3f0cd",
+        "bytes": 39842
+      },
+      {
+        "path": "/tmp/plato-phase4-harness-fix3-author/red-temp/test_first_child_event_failure5/repo/tests/examples_phase4/common.py",
+        "sha256": "faaa14e45103a419549baa53c9c32ec2b277c05bae72b818c20144f9b1a3f0cd",
+        "bytes": 39842
+      },
+      {
+        "path": "/tmp/plato-phase4-harness-fix3-author/red-temp/test_first_child_event_failure2/repo/tests/examples_phase4/common.py",
+        "sha256": "faaa14e45103a419549baa53c9c32ec2b277c05bae72b818c20144f9b1a3f0cd",
+        "bytes": 39842
+      },
+      {
+        "path": "/tmp/plato-phase4-harness-fix3-author/red-temp/test_first_child_event_failure0/repo/tests/examples_phase4/common.py",
+        "sha256": "faaa14e45103a419549baa53c9c32ec2b277c05bae72b818c20144f9b1a3f0cd",
+        "bytes": 39842
+      },
+      {
+        "path": "/tmp/plato-phase4-harness-fix3-author/red-temp/test_first_child_event_failure1/repo/tests/examples_phase4/common.py",
+        "sha256": "faaa14e45103a419549baa53c9c32ec2b277c05bae72b818c20144f9b1a3f0cd",
+        "bytes": 39842
+      },
+      {
+        "path": "/tmp/plato-phase4-harness-fix3-author/red-temp/test_first_write_failure_never0/repo/tests/examples_phase4/common.py",
+        "sha256": "faaa14e45103a419549baa53c9c32ec2b277c05bae72b818c20144f9b1a3f0cd",
+        "bytes": 39842
+      },
+      {
+        "path": "/tmp/plato-phase4-harness-fix3-author/red-temp/test_first_write_failure_never1/repo/tests/examples_phase4/common.py",
+        "sha256": "faaa14e45103a419549baa53c9c32ec2b277c05bae72b818c20144f9b1a3f0cd",
+        "bytes": 39842
+      }
+    ],
+    "red_outcome": "8 failed including two exact oversized timestamp detached hard-exit false-success reproductions, serializer/reserved/stale-owned boundaries and invalid unrelated metadata. Fixture cleanup uses only independently known exact identities.",
+    "green": {
+      "harness": {
+        "counts": {
+          "tests": 100,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "junit": {
+          "path": "/tmp/plato-phase4-harness-fix3-author/artifacts/harness-final.xml",
+          "sha256": "1ad2af1b01a319d73ea07674ff81e863a47457254a34ec0378e64c2f9889cc83",
+          "bytes": 16000
+        },
+        "log": {
+          "path": "/tmp/plato-phase4-harness-fix3-author/artifacts/harness-final.log",
+          "sha256": "849c99ca7e69359ae3575742f248df9950d7c46029284832c37490e8b015fcce",
+          "bytes": 254
+        }
+      },
+      "existing_profile_contracts": {
+        "counts": {
+          "tests": 245,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "junit": {
+          "path": "/tmp/plato-phase4-harness-fix3-author/artifacts/existing-policy.xml",
+          "sha256": "4854a785599caf7bde806bc9006674915f8e159014257ff9f9fde67d5b4e0af1",
+          "bytes": 55804
+        },
+        "log": {
+          "path": "/tmp/plato-phase4-harness-fix3-author/artifacts/existing-policy.log",
+          "sha256": "4299ad106db32debc5cff6c1bfbce88e7ffb48eeb32c1e1dc732a89e9c38df79",
+          "bytes": 990
+        }
+      },
+      "focused_first_write_and_identity": {
+        "counts": {
+          "tests": 17,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "junit": {
+          "path": "/tmp/plato-phase4-harness-fix3-author/artifacts/first-write-green.xml",
+          "sha256": "20627d3a411de4ed2cfe34b2cbd91a23a455701f461ceceeeabaf2cfdd5ad7e2",
+          "bytes": 2925
+        },
+        "log": {
+          "path": "/tmp/plato-phase4-harness-fix3-author/artifacts/first-write-green.log",
+          "sha256": "230e889e6956fedf3f6dc16bfe4366975d59e951969532a60e99d788649cdf7f",
+          "bytes": 178
+        }
+      },
+      "typing": {
+        "path": "/tmp/plato-phase4-harness-fix3-author/artifacts/ty-final.log",
+        "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+        "bytes": 19
+      },
+      "ruff": {
+        "path": "/tmp/plato-phase4-harness-fix3-author/artifacts/ruff-final.log",
+        "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+        "bytes": 19
+      },
+      "format": {
+        "path": "/tmp/plato-phase4-harness-fix3-author/artifacts/format-final.log",
+        "sha256": "177f260a5645724013185e4b140c7045cc39e56c0c97b120f5cb23599f85f0de",
+        "bytes": 26
+      }
+    }
+  },
+  "validation": {
+    "harness": {
+      "counts": {
+        "tests": 100,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "junit": {
+        "path": "/tmp/plato-phase4-harness-fix3-author/artifacts/harness-final.xml",
+        "sha256": "1ad2af1b01a319d73ea07674ff81e863a47457254a34ec0378e64c2f9889cc83",
+        "bytes": 16000
+      },
+      "log": {
+        "path": "/tmp/plato-phase4-harness-fix3-author/artifacts/harness-final.log",
+        "sha256": "849c99ca7e69359ae3575742f248df9950d7c46029284832c37490e8b015fcce",
+        "bytes": 254
+      }
+    },
+    "existing_profile_contracts": {
+      "counts": {
+        "tests": 245,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "junit": {
+        "path": "/tmp/plato-phase4-harness-fix3-author/artifacts/existing-policy.xml",
+        "sha256": "4854a785599caf7bde806bc9006674915f8e159014257ff9f9fde67d5b4e0af1",
+        "bytes": 55804
+      },
+      "log": {
+        "path": "/tmp/plato-phase4-harness-fix3-author/artifacts/existing-policy.log",
+        "sha256": "4299ad106db32debc5cff6c1bfbce88e7ffb48eeb32c1e1dc732a89e9c38df79",
+        "bytes": 990
+      }
+    },
+    "focused_first_write_and_identity": {
+      "counts": {
+        "tests": 17,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "junit": {
+        "path": "/tmp/plato-phase4-harness-fix3-author/artifacts/first-write-green.xml",
+        "sha256": "20627d3a411de4ed2cfe34b2cbd91a23a455701f461ceceeeabaf2cfdd5ad7e2",
+        "bytes": 2925
+      },
+      "log": {
+        "path": "/tmp/plato-phase4-harness-fix3-author/artifacts/first-write-green.log",
+        "sha256": "230e889e6956fedf3f6dc16bfe4366975d59e951969532a60e99d788649cdf7f",
+        "bytes": 178
+      }
+    },
+    "typing": {
+      "path": "/tmp/plato-phase4-harness-fix3-author/artifacts/ty-final.log",
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "bytes": 19
+    },
+    "ruff": {
+      "path": "/tmp/plato-phase4-harness-fix3-author/artifacts/ruff-final.log",
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "bytes": 19
+    },
+    "format": {
+      "path": "/tmp/plato-phase4-harness-fix3-author/artifacts/format-final.log",
+      "sha256": "177f260a5645724013185e4b140c7045cc39e56c0c97b120f5cb23599f85f0de",
+      "bytes": 26
+    }
+  },
+  "collections": [
+    {
+      "scope": "core",
+      "previous_count": 1727,
+      "fixed_count": 1735,
+      "exact_previous_nodes_retained": true,
+      "added_nodes": [
+        "tests/test_examples_phase4_contract.py::test_first_child_event_failure_is_durable_and_cannot_be_suppressed[huge-created-1]",
+        "tests/test_examples_phase4_contract.py::test_first_child_event_failure_is_durable_and_cannot_be_suppressed[huge-created-2]",
+        "tests/test_examples_phase4_contract.py::test_first_child_event_failure_is_durable_and_cannot_be_suppressed[unserializable-field]",
+        "tests/test_examples_phase4_contract.py::test_first_child_event_failure_is_durable_and_cannot_be_suppressed[unserializable-case]",
+        "tests/test_examples_phase4_contract.py::test_first_child_event_failure_is_durable_and_cannot_be_suppressed[reserved-field]",
+        "tests/test_examples_phase4_contract.py::test_first_child_event_failure_is_durable_and_cannot_be_suppressed[stale-owned]",
+        "tests/test_examples_phase4_contract.py::test_first_write_failure_never_signals_an_unrelated_hint[huge-created]",
+        "tests/test_examples_phase4_contract.py::test_first_write_failure_never_signals_an_unrelated_hint[unserializable-case]"
+      ],
+      "previous": {
+        "path": "/tmp/plato-phase4-harness-fix2-author/artifacts/final-core.json",
+        "sha256": "e88a5c9fe95ee8fae340d1f1278fdf62beeae98e335fa0c536a13b36ec28c8df",
+        "bytes": 206752
+      },
+      "fixed": {
+        "path": "/tmp/plato-phase4-harness-fix3-author/artifacts/final-core.json",
+        "sha256": "859bd9ab0b0f4e03dbe9bc91a8d3ab9969b66b097077cdb79fc1a879c4f3456d",
+        "bytes": 207783
+      },
+      "imports": {
+        "path": "/tmp/plato-phase4-harness-fix3-author/artifacts/final-core-imports.json",
+        "sha256": "8c1c6ff181b2a7f3942721868b128fabb4cb63d94ca05d329f6507319e7f1994",
+        "bytes": 212
+      }
+    },
+    {
+      "scope": "runtime",
+      "previous_count": 51,
+      "fixed_count": 51,
+      "exact_previous_nodes_retained": true,
+      "added_nodes": [],
+      "previous": {
+        "path": "/tmp/plato-phase4-harness-fix2-author/artifacts/final-runtime.json",
+        "sha256": "291a890b719cb1be80d8bb19d3d732fd655d18a5289a4676ffe13e89cece3543",
+        "bytes": 6558
+      },
+      "fixed": {
+        "path": "/tmp/plato-phase4-harness-fix3-author/artifacts/final-runtime.json",
+        "sha256": "5134abe4d9f56bb5d574fd58566003bc74190d7bdafbf55a6a19142a28eebdf4",
+        "bytes": 6558
+      },
+      "imports": {
+        "path": "/tmp/plato-phase4-harness-fix3-author/artifacts/final-runtime-imports.json",
+        "sha256": "8c1c6ff181b2a7f3942721868b128fabb4cb63d94ca05d329f6507319e7f1994",
+        "bytes": 212
+      },
+      "startup_count": 48,
+      "feddyn_count": 3
+    },
+    {
+      "scope": "retained",
+      "previous_count": 19,
+      "fixed_count": 19,
+      "exact_previous_nodes_retained": true,
+      "added_nodes": [],
+      "previous": {
+        "path": "/tmp/plato-phase4-harness-fix2-author/artifacts/final-retained.json",
+        "sha256": "b47b9be250657d9047269153a775d816c514ed88782ea91630b651579b397fee",
+        "bytes": 2402
+      },
+      "fixed": {
+        "path": "/tmp/plato-phase4-harness-fix3-author/artifacts/final-retained.json",
+        "sha256": "b3bdb9ace363e14f3ba492f0db5c8e93865c5dba7c6865e3294840f87ac2d26a",
+        "bytes": 2402
+      },
+      "imports": {
+        "path": "/tmp/plato-phase4-harness-fix3-author/artifacts/final-retained-imports.json",
+        "sha256": "cb7d3eabefe41c3ea79ae5446271ee855a906a3c967a88892bc24f3617b1dd03",
+        "bytes": 82
+      }
+    },
+    {
+      "scope": "native",
+      "previous_count": 383,
+      "fixed_count": 383,
+      "exact_previous_nodes_retained": true,
+      "added_nodes": [],
+      "previous": {
+        "path": "/tmp/plato-phase4-harness-fix2-author/artifacts/final-native.json",
+        "sha256": "754b197ab134b2cb77f2797d34e8ffabe9b6893b5a09ddf05ff6191f2c42c7ac",
+        "bytes": 53575
+      },
+      "fixed": {
+        "path": "/tmp/plato-phase4-harness-fix3-author/artifacts/final-native.json",
+        "sha256": "9d02883fc8bf749404113bdb1831c20df98cb46f8e06497e0182f6c9887f7034",
+        "bytes": 53575
+      },
+      "imports": {
+        "path": "/tmp/plato-phase4-harness-fix3-author/artifacts/final-native-imports.json",
+        "sha256": "cb7d3eabefe41c3ea79ae5446271ee855a906a3c967a88892bc24f3617b1dd03",
+        "bytes": 82
+      }
+    },
+    {
+      "scope": "eval",
+      "previous_count": 11,
+      "fixed_count": 11,
+      "exact_previous_nodes_retained": true,
+      "added_nodes": [],
+      "previous": {
+        "path": "/tmp/plato-phase4-harness-fix2-author/artifacts/final-eval.json",
+        "sha256": "fc59e00bdd86b214e3449b8ddc0b70251434641b17a331ad596a2aecd0ae4dbc",
+        "bytes": 1722
+      },
+      "fixed": {
+        "path": "/tmp/plato-phase4-harness-fix3-author/artifacts/final-eval.json",
+        "sha256": "7140f9fd19b2a98d2327d5619825be9d76f013c59a41ccaca1387d21dc1acaa9",
+        "bytes": 1721
+      },
+      "imports": {
+        "path": "/tmp/plato-phase4-harness-fix3-author/artifacts/final-eval-imports.json",
+        "sha256": "cb7d3eabefe41c3ea79ae5446271ee855a906a3c967a88892bc24f3617b1dd03",
+        "bytes": 82
+      }
+    }
+  ],
+  "helper_worker_receipts": [
+    {
+      "receipt": {
+        "path": "/tmp/plato-phase4-harness-fix3-author/final-temp/test_bad_event_files_cannot_by0/bad-events/result.json",
+        "sha256": "3596e4e085b3daf4696628ff9e1e1fe953a7bc800bb598ab131ea8e2ff615939",
+        "bytes": 34454
+      },
+      "directory": "/tmp/plato-phase4-harness-fix3-author/final-temp/test_bad_event_files_cannot_by0/bad-events",
+      "returncode": -15,
+      "timed_out": true,
+      "forced": [
+        "TERM"
+      ],
+      "survivors": [],
+      "processes": {
+        "15976": 1791077504.022497,
+        "15977": 1791077504.077465
+      },
+      "malformed_events": [
+        "events-bad.jsonl: UnicodeDecodeError: 'utf-8' codec can't decode byte 0xff in position 0: invalid start byte"
+      ],
+      "child_registrations": [
+        {
+          "case_id": "contract",
+          "registration_id": "aedcbe577c0d745851ae2fef216a614a",
+          "reporter_pid": 15976,
+          "reporter_created": 1791077504.022497,
+          "child_pid": 15977,
+          "child_created": 1791077504.077465,
+          "disposition": "registered"
+        }
+      ],
+      "registration_errors": [],
+      "unresolved_child_hints": [],
+      "errors": [
+        "worker did not exit naturally with valid evidence",
+        "missing unique final parent success event",
+        "missing configured event",
+        "missing source provenance"
+      ]
+    },
+    {
+      "receipt": {
+        "path": "/tmp/plato-phase4-harness-fix3-author/final-temp/test_bad_event_files_cannot_by1/bad-events/result.json",
+        "sha256": "a3c1324e88a29abf846d85df078a1bf08b12e8094fa6bad5db9c0411c57e0b51",
+        "bytes": 34528
+      },
+      "directory": "/tmp/plato-phase4-harness-fix3-author/final-temp/test_bad_event_files_cannot_by1/bad-events",
+      "returncode": -15,
+      "timed_out": true,
+      "forced": [
+        "TERM"
+      ],
+      "survivors": [],
+      "processes": {
+        "15987": 1791077507.566006,
+        "15988": 1791077507.623913
+      },
+      "malformed_events": [
+        "events-bad.jsonl: PermissionError: [Errno 13] Permission denied: '/private/tmp/plato-phase4-harness-fix3-author/final-temp/test_bad_event_files_cannot_by1/bad-events/events-bad.jsonl'"
+      ],
+      "child_registrations": [
+        {
+          "case_id": "contract",
+          "registration_id": "99b95dc84953635ed28bc598a3c2152b",
+          "reporter_pid": 15987,
+          "reporter_created": 1791077507.566006,
+          "child_pid": 15988,
+          "child_created": 1791077507.623913,
+          "disposition": "registered"
+        }
+      ],
+      "registration_errors": [],
+      "unresolved_child_hints": [],
+      "errors": [
+        "worker did not exit naturally with valid evidence",
+        "missing unique final parent success event",
+        "missing configured event",
+        "missing source provenance"
+      ]
+    },
+    {
+      "receipt": {
+        "path": "/tmp/plato-phase4-harness-fix3-author/final-temp/test_bad_event_files_cannot_by2/bad-events/result.json",
+        "sha256": "2c7fa4469bbf34f67d18412603e19d0145e5df078c727f5a2a9a0085287c1a6b",
+        "bytes": 34392
+      },
+      "directory": "/tmp/plato-phase4-harness-fix3-author/final-temp/test_bad_event_files_cannot_by2/bad-events",
+      "returncode": -15,
+      "timed_out": true,
+      "forced": [
+        "TERM"
+      ],
+      "survivors": [],
+      "processes": {
+        "15995": 1791077511.04659,
+        "15996": 1791077511.101989
+      },
+      "malformed_events": [
+        "events-bad.jsonl: int too large to convert to float"
+      ],
+      "child_registrations": [
+        {
+          "case_id": "contract",
+          "registration_id": "a2f3e6bfed9e433d63007efa384b86d3",
+          "reporter_pid": 15995,
+          "reporter_created": 1791077511.04659,
+          "child_pid": 15996,
+          "child_created": 1791077511.101989,
+          "disposition": "registered"
+        }
+      ],
+      "registration_errors": [],
+      "unresolved_child_hints": [],
+      "errors": [
+        "worker did not exit naturally with valid evidence",
+        "missing unique final parent success event",
+        "missing configured event",
+        "missing source provenance"
+      ]
+    },
+    {
+      "receipt": {
+        "path": "/tmp/plato-phase4-harness-fix3-author/final-temp/test_bad_event_files_cannot_by3/bad-events/result.json",
+        "sha256": "5265eaf0b33701c3521230bb6ceff681c2997260035d715a7c12d2cb24f4bfa3",
+        "bytes": 34396
+      },
+      "directory": "/tmp/plato-phase4-harness-fix3-author/final-temp/test_bad_event_files_cannot_by3/bad-events",
+      "returncode": -15,
+      "timed_out": true,
+      "forced": [
+        "TERM"
+      ],
+      "survivors": [],
+      "processes": {
+        "16004": 1791077514.534161,
+        "16005": 1791077514.590496
+      },
+      "malformed_events": [
+        "events-bad.jsonl: int too large to convert to float"
+      ],
+      "child_registrations": [
+        {
+          "case_id": "contract",
+          "registration_id": "2499cfc7b0b63189c2c160471d68a38b",
+          "reporter_pid": 16004,
+          "reporter_created": 1791077514.534161,
+          "child_pid": 16005,
+          "child_created": 1791077514.590496,
+          "disposition": "registered"
+        }
+      ],
+      "registration_errors": [],
+      "unresolved_child_hints": [],
+      "errors": [
+        "worker did not exit naturally with valid evidence",
+        "missing unique final parent success event",
+        "missing configured event",
+        "missing source provenance"
+      ]
+    },
+    {
+      "receipt": {
+        "path": "/tmp/plato-phase4-harness-fix3-author/final-temp/test_bad_event_files_cannot_by4/bad-events/result.json",
+        "sha256": "00b225dff464696bfaae0e673b48b5eb31b3a1a89e4ab9cedde7511b8afc166b",
+        "bytes": 34399
+      },
+      "directory": "/tmp/plato-phase4-harness-fix3-author/final-temp/test_bad_event_files_cannot_by4/bad-events",
+      "returncode": -15,
+      "timed_out": true,
+      "forced": [
+        "TERM"
+      ],
+      "survivors": [],
+      "processes": {
+        "16142": 1791077518.047177,
+        "16143": 1791077518.102771
+      },
+      "malformed_events": [
+        "events-bad.jsonl: event lacks required identity fields"
+      ],
+      "child_registrations": [
+        {
+          "case_id": "contract",
+          "registration_id": "f23d9c3cfb75177a795c0f97187ab960",
+          "reporter_pid": 16142,
+          "reporter_created": 1791077518.047177,
+          "child_pid": 16143,
+          "child_created": 1791077518.102771,
+          "disposition": "registered"
+        }
+      ],
+      "registration_errors": [],
+      "unresolved_child_hints": [],
+      "errors": [
+        "worker did not exit naturally with valid evidence",
+        "missing unique final parent success event",
+        "missing configured event",
+        "missing source provenance"
+      ]
+    },
+    {
+      "receipt": {
+        "path": "/tmp/plato-phase4-harness-fix3-author/final-temp/test_direct_child_hint_cannot_0/direct-hint/result.json",
+        "sha256": "1df851260404c5efbf21bdbcf0049b656195e4a1f4c5d8cf3736014370fc8cb0",
+        "bytes": 52426
+      },
+      "directory": "/tmp/plato-phase4-harness-fix3-author/final-temp/test_direct_child_hint_cannot_0/direct-hint",
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [],
+      "survivors": [],
+      "processes": {
+        "16221": 1791077538.302048
+      },
+      "malformed_events": [],
+      "child_registrations": [],
+      "registration_errors": [],
+      "unresolved_child_hints": [
+        {
+          "pid": 16224,
+          "created": 1791077539.212718
+        }
+      ],
+      "errors": [
+        "child_started lacks matching acknowledged registration",
+        "unresolved live child hints; ownership unproven and no signal authorized"
+      ]
+    },
+    {
+      "receipt": {
+        "path": "/tmp/plato-phase4-harness-fix3-author/final-temp/test_direct_child_hint_cannot_1/direct-hint/result.json",
+        "sha256": "6ad89393810705f0dd57d59e51cd1853f76e1c23fee3501250069e9f9443abcc",
+        "bytes": 52595
+      },
+      "directory": "/tmp/plato-phase4-harness-fix3-author/final-temp/test_direct_child_hint_cannot_1/direct-hint",
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [],
+      "survivors": [],
+      "processes": {
+        "16233": 1791077539.718794
+      },
+      "malformed_events": [],
+      "child_registrations": [],
+      "registration_errors": [
+        "ConnectionError: child registration closed before acknowledgment"
+      ],
+      "unresolved_child_hints": [
+        {
+          "pid": 16236,
+          "created": 1791077540.614644
+        }
+      ],
+      "errors": [
+        "child_started lacks matching acknowledged registration",
+        "unresolved live child hints; ownership unproven and no signal authorized",
+        "child registration error: ConnectionError: child registration closed before acknowledgment"
+      ]
+    },
+    {
+      "receipt": {
+        "path": "/tmp/plato-phase4-harness-fix3-author/final-temp/test_direct_child_hint_cannot_2/direct-hint/result.json",
+        "sha256": "f3e786445fbf682064ee7a42f71c9f00cfe6ca19150ab717552b340b0419bc0a",
+        "bytes": 52456
+      },
+      "directory": "/tmp/plato-phase4-harness-fix3-author/final-temp/test_direct_child_hint_cannot_2/direct-hint",
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [],
+      "survivors": [],
+      "processes": {
+        "16239": 1791077541.098859,
+        "16241": 1791077541.94427
+      },
+      "malformed_events": [],
+      "child_registrations": [],
+      "registration_errors": [],
+      "unresolved_child_hints": [
+        {
+          "pid": 16237,
+          "created": 1791077540.743656
+        }
+      ],
+      "errors": [
+        "child_started lacks matching acknowledged registration",
+        "unresolved live child hints; ownership unproven and no signal authorized"
+      ]
+    },
+    {
+      "receipt": {
+        "path": "/tmp/plato-phase4-harness-fix3-author/final-temp/test_direct_child_hint_cannot_3/direct-hint/result.json",
+        "sha256": "5b5dc5d6d437336076bf6bd35568302534441247553656425e769ab427228029",
+        "bytes": 52456
+      },
+      "directory": "/tmp/plato-phase4-harness-fix3-author/final-temp/test_direct_child_hint_cannot_3/direct-hint",
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [],
+      "survivors": [],
+      "processes": {
+        "16250": 1791077542.542242
+      },
+      "malformed_events": [],
+      "child_registrations": [],
+      "registration_errors": [],
+      "unresolved_child_hints": [
+        {
+          "pid": 16243,
+          "created": 1791077542.189218
+        }
+      ],
+      "errors": [
+        "child_started lacks matching acknowledged registration",
+        "unresolved live child hints; ownership unproven and no signal authorized"
+      ]
+    },
+    {
+      "receipt": {
+        "path": "/tmp/plato-phase4-harness-fix3-author/final-temp/test_fast_detached_child_canno0/fast-child-1/result.json",
+        "sha256": "e8dbfd1dbbb583b11e749d7a4cba04778266b58a6da003fdf799aa44c2898e0a",
+        "bytes": 52664
+      },
+      "directory": "/tmp/plato-phase4-harness-fix3-author/final-temp/test_fast_detached_child_canno0/fast-child-1",
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [
+        "TERM"
+      ],
+      "survivors": [],
+      "processes": {
+        "16166": 1791077525.361964,
+        "16169": 1791077526.266401
+      },
+      "malformed_events": [],
+      "child_registrations": [
+        {
+          "case_id": "contract",
+          "registration_id": "1d4d29887176042cbf18c07a0997ffee",
+          "reporter_pid": 16166,
+          "reporter_created": 1791077525.361964,
+          "child_pid": 16169,
+          "child_created": 1791077526.266401,
+          "disposition": "registered"
+        }
+      ],
+      "registration_errors": [],
+      "unresolved_child_hints": [],
+      "errors": [
+        "worker did not exit naturally with valid evidence"
+      ]
+    },
+    {
+      "receipt": {
+        "path": "/tmp/plato-phase4-harness-fix3-author/final-temp/test_fast_detached_child_canno1/fast-child-2/result.json",
+        "sha256": "3c74a10a89188d43248e31fa36b880881d759a192b46eddd99e07a36ab3d54ea",
+        "bytes": 52666
+      },
+      "directory": "/tmp/plato-phase4-harness-fix3-author/final-temp/test_fast_detached_child_canno1/fast-child-2",
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [
+        "TERM"
+      ],
+      "survivors": [],
+      "processes": {
+        "16182": 1791077531.826433,
+        "16186": 1791077532.742257
+      },
+      "malformed_events": [],
+      "child_registrations": [
+        {
+          "case_id": "contract",
+          "registration_id": "0e9d43c650027c8fa3ef13cc7024d0b9",
+          "reporter_pid": 16182,
+          "reporter_created": 1791077531.826433,
+          "child_pid": 16186,
+          "child_created": 1791077532.742257,
+          "disposition": "registered"
+        }
+      ],
+      "registration_errors": [],
+      "unresolved_child_hints": [],
+      "errors": [
+        "worker did not exit naturally with valid evidence"
+      ]
+    },
+    {
+      "receipt": {
+        "path": "/tmp/plato-phase4-harness-fix3-author/final-temp/test_finally_cleanup_is_record0/fallback/result.json",
+        "sha256": "2b43b417c74343feef7aaf44f76e4073c1ae3768c0bbe7f2c97ff57f7b85aaeb",
+        "bytes": 33808
+      },
+      "directory": "/tmp/plato-phase4-harness-fix3-author/final-temp/test_finally_cleanup_is_record0/fallback",
+      "returncode": -9,
+      "timed_out": false,
+      "forced": [
+        "finally-KILL:15974"
+      ],
+      "survivors": [],
+      "processes": {
+        "15974": 1791077503.570387
+      },
+      "malformed_events": [],
+      "child_registrations": [],
+      "registration_errors": [],
+      "unresolved_child_hints": [],
+      "errors": [
+        "containment error: RuntimeError: deliberate communicate failure",
+        "worker did not exit naturally with valid evidence",
+        "missing unique final parent success event",
+        "missing configured event",
+        "missing source provenance"
+      ]
+    },
+    {
+      "receipt": {
+        "path": "/tmp/plato-phase4-harness-fix3-author/final-temp/test_first_child_event_failure0/first-write/result.json",
+        "sha256": "a0268863a6126e1cc107dfc4448a9a1e00fb21f9320a91421932a1325e097c86",
+        "bytes": 52646
+      },
+      "directory": "/tmp/plato-phase4-harness-fix3-author/final-temp/test_first_child_event_failure0/first-write",
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [],
+      "survivors": [],
+      "processes": {
+        "16313": 1791077557.644916
+      },
+      "malformed_events": [],
+      "child_registrations": [],
+      "registration_errors": [],
+      "unresolved_child_hints": [],
+      "errors": [
+        "failed, skipped, or mismatched case event"
+      ]
+    },
+    {
+      "receipt": {
+        "path": "/tmp/plato-phase4-harness-fix3-author/final-temp/test_first_child_event_failure1/first-write/result.json",
+        "sha256": "eb347245a5cbbd759e4c33014c42249b9ff21e4070c57603b88220fabdd8d082",
+        "bytes": 52641
+      },
+      "directory": "/tmp/plato-phase4-harness-fix3-author/final-temp/test_first_child_event_failure1/first-write",
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [],
+      "survivors": [],
+      "processes": {
+        "16323": 1791077558.97637
+      },
+      "malformed_events": [],
+      "child_registrations": [],
+      "registration_errors": [],
+      "unresolved_child_hints": [],
+      "errors": [
+        "failed, skipped, or mismatched case event"
+      ]
+    },
+    {
+      "receipt": {
+        "path": "/tmp/plato-phase4-harness-fix3-author/final-temp/test_first_child_event_failure2/first-write/result.json",
+        "sha256": "5c21487ae1dc468676e68563479e9052039ea63b97e518b534215992a8e56628",
+        "bytes": 52657
+      },
+      "directory": "/tmp/plato-phase4-harness-fix3-author/final-temp/test_first_child_event_failure2/first-write",
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [],
+      "survivors": [],
+      "processes": {
+        "16335": 1791077560.332276
+      },
+      "malformed_events": [],
+      "child_registrations": [],
+      "registration_errors": [],
+      "unresolved_child_hints": [],
+      "errors": [
+        "failed, skipped, or mismatched case event"
+      ]
+    },
+    {
+      "receipt": {
+        "path": "/tmp/plato-phase4-harness-fix3-author/final-temp/test_first_child_event_failure3/first-write/result.json",
+        "sha256": "ee4ab005fb4d8646da22b4d7dac366521d45568c42b97ddcb60304b0df7619b9",
+        "bytes": 52652
+      },
+      "directory": "/tmp/plato-phase4-harness-fix3-author/final-temp/test_first_child_event_failure3/first-write",
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [],
+      "survivors": [],
+      "processes": {
+        "16345": 1791077561.685643
+      },
+      "malformed_events": [],
+      "child_registrations": [],
+      "registration_errors": [],
+      "unresolved_child_hints": [],
+      "errors": [
+        "failed, skipped, or mismatched case event"
+      ]
+    },
+    {
+      "receipt": {
+        "path": "/tmp/plato-phase4-harness-fix3-author/final-temp/test_first_child_event_failure4/first-write/result.json",
+        "sha256": "ed4e57c520fac9d21bb97262d79bb6b6a33eed1f7678e47f6c8bec50820cb398",
+        "bytes": 52639
+      },
+      "directory": "/tmp/plato-phase4-harness-fix3-author/final-temp/test_first_child_event_failure4/first-write",
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [],
+      "survivors": [],
+      "processes": {
+        "16350": 1791077563.033611
+      },
+      "malformed_events": [],
+      "child_registrations": [],
+      "registration_errors": [],
+      "unresolved_child_hints": [],
+      "errors": [
+        "failed, skipped, or mismatched case event"
+      ]
+    },
+    {
+      "receipt": {
+        "path": "/tmp/plato-phase4-harness-fix3-author/final-temp/test_first_child_event_failure5/first-write/result.json",
+        "sha256": "a8ce9ca34e729964d738ba37c8c33c356c0ea5029c3e0ba990a71add69913b35",
+        "bytes": 52661
+      },
+      "directory": "/tmp/plato-phase4-harness-fix3-author/final-temp/test_first_child_event_failure5/first-write",
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [],
+      "survivors": [],
+      "processes": {
+        "16360": 1791077564.363348
+      },
+      "malformed_events": [],
+      "child_registrations": [],
+      "registration_errors": [],
+      "unresolved_child_hints": [],
+      "errors": [
+        "failed, skipped, or mismatched case event"
+      ]
+    },
+    {
+      "receipt": {
+        "path": "/tmp/plato-phase4-harness-fix3-author/final-temp/test_first_write_failure_never0/unrelated-first-write/result.json",
+        "sha256": "066863e8d00e6b7d896c961d2442a4bdd217e8864030afac1b451abaf1649fe8",
+        "bytes": 52606
+      },
+      "directory": "/tmp/plato-phase4-harness-fix3-author/final-temp/test_first_write_failure_never0/unrelated-first-write",
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [],
+      "survivors": [],
+      "processes": {
+        "16366": 1791077565.721182
+      },
+      "malformed_events": [],
+      "child_registrations": [],
+      "registration_errors": [],
+      "unresolved_child_hints": [],
+      "errors": [
+        "failed, skipped, or mismatched case event"
+      ]
+    },
+    {
+      "receipt": {
+        "path": "/tmp/plato-phase4-harness-fix3-author/final-temp/test_first_write_failure_never1/unrelated-first-write/result.json",
+        "sha256": "7f9fb68cc0a7d80f0b2d5e79dc3f5db04ee11244a18e9c265c10704c703040b6",
+        "bytes": 52614
+      },
+      "directory": "/tmp/plato-phase4-harness-fix3-author/final-temp/test_first_write_failure_never1/unrelated-first-write",
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [],
+      "survivors": [],
+      "processes": {
+        "16371": 1791077567.039892
+      },
+      "malformed_events": [],
+      "child_registrations": [],
+      "registration_errors": [],
+      "unresolved_child_hints": [],
+      "errors": [
+        "failed, skipped, or mismatched case event"
+      ]
+    },
+    {
+      "receipt": {
+        "path": "/tmp/plato-phase4-harness-fix3-author/final-temp/test_genuine_child_identity_is0/genuine-child/result.json",
+        "sha256": "b97beda29021a68236924499e847b3938124822f2d3d74c52f4a148e385407df",
+        "bytes": 52601
+      },
+      "directory": "/tmp/plato-phase4-harness-fix3-author/final-temp/test_genuine_child_identity_is0/genuine-child",
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [],
+      "survivors": [],
+      "processes": {
+        "16150": 1791077521.523152,
+        "16151": 1791077521.579145
+      },
+      "malformed_events": [],
+      "child_registrations": [
+        {
+          "case_id": "contract",
+          "registration_id": "46e443b32f23ad72fa764467ca45cce1",
+          "reporter_pid": 16150,
+          "reporter_created": 1791077521.523152,
+          "child_pid": 16151,
+          "child_created": 1791077521.579145,
+          "disposition": "registered"
+        }
+      ],
+      "registration_errors": [],
+      "unresolved_child_hints": [],
+      "errors": []
+    },
+    {
+      "receipt": {
+        "path": "/tmp/plato-phase4-harness-fix3-author/final-temp/test_genuine_child_identity_is1/genuine-child/result.json",
+        "sha256": "b7f37848e468691c9522c219644c4ae46184e1c721f7e9a82a0def64b3342f47",
+        "bytes": 52590
+      },
+      "directory": "/tmp/plato-phase4-harness-fix3-author/final-temp/test_genuine_child_identity_is1/genuine-child",
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [],
+      "survivors": [],
+      "processes": {
+        "16156": 1791077523.47513,
+        "16157": 1791077523.52988
+      },
+      "malformed_events": [],
+      "child_registrations": [
+        {
+          "case_id": "contract",
+          "registration_id": "017050104955cc3c75ac60da8b27fc39",
+          "reporter_pid": 16156,
+          "reporter_created": 1791077523.47513,
+          "child_pid": 16157,
+          "child_created": 1791077523.52988,
+          "disposition": "registered"
+        }
+      ],
+      "registration_errors": [],
+      "unresolved_child_hints": [],
+      "errors": []
+    },
+    {
+      "receipt": {
+        "path": "/tmp/plato-phase4-harness-fix3-author/final-temp/test_real_failed_workers_retai0/failure/result.json",
+        "sha256": "9151d3dfc4b4db1a63a6f0f0fe948d458ab7927a5d17265a7571d36152c79494",
+        "bytes": 52223
+      },
+      "directory": "/tmp/plato-phase4-harness-fix3-author/final-temp/test_real_failed_workers_retai0/failure",
+      "returncode": 1,
+      "timed_out": false,
+      "forced": [],
+      "survivors": [],
+      "processes": {
+        "15878": 1791077487.838377
+      },
+      "malformed_events": [],
+      "child_registrations": [],
+      "registration_errors": [],
+      "unresolved_child_hints": [],
+      "errors": [
+        "worker did not exit naturally with valid evidence",
+        "missing unique final parent success event",
+        "failed, skipped, or mismatched case event",
+        "worker traceback or asynchronous diagnostic"
+      ]
+    },
+    {
+      "receipt": {
+        "path": "/tmp/plato-phase4-harness-fix3-author/final-temp/test_real_failed_workers_retai1/failure/result.json",
+        "sha256": "d8fca273e3b718b2707e1357cfcab004297f6006b4cb7eaf603d9d514689d58e",
+        "bytes": 52078
+      },
+      "directory": "/tmp/plato-phase4-harness-fix3-author/final-temp/test_real_failed_workers_retai1/failure",
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [],
+      "survivors": [],
+      "processes": {
+        "15883": 1791077489.466605
+      },
+      "malformed_events": [
+        "events-bad.jsonl: Expecting value: line 1 column 1 (char 0)"
+      ],
+      "child_registrations": [],
+      "registration_errors": [],
+      "unresolved_child_hints": [],
+      "errors": [
+        "worker did not exit naturally with valid evidence"
+      ]
+    },
+    {
+      "receipt": {
+        "path": "/tmp/plato-phase4-harness-fix3-author/final-temp/test_real_failed_workers_retai2/failure/result.json",
+        "sha256": "204c361a08fd5fd25ad146366ea4196ce4b12d22f283561852647a4a18bb2878",
+        "bytes": 38918
+      },
+      "directory": "/tmp/plato-phase4-harness-fix3-author/final-temp/test_real_failed_workers_retai2/failure",
+      "returncode": -15,
+      "timed_out": true,
+      "forced": [
+        "TERM"
+      ],
+      "survivors": [],
+      "processes": {
+        "15893": 1791077491.106381,
+        "15895": 1791077491.924152
+      },
+      "malformed_events": [],
+      "child_registrations": [
+        {
+          "case_id": "contract",
+          "registration_id": "e51a08af8dee28f1ab1f7c75bee3937f",
+          "reporter_pid": 15893,
+          "reporter_created": 1791077491.106381,
+          "child_pid": 15895,
+          "child_created": 1791077491.924152,
+          "disposition": "registered"
+        }
+      ],
+      "registration_errors": [],
+      "unresolved_child_hints": [],
+      "errors": [
+        "worker did not exit naturally with valid evidence",
+        "missing unique final parent success event",
+        "missing source provenance"
+      ]
+    },
+    {
+      "receipt": {
+        "path": "/tmp/plato-phase4-harness-fix3-author/final-temp/test_real_failed_workers_retai3/failure/result.json",
+        "sha256": "df7a1ba25c1d45bbafc435dcc375140d007fec70b8a1da0923b13c9152a8ffbf",
+        "bytes": 52267
+      },
+      "directory": "/tmp/plato-phase4-harness-fix3-author/final-temp/test_real_failed_workers_retai3/failure",
+      "returncode": 1,
+      "timed_out": false,
+      "forced": [],
+      "survivors": [],
+      "processes": {
+        "15903": 1791077494.69408
+      },
+      "malformed_events": [],
+      "child_registrations": [],
+      "registration_errors": [],
+      "unresolved_child_hints": [],
+      "errors": [
+        "worker did not exit naturally with valid evidence",
+        "missing unique final parent success event",
+        "failed, skipped, or mismatched case event",
+        "worker traceback or asynchronous diagnostic"
+      ]
+    },
+    {
+      "receipt": {
+        "path": "/tmp/plato-phase4-harness-fix3-author/final-temp/test_real_failed_workers_retai4/failure/result.json",
+        "sha256": "f1a652a932894aaeaba86bf6d8c92b7fa37137a3240c227c603e5a201426c71c",
+        "bytes": 51845
+      },
+      "directory": "/tmp/plato-phase4-harness-fix3-author/final-temp/test_real_failed_workers_retai4/failure",
+      "returncode": 1,
+      "timed_out": false,
+      "forced": [],
+      "survivors": [],
+      "processes": {
+        "15911": 1791077496.35024
+      },
+      "malformed_events": [],
+      "child_registrations": [],
+      "registration_errors": [],
+      "unresolved_child_hints": [],
+      "errors": [
+        "worker did not exit naturally with valid evidence",
+        "missing unique final parent success event",
+        "source identity mismatch",
+        "worker traceback or asynchronous diagnostic"
+      ]
+    },
+    {
+      "receipt": {
+        "path": "/tmp/plato-phase4-harness-fix3-author/final-temp/test_real_failed_workers_retai5/failure/result.json",
+        "sha256": "0bd82f0c3a9395e361861dba73137b272370175a66a17912ea942b84173d7b2e",
+        "bytes": 52159
+      },
+      "directory": "/tmp/plato-phase4-harness-fix3-author/final-temp/test_real_failed_workers_retai5/failure",
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [],
+      "survivors": [],
+      "processes": {
+        "15941": 1791077497.991617
+      },
+      "malformed_events": [],
+      "child_registrations": [],
+      "registration_errors": [],
+      "unresolved_child_hints": [],
+      "errors": [
+        "missing unique final parent success event"
+      ]
+    },
+    {
+      "receipt": {
+        "path": "/tmp/plato-phase4-harness-fix3-author/final-temp/test_real_failed_workers_retai6/failure/result.json",
+        "sha256": "d25b422bbc260ebae83752220567aa7c2864120e1c6bb4533518cb1fef5aa9f3",
+        "bytes": 52065
+      },
+      "directory": "/tmp/plato-phase4-harness-fix3-author/final-temp/test_real_failed_workers_retai6/failure",
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [],
+      "survivors": [],
+      "processes": {
+        "15951": 1791077499.678025
+      },
+      "malformed_events": [
+        "events-15951.jsonl: invalid provenance snapshot"
+      ],
+      "child_registrations": [],
+      "registration_errors": [],
+      "unresolved_child_hints": [],
+      "errors": [
+        "worker did not exit naturally with valid evidence"
+      ]
+    },
+    {
+      "receipt": {
+        "path": "/tmp/plato-phase4-harness-fix3-author/final-temp/test_real_worker_natural_exit_0/success/result.json",
+        "sha256": "186de253554e41575a86c959ee51d613ccf0f449bf51a9949a9aaaf1a0df1859",
+        "bytes": 52284
+      },
+      "directory": "/tmp/plato-phase4-harness-fix3-author/final-temp/test_real_worker_natural_exit_0/success",
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [],
+      "survivors": [],
+      "processes": {
+        "15838": 1791077484.465321
+      },
+      "malformed_events": [],
+      "child_registrations": [],
+      "registration_errors": [],
+      "unresolved_child_hints": [],
+      "errors": []
+    },
+    {
+      "receipt": {
+        "path": "/tmp/plato-phase4-harness-fix3-author/final-temp/test_real_worker_natural_exit_1/success/result.json",
+        "sha256": "e9ecb1a4e142c8d0c5e1223c356148d7f8afb0dbd91c4c4ad58063e3e0621d69",
+        "bytes": 52399
+      },
+      "directory": "/tmp/plato-phase4-harness-fix3-author/final-temp/test_real_worker_natural_exit_1/success",
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [],
+      "survivors": [],
+      "processes": {
+        "15852": 1791077486.121382
+      },
+      "malformed_events": [],
+      "child_registrations": [],
+      "registration_errors": [],
+      "unresolved_child_hints": [],
+      "errors": []
+    },
+    {
+      "receipt": {
+        "path": "/tmp/plato-phase4-harness-fix3-author/final-temp/test_rejected_registration_fai0/rejected/result.json",
+        "sha256": "1276e97ea0ec5666ca76db627157e2b448c0ac9d03806514a24ce7c707717641",
+        "bytes": 53147
+      },
+      "directory": "/tmp/plato-phase4-harness-fix3-author/final-temp/test_rejected_registration_fai0/rejected",
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [],
+      "survivors": [],
+      "processes": {
+        "16254": 1791077543.923733
+      },
+      "malformed_events": [],
+      "child_registrations": [],
+      "registration_errors": [
+        "ValueError: child registration authentication failed"
+      ],
+      "unresolved_child_hints": [],
+      "errors": [
+        "child_started lacks matching acknowledged registration",
+        "child registration error: ValueError: child registration authentication failed",
+        "failed, skipped, or mismatched case event"
+      ]
+    },
+    {
+      "receipt": {
+        "path": "/tmp/plato-phase4-harness-fix3-author/final-temp/test_self_registration_fails_w0/self-registration/result.json",
+        "sha256": "dcdc8edd3e10b05119d7b4970fefcddfcae8a2f3a1e8a2131beab92095d61723",
+        "bytes": 52587
+      },
+      "directory": "/tmp/plato-phase4-harness-fix3-author/final-temp/test_self_registration_fails_w0/self-registration",
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [],
+      "survivors": [],
+      "processes": {
+        "16264": 1791077545.520368
+      },
+      "malformed_events": [],
+      "child_registrations": [],
+      "registration_errors": [],
+      "unresolved_child_hints": [],
+      "errors": [
+        "failed, skipped, or mismatched case event"
+      ]
+    },
+    {
+      "receipt": {
+        "path": "/tmp/plato-phase4-harness-fix3-author/final-temp/test_unrelated_process_identit0/unrelated/result.json",
+        "sha256": "7998fe3bf54c9b9e30eb683115cbe8f610a990ffe4e25ced1bd4643eec45ccab",
+        "bytes": 52542
+      },
+      "directory": "/tmp/plato-phase4-harness-fix3-author/final-temp/test_unrelated_process_identit0/unrelated",
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [],
+      "survivors": [],
+      "processes": {
+        "15962": 1791077501.405512
+      },
+      "malformed_events": [],
+      "child_registrations": [
+        {
+          "case_id": "contract",
+          "registration_id": "06cb2580db0f4386e6130381cfd24afc",
+          "reporter_pid": 15962,
+          "reporter_created": 1791077501.405512,
+          "child_pid": 15959,
+          "child_created": 1791077502.033996,
+          "disposition": "already_gone"
+        }
+      ],
+      "registration_errors": [],
+      "unresolved_child_hints": [],
+      "errors": []
+    },
+    {
+      "receipt": {
+        "path": "/tmp/plato-phase4-harness-fix3-author/final-temp/test_valid_unrelated_process_i0/unrelated/result.json",
+        "sha256": "c26fc5aea5b39d9747ce76ba4d6ca0f4ab3ed77d0504335a1f15ab66e7541c92",
+        "bytes": 35019
+      },
+      "directory": "/tmp/plato-phase4-harness-fix3-author/final-temp/test_valid_unrelated_process_i0/unrelated",
+      "returncode": 1,
+      "timed_out": false,
+      "forced": [],
+      "survivors": [],
+      "processes": {
+        "15972": 1791077502.993501
+      },
+      "malformed_events": [],
+      "child_registrations": [],
+      "registration_errors": [
+        "ValueError: child has no independently proven owned lineage/session"
+      ],
+      "unresolved_child_hints": [
+        {
+          "pid": 15970,
+          "created": 1791077502.622894
+        }
+      ],
+      "errors": [
+        "child_started lacks matching acknowledged registration",
+        "unresolved live child hints; ownership unproven and no signal authorized",
+        "child registration error: ValueError: child has no independently proven owned lineage/session",
+        "worker did not exit naturally with valid evidence",
+        "missing unique final parent success event",
+        "missing configured event",
+        "missing source provenance",
+        "failed, skipped, or mismatched case event",
+        "worker traceback or asynchronous diagnostic"
+      ]
+    }
+  ],
+  "local_failure_receipts": [
+    {
+      "events": {
+        "path": "/tmp/plato-phase4-harness-fix3-author/final-temp/test_failed_acknowledgment_is_0/events-15684.jsonl",
+        "sha256": "ed529dd706452dee646ee917e6de8f2c8c0cb9580b526065d3a187d382a026e3",
+        "bytes": 697
+      },
+      "failure": {
+        "case_id": "contract-case",
+        "type": "ChildRegistrationError",
+        "message": "child registration failed: KeyError: 'PLATO_PHASE4_REGISTRATION'",
+        "registration_id": "3327f69e5e88a6f6b2d95abce778ebfe",
+        "local_child_owned": true,
+        "local_child_identity": {
+          "pid": 16270,
+          "created": 1791077546.79907
+        },
+        "local_cleanup": {
+          "forced": [
+            "TERM"
+          ],
+          "survivors": [],
+          "errors": []
+        },
+        "pid": 15684,
+        "created": 1791077470.171674,
+        "monotonic": 1940243.823144,
+        "event": "failure"
+      }
+    },
+    {
+      "events": {
+        "path": "/tmp/plato-phase4-harness-fix3-author/final-temp/test_failed_acknowledgment_is_1/events-15684.jsonl",
+        "sha256": "f2afb67290c86e5cb7480e25076a81071ce05ad5d07f9ed34dc48e6189b456a6",
+        "bytes": 710
+      },
+      "failure": {
+        "case_id": "contract-case",
+        "type": "ChildRegistrationError",
+        "message": "child registration failed: ValueError: invalid child registration endpoint",
+        "registration_id": "3130ab138e8584eecfd559d70fc9881c",
+        "local_child_owned": true,
+        "local_child_identity": {
+          "pid": 16271,
+          "created": 1791077546.844154
+        },
+        "local_cleanup": {
+          "forced": [
+            "TERM"
+          ],
+          "survivors": [],
+          "errors": []
+        },
+        "pid": 15684,
+        "created": 1791077470.171674,
+        "monotonic": 1940243.859254375,
+        "event": "failure"
+      }
+    },
+    {
+      "events": {
+        "path": "/tmp/plato-phase4-harness-fix3-author/final-temp/test_failed_acknowledgment_is_2/events-15684.jsonl",
+        "sha256": "72502e715a41c68efa44d6df209afe2cc36e13fd1e5d246af3c6036defdac7f6",
+        "bytes": 724
+      },
+      "failure": {
+        "case_id": "contract-case",
+        "type": "ChildRegistrationError",
+        "message": "child registration failed: RuntimeError: child registration was rejected or mismatched",
+        "registration_id": "0bc5b55a0dfdf8a5d4a6cb68df8c61d8",
+        "local_child_owned": true,
+        "local_child_identity": {
+          "pid": 16272,
+          "created": 1791077546.879439
+        },
+        "local_cleanup": {
+          "forced": [
+            "TERM"
+          ],
+          "survivors": [],
+          "errors": []
+        },
+        "pid": 15684,
+        "created": 1791077470.171674,
+        "monotonic": 1940243.892621791,
+        "event": "failure"
+      }
+    },
+    {
+      "events": {
+        "path": "/tmp/plato-phase4-harness-fix3-author/final-temp/test_failed_acknowledgment_is_3/events-15684.jsonl",
+        "sha256": "ab3adc5653ab689268082c2184b81913ad730b28b2bb3b438b4a0d666b9c71a5",
+        "bytes": 688
+      },
+      "failure": {
+        "case_id": "contract-case",
+        "type": "ChildRegistrationError",
+        "message": "child registration failed: TimeoutError: timed out",
+        "registration_id": "dad6b1dec56bcb63984e1e97d81e836d",
+        "local_child_owned": true,
+        "local_child_identity": {
+          "pid": 16274,
+          "created": 1791077546.913242
+        },
+        "local_cleanup": {
+          "forced": [
+            "TERM"
+          ],
+          "survivors": [],
+          "errors": []
+        },
+        "pid": 15684,
+        "created": 1791077470.171674,
+        "monotonic": 1940248.939804666,
+        "event": "failure"
+      }
+    },
+    {
+      "events": {
+        "path": "/tmp/plato-phase4-harness-fix3-author/final-temp/test_failed_acknowledgment_is_4/events-15684.jsonl",
+        "sha256": "41b73ffe315b198da081c4a1c23fb3d569cffc8880690ad894cd240b518f7237",
+        "bytes": 688
+      },
+      "failure": {
+        "case_id": "contract-case",
+        "type": "ChildRegistrationError",
+        "message": "child registration failed: TimeoutError: timed out",
+        "registration_id": "5d2935dad83107116cddee9ef459b179",
+        "local_child_owned": true,
+        "local_child_identity": {
+          "pid": 16302,
+          "created": 1791077551.977819
+        },
+        "local_cleanup": {
+          "forced": [
+            "TERM"
+          ],
+          "survivors": [],
+          "errors": []
+        },
+        "pid": 15684,
+        "created": 1791077470.171674,
+        "monotonic": 1940254.014971458,
+        "event": "failure"
+      }
+    },
+    {
+      "events": {
+        "path": "/tmp/plato-phase4-harness-fix3-author/final-temp/test_supervisor_termination_be0/events-15684.jsonl",
+        "sha256": "ff5698d8c64badcc52a1dd5a2a634d59f500004022e20e8156cb2074e6fe3be9",
+        "bytes": 728
+      },
+      "failure": {
+        "case_id": "contract-case",
+        "type": "ChildRegistrationError",
+        "message": "child registration failed: ConnectionError: child registration closed before acknowledgment",
+        "registration_id": "8e4da4a7beb719dfdc96bcd995859c18",
+        "local_child_owned": true,
+        "local_child_identity": {
+          "pid": 16311,
+          "created": 1791077557.079916
+        },
+        "local_cleanup": {
+          "forced": [
+            "TERM"
+          ],
+          "survivors": [],
+          "errors": []
+        },
+        "pid": 15684,
+        "created": 1791077470.171674,
+        "monotonic": 1940254.10529025,
+        "event": "failure"
+      }
+    }
+  ],
+  "post_fixture_liveness": {
+    "path": "/tmp/plato-phase4-harness-fix3-author/artifacts/owned-liveness-after-final.json",
+    "sha256": "75235e0e4149836cfd0b244a7354d30f258b1aeb2c44a95cfe9b4130efc771b4",
+    "bytes": 51
+  },
+  "environment": {
+    "executable": "/tmp/plato-phase4-harness-fix3-author/env/bin/python",
+    "prefix": "/tmp/plato-phase4-harness-fix3-author/env",
+    "version": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+    "packages": {
+      "pytest": "9.1.1",
+      "ty": "0.0.84",
+      "ruff": "0.16.10",
+      "torch": "2.14.1",
+      "numpy": "2.5.3",
+      "psutil": "7.2.2",
+      "opacus": "1.6.0",
+      "kazoo": "2.11.0",
+      "gymnasium": "1.3.0",
+      "ptflops": "0.7.5",
+      "mlx": "0.32.3",
+      "mlx-metal": "0.32.3",
+      "lighteval": "0.13.0",
+      "nltk": "3.10.3"
+    }
+  },
+  "provisioning": {
+    "shell": "zsh -lc",
+    "only_new_owned_environment": true,
+    "command": "UV_PROJECT_ENVIRONMENT=/tmp/plato-phase4-harness-fix3-author/env uv sync --locked --python 3.13 --group test-model-search --group dev --extra mlx --extra llm_eval",
+    "log": {
+      "path": "/tmp/plato-phase4-harness-fix3-author/artifacts/provision.log",
+      "sha256": "09ac257a690398a89e600eb6ae47706a4ea326ee6a3f30c0c50090181ed0354c",
+      "bytes": 4136
+    },
+    "nltk_resource_copy": "Read-only copy from fix2-author/nltk_data into new fix3-author/nltk_data; no old environment synchronized.",
+    "pyproject": {
+      "path": "/private/tmp/plato-refresh-worktrees/phase4-harness-fix3/pyproject.toml",
+      "sha256": "fcc830f9fac66f2e2f28bef0d715bea3eb1300105a4239bb33cce8f62b71b398",
+      "bytes": 4102
+    },
+    "lock": {
+      "path": "/private/tmp/plato-refresh-worktrees/phase4-harness-fix3/uv.lock",
+      "sha256": "66a4e4442d7b1f26d220b44ca73c44ff4f1151a86857bb3f93a594819fd08126",
+      "bytes": 755641
+    },
+    "python_version_file": {
+      "path": "/private/tmp/plato-refresh-worktrees/phase4-harness-fix3/.python-version",
+      "sha256": "02e735b3dfe1c32833eb550b7ff8ffa17f5f2bc3fa1e7bae61a8f5a3883ce398",
+      "bytes": 5
+    }
+  },
+  "scope_preserved": {
+    "public_api_signatures_unchanged": true,
+    "all399_accepted_source_hashes_unchanged": true,
+    "draft_ledger_unchanged": true,
+    "all12_tasks_draft_and_cases_empty": true,
+    "all92_previous_contract_nodeids_preserved": true,
+    "additional_contract_nodes": 8,
+    "prior_unrelated_utf8_numeric_and_acknowledgment_fixes_preserved": true,
+    "owned_typing_diagnostics": 0,
+    "production_metadata_lock_workflow_family_changes": false,
+    "nested_agents_push_pr_external_messages": false
+  },
+  "raw_artifact_archive": {
+    "path": "/tmp/plato-phase4-harness-fix3-author/phase4-harness-fix3-raw-evidence.tar.gz",
+    "sha256": "ad50572753f9c03f2cd6ca10a405847c6a2558b6835050db6f206e29bcf3b7f1",
+    "bytes": 4497583
+  },
+  "limits": [
+    "The prior independent review was interrupted with a reproduced material finding; it supplies no acceptance. A different fresh implementation review is required.",
+    "Unproven live direct hints fail and never authorize signals. Unknown detached orphans cannot be claimed cleanly contained by the helper; controlled fixture owners recover their own exact processes.",
+    "All12 task rows remain draft and empty; synthetic harness checks establish no family qualification.",
+    "Exact native383/runtime51(startup48+FedDyn3)/retained19/eval11 inventories preserved. Full training/runtime suites were not repeated."
+  ]
+}

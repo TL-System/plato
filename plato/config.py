@@ -12,6 +12,8 @@ import tomllib
 from pathlib import Path
 from typing import Any, Optional
 
+from plato.utils.retired_backends import raise_if_retired_config
+
 _CLI_ARG_NOT_SUPPLIED = object()
 
 import numpy as np
@@ -294,6 +296,7 @@ class Config:
                 raw_config = loader.load()
                 config = ConfigNode.from_object(raw_config)
             else:
+                raise_if_retired_config(filename)
                 usage = parser.format_usage().strip()
                 raise SystemExit(
                     "Please provide a configuration file using the '-c' option.\n"

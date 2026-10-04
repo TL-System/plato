@@ -43,9 +43,6 @@ class Datasource:
     def targets(self):
         return self.trainset.targets
 
-    def get_modality_name(self):
-        return ["rgb", "audio", "flow"]
-
 
 def assert_numpy_state_equal(before, rng=None):
     after = (np.random if rng is None else rng).get_state()
@@ -287,15 +284,10 @@ def test_single_dirichlet_partition_can_use_entire_dataset():
     np.testing.assert_array_equal(proportions, [1.0])
 
 
-def test_modality_quantity_single_modality_fallback(temp_config):
-    class ImageOnlySource:
-        pass
-
-    sampler = registry.get(
-        ImageOnlySource(), 1, sampler_type="modality_quantity_noniid"
-    )
-    assert list(sampler.get()) == ["rgb"]
-    assert sampler.modality_size() == 1
+@pytest.mark.parametrize("name", ["modality_iid", "modality_quantity_noniid"])
+def test_retired_modality_masks_fail_before_datasource_access(temp_config, name):
+    with pytest.raises(ValueError, match="retired.*modality-samplers/README.md"):
+        registry.get(object(), 1, sampler_type=name)
 
 
 def test_infeasible_dirichlet_minimum_fails_promptly():

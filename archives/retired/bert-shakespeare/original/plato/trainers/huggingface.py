@@ -1,0 +1,1167 @@
+"""
+Strategy-based trainer for HuggingFace transformer models.
+
+This implementation uses Plato's composable trainer architecture by wiring
+HuggingFace data handling through strategy objects instead of overriding
+`load_model`/`save_model` hooks.
+
+"""
+
+import copy
+import json
+import logging
+import math
+import os
+import pickle
+import tempfile
+from collections.abc import Iterable, Mapping, Sequence
+from pathlib import Path
+from typing import TYPE_CHECKING, Any, Dict, Optional, Tuple, TypeGuard, Union, cast
+
+import torch
+import torch.nn.functional as F
+import torch.utils.data
+from transformers import (
+    AutoConfig,
+    AutoTokenizer,
+    HfArgumentParser,
+    LlamaTokenizer,
+    TrainingArguments,
+)
+from transformers import (
+    TrainerCallback as HFTrainerCallback,
+)
+from transformers.trainer_callback import TrainerControl, TrainerState
+
+from plato.callbacks.trainer import TrainerCallback as PlatoTrainerCallback
+from plato.config import Config
+from plato.datasources import registry as datasources_registry
+from plato.serialization.safetensor import deserialize_tree, serialize_tree
+from plato.trainers.composable import ComposableTrainer
+from plato.trainers.strategies import CustomCollateFnDataLoaderStrategy
+from plato.trainers.strategies.base import (
+    TestingStrategy,
+    TrainingContext,
+    TrainingStepStrategy,
+)
+from plato.utils.checkpoint_paths import (
+    checkpoint_name,
+    checkpoint_path,
+    checkpoint_sidecar,
+    snapshot_details,
+)
+from plato.utils.huggingface import (
+    adapter_save_embeddings,
+    artifact_identity,
+    pretrained_kwargs,
+)
+
+if TYPE_CHECKING:
+    from peft import PeftModel
+
+
+class HuggingFaceBatch(dict):
+    """Dictionary-style batch that supports `.to(device)` like torch tensors."""
+
+    def to(self, device):
+        for key, value in self.items():
+            if hasattr(value, "to"):
+                self[key] = value.to(device)
+        return self
+
+
+class HuggingFaceCollateWrapper:
+    """Pad variable-length token batches while keeping labels separate."""
+
+    def __init__(self, tokenizer):
+        if tokenizer is None or not hasattr(tokenizer, "pad"):
+            raise ValueError(
+                "HuggingFaceCollateWrapper requires a tokenizer with pad() support."
+            )
+        self.tokenizer = tokenizer
+
+    @staticmethod
+    def _to_list(value):
+        if hasattr(value, "tolist"):
+            value = value.tolist()
+        elif isinstance(value, tuple):
+            value = list(value)
+        return value
+
+    def _normalize_example(self, example: dict[str, Any]) -> dict[str, Any]:
+        """Flatten nested tokenizer payloads stored under input_ids."""
+        normalized = dict(example)
+        nested_inputs = normalized.get("input_ids")
+        if isinstance(nested_inputs, Mapping) and "input_ids" in nested_inputs:
+            normalized["input_ids"] = self._to_list(nested_inputs["input_ids"])
+
+            nested_attention = nested_inputs.get("attention_mask")
+            current_attention = normalized.get("attention_mask")
+            normalized_input_ids = normalized.get("input_ids")
+            current_attention = self._to_list(current_attention)
+
+            if nested_attention is not None:
+                nested_attention = self._to_list(nested_attention)
+            if (
+                nested_attention is not None
+                and isinstance(normalized_input_ids, list)
+                and (
+                    not isinstance(current_attention, list)
+                    or len(current_attention) != len(normalized_input_ids)
+                )
+            ):
+                normalized["attention_mask"] = nested_attention
+
+        return normalized
+
+    def _pad_labels(
+        self,
+        label_rows: list[list[int]],
+        sequence_length: int,
+        *,
+        padding_side: str = "right",
+    ) -> torch.Tensor:
+        padded = torch.full(
+            (len(label_rows), sequence_length),
+            -100,
+            dtype=torch.long,
+        )
+        for index, row in enumerate(label_rows):
+            row_tensor = torch.tensor(row, dtype=torch.long)
+            length = min(sequence_length, row_tensor.numel())
+            if length <= 0:
+                continue
+            if padding_side == "left":
+                padded[index, sequence_length - length :] = row_tensor[-length:]
+            else:
+                padded[index, :length] = row_tensor[:length]
+        return padded
+
+    def __call__(
+        self, examples: Iterable[dict]
+    ) -> tuple[HuggingFaceBatch, torch.Tensor | None]:
+        example_list = [self._normalize_example(dict(example)) for example in examples]
+        if not example_list:
+            raise ValueError("HuggingFace collator received an empty batch.")
+
+        feature_rows = [
+            {k: v for k, v in example.items() if k != "labels"}
+            for example in example_list
+        ]
+
+        padding_side = getattr(self.tokenizer, "padding_side", "right")
+        batch = self.tokenizer.pad(
+            feature_rows,
+            padding=True,
+            return_tensors="pt",
+        )
+
+        batch = HuggingFaceBatch(batch)
+        labels_raw = [example.get("labels") for example in example_list]
+        labels = None
+        if any(label is not None for label in labels_raw):
+            normalized_rows = [
+                list(label) if label is not None else list(example["input_ids"])
+                for example, label in zip(example_list, labels_raw, strict=False)
+            ]
+            labels = self._pad_labels(
+                normalized_rows,
+                batch["input_ids"].shape[1],
+                padding_side=padding_side,
+            )
+        else:
+            input_ids = batch.get("input_ids")
+            if input_ids is not None:
+                labels = input_ids.clone()
+                attention_mask = batch.get("attention_mask")
+                if attention_mask is not None:
+                    labels = labels.masked_fill(attention_mask == 0, -100)
+                elif self.tokenizer.pad_token_id is not None:
+                    labels = labels.masked_fill(
+                        labels == self.tokenizer.pad_token_id, -100
+                    )
+
+        return batch, labels
+
+
+def _resolve_hf_loss(outputs, labels, *, allow_fallback: bool = True):
+    """
+    Resolve a loss tensor from HuggingFace model outputs.
+
+    Args:
+        outputs: HuggingFace model outputs (ModelOutput, tuple, tensor, etc.).
+        labels: Labels tensor if available.
+        allow_fallback: Whether to compute loss manually when not provided.
+
+    Returns:
+        A torch.Tensor representing the loss.
+
+    Raises:
+        ValueError: If no loss tensor can be determined.
+    """
+    loss = getattr(outputs, "loss", None)
+    if loss is None:
+        if isinstance(outputs, dict):
+            loss = outputs.get("loss")
+        elif isinstance(outputs, tuple) and len(outputs) > 0:
+            loss = outputs[0]
+        else:
+            loss = outputs
+
+    if torch.is_tensor(loss):
+        return loss
+
+    if not allow_fallback:
+        raise ValueError("HuggingFace model did not return a tensor loss.")
+
+    logits = getattr(outputs, "logits", None)
+    if logits is None and isinstance(outputs, dict):
+        logits = outputs.get("logits")
+    if logits is None and isinstance(outputs, tuple) and len(outputs) > 0:
+        logits = outputs[0]
+
+    if logits is None or labels is None:
+        logits_shape = None if logits is None else tuple(logits.shape)
+        labels_shape = None if labels is None else tuple(labels.shape)
+        logging.error(
+            "Unable to resolve HuggingFace loss: logits=%s labels=%s outputs_type=%s",
+            "None" if logits is None else f"{type(logits)} shape={logits_shape}",
+            "None" if labels is None else f"{type(labels)} shape={labels_shape}",
+            type(outputs),
+        )
+        if hasattr(outputs, "keys"):
+            logging.error("Outputs keys: %s", list(outputs.keys()))
+        elif isinstance(outputs, tuple):
+            logging.error("Outputs tuple length: %d", len(outputs))
+        raise ValueError("HuggingFace model did not return a tensor loss.")
+
+    logits = logits.to(labels.device) if labels.device != logits.device else logits
+    labels = labels.to(logits.device)
+
+    vocab_size = logits.size(-1)
+    if logits.ndim > 2:
+        shift_logits = logits[..., :-1, :].contiguous()
+        shift_labels = labels[..., 1:].contiguous()
+        if shift_logits.numel() > 0:
+            logits = shift_logits
+            labels = shift_labels
+
+    logits_flat = logits.view(-1, vocab_size)
+    labels_flat = labels.view(-1)
+    valid_mask = labels_flat != -100
+    if not torch.any(valid_mask):
+        return torch.tensor(0.0, device=logits.device, dtype=logits.dtype)
+
+    loss = F.cross_entropy(
+        logits_flat,
+        labels_flat,
+        ignore_index=-100,
+    )
+    return loss
+
+
+class HuggingFaceTrainingStepStrategy(TrainingStepStrategy):
+    """Performs forward/backward steps with optional gradient accumulation."""
+
+    def __init__(self, gradient_accumulation_steps: int | None = None):
+        self.gradient_accumulation_steps = (
+            int(gradient_accumulation_steps) if gradient_accumulation_steps else 1
+        )
+
+    def setup(self, context: TrainingContext) -> None:
+        """Ensure gradient accumulation state is initialized."""
+        context.state.setdefault("grad_accum_counter", 0)
+        context.state.setdefault("grad_accum_loss_total", 0.0)
+        context.state.setdefault("grad_accum_loss_count", 0)
+
+    def get_accumulation_steps(self, context: TrainingContext) -> int:
+        """Return configured gradient accumulation steps."""
+        steps = context.config.get("gradient_accumulation_steps")
+        if steps is None:
+            steps = self.gradient_accumulation_steps
+        try:
+            steps = int(steps)
+        except (TypeError, ValueError):
+            steps = 1
+        return max(steps, 1)
+
+    def optimizer_steps_per_epoch(self, batches: int) -> int:
+        """Account for accumulation, including a partial final window."""
+        return math.ceil(batches / max(self.gradient_accumulation_steps, 1))
+
+    def _normalize_partial_window(self, optimizer, context: TrainingContext) -> None:
+        """Average a tail window over its actual number of microbatches."""
+        counter = int(context.state.get("grad_accum_counter", 0))
+        accumulation_steps = self.get_accumulation_steps(context)
+        if 0 < counter < accumulation_steps:
+            correction = accumulation_steps / counter
+            for group in optimizer.param_groups:
+                for parameter in group["params"]:
+                    if parameter.grad is not None:
+                        parameter.grad.mul_(correction)
+
+    def training_step(
+        self,
+        model,
+        optimizer,
+        examples,
+        labels,
+        loss_criterion,  # pylint: disable=unused-argument
+        context: TrainingContext,
+    ):
+        accum_steps = self.get_accumulation_steps(context)
+        counter = int(context.state.get("grad_accum_counter", 0))
+
+        if counter == 0:
+            optimizer.zero_grad()
+
+        batch_inputs = dict(examples)
+        if labels is not None:
+            batch_inputs["labels"] = labels
+        batch_inputs.setdefault("return_dict", True)
+
+        outputs = model(**batch_inputs)
+        labels_tensor = batch_inputs.get("labels")
+        loss = _resolve_hf_loss(outputs, labels_tensor)
+
+        loss_for_backward = loss.div(accum_steps) if accum_steps > 1 else loss
+        loss_for_backward.backward()
+
+        counter += 1
+        context.state["grad_accum_counter"] = counter
+        loss_detached = loss.detach()
+        context.state["grad_accum_loss_total"] = (
+            context.state.get("grad_accum_loss_total", 0.0) + loss_detached.item()
+        )
+        context.state["grad_accum_loss_count"] = (
+            context.state.get("grad_accum_loss_count", 0) + 1
+        )
+
+        should_step = counter >= accum_steps
+        if not should_step and context.state.get("is_last_batch", False):
+            should_step = counter > 0
+
+        trainer = context.state.get("hf_trainer")
+
+        if should_step:
+            self._normalize_partial_window(optimizer, context)
+            if trainer is not None:
+                trainer._hf_on_pre_optimizer_step()
+
+            optimizer.step()
+
+            if trainer is not None:
+                trainer._hf_on_optimizer_step()
+
+            optimizer.zero_grad()
+
+            loss_total = context.state.get("grad_accum_loss_total", 0.0)
+            loss_count = max(context.state.get("grad_accum_loss_count", 0), 1)
+            context.state["hf_loss_for_step"] = loss_total / loss_count
+            context.state["grad_accum_loss_total"] = 0.0
+            context.state["grad_accum_loss_count"] = 0
+            context.state["optimizer_step_completed"] = True
+            context.state["hf_optimizer_step_index"] = (
+                context.state.get("hf_optimizer_step_index", 0) + 1
+            )
+            context.state["grad_accum_counter"] = 0
+        else:
+            context.state["optimizer_step_completed"] = False
+
+        return loss_detached
+
+    def finalize(self, model, optimizer, context: TrainingContext):
+        """
+        Flush any remaining accumulated gradients (e.g., partial final micro-batch).
+
+        Returns a detached loss tensor representative of the accumulated step
+        when a step is executed, otherwise None.
+        """
+        counter = int(context.state.get("grad_accum_counter", 0))
+        if counter == 0:
+            context.state["optimizer_step_completed"] = False
+            return None
+
+        self._normalize_partial_window(optimizer, context)
+        trainer = context.state.get("hf_trainer")
+        if trainer is not None:
+            trainer._hf_on_pre_optimizer_step()
+
+        optimizer.step()
+
+        if trainer is not None:
+            trainer._hf_on_optimizer_step()
+
+        optimizer.zero_grad()
+
+        loss_total = context.state.get("grad_accum_loss_total", 0.0)
+        loss_count = max(context.state.get("grad_accum_loss_count", 0), 1)
+        average_loss = loss_total / loss_count if loss_count else 0.0
+        context.state["hf_loss_for_step"] = average_loss
+        context.state["grad_accum_loss_total"] = 0.0
+        context.state["grad_accum_loss_count"] = 0
+        context.state["grad_accum_counter"] = 0
+        context.state["optimizer_step_completed"] = True
+        context.state["hf_optimizer_step_index"] = (
+            context.state.get("hf_optimizer_step_index", 0) + 1
+        )
+
+        if context.device is not None:
+            loss_tensor = torch.tensor(average_loss, device=context.device)
+        else:
+            loss_tensor = torch.tensor(average_loss)
+        return loss_tensor.detach()
+
+
+class HuggingFaceTestingStrategy(TestingStrategy):
+    """Evaluates HuggingFace models and reports perplexity based on loss."""
+
+    def __init__(self, collate_fn: HuggingFaceCollateWrapper):
+        self.collate_fn = collate_fn
+
+    def test_model(self, model, config, testset, sampler, context: TrainingContext):
+        batch_size = config.get("batch_size", 1)
+
+        # Resolve sampler into a torch sampler when provided.
+        if sampler is not None:
+            if isinstance(sampler, torch.utils.data.Sampler):
+                sampler_obj = sampler
+            elif isinstance(sampler, (list, range)):
+                sampler_obj = torch.utils.data.SubsetRandomSampler(sampler)
+            elif hasattr(sampler, "get"):
+                sampler_obj = sampler.get()
+            else:
+                sampler_obj = sampler
+        else:
+            sampler_obj = None
+
+        data_loader = torch.utils.data.DataLoader(
+            testset,
+            batch_size=batch_size,
+            shuffle=False,
+            sampler=sampler_obj,
+            collate_fn=self.collate_fn,
+        )
+
+        model.to(context.device)
+        model.eval()
+        context.state["eval_loader"] = data_loader
+
+        total_loss = 0.0
+        total_weight = 0
+
+        with torch.no_grad():
+            for batch_inputs, labels in data_loader:
+                batch_inputs = batch_inputs.to(context.device)
+                if labels is not None:
+                    labels = labels.to(context.device)
+                    batch_inputs["labels"] = labels
+
+                batch_inputs.setdefault("return_dict", True)
+                outputs = model(**batch_inputs)
+                loss = _resolve_hf_loss(outputs, labels)
+
+                if labels is not None:
+                    weight = labels.ne(-100).sum().item()
+                    if weight == 0:
+                        continue
+                else:
+                    weight = 1
+
+                total_loss += loss.item() * weight
+                total_weight += weight
+
+        model.train()
+        context.state.pop("eval_loader", None)
+
+        if total_weight == 0:
+            return float("inf")
+
+        avg_loss = total_loss / total_weight
+        try:
+            return math.exp(avg_loss)
+        except OverflowError:
+            return float("inf")
+
+
+def _split_callback_types(
+    callbacks: Sequence[type | object] | None,
+) -> tuple[Sequence[type | object], Sequence[type | object]]:
+    """Separate HuggingFace callbacks from Plato trainer callbacks."""
+    if not callbacks:
+        return [], []
+
+    hf_callbacks = []
+    plato_callbacks = []
+    for callback in callbacks:
+        callback_cls = callback if isinstance(callback, type) else callback.__class__
+        if isinstance(callback_cls, type) and issubclass(
+            callback_cls, HFTrainerCallback
+        ):
+            hf_callbacks.append(callback)
+        elif isinstance(callback, HFTrainerCallback):
+            hf_callbacks.append(callback)
+        else:
+            plato_callbacks.append(callback)
+    return hf_callbacks, plato_callbacks
+
+
+class HuggingFaceCallbackBridge(PlatoTrainerCallback):
+    """Adapter that invokes HuggingFace callbacks via Plato callback events."""
+
+    def __init__(self, trainer: "Trainer"):
+        self._trainer = trainer
+
+    def on_train_run_start(self, trainer, config, **kwargs):
+        self._trainer._hf_on_train_begin(config)
+
+    def on_train_run_end(self, trainer, config, **kwargs):
+        self._trainer._hf_on_train_end()
+
+    def on_train_epoch_start(self, trainer, config, **kwargs):
+        self._trainer._hf_on_epoch_begin()
+
+    def on_train_epoch_end(self, trainer, config, **kwargs):
+        self._trainer._hf_on_epoch_end()
+
+    def on_train_step_start(self, trainer, config, batch, **kwargs):
+        counter = trainer.context.state.get("grad_accum_counter", 0)
+        if counter == 0:
+            self._trainer._hf_on_step_begin(batch)
+
+    def on_train_step_end(self, trainer, config, batch, loss, **kwargs):
+        if not trainer.context.state.get("optimizer_step_completed", True):
+            return
+        self._trainer._hf_on_step_end(batch, loss)
+        self._trainer._hf_handle_control_flags()
+
+
+class Trainer(ComposableTrainer):
+    """Composable HuggingFace trainer built on Plato's strategy API."""
+
+    training_args: TrainingArguments
+
+    def __init__(self, model=None, callbacks=None):
+        hf_callbacks, plato_callbacks = _split_callback_types(callbacks)
+
+        self._hf_callbacks: list[HFTrainerCallback] = []
+        self._hf_bridge: HuggingFaceCallbackBridge | None = None
+        self._hf_state = TrainerState()
+        self._hf_control = TrainerControl()
+        self._hf_steps_per_epoch: int | None = None
+        self._gradient_checkpointing_prepared = False
+
+        parser = HfArgumentParser(cast(Any, TrainingArguments))
+        (training_args,) = parser.parse_args_into_dataclasses(
+            args=[
+                "--output_dir=" + Config.params["checkpoint_path"],
+                "--report_to=none",
+            ]
+        )
+        self.training_args = cast(TrainingArguments, training_args)
+
+        identity = artifact_identity()
+        model_name = identity["model_name"]
+        tokenizer_name = identity["tokenizer_name"]
+        config_kwargs = pretrained_kwargs(
+            revision=identity["model_revision"],
+            cache_dir=Config().params["model_path"] + "/huggingface",
+        )
+        self.config = AutoConfig.from_pretrained(model_name, **config_kwargs)
+
+        tokenizer_loader: Any = (
+            LlamaTokenizer if "llama" in tokenizer_name else AutoTokenizer
+        )
+        tokenizer_kwargs = pretrained_kwargs(
+            revision=identity["tokenizer_revision"],
+            cache_dir=Config().params["data_path"] + "/huggingface",
+        )
+        tokenizer_kwargs.update(config=self.config, use_fast=True)
+        self.tokenizer: Any = tokenizer_loader.from_pretrained(
+            tokenizer_name,
+            **tokenizer_kwargs,
+        )
+
+        tokenizer = self.tokenizer
+        if getattr(tokenizer, "pad_token_id", None) is None:
+            eos_token = getattr(tokenizer, "eos_token", None)
+            if eos_token is not None:
+                tokenizer.pad_token = eos_token
+
+        grad_accum_steps = getattr(Config().trainer, "gradient_accumulation_steps", 1)
+        try:
+            grad_accum_steps = int(grad_accum_steps)
+        except (TypeError, ValueError):
+            grad_accum_steps = 1
+        self._gradient_accumulation_steps = max(grad_accum_steps, 1)
+        self._collate_wrapper = HuggingFaceCollateWrapper(tokenizer)
+        self.training_args.gradient_accumulation_steps = (
+            self._gradient_accumulation_steps
+        )
+        self.training_args.gradient_checkpointing = bool(
+            getattr(Config().trainer, "gradient_checkpointing", False)
+        )
+        self.training_args.bf16 = bool(getattr(Config().trainer, "bf16", False))
+        self.training_args.fp16 = bool(getattr(Config().trainer, "fp16", False))
+
+        plato_callbacks_list = list(plato_callbacks)
+
+        super().__init__(
+            model=model,
+            callbacks=plato_callbacks_list,
+            loss_strategy=None,
+            optimizer_strategy=None,
+            training_step_strategy=HuggingFaceTrainingStepStrategy(
+                gradient_accumulation_steps=self._gradient_accumulation_steps
+            ),
+            lr_scheduler_strategy=None,
+            model_update_strategy=None,
+            data_loader_strategy=CustomCollateFnDataLoaderStrategy(
+                collate_fn=self._collate_wrapper,
+                num_workers=0,
+                pin_memory=True,
+            ),
+            testing_strategy=HuggingFaceTestingStrategy(self._collate_wrapper),
+        )
+
+        if hf_callbacks:
+            self.add_callbacks(hf_callbacks)
+
+        model_instance = self._require_model()
+        if hasattr(model_instance, "loss_type"):
+            setattr(model_instance, "loss_type", "ForCausalLM")
+
+        tokenizer_vocab_size = None
+        if hasattr(self.tokenizer, "__len__"):
+            try:
+                tokenizer_vocab_size = len(self.tokenizer)
+            except TypeError:
+                tokenizer_vocab_size = None
+        embedding_getter = getattr(model_instance, "get_input_embeddings", None)
+        embedding_resizer = getattr(model_instance, "resize_token_embeddings", None)
+        if callable(embedding_getter):
+            embeddings = embedding_getter()
+            embedding_size = getattr(embeddings, "num_embeddings", None)
+            original_vocab_size = getattr(self.config, "vocab_size", None)
+            if (
+                isinstance(embedding_size, int)
+                and isinstance(original_vocab_size, int)
+                and embedding_size != original_vocab_size
+            ):
+                # A supplied PEFT model may already have been resized. Its own
+                # config then holds the new size; use the pinned original config.
+                setattr(model_instance, "plato_save_embedding_layers", True)
+            if (
+                tokenizer_vocab_size is not None
+                and callable(embedding_resizer)
+                and embedding_size is not None
+                and embedding_size < tokenizer_vocab_size
+            ):
+                embedding_resizer(tokenizer_vocab_size)
+                setattr(model_instance, "plato_save_embedding_layers", True)
+
+        if self.training_args.gradient_checkpointing:
+            model_config = getattr(model_instance, "config", None)
+            if model_config is not None and hasattr(model_config, "use_cache"):
+                setattr(model_config, "use_cache", False)
+
+        # Ensure model checkpoints can be saved when model names include slashes.
+        params = Config().params
+        try:
+            model_path = params["model_path"]
+        except (TypeError, KeyError):
+            model_path = None
+        sub_dir = os.path.dirname(model_name)
+        if model_path and sub_dir:
+            os.makedirs(os.path.join(model_path, sub_dir), exist_ok=True)
+        self.context.state["hf_trainer"] = self
+        self.context.state["grad_accum_counter"] = 0
+        self.context.state["grad_accum_loss_total"] = 0.0
+        self.context.state["grad_accum_loss_count"] = 0
+        self._hf_pending_keys = (
+            "save",
+            "evaluate",
+            "log",
+            "stop_epoch",
+            "stop_training",
+        )
+        self._hf_pending_actions = {key: False for key in self._hf_pending_keys}
+        self._hf_pending_log_data = None
+
+    def add_callbacks(self, callbacks: Sequence[type | object]):
+        """
+        Add callbacks to the HuggingFace trainer.
+
+        HuggingFace TrainerCallbacks are stored for future integration, while
+        Plato trainer callbacks are registered with the composable callback
+        handler.
+        """
+        hf_callbacks, plato_callbacks = _split_callback_types(callbacks)
+
+        for callback in hf_callbacks:
+            instance = callback() if isinstance(callback, type) else callback
+            callback_cls = instance.__class__
+            if not isinstance(instance, HFTrainerCallback):
+                raise ValueError(
+                    f"HuggingFace trainer expects subclass of {HFTrainerCallback}, got {callback_cls}."
+                )
+            self._hf_callbacks.append(instance)
+
+        if self._hf_callbacks:
+            self._ensure_hf_bridge()
+
+        if plato_callbacks:
+            self.callback_handler.add_callbacks(plato_callbacks)
+
+    def _ensure_hf_bridge(self):
+        if self._hf_bridge is None:
+            self._hf_bridge = HuggingFaceCallbackBridge(self)
+            self.callback_handler.add_callbacks([self._hf_bridge])
+
+    def _prepare_model_for_training(self):
+        """Apply model mutations that must happen inside the training process."""
+        if not self.training_args.gradient_checkpointing:
+            return
+
+        model_instance = self._require_model()
+        model_config = getattr(model_instance, "config", None)
+        if model_config is not None and hasattr(model_config, "use_cache"):
+            setattr(model_config, "use_cache", False)
+
+        if self._gradient_checkpointing_prepared:
+            return
+
+        enable_gradient_checkpointing = getattr(
+            model_instance, "gradient_checkpointing_enable", None
+        )
+        if callable(enable_gradient_checkpointing):
+            enable_gradient_checkpointing()
+
+        self._gradient_checkpointing_prepared = True
+
+    def train_model(self, config, trainset, sampler, **kwargs):
+        """Update HuggingFace training arguments before delegating to strategies."""
+        seed = config.get("random_seed")
+        if seed is not None:
+            self.training_args.seed = int(seed)
+            torch.manual_seed(int(seed) + self.client_id)
+        self.training_args.num_train_epochs = config["epochs"]
+        self.training_args.per_device_train_batch_size = config["batch_size"]
+        accum_steps = config.get(
+            "gradient_accumulation_steps", self._gradient_accumulation_steps
+        )
+        try:
+            accum_steps = int(accum_steps)
+        except (TypeError, ValueError):
+            accum_steps = 1
+        accum_steps = max(accum_steps, 1)
+        self.training_args.gradient_accumulation_steps = accum_steps
+        self._gradient_accumulation_steps = accum_steps
+        if hasattr(self.training_step_strategy, "gradient_accumulation_steps"):
+            setattr(
+                self.training_step_strategy,
+                "gradient_accumulation_steps",
+                accum_steps,
+            )
+        self.context.state["grad_accum_counter"] = 0
+        self.context.state["grad_accum_loss_total"] = 0.0
+        self.context.state["grad_accum_loss_count"] = 0
+        self.context.state["hf_optimizer_step_index"] = 0
+        if self._hf_callbacks:
+            self._hf_state = TrainerState()
+            self._hf_control = TrainerControl()
+            self._hf_state.num_train_epochs = config.get("epochs", 1)
+            self._hf_state.max_steps = 0
+            self._hf_steps_per_epoch = None
+            self._hf_pending_actions = {key: False for key in self._hf_pending_keys}
+            self._hf_pending_log_data = None
+        self._prepare_model_for_training()
+        return super().train_model(config, trainset, sampler, **kwargs)
+
+    def test_model(self, config, testset, sampler=None, **kwargs):
+        """Update HuggingFace evaluation batch size before testing."""
+        self.training_args.per_device_eval_batch_size = config.get("batch_size", 1)
+        result = super().test_model(config, testset, sampler=sampler, **kwargs)
+        if self._hf_callbacks:
+            metrics = (
+                {"perplexity": result} if isinstance(result, (int, float)) else result
+            )
+            self._hf_on_evaluate(metrics)
+        return result
+
+    def save_model(self, filename=None, location=None):
+        """Save PEFT adapters or a full model using Plato's checkpoint contract."""
+        model = self._require_model()
+        if self._is_peft_model(model):
+            from safetensors.torch import load_file
+
+            root, path = self._adapter_checkpoint_path(filename, location)
+            os.makedirs(os.path.dirname(path), exist_ok=True)
+            identity = artifact_identity()
+            # Export with PEFT's native API; retain Plato's single-file tree and
+            # history format for worker handoff and asynchronous snapshots.
+            with tempfile.TemporaryDirectory() as export_dir:
+                model.save_pretrained(
+                    export_dir, save_embedding_layers=adapter_save_embeddings(model)
+                )
+                state = load_file(os.path.join(export_dir, "adapter_model.safetensors"))
+                adapter_config = json.loads(
+                    Path(export_dir, "adapter_config.json").read_text()
+                )
+            adapter_config["base_model_name_or_path"] = identity["model_name"]
+            adapter_config["revision"] = identity["model_revision"]
+            with open(path, "wb") as checkpoint:
+                checkpoint.write(serialize_tree(state))
+            metadata_path = checkpoint_sidecar(root, path, ".hf")
+            Path(metadata_path).write_text(
+                json.dumps(
+                    {"artifacts": identity, "adapter_config": adapter_config}, indent=2
+                )
+                + "\n"
+            )
+            with open(checkpoint_sidecar(root, path), "wb") as history:
+                pickle.dump(self.run_history, history)
+        else:
+            super().save_model(filename=filename, location=location)
+        if self._hf_callbacks:
+            self._hf_call_callbacks("on_save", model=self._require_model())
+            self._hf_handle_control_flags()
+
+    @staticmethod
+    def _is_peft_model(model) -> TypeGuard["PeftModel"]:
+        from peft import PeftModel
+
+        return isinstance(model, PeftModel)
+
+    @staticmethod
+    def _adapter_checkpoint_path(filename, location):
+        root = Config().params["model_path"] if location is None else location
+        name = (
+            filename
+            if filename is not None
+            else checkpoint_name(Config().trainer.model_name, suffix=".safetensors")
+        )
+        path = checkpoint_path(root, name)
+        if not path.endswith(".safetensors"):
+            raise ValueError("HuggingFace adapter checkpoints require .safetensors.")
+        return root, path
+
+    @staticmethod
+    def _load_adapter(model, root, path):
+        from peft import get_peft_model_state_dict, set_peft_model_state_dict
+
+        metadata = json.loads(Path(checkpoint_sidecar(root, path, ".hf")).read_text())
+        if metadata["artifacts"] != artifact_identity():
+            raise ValueError("Adapter checkpoint model/tokenizer identity mismatch.")
+        with open(path, "rb") as checkpoint:
+            state = deserialize_tree(checkpoint.read())
+        expected = get_peft_model_state_dict(
+            model, save_embedding_layers=adapter_save_embeddings(model)
+        )
+        if not isinstance(state, dict) or state.keys() != expected.keys():
+            raise ValueError("Adapter checkpoint keys do not match the PEFT model.")
+        for key, tensor in state.items():
+            if tensor.shape != expected[key].shape:
+                raise ValueError(f"Adapter checkpoint shape mismatch: {key}")
+        set_peft_model_state_dict(model, state)
+
+    def load_model(self, filename=None, location=None):
+        """Restore adapters in place, retaining the frozen pretrained base."""
+        model = self._require_model()
+        if not self._is_peft_model(model):
+            return super().load_model(filename=filename, location=location)
+        root, path = self._adapter_checkpoint_path(filename, location)
+        self._load_adapter(model, root, path)
+        history_path = checkpoint_sidecar(root, path)
+        if os.path.exists(history_path):
+            with open(history_path, "rb") as history:
+                self.run_history = pickle.load(history)
+
+    def obtain_model_at_time(self, client_id, requested_time):
+        """Restore an adapter snapshot without altering the active base/model."""
+        if not self._is_peft_model(self._require_model()):
+            return super().obtain_model_at_time(client_id, requested_time)
+        root = Config().params["model_path"]
+        candidates = []
+        for filename in os.listdir(root):
+            details = snapshot_details(filename)
+            if (
+                details is not None
+                and details[0] == client_id
+                and details[2] < requested_time
+                and filename.endswith(".safetensors")
+            ):
+                candidates.append((details[2], details[1], filename))
+        if not candidates:
+            raise ValueError(f"Cannot find an adapter snapshot for client {client_id}.")
+        _, _, filename = max(candidates)
+        model = copy.deepcopy(self._require_model())
+        self._load_adapter(model, root, checkpoint_path(root, filename))
+        return model
+
+    # --- HuggingFace callback integration helpers ---
+
+    def _hf_call_callbacks(self, method: str, **kwargs):
+        for callback in self._hf_callbacks:
+            handler = getattr(callback, method, None)
+            if handler is None:
+                continue
+            result = handler(
+                self.training_args, self._hf_state, self._hf_control, **kwargs
+            )
+            if isinstance(result, TrainerControl):
+                self._hf_control = result
+
+    def _hf_on_train_begin(self, config):
+        self._hf_control._new_training()
+        self._hf_state.global_step = 0
+        self._hf_state.epoch = 0
+        self._hf_pending_actions = {key: False for key in self._hf_pending_keys}
+        self._hf_pending_log_data = None
+        model = self._require_model()
+        self._hf_call_callbacks(
+            "on_train_begin",
+            model=model,
+            tokenizer=self.tokenizer,
+            train_dataloader=self.train_loader,
+        )
+
+    def _hf_on_train_end(self):
+        model = self._require_model()
+        self._hf_call_callbacks(
+            "on_train_end",
+            model=model,
+            tokenizer=self.tokenizer,
+            train_dataloader=self.train_loader,
+        )
+        self._hf_handle_control_flags()
+
+    def _hf_update_training_metadata(self):
+        if self.train_loader is None:
+            return
+        if self._hf_steps_per_epoch is None:
+            try:
+                steps = len(self.train_loader)
+            except TypeError:
+                steps = None
+            if steps:
+                get_steps = getattr(
+                    self.training_step_strategy, "get_accumulation_steps", None
+                )
+                if callable(get_steps):
+                    accum_steps = get_steps(self.context)
+                    if accum_steps > 0:
+                        steps = math.ceil(steps / accum_steps)
+                self._hf_steps_per_epoch = steps
+                self._hf_state.max_steps = steps * self._hf_state.num_train_epochs
+                batch_size = getattr(self.train_loader, "batch_size", None)
+                self._hf_state.train_batch_size = batch_size
+
+    def _hf_on_epoch_begin(self):
+        self._hf_control._new_epoch()
+        self._hf_update_training_metadata()
+        current_epoch = max(self.current_epoch - 1, 0)
+        self._hf_state.epoch = float(current_epoch)
+        model = self._require_model()
+        self._hf_call_callbacks(
+            "on_epoch_begin",
+            model=model,
+            tokenizer=self.tokenizer,
+            optimizer=self.optimizer,
+            lr_scheduler=self.lr_scheduler,
+            train_dataloader=self.train_loader,
+        )
+        self._hf_handle_control_flags()
+
+    def _hf_on_epoch_end(self):
+        self._hf_state.epoch = float(self.current_epoch)
+        model = self._require_model()
+        self._hf_call_callbacks(
+            "on_epoch_end",
+            model=model,
+            tokenizer=self.tokenizer,
+            optimizer=self.optimizer,
+            lr_scheduler=self.lr_scheduler,
+            train_dataloader=self.train_loader,
+        )
+        self._hf_handle_control_flags()
+
+    def _hf_on_step_begin(self, batch_index: int):
+        self._hf_control._new_step()
+        model = self._require_model()
+        self._hf_call_callbacks(
+            "on_step_begin",
+            model=model,
+            tokenizer=self.tokenizer,
+            optimizer=self.optimizer,
+            lr_scheduler=self.lr_scheduler,
+            train_dataloader=self.train_loader,
+            step=batch_index,
+        )
+        self._hf_handle_control_flags()
+
+    def _hf_on_pre_optimizer_step(self):
+        model = self._require_model()
+        self._hf_call_callbacks(
+            "on_pre_optimizer_step",
+            model=model,
+            tokenizer=self.tokenizer,
+            optimizer=self.optimizer,
+            lr_scheduler=self.lr_scheduler,
+        )
+
+    def _hf_on_optimizer_step(self):
+        model = self._require_model()
+        self._hf_call_callbacks(
+            "on_optimizer_step",
+            model=model,
+            tokenizer=self.tokenizer,
+            optimizer=self.optimizer,
+            lr_scheduler=self.lr_scheduler,
+        )
+
+    def _hf_on_step_end(self, batch_index: int, loss: torch.Tensor):
+        model = self._require_model()
+        if self._hf_steps_per_epoch:
+            step_index = self.context.state.get("hf_optimizer_step_index")
+            if step_index is None:
+                progress = (batch_index + 1) / self._hf_steps_per_epoch
+            else:
+                progress = step_index / self._hf_steps_per_epoch
+            progress = min(progress, 1.0)
+            self._hf_state.epoch = float(self.current_epoch - 1 + progress)
+        self._hf_state.global_step += 1
+        loss_override = self.context.state.pop("hf_loss_for_step", None)
+        if loss_override is not None:
+            loss_value = float(loss_override)
+        else:
+            loss_value = loss.item() if hasattr(loss, "item") else float(loss)
+        log_entry = {
+            "loss": float(loss_value),
+            "step": self._hf_state.global_step,
+            "epoch": self._hf_state.epoch,
+        }
+        current_lr = self._get_current_lr()
+        if current_lr is not None:
+            log_entry["learning_rate"] = current_lr
+        sanitized_entry = {
+            key: float(value)
+            for key, value in log_entry.items()
+            if isinstance(value, (int, float))
+        }
+        self._hf_state.log_history.append(sanitized_entry)
+        self._hf_pending_log_data = log_entry
+        self._hf_call_callbacks(
+            "on_step_end",
+            model=model,
+            tokenizer=self.tokenizer,
+            optimizer=self.optimizer,
+            lr_scheduler=self.lr_scheduler,
+            train_dataloader=self.train_loader,
+            metrics={"loss": loss_value},
+        )
+
+    def _hf_on_evaluate(self, metrics):
+        model = self._require_model()
+        self._hf_call_callbacks(
+            "on_evaluate",
+            model=model,
+            tokenizer=self.tokenizer,
+            metrics=metrics,
+            eval_dataloader=self.context.state.get("eval_loader"),
+        )
+        self._hf_handle_control_flags()
+
+    def _hf_handle_control_flags(self):
+        if not self._hf_callbacks:
+            return
+
+        control = self._hf_control
+
+        if control.should_save:
+            self._hf_pending_actions["save"] = True
+            control.should_save = False
+
+        if control.should_evaluate:
+            self._hf_pending_actions["evaluate"] = True
+            control.should_evaluate = False
+
+        if control.should_log:
+            self._hf_pending_actions["log"] = True
+            control.should_log = False
+
+        if control.should_epoch_stop:
+            self._hf_pending_actions["stop_epoch"] = True
+            control.should_epoch_stop = False
+
+        if control.should_training_stop:
+            self._hf_pending_actions["stop_training"] = True
+            self._hf_pending_actions["stop_epoch"] = True
+            control.should_training_stop = False
+
+    def _consume_control_flags(self):
+        if not self._hf_callbacks:
+            return {}
+
+        actions = {
+            key: bool(self._hf_pending_actions.get(key))
+            for key in self._hf_pending_keys
+        }
+        self._hf_pending_actions = {key: False for key in self._hf_pending_keys}
+        return actions
+
+    def _handle_control_evaluate(self):
+        metrics = {}
+        try:
+            datasource = datasources_registry.get(client_id=self.client_id)
+            testset = datasource.get_test_set()
+            model = self._require_model()
+            metrics_value = self.testing_strategy.test_model(
+                model,
+                self.context.config,
+                testset,
+                None,
+                self.context,
+            )
+            metrics = {"perplexity": metrics_value}
+        except Exception as exc:
+            logging.warning(
+                "HuggingFace trainer failed to run evaluation requested by callback: %s",
+                exc,
+            )
+        finally:
+            self._hf_on_evaluate(metrics)
+
+    def _handle_control_log(self):
+        logs = {}
+        if self._hf_pending_log_data is not None:
+            logs = dict(self._hf_pending_log_data)
+        elif self._hf_state.log_history:
+            logs = dict(self._hf_state.log_history[-1])
+        else:
+            last_loss = self.context.state.get("last_loss")
+            if last_loss is not None:
+                logs = {"loss": float(last_loss)}
+
+        if logs and "learning_rate" not in logs:
+            current_lr = self._get_current_lr()
+            if current_lr is not None:
+                logs["learning_rate"] = current_lr
+
+        model = self._require_model()
+        self._hf_call_callbacks(
+            "on_log",
+            model=model,
+            tokenizer=self.tokenizer,
+            logs=logs,
+        )
+        self._hf_pending_log_data = None
+
+    def _get_current_lr(self):
+        if self.optimizer is None:
+            return None
+        for group in getattr(self.optimizer, "param_groups", []):
+            lr = group.get("lr")
+            if lr is not None:
+                return lr
+        return None

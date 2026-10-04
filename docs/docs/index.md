@@ -33,6 +33,9 @@ Welcome to *Plato*, a software framework to facilitate scalable, reproducible, a
     - **[Model Pruning](examples/algorithms/13. Model Pruning Algorithms.md)**
     - **[Gradient Leakage Attacks and Defences](examples/algorithms/14. Gradient Leakage Attacks and Defences.md)**
 
+    ### Archived Research
+    - **[Archived research examples](examples/archived.md)**
+
     ### Case Studies
     - **[Qwen3 Federated LoRA](examples/case-studies/6. Qwen3 Federated LoRA.md)**
     - **[Federated LoRA Fine-Tuning](examples/case-studies/1. LoRA.md)**

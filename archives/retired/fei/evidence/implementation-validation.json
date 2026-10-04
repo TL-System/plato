@@ -1,0 +1,98 @@
+{
+  "schema_version": 1,
+  "status": "Scoped retirement implementation complete; independent implementation review still required before integration.",
+  "recorded_at_utc": "2026-10-04T03:11:56.124667+00:00",
+  "worktree": "/private/tmp/plato-refresh-worktrees/fei-retirement",
+  "base_commit": "e81248dae1844fb5bc66a8d880c9a17b485606ac",
+  "plan_sha256": "2d46ccccaa35c1753c44c1974d226405d49d04cdd3178812f816879320ed6667",
+  "plan_review_sha256": "2bc7f5a374040880b18f29026881dc91b822d3815cf09ea9b7d73da74cebe303",
+  "source_hashes": {
+    "archives/retired/README.md": "a33214bf234e07ce9dc75d9314fce2e5c4ea0b7dc15ed80b7c08687a4e21f0c2",
+    "archives/retired/fei/README.md": "11079329904c9aaa6bf3255ab5c34eb14fa53daa15d1c3f820ed52dd443d993c",
+    "archives/retired/fei/manifest.json": "8a3c9f73a4a47d1c72034e2116ebe224e6d35c1051f25cebace0cf7cc97b28e9",
+    "tests/conftest.py": "81190a72e82dd3486f09098c4aca4adea1dd520b9bede132fc0600705776b800",
+    "tests/examples_phase4/cases.json": "7d18beab505f3f23cb6b14785c35b4d7a3b5b425b9dd541769e43bcd7b80167a",
+    "tests/test_examples_phase4_contract.py": "ce386d9ee7466a022ac6a59a26ff63d650f416d96c0695589d7152a72f82be9b",
+    "tests/test_fei_retirement.py": "c0673993f98da0a8da42ff0de134296884167e875be1d12ae30bedfce1086ffb"
+  },
+  "validation": {
+    "focused_execution": {
+      "interpreter": "/tmp/plato-phase4-fei-code-review-env/bin/python",
+      "first_command": "python -m pytest tests/test_fei_retirement.py tests/test_examples_phase4_contract.py tests/utils/test_rl_payload_utilities.py -q --basetemp=/tmp/plato-fei-retirement-tests",
+      "first_result": {
+        "passed": 118,
+        "setup_errors": 4,
+        "seconds": 84.97,
+        "cause": "New retirement module imported policy fixture without its profile_source dependency."
+      },
+      "correction": "Imported profile_source alongside policy; import-order and format checks pass.",
+      "unaffected_modules": {
+        "tests/test_examples_phase4_contract.py": {
+          "passed": 100
+        },
+        "tests/utils/test_rl_payload_utilities.py": {
+          "passed": 14
+        }
+      },
+      "affected_module_rerun": {
+        "command": "python -m pytest tests/test_fei_retirement.py -q --basetemp=/tmp/plato-fei-retirement-final-tests",
+        "passed": 8,
+        "failed": 0,
+        "errors": 0,
+        "seconds": 0.06,
+        "log_path": "/tmp/plato-fei-retirement-final-tests.log",
+        "log_sha256": "972f7568fb901b7678945e9d0cd0bbffabce0ef35dd68282a3660689b67836e1",
+        "archived_log": "archives/retired/fei/evidence/retirement-tests.txt",
+        "archived_log_sha256": "972f7568fb901b7678945e9d0cd0bbffabce0ef35dd68282a3660689b67836e1"
+      },
+      "unique_passed_after_correction": 122,
+      "limits": "Only affected module rerun after fixture correction; first combined command was not a successful qualification run."
+    },
+    "ordinary_collection": {
+      "command": "python -m pytest tests --test-profile=base --collect-only -q",
+      "exit_code": 0,
+      "collected": 1743,
+      "seconds": 0.98,
+      "phase4_worker_nodes": 0,
+      "archive_nodes": 0,
+      "log_path": "/tmp/plato-fei-retirement-base-collection.log",
+      "log_sha256": "305f74ffac13c07c0e84cb219f24d1b633a1affa35053ec80e6a9e875c30e1db",
+      "meaning": "Collection only; no full-suite execution qualification."
+    },
+    "reference_audit": {
+      "command": "rg -n -i fei plato examples configs docs .github pyproject.toml README.md",
+      "exit_code": 1,
+      "matches": 0,
+      "conclusion": "No active FEI references remain; historical evidence/archive references retained."
+    },
+    "packaging": {
+      "command": "uv build --sdist --wheel --out-dir /tmp/plato-fei-retirement-dist",
+      "exit_code": 0,
+      "distributions": [
+        {
+          "path": "/tmp/plato-fei-retirement-dist/plato_learn-1.4.3-py3-none-any.whl",
+          "sha256": "5e300e5a00b575557cd0ca5c948d956772fb7229a470bdbead2ac1333ced79dd",
+          "members": 213,
+          "archive_or_obsolete_fei_members": []
+        },
+        {
+          "path": "/tmp/plato-fei-retirement-dist/plato_learn-1.4.3.tar.gz",
+          "sha256": "c0e3442c290b2122ec6e9603177faeb4e4c99daa05720be96dbcec167c9feea5",
+          "members": 1530,
+          "archive_or_obsolete_fei_members": []
+        }
+      ]
+    },
+    "lint": {
+      "command": "ruff check tests/test_fei_retirement.py tests/test_examples_phase4_contract.py tests/conftest.py --select I",
+      "exit_code": 0,
+      "new_test_format_check": 0,
+      "git_diff_check": 0
+    }
+  },
+  "limits": [
+    "No full training-suite rerun, FEI repair, or research/accuracy qualification.",
+    "Original archived source and historical authority evidence retain their prior audited identities.",
+    "Raw PDF-containing review archive remains external; no new FEI CI step."
+  ]
+}

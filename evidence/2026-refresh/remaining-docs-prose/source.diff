@@ -1,0 +1,647 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index 60d8b079..80617ae6 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -4,10 +4,11 @@
+ Plato's core runtime lives in `plato/`. Key submodules include `algorithms/` (federated strategies), `clients/` plus `client.py` (orchestration logic), `servers/` (coordination), `trainers/` (model/optimizer loops), and supporting layers in `datasources/`, `samplers/`, `processors/`, and `utils/`. Scenario definitions sit under `configs/<dataset>/` as TOML, while reproducible research case studies live in `examples/` with their own workspace entries described in `pyproject.toml`. Shared documentation is under `docs/`, and automated checks are centralized in `tests/`.
+ 
+ ## Build, Test, and Development Commands
+-- `uv sync` provisions dependencies declared in `pyproject.toml` and `uv.lock`.
++- `uv sync --locked --python 3.13` provisions dependencies declared in `pyproject.toml` and `uv.lock`.
+ - `source .venv/bin/activate` to activate the Python virtual environment after `uv sync`.
+-- `uv run python plato.py --config configs/MNIST/fedavg_lenet5.toml` launches a reference experiment; swap in different config paths as needed.
+-- `uv run pytest tests` runs the complete suite; scope it with a target like `tests/test_strategies_simple.py` for faster feedback.
++- `uv run --locked python plato.py --config configs/MNIST/fedavg_lenet5.toml` launches a reference experiment; swap in different config paths as needed.
++- `uv run --locked --group test-model-search python -m pytest tests --test-profile=mandatory -ra` runs the mandatory core suite, including retained model-search tests.
++- `uv run --locked --group test-model-search python -m pytest tests/trainers/test_lr_scheduler_registry.py -ra` runs focused scheduler coverage from the repository root.
+ - `uv run ruff check . --select I --fix` enforces the repo's import-order policy before creating a pull request.
+ - When running any shell commands, use `zsh -lc` to load the current `.zshrc` environment.
+ 
+@@ -15,7 +16,14 @@ Plato's core runtime lives in `plato/`. Key submodules include `algorithms/` (fe
+ Follow PEP 8 with 4-space indentation and keep lines ≤88 characters (matching the Ruff configuration). Package and module names stay lowercase with underscores; classes use PascalCase; functions, methods, and variables use snake_case. Prefer explicit type hints on new public APIs, and keep docstrings concise but descriptive. TOML configuration keys should remain lowercase_with_underscores.
+ 
+ ## Testing Guidelines
+-Pytest is the standard harness. Add focused unit tests alongside the closest existing coverage (e.g., new server logic belongs near `tests/test_strategies_integration.py`). Integration scenarios should exercise their TOML configs via lightweight smoke tests when practical. Use deterministic seeds (see `server.random_seed` in configs) to make failures reproducible, and include negative-path or degradation checks whenever behaviour may regress existing algorithms.
++Pytest is the standard harness. Add focused unit tests alongside the closest existing coverage (e.g., new server logic belongs near `tests/servers/test_fedavg_strategy.py`). Integration scenarios should exercise their TOML configs via lightweight smoke tests when practical. Use deterministic seeds (see `server.random_seed` in configs) to make failures reproducible, and include negative-path or degradation checks whenever behaviour may regress existing algorithms.
++
++Ordinary `pytest tests` and the mandatory profile exclude native MLX, Lighteval
++runtime, and Phase 4 example qualification directories. Follow the separate
++[native MLX checks](docs/docs/mlx.md#run-native-checks),
++[Lighteval runtime qualification](docs/docs/references/evaluators.md#optional-runtime-qualification),
++and [Phase 4 inventory](tests/examples_phase4/cases.json) with its collection
++policy in `tests/conftest.py`. A core suite pass does not qualify those workloads.
+ 
+ ## Commit & Pull Request Guidelines
+ Match the Git history by writing sentence-style commit subjects with initial capitals and closing periods (e.g., “Refactored FedBuff for the new strategy API.”). Group related changes per commit, and include a brief body if context is non-obvious. Pull requests should outline the motivation, enumerate config or interface changes, link tracking issues, and attach experiment metrics or logs when altering training behaviour. Mention required follow-up work explicitly to aid other contributors.
+diff --git a/docs/README.md b/docs/README.md
+index 9954971d..f5017a95 100644
+--- a/docs/README.md
++++ b/docs/README.md
+@@ -1,21 +1,25 @@
+-To install Material for MkDocs, run:
++# Building and previewing the documentation
+ 
+-```bash
+-uv venv
+-source .venv/bin/activate
+-uv pip install mkdocs-material
+-```
++Run commands from the repository root with Python 3.13 and uv available.
++The [installation guide](docs/install.md#building-the-documentation) describes
++the locked docs environment and its configurable paths.
+ 
+-To serve the website for development, run:
++Build the static website:
+ 
+ ```bash
+-mkdocs serve
++PLATO_DOCS_PYTHON="$(uv python find 3.13)" ./docs/build.sh
+ ```
+ 
+-To compile it to a static website, run:
++The build script provisions `.venv-docs` from the root lockfile, checks dependency
++parity, and runs MkDocs in strict mode. The HTML output is in `docs/site`.
++It provisions `.venv-docs-bootstrap` only if uv 0.12.22 is not already available.
++
++After a successful build, preview edits with the provisioned docs interpreter:
+ 
+ ```bash
+-mkdocs build
++.venv-docs/bin/python -m mkdocs serve --strict -f docs/mkdocs.yml
+ ```
+ 
+-The static website will be available in `/sites` directory.
++Open `http://127.0.0.1:8000/` and stop the server with `Ctrl-C` when finished.
++If you set `PLATO_DOCS_ENVIRONMENT` for the build, use that environment's
++`bin/python` in the serve command as well.
+diff --git a/docs/docs/ccdb.md b/docs/docs/ccdb.md
+index c60ccfd0..35fdaee4 100644
+--- a/docs/docs/ccdb.md
++++ b/docs/docs/ccdb.md
+@@ -1,223 +1,173 @@
+-## Installation
++# Digital Research Alliance of Canada
+ 
+-SSH into a cluster on Digital Research Alliance of Canada. Here we take [Narval](https://docs.alliancecan.ca/wiki/Narval) as an example, while [Rorqual](https://docs.alliancecan.ca/wiki/Rorqual/en) is also available.
++## Prepare a checkout
+ 
+-```bash
+-ssh <CCDB username>@narval.computecanada.ca
+-cd projects/def-baochun/<CCDB username>
+-```
+-
+-!!! note "Note"
+-    You could also use `/scratch/<CCDB username>` to store temporary files using next command.
+-    ```bash
+-    cd /scratch/<CCDB username>
+-    ```
++This is a preparation and Slurm job template for Python 3.13. Adapt the cluster
++hostname, allocation account, storage paths, module stack, and requested
++resources to your site. Consult the Alliance [available software](https://docs.alliancecan.ca/wiki/Available_software),
++[Python](https://docs.alliancecan.ca/wiki/Python), and
++[running jobs](https://docs.alliancecan.ca/wiki/Running_jobs) documentation.
++Site references include [Narval](https://docs.alliancecan.ca/wiki/Narval) and
++[Rorqual](https://docs.alliancecan.ca/wiki/Rorqual/en); check the destination
++and resource instructions for your allocation.
+ 
+-Then clone the *Plato* repository to your own directory:
+-```
+-git clone https://github.com/TL-System/plato
+-```
++Current module availability, Plato package/wheel and CUDA compatibility, offline
++assets, allocation policy, and actual cluster execution have not been verified
++for this template. Direct retrieval of those official pages during this refresh
++returned BotStopper Access Denied; this guide does not infer a current site-wide
++installation procedure or compute-node networking policy from them.
+ 
+-Your CCDB username can be located after signing into the [CCDB portal](https://ccdb.computecanada.ca/). Contact Baochun Li (`bli@ece.toronto.edu`) for a new account on Digital Research Alliance of Canada.
+-
+-## Preparing the Python Runtime Environment
+-
+-First, load version 3.12 of the Python programming language:
+-
+-To discover the versions of Python available:
++Use your existing [CCDB account](https://ccdb.computecanada.ca/) and an approved
++project or scratch location. Replace every angle-bracket placeholder before
++running the following commands:
+ 
+ ```bash
+-module avail python
++ssh <username>@<cluster-hostname>
++cd <approved-project-directory>
++git clone https://github.com/TL-System/plato.git
++cd plato
+ ```
+ 
+-Load version 3.12 of the Python programming language:
++## Prepare Python and dependencies before submission
+ 
+-```bash
+-module load python/3.12
+-```
++Discover the Python modules available on the target cluster:
+ 
+-You can then create your own Python virtual environment (for example, one called .federated):
+ ```bash
+-virtualenv --no-download ~/.federated # creating your own virtual environment
+-source ~/.federated/bin/activate
++module avail python
++module spider python
+ ```
+ 
+-Then install uv if it's not already available:
++Select an available Python 3.13 module and any prerequisite modules required by
++the site. Use the same module stack when preparing the environment and running
++the job; no fixed module name is assumed here.
+ 
+ ```bash
+-curl -LsSf https://astral.sh/uv/install.sh | sh
+-source $HOME/.local/bin/env
++module load <site-python-3.13-module>
++python -c 'import sys; assert sys.version_info[:2] == (3, 13), sys.version'
+ ```
+ 
+-Now you can run Plato with `uv run`:
++Make uv 0.12.22 available using the site's approved installation procedure.
++Provision the locked environment on a site-approved preparation host before
++submission, from the checkout root:
+ 
+ ```bash
+-uv run --active plato.py -c configs/MNIST/fedavg_lenet5.toml
+-```
++uv --version
++PLATO_CLUSTER_PYTHON="$(command -v python)"
++UV_PYTHON_DOWNLOADS=never uv sync --locked --python "$PLATO_CLUSTER_PYTHON"
++.venv/bin/python -c 'import sys; assert sys.version_info[:2] == (3, 13), sys.version'
++```
++
++The final interpreter check catches an existing environment with the wrong
++Python version. Use a dedicated checkout/environment for a different module
++stack or dependency selection. Confirm package and accelerator compatibility
++on the target system before committing substantial resources.
++
++The base command above selects the default dependencies. Follow
++[Installation](install.md) for extras and workspace members; provision the
++workload's selected dependencies before submission. For example, Lighteval
++requires the locked `llm_eval` extra and NLTK resources, and `ssl` uses a
++separate environment.
++
++## Prepare datasets and model assets
++
++Provision datasets, model weights, tokenizers, and other required assets on a
++site-approved host with the needed access, before submitting the training job.
++Use the family recipe's explicit preparation steps and point the config at the
++prepared paths. Keep those paths accessible from the allocated compute node.
++
++The [Qwen3 reference](examples/case-studies/6. Qwen3 Federated LoRA.md) describes
++its pinned model and local data. The
++[Lighteval installation steps](install.md#optional-server-side-llm-evaluation-with-lighteval)
++and [runtime qualification](references/evaluators.md#optional-runtime-qualification)
++describe its resources and bounded checks. These guides do not establish
++Alliance cluster compatibility or a complete offline Hugging Face workflow.
++
++For the illustrative MNIST job below, prepare MNIST under the configured data
++path before submission. Check the selected config's data and output paths
++against your storage allocation. Running training on a login node and
++interrupting it is not an asset-preparation recipe.
++
++## Create a batch script
++
++Save the following as `plato_job.sh`, replacing the module, account, and
++absolute checkout path. The CPU MNIST command is illustrative; adjust time,
++memory, CPU/GPU requests, config, and device flags to the workload and site
++policy. CUDA jobs need a compatible module/package stack and site-specific GPU
++resource requests; consult the official job documentation.
+ 
+-In case you wish to exit your Python virtual environment, run the command:
+ ```bash
+-deactivate
+-```
+-
+-!!! note "Note"
+-    Use alias to save trouble for future running *Plato*.
+-
+-    ```
+-    vim ~/.bashrc
+-    ```
+-
+-    Then add
+-
+-    ```
+-    alias plato='cd ~/projects/def-baochun/<CCDB username>/plato/; module load python/3.12; source ~/.federated/bin/activate'
+-    ```
+-
+-    After saving this change and exiting `vim`:
+-
+-    ```
+-    source ~/.bashrc
+-    ```
+-
+-    Next time, after you SSH into this cluster, just type `plato`:)
+-
+-## Running Plato
+-
+-To start a federated learning training workload with *Plato*, create a job script:
+-
+-```bash
+-vi <job script file name>.sh
+-```
+-
+-For exmaple:
+-
+-```bash
+-cd ~/projects/def-baochun/<CCDB username>/plato
+-vi cifar_wideresnet.sh
+-```
+-
+-Then add your configuration parameters in the job script. The following is an example:
+-
+-```
+ #!/bin/bash
+-#SBATCH --time=3:00:00
++#SBATCH --time=01:00:00
+ #SBATCH --nodes=1
+-#SBATCH --gres=gpu:1
+-#SBATCH --mem=128G
+-#SBATCH --account=def-baochun
+-#SBATCH --output=cifar_wideresnet.out
+-
+-module load python/3.12
+-source ~/.federated/bin/activate
+-
+-curl -LsSf https://astral.sh/uv/install.sh | sh
+-source $HOME/.local/bin/env
++#SBATCH --cpus-per-task=2
++#SBATCH --mem=8G
++#SBATCH --account=<allocation-account>
++#SBATCH --output=plato-%j.out
+ 
+-uv run --active plato.py -c configs/CIFAR10/fedavg_wideresnet.toml
++set -euo pipefail
++module load <site-python-3.13-module>
++cd <absolute-path-to-plato-checkout>
++.venv/bin/python -c 'import sys; assert sys.version_info[:2] == (3, 13), sys.version'
++exec .venv/bin/python plato.py --config configs/MNIST/fedavg_lenet5.toml --cpu
+ ```
+ 
+-Submit the job:
++The batch command uses the already provisioned environment directly. Dependency
++resolution, package installation, and asset preparation belong before
++submission. The selected workload must also be configured to use its prepared
++assets; calling the interpreter directly does not prevent a data source from
++attempting downloads when assets are missing.
+ 
+-```bash
+-sbatch <job script file name>.sh
+-```
++## Manage the job
+ 
+-For example:
++After completing preparation and adapting the script, submit it and retain its
++job ID:
+ 
+ ```bash
+-sbatch cifar_wideresnet.sh
++sbatch plato_job.sh
+ ```
+ 
+-To check the status of a submitted job, use the `sq` command. Refer to the [official Computer Canada documentation](https://docs.alliancecan.ca/wiki/Running_jobs#Use_squeue_or_sq_to_list_jobs) for more details.
+-
+-To monitor the output as it is generated live, use the command:
+-
+-```bash
+-watch -n 1 tail -n 50 ./cifar_wideresnet.out
+-```
+-
+-where `./cifar_wideresnet.out` is the output file that needs to be monitored, and the `-n` parameter for `watch` specifies the monitoring frequency in seconds (the default value is 2 seconds), and the `-n` parameter for `tail` specifies the number of lines at the end of the file to be shown. Type `Control + C` to exit the `watch` session.
+-
+-!!! note "Tip"
+-    Make sure you use different `port` numbers under `server` in different jobs' configuration files before submitting your jobs if you plan to run them at the same time. This is because they may be allocated to the same node, which is especially common when you use the `Narval` cluster. In that case, if the `port` and `address` under `server` in your configuration files of the jobs are the same, you will get `OSError: [Errno 48] error while attempting to bind on address: address already in use`.
+-
+-If there is a need to start an interactive session (for debugging purposes, for example), it is also supported by Digital Research Alliance of Canada using the `salloc` command:
++Use the specific ID returned by Slurm to inspect status and output:
+ 
+ ```bash
+-salloc --time=2:00:00 --gres=gpu:1 --mem=64G --account=def-baochun
++squeue --jobs=<job-id>
++sacct --jobs=<job-id>
++tail -f plato-<job-id>.out
+ ```
+ 
+-The job will then be queued and waiting for resources:
+-
+-```
+-salloc: Pending job allocation 53923456
+-salloc: job 53923456 queued and waiting for resources
+-```
+-
+-As soon as your job gets resources, you get the following prompts:
+-
+-```
+-salloc: job 53923456 has been allocated resources
+-salloc: Granted job allocation 53923456
+-```
+-
+-Then you can run *Plato*:
++Stop output monitoring with `Ctrl-C`. To cancel that training job:
+ 
+ ```bash
+-uv run --active plato.py -c configs/CIFAR10/fedavg_wideresnet.toml
++scancel <job-id>
+ ```
+ 
+-After the job is done, use `exit` at the command to relinquish the job allocation.
+-
+-!!! note "Note"
+-    On the Digital Research Alliance of Canada, if there are issues in the code that prevent it from running to completion, the potential issues could be:
++See the Alliance [job-management material](https://docs.alliancecan.ca/mediawiki/images/7/77/Managing_jobs.pdf)
++for the roles of these commands. Submission and cancellation are shown as user
++instructions; neither was executed to validate this guide.
+ 
+-    !!! tip "Out of CUDA memory."
+-        Potential solutions: Decrease the `max_concurrency` value in the `trainer` section in your configuration file.
++For interactive debugging, consult the site's
++[interactive job instructions](https://docs.alliancecan.ca/wiki/Running_jobs#Interactive_jobs)
++and obtain an allocation with the required resources. On the allocated compute
++node, load the same modules, enter the checkout, and use the prepared
++`.venv/bin/python` command. Release the allocation when finished.
+ 
+-    !!! tip "Running processes have not been terminated from previous runs."
+-        Potential solutions: Use the command `pkill python` to terminate them so that there will not be CUDA errors in the upcoming run.
++!!! tip "Concurrent sessions"
++    Use distinct `server.port` values for concurrent sessions that may share a
++    node. Matching bind addresses and ports can cause an address-in-use error.
+ 
+-    !!! tip "The time that a client waits for the server to respond before disconnecting is too short."
+-        This could happen when training with large neural network models. If you get an `AssertionError` saying that there are not enough launched clients for the server to select, this could be the reason. But make sure you first check if it is due to the *out of CUDA memory* error.
++## Troubleshooting
+ 
+-        Potential solutions: Add `ping_timeout` in the `server` section in your configuration file. The default value for `ping_timeout` is 360 (seconds).
++!!! tip "Out of CUDA memory"
++    Decrease `trainer.max_concurrency` in the selected configuration and inspect
++    the failed session's logs and allocated resources.
+ 
++!!! tip "An earlier session is still running"
++    Stop the identified interactive training session with `Ctrl-C`, or cancel
++    its specific scheduler job ID with `scancel`. Verify that the session has
++    released its resources before restarting.
+ 
+-### Running jobs of HuggingFace
+-
+-Running a job of HuggingFace requires connecting to the Internet to download the dataset and the model. However, Digital Research Alliance of Canada doesn't allow Internet connections inside sbatch/salloc. Therefore, they need to be pre-downloaded via the following steps:
+-
+-1. Run the command first outside sbatch/salloc, for example, `uv run --active plato.py -c <your configuration file>`, and use `control + C` to terminate the program right after the first client starts training. After this step, the dataset and the model should be automatically downloaded.
+-
+-2. Switch to running it inside sbatch/salloc, and add `TRANSFORMERS_OFFLINE=1` before the command. The below is a sample job script:
+-
+-```
+-#!/bin/bash
+-#SBATCH --time=4:00:00
+-#SBATCH --nodes=1
+-#SBATCH --gres=gpu:1
+-#SBATCH --mem=498G
+-#SBATCH --account=def-baochun
+-#SBATCH --output=test.out
+-
+-# Limit OpenBLAS threads
+-export OPENBLAS_NUM_THREADS=1
+-export OMP_NUM_THREADS=1
+-export MKL_NUM_THREADS=1
+-
+-module load python/3.12
+-source ~/.federated/bin/activate
+-
+-# Running the test.sh under examples/async/fedbuff
+-TRANSFORMERS_OFFLINE=1 uv run --active fedbuff.py -c fedbuff_cifar10.toml
+-```
+-
+-
+-### Removing the Python virtual environment
+-
+-To remove the environment after experiments are completed, just delete the directory:
+-
+-```bash
+-rm -rf ~/.federated
+-```
++!!! tip "Client timeout"
++    Check for failed or memory-constrained clients before attributing a missing
++    client to a slow server response. The default `server.ping_timeout` is
++    3600 seconds. Measure delays in the affected session before choosing an
++    override in the `server` configuration section. See
++    [Miscellaneous Notes](misc.md#potential-runtime-errors) for related guidance.
+diff --git a/docs/docs/configurations/server.md b/docs/docs/configurations/server.md
+index 927e5bc4..134e722b 100644
+--- a/docs/docs/configurations/server.md
++++ b/docs/docs/configurations/server.md
+@@ -107,7 +107,6 @@
+     A list of processors to apply on the payload right after receiving. Multiple processors are permitted.
+ 
+     - `model_decompress` Decompress model parameters. Must be placed as the first processor if `model_compress` is applied on the client side.
+- `outbound_feature_ndarrays`.
+     - `model_dequantize` Dequantize model parameters back to the 32-bit floating number format.
+     - `model_dequantize_qsgd` Dequantize model parameters quantized with QSGD.
+ 
+diff --git a/docs/docs/configurations/trainer.md b/docs/docs/configurations/trainer.md
+index c1f3df05..5e48a636 100644
+--- a/docs/docs/configurations/trainer.md
++++ b/docs/docs/configurations/trainer.md
+@@ -110,17 +110,18 @@ below describe the PyTorch path unless stated otherwise. See
+     - `CyclicLR`
+     - `CosineAnnealingWarmRestarts`
+ 
+-    Alternatively, all four schedulers from [timm](https://timm.fast.ai/schedulers) are supported if `lr_scheduler` is specified as `timm` and `trainer -> type` is specified as `timm_basic`. For example, to use the `SGDR` scheduler, we specify `cosine` as `sched` in its arguments (`parameters -> learning_rate`):
++    Alternatively, all four schedulers from [timm](https://timm.fast.ai/schedulers) are supported if `lr_scheduler` is specified as `timm` and `trainer -> type` is specified as `timm_basic`. For example, to use the `SGDR` scheduler, we specify `cosine` as `sched` in its arguments (`parameters -> learning_rate`) in this configuration fragment:
+ 
+     ```toml
+     [trainer]
+     type = "timm_basic"
++    lr_scheduler = "timm"
+ 
+     [parameters]
+ 
+     [parameters.learning_rate]
+-    sched = cosine
+-    min_lr = 1.e-6
++    sched = "cosine"
++    min_lr = 1.0e-6
+     warmup_lr = 0.0001
+     warmup_epochs = 3
+     cooldown_epochs = 10
+diff --git a/docs/docs/development.md b/docs/docs/development.md
+index bac055c0..754c6d95 100644
+--- a/docs/docs/development.md
++++ b/docs/docs/development.md
+@@ -232,7 +232,7 @@ model = partial(
+ 
+ If a custom `DataSource` is needed for a custom training session, one can subclass from the `base.DataSource` class.
+ 
+-Example excerpt from `examples/custom_model.py`:
++Example excerpt from `examples/basic/basic.py`:
+ 
+ ```python
+ from pathlib import Path
+diff --git a/docs/docs/examples/Getting Started.md b/docs/docs/examples/Getting Started.md
+index ac6ebea8..570ece4d 100644
+--- a/docs/docs/examples/Getting Started.md	
++++ b/docs/docs/examples/Getting Started.md	
+@@ -2,18 +2,34 @@
+ 
+ In `examples/`, we included a wide variety of examples that showed how federated learning algorithms in the research literature can be implemented using Plato by customizing the `client`, `server`, `algorithm`, and `trainer` classes.
+ 
+-### Dataset Preparation
+-
+-When you run an example for the first time, Plato downloads the required datasets automatically before training begins. Depending on the dataset size and your connection speed, the first round may take a little longer while the assets are prepared.
+-
+-Plato uses [uv](https://docs.astral.sh/uv/) for hierarchical dependency management. Example-specific packages are defined in local `pyproject.toml` files rather than in the top-level directory.
+-
+-To run an example with its dependencies, you need to run `uv sync` first in the top-level directory, navigate to the directory containing the example, and then use `uv run` to run the example.
+-
+-!!! tip "Note"
+-    To make sure that all dependencies are properly loaded, always run `uv run` from within the directory containing the example.
+-
+-Plato supports both Linux with NVIDIA GPUs and macOS with M1/M2/M4/M4 GPUs. It will automatically detect and use these GPUs when they are present.
++### Prepare the environment and assets
++
++Use Python 3.13 and the checked-in lockfile. From the repository root, the
++base environment is provisioned with:
++
++```bash
++uv sync --locked --python 3.13
++```
++
++Most examples inherit the root dependencies. Some are workspace members with
++additional packages in their local `pyproject.toml`; shared optional features
++use root extras. Follow [Installation](../install.md) for workspace selection
++and separate environments for incompatible extras such as `ssl` and `llm_eval`.
++Keep the selected extra on syncing `uv run --locked` commands.
++
++Follow the particular example's recipe for its working directory, entrypoint,
++config, datasets, and model checkpoints. Some data sources download assets on
++first use; others require preparation or external access before training.
++See the [Qwen3 reference](case-studies/6. Qwen3 Federated LoRA.md) and
++[Lighteval preparation](../install.md#optional-server-side-llm-evaluation-with-lighteval)
++for those specific workloads.
++
++CPU, CUDA, and Apple Silicon execution depend on the selected backend and
++workload. See [Quick Start](../quickstart.md) for device flags and
++[Native MLX](../mlx.md) for the bounded Apple CPU/Metal reference and checks.
++A chapter or config in this index does not establish validated support for
++every dataset, algorithm, or device combination; qualification applies to the
++specific workload and environment recorded in its validation evidence.
+ 
+ ---
+ 
+@@ -45,6 +61,12 @@ Plato supports both Linux with NVIDIA GPUs and macOS with M1/M2/M4/M4 GPUs. It w
+ 
+ - [Model Pruning Algorithms](algorithms/13. Model Pruning Algorithms.md)
+ 
++- [Gradient Leakage Attacks and Defences](algorithms/14. Gradient Leakage Attacks and Defences.md)
++
++## Archived Research
++
++- [Archived research examples](archived.md)
++
+ ## Case Studies
+ 
+ - [Qwen3 Federated LoRA](case-studies/6. Qwen3 Federated LoRA.md)
+diff --git a/docs/docs/examples/algorithms/1. Server Aggregation Algorithms.md b/docs/docs/examples/algorithms/1. Server Aggregation Algorithms.md
+index 65a03b1a..bd2f62b7 100644
+--- a/docs/docs/examples/algorithms/1. Server Aggregation Algorithms.md	
++++ b/docs/docs/examples/algorithms/1. Server Aggregation Algorithms.md	
+@@ -147,20 +147,20 @@ C. P. Wan, Q. Chen. "[Robust Federated Learning with Attack-Adaptive Aggregation
+ 
+     #### 1. Capture rounds from a simulation
+ 
+-    Edit your experiment TOML so the attack-adaptive strategy records each round. Add the following keys under `algorithm` (directories are created if missing):
++    Edit your experiment TOML so the attack-adaptive strategy records each round. Add the following configuration fragment under `algorithm` (directories are created if missing):
+ 
+     ```toml
+     [algorithm]
+ 
+     # Aggregation algorithm
+-    type = fedavg
++    type = "fedavg"
+ 
+     # Scaling factor (temperature) used by the attention module
+     scaling_factor = 10
+ 
+     # Path to the trained attention model shipped with the attack-adaptive paper.
+     # Provide your own checkpoint before running the example.
+-    attention_model_path: ./attention_model.pt
++    attention_model_path = "./attention_model.pt"
+ 
+     # Number of PCA components per layer before feeding into attention.
+     pca_components = 10
+@@ -173,7 +173,7 @@ C. P. Wan, Q. Chen. "[Robust Federated Learning with Attack-Adaptive Aggregation
+     attention_hidden = 32
+ 
+     # Optional: set to capture per-round tensors for pretraining the attention module.
+-    # dataset_capture_dir = ./attack_adaptive_dataset
++    # dataset_capture_dir = "./attack_adaptive_dataset"
+     ```
+ 
+     Run the experiment as usual:
+diff --git a/docs/docs/index.md b/docs/docs/index.md
+index 065919b4..2bbc914a 100644
+--- a/docs/docs/index.md
++++ b/docs/docs/index.md
+@@ -33,6 +33,9 @@ Welcome to *Plato*, a software framework to facilitate scalable, reproducible, a
+     - **[Model Pruning](examples/algorithms/13. Model Pruning Algorithms.md)**
+     - **[Gradient Leakage Attacks and Defences](examples/algorithms/14. Gradient Leakage Attacks and Defences.md)**
+ 
++    ### Archived Research
++    - **[Archived research examples](examples/archived.md)**
++
+     ### Case Studies
+     - **[Qwen3 Federated LoRA](examples/case-studies/6. Qwen3 Federated LoRA.md)**
+     - **[Federated LoRA Fine-Tuning](examples/case-studies/1. LoRA.md)**
+diff --git a/docs/docs/misc.md b/docs/docs/misc.md
+index 9bbfb039..dfd799a4 100644
+--- a/docs/docs/misc.md
++++ b/docs/docs/misc.md
+@@ -12,14 +12,14 @@ If runtime exceptions occur that prevent a federated learning session from runni
+ !!! warning "Client Timeout Issues"
+     **Issue:** The time that a client waits for the server to respond before disconnecting is too short. This could happen when training with large neural network models. If you get an `AssertionError` saying that there are not enough launched clients for the server to select, this could be the reason. But make sure you first check if it is due to the *out of CUDA memory* error.
+ 
+-    **Potential solutions:** Add `ping_timeout` in the `server` section in your configuration file. The default value for `ping_timeout` is 360 (seconds).
++    **Potential solutions:** The default `server.ping_timeout` is 3600 seconds. Measure the delays in the affected session and check for failed or memory-constrained clients before overriding it in your configuration file.
+ 
+-    For example, when running on [Compute Canada resources](https://github.com/TL-System/plato/blob/main/docs/Running.md) with the CIFAR-10 dataset and the ResNet-18 model, and if 10 clients are selected per round, `ping_timeout` needs to be 360 when clients' local datasets are non-iid by symmetric Dirichlet distribution with the concentration of 0.01. Consider an even larger number if you run with larger models and more clients.
++    Choose an override from observed response delays for your workload. See the [Digital Research Alliance of Canada guide](ccdb.md) for cluster preparation and job management.
+ 
+ !!! warning "Process Cleanup"
+     **Issue:** Running processes have not been terminated from previous runs.
+ 
+-    **Potential solutions:** Use the command `pkill python` to terminate them so that there will not be CUDA errors in the upcoming run.
++    **Potential solutions:** Stop the identified training session with `Ctrl-C`. For a scheduled cluster job, cancel its specific job ID as described in the [cluster guide](ccdb.md#manage-the-job), then verify that the session has released its resources before restarting.
+ 
+ ## Client simulation mode
+ 
+@@ -35,7 +35,26 @@ In contrast, if server asynchronous mode is activated (`server:synchronous` set
+ 
+ ## Running unit tests
+ 
+-All unit tests are in the `tests/` directory. These tests are designed to be standalone and executed separately. For example, the command `python lr_schedule_tests.py` runs the unit tests for learning rate schedules.
++Tests are in `tests/`. From the repository root, provision Python 3.13 and run focused learning-rate scheduler coverage:
++
++```bash
++uv sync --locked --python 3.13 --group test-model-search
++uv run --locked --group test-model-search python -m pytest tests/trainers/test_lr_scheduler_registry.py -ra
++```
++
++For the mandatory core suite, including retained model-search tests, use:
++
++```bash
++uv run --locked --group test-model-search python -m pytest tests --test-profile=mandatory -ra
++```
++
++Ordinary `pytest tests` and this mandatory command exclude native MLX,
++Lighteval runtime, and Phase 4 example qualification directories. Follow the
++separate [native MLX checks](mlx.md#run-native-checks),
++[Lighteval runtime qualification](references/evaluators.md#optional-runtime-qualification),
++and the repository's `tests/examples_phase4/cases.json` inventory and
++`tests/conftest.py` policy for those checks.
++A core pass does not establish example-family or optional-backend qualification.
+ 
+ ## Running Continuous Integration tests as GitHub actions
+ 

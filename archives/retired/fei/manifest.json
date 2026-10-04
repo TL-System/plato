@@ -1,0 +1,150 @@
+{
+  "schema_version": 1,
+  "backend": "fei",
+  "retired_at": "2026-10-04",
+  "pre_retirement_plato_commit": "3d4e08b26972e114d87ef39795e01f4dfa554b94",
+  "pre_retirement_plato_tree": "16602a4bd057c30ec2bf195b926d6f2d405774dd",
+  "integration_commit": "e81248dae1844fb5bc66a8d880c9a17b485606ac",
+  "integration_tree": "ff5fcc51936fdca4e324ffc9aadd878522832291",
+  "plan_sha256": "2d46ccccaa35c1753c44c1974d226405d49d04cdd3178812f816879320ed6667",
+  "plan_review_sha256": "2bc7f5a374040880b18f29026881dc91b822d3815cf09ea9b7d73da74cebe303",
+  "files": [
+    {
+      "original_path": "examples/reinforcement_learning/fei/fei.py",
+      "archive_path": "archives/retired/fei/original/examples/reinforcement_learning/fei/fei.py",
+      "disposition": "moved",
+      "git_mode": "100644",
+      "git_blob": "539228a3210f30cd7b21d779b3fdef070d348252",
+      "sha256": "d624ac5d2ebaedc1c6c2e6262678314531376db16b81ed775d3014a0dc21f870",
+      "bytes": 456,
+      "source_commit": "3d4e08b26972e114d87ef39795e01f4dfa554b94"
+    },
+    {
+      "original_path": "examples/reinforcement_learning/fei/fei_CIFAR10_resnet18.toml",
+      "archive_path": "archives/retired/fei/original/examples/reinforcement_learning/fei/fei_CIFAR10_resnet18.toml",
+      "disposition": "moved",
+      "git_mode": "100644",
+      "git_blob": "4a005d46c97ae1bf925d440ba6d028348af91316",
+      "sha256": "2a03ce665614c0a2b2a667801d5600aa1ae2ad4974601b5c7b2211dcc744562c",
+      "bytes": 3185,
+      "source_commit": "3d4e08b26972e114d87ef39795e01f4dfa554b94"
+    },
+    {
+      "original_path": "examples/reinforcement_learning/fei/fei_FashionMNIST_lenet5.toml",
+      "archive_path": "archives/retired/fei/original/examples/reinforcement_learning/fei/fei_FashionMNIST_lenet5.toml",
+      "disposition": "moved",
+      "git_mode": "100644",
+      "git_blob": "1b536666ea801570835735f5c437e94d0e34e649",
+      "sha256": "6b7dfae3c2c4ac3bdee861adac0d183b950c119f20b5fb0635afcafbeafd2bb3",
+      "bytes": 3103,
+      "source_commit": "3d4e08b26972e114d87ef39795e01f4dfa554b94"
+    },
+    {
+      "original_path": "examples/reinforcement_learning/fei/fei_agent.py",
+      "archive_path": "archives/retired/fei/original/examples/reinforcement_learning/fei/fei_agent.py",
+      "disposition": "moved",
+      "git_mode": "100644",
+      "git_blob": "6b5ba75b58b33fa94a2707da964a7ca683ca48d4",
+      "sha256": "ee186f5858e3362576d35bad2a3f4c7bf48f7a08ba1daab7f64895194c77da34",
+      "bytes": 11089,
+      "source_commit": "3d4e08b26972e114d87ef39795e01f4dfa554b94"
+    },
+    {
+      "original_path": "examples/reinforcement_learning/fei/fei_client.py",
+      "archive_path": "archives/retired/fei/original/examples/reinforcement_learning/fei/fei_client.py",
+      "disposition": "moved",
+      "git_mode": "100644",
+      "git_blob": "603924c0991ac53c83327e40b42bf72b36145072",
+      "sha256": "2dd8fa26e9d505537c0fd660ff40f37fc84954c626e0efba84ac0490b22b5e71",
+      "bytes": 2890,
+      "source_commit": "3d4e08b26972e114d87ef39795e01f4dfa554b94"
+    },
+    {
+      "original_path": "examples/reinforcement_learning/fei/fei_server.py",
+      "archive_path": "archives/retired/fei/original/examples/reinforcement_learning/fei/fei_server.py",
+      "disposition": "moved",
+      "git_mode": "100644",
+      "git_blob": "38c13a579fe13e21da8ce49d27407cd0769c21b7",
+      "sha256": "8493f3859b862d28214e34a5c5c3edea26bc01febc9752e09c343f65caa19a74",
+      "bytes": 3642,
+      "source_commit": "3d4e08b26972e114d87ef39795e01f4dfa554b94"
+    },
+    {
+      "original_path": "LICENSE",
+      "source_commit": "3d4e08b26972e114d87ef39795e01f4dfa554b94",
+      "git_mode": "100644",
+      "git_blob": "261eeb9e9f8b2b4b0d119366dda99c6fd7d35c64",
+      "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+      "bytes": 11357,
+      "archive_path": "archives/retired/fei/original/LICENSE",
+      "disposition": "copied_context"
+    },
+    {
+      "original_path": "pyproject.toml",
+      "source_commit": "3d4e08b26972e114d87ef39795e01f4dfa554b94",
+      "git_mode": "100644",
+      "git_blob": "ff69fd39a94c2889c78611d193559856ef4e1452",
+      "sha256": "fcc830f9fac66f2e2f28bef0d715bea3eb1300105a4239bb33cce8f62b71b398",
+      "bytes": 4102,
+      "archive_path": "archives/retired/fei/original/pyproject.toml",
+      "disposition": "copied_context"
+    },
+    {
+      "original_path": "uv.lock",
+      "source_commit": "3d4e08b26972e114d87ef39795e01f4dfa554b94",
+      "git_mode": "100644",
+      "git_blob": "419ce6bf04e2ca46520dcf1e05a36ac134cdc63c",
+      "sha256": "66a4e4442d7b1f26d220b44ca73c44ff4f1151a86857bb3f93a594819fd08126",
+      "bytes": 755641,
+      "archive_path": "archives/retired/fei/original/uv.lock",
+      "disposition": "copied_context"
+    },
+    {
+      "original_path": "tests/examples_phase4/cases.json",
+      "source_commit": "e81248dae1844fb5bc66a8d880c9a17b485606ac",
+      "git_mode": "100644",
+      "git_blob": "29d2d903bc64a7492a4f9f3a55df904aa1091552",
+      "sha256": "3e2aaca8daf3343ec4e7d31960185606f86992653b0772b0255adca47834a44d",
+      "bytes": 307132,
+      "archive_path": "archives/retired/fei/original/tests/examples_phase4/cases.json",
+      "disposition": "copied_context"
+    }
+  ],
+  "inventory_sha256": "4f88e8e1ba6493448f7b34ec3f08c60615e5f6ab52feff7b2fec8e27f1d5875f",
+  "evidence": [
+    {
+      "archive_path": "archives/retired/fei/evidence/retirement-plan.json",
+      "sha256": "2d46ccccaa35c1753c44c1974d226405d49d04cdd3178812f816879320ed6667",
+      "bytes": 9986
+    },
+    {
+      "archive_path": "archives/retired/fei/evidence/retirement-plan-review.json",
+      "sha256": "2bc7f5a374040880b18f29026881dc91b822d3815cf09ea9b7d73da74cebe303",
+      "bytes": 13050
+    },
+    {
+      "archive_path": "archives/retired/fei/evidence/rejected-repair-review.json",
+      "sha256": "80094b3cec8272a8f44456ef2df4244579f9076990885e299b83b09d4e1f11d1",
+      "bytes": 28238
+    }
+  ],
+  "research_disposition": "Retired, unqualified historical implementation. No production repair accepted. Repaired strict candidate: six passed, one failed; no accuracy or benchmark reproduction claim.",
+  "external_raw_evidence": {
+    "path": "/tmp/plato-phase4-fei-code-review-artifacts.tgz",
+    "sha256": "3061941926be598c454532b62b909fbb5bc3ba17bc780004767514967d6db44e",
+    "distributed": false,
+    "reason": "Contains third-party research PDF; retained externally as an audit artifact."
+  },
+  "unaccepted_work": [
+    {
+      "commit": "dc93e49f",
+      "path": "/tmp/plato-refresh-worktrees/phase4-fei",
+      "disposition": "Abandoned repair; not integrated."
+    },
+    {
+      "commit": "7a2da68e",
+      "path": "/tmp/plato-refresh-worktrees/phase4-fei-ci",
+      "disposition": "Abandoned FEI CI change; not integrated."
+    }
+  ]
+}
