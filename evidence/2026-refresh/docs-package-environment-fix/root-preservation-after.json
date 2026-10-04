@@ -1,0 +1,15 @@
+{
+  "root_source": "0c942d7e81171e01bb715c0ba7b82f08900ea56a",
+  "targets": [
+    "/tmp/plato-refresh-worktrees/deployment-integration/.venv-docs",
+    "/tmp/plato-refresh-worktrees/deployment-integration/ci-artifacts",
+    "/tmp/plato-deployment-integration/docs-environment-package-finding.json",
+    "/tmp/plato-deployment-integration/publication-container-static.log",
+    "/tmp/plato-deployment-integration/publication-package.log",
+    "/tmp/plato-deployment-integration/publication-docs.log",
+    "/tmp/plato-deployment-integration/publication-docs-system-python-rejection.log"
+  ],
+  "snapshot_entries": 17378,
+  "snapshot_sha256": "6127fa6711119ee1f4b59166481b6c13c43387ed9e86d87f490897e8bcd46693",
+  "unchanged_bytes_symlinks_modes_and_mtimes": true
+}

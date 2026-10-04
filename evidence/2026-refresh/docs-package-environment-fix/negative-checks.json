@@ -1,0 +1,245 @@
+{
+  "source_commit": "06ba679690f090aacf7e6a95a6dffd74b81ffad3",
+  "checker_sha256": "1b3ea71a1eef084f602092de35a97ceed04beb4ab47da2074690dc89c5c34c3f",
+  "accepted": true,
+  "results": [
+    {
+      "name": "existing-unsupported-tracked-directory",
+      "accepted": true,
+      "exit_code": 1,
+      "command": [
+        "/tmp/plato-p2-docs-environment-fix/controller-env/bin/python",
+        ".github/scripts/check_distribution.py",
+        "--output-dir",
+        "/private/tmp/plato-refresh-worktrees/docs-package-env-negative/docs"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/docs-package-env-negative",
+      "path_prefix": null,
+      "directory_unchanged": true,
+      "snapshot_entries": 61,
+      "snapshot_sha256": "43884293ab019366ac0246f1e54d8d96bd89af1da8da66c705a45643a4bb4f51"
+    },
+    {
+      "name": "existing-external-directory",
+      "accepted": true,
+      "exit_code": 1,
+      "command": [
+        "/tmp/plato-p2-docs-environment-fix/controller-env/bin/python",
+        ".github/scripts/check_distribution.py",
+        "--output-dir",
+        "/tmp/plato-p2-docs-environment-fix/existing-external-output"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/docs-package-env-negative",
+      "path_prefix": null,
+      "directory_unchanged": true,
+      "snapshot_entries": 2,
+      "snapshot_sha256": "96bdb434dc26a39eace44577e4a3a5f3b015cc2329e1214bcc4ae1c2be31afaf"
+    },
+    {
+      "name": "checkout-root",
+      "accepted": true,
+      "exit_code": 1,
+      "command": [
+        "/tmp/plato-p2-docs-environment-fix/controller-env/bin/python",
+        ".github/scripts/check_distribution.py",
+        "--output-dir",
+        "/private/tmp/plato-refresh-worktrees/docs-package-env-negative"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/docs-package-env-negative",
+      "path_prefix": null,
+      "directory_unchanged": true,
+      "snapshot_entries": 2230,
+      "snapshot_sha256": "785121d591e208a9e5753e49bfd98c16eba83fa459801b9191aac208bc532478"
+    },
+    {
+      "name": "existing-unsupported-untracked-directory",
+      "accepted": true,
+      "exit_code": 1,
+      "command": [
+        "/tmp/plato-p2-docs-environment-fix/controller-env/bin/python",
+        ".github/scripts/check_distribution.py",
+        "--output-dir",
+        "/private/tmp/plato-refresh-worktrees/docs-package-env-negative/arbitrary-generated-output"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/docs-package-env-negative",
+      "path_prefix": null,
+      "directory_unchanged": true,
+      "snapshot": {
+        ".": {
+          "mode": 16877,
+          "size": 96,
+          "mtime_ns": 1791074596467898312
+        },
+        "existing-source.txt": {
+          "mode": 33188,
+          "size": 31,
+          "mtime_ns": 1791074596467977228,
+          "sha256": "32d31d10119a8e6a59c68e0551d0d93bb1d7a81cebe6e709da7aabc31ce64324"
+        }
+      }
+    },
+    {
+      "name": "pre-existing-valid-ci-output",
+      "accepted": true,
+      "exit_code": 1,
+      "command": [
+        "/tmp/plato-p2-docs-environment-fix/controller-env/bin/python",
+        ".github/scripts/check_distribution.py"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/docs-package-env-default",
+      "path_prefix": null,
+      "directory_unchanged": true,
+      "snapshot_entries": 25,
+      "snapshot_sha256": "fac29890e4b5ba3b9e8ce3c422cb6b508d0349c4e9a1fc7d613feea6aaf22d22"
+    },
+    {
+      "name": "actual-unrelated-untracked-default-build",
+      "accepted": true,
+      "exit_code": 1,
+      "command": [
+        "/tmp/plato-p2-docs-environment-fix/controller-env/bin/python",
+        ".github/scripts/check_distribution.py"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/docs-package-env-negative",
+      "path_prefix": null,
+      "owned_failure_receipt": {
+        "accepted": false,
+        "error": "Sdist source members absent from frozen Git tree: ['unrelated-research-output.json']"
+      },
+      "source_commit": "06ba679690f090aacf7e6a95a6dffd74b81ffad3",
+      "input_unchanged": true,
+      "actual_sdist": "/private/tmp/plato-refresh-worktrees/docs-package-env-negative/ci-artifacts/docs-package/distributions/plato_learn-1.4.3.tar.gz"
+    },
+    {
+      "name": "actual-altered-tracked-source-build",
+      "accepted": true,
+      "exit_code": 1,
+      "command": [
+        "/tmp/plato-p2-docs-environment-fix/controller-env/bin/python",
+        ".github/scripts/check_distribution.py",
+        "--output-dir",
+        "/private/tmp/plato-refresh-worktrees/docs-package-env-negative/ci-artifacts/altered-tracked-source"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/docs-package-env-negative",
+      "path_prefix": null,
+      "owned_failure_receipt": {
+        "accepted": false,
+        "error": "Sdist bytes differ from frozen Git tree: ['plato/config.py']"
+      },
+      "source_commit": "06ba679690f090aacf7e6a95a6dffd74b81ffad3",
+      "fixture_sha256": "f71ee6a6a84d59910bdd54edb4095577429df8a1a0cc98cdb9e5a624cf1c359f",
+      "frozen_sha256": "c96aed26f35e2cbf2e54153dbb7099cd8ba3c8042ff5cf467d2e954cbb95308e",
+      "actual_sdist": "/private/tmp/plato-refresh-worktrees/docs-package-env-negative/ci-artifacts/altered-tracked-source/distributions/plato_learn-1.4.3.tar.gz"
+    },
+    {
+      "name": "exact-pkg-info-generated-exception",
+      "accepted": true,
+      "git_tree_bound_members": 1298,
+      "metadata_sha256": "08e03ffe8434783a17ca65294fd3c65c5f189a2ec3e0d70e1590a1b553654a7a"
+    },
+    {
+      "name": "real-root-default-environment-red",
+      "accepted": true,
+      "reason": "Non-regular sdist source member: plato_learn-1.4.3/.venv-docs/bin/python",
+      "actual_sdist_sha256": "206a0cbf2910daaf58cb7d44776ef478d6c967728e00c8e129622fee72f0b36a",
+      "default_environment_members": 26,
+      "absolute_environment_symlinks": {
+        "plato_learn-1.4.3/.venv-docs/bin/python": "/Users/bli/.local/share/uv/python/cpython-3.13-macos-aarch64-none/bin/python3.13"
+      }
+    },
+    {
+      "name": "injected-untracked-sdist",
+      "accepted": true,
+      "reason": "Sdist source members absent from frozen Git tree: ['unrelated-generated.txt']",
+      "actual_sdist_sha256": "c9e662a83d913055a25f13a961676d809598e5acb29c175a80c01e2f82a69d1d"
+    },
+    {
+      "name": "altered-tracked-sdist",
+      "accepted": true,
+      "reason": "Sdist bytes differ from frozen Git tree: ['README.md']",
+      "actual_sdist_sha256": "c44e719cf369979b74625bc9c8f77105fd4bb68336b50c2095cb3b63a3dc1a57"
+    },
+    {
+      "name": "unverified-pkg-info",
+      "accepted": true,
+      "reason": "Generated PKG-INFO must match the built wheel METADATA bytes.",
+      "actual_sdist_sha256": "fb68901ed740b6cc2e391e43869544873f3aaeaedf2de1d15fecca760abd1231"
+    },
+    {
+      "name": "other-generated-metadata",
+      "accepted": true,
+      "reason": "Sdist source members absent from frozen Git tree: ['backend-generated.json']",
+      "actual_sdist_sha256": "a9bfa02e39349f3536f72b0611d33440f16e6bb02eaa80e0794e06e51cf68523"
+    },
+    {
+      "name": "duplicate-sdist-member",
+      "accepted": true,
+      "reason": "Duplicate sdist source member: README.md",
+      "actual_sdist_sha256": "f64a7f253512b38ccf5961c3a917b962643ac5449713e1a6018b5a930cd76c1f"
+    },
+    {
+      "name": "nonregular-sdist-member",
+      "accepted": true,
+      "reason": "Non-regular sdist source member: plato_learn-1.4.3/untracked-link",
+      "actual_sdist_sha256": "865ccce213d9d522cffeadbaede969b5d30c369a304ecae36a82ad4d02357548"
+    },
+    {
+      "name": "owned-output-build-failure-receipt",
+      "accepted": true,
+      "exit_code": 1,
+      "command": [
+        "/tmp/plato-p2-docs-environment-fix/controller-env/bin/python",
+        ".github/scripts/check_distribution.py",
+        "--output-dir",
+        "/private/tmp/plato-refresh-worktrees/docs-package-env-negative/ci-artifacts/owned-build-failure"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/docs-package-env-negative",
+      "path_prefix": "/tmp/plato-p2-docs-environment-fix/negative/failure-stub",
+      "output_created_by_invocation": true,
+      "failure_receipt": {
+        "accepted": false,
+        "error": "Command failed (43); see /private/tmp/plato-refresh-worktrees/docs-package-env-negative/ci-artifacts/owned-build-failure/build.log"
+      }
+    },
+    {
+      "name": "generated-docs-site",
+      "accepted": true,
+      "reason": "Forbidden distribution payloads: ['docs/site/index.html']"
+    },
+    {
+      "name": "generated-ci-artifact",
+      "accepted": true,
+      "reason": "Forbidden distribution payloads: ['ci-artifacts/provenance.json']"
+    },
+    {
+      "name": "archived-source",
+      "accepted": true,
+      "reason": "Forbidden distribution payloads: ['archives/retired/probe.py']"
+    },
+    {
+      "name": "environment",
+      "accepted": true,
+      "reason": "Forbidden distribution payloads: ['.venv/lib/probe.py']"
+    },
+    {
+      "name": "default-docs-environment",
+      "accepted": true,
+      "reason": "Forbidden distribution payloads: ['.venv-docs/lib/probe.py']"
+    },
+    {
+      "name": "default-bootstrap-environment",
+      "accepted": true,
+      "reason": "Forbidden distribution payloads: ['.venv-docs-bootstrap/lib/probe.py']"
+    },
+    {
+      "name": "cache",
+      "accepted": true,
+      "reason": "Forbidden distribution payloads: ['__pycache__/probe.pyc']"
+    },
+    {
+      "name": "reproduction",
+      "accepted": true,
+      "reason": "Forbidden distribution payloads: ['evidence/2026-refresh/reproductions/probe.json']"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "source_commit": "06ba679690f090aacf7e6a95a6dffd74b81ffad3",
+  "checkout": "/private/tmp/plato-refresh-worktrees/docs-package-env-bootstrap",
+  "environments": {
+    ".venv-docs": {
+      "entries": 17357,
+      "snapshot_sha256": "ae0fd500af231788a54d40bd1868b26b7580ec1fb6ffadf25bbca5017dc09641",
+      "python_link": "/Users/bli/.local/share/uv/python/cpython-3.13-macos-aarch64-none/bin/python3.13",
+      "sentinels": {
+        "p2-m3-environment-sentinel.json": "df2db306b1d7e49e9451baac2fbae29d31ef4ffe3e5da4846f3f0d02f9e7bdba"
+      }
+    },
+    ".venv-docs-bootstrap": {
+      "entries": 1051,
+      "snapshot_sha256": "64199529bfc715b038d85b834dbbb38f2552f75a7a21b2904775154d52bbd5ae",
+      "python_link": "python3.13",
+      "sentinels": {
+        "p2-m3-bootstrap-sentinel.json": "b54d9d92884ec52c59fdb776e702b5d6bcb2c4b53df06fda50fe3d62d8e7c416"
+      }
+    }
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "packages": {
+    "pip": "26.2.1",
+    "uv": "0.12.22"
+  },
+  "uv_version": "uv 0.12.22 (70fe1196a 2026-10-01 aarch64-apple-darwin)",
+  "default_bootstrap_prefix": "/tmp/plato-refresh-worktrees/docs-package-env-bootstrap/.venv-docs-bootstrap",
+  "no_project_or_runtime": true,
+  "uv_was_absent_from_docs_path": true,
+  "docs_path": "/usr/bin:/bin:/usr/sbin:/sbin"
+}
