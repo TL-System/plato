@@ -1,0 +1,149 @@
+{
+  "status": "LOCAL_ACCEPTANCE_PENDING_PUBLICATION_GATE_AND_LINUX",
+  "source": "86573a123c4166e5f9124e46f9ccef33505fc6cf",
+  "utc": "2026-10-03T23:24:41.452204+00:00",
+  "reviewed_combined_source": "d2ed4bcbc46684ac60dfdb1505ff764029ee48e9",
+  "changes_from_reviewed_source": [
+    "docs/docs/configurations/evaluation.md",
+    "docs/docs/development.md",
+    "docs/docs/examples/case-studies/4. Server-side Lighteval for SmolLM2.md",
+    "docs/docs/install.md",
+    "docs/docs/quickstart.md",
+    "docs/docs/references/evaluators.md",
+    "evidence/2026-refresh/lighteval-docs-review.json",
+    "evidence/2026-refresh/lighteval-docs.json",
+    "evidence/2026-refresh/lighteval-fixture-permissions.json",
+    "evidence/2026-refresh/lighteval-profile-cleanup-review.json",
+    "evidence/2026-refresh/lighteval-profile-validation.json",
+    "evidence/2026-refresh/reproductions/lighteval-docs-validation.tar.gz",
+    "evidence/2026-refresh/reproductions/lighteval-profile-policy.tar.gz"
+  ],
+  "production_test_profile_sources_identical": true,
+  "docs_match_reviewed_source": true,
+  "reviews": {
+    "lighteval-runtime-review": {
+      "path": "/tmp/plato-lighteval-runtime-review.json",
+      "sha256": "f034d94fa98c7e291df33a1ad1e3bea2bb6e74d2dcc145ac7c32f9985e3c1e53"
+    },
+    "lighteval-profile-cleanup-review": {
+      "path": "/tmp/plato-lighteval-profile-cleanup-review.json",
+      "sha256": "9d22ba1577f86a546eec5ba3a3f92d465e76b64c08d77d694c49ed23a196d80b"
+    },
+    "lighteval-docs-review": {
+      "path": "/tmp/plato-lighteval-docs-review.json",
+      "sha256": "ad6da0d7ebf67c9cf297138af245640f5f7ef957b841532b96ac39dd3ea4a278"
+    }
+  },
+  "local_checks": {
+    "head": "86573a123c4166e5f9124e46f9ccef33505fc6cf",
+    "utc": "2026-10-03T23:14:16.527186+00:00",
+    "results": [
+      {
+        "name": "core-evaluator",
+        "command": [
+          "/tmp/plato-lighteval-final/env/bin/python",
+          "-m",
+          "pytest",
+          "tests/evaluators",
+          "--test-profile=mandatory",
+          "-ra",
+          "--basetemp=/tmp/plato-lighteval-final/core-evaluator-tmp",
+          "--junitxml=/tmp/plato-lighteval-final/core-evaluator.xml"
+        ],
+        "passed": 28,
+        "returncode": 0,
+        "seconds": 34.23996154195629,
+        "log_sha256": "f971733230729a12cae9e0e2888030fc7d439b80703684bc56225a416aeb289c"
+      },
+      {
+        "name": "mlx-native",
+        "command": [
+          "/tmp/plato-lighteval-final/env/bin/python",
+          "-m",
+          "pytest",
+          "tests/mlx_native",
+          "--test-profile=mlx-native",
+          "-ra",
+          "--basetemp=/tmp/plato-lighteval-final/mlx-native-tmp",
+          "--junitxml=/tmp/plato-lighteval-final/mlx-native.xml"
+        ],
+        "passed": 383,
+        "returncode": 0,
+        "seconds": 101.11970729101449,
+        "log_sha256": "1d67f7ea812e503e1f4ef01e175ffab1456525f892914d1593e5efca2386879b"
+      }
+    ],
+    "source_unchanged": true,
+    "reused_runtime_review": "/tmp/plato-lighteval-profile-cleanup-review.json",
+    "source_manifest_sha256": "ad48fbe267b961b7f7e8a32a49414381012ef7c1ab09516df867304e6d9d886c",
+    "limits": "Full exact11 optional runtime and installed/absent profile guards were independently executed on source-equivalent d2ed. This run adds final assembled core-evaluator and actual native coverage for changed shared profile hooks; exact Linux is pending."
+  },
+  "package_checks": {
+    "head": "86573a123c4166e5f9124e46f9ccef33505fc6cf",
+    "distributions": [
+      {
+        "file": "plato_learn-1.4.3-py3-none-any.whl",
+        "bytes": 383621,
+        "sha256": "5e300e5a00b575557cd0ca5c948d956772fb7229a470bdbead2ac1333ced79dd",
+        "members": 213,
+        "metadata_matches": true,
+        "source_files_match": true
+      },
+      {
+        "file": "plato_learn-1.4.3.tar.gz",
+        "bytes": 3947918,
+        "sha256": "ac03afb21da2721032d3151bc58aeb624c544e4dbc70add4cbec53c144fdf553",
+        "members": 1244,
+        "metadata_matches": true,
+        "source_files_match": true
+      }
+    ],
+    "strict_docs_log_sha256": "66e2b36f30e77ae22af7cd5b72a4811385beee8c1216e8cf29e0a17788f9b000",
+    "ruff": "All checks passed!",
+    "scope": "Retired shortlist and generated payload checks; broader legacy archive exclusion remains separate P2 work."
+  },
+  "wheel_import": {
+    "head": "86573a123c4166e5f9124e46f9ccef33505fc6cf",
+    "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+    "cwd": "/private/tmp",
+    "prefix": "/private/tmp/plato-lighteval-final/wheel-env",
+    "plato_path": "/tmp/plato-lighteval-final/wheel-env/lib/python3.13/site-packages/plato/__init__.py",
+    "registry_path": "/tmp/plato-lighteval-final/wheel-env/lib/python3.13/site-packages/plato/models/registry.py",
+    "version": "1.4.3",
+    "direct_url": {
+      "url": "file:///tmp/plato-lighteval-final/dist/plato_learn-1.4.3-py3-none-any.whl",
+      "archive_info": {}
+    },
+    "retirement_diagnostics": {
+      "vit": "The model 'vit' was retired. Historical source and restoration instructions: archives/retired/legacy-vit/README.md.",
+      "nanochat": "The model 'nanochat' was retired. Historical source and restoration instructions: archives/retired/nanochat/README.md. For supported text training, use configs/HuggingFace/fedavg_qwen3_06b_lora.toml.",
+      "lerobot": "The model 'lerobot' was retired. Historical source and restoration instructions: archives/retired/lerobot/README.md.",
+      "smolvla": "The model 'smolvla' was retired. Historical source and restoration instructions: archives/retired/lerobot/README.md."
+    }
+  },
+  "bundle": {
+    "file": "lighteval-local-qualification.tar.gz",
+    "sha256": "d619ae2c163c99f402e64014af18d0d7c7353c40d005f44b6bc96255d18158a1",
+    "bytes": 48645123,
+    "members": 6405
+  },
+  "manifest_sha256": "3a645ac39583a6157a9b8ca9784676a16e0b24471c8629cbcda88fa22c6f3427",
+  "raw_records": 6406,
+  "omitted_large_records": [
+    {
+      "path": "docs-review/nltk_data/tokenizers/punkt.zip",
+      "raw_path": "/tmp/plato-lighteval-docs-review-artifacts/nltk_data/tokenizers/punkt.zip",
+      "bytes": 13905355,
+      "sha256": "51c3078994aeaf650bfc8e028be4fb42b4a0d177d41c012b6a983979653660ec",
+      "in_bundle": false
+    },
+    {
+      "path": "docs-review/nltk_data/tokenizers/punkt_tab.zip",
+      "raw_path": "/tmp/plato-lighteval-docs-review-artifacts/nltk_data/tokenizers/punkt_tab.zip",
+      "bytes": 4319076,
+      "sha256": "e57f64187974277726a3417ca6f181ec5403676c717672eef6a748a7b20e0106",
+      "in_bundle": false
+    }
+  ],
+  "limits": "Exact-source Linux CI is required before merge. Runtime proofs use controlled tiny local GPT2 fixtures, not pretrained benchmark accuracy or GPU qualification. Final-HEAD rebuild follows any evidence-only commit because evidence JSON enters the sdist. Existing legacy sdist archive exclusions are separate P2 work."
+}

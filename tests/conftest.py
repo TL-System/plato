@@ -184,14 +184,112 @@ def _load_native_ledger(path: Path) -> Counter:
         raise pytest.UsageError(f"mlx-native ledger invalid: {path}: {exc}") from exc
 
 
+def _eval_prerequisites() -> None:
+    """Check real packages and resources before upstream Registry can download."""
+    from packaging.specifiers import SpecifierSet
+
+    try:
+        nltk = importlib.import_module("nltk")
+        importlib.import_module("langdetect")
+        for name, specifier in (
+            ("lighteval", "==0.13.0"),
+            ("langdetect", ">=1.0.9,<2"),
+            ("xxhash", ">=3.8.1,<4"),
+            ("nltk", "==3.10.3"),
+        ):
+            version = importlib.metadata.version(name)
+            if version not in SpecifierSet(specifier):
+                raise RuntimeError(f"{name} {version} requires {specifier}")
+        for resource in ("tokenizers/punkt", "tokenizers/punkt_tab"):
+            try:
+                nltk.data.find(resource)
+            except LookupError as exc:
+                raise RuntimeError(
+                    f"missing NLTK resource {resource}; provision explicitly with "
+                    "python -m nltk.downloader punkt punkt_tab"
+                ) from exc
+        apis = {
+            "lighteval.pipeline": (
+                "Pipeline",
+                "PipelineParameters",
+                "ParallelismManager",
+            ),
+            "lighteval.tasks.registry": ("Registry",),
+            "lighteval.logging.evaluation_tracker": ("EvaluationTracker",),
+            "lighteval.models.transformers.transformers_model": (
+                "TransformersModelConfig",
+            ),
+            "transformers": (
+                "GPT2Config",
+                "GPT2LMHeadModel",
+                "PreTrainedTokenizerFast",
+            ),
+            "datasets": ("Dataset",),
+            "torch": ("Tensor",),
+            "tokenizers": ("Tokenizer",),
+        }
+        for name, attributes in apis.items():
+            module = importlib.import_module(name)
+            for attribute in attributes:
+                getattr(module, attribute)
+    except Exception as exc:
+        raise pytest.UsageError(f"llm-eval prerequisite failed: {exc}") from exc
+
+
+def _load_eval_ledger(path: Path) -> Counter:
+    """Read the independently reviewed optional inventory and criteria mapping."""
+    try:
+        ledger = json.loads(path.read_text())
+        if not isinstance(ledger, dict) or ledger.get("schema_version") != 1:
+            raise ValueError("expected schema_version 1 object")
+        cases = ledger.get("cases")
+        if not isinstance(cases, list) or not cases:
+            raise ValueError("cases must be a nonempty list")
+        nodes = []
+        covered = set()
+        allowed = {"LE1", "LE2", "LE3", "LE4"}
+        for case in cases:
+            if not isinstance(case, dict):
+                raise ValueError("each case must be an object")
+            node = case.get("nodeid")
+            if (
+                not isinstance(node, str)
+                or not node.startswith("tests/llm_eval/")
+                or "::" not in node
+                or ".." in Path(node.split("::", 1)[0]).parts
+                or "\\" in node
+            ):
+                raise ValueError(f"invalid llm-eval nodeid: {node!r}")
+            criteria = case.get("criteria")
+            if (
+                not isinstance(criteria, list)
+                or not criteria
+                or any(
+                    not isinstance(value, str) or value not in allowed
+                    for value in criteria
+                )
+            ):
+                raise ValueError(f"invalid LE1-LE4 criteria for {node}")
+            covered.update(criteria)
+            nodes.append(node)
+        counts = Counter(nodes)
+        if any(count != 1 for count in counts.values()):
+            raise ValueError("duplicate nodeids")
+        if covered != allowed:
+            raise ValueError("collective criteria must cover LE1-LE4")
+        return counts
+    except (OSError, ValueError, TypeError) as exc:
+        raise pytest.UsageError(f"llm-eval ledger invalid: {path}: {exc}") from exc
+
+
 def pytest_addoption(parser):
     parser.addoption(
         "--test-profile",
-        choices=("base", "mandatory", "mlx-native"),
+        choices=("base", "mandatory", "mlx-native", "llm-eval"),
         default=None,
         help=(
             "base permits named optional omissions; unfiltered suites default "
-            "mandatory core; mlx-native adds complete native qualification"
+            "mandatory core; named optional profiles add complete qualification"
         ),
     )
 
@@ -201,7 +299,7 @@ def pytest_configure(config):
 
 
 class _ProfileChecks:
-    """Enforce declared core/native scopes and their exact case contracts."""
+    """Enforce declared core and optional scopes and their exact case contracts."""
 
     def __init__(self, config):
         self.config = config
@@ -225,6 +323,21 @@ class _ProfileChecks:
             for arg in config.args
         )
         self.native_requested = self.native_qualification or explicit_native
+        self.eval_boundary = (config.rootpath / "tests/llm_eval").resolve()
+        self.eval_qualification = config.getoption("test_profile") == "llm-eval"
+        explicit_eval = any(
+            self._eval_path(config.invocation_params.dir / str(arg).split("::", 1)[0])
+            for arg in config.args
+        )
+        dotted_eval = any(
+            str(arg).split("::", 1)[0] == "tests.llm_eval"
+            or str(arg).split("::", 1)[0].startswith("tests.llm_eval.")
+            for arg in config.args
+        )
+        self.eval_requested = self.eval_qualification or explicit_eval
+        self.eval_prerequisite_passed = False
+        self.eval_expected = Counter()
+        self.eval_collected = Counter()
         self.native_prerequisite_passed = False
         self.native_expected = Counter()
         self.native_collected = Counter()
@@ -232,11 +345,22 @@ class _ProfileChecks:
         self.violations = []
         self.passed = set()
         self.allowed_skips = set()
+        if self.eval_requested and self.native_requested:
+            raise pytest.UsageError("native and llm-eval targets/profiles conflict")
+        if explicit_eval and config.getoption("test_profile") in {
+            "base",
+            "mandatory",
+            "mlx-native",
+        }:
+            raise pytest.UsageError("llm-eval target conflicts with selected profile")
+        if config.getoption("pyargs") and (self.eval_requested or dotted_eval):
+            raise pytest.UsageError(self._eval_unsupported_selector())
         if config.getoption("pyargs") and (self.native_requested or dotted_native):
             raise pytest.UsageError(self._unsupported_selector())
         if explicit_native and config.getoption("test_profile") in {
             "base",
             "mandatory",
+            "llm-eval",
         }:
             raise pytest.UsageError(
                 "mlx-native target conflicts with core-only profile; use filesystem "
@@ -244,6 +368,25 @@ class _ProfileChecks:
                 "tests/mlx_native --test-profile=mlx-native"
             )
         markexpr = config.getoption("markexpr") or ""
+        if "llm_eval" in re.findall(r"\b\w+\b", markexpr) and not self.eval_requested:
+            raise pytest.UsageError(
+                "llm_eval marker requires an explicit optional filesystem path "
+                "or --test-profile=llm-eval"
+            )
+        if self.eval_qualification and any(
+            config.getoption(option)
+            for option in (
+                "keyword",
+                "markexpr",
+                "deselect",
+                "ignore",
+                "ignore_glob",
+                "pyargs",
+            )
+        ):
+            raise pytest.UsageError(
+                "llm-eval qualification does not permit selection or collection filters"
+            )
         self.retained_qualification = (
             config.getoption("test_profile") == "mandatory"
             and markexpr == "retained_model_search"
@@ -294,6 +437,19 @@ class _ProfileChecks:
                     "retained qualification does not permit filters or exclusions"
                 )
 
+    def _eval_path(self, path) -> bool:
+        return Path(path).resolve().is_relative_to(self.eval_boundary)
+
+    def _eval_node(self, nodeid: str) -> bool:
+        return self._eval_path(self.config.rootpath / nodeid.split("::", 1)[0])
+
+    @staticmethod
+    def _eval_unsupported_selector() -> str:
+        return (
+            "llm-eval selector unsupported: --pyargs cannot target optional tests; "
+            "use filesystem paths"
+        )
+
     def _native_path(self, path) -> bool:
         return Path(path).resolve().is_relative_to(self.native_boundary)
 
@@ -308,12 +464,21 @@ class _ProfileChecks:
         )
 
     def pytest_ignore_collect(self, collection_path):
+        if not self.eval_requested and self._eval_path(collection_path):
+            return True
         if not self.native_requested and self._native_path(collection_path):
             return True
         return None
 
     @pytest.hookimpl(wrapper=True, tryfirst=True)
     def pytest_collect_file(self, file_path, parent):
+        if self._eval_path(file_path):
+            if self.config.getoption("pyargs"):
+                raise pytest.UsageError(self._eval_unsupported_selector())
+            if not self.eval_requested or not self.eval_prerequisite_passed:
+                raise pytest.UsageError(
+                    "llm-eval preflight required before optional file collection"
+                )
         if self._native_path(file_path):
             if self.config.getoption("pyargs"):
                 raise pytest.UsageError(self._unsupported_selector())
@@ -326,6 +491,9 @@ class _ProfileChecks:
         return (yield)
 
     def pytest_sessionstart(self):
+        if self.eval_requested:
+            _eval_prerequisites()
+            self.eval_prerequisite_passed = True
         if self.native_requested:
             _native_prerequisites()
             self.native_prerequisite_passed = True
@@ -342,8 +510,19 @@ class _ProfileChecks:
                 self.native_boundary / "cases.json"
             )
 
+        if self.eval_qualification:
+            self.eval_expected = _load_eval_ledger(self.eval_boundary / "cases.json")
+
     def pytest_collection_modifyitems(self, items):
         for item in items:
+            if self._eval_path(item.path):
+                if not self.eval_requested or not self.eval_prerequisite_passed:
+                    raise pytest.UsageError("llm-eval collection escaped preflight")
+                item.add_marker("llm_eval")
+            elif item.get_closest_marker("llm_eval") is not None:
+                raise pytest.UsageError(
+                    f"llm_eval marker outside optional directory: {item.nodeid}"
+                )
             if self.retained_qualification and any(
                 item.get_closest_marker(name) is None
                 for name in ("runtime", "retained_model_search")
@@ -361,6 +540,15 @@ class _ProfileChecks:
                 )
 
     def pytest_collection_finish(self, session):
+        self.eval_collected = Counter(
+            item.nodeid for item in session.items if self._eval_path(item.path)
+        )
+        if self.eval_qualification and self.eval_collected != self.eval_expected:
+            self.violations.append(
+                "llm-eval ledger mismatch: "
+                f"missing {dict(self.eval_expected - self.eval_collected)}; "
+                f"extra or duplicate {dict(self.eval_collected - self.eval_expected)}"
+            )
         if self.retained_qualification:
             expected = Counter(_RETAINED)
             collected = Counter(item.nodeid for item in session.items)
@@ -389,12 +577,20 @@ class _ProfileChecks:
                 )
 
     def _check_skip(self, report):
-        if not (self.qualify or self._native_node(report.nodeid)) or not report.skipped:
+        if (
+            not (
+                self.qualify
+                or self._native_node(report.nodeid)
+                or self._eval_node(report.nodeid)
+            )
+            or not report.skipped
+        ):
             return
         reason = report.longrepr[2].removeprefix("Skipped: ")
         allowed = (
             self.base
             and not self._native_node(report.nodeid)
+            and not self._eval_node(report.nodeid)
             and report.nodeid == _DP_MODULE
             and reason == _DP_REASON
             and importlib.util.find_spec("opacus") is None
@@ -408,7 +604,11 @@ class _ProfileChecks:
         self._check_skip(report)
 
     def pytest_runtest_logreport(self, report):
-        if not (self.qualify or self._native_node(report.nodeid)):
+        if not (
+            self.qualify
+            or self._native_node(report.nodeid)
+            or self._eval_node(report.nodeid)
+        ):
             return
         if hasattr(report, "wasxfail"):
             self.violations.append(f"unexpected xfail/xpass: {report.nodeid}")
@@ -433,6 +633,12 @@ class _ProfileChecks:
 
     def pytest_sessionfinish(self, session, exitstatus):
         self.session = session
+        if self.eval_qualification and not self.config.getoption("collectonly"):
+            missing = self.eval_expected.keys() - self.passed
+            if missing:
+                self.violations.append(
+                    "llm-eval ledger cases did not pass: " + ", ".join(sorted(missing))
+                )
         if self.retained_qualification and not self.config.getoption("collectonly"):
             missing = _RETAINED - self.passed
             if missing:
@@ -492,7 +698,7 @@ class _ProfileChecks:
             self.session is not None and self.session.exitstatus == pytest.ExitCode.OK
         )
         if not self.native_requested:
-            scope = "core scope (native excluded)"
+            scope = "core scope (native excluded); Lighteval excluded"
         elif not self.native_qualification:
             scope = "native focused execution (not complete qualification)"
         elif success and self.config.getoption("collectonly"):
@@ -501,6 +707,17 @@ class _ProfileChecks:
             scope = "native complete qualification"
         else:
             scope = "native qualification failed"
+        if self.eval_requested:
+            if not self.eval_qualification:
+                scope = "Lighteval focused execution (not complete qualification)"
+            elif success and self.config.getoption("collectonly"):
+                scope = (
+                    "Lighteval collection-only validation (no execution qualification)"
+                )
+            elif success and self.eval_expected:
+                scope = "Lighteval complete qualification"
+            else:
+                scope = "Lighteval qualification failed"
         terminalreporter.write_line(f"test profile: {scope}")
         if self.violations:
             terminalreporter.section("test profile violations", red=True)

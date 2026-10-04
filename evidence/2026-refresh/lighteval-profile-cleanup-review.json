@@ -1,0 +1,578 @@
+{
+  "schema_version": 1,
+  "reviewer": "/root/lighteval_profile_cleanup_review",
+  "review_type": "Fresh independent review of frozen optional profile plus original-author LR1 fixture-only cleanup; no nested agents or source edits.",
+  "recorded_at_utc": "2026-10-03T23:02:02.356222+00:00",
+  "verdict": "ACCEPT_COMBINED_SOURCE; Linux execution remains an explicit root gate",
+  "findings": [],
+  "unresolved_findings": {
+    "critical": 0,
+    "high": 0,
+    "medium": 0,
+    "low": 0
+  },
+  "source": {
+    "worktree": "/tmp/plato-refresh-worktrees/lighteval-integration",
+    "base_commit": "5dfe67bd49f6bd1383e134e4d8a475261de22075",
+    "candidate_commit": "d2ed4bcbc46684ac60dfdb1505ff764029ee48e9",
+    "candidate_tree": "5a4c1d53e1715ecb38df5e7e16f9369d5c029750",
+    "status_porcelain": "",
+    "profile_source_commit": "1a7fea6f4fbd0232032332958f4354067e306342",
+    "profile_cherry_pick": "db6f88fb",
+    "lr1_source_commit": "52b7ecdf063fd0827ceae05b068e2c55c79aae08",
+    "changed_paths": [
+      ".github/scripts/stage_ci_artifacts.py",
+      ".github/workflows/pytorch_tests.yml",
+      "pyproject.toml",
+      "tests/conftest.py",
+      "tests/llm_eval/cases.json",
+      "tests/llm_eval/test_lighteval_runtime.py",
+      "tests/test_llm_eval_profile_contract.py"
+    ],
+    "sha256": {
+      ".github/scripts/stage_ci_artifacts.py": {
+        "path": "/tmp/plato-refresh-worktrees/lighteval-integration/.github/scripts/stage_ci_artifacts.py",
+        "sha256": "f42387c37fa6de4774dc2a04fd6536ff812223aec7a31393f1de20d8fa1bf547",
+        "bytes": 10344
+      },
+      ".github/workflows/pytorch_tests.yml": {
+        "path": "/tmp/plato-refresh-worktrees/lighteval-integration/.github/workflows/pytorch_tests.yml",
+        "sha256": "cd6895c7fc62ee6f0efeff0909fc16078e31adbc61d900db8058548b86714b54",
+        "bytes": 33238
+      },
+      "pyproject.toml": {
+        "path": "/tmp/plato-refresh-worktrees/lighteval-integration/pyproject.toml",
+        "sha256": "fcc830f9fac66f2e2f28bef0d715bea3eb1300105a4239bb33cce8f62b71b398",
+        "bytes": 4102
+      },
+      "tests/conftest.py": {
+        "path": "/tmp/plato-refresh-worktrees/lighteval-integration/tests/conftest.py",
+        "sha256": "2d5323021b000249805712282c2ee5281eaa3c4fc65a55a65e8215acfe14a54f",
+        "bytes": 33845
+      },
+      "tests/llm_eval/cases.json": {
+        "path": "/tmp/plato-refresh-worktrees/lighteval-integration/tests/llm_eval/cases.json",
+        "sha256": "557fd7e5af010e49c7a687b5632c22ef80cc0db4f6639c8ce67fda20d9b7dded",
+        "bytes": 2149
+      },
+      "tests/llm_eval/test_lighteval_runtime.py": {
+        "path": "/tmp/plato-refresh-worktrees/lighteval-integration/tests/llm_eval/test_lighteval_runtime.py",
+        "sha256": "923813575c9a7e588da27f4f3a1d178ee896b651829234a7306edb33bf381d44",
+        "bytes": 20862
+      },
+      "tests/test_llm_eval_profile_contract.py": {
+        "path": "/tmp/plato-refresh-worktrees/lighteval-integration/tests/test_llm_eval_profile_contract.py",
+        "sha256": "19e81abd34c9c689d840a73e4f5d54f9c3c3a73ca7360d3db2eca7b5ac5e74bc",
+        "bytes": 25201
+      }
+    }
+  },
+  "author_evidence": {
+    "profile": {
+      "path": "/tmp/plato-refresh-worktrees/lighteval-profile/evidence/2026-refresh/lighteval-profile-validation.json",
+      "sha256": "2c2e9a139240c641b328a66e7463874fcda6add4082dd2815423dc87ae34422d",
+      "bytes": 19020
+    },
+    "fixture_cleanup": {
+      "path": "/tmp/plato-refresh-worktrees/lighteval-runtime/evidence/2026-refresh/lighteval-fixture-permissions.json",
+      "sha256": "4f5cc5c11308a28611d94daf03050a6c1b2a8c41de9c21762e5bd53ffa58d243",
+      "bytes": 176324
+    },
+    "profile_raw_reproduction": {
+      "path": "/tmp/plato-refresh-worktrees/lighteval-profile/evidence/2026-refresh/reproductions/lighteval-profile-policy.tar.gz",
+      "sha256": "9f26aaa559ec451f4a2f1d7585a70c00a9f12697236a8bb73c8cac8bd3d3accd",
+      "bytes": 200885
+    }
+  },
+  "authority": {
+    "accepted_plan": {
+      "path": "/tmp/plato-lighteval-profile-plan.json",
+      "sha256": "8a457832ca649ba39e7ba4f39175aec35e111e00e8856068641ac324ce4015fe",
+      "bytes": 43359
+    },
+    "fresh_plan_review2": {
+      "path": "/tmp/plato-lighteval-profile-plan-review2.json",
+      "sha256": "953261a846d0d19658279a99f688f465f741f3ad040806a9e2cb5a7ccf727529",
+      "bytes": 7622
+    },
+    "accepted_production_runtime_review": {
+      "path": "/tmp/plato-lighteval-runtime-review.json",
+      "sha256": "f034d94fa98c7e291df33a1ad1e3bea2bb6e74d2dcc145ac7c32f9985e3c1e53",
+      "bytes": 20172
+    }
+  },
+  "preservation": {
+    "byte_identical_to_base": {
+      "uv.lock": {
+        "path": "/tmp/plato-refresh-worktrees/lighteval-integration/uv.lock",
+        "sha256": "66a4e4442d7b1f26d220b44ca73c44ff4f1151a86857bb3f93a594819fd08126",
+        "bytes": 755641
+      },
+      "tests/mlx_native/cases.json": {
+        "path": "/tmp/plato-refresh-worktrees/lighteval-integration/tests/mlx_native/cases.json",
+        "sha256": "c168dc33a4d4e7ed70079e09c3de70f5b318d543c035ec13de2826b48e1175bb",
+        "bytes": 88187
+      },
+      "tests/test_mlx_profile_contract.py": {
+        "path": "/tmp/plato-refresh-worktrees/lighteval-integration/tests/test_mlx_profile_contract.py",
+        "sha256": "c26c766a599d235f6841aafe82f178b7fd8a3ae02d8362420d0d4f7e95dd8088",
+        "bytes": 24793
+      },
+      "tests/test_model_search_profile_contract.py": {
+        "path": "/tmp/plato-refresh-worktrees/lighteval-integration/tests/test_model_search_profile_contract.py",
+        "sha256": "fc8f8b300afab10bf5cc6f97b670aeba0e996b708202e14aeaeee015f5712e92",
+        "bytes": 18041
+      },
+      "tests/integration/test_retained_model_search.py": {
+        "path": "/tmp/plato-refresh-worktrees/lighteval-integration/tests/integration/test_retained_model_search.py",
+        "sha256": "ff902a9a34c97ce4842f0dd35b2bc396da5c2998381a66f52d4c5d1142e4fe0d",
+        "bytes": 9141
+      },
+      "plato/evaluators/lighteval.py": {
+        "path": "/tmp/plato-refresh-worktrees/lighteval-integration/plato/evaluators/lighteval.py",
+        "sha256": "73a6f9f790ed1810033f4dcdc7c35bba68cd738260462e517dffd946d26b9775",
+        "bytes": 19717
+      },
+      "plato/evaluators/lighteval_tasks.py": {
+        "path": "/tmp/plato-refresh-worktrees/lighteval-integration/plato/evaluators/lighteval_tasks.py",
+        "sha256": "c5af11e1f9cc71d8cbd0318266690246045049701d00ddd944f45cce121c984f",
+        "bytes": 1427
+      },
+      "tests/llm_eval/helpers.py": {
+        "path": "/tmp/plato-refresh-worktrees/lighteval-integration/tests/llm_eval/helpers.py",
+        "sha256": "0a3c9f230f3de6095791f0930f7e2963aaf2a88a2190f00b8aed01d878614bf1",
+        "bytes": 5097
+      },
+      "tests/llm_eval/__init__.py": {
+        "path": "/tmp/plato-refresh-worktrees/lighteval-integration/tests/llm_eval/__init__.py",
+        "sha256": "50f6badeb74c56f691f86099db5363ab7ce0f551b0ad9dda09e5ca0d762bcabf",
+        "bytes": 59
+      }
+    },
+    "unchanged_conftest_function_ast": [
+      "_full_suite",
+      "_native_prerequisites",
+      "_load_native_ledger",
+      "isolate_test_state",
+      "temp_config"
+    ],
+    "profile_six_paths_match_author_frozen_hashes": true,
+    "runtime_fixture_matches_original_lr1_author_frozen_hash": true
+  },
+  "environment": {
+    "executable": "/tmp/plato-lighteval-integration/env/bin/python",
+    "prefix": "/tmp/plato-lighteval-integration/env",
+    "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+    "packages": {
+      "lighteval": "0.13.0",
+      "nltk": "3.10.3",
+      "langdetect": "1.0.9",
+      "xxhash": "3.8.1",
+      "opacus": "1.6.0",
+      "kazoo": "2.11.0",
+      "gymnasium": "1.3.0"
+    }
+  },
+  "execution_constraints": {
+    "shell": "All shell commands zsh -lc",
+    "model_pipeline_runs": "Serial, CPU-only, OMP/MKL/OpenBLAS each 1, offline HF, no root .venv or shared env resync.",
+    "owned_absent_environment": "/tmp/plato-lighteval-profile-cleanup-review-evidence/env-absent",
+    "owned_missing_langdetect_environment": "/tmp/plato-lighteval-profile-cleanup-review-evidence/env-no-langdetect",
+    "nltk_assets": "Existing /Users/bli/nltk_data reused read-only; resource-negative fixtures are independently copied and child-isolated."
+  },
+  "independent_checks": [
+    {
+      "name": "installed-policy-compatibility",
+      "exit_code": 0,
+      "passed": 266,
+      "seconds": 66.93
+    },
+    {
+      "name": "absent-policy-compatibility",
+      "exit_code": 0,
+      "passed": 266,
+      "seconds": 63.34
+    },
+    {
+      "name": "actual-llm-eval-profile",
+      "exit_code": 0,
+      "passed": 11,
+      "seconds": 78.71
+    },
+    {
+      "name": "reused-basetemp-readonly-cases",
+      "exit_code": 0,
+      "passed": 2,
+      "seconds": 25.69
+    }
+  ],
+  "policy_assessment": [
+    "Actual production conftest excludes optional modules before import on default/core/base/mandatory roots with installed and absent extras. Additional root-dot, core --pyargs tests, actual native383 and retained19 use an import finder sentinel; zero real Lighteval imports and zero optional runtime test modules.",
+    "Filesystem containment is canonical via resolve/is_relative_to and :: parsing. Canonical optional --pyargs rejects before resolution; real alias backstop rejects before optional test import. Inert optional initializer, marker-only rejection, profile/family conflicts, configured/environment filters and focused-versus-complete summaries are covered by naturally executed policy tests.",
+    "Named optional qualification compares exact Counter ledger after selection and requires every expected call pass. Focused optional reports reject collection/setup/call/teardown skips and xfail/xpass. Setup/teardown failures and original nonzero exits cannot become qualification success. Core Config.fromdictargs callers and original RNG/Config fixtures pass without optional requests.",
+    "Real missing package environment and actual missing langdetect reject before upstream import/download. Each real NLTK negative proves LookupError under an isolated actual nltk.data.path with the other resource present before actual production preflight; zero upstream/download events. Success preflight uses real installed API classes and reviewed versions/resources.",
+    "Workflow has persistent step-level UV_PROJECT_ENVIRONMENT covering sync, resources, preflight, collection, pytest, verifier and typing. Repeated identity functions validate Python3.13, resolved prefixes, separate venv and lexical executable ownership; prerequisite/runtime/type/source receipts compare exact tuples. Actual uv correct/omitted/wrong identity regressions pass.",
+    "Exact frozen workflow verifier accepts independently executed combined11 runtime/collection artifacts plus candidate source hashes, actual preflight/interpreter receipts and same-env strict typing. Eleven additional independent mutations reject omissions/substitutions/duplicates/extras, skipped/failure/error/xfail/xpass, inconsistent suite totals and duplicate collection.",
+    "Artifact staging requires all nine optional records for success, excludes optional weights/Parquet and pytest aliases, preserves allowed small diagnostics and retained binary evidence. Ten independent complete/missing-record staging probes pass alongside existing guards.",
+    "Implementation extends existing hooks and counters without new profile framework or backend bypass. Shared native/core/retained contracts, original evaluator code and dependency lock remain byte-identical. No maintainability defect requiring a change was found."
+  ],
+  "collection_preservation": [
+    {
+      "name": "root-dot",
+      "count": 1609,
+      "receipt": {
+        "path": "/tmp/plato-lighteval-profile-cleanup-review-evidence/root-dot.json",
+        "sha256": "823be227707a365773c69a8244c81543879171c678cd75c8e9d4bbb552af4161",
+        "bytes": 138
+      },
+      "log": {
+        "path": "/tmp/plato-lighteval-profile-cleanup-review-evidence/root-dot.log",
+        "sha256": "21c903e9f940b19b7a0bd446eb939ca89221d1b104b144459d345efe9039ea77",
+        "bytes": 183701
+      }
+    },
+    {
+      "name": "core-pyargs-root",
+      "count": 1609,
+      "receipt": {
+        "path": "/tmp/plato-lighteval-profile-cleanup-review-evidence/core-pyargs-root.json",
+        "sha256": "823be227707a365773c69a8244c81543879171c678cd75c8e9d4bbb552af4161",
+        "bytes": 138
+      },
+      "log": {
+        "path": "/tmp/plato-lighteval-profile-cleanup-review-evidence/core-pyargs-root.log",
+        "sha256": "3fb8b5fc2967cd63f2a8bd049d3ec7f9cac9248ce6fb189320bce4046cc6e9c5",
+        "bytes": 183701
+      }
+    },
+    {
+      "name": "core51",
+      "count": 51,
+      "receipt": {
+        "path": "/tmp/plato-lighteval-profile-cleanup-review-evidence/core51.json",
+        "sha256": "823be227707a365773c69a8244c81543879171c678cd75c8e9d4bbb552af4161",
+        "bytes": 138
+      },
+      "log": {
+        "path": "/tmp/plato-lighteval-profile-cleanup-review-evidence/core51.log",
+        "sha256": "da116f1ee52de637595a96f67753cdcc20ae1e8b75aba0d7a4f737a9a09b4636",
+        "bytes": 5991
+      }
+    },
+    {
+      "name": "native383",
+      "count": 383,
+      "receipt": {
+        "path": "/tmp/plato-lighteval-profile-cleanup-review-evidence/native383.json",
+        "sha256": "823be227707a365773c69a8244c81543879171c678cd75c8e9d4bbb552af4161",
+        "bytes": 138
+      },
+      "log": {
+        "path": "/tmp/plato-lighteval-profile-cleanup-review-evidence/native383.log",
+        "sha256": "71975123b9d4313bb3b5d6f0b6f76fc242de821dca726edc08fe89133035db99",
+        "bytes": 50721
+      }
+    },
+    {
+      "name": "retained19",
+      "count": 19,
+      "receipt": {
+        "path": "/tmp/plato-lighteval-profile-cleanup-review-evidence/retained19.json",
+        "sha256": "823be227707a365773c69a8244c81543879171c678cd75c8e9d4bbb552af4161",
+        "bytes": 138
+      },
+      "log": {
+        "path": "/tmp/plato-lighteval-profile-cleanup-review-evidence/retained19.log",
+        "sha256": "5c7e90a057e359b3c1f031b1e17e86290300094972b78b47117e5a589d7788e9",
+        "bytes": 2008
+      }
+    }
+  ],
+  "exact_runtime_inventory": [
+    "tests/llm_eval/test_lighteval_runtime.py::test_real_preset_pipeline_normalizes_metrics_and_refreshes_exports[current-model]",
+    "tests/llm_eval/test_lighteval_runtime.py::test_real_preset_pipeline_normalizes_metrics_and_refreshes_exports[configured-local]",
+    "tests/llm_eval/test_lighteval_runtime.py::test_real_piqa_prompt_and_preset_task_contract",
+    "tests/llm_eval/test_lighteval_runtime.py::test_real_model_config_failure_clears_stale_results_and_exports[False]",
+    "tests/llm_eval/test_lighteval_runtime.py::test_real_model_config_failure_clears_stale_results_and_exports[True]",
+    "tests/llm_eval/test_lighteval_runtime.py::test_real_missing_primary_metric_is_rejected",
+    "tests/llm_eval/test_lighteval_runtime.py::test_real_readonly_local_source_ignores_old_responses[same]",
+    "tests/llm_eval/test_lighteval_runtime.py::test_real_readonly_local_source_ignores_old_responses[separate]",
+    "tests/llm_eval/test_lighteval_runtime.py::test_failure_after_actual_inference_cleans_local_copies[False]",
+    "tests/llm_eval/test_lighteval_runtime.py::test_failure_after_actual_inference_cleans_local_copies[True]",
+    "tests/llm_eval/test_lighteval_runtime.py::test_real_hub_style_response_cache_is_per_run"
+  ],
+  "runtime_junit_totals": {
+    "tests": 11,
+    "errors": 0,
+    "failures": 0,
+    "skipped": 0
+  },
+  "readonly_lr1_closure": {
+    "status": "CLOSED",
+    "affected_case_count": 2,
+    "first_combined_run_and_reused_basetemp_repeat_both_passed": true,
+    "source_immutability_oracles_executed_before_permission_teardown": true,
+    "restored_counts": [
+      12,
+      13
+    ],
+    "no_rm_rf_pytest_cleanup_warnings": true,
+    "original_author_post_assertion_injected_failure_receipt_read_and_source_bound": true,
+    "independent_post_assertion_injected_failure_not_repeated": "Original finally implementation inspected; independent combined run plus reused basetemp repeat close the observed housekeeping regression."
+  },
+  "ci_verifier": {
+    "accepted_actual_combined11": true,
+    "source_file_count": 14,
+    "independent_rejected_mutations": [
+      {
+        "damage": "omitted",
+        "status": 1,
+        "issues": [
+          "JUnit must match the reviewed ledger exactly once."
+        ]
+      },
+      {
+        "damage": "substituted",
+        "status": 1,
+        "issues": [
+          "JUnit must match the reviewed ledger exactly once."
+        ]
+      },
+      {
+        "damage": "duplicate",
+        "status": 1,
+        "issues": [
+          "JUnit must match the reviewed ledger exactly once."
+        ]
+      },
+      {
+        "damage": "extra",
+        "status": 1,
+        "issues": [
+          "JUnit must match the reviewed ledger exactly once."
+        ]
+      },
+      {
+        "damage": "skip",
+        "status": 1,
+        "issues": [
+          "JUnit has a nonpassing case."
+        ]
+      },
+      {
+        "damage": "failure",
+        "status": 1,
+        "issues": [
+          "JUnit has a nonpassing case."
+        ]
+      },
+      {
+        "damage": "error",
+        "status": 1,
+        "issues": [
+          "JUnit has a nonpassing case."
+        ]
+      },
+      {
+        "damage": "xfail",
+        "status": 1,
+        "issues": [
+          "JUnit has a nonpassing case."
+        ]
+      },
+      {
+        "damage": "xpass",
+        "status": 1,
+        "issues": [
+          "Execution has missing passes or forbidden outcomes."
+        ]
+      },
+      {
+        "damage": "suite-totals",
+        "status": 1,
+        "issues": [
+          "JUnit suite totals must match all passing ledger cases."
+        ]
+      },
+      {
+        "damage": "collection-duplicate",
+        "status": 1,
+        "issues": [
+          "Collection must match the reviewed ledger exactly once."
+        ]
+      }
+    ],
+    "receipt": {
+      "path": "/tmp/plato-lighteval-profile-cleanup-review-evidence/actual-ci-acceptance.json",
+      "sha256": "f35757d441e2cbd9ee4633581d7346429a6a8c081f6b67a0414f555f370dce7b",
+      "bytes": 50391
+    }
+  },
+  "raw_receipts": {
+    "interpreter.json": {
+      "path": "/tmp/plato-lighteval-profile-cleanup-review-evidence/interpreter.json",
+      "sha256": "42eab4a2f7a3934f7f386a4592f2af586f55f470c78812949a76dbc257780aeb",
+      "bytes": 382
+    },
+    "runtime.log": {
+      "path": "/tmp/plato-lighteval-profile-cleanup-review-evidence/runtime.log",
+      "sha256": "ec446b68872751d6a397277743b68b2513c3f37bb082f4ecab5053aaf2fdbd5b",
+      "bytes": 1398,
+      "raw": "W1003 18:48:25.317000 68614 /private/tmp/plato-lighteval-integration/env/lib/python3.13/site-packages/torch/distributed/elastic/multiprocessing/redirects.py:35] NOTE: Redirects are currently not supported in MacOs.\n============================= test session starts ==============================\nplatform darwin -- Python 3.13.16, pytest-9.1.1, pluggy-1.6.0\nrootdir: /private/tmp/plato-refresh-worktrees/lighteval-integration\nconfigfile: pyproject.toml\nplugins: platformdirs-4.12.2, cov-7.1.0, anyio-4.15.1\ncollected 11 items\n\ntests/llm_eval/test_lighteval_runtime.py ...........                     [100%]\n\n=============================== warnings summary ===============================\ntests/llm_eval/test_lighteval_runtime.py::test_real_preset_pipeline_normalizes_metrics_and_refreshes_exports[current-model]\n  /tmp/plato-lighteval-integration/env/lib/python3.13/site-packages/huggingface_hub/utils/_deprecation.py:100: FutureWarning: Deprecated argument(s) used in 'list_models': model_name. Will not be supported from version '2.0'.\n  \n  Use `search` instead.\n    warnings.warn(message, FutureWarning)\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n- generated xml file: /tmp/plato-lighteval-profile-cleanup-review-evidence/runtime.xml -\ntest profile: Lighteval complete qualification\n=================== 11 passed, 1 warning in 78.71s (0:01:18) ===================\n"
+    },
+    "runtime.xml": {
+      "path": "/tmp/plato-lighteval-profile-cleanup-review-evidence/runtime.xml",
+      "sha256": "cfd68a8233275f9653303c967f2cadbfb767501befdb793c3261b45258a9d9b9",
+      "bytes": 58193
+    },
+    "runtime-readonly-repeat.log": {
+      "path": "/tmp/plato-lighteval-profile-cleanup-review-evidence/runtime-readonly-repeat.log",
+      "sha256": "a3131ba1575a69bad13f8491bfa0400933ab498ea34e64ccf61eed92c05a2511",
+      "bytes": 732,
+      "raw": "..                                                                       [100%]\n=============================== warnings summary ===============================\ntests/llm_eval/test_lighteval_runtime.py::test_real_readonly_local_source_ignores_old_responses[same]\n  /tmp/plato-lighteval-integration/env/lib/python3.13/site-packages/huggingface_hub/utils/_deprecation.py:100: FutureWarning: Deprecated argument(s) used in 'list_models': model_name. Will not be supported from version '2.0'.\n  \n  Use `search` instead.\n    warnings.warn(message, FutureWarning)\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\ntest profile: Lighteval focused execution (not complete qualification)\n2 passed, 1 warning in 25.69s\n"
+    },
+    "runtime-readonly-repeat.xml": {
+      "path": "/tmp/plato-lighteval-profile-cleanup-review-evidence/runtime-readonly-repeat.xml",
+      "sha256": "c64a6e90afae94295bbf593b85fc9dcfdd657c80269e31dbe88232e03c2fc469",
+      "bytes": 9529
+    },
+    "policy-installed.log": {
+      "path": "/tmp/plato-lighteval-profile-cleanup-review-evidence/policy-installed.log",
+      "sha256": "75b8636436b79b24464426d6be537845fb5b1cdeada2e559eef4fc9f0e02365f",
+      "bytes": 414,
+      "raw": "........................................................................ [ 27%]\n........................................................................ [ 54%]\n........................................................................ [ 81%]\n..................................................                       [100%]\ntest profile: core scope (native excluded); Lighteval excluded\n266 passed in 66.93s (0:01:06)\n"
+    },
+    "policy-installed.xml": {
+      "path": "/tmp/plato-lighteval-profile-cleanup-review-evidence/policy-installed.xml",
+      "sha256": "618a35bdd8e83c1b721dc33016ddef75eeb7c15d62f71965bab49ecb9eed39ac",
+      "bytes": 74198
+    },
+    "policy-absent.log": {
+      "path": "/tmp/plato-lighteval-profile-cleanup-review-evidence/policy-absent.log",
+      "sha256": "50ff7c5bc289fb51a0243644640976a5e2916d4ac636e9509f3ccda4919e9e5d",
+      "bytes": 414,
+      "raw": "........................................................................ [ 27%]\n........................................................................ [ 54%]\n........................................................................ [ 81%]\n..................................................                       [100%]\ntest profile: core scope (native excluded); Lighteval excluded\n266 passed in 63.34s (0:01:03)\n"
+    },
+    "policy-absent.xml": {
+      "path": "/tmp/plato-lighteval-profile-cleanup-review-evidence/policy-absent.xml",
+      "sha256": "0f6bc8686d25318822ce28607c2e20f1ded910f33502ec8f673f5a941454c31b",
+      "bytes": 55595
+    },
+    "real-resource-negatives.json": {
+      "path": "/tmp/plato-lighteval-profile-cleanup-review-evidence/real-resource-negatives.json",
+      "sha256": "6233d81b6a238524e640198ecfc9b2647f91b52e6ed3c2068739a7171eebf345",
+      "bytes": 17146
+    },
+    "no-langdetect-prerequisite.json": {
+      "path": "/tmp/plato-lighteval-profile-cleanup-review-evidence/no-langdetect-prerequisite.json",
+      "sha256": "3f82b8ea32e7f7c5cf520bec31e0bf368484297eb536674c10bc538b6f40e27a",
+      "bytes": 482
+    },
+    "absent-extra-prerequisite.json": {
+      "path": "/tmp/plato-lighteval-profile-cleanup-review-evidence/absent-extra-prerequisite.json",
+      "sha256": "2fd9dde06f8524d0a79781e3aa900c6ce516513a8b29be3be9fa5e5f0546fce0",
+      "bytes": 454
+    },
+    "extra-policy-summary.json": {
+      "path": "/tmp/plato-lighteval-profile-cleanup-review-evidence/extra-policy-summary.json",
+      "sha256": "3904ef05c62013526fd3421a1312de54694afe5039c4d172f44f0039b79d8f4a",
+      "bytes": 2504
+    },
+    "actual-eval-collection.log": {
+      "path": "/tmp/plato-lighteval-profile-cleanup-review-evidence/actual-eval-collection.log",
+      "sha256": "5ddc7f152f0230a7226cbdc32a9028ff4455e0978fc01fefd2a8de3ea66e5cae",
+      "bytes": 1481,
+      "raw": "W1003 18:57:42.382000 70876 /private/tmp/plato-lighteval-integration/env/lib/python3.13/site-packages/torch/distributed/elastic/multiprocessing/redirects.py:35] NOTE: Redirects are currently not supported in MacOs.\ntests/llm_eval/test_lighteval_runtime.py::test_real_preset_pipeline_normalizes_metrics_and_refreshes_exports[current-model]\ntests/llm_eval/test_lighteval_runtime.py::test_real_preset_pipeline_normalizes_metrics_and_refreshes_exports[configured-local]\ntests/llm_eval/test_lighteval_runtime.py::test_real_piqa_prompt_and_preset_task_contract\ntests/llm_eval/test_lighteval_runtime.py::test_real_model_config_failure_clears_stale_results_and_exports[False]\ntests/llm_eval/test_lighteval_runtime.py::test_real_model_config_failure_clears_stale_results_and_exports[True]\ntests/llm_eval/test_lighteval_runtime.py::test_real_missing_primary_metric_is_rejected\ntests/llm_eval/test_lighteval_runtime.py::test_real_readonly_local_source_ignores_old_responses[same]\ntests/llm_eval/test_lighteval_runtime.py::test_real_readonly_local_source_ignores_old_responses[separate]\ntests/llm_eval/test_lighteval_runtime.py::test_failure_after_actual_inference_cleans_local_copies[False]\ntests/llm_eval/test_lighteval_runtime.py::test_failure_after_actual_inference_cleans_local_copies[True]\ntests/llm_eval/test_lighteval_runtime.py::test_real_hub_style_response_cache_is_per_run\n\ntest profile: Lighteval collection-only validation (no execution qualification)\n11 tests collected in 0.01s\n"
+    },
+    "actual-ci-acceptance.json": {
+      "path": "/tmp/plato-lighteval-profile-cleanup-review-evidence/actual-ci-acceptance.json",
+      "sha256": "f35757d441e2cbd9ee4633581d7346429a6a8c081f6b67a0414f555f370dce7b",
+      "bytes": 50391
+    },
+    "actual-ci-mutations.json": {
+      "path": "/tmp/plato-lighteval-profile-cleanup-review-evidence/actual-ci-mutations.json",
+      "sha256": "e555b0fdc894a4eca9ccaa4a486332a6aa7ba70210f03ce583599a6d369d71da",
+      "bytes": 1391
+    },
+    "actual-ci-gate.log": {
+      "path": "/tmp/plato-lighteval-profile-cleanup-review-evidence/actual-ci-gate.log",
+      "sha256": "c189c490e9c949a0893a29d691bcd7f423ede1f12a32fb1ecc73ef711d89df62",
+      "bytes": 596,
+      "raw": "{\n  \"actual_gate_accepted\": true,\n  \"mutations_rejected\": 11,\n  \"interpreter\": {\n    \"configured_environment\": \"/tmp/plato-lighteval-integration/env\",\n    \"executable\": \"/tmp/plato-lighteval-integration/env/bin/python\",\n    \"prefix\": \"/tmp/plato-lighteval-integration/env\",\n    \"exec_prefix\": \"/tmp/plato-lighteval-integration/env\",\n    \"base_prefix\": \"/Users/bli/.local/share/uv/python/cpython-3.13.16-macos-aarch64-none\",\n    \"python\": \"3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]\"\n  },\n  \"runtime_fixture_sha256\": \"923813575c9a7e588da27f4f3a1d178ee896b651829234a7306edb33bf381d44\"\n}\n"
+    },
+    "typing-present.log": {
+      "path": "/tmp/plato-lighteval-profile-cleanup-review-evidence/typing-present.log",
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "bytes": 19,
+      "raw": "All checks passed!\n"
+    },
+    "typing-absent.log": {
+      "path": "/tmp/plato-lighteval-profile-cleanup-review-evidence/typing-absent.log",
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "bytes": 19,
+      "raw": "All checks passed!\n"
+    },
+    "typing-stager.log": {
+      "path": "/tmp/plato-lighteval-profile-cleanup-review-evidence/typing-stager.log",
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "bytes": 19,
+      "raw": "All checks passed!\n"
+    },
+    "ruff.log": {
+      "path": "/tmp/plato-lighteval-profile-cleanup-review-evidence/ruff.log",
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "bytes": 19,
+      "raw": "All checks passed!\n"
+    },
+    "lock-check.log": {
+      "path": "/tmp/plato-lighteval-profile-cleanup-review-evidence/lock-check.log",
+      "sha256": "6dacb778c162ca592bdbb01c2ce5ea925c1bb6037efbb57c8714087f878922ee",
+      "bytes": 51,
+      "raw": "Using CPython 3.13.16\nResolved 265 packages in 5ms\n"
+    },
+    "stager-summary.json": {
+      "path": "/tmp/plato-lighteval-profile-cleanup-review-evidence/stager-summary.json",
+      "sha256": "70554dc1a3f7b2dc3aca95dc7d341efc9cbf91458b24fcd95caad977b92fa515",
+      "bytes": 1751
+    }
+  },
+  "review_harnesses": {
+    "extra_policy.py": {
+      "path": "/tmp/plato-lighteval-profile-cleanup-review-evidence/extra_policy.py",
+      "sha256": "95b6f194e1ad841178a1983e34192f6c546a797f84266959f7b5cd139cbf4534",
+      "bytes": 3148
+    },
+    "package_negative.py": {
+      "path": "/tmp/plato-lighteval-profile-cleanup-review-evidence/package_negative.py",
+      "sha256": "0bbfe3b4972f920ed75e138f84f3415e1b73197b2ef9f24b6bb3a52894c859fd",
+      "bytes": 2049
+    },
+    "ci_gate.py": {
+      "path": "/tmp/plato-lighteval-profile-cleanup-review-evidence/ci_gate.py",
+      "sha256": "3df6dbf2da88106a62292ca2961c4398f9697c5c2aa9f2e2afdd31ddbcad887a",
+      "bytes": 5435
+    },
+    "stager_probe.py": {
+      "path": "/tmp/plato-lighteval-profile-cleanup-review-evidence/stager_probe.py",
+      "sha256": "05d4ae06caee1a2ba3b1a22fde8980ea9125a5e2e79f74e6176590ec9ae94b6f",
+      "bytes": 2197
+    },
+    "write_review.py": {
+      "path": "/tmp/plato-lighteval-profile-cleanup-review-evidence/write_review.py",
+      "sha256": "ddb62510df94785398556cde3ee0f29bc045949052354918d9c2b9e38574b156",
+      "bytes": 15623
+    }
+  },
+  "limitations_and_root_gates": [
+    "Actual runtime and native preflight/collection ran on Darwin arm64 Python3.13.16. Linux Python3.13 locked CI provisioning, 11 runtime execution, budgets and actual artifacts remain root gates.",
+    "No broad core/native/retained behavior suite was duplicated. Source preservation, existing profile/compatibility tests and exact actual collection inventories were independently checked; root owns final full qualification.",
+    "CI artifact verifier was extracted exactly from frozen workflow and run on independent actual combined11 outputs in an owned sandbox. Full workflow CI shell provisioning was not redispatched or rerun; same-env identity/resource/type behavior and artifact mutations were separately exercised.",
+    "The only actual runtime warning is the accepted upstream Hugging Face Hub list_models deprecation. No cleanup warning occurs after fixture fix.",
+    "Support is bounded real installed API/controlled offline synthetic-model integration and cache/failure/source invariance. No benchmark accuracy, GPU/distributed/all-task/resource/security assurance is claimed."
+  ],
+  "non_source_tooling_corrections": [
+    "One exploratory pytest invocation named nonexistent tests/test_ci_artifact_staging.py and exited4 before collection. Corrected five-path subset subsequently passed266 in both environments; no product failure or pass claim from that invocation.",
+    "One auxiliary receipt read used unavailable bare python and exited127 after successful preceding read-only shell output. Receipt was read with sed and validated by owned uv interpreter."
+  ],
+  "writes": "Only isolated /tmp review evidence and owned envs; candidate source unchanged, no workflow dispatch/publication, no unrelated cleanup."
+}

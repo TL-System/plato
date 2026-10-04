@@ -1,0 +1,24 @@
+{
+  "head": "86573a123c4166e5f9124e46f9ccef33505fc6cf",
+  "distributions": [
+    {
+      "file": "plato_learn-1.4.3-py3-none-any.whl",
+      "bytes": 383621,
+      "sha256": "5e300e5a00b575557cd0ca5c948d956772fb7229a470bdbead2ac1333ced79dd",
+      "members": 213,
+      "metadata_matches": true,
+      "source_files_match": true
+    },
+    {
+      "file": "plato_learn-1.4.3.tar.gz",
+      "bytes": 3947918,
+      "sha256": "ac03afb21da2721032d3151bc58aeb624c544e4dbc70add4cbec53c144fdf553",
+      "members": 1244,
+      "metadata_matches": true,
+      "source_files_match": true
+    }
+  ],
+  "strict_docs_log_sha256": "66e2b36f30e77ae22af7cd5b72a4811385beee8c1216e8cf29e0a17788f9b000",
+  "ruff": "All checks passed!",
+  "scope": "Retired shortlist and generated payload checks; broader legacy archive exclusion remains separate P2 work."
+}

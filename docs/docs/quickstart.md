@@ -40,16 +40,22 @@ type = "lighteval"
 install the optional evaluator stack first:
 
 ```bash
-uv sync --extra llm_eval
+uv sync --locked --python 3.13 --extra llm_eval
+uv run --locked --extra llm_eval python -m nltk.downloader punkt punkt_tab
 ```
 
 Then run the reference SmolLM2 configuration:
 
 ```bash
-uv run python plato.py --config configs/HuggingFace/fedavg_smol_smoltalk_smollm2_135m.toml
+uv run --locked --extra llm_eval python plato.py --config configs/HuggingFace/fedavg_smol_smoltalk_smollm2_135m.toml
 ```
 
-This configuration performs Hugging Face training locally while the server evaluates the aggregated global model with Lighteval after each round.
+This configuration trains SmolLM2 while the server evaluates the aggregated
+global model after each round. It downloads external models and datasets and
+sets `evaluation.device = "cuda:0"`. For CPU evaluation, change that field to
+`"cpu"` in a copied config and pass `--cpu` for the trainer. Keep `--extra llm_eval`
+on syncing commands; see [installation](install.md#optional-server-side-llm-evaluation-with-lighteval)
+for dependency isolation and NLTK resources.
 
 See [Evaluation](configurations/evaluation.md) for the available evaluator options and [Server-side Lighteval for SmolLM2](examples/case-studies/4. Server-side Lighteval for SmolLM2.md) for the full example.
 

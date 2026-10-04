@@ -54,6 +54,8 @@ ssl = [
 llm_eval = [
     "lighteval==0.13.0",
     "langdetect>=1.0.9,<2",
+    # Lighteval 0.13.0 hashes text directly; xxhash 4 requires bytes.
+    "xxhash>=3.8.1,<4",
 ]
 
 [project.urls]
@@ -165,6 +167,7 @@ norecursedirs = [
 ]
 addopts = "--strict-markers"
 markers = [
+    "llm_eval: explicit real CPU Lighteval qualification cases.",
     "mlx_native: explicit Apple Silicon native MLX qualification cases.",
     "retained_model_search: isolated retained model-search behavior requiring ptflops.",
     "runtime: fresh startup, CPU socket rounds and containment regressions.",
