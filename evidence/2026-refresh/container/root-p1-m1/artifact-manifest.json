@@ -1,0 +1,237 @@
+{
+  "repair_code_commit": "1d26c7926c2f4c0fd83823650612757816ef8142",
+  "files": {
+    "repair.json": {
+      "bytes": 4925,
+      "sha256": "9437e69960dead60e49d6068345bc82af7da89d977b4a4dc9efa0787aa975a74"
+    },
+    "bytecode-regression.py": {
+      "bytes": 6426,
+      "sha256": "094d665fcfe7b1a8e34c7e78bfaa025cdde4d04100d57abedc1e78ae9ca1b1c3"
+    },
+    "failed-linux-console.log": {
+      "bytes": 13856,
+      "sha256": "507fa1ef09445a99372fdb3cc2ecdcfaa9b489e96dc490b2b22bd749764788e3"
+    },
+    "existing-degradation-replay.py": {
+      "bytes": 5297,
+      "sha256": "58f1e3091698d2805235f6ec6f5d4f1005bd7c159ebc30ca946e1056eb98910a"
+    },
+    "local/format.log": {
+      "bytes": 25,
+      "sha256": "fd2299c9f1c6dc869070883e281051bfe93aacf66c1a3b0069f45b4aa410ca50"
+    },
+    "local/existing-degradation.log": {
+      "bytes": 61,
+      "sha256": "cd29c6637d211af6b88b1accc5469310c3cbc6b5c79b3a2f69da7be138c971d4"
+    },
+    "local/commands.json": {
+      "bytes": 2875,
+      "sha256": "76817fe127a36e2dfddb68845ef92f0f393bfded0338c16c2d091e84c249a730"
+    },
+    "local/ruff.log": {
+      "bytes": 19,
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    "local/bytecode-regression.log": {
+      "bytes": 84,
+      "sha256": "1ebd37960f417156b40fac623423d2aa2e28206773750233b3ca0318dd88e473"
+    },
+    "local/static.log": {
+      "bytes": 121,
+      "sha256": "df84527cc6d8efce3db8a790cdb4705f4d905e54b9fd44df0a62ad06f81e3391"
+    },
+    "local/diff.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "local/actionlint.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "failed-linux-run/image-inspect.log": {
+      "bytes": 9805,
+      "sha256": "792ca2e1329d2a29b0d3306a7842dfcd80ec8471e5bed61e9831fe5877ed4aa5"
+    },
+    "failed-linux-run/docker-info-after.log": {
+      "bytes": 9764,
+      "sha256": "7bbbcf263cca6fa9984a22dd98db901152b762bf8baf16db7dd7ded674af18a0"
+    },
+    "failed-linux-run/image-id.txt": {
+      "bytes": 71,
+      "sha256": "6acf5a44f68af0c2a887c65f98341b7ab802824c793e0f9590919f28aa04dccd"
+    },
+    "failed-linux-run/uv-manifest-raw.log": {
+      "bytes": 2196,
+      "sha256": "f513a91fc62fe7c17567eee97230dd198e43edb8a9fbecca843714a4358fe1bc"
+    },
+    "failed-linux-run/base-manifest-raw.log": {
+      "bytes": 743,
+      "sha256": "b7ae301dea2c162444795462ce17a05f6a516e5a75944b57af5b88540a1a2266"
+    },
+    "failed-linux-run/resources-after.json": {
+      "bytes": 520,
+      "sha256": "cf3c45e06d636b77c0b0ed0f8e73ac643032f3bd5cfa6a5045070c827d111c62"
+    },
+    "failed-linux-run/source.json": {
+      "bytes": 1305,
+      "sha256": "f5afae51a2b9438a007cfbf3d20bd10e0a3e824789f1a1b66d085dcd9cc40d95"
+    },
+    "failed-linux-run/cli-help.log": {
+      "bytes": 1479,
+      "sha256": "a3a831ad47b2797bd7b0fdb5e6218715901e8cb4679775f8980d93ec2c6a5577"
+    },
+    "failed-linux-run/resources-initial.json": {
+      "bytes": 522,
+      "sha256": "56c603cd58b743a308c43e871969b8e1a0ab783ae4826c32dfd1f38a0cfad847"
+    },
+    "failed-linux-run/hosted-sdk-reclamation.json": {
+      "bytes": 105,
+      "sha256": "e582463da7d78e3343fcae1bdfb5bd4599b65e0db7c89550575aaf376f8438a7"
+    },
+    "failed-linux-run/docker-disk-initial.log": {
+      "bytes": 266,
+      "sha256": "90680ca432792862940e3cae0ebdc02a1aa08a12404d84452d39ba5c25b1d377"
+    },
+    "failed-linux-run/mounted-cpu.json": {
+      "bytes": 16605,
+      "sha256": "60523c35ad544653bf9db28e553b969f373d1e503992d2c04e1fd07414b5526a"
+    },
+    "failed-linux-run/unmounted-auto-removal.log": {
+      "bytes": 63,
+      "sha256": "35a1e8896396f57f9096848dff7f89fb4736ac88f48abac24957c18d2b835942"
+    },
+    "failed-linux-run/commands.json": {
+      "bytes": 6913,
+      "sha256": "8b63f042a59a6c026ff9e0bde758324fe377c1618e5e42d4ccdb42fe390d382c"
+    },
+    "failed-linux-run/docker-disk-before.log": {
+      "bytes": 266,
+      "sha256": "90680ca432792862940e3cae0ebdc02a1aa08a12404d84452d39ba5c25b1d377"
+    },
+    "failed-linux-run/resources-before.json": {
+      "bytes": 521,
+      "sha256": "a32fb1336be345616539ab7ba62a418fd8ed95764ca37f6b00a9f010f4b0dfa0"
+    },
+    "failed-linux-run/mounted-exit-auto-removal.log": {
+      "bytes": 64,
+      "sha256": "5c9018b7ceb5ad0e1830fcf3a218ca02ee82ccfe7c8ff63dd70e268c7714d20d"
+    },
+    "failed-linux-run/base-manifest.log": {
+      "bytes": 766,
+      "sha256": "517ba6238b5402a8b6dc0b3cb44abec7e26667253c62e9e20221e87c4f2b40c9"
+    },
+    "failed-linux-run/linux-acceptance.json": {
+      "bytes": 246,
+      "sha256": "46a23b50d9ea8134340747b3b1a660c19964595377f2fae00857b933f5cb47a2"
+    },
+    "failed-linux-run/image-summary.json": {
+      "bytes": 1469,
+      "sha256": "3908becb2f04cc9e9a34eeb656c874e5f010e2bf1ec2137cb03b4b867574b3a1"
+    },
+    "failed-linux-run/mounted-auto-removal.log": {
+      "bytes": 64,
+      "sha256": "5c9018b7ceb5ad0e1830fcf3a218ca02ee82ccfe7c8ff63dd70e268c7714d20d"
+    },
+    "failed-linux-run/mounted-exit.log": {
+      "bytes": 848,
+      "sha256": "1c23c19ed044efa9f27a4944c442e3b218ea49cc444c41d27acc070f89e7a427"
+    },
+    "failed-linux-run/df-before.log": {
+      "bytes": 129,
+      "sha256": "12f14ba674ede13bc0c350bc788ba535529ab9a4ceac5565e5bf706a017e9a40"
+    },
+    "failed-linux-run/uv-manifest.log": {
+      "bytes": 1480,
+      "sha256": "94b30753da8694db575eac68dd83fb2bf0021b5635d7d156084acbf453f3198e"
+    },
+    "failed-linux-run/unmounted-cpu.log": {
+      "bytes": 16210,
+      "sha256": "440828ca91c4fbede18db7fd306154c2ea2214724a246821d8b3da5821ed7560"
+    },
+    "failed-linux-run/docker-disk-after.log": {
+      "bytes": 271,
+      "sha256": "8a49e3ae1862f2b6738654334424d18b85149375d3454c550d4582b06c6ea6c4"
+    },
+    "failed-linux-run/docker-info-before.log": {
+      "bytes": 9764,
+      "sha256": "13a903902c0dde5d8d0aee624f2b27843cfc5c0d6a4dadd803409f1fa57e2248"
+    },
+    "failed-linux-run/df-initial.log": {
+      "bytes": 129,
+      "sha256": "12f14ba674ede13bc0c350bc788ba535529ab9a4ceac5565e5bf706a017e9a40"
+    },
+    "failed-linux-run/unmounted-cpu.json": {
+      "bytes": 15788,
+      "sha256": "a794244ec9e75f4b6cd18f8cfc465742e8c2413a8c0a1007e2e2c77c8c8d2179"
+    },
+    "failed-linux-run/mounted-cpu.log": {
+      "bytes": 16209,
+      "sha256": "9b1ca2eb574a4b3304c6f111e2a1b210cab83822ea26f87804627f6b811fad47"
+    },
+    "failed-linux-run/context-sentinels.json": {
+      "bytes": 217,
+      "sha256": "ab36bac9f31bc832e2f606dacfaa110c2d8018624a9fc7d198728615db387893"
+    },
+    "failed-linux-run/static-acceptance.json": {
+      "bytes": 3052,
+      "sha256": "d79701b104ffd04f8fc2822d8dafe814a47f7e125bba93f714c58a49da27e96c"
+    },
+    "failed-linux-run/docker-info-initial.log": {
+      "bytes": 9764,
+      "sha256": "4e50752987d99f3f011e28ef5891e9ac9c9a9fbc5a283b05b9adeb9c2020e449"
+    },
+    "failed-linux-run/df-after.log": {
+      "bytes": 129,
+      "sha256": "dd11bbd6b176ba78da508811bfb5bce0761d76f2ba06d77097d4620c9551d41f"
+    },
+    "failed-linux-run/image-history.log": {
+      "bytes": 169235,
+      "sha256": "94e5023dfd57d6d94b4048cfd6aa8030e3239cd7afc2d4c7e9d907e6951f3246"
+    },
+    "failed-linux-run/build.log": {
+      "bytes": 21511,
+      "sha256": "07ca7a6a31defa03d494983fe21b3b1966652259193a95da3b0e5bf741675c9e"
+    },
+    "local/degradation/local-linux-refusal.log": {
+      "bytes": 1115,
+      "sha256": "5851a5c2e6b838d5d3c3616aa4f18cbf512dbfafb1a9feaacf0c633cfe7505b0"
+    },
+    "local/degradation/negative-checks.json": {
+      "bytes": 4364,
+      "sha256": "2500d339a7aa8a9df82fdafa1be3478c722d7a8c980e0837ff97c587e2f411d5"
+    },
+    "local/static/source.json": {
+      "bytes": 1300,
+      "sha256": "fb818ecf6f60e722f93f57f8375479ccfb502ca44a1387b625ce7527e4a425a0"
+    },
+    "local/static/static-acceptance.json": {
+      "bytes": 3364,
+      "sha256": "6b64faeb081a5c19c38238ab52e6502e36c335e80c3334284e42694112061e2b"
+    },
+    "local/regression/regression.json": {
+      "bytes": 6555,
+      "sha256": "cafdaa68e2dd0dc8853f5c0cda38af74ab9af035a433cc56602356fa8524adc1"
+    },
+    "local/regression/suppressed/mounted-cpu.json": {
+      "bytes": 777,
+      "sha256": "4c3ed9d9a499185cb851e02ec0f085a8509e2cd791baf72844d896b76a7149b3"
+    },
+    "local/degradation/simulated-resource-gate/hosted-sdk-reclamation.json": {
+      "bytes": 102,
+      "sha256": "d26fb8ee004992f3ffefb38c305637024b3b7cde35b56bd2e5318aff9b316a85"
+    },
+    "local/degradation/simulated-resource-gate/resources-before.json": {
+      "bytes": 506,
+      "sha256": "acaacf477693e68e392485b800df4c8f90ab68e120b9eff4dad4f9f387483a89"
+    },
+    "local/degradation/local-linux-refusal/source.json": {
+      "bytes": 1300,
+      "sha256": "fb818ecf6f60e722f93f57f8375479ccfb502ca44a1387b625ce7527e4a425a0"
+    },
+    "local/degradation/local-linux-refusal/linux-acceptance.json": {
+      "bytes": 178,
+      "sha256": "ef384fc3c64b3187ad8039abf473ebf21c1ed5eb179114285425e47c8decc1bd"
+    }
+  }
+}

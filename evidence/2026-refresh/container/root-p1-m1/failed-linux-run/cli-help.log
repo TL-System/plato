@@ -1,0 +1,34 @@
+
+==========
+== CUDA ==
+==========
+
+CUDA Version 13.0.3
+
+Container image Copyright (c) 2016-2023, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+
+This container image and its contents are governed by the NVIDIA Deep Learning Container License.
+By pulling and using the container, you accept the terms and conditions of this license:
+https://developer.nvidia.com/ngc/nvidia-deep-learning-container-license
+
+A copy of this license is made available in this container at /NGC-DL-CONTAINER-LICENSE for your convenience.
+
+WARNING: The NVIDIA Driver was not detected.  GPU functionality will not be available.
+   Use the NVIDIA Container Toolkit to start this container with GPU support; see
+   https://docs.nvidia.com/datacenter/cloud-native/ .
+
+usage: uv run plato.py [-h] [-i ID] [-p PORT] [-c CONFIG] [-b BASE]
+                       [-s SERVER] [-u] [-m] [-r] [-l LOG]
+
+options:
+  -h, --help           show this help message and exit
+  -i, --id ID          Unique client ID.
+  -p, --port PORT      The port number for running a server.
+  -c, --config CONFIG  Federated learning configuration file.
+  -b, --base BASE      The base path for datasets, models, checkpoints, and
+                       results.
+  -s, --server SERVER  The server hostname and port number.
+  -u, --cpu            Use CPU as the device.
+  -m, --mps            Use MPS as the device.
+  -r, --resume         Resume a previously interrupted training session.
+  -l, --log LOG        Log messages level.

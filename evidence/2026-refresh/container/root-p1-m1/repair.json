@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "finding": "ROOT-P1-M1",
+  "author": "/root/container_author",
+  "created_at_utc": "2026-10-04T01:26:49.302134+00:00",
+  "repair_code_commit": "1d26c7926c2f4c0fd83823650612757816ef8142",
+  "repair_parent": "7fa254c5b944c4bfb65563fc77ee4a33704aa52a",
+  "owned_code_paths": [
+    "Dockerfile",
+    ".github/scripts/check_container.py"
+  ],
+  "code_file_sha256": {
+    "Dockerfile": "a88e26b636ec341bcb69b1894a388c5db0f71bc86e7357d2b789a49ed90e78f1",
+    ".dockerignore": "b90144eaa006aa9954e2f878fcfcbc6d1fa369027582e6f51f4b0500d23ce5da",
+    "dockerrun.sh": "6bbcb5530e5343b0fcb0fd675235f72081efa5fdcfd5fc464e1b28f3eedefee4",
+    "dockerrun_gpu.sh": "2f7ac611428cb0a4d3e36a6b040af4f461cfca8e09252ba0c65fbe105a6a6761",
+    ".github/scripts/check_container.py": "33254721a4a9e4795aac9c3d7e4523f8c17c1afb8da4bc732742e4a75bcc88ee",
+    ".github/workflows/container_checks.yml": "58b24307efa3414c0747e23982ca84822942e62952be886409fd2e3650d3b3e7"
+  },
+  "failed_actual_linux_run": {
+    "pr": 422,
+    "candidate_source": "0791c01afcaea96223a925a32ee22882dc437ee2",
+    "tested_pr_merge_source": "65a88bdfdf3e2418e356971c7d3e225b48c1d3da",
+    "run_id": "37167178271",
+    "run_attempt": "1",
+    "artifact_name": "container-cpu-65a88bdfdf3e2418e356971c7d3e225b48c1d3da-1",
+    "source_record": "failed-linux-run/source.json",
+    "image_id": "sha256:62c091ebdaa09ad106eb6efd744baa63888126f76eb37357820d9f5fe7e3de92",
+    "image_build_completed": true,
+    "cpu_and_mount_checks_completed": true,
+    "overall_accepted": false,
+    "failure": "PermissionError: [Errno 1] Operation not permitted: '/tmp/plato mounted checkout jc_t92ti/source with spaces/plato/__pycache__'",
+    "earlier_failure_masked": false,
+    "command_statuses_checked": 23,
+    "expected_nonzero_command_statuses": {
+      "unmounted-auto-removal.log": 1,
+      "mounted-auto-removal.log": 1,
+      "mounted-exit.log": 23,
+      "mounted-exit-auto-removal.log": 1
+    },
+    "baseline_p1_code_matches_failed_run": {
+      "Dockerfile": "4e67953be6d90fcc73fb52a44fd05914494af625c529990f9366b662041b6a82",
+      ".dockerignore": "b90144eaa006aa9954e2f878fcfcbc6d1fa369027582e6f51f4b0500d23ce5da",
+      "dockerrun.sh": "6bbcb5530e5343b0fcb0fd675235f72081efa5fdcfd5fc464e1b28f3eedefee4",
+      "dockerrun_gpu.sh": "2f7ac611428cb0a4d3e36a6b040af4f461cfca8e09252ba0c65fbe105a6a6761",
+      ".github/scripts/check_container.py": "0f4dd45635dc3f560d6d7f2721aa23492374ecc27a5b408f25acd36c608c80d5",
+      ".github/workflows/container_checks.yml": "58b24307efa3414c0747e23982ca84822942e62952be886409fd2e3650d3b3e7"
+    },
+    "root_cause": "Python imports wrote root-owned plato/__pycache__ into the writable source mount. The host runner could not unlink cache contents or chmod their directory during ordinary TemporaryDirectory cleanup.",
+    "receipt_limit": "Mounted CPU/import/argument/exit/removal assertions passed before cleanup, but the complete Linux job failed. These are failed-baseline artifacts, not qualification of the repaired source."
+  },
+  "repair": {
+    "image_env": "PYTHONDONTWRITEBYTECODE=1",
+    "probe": "Assert and record sys.dont_write_bytecode in the actual image interpreter",
+    "mount_gate": "Reject fixture __pycache__; write accepted mounted receipt only after successful ordinary host fixture cleanup and absence verification",
+    "preserved": "Default root execution, writable checkout mount, persistent/root-owned intentional user outputs, --rm, command forwarding, dependency versions, all existing CPU/provenance checks",
+    "privileged_cleanup_or_ownership_changes": false,
+    "cleanup_errors_suppressed": false
+  },
+  "local_validation": {
+    "commands": "local/commands.json",
+    "bytecode_regression": "local/regression/regression.json",
+    "existing_static_and_degradation_passed": true,
+    "actual_child_import_control": "Without suppression, a real fresh Python 3.13 import writes pyc; with image env value, it imports successfully and writes no bytecode",
+    "actual_checker_exercised": "Real check_mount method with real child imports of copied plato source; Docker/launcher transport and root-owned cleanup denial simulated",
+    "cleanup_denial": "Simulated PermissionError propagates and produces no passing mounted receipt",
+    "actual_docker_executed_locally": false,
+    "actual_root_owned_fixture_created_locally": false,
+    "docker_cli_present_locally": false
+  },
+  "pending_required": [
+    "Different fresh Sol reviewer must review exact repair/evidence commits and raw baseline failure",
+    "Root integrates accepted M1 and M4 repairs and runs actual Linux workflow on revised integrated source",
+    "Actual repaired image must assert dont_write_bytecode, leave no fixture pycache, complete ordinary fixture cleanup and pass all existing image/CPU/mount/provenance gates"
+  ],
+  "repaired_actual_linux_qualification_executed": false,
+  "gpu_compute_tested": false
+}
