@@ -1,0 +1,17 @@
+{
+  "create_time": 1791080062.665214,
+  "cwd": "/private/tmp/plato-refresh-worktrees/remaining-docs-prose",
+  "cmdline": [
+    ".venv-docs/bin/python",
+    "-m",
+    "mkdocs",
+    "serve",
+    "--strict",
+    "-f",
+    "docs/mkdocs.yml"
+  ],
+  "pid": 25113,
+  "exit_code": null,
+  "alive_after": false,
+  "port_8000_connect_ex_after": 61
+}

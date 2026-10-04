@@ -1,0 +1,11 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.13.16, pytest-9.1.1, pluggy-1.6.0
+rootdir: /private/tmp/plato-refresh-worktrees/remaining-docs-prose
+configfile: pyproject.toml
+plugins: cov-7.1.0, anyio-4.15.1
+collected 3 items
+
+tests/trainers/test_lr_scheduler_registry.py ...                         [100%]
+
+test profile: core scope (native excluded); Lighteval excluded
+============================== 3 passed in 0.03s ===============================
