@@ -1,0 +1,22 @@
+{
+  "actionlint_version": "1.7.12",
+  "accepted": true,
+  "results": [
+    {
+      "file": ".github/workflows/docs_package_checks.yml",
+      "source_commit": "24b5e154bd43795ea6b2a47b6c9458fdf3a587ea",
+      "same_bytes_as_published_0791c01": true,
+      "exit_code": 1,
+      "sha256": "3bd50449d468b4f6606648a66edc9d54e8710577ccd7878f291704391057aa64",
+      "output": ".github/workflows/docs_package_checks.yml:20:35: context \"runner\" is not allowed here. available contexts are \"github\", \"inputs\", \"matrix\", \"needs\", \"secrets\", \"strategy\", \"vars\". see https://docs.github.com/en/actions/learn-github-actions/contexts#context-availability for more details [expression]\n   |\n20 |       PLATO_DOCS_ENVIRONMENT: ${{ runner.temp }}/plato-docs/.venv-docs\n   |                                   ^~~~~~~~~~~\n"
+    },
+    {
+      "file": ".github/workflows/pypi_publish.yml",
+      "source_commit": "24b5e154bd43795ea6b2a47b6c9458fdf3a587ea",
+      "same_bytes_as_published_0791c01": true,
+      "exit_code": 0,
+      "sha256": "44d20d3daa8e953546acf7e5b01ee61cf54d056b96b09b799ad3cfa65b105062",
+      "output": ""
+    }
+  ]
+}

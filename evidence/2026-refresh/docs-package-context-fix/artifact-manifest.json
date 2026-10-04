@@ -1,0 +1,65 @@
+{
+  "frozen_source_commit": "8dd6a604712973c6db050082ccd35f154d59ce56",
+  "files": {
+    "evidence/2026-refresh/docs-package-context-fix/actionlint-version.log": {
+      "bytes": 96,
+      "sha256": "2f40fa9e505771c4dd7ff4b6ed601e587f52744935b72906e55b21a9a7c1ce1b"
+    },
+    "evidence/2026-refresh/docs-package-context-fix/green-actionlint-exit.txt": {
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    "evidence/2026-refresh/docs-package-context-fix/green-actionlint.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "evidence/2026-refresh/docs-package-context-fix/red-docs_package_checks.log": {
+      "bytes": 432,
+      "sha256": "f596bde2927f855c1dead70320e904bf3afd48a893c812e9b76358c606b80f86"
+    },
+    "evidence/2026-refresh/docs-package-context-fix/red-pypi_publish.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "evidence/2026-refresh/docs-package-context-fix/red-validation.json": {
+      "bytes": 1143,
+      "sha256": "2c5e2335f96415e589768172a568cfe1b5e9f774c1b9375b9731a6591a231393"
+    },
+    "evidence/2026-refresh/docs-package-context-fix/remote-failure.json": {
+      "bytes": 620,
+      "sha256": "2306e73610be39181ff6ab882b898beaa2801880e8e2992c5c8d9d6d0b9aee96"
+    },
+    "evidence/2026-refresh/docs-package-context-fix/remote-jobs.json": {
+      "bytes": 41,
+      "sha256": "d232081185de70f0bf26e44b5c2a069ca080bf9da48bbc3a067d8670f67d052a"
+    },
+    "evidence/2026-refresh/docs-package-context-fix/remote-run.json": {
+      "bytes": 14001,
+      "sha256": "2d4deec6f3e3b615f228422a2289de45e14841bd10686d9280835eb92c9ac8ee"
+    },
+    "evidence/2026-refresh/docs-package-context-fix/root-previous-final-publication-acceptance.json": {
+      "bytes": 8963,
+      "sha256": "2c374cad796f8ba51bf8becb2e4be55a7b51b8624fcb0d3c96eed74b4274a3f8"
+    },
+    "evidence/2026-refresh/reproductions/docs-package-context-fix/actionlint_1.7.12_checksums.txt": {
+      "bytes": 1130,
+      "sha256": "433028cf0ba3c42163ea1a668dedce30fcdbe84fe912b1a5e288c006eab8a4f5"
+    },
+    "evidence/2026-refresh/reproductions/docs-package-context-fix/red-docs_package_checks.yml": {
+      "bytes": 2745,
+      "sha256": "3bd50449d468b4f6606648a66edc9d54e8710577ccd7878f291704391057aa64"
+    },
+    "evidence/2026-refresh/reproductions/docs-package-context-fix/red-pypi_publish.yml": {
+      "bytes": 1688,
+      "sha256": "44d20d3daa8e953546acf7e5b01ee61cf54d056b96b09b799ad3cfa65b105062"
+    },
+    "evidence/2026-refresh/reproductions/docs-package-context-fix/remote-run.html": {
+      "bytes": 200923,
+      "sha256": "596f3ba978d1caa06e5018e60936a3610c00d04b5391a0eefd5badc1c0007d1f"
+    },
+    "evidence/2026-refresh/reproductions/docs-package-context-fix/verify-and-record.py": {
+      "bytes": 9926,
+      "sha256": "f2334f60095dc89bf38a76c35698006cc447f9c9bbb833f6ff103cd9ad4ad063"
+    }
+  }
+}

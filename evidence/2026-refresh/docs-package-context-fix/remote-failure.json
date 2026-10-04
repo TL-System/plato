@@ -1,0 +1,12 @@
+{
+  "run_id": 37167176060,
+  "head_sha": "0791c01afcaea96223a925a32ee22882dc437ee2",
+  "event": "push",
+  "conclusion": "failure",
+  "created_jobs": 0,
+  "annotation": "(Line: 20, Col: 31): Unrecognized named-value: 'runner'. Located at position 1 within expression: runner.temp",
+  "url": "https://github.com/TL-System/plato/actions/runs/37167176060",
+  "raw_api_sha256": "2d4deec6f3e3b615f228422a2289de45e14841bd10686d9280835eb92c9ac8ee",
+  "raw_jobs_sha256": "d232081185de70f0bf26e44b5c2a069ca080bf9da48bbc3a067d8670f67d052a",
+  "raw_html_sha256": "596f3ba978d1caa06e5018e60936a3610c00d04b5391a0eefd5badc1c0007d1f"
+}
