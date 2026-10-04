@@ -1,0 +1,844 @@
+{
+  "schema_version": 1,
+  "recorded_at_utc": "2026-10-04T00:31:21.554803+00:00",
+  "reviewer": "/root/historical_archive_docs_review",
+  "review_type": "Fresh independent Phase4B historical archive prose and static documentation review.",
+  "verdict": "ACCEPT",
+  "status": "ACCEPTED_FOR_ROOT_INTEGRATION",
+  "unresolved_findings": {
+    "critical": 0,
+    "high": 0,
+    "medium": 0,
+    "low": 0
+  },
+  "findings": [],
+  "source_binding": {
+    "worktree": "/tmp/plato-refresh-worktrees/historical-archive-docs",
+    "base_commit": "d29773793d59bbaecdb650f408f116920b037bdb",
+    "prose_commit": "cbe6cce325cec88a056ba7af222171b533eb24b3",
+    "evidence_commit": "9b89f6d8a94638b74579345ba18fb314f4517c11",
+    "evidence_tree": "44fa7daa2dec60b3174745d30dc731ec2fe77e17",
+    "page_sha256": "aa41340081e9f8d60a20457206094522d5e0c0f8edc3e1848b184760239e01b5",
+    "receipt_sha256": "53ff5e25d7f477fc65760a3737826929ee2fec9253071a41fe68134ee9952e52",
+    "plan_sha256": "07d90034e89b83283c9b592550ebe17a1ea3a28a9fa2fbc292cc328db4977e4b",
+    "plan_review_sha256": "1fb78cdc19f530f9e17258d5e8481e54703f846b1aa8b7160112a9af18e477aa",
+    "prose_tree": "5e06cbee5e7e486782ab4600981a264d2f2e5f5e",
+    "worktree_clean_at_start_and_end": true,
+    "owned_paths": [
+      "docs/docs/examples/archived.md",
+      "evidence/2026-refresh/historical-archive-docs.json"
+    ],
+    "candidate_files_edited_by_reviewer": false,
+    "all_code_and_configuration_unchanged_from_base": true,
+    "modern_retirement_prefix_sha256": "a9515ebe52ba395ddd6a9ede4cc0976e9603add3b830611b301a496c7dbe0ee8",
+    "modern_retirement_prefix_byte_identical": true
+  },
+  "authority": [
+    {
+      "path": "/tmp/plato-phase4-family-plan.json",
+      "sha256": "07d90034e89b83283c9b592550ebe17a1ea3a28a9fa2fbc292cc328db4977e4b",
+      "bytes": 543551
+    },
+    {
+      "path": "/tmp/plato-phase4-family-plan-review.json",
+      "sha256": "1fb78cdc19f530f9e17258d5e8481e54703f846b1aa8b7160112a9af18e477aa",
+      "bytes": 24400
+    }
+  ],
+  "scope_assessment": [
+    "The accepted legacy_archive_inventory maps to exactly 20 linked table rows: norm_bounding 3, FjORD 8, FL-MAML 5, CS-MAML 4. Each retained path, exact source hash, family, filename label and descriptive role matches the author receipt and accepted inventory.",
+    "The public text distinguishes entrypoints, trainer/server/client helpers, model definitions and TOML configurations. Dataset/Gym utilities are described separately and do not become maintained experiment entrypoints.",
+    "Dependencies are tied to preserved source imports and TOML selections. No complete historical environment or version pin is invented. The page makes no historical execution or successful restoration claim.",
+    "The four estimates are explicitly preliminary planning ranges for bounded implementation/review fixtures. Environment recovery, research semantics, external assets and paper-scale results may add work; FjORD ViT remains separate and CS-MAML depends on FL-MAML work.",
+    "Norm bounding preserves the valid aggregate_deltas override hook and describes the actual None fallback, direct NumPy conversion and unweighted clipped sum. Numerical, device and research-semantic validation remain future work.",
+    "FjORD eagerly imports its local ResNet and Torch/einops ViT modules. Its ptflops import, disabled resource-limit TOML branch, size comparison against both limits and subtotal aggregation code support the qualified restoration questions. No retired legacy-factory dependency is claimed.",
+    "FL-MAML reads optimizer fields from a different section than its supplied TOML, references undefined optimizers/lr_scheduler names in scheduler branches and supplies 9 positional arguments to each stage call requiring 10. Its inner/outer gradient semantics are explicitly unqualified.",
+    "CS-MAML has a working-directory-relative sibling FL-MAML import and central/edge personalization event paths. Its four positional server.run arguments match the current base signature. That match is appropriately separated from real cross-silo qualification.",
+    "Existing modern retirement/provenance content and the accepted deployment/source base are preserved. This prose review adds no active-family, packaging, global repository qualification or published-PR integration claim."
+  ],
+  "independent_validation": {
+    "environment": {
+      "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+      "executable": "/tmp/plato-historical-archive-docs-review/docs-env/bin/python",
+      "versions": {
+        "mkdocs": "1.6.1",
+        "mkdocs-material": "9.7.7"
+      }
+    },
+    "provision": {
+      "command": "UV_PROJECT_ENVIRONMENT=/tmp/plato-historical-archive-docs-review/docs-env uv sync --locked --python 3.13 --only-group docs --no-install-project",
+      "returncode": 0,
+      "log": {
+        "path": "/tmp/plato-historical-archive-docs-review/artifacts/docs-sync.log",
+        "sha256": "f7bd11dc7e938a010b7c0605dcdab2d5c3f1d701abea20ce12732c6c32523855",
+        "bytes": 56
+      },
+      "existing_environments_mutated": false,
+      "historical_runtime_dependencies_absent": true
+    },
+    "strict_mkdocs": {
+      "command": "/tmp/plato-historical-archive-docs-review/docs-env/bin/python -m mkdocs build --strict --config-file docs/mkdocs.yml --site-dir /tmp/plato-historical-archive-docs-review/site",
+      "returncode": 0,
+      "log": {
+        "path": "/tmp/plato-historical-archive-docs-review/artifacts/docs-build.log",
+        "sha256": "d4c1a1fdd6f0c2fb334b6873059e1f0715def8ade19b11fc2e9b81ab08ff8b71",
+        "bytes": 1217
+      },
+      "notes": "Existing Material advisory and informational retired-page navigation notices did not fail the strict build. Build consumed the bound candidate bytes."
+    },
+    "source_and_link_audit": {
+      "command": "/tmp/plato-historical-archive-docs-review/docs-env/bin/python /tmp/plato-historical-archive-docs-review/artifacts/independent_audit.py",
+      "returncode": 0,
+      "script": {
+        "path": "/tmp/plato-historical-archive-docs-review/artifacts/independent_audit.py",
+        "sha256": "3096a60581febab5d667a257f64edaee0d087fbb0b43448f6b8b660c5b612954",
+        "bytes": 16865
+      },
+      "artifact": {
+        "path": "/tmp/plato-historical-archive-docs-review/artifacts/independent-audit.json",
+        "sha256": "036f9cb180c4267304b2e38eb44127a44e0fa4bf6cf9d906fce0aa7e27fed752",
+        "bytes": 46853
+      },
+      "log": {
+        "path": "/tmp/plato-historical-archive-docs-review/artifacts/independent-audit.log",
+        "sha256": "ec794f0ad0ddcd2635437b01d3d5a98a7868616375c66e1e83e3dda834a06287",
+        "bytes": 914
+      },
+      "checks_passed": 123,
+      "checks": {
+        "page_binding": {
+          "passed": true,
+          "detail": "aa41340081e9f8d60a20457206094522d5e0c0f8edc3e1848b184760239e01b5"
+        },
+        "receipt_binding": {
+          "passed": true,
+          "detail": "53ff5e25d7f477fc65760a3737826929ee2fec9253071a41fe68134ee9952e52"
+        },
+        "head_binding": {
+          "passed": true,
+          "detail": null
+        },
+        "clean_worktree": {
+          "passed": true,
+          "detail": null
+        },
+        "accepted_plan_review": {
+          "passed": true,
+          "detail": null
+        },
+        "accepted_plan_binding": {
+          "passed": true,
+          "detail": null
+        },
+        "receipt_authority_plato-phase4-family-plan.json": {
+          "passed": true,
+          "detail": null
+        },
+        "receipt_authority_plato-phase4-family-plan-review.json": {
+          "passed": true,
+          "detail": null
+        },
+        "scope_paths": {
+          "passed": true,
+          "detail": null
+        },
+        "prose_only_page": {
+          "passed": true,
+          "detail": null
+        },
+        "evidence_only_receipt": {
+          "passed": true,
+          "detail": null
+        },
+        "prose_receipt_parent": {
+          "passed": true,
+          "detail": null
+        },
+        "page_in_prose_equals_current": {
+          "passed": true,
+          "detail": null
+        },
+        "prose_tree_receipt_binding": {
+          "passed": true,
+          "detail": null
+        },
+        "page_before_receipt_binding": {
+          "passed": true,
+          "detail": null
+        },
+        "modern_prefix_marker": {
+          "passed": true,
+          "detail": null
+        },
+        "modern_prefix_byte_identical": {
+          "passed": true,
+          "detail": "a9515ebe52ba395ddd6a9ede4cc0976e9603add3b830611b301a496c7dbe0ee8"
+        },
+        "modern_prefix_receipt_binding": {
+          "passed": true,
+          "detail": null
+        },
+        "context_hash_plato/servers/base.py": {
+          "passed": true,
+          "detail": null
+        },
+        "context_unchanged_plato/servers/base.py": {
+          "passed": true,
+          "detail": null
+        },
+        "context_hash_plato/servers/fedavg.py": {
+          "passed": true,
+          "detail": null
+        },
+        "context_unchanged_plato/servers/fedavg.py": {
+          "passed": true,
+          "detail": null
+        },
+        "context_hash_plato/trainers/basic.py": {
+          "passed": true,
+          "detail": null
+        },
+        "context_unchanged_plato/trainers/basic.py": {
+          "passed": true,
+          "detail": null
+        },
+        "context_hash_archives/legacy_datalib/README.md": {
+          "passed": true,
+          "detail": null
+        },
+        "context_unchanged_archives/legacy_datalib/README.md": {
+          "passed": true,
+          "detail": null
+        },
+        "context_hash_archives/legacy_rl_env/README.md": {
+          "passed": true,
+          "detail": null
+        },
+        "context_unchanged_archives/legacy_rl_env/README.md": {
+          "passed": true,
+          "detail": null
+        },
+        "context_hash_archives/legacy_rl_env/rl_env.py": {
+          "passed": true,
+          "detail": null
+        },
+        "context_unchanged_archives/legacy_rl_env/rl_env.py": {
+          "passed": true,
+          "detail": null
+        },
+        "context_hash_docs/mkdocs.yml": {
+          "passed": true,
+          "detail": null
+        },
+        "context_unchanged_docs/mkdocs.yml": {
+          "passed": true,
+          "detail": null
+        },
+        "context_hash_pyproject.toml": {
+          "passed": true,
+          "detail": null
+        },
+        "context_unchanged_pyproject.toml": {
+          "passed": true,
+          "detail": null
+        },
+        "context_hash_uv.lock": {
+          "passed": true,
+          "detail": null
+        },
+        "context_unchanged_uv.lock": {
+          "passed": true,
+          "detail": null
+        },
+        "accepted_inventory_size": {
+          "passed": true,
+          "detail": null
+        },
+        "receipt_inventory_exact_set": {
+          "passed": true,
+          "detail": null
+        },
+        "docs_inventory_exact_set": {
+          "passed": true,
+          "detail": null
+        },
+        "family_row_counts": {
+          "passed": true,
+          "detail": {
+            "norm_bounding": 3,
+            "fjord": 8,
+            "fl_maml": 5,
+            "cs_maml": 4
+          }
+        },
+        "source_hash_examples/outdated/norm_bounding/norm_bounding.py": {
+          "passed": true,
+          "detail": null
+        },
+        "source_unchanged_examples/outdated/norm_bounding/norm_bounding.py": {
+          "passed": true,
+          "detail": null
+        },
+        "row_mapping_examples/outdated/norm_bounding/norm_bounding.py": {
+          "passed": true,
+          "detail": null
+        },
+        "source_hash_examples/outdated/norm_bounding/norm_bounding_MNIST_lenet5.toml": {
+          "passed": true,
+          "detail": null
+        },
+        "source_unchanged_examples/outdated/norm_bounding/norm_bounding_MNIST_lenet5.toml": {
+          "passed": true,
+          "detail": null
+        },
+        "row_mapping_examples/outdated/norm_bounding/norm_bounding_MNIST_lenet5.toml": {
+          "passed": true,
+          "detail": null
+        },
+        "source_hash_examples/outdated/norm_bounding/norm_bounding_server.py": {
+          "passed": true,
+          "detail": null
+        },
+        "source_unchanged_examples/outdated/norm_bounding/norm_bounding_server.py": {
+          "passed": true,
+          "detail": null
+        },
+        "row_mapping_examples/outdated/norm_bounding/norm_bounding_server.py": {
+          "passed": true,
+          "detail": null
+        },
+        "source_hash_examples/outdated/model_search/fjord/fjord.py": {
+          "passed": true,
+          "detail": null
+        },
+        "source_unchanged_examples/outdated/model_search/fjord/fjord.py": {
+          "passed": true,
+          "detail": null
+        },
+        "row_mapping_examples/outdated/model_search/fjord/fjord.py": {
+          "passed": true,
+          "detail": null
+        },
+        "source_hash_examples/outdated/model_search/fjord/fjord_algorithm.py": {
+          "passed": true,
+          "detail": null
+        },
+        "source_unchanged_examples/outdated/model_search/fjord/fjord_algorithm.py": {
+          "passed": true,
+          "detail": null
+        },
+        "row_mapping_examples/outdated/model_search/fjord/fjord_algorithm.py": {
+          "passed": true,
+          "detail": null
+        },
+        "source_hash_examples/outdated/model_search/fjord/fjord_client.py": {
+          "passed": true,
+          "detail": null
+        },
+        "source_unchanged_examples/outdated/model_search/fjord/fjord_client.py": {
+          "passed": true,
+          "detail": null
+        },
+        "row_mapping_examples/outdated/model_search/fjord/fjord_client.py": {
+          "passed": true,
+          "detail": null
+        },
+        "source_hash_examples/outdated/model_search/fjord/fjord_resnet18_dynamic.toml": {
+          "passed": true,
+          "detail": null
+        },
+        "source_unchanged_examples/outdated/model_search/fjord/fjord_resnet18_dynamic.toml": {
+          "passed": true,
+          "detail": null
+        },
+        "row_mapping_examples/outdated/model_search/fjord/fjord_resnet18_dynamic.toml": {
+          "passed": true,
+          "detail": null
+        },
+        "source_hash_examples/outdated/model_search/fjord/fjord_server.py": {
+          "passed": true,
+          "detail": null
+        },
+        "source_unchanged_examples/outdated/model_search/fjord/fjord_server.py": {
+          "passed": true,
+          "detail": null
+        },
+        "row_mapping_examples/outdated/model_search/fjord/fjord_server.py": {
+          "passed": true,
+          "detail": null
+        },
+        "source_hash_examples/outdated/model_search/fjord/fjord_trainer.py": {
+          "passed": true,
+          "detail": null
+        },
+        "source_unchanged_examples/outdated/model_search/fjord/fjord_trainer.py": {
+          "passed": true,
+          "detail": null
+        },
+        "row_mapping_examples/outdated/model_search/fjord/fjord_trainer.py": {
+          "passed": true,
+          "detail": null
+        },
+        "source_hash_examples/outdated/model_search/fjord/resnet.py": {
+          "passed": true,
+          "detail": null
+        },
+        "source_unchanged_examples/outdated/model_search/fjord/resnet.py": {
+          "passed": true,
+          "detail": null
+        },
+        "row_mapping_examples/outdated/model_search/fjord/resnet.py": {
+          "passed": true,
+          "detail": null
+        },
+        "source_hash_examples/outdated/model_search/fjord/vit.py": {
+          "passed": true,
+          "detail": null
+        },
+        "source_unchanged_examples/outdated/model_search/fjord/vit.py": {
+          "passed": true,
+          "detail": null
+        },
+        "row_mapping_examples/outdated/model_search/fjord/vit.py": {
+          "passed": true,
+          "detail": null
+        },
+        "source_hash_examples/outdated/fl_maml/fl_maml.py": {
+          "passed": true,
+          "detail": null
+        },
+        "source_unchanged_examples/outdated/fl_maml/fl_maml.py": {
+          "passed": true,
+          "detail": null
+        },
+        "row_mapping_examples/outdated/fl_maml/fl_maml.py": {
+          "passed": true,
+          "detail": null
+        },
+        "source_hash_examples/outdated/fl_maml/fl_maml_MNIST_lenet5.toml": {
+          "passed": true,
+          "detail": null
+        },
+        "source_unchanged_examples/outdated/fl_maml/fl_maml_MNIST_lenet5.toml": {
+          "passed": true,
+          "detail": null
+        },
+        "row_mapping_examples/outdated/fl_maml/fl_maml_MNIST_lenet5.toml": {
+          "passed": true,
+          "detail": null
+        },
+        "source_hash_examples/outdated/fl_maml/fl_maml_client.py": {
+          "passed": true,
+          "detail": null
+        },
+        "source_unchanged_examples/outdated/fl_maml/fl_maml_client.py": {
+          "passed": true,
+          "detail": null
+        },
+        "row_mapping_examples/outdated/fl_maml/fl_maml_client.py": {
+          "passed": true,
+          "detail": null
+        },
+        "source_hash_examples/outdated/fl_maml/fl_maml_server.py": {
+          "passed": true,
+          "detail": null
+        },
+        "source_unchanged_examples/outdated/fl_maml/fl_maml_server.py": {
+          "passed": true,
+          "detail": null
+        },
+        "row_mapping_examples/outdated/fl_maml/fl_maml_server.py": {
+          "passed": true,
+          "detail": null
+        },
+        "source_hash_examples/outdated/fl_maml/fl_maml_trainer.py": {
+          "passed": true,
+          "detail": null
+        },
+        "source_unchanged_examples/outdated/fl_maml/fl_maml_trainer.py": {
+          "passed": true,
+          "detail": null
+        },
+        "row_mapping_examples/outdated/fl_maml/fl_maml_trainer.py": {
+          "passed": true,
+          "detail": null
+        },
+        "source_hash_examples/outdated/cs_maml/cs_maml.py": {
+          "passed": true,
+          "detail": null
+        },
+        "source_unchanged_examples/outdated/cs_maml/cs_maml.py": {
+          "passed": true,
+          "detail": null
+        },
+        "row_mapping_examples/outdated/cs_maml/cs_maml.py": {
+          "passed": true,
+          "detail": null
+        },
+        "source_hash_examples/outdated/cs_maml/cs_maml_MNIST_lenet5.toml": {
+          "passed": true,
+          "detail": null
+        },
+        "source_unchanged_examples/outdated/cs_maml/cs_maml_MNIST_lenet5.toml": {
+          "passed": true,
+          "detail": null
+        },
+        "row_mapping_examples/outdated/cs_maml/cs_maml_MNIST_lenet5.toml": {
+          "passed": true,
+          "detail": null
+        },
+        "source_hash_examples/outdated/cs_maml/cs_maml_edge.py": {
+          "passed": true,
+          "detail": null
+        },
+        "source_unchanged_examples/outdated/cs_maml/cs_maml_edge.py": {
+          "passed": true,
+          "detail": null
+        },
+        "row_mapping_examples/outdated/cs_maml/cs_maml_edge.py": {
+          "passed": true,
+          "detail": null
+        },
+        "source_hash_examples/outdated/cs_maml/cs_maml_server.py": {
+          "passed": true,
+          "detail": null
+        },
+        "source_unchanged_examples/outdated/cs_maml/cs_maml_server.py": {
+          "passed": true,
+          "detail": null
+        },
+        "row_mapping_examples/outdated/cs_maml/cs_maml_server.py": {
+          "passed": true,
+          "detail": null
+        },
+        "syntax_only_inventory_counts": {
+          "passed": true,
+          "detail": {
+            "python_ast": 16,
+            "toml": 4
+          }
+        },
+        "norm_current_override_hook": {
+          "passed": true,
+          "detail": null
+        },
+        "norm_none_threshold_direct_conversion_unweighted_sum": {
+          "passed": true,
+          "detail": null
+        },
+        "norm_config_claims": {
+          "passed": true,
+          "detail": null
+        },
+        "fjord_eager_local_torch_einops_vit": {
+          "passed": true,
+          "detail": null
+        },
+        "fjord_ptflops_numpy_torch": {
+          "passed": true,
+          "detail": null
+        },
+        "fjord_resource_limit_review_supported": {
+          "passed": true,
+          "detail": null
+        },
+        "fjord_config_claims": {
+          "passed": true,
+          "detail": null
+        },
+        "fjord_scoped_training_and_aggregation": {
+          "passed": true,
+          "detail": null
+        },
+        "fl_maml_config_optimizer_mismatch": {
+          "passed": true,
+          "detail": null
+        },
+        "fl_maml_undefined_scheduler_names": {
+          "passed": true,
+          "detail": null
+        },
+        "fl_maml_two_missing_argument_calls": {
+          "passed": true,
+          "detail": {
+            "required_without_self": 10,
+            "positional_supplied": [
+              9,
+              9
+            ]
+          }
+        },
+        "fl_maml_config_and_training_roles": {
+          "passed": true,
+          "detail": null
+        },
+        "cs_maml_relative_sibling_dependencies": {
+          "passed": true,
+          "detail": null
+        },
+        "cs_maml_current_positional_signature": {
+          "passed": true,
+          "detail": null
+        },
+        "cs_maml_config_and_event_roles": {
+          "passed": true,
+          "detail": null
+        },
+        "rendered_local_links_and_anchors": {
+          "passed": true,
+          "detail": {
+            "count": 67,
+            "errors": []
+          }
+        },
+        "retained_repository_targets": {
+          "passed": true,
+          "detail": {
+            "count": 32,
+            "errors": []
+          }
+        },
+        "all_inventory_links_rendered_once": {
+          "passed": true,
+          "detail": null
+        },
+        "explicit_python_313": {
+          "passed": true,
+          "detail": {
+            "version": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+            "executable": "/tmp/plato-historical-archive-docs-review/docs-env/bin/python"
+          }
+        },
+        "historical_runtime_dependencies_absent": {
+          "passed": true,
+          "detail": [
+            "babel",
+            "backrefs",
+            "certifi",
+            "charset-normalizer",
+            "click",
+            "colorama",
+            "ghp-import",
+            "idna",
+            "jinja2",
+            "markdown",
+            "markupsafe",
+            "mergedeep",
+            "mkdocs",
+            "mkdocs-get-deps",
+            "mkdocs-material",
+            "mkdocs-material-extensions",
+            "packaging",
+            "paginate",
+            "pathspec",
+            "platformdirs",
+            "pygments",
+            "pymdown-extensions",
+            "python-dateutil",
+            "pyyaml",
+            "pyyaml-env-tag",
+            "requests",
+            "six",
+            "urllib3",
+            "watchdog"
+          ]
+        },
+        "git_diff_check": {
+          "passed": true,
+          "detail": null
+        },
+        "final_worktree_clean": {
+          "passed": true,
+          "detail": null
+        }
+      },
+      "historical_python_files_parsed_without_import": 16,
+      "historical_toml_files_parsed": 4,
+      "rows": 20,
+      "family_counts": {
+        "norm_bounding": 3,
+        "fjord": 8,
+        "fl_maml": 5,
+        "cs_maml": 4
+      },
+      "rendered_local_links_and_anchors": 67,
+      "repository_blob_tree_targets": 32,
+      "external_url_availability_asserted": false,
+      "errors": [],
+      "method": "Independent checker written in review scratch; source hashes and git byte comparisons, AST/TOML parsing, direct current hook/signature and static inconsistency checks, HTML target/fragment validation and retained tracked repository target audit. No author audit script reused."
+    },
+    "review_harness_corrections": [
+      "An initial zsh wrapper used its read-only status variable after provisioning. Repeated the authorized sync with review_exit and confirmed exit 0.",
+      "The first checker had a Counter(dict) comparison and an unresolved /tmp containment path on macOS. Corrected the review-only helper to count dictionary keys and resolve the site root; all checks then passed. These were review harness errors, not candidate findings."
+    ],
+    "git_diff_check": 0,
+    "historical_code_execution": false,
+    "historical_modules_imported": false,
+    "historical_dependency_installation": false,
+    "nested_agents": false,
+    "push_pr_workflow_publication": false
+  },
+  "inventory_verification": [
+    {
+      "path": "examples/outdated/norm_bounding/norm_bounding.py",
+      "family": "norm_bounding",
+      "label": "norm_bounding.py",
+      "url": "https://github.com/TL-System/plato/blob/main/examples/outdated/norm_bounding/norm_bounding.py",
+      "role": "Experiment entrypoint.",
+      "sha256": "06dec2a78140e70a8cc1eff028710c77e1c2e0952f0b326def87e2760dede1b6"
+    },
+    {
+      "path": "examples/outdated/norm_bounding/norm_bounding_MNIST_lenet5.toml",
+      "family": "norm_bounding",
+      "label": "norm_bounding_MNIST_lenet5.toml",
+      "url": "https://github.com/TL-System/plato/blob/main/examples/outdated/norm_bounding/norm_bounding_MNIST_lenet5.toml",
+      "role": "MNIST/LeNet-5 configuration; threshold set to 5.",
+      "sha256": "4ea5851ae75450d63b23431a3a36841bc96781ba031ab932611cb05022870cb4"
+    },
+    {
+      "path": "examples/outdated/norm_bounding/norm_bounding_server.py",
+      "family": "norm_bounding",
+      "label": "norm_bounding_server.py",
+      "url": "https://github.com/TL-System/plato/blob/main/examples/outdated/norm_bounding/norm_bounding_server.py",
+      "role": "Update norm calculation and clipped-update aggregation.",
+      "sha256": "d6c8589149505d3f48511bc367b5f1e7a175231b270e6669fa18f585d592a81f"
+    },
+    {
+      "path": "examples/outdated/model_search/fjord/fjord.py",
+      "family": "fjord",
+      "label": "fjord.py",
+      "url": "https://github.com/TL-System/plato/blob/main/examples/outdated/model_search/fjord/fjord.py",
+      "role": "Entrypoint selecting a local ResNet or ViT model.",
+      "sha256": "a18a8162b92a0f9f87855e35a318b8d0dc083c1de72c0bf1e7124a299ec60a24"
+    },
+    {
+      "path": "examples/outdated/model_search/fjord/fjord_algorithm.py",
+      "family": "fjord",
+      "label": "fjord_algorithm.py",
+      "url": "https://github.com/TL-System/plato/blob/main/examples/outdated/model_search/fjord/fjord_algorithm.py",
+      "role": "Width selection, parameter slicing and aggregation.",
+      "sha256": "c929db7f5735a979b6df65ab76fdf1874a88a913c7f2f55e8c2d1accccd0fcca"
+    },
+    {
+      "path": "examples/outdated/model_search/fjord/fjord_client.py",
+      "family": "fjord",
+      "label": "fjord_client.py",
+      "url": "https://github.com/TL-System/plato/blob/main/examples/outdated/model_search/fjord/fjord_client.py",
+      "role": "Client lifecycle handling for the server-selected width.",
+      "sha256": "fd1d84bc537d2de13ffc6fbc15180d26791d556c4be641a050cf515072aefc7d"
+    },
+    {
+      "path": "examples/outdated/model_search/fjord/fjord_resnet18_dynamic.toml",
+      "family": "fjord",
+      "label": "fjord_resnet18_dynamic.toml",
+      "url": "https://github.com/TL-System/plato/blob/main/examples/outdated/model_search/fjord/fjord_resnet18_dynamic.toml",
+      "role": "CIFAR-10/ResNet-18 configuration; resource limits disabled.",
+      "sha256": "e2714e100645b9d0a675ddd3f776accb20ce7011892a96087f030839daa9e9db"
+    },
+    {
+      "path": "examples/outdated/model_search/fjord/fjord_server.py",
+      "family": "fjord",
+      "label": "fjord_server.py",
+      "url": "https://github.com/TL-System/plato/blob/main/examples/outdated/model_search/fjord/fjord_server.py",
+      "role": "Per-client width responses and aggregation dispatch.",
+      "sha256": "222e9bfcb6027d178e9b85dbdfc41dc998a61a626863376a36ccfdbf250694bb"
+    },
+    {
+      "path": "examples/outdated/model_search/fjord/fjord_trainer.py",
+      "family": "fjord",
+      "label": "fjord_trainer.py",
+      "url": "https://github.com/TL-System/plato/blob/main/examples/outdated/model_search/fjord/fjord_trainer.py",
+      "role": "Server model construction and client subnet training.",
+      "sha256": "987aa475a1df0b149f3d7ea369e52bb1101c5cabe0a83c4a556eab43755bdf22"
+    },
+    {
+      "path": "examples/outdated/model_search/fjord/resnet.py",
+      "family": "fjord",
+      "label": "resnet.py",
+      "url": "https://github.com/TL-System/plato/blob/main/examples/outdated/model_search/fjord/resnet.py",
+      "role": "Local variable-width ResNet model definitions.",
+      "sha256": "1295a4c45add3f5701b3c41900e7217cad118496e948e82951f310766ab7de31"
+    },
+    {
+      "path": "examples/outdated/model_search/fjord/vit.py",
+      "family": "fjord",
+      "label": "vit.py",
+      "url": "https://github.com/TL-System/plato/blob/main/examples/outdated/model_search/fjord/vit.py",
+      "role": "Local variable-width ViT model definition.",
+      "sha256": "8b7fdd72f4bf96de879b300081a1a5be09cc011475deac3d140211c8310b22cb"
+    },
+    {
+      "path": "examples/outdated/fl_maml/fl_maml.py",
+      "family": "fl_maml",
+      "label": "fl_maml.py",
+      "url": "https://github.com/TL-System/plato/blob/main/examples/outdated/fl_maml/fl_maml.py",
+      "role": "Experiment entrypoint wiring client, server and trainer.",
+      "sha256": "02a09377aae549d301456b61b3c033d7701fa644c6852b539cb6b2db7ad04834"
+    },
+    {
+      "path": "examples/outdated/fl_maml/fl_maml_MNIST_lenet5.toml",
+      "family": "fl_maml",
+      "label": "fl_maml_MNIST_lenet5.toml",
+      "url": "https://github.com/TL-System/plato/blob/main/examples/outdated/fl_maml/fl_maml_MNIST_lenet5.toml",
+      "role": "MNIST/LeNet-5 configuration and meta learning rate.",
+      "sha256": "1633deba7db6085a6dcb6c850368758ccb86184aad15297682f4f858afc594e7"
+    },
+    {
+      "path": "examples/outdated/fl_maml/fl_maml_client.py",
+      "family": "fl_maml",
+      "label": "fl_maml_client.py",
+      "url": "https://github.com/TL-System/plato/blob/main/examples/outdated/fl_maml/fl_maml_client.py",
+      "role": "Personalization request handling and accuracy reporting.",
+      "sha256": "c3f2937b19b9d60c5f88be3253c248afefc9350f279d78a75672eb63bf1be4f2"
+    },
+    {
+      "path": "examples/outdated/fl_maml/fl_maml_server.py",
+      "family": "fl_maml",
+      "label": "fl_maml_server.py",
+      "url": "https://github.com/TL-System/plato/blob/main/examples/outdated/fl_maml/fl_maml_server.py",
+      "role": "Training/personalization round and report coordination.",
+      "sha256": "5a40e1bf7ae9cf771ce2b93dc1a6ea973917484c5624b6b021e2e455e0f71956"
+    },
+    {
+      "path": "examples/outdated/fl_maml/fl_maml_trainer.py",
+      "family": "fl_maml",
+      "label": "fl_maml_trainer.py",
+      "url": "https://github.com/TL-System/plato/blob/main/examples/outdated/fl_maml/fl_maml_trainer.py",
+      "role": "Two-stage training, personalization and testing loops.",
+      "sha256": "19297031c138e13b501ac3acfe3ee63deb78e735db63e887271503da6f84f3a9"
+    },
+    {
+      "path": "examples/outdated/cs_maml/cs_maml.py",
+      "family": "cs_maml",
+      "label": "cs_maml.py",
+      "url": "https://github.com/TL-System/plato/blob/main/examples/outdated/cs_maml/cs_maml.py",
+      "role": "Cross-silo entrypoint importing sibling FL-MAML modules.",
+      "sha256": "ab2c94989ed4d8807cc524015c4e60a9dca2a73bc1ba3bd29588a9827c06b511"
+    },
+    {
+      "path": "examples/outdated/cs_maml/cs_maml_MNIST_lenet5.toml",
+      "family": "cs_maml",
+      "label": "cs_maml_MNIST_lenet5.toml",
+      "url": "https://github.com/TL-System/plato/blob/main/examples/outdated/cs_maml/cs_maml_MNIST_lenet5.toml",
+      "role": "MNIST/LeNet-5 configuration with one edge silo.",
+      "sha256": "71cf11ca3b040579c90987b17c0c29c0c07cbd7ea42d28bbcf6d207f133f696f"
+    },
+    {
+      "path": "examples/outdated/cs_maml/cs_maml_edge.py",
+      "family": "cs_maml",
+      "label": "cs_maml_edge.py",
+      "url": "https://github.com/TL-System/plato/blob/main/examples/outdated/cs_maml/cs_maml_edge.py",
+      "role": "Edge-client personalization strategy and event waiting.",
+      "sha256": "14369de9c527863286b6f5bdce9b650d503b6e6064a012de444d0d39333f8840"
+    },
+    {
+      "path": "examples/outdated/cs_maml/cs_maml_server.py",
+      "family": "cs_maml",
+      "label": "cs_maml_server.py",
+      "url": "https://github.com/TL-System/plato/blob/main/examples/outdated/cs_maml/cs_maml_server.py",
+      "role": "Central/edge round, report and personalization coordination.",
+      "sha256": "1d7a04d3aea581ff0a01c4d5304c9498fa407720406d8ef113059d7674b30f87"
+    }
+  ],
+  "acceptance_boundary": "Accept the exact bound prose commit and evidence receipt for root integration with zero unresolved critical/high/medium findings. This is documentation/static-source acceptance only. No historical runtime restoration, active-family qualification, global archive packaging or whole-repository completion is established; root integration and later publication remain separate."
+}
