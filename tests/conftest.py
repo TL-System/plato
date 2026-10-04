@@ -941,9 +941,13 @@ class _ProfileChecks:
         if self.phase4_requested:
             if not self.phase4_qualification:
                 scope = "Phase4 focused execution (not complete task qualification)"
-            elif success and self.config.getoption("collectonly"):
+            elif (
+                success
+                and self.phase4_task is not None
+                and self.config.getoption("collectonly")
+            ):
                 scope = f"Phase4 {self.phase4_task['task_id']} collection-only validation (no execution qualification)"
-            elif success and self.phase4_expected:
+            elif success and self.phase4_task is not None and self.phase4_expected:
                 scope = (
                     f"Phase4 {self.phase4_task['task_id']} complete task qualification"
                 )

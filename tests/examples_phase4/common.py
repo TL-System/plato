@@ -22,12 +22,38 @@ import time
 from collections.abc import Iterator, Mapping, Sequence
 from contextlib import contextmanager
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, TypedDict, cast
 
 if TYPE_CHECKING:
     from plato.config import Config
 
 REPO = Path(__file__).resolve().parents[2]
+
+
+class _ModuleSource(TypedDict):
+    file: str
+    loader_origin: str | None
+    sha256: str
+
+
+class _Snapshot(TypedDict):
+    files: dict[str, str]
+    modules: dict[str, _ModuleSource]
+    identity_errors: list[str]
+    executable: str
+    version: str
+
+
+def _strings(value: object) -> list[str]:
+    if not isinstance(value, list) or any(not isinstance(p, str) for p in value):
+        raise ValueError("expected a list of strings")
+    return cast(list[str], value)
+
+
+def _mapping(value: object) -> Mapping[str, object]:
+    if not isinstance(value, Mapping) or any(not isinstance(k, str) for k in value):
+        raise ValueError("expected a mapping with string keys")
+    return cast(Mapping[str, object], value)
 
 
 def _digest(value: object) -> str:
@@ -183,23 +209,23 @@ def configured_case(spec: Mapping[str, object], directory: Path) -> Iterator[Con
             [
                 str(spec["config"]),
                 str(spec["entrypoint"]),
-                *spec.get("source_paths", []),
+                *_strings(spec.get("source_paths", [])),
                 "tests/examples_phase4/common.py",
                 "tests/integration/utils.py",
             ]
         )
     )
-    initial = source_snapshot(REPO, explicit)
+    initial = cast(_Snapshot, source_snapshot(REPO, explicit))
     try:
         if sys.version_info[:2] != (3, 13):
             raise RuntimeError("Phase4 workers require Python 3.13")
-        for name in spec.get("required_distributions", []):
+        for name in _strings(spec.get("required_distributions", [])):
             importlib.metadata.version(name)
         resolved = ObservedLoader(source).load()
         effective = copy.deepcopy(resolved)
         allowed = spec.get("allowed_overlay_paths", {})
         changes = []
-        for path, value in _leaves(spec.get("overlays", {})):
+        for path, value in _leaves(_mapping(spec.get("overlays", {}))):
             if not isinstance(allowed, Mapping) or not allowed.get(path):
                 raise ValueError(f"unreviewed overlay: {path}")
             changes.append(_replace(effective, path, value))
@@ -213,8 +239,8 @@ def configured_case(spec: Mapping[str, object], directory: Path) -> Iterator[Con
             "results.result_path": "results",
         }.items():
             runtime_changes.append(_replace(effective, path, value))
-        runtime = spec.get("runtime", {})
-        for path, value in runtime.get("ports", {}).items():
+        runtime = _mapping(spec.get("runtime", {}))
+        for path, value in _mapping(runtime.get("ports", {})).items():
             runtime_changes.append(_replace(effective, path, value))
         config_path = directory / "effective.toml"
         toml_writer.dump(effective, config_path)
@@ -247,9 +273,12 @@ def configured_case(spec: Mapping[str, object], directory: Path) -> Iterator[Con
             str(REPO),
             *[p for p in previous_path if p not in {str(REPO), str(entrypoint.parent)}],
         ]
-        random.seed(spec["seed"])
-        np.random.seed(spec["seed"])
-        torch.manual_seed(spec["seed"])
+        seed = spec["seed"]
+        if type(seed) is not int:
+            raise ValueError("case seed must be an integer")
+        random.seed(seed)
+        np.random.seed(seed)
+        torch.manual_seed(seed)
         torch.set_num_threads(1)
         with isolated_config_state():
             config = Config()
@@ -275,7 +304,7 @@ def configured_case(spec: Mapping[str, object], directory: Path) -> Iterator[Con
     finally:
         try:
             explicit.extend(str(Path(v["path"]).relative_to(REPO)) for v in visited)
-            final = source_snapshot(REPO, explicit)
+            final = cast(_Snapshot, source_snapshot(REPO, explicit))
             errors = final["identity_errors"]
             for path, digest in initial["files"].items():
                 if final["files"].get(path) != digest:
@@ -333,7 +362,10 @@ def run_case(
             or _digest(authored) != case["authored_spec_sha256"]
         ):
             raise AssertionError("worker or authored spec differs from frozen ledger")
-    timeout = float(spec.get("timeout_seconds", 60))
+    timeout_value = spec.get("timeout_seconds", 60)
+    if not isinstance(timeout_value, (int, float)):
+        raise ValueError("worker timeout must be numeric")
+    timeout = float(timeout_value)
     if not 0 < timeout <= 180:
         raise ValueError("worker timeout must be in (0, 180]")
     directory = directory.resolve()
@@ -354,14 +386,14 @@ def run_case(
             [
                 str(spec["config"]),
                 str(spec["entrypoint"]),
-                *spec.get("source_paths", []),
+                *_strings(spec.get("source_paths", [])),
                 "tests/examples_phase4/common.py",
                 "tests/integration/utils.py",
                 worker.replace(".", "/") + ".py",
             ]
         )
     )
-    initial = source_snapshot(REPO, explicit)
+    initial = cast(_Snapshot, source_snapshot(REPO, explicit))
     cwd = _path(REPO, str(spec.get("cwd", ".")))
     path_order = [str(REPO)]
     entrypoint_parent = _path(REPO, str(spec["entrypoint"])).parent
@@ -412,8 +444,18 @@ def run_case(
 
     def read_events():
         events = []
-        for path in sorted(directory.glob("events-*.jsonl")):
-            for line in path.read_text().splitlines():
+        try:
+            paths = sorted(directory.glob("events-*.jsonl"))
+        except OSError as exc:
+            malformed.append(f"event listing: {exc}")
+            return events
+        for path in paths:
+            try:
+                lines = path.read_text(encoding="utf-8").splitlines()
+            except (OSError, UnicodeError) as exc:
+                malformed.append(f"{path.name}: {type(exc).__name__}: {exc}")
+                continue
+            for line in lines:
                 try:
                     event = json.loads(line)
                     if not isinstance(event, dict) or not all(
@@ -446,6 +488,15 @@ def run_case(
                             or not isinstance(snapshot.get("executable"), str)
                             or not isinstance(snapshot.get("modules"), dict)
                             or not isinstance(snapshot.get("version"), str)
+                            or any(
+                                not isinstance(k, str) or not isinstance(v, str)
+                                for k, v in snapshot.get("files", {}).items()
+                            )
+                            or any(
+                                not isinstance(v, dict)
+                                or not isinstance(v.get("file"), str)
+                                for v in snapshot.get("modules", {}).values()
+                            )
                         ):
                             raise ValueError("invalid provenance snapshot")
                     events.append(event)
@@ -453,32 +504,39 @@ def run_case(
                     malformed.append(f"{path.name}: {exc}")
         return events
 
+    def register_owned(process):
+        """Accept OS session/lineage proof, never a worker's ownership claim."""
+        try:
+            created = process.create_time()
+            if process.pid in identities:
+                return identities[process.pid] == created
+            same_session = os.getsid(process.pid) == proc.pid
+            parent_pid = process.ppid()
+            parent_owned = False
+            if parent_pid in identities:
+                parent = psutil.Process(parent_pid)
+                parent_owned = parent.create_time() == identities[parent_pid]
+            if same_session or parent_owned:
+                identities[process.pid] = created
+                return True
+        except (ProcessLookupError, psutil.NoSuchProcess, psutil.AccessDenied):
+            pass
+        return False
+
+    def refresh_owned():
+        for process in psutil.process_iter(["pid", "create_time"]):
+            register_owned(process)
+
     def observe():
         while not finished.wait(0.02):
-            for process in psutil.process_iter(["pid", "create_time"]):
-                try:
-                    if os.getpgid(process.pid) == proc.pid:
-                        identities[process.pid] = process.create_time()
-                except (ProcessLookupError, psutil.NoSuchProcess, PermissionError):
-                    pass
+            refresh_owned()
 
     observer = threading.Thread(target=observe, daemon=True)
     observer.start()
 
     def survivors():
-        for event in read_events():
-            if event["event"] == "child_started":
-                pid, created = event.get("child_pid"), event.get("child_created")
-                try:
-                    child = psutil.Process(pid)
-                    if child.create_time() == created and (
-                        child.ppid() in identities
-                        or os.getpgid(pid) == proc.pid
-                        or identities.get(event["pid"]) == event["created"]
-                    ):
-                        identities[pid] = created
-                except (ProcessLookupError, psutil.NoSuchProcess, TypeError):
-                    pass
+        # Cleanup never reads events; corrupt evidence cannot disable containment.
+        refresh_owned()
         live = []
         for pid, created in list(identities.items()):
             try:
@@ -552,7 +610,11 @@ def run_case(
         errors.append("missing initial worker_started event")
     if not any(e["event"] == "configured" for e in parent_events):
         errors.append("missing configured event")
-    snapshots = [e["snapshot"] for e in parent_events if e["event"] == "provenance"]
+    snapshots = [
+        cast(_Snapshot, e["snapshot"])
+        for e in parent_events
+        if e["event"] == "provenance"
+    ]
     if not snapshots:
         errors.append("missing source provenance")
     for snapshot in snapshots:

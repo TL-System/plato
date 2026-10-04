@@ -110,11 +110,12 @@ def test_inert_import_and_standard_library_helpers():
     tree = ast.parse((REPO / "tests/examples_phase4/common.py").read_text())
     for node in tree.body:
         if isinstance(node, (ast.Import, ast.ImportFrom)):
-            names = (
-                [a.name.split(".")[0] for a in node.names]
-                if isinstance(node, ast.Import)
-                else [node.module.split(".")[0]]
-            )
+            if isinstance(node, ast.Import):
+                names = [a.name.split(".")[0] for a in node.names]
+            else:
+                module = node.module
+                assert module is not None
+                names = [module.split(".")[0]]
             assert all(
                 name in sys.stdlib_module_names or name == "__future__"
                 for name in names
@@ -436,8 +437,11 @@ def test_real_worker_natural_exit_identity_and_numeric_events(
     assert (
         result["returncode"] == 0 and not result["forced"] and not result["survivors"]
     )
-    assert any(e.get("loss") == 0.25 for e in result["events"])
-    assert result["environment"]["PYTHONPATH"].split(os.pathsep) == (
+    events = result["events"]
+    environment = result["environment"]
+    assert isinstance(events, list) and isinstance(environment, dict)
+    assert any(e.get("loss") == 0.25 for e in events)
+    assert environment["PYTHONPATH"].split(os.pathsep) == (
         [str(worker_repo), str(worker_repo / "example")]
         if cwd == "example"
         else [str(worker_repo)]
@@ -526,14 +530,17 @@ def test_frozen_spec_and_worker_binding_precedes_launch(
     assert not (tmp_path / "never").exists()
 
 
-def test_unrelated_process_identity_is_never_signaled(worker_repo, tmp_path):
+def _unrelated_process_probe(worker_repo, tmp_path, timestamp):
     import psutil
 
     unrelated = subprocess.Popen([sys.executable, "-c", "import time; time.sleep(30)"])
     try:
+        created = psutil.Process(unrelated.pid).create_time()
+        if timestamp == "stale":
+            created += 1
         body = (
             f"emit(directory, 'child_started', child_pid={unrelated.pid}, "
-            f"child_created={psutil.Process(unrelated.pid).create_time() + 1})\n"
+            f"child_created={created})\n"
             "with configured_case(spec, directory):\n    import entry\n"
             "emit(directory, 'success')\n"
         )
@@ -544,11 +551,21 @@ def test_unrelated_process_identity_is_never_signaled(worker_repo, tmp_path):
             spec=_spec(config="leaf.toml", entrypoint="entry.py"),
         )
         assert unrelated.poll() is None
-        assert str(unrelated.pid) not in result["processes"]
-        assert unrelated.pid not in result["processes"]
+        processes = result["processes"]
+        assert isinstance(processes, dict)
+        assert str(unrelated.pid) not in processes
+        assert unrelated.pid not in processes
     finally:
         unrelated.terminate()
         unrelated.communicate(timeout=5)
+
+
+def test_unrelated_process_identity_is_never_signaled(worker_repo, tmp_path):
+    _unrelated_process_probe(worker_repo, tmp_path, "stale")
+
+
+def test_valid_unrelated_process_identity_is_never_signaled(worker_repo, tmp_path):
+    _unrelated_process_probe(worker_repo, tmp_path, "valid")
 
 
 def test_finally_cleanup_is_recorded_and_fails(worker_repo, tmp_path, monkeypatch):
@@ -557,7 +574,12 @@ def test_finally_cleanup_is_recorded_and_fails(worker_repo, tmp_path, monkeypatc
 
     class BrokenCommunication(original):
         def communicate(self, *args, **kwargs):
-            if self.args[-1] == worker and not getattr(self, "injected", False):
+            arguments = self.args
+            if (
+                isinstance(arguments, (list, tuple))
+                and arguments[-1] == worker
+                and not getattr(self, "injected", False)
+            ):
                 self.injected = True
                 raise RuntimeError("deliberate communicate failure")
             return super().communicate(*args, **kwargs)
@@ -593,3 +615,98 @@ def test_original_nonzero_exit_and_serial_execution_guard(policy):
     checks.pytest_sessionfinish(session, pytest.ExitCode.INTERRUPTED)
     assert session.exitstatus == pytest.ExitCode.INTERRUPTED
     assert any("original exit was nonzero" in error for error in checks.violations)
+
+
+@pytest.mark.parametrize("corruption", ["undecodable", "unreadable"])
+def test_bad_event_files_cannot_bypass_cleanup(worker_repo, tmp_path, corruption):
+    import psutil
+
+    body = (
+        "import subprocess, psutil, time\n"
+        "child = subprocess.Popen([sys.executable, '-c', 'import time; time.sleep(30)'])\n"
+        "emit(directory, 'child_started', child_pid=child.pid, child_created=psutil.Process(child.pid).create_time())\n"
+        "print('owned child started', flush=True)\n"
+        "bad = directory / 'events-bad.jsonl'\n"
+        + (
+            "bad.write_bytes(bytes([255]))\n"
+            if corruption == "undecodable"
+            else "bad.write_text('unreadable event')\nbad.chmod(0)\n"
+        )
+        + "time.sleep(30)\n"
+    )
+    worker = _worker(worker_repo, body)
+    directory = tmp_path / "bad-events"
+    try:
+        with pytest.raises(AssertionError, match="Phase4 case failed"):
+            common.run_case(
+                directory,
+                worker=worker,
+                spec=_spec(
+                    config="leaf.toml", entrypoint="entry.py", timeout_seconds=3
+                ),
+            )
+        result = json.loads((directory / "result.json").read_text())
+        assert result["timed_out"] and result["forced"] and result["survivors"] == []
+        assert result["malformed_events"]
+        assert "owned child started" in (directory / "stdout.log").read_text()
+        assert (directory / "stderr.log").exists()
+        assert len(result["processes"]) >= 2
+        for pid, created in result["processes"].items():
+            try:
+                process = psutil.Process(int(pid))
+                assert (
+                    process.create_time() != created
+                    or process.status() == psutil.STATUS_ZOMBIE
+                )
+            except psutil.NoSuchProcess:
+                pass
+    finally:
+        # Contain only exact identities from this probe if the old helper fails.
+        bad = directory / "events-bad.jsonl"
+        if bad.exists():
+            bad.chmod(0o600)
+        for path in directory.glob("events-*.jsonl"):
+            if path == bad:
+                continue
+            for line in path.read_text().splitlines():
+                event = json.loads(line)
+                owned = [(event["pid"], event["created"])]
+                if event["event"] == "child_started":
+                    owned.append((event["child_pid"], event["child_created"]))
+                for pid, created in owned:
+                    try:
+                        process = psutil.Process(pid)
+                        if (
+                            process.create_time() == created
+                            and process.status() != psutil.STATUS_ZOMBIE
+                        ):
+                            process.kill()
+                    except psutil.NoSuchProcess:
+                        pass
+
+
+@pytest.mark.parametrize("detached", [False, True])
+def test_genuine_child_identity_is_observed_and_exits_naturally(
+    worker_repo, tmp_path, detached
+):
+    worker = _worker(
+        worker_repo,
+        (
+            "import subprocess, psutil\n"
+            f"child = subprocess.Popen([sys.executable, '-c', 'import time; time.sleep(0.3)'], start_new_session={detached})\n"
+            "emit(directory, 'child_started', child_pid=child.pid, child_created=psutil.Process(child.pid).create_time())\n"
+            "child.wait(timeout=5)\n"
+            "with configured_case(spec, directory):\n    import entry\n"
+            "emit(directory, 'success')\n"
+        ),
+    )
+    result = common.run_case(
+        tmp_path / "genuine-child",
+        worker=worker,
+        spec=_spec(config="leaf.toml", entrypoint="entry.py"),
+    )
+    processes, events = result["processes"], result["events"]
+    assert isinstance(processes, dict) and isinstance(events, list)
+    child = next(e for e in events if e["event"] == "child_started")
+    assert processes[child["child_pid"]] == child["child_created"]
+    assert result["forced"] == [] and result["survivors"] == []
