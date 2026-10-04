@@ -46,7 +46,7 @@ uv run --no-sync --python 3.13 python -m pytest tests --test-profile=mandatory \
 ```
 
 Plain `pytest tests` also retains slow tests. Native Apple Silicon MLX,
-Lighteval, and Phase4 example task modules keep their explicit profile boundaries;
+Lighteval, and other optional example modules keep their explicit profile boundaries;
 the manual PyTorch workflow does not qualify all native or optional example tasks.
 
 The preceding successful Linux qualification took about 64 minutes. Its measured

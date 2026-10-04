@@ -720,7 +720,7 @@ class _ProfileChecks:
         if self.fast_core:
             scope = (
                 "fast core (runtime and slow excluded; not full qualification); "
-                "native, Lighteval and Phase4 task qualifications excluded"
+                "native, Lighteval and optional example qualifications excluded"
             )
         if self.eval_requested:
             if not self.eval_qualification:
