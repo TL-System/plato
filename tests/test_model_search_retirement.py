@@ -195,7 +195,7 @@ def test_retired_category_fails_before_factory_activity(
         pytest.fail("Retired category reached another factory.")
 
     monkeypatch.setattr(registry.huggingface.Model, "get", forbidden)
-    monkeypatch.setattr(registry.torch_hub.Model, "get", forbidden)
+    monkeypatch.setattr(registry.torchvision.Model, "get", forbidden)
     with pytest.raises(
         ValueError, match="retired.*archives/retired/legacy-vit/README.md"
     ):
@@ -215,8 +215,8 @@ def test_generic_torchvision_category_still_delegates(
         calls.append(kwargs)
         return sentinel
 
-    monkeypatch.setattr(registry.torch_hub.Model, "get", factory)
-    assert registry.get(model_type="torch_hub", model_name=name) is sentinel
+    monkeypatch.setattr(registry.torchvision.Model, "get", factory)
+    assert registry.get(model_type="torchvision", model_name=name) is sentinel
     assert calls == [{"model_name": name}]
     raise_if_retired("vit", category="datasource")
     raise_if_retired("vit", category="trainer")

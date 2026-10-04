@@ -1,14 +1,14 @@
 {
   "schema_version": 1,
-  "status": "FEI retired by reviewed amendment; eleven active ownership rows remain draft. No family is yet accepted.",
+  "status": "FEI and five bounded legacy scopes retired by reviewed amendments; eleven active ownership rows remain draft. No family is yet accepted.",
   "authority": {
     "family_plan_sha256": "07d90034e89b83283c9b592550ebe17a1ea3a28a9fa2fbc292cc328db4977e4b",
     "family_review_sha256": "1fb78cdc19f530f9e17258d5e8481e54703f846b1aa8b7160112a9af18e477aa",
     "harness_design_sha256": "0b01acff4e03d725f239af1fcc8d6f778fb1817ce69cb313f947391fcd14d502",
     "harness_review_sha256": "e97e3149a52639c9d13c7507d2e946eec50e1b0c775675255579ad25bc8b62f0"
   },
-  "path_map_sha256": "84daa8d2da6a48241781cf008c6fd10e9333792433c2d9c37eb52f0d7f271cd1",
-  "config_bindings_sha256": "8f85172fd1c7acd9174ca54df4872c038516ac53564f3f8edce01adc54daba35",
+  "path_map_sha256": "b05b74ba9eddcd201f82d33edb2737e5969d613486deadf496cf91db2df224a4",
+  "config_bindings_sha256": "eb9c21afc4a9b9b8d9047e8c8e4eeac7802bbe0104a8b56faf2377d15ddfae39",
   "source_inventory": [
     {
       "path": "configs/CIFAR10/fedavg_resnet18.toml",
@@ -29,9 +29,9 @@
       "status": "internal-fix pending"
     },
     {
-      "path": "configs/CIFAR10/fedavg_resnet18_torchhub.toml",
-      "sha256": "2ca99bb45498a605dcd2b202aa4e5aee30a23e517a5d318288db11ffa5230483",
-      "family": "configs/CIFAR10/fedavg_resnet18_torchhub.toml",
+      "path": "configs/CIFAR10/fedavg_resnet18_torchvision.toml",
+      "sha256": "33e218cd7bdedccc9f836b53edd7e28a6b4e9e842816e10fe15cb0aee1daf71a",
+      "family": "configs/CIFAR10/fedavg_resnet18_torchvision.toml",
       "owner": "P4-core",
       "consumer_owner": "P4-core",
       "role": "config",
@@ -198,15 +198,6 @@
       "consumer_owner": "P4-proof-reconcile",
       "role": "config",
       "status": "validated-source-bound"
-    },
-    {
-      "path": "configs/HuggingFace/fedavg_shakespeare_bert.toml",
-      "sha256": "1aa5b3c151fc76742a316ca2a5fefb455c5d7fb0ed074fcba4ce8870fde81f87",
-      "family": "configs/HuggingFace/fedavg_shakespeare_bert.toml",
-      "owner": "P4-split-hf",
-      "consumer_owner": "P4-split-hf",
-      "role": "config",
-      "status": "internal-fix pending"
     },
     {
       "path": "configs/HuggingFace/fedavg_shakespeare_distilgpt2.toml",
@@ -399,7 +390,7 @@
     },
     {
       "path": "configs/TinyImageNet/fedavg_alexnet.toml",
-      "sha256": "f635d90fc2b0b0e5534ed60cd832a13340478a8e74ecf521bce1ee2f16babbca",
+      "sha256": "7208d88d3c919ba9e17a12a4c6f11dbb2b3552326a8be4e7acb052a1a3b54f53",
       "family": "configs/TinyImageNet/fedavg_alexnet.toml",
       "owner": "P4-core",
       "consumer_owner": "P4-core",
@@ -408,7 +399,7 @@
     },
     {
       "path": "configs/TinyImageNet/fedavg_googlenet.toml",
-      "sha256": "1c4d0d931b5ae326c4497882b3f1b131580f65bfada2b09e9f120920f16faea2",
+      "sha256": "79882247bfcfa4e502408b318b48cef83369dbadac9f811148487e8798a9f242",
       "family": "configs/TinyImageNet/fedavg_googlenet.toml",
       "owner": "P4-core",
       "consumer_owner": "P4-core",
@@ -417,7 +408,7 @@
     },
     {
       "path": "configs/TinyImageNet/fedavg_inceptionv3.toml",
-      "sha256": "8f9bba13b7279f0da0df2b0ab68a2767770f96c4485ecc2ec92942f339c87aa0",
+      "sha256": "7576bced855fa9b9ea72ac920836edd354d6a8296dc3952eab1b31cf83418125",
       "family": "configs/TinyImageNet/fedavg_inceptionv3.toml",
       "owner": "P4-core",
       "consumer_owner": "P4-core",
@@ -426,7 +417,7 @@
     },
     {
       "path": "configs/TinyImageNet/fedavg_shufflenet.toml",
-      "sha256": "343ad1fe87cda2dfde085afbf7f468c0c5a560cb5bf4fc897693ed8a41b95a6f",
+      "sha256": "d6006168835f7b91e5224449a9c6feb723d159cc6100b0d7619007c87fcb7044",
       "family": "configs/TinyImageNet/fedavg_shufflenet.toml",
       "owner": "P4-core",
       "consumer_owner": "P4-core",
@@ -435,7 +426,7 @@
     },
     {
       "path": "configs/TinyImageNet/fedavg_squeezenet.toml",
-      "sha256": "14b43298f97ccdfb196b324c31eb887c5fe136e77642d87da7746698431a7fc1",
+      "sha256": "a2b4a753b0b78db1fd8b72749683e3738837693185e23d29de56a2b9dd8b2d4e",
       "family": "configs/TinyImageNet/fedavg_squeezenet.toml",
       "owner": "P4-core",
       "consumer_owner": "P4-core",
@@ -1695,7 +1686,7 @@
     },
     {
       "path": "examples/model_search/anycostfl/example_ResNet.toml",
-      "sha256": "4a74ee96d86be5786c935e3454cec0a1ea2861010d82112699ab01d77a07cbb5",
+      "sha256": "f6ae45c764ecaee6d925ee76303b64afacf5f100448c32bde7851481014511f8",
       "family": "anycostfl",
       "owner": "P4-proof-reconcile",
       "consumer_owner": "P4-proof-reconcile",
@@ -1722,7 +1713,7 @@
     },
     {
       "path": "examples/model_search/fedrolex/example_ResNet.toml",
-      "sha256": "4a74ee96d86be5786c935e3454cec0a1ea2861010d82112699ab01d77a07cbb5",
+      "sha256": "f6ae45c764ecaee6d925ee76303b64afacf5f100448c32bde7851481014511f8",
       "family": "fedrolex",
       "owner": "P4-proof-reconcile",
       "consumer_owner": "P4-proof-reconcile",
@@ -1821,7 +1812,7 @@
     },
     {
       "path": "examples/model_search/heterofl/heterofl_resnet18_dynamic.toml",
-      "sha256": "361563886ce2a5eca689d8d1702fb8778874614c9c5bc77d6f2775eb01fd42aa",
+      "sha256": "1da0ef4948816d777a038381145bd433649a37c022b784e33396f3dcc0272f23",
       "family": "heterofl",
       "owner": "P4-proof-reconcile",
       "consumer_owner": "P4-proof-reconcile",
@@ -1866,7 +1857,7 @@
     },
     {
       "path": "examples/model_search/sysheterofl/config_ResNet152.toml",
-      "sha256": "e4e9b28df53fa3bc78f19aa53e0753c36d67a90dbba9a2e37ec583da5b354f87",
+      "sha256": "b132e201ef12cce0345353278e49e511f64dacc5964f47aac5293574f4311dc9",
       "family": "sysheterofl",
       "owner": "P4-proof-reconcile",
       "consumer_owner": "P4-proof-reconcile",
@@ -2756,24 +2747,6 @@
       "status": "internal-fix pending"
     },
     {
-      "path": "examples/split_learning/llm_split_learning/split_learning_wikitext2_llama2.toml",
-      "sha256": "fcf12991d3e5e5c6a0afad4eef8bd9bec234a2bf1dcb6a6dfc5f4ab7dd1eda6a",
-      "family": "split-llm",
-      "owner": "P4-split-hf",
-      "consumer_owner": "P4-split-hf",
-      "role": "config",
-      "status": "internal-fix pending"
-    },
-    {
-      "path": "examples/split_learning/llm_split_learning/split_learning_wikitext2_opt350m.toml",
-      "sha256": "d05e8c3c2b668e16a9b48ee8e9a1771e37410e39c89810bbeea0101a976f085e",
-      "family": "split-llm",
-      "owner": "P4-split-hf",
-      "consumer_owner": "P4-split-hf",
-      "role": "config",
-      "status": "internal-fix pending"
-    },
-    {
       "path": "examples/ssl/byol/byol.py",
       "sha256": "3da8cd75b16a586e4d5e59c21e05e1bf55f076c882108bc6cc1d242c006057f8",
       "family": "ssl-byol",
@@ -3315,7 +3288,7 @@
     },
     {
       "path": "examples/unlearning/fedunlearning/fedunlearning.py",
-      "sha256": "8010b92fa99a7251859870f0e722283c62ce878f5bc7bb4237d60bead0119fa4",
+      "sha256": "17857f977adf44da98896638420b539b240593097ce0f0b6996b036a1835567f",
       "family": "fedunlearning",
       "owner": "P4-unlearning",
       "consumer_owner": "P4-unlearning",
@@ -3323,8 +3296,8 @@
       "status": "internal-fix pending"
     },
     {
-      "path": "examples/unlearning/fedunlearning/fedunlearning_adahessian_MNIST_lenet5.toml",
-      "sha256": "2b60e6f67866c2836417893ab0653543a0af3fa201d5d4a96e80e7592a0a0944",
+      "path": "examples/unlearning/fedunlearning/fedunlearning_MNIST_lenet5.toml",
+      "sha256": "7d66615ab124863b2efedc05bde97d755a2cba1745e2144e82b23506e3c27356",
       "family": "fedunlearning",
       "owner": "P4-unlearning",
       "consumer_owner": "P4-unlearning",
@@ -3333,7 +3306,7 @@
     },
     {
       "path": "examples/unlearning/fedunlearning/fedunlearning_client.py",
-      "sha256": "202fc99ef59a458fce1387e95b4c42ef95ee7454b6f4ede1ce872b79714d14bb",
+      "sha256": "c05781d1c80a45a03bd6cdac77c139ce8a068ee0c319610f75702aed71597d43",
       "family": "fedunlearning",
       "owner": "P4-unlearning",
       "consumer_owner": "P4-unlearning",
@@ -3342,7 +3315,7 @@
     },
     {
       "path": "examples/unlearning/fedunlearning/fedunlearning_server.py",
-      "sha256": "0a5e4496a555cbddfe4f87c763e1ca74ec792de4cac958094d9fd15458518aaf",
+      "sha256": "c09efdcd32595e890ed40be7d507bb013439087b36ddbc035a2c4738718b6331",
       "family": "fedunlearning",
       "owner": "P4-unlearning",
       "consumer_owner": "P4-unlearning",
@@ -3396,7 +3369,7 @@
     },
     {
       "path": "examples/unlearning/fedunlearning/unlearning_iid.py",
-      "sha256": "ec241fe7e55dec86aafada28126008d57f2eb2dcd3c8e784bbf1fb9b8e175a32",
+      "sha256": "aeb1ab00020d6239390a62e88a7e0690999a573792a52cc226ed6bb400a6e620",
       "family": "fedunlearning",
       "owner": "P4-unlearning",
       "consumer_owner": "P4-unlearning",
@@ -3405,7 +3378,7 @@
     },
     {
       "path": "examples/unlearning/knot/fedunlearning_server.py",
-      "sha256": "1d3ca2c12e974f40be3bcdc349fe797477fcce99d8065ff22682e495dad2c478",
+      "sha256": "4940f65775c1b4290a2e3dfb2af825774341538c73fd9d0ca4883008d254371a",
       "family": "knot",
       "owner": "P4-unlearning",
       "consumer_owner": "P4-unlearning",
@@ -3531,7 +3504,7 @@
     },
     {
       "path": "examples/unlearning/knot/unlearning_iid.py",
-      "sha256": "f413b67450f71174787edab71a7273bd1c53ab6956d82d646f4c0154ad21f18d",
+      "sha256": "b21b4cead0f7fdf1c4f029b1c23c792140eace31a71aea4528ba6e9a0eb54135",
       "family": "knot",
       "owner": "P4-unlearning",
       "consumer_owner": "P4-unlearning",
@@ -3818,12 +3791,12 @@
         "composable-trainer"
       ],
       "authority_sha256": "07d90034e89b83283c9b592550ebe17a1ea3a28a9fa2fbc292cc328db4977e4b",
-      "inventory_revision": 1,
+      "inventory_revision": 2,
       "state": "draft",
       "cases": [],
       "owned_paths": [
         "configs/CIFAR10/fedavg_resnet18.toml",
-        "configs/CIFAR10/fedavg_resnet18_torchhub.toml",
+        "configs/CIFAR10/fedavg_resnet18_torchvision.toml",
         "configs/CIFAR10/fedavg_vgg16.toml",
         "configs/CIFAR10/fedavg_wideresnet.toml",
         "configs/CIFAR10/test_enhance_resnet18.toml",
@@ -3878,7 +3851,7 @@
           "assignment": "Author resolves any multiple candidates into explicit case branches; all listed utilities/entrypoints remain inventoried. Include-only fragments inherit consuming leaf behavioral proof."
         },
         {
-          "config": "configs/CIFAR10/fedavg_resnet18_torchhub.toml",
+          "config": "configs/CIFAR10/fedavg_resnet18_torchvision.toml",
           "owner": "P4-core",
           "entrypoint_candidates": [
             "plato.py"
@@ -4873,7 +4846,7 @@
         "sysheterofl"
       ],
       "authority_sha256": "07d90034e89b83283c9b592550ebe17a1ea3a28a9fa2fbc292cc328db4977e4b",
-      "inventory_revision": 1,
+      "inventory_revision": 2,
       "state": "draft",
       "cases": [],
       "owned_paths": [
@@ -5146,13 +5119,12 @@
         "split-llm"
       ],
       "authority_sha256": "07d90034e89b83283c9b592550ebe17a1ea3a28a9fa2fbc292cc328db4977e4b",
-      "inventory_revision": 1,
+      "inventory_revision": 2,
       "state": "draft",
       "cases": [],
       "owned_paths": [
         "configs/CIFAR10/split_learning_resnet18.toml",
         "configs/HuggingFace/fedavg_opt_lora.toml",
-        "configs/HuggingFace/fedavg_shakespeare_bert.toml",
         "configs/HuggingFace/fedavg_shakespeare_distilgpt2.toml",
         "configs/HuggingFace/fedavg_smol_smoltalk_smollm2_135m.toml",
         "configs/HuggingFace/fedavg_wikitext2_gpt2.toml",
@@ -5166,9 +5138,7 @@
         "examples/split_learning/llm_split_learning/split_learning_trainer_attack.py",
         "examples/split_learning/llm_split_learning/split_learning_wikitext2_gpt2.toml",
         "examples/split_learning/llm_split_learning/split_learning_wikitext2_gpt2_attack.toml",
-        "examples/split_learning/llm_split_learning/split_learning_wikitext2_gpt2_lora.toml",
-        "examples/split_learning/llm_split_learning/split_learning_wikitext2_llama2.toml",
-        "examples/split_learning/llm_split_learning/split_learning_wikitext2_opt350m.toml"
+        "examples/split_learning/llm_split_learning/split_learning_wikitext2_gpt2_lora.toml"
       ],
       "config_bindings": [
         {
@@ -5183,16 +5153,6 @@
         },
         {
           "config": "configs/HuggingFace/fedavg_opt_lora.toml",
-          "owner": "P4-split-hf",
-          "entrypoint_candidates": [
-            "plato.py"
-          ],
-          "include_consumers": [],
-          "kind": "leaf-or-multi-mode-config",
-          "assignment": "Author resolves any multiple candidates into explicit case branches; all listed utilities/entrypoints remain inventoried. Include-only fragments inherit consuming leaf behavioral proof."
-        },
-        {
-          "config": "configs/HuggingFace/fedavg_shakespeare_bert.toml",
           "owner": "P4-split-hf",
           "entrypoint_candidates": [
             "plato.py"
@@ -5255,28 +5215,6 @@
         },
         {
           "config": "examples/split_learning/llm_split_learning/split_learning_wikitext2_gpt2_lora.toml",
-          "owner": "P4-split-hf",
-          "entrypoint_candidates": [
-            "examples/split_learning/llm_split_learning/split_learning_main.py",
-            "examples/split_learning/llm_split_learning/split_learning_main_attack.py"
-          ],
-          "include_consumers": [],
-          "kind": "leaf-or-multi-mode-config",
-          "assignment": "Author resolves any multiple candidates into explicit case branches; all listed utilities/entrypoints remain inventoried. Include-only fragments inherit consuming leaf behavioral proof."
-        },
-        {
-          "config": "examples/split_learning/llm_split_learning/split_learning_wikitext2_llama2.toml",
-          "owner": "P4-split-hf",
-          "entrypoint_candidates": [
-            "examples/split_learning/llm_split_learning/split_learning_main.py",
-            "examples/split_learning/llm_split_learning/split_learning_main_attack.py"
-          ],
-          "include_consumers": [],
-          "kind": "leaf-or-multi-mode-config",
-          "assignment": "Author resolves any multiple candidates into explicit case branches; all listed utilities/entrypoints remain inventoried. Include-only fragments inherit consuming leaf behavioral proof."
-        },
-        {
-          "config": "examples/split_learning/llm_split_learning/split_learning_wikitext2_opt350m.toml",
           "owner": "P4-split-hf",
           "entrypoint_candidates": [
             "examples/split_learning/llm_split_learning/split_learning_main.py",
@@ -5498,13 +5436,13 @@
         "knot"
       ],
       "authority_sha256": "07d90034e89b83283c9b592550ebe17a1ea3a28a9fa2fbc292cc328db4977e4b",
-      "inventory_revision": 1,
+      "inventory_revision": 2,
       "state": "draft",
       "cases": [],
       "owned_paths": [
         "examples/unlearning/fedunlearning/.gitignore",
         "examples/unlearning/fedunlearning/fedunlearning.py",
-        "examples/unlearning/fedunlearning/fedunlearning_adahessian_MNIST_lenet5.toml",
+        "examples/unlearning/fedunlearning/fedunlearning_MNIST_lenet5.toml",
         "examples/unlearning/fedunlearning/fedunlearning_client.py",
         "examples/unlearning/fedunlearning/fedunlearning_server.py",
         "examples/unlearning/fedunlearning/lib_mia/__init__.py",
@@ -5529,7 +5467,7 @@
       ],
       "config_bindings": [
         {
-          "config": "examples/unlearning/fedunlearning/fedunlearning_adahessian_MNIST_lenet5.toml",
+          "config": "examples/unlearning/fedunlearning/fedunlearning_MNIST_lenet5.toml",
           "owner": "P4-unlearning",
           "entrypoint_candidates": [
             "examples/unlearning/fedunlearning/fedunlearning.py"
@@ -5641,5 +5579,392 @@
       "config_bindings": 134
     },
     "authority_disposition": "Original authority hashes retain their historical pre-retirement meaning; this reviewed amendment changes only active FEI inventory."
+  },
+  "additional_retirement_amendment": {
+    "prior_ledger_sha256": "7d18beab505f3f23cb6b14785c35b4d7a3b5b425b9dd541769e43bcd7b80167a",
+    "plan_sha256": "a49502dca7146305f37c94a404ff7735c7507d79d3968b5a813f09e304442716",
+    "plan_review_sha256": "a93502a267b86617ff3bde0d30462179c219f0bbc279354d0c049dfddcd0ecb8",
+    "removed_paths": [
+      "configs/HuggingFace/fedavg_shakespeare_bert.toml",
+      "examples/split_learning/llm_split_learning/split_learning_wikitext2_llama2.toml",
+      "examples/split_learning/llm_split_learning/split_learning_wikitext2_opt350m.toml"
+    ],
+    "path_renames": {
+      "examples/unlearning/fedunlearning/fedunlearning_adahessian_MNIST_lenet5.toml": "examples/unlearning/fedunlearning/fedunlearning_MNIST_lenet5.toml",
+      "configs/CIFAR10/fedavg_resnet18_torchhub.toml": "configs/CIFAR10/fedavg_resnet18_torchvision.toml"
+    },
+    "changed_source_rows": [
+      {
+        "before": {
+          "path": "configs/CIFAR10/fedavg_resnet18_torchhub.toml",
+          "sha256": "2ca99bb45498a605dcd2b202aa4e5aee30a23e517a5d318288db11ffa5230483",
+          "family": "configs/CIFAR10/fedavg_resnet18_torchhub.toml",
+          "owner": "P4-core",
+          "consumer_owner": "P4-core",
+          "role": "config",
+          "status": "internal-fix pending"
+        },
+        "after": {
+          "path": "configs/CIFAR10/fedavg_resnet18_torchvision.toml",
+          "sha256": "33e218cd7bdedccc9f836b53edd7e28a6b4e9e842816e10fe15cb0aee1daf71a",
+          "family": "configs/CIFAR10/fedavg_resnet18_torchvision.toml",
+          "owner": "P4-core",
+          "consumer_owner": "P4-core",
+          "role": "config",
+          "status": "internal-fix pending"
+        }
+      },
+      {
+        "before": {
+          "path": "configs/TinyImageNet/fedavg_alexnet.toml",
+          "sha256": "f635d90fc2b0b0e5534ed60cd832a13340478a8e74ecf521bce1ee2f16babbca",
+          "family": "configs/TinyImageNet/fedavg_alexnet.toml",
+          "owner": "P4-core",
+          "consumer_owner": "P4-core",
+          "role": "config",
+          "status": "internal-fix pending"
+        },
+        "after": {
+          "path": "configs/TinyImageNet/fedavg_alexnet.toml",
+          "sha256": "7208d88d3c919ba9e17a12a4c6f11dbb2b3552326a8be4e7acb052a1a3b54f53",
+          "family": "configs/TinyImageNet/fedavg_alexnet.toml",
+          "owner": "P4-core",
+          "consumer_owner": "P4-core",
+          "role": "config",
+          "status": "internal-fix pending"
+        }
+      },
+      {
+        "before": {
+          "path": "configs/TinyImageNet/fedavg_googlenet.toml",
+          "sha256": "1c4d0d931b5ae326c4497882b3f1b131580f65bfada2b09e9f120920f16faea2",
+          "family": "configs/TinyImageNet/fedavg_googlenet.toml",
+          "owner": "P4-core",
+          "consumer_owner": "P4-core",
+          "role": "config",
+          "status": "internal-fix pending"
+        },
+        "after": {
+          "path": "configs/TinyImageNet/fedavg_googlenet.toml",
+          "sha256": "79882247bfcfa4e502408b318b48cef83369dbadac9f811148487e8798a9f242",
+          "family": "configs/TinyImageNet/fedavg_googlenet.toml",
+          "owner": "P4-core",
+          "consumer_owner": "P4-core",
+          "role": "config",
+          "status": "internal-fix pending"
+        }
+      },
+      {
+        "before": {
+          "path": "configs/TinyImageNet/fedavg_inceptionv3.toml",
+          "sha256": "8f9bba13b7279f0da0df2b0ab68a2767770f96c4485ecc2ec92942f339c87aa0",
+          "family": "configs/TinyImageNet/fedavg_inceptionv3.toml",
+          "owner": "P4-core",
+          "consumer_owner": "P4-core",
+          "role": "config",
+          "status": "internal-fix pending"
+        },
+        "after": {
+          "path": "configs/TinyImageNet/fedavg_inceptionv3.toml",
+          "sha256": "7576bced855fa9b9ea72ac920836edd354d6a8296dc3952eab1b31cf83418125",
+          "family": "configs/TinyImageNet/fedavg_inceptionv3.toml",
+          "owner": "P4-core",
+          "consumer_owner": "P4-core",
+          "role": "config",
+          "status": "internal-fix pending"
+        }
+      },
+      {
+        "before": {
+          "path": "configs/TinyImageNet/fedavg_shufflenet.toml",
+          "sha256": "343ad1fe87cda2dfde085afbf7f468c0c5a560cb5bf4fc897693ed8a41b95a6f",
+          "family": "configs/TinyImageNet/fedavg_shufflenet.toml",
+          "owner": "P4-core",
+          "consumer_owner": "P4-core",
+          "role": "config",
+          "status": "internal-fix pending"
+        },
+        "after": {
+          "path": "configs/TinyImageNet/fedavg_shufflenet.toml",
+          "sha256": "d6006168835f7b91e5224449a9c6feb723d159cc6100b0d7619007c87fcb7044",
+          "family": "configs/TinyImageNet/fedavg_shufflenet.toml",
+          "owner": "P4-core",
+          "consumer_owner": "P4-core",
+          "role": "config",
+          "status": "internal-fix pending"
+        }
+      },
+      {
+        "before": {
+          "path": "configs/TinyImageNet/fedavg_squeezenet.toml",
+          "sha256": "14b43298f97ccdfb196b324c31eb887c5fe136e77642d87da7746698431a7fc1",
+          "family": "configs/TinyImageNet/fedavg_squeezenet.toml",
+          "owner": "P4-core",
+          "consumer_owner": "P4-core",
+          "role": "config",
+          "status": "internal-fix pending"
+        },
+        "after": {
+          "path": "configs/TinyImageNet/fedavg_squeezenet.toml",
+          "sha256": "a2b4a753b0b78db1fd8b72749683e3738837693185e23d29de56a2b9dd8b2d4e",
+          "family": "configs/TinyImageNet/fedavg_squeezenet.toml",
+          "owner": "P4-core",
+          "consumer_owner": "P4-core",
+          "role": "config",
+          "status": "internal-fix pending"
+        }
+      },
+      {
+        "before": {
+          "path": "examples/model_search/anycostfl/example_ResNet.toml",
+          "sha256": "4a74ee96d86be5786c935e3454cec0a1ea2861010d82112699ab01d77a07cbb5",
+          "family": "anycostfl",
+          "owner": "P4-proof-reconcile",
+          "consumer_owner": "P4-proof-reconcile",
+          "role": "config",
+          "status": "validated-source-bound"
+        },
+        "after": {
+          "path": "examples/model_search/anycostfl/example_ResNet.toml",
+          "sha256": "f6ae45c764ecaee6d925ee76303b64afacf5f100448c32bde7851481014511f8",
+          "family": "anycostfl",
+          "owner": "P4-proof-reconcile",
+          "consumer_owner": "P4-proof-reconcile",
+          "role": "config",
+          "status": "validated-source-bound"
+        }
+      },
+      {
+        "before": {
+          "path": "examples/model_search/fedrolex/example_ResNet.toml",
+          "sha256": "4a74ee96d86be5786c935e3454cec0a1ea2861010d82112699ab01d77a07cbb5",
+          "family": "fedrolex",
+          "owner": "P4-proof-reconcile",
+          "consumer_owner": "P4-proof-reconcile",
+          "role": "config",
+          "status": "validated-source-bound"
+        },
+        "after": {
+          "path": "examples/model_search/fedrolex/example_ResNet.toml",
+          "sha256": "f6ae45c764ecaee6d925ee76303b64afacf5f100448c32bde7851481014511f8",
+          "family": "fedrolex",
+          "owner": "P4-proof-reconcile",
+          "consumer_owner": "P4-proof-reconcile",
+          "role": "config",
+          "status": "validated-source-bound"
+        }
+      },
+      {
+        "before": {
+          "path": "examples/model_search/heterofl/heterofl_resnet18_dynamic.toml",
+          "sha256": "361563886ce2a5eca689d8d1702fb8778874614c9c5bc77d6f2775eb01fd42aa",
+          "family": "heterofl",
+          "owner": "P4-proof-reconcile",
+          "consumer_owner": "P4-proof-reconcile",
+          "role": "config",
+          "status": "validated-source-bound"
+        },
+        "after": {
+          "path": "examples/model_search/heterofl/heterofl_resnet18_dynamic.toml",
+          "sha256": "1da0ef4948816d777a038381145bd433649a37c022b784e33396f3dcc0272f23",
+          "family": "heterofl",
+          "owner": "P4-proof-reconcile",
+          "consumer_owner": "P4-proof-reconcile",
+          "role": "config",
+          "status": "validated-source-bound"
+        }
+      },
+      {
+        "before": {
+          "path": "examples/model_search/sysheterofl/config_ResNet152.toml",
+          "sha256": "e4e9b28df53fa3bc78f19aa53e0753c36d67a90dbba9a2e37ec583da5b354f87",
+          "family": "sysheterofl",
+          "owner": "P4-proof-reconcile",
+          "consumer_owner": "P4-proof-reconcile",
+          "role": "config",
+          "status": "validated-source-bound"
+        },
+        "after": {
+          "path": "examples/model_search/sysheterofl/config_ResNet152.toml",
+          "sha256": "b132e201ef12cce0345353278e49e511f64dacc5964f47aac5293574f4311dc9",
+          "family": "sysheterofl",
+          "owner": "P4-proof-reconcile",
+          "consumer_owner": "P4-proof-reconcile",
+          "role": "config",
+          "status": "validated-source-bound"
+        }
+      },
+      {
+        "before": {
+          "path": "examples/unlearning/fedunlearning/fedunlearning.py",
+          "sha256": "8010b92fa99a7251859870f0e722283c62ce878f5bc7bb4237d60bead0119fa4",
+          "family": "fedunlearning",
+          "owner": "P4-unlearning",
+          "consumer_owner": "P4-unlearning",
+          "role": "entrypoint",
+          "status": "internal-fix pending"
+        },
+        "after": {
+          "path": "examples/unlearning/fedunlearning/fedunlearning.py",
+          "sha256": "17857f977adf44da98896638420b539b240593097ce0f0b6996b036a1835567f",
+          "family": "fedunlearning",
+          "owner": "P4-unlearning",
+          "consumer_owner": "P4-unlearning",
+          "role": "entrypoint",
+          "status": "internal-fix pending"
+        }
+      },
+      {
+        "before": {
+          "path": "examples/unlearning/fedunlearning/fedunlearning_adahessian_MNIST_lenet5.toml",
+          "sha256": "2b60e6f67866c2836417893ab0653543a0af3fa201d5d4a96e80e7592a0a0944",
+          "family": "fedunlearning",
+          "owner": "P4-unlearning",
+          "consumer_owner": "P4-unlearning",
+          "role": "config",
+          "status": "internal-fix pending"
+        },
+        "after": {
+          "path": "examples/unlearning/fedunlearning/fedunlearning_MNIST_lenet5.toml",
+          "sha256": "7d66615ab124863b2efedc05bde97d755a2cba1745e2144e82b23506e3c27356",
+          "family": "fedunlearning",
+          "owner": "P4-unlearning",
+          "consumer_owner": "P4-unlearning",
+          "role": "config",
+          "status": "internal-fix pending"
+        }
+      },
+      {
+        "before": {
+          "path": "examples/unlearning/fedunlearning/fedunlearning_client.py",
+          "sha256": "202fc99ef59a458fce1387e95b4c42ef95ee7454b6f4ede1ce872b79714d14bb",
+          "family": "fedunlearning",
+          "owner": "P4-unlearning",
+          "consumer_owner": "P4-unlearning",
+          "role": "source/support",
+          "status": "internal-fix pending"
+        },
+        "after": {
+          "path": "examples/unlearning/fedunlearning/fedunlearning_client.py",
+          "sha256": "c05781d1c80a45a03bd6cdac77c139ce8a068ee0c319610f75702aed71597d43",
+          "family": "fedunlearning",
+          "owner": "P4-unlearning",
+          "consumer_owner": "P4-unlearning",
+          "role": "source/support",
+          "status": "internal-fix pending"
+        }
+      },
+      {
+        "before": {
+          "path": "examples/unlearning/fedunlearning/fedunlearning_server.py",
+          "sha256": "0a5e4496a555cbddfe4f87c763e1ca74ec792de4cac958094d9fd15458518aaf",
+          "family": "fedunlearning",
+          "owner": "P4-unlearning",
+          "consumer_owner": "P4-unlearning",
+          "role": "source/support",
+          "status": "internal-fix pending"
+        },
+        "after": {
+          "path": "examples/unlearning/fedunlearning/fedunlearning_server.py",
+          "sha256": "c09efdcd32595e890ed40be7d507bb013439087b36ddbc035a2c4738718b6331",
+          "family": "fedunlearning",
+          "owner": "P4-unlearning",
+          "consumer_owner": "P4-unlearning",
+          "role": "source/support",
+          "status": "internal-fix pending"
+        }
+      },
+      {
+        "before": {
+          "path": "examples/unlearning/fedunlearning/unlearning_iid.py",
+          "sha256": "ec241fe7e55dec86aafada28126008d57f2eb2dcd3c8e784bbf1fb9b8e175a32",
+          "family": "fedunlearning",
+          "owner": "P4-unlearning",
+          "consumer_owner": "P4-unlearning",
+          "role": "source/support",
+          "status": "internal-fix pending"
+        },
+        "after": {
+          "path": "examples/unlearning/fedunlearning/unlearning_iid.py",
+          "sha256": "aeb1ab00020d6239390a62e88a7e0690999a573792a52cc226ed6bb400a6e620",
+          "family": "fedunlearning",
+          "owner": "P4-unlearning",
+          "consumer_owner": "P4-unlearning",
+          "role": "source/support",
+          "status": "internal-fix pending"
+        }
+      },
+      {
+        "before": {
+          "path": "examples/unlearning/knot/fedunlearning_server.py",
+          "sha256": "1d3ca2c12e974f40be3bcdc349fe797477fcce99d8065ff22682e495dad2c478",
+          "family": "knot",
+          "owner": "P4-unlearning",
+          "consumer_owner": "P4-unlearning",
+          "role": "source/support",
+          "status": "internal-fix pending"
+        },
+        "after": {
+          "path": "examples/unlearning/knot/fedunlearning_server.py",
+          "sha256": "4940f65775c1b4290a2e3dfb2af825774341538c73fd9d0ca4883008d254371a",
+          "family": "knot",
+          "owner": "P4-unlearning",
+          "consumer_owner": "P4-unlearning",
+          "role": "source/support",
+          "status": "internal-fix pending"
+        }
+      },
+      {
+        "before": {
+          "path": "examples/unlearning/knot/unlearning_iid.py",
+          "sha256": "f413b67450f71174787edab71a7273bd1c53ab6956d82d646f4c0154ad21f18d",
+          "family": "knot",
+          "owner": "P4-unlearning",
+          "consumer_owner": "P4-unlearning",
+          "role": "source/support",
+          "status": "internal-fix pending"
+        },
+        "after": {
+          "path": "examples/unlearning/knot/unlearning_iid.py",
+          "sha256": "b21b4cead0f7fdf1c4f029b1c23c792140eace31a71aea4528ba6e9a0eb54135",
+          "family": "knot",
+          "owner": "P4-unlearning",
+          "consumer_owner": "P4-unlearning",
+          "role": "source/support",
+          "status": "internal-fix pending"
+        }
+      }
+    ],
+    "inventory_revision_deltas": {
+      "P4-core": {
+        "before": 1,
+        "after": 2
+      },
+      "P4-proof-reconcile": {
+        "before": 1,
+        "after": 2
+      },
+      "P4-split-hf": {
+        "before": 1,
+        "after": 2
+      },
+      "P4-unlearning": {
+        "before": 1,
+        "after": 2
+      }
+    },
+    "active_counts": {
+      "tasks": 11,
+      "paths": 390,
+      "families": 57,
+      "config_bindings": 131
+    },
+    "archive_manifest_sha256": {
+      "adahessian": "1bf1d11810978d71d166a77d79e6976427c3f8cef0dbcf657d4e972f3f304743",
+      "modality-samplers": "0ee9fc8f945688f526a9ca4e1271d1f5c8fad79121d167b69e50ea36844e99ea",
+      "torch-hub": "48e4fb9cb4ef9a4849da8388e61a004b4dd5d6d533809e4130a11f6e7736c799",
+      "bert-shakespeare": "30fcff33e48db04fd3ecac62e61ecea1589413d01d9df20a75e1d6c03245f4e8",
+      "older-split-llm-recipes": "e074566d04f46ee5eccc3dd6bc80bde7066ebac96af6cc9207bbed13a26620a0"
+    }
   }
 }

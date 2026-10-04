@@ -1,0 +1,5 @@
+{
+  "scope": "Tiny random BERT architecture with default config, offline; no pretrained checkpoint or dataset tested.",
+  "is_decoder": false,
+  "earlier_position_max_difference_when_future_token_changes": 0.0002598613500595093
+}

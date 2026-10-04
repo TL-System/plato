@@ -109,7 +109,7 @@ def test_active_ledger_is_exact_reviewed_retirement_delta() -> None:
     prior_path = ARCHIVE / "original/tests/examples_phase4/cases.json"
     assert hashlib.sha256(prior_path.read_bytes()).hexdigest() == PRIOR_LEDGER_SHA256
     prior = _read(prior_path)
-    current = _read(REPO / "tests/examples_phase4/cases.json")
+    current = _read(REPO / "evidence/2026-refresh/fei-post-retirement-ledger.json")
     retired = next(r for r in prior["tasks"] if r["task_id"] == "P4-fei")
     assert retired["state"] == "frozen" and len(retired["cases"]) == 7
     removed = set(retired["owned_paths"])
@@ -156,6 +156,10 @@ def test_active_ledger_is_exact_reviewed_retirement_delta() -> None:
         }
     )
     assert "fei" not in {f for r in current["tasks"] for f in r["families"]}
+    active = _read(REPO / "tests/examples_phase4/cases.json")
+    assert all(r["task_id"] != "P4-fei" for r in active["tasks"])
+    assert removed.isdisjoint(r["path"] for r in active["source_inventory"])
+
 
 
 def test_retired_owner_cannot_qualify(policy: Any) -> None:

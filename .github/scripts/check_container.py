@@ -270,7 +270,6 @@ def inside_probe(expected_lock: str, mounted: bool) -> dict[str, object]:
         "transformers",
         "tenseal",
         "socketio",
-        "torch_optimizer",
         "timm",
         "zstd",
     ]

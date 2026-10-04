@@ -4,11 +4,11 @@ Optimizers for training workloads.
 
 from typing import Any, Union
 
-import torch_optimizer as torch_optim
 from timm import optim as timm_optim
 from torch import optim
 
 from plato.config import Config
+from plato.utils.retired_backends import raise_if_retired
 
 
 def get(model, **kwargs: Any) -> optim.Optimizer:
@@ -17,7 +17,6 @@ def get(model, **kwargs: Any) -> optim.Optimizer:
         "Adam": optim.Adam,
         "Adadelta": optim.Adadelta,
         "Adagrad": optim.Adagrad,
-        "AdaHessian": torch_optim.Adahessian,
         "AdamW": optim.AdamW,
         "SparseAdam": optim.SparseAdam,
         "Adamax": optim.Adamax,
@@ -42,6 +41,7 @@ def get(model, **kwargs: Any) -> optim.Optimizer:
     )
     if not isinstance(optimizer_name, str):
         raise TypeError("optimizer_name must be provided as a string.")
+    raise_if_retired(optimizer_name, category="optimizer")
     if "optimizer_params" in kwargs:
         optimizer_params = kwargs["optimizer_params"]
     else:
