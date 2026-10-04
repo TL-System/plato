@@ -284,7 +284,7 @@ def test_fast_partition_reports_coverage_limits(policy, tmp_path):
     checks.pytest_terminal_summary(SimpleNamespace(write_line=lines.append))
     assert lines == [
         "test profile: fast core (runtime and slow excluded; not full qualification); "
-        "native, Lighteval and Phase4 task qualifications excluded"
+        "native, Lighteval and optional example qualifications excluded"
     ]
 
 
