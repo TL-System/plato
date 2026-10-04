@@ -30,7 +30,7 @@ SCOPES = {scope["archive"]: scope for scope in PLAN["scopes"]}
 
 
 def _verify_file(path, entry):
-    mode = path.stat().st_mode
+    mode = path.lstat().st_mode
     assert stat.S_ISREG(mode)
     assert bool(mode & 0o111) == (entry["git_mode"] == "100755")
     data = path.read_bytes()
@@ -89,7 +89,7 @@ def test_archives_match_reviewed_immutable_inventory(archive):
     )
 
 
-@pytest.mark.parametrize("damage", ["byte", "mode"])
+@pytest.mark.parametrize("damage", ["byte", "mode", "symlink"])
 def test_archive_identity_verifier_rejects_damage(tmp_path, damage):
     entry = SCOPES["modality-samplers"]["source_inventory"][0]
     path = tmp_path / "source"
@@ -98,6 +98,9 @@ def test_archive_identity_verifier_rejects_damage(tmp_path, damage):
     _verify_file(path, entry)
     if damage == "mode":
         path.chmod(0o755)
+    elif damage == "symlink":
+        path.unlink()
+        path.symlink_to(REPO / entry["archive_path"])
     else:
         path.write_bytes(path.read_bytes() + b"\n")
     with pytest.raises(AssertionError):
