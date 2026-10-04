@@ -227,6 +227,10 @@ def inside_probe(expected_lock: str, mounted: bool) -> dict[str, object]:
     require(Path(sys.executable).parent == environment / "bin", "Wrong executable.")
     require(sys.version_info[:2] == (3, 13), "Python 3.13 is required.")
     require(
+        sys.dont_write_bytecode,
+        "Container imports must not write bytecode into the mounted checkout.",
+    )
+    require(
         Path(sys.base_prefix).is_relative_to("/opt/plato/python"),
         "Managed interpreter must be outside the checkout mount.",
     )
@@ -354,6 +358,7 @@ def inside_probe(expected_lock: str, mounted: bool) -> dict[str, object]:
         "executable": sys.executable,
         "prefix": sys.prefix,
         "base_prefix": sys.base_prefix,
+        "dont_write_bytecode": sys.dont_write_bytecode,
         "uv": uv_version,
         "lock_sha256": expected_lock,
         "imports": imports,
@@ -601,7 +606,8 @@ class LinuxCheck:
 
     def check_mount(self, lock_hash: str) -> None:
         with tempfile.TemporaryDirectory(prefix="plato mounted checkout ") as temporary:
-            checkout = Path(temporary).resolve() / "source with spaces"
+            fixture = Path(temporary).resolve()
+            checkout = fixture / "source with spaces"
             shutil.copytree(
                 self.root,
                 checkout,
@@ -672,18 +678,28 @@ class LinuxCheck:
                 if p.is_file()
             }
             require(before == after, "Container modified the invalid host environment.")
-            save(
-                self.artifacts / "mounted-cpu.json",
-                {
-                    "accepted": True,
-                    "cpu": mounted,
-                    "forwarding": exit_record,
-                    "host_venv_before": before,
-                    "host_venv_after": after,
-                    "command_exit_code": 23,
-                    "auto_removed": True,
-                },
+            bytecode_paths = [
+                str(path.relative_to(checkout))
+                for path in checkout.rglob("__pycache__")
+            ]
+            require(
+                not bytecode_paths, "Smoke imports wrote bytecode into the fixture."
             )
+            record = {
+                "accepted": True,
+                "cpu": mounted,
+                "forwarding": exit_record,
+                "host_venv_before": before,
+                "host_venv_after": after,
+                "command_exit_code": 23,
+                "auto_removed": True,
+                "bytecode_paths": bytecode_paths,
+            }
+        # The mount receipt includes successful ordinary host fixture cleanup.
+        # Cleanup errors propagate; no ownership changes or privileged deletion.
+        require(not fixture.exists(), "Mounted checkout fixture was not removed.")
+        record["fixture_cleanup_complete"] = True
+        save(self.artifacts / "mounted-cpu.json", record)
 
 
 def main() -> None:
