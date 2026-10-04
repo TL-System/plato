@@ -1,0 +1,7 @@
+{
+  "accepted": false,
+  "elapsed_seconds": 176.142,
+  "error": "PermissionError: [Errno 1] Operation not permitted: '/tmp/plato mounted checkout jc_t92ti/source with spaces/plato/__pycache__'",
+  "gpu_compute_tested": false,
+  "mode": "linux"
+}

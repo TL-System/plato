@@ -1,0 +1,12 @@
+[
+  "archives/retired",
+  "evidence/container-check",
+  ".venv",
+  ".venv-host",
+  ".cache",
+  "plato/__pycache__",
+  "source-cache",
+  "source-caches",
+  "examples/detector/.venv",
+  "examples/detector/.venv-host"
+]
