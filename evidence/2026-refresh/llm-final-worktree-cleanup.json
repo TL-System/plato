@@ -1,0 +1,118 @@
+{
+  "status": "COMPLETE_OWNED_MERGED_LLM_FINAL_WORKTREE_CLEANUP",
+  "target": "/tmp/plato-refresh-worktrees/llm-integrated",
+  "branch": "maintenance/2026-llm-refresh",
+  "head": "7beda2a8257e5c1e2a7aeef45314f01f143fd6b4",
+  "qualified_index_tree_preserved": "d230cd65244b4e8fc030778ad02c8760615f863f",
+  "accepted_merge_commit": "477f2f1bb52a1b5a58c1f9f2d30f640039f83a8e",
+  "inventory": "/tmp/plato-llm-final-cleanup-inventory.json",
+  "inventory_sha256": "c9375e3f3e3acc85abab148f52d639b50a0b0d6cb0d3dcb94a9d4b0d34fd755c",
+  "evidence_directory": "/tmp/plato-llm-final-cleanup-evidence-20261003T235923Z",
+  "removed_idle_owned_environments": [
+    "/private/tmp/plato-llm-integration/base-313",
+    "/private/tmp/plato-llm-integration/mandatory-313",
+    "/private/tmp/plato-llm-integration/tooling-313"
+  ],
+  "removed_worktrees": [
+    "/tmp/plato-refresh-worktrees/llm-integrated"
+  ],
+  "removed_local_branches": [
+    "maintenance/2026-llm-refresh"
+  ],
+  "removal_receipts": [
+    {
+      "kind": "idle_owned_llm_environment",
+      "environment": "/private/tmp/plato-llm-integration/base-313",
+      "activity_immediately_before": {
+        "command_matches": [],
+        "open_files": []
+      }
+    },
+    {
+      "kind": "idle_owned_llm_environment",
+      "environment": "/private/tmp/plato-llm-integration/mandatory-313",
+      "activity_immediately_before": {
+        "command_matches": [],
+        "open_files": []
+      }
+    },
+    {
+      "kind": "idle_owned_llm_environment",
+      "environment": "/private/tmp/plato-llm-integration/tooling-313",
+      "activity_immediately_before": {
+        "command_matches": [],
+        "open_files": []
+      }
+    },
+    {
+      "kind": "forced_git_worktree_remove_after_exact_staged_work_backup",
+      "target": "/tmp/plato-refresh-worktrees/llm-integrated",
+      "activity_immediately_before": {
+        "command_matches": [],
+        "open_files": []
+      },
+      "source_lineage_proven": true,
+      "dirty_index_fully_preserved": true,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "kind": "merged_local_branch_delete",
+      "branch": "maintenance/2026-llm-refresh",
+      "stdout": "Deleted branch maintenance/2026-llm-refresh (was 7beda2a8).\n"
+    }
+  ],
+  "protected_worktrees_preserved": [
+    "/Users/bli/Playground/plato",
+    "/private/tmp/plato-lighteval-docs-review-worktree",
+    "/private/tmp/plato-p2-fix-independent-review/negative-source",
+    "/private/tmp/plato-p2-fix-independent-review/release-source",
+    "/private/tmp/plato-p2-fix-independent-review/workflow-source",
+    "/private/tmp/plato-refresh-worktrees/container-refresh",
+    "/private/tmp/plato-refresh-worktrees/deployment-docs",
+    "/private/tmp/plato-refresh-worktrees/deployment-integration",
+    "/private/tmp/plato-refresh-worktrees/docs-package-binding-negative",
+    "/private/tmp/plato-refresh-worktrees/docs-package-binding-release",
+    "/private/tmp/plato-refresh-worktrees/docs-package-binding-workflow",
+    "/private/tmp/plato-refresh-worktrees/docs-package-fix-negative",
+    "/private/tmp/plato-refresh-worktrees/docs-package-fix-release",
+    "/private/tmp/plato-refresh-worktrees/docs-package-fix-workflow",
+    "/private/tmp/plato-refresh-worktrees/docs-package-negative",
+    "/private/tmp/plato-refresh-worktrees/docs-package-refresh",
+    "/private/tmp/plato-refresh-worktrees/lighteval-dependencies",
+    "/private/tmp/plato-refresh-worktrees/lighteval-docs",
+    "/private/tmp/plato-refresh-worktrees/lighteval-final",
+    "/private/tmp/plato-refresh-worktrees/lighteval-integration",
+    "/private/tmp/plato-refresh-worktrees/lighteval-profile",
+    "/private/tmp/plato-refresh-worktrees/lighteval-runtime",
+    "/private/tmp/plato-refresh-worktrees/phase4-harness"
+  ],
+  "protected_environment_hashes_unchanged": true,
+  "root_checkout_unchanged": true,
+  "raw_scratch_receipts_and_shared_caches_preserved": true,
+  "no_commits_or_source_pushes_or_remote_changes_or_herdr_actions": true,
+  "post_cleanup_audit": {
+    "path": "/tmp/plato-llm-final-cleanup-evidence-20261003T235923Z/post-cleanup-audit.json",
+    "sha256": "6feb330c5d1d6fb612c00a19857e006dbfc05e805b56af3f51610c68a780661c"
+  },
+  "remaining_editable_bindings": [],
+  "verified_snapshot_files": 1812,
+  "verified_snapshot_bytes": 95577567,
+  "original_raw_index_sha256": "80ab19c6c3781bfd2dfebfa73ddae32d277b1ccecd118f62a0cfd0e96cafd92c",
+  "recoverability": {
+    "binary_patch_reconstructed_exact_tree": "d230cd65244b4e8fc030778ad02c8760615f863f",
+    "history_bundle": {
+      "path": "/tmp/plato-llm-final-cleanup-evidence-20261003T235923Z/source-history.bundle",
+      "bytes": 254509161,
+      "sha256": "f1f08abaa0c40e12a58178ec7d0851a7ea6b817a3639468bb515ab39f7f9f395"
+    },
+    "standalone_qualified_tree_pack": {
+      "path": "/tmp/plato-llm-final-cleanup-evidence-20261003T235923Z/qualified-tree.pack",
+      "bytes": 24844016,
+      "sha256": "ff4d9ed61f752d9f28c8847d06841cbf8e797ad733f8d61570c65ca68bfccbcf"
+    },
+    "git_reference": "/tmp/plato-llm-final-cleanup-evidence-20261003T235923Z/recovery.git:refs/cleanup-backups/qualified-index-tree"
+  },
+  "active_deployment_docs_draft_worktree_preserved": true,
+  "limitations": "The global binding scan could not access unrelated other-user daemon/socket scratch directories; all owned target/protected assets were accessible. No unresolved bindings remain in accessible owned environments."
+}
