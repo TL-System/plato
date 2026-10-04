@@ -1,0 +1,539 @@
+{
+  "schema_version": 1,
+  "reviewer": "/root/docs_package_environment_review",
+  "reviewed_at_utc": "2026-10-04T00:57:53.133450+00:00",
+  "verdict": "ACCEPT",
+  "accepted": true,
+  "acceptance_scope": "Independent local narrow ROOT-P2-M3 correction acceptance at frozen 06ba6796, using actual default in-checkout docs environments and default package output. Source-bound final integrated tree acceptance remains separate.",
+  "source": {
+    "commit": "06ba679690f090aacf7e6a95a6dffd74b81ffad3",
+    "candidate_evidence_commit": "24b5e154bd43795ea6b2a47b6c9458fdf3a587ea",
+    "candidate_worktree": "/tmp/plato-refresh-worktrees/docs-package-refresh",
+    "candidate_clean_before_and_after": true,
+    "source_files_sha256": {
+      "pyproject.toml": "02972a9e51e828ad1f0cff4ec57911d4468296d36e984aaa345442ba6f201a3a",
+      "uv.lock": "e2a53aaae9a0dd49f5446b490bb3071e86aa3a9a20d6271c9dd30b4ae2dcbff9",
+      ".python-version": "02e735b3dfe1c32833eb550b7ff8ffa17f5f2bc3fa1e7bae61a8f5a3883ce398",
+      "netlify.toml": "9ae1049a54d5edc1a29b5f34ba7c235c7f0bf3e63802fb8a9f1d421ca79ead0b",
+      "docs/build.sh": "e21f333201ce75ea7e4a820d505e7b230a5a6048f279b56b0758f1a6cfc338b7",
+      "docs/requirements.txt": "9c33555b3d0cbc983d6dd59f261a242a92d136f2bb1364f300a01824f9eff665",
+      "docs/mkdocs.yml": "d26f6c6e7b91cf8835b4187e3b9e01125801e735122d79e7a148179b31a852ec",
+      ".github/scripts/check_distribution.py": "1b3ea71a1eef084f602092de35a97ceed04beb4ab47da2074690dc89c5c34c3f",
+      ".github/workflows/docs_package_checks.yml": "3bd50449d468b4f6606648a66edc9d54e8710577ccd7878f291704391057aa64",
+      ".github/workflows/pypi_publish.yml": "44d20d3daa8e953546acf7e5b01ee61cf54d056b96b09b799ad3cfa65b105062"
+    },
+    "authorized_source_delta": {
+      "pyproject.toml": "Exactly two added Hatch exclusions: .venv-docs/** and .venv-docs-bootstrap/**."
+    },
+    "dependency_version_marker_lock_checker_docs_workflow_bytes_unchanged": true
+  },
+  "inputs": {
+    "accepted": true,
+    "source": "06ba679690f090aacf7e6a95a6dffd74b81ffad3",
+    "evidence": "24b5e154bd43795ea6b2a47b6c9458fdf3a587ea",
+    "qualification_sha256": "77e69f46f0748f9f9459a3f1c7fb3d8463e1b4d335876f42131b84a0329397a3",
+    "artifact_manifest_sha256": "b15af7dc4615e3ba5615ab7be6aeef9e290cc0b0ef2849240e887ba7cd5f4963",
+    "committed_artifacts_verified": 126,
+    "source_files_sha256": {
+      "pyproject.toml": "02972a9e51e828ad1f0cff4ec57911d4468296d36e984aaa345442ba6f201a3a",
+      "uv.lock": "e2a53aaae9a0dd49f5446b490bb3071e86aa3a9a20d6271c9dd30b4ae2dcbff9",
+      ".python-version": "02e735b3dfe1c32833eb550b7ff8ffa17f5f2bc3fa1e7bae61a8f5a3883ce398",
+      "netlify.toml": "9ae1049a54d5edc1a29b5f34ba7c235c7f0bf3e63802fb8a9f1d421ca79ead0b",
+      "docs/build.sh": "e21f333201ce75ea7e4a820d505e7b230a5a6048f279b56b0758f1a6cfc338b7",
+      "docs/requirements.txt": "9c33555b3d0cbc983d6dd59f261a242a92d136f2bb1364f300a01824f9eff665",
+      "docs/mkdocs.yml": "d26f6c6e7b91cf8835b4187e3b9e01125801e735122d79e7a148179b31a852ec",
+      ".github/scripts/check_distribution.py": "1b3ea71a1eef084f602092de35a97ceed04beb4ab47da2074690dc89c5c34c3f",
+      ".github/workflows/docs_package_checks.yml": "3bd50449d468b4f6606648a66edc9d54e8710577ccd7878f291704391057aa64",
+      ".github/workflows/pypi_publish.yml": "44d20d3daa8e953546acf7e5b01ee61cf54d056b96b09b799ad3cfa65b105062"
+    },
+    "source_delta_numstat": "2\t0\tpyproject.toml",
+    "pyproject_exact_two_lines_only": true,
+    "dependencies_versions_markers_lock_unchanged": true,
+    "evidence_commit_only_evidence": true,
+    "authority_inputs": {
+      "/tmp/plato-docs-package-binding-review.json": {
+        "sha256": "c42c4deea9bf414388711069c34b48238f6ead704ed5dadce38e605b5e5b1075",
+        "bytes": 40894
+      },
+      "/tmp/plato-deployment-integration/docs-environment-package-finding.json": {
+        "sha256": "187268d743aaeb3440c870126d9a65e0711e7be6fffdb10ae62e203bb85d384e",
+        "bytes": 3696
+      }
+    },
+    "prior_accepted_review_commit": "63f0d2000f0370708b9afe1e2e6a2dc8559b72e1",
+    "old_root_red_exists_and_copied_sha256": "206a0cbf2910daaf58cb7d44776ef478d6c967728e00c8e129622fee72f0b36a"
+  },
+  "unresolved_findings_by_severity": {
+    "critical": 0,
+    "high": 0,
+    "medium": 0,
+    "low": 0
+  },
+  "findings": [],
+  "resolved_prior_findings": [
+    {
+      "id": "ROOT-P2-M3",
+      "status": "Resolved and independently verified",
+      "evidence": "Actual strict docs\u2192package default sequence and uv-absent DEFAULT bootstrap\u2192package pass with environments retained and excluded; both distributions match fresh release source. Preserved original root red tar has its absolute .venv-docs Python symlink and current checker rejects it."
+    }
+  ],
+  "actual_build_outputs": {
+    "accepted": true,
+    "source": "06ba679690f090aacf7e6a95a6dffd74b81ffad3",
+    "independent_git_archive_sha256": "a5488dce97b647cd90f9dd9c1c4cbea96f85f21a3a4c610cbdfdfc7124d5fb59",
+    "builds": {
+      "default": {
+        "accepted": true,
+        "source_commit": "06ba679690f090aacf7e6a95a6dffd74b81ffad3",
+        "checkout": "/tmp/plato-p2-environment-independent-review/default-source",
+        "sdist_sha256": "2568b2c97cd289657e32f2324d12b01e02c700e8d54149bdfa5c9de8a492d1b8",
+        "wheel_sha256": "d00d2c2acd5e5867e6a818fe3bc4132db8f92e00f47017da35e5a3159a60ba96",
+        "git_archive_bytes_verified": 1298,
+        "only_generated_member": {
+          "PKG-INFO": "08e03ffe8434783a17ca65294fd3c65c5f189a2ec3e0d70e1590a1b553654a7a"
+        },
+        "metadata_dependency_extras_python_parity": true,
+        "plato_source_count": 209,
+        "workspace_manifests": 12,
+        "rebuild_wheel_bytes_equal": true,
+        "installedwheel_provenance_imports_tensor_nms_locked_versions": true,
+        "installed_package_count": 80,
+        "copied_package_receipts": "/tmp/plato-p2-environment-independent-review/receipts/default/package",
+        "docs_only_locked_count": 29,
+        "docs_receipt": "/tmp/plato-p2-environment-independent-review/receipts/default/docs/docs-environment.json",
+        "environment_snapshot_unchanged": {
+          "entries": 17357,
+          "sha256": "7bfe4aa2bccd5e9760a8e430c9006e22af6e7c3a15a58e6388ac134d8215758e"
+        },
+        "actual_python_link": "/Users/bli/.local/share/uv/python/cpython-3.13-macos-aarch64-none/bin/python3.13"
+      },
+      "bootstrap": {
+        "accepted": true,
+        "source_commit": "06ba679690f090aacf7e6a95a6dffd74b81ffad3",
+        "checkout": "/tmp/plato-p2-environment-independent-review/bootstrap-source",
+        "sdist_sha256": "2568b2c97cd289657e32f2324d12b01e02c700e8d54149bdfa5c9de8a492d1b8",
+        "wheel_sha256": "d00d2c2acd5e5867e6a818fe3bc4132db8f92e00f47017da35e5a3159a60ba96",
+        "git_archive_bytes_verified": 1298,
+        "only_generated_member": {
+          "PKG-INFO": "08e03ffe8434783a17ca65294fd3c65c5f189a2ec3e0d70e1590a1b553654a7a"
+        },
+        "metadata_dependency_extras_python_parity": true,
+        "plato_source_count": 209,
+        "workspace_manifests": 12,
+        "rebuild_wheel_bytes_equal": true,
+        "installedwheel_provenance_imports_tensor_nms_locked_versions": true,
+        "installed_package_count": 80,
+        "copied_package_receipts": "/tmp/plato-p2-environment-independent-review/receipts/bootstrap/package",
+        "docs_only_locked_count": 29,
+        "docs_receipt": "/tmp/plato-p2-environment-independent-review/receipts/bootstrap/docs/docs-environment.json",
+        "environment_snapshot_unchanged": {
+          "entries": 18408,
+          "sha256": "e2b6c77abc32b789c169383fc0679867ea015611f3c42e2d368c2f15cfc7876d"
+        },
+        "actual_python_link": "/Users/bli/.local/share/uv/python/cpython-3.13-macos-aarch64-none/bin/python3.13",
+        "bootstrap_inventory": {
+          "packages": {
+            "pip": "26.2.1",
+            "uv": "0.12.22"
+          },
+          "path": "/tmp/plato-p2-environment-independent-review/bootstrap-source/.venv-docs-bootstrap",
+          "uv_absent_docs_path": "/usr/bin:/bin:/usr/sbin:/sbin",
+          "default_bootstrap_environment": true
+        }
+      },
+      "release": {
+        "accepted": true,
+        "source_commit": "06ba679690f090aacf7e6a95a6dffd74b81ffad3",
+        "checkout": "/tmp/plato-p2-environment-independent-review/release-source",
+        "sdist_sha256": "2568b2c97cd289657e32f2324d12b01e02c700e8d54149bdfa5c9de8a492d1b8",
+        "wheel_sha256": "d00d2c2acd5e5867e6a818fe3bc4132db8f92e00f47017da35e5a3159a60ba96",
+        "git_archive_bytes_verified": 1298,
+        "only_generated_member": {
+          "PKG-INFO": "08e03ffe8434783a17ca65294fd3c65c5f189a2ec3e0d70e1590a1b553654a7a"
+        },
+        "metadata_dependency_extras_python_parity": true,
+        "plato_source_count": 209,
+        "workspace_manifests": 12,
+        "rebuild_wheel_bytes_equal": true,
+        "installedwheel_provenance_imports_tensor_nms_locked_versions": true,
+        "installed_package_count": 80,
+        "copied_package_receipts": "/tmp/plato-p2-environment-independent-review/receipts/release/package"
+      }
+    },
+    "all_three_archives_identical": true
+  },
+  "focused_negative_guard_checks": {
+    "accepted": true,
+    "source": "06ba679690f090aacf7e6a95a6dffd74b81ffad3",
+    "checks": [
+      {
+        "name": "existing-external-output",
+        "command": [
+          "zsh",
+          "-lc",
+          "/tmp/plato-p2-environment-independent-review/controller-env/bin/python .github/scripts/check_distribution.py --output-dir /tmp/plato-p2-environment-independent-review/negative/existing-external"
+        ],
+        "cwd": "/tmp/plato-p2-environment-independent-review/negative-source",
+        "exit_code": 1,
+        "log": "/tmp/plato-p2-environment-independent-review/negative/existing-external-output.log",
+        "untouched_caller_owned_entries": 2,
+        "untouched_snapshot_sha256": "6ce05a707641bf6eee5075f706948148d33ef4a8d79e2e234e7e79ab67b94531"
+      },
+      {
+        "name": "existing-checkout-root-output",
+        "command": [
+          "zsh",
+          "-lc",
+          "/tmp/plato-p2-environment-independent-review/controller-env/bin/python .github/scripts/check_distribution.py --output-dir /tmp/plato-p2-environment-independent-review/negative-source"
+        ],
+        "cwd": "/tmp/plato-p2-environment-independent-review/negative-source",
+        "exit_code": 1,
+        "log": "/tmp/plato-p2-environment-independent-review/negative/existing-checkout-root-output.log",
+        "untouched_caller_owned_entries": 2230,
+        "untouched_snapshot_sha256": "5ef0330e09d655ca0733d595cc725f6e441265917edbe7811596209cc163859d"
+      },
+      {
+        "name": "existing-tracked-docs-output",
+        "command": [
+          "zsh",
+          "-lc",
+          "/tmp/plato-p2-environment-independent-review/controller-env/bin/python .github/scripts/check_distribution.py --output-dir /tmp/plato-p2-environment-independent-review/negative-source/docs"
+        ],
+        "cwd": "/tmp/plato-p2-environment-independent-review/negative-source",
+        "exit_code": 1,
+        "log": "/tmp/plato-p2-environment-independent-review/negative/existing-tracked-docs-output.log",
+        "untouched_caller_owned_entries": 61,
+        "untouched_snapshot_sha256": "fd84ddd00ac1274c4d26ea05b4ac4b9fcb3a3a0281496e36d40f669608200005"
+      },
+      {
+        "name": "existing-default-ci-output",
+        "command": [
+          "zsh",
+          "-lc",
+          "/tmp/plato-p2-environment-independent-review/controller-env/bin/python .github/scripts/check_distribution.py --output-dir /tmp/plato-p2-environment-independent-review/default-source/ci-artifacts/docs-package"
+        ],
+        "cwd": "/tmp/plato-p2-environment-independent-review/default-source",
+        "exit_code": 1,
+        "log": "/tmp/plato-p2-environment-independent-review/negative/existing-default-ci-output.log",
+        "untouched_caller_owned_entries": 25,
+        "untouched_snapshot_sha256": "48e70141f98c0411636ed365f3e7e0c6c84ce98f2e163b290e0caef68b0ab89f"
+      },
+      {
+        "name": "existing-in-checkout-docs-environment-output",
+        "command": [
+          "zsh",
+          "-lc",
+          "/tmp/plato-p2-environment-independent-review/controller-env/bin/python .github/scripts/check_distribution.py --output-dir /tmp/plato-p2-environment-independent-review/default-source/.venv-docs"
+        ],
+        "cwd": "/tmp/plato-p2-environment-independent-review/default-source",
+        "exit_code": 1,
+        "log": "/tmp/plato-p2-environment-independent-review/negative/existing-in-checkout-docs-environment-output.log",
+        "untouched_caller_owned_entries": 17371,
+        "untouched_snapshot_sha256": "7518af884a778a871688a617a57979af2af488a46373bdd137111606583357d0"
+      },
+      {
+        "name": "new-unsupported-checkout-output",
+        "command": [
+          "zsh",
+          "-lc",
+          "/tmp/plato-p2-environment-independent-review/controller-env/bin/python .github/scripts/check_distribution.py --output-dir /tmp/plato-p2-environment-independent-review/negative-source/arbitrary-generated-reviewer-output"
+        ],
+        "cwd": "/tmp/plato-p2-environment-independent-review/negative-source",
+        "exit_code": 1,
+        "log": "/tmp/plato-p2-environment-independent-review/negative/new-unsupported-checkout-output.log",
+        "invalid_target_not_created": true
+      },
+      {
+        "name": "actual-untracked-source-default-build",
+        "command": [
+          "zsh",
+          "-lc",
+          "/tmp/plato-p2-environment-independent-review/controller-env/bin/python .github/scripts/check_distribution.py"
+        ],
+        "cwd": "/tmp/plato-p2-environment-independent-review/negative-source",
+        "exit_code": 1,
+        "log": "/tmp/plato-p2-environment-independent-review/negative/actual-untracked-source-default-build.log",
+        "owned_failure_receipt": {
+          "accepted": false,
+          "error": "Sdist source members absent from frozen Git tree: ['reviewer-untracked-input.json']"
+        },
+        "output": "/tmp/plato-p2-environment-independent-review/negative-source/ci-artifacts/docs-package",
+        "actual_archive": "/tmp/plato-p2-environment-independent-review/negative-source/ci-artifacts/docs-package/distributions/plato_learn-1.4.3.tar.gz",
+        "actual_archive_sha256": "64ac168cb3b91d2690f915685eb5b113c3ae992bba731709df589fa5e92d8bcf",
+        "injected_payload_bytes_verified": true
+      },
+      {
+        "name": "actual-altered-tracked-source-build",
+        "command": [
+          "zsh",
+          "-lc",
+          "/tmp/plato-p2-environment-independent-review/controller-env/bin/python .github/scripts/check_distribution.py --output-dir /tmp/plato-p2-environment-independent-review/negative-source/ci-artifacts/altered-source"
+        ],
+        "cwd": "/tmp/plato-p2-environment-independent-review/negative-source",
+        "exit_code": 1,
+        "log": "/tmp/plato-p2-environment-independent-review/negative/actual-altered-tracked-source-build.log",
+        "owned_failure_receipt": {
+          "accepted": false,
+          "error": "Sdist bytes differ from frozen Git tree: ['plato/config.py']"
+        },
+        "output": "/tmp/plato-p2-environment-independent-review/negative-source/ci-artifacts/altered-source",
+        "actual_archive": "/tmp/plato-p2-environment-independent-review/negative-source/ci-artifacts/altered-source/distributions/plato_learn-1.4.3.tar.gz",
+        "actual_archive_sha256": "24fd13a7747c98dc4d4641cb6ce50946ac6160a28fb228dd60df9c714849e20e",
+        "injected_payload_bytes_verified": true
+      },
+      {
+        "name": "owned-real-build-command-failure",
+        "command": [
+          "zsh",
+          "-lc",
+          "PATH=/tmp/plato-p2-environment-independent-review/negative/build-failure-bin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/pkg/env/global/bin:/opt/homebrew/bin:/Users/bli/.codex/packages/standalone/releases/0.160.0-aarch64-apple-darwin/codex-path:/Users/bli/.codex/tmp/arg0/codex-arg0eo2EYy:/Users/bli/.local/bin:/Users/bli/Library/pnpm/bin:/Users/bli/.bun/bin:/opt/homebrew/sbin:/Users/bli/.cargo/bin /tmp/plato-p2-environment-independent-review/controller-env/bin/python .github/scripts/check_distribution.py --output-dir /tmp/plato-p2-environment-independent-review/negative-source/ci-artifacts/owned-build-failure"
+        ],
+        "cwd": "/tmp/plato-p2-environment-independent-review/negative-source",
+        "exit_code": 1,
+        "log": "/tmp/plato-p2-environment-independent-review/negative/owned-real-build-command-failure.log",
+        "owned_failure_receipt": {
+          "accepted": false,
+          "error": "Command failed (42); see /private/tmp/plato-p2-environment-independent-review/negative-source/ci-artifacts/owned-build-failure/build.log"
+        },
+        "output": "/tmp/plato-p2-environment-independent-review/negative-source/ci-artifacts/owned-build-failure"
+      },
+      {
+        "name": "preserved-real-root-environment-red",
+        "accepted": true,
+        "reason": "Non-regular sdist source member: plato_learn-1.4.3/.venv-docs/bin/python",
+        "archive_sha256": "206a0cbf2910daaf58cb7d44776ef478d6c967728e00c8e129622fee72f0b36a",
+        "docs_environment_members": 26,
+        "absolute_python_links": {
+          "plato_learn-1.4.3/.venv-docs/bin/python": "/Users/bli/.local/share/uv/python/cpython-3.13-macos-aarch64-none/bin/python3.13"
+        },
+        "original_root_raw_exists": true
+      },
+      {
+        "name": "regular-docs-environment-archive-payload",
+        "accepted": true,
+        "reason": "Forbidden distribution payloads: ['.venv-docs/lib/reviewer.json']",
+        "actual_archive": "/tmp/plato-p2-environment-independent-review/negative/regular-docs-environment-archive-payload/plato_learn-1.4.3.tar.gz",
+        "archive_sha256": "42e44bd0d00dee3423be3733dc408a26c2e2f98db811c71927a40f62413e0f1e"
+      },
+      {
+        "name": "regular-bootstrap-environment-archive-payload",
+        "accepted": true,
+        "reason": "Forbidden distribution payloads: ['.venv-docs-bootstrap/lib/reviewer.json']",
+        "actual_archive": "/tmp/plato-p2-environment-independent-review/negative/regular-bootstrap-environment-archive-payload/plato_learn-1.4.3.tar.gz",
+        "archive_sha256": "5e1d9078d0988fb969b19c81c5bf42a2eda3ed16afb141d1fc1a3d89291e0a04"
+      },
+      {
+        "name": "untracked-source-archive-member",
+        "accepted": true,
+        "reason": "Sdist source members absent from frozen Git tree: ['reviewer-untracked-generated.json']",
+        "actual_archive": "/tmp/plato-p2-environment-independent-review/negative/untracked-source-archive-member/plato_learn-1.4.3.tar.gz",
+        "archive_sha256": "5220a8e61a03ce7d170d2279867226534c87015d26d387c499787fc4b06ef5d9"
+      },
+      {
+        "name": "altered-git-byte-archive-member",
+        "accepted": true,
+        "reason": "Sdist bytes differ from frozen Git tree: ['README.md']",
+        "actual_archive": "/tmp/plato-p2-environment-independent-review/negative/altered-git-byte-archive-member/plato_learn-1.4.3.tar.gz",
+        "archive_sha256": "ee5af171a7f98c85c520aeac72c01af2c06a3588efc18dec866eb0d49cc5030c"
+      },
+      {
+        "name": "corrupt-generated-pkg-info",
+        "accepted": true,
+        "reason": "Generated PKG-INFO must match the built wheel METADATA bytes.",
+        "actual_archive": "/tmp/plato-p2-environment-independent-review/negative/corrupt-generated-pkg-info/plato_learn-1.4.3.tar.gz",
+        "archive_sha256": "65156d641acc0e7bed7945ded6ec6d99167ee1523295913062de5b8463dbb3c8"
+      },
+      {
+        "name": "duplicate-archive-member",
+        "accepted": true,
+        "reason": "Duplicate sdist source member: README.md",
+        "actual_archive": "/tmp/plato-p2-environment-independent-review/negative/duplicate-archive-member/plato_learn-1.4.3.tar.gz",
+        "archive_sha256": "4b4daf675db095480b29d42745bd3024f10506403041cf65a4118036aee7ca1e"
+      }
+    ],
+    "focused_check_count": 16,
+    "tracked_fixture_restored": true,
+    "caller_owned_paths_untouched": true,
+    "copied_actual_failed_package_outputs": "/tmp/plato-p2-environment-independent-review/receipts/negative"
+  },
+  "executed_commands_and_results": [
+    {
+      "command": [
+        "zsh",
+        "-lc",
+        ". /tmp/plato-p2-environment-independent-review/default-command.zsh"
+      ],
+      "cwd": "/tmp/plato-p2-environment-independent-review/default-source",
+      "exit_code": 0,
+      "script_sha256": "b8a393d78df8d9b325ea31644132fe422235495dd946247e84dd3b273cec6436",
+      "package_command": [
+        "uv",
+        "run",
+        "--no-project",
+        "--python",
+        "3.13",
+        "python",
+        ".github/scripts/check_distribution.py"
+      ],
+      "package_output": "ci-artifacts/docs-package",
+      "package_log": "/tmp/plato-p2-environment-independent-review/default-package.log",
+      "docs_log": "/tmp/plato-p2-environment-independent-review/default-docs.log",
+      "docs_environment": "/tmp/plato-p2-environment-independent-review/default-source/.venv-docs",
+      "bootstrap_environment": null
+    },
+    {
+      "command": [
+        "zsh",
+        "-lc",
+        ". /tmp/plato-p2-environment-independent-review/bootstrap-command.zsh"
+      ],
+      "cwd": "/tmp/plato-p2-environment-independent-review/bootstrap-source",
+      "exit_code": 0,
+      "script_sha256": "92ff62f554f7014861cefded7fca491c9765451ba906a8fa85bf73352c042902",
+      "package_command": [
+        "uv",
+        "run",
+        "--no-project",
+        "--python",
+        "3.13",
+        "python",
+        ".github/scripts/check_distribution.py"
+      ],
+      "package_output": "ci-artifacts/docs-package",
+      "package_log": "/tmp/plato-p2-environment-independent-review/bootstrap-package.log",
+      "docs_log": "/tmp/plato-p2-environment-independent-review/bootstrap-docs.log",
+      "docs_environment": "/tmp/plato-p2-environment-independent-review/bootstrap-source/.venv-docs",
+      "bootstrap_environment": "/tmp/plato-p2-environment-independent-review/bootstrap-source/.venv-docs-bootstrap"
+    },
+    {
+      "command": [
+        "zsh",
+        "-lc",
+        ". /tmp/plato-p2-environment-independent-review/release-command.zsh"
+      ],
+      "cwd": "/tmp/plato-p2-environment-independent-review/release-source",
+      "exit_code": 0,
+      "script_sha256": "e8ad72afdf52c756b157d73adadd3a03004e6de24241e95938412d8cc65a14ba",
+      "package_command": [
+        "uv",
+        "run",
+        "--no-project",
+        "--python",
+        "3.13",
+        "python",
+        ".github/scripts/check_distribution.py"
+      ],
+      "package_output": "ci-artifacts/docs-package",
+      "package_log": "/tmp/plato-p2-environment-independent-review/release-package.log",
+      "docs_log": null,
+      "docs_environment": null,
+      "bootstrap_environment": null
+    },
+    {
+      "command": [
+        "zsh",
+        "-lc",
+        "/tmp/plato-p2-environment-independent-review/controller-env/bin/python /tmp/plato-p2-environment-independent-review/audit_inputs.py"
+      ],
+      "exit_code": 0,
+      "result": "Exact qualification and source hashes; all 126 committed artifact bytes; preserved old root raw archive copied."
+    },
+    {
+      "command": [
+        "zsh",
+        "-lc",
+        "/tmp/plato-p2-environment-independent-review/default-source/.venv-docs/bin/python /tmp/plato-p2-environment-independent-review/verify_outputs.py"
+      ],
+      "exit_code": 0,
+      "result": "Raw three-way archive equality; 1298 Git-archive source bytes each; exact generated metadata; deps/extras/Python; clean rebuilt wheel bytes and outside-checkout import/tensor/NMS/lock receipts."
+    },
+    {
+      "command": [
+        "zsh",
+        "-lc",
+        "/tmp/plato-p2-environment-independent-review/controller-env/bin/python /tmp/plato-p2-environment-independent-review/negative_checks.py"
+      ],
+      "exit_code": 0,
+      "result": "16 focused independent guard checks passed; own fixtures restored."
+    },
+    {
+      "command": [
+        "zsh",
+        "-lc",
+        "uv lock --check --python 3.13"
+      ],
+      "cwd": "/tmp/plato-p2-environment-independent-review/release-source",
+      "exit_code": 0,
+      "log": "/tmp/plato-p2-environment-independent-review/lock-check.log"
+    },
+    {
+      "command": [
+        "zsh",
+        "-lc",
+        "git diff --check 06ba6796^ 06ba6796"
+      ],
+      "cwd": "/tmp/plato-p2-environment-independent-review/release-source",
+      "exit_code": 0,
+      "log": "/tmp/plato-p2-environment-independent-review/source-whitespace.log"
+    }
+  ],
+  "prior_binding_review_reused_with_unchanged_authority": {
+    "path": "/tmp/plato-docs-package-binding-review.json",
+    "sha256": "c42c4deea9bf414388711069c34b48238f6ead704ed5dadce38e605b5e5b1075",
+    "accepted_source_commit": "63f0d2000f0370708b9afe1e2e6a2dc8559b72e1",
+    "checker_sha256": "1b3ea71a1eef084f602092de35a97ceed04beb4ab47da2074690dc89c5c34c3f",
+    "reason": "Source-byte and output-ownership correction is byte-identical; prior acceptance remains authoritative. This review adds real default environment coverage and 16 meaningful guard regressions without claiming a blind rerun of all earlier large checks."
+  },
+  "preservation": {
+    "protected_targets": [
+      "/tmp/plato-refresh-worktrees/deployment-integration/.venv-docs",
+      "/tmp/plato-refresh-worktrees/deployment-integration/ci-artifacts",
+      "/tmp/plato-deployment-integration/docs-environment-package-finding.json",
+      "/tmp/plato-deployment-integration/publication-docs.log",
+      "/tmp/plato-deployment-integration/publication-package.log"
+    ],
+    "snapshot_entries": 17376,
+    "before_sha256": "ebb36f1185ae0199a709e35139a958cefe1fd9c8bdb410aede5fd20c52502103",
+    "after_sha256": "ebb36f1185ae0199a709e35139a958cefe1fd9c8bdb410aede5fd20c52502103",
+    "root_environment_ci_receipts_bytes_links_modes_mtimes_unchanged": true,
+    "protected_snapshot_before": "/tmp/plato-p2-environment-independent-review/protected-before.json",
+    "protected_snapshot_after": "/tmp/plato-p2-environment-independent-review/protected-after.json",
+    "candidate_and_author_environments_not_mutated": true,
+    "old_root_red_raw_still_exists": true,
+    "old_root_red_sha256": "206a0cbf2910daaf58cb7d44776ef478d6c967728e00c8e129622fee72f0b36a"
+  },
+  "host": {
+    "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+    "machine": "arm64",
+    "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+    "uv": "uv 0.12.22 (70fe1196a 2026-10-01 aarch64-apple-darwin)"
+  },
+  "artifacts": {
+    "root": "/tmp/plato-p2-environment-independent-review",
+    "manifest": "/tmp/plato-p2-environment-independent-review/review-artifact-manifest.json",
+    "manifest_sha256": "4b9e54c88ce9f8e44fa26a5ebdaab53eb528411a674032acf8601ca5e14d0f68",
+    "manifest_entries": 154,
+    "copied_raw_receipts_root": "/tmp/plato-p2-environment-independent-review/receipts",
+    "copied_author_inputs_root": "/tmp/plato-p2-environment-independent-review/raw",
+    "copied_root_red_archive": "/tmp/plato-p2-environment-independent-review/raw/root-red-plato_learn-1.4.3.tar.gz",
+    "copied_package_receipts": {
+      "default": "/tmp/plato-p2-environment-independent-review/receipts/default/package",
+      "bootstrap": "/tmp/plato-p2-environment-independent-review/receipts/bootstrap/package",
+      "release": "/tmp/plato-p2-environment-independent-review/receipts/release/package"
+    },
+    "source_sdist_sha256": "2568b2c97cd289657e32f2324d12b01e02c700e8d54149bdfa5c9de8a492d1b8",
+    "wheel_sha256": "d00d2c2acd5e5867e6a818fe3bc4132db8f92e00f47017da35e5a3159a60ba96"
+  },
+  "remaining_integration_gates": [
+    "Root must integrate the narrow source change and qualify the exact final HEAD with the actual documented default docs\u2192package sequence and preserve new source-bound receipts.",
+    "Final integrated/evidence-bearing source is not 06ba6796 and requires its own sdist Git-byte binding.",
+    "Previously required Linux/hosted Netlify and root native/core/retained gates are not replaced by this local focused review."
+  ],
+  "limits": [
+    "Local macOS arm64, Python3.13.16, uv0.12.22 only; no GitHub Linux or hosted Netlify action executed.",
+    "No candidate edits, nested agents, root/author environment activation or sync, publication, PR, push, release, workflow dispatch, or hosted deployment.",
+    "Controller and docs/bootstrap execution environments plus all fixtures were reviewer-owned isolated temporary worktrees.",
+    "Checker-created extracted-sdist and installed-wheel environments are removed by checker after actual successful proof; raw wheel/sdist, logs and installed-wheel receipts were copied and retained.",
+    "A reviewer audit assertion initially used a broad replace on every TOML exclude list; it was corrected to target only [tool.hatch.build], then exact two-line proof passed. This affected reviewer code only."
+  ]
+}
