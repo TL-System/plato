@@ -154,10 +154,11 @@ audit = [
 [tool.ty]
 
 [tool.ty.src]
-# Remove `build` from the excluded directories.
+# Historical source snapshots and sealed reproduction evidence are not maintained.
 exclude = [
     "examples/outdated",
-    "archives/retired",
+    "archives",
+    "evidence",
 ]
 
 [tool.ty.rules]
