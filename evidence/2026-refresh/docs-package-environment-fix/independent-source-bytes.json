@@ -1,0 +1,26 @@
+{
+  "source_commit": "06ba679690f090aacf7e6a95a6dffd74b81ffad3",
+  "accepted": true,
+  "builds": {
+    "default": {
+      "git_archive_source": "06ba679690f090aacf7e6a95a6dffd74b81ffad3",
+      "all_regular_source_member_bytes_equal": true,
+      "members": 1298,
+      "sdist_sha256": "2568b2c97cd289657e32f2324d12b01e02c700e8d54149bdfa5c9de8a492d1b8"
+    },
+    "bootstrap": {
+      "git_archive_source": "06ba679690f090aacf7e6a95a6dffd74b81ffad3",
+      "all_regular_source_member_bytes_equal": true,
+      "members": 1298,
+      "sdist_sha256": "2568b2c97cd289657e32f2324d12b01e02c700e8d54149bdfa5c9de8a492d1b8"
+    },
+    "release": {
+      "git_archive_source": "06ba679690f090aacf7e6a95a6dffd74b81ffad3",
+      "all_regular_source_member_bytes_equal": true,
+      "members": 1298,
+      "sdist_sha256": "2568b2c97cd289657e32f2324d12b01e02c700e8d54149bdfa5c9de8a492d1b8"
+    }
+  },
+  "pyproject_only_two_authorized_exclusions": true,
+  "lock_dependencies_markers_versions_and_existing_p2_files_unchanged": true
+}

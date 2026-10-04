@@ -1,0 +1,14 @@
+{
+  "source_commit": "06ba679690f090aacf7e6a95a6dffd74b81ffad3",
+  "checkout": "/private/tmp/plato-refresh-worktrees/docs-package-env-default",
+  "environments": {
+    ".venv-docs": {
+      "entries": 17357,
+      "snapshot_sha256": "7653d6e4c238b422ab5f4b3bbc0a1703126b6e3898ad37834ab8f4080bd185cd",
+      "python_link": "/Users/bli/.local/share/uv/python/cpython-3.13-macos-aarch64-none/bin/python3.13",
+      "sentinels": {
+        "p2-m3-environment-sentinel.json": "ec71a8ce2a7d01f99084b87a5459bc741fe16706e4202f3e2db880856c665fa9"
+      }
+    }
+  }
+}
