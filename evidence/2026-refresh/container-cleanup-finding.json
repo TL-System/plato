@@ -1,0 +1,193 @@
+{
+  "id": "ROOT-P1-M1",
+  "severity": "medium",
+  "status": "ORIGINAL_AUTHOR_REPAIR_REQUIRED",
+  "source": "0791c01afcaea96223a925a32ee22882dc437ee2",
+  "ci_merge": "65a88bdfdf3e2418e356971c7d3e225b48c1d3da",
+  "run": 37167178271,
+  "title": "Root-owned mounted bytecode prevents qualification fixture cleanup.",
+  "actual": "Image built and actual unmounted/mounted CPU, CLI, native libraries, argument forwarding, exit23 and auto-removal checks passed. Exiting TemporaryDirectory raises PermissionError removing root-owned plato/__pycache__; finallinuxacceptancefalse.",
+  "fix_scope": "Original author narrow P1 fix; do not suppress cleanup failure or delete unrelated paths. Preserve root-owned persistent user output contract; requalify actualLinux after fresh review.",
+  "artifacts": [
+    {
+      "path": "/tmp/plato-deployment-linux/container0791/container-cpu-65a88bdfdf3e2418e356971c7d3e225b48c1d3da-1/base-manifest-raw.log",
+      "bytes": 743,
+      "sha256": "b7ae301dea2c162444795462ce17a05f6a516e5a75944b57af5b88540a1a2266"
+    },
+    {
+      "path": "/tmp/plato-deployment-linux/container0791/container-cpu-65a88bdfdf3e2418e356971c7d3e225b48c1d3da-1/base-manifest.log",
+      "bytes": 766,
+      "sha256": "517ba6238b5402a8b6dc0b3cb44abec7e26667253c62e9e20221e87c4f2b40c9"
+    },
+    {
+      "path": "/tmp/plato-deployment-linux/container0791/container-cpu-65a88bdfdf3e2418e356971c7d3e225b48c1d3da-1/build.log",
+      "bytes": 21511,
+      "sha256": "07ca7a6a31defa03d494983fe21b3b1966652259193a95da3b0e5bf741675c9e"
+    },
+    {
+      "path": "/tmp/plato-deployment-linux/container0791/container-cpu-65a88bdfdf3e2418e356971c7d3e225b48c1d3da-1/cli-help.log",
+      "bytes": 1479,
+      "sha256": "a3a831ad47b2797bd7b0fdb5e6218715901e8cb4679775f8980d93ec2c6a5577"
+    },
+    {
+      "path": "/tmp/plato-deployment-linux/container0791/container-cpu-65a88bdfdf3e2418e356971c7d3e225b48c1d3da-1/commands.json",
+      "bytes": 6913,
+      "sha256": "8b63f042a59a6c026ff9e0bde758324fe377c1618e5e42d4ccdb42fe390d382c"
+    },
+    {
+      "path": "/tmp/plato-deployment-linux/container0791/container-cpu-65a88bdfdf3e2418e356971c7d3e225b48c1d3da-1/context-sentinels.json",
+      "bytes": 217,
+      "sha256": "ab36bac9f31bc832e2f606dacfaa110c2d8018624a9fc7d198728615db387893"
+    },
+    {
+      "path": "/tmp/plato-deployment-linux/container0791/container-cpu-65a88bdfdf3e2418e356971c7d3e225b48c1d3da-1/df-after.log",
+      "bytes": 129,
+      "sha256": "dd11bbd6b176ba78da508811bfb5bce0761d76f2ba06d77097d4620c9551d41f"
+    },
+    {
+      "path": "/tmp/plato-deployment-linux/container0791/container-cpu-65a88bdfdf3e2418e356971c7d3e225b48c1d3da-1/df-before.log",
+      "bytes": 129,
+      "sha256": "12f14ba674ede13bc0c350bc788ba535529ab9a4ceac5565e5bf706a017e9a40"
+    },
+    {
+      "path": "/tmp/plato-deployment-linux/container0791/container-cpu-65a88bdfdf3e2418e356971c7d3e225b48c1d3da-1/df-initial.log",
+      "bytes": 129,
+      "sha256": "12f14ba674ede13bc0c350bc788ba535529ab9a4ceac5565e5bf706a017e9a40"
+    },
+    {
+      "path": "/tmp/plato-deployment-linux/container0791/container-cpu-65a88bdfdf3e2418e356971c7d3e225b48c1d3da-1/docker-disk-after.log",
+      "bytes": 271,
+      "sha256": "8a49e3ae1862f2b6738654334424d18b85149375d3454c550d4582b06c6ea6c4"
+    },
+    {
+      "path": "/tmp/plato-deployment-linux/container0791/container-cpu-65a88bdfdf3e2418e356971c7d3e225b48c1d3da-1/docker-disk-before.log",
+      "bytes": 266,
+      "sha256": "90680ca432792862940e3cae0ebdc02a1aa08a12404d84452d39ba5c25b1d377"
+    },
+    {
+      "path": "/tmp/plato-deployment-linux/container0791/container-cpu-65a88bdfdf3e2418e356971c7d3e225b48c1d3da-1/docker-disk-initial.log",
+      "bytes": 266,
+      "sha256": "90680ca432792862940e3cae0ebdc02a1aa08a12404d84452d39ba5c25b1d377"
+    },
+    {
+      "path": "/tmp/plato-deployment-linux/container0791/container-cpu-65a88bdfdf3e2418e356971c7d3e225b48c1d3da-1/docker-info-after.log",
+      "bytes": 9764,
+      "sha256": "7bbbcf263cca6fa9984a22dd98db901152b762bf8baf16db7dd7ded674af18a0"
+    },
+    {
+      "path": "/tmp/plato-deployment-linux/container0791/container-cpu-65a88bdfdf3e2418e356971c7d3e225b48c1d3da-1/docker-info-before.log",
+      "bytes": 9764,
+      "sha256": "13a903902c0dde5d8d0aee624f2b27843cfc5c0d6a4dadd803409f1fa57e2248"
+    },
+    {
+      "path": "/tmp/plato-deployment-linux/container0791/container-cpu-65a88bdfdf3e2418e356971c7d3e225b48c1d3da-1/docker-info-initial.log",
+      "bytes": 9764,
+      "sha256": "4e50752987d99f3f011e28ef5891e9ac9c9a9fbc5a283b05b9adeb9c2020e449"
+    },
+    {
+      "path": "/tmp/plato-deployment-linux/container0791/container-cpu-65a88bdfdf3e2418e356971c7d3e225b48c1d3da-1/hosted-sdk-reclamation.json",
+      "bytes": 105,
+      "sha256": "e582463da7d78e3343fcae1bdfb5bd4599b65e0db7c89550575aaf376f8438a7"
+    },
+    {
+      "path": "/tmp/plato-deployment-linux/container0791/container-cpu-65a88bdfdf3e2418e356971c7d3e225b48c1d3da-1/image-history.log",
+      "bytes": 169235,
+      "sha256": "94e5023dfd57d6d94b4048cfd6aa8030e3239cd7afc2d4c7e9d907e6951f3246"
+    },
+    {
+      "path": "/tmp/plato-deployment-linux/container0791/container-cpu-65a88bdfdf3e2418e356971c7d3e225b48c1d3da-1/image-id.txt",
+      "bytes": 71,
+      "sha256": "6acf5a44f68af0c2a887c65f98341b7ab802824c793e0f9590919f28aa04dccd"
+    },
+    {
+      "path": "/tmp/plato-deployment-linux/container0791/container-cpu-65a88bdfdf3e2418e356971c7d3e225b48c1d3da-1/image-inspect.log",
+      "bytes": 9805,
+      "sha256": "792ca2e1329d2a29b0d3306a7842dfcd80ec8471e5bed61e9831fe5877ed4aa5"
+    },
+    {
+      "path": "/tmp/plato-deployment-linux/container0791/container-cpu-65a88bdfdf3e2418e356971c7d3e225b48c1d3da-1/image-summary.json",
+      "bytes": 1469,
+      "sha256": "3908becb2f04cc9e9a34eeb656c874e5f010e2bf1ec2137cb03b4b867574b3a1"
+    },
+    {
+      "path": "/tmp/plato-deployment-linux/container0791/container-cpu-65a88bdfdf3e2418e356971c7d3e225b48c1d3da-1/linux-acceptance.json",
+      "bytes": 246,
+      "sha256": "46a23b50d9ea8134340747b3b1a660c19964595377f2fae00857b933f5cb47a2"
+    },
+    {
+      "path": "/tmp/plato-deployment-linux/container0791/container-cpu-65a88bdfdf3e2418e356971c7d3e225b48c1d3da-1/mounted-auto-removal.log",
+      "bytes": 64,
+      "sha256": "5c9018b7ceb5ad0e1830fcf3a218ca02ee82ccfe7c8ff63dd70e268c7714d20d"
+    },
+    {
+      "path": "/tmp/plato-deployment-linux/container0791/container-cpu-65a88bdfdf3e2418e356971c7d3e225b48c1d3da-1/mounted-cpu.json",
+      "bytes": 16605,
+      "sha256": "60523c35ad544653bf9db28e553b969f373d1e503992d2c04e1fd07414b5526a"
+    },
+    {
+      "path": "/tmp/plato-deployment-linux/container0791/container-cpu-65a88bdfdf3e2418e356971c7d3e225b48c1d3da-1/mounted-cpu.log",
+      "bytes": 16209,
+      "sha256": "9b1ca2eb574a4b3304c6f111e2a1b210cab83822ea26f87804627f6b811fad47"
+    },
+    {
+      "path": "/tmp/plato-deployment-linux/container0791/container-cpu-65a88bdfdf3e2418e356971c7d3e225b48c1d3da-1/mounted-exit-auto-removal.log",
+      "bytes": 64,
+      "sha256": "5c9018b7ceb5ad0e1830fcf3a218ca02ee82ccfe7c8ff63dd70e268c7714d20d"
+    },
+    {
+      "path": "/tmp/plato-deployment-linux/container0791/container-cpu-65a88bdfdf3e2418e356971c7d3e225b48c1d3da-1/mounted-exit.log",
+      "bytes": 848,
+      "sha256": "1c23c19ed044efa9f27a4944c442e3b218ea49cc444c41d27acc070f89e7a427"
+    },
+    {
+      "path": "/tmp/plato-deployment-linux/container0791/container-cpu-65a88bdfdf3e2418e356971c7d3e225b48c1d3da-1/resources-after.json",
+      "bytes": 520,
+      "sha256": "cf3c45e06d636b77c0b0ed0f8e73ac643032f3bd5cfa6a5045070c827d111c62"
+    },
+    {
+      "path": "/tmp/plato-deployment-linux/container0791/container-cpu-65a88bdfdf3e2418e356971c7d3e225b48c1d3da-1/resources-before.json",
+      "bytes": 521,
+      "sha256": "a32fb1336be345616539ab7ba62a418fd8ed95764ca37f6b00a9f010f4b0dfa0"
+    },
+    {
+      "path": "/tmp/plato-deployment-linux/container0791/container-cpu-65a88bdfdf3e2418e356971c7d3e225b48c1d3da-1/resources-initial.json",
+      "bytes": 522,
+      "sha256": "56c603cd58b743a308c43e871969b8e1a0ab783ae4826c32dfd1f38a0cfad847"
+    },
+    {
+      "path": "/tmp/plato-deployment-linux/container0791/container-cpu-65a88bdfdf3e2418e356971c7d3e225b48c1d3da-1/source.json",
+      "bytes": 1305,
+      "sha256": "f5afae51a2b9438a007cfbf3d20bd10e0a3e824789f1a1b66d085dcd9cc40d95"
+    },
+    {
+      "path": "/tmp/plato-deployment-linux/container0791/container-cpu-65a88bdfdf3e2418e356971c7d3e225b48c1d3da-1/static-acceptance.json",
+      "bytes": 3052,
+      "sha256": "d79701b104ffd04f8fc2822d8dafe814a47f7e125bba93f714c58a49da27e96c"
+    },
+    {
+      "path": "/tmp/plato-deployment-linux/container0791/container-cpu-65a88bdfdf3e2418e356971c7d3e225b48c1d3da-1/unmounted-auto-removal.log",
+      "bytes": 63,
+      "sha256": "35a1e8896396f57f9096848dff7f89fb4736ac88f48abac24957c18d2b835942"
+    },
+    {
+      "path": "/tmp/plato-deployment-linux/container0791/container-cpu-65a88bdfdf3e2418e356971c7d3e225b48c1d3da-1/unmounted-cpu.json",
+      "bytes": 15788,
+      "sha256": "a794244ec9e75f4b6cd18f8cfc465742e8c2413a8c0a1007e2e2c77c8c8d2179"
+    },
+    {
+      "path": "/tmp/plato-deployment-linux/container0791/container-cpu-65a88bdfdf3e2418e356971c7d3e225b48c1d3da-1/unmounted-cpu.log",
+      "bytes": 16210,
+      "sha256": "440828ca91c4fbede18db7fd306154c2ea2214724a246821d8b3da5821ed7560"
+    },
+    {
+      "path": "/tmp/plato-deployment-linux/container0791/container-cpu-65a88bdfdf3e2418e356971c7d3e225b48c1d3da-1/uv-manifest-raw.log",
+      "bytes": 2196,
+      "sha256": "f513a91fc62fe7c17567eee97230dd198e43edb8a9fbecca843714a4358fe1bc"
+    },
+    {
+      "path": "/tmp/plato-deployment-linux/container0791/container-cpu-65a88bdfdf3e2418e356971c7d3e225b48c1d3da-1/uv-manifest.log",
+      "bytes": 1480,
+      "sha256": "94b30753da8694db575eac68dd83fb2bf0021b5635d7d156084acbf453f3198e"
+    }
+  ]
+}
