@@ -1,0 +1,122 @@
+{
+  "accepted": true,
+  "source": {
+    "commit": "da2ffde66e8ae5d893ceed9bb73d801680c150b6",
+    "file_sha256": {
+      "Dockerfile": "4e67953be6d90fcc73fb52a44fd05914494af625c529990f9366b662041b6a82",
+      ".dockerignore": "b90144eaa006aa9954e2f878fcfcbc6d1fa369027582e6f51f4b0500d23ce5da",
+      "dockerrun.sh": "6bbcb5530e5343b0fcb0fd675235f72081efa5fdcfd5fc464e1b28f3eedefee4",
+      "dockerrun_gpu.sh": "2f7ac611428cb0a4d3e36a6b040af4f461cfca8e09252ba0c65fbe105a6a6761",
+      ".github/workflows/container_checks.yml": "58b24307efa3414c0747e23982ca84822942e62952be886409fd2e3650d3b3e7",
+      ".github/scripts/check_container.py": "0f4dd45635dc3f560d6d7f2721aa23492374ecc27a5b408f25acd36c608c80d5",
+      "pyproject.toml": "8aaa7414717fa17841900d377d89851547677ba2ae93963afef79fc5490ba610",
+      "uv.lock": "e2a53aaae9a0dd49f5446b490bb3071e86aa3a9a20d6271c9dd30b4ae2dcbff9",
+      ".python-version": "02e735b3dfe1c32833eb550b7ff8ffa17f5f2bc3fa1e7bae61a8f5a3883ce398"
+    },
+    "base_image": "nvidia/cuda:13.0.3-devel-ubuntu24.04@sha256:b7ae301dea2c162444795462ce17a05f6a516e5a75944b57af5b88540a1a2266",
+    "uv_image": "ghcr.io/astral-sh/uv:0.12.22@sha256:f513a91fc62fe7c17567eee97230dd198e43edb8a9fbecca843714a4358fe1bc",
+    "host_python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+    "github_run_id": null,
+    "github_run_attempt": null
+  },
+  "cases": [
+    {
+      "case": "global-toml-exclusion",
+      "accepted": true,
+      "expected_rejection": "Build source excluded: pyproject.toml",
+      "simulated": true
+    },
+    {
+      "case": "workspace-source-exclusion",
+      "accepted": true,
+      "expected_rejection": "Build source excluded: examples/detector/pyproject.toml",
+      "simulated": true
+    },
+    {
+      "case": "evidence-context-leak",
+      "accepted": true,
+      "expected_rejection": "Not excluded: evidence/container-check",
+      "simulated": true
+    },
+    {
+      "case": "normal-NVIDIA-banner",
+      "accepted": true,
+      "simulated": true
+    },
+    {
+      "case": "missing-probe-record",
+      "accepted": true,
+      "expected_rejection": "Expected one marked container probe record.",
+      "simulated": true
+    },
+    {
+      "case": "duplicate-probe-record",
+      "accepted": true,
+      "expected_rejection": "Expected one marked container probe record.",
+      "simulated": true
+    },
+    {
+      "case": "standard-14GiB-resource-floor",
+      "accepted": true,
+      "expected_rejection": "Need at least 35 GiB free for CUDA/PyTorch build and layers. Select an available larger Linux x64 PLATO_CONTAINER_RUNNER; do not substitute a CPU image or claim a passed build.",
+      "simulated": true
+    },
+    {
+      "case": "45GiB-resource-floor",
+      "accepted": true,
+      "measured": {
+        "phase": "before",
+        "disks": {
+          "/private/tmp/plato-refresh-worktrees/container-refresh": {
+            "total": 100,
+            "used": 55,
+            "free": 48318382080
+          },
+          "/simulated-docker-root": {
+            "total": 100,
+            "used": 55,
+            "free": 48318382080
+          }
+        },
+        "minimum_free_bytes": 37580963840,
+        "base_compressed_bytes": 3973716026,
+        "standard_runner_documented_storage_gb": 14,
+        "runner_os": "macOS-27.0-arm64-arm-64bit-Mach-O",
+        "docker_os": "linux",
+        "docker_arch": "x86_64"
+      },
+      "simulated": true
+    },
+    {
+      "case": "wrong-daemon-architecture",
+      "accepted": true,
+      "expected_rejection": "Qualification requires a Linux amd64 Docker daemon.",
+      "simulated": true
+    },
+    {
+      "case": "no-SDK-removal-on-self-hosted-or-user-host",
+      "accepted": true,
+      "record": {
+        "reason": "Never remove SDKs outside a GitHub-hosted runner.",
+        "removed": [],
+        "skipped": []
+      },
+      "simulated": true
+    },
+    {
+      "case": "real-macOS-linux-mode-refusal",
+      "accepted": true,
+      "simulated": false,
+      "exit_code": 1,
+      "docker_commands_executed": false,
+      "receipt": {
+        "accepted": false,
+        "elapsed_seconds": 0.013,
+        "error": "RuntimeError: Actual image checks run only on Linux amd64 CI.",
+        "gpu_compute_tested": false,
+        "mode": "linux"
+      }
+    }
+  ],
+  "scope": "Local static/helper degradation only; no actual image or GPU proof"
+}

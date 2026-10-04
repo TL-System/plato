@@ -50,6 +50,7 @@ def test_dp_actual_time_snapshot_writer_to_plain_urgent_reader(tmp_path):
         assert sum(item[2] for item in history) == 8
 
 
+@pytest.mark.slow
 def test_actual_spawned_dp_rounds_return_accounting_and_isolate_clients(tmp_path):
     from plato.trainers.diff_privacy import Trainer
     from tests.integration.utils import build_minimal_config, configure_environment

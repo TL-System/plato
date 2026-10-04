@@ -1,0 +1,130 @@
+{
+  "status": "PRESERVED_BY_RELOCATION_WITH_IDENTICAL_BYTES_MODES_SYMLINKS_AND_MTIMES",
+  "old_path": "/tmp/plato-refresh-worktrees/deployment-integration/ci-artifacts",
+  "preserved_path": "/tmp/plato-deployment-integration/preserved-failed-publication-ci-artifacts",
+  "records": [
+    {
+      "path": "container",
+      "mode": 493,
+      "mtime_ns": 1791073544304144419,
+      "kind": "directory"
+    },
+    {
+      "path": "container/source.json",
+      "mode": 420,
+      "mtime_ns": 1791073543988940576,
+      "kind": "file",
+      "bytes": 1300,
+      "sha256": "291dbf6f36712f2548fa795543102ab180e768036784076977b00c2d9c9c4f11"
+    },
+    {
+      "path": "container/static-acceptance.json",
+      "mode": 420,
+      "mtime_ns": 1791073544304212169,
+      "kind": "file",
+      "bytes": 3364,
+      "sha256": "04ce7a7cfbd2fa55a7ee9d12e08eb0e34c6727ab54835b70a8cbcdf32f3ffe97"
+    },
+    {
+      "path": "docs",
+      "mode": 493,
+      "mtime_ns": 1791073542808171207,
+      "kind": "directory"
+    },
+    {
+      "path": "docs/docs-environment.json",
+      "mode": 420,
+      "mtime_ns": 1791073542808231041,
+      "kind": "file",
+      "bytes": 1116,
+      "sha256": "6217d5f3327173378537602a334fb20c013c489b04db2392c2c42f5802cd615c"
+    },
+    {
+      "path": "docs-package",
+      "mode": 493,
+      "mtime_ns": 1791073546401015191,
+      "kind": "directory"
+    },
+    {
+      "path": "docs-package/acceptance.json",
+      "mode": 420,
+      "mtime_ns": 1791073546401130483,
+      "kind": "file",
+      "bytes": 158,
+      "sha256": "4e9b220e6518899b0dfbe39d6e11cc53b4a58441db320bb0cac83b32617d108c"
+    },
+    {
+      "path": "docs-package/build-constraints.log",
+      "mode": 420,
+      "mtime_ns": 1791073544439262965,
+      "kind": "file",
+      "bytes": 590,
+      "sha256": "773dc69f5231bf02535d0c4acd64e458a6269a0580980f7b28ca34d8aed59182"
+    },
+    {
+      "path": "docs-package/build-constraints.txt",
+      "mode": 420,
+      "mtime_ns": 1791073544439405382,
+      "kind": "file",
+      "bytes": 212,
+      "sha256": "284e1018003f55e4ce6fbb5c80b7dad20e86d9ed60ef544d817f1892626326de"
+    },
+    {
+      "path": "docs-package/build.log",
+      "mode": 420,
+      "mtime_ns": 1791073546398880525,
+      "kind": "file",
+      "bytes": 913,
+      "sha256": "ab0b8eef3f3b71e504172b32336aef8512e9d7dd3d2c7bf935fe2b30f504013a"
+    },
+    {
+      "path": "docs-package/distributions",
+      "mode": 493,
+      "mtime_ns": 1791073546358282523,
+      "kind": "directory"
+    },
+    {
+      "path": "docs-package/distributions/.gitignore",
+      "mode": 420,
+      "mtime_ns": 1791073544473428633,
+      "kind": "file",
+      "bytes": 1,
+      "sha256": "684888c0ebb17f374298b65ee2807526c066094c701bcc7ebbe1c1095f494fc1"
+    },
+    {
+      "path": "docs-package/distributions/plato_learn-1.4.3.tar.gz",
+      "mode": 420,
+      "mtime_ns": 1791073546357928607,
+      "kind": "file",
+      "bytes": 5426632,
+      "sha256": "206a0cbf2910daaf58cb7d44776ef478d6c967728e00c8e129622fee72f0b36a"
+    },
+    {
+      "path": "docs-package/provenance.json",
+      "mode": 420,
+      "mtime_ns": 1791073544421957464,
+      "kind": "file",
+      "bytes": 985,
+      "sha256": "3e76448492668ed77917814301eb26bca31df650dd057d81a9d6c87087f64f31"
+    },
+    {
+      "path": "docs-package/runtime-constraints.log",
+      "mode": 420,
+      "mtime_ns": 1791073544459136340,
+      "kind": "file",
+      "bytes": 7646,
+      "sha256": "1ac00e1b6a904adbfd6d526b3a67739a3b5a19f8db4d10135ceccad025436b67"
+    },
+    {
+      "path": "docs-package/runtime-constraints.txt",
+      "mode": 420,
+      "mtime_ns": 1791073544459306841,
+      "kind": "file",
+      "bytes": 7268,
+      "sha256": "9c9b82f4c52ba05fb5a1c7e6e841e15fcd69104f9867cf7d7526060055a32709"
+    }
+  ],
+  "docs_environment_retained": "/tmp/plato-refresh-worktrees/deployment-integration/.venv-docs",
+  "reason": "Preserve original failed default output intact and free the default pathname for a new invocation-owned checker output; do not overwrite or delete failure evidence.",
+  "source_before": "2779404ee5a9c5120e33267eee221bb84d46658e"
+}

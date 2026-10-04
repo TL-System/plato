@@ -12,8 +12,7 @@ from plato.utils import s3
 from tests.conftest import pytest_configure
 
 
-@pytest.fixture
-def lock_timeout_type(request):
+def resolve_lock_timeout_type(request):
     """Use the real Kazoo exception for effective mandatory qualification."""
     profile = request.config.pluginmanager.get_plugin("plato-profile-checks")
     if profile.qualify and not profile.base:
@@ -22,6 +21,10 @@ def lock_timeout_type(request):
         return LockTimeout
     return TimeoutError
 
+
+@pytest.fixture
+def lock_timeout_type(request):
+    return resolve_lock_timeout_type(request)
 
 @pytest.mark.parametrize(
     "scope, options, required",
@@ -51,13 +54,13 @@ def test_lock_timeout_follows_effective_pytest_profile(
         probe_request = SimpleNamespace(config=config)
         if required and find_spec("kazoo") is None:
             with pytest.raises(ModuleNotFoundError, match="kazoo"):
-                lock_timeout_type.__wrapped__(probe_request)
+                resolve_lock_timeout_type(probe_request)
         elif required:
             from kazoo.exceptions import LockTimeout
 
-            assert lock_timeout_type.__wrapped__(probe_request) is LockTimeout
+            assert resolve_lock_timeout_type(probe_request) is LockTimeout
         else:
-            assert lock_timeout_type.__wrapped__(probe_request) is TimeoutError
+            assert resolve_lock_timeout_type(probe_request) is TimeoutError
     finally:
         config._ensure_unconfigure()
 

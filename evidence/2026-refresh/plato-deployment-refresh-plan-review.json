@@ -1,0 +1,210 @@
+{
+  "schema_version": 1,
+  "reviewer": "/root/deployment_plan_review",
+  "reviewed_at_utc": "2026-10-03T21:56:41.668828+00:00",
+  "verdict": "ACCEPT",
+  "accepted": true,
+  "acceptance_scope": "Bounded implementation plan only. This is not acceptance of an image, package, docs build, deployment, GPU path, or final integration.",
+  "inputs": {
+    "plan": {
+      "path": "/tmp/plato-deployment-refresh-plan.json",
+      "sha256": "6d9eca53b96e1e70d6f89617fce2f2a1234fb5d8fc94fa79e387ade605c4fe9e"
+    },
+    "source_evidence": {
+      "path": "/tmp/plato-deployment-source-evidence.json",
+      "sha256": "c0d213f97e059d51a997f804e87087ac31d2071d25449021a37fc4fd1a211893"
+    }
+  },
+  "source": {
+    "commit": "6bf8836d06072c7946cdfb5499a09e4bce459805",
+    "worktree": "/tmp/plato-refresh-worktrees/archive-integration",
+    "clean_tracked_worktree": true,
+    "file_sha256": {
+      "AGENTS.md": "b50f87f31ea3d87076952d8b7d2d8af067132fbf877d80f8780c208fb45527ec",
+      "Dockerfile": "386f360c795b1c06b34aef8ccaef750b6156c23f8c9535d26c2ef271c9bd2ae2",
+      "dockerrun.sh": "7e03c34aba60fd178b0ffd4492b4e399867a8c807a746e884a992b5f9267f690",
+      "dockerrun_gpu.sh": "63e94eda781bc8b53cd2a5735374bed98c523200097f194163bbede29305b51f",
+      "netlify.toml": "9b3382524f2fb5973b9fc1c186741a920e3dc52a6c4962739b8209df3a692a3c",
+      "docs/requirements.txt": "b648383d0fa36ceccb3fce7c76e0aa36df591c817b7e5ce46ee61c0c92f29b04",
+      ".github/workflows/pypi_publish.yml": "776b5fa1ac911ab3af9d01c6eb15414676066e1f4dab299b181c5ca3c840fbae",
+      ".github/workflows/pytorch_tests.yml": "697c6ae0c39fa7fd42766f8161f350944e90108b3dad852148da952acfcc9317",
+      "pyproject.toml": "8aaa7414717fa17841900d377d89851547677ba2ae93963afef79fc5490ba610",
+      "uv.lock": "e2a53aaae9a0dd49f5446b490bb3071e86aa3a9a20d6271c9dd30b4ae2dcbff9",
+      ".python-version": "02e735b3dfe1c32833eb550b7ff8ffa17f5f2bc3fa1e7bae61a8f5a3883ce398",
+      "docs/docs/install.md": "8f7e57f4c0c72df67d769af788bcb9ece2d6907f823513fec17692644b21340b",
+      "docs/docs/quickstart.md": "1cd72bfbaf114d44b3c1b177c0d38709c8e7e939d2780f29b040139b713a4d0b",
+      "docs/mkdocs.yml": "d26f6c6e7b91cf8835b4187e3b9e01125801e735122d79e7a148179b31a852ec"
+    },
+    "all_recorded_source_hashes_match": true,
+    "retained_workspace_member_manifest_count": 12,
+    "all_retained_workspace_member_manifests_present": true,
+    "policy": "Read-only review. No source edits, environment sync/install, Docker installation/build/run, release, publishing, or nested agents. Only this requested review report was written."
+  },
+  "unresolved_findings_by_severity": {
+    "critical": 0,
+    "high": 0,
+    "medium": 0,
+    "low": 1
+  },
+  "findings": [
+    {
+      "id": "DEPLOY-PLAN-L1",
+      "severity": "low",
+      "status": "Nonblocking implementation/documentation note",
+      "area": "Linux bind-mount data ownership",
+      "plan_paths": [
+        "decisions.container.layout",
+        "decisions.container.scripts",
+        "work_packages.P3-general-prose"
+      ],
+      "source_paths": [
+        "Dockerfile",
+        "dockerrun.sh",
+        "dockerrun_gpu.sh",
+        "docs/docs/quickstart.md"
+      ],
+      "observation": "The plan preserves the development checkout mount and image default root execution, but does not explicitly name the ownership of files written into that mount. With ordinary rootful Docker on Linux, resulting datasets/checkpoints/results can be owned by root on the host. --rm removes the container and its environment changes but retains host bind-mount outputs.",
+      "requested_followup": "P3 should state the default container identity, resulting host ownership behavior, persistence of mounted outputs, and loss of container-only dependency changes on exit. Preserve the authorized launch behavior; no UID mapping or launcher redesign is requested.",
+      "why_nonblocking": "The existing image and launchers already use root and a writable host bind mount. This is an omitted practical detail in planned prose, not a newly introduced runtime regression.",
+      "primary_source": "https://docs.docker.com/engine/storage/bind-mounts/"
+    }
+  ],
+  "area_conclusions": [
+    {
+      "area": "Scope and ownership",
+      "result": "Pass",
+      "evidence": "P1/P2 owned paths are disjoint from the shared PyTorch workflow and runtime profiles; P3/P4 prose is serialized after final behavior freezes. Root-only qualification gates and immutable pinned source are preserved."
+    },
+    {
+      "area": "Environment selection and host mount",
+      "result": "Pass",
+      "evidence": "Absolute UV_PROJECT_ENVIRONMENT=/opt/plato/.venv, PATH precedence and managed Python outside /root/plato address source-mount masking. Actual mounted/unmounted environment and exit-code proofs are mandatory, including a checkout path with spaces and invalid host .venv."
+    },
+    {
+      "area": "CPU/GPU semantics",
+      "result": "Pass",
+      "evidence": "CUDA compiler/runtime capability and GPU launcher are preserved. Toolkit alignment is a design rationale; actual CPU/native torchvision/library-loading/startup checks are required. Stub GPU flag proof is expressly separated from absent hardware qualification."
+    },
+    {
+      "area": "Dependency and build isolation",
+      "result": "Pass",
+      "evidence": "Container base sync excludes default groups. Docs-only sync omits the project/runtime/dev set and verifies absence of torch/lighteval/plato-learn. Package build uses an explicit locked build-constraints bridge with --no-sources, then clean sdist rebuild and installed-wheel provenance outside checkout. uv 0.12.22 help confirms the required flags."
+    },
+    {
+      "area": "Context and package payloads",
+      "result": "Pass",
+      "evidence": "Docker ignore rules must preserve tracked metadata/code/fixtures and all 12 retained workspace manifests while excluding archived/evidence/environment/cache artifacts. The plan requires disposable CI sentinel probes, actual context bytes, and package manifest inspection. Packaging excludes are correctly distinguished from Docker context ignores."
+    },
+    {
+      "area": "Reproducibility and provenance",
+      "result": "Pass",
+      "evidence": "Base/uv image digests and actions are immutable; dependencies use uv.lock. Python patch/build, OS packages, image ID/inspect/history, source SHA, lock/file hashes and package inventory must be recorded. The plan supports locked dependency provenance, not a claim of bit-identical image builds across changing apt/Python patch inputs."
+    },
+    {
+      "area": "Runner capacity",
+      "result": "Pass with existing mandatory execution gate",
+      "evidence": "The selected base has 3,973,716,026 compressed layer bytes before installation. GitHub documents 14 GB storage for standard ubuntu-24.04 runners. The plan explicitly requires resource measurements and a sufficiently sized runner, and requires a larger supported runner or freshly reviewed leaner approach if disk is insufficient. Runner availability and successful build remain unexecuted and cannot be claimed from this plan review."
+    },
+    {
+      "area": "Netlify working directory and interpreter",
+      "result": "Pass",
+      "evidence": "Root build base, docs/site publish path, explicit Python 3.13, pinned uv bootstrap and a shared strict-build implementation are coherent. Hosted effective directory/context behavior remains subject to real Deploy Preview evidence or an honest hosted-validation limitation."
+    },
+    {
+      "area": "Workflow event and publishing behavior",
+      "result": "Pass",
+      "evidence": "PR docs/package validation is separated from release publication. Original release.created event and token publishing intent remain unchanged; no release event, uv publish, registry push or manual production deployment is authorized for validation. GitHub documents that created does not fire for draft releases; this pre-existing behavior is intentionally preserved."
+    },
+    {
+      "area": "Cleanup and launcher behavior",
+      "result": "Pass",
+      "evidence": "The plan replaces global docker rm-all prose with per-container --rm, preserves Linux networking/shared memory, quotes source paths, forwards arguments, selects TTY flags appropriately and requires real launcher exit-code/auto-removal evidence."
+    },
+    {
+      "area": "Final acceptance and failure propagation",
+      "result": "Pass",
+      "evidence": "Independent reviewers must inspect actual logs/artifacts for the integrated source SHA, reject continue-on-error masking, preserve native 383/core 51/retained 19 gates and distinguish implementation from executed CPU/docs/package/preview evidence and untested GPU behavior."
+    }
+  ],
+  "independently_verified_current_facts": [
+    {
+      "url": "https://pypi.org/pypi/torch/2.14.1/json",
+      "result": "Official torch 2.14.1 metadata matches cuda-toolkit==13.0.3 and nvidia-cudnn-cu13==9.24.0.43 on Linux."
+    },
+    {
+      "url": "https://registry-1.docker.io/v2/nvidia/cuda/manifests/13.0.3-devel-ubuntu24.04",
+      "digest": "sha256:b7ae301dea2c162444795462ce17a05f6a516e5a75944b57af5b88540a1a2266",
+      "amd64_manifest": "sha256:7d56ebe2b7cd864a60dca3c8b2d0a39f8fc110417e8253e32505c3387f59119c",
+      "compressed_layer_bytes": 3973716026,
+      "result": "Body/header digest matches plan; CUDA 13.0.3, cudart 13.0.96-1 and cuBLAS 13.1.1.3-1; no NV_CUDNN_VERSION in selected image config."
+    },
+    {
+      "url": "https://ghcr.io/v2/astral-sh/uv/manifests/0.12.22",
+      "digest": "sha256:f513a91fc62fe7c17567eee97230dd198e43edb8a9fbecca843714a4358fe1bc",
+      "amd64_manifest": "sha256:0f1da8ef29dfee2fc8490653fe306c0242e653a160b56278d468997afc65a314",
+      "result": "Body/header digest matches plan."
+    },
+    {
+      "url": "https://docs.nvidia.com/cuda/archive/13.0.3/cuda-toolkit-release-notes/index.html",
+      "result": "Official Update 3 release notes match independently versioned cudart/cuBLAS components; driver and hardware requirements remain separate."
+    },
+    {
+      "url": "https://docs.nvidia.com/deploy/cuda-compatibility/minor-version-compatibility.html",
+      "result": "Compatibility conditions support the plan claim limit; no GPU compatibility inference is accepted as executed proof."
+    },
+    {
+      "url": "https://docs.astral.sh/uv/guides/integration/docker/",
+      "result": "Official digest pinning, environment PATH and bind-mount guidance support the selected layout; workspace final locked sync requires all member metadata."
+    },
+    {
+      "url": "https://docs.astral.sh/uv/reference/cli/",
+      "result": "--only-group omits project dependencies; --no-emit-project exports dependencies without project; --build-constraints constrains isolated distribution build dependencies."
+    },
+    {
+      "url": "https://docs.netlify.com/build/configure-builds/manage-dependencies/",
+      "result": "PYTHON_VERSION is configurable and requirements auto-install behavior is relative to the base directory."
+    },
+    {
+      "url": "https://docs.github.com/en/actions/reference/runners/github-hosted-runners",
+      "result": "Standard ubuntu-24.04 x64 runner storage documented as 14 GB."
+    },
+    {
+      "url": "https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#release",
+      "result": "Release event tagged source behavior and draft-release created limitation confirmed."
+    },
+    {
+      "url": "https://api.github.com/repos/actions/checkout/git/ref/tags/v7.0.1",
+      "sha": "3d3c42e5aac5ba805825da76410c181273ba90b1",
+      "matches": true
+    },
+    {
+      "url": "https://api.github.com/repos/actions/setup-python/git/ref/tags/v7.0.0",
+      "sha": "5fda3b95a4ea91299a34e894583c3862153e4b97",
+      "matches": true
+    },
+    {
+      "url": "https://api.github.com/repos/astral-sh/setup-uv/git/ref/tags/v10.2.0",
+      "sha": "c18668ad3cf93ea998bef934396af7bb5c839dc7",
+      "matches": true
+    },
+    {
+      "url": "https://api.github.com/repos/actions/upload-artifact/git/ref/tags/v7.0.1",
+      "sha": "043fb46d1a93c77aae656e7c1c64a875d1fc6a0a",
+      "matches": true
+    }
+  ],
+  "not_executed": [
+    "Environment installation/sync",
+    "Docker installation/build/run",
+    "CPU or GPU container workload",
+    "Package build/install",
+    "MkDocs build",
+    "Netlify Deploy Preview",
+    "Release/publication"
+  ],
+  "delivery": {
+    "root": "Review summary sent",
+    "original_author": "Attempted /root/deployment_plan delivery; collaboration tool returned agent thread limit reached; root notified to forward report."
+  },
+  "next_action": "Root may assign bounded implementation authors against a frozen integration source. P1/P2 implementation and actual execution still require fresh independent review before final acceptance."
+}

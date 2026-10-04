@@ -1,0 +1,152 @@
+{
+  "schema_version": 1,
+  "source_commit": "be2ae55c9d6d3efdabcd215959859c66c86837e8",
+  "accepted": true,
+  "checker_sha256": "a56cf112ddedd91479c4f57dc4d1510267b9c4a3e2cd34e27396efade717e180",
+  "results": [
+    {
+      "name": "actual_pre_fix_archived_sdist",
+      "accepted": true,
+      "expected_rejection": "Forbidden distribution payloads: ['archives/legacy_datalib/LICENSE', 'archives/legacy_datalib/README.md', 'archives/legacy_datalib/__init__.py', 'archives/legacy_datalib/audio_extraction_tools.py', 'archives/legacy_datalib/data_utils.py', 'archives/legacy_datalib/flickr30kE_utils.py', 'archives/legacy_datalib/frames_extraction_tools.py', 'archives/legacy_datalib/gym_utils/__init__.py', 'archives/legacy_datalib/gym_utils/gym_trim.py', 'archives/legacy_datalib/modality_data_anntation_tools.py', 'archives/legacy_datalib/modality_extraction_base.py', 'archives/legacy_datalib/parse_datasets.py', 'archives/legacy_datalib/refer_utils/__init__.py', 'archives/legacy_datalib/refer_utils/referitgame_utils.py', 'archives/legacy_datalib/tiny_data_tools.py', 'archives/legacy_datalib/video_transform.py', 'archives/legacy_rl_env/LICENSE', 'archives/legacy_rl_env/README.md', 'archives/legacy_rl_env/rl_env.py']",
+      "artifact_sha256": "12b99c494d1fb82ab414ae433827602fb71d5e8f7141cb991281159e0e7c29b2",
+      "origin": {
+        "source_commit": "6bf8836d06072c7946cdfb5499a09e4bce459805",
+        "source_status": " M .github/workflows/pypi_publish.yml\n M docs/requirements.txt\n M netlify.toml\n",
+        "source_files": {
+          "pyproject.toml": "8aaa7414717fa17841900d377d89851547677ba2ae93963afef79fc5490ba610",
+          "uv.lock": "e2a53aaae9a0dd49f5446b490bb3071e86aa3a9a20d6271c9dd30b4ae2dcbff9",
+          ".python-version": "02e735b3dfe1c32833eb550b7ff8ffa17f5f2bc3fa1e7bae61a8f5a3883ce398",
+          ".github/scripts/check_distribution.py": "6f747e9e2e25dc78f08998634f50a1b66a885852b22bcc5fc6f51ea5aad09564",
+          ".github/workflows/docs_package_checks.yml": "3bd50449d468b4f6606648a66edc9d54e8710577ccd7878f291704391057aa64",
+          ".github/workflows/pypi_publish.yml": "44d20d3daa8e953546acf7e5b01ee61cf54d056b96b09b799ad3cfa65b105062"
+        },
+        "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+        "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+        "uv": "uv 0.12.22 (70fe1196a 2026-10-01 aarch64-apple-darwin)"
+      }
+    },
+    {
+      "name": "archived_wheel",
+      "accepted": true,
+      "expected_rejection": "Forbidden distribution payloads: ['archives/legacy/module.py']",
+      "artifact_sha256": "531c51f3a68567c15ba50aa8aa766d4eaffd2408b716672575d0f4af028792bd"
+    },
+    {
+      "name": "reproduction_wheel",
+      "accepted": true,
+      "expected_rejection": "Forbidden distribution payloads: ['evidence/2026-refresh/reproductions/sentinel.txt']",
+      "artifact_sha256": "39edef5911fe80deb01ca37c7536696ebb3604a9409b9749ed1b606e8b98a43c"
+    },
+    {
+      "name": "environment_wheel",
+      "accepted": true,
+      "expected_rejection": "Forbidden distribution payloads: ['.venv/lib/sentinel']",
+      "artifact_sha256": "7eff22171fde597e11bba980ff1feb9471bc0d7924048bd718c5c6d9fd7d397b"
+    },
+    {
+      "name": "cache_wheel",
+      "accepted": true,
+      "expected_rejection": "Forbidden distribution payloads: ['__pycache__/sentinel.pyc']",
+      "artifact_sha256": "937048a0ffc38a582f5c111ce282f10560a6dc2d1cd61f45327c853e903a098b"
+    },
+    {
+      "name": "missing_source_wheel",
+      "accepted": true,
+      "expected_rejection": "Missing Plato source files: ['plato/config.py']",
+      "artifact_sha256": "4847cb91c24d9c0b02599adfa021f10ed2a6f6b5cf6034e4c3be4e37eb9dc0be"
+    },
+    {
+      "name": "wrong_version_metadata",
+      "accepted": true,
+      "expected_rejection": "Version: '0.0.0' != '1.4.3'",
+      "artifact_sha256": "af12130c33e50562e2e5d3978b060192bc0c60402bdfffaa04ed8b17dc8b1713"
+    },
+    {
+      "name": "wrong_python_metadata",
+      "accepted": true,
+      "expected_rejection": "Requires-Python: '>=3.14' != '>=3.13'",
+      "artifact_sha256": "12a465b7265487a3ea8ca9faa5438bc9581f4f2a084329c9ce2be7856360503c"
+    },
+    {
+      "name": "existing_output_rejected",
+      "accepted": true,
+      "exit_code": 1,
+      "expected_rejection": "File exists",
+      "command": [
+        "/tmp/plato-p2-final/.venv-docs/bin/python",
+        "/private/tmp/plato-refresh-worktrees/docs-package-refresh/.github/scripts/check_distribution.py",
+        "--output-dir",
+        "/tmp/plato-p2-final/negative/existing_output"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/docs-package-refresh"
+    },
+    {
+      "name": "wrong_uv_rejected",
+      "accepted": true,
+      "exit_code": 1,
+      "expected_rejection": "uv 0.12.22 is required",
+      "command": [
+        "/tmp/plato-p2-final/.venv-docs/bin/python",
+        "/private/tmp/plato-refresh-worktrees/docs-package-refresh/.github/scripts/check_distribution.py",
+        "--output-dir",
+        "/tmp/plato-p2-final/negative/wrong_uv_output"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/docs-package-refresh"
+    },
+    {
+      "name": "repository_cwd_rejected",
+      "accepted": true,
+      "exit_code": 1,
+      "expected_rejection": "AssertionError",
+      "command": [
+        "/tmp/plato-p2-final/.venv-docs/bin/python",
+        "-I",
+        "-c",
+        "\nimport hashlib\nimport importlib\nimport importlib.metadata\nimport json\nimport sys\nfrom pathlib import Path\n\nrepository, wheel_manifest, expected_version, receipt_path = sys.argv[1:]\nrepository = Path(repository).resolve()\nprefix = Path(sys.prefix).resolve()\nassert sys.version_info[:2] == (3, 13), sys.version\nassert not Path.cwd().resolve().is_relative_to(repository), Path.cwd()\ndistribution = importlib.metadata.distribution(\"plato-learn\")\nassert distribution.version == expected_version, distribution.version\ninstalled_root = Path(distribution.locate_file(\".\")).resolve()\nassert installed_root.is_relative_to(prefix), installed_root\nassert not installed_root.is_relative_to(repository), installed_root\nmanifest = json.loads(Path(wheel_manifest).read_text())[\"files\"]\nfor name, digest in manifest.items():\n    if not name.endswith(\".dist-info/RECORD\"):\n        installed_file = Path(distribution.locate_file(name)).resolve()\n        assert installed_file.is_relative_to(prefix), installed_file\n        assert hashlib.sha256(installed_file.read_bytes()).hexdigest() == digest, name\nimports = {}\nfor name in (\n    \"plato\", \"plato.config\", \"plato.utils.tree\", \"torch\", \"torchvision\",\n    \"numpy\", \"scipy\", \"aiohttp\", \"socketio\", \"datasets\", \"transformers\",\n):\n    module = importlib.import_module(name)\n    location = Path(module.__file__).resolve()\n    assert location.is_relative_to(prefix), (name, location, prefix)\n    assert not location.is_relative_to(repository), (name, location)\n    imports[name] = str(location)\nassert importlib.import_module(\"plato\").__version__ == expected_version\nimport torch\nimport torchvision\nassert torch.equal(torch.tensor([1, 2]) + 1, torch.tensor([2, 3]))\nkept = torchvision.ops.nms(\n    torch.tensor([[0., 0., 1., 1.], [0., 0., 1., 1.]]),\n    torch.tensor([1., 0.5]), 0.5,\n)\nassert kept.tolist() == [0], kept\npackages = {\n    item.metadata[\"Name\"]: item.version\n    for item in importlib.metadata.distributions()\n}\ndirect_url = json.loads(distribution.read_text(\"direct_url.json\"))\nassert \"archive_info\" in direct_url and \"dir_info\" not in direct_url, direct_url\nreceipt = {\n    \"python\": sys.version, \"executable\": sys.executable, \"prefix\": sys.prefix,\n    \"cwd\": str(Path.cwd()), \"distribution_root\": str(installed_root),\n    \"version\": distribution.version, \"imports\": imports,\n    \"direct_url\": direct_url,\n    \"installed_payload_matches_wheel\": True,\n    \"cpu_tensor_and_torchvision_operation\": True,\n    \"packages\": dict(sorted(packages.items())),\n}\nPath(receipt_path).write_text(json.dumps(receipt, indent=2) + \"\\n\")\nprint(json.dumps(receipt, indent=2))\n",
+        "/private/tmp/plato-refresh-worktrees/docs-package-refresh",
+        "/tmp/plato-p2-final/package/wheel-manifest.json",
+        "1.4.3",
+        "/tmp/plato-p2-final/negative/unexpected-probe.json"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/docs-package-refresh"
+    },
+    {
+      "name": "application_environment_rejected",
+      "accepted": true,
+      "exit_code": 1,
+      "expected_rejection": "AssertionError",
+      "command": [
+        "zsh",
+        "-lc",
+        "./docs/build.sh"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/docs-package-negative"
+    },
+    {
+      "name": "requirements_parity_rejected",
+      "accepted": true,
+      "exit_code": 1,
+      "expected_rejection": "EOF",
+      "command": [
+        "zsh",
+        "-lc",
+        "./docs/build.sh"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/docs-package-negative"
+    },
+    {
+      "name": ".github/workflows/docs_package_checks.yml",
+      "accepted": true,
+      "yaml_and_embedded_commands_parsed": true
+    },
+    {
+      "name": ".github/workflows/pypi_publish.yml",
+      "accepted": true,
+      "yaml_and_embedded_commands_parsed": true
+    },
+    {
+      "name": "netlify_toml_and_source_syntax",
+      "accepted": true
+    }
+  ]
+}

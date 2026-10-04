@@ -144,6 +144,7 @@ def test_classification_permutation_preserves_full_objective_gradient(tmp_path):
                 [[1.0, 0.0], [0.0, 1.0], [1.0, 1.0]], dtype=torch.double
             )
             loss.compute_loss(model(inputs), labels, context).backward()
+            assert model.weight.grad is not None
             gradients.append(
                 model.weight.grad.flip(0) if permutation else model.weight.grad
             )

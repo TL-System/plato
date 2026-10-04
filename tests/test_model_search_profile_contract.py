@@ -15,6 +15,7 @@ import pytest
 from tests.test_mlx_profile_contract import policy, profile_source
 
 CORE_RUNTIME = "runtime and not retained_model_search"
+FAST_CORE = "not runtime and not slow"
 RETAINED_MODULE = "tests/integration/test_retained_model_search.py"
 RETAINED_NAMES = (
     "test_retained_width_round[anycostfl]",
@@ -102,17 +103,22 @@ def _finish(checks, items, *, passed=True):
     return session
 
 
-@pytest.mark.parametrize("partition", ["", "runtime", "not runtime", CORE_RUNTIME])
+@pytest.mark.parametrize(
+    "partition", ["", "runtime", "not runtime", CORE_RUNTIME, FAST_CORE]
+)
+@pytest.mark.parametrize("slow", [False, True])
 @pytest.mark.parametrize(
     "runtime,retained", [(False, False), (False, True), (True, False), (True, True)]
 )
 def test_exact_partition_deselection_truth_table(
-    policy, tmp_path, partition, runtime, retained
+    policy, tmp_path, partition, runtime, retained, slow
 ):
     checks = policy._ProfileChecks(_config(tmp_path, partition))
     markers = {
         name
-        for name, enabled in [("runtime", runtime), ("retained_model_search", retained)]
+        for name, enabled in [
+            ("runtime", runtime), ("retained_model_search", retained), ("slow", slow)
+        ]
         if enabled
     }
     checks.pytest_deselected(
@@ -123,18 +129,21 @@ def test_exact_partition_deselection_truth_table(
         "runtime": not runtime,
         "not runtime": runtime,
         CORE_RUNTIME: not runtime or retained,
+        FAST_CORE: runtime or slow,
     }[partition]
     assert bool(checks.violations) is not permitted
 
 
-@pytest.mark.parametrize("partition", ["", "runtime", "not runtime", CORE_RUNTIME])
+@pytest.mark.parametrize(
+    "partition", ["", "runtime", "not runtime", CORE_RUNTIME, FAST_CORE]
+)
 def test_accepted_full_partitions_keep_required_inventories(
     policy, tmp_path, partition
 ):
     checks = policy._ProfileChecks(_config(tmp_path, partition))
     runtime = _startup(policy, tmp_path)
     required = [_item(tmp_path, node) for node in policy._REQUIRED]
-    items = required if partition == "not runtime" else runtime
+    items = required if partition in {"not runtime", FAST_CORE} else runtime
     if partition == "":
         items += required
     session = _finish(checks, items)
@@ -149,6 +158,10 @@ def test_accepted_full_partitions_keep_required_inventories(
         "runtime and (not retained_model_search)",
         "not retained_model_search and runtime",
         "runtime or retained_model_search",
+        "not slow",
+        "not slow and not runtime",
+        "not runtime and (not slow)",
+        "not runtime and not slow and not integration",
     ],
 )
 def test_unapproved_full_partition_is_rejected_even_without_deselection(
@@ -181,9 +194,14 @@ def test_core_runtime_required_presence_and_pass_checks(policy, tmp_path, damage
     assert any("required" in violation for violation in checks.violations)
 
 
-@pytest.mark.parametrize("profile", ["base", "mandatory"])
-def test_non_runtime_required_mpc_omission_still_fails(policy, tmp_path, profile):
-    checks = policy._ProfileChecks(_config(tmp_path, "not runtime", profile=profile))
+@pytest.mark.parametrize(
+    "profile,partition",
+    [("base", "not runtime"), ("mandatory", "not runtime"), ("mandatory", FAST_CORE)],
+)
+def test_non_runtime_required_mpc_omission_still_fails(
+    policy, tmp_path, profile, partition
+):
+    checks = policy._ProfileChecks(_config(tmp_path, partition, profile=profile))
     omitted = "tests/mpc/test_mpc.py::test_round_info_store_local"
     session = _finish(
         checks, [_item(tmp_path, node) for node in policy._REQUIRED if node != omitted]
@@ -193,11 +211,12 @@ def test_non_runtime_required_mpc_omission_still_fails(policy, tmp_path, profile
 
 
 @pytest.mark.parametrize("collectonly", [False, True])
+@pytest.mark.parametrize("partition", ["not runtime", FAST_CORE])
 def test_mandatory_non_runtime_keeps_dp_presence_and_pass_checks(
-    policy, tmp_path, collectonly
+    policy, tmp_path, collectonly, partition
 ):
     checks = policy._ProfileChecks(
-        _config(tmp_path, "not runtime", collectonly=collectonly)
+        _config(tmp_path, partition, collectonly=collectonly)
     )
     nodeid = policy._DP_MODULE + "::test_dp_strategy_handles_plato_sampler_get"
     items = [_item(tmp_path, node) for node in policy._REQUIRED]
@@ -208,6 +227,65 @@ def test_mandatory_non_runtime_keeps_dp_presence_and_pass_checks(
     session = _finish(checks, items, passed=collectonly)
     assert session.exitstatus == pytest.ExitCode.TESTS_FAILED
     assert any(nodeid in violation for violation in checks.violations)
+
+
+@pytest.mark.parametrize("profile", [None, "base", "mlx-native", "llm-eval"])
+def test_fast_partition_requires_mandatory_profile(policy, tmp_path, profile):
+    with pytest.raises(pytest.UsageError, match="requires mandatory profile"):
+        policy._ProfileChecks(_config(tmp_path, FAST_CORE, profile=profile))
+
+
+def test_fast_partition_rejects_keyword_filter(policy, tmp_path):
+    with pytest.raises(pytest.UsageError, match="does not permit keyword filters"):
+        policy._ProfileChecks(_config(tmp_path, FAST_CORE, keyword="test_case"))
+
+
+@pytest.mark.parametrize("option", ["ignore", "ignore_glob", "deselect"])
+def test_fast_partition_rejects_collection_exclusions(policy, tmp_path, option):
+    checks = policy._ProfileChecks(
+        _config(tmp_path, FAST_CORE, **{option: ["tests/test_other.py"]})
+    )
+    session = _finish(checks, [_item(tmp_path, node) for node in policy._REQUIRED])
+    assert session.exitstatus == pytest.ExitCode.TESTS_FAILED
+    assert "test profiles do not permit collection exclusions" in checks.violations
+
+
+@pytest.mark.parametrize("outcome", ["skip", "xfail", "xpass"])
+def test_fast_partition_rejects_nonpassing_outcomes(policy, tmp_path, outcome):
+    checks = policy._ProfileChecks(_config(tmp_path, FAST_CORE, collectonly=False))
+    report = SimpleNamespace(
+        nodeid="tests/test_scope.py::test_case",
+        skipped=outcome != "xpass",
+        passed=outcome == "xpass",
+        when="call",
+        longrepr=("file", 1, "Skipped: injected"),
+    )
+    if outcome != "skip":
+        report.wasxfail = "injected"
+    checks.pytest_runtest_logreport(report)
+    session = _finish(checks, [_item(tmp_path, node) for node in policy._REQUIRED])
+    assert session.exitstatus == pytest.ExitCode.TESTS_FAILED
+    assert any("unexpected" in violation for violation in checks.violations)
+
+
+def test_fast_partition_requires_mpc_calls_to_pass(policy, tmp_path):
+    checks = policy._ProfileChecks(_config(tmp_path, FAST_CORE, collectonly=False))
+    session = _finish(
+        checks, [_item(tmp_path, node) for node in policy._REQUIRED], passed=False
+    )
+    assert session.exitstatus == pytest.ExitCode.TESTS_FAILED
+    assert any("required tests did not pass" in issue for issue in checks.violations)
+
+
+def test_fast_partition_reports_coverage_limits(policy, tmp_path):
+    checks = policy._ProfileChecks(_config(tmp_path, FAST_CORE, collectonly=False))
+    _finish(checks, [_item(tmp_path, node) for node in policy._REQUIRED])
+    lines = []
+    checks.pytest_terminal_summary(SimpleNamespace(write_line=lines.append))
+    assert lines == [
+        "test profile: fast core (runtime and slow excluded; not full qualification); "
+        "native, Lighteval and optional example qualifications excluded"
+    ]
 
 
 @pytest.mark.parametrize(
@@ -398,7 +476,7 @@ def test_native_inventory_remains_strict(policy, tmp_path, collectonly):
 def ci_verifier():
     """Execute the exact independent inline CI verifier without its entrypoint."""
     workflow = (
-        Path(__file__).parents[1] / ".github/workflows/pytorch_tests.yml"
+        Path(__file__).parents[1] / ".github/workflows/pytorch_qualification.yml"
     ).read_text()
     step = workflow.split("- name: Retained model-search qualification", 1)[1]
     source = textwrap.dedent(

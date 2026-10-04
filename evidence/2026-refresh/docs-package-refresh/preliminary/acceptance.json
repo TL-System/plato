@@ -1,0 +1,4 @@
+{
+  "accepted": false,
+  "error": "Forbidden distribution payloads: ['archives/legacy_datalib/LICENSE', 'archives/legacy_datalib/README.md', 'archives/legacy_datalib/__init__.py', 'archives/legacy_datalib/audio_extraction_tools.py', 'archives/legacy_datalib/data_utils.py', 'archives/legacy_datalib/flickr30kE_utils.py', 'archives/legacy_datalib/frames_extraction_tools.py', 'archives/legacy_datalib/gym_utils/__init__.py', 'archives/legacy_datalib/gym_utils/gym_trim.py', 'archives/legacy_datalib/modality_data_anntation_tools.py', 'archives/legacy_datalib/modality_extraction_base.py', 'archives/legacy_datalib/parse_datasets.py', 'archives/legacy_datalib/refer_utils/__init__.py', 'archives/legacy_datalib/refer_utils/referitgame_utils.py', 'archives/legacy_datalib/tiny_data_tools.py', 'archives/legacy_datalib/video_transform.py', 'archives/legacy_rl_env/LICENSE', 'archives/legacy_rl_env/README.md', 'archives/legacy_rl_env/rl_env.py']"
+}

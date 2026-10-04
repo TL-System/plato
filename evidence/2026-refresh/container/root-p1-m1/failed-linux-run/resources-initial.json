@@ -1,0 +1,21 @@
+{
+  "base_compressed_bytes": 3973716026,
+  "disks": {
+    "/home/runner/work/plato/plato": {
+      "free": 91941687296,
+      "total": 154894188544,
+      "used": 62935724032
+    },
+    "/var/lib/docker": {
+      "free": 91941687296,
+      "total": 154894188544,
+      "used": 62935724032
+    }
+  },
+  "docker_arch": "x86_64",
+  "docker_os": "linux",
+  "minimum_free_bytes": 37580963840,
+  "phase": "initial",
+  "runner_os": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+  "standard_runner_documented_storage_gb": 14
+}

@@ -1,0 +1,247 @@
+{
+  "schema_version": 1,
+  "recorded_at_utc": "2026-10-04T00:46:59.093316+00:00",
+  "scope": "ROOT-P2-M3 original-author repair execution; a different fresh independent reviewer is required before acceptance.",
+  "finding": "ROOT-P2-M3",
+  "finding_sha256": "187268d743aaeb3440c870126d9a65e0711e7be6fffdb10ae62e203bb85d384e",
+  "root_integrated_red_source": "0c942d7e81171e01bb715c0ba7b82f08900ea56a",
+  "previous_author_source_commit": "63f0d2000f0370708b9afe1e2e6a2dc8559b72e1",
+  "previous_author_evidence_commit": "cd40f3f862782ccf22fd95d5c7ba1822328842f9",
+  "frozen_source_commit": "06ba679690f090aacf7e6a95a6dffd74b81ffad3",
+  "source_files_sha256": {
+    "pyproject.toml": "02972a9e51e828ad1f0cff4ec57911d4468296d36e984aaa345442ba6f201a3a",
+    "uv.lock": "e2a53aaae9a0dd49f5446b490bb3071e86aa3a9a20d6271c9dd30b4ae2dcbff9",
+    ".python-version": "02e735b3dfe1c32833eb550b7ff8ffa17f5f2bc3fa1e7bae61a8f5a3883ce398",
+    "netlify.toml": "9ae1049a54d5edc1a29b5f34ba7c235c7f0bf3e63802fb8a9f1d421ca79ead0b",
+    "docs/build.sh": "e21f333201ce75ea7e4a820d505e7b230a5a6048f279b56b0758f1a6cfc338b7",
+    "docs/requirements.txt": "9c33555b3d0cbc983d6dd59f261a242a92d136f2bb1364f300a01824f9eff665",
+    "docs/mkdocs.yml": "d26f6c6e7b91cf8835b4187e3b9e01125801e735122d79e7a148179b31a852ec",
+    ".github/scripts/check_distribution.py": "1b3ea71a1eef084f602092de35a97ceed04beb4ab47da2074690dc89c5c34c3f",
+    ".github/workflows/docs_package_checks.yml": "3bd50449d468b4f6606648a66edc9d54e8710577ccd7878f291704391057aa64",
+    ".github/workflows/pypi_publish.yml": "44d20d3daa8e953546acf7e5b01ee61cf54d056b96b09b799ad3cfa65b105062"
+  },
+  "authorized_source_delta": {
+    "pyproject.toml": [
+      "Added .venv-docs/** to Hatch build exclusions.",
+      "Added .venv-docs-bootstrap/** to Hatch build exclusions."
+    ],
+    "dependencies_versions_markers_lock_or_existing_p2_code_changed": false
+  },
+  "host": {
+    "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+    "machine": "arm64",
+    "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]"
+  },
+  "actual_default_paths": {
+    "source_commit": "06ba679690f090aacf7e6a95a6dffd74b81ffad3",
+    "accepted": true,
+    "builds": {
+      "default": {
+        "source_commit": "06ba679690f090aacf7e6a95a6dffd74b81ffad3",
+        "accepted": true,
+        "checkout": "/tmp/plato-refresh-worktrees/docs-package-env-default",
+        "command": [
+          "uv",
+          "run",
+          "--no-project",
+          "--python",
+          "3.13",
+          "python",
+          ".github/scripts/check_distribution.py"
+        ],
+        "sdist_sha256": "2568b2c97cd289657e32f2324d12b01e02c700e8d54149bdfa5c9de8a492d1b8",
+        "wheel_sha256": "d00d2c2acd5e5867e6a818fe3bc4132db8f92e00f47017da35e5a3159a60ba96",
+        "git_tree_bound_members": 1298,
+        "only_generated_exception": {
+          "PKG-INFO": "08e03ffe8434783a17ca65294fd3c65c5f189a2ec3e0d70e1590a1b553654a7a"
+        },
+        "requires_dist_extras_and_requires_python_parity": true,
+        "clean_rebuild_and_installed_wheel_proof": true
+      },
+      "bootstrap": {
+        "source_commit": "06ba679690f090aacf7e6a95a6dffd74b81ffad3",
+        "accepted": true,
+        "checkout": "/tmp/plato-refresh-worktrees/docs-package-env-bootstrap",
+        "command": [
+          "uv",
+          "run",
+          "--no-project",
+          "--python",
+          "3.13",
+          "python",
+          ".github/scripts/check_distribution.py"
+        ],
+        "sdist_sha256": "2568b2c97cd289657e32f2324d12b01e02c700e8d54149bdfa5c9de8a492d1b8",
+        "wheel_sha256": "d00d2c2acd5e5867e6a818fe3bc4132db8f92e00f47017da35e5a3159a60ba96",
+        "git_tree_bound_members": 1298,
+        "only_generated_exception": {
+          "PKG-INFO": "08e03ffe8434783a17ca65294fd3c65c5f189a2ec3e0d70e1590a1b553654a7a"
+        },
+        "requires_dist_extras_and_requires_python_parity": true,
+        "clean_rebuild_and_installed_wheel_proof": true
+      },
+      "release": {
+        "source_commit": "06ba679690f090aacf7e6a95a6dffd74b81ffad3",
+        "accepted": true,
+        "checkout": "/tmp/plato-refresh-worktrees/docs-package-env-release",
+        "command": [
+          "uv",
+          "run",
+          "--no-project",
+          "--python",
+          "3.13",
+          "python",
+          ".github/scripts/check_distribution.py"
+        ],
+        "sdist_sha256": "2568b2c97cd289657e32f2324d12b01e02c700e8d54149bdfa5c9de8a492d1b8",
+        "wheel_sha256": "d00d2c2acd5e5867e6a818fe3bc4132db8f92e00f47017da35e5a3159a60ba96",
+        "git_tree_bound_members": 1298,
+        "only_generated_exception": {
+          "PKG-INFO": "08e03ffe8434783a17ca65294fd3c65c5f189a2ec3e0d70e1590a1b553654a7a"
+        },
+        "requires_dist_extras_and_requires_python_parity": true,
+        "clean_rebuild_and_installed_wheel_proof": true
+      }
+    },
+    "fresh_docs_requirement_parity": true,
+    "docs_dependency_count": 29,
+    "workflow_and_netlify_syntax_and_publication_boundary": true,
+    "default_and_bootstrap_environments_retained_and_excluded": true
+  },
+  "independent_git_archive_byte_verification": {
+    "source_commit": "06ba679690f090aacf7e6a95a6dffd74b81ffad3",
+    "accepted": true,
+    "builds": {
+      "default": {
+        "git_archive_source": "06ba679690f090aacf7e6a95a6dffd74b81ffad3",
+        "all_regular_source_member_bytes_equal": true,
+        "members": 1298,
+        "sdist_sha256": "2568b2c97cd289657e32f2324d12b01e02c700e8d54149bdfa5c9de8a492d1b8"
+      },
+      "bootstrap": {
+        "git_archive_source": "06ba679690f090aacf7e6a95a6dffd74b81ffad3",
+        "all_regular_source_member_bytes_equal": true,
+        "members": 1298,
+        "sdist_sha256": "2568b2c97cd289657e32f2324d12b01e02c700e8d54149bdfa5c9de8a492d1b8"
+      },
+      "release": {
+        "git_archive_source": "06ba679690f090aacf7e6a95a6dffd74b81ffad3",
+        "all_regular_source_member_bytes_equal": true,
+        "members": 1298,
+        "sdist_sha256": "2568b2c97cd289657e32f2324d12b01e02c700e8d54149bdfa5c9de8a492d1b8"
+      }
+    },
+    "pyproject_only_two_authorized_exclusions": true,
+    "lock_dependencies_markers_versions_and_existing_p2_files_unchanged": true
+  },
+  "environment_snapshots": {
+    "default": {
+      "source_commit": "06ba679690f090aacf7e6a95a6dffd74b81ffad3",
+      "checkout": "/private/tmp/plato-refresh-worktrees/docs-package-env-default",
+      "environments": {
+        ".venv-docs": {
+          "entries": 17357,
+          "snapshot_sha256": "7653d6e4c238b422ab5f4b3bbc0a1703126b6e3898ad37834ab8f4080bd185cd",
+          "python_link": "/Users/bli/.local/share/uv/python/cpython-3.13-macos-aarch64-none/bin/python3.13",
+          "sentinels": {
+            "p2-m3-environment-sentinel.json": "ec71a8ce2a7d01f99084b87a5459bc741fe16706e4202f3e2db880856c665fa9"
+          }
+        }
+      },
+      "untouched_by_package_checker": true
+    },
+    "bootstrap": {
+      "source_commit": "06ba679690f090aacf7e6a95a6dffd74b81ffad3",
+      "checkout": "/private/tmp/plato-refresh-worktrees/docs-package-env-bootstrap",
+      "environments": {
+        ".venv-docs": {
+          "entries": 17357,
+          "snapshot_sha256": "ae0fd500af231788a54d40bd1868b26b7580ec1fb6ffadf25bbca5017dc09641",
+          "python_link": "/Users/bli/.local/share/uv/python/cpython-3.13-macos-aarch64-none/bin/python3.13",
+          "sentinels": {
+            "p2-m3-environment-sentinel.json": "df2db306b1d7e49e9451baac2fbae29d31ef4ffe3e5da4846f3f0d02f9e7bdba"
+          }
+        },
+        ".venv-docs-bootstrap": {
+          "entries": 1051,
+          "snapshot_sha256": "64199529bfc715b038d85b834dbbb38f2552f75a7a21b2904775154d52bbd5ae",
+          "python_link": "python3.13",
+          "sentinels": {
+            "p2-m3-bootstrap-sentinel.json": "b54d9d92884ec52c59fdb776e702b5d6bcb2c4b53df06fda50fe3d62d8e7c416"
+          }
+        }
+      },
+      "untouched_by_package_checker": true
+    }
+  },
+  "bootstrap_inventory": {
+    "packages": {
+      "pip": "26.2.1",
+      "uv": "0.12.22"
+    },
+    "uv_version": "uv 0.12.22 (70fe1196a 2026-10-01 aarch64-apple-darwin)",
+    "default_bootstrap_prefix": "/tmp/plato-refresh-worktrees/docs-package-env-bootstrap/.venv-docs-bootstrap",
+    "no_project_or_runtime": true,
+    "uv_was_absent_from_docs_path": true,
+    "docs_path": "/usr/bin:/bin:/usr/sbin:/sbin"
+  },
+  "root_preservation": {
+    "root_source": "0c942d7e81171e01bb715c0ba7b82f08900ea56a",
+    "targets": [
+      "/tmp/plato-refresh-worktrees/deployment-integration/.venv-docs",
+      "/tmp/plato-refresh-worktrees/deployment-integration/ci-artifacts",
+      "/tmp/plato-deployment-integration/docs-environment-package-finding.json",
+      "/tmp/plato-deployment-integration/publication-container-static.log",
+      "/tmp/plato-deployment-integration/publication-package.log",
+      "/tmp/plato-deployment-integration/publication-docs.log",
+      "/tmp/plato-deployment-integration/publication-docs-system-python-rejection.log"
+    ],
+    "snapshot_entries": 17378,
+    "snapshot_sha256": "6127fa6711119ee1f4b59166481b6c13c43387ed9e86d87f490897e8bcd46693",
+    "unchanged_bytes_symlinks_modes_and_mtimes": true
+  },
+  "focused_negative_and_boundary_checks": 24,
+  "executed_checks": [
+    "Strict docs using the exact documented Python3.13 command and the default in-checkout .venv-docs, then the exact uv run --no-project checker command, passed.",
+    "With uv absent from PATH, the helper created its default .venv-docs-bootstrap with uv0.12.22 and default .venv-docs; strict docs and the same subsequent package command passed.",
+    "Both environments, their actual Python symlinks, generated docs/site, dirty CI output and added sentinel payloads remained present during package builds and were absent from wheel/sdist manifests.",
+    "Package checking left docs/bootstrap environment bytes, paths, modes and mtimes untouched.",
+    "A separate pristine source checkout passed the actual release-default checker command; all three green builds produced identical wheel and sdist hashes.",
+    "All three builds retained locked constraints, clean extracted-sdist rebuild, matching metadata/payload, uv pip check, outside-checkout installed-wheel imports and tensor/NMS operations.",
+    "Each actual sdist had 1298 source-file payloads equal to an independently read git archive of the frozen source, plus PKG-INFO exactly equal to wheel METADATA.",
+    "Required/optional dependencies, extras, Requires-Python and retained workspace manifests matched pyproject; generated docs requirements matched a fresh locked export.",
+    "Twenty-four focused checks retained untouched existing output rejection, real unrelated untracked and altered tracked build rejection, generated metadata/source/member rejection, forbidden generated/environment/cache/archive paths and owned-output failure propagation.",
+    "The real root red sdist was preserved and rejected for .venv-docs/bin/python; all root environment and failure evidence bytes, symlinks, modes and mtimes remained untouched.",
+    "uv lock --check, unchanged-source byte comparison, shell/TOML/workflow/embedded syntax, Ruff import/format and whitespace checks passed."
+  ],
+  "red_artifact": {
+    "sha256": "206a0cbf2910daaf58cb7d44776ef478d6c967728e00c8e129622fee72f0b36a",
+    "default_environment_members": 26,
+    "absolute_environment_symlinks": {
+      "plato_learn-1.4.3/.venv-docs/bin/python": "/Users/bli/.local/share/uv/python/cpython-3.13-macos-aarch64-none/bin/python3.13"
+    },
+    "preserved_in_commit": "evidence/2026-refresh/reproductions/docs-package-environment-fix/red/plato_learn-1.4.3.tar.gz",
+    "current_checker_rejects": true
+  },
+  "retained_green_distributions": {
+    "default": "/tmp/plato-refresh-worktrees/docs-package-env-default/ci-artifacts/docs-package/distributions",
+    "bootstrap": "/tmp/plato-refresh-worktrees/docs-package-env-bootstrap/ci-artifacts/docs-package/distributions",
+    "release": "/tmp/plato-refresh-worktrees/docs-package-env-release/ci-artifacts/docs-package/distributions"
+  },
+  "limits": [
+    "Local macOS arm64 Python3.13.16 and uv0.12.22 execution only; no GitHub Linux or hosted Netlify execution was dispatched.",
+    "These receipts bind source06ba6796 only. Root's final integrated source and any evidence-bearing final tree require their own binding and qualification.",
+    "No push, PR, release, package publication or hosted deployment occurred; release.created/token publishing intent is unchanged.",
+    "All docs/default/bootstrap/controller/runtime environments used for execution were created in dedicated author-owned temporary paths. Root's protected integration environments were read only for preservation verification.",
+    "Existing docs helper and distribution checker were not changed; the earlier external-environment success claims did not cover the helper's default environment path.",
+    "Checker temporary extracted-source and installed-wheel environments are removed after proof; actual raw green distributions and negative archives remain in author-local temporary paths.",
+    "Reproduction helpers identify author-local test paths. A new reviewer must use a fresh independent source checkout.",
+    "The historical root Python3.9 rejection traceback is retained byte for byte, including one trailing space. Evidence whitespace validation excludes only that exact raw log; source whitespace validation passed."
+  ],
+  "artifact_manifest_sha256": "b15af7dc4615e3ba5615ab7be6aeef9e290cc0b0ef2849240e887ba7cd5f4963",
+  "reproduction_commands_in_commit": [
+    "evidence/2026-refresh/reproductions/docs-package-environment-fix/default-command.zsh",
+    "evidence/2026-refresh/reproductions/docs-package-environment-fix/bootstrap-command.zsh",
+    "evidence/2026-refresh/reproductions/docs-package-environment-fix/release-command.zsh"
+  ]
+}

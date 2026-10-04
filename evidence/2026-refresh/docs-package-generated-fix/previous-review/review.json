@@ -1,0 +1,266 @@
+{
+  "schema_version": 1,
+  "reviewer": "/root/docs_package_review",
+  "reviewed_at_utc": "2026-10-03T22:46:00.741322+00:00",
+  "verdict": "REQUEST_CHANGES",
+  "accepted": false,
+  "acceptance_scope": "Independent local macOS arm64 Python 3.13 review only. Docs and installed-wheel checks pass, but the actual default workflow build packages generated outputs and cannot be accepted as a clean source distribution. Remote Linux workflows and hosted Netlify preview remain mandatory final integration gates where available.",
+  "source": {
+    "candidate_worktree": "/tmp/plato-refresh-worktrees/docs-package-refresh",
+    "frozen_source_commit": "be2ae55c9d6d3efdabcd215959859c66c86837e8",
+    "archive_exclusion_prerequisite_commit": "420853a2af236f1a084eabaf959dbfbb8ab10492",
+    "evidence_only_commit": "bd6ddaa63a40895172d15f37ab47b855ee2e44a1",
+    "base_commit": "6bf8836d06072c7946cdfb5499a09e4bce459805",
+    "qualification_path": "/tmp/plato-refresh-worktrees/docs-package-refresh/evidence/2026-refresh/docs-package-refresh/qualification.json",
+    "qualification_sha256": "e701ec9b2ba664f81425b56579d3079c8eaa15369007332a62c5183fe68a37f4",
+    "plan_sha256": "6d9eca53b96e1e70d6f89617fce2f2a1234fb5d8fc94fa79e387ade605c4fe9e",
+    "plan_review_sha256": "98b845c6dd3d1562a327239f4dd96c909b4d8bc6c9db2f24240393423dfb976b",
+    "bindings_and_raw_artifacts": {
+      "qualification_hash_matches": true,
+      "source_and_plan_hashes_match": true,
+      "artifact_manifest_entries_verified": 35,
+      "authorized_metadata_delta_only": true,
+      "uv_lock_unchanged": true,
+      "source_commit": "be2ae55c9d6d3efdabcd215959859c66c86837e8",
+      "raw_distribution_hashes_and_member_hashes_verified": true,
+      "prefixed_archive_artifact_has_19_files": true,
+      "negative_harness_hash_matches": true,
+      "evidence_commit_contains_evidence_and_excluded_harness_only": true
+    },
+    "candidate_changes_made_by_reviewer": false,
+    "policy": "No nested agents, source edits, release creation, publication, workflow dispatch, push or PR creation. All shell commands used zsh -lc. New environments and mutations were confined to independent /tmp review checkouts; root application/archive/evaluator environments were not changed. The supplied root helper Python was used read-only for stdlib/YAML/metadata orchestration."
+  },
+  "unresolved_findings_by_severity": {
+    "critical": 0,
+    "high": 0,
+    "medium": 1,
+    "low": 0
+  },
+  "findings": [
+    {
+      "id": "P2-M1",
+      "severity": "medium",
+      "status": "Blocking clean-distribution and PR/release build acceptance",
+      "title": "The default workflow builds an sdist containing generated docs and its own validation files.",
+      "locations": [
+        ".github/scripts/check_distribution.py:213",
+        ".github/scripts/check_distribution.py:269",
+        ".github/scripts/check_distribution.py:374",
+        ".github/scripts/check_distribution.py:96",
+        ".github/workflows/docs_package_checks.yml:70",
+        ".github/workflows/docs_package_checks.yml:73",
+        ".github/workflows/pypi_publish.yml:42"
+      ],
+      "observation": "validate_package creates provenance and constraint files under the default in-checkout ci-artifacts/docs-package path before running uv build against that same checkout. The PR job also builds docs/site before packaging. Both are included in the actual sdist, while forbidden_payload has no generated docs/CI-output rule and the checker returns accepted=true. This produces different source archives from a clean source build, PR build and release build and ships temporary qualification inputs as package source.",
+      "reproduction": {
+        "source_commit": "be2ae55c9d6d3efdabcd215959859c66c86837e8",
+        "independent_checkout": "/tmp/plato-p2-independent-review/workflow-source",
+        "sequence": "Create the workflow docs provenance files, run the shared strict docs helper with PLATO_DOCS_ARTIFACT_DIR=ci-artifacts/docs, then invoke Python 3.13 .github/scripts/check_distribution.py without --output-dir, exactly as the workflows do.",
+        "default_cli_exit_code": 0,
+        "default_cli_accepted": true,
+        "actual_sdist": "/tmp/plato-p2-independent-review/workflow-source/ci-artifacts/docs-package/distributions/plato_learn-1.4.3.tar.gz",
+        "actual_sdist_sha256": "33fca2948256ec4b7457d75caed1bd56d14594dd63d097fbd63e4fb61e33d4d7",
+        "generated_docs_member_count": 91,
+        "example_generated_docs_members": [
+          "docs/site/index.html",
+          "docs/site/install/index.html",
+          "docs/site/search/search_index.json",
+          "docs/site/sitemap.xml.gz"
+        ],
+        "exact_transient_ci_members": [
+          "ci-artifacts/docs-package/build-constraints.txt",
+          "ci-artifacts/docs-package/distributions/.gitignore",
+          "ci-artifacts/docs-package/provenance.json",
+          "ci-artifacts/docs-package/runtime-constraints.txt",
+          "ci-artifacts/docs/commit.txt",
+          "ci-artifacts/docs/docs-environment.json",
+          "ci-artifacts/docs/python.txt",
+          "ci-artifacts/docs/source-hashes.txt",
+          "ci-artifacts/docs/uv.txt"
+        ],
+        "all_generated_member_paths_receipt": "/tmp/plato-p2-independent-review/workflow-default-contamination.json",
+        "actual_sdist_manifest": "/tmp/plato-p2-independent-review/workflow-source/ci-artifacts/docs-package/sdist-manifest.json",
+        "original_author_sdist": "/tmp/plato-p2-final/package/distributions/plato_learn-1.4.3.tar.gz",
+        "original_author_sdist_sha256": "6f2ab2337df11fa481ecc9a360f283e79fbdeff3ccac31d42d84a091158cf1db",
+        "original_author_sdist_also_contains_generated_docs_members": 91,
+        "early_clean_checkout_sdist_sha256": "a4cd5f6bdac5534eaf92ccc705c0857a899f7fe94dcdc2945cf0941b2fe2e916",
+        "early_clean_checkout_wheel_matches_author_sha256": "d00d2c2acd5e5867e6a818fe3bc4132db8f92e00f47017da35e5a3159a60ba96"
+      },
+      "ignore_behavior": {
+        "receipt": "/tmp/plato-p2-independent-review/ignore-behavior.json",
+        "docs_site": "git check-ignore reports repository docs/.gitignore:1:site. The actual Hatch sdist nevertheless includes docs/site files; Git ignoring a path did not prove this package backend excluded it.",
+        "ci_logs": "Repository .gitignore:60:*.log excludes CI logs from Git and the sdist observed here.",
+        "distributions": "uv writes ci-artifacts/docs-package/distributions/.gitignore with *, hiding produced wheel/sdist files from Git; that .gitignore itself is included in the source archive.",
+        "status": "The checker deliberately records git status --porcelain --untracked-files=no, which is empty while untracked ci-artifacts receipts exist. Explicit git status --untracked-files=all exposes those receipt files. No core.excludesfile configuration was set in this review; a global ignore rule is not the explanation for the observed docs/CI behavior."
+      },
+      "required_changes": [
+        "Ensure PR, release and local default builds use source inputs that exclude generated docs/site and transient ci-artifacts; keep build logs, constraint files and output distributions outside the package source set or explicitly exclude those generated outputs.",
+        "Extend the package manifest failure gate to reject these generated output paths. Preserve existing archive/reproduction/cache/environment, metadata, source-coverage, locked-build, clean-rebuild and installed-wheel gates.",
+        "Reproduce the actual workflow default invocation after a strict docs build in a fresh checkout, plus the release default invocation without prior docs output. Retain manifests proving neither sdist contains generated docs/CI payloads.",
+        "Add focused negative probes showing injected docs/site and ci-artifacts members are rejected; bind replacement receipts to the corrected frozen source and send the corrected candidate to a fresh independent reviewer."
+      ],
+      "ownership": "Returned to root for original P2 author repair. Any package exclusion metadata change beyond the already authorized archives/** hunk requires root to extend ownership narrowly; this reviewer made no changes."
+    }
+  ],
+  "executed_local_checks": {
+    "source_receipt_and_author_raw_distribution_validation": {
+      "qualification_hash_matches": true,
+      "source_and_plan_hashes_match": true,
+      "artifact_manifest_entries_verified": 35,
+      "authorized_metadata_delta_only": true,
+      "uv_lock_unchanged": true,
+      "source_commit": "be2ae55c9d6d3efdabcd215959859c66c86837e8",
+      "raw_distribution_hashes_and_member_hashes_verified": true,
+      "prefixed_archive_artifact_has_19_files": true,
+      "negative_harness_hash_matches": true,
+      "evidence_commit_contains_evidence_and_excluded_harness_only": true
+    },
+    "docs_and_bootstrap": {
+      "bootstrap_without_uv_used_pinned_version": true,
+      "bootstrap_environment": "/tmp/plato-p2-independent-review/bootstrap-uv-environment",
+      "docs_inventory_packages": 29,
+      "docs_python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+      "invoked_from_docs_subdirectory_built_at_root_publish_path": true,
+      "site_index_exists": true,
+      "mkdocs": "1.6.1",
+      "material": "9.7.7",
+      "runtime_and_project_absent": true,
+      "requirements_export_byte_parity": true
+    },
+    "package_payload_metadata_and_installed_provenance": {
+      "all_required_and_optional_dependency_metadata_matches_pyproject": true,
+      "workspace_member_manifest_count": 12,
+      "all_retained_workspace_member_manifests_present": true,
+      "tracked_plato_source_file_count": 209,
+      "all_plato_python_sources_present": true,
+      "installed_direct_url_matches_built_wheel": true,
+      "installed_payload_hashes_match_wheel": true,
+      "installed_imports_outside_checkout_under_isolated_prefix": true,
+      "installed_package_count": 80,
+      "wheel_sha256": "d00d2c2acd5e5867e6a818fe3bc4132db8f92e00f47017da35e5a3159a60ba96",
+      "sdist_sha256": "a4cd5f6bdac5534eaf92ccc705c0857a899f7fe94dcdc2945cf0941b2fe2e916"
+    },
+    "fresh_external_output_package_build_rebuild_install": {
+      "accepted": true,
+      "source_commit": "be2ae55c9d6d3efdabcd215959859c66c86837e8",
+      "wheel_sha256": "d00d2c2acd5e5867e6a818fe3bc4132db8f92e00f47017da35e5a3159a60ba96",
+      "sdist_sha256": "a4cd5f6bdac5534eaf92ccc705c0857a899f7fe94dcdc2945cf0941b2fe2e916",
+      "rebuilt_wheel_payload_matches": true,
+      "installed_wheel_provenance_and_imports": true,
+      "build_constraints_sha256": "284e1018003f55e4ce6fbb5c80b7dad20e86d9ed60ef544d817f1892626326de",
+      "runtime_constraints_sha256": "9c9b82f4c52ba05fb5a1c7e6e841e15fcd69104f9867cf7d7526060055a32709"
+    },
+    "workflow_default_package_build_rebuild_install_exit_code": 0,
+    "independent_negative_check_count": 15,
+    "independent_negative_receipt": "/tmp/plato-p2-independent-review/independent-negatives.json",
+    "negative_coverage": [
+      "archive_member",
+      "reproduction_member",
+      "cache_member",
+      "environment_member",
+      "missing_plato_source",
+      "wrong_metadata_version",
+      "wrong_python_metadata",
+      "actual_pre_fix_archive_sdist",
+      "existing-output-rejected",
+      "repository-cwd-rejected",
+      "application-environment-rejected",
+      "requirements-parity-rejected",
+      "docs-sync-failure",
+      "strict-mkdocs-failure",
+      "package-subprocess-failure"
+    ],
+    "syntax_and_workflow_semantics": [
+      {
+        "path": ".github/workflows/docs_package_checks.yml",
+        "syntax_and_semantics": true
+      },
+      {
+        "path": ".github/workflows/pypi_publish.yml",
+        "syntax_and_semantics": true
+      }
+    ],
+    "current_action_pins_verified_live_from_github_api": [
+      {
+        "url": "https://api.github.com/repos/actions/checkout/git/ref/tags/v7.0.1",
+        "sha": "3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "matches": true
+      },
+      {
+        "url": "https://api.github.com/repos/actions/setup-python/git/ref/tags/v7.0.0",
+        "sha": "5fda3b95a4ea91299a34e894583c3862153e4b97",
+        "matches": true
+      },
+      {
+        "url": "https://api.github.com/repos/astral-sh/setup-uv/git/ref/tags/v10.2.0",
+        "sha": "c18668ad3cf93ea998bef934396af7bb5c839dc7",
+        "matches": true
+      },
+      {
+        "url": "https://api.github.com/repos/actions/upload-artifact/git/ref/tags/v7.0.1",
+        "sha": "043fb46d1a93c77aae656e7c1c64a875d1fc6a0a",
+        "matches": true
+      }
+    ],
+    "uv_lock_check": true,
+    "ruff_import_order_and_format": true,
+    "committed_diff_whitespace_check": true
+  },
+  "area_conclusions": [
+    {
+      "area": "Scope and source provenance",
+      "result": "Pass",
+      "evidence": "All recorded plan/source hashes and 35 author raw evidence manifest entries match. The three retained actual distribution hashes/member maps match receipts. The evidence-only commit contains evidence plus its excluded reproduction harness. Only the root-authorized archives/retired/** to archives/** metadata delta is present; uv.lock is unchanged."
+    },
+    {
+      "area": "Python 3.13 docs-only lock selection",
+      "result": "Pass locally",
+      "evidence": "Fresh independent docs and uv-absent bootstrap environments contain exactly 29 docs dependencies. MkDocs1.6.1 and Material9.7.7 match uv.lock; torch, lighteval and plato-learn are absent. Generated requirements byte parity and uv pip check pass. Strict MkDocs completes without suppressed warnings."
+    },
+    {
+      "area": "Netlify root and publish configuration",
+      "result": "Pass configuration and local behavior; hosted gate pending",
+      "evidence": "The root base, docs/site publish path and one inherited ./docs/build.sh command match current Netlify documentation. Running the helper from docs/ still builds docs/site at repository root. No hosted Netlify preview was executed."
+    },
+    {
+      "area": "Explicit build constraints and installed wheel proof",
+      "result": "Pass locally within the checked package scope",
+      "evidence": "uv0.12.22 exports locked build/runtime constraints, uv build uses --no-sources --build-constraints with Python3.13, and a fresh extracted-sdist wheel matches every original wheel member hash. An isolated installed wheel imports outside the checkout using -I; all installed payload hashes, project version, representative imports, CPU tensor and torchvision NMS, uv pip check and locked dependency inventory pass. All20 base dependency declarations and six optional extras match pyproject metadata; all209 tracked Plato Python files and all12 retained workspace manifests are present."
+    },
+    {
+      "area": "Source archive cleanliness and workflow-equivalent validation",
+      "result": "Fail; P2-M1",
+      "evidence": "Actual default workflow invocation accepted an sdist containing91 generated docs files and nine CI files. Author used an external package output path and its actual source archive already included91 generated docs files. Passing wheel hashes and imports do not validate source archive cleanliness."
+    },
+    {
+      "area": "Workflow publication boundary and failure propagation",
+      "result": "Pass static semantics and local failure cases",
+      "evidence": "Original release.created trigger and token intent remain. PR workflow has no publish step; release publish consumes only the validated distributions and has normal preceding-step success gating. Actions use current verified full SHAs and uv0.12.22/Python3.13. Fifteen independent negative cases reject bad payloads/metadata/environment/parity/source/output/cwd and propagate package subprocess, docs sync and strict-build failures."
+    }
+  ],
+  "remaining_remote_gates": [
+    "After correction and fresh review, run actual new docs/package workflow on the final integrated SHA on GitHub Linux and inspect retained provenance, inventories, logs, clean archive manifests, rebuild and installed-wheel proof. Parsed workflows and local macOS execution are not remote Linux qualification.",
+    "Obtain a real Netlify Deploy Preview on the final integrated PR when service access is available and verify effective root working directory, Python3.13 bootstrap and docs/site deployment. If unavailable, report the hosted-validation limitation explicitly; do not replace it with a local build claim.",
+    "Root preserves and determines reruns of native383/core51/retained19 gates against final integrated source. This reviewer did not rerun or replace those gates."
+  ],
+  "not_executed": [
+    "Remote GitHub Linux workflow",
+    "Hosted Netlify Deploy Preview",
+    "Release creation/dispatch",
+    "Package publication",
+    "Container/GPU/Metal/training qualification",
+    "Root native/core/retained gate reruns"
+  ],
+  "artifacts": {
+    "root": "/tmp/plato-p2-independent-review",
+    "manifest": "/tmp/plato-p2-independent-review/review-artifact-manifest.json",
+    "manifest_sha256": "ca29f417db52cd3f013812eac401e56ae0dbd5f6e256d4f1ebb81749bec7ca78",
+    "retained_red_artifact": "/tmp/plato-p2-independent-review/workflow-source/ci-artifacts/docs-package/distributions/plato_learn-1.4.3.tar.gz",
+    "retained_red_artifact_sha256": "33fca2948256ec4b7457d75caed1bd56d14594dd63d097fbd63e4fb61e33d4d7"
+  },
+  "delivery": {
+    "root_notified_of_confirmed_defect": true,
+    "original_author_route": "Root will return the confirmed finding to original P2 author with narrow repair ownership.",
+    "fresh_review_required_after_fix": true
+  }
+}

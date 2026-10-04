@@ -75,7 +75,10 @@ def run_probe(
     if case.startswith("socket"):
         config["server"]["disable_clients"] = False
     if case.startswith("edge") or case == "central":
-        config["algorithm"].update(cross_silo=True, total_silos=1, local_rounds=1)
+        config["algorithm"] = {
+            **config["algorithm"], "cross_silo": True,
+            "total_silos": 1, "local_rounds": 1,
+        }
     toml_writer.dump(config, directory / "config.toml")
     env = {
         **os.environ,

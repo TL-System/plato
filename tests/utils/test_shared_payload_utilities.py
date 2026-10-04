@@ -103,7 +103,7 @@ def test_toml_nested_array_tables_and_literal_keys_keep_structure():
     ],
 )
 def test_toml_supplementary_unicode_and_control_escapes_roundtrip(config, tmp_path):
-    comments = {(): ["UTF-8 🚀"]}
+    comments: dict[tuple[str, ...], list[str]] = {(): ["UTF-8 🚀"]}
     wire = toml_writer.dumps(config, comments=comments)
     assert tomllib.loads(wire) == config
     path = tmp_path / "unicode.toml"

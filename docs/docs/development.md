@@ -7,6 +7,55 @@ This framework makes extensive use of object oriented subclassing with the help 
 
 ---
 
+## Fast CI and full qualification
+
+Automatic CI uses Python 3.13 and one locked mandatory development environment:
+
+```sh
+uv sync --locked --python 3.13 --no-default-groups --group dev
+uv run --no-sync --python 3.13 python -m pytest tests --test-profile=mandatory \
+    -m "not runtime and not slow" -ra --durations=20
+uv run --no-sync --python 3.13 ruff check . --select I
+uv run --no-sync --python 3.13 ty check --output-format concise --error-on-warning
+```
+
+The fast core retains in-process training, ordinary integration checks, profile
+and import audits, and required DP/MPC checks. It excludes the runtime startup
+and containment partition and 35 reviewed cases that run actual spawned training
+workers or repeated subprocess training. Only those functions or their `spawn=True`
+parameters carry `slow`; the mixed tests' `spawn=False` cases remain automatic.
+Both Ruff and configured typing must pass. Typing retains the inherited optional
+unresolved-import policy; this does not certify every optional package API.
+
+Use **PyTorch Full Qualification** (`pytorch_qualification.yml`) from the Actions
+**Run workflow** menu before releases or when changing spawned training, startup,
+containment, or the optional CPU qualifications. It preserves fresh base and
+mandatory environments, the full non-runtime suite including slow cases, runtime
+startup and containment tests, retained model-search checks, and real CPU
+Lighteval qualification with their exact artifact acceptance gates. The automatic
+**Python 3.13 / supported-default** check reports fast core validation. Docs/package
+and container checks also remain automatic; superseded pull-request runs cancel.
+
+The full core partitions remain available locally without excluding `slow`:
+
+```sh
+uv run --no-sync --python 3.13 python -m pytest tests --test-profile=mandatory \
+    -m "not runtime" -ra
+uv run --no-sync --python 3.13 python -m pytest tests --test-profile=mandatory \
+    -m "runtime and not retained_model_search" -ra
+```
+
+Plain `pytest tests` also retains slow tests. Native Apple Silicon MLX,
+Lighteval, and other optional example modules keep their explicit profile boundaries;
+the manual PyTorch workflow does not qualify all native or optional example tasks.
+
+The preceding successful Linux qualification took about 64 minutes. Its measured
+case durations project a 6–8 minute fast automatic run, with a target of at most
+10 minutes; those estimates need a hosted run of the final commit. Fast artifacts
+contain logs, JUnit, coverage, and commit/lock/package provenance, with pytest
+temporary files outside the upload directory. Full qualification retains its
+larger staged artifacts and source ledgers.
+
 ## Native MLX development
 
 The Apple Silicon backend has a separate `ComposableMLXTrainer` with native

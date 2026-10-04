@@ -1,0 +1,377 @@
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 1.31kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/nvidia/cuda:13.0.3-devel-ubuntu24.04@sha256:b7ae301dea2c162444795462ce17a05f6a516e5a75944b57af5b88540a1a2266
+#2 ...
+
+#3 [auth] nvidia/cuda:pull token for registry-1.docker.io
+#3 DONE 0.0s
+
+#4 [internal] load metadata for ghcr.io/astral-sh/uv:0.12.22@sha256:f513a91fc62fe7c17567eee97230dd198e43edb8a9fbecca843714a4358fe1bc
+#4 ...
+
+#2 [internal] load metadata for docker.io/nvidia/cuda:13.0.3-devel-ubuntu24.04@sha256:b7ae301dea2c162444795462ce17a05f6a516e5a75944b57af5b88540a1a2266
+#2 DONE 0.7s
+
+#4 [internal] load metadata for ghcr.io/astral-sh/uv:0.12.22@sha256:f513a91fc62fe7c17567eee97230dd198e43edb8a9fbecca843714a4358fe1bc
+#4 DONE 0.8s
+
+#5 [internal] load .dockerignore
+#5 transferring context: 885B done
+#5 DONE 0.0s
+
+#6 FROM ghcr.io/astral-sh/uv:0.12.22@sha256:f513a91fc62fe7c17567eee97230dd198e43edb8a9fbecca843714a4358fe1bc
+#6 resolve ghcr.io/astral-sh/uv:0.12.22@sha256:f513a91fc62fe7c17567eee97230dd198e43edb8a9fbecca843714a4358fe1bc done
+#6 sha256:f513a91fc62fe7c17567eee97230dd198e43edb8a9fbecca843714a4358fe1bc 2.20kB / 2.20kB done
+#6 sha256:0f1da8ef29dfee2fc8490653fe306c0242e653a160b56278d468997afc65a314 669B / 669B done
+#6 sha256:4f578fcf5fe6c53b513b259bff330b69bf4ec90d8c6a1d85d85cd09116ca4915 1.30kB / 1.30kB done
+#6 sha256:6bc8dd08d219d809d1700042cabce9e32afe2a53eb35463dba37c44a473fc06f 0B / 23.59MB 0.1s
+#6 sha256:ce8307d76f5623604618651e3d408c9228a4711223cb3c8d21f5b3beccf6b812 0B / 98B 0.1s
+#6 ...
+
+#7 [internal] load build context
+#7 transferring context: 3.46MB 0.1s done
+#7 DONE 0.1s
+
+#6 FROM ghcr.io/astral-sh/uv:0.12.22@sha256:f513a91fc62fe7c17567eee97230dd198e43edb8a9fbecca843714a4358fe1bc
+#6 sha256:6bc8dd08d219d809d1700042cabce9e32afe2a53eb35463dba37c44a473fc06f 12.58MB / 23.59MB 0.3s
+#6 sha256:ce8307d76f5623604618651e3d408c9228a4711223cb3c8d21f5b3beccf6b812 98B / 98B 0.2s done
+#6 sha256:6bc8dd08d219d809d1700042cabce9e32afe2a53eb35463dba37c44a473fc06f 20.97MB / 23.59MB 0.4s
+#6 sha256:6bc8dd08d219d809d1700042cabce9e32afe2a53eb35463dba37c44a473fc06f 23.59MB / 23.59MB 0.4s done
+#6 extracting sha256:6bc8dd08d219d809d1700042cabce9e32afe2a53eb35463dba37c44a473fc06f
+#6 extracting sha256:6bc8dd08d219d809d1700042cabce9e32afe2a53eb35463dba37c44a473fc06f 0.5s done
+#6 extracting sha256:ce8307d76f5623604618651e3d408c9228a4711223cb3c8d21f5b3beccf6b812 done
+#6 DONE 2.6s
+
+#8 [stage-0 1/6] FROM docker.io/nvidia/cuda:13.0.3-devel-ubuntu24.04@sha256:b7ae301dea2c162444795462ce17a05f6a516e5a75944b57af5b88540a1a2266
+#8 resolve docker.io/nvidia/cuda:13.0.3-devel-ubuntu24.04@sha256:b7ae301dea2c162444795462ce17a05f6a516e5a75944b57af5b88540a1a2266 done
+#8 sha256:b7ae301dea2c162444795462ce17a05f6a516e5a75944b57af5b88540a1a2266 743B / 743B done
+#8 sha256:7d56ebe2b7cd864a60dca3c8b2d0a39f8fc110417e8253e32505c3387f59119c 3.25kB / 3.25kB done
+#8 sha256:0e655e18c204cbf20beaec9f02a4b4adc6069a12d410be4bc6d11c54a3990cca 21.77kB / 21.77kB done
+#8 sha256:689b91d88a0f4086057ec826027b128902ecf2b516be510371c115bc55da19a6 29.73MB / 29.73MB 0.2s done
+#8 sha256:95e35692d3cc347d712fd236fd2af3b1c697783518182b1ae716722f694ed616 6.96MB / 6.96MB 0.4s done
+#8 extracting sha256:689b91d88a0f4086057ec826027b128902ecf2b516be510371c115bc55da19a6 1.6s done
+#8 sha256:5e25946ba40dcbc2410bf1852d135a46cb31cc7f89c05b9ef1ab12a6ef988aeb 362.52kB / 362.52kB 0.3s done
+#8 sha256:4f4fb700ef54461cfa02571ae0db9a0dc1e0cdb5577484a6d75e68dc38e8acc1 32B / 32B 0.4s done
+#8 sha256:f0af354daeda18f18684b23520969ef6bb3de82bb267936f867b12769be9125d 104.89MB / 104.89MB 0.6s done
+#8 sha256:ccf9c70a85fc6158d617c85f3f719f669efb00c28fd45fa292575d351435bd2f 186B / 186B 0.5s done
+#8 sha256:a30da298bda6986d68697bc361b9204f189616a3b7cc748c91846ecddbb873aa 326.11MB / 1.51GB 2.7s
+#8 sha256:730c8029606bf4b4533d7a7159458cf5e3f348ea956ccfb10ce5da3e20adac8f 6.89kB / 6.89kB 0.5s done
+#8 sha256:21e0ed254c8bac8e7e21e80b250a5dc4a92211bbc2f658f9f81ef93c7c623f03 59.99kB / 59.99kB 0.6s done
+#8 sha256:cb3db0ad5ae089b6ae0c5b39b73e73cac40a558df052e602f8b0f24972b003b4 1.69kB / 1.69kB 0.7s done
+#8 sha256:8bd080c2e4b22c71c5058be60551a2735c1bead7341fe005313ca704578d9fa5 1.52kB / 1.52kB 0.7s done
+#8 sha256:b533a7368b7da8141f98b9a2442f84b5aa5d32f2d286c2611a32f725361f84b6 324.01MB / 2.32GB 2.7s
+#8 sha256:cc689184d8c0977f56d2da63b3a3d225dc9c7fadb9375338768cf4909b016b32 221B / 221B 0.8s done
+#8 sha256:400821fd86ee1a17c460a7addf3892121cfb660a274b37e6a23cf36e7eaa931c 90.09kB / 90.09kB 0.8s done
+#8 extracting sha256:95e35692d3cc347d712fd236fd2af3b1c697783518182b1ae716722f694ed616
+#8 sha256:a30da298bda6986d68697bc361b9204f189616a3b7cc748c91846ecddbb873aa 436.21MB / 1.51GB 3.6s
+#8 sha256:b533a7368b7da8141f98b9a2442f84b5aa5d32f2d286c2611a32f725361f84b6 473.96MB / 2.32GB 3.8s
+#8 extracting sha256:95e35692d3cc347d712fd236fd2af3b1c697783518182b1ae716722f694ed616 1.3s done
+#8 sha256:a30da298bda6986d68697bc361b9204f189616a3b7cc748c91846ecddbb873aa 527.43MB / 1.51GB 4.1s
+#8 sha256:b533a7368b7da8141f98b9a2442f84b5aa5d32f2d286c2611a32f725361f84b6 596.64MB / 2.32GB 4.3s
+#8 sha256:a30da298bda6986d68697bc361b9204f189616a3b7cc748c91846ecddbb873aa 606.08MB / 1.51GB 4.4s
+#8 extracting sha256:5e25946ba40dcbc2410bf1852d135a46cb31cc7f89c05b9ef1ab12a6ef988aeb
+#8 extracting sha256:5e25946ba40dcbc2410bf1852d135a46cb31cc7f89c05b9ef1ab12a6ef988aeb 0.0s done
+#8 sha256:a30da298bda6986d68697bc361b9204f189616a3b7cc748c91846ecddbb873aa 688.91MB / 1.51GB 4.8s
+#8 extracting sha256:f0af354daeda18f18684b23520969ef6bb3de82bb267936f867b12769be9125d 0.1s
+#8 sha256:b533a7368b7da8141f98b9a2442f84b5aa5d32f2d286c2611a32f725361f84b6 734.00MB / 2.32GB 5.0s
+#8 sha256:a30da298bda6986d68697bc361b9204f189616a3b7cc748c91846ecddbb873aa 785.38MB / 1.51GB 5.2s
+#8 sha256:a30da298bda6986d68697bc361b9204f189616a3b7cc748c91846ecddbb873aa 874.51MB / 1.51GB 5.6s
+#8 sha256:b533a7368b7da8141f98b9a2442f84b5aa5d32f2d286c2611a32f725361f84b6 870.32MB / 2.32GB 5.6s
+#8 sha256:a30da298bda6986d68697bc361b9204f189616a3b7cc748c91846ecddbb873aa 950.01MB / 1.51GB 5.9s
+#8 sha256:b533a7368b7da8141f98b9a2442f84b5aa5d32f2d286c2611a32f725361f84b6 993.00MB / 2.32GB 6.2s
+#8 sha256:a30da298bda6986d68697bc361b9204f189616a3b7cc748c91846ecddbb873aa 1.03GB / 1.51GB 6.4s
+#8 sha256:a30da298bda6986d68697bc361b9204f189616a3b7cc748c91846ecddbb873aa 1.14GB / 1.51GB 6.9s
+#8 sha256:b533a7368b7da8141f98b9a2442f84b5aa5d32f2d286c2611a32f725361f84b6 1.14GB / 2.32GB 6.9s
+#8 extracting sha256:f0af354daeda18f18684b23520969ef6bb3de82bb267936f867b12769be9125d 1.9s done
+#8 sha256:a30da298bda6986d68697bc361b9204f189616a3b7cc748c91846ecddbb873aa 1.25GB / 1.51GB 7.5s
+#8 sha256:b533a7368b7da8141f98b9a2442f84b5aa5d32f2d286c2611a32f725361f84b6 1.27GB / 2.32GB 7.6s
+#8 sha256:a30da298bda6986d68697bc361b9204f189616a3b7cc748c91846ecddbb873aa 1.34GB / 1.51GB 8.0s
+#8 sha256:b533a7368b7da8141f98b9a2442f84b5aa5d32f2d286c2611a32f725361f84b6 1.39GB / 2.32GB 8.2s
+#8 sha256:a30da298bda6986d68697bc361b9204f189616a3b7cc748c91846ecddbb873aa 1.42GB / 1.51GB 8.4s
+#8 sha256:a30da298bda6986d68697bc361b9204f189616a3b7cc748c91846ecddbb873aa 1.51GB / 1.51GB 8.9s
+#8 sha256:b533a7368b7da8141f98b9a2442f84b5aa5d32f2d286c2611a32f725361f84b6 1.53GB / 2.32GB 8.9s
+#8 sha256:b533a7368b7da8141f98b9a2442f84b5aa5d32f2d286c2611a32f725361f84b6 1.70GB / 2.32GB 9.4s
+#8 sha256:b533a7368b7da8141f98b9a2442f84b5aa5d32f2d286c2611a32f725361f84b6 1.87GB / 2.32GB 9.8s
+#8 sha256:b533a7368b7da8141f98b9a2442f84b5aa5d32f2d286c2611a32f725361f84b6 1.99GB / 2.32GB 10.1s
+#8 sha256:b533a7368b7da8141f98b9a2442f84b5aa5d32f2d286c2611a32f725361f84b6 2.15GB / 2.32GB 10.6s
+#8 sha256:b533a7368b7da8141f98b9a2442f84b5aa5d32f2d286c2611a32f725361f84b6 2.27GB / 2.32GB 10.9s
+#8 sha256:a30da298bda6986d68697bc361b9204f189616a3b7cc748c91846ecddbb873aa 1.51GB / 1.51GB 11.1s done
+#8 extracting sha256:4f4fb700ef54461cfa02571ae0db9a0dc1e0cdb5577484a6d75e68dc38e8acc1
+#8 sha256:b533a7368b7da8141f98b9a2442f84b5aa5d32f2d286c2611a32f725361f84b6 2.32GB / 2.32GB 13.5s done
+#8 extracting sha256:4f4fb700ef54461cfa02571ae0db9a0dc1e0cdb5577484a6d75e68dc38e8acc1 done
+#8 extracting sha256:ccf9c70a85fc6158d617c85f3f719f669efb00c28fd45fa292575d351435bd2f done
+#8 extracting sha256:730c8029606bf4b4533d7a7159458cf5e3f348ea956ccfb10ce5da3e20adac8f done
+#8 extracting sha256:a30da298bda6986d68697bc361b9204f189616a3b7cc748c91846ecddbb873aa 0.1s
+#8 extracting sha256:a30da298bda6986d68697bc361b9204f189616a3b7cc748c91846ecddbb873aa 5.1s
+#8 extracting sha256:a30da298bda6986d68697bc361b9204f189616a3b7cc748c91846ecddbb873aa 8.5s done
+#8 extracting sha256:21e0ed254c8bac8e7e21e80b250a5dc4a92211bbc2f658f9f81ef93c7c623f03
+#8 extracting sha256:21e0ed254c8bac8e7e21e80b250a5dc4a92211bbc2f658f9f81ef93c7c623f03 done
+#8 extracting sha256:cb3db0ad5ae089b6ae0c5b39b73e73cac40a558df052e602f8b0f24972b003b4 done
+#8 extracting sha256:8bd080c2e4b22c71c5058be60551a2735c1bead7341fe005313ca704578d9fa5 done
+#8 extracting sha256:b533a7368b7da8141f98b9a2442f84b5aa5d32f2d286c2611a32f725361f84b6 0.1s
+#8 extracting sha256:b533a7368b7da8141f98b9a2442f84b5aa5d32f2d286c2611a32f725361f84b6 5.2s
+#8 extracting sha256:b533a7368b7da8141f98b9a2442f84b5aa5d32f2d286c2611a32f725361f84b6 10.2s
+#8 extracting sha256:b533a7368b7da8141f98b9a2442f84b5aa5d32f2d286c2611a32f725361f84b6 15.3s
+#8 extracting sha256:b533a7368b7da8141f98b9a2442f84b5aa5d32f2d286c2611a32f725361f84b6 20.3s
+#8 extracting sha256:b533a7368b7da8141f98b9a2442f84b5aa5d32f2d286c2611a32f725361f84b6 21.4s done
+#8 extracting sha256:cc689184d8c0977f56d2da63b3a3d225dc9c7fadb9375338768cf4909b016b32
+#8 extracting sha256:cc689184d8c0977f56d2da63b3a3d225dc9c7fadb9375338768cf4909b016b32 done
+#8 extracting sha256:400821fd86ee1a17c460a7addf3892121cfb660a274b37e6a23cf36e7eaa931c done
+#8 DONE 50.1s
+
+#9 [stage-0 2/6] COPY --from=ghcr.io/astral-sh/uv:0.12.22@sha256:f513a91fc62fe7c17567eee97230dd198e43edb8a9fbecca843714a4358fe1bc /uv /uvx /usr/local/bin/
+#9 DONE 0.1s
+
+#10 [stage-0 3/6] RUN apt-get update     && apt-get install -y --no-install-recommends ca-certificates libgomp1     && rm -rf /var/lib/apt/lists/*     && uv --no-cache python install 3.13
+#10 0.270 Get:1 https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64  InRelease [1578 B]
+#10 0.335 Get:2 https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64  Packages [1884 kB]
+#10 0.466 Get:3 http://security.ubuntu.com/ubuntu noble-security InRelease [126 kB]
+#10 0.472 Get:4 http://archive.ubuntu.com/ubuntu noble InRelease [256 kB]
+#10 0.804 Get:5 http://security.ubuntu.com/ubuntu noble-security/main amd64 Packages [1318 kB]
+#10 1.196 Get:6 http://archive.ubuntu.com/ubuntu noble-updates InRelease [126 kB]
+#10 1.214 Get:7 http://security.ubuntu.com/ubuntu noble-security/multiverse amd64 Packages [50.0 kB]
+#10 1.215 Get:8 http://security.ubuntu.com/ubuntu noble-security/universe amd64 Packages [1543 kB]
+#10 1.314 Get:9 http://security.ubuntu.com/ubuntu noble-security/restricted amd64 Packages [1943 kB]
+#10 1.374 Get:10 http://archive.ubuntu.com/ubuntu noble-backports InRelease [126 kB]
+#10 1.553 Get:11 http://archive.ubuntu.com/ubuntu noble/restricted amd64 Packages [117 kB]
+#10 1.597 Get:12 http://archive.ubuntu.com/ubuntu noble/multiverse amd64 Packages [331 kB]
+#10 1.758 Get:13 http://archive.ubuntu.com/ubuntu noble/main amd64 Packages [1808 kB]
+#10 2.136 Get:14 http://archive.ubuntu.com/ubuntu noble/universe amd64 Packages [19.3 MB]
+#10 2.895 Get:15 http://archive.ubuntu.com/ubuntu noble-updates/multiverse amd64 Packages [56.2 kB]
+#10 2.896 Get:16 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 Packages [1688 kB]
+#10 2.913 Get:17 http://archive.ubuntu.com/ubuntu noble-updates/restricted amd64 Packages [2127 kB]
+#10 2.971 Get:18 http://archive.ubuntu.com/ubuntu noble-updates/universe amd64 Packages [2162 kB]
+#10 2.995 Get:19 http://archive.ubuntu.com/ubuntu noble-backports/main amd64 Packages [49.0 kB]
+#10 2.996 Get:20 http://archive.ubuntu.com/ubuntu noble-backports/multiverse amd64 Packages [671 B]
+#10 2.996 Get:21 http://archive.ubuntu.com/ubuntu noble-backports/universe amd64 Packages [36.0 kB]
+#10 3.708 Fetched 35.1 MB in 3s (10.0 MB/s)
+#10 3.708 Reading package lists...
+#10 4.536 Reading package lists...
+#10 5.366 Building dependency tree...
+#10 5.582 Reading state information...
+#10 5.783 libgomp1 is already the newest version (14.2.0-4ubuntu2~24.04.1).
+#10 5.783 libgomp1 set to manually installed.
+#10 5.783 The following packages will be upgraded:
+#10 5.784   ca-certificates
+#10 6.050 1 upgraded, 0 newly installed, 0 to remove and 67 not upgraded.
+#10 6.050 Need to get 139 kB of archives.
+#10 6.050 After this operation, 54.3 kB disk space will be freed.
+#10 6.050 Get:1 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 ca-certificates all 20260601~24.04.1 [139 kB]
+#10 6.602 debconf: delaying package configuration, since apt-utils is not installed
+#10 6.631 Fetched 139 kB in 1s (199 kB/s)
+#10 6.645 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 15512 files and directories currently installed.)
+#10 6.659 Preparing to unpack .../ca-certificates_20260601~24.04.1_all.deb ...
+#10 6.661 Unpacking ca-certificates (20260601~24.04.1) over (20240203) ...
+#10 6.772 Setting up ca-certificates (20260601~24.04.1) ...
+#10 6.839 debconf: unable to initialize frontend: Dialog
+#10 6.839 debconf: (TERM is not set, so the dialog frontend is not usable.)
+#10 6.839 debconf: falling back to frontend: Readline
+#10 6.845 debconf: unable to initialize frontend: Readline
+#10 6.845 debconf: (This frontend requires a controlling tty.)
+#10 6.845 debconf: falling back to frontend: Teletype
+#10 8.036 Updating certificates in /etc/ssl/certs...
+#10 8.709 rehash: warning: skipping ca-certificates.crt,it does not contain exactly one certificate or CRL
+#10 8.715 14 added, 39 removed; done.
+#10 8.727 Processing triggers for ca-certificates (20260601~24.04.1) ...
+#10 8.731 Updating certificates in /etc/ssl/certs...
+#10 9.142 0 added, 0 removed; done.
+#10 9.142 Running hooks in /etc/ca-certificates/update.d...
+#10 9.143 done.
+#10 9.294 Downloading cpython-3.13.16-linux-x86_64-gnu (download) (33.4MiB)
+#10 10.47  Downloaded cpython-3.13.16-linux-x86_64-gnu (download)
+#10 10.48 Installed Python 3.13.16 in 1.30s
+#10 10.48  + cpython-3.13.16-linux-x86_64-gnu (python3.13)
+#10 10.48 warning: `/root/.local/bin` is not on your PATH. To use installed Python executables, add the directory to your PATH.
+#10 DONE 10.6s
+
+#11 [stage-0 4/6] WORKDIR /root/plato
+#11 DONE 0.0s
+
+#12 [stage-0 5/6] COPY . /root/plato/
+#12 DONE 0.1s
+
+#13 [stage-0 6/6] RUN uv sync --locked --python 3.13 --no-default-groups --no-cache     && sha256sum uv.lock > /opt/plato/lock.sha256
+#13 0.276 Using CPython 3.13.16
+#13 0.276 Creating virtual environment at: /opt/plato/.venv
+#13 0.287 Resolved 265 packages in 2ms
+#13 0.318    Building plato-learn @ file:///root/plato
+#13 0.381 Downloading nvidia-cublas (403.5MiB)
+#13 0.381 Downloading scipy (33.7MiB)
+#13 0.381 Downloading nvidia-cusolver (191.6MiB)
+#13 0.382 Downloading nvidia-nccl-cu13 (206.0MiB)
+#13 0.382 Downloading nvidia-cusparse (139.2MiB)
+#13 0.382 Downloading nvidia-nvshmem-cu13 (57.6MiB)
+#13 0.383 Downloading nvidia-curand (56.8MiB)
+#13 0.383 Downloading nvidia-cuda-nvrtc (86.0MiB)
+#13 0.383 Downloading numpy (15.9MiB)
+#13 0.384 Downloading botocore (15.2MiB)
+#13 0.384 Downloading pandas (10.3MiB)
+#13 0.384 Downloading hf-xet (4.3MiB)
+#13 0.384 Downloading nvidia-cuda-runtime (2.1MiB)
+#13 0.384 Downloading networkx (2.0MiB)
+#13 0.384 Downloading pygments (1.2MiB)
+#13 0.385 Downloading aiohttp (1.7MiB)
+#13 0.385 Downloading nvidia-cufile (1.2MiB)
+#13 0.397 Downloading nvidia-cusparselt-cu13 (162.3MiB)
+#13 0.397 Downloading timm (2.5MiB)
+#13 0.398 Downloading torchvision (7.1MiB)
+#13 0.398 Downloading torch (528.9MiB)
+#13 0.398 Downloading triton (236.5MiB)
+#13 0.399 Downloading sympy (6.0MiB)
+#13 0.400 Downloading pyarrow (47.8MiB)
+#13 0.401 Downloading nvidia-nvjitlink (40.5MiB)
+#13 0.401 Downloading tokenizers (3.2MiB)
+#13 0.401 Downloading nvidia-cuda-cupti (10.2MiB)
+#13 0.402 Downloading transformers (12.0MiB)
+#13 0.402 Downloading nvidia-cufft (204.2MiB)
+#13 0.402 Downloading nvidia-cudnn-cu13 (527.5MiB)
+#13 0.403 Downloading pillow (6.6MiB)
+#13 0.403 Downloading cuda-bindings (6.6MiB)
+#13 0.464 Downloading tenseal (5.0MiB)
+#13 0.753  Downloaded nvidia-cufile
+#13 0.754  Downloaded pygments
+#13 0.833  Downloaded aiohttp
+#13 0.883  Downloaded networkx
+#13 0.901  Downloaded nvidia-cuda-runtime
+#13 1.006  Downloaded timm
+#13 1.009  Downloaded tokenizers
+#13 1.134  Downloaded hf-xet
+#13 1.346  Downloaded sympy
+#13 1.400  Downloaded pillow
+#13 1.402  Downloaded cuda-bindings
+#13 1.403  Downloaded tenseal
+#13 1.419  Downloaded torchvision
+#13 1.686  Downloaded nvidia-cuda-cupti
+#13 1.706  Downloaded pandas
+#13 1.895  Downloaded transformers
+#13 2.146  Downloaded botocore
+#13 2.211  Downloaded numpy
+#13 3.495  Downloaded scipy
+#13 3.585       Built plato-learn @ file:///root/plato
+#13 3.871  Downloaded nvidia-nvjitlink
+#13 4.188  Downloaded pyarrow
+#13 4.533  Downloaded nvidia-curand
+#13 4.581  Downloaded nvidia-nvshmem-cu13
+#13 5.466  Downloaded nvidia-cuda-nvrtc
+#13 6.587  Downloaded nvidia-cusparse
+#13 6.975  Downloaded nvidia-cusparselt-cu13
+#13 7.423  Downloaded nvidia-cusolver
+#13 7.593  Downloaded nvidia-cufft
+#13 7.607  Downloaded nvidia-nccl-cu13
+#13 9.342  Downloaded nvidia-cublas
+#13 10.01  Downloaded triton
+#13 12.10  Downloaded torch
+#13 12.11  Downloaded nvidia-cudnn-cu13
+#13 12.75 Prepared 99 packages in 12.45s
+#13 39.55 Installed 99 packages in 26.80s
+#13 39.55  + accelerate==1.15.0
+#13 39.55  + aiohappyeyeballs==2.7.1
+#13 39.55  + aiohttp==3.14.3
+#13 39.55  + aiosignal==1.4.0
+#13 39.55  + annotated-doc==0.0.5
+#13 39.55  + anyio==4.15.1
+#13 39.55  + attrs==26.1.0
+#13 39.55  + beautifulsoup4==4.15.0
+#13 39.55  + bidict==0.24.1
+#13 39.55  + boto3==1.43.106
+#13 39.55  + botocore==1.43.106
+#13 39.55  + certifi==2026.7.22
+#13 39.55  + charset-normalizer==3.5.2
+#13 39.55  + click==8.5.0
+#13 39.55  + cuda-bindings==13.4.3
+#13 39.55  + cuda-pathfinder==1.8.3
+#13 39.55  + cuda-toolkit==13.0.3.0
+#13 39.55  + datasets==5.0.1
+#13 39.55  + dill==0.4.1
+#13 39.55  + evaluate==0.4.6
+#13 39.55  + filelock==4.0.9
+#13 39.55  + frozenlist==1.8.0
+#13 39.55  + fsspec==2026.6.0
+#13 39.55  + gdown==6.4.1
+#13 39.55  + h11==0.16.0
+#13 39.55  + hf-xet==1.6.0
+#13 39.55  + httpcore==1.0.9
+#13 39.55  + httpx==0.28.1
+#13 39.55  + huggingface-hub==1.33.0
+#13 39.55  + idna==3.20
+#13 39.55  + jinja2==3.1.6
+#13 39.55  + jmespath==1.1.0
+#13 39.55  + markdown-it-py==4.2.0
+#13 39.55  + markupsafe==3.0.3
+#13 39.55  + mdurl==0.1.2
+#13 39.55  + mpmath==1.3.0
+#13 39.55  + multidict==6.9.1
+#13 39.55  + multiprocess==0.70.19
+#13 39.55  + munch==4.0.0
+#13 39.55  + networkx==3.7
+#13 39.55  + numpy==2.5.3
+#13 39.55  + nvidia-cublas==13.1.1.3
+#13 39.55  + nvidia-cuda-cupti==13.0.85
+#13 39.55  + nvidia-cuda-nvrtc==13.0.88
+#13 39.55  + nvidia-cuda-runtime==13.0.96
+#13 39.55  + nvidia-cudnn-cu13==9.24.0.43
+#13 39.55  + nvidia-cufft==12.0.0.61
+#13 39.55  + nvidia-cufile==1.15.1.6
+#13 39.55  + nvidia-curand==10.4.0.35
+#13 39.55  + nvidia-cusolver==12.0.4.66
+#13 39.55  + nvidia-cusparse==12.6.3.3
+#13 39.55  + nvidia-cusparselt-cu13==0.8.1
+#13 39.55  + nvidia-nccl-cu13==2.30.7
+#13 39.55  + nvidia-nvjitlink==13.4.92
+#13 39.55  + nvidia-nvshmem-cu13==3.4.5
+#13 39.55  + nvidia-nvtx==13.0.85
+#13 39.55  + packaging==26.3
+#13 39.55  + pandas==3.0.6
+#13 39.55  + peft==0.21.2
+#13 39.55  + pillow==12.3.0
+#13 39.55  + plato-learn==1.4.3 (from file:///root/plato)
+#13 39.55  + propcache==0.5.4
+#13 39.56  + psutil==7.2.2
+#13 39.56  + pyarrow==25.0.1
+#13 39.56  + pygments==2.21.0
+#13 39.56  + pysocks==1.7.1
+#13 39.56  + python-dateutil==2.9.0.post0
+#13 39.56  + python-engineio==4.14.0
+#13 39.56  + python-socketio==5.17.0
+#13 39.56  + pytorch-ranger==0.1.1
+#13 39.56  + pyyaml==6.0.3
+#13 39.56  + regex==2026.9.29
+#13 39.56  + requests==2.34.2
+#13 39.56  + rich==15.0.0
+#13 39.56  + s3transfer==0.19.2
+#13 39.56  + safetensors==0.8.0
+#13 39.56  + scipy==1.18.1
+#13 39.56  + setuptools==84.0.0
+#13 39.56  + shellingham==1.5.4
+#13 39.56  + simple-websocket==1.1.0
+#13 39.56  + six==1.17.0
+#13 39.56  + soupsieve==2.10
+#13 39.56  + sympy==1.14.0
+#13 39.56  + tenseal==0.3.18
+#13 39.56  + timm==1.0.30
+#13 39.56  + tokenizers==0.23.2
+#13 39.56  + torch==2.14.1
+#13 39.56  + torch-optimizer==0.3.0
+#13 39.56  + torchvision==0.29.1
+#13 39.56  + tqdm==4.70.1
+#13 39.56  + transformers==5.18.0
+#13 39.56  + triton==3.8.0
+#13 39.56  + typer==0.27.2
+#13 39.56  + typing-extensions==4.16.0
+#13 39.56  + urllib3==2.8.0
+#13 39.56  + wsproto==1.3.2
+#13 39.56  + xxhash==4.0.1
+#13 39.56  + yarl==1.25.1
+#13 39.56  + zstd==1.5.7.2
+#13 DONE 42.6s
+
+#14 exporting to image
+#14 exporting layers
+#14 exporting layers 14.3s done
+#14 writing image sha256:62c091ebdaa09ad106eb6efd744baa63888126f76eb37357820d9f5fe7e3de92 done
+#14 naming to docker.io/library/plato done
+#14 DONE 14.3s

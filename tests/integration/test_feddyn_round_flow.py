@@ -32,6 +32,7 @@ EXAMPLE = (
 
 def load_example(name):
     spec = importlib.util.spec_from_file_location(name, EXAMPLE / f"{name}.py")
+    assert spec is not None and spec.loader is not None
     module = importlib.util.module_from_spec(spec)
     sys.modules[name] = module
     spec.loader.exec_module(module)
@@ -177,6 +178,7 @@ def rational_round(x, histories, selected, targets, counts, mode):
         "parent",
     ],
 )
+@pytest.mark.slow
 def test_actual_spawned_rejection_retry_and_logical_reuse(tmp_path, defect):
     output = tmp_path / "result.json"
     command = [
@@ -253,7 +255,9 @@ def run_partial(
 
 
 @pytest.mark.parametrize("mode,counts", [("uniform", (2, 2)), ("sample", (1, 3))])
-@pytest.mark.parametrize("spawn", [False, True])
+@pytest.mark.parametrize(
+    "spawn", [False, pytest.param(True, marks=pytest.mark.slow)]
+)
 def test_consecutive_same_client_uses_current_cloud_and_dispatched_history(
     tmp_path, mode, counts, spawn
 ):
@@ -336,6 +340,7 @@ def test_actual_full_participation_first_cloud(tmp_path, mode):
 
 
 @pytest.mark.parametrize("mode,counts", [("uniform", (2, 2)), ("sample", (1, 3))])
+@pytest.mark.slow
 def test_actual_spawn_reused_client_matches_partial_oracle(tmp_path, mode, counts):
     output = tmp_path / "result.json"
     command = [
@@ -485,7 +490,8 @@ class InterruptCallbacks(ServerCallback):
     def __init__(self, mode):
         self.mode = mode
 
-    def on_weights_received(self, s, payloads):
+    def on_weights_received(self, server, weights_received):
+        s, payloads = server, weights_received
         if self.mode == "receive-error":
             raise RuntimeError("Deliberate receive failure")
         if self.mode == "receive-model":
@@ -499,7 +505,8 @@ class InterruptCallbacks(ServerCallback):
         if self.mode == "receive-round":
             s.current_round += 1
 
-    def on_weights_aggregated(self, s, updates):
+    def on_weights_aggregated(self, server, updates):
+        s = server
         if self.mode == "aggregate-error":
             raise RuntimeError("Deliberate aggregation callback failure")
         if self.mode == "aggregate-model":
@@ -507,7 +514,7 @@ class InterruptCallbacks(ServerCallback):
         if self.mode == "aggregate-history":
             s.histories[1]["theta"].add_(1)
 
-    def on_clients_processed(self, server):
+    def on_clients_processed(self, server, **kwargs):
         if self.mode == "postcommit":
             raise RuntimeError("Deliberate reporting failure")
 
@@ -583,7 +590,7 @@ class ObserveSteps(TrainerCallback):
     def __init__(self):
         self.steps = 0
 
-    def on_train_step_end(self, trainer, config, **kwargs):
+    def on_train_step_end(self, trainer, config, batch, loss, **kwargs):
         self.steps += 1
 
 
@@ -726,7 +733,7 @@ def test_actual_local_schema_buffer_and_count_mutation_rolls_back(tmp_path, fiel
         identities = {n: id(p) for n, p in c.trainer.model.named_parameters()}
 
         class Mutate(TrainerCallback):
-            def on_train_step_end(self, trainer, config, **kwargs):
+            def on_train_step_end(self, trainer, config, batch, loss, **kwargs):
                 if field == "flag":
                     trainer.model.a.requires_grad_(False)
                 elif field == "shape":

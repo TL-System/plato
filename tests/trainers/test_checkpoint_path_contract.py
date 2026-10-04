@@ -22,7 +22,9 @@ def test_default_worker_test_and_cleanup_checkpoint_names(tmp_path, name):
     with configure_environment(config, runtime_root=tmp_path):
         trainer = ComposableTrainer(model=torch.nn.Linear(2, 2))
         trainer.set_client_id(7)
-        trainer.device = trainer.context.device = torch.device("cpu")
+        trainer.device = "cpu"
+        trainer.context.device = torch.device("cpu")
+        assert trainer.model is not None
         root = Path(Config.params["model_path"])
         trainer.run_history.update_metric("custom", 12)
         expected = copy.deepcopy(trainer.model.state_dict())
@@ -73,6 +75,7 @@ def test_long_logical_model_name_default_save_load_stays_in_filename_limit(
         build_minimal_config(model_name=name), runtime_root=tmp_path
     ):
         trainer = ComposableTrainer(model=torch.nn.Linear(2, 2))
+        assert trainer.model is not None
         expected = copy.deepcopy(trainer.model.state_dict())
         trainer.save_model()
         trainer.model.weight.data.zero_()
@@ -108,7 +111,9 @@ def test_urgent_actual_snapshots_numerical_order_cutoff_architecture_and_state(
     with configure_environment(config, runtime_root=tmp_path):
         trainer = ComposableTrainer(model=torch.nn.Linear(2, 2))
         trainer.set_client_id(7)
-        trainer.device = trainer.context.device = torch.device("cpu")
+        trainer.device = "cpu"
+        trainer.context.device = torch.device("cpu")
+        assert trainer.model is not None
         trainer.model.train()
         for client, epoch, time, value in [
             (7, 9, 9.0, 9.0),
@@ -132,6 +137,7 @@ def test_urgent_actual_snapshots_numerical_order_cutoff_architecture_and_state(
             trainer.obtain_model_at_time(99, 100.0)
 
 
+@pytest.mark.slow
 def test_real_spawned_worker_train_test_and_history_with_slash_name(tmp_path):
     """The parent consumes the child's actual model and testing artifacts."""
     config = build_minimal_config(model_name="org/model")
@@ -140,7 +146,9 @@ def test_real_spawned_worker_train_test_and_history_with_slash_name(tmp_path):
         torch.manual_seed(31)
         trainer = ComposableTrainer(model=torch.nn.Linear(2, 2))
         trainer.set_client_id(7)
-        trainer.device = trainer.context.device = torch.device("cpu")
+        trainer.device = "cpu"
+        trainer.context.device = torch.device("cpu")
+        assert trainer.model is not None
         before = copy.deepcopy(trainer.model.state_dict())
         data = TensorDataset(torch.eye(2).repeat(2, 1), torch.tensor([0, 1, 0, 1]))
         assert trainer.train(data, [0, 1, 2, 3]) >= 0
@@ -181,6 +189,7 @@ def test_history_sidecar_symlinks_are_checked_before_weight_write_or_load(tmp_pa
         trainer.save_model("weights.safetensors", custom)
         history.unlink()
         history.symlink_to(outside)
+        assert trainer.model is not None
         trainer.model.weight.data.zero_()
         with pytest.raises(ValueError, match="within"):
             trainer.load_model("weights.safetensors", custom)

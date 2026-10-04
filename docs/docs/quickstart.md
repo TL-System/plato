@@ -2,10 +2,12 @@
 
 ## Running Plato Directly Using `uv`
 
-To start a federated learning training workload with only a configuration file, run `uv run [Python file] -c [configuration file] ...`. For example:
+From the repository root, provision the locked Python 3.13 environment and run
+a reference workload on the CPU:
 
 ```bash
-uv run plato.py -c configs/MNIST/fedavg_lenet5.toml
+uv sync --locked --python 3.13
+uv run --locked python plato.py --config configs/MNIST/fedavg_lenet5.toml --cpu
 ```
 
 The following command-line parameters are supported:
@@ -18,14 +20,17 @@ The following command-line parameters are supported:
 
 - `--cpu`: use the CPU as the device only.
 
-Datasets required by an example are downloaded automatically the first time it runs; subsequent executions reuse the cached copies stored under the chosen base path.
+For this MNIST reference, the datasource downloads the dataset on first use
+and reuses it under the selected base path. Other datasets and pretrained models
+may require separate files or access; follow the selected example's instructions.
+Omit `--cpu` to let the configured trainer select an available device.
 
 _Plato_ uses the TOML format for its configuration files to manage runtime configuration parameters. Example configuration files have been provided in the `configs/` directory.
 
 In `examples/`, a number of federated learning algorithms have been included. To run them, just run the main Python program in each of the directories with a suitable configuration file. For example, to run the `basic` example located at `examples/basic/`, run the command:
 
 ```bash
-uv run examples/basic/basic.py -c configs/MNIST/fedavg_lenet5.toml
+uv run --locked python examples/basic/basic.py -c configs/MNIST/fedavg_lenet5.toml --cpu
 ```
 
 ## Running Server-side Lighteval Evaluation
@@ -90,114 +95,88 @@ explicit native qualification command.
 
 ## Running Plato in a Docker Container
 
-To build such a Docker image, use the provided `Dockerfile`:
+The supplied development image uses Ubuntu 24.04, CUDA 13.0.3 and managed Python
+3.13. It installs the locked base runtime dependencies into `/opt/plato/.venv`,
+with Python itself under `/opt/plato/python`. Both locations sit outside the
+checkout mount at `/root/plato`, so mounting your source does not hide the
+container's interpreter or environment. Optional extras and development tools
+are installed separately when needed.
+
+Build the image from the repository root on a Linux Docker host:
 
 ```bash
 docker build -t plato -f Dockerfile .
 ```
 
-To run the docker image that was just built, use the command:
+Run the CPU reference using the Linux launcher:
 
 ```bash
-./dockerrun.sh
+./dockerrun.sh python plato.py --config configs/MNIST/fedavg_lenet5.toml --cpu
 ```
 
-To remove all the containers after they are run, use the command:
+To open a shell instead, run `./dockerrun.sh` without arguments. The launcher
+forwards supplied command arguments and allocates a terminal only when running
+from a terminal. It uses host networking and the host's `/dev/shm`.
+
+Both launchers quote the current directory in the bind mount
+(`-v "$PWD:/root/plato"`) and use `--rm` to remove the container when it exits.
+Run them from the repository root. Source edits and outputs written under this
+mount, including the default `runtime` directory, remain on the host after exit.
+The container runs as root; with ordinary rootful Docker on Linux, files it
+creates in the mount can be root-owned on the host. Changes elsewhere in the
+container, including packages added to `/opt/plato/.venv`, disappear when the
+container is removed.
+
+Build from the checkout you intend to mount. If its dependency lock changes,
+rebuild the image or run a locked sync inside the container before using it:
 
 ```bash
-docker rm $(docker ps -a -q)
+uv sync --locked --python 3.13 --no-default-groups
 ```
 
-To remove the `plato` Docker image, use the command:
-
-```bash
-docker rmi plato
-```
-
-The provided `Dockerfile` helps to build a Docker image running Ubuntu 24.04, with a virtual environment called `plato` pre-configured to run Plato.
+For an optional workload, add its compatible extra to the sync and subsequent
+syncing run commands; the [Lighteval setup](install.md#optional-server-side-llm-evaluation-with-lighteval)
+requires `--extra llm_eval` throughout. Rebuild an appropriately provisioned image
+to retain added dependencies across disposable container runs.
 
 ## Running Plato in a Docker Container with GPU Support
 
-First, the [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html) will need to be installed on the host machine. On Ubuntu 24.04, follow these steps:
+On a Linux host with a supported NVIDIA GPU, install the driver and follow the
+current [NVIDIA Container Toolkit installation and Docker configuration guide](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html).
+The image's CUDA libraries do not install or configure the host driver/runtime.
 
-1. Configure the production repository:
-
-```bash
-curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg \
-  && curl -s -L https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list | \
-    sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' | \
-    sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
-```
-
-2. Update the packages list from the repository:
+With the `plato` image built and Docker configured, inspect GPU visibility:
 
 ```bash
-sudo apt-get update
+./dockerrun_gpu.sh nvidia-smi
 ```
 
-3. Install the NVIDIA Container Toolkit packages (where `1.17.8-1` is the latest version as of October 2025):
+Then run the reference workload with GPU access:
 
 ```bash
-export NVIDIA_CONTAINER_TOOLKIT_VERSION=1.17.8-1
-  sudo apt-get install -y \
-      nvidia-container-toolkit=${NVIDIA_CONTAINER_TOOLKIT_VERSION} \
-      nvidia-container-toolkit-base=${NVIDIA_CONTAINER_TOOLKIT_VERSION} \
-      libnvidia-container-tools=${NVIDIA_CONTAINER_TOOLKIT_VERSION} \
-      libnvidia-container1=${NVIDIA_CONTAINER_TOOLKIT_VERSION}
+./dockerrun_gpu.sh python plato.py --config configs/MNIST/fedavg_lenet5.toml
 ```
 
-4. Configure the Docker runtime for GPU support:
-
-```bash
-sudo nvidia-ctk runtime configure --runtime=docker
-```
-
-5. Restart Docker:
-
-```bash
-sudo systemctl restart docker
-```
-
-For more information about installing the NVIDIA Container Toolkit, refer to its [official documentation](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html).
-
-The following command can be used to verify that GPU access is available in Docker containers:
-
-```bash
-docker run --gpus all --rm nvidia/cuda:13.0.1-cudnn-devel-ubuntu24.04 nvidia-smi
-```
-
-This should output a table listing your GPUs, confirming that GPU access works.
-
-The following command can be used to enter GPU-enabled Docker container with Plato built-in:
-
-```bash
-./dockerrun_gpu.sh
-```
+The GPU launcher adds `--gpus all`; `--cpu` still forces CPU training if supplied.
+`nvidia-smi` checks device visibility. A successful CPU run or visibility check
+does not establish GPU training compatibility for every model, driver or device.
 
 ## Formatting the Code and Fixing Linter Errors
 
-It is strongly recommended that new additions and revisions of the codebase conform to [Ruff](https://docs.astral.sh/ruff/)'s formatting and linter guidelines. To format the entire codebase automatically, run:
+Use the locked development tools from the repository root. To format the active
+Python code and apply the configured Ruff fixes:
 
 ```bash
-uvx ruff format
-```
-
-To fix all linter errors automatically, run:
-
-```bash
-uvx ruff check --fix
+uv run --locked --group dev ruff format .
+uv run --locked --group dev ruff check . --fix
 ```
 
 ## Type Checking
 
-It is also strongly recommended that new additions and revisions of the code base to pass Astral's [ty](https://docs.astral.sh/ty/) type checker cleanly. To install `ty` globally using `uv`, run:
+Run the locked type checker against the core package:
 
 ```bash
-uv tool install ty@latest
+uv run --locked --group dev ty check plato
 ```
 
-To check the codebase on any sub-directory in Plato, such as `plato`, run:
-
-```bash
-ty check plato
-```
+See [Development](development.md) for the test profiles and contribution checks.

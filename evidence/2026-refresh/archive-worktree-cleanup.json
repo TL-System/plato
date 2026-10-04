@@ -1,0 +1,343 @@
+{
+  "status": "COMPLETE_OWNED_MERGED_ARCHIVE_CLEANUP",
+  "merged_main": "bb4986d29e312aaa7b09baebbf01fa970b2c302f",
+  "inventory": "/tmp/plato-archive-worktree-cleanup-inventory.json",
+  "inventory_sha256": "2d7e74e1191d99d7ffdbd059640028779919f717bae904da2cbad5f85a5ee276",
+  "evidence_directory": "/tmp/plato-archive-cleanup-evidence-20261003T234015Z",
+  "removed_worktrees": [
+    "/tmp/plato-refresh-worktrees/archive-integration",
+    "/tmp/plato-refresh-worktrees/archive-profile",
+    "/tmp/plato-refresh-worktrees/model-search-docs",
+    "/tmp/plato-refresh-worktrees/model-search-retirement",
+    "/tmp/plato-archive-profile-independent-worktree",
+    "/tmp/plato-archive-profile-red-base",
+    "/tmp/plato-archive-shortlist-fix-review-checkout",
+    "/tmp/plato-archive-shortlist-review"
+  ],
+  "removed_local_branches": [
+    "maintenance/2026-archive-integration",
+    "maintenance/2026-archive-profile",
+    "maintenance/2026-model-search-docs",
+    "maintenance/2026-model-search-retirement"
+  ],
+  "removed_idle_task_environments": [
+    "/private/tmp/plato-archive-author/environment",
+    "/private/tmp/plato-archive-author/verified-workspaces-final/anycostfl",
+    "/private/tmp/plato-archive-author/verified-workspaces-final/fedrolex",
+    "/private/tmp/plato-archive-author/verified-workspaces-final/heterofl",
+    "/private/tmp/plato-archive-author/verified-workspaces/anycostfl",
+    "/private/tmp/plato-archive-author/workspaces/anycostfl",
+    "/private/tmp/plato-archive-author/workspaces/fedrolex",
+    "/private/tmp/plato-archive-author/workspaces/heterofl",
+    "/private/tmp/plato-archive-integration/base-env",
+    "/private/tmp/plato-archive-integration/env",
+    "/private/tmp/plato-archive-profile-independent-base",
+    "/private/tmp/plato-archive-profile-independent-dev",
+    "/private/tmp/plato-archive-profile-independent-env",
+    "/private/tmp/plato-archive-profile-independent-native"
+  ],
+  "retained_assets": [
+    {
+      "path": "/Users/bli/Playground/plato/.venv",
+      "reason": "explicitly protected environment",
+      "binding_and_configuration_hashes_unchanged": true
+    },
+    {
+      "path": "/tmp/plato-lighteval-final/env",
+      "reason": "explicitly protected environment",
+      "binding_and_configuration_hashes_unchanged": true
+    },
+    {
+      "path": "/tmp/plato-archive-integration/docs-env",
+      "reason": "explicitly protected environment",
+      "binding_and_configuration_hashes_unchanged": true
+    }
+  ],
+  "removal_receipts": [
+    {
+      "kind": "idle_owned_environment",
+      "path": "/private/tmp/plato-archive-author/environment",
+      "activity_immediately_before": {
+        "command_matches": [],
+        "open_files": []
+      }
+    },
+    {
+      "kind": "idle_owned_environment",
+      "path": "/private/tmp/plato-archive-author/verified-workspaces-final/anycostfl",
+      "activity_immediately_before": {
+        "command_matches": [],
+        "open_files": []
+      }
+    },
+    {
+      "kind": "idle_owned_environment",
+      "path": "/private/tmp/plato-archive-author/verified-workspaces-final/fedrolex",
+      "activity_immediately_before": {
+        "command_matches": [],
+        "open_files": []
+      }
+    },
+    {
+      "kind": "idle_owned_environment",
+      "path": "/private/tmp/plato-archive-author/verified-workspaces-final/heterofl",
+      "activity_immediately_before": {
+        "command_matches": [],
+        "open_files": []
+      }
+    },
+    {
+      "kind": "idle_owned_environment",
+      "path": "/private/tmp/plato-archive-author/verified-workspaces/anycostfl",
+      "activity_immediately_before": {
+        "command_matches": [],
+        "open_files": []
+      }
+    },
+    {
+      "kind": "idle_owned_environment",
+      "path": "/private/tmp/plato-archive-author/workspaces/anycostfl",
+      "activity_immediately_before": {
+        "command_matches": [],
+        "open_files": []
+      }
+    },
+    {
+      "kind": "idle_owned_environment",
+      "path": "/private/tmp/plato-archive-author/workspaces/fedrolex",
+      "activity_immediately_before": {
+        "command_matches": [],
+        "open_files": []
+      }
+    },
+    {
+      "kind": "idle_owned_environment",
+      "path": "/private/tmp/plato-archive-author/workspaces/heterofl",
+      "activity_immediately_before": {
+        "command_matches": [],
+        "open_files": []
+      }
+    },
+    {
+      "kind": "idle_owned_environment",
+      "path": "/private/tmp/plato-archive-integration/base-env",
+      "activity_immediately_before": {
+        "command_matches": [],
+        "open_files": []
+      }
+    },
+    {
+      "kind": "idle_owned_environment",
+      "path": "/private/tmp/plato-archive-integration/env",
+      "activity_immediately_before": {
+        "command_matches": [],
+        "open_files": []
+      }
+    },
+    {
+      "kind": "idle_owned_environment",
+      "path": "/private/tmp/plato-archive-profile-independent-base",
+      "activity_immediately_before": {
+        "command_matches": [],
+        "open_files": []
+      }
+    },
+    {
+      "kind": "idle_owned_environment",
+      "path": "/private/tmp/plato-archive-profile-independent-dev",
+      "activity_immediately_before": {
+        "command_matches": [],
+        "open_files": []
+      }
+    },
+    {
+      "kind": "idle_owned_environment",
+      "path": "/private/tmp/plato-archive-profile-independent-env",
+      "activity_immediately_before": {
+        "command_matches": [],
+        "open_files": []
+      }
+    },
+    {
+      "kind": "idle_owned_environment",
+      "path": "/private/tmp/plato-archive-profile-independent-native",
+      "activity_immediately_before": {
+        "command_matches": [],
+        "open_files": []
+      }
+    },
+    {
+      "kind": "ordinary_git_worktree_remove",
+      "path": "/tmp/plato-refresh-worktrees/archive-integration",
+      "head": "b94a994323914edc4679cbeb9b0595c6f7fb79b5",
+      "activity_immediately_before": {
+        "command_matches": [],
+        "open_files": []
+      },
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "kind": "ordinary_git_worktree_remove",
+      "path": "/tmp/plato-refresh-worktrees/archive-profile",
+      "head": "cda33622677c55679589bb04e42dc3b6397691a8",
+      "activity_immediately_before": {
+        "command_matches": [],
+        "open_files": []
+      },
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "kind": "ordinary_git_worktree_remove",
+      "path": "/tmp/plato-refresh-worktrees/model-search-docs",
+      "head": "650c27e25563cec409dec0887b4ed5e7681c1dc9",
+      "activity_immediately_before": {
+        "command_matches": [],
+        "open_files": []
+      },
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "kind": "submodule_administrative_snapshot",
+      "path": "/tmp/plato-refresh-worktrees/model-search-retirement",
+      "manifest": "/tmp/plato-archive-cleanup-evidence-20261003T234015Z/submodule-administrative/model-search-retirement-manifest.json",
+      "manifest_sha256": "f37c996f9ac5fcbaf96bea9eac1c79df5589e8c4d334aa23567a8bb6fa1875d9",
+      "files": 56,
+      "bytes": 39737288
+    },
+    {
+      "kind": "forced_git_remove_clean_retired_submodule_administration",
+      "path": "/tmp/plato-refresh-worktrees/model-search-retirement",
+      "head": "4a31943749972c1e2030d19e4ee077b235d77de4",
+      "activity_immediately_before": {
+        "command_matches": [],
+        "open_files": []
+      },
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "kind": "ordinary_git_worktree_remove",
+      "path": "/tmp/plato-archive-profile-independent-worktree",
+      "head": "591d706b01bed27fb4ec8687b2f5a298740560e7",
+      "activity_immediately_before": {
+        "command_matches": [],
+        "open_files": []
+      },
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "kind": "ordinary_git_worktree_remove",
+      "path": "/tmp/plato-archive-profile-red-base",
+      "head": "aa2c3d5cdee60863dfe2c1d389ec1e0cbe89111b",
+      "activity_immediately_before": {
+        "command_matches": [],
+        "open_files": []
+      },
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "kind": "ordinary_git_worktree_remove",
+      "path": "/tmp/plato-archive-shortlist-fix-review-checkout",
+      "head": "4a31943749972c1e2030d19e4ee077b235d77de4",
+      "activity_immediately_before": {
+        "command_matches": [],
+        "open_files": []
+      },
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "kind": "ordinary_git_worktree_remove",
+      "path": "/tmp/plato-archive-shortlist-review",
+      "head": "90a26f703142cddaf069f0494a940b833cdd397a",
+      "activity_immediately_before": {
+        "command_matches": [],
+        "open_files": []
+      },
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "kind": "merged_local_branch_delete",
+      "branch": "maintenance/2026-archive-integration",
+      "stdout": "Deleted branch maintenance/2026-archive-integration (was b94a9943).\n"
+    },
+    {
+      "kind": "merged_local_branch_delete",
+      "branch": "maintenance/2026-archive-profile",
+      "stdout": "Deleted branch maintenance/2026-archive-profile (was cda33622).\n"
+    },
+    {
+      "kind": "merged_local_branch_delete",
+      "branch": "maintenance/2026-model-search-docs",
+      "stdout": "Deleted branch maintenance/2026-model-search-docs (was 650c27e2).\n"
+    },
+    {
+      "kind": "merged_local_branch_delete",
+      "branch": "maintenance/2026-model-search-retirement",
+      "stdout": "Deleted branch maintenance/2026-model-search-retirement (was 4a319437).\n"
+    },
+    {
+      "kind": "github_api_delete_merged_archive_ref",
+      "branch": "maintenance/2026-archive-integration",
+      "verified_merged_sha": "b94a994323914edc4679cbeb9b0595c6f7fb79b5",
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "protected_worktrees_preserved": [
+    "/Users/bli/Playground/plato",
+    "/private/tmp/plato-lighteval-docs-review-worktree",
+    "/private/tmp/plato-p2-fix-independent-review/negative-source",
+    "/private/tmp/plato-p2-fix-independent-review/release-source",
+    "/private/tmp/plato-p2-fix-independent-review/workflow-source",
+    "/private/tmp/plato-refresh-worktrees/container-refresh",
+    "/private/tmp/plato-refresh-worktrees/deployment-integration",
+    "/private/tmp/plato-refresh-worktrees/docs-package-binding-negative",
+    "/private/tmp/plato-refresh-worktrees/docs-package-binding-release",
+    "/private/tmp/plato-refresh-worktrees/docs-package-binding-workflow",
+    "/private/tmp/plato-refresh-worktrees/docs-package-fix-negative",
+    "/private/tmp/plato-refresh-worktrees/docs-package-fix-release",
+    "/private/tmp/plato-refresh-worktrees/docs-package-fix-workflow",
+    "/private/tmp/plato-refresh-worktrees/docs-package-negative",
+    "/private/tmp/plato-refresh-worktrees/docs-package-refresh",
+    "/private/tmp/plato-refresh-worktrees/lighteval-dependencies",
+    "/private/tmp/plato-refresh-worktrees/lighteval-docs",
+    "/private/tmp/plato-refresh-worktrees/lighteval-final",
+    "/private/tmp/plato-refresh-worktrees/lighteval-integration",
+    "/private/tmp/plato-refresh-worktrees/lighteval-profile",
+    "/private/tmp/plato-refresh-worktrees/lighteval-runtime",
+    "/private/tmp/plato-refresh-worktrees/llm-integrated",
+    "/private/tmp/plato-refresh-worktrees/phase4-harness"
+  ],
+  "root_head_and_branch_unchanged": true,
+  "root_status_change_by_parent": {
+    "before": "?? plato/models/dvit/\n?? plato/models/t2tvit/\n",
+    "after": "",
+    "receipt": "/tmp/plato-retired-root-submodule-snapshots/receipt.json",
+    "receipt_sha256": "f0cb2514695fa7701fb50d7222845dc1d2a14db8e20632e438707f7c0b6663d5",
+    "reason": "Parent separately preserved and moved the retired root submodule working copies; archive cleanup did not manipulate them."
+  },
+  "root_checkout_unchanged_by_archive_cleanup": true,
+  "user_root_environment_unchanged": true,
+  "raw_scratch_reports_and_shared_caches_preserved": true,
+  "submodule_worktree_handling": "All target source trees were verified clean, with empty recursive submodule status and no gitlinks. Ordinary Git removal was used except for model-search-retirement: its stale retired-submodule administration was fully snapshotted before the authorized force exception.",
+  "removed_remote_branch": "maintenance/2026-archive-integration",
+  "removed_remote_tracking_ref": "refs/remotes/origin/maintenance/2026-archive-integration",
+  "remote_branch_absence_verified": true,
+  "post_cleanup_audit": {
+    "path": "/tmp/plato-archive-cleanup-evidence-20261003T234015Z/post-cleanup-audit.json",
+    "sha256": "07bf77bc7cafdd621ccdf0cfa281c318a685abca7179e527f03fe8de5fd341cd"
+  },
+  "remaining_editable_bindings_to_removed_archive_sources": [],
+  "verified_snapshot_files": 1289,
+  "verified_snapshot_bytes": 47901459,
+  "no_commits_or_source_pushes_or_herdr_actions": true,
+  "active_evaluator_p2_container_phase4_llm_worktrees_preserved": true,
+  "limitations": "Global binding scan could not enter unrelated other-user daemon/socket scratch directories; all owned target and protected environments were accessible and checked."
+}

@@ -1,0 +1,375 @@
+{
+  "schema_version": 1,
+  "finding": "ROOT-P2-M4",
+  "status": "ACCEPT",
+  "material_findings": [],
+  "recorded_at_utc": "2026-10-04T01:20:08.446051+00:00",
+  "review_scope": "Fresh independent narrow review of the original-author GitHub workflow-context correction; no candidate edit, dependency or environment mutation, package or training retest.",
+  "reviewer": "/root/docs_workflow_context_review",
+  "source": {
+    "published_rejected_commit": "0791c01afcaea96223a925a32ee22882dc437ee2",
+    "author_parent_commit": "24b5e154bd43795ea6b2a47b6c9458fdf3a587ea",
+    "frozen_correction_commit": "8dd6a604712973c6db050082ccd35f154d59ce56",
+    "final_author_evidence_commit": "07b0075ca3cabc2fafed05275e2c165f3eae8ff4",
+    "author_worktree": "/tmp/plato-refresh-worktrees/docs-package-refresh",
+    "correction_only_source_file": ".github/workflows/docs_package_checks.yml",
+    "source_diff_sha256": "c42cfe0bafd37c2c27ef3b3c84987530490cd340e624df966cf194598509da4c"
+  },
+  "final_author_receipt": {
+    "commit": "07b0075ca3cabc2fafed05275e2c165f3eae8ff4",
+    "git_path": "evidence/2026-refresh/docs-package-context-fix/qualification.json",
+    "sha256": "b34254829e3c3a705d32d7d91929f7d2cf3c43c13495d22d064dd1c064870519",
+    "artifact_manifest_git_path": "evidence/2026-refresh/docs-package-context-fix/artifact-manifest.json",
+    "artifact_manifest_sha256": "b4f46b4bc18d7a0d244458d5baf936e65c1e876490b8637cbd2151005611ee5f",
+    "all_15_artifacts_verified_from_git": true,
+    "all_8_source_hashes_verified_from_git": true,
+    "evidence_commit_changes_only_evidence": true
+  },
+  "reviewed_workflow_blobs": {
+    "published": {
+      ".github/workflows/docs_package_checks.yml": {
+        "path": "/tmp/plato-docs-workflow-context-review-20261004/published/.github/workflows/docs_package_checks.yml",
+        "sha256": "3bd50449d468b4f6606648a66edc9d54e8710577ccd7878f291704391057aa64",
+        "bytes": 2745
+      },
+      ".github/workflows/pypi_publish.yml": {
+        "path": "/tmp/plato-docs-workflow-context-review-20261004/published/.github/workflows/pypi_publish.yml",
+        "sha256": "44d20d3daa8e953546acf7e5b01ee61cf54d056b96b09b799ad3cfa65b105062",
+        "bytes": 1688
+      }
+    },
+    "parent": {
+      ".github/workflows/docs_package_checks.yml": {
+        "path": "/tmp/plato-docs-workflow-context-review-20261004/parent/.github/workflows/docs_package_checks.yml",
+        "sha256": "3bd50449d468b4f6606648a66edc9d54e8710577ccd7878f291704391057aa64",
+        "bytes": 2745
+      },
+      ".github/workflows/pypi_publish.yml": {
+        "path": "/tmp/plato-docs-workflow-context-review-20261004/parent/.github/workflows/pypi_publish.yml",
+        "sha256": "44d20d3daa8e953546acf7e5b01ee61cf54d056b96b09b799ad3cfa65b105062",
+        "bytes": 1688
+      }
+    },
+    "fixed": {
+      ".github/workflows/docs_package_checks.yml": {
+        "path": "/tmp/plato-docs-workflow-context-review-20261004/fixed/.github/workflows/docs_package_checks.yml",
+        "sha256": "3af2f950f8b481708640e13abfe5455b8b9d6726df7bd345e54dd8cf6c360d93",
+        "bytes": 2762
+      },
+      ".github/workflows/pypi_publish.yml": {
+        "path": "/tmp/plato-docs-workflow-context-review-20261004/fixed/.github/workflows/pypi_publish.yml",
+        "sha256": "44d20d3daa8e953546acf7e5b01ee61cf54d056b96b09b799ad3cfa65b105062",
+        "bytes": 1688
+      }
+    }
+  },
+  "primary_references": [
+    {
+      "url": "https://docs.github.com/en/actions/reference/workflows-and-actions/contexts#context-availability",
+      "raw": {
+        "path": "/tmp/plato-docs-workflow-context-review-20261004/github-contexts.html",
+        "bytes": 1014668,
+        "sha256": "e0089768f683cbdb18e471ede996ac6c8c9140e67a0a6404cf2a955c1c621edc"
+      },
+      "verified": {
+        "job_env_runner_allowed": false,
+        "step_env_runner_allowed": true
+      }
+    },
+    {
+      "url": "https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#jobsjob_idstepsenv",
+      "raw": {
+        "path": "/tmp/plato-docs-workflow-context-review-20261004/github-workflow-syntax.html",
+        "bytes": 2096202,
+        "sha256": "9bba4d2eabc7197eda43fcc9d9976d4521f99aa2d5ead4ff2e8e0466f5229bd6"
+      },
+      "supports": "Step environment values are passed to that step's command."
+    },
+    {
+      "url": "https://github.com/rhysd/actionlint/releases/tag/v1.7.12",
+      "supports": "Pinned official GitHub-aware validator; archive checked against independently downloaded official release manifest."
+    }
+  ],
+  "actual_original_remote_failure": {
+    "run_id": 37167176060,
+    "run_url": "https://github.com/TL-System/plato/actions/runs/37167176060",
+    "head_sha": "0791c01afcaea96223a925a32ee22882dc437ee2",
+    "conclusion": "failure",
+    "created_jobs": 0,
+    "annotation": "Unrecognized named-value: 'runner'. Located at position 1 within expression: runner.temp",
+    "root_original_raw": [
+      {
+        "path": "/tmp/plato-deployment-linux/docs-invalid-workflow-run.json",
+        "bytes": 12451,
+        "sha256": "a83fd0c0067209cef5113a924b3dc75f74dfd57abf2bdeee96a5a35f498c8419"
+      },
+      {
+        "path": "/tmp/plato-deployment-linux/docs-invalid-workflow-page.html",
+        "bytes": 200923,
+        "sha256": "5bf879a439e5ca70f33b98881a7423fc5fbe064c9f94a30e50fc0904cfa4760f"
+      }
+    ],
+    "author_raw": [
+      {
+        "git_path": "evidence/2026-refresh/docs-package-context-fix/remote-jobs.json",
+        "bytes": 41,
+        "sha256": "d232081185de70f0bf26e44b5c2a069ca080bf9da48bbc3a067d8670f67d052a"
+      },
+      {
+        "git_path": "evidence/2026-refresh/docs-package-context-fix/remote-run.json",
+        "bytes": 14001,
+        "sha256": "2d4deec6f3e3b615f228422a2289de45e14841bd10686d9280835eb92c9ac8ee"
+      },
+      {
+        "git_path": "evidence/2026-refresh/reproductions/docs-package-context-fix/remote-run.html",
+        "bytes": 200923,
+        "sha256": "596f3ba978d1caa06e5018e60936a3610c00d04b5391a0eefd5badc1c0007d1f"
+      }
+    ]
+  },
+  "independent_actionlint": {
+    "release_url": "https://github.com/rhysd/actionlint/releases/tag/v1.7.12",
+    "version": "1.7.12\ninstalled by downloading from release page\nbuilt with go1.26.1 compiler for darwin/arm64\n",
+    "binary_sha256": "8db11704dc296f096216db4db65d86cd7f0ebfdf4c38453a1da276b137b88388",
+    "archive_sha256": "aba9ced2dee8d27fecca3dc7feb1a7f9a52caefa1eb46f3271ea66b6e0e6953f",
+    "checksums_sha256": "433028cf0ba3c42163ea1a668dedce30fcdbe84fe912b1a5e288c006eab8a4f5",
+    "archive_matches_official_release_manifest": true,
+    "downloaded_binary_matches_archive": true,
+    "results": [
+      {
+        "label": "published",
+        "workflow": ".github/workflows/docs_package_checks.yml",
+        "commit": "0791c01afcaea96223a925a32ee22882dc437ee2",
+        "command": [
+          "/tmp/plato-docs-workflow-context-review-20261004/tools/actionlint",
+          "-no-color",
+          "/tmp/plato-docs-workflow-context-review-20261004/published/.github/workflows/docs_package_checks.yml"
+        ],
+        "cwd": "/tmp/plato-docs-workflow-context-review-20261004",
+        "exit_code": 1,
+        "output": "../../../tmp/plato-docs-workflow-context-review-20261004/published/.github/workflows/docs_package_checks.yml:20:35: context \"runner\" is not allowed here. available contexts are \"github\", \"inputs\", \"matrix\", \"needs\", \"secrets\", \"strategy\", \"vars\". see https://docs.github.com/en/actions/learn-github-actions/contexts#context-availability for more details [expression]\n   |\n20 |       PLATO_DOCS_ENVIRONMENT: ${{ runner.temp }}/plato-docs/.venv-docs\n   |                                   ^~~~~~~~~~~\n",
+        "log": "/tmp/plato-docs-workflow-context-review-20261004/published-docs_package_checks-actionlint.log",
+        "log_sha256": "3f6c6a83a303dd79b923f4f928aaa7cc89a8d43a18f66802e66733c735aa4c92",
+        "input_sha256": "3bd50449d468b4f6606648a66edc9d54e8710577ccd7878f291704391057aa64"
+      },
+      {
+        "label": "published",
+        "workflow": ".github/workflows/pypi_publish.yml",
+        "commit": "0791c01afcaea96223a925a32ee22882dc437ee2",
+        "command": [
+          "/tmp/plato-docs-workflow-context-review-20261004/tools/actionlint",
+          "-no-color",
+          "/tmp/plato-docs-workflow-context-review-20261004/published/.github/workflows/pypi_publish.yml"
+        ],
+        "cwd": "/tmp/plato-docs-workflow-context-review-20261004",
+        "exit_code": 0,
+        "output": "",
+        "log": "/tmp/plato-docs-workflow-context-review-20261004/published-pypi_publish-actionlint.log",
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "input_sha256": "44d20d3daa8e953546acf7e5b01ee61cf54d056b96b09b799ad3cfa65b105062"
+      },
+      {
+        "label": "fixed",
+        "workflow": ".github/workflows/docs_package_checks.yml",
+        "commit": "8dd6a604712973c6db050082ccd35f154d59ce56",
+        "command": [
+          "/tmp/plato-docs-workflow-context-review-20261004/tools/actionlint",
+          "-no-color",
+          "/tmp/plato-docs-workflow-context-review-20261004/fixed/.github/workflows/docs_package_checks.yml"
+        ],
+        "cwd": "/tmp/plato-docs-workflow-context-review-20261004",
+        "exit_code": 0,
+        "output": "",
+        "log": "/tmp/plato-docs-workflow-context-review-20261004/fixed-docs_package_checks-actionlint.log",
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "input_sha256": "3af2f950f8b481708640e13abfe5455b8b9d6726df7bd345e54dd8cf6c360d93"
+      },
+      {
+        "label": "fixed",
+        "workflow": ".github/workflows/pypi_publish.yml",
+        "commit": "8dd6a604712973c6db050082ccd35f154d59ce56",
+        "command": [
+          "/tmp/plato-docs-workflow-context-review-20261004/tools/actionlint",
+          "-no-color",
+          "/tmp/plato-docs-workflow-context-review-20261004/fixed/.github/workflows/pypi_publish.yml"
+        ],
+        "cwd": "/tmp/plato-docs-workflow-context-review-20261004",
+        "exit_code": 0,
+        "output": "",
+        "log": "/tmp/plato-docs-workflow-context-review-20261004/fixed-pypi_publish-actionlint.log",
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "input_sha256": "44d20d3daa8e953546acf7e5b01ee61cf54d056b96b09b799ad3cfa65b105062"
+      }
+    ]
+  },
+  "scope_and_semantics": {
+    "reverse_env_move_reproduces_published_workflow_bytes": true,
+    "original_value_preserved": "${{ runner.temp }}/plato-docs/.venv-docs",
+    "sole_consumer": "Build strict docs and verify locked requirements parity -> ./docs/build.sh",
+    "docs_build_environment_propagation": "docs/build.sh exports PLATO_DOCS_ENVIRONMENT as UV_PROJECT_ENVIRONMENT; all docs sync, check and mkdocs commands retain that override.",
+    "pypi_workflow_unchanged_from_published_parent_and_source": true,
+    "pypi_sha256": "44d20d3daa8e953546acf7e5b01ee61cf54d056b96b09b799ad3cfa65b105062",
+    "triggers_permissions_secret_placement_action_version_pins_runner_timeouts_and_commands_unchanged": true,
+    "default_packaging_exclusions_dependencies_lock_and_docs_configuration_unchanged_by_correction": true,
+    "checked_unchanged_source_files": [
+      {
+        "file": "docs/build.sh",
+        "sha256": "e21f333201ce75ea7e4a820d505e7b230a5a6048f279b56b0758f1a6cfc338b7",
+        "same_as_parent": true,
+        "same_as_published": true
+      },
+      {
+        "file": ".github/scripts/check_distribution.py",
+        "sha256": "1b3ea71a1eef084f602092de35a97ceed04beb4ab47da2074690dc89c5c34c3f",
+        "same_as_parent": true,
+        "same_as_published": true
+      },
+      {
+        "file": "pyproject.toml",
+        "sha256": "02972a9e51e828ad1f0cff4ec57911d4468296d36e984aaa345442ba6f201a3a",
+        "same_as_parent": true,
+        "same_as_published": false
+      },
+      {
+        "file": "uv.lock",
+        "sha256": "e2a53aaae9a0dd49f5446b490bb3071e86aa3a9a20d6271c9dd30b4ae2dcbff9",
+        "same_as_parent": true,
+        "same_as_published": false
+      },
+      {
+        "file": "docs/requirements.txt",
+        "sha256": "9c33555b3d0cbc983d6dd59f261a242a92d136f2bb1364f300a01824f9eff665",
+        "same_as_parent": true,
+        "same_as_published": true
+      },
+      {
+        "file": "netlify.toml",
+        "sha256": "9ae1049a54d5edc1a29b5f34ba7c235c7f0bf3e63802fb8a9f1d421ca79ead0b",
+        "same_as_parent": true,
+        "same_as_published": true
+      }
+    ],
+    "author_pyproject_and_lock_differ_from_published_integration": "Expected branch ancestry, explicitly recorded above; acceptance authorizes cherry-picking the workflow-only correction and evidence commits, not replacing the integration tree.",
+    "source_and_final_evidence_workflows_equal": true
+  },
+  "verified_author_artifacts": [
+    {
+      "git_path": "evidence/2026-refresh/docs-package-context-fix/actionlint-version.log",
+      "bytes": 96,
+      "sha256": "2f40fa9e505771c4dd7ff4b6ed601e587f52744935b72906e55b21a9a7c1ce1b"
+    },
+    {
+      "git_path": "evidence/2026-refresh/docs-package-context-fix/green-actionlint-exit.txt",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "git_path": "evidence/2026-refresh/docs-package-context-fix/green-actionlint.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "git_path": "evidence/2026-refresh/docs-package-context-fix/red-docs_package_checks.log",
+      "bytes": 432,
+      "sha256": "f596bde2927f855c1dead70320e904bf3afd48a893c812e9b76358c606b80f86"
+    },
+    {
+      "git_path": "evidence/2026-refresh/docs-package-context-fix/red-pypi_publish.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "git_path": "evidence/2026-refresh/docs-package-context-fix/red-validation.json",
+      "bytes": 1143,
+      "sha256": "2c5e2335f96415e589768172a568cfe1b5e9f774c1b9375b9731a6591a231393"
+    },
+    {
+      "git_path": "evidence/2026-refresh/docs-package-context-fix/remote-failure.json",
+      "bytes": 620,
+      "sha256": "2306e73610be39181ff6ab882b898beaa2801880e8e2992c5c8d9d6d0b9aee96"
+    },
+    {
+      "git_path": "evidence/2026-refresh/docs-package-context-fix/remote-jobs.json",
+      "bytes": 41,
+      "sha256": "d232081185de70f0bf26e44b5c2a069ca080bf9da48bbc3a067d8670f67d052a"
+    },
+    {
+      "git_path": "evidence/2026-refresh/docs-package-context-fix/remote-run.json",
+      "bytes": 14001,
+      "sha256": "2d4deec6f3e3b615f228422a2289de45e14841bd10686d9280835eb92c9ac8ee"
+    },
+    {
+      "git_path": "evidence/2026-refresh/docs-package-context-fix/root-previous-final-publication-acceptance.json",
+      "bytes": 8963,
+      "sha256": "2c374cad796f8ba51bf8becb2e4be55a7b51b8624fcb0d3c96eed74b4274a3f8"
+    },
+    {
+      "git_path": "evidence/2026-refresh/reproductions/docs-package-context-fix/actionlint_1.7.12_checksums.txt",
+      "bytes": 1130,
+      "sha256": "433028cf0ba3c42163ea1a668dedce30fcdbe84fe912b1a5e288c006eab8a4f5"
+    },
+    {
+      "git_path": "evidence/2026-refresh/reproductions/docs-package-context-fix/red-docs_package_checks.yml",
+      "bytes": 2745,
+      "sha256": "3bd50449d468b4f6606648a66edc9d54e8710577ccd7878f291704391057aa64"
+    },
+    {
+      "git_path": "evidence/2026-refresh/reproductions/docs-package-context-fix/red-pypi_publish.yml",
+      "bytes": 1688,
+      "sha256": "44d20d3daa8e953546acf7e5b01ee61cf54d056b96b09b799ad3cfa65b105062"
+    },
+    {
+      "git_path": "evidence/2026-refresh/reproductions/docs-package-context-fix/remote-run.html",
+      "bytes": 200923,
+      "sha256": "596f3ba978d1caa06e5018e60936a3610c00d04b5391a0eefd5badc1c0007d1f"
+    },
+    {
+      "git_path": "evidence/2026-refresh/reproductions/docs-package-context-fix/verify-and-record.py",
+      "bytes": 9926,
+      "sha256": "f2334f60095dc89bf38a76c35698006cc447f9c9bbb833f6ff103cd9ad4ad063"
+    }
+  ],
+  "independent_raw": [
+    {
+      "path": "/tmp/plato-docs-workflow-context-review-20261004/independent-validation.json",
+      "bytes": 7856,
+      "sha256": "bbd6ebd69414e7fe4d9f1a5fa0cdd87b2cd0b74406b0899153a303bdf80dba6d"
+    },
+    {
+      "path": "/tmp/plato-docs-workflow-context-review-20261004/source-diff.patch",
+      "bytes": 827,
+      "sha256": "c42cfe0bafd37c2c27ef3b3c84987530490cd340e624df966cf194598509da4c"
+    },
+    {
+      "path": "/tmp/plato-docs-workflow-context-review-20261004/tools/checksums.txt",
+      "bytes": 1130,
+      "sha256": "433028cf0ba3c42163ea1a668dedce30fcdbe84fe912b1a5e288c006eab8a4f5"
+    },
+    {
+      "path": "/tmp/plato-docs-workflow-context-review-20261004/tools/actionlint.tar.gz",
+      "bytes": 2164202,
+      "sha256": "aba9ced2dee8d27fecca3dc7feb1a7f9a52caefa1eb46f3271ea66b6e0e6953f"
+    },
+    {
+      "path": "/tmp/plato-docs-workflow-context-review-20261004/tools/actionlint",
+      "bytes": 5829842,
+      "sha256": "8db11704dc296f096216db4db65d86cd7f0ebfdf4c38453a1da276b137b88388"
+    },
+    {
+      "path": "/tmp/plato-docs-workflow-context-review-20261004/actionlint-version.log",
+      "bytes": 96,
+      "sha256": "2f40fa9e505771c4dd7ff4b6ed601e587f52744935b72906e55b21a9a7c1ce1b"
+    }
+  ],
+  "gate_conditions": [
+    "Root integrates only the accepted source correction plus evidence and its gate addendum, preserving published integration package/dependency changes.",
+    "The integrated docs workflow must retain reviewed SHA256 3af2f950f8b481708640e13abfe5455b8b9d6726df7bd345e54dd8cf6c360d93 and the unchanged publish workflow SHA256 44d20d3daa8e953546acf7e5b01ee61cf54d056b96b09b799ad3cfa65b105062.",
+    "A real GitHub CI retry on the integrated published head remains a merge condition."
+  ],
+  "limits": [
+    "Actionlint red/green runs were independently executed locally on macOS arm64 using a separately downloaded official1.7.12 binary, with no ignore or optional-check disable flags.",
+    "This review does not claim the corrected workflow was remotely run or that GitHub CI already passed.",
+    "Previously accepted0791c01 docs/default-package runtime evidence remains historical; it was not rerun or rebound to this author-source commit.",
+    "No source checkout, root environment, publication, PR, branch or external message was changed by this review."
+  ]
+}

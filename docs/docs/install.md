@@ -1,37 +1,30 @@
 # Installation
 
-Plato uses `uv` as its package manager, which is a modern, fast Python package manager that provides significant performance improvements over `conda` environments. To install `uv`, refer to its [official documentation](https://docs.astral.sh/uv/getting-started/installation/), or simply run the following commands:
+Use Python 3.13 and [uv](https://docs.astral.sh/uv/getting-started/installation/)
+to install Plato from its checked-in manifest and lockfile. The repository's
+build and CI tools use uv 0.12.22. To install uv:
 
 ```bash
 curl -LsSf https://astral.sh/uv/install.sh | sh
-source $HOME/.local/bin/env
+source "$HOME/.local/bin/env"
 ```
 
-To upgrade `uv`, run the command:
-
-```
-uv self update
-```
-
-To start working with Plato, first clone its git repository:
+Clone the repository and provision its environment:
 
 ```bash
-git clone git@github.com:TL-System/plato.git
+git clone https://github.com/TL-System/plato.git
 cd plato
-```
-
-You can run Plato using `uv run`, using one of its configuration files:
-
-```bash
-uv run plato.py -c configs/MNIST/fedavg_lenet5.toml
-```
-
-Provision the project environment from its manifest and lockfile using Python
-3.13, the default qualification and CI interpreter:
-
-```bash
 uv sync --locked --python 3.13
 ```
+
+Run a reference workload from the repository root:
+
+```bash
+uv run --locked python plato.py --config configs/MNIST/fedavg_lenet5.toml --cpu
+```
+
+See [Quick Start](quickstart.md) for device selection, output paths and Docker
+launch commands.
 
 `uv sync` installs the selected project dependencies into `.venv`; it does not
 copy all globally installed Python packages. Optional **extras** select runtime
@@ -59,14 +52,18 @@ Useful extras in the current root package include:
 - `mlx` for Apple Silicon MLX workloads
 - `dp`, `rl`, and `mpc` for specialized research workloads
 
-Each example should be run in its own directory:
+Most example directories use the root project dependencies. Follow each
+example's instructions for its entrypoint and config; for example:
 
 ```bash
 cd examples/server_aggregation/fedatt
-uv run fedatt.py -c fedatt_FashionMNIST_lenet5.toml
+uv run --locked python fedatt.py -c fedatt_FashionMNIST_lenet5.toml
 ```
 
-This will make sure that any additional Python packages, specified in the local `pyproject.toml` configuration, will be installed first.
+Some examples have their own `pyproject.toml` and are registered as workspace
+members in the root manifest. Running uv from one of those directories selects
+that member and its additional dependencies. A directory without its own
+manifest does not gain extra packages just by changing into it.
 
 ### Optional: MLX Backend for Apple Silicon
 
@@ -112,31 +109,44 @@ The Qwen3 reference uses the standard Hugging Face and PEFT dependencies from
 [Qwen3 Federated LoRA](examples/case-studies/6. Qwen3 Federated LoRA.md)
 for the pinned model, local data, CPU command, and validation scope.
 
-### Building the `plato-learn` PyPi Package
+### Building the Documentation
 
-The `plato-learn` PyPi package will be automatically built and published by a GitHub action workflow every time a release is created on GitHub. To build the package manually, follow these steps:
+From the repository root with Python 3.13 available, run:
 
-1. Clean previous builds (optional):
 ```bash
-rm -rf dist/ build/ *.egg-info
+PLATO_DOCS_PYTHON="$(uv python find 3.13)" ./docs/build.sh
 ```
 
-2. Build the package:
+The script uses uv 0.12.22, bootstrapping it in `.venv-docs-bootstrap` if needed.
+It provisions the locked docs-only group in `.venv-docs`, checks the generated
+`docs/requirements.txt` against the lockfile, and runs a strict MkDocs build.
+The HTML output is in `docs/site`. This environment does not install Plato,
+PyTorch or Lighteval. Set `PLATO_DOCS_ENVIRONMENT` to use another dedicated docs
+environment; the application `.venv` is not a valid destination.
+
+### Building the `plato-learn` PyPI Package
+
+With uv 0.12.22 installed, run the same package check used by the release
+workflow from a committed checkout:
+
 ```bash
-uv build
+uv run --no-project --python 3.13 python .github/scripts/check_distribution.py
 ```
 
-3. Publish to PyPI:
-    ```bash
-    uv publish
-    ```
+The check compares archive source bytes with Git HEAD, so commit tracked source
+changes before running it. Generated build outputs are excluded.
 
-    Or if you need to specify the PyPi token explicitly:
-    ```bash
-    uv publish --token <your-pypi-token>
-    ```
+This builds the wheel and source distribution with build dependencies constrained
+from `uv.lock`, checks their contents, rebuilds a wheel from the source archive,
+and installs the wheel in an isolated Python 3.13 environment for import and CPU
+operation checks. It downloads the required build and runtime dependencies.
+Distributions, logs and validation receipts go to `ci-artifacts/docs-package`.
+That output directory must not already exist; use `--output-dir` to select a new
+path outside the repository or beneath `ci-artifacts` for another run.
 
-The `uv` tool will handle all the build process using the modern, PEP 517-compliant `hatchling` backend specified in `pyproject.toml`, making it much simpler than the old `python setup.py sdist bdist_wheel` approach.
+The check does not publish a package. The release-created GitHub workflow is
+configured to publish its validated distributions using the repository's PyPI
+token.
 
 ### Uninstalling Plato
 

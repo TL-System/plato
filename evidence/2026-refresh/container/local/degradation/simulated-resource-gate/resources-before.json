@@ -1,0 +1,21 @@
+{
+  "base_compressed_bytes": 3973716026,
+  "disks": {
+    "/private/tmp/plato-refresh-worktrees/container-refresh": {
+      "free": 48318382080,
+      "total": 100,
+      "used": 55
+    },
+    "/simulated-docker-root": {
+      "free": 48318382080,
+      "total": 100,
+      "used": 55
+    }
+  },
+  "docker_arch": "aarch64",
+  "docker_os": "linux",
+  "minimum_free_bytes": 37580963840,
+  "phase": "before",
+  "runner_os": "macOS-27.0-arm64-arm-64bit-Mach-O",
+  "standard_runner_documented_storage_gb": 14
+}

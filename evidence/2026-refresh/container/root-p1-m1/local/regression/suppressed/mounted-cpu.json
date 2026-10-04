@@ -1,0 +1,28 @@
+{
+  "accepted": true,
+  "auto_removed": true,
+  "bytecode_paths": [],
+  "command_exit_code": 23,
+  "cpu": {
+    "accepted": true,
+    "dont_write_bytecode": true,
+    "hostname": "simulated-container"
+  },
+  "fixture_cleanup_complete": true,
+  "forwarding": {
+    "args": [
+      "a b",
+      "literal $x `x` $(x)",
+      ""
+    ],
+    "hostname": "miami.csl.utoronto.ca"
+  },
+  "host_venv_after": {
+    "bin/python": "d3b5f42d8a63f02454ce59ec36d72b0cb90e0f02df8b3f1793c6a7d85102542e",
+    "pyvenv.cfg": "3980fce3e6f51055a75dbee3b9c1d96a46e5375ddc88a9b5f6ba5fd565c7f857"
+  },
+  "host_venv_before": {
+    "bin/python": "d3b5f42d8a63f02454ce59ec36d72b0cb90e0f02df8b3f1793c6a7d85102542e",
+    "pyvenv.cfg": "3980fce3e6f51055a75dbee3b9c1d96a46e5375ddc88a9b5f6ba5fd565c7f857"
+  }
+}

@@ -1,0 +1,117 @@
+{
+  "schema_version": 1,
+  "recorded_at_utc": "2026-10-03T22:30:30.926534+00:00",
+  "scope": "P2 author execution receipts; fresh independent review remains required.",
+  "accepted_plan_sha256": "6d9eca53b96e1e70d6f89617fce2f2a1234fb5d8fc94fa79e387ade605c4fe9e",
+  "accepted_plan_review_sha256": "98b845c6dd3d1562a327239f4dd96c909b4d8bc6c9db2f24240393423dfb976b",
+  "base_commit": "6bf8836d06072c7946cdfb5499a09e4bce459805",
+  "archive_exclusion_prerequisite_commit": "420853a2af236f1a084eabaf959dbfbb8ab10492",
+  "frozen_source_commit": "be2ae55c9d6d3efdabcd215959859c66c86837e8",
+  "source_files_sha256": {
+    "netlify.toml": "9ae1049a54d5edc1a29b5f34ba7c235c7f0bf3e63802fb8a9f1d421ca79ead0b",
+    "docs/requirements.txt": "9c33555b3d0cbc983d6dd59f261a242a92d136f2bb1364f300a01824f9eff665",
+    "docs/build.sh": "e21f333201ce75ea7e4a820d505e7b230a5a6048f279b56b0758f1a6cfc338b7",
+    ".github/workflows/pypi_publish.yml": "44d20d3daa8e953546acf7e5b01ee61cf54d056b96b09b799ad3cfa65b105062",
+    ".github/workflows/docs_package_checks.yml": "3bd50449d468b4f6606648a66edc9d54e8710577ccd7878f291704391057aa64",
+    ".github/scripts/check_distribution.py": "a56cf112ddedd91479c4f57dc4d1510267b9c4a3e2cd34e27396efade717e180",
+    "pyproject.toml": "734c815784d7210174a8a4f709c7cf9f5de322945b90c605ce91897b10da9fff",
+    "uv.lock": "e2a53aaae9a0dd49f5446b490bb3071e86aa3a9a20d6271c9dd30b4ae2dcbff9",
+    ".python-version": "02e735b3dfe1c32833eb550b7ff8ffa17f5f2bc3fa1e7bae61a8f5a3883ce398",
+    "docs/mkdocs.yml": "d26f6c6e7b91cf8835b4187e3b9e01125801e735122d79e7a148179b31a852ec"
+  },
+  "source_status_at_qualification": "",
+  "owned_paths": [
+    "netlify.toml",
+    "docs/requirements.txt",
+    "docs/build.sh",
+    ".github/workflows/pypi_publish.yml",
+    ".github/workflows/docs_package_checks.yml",
+    ".github/scripts/check_distribution.py"
+  ],
+  "approved_scope_delta": {
+    "path": "pyproject.toml",
+    "authorization": "Root serialized pyproject ownership and expressly authorized exactly this Hatch archive exclusion delta in a separate prerequisite commit.",
+    "before": "archives/retired/**",
+    "after": "archives/**",
+    "other_pyproject_or_lock_changes": false
+  },
+  "host": {
+    "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+    "machine": "arm64",
+    "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+    "uv": "uv 0.12.22 (70fe1196a 2026-10-01 aarch64-apple-darwin)"
+  },
+  "executed_checks": {
+    "fresh_locked_docs_environment": true,
+    "strict_mkdocs_build": true,
+    "generated_requirements_byte_parity": true,
+    "mkdocs_and_material_match_lock": true,
+    "torch_lighteval_and_project_absent_from_docs_environment": true,
+    "uv_absent_bootstrap_installed_0_12_22_and_built_strict_docs": true,
+    "clean_locked_constraint_wheel_and_sdist_build": true,
+    "archive_reproduction_cache_and_environment_payload_gate": true,
+    "clean_sdist_rebuild_matching_all_wheel_member_hashes": true,
+    "independent_runtime_locked_installed_wheel_proof_outside_checkout": true,
+    "installed_payload_and_metadata_match_original_wheel": true,
+    "cpu_tensor_and_torchvision_nms_from_installed_dependencies": true,
+    "uv_pip_check_docs_and_installed_wheel": true,
+    "uv_lock_check": true,
+    "workflow_yaml_and_embedded_shell_python_syntax": true,
+    "netlify_toml_and_shell_python_source_syntax": true,
+    "ruff_import_order_and_format_checks": true,
+    "negative_and_syntax_checks": 16
+  },
+  "commands": [
+    "PLATO_DOCS_PYTHON=$(uv python find 3.13) PLATO_DOCS_ENVIRONMENT=/tmp/plato-p2-final/.venv-docs PLATO_DOCS_ARTIFACT_DIR=/tmp/plato-p2-final/docs ./docs/build.sh",
+    "uv run --no-project --python 3.13 python .github/scripts/check_distribution.py --output-dir /tmp/plato-p2-final/package",
+    "PLATO_DOCS_PYTHON=$(uv python find 3.13) PLATO_DOCS_ENVIRONMENT=/tmp/plato-p2-final/bootstrap/.venv-docs PLATO_DOCS_BOOTSTRAP_ENVIRONMENT=/tmp/plato-p2-final/bootstrap/.venv-uv PLATO_DOCS_ARTIFACT_DIR=/tmp/plato-p2-final/bootstrap PATH=/usr/bin:/bin:/usr/sbin:/sbin ./docs/build.sh",
+    "/tmp/plato-p2-final/.venv-docs/bin/python /tmp/plato-p2-negative-checks.py",
+    "uv lock --check",
+    "uvx --from ruff==0.16.10 ruff check .github/scripts/check_distribution.py --select I",
+    "uvx --from ruff==0.16.10 ruff format --check .github/scripts/check_distribution.py",
+    "git diff --check"
+  ],
+  "command_shell": "All top-level execution commands were invoked with zsh -lc; helpers invoke explicit argv subprocesses.",
+  "package_assertions": {
+    "accepted": true,
+    "source_commit": "be2ae55c9d6d3efdabcd215959859c66c86837e8",
+    "wheel_sha256": "d00d2c2acd5e5867e6a818fe3bc4132db8f92e00f47017da35e5a3159a60ba96",
+    "sdist_sha256": "6f2ab2337df11fa481ecc9a360f283e79fbdeff3ccac31d42d84a091158cf1db",
+    "rebuilt_wheel_payload_matches": true,
+    "installed_wheel_provenance_and_imports": true,
+    "build_constraints_sha256": "284e1018003f55e4ce6fbb5c80b7dad20e86d9ed60ef544d817f1892626326de",
+    "runtime_constraints_sha256": "9c9b82f4c52ba05fb5a1c7e6e841e15fcd69104f9867cf7d7526060055a32709"
+  },
+  "docs_site": {
+    "root_working_directory": "/private/tmp/plato-refresh-worktrees/docs-package-refresh",
+    "publish_directory": "docs/site",
+    "index_exists": true,
+    "index_sha256": "b8aaf649aefc3896ebeb4d820cb3cf2eb9fdc652129c03c9708017f8a6cf4102",
+    "regular_files": 93,
+    "netlify_hosted_preview_executed": false
+  },
+  "retained_actual_distributions": {
+    "path": "/tmp/plato-p2-final/package/distributions",
+    "wheel_sha256": "d00d2c2acd5e5867e6a818fe3bc4132db8f92e00f47017da35e5a3159a60ba96",
+    "sdist_sha256": "6f2ab2337df11fa481ecc9a360f283e79fbdeff3ccac31d42d84a091158cf1db",
+    "source_sdist_rebuilt_wheel": "/tmp/plato-p2-final/package/rebuilt/plato_learn-1.4.3-py3-none-any.whl"
+  },
+  "preliminary_red": {
+    "scope": "Development artifact built before source freeze from base commit plus then-working P2 edits. Hashes and dirty tracked status remain in its provenance.",
+    "archived_legacy_files": 19,
+    "actual_artifact_retained": "/tmp/plato-p2-preliminary/package-second/distributions/plato_learn-1.4.3.tar.gz",
+    "current_frozen_checker_rejected_this_artifact": true
+  },
+  "limitations": [
+    "Executed on macOS arm64 with Python 3.13.16; the new GitHub Linux workflows were parsed but were not dispatched or executed by P2.",
+    "No real Netlify Deploy Preview was executed; effective root/docs/site behavior is proved locally, not on Netlify.",
+    "Material for MkDocs prints its stock future-framework notice; MkDocs reports two non-nav case-study pages at INFO level. No strict-build site warning was suppressed.",
+    "No release was created or dispatched and no package was published. The original release.created trigger and token-based publication intent remain.",
+    "This author did not repeat root's native/core/retained qualification gates or claim GPU, Metal or training acceptance.",
+    "Installed wheel and extracted sdist environments were created in fresh temporary directories and removed after proof; complete command/import/dependency receipts and distributions are retained.",
+    "Standalone negative reproduction harness references retained local author artifacts; independent review should run its own fresh source-bound checks."
+  ],
+  "evidence_artifact_manifest_sha256": "38e140d550216ffeb8ea82097e99f56c20815c1d3f7241e4d55f0c3b3105e402",
+  "negative_harness_sha256": "2eb8524767369e6fd90c1a10fd96baab7701c3322a5a669c58df9c55d9e7abb7",
+  "negative_harness_note": "The copied reproduction script has its trailing blank line normalized; the recorded checks used the same statements."
+}

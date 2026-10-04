@@ -1,0 +1,15 @@
+cwd: /private/tmp/plato-refresh-worktrees/docs-package-binding-release
+command: ["uv", "export", "--locked", "--python", "3.13", "--no-emit-project", "--no-header", "--no-hashes", "--only-group", "build", "--output-file", "/private/tmp/plato-refresh-worktrees/docs-package-binding-release/ci-artifacts/docs-package/build-constraints.txt"]
+Using CPython 3.13.16
+Resolved 264 packages in 5ms
+hatchling==1.32.4
+packaging==26.3
+    # via hatchling
+pathspec==1.1.1
+    # via hatchling
+pluggy==1.6.0
+    # via hatchling
+tomlkit==0.15.1
+    # via hatchling
+trove-classifiers==2026.9.21.13
+    # via hatchling

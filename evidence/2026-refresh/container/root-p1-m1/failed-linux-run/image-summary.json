@@ -1,0 +1,23 @@
+{
+  "id": "sha256:62c091ebdaa09ad106eb6efd744baa63888126f76eb37357820d9f5fe7e3de92",
+  "size_bytes": 13628525248,
+  "source": {
+    "base_image": "nvidia/cuda:13.0.3-devel-ubuntu24.04@sha256:b7ae301dea2c162444795462ce17a05f6a516e5a75944b57af5b88540a1a2266",
+    "commit": "65a88bdfdf3e2418e356971c7d3e225b48c1d3da",
+    "file_sha256": {
+      ".dockerignore": "b90144eaa006aa9954e2f878fcfcbc6d1fa369027582e6f51f4b0500d23ce5da",
+      ".github/scripts/check_container.py": "0f4dd45635dc3f560d6d7f2721aa23492374ecc27a5b408f25acd36c608c80d5",
+      ".github/workflows/container_checks.yml": "58b24307efa3414c0747e23982ca84822942e62952be886409fd2e3650d3b3e7",
+      ".python-version": "02e735b3dfe1c32833eb550b7ff8ffa17f5f2bc3fa1e7bae61a8f5a3883ce398",
+      "Dockerfile": "4e67953be6d90fcc73fb52a44fd05914494af625c529990f9366b662041b6a82",
+      "dockerrun.sh": "6bbcb5530e5343b0fcb0fd675235f72081efa5fdcfd5fc464e1b28f3eedefee4",
+      "dockerrun_gpu.sh": "2f7ac611428cb0a4d3e36a6b040af4f461cfca8e09252ba0c65fbe105a6a6761",
+      "pyproject.toml": "4c68adebeb88bba969a5d5c08a874644b1d40ccff241761dd7f2bd201b6ba3d3",
+      "uv.lock": "66a4e4442d7b1f26d220b44ca73c44ff4f1151a86857bb3f93a594819fd08126"
+    },
+    "github_run_attempt": "1",
+    "github_run_id": "37167178271",
+    "host_python": "3.13.15 (main, Aug  6 2026, 02:15:18) [GCC 13.3.0]",
+    "uv_image": "ghcr.io/astral-sh/uv:0.12.22@sha256:f513a91fc62fe7c17567eee97230dd198e43edb8a9fbecca843714a4358fe1bc"
+  }
+}

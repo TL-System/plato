@@ -107,6 +107,7 @@ def test_real_accumulation_updates_tail_and_empty_round(
             training_step_strategy=GradientAccumulationStepStrategy(2),
             loss_strategy=MSELossStrategy(),
         )
+        assert isinstance(trainer.loss_strategy, MSELossStrategy)
         trainer.loss_strategy._criterion = quadratic_loss
         trainer.set_client_id(1)
         strategy.client_control_variate = scalar_controls(1.0)
@@ -127,6 +128,7 @@ def test_real_accumulation_updates_tail_and_empty_round(
         run = {**config["trainer"], "run_id": "accum"}
         trainer.train_model(run, data, torch.utils.data.SequentialSampler(data))
         assert strategy.local_steps == (microbatches + 1) // 2
+        assert trainer.model is not None
         assert trainer.model.theta.item() == pytest.approx(expected, abs=1e-12)
         assert strategy.client_control_variate["theta"].item() == pytest.approx(
             sum(gradients) / len(gradients), abs=1e-12
@@ -157,6 +159,7 @@ def test_skipped_update_is_not_corrected(tmp_path):
         strategy.on_train_result_accepted(context)
         assert context.model.theta.item() == 1.0
         assert strategy.local_steps == 0
+        assert strategy.client_control_variate is not None
         assert strategy.client_control_variate["theta"].item() == 1.0
 
 
@@ -173,6 +176,7 @@ def test_invalid_executed_rate_fails_before_update(tmp_path, rate):
         with pytest.raises(ValueError, match="SCAFFOLD.*positive"):
             optimizer.step()
         assert context.model.theta.item() == 1.0
+        assert strategy.client_control_variate_path is not None
         assert not Path(strategy.client_control_variate_path).exists()
         strategy.on_train_cleanup(context, successful=False)
         with pytest.raises(RuntimeError, match="successful"):
@@ -202,6 +206,7 @@ def test_missing_optimizer_and_post_step_rate_capture_then_tail_rejection(tmp_pa
             strategy.before_step(trainer.context)
         strategy.client_control_variate = scalar_controls(1.0)
         trainer.context.state["server_control_variate"] = scalar_controls(2.0)
+        assert isinstance(trainer.loss_strategy, MSELossStrategy)
         trainer.loss_strategy._criterion = lambda outputs, labels: outputs.sum() * 0
         data = TensorDataset(torch.ones(3, 1).double(), torch.zeros(3, 1).double())
         with pytest.raises(ValueError, match="constant within"):
@@ -209,10 +214,13 @@ def test_missing_optimizer_and_post_step_rate_capture_then_tail_rejection(tmp_pa
                 {**config["trainer"], "run_id": "rate"}, data, [0, 1, 2]
             )
         # First correction uses the pre-step .1 despite the post-step .025.
+        assert trainer.model is not None
         assert trainer.model.theta.item() == pytest.approx(0.9)
         assert strategy.local_steps == 1
+        assert strategy.client_control_variate_path is not None
         assert not Path(strategy.client_control_variate_path).exists()
         assert trainer.context.state.get("client_control_variate_delta") is None
+        assert trainer.optimizer is not None
         assert not trainer.optimizer._optimizer_step_pre_hooks
 
 
@@ -235,10 +243,13 @@ def test_final_tail_denominator_uses_executed_rate_before_post_hook(tmp_path):
         trainer.set_client_id(1)
         strategy.client_control_variate = scalar_controls(1.0)
         trainer.context.state["server_control_variate"] = scalar_controls(2.0)
+        assert isinstance(trainer.loss_strategy, MSELossStrategy)
         trainer.loss_strategy._criterion = lambda outputs, labels: outputs.sum() * 0
         data = TensorDataset(torch.ones(1, 1).double(), torch.zeros(1, 1).double())
         trainer.train_model({**config["trainer"], "run_id": "tail"}, data, [0])
+        assert trainer.model is not None
         assert trainer.model.theta.item() == pytest.approx(0.9)
+        assert trainer.optimizer is not None
         assert trainer.optimizer.param_groups[0]["lr"] == 0.025
         assert strategy.learning_rate == 0.1 and strategy.local_steps == 1
         assert strategy.client_control_variate["theta"].item() == pytest.approx(
@@ -247,6 +258,9 @@ def test_final_tail_denominator_uses_executed_rate_before_post_hook(tmp_path):
 
 
 class MixedParameters(ScalarModel):
+    floating: torch.Tensor
+    integer: torch.Tensor
+
     def __init__(self):
         super().__init__()
         self.weight = torch.nn.Parameter(torch.tensor([1.0], dtype=torch.double))
@@ -407,17 +421,21 @@ def test_exact_legacy_load_canonical_precedence_and_client_zero_isolation(
         trainer = ComposableTrainer(model=ScalarModel(), model_update_strategy=strategy)
         assert strategy.client_control_variate is None
         trainer.set_client_id(1)
+        assert strategy.client_control_variate is not None
         assert strategy.client_control_variate["theta"].item() == 3.0
         original = paths[legacy].read_bytes()
         trainer.set_client_id(2)
         assert strategy.client_control_variate is None
         trainer.set_client_id(1)
+        assert strategy.client_control_variate is not None
         assert strategy.client_control_variate["theta"].item() == 3.0
         assert paths[legacy].read_bytes() == original
         dump(root / "scaffold_cv_1.pkl", 4.0)
         trainer.set_client_id(2)
         trainer.set_client_id(1)
+        assert strategy.client_control_variate is not None
         assert strategy.client_control_variate["theta"].item() == 4.0
+        assert strategy.client_control_variate_path is not None
         assert Path(strategy.client_control_variate_path).parent == root
 
 
@@ -462,13 +480,17 @@ def test_direct_callback_failure_keeps_only_accepted_controls(
             model_update_strategy=strategy,
             loss_strategy=MSELossStrategy(),
         )
-        trainer.loss_strategy.compute_loss = (
-            lambda outputs, labels, context: quadratic_loss(outputs, labels)
+        setattr(
+            trainer.loss_strategy, "compute_loss",
+            lambda outputs, labels, context: quadratic_loss(outputs, labels),
         )
         trainer.set_client_id(1)
-        trainer.device = trainer.context.device = torch.device("cpu")
+        trainer.device = "cpu"
+        trainer.context.device = torch.device("cpu")
+        assert trainer.model is not None
         strategy.client_control_variate = scalar_controls(1.0)
         trainer.context.state["server_control_variate"] = scalar_controls(2.0)
+        assert strategy.client_control_variate_path is not None
         canonical = Path(strategy.client_control_variate_path)
         if existing_checkpoint:
             canonical.write_bytes(pickle.dumps(scalar_controls(1.0)))

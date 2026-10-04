@@ -24,7 +24,9 @@ def test_actual_registered_dcgan_training_changes_both_networks(tmp_path):
         torch.manual_seed(23)
         trainer = registry.get()
         assert isinstance(trainer.model, torch.nn.Module)
-        trainer.device = trainer.context.device = torch.device("cpu")
+        trainer.device = "cpu"
+        trainer.context.device = torch.device("cpu")
+        assert trainer.model is not None
         before_g = copy.deepcopy(trainer.generator.state_dict())
         before_d = copy.deepcopy(trainer.discriminator.state_dict())
         data = TensorDataset(torch.rand(2, 3, 64, 64) * 2 - 1, torch.zeros(2))
@@ -178,9 +180,14 @@ def test_gan_fid_actual_partition_tail_padding_and_scalar_covariance_reference()
             value = images[:, 0, images.shape[-2] // 2, images.shape[-1] // 2]
             return torch.stack((value, torch.zeros_like(value)), dim=1)
 
-    model = torch.nn.Module()
-    model.generator = Generator()
-    model.nz = 2
+    class GANModel(torch.nn.Module):
+        nz: int = 2
+
+        def __init__(self):
+            super().__init__()
+            self.generator = Generator()
+
+    model = GANModel()
     strategy = GANTestingStrategy.__new__(GANTestingStrategy)
     strategy.inception_model = FeatureExtractor()
     images = torch.arange(1, 6).view(5, 1, 1, 1).expand(5, 3, 32, 80).float()

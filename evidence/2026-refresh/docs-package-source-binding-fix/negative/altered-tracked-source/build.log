@@ -1,0 +1,6 @@
+cwd: /private/tmp/plato-refresh-worktrees/docs-package-binding-negative
+command: ["uv", "build", "--no-sources", "--build-constraints", "/private/tmp/plato-refresh-worktrees/docs-package-binding-negative/ci-artifacts/altered-tracked-source/build-constraints.txt", "--python", "3.13", "--out-dir", "/private/tmp/plato-refresh-worktrees/docs-package-binding-negative/ci-artifacts/altered-tracked-source/distributions"]
+Building source distribution...
+Building wheel from source distribution...
+Successfully built ci-artifacts/altered-tracked-source/distributions/plato_learn-1.4.3.tar.gz
+Successfully built ci-artifacts/altered-tracked-source/distributions/plato_learn-1.4.3-py3-none-any.whl

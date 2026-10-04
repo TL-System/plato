@@ -1,0 +1,6 @@
+{
+  "source_commit": "f1963eb906228c287f9787251f4319339ca7ee78",
+  "accepted": true,
+  "workflow_yaml_and_embedded_shell_python_commands": true,
+  "netlify_toml": true
+}

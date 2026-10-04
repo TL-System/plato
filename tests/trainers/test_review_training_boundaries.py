@@ -30,7 +30,7 @@ class ObserveUpdates(TrainerCallback):
         self.completed = 0
         self.flags = []
 
-    def on_train_step_end(self, trainer, config, **kwargs):
+    def on_train_step_end(self, trainer, config, batch, loss, **kwargs):
         self.completed += 1
         self.flags.append(trainer.context.state["optimizer_step_completed"])
 
@@ -65,7 +65,9 @@ def test_real_amp_clipping_unscaled_success_and_overflow(
             ),
             training_step_strategy=step,
         )
-        trainer.device = trainer.context.device = torch.device("cpu")
+        trainer.device = "cpu"
+        trainer.context.device = torch.device("cpu")
+        assert trainer.model is not None
         step.enabled = True
         step.scaler = torch.amp.GradScaler("cpu", init_scale=scale)
         data = TensorDataset(torch.ones(1, 1), torch.zeros(1, 1))
@@ -90,7 +92,9 @@ def test_actual_worker_cleanup_full_names_and_unrelated_owners(tmp_path, name):
     with configure_environment(config, runtime_root=tmp_path):
         trainer = ComposableTrainer(model=torch.nn.Linear(1, 2))
         trainer.set_client_id(7)
-        trainer.device = trainer.context.device = torch.device("cpu")
+        trainer.device = "cpu"
+        trainer.context.device = torch.device("cpu")
+        assert trainer.model is not None
         data = TensorDataset(torch.ones(2, 1), torch.zeros(2, dtype=torch.long))
         run = {**config["trainer"], "run_id": Config.params["run_id"]}
         trainer.train_process(run, data, [0, 1])
@@ -170,7 +174,9 @@ def test_actual_accepted_b_feddyn_writer_migration(
         assert legacy.read_bytes() == original
 
 
-@pytest.mark.parametrize("spawn", [False, True])
+@pytest.mark.parametrize(
+    "spawn", [False, pytest.param(True, marks=pytest.mark.slow)]
+)
 def test_fedala_memory_only_return_matches_dedicated_rounds(tmp_path, spawn):
     config = build_minimal_config(model_name="org/model")
     config["parameters"]["optimizer"].update(lr=0.1, momentum=0.0)
@@ -185,7 +191,9 @@ def test_fedala_memory_only_return_matches_dedicated_rounds(tmp_path, spawn):
                 save_state=False, eta=1.0, max_ala_epochs=2, rand_percent=100
             )
             trainer = ComposableTrainer(model=model, model_update_strategy=strategy)
-            trainer.device = trainer.context.device = torch.device("cpu")
+            trainer.device = "cpu"
+            trainer.context.device = torch.device("cpu")
+            assert trainer.model is not None
             trainer.set_client_id(1)
             return trainer
 

@@ -31,7 +31,8 @@ class InterruptBatch(ServerCallback):
     def __init__(self, mode):
         self.mode = mode
 
-    def on_weights_received(self, server, weights):
+    def on_weights_received(self, server, weights_received):
+        weights = weights_received
         if self.mode == "receive":
             raise RuntimeError("Deliberate receive callback failure")
         if self.mode == "metadata":
@@ -53,7 +54,7 @@ class InterruptBatch(ServerCallback):
         if self.mode == "aggregate-control":
             server.server_control_variate["theta"].add_(1)
 
-    def on_clients_processed(self, server):
+    def on_clients_processed(self, server, **kwargs):
         if self.mode == "postcommit":
             raise RuntimeError("Deliberate postcommit reporting failure")
 
@@ -259,6 +260,7 @@ def test_fallible_end_hook_rejects_before_acceptance_and_releases_ownership(
 
 
 @pytest.mark.parametrize("existing", [False, True])
+@pytest.mark.slow
 def test_actual_spawned_successful_run_cleanup_rejects_before_parent_acceptance(
     tmp_path, existing
 ):

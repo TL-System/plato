@@ -27,7 +27,7 @@ def service(monkeypatch):
     )
 
     class Handler(BaseHTTPRequestHandler):
-        def log_message(self, *_args):
+        def log_message(self, format, *_args):
             pass
 
         def respond(self, status, body=b""):
@@ -184,6 +184,7 @@ def test_network_paths_fail_within_deadline(service, fault, operation):
                 if operation == "put":
                     client.put_to_s3("model", 1)
                 else:
+                    assert callable(method)
                     method("model")
         except Exception as exc:
             errors.append(exc)

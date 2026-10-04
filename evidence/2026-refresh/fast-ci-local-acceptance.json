@@ -1,0 +1,34 @@
+{
+  "status": "PASS_INTEGRATED_LOCAL_FAST_AND_CONFIGURED_TYPING",
+  "source_commit": "76d716e28f978b1ae66bfe7e046f219494527e2b",
+  "python": "3.13.16",
+  "ty": "0.0.84",
+  "ruff": "0.16.10",
+  "profile": "locked dev, mandatory, not runtime and not slow",
+  "passed": 1588,
+  "deselected": 105,
+  "warnings": 30,
+  "pytest_seconds": 217.17,
+  "wall_seconds": 226.72,
+  "typing_scope": "Maintained source and tests; archives/evidence/outdated excluded; inherited unresolved-import policy unchanged.",
+  "artifacts": {
+    "mandatory.xml": "553bde853cd7bf967f85c707ef360804cd8cf4217e12db141008957f766d4bb1",
+    "mandatory.log": "bc07885ee93fa26d94fdef8fcac3cd37c850a0b1aeee52df20f7844dc4c54525",
+    "ty.log": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+    "ruff.log": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+    "coverage.json": "0fcce3f868de15b366eb77eca49196e413d63c93dd0ec7122a6bda211b18b8b1",
+    "commit.txt": "9a9f06e6cc04803e88654819f8097fdfb1d3db5c5bea48aa1d8d34e01eb745fe"
+  },
+  "raw_directory": "/tmp/plato-deployment-fast-76d716e2",
+  "prior_incomplete_runs": [
+    {
+      "directory": "/tmp/plato-fast-execution-artifacts",
+      "status": "Author session ended without completed JUnit; not accepted."
+    },
+    {
+      "directory": "/tmp/plato-deployment-fast-74947956",
+      "status": "Root intentionally interrupted exit130 after reviewer found stale summary assertion; fixed in76d716e2."
+    }
+  ],
+  "limits": "Local macOS fast core only; hosted Linux, container and docs/package final-source checks still required. Full manual qualification not rerun."
+}

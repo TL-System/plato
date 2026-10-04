@@ -149,8 +149,8 @@ class TestLossCriterionStrategy:
     def test_interface_has_abstract_method(self):
         """Test that compute_loss is abstract."""
         with pytest.raises(TypeError):
-            # Should not be able to instantiate abstract class
-            LossCriterionStrategy()
+            # Exercise metaclass rejection, including deliberate invalid calls.
+            type.__call__(LossCriterionStrategy)
 
     def test_concrete_implementation(self):
         """Test that concrete implementation works."""
@@ -181,7 +181,7 @@ class TestOptimizerStrategy:
     def test_interface_has_abstract_method(self):
         """Test that create_optimizer is abstract."""
         with pytest.raises(TypeError):
-            OptimizerStrategy()
+            type.__call__(OptimizerStrategy)
 
     def test_concrete_implementation(self):
         """Test that concrete implementation works."""
@@ -237,7 +237,7 @@ class TestTrainingStepStrategy:
     def test_interface_has_abstract_method(self):
         """Test that training_step is abstract."""
         with pytest.raises(TypeError):
-            TrainingStepStrategy()
+            type.__call__(TrainingStepStrategy)
 
     def test_concrete_implementation(self):
         """Test that concrete implementation works."""
@@ -276,7 +276,7 @@ class TestLRSchedulerStrategy:
     def test_interface_has_abstract_method(self):
         """Test that create_scheduler is abstract."""
         with pytest.raises(TypeError):
-            LRSchedulerStrategy()
+            type.__call__(LRSchedulerStrategy)
 
     def test_concrete_implementation(self):
         """Test that concrete implementation works."""
@@ -445,7 +445,7 @@ class TestDataLoaderStrategy:
     def test_interface_has_abstract_method(self):
         """Test that create_train_loader is abstract."""
         with pytest.raises(TypeError):
-            DataLoaderStrategy()
+            type.__call__(DataLoaderStrategy)
 
     def test_concrete_implementation(self):
         """Test that concrete implementation works."""

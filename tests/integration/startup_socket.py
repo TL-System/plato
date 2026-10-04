@@ -100,7 +100,7 @@ class ObserveServer(ServerCallback):
 
 
 class FailingServer(fedavg.Server):
-    async def _periodic(self, interval):
+    async def _periodic(self, periodic_interval):
         await asyncio.sleep(0.2)
         emit("original_failure", message="post-launch-sentinel")
         raise SentinelError("post-launch-sentinel")
@@ -143,8 +143,8 @@ def real_round():
             created=psutil.Process(process.pid).create_time(),
         )
 
-    mp.Process.start = observe_start
-    server_base.run = observe_client_run
+    setattr(mp.Process, "start", observe_start)
+    setattr(server_base, "run", observe_client_run)
     client = simple.Client(
         model=TinyModel, datasource=TinyDatasource, callbacks=[ObserveClient]
     )

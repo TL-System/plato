@@ -1,0 +1,140 @@
+{
+  "schema_version": 1,
+  "recorded_at_utc": "2026-10-03T22:59:10.103269+00:00",
+  "scope": "P2-M1 repair author execution. All assertions passed; a fresh different independent reviewer is required before acceptance.",
+  "finding_addressed": "P2-M1",
+  "review_sha256": "46cdeab83688525106b3987064cf2da88d9cd5e75ea72fa4ad108b58c76de578",
+  "previous_frozen_source_commit": "be2ae55c9d6d3efdabcd215959859c66c86837e8",
+  "previous_evidence_commit": "bd6ddaa63a40895172d15f37ab47b855ee2e44a1",
+  "frozen_source_commit": "f1963eb906228c287f9787251f4319339ca7ee78",
+  "source_files_sha256": {
+    "pyproject.toml": "2ff99eef16f4105af2810f58b1778c7ba131fe894f379837d2b65c7729724a7d",
+    "uv.lock": "e2a53aaae9a0dd49f5446b490bb3071e86aa3a9a20d6271c9dd30b4ae2dcbff9",
+    ".python-version": "02e735b3dfe1c32833eb550b7ff8ffa17f5f2bc3fa1e7bae61a8f5a3883ce398",
+    "netlify.toml": "9ae1049a54d5edc1a29b5f34ba7c235c7f0bf3e63802fb8a9f1d421ca79ead0b",
+    "docs/build.sh": "e21f333201ce75ea7e4a820d505e7b230a5a6048f279b56b0758f1a6cfc338b7",
+    "docs/requirements.txt": "9c33555b3d0cbc983d6dd59f261a242a92d136f2bb1364f300a01824f9eff665",
+    "docs/mkdocs.yml": "d26f6c6e7b91cf8835b4187e3b9e01125801e735122d79e7a148179b31a852ec",
+    ".github/scripts/check_distribution.py": "281b7cd7ff9b7b5dfb7e499d9e249eb8cf29993e9ce8d7c7bccabc12f7325ee1",
+    ".github/workflows/docs_package_checks.yml": "3bd50449d468b4f6606648a66edc9d54e8710577ccd7878f291704391057aa64",
+    ".github/workflows/pypi_publish.yml": "44d20d3daa8e953546acf7e5b01ee61cf54d056b96b09b799ad3cfa65b105062"
+  },
+  "source_changes": {
+    ".github/scripts/check_distribution.py": [
+      "Reject generated docs/site and ci-artifacts members during wheel/sdist manifest inspection.",
+      "Require in-checkout outputs to use the explicitly excluded ci-artifacts directory; external outputs remain supported."
+    ],
+    "pyproject.toml": [
+      "Root expressly authorized only additional Hatch exclusions ci-artifacts/** and docs/site/**.",
+      "Previously approved archives/** exclusion and reproduction exclusion are preserved.",
+      "No dependency, lock, pytest marker or lint policy change."
+    ]
+  },
+  "host": {
+    "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+    "machine": "arm64",
+    "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]"
+  },
+  "workflow_default_regression": {
+    "source_commit": "f1963eb906228c287f9787251f4319339ca7ee78",
+    "accepted": true,
+    "dirty_generated_sentinels_remain_in_checkout_and_are_absent_from_archive": true,
+    "workflow_and_release_sdist_sha256_identical": true,
+    "builds": {
+      "workflow_default_after_docs_and_dirty_outputs": {
+        "source_commit": "f1963eb906228c287f9787251f4319339ca7ee78",
+        "checkout": "/private/tmp/plato-refresh-worktrees/docs-package-fix-workflow",
+        "command": [
+          "/Users/bli/.local/share/uv/python/cpython-3.13-macos-aarch64-none/bin/python3.13",
+          ".github/scripts/check_distribution.py"
+        ],
+        "default_output_path": "ci-artifacts/docs-package",
+        "accepted": true,
+        "sdist_sha256": "74ceec3e74f18a51cef73285d271daa16dedf2a03a6076405621bd2c0b3d68b1",
+        "wheel_sha256": "d00d2c2acd5e5867e6a818fe3bc4132db8f92e00f47017da35e5a3159a60ba96",
+        "sdist_member_count": 1211,
+        "generated_docs_members": [],
+        "transient_ci_members": [],
+        "forbidden_members": [],
+        "tracked_plato_source_count": 209,
+        "retained_workspace_manifest_count": 12,
+        "required_and_optional_metadata_parity": true,
+        "installed_direct_url_and_outside_imports": true,
+        "clean_from_sdist_rebuild_matching_payload_and_metadata": true,
+        "tracked_source_status": "",
+        "all_untracked_status": "?? ci-artifacts/docs-package/acceptance.json\n?? ci-artifacts/docs-package/build-constraints.txt\n?? ci-artifacts/docs-package/installed-wheel.json\n?? ci-artifacts/docs-package/provenance.json\n?? ci-artifacts/docs-package/rebuilt-wheel-manifest.json\n?? ci-artifacts/docs-package/runtime-constraints.txt\n?? ci-artifacts/docs-package/sdist-manifest.json\n?? ci-artifacts/docs-package/wheel-manifest.json\n?? ci-artifacts/docs/commit.txt\n?? ci-artifacts/docs/docs-environment.json\n?? ci-artifacts/docs/python.txt\n?? ci-artifacts/docs/source-hashes.txt\n?? ci-artifacts/docs/uv.txt\n?? ci-artifacts/stale-run/probe.json\n"
+      },
+      "release_default_without_docs": {
+        "source_commit": "f1963eb906228c287f9787251f4319339ca7ee78",
+        "checkout": "/private/tmp/plato-refresh-worktrees/docs-package-fix-release",
+        "command": [
+          "/Users/bli/.local/share/uv/python/cpython-3.13-macos-aarch64-none/bin/python3.13",
+          ".github/scripts/check_distribution.py"
+        ],
+        "default_output_path": "ci-artifacts/docs-package",
+        "accepted": true,
+        "sdist_sha256": "74ceec3e74f18a51cef73285d271daa16dedf2a03a6076405621bd2c0b3d68b1",
+        "wheel_sha256": "d00d2c2acd5e5867e6a818fe3bc4132db8f92e00f47017da35e5a3159a60ba96",
+        "sdist_member_count": 1211,
+        "generated_docs_members": [],
+        "transient_ci_members": [],
+        "forbidden_members": [],
+        "tracked_plato_source_count": 209,
+        "retained_workspace_manifest_count": 12,
+        "required_and_optional_metadata_parity": true,
+        "installed_direct_url_and_outside_imports": true,
+        "clean_from_sdist_rebuild_matching_payload_and_metadata": true,
+        "tracked_source_status": "",
+        "all_untracked_status": "?? ci-artifacts/docs-package/acceptance.json\n?? ci-artifacts/docs-package/build-constraints.txt\n?? ci-artifacts/docs-package/installed-wheel.json\n?? ci-artifacts/docs-package/provenance.json\n?? ci-artifacts/docs-package/rebuilt-wheel-manifest.json\n?? ci-artifacts/docs-package/runtime-constraints.txt\n?? ci-artifacts/docs-package/sdist-manifest.json\n?? ci-artifacts/docs-package/wheel-manifest.json\n"
+      }
+    }
+  },
+  "default_invocation_commands": {
+    "workflow": "After writing CI docs provenance, PLATO_DOCS_PYTHON=\"$(uv python find 3.13)\" PLATO_DOCS_ENVIRONMENT=/tmp/plato-p2-generated-fix/workflow-environment/.venv-docs PLATO_DOCS_ARTIFACT_DIR=\"$PWD/ci-artifacts/docs\" ./docs/build.sh; add dirty generated output sentinels; \"$(uv python find 3.13)\" .github/scripts/check_distribution.py",
+    "release": "In a fresh checkout without docs/site or ci-artifacts: \"$(uv python find 3.13)\" .github/scripts/check_distribution.py",
+    "validation": "/tmp/plato-p2-generated-fix/workflow-environment/.venv-docs/bin/python /tmp/plato-p2-generated-fix/checks.py",
+    "real_strict_failure": "/tmp/plato-p2-generated-fix/workflow-environment/.venv-docs/bin/python /tmp/plato-p2-generated-fix/actual-strict-probe.py",
+    "shell_convention": "Top-level commands and command-probe helpers use zsh -lc; archive/hash operations use explicit Python APIs."
+  },
+  "executed_checks": [
+    "Actual docs helper followed by the default package checker in a disposable frozen-source checkout, with dirty generated docs/site and ci-artifacts outputs retained.",
+    "Actual release-default package checker in a second fresh frozen-source checkout without prior docs output.",
+    "Both actual sdists contain zero generated docs/CI members and zero existing forbidden payload members.",
+    "Both workflows produce identical sdist SHA256 and unchanged identical wheel SHA256 on this source.",
+    "Both default paths rebuild the extracted sdist in a clean temporary directory and match all wheel member hashes and metadata.",
+    "Both default paths install the wheel with locked runtime constraints and prove payload, metadata, direct_url and representative imports outside the checkout.",
+    "Both installed environments run CPU tensor and torchvision NMS operations and uv pip check.",
+    "All 209 tracked Plato Python sources and all 12 retained workspace manifests are present.",
+    "All mandatory and optional Requires-Dist declarations, six extras and Requires-Python match pyproject.",
+    "Fresh docs-only environment, strict docs build, mkdocs/material lock versions, absent runtime/project packages and generated requirements byte parity.",
+    "23 negative checks: generated docs/CI injections, prior real dirty red sdists, archives/reproductions/cache/environment, missing source, bad metadata, output placement/existing output, cwd, application environment, requirements drift, wrong uv, and failure propagation.",
+    "Real MkDocs strict-mode missing-nav warning fails the helper with exit 1; disposable fixture is restored.",
+    "uv lock --check, Ruff import/format checks, workflow/TOML/embedded command parsing, shell/Python syntax and whitespace checks."
+  ],
+  "negative_check_count": 23,
+  "red_artifact": {
+    "review_original_path": "/tmp/plato-p2-independent-review/workflow-source/ci-artifacts/docs-package/distributions/plato_learn-1.4.3.tar.gz",
+    "original_sha256": "33fca2948256ec4b7457d75caed1bd56d14594dd63d097fbd63e4fb61e33d4d7",
+    "preserved_in_commit_path": "evidence/2026-refresh/reproductions/docs-package-generated-fix/red/plato_learn-1.4.3.tar.gz",
+    "current_checker_rejects_it": true,
+    "historical_generated_docs_members": 91,
+    "historical_transient_ci_members": 9,
+    "historical_author_acceptance_superseded": true
+  },
+  "retained_green_distributions": {
+    "workflow": "/tmp/plato-refresh-worktrees/docs-package-fix-workflow/ci-artifacts/docs-package/distributions",
+    "release": "/tmp/plato-refresh-worktrees/docs-package-fix-release/ci-artifacts/docs-package/distributions",
+    "sdist_sha256": "74ceec3e74f18a51cef73285d271daa16dedf2a03a6076405621bd2c0b3d68b1",
+    "wheel_sha256": "d00d2c2acd5e5867e6a818fe3bc4132db8f92e00f47017da35e5a3159a60ba96"
+  },
+  "limits": [
+    "Execution is local macOS arm64 / Python 3.13.16; GitHub Linux workflows and hosted Netlify preview were not executed or dispatched.",
+    "This receipt validates the corrected frozen source only; final integrated source must receive its own bound remote/local receipts.",
+    "No release, package publication, push, PR or hosted deployment occurred.",
+    "Root application/archive/evaluator environments and all native/core/retained qualification gates remain untouched.",
+    "The reproduction checker script's positive-command field was corrected to the managed interpreter actually invoked; verifier itself ran under its separate docs Python environment.",
+    "Temporary extracted-sdist and installed-wheel environments were removed by the checker after receipts were written; produced distributions remain at the recorded paths.",
+    "The prior failed receipts and actual contaminated sdist are retained as historical evidence, not acceptance of that source."
+  ],
+  "artifact_manifest_sha256": "a76bd0a45d49d18c26d17f98718cfda5bf95ff6dc7ba19ee3a749bf94f8750d7"
+}

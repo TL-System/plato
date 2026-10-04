@@ -1,0 +1,174 @@
+{
+  "schema_version": 1,
+  "reviewer": "/root/container_review",
+  "reviewed_at_utc": "2026-10-03T22:28:43.132414+00:00",
+  "verdict": "ACCEPT_LOCAL_STATIC",
+  "accepted": true,
+  "acceptance_scope": "P1 source implementation, source-bound local evidence, and CI contract review only. Actual Linux image qualification remains mandatory after reviewed publication on the final integrated SHA. This is not acceptance of an image build, container runtime, GPU compute, or deployment.",
+  "source": {
+    "base_commit": "6bf8836d06072c7946cdfb5499a09e4bce459805",
+    "code_commit": "da2ffde66e8ae5d893ceed9bb73d801680c150b6",
+    "evidence_commit": "7fa254c5b944c4bfb65563fc77ee4a33704aa52a",
+    "worktree": "/tmp/plato-refresh-worktrees/container-refresh",
+    "clean_tracked_and_untracked_worktree": true,
+    "owned_code_paths": [
+      "Dockerfile",
+      ".dockerignore",
+      "dockerrun.sh",
+      "dockerrun_gpu.sh",
+      ".github/workflows/container_checks.yml",
+      ".github/scripts/check_container.py"
+    ],
+    "changed_code_paths_match_ownership": true,
+    "evidence_commit_changes_evidence_only": true,
+    "file_sha256": {
+      "Dockerfile": "4e67953be6d90fcc73fb52a44fd05914494af625c529990f9366b662041b6a82",
+      ".dockerignore": "b90144eaa006aa9954e2f878fcfcbc6d1fa369027582e6f51f4b0500d23ce5da",
+      "dockerrun.sh": "6bbcb5530e5343b0fcb0fd675235f72081efa5fdcfd5fc464e1b28f3eedefee4",
+      "dockerrun_gpu.sh": "2f7ac611428cb0a4d3e36a6b040af4f461cfca8e09252ba0c65fbe105a6a6761",
+      ".github/workflows/container_checks.yml": "58b24307efa3414c0747e23982ca84822942e62952be886409fd2e3650d3b3e7",
+      ".github/scripts/check_container.py": "0f4dd45635dc3f560d6d7f2721aa23492374ecc27a5b408f25acd36c608c80d5",
+      "pyproject.toml": "8aaa7414717fa17841900d377d89851547677ba2ae93963afef79fc5490ba610",
+      "uv.lock": "e2a53aaae9a0dd49f5446b490bb3071e86aa3a9a20d6271c9dd30b4ae2dcbff9",
+      ".python-version": "02e735b3dfe1c32833eb550b7ff8ffa17f5f2bc3fa1e7bae61a8f5a3883ce398",
+      ".github/workflows/pytorch_tests.yml": "697c6ae0c39fa7fd42766f8161f350944e90108b3dad852148da952acfcc9317"
+    },
+    "hashes_match_current_files_and_code_commit": true,
+    "plan_sha256": "6d9eca53b96e1e70d6f89617fce2f2a1234fb5d8fc94fa79e387ade605c4fe9e",
+    "plan_review_sha256": "98b845c6dd3d1562a327239f4dd96c909b4d8bc6c9db2f24240393423dfb976b"
+  },
+  "author_evidence_verification": {
+    "qualification_path": "/tmp/plato-refresh-worktrees/container-refresh/evidence/2026-refresh/container/qualification.json",
+    "qualification_sha256": "d9f41e886d38842b46d5150cac388392c52150bc26fd378dfdf2cbe14c86331d",
+    "artifact_manifest_path": "/tmp/plato-refresh-worktrees/container-refresh/evidence/2026-refresh/container/artifact-manifest.json",
+    "artifact_manifest_sha256": "5fd88533d315648d397698f5dc72318e84dc5d2d417fd2b2271a1181288a9df4",
+    "verified_artifact_count": 19,
+    "verified_source_hash_count": 10,
+    "all_artifact_bytes_and_hashes_match": true,
+    "author_static_and_degradation_receipts_bound_to_code_commit": true,
+    "actual_image_build_executed": false,
+    "actual_cpu_container_executed": false
+  },
+  "findings": [],
+  "unresolved_material_findings": 0,
+  "area_conclusions": [
+    {
+      "area": "Dependency and CUDA selection",
+      "result": "Pass at metadata/design level",
+      "evidence": "Pinned CUDA 13.0.3 devel and uv 0.12.22 digests match the accepted plan. Live PyPI Linux x86_64 cp313 torch 2.14.1/torchvision 0.29.1 wheel hashes, universal cuda-toolkit 13.0.3.0, and cuDNN 9.24.0.43 wheel hashes match uv.lock. Torch metadata selects toolkit 13.0.3 and cuDNN 9.24.0.43. Runtime library behavior is explicitly pending actual Linux image checks."
+    },
+    {
+      "area": "Interpreter, editable install and source mount",
+      "result": "Pass",
+      "evidence": "Managed interpreter /opt/plato/python, UV_PROJECT_ENVIRONMENT=/opt/plato/.venv and PATH precedence keep the environment outside /root/plato. Locked sync runs after full COPY, omits default groups, and preserves editable root source. Linux probes assert executable/prefix/base prefix, lock hash, dist versions and editable install origin, then exercise uv run --no-sync with invalid unchanged host .venv."
+    },
+    {
+      "area": "Context and retained workspace",
+      "result": "Pass at static level; image proof pending",
+      "evidence": "Fresh static checks preserve all 12 retained workspace manifests and 645 required source entries. Positive-only ignores exclude archive/evidence/environment/cache/output paths while preserving tracked active examples/config data. Docker build uses distinctive sentinels and unmounted image checks; actual Docker semantics and context-byte build output remain authoritative."
+    },
+    {
+      "area": "Launcher behavior",
+      "result": "Pass locally; real container proof pending",
+      "evidence": "Both executable launchers preserve Linux networking/shared memory, quote checkout mount, use exec and --rm, forward literal arguments including spaces/empty/shell metacharacters, select -i without a terminal and -it with both streams on a pseudo-terminal, and retain --gpus all solely in GPU launcher. Stub checks propagate exit 23. Actual mounted CI launcher checks test argv, exit 23, /opt environment and auto-removal."
+    },
+    {
+      "area": "Actual CI qualification contract",
+      "result": "Pass on code review",
+      "evidence": "The Python 3.13 workflow invokes static then mandatory Linux mode using check=True, without continue-on-error or publication steps. Linux build is --pull --progress=plain --platform linux/amd64, records image ID/inspect/history/source/lock/manifest/build logs, and binds image revision/ID to source. Normal-entrypoint network-disabled image probes perform base imports, CPU tensor calculation, torchvision native NMS, cuDNN version and wheel-path checks, loaded library inventory, uv pip check/freeze, OS/nvcc records and Plato CLI --help."
+    },
+    {
+      "area": "Failure propagation and artifact retention",
+      "result": "Pass locally at contract level",
+      "evidence": "Fresh independent child failure, expected exit 23, timeout, inspect-error and final-resource-error checks passed. Missing/duplicate marked output is rejected in replayed negative checks. Errors propagate from commands and Linux qualification; acceptance starts false and final resource errors force false and a nonzero result. Upload runs always and missing artifacts is an error."
+    },
+    {
+      "area": "Disk capacity and cleanup boundaries",
+      "result": "Pass with mandatory unexecuted resource gate",
+      "evidence": "Initial/before/after resources are recorded; 35 GiB measured free floor is enforced for checkout and Docker storage. Standard ubuntu-24.04 remains default and no larger runner is assumed. Only fixed unused Android/.NET/Swift trees are eligible, only on github-hosted Ubuntu 24.04 below floor; user/self-hosted/wrong distro/version cleanup is refused and symlink trees are skipped. No cleanup was executed by this review. Capacity and sufficient build disk remain unproved until remote Linux execution."
+    },
+    {
+      "area": "Scope and integration ownership",
+      "result": "Pass",
+      "evidence": "Exactly six owned code files changed from base; evidence commit changes only container evidence. Runtime lock/profile files and .github/workflows/pytorch_tests.yml retain recorded hashes. Native/core/retained gates are neither altered nor replaced. P3 root identity/mounted output persistence/container-only environment lifetime prose obligations are supplied in qualification handoff."
+    }
+  ],
+  "independently_executed": [
+    "Read accepted plan/review, all six source files, relevant project/lock metadata, author local commands/degradation script/receipts, and artifact manifest.",
+    "Verified all 19 author artifact sizes/hashes and all 10 source hashes against current files and exact code commit; checked clean worktree and commit-owned path boundaries.",
+    "Fresh Python 3.13 no-project static replay passed: 12 workspace manifests, 645 required source entries, six non-TTY CPU/GPU launcher cases.",
+    "Fresh replay of 11 author local degradation checks passed, including actual macOS Linux-mode refusal before Docker.",
+    "Ten independent pseudo-terminal/subprocess/mocked CI contract checks passed, including both TTY branches, fatal child exit/timeout, exit 23 success, removal rejection, cleanup environment guards and final-resource failure.",
+    "Fresh actionlint workflow parse, Ruff E/F/I check and git diff --check passed.",
+    "Fetched live project-owned PyPI metadata and verified compatible wheel names/hashes plus toolkit/cuDNN requirements against uv.lock."
+  ],
+  "independent_review_artifacts": [
+    {
+      "path": "/tmp/plato-container-review-checks/static/static-acceptance.json",
+      "sha256": "fba19254580c61dcaf7defab5e7e2b95773ef4110d1b4725351a778921360299",
+      "bytes": 3363
+    },
+    {
+      "path": "/tmp/plato-container-review-checks/static/source.json",
+      "sha256": "b4106e15234726df8169a887ff0888b1484d82c13c889e1ccbc10a287508f81a",
+      "bytes": 1300
+    },
+    {
+      "path": "/tmp/plato-container-review-checks/degradation/negative-checks.json",
+      "sha256": "45a65af798ca38f2d52af39ef63ba3da5f114af3f23466c46b269f2fa678c6df",
+      "bytes": 4364
+    },
+    {
+      "path": "/tmp/plato-container-review-checks/degradation/local-linux-refusal/linux-acceptance.json",
+      "sha256": "a896d73225a816ea0d6333550b662a627ff44da73c093a77fc6caf032d06f06e",
+      "bytes": 178
+    },
+    {
+      "path": "/tmp/plato-container-review-checks/independent-contracts/results.json",
+      "sha256": "e50a0adf974628246e25b0a04bbbca093d9bfb7130045fc2b7ad9df17d0fbad5",
+      "bytes": 4103
+    },
+    {
+      "path": "/tmp/plato-container-review-checks/independent-contracts/commands.json",
+      "sha256": "d20baf65db672adfc82a61141df8c5c0d295f987111eecc906de9a0a940bbd6f",
+      "bytes": 898
+    },
+    {
+      "path": "/tmp/plato-container-review-checks/independent-contracts/final-resource-failure/linux-acceptance.json",
+      "sha256": "f993ebdaa43fdc1c6fe95ecb396624a8df15a5d811d6f59da4c5478a0154289c",
+      "bytes": 214
+    },
+    {
+      "path": "/tmp/plato-container-review-checks/live-wheel-metadata.json",
+      "sha256": "582a72dba0dcc506f1984549b94c6602401e75aa74df50c726083fb5d2c59294",
+      "bytes": 1955
+    },
+    {
+      "path": "/tmp/plato-container-review-checks/independent_contracts.py",
+      "sha256": "13f0aa1d5f74fd2bfc96233a1bfaf143299049032e16547ae51a288ecb200549",
+      "bytes": 5203
+    },
+    {
+      "path": "/tmp/plato-container-review-checks/live_wheel_metadata.py",
+      "sha256": "d8930f8daa3823b0f5ad6e66123697b83d9ff4fea8e3ef670544e067c12de7e8",
+      "bytes": 1958
+    }
+  ],
+  "primary_sources": [
+    "https://pypi.org/pypi/torch/2.14.1/json",
+    "https://pypi.org/pypi/torchvision/0.29.1/json",
+    "https://pypi.org/pypi/nvidia-cudnn-cu13/9.24.0.43/json",
+    "https://pypi.org/pypi/cuda-toolkit/13.0.3.0/json",
+    "https://docs.astral.sh/uv/guides/integration/docker/",
+    "https://github.com/actions/runner-images/blob/main/images/ubuntu/Ubuntu2404-Readme.md"
+  ],
+  "limits_and_pending_required_checks": [
+    "No Docker CLI on review host. No Docker/Colima install, service changes, image build, container execution or actual SDK removal occurred.",
+    "Root must run actual reviewed container workflow after authorized publication on final integrated SHA and inspect Linux resource/build/provenance/context/import/NMS/cuDNN/library/CLI/mount/exit/removal artifacts. A local static acceptance receipt is insufficient.",
+    "35 GiB floor and hosted SDK reclamation are implementation contracts, not measured hosted capacity. If remote disk floor/build fails, an evidence-based capacity/change resolution needs fresh review; no larger runner is assumed provisioned.",
+    "GPU compute, NVIDIA driver compatibility, Linux arm64, byte-identical image reproducibility and production deployment remain unclaimed.",
+    "P3 must carry accepted DEPLOY-PLAN-L1 prose about root identity, root-owned host outputs, bind-mount output persistence and container-only dependency changes lost on --rm.",
+    "No candidate source edits, environment sync, heavy ML workload, push, PR creation, release, registry/package publication or nested agents occurred."
+  ],
+  "next_action": "P1 may be integrated with this bounded acceptance. Final container/image acceptance requires actual source-bound Linux workflow artifacts reviewed by root after final integrated source publication."
+}

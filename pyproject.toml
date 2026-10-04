@@ -80,7 +80,11 @@ lint.select = ["I"]
 
 [tool.hatch.build]
 exclude = [
-    "archives/retired/**",
+    ".venv-docs/**",
+    ".venv-docs-bootstrap/**",
+    "archives/**",
+    "ci-artifacts/**",
+    "docs/site/**",
     "evidence/2026-refresh/reproductions/**",
 ]
 
@@ -150,10 +154,11 @@ audit = [
 [tool.ty]
 
 [tool.ty.src]
-# Remove `build` from the excluded directories.
+# Historical source snapshots and sealed reproduction evidence are not maintained.
 exclude = [
     "examples/outdated",
-    "archives/retired",
+    "archives",
+    "evidence",
 ]
 
 [tool.ty.rules]
@@ -170,6 +175,7 @@ markers = [
     "llm_eval: explicit real CPU Lighteval qualification cases.",
     "mlx_native: explicit Apple Silicon native MLX qualification cases.",
     "retained_model_search: isolated retained model-search behavior requiring ptflops.",
+    "slow: expensive spawned training checks retained in full qualification.",
     "runtime: fresh startup, CPU socket rounds and containment regressions.",
     "startup_runtime: real CPU socket round and socket failure cases.",
     "startup_containment: deliberate noncooperative teardown and child containment.",

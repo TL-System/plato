@@ -57,6 +57,7 @@ def test_real_ckks_weighted_average_matches_plaintext(ckks, indices):
         FedAvgHEAggregationStrategy().aggregate_weights(updates, {}, payloads, context)
     )
     expected = (2 * weights[0].double() + 6 * weights[1].double()) / 8
+    assert result is not None
     torch.testing.assert_close(
         result["layer.weight"].double(), expected, atol=2e-5, rtol=0
     )

@@ -35,6 +35,7 @@ def test_fedasync_actual_example_preserves_staleness_mixing(temp_config):
         / "examples/async/fedasync/fedasync_algorithm.py"
     )
     spec = importlib.util.spec_from_file_location("phase2b_fedasync_algorithm", path)
+    assert spec is not None and spec.loader is not None
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     context = ServerContext()
@@ -73,9 +74,9 @@ def test_async_periodic_aggregation_respects_minimum_and_round_order(temp_config
         async def select():
             events.append("select")
 
-        server._process_reports = aggregate
-        server.wrap_up = wrap
-        server._select_clients = select
+        setattr(server, "_process_reports", aggregate)
+        setattr(server, "wrap_up", wrap)
+        setattr(server, "_select_clients", select)
         server.updates = [SimpleNamespace(client_id=1)]
         await server._periodic_task()
         assert events == []
@@ -93,13 +94,14 @@ def test_cross_silo_invalid_hook_output_preserves_trainer_identity(temp_config):
     server.trainer = SimpleNamespace(client_id=9)
 
     def set_client_id(client_id):
+        assert server.trainer is not None
         server.trainer.client_id = client_id
 
     server.trainer.set_client_id = set_client_id
     server.updates = [
         SimpleNamespace(report=SimpleNamespace(num_samples=1), payload={})
     ]
-    server.weights_received = lambda weights: []
+    setattr(server, "weights_received", lambda weights: [])
     with pytest.raises(ValueError, match="payload"):
         asyncio.run(server._process_reports())
     assert server.trainer.client_id == 9
@@ -138,7 +140,7 @@ def test_async_partial_round_replaces_only_idle_workers(temp_config, batched):
         server.training_sids = ["slow"]
         server._assign_client("slow", 1)
         server.updates = [SimpleNamespace(client_id=2)]
-        server.sio = SimpleNamespace(emit=AsyncMock())
+        setattr(server, "sio", SimpleNamespace(emit=AsyncMock()))
         server.algorithm = SimpleNamespace(extract_weights=lambda: {})
         server._send = AsyncMock()
         server._process_reports = AsyncMock()

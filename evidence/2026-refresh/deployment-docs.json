@@ -1,0 +1,963 @@
+{
+  "schema_version": 1,
+  "recorded_at_utc": "2026-10-04T00:04:57.819499+00:00",
+  "status": "LOCAL_CHECKS_PASSED_PENDING_FRESH_DOCS_REVIEW_AND_LINUX",
+  "publication_gate": {
+    "ready": false,
+    "required": [
+      "Fresh independent Sol review of these two prose files and their commands.",
+      "Root actual Linux Docker build/execution and other integrated CI/Netlify validation gates; static launcher checks are not container execution."
+    ],
+    "not_claimed": [
+      "Global CI pass",
+      "Actual Docker image build or container execution",
+      "GPU training qualification",
+      "Netlify deployment",
+      "Release/package publication"
+    ]
+  },
+  "scope": {
+    "owned_paths": [
+      "docs/docs/install.md",
+      "docs/docs/quickstart.md",
+      "evidence/2026-refresh/deployment-docs.json"
+    ],
+    "no_production_metadata_workflow_script_edits": true,
+    "no_nested_agents_or_push_or_PR": true,
+    "all_shell_commands": "zsh -lc"
+  },
+  "source": {
+    "draft_base": "be6caea2ba12160e5e9995c01c88f2b145470fe6",
+    "accepted_integrated_base": "d29773793d59bbaecdb650f408f116920b037bdb",
+    "prose_commit": "8f852a338a1f99f81963bd32584e5f663ea9e942",
+    "prose_tree": "7e0a473768a223329f94240ad26d20421f0af2ff",
+    "p1_source_commit": "da2ffde66e8ae5d893ceed9bb73d801680c150b6",
+    "p2_source_commit": "63f0d2000f0370708b9afe1e2e6a2dc8559b72e1",
+    "p2_evidence_commit": "cd40f3f862782ccf22fd95d5c7ba1822328842f9",
+    "protected_source_sha256": {
+      "Dockerfile": "4e67953be6d90fcc73fb52a44fd05914494af625c529990f9366b662041b6a82",
+      ".dockerignore": "b90144eaa006aa9954e2f878fcfcbc6d1fa369027582e6f51f4b0500d23ce5da",
+      "dockerrun.sh": "6bbcb5530e5343b0fcb0fd675235f72081efa5fdcfd5fc464e1b28f3eedefee4",
+      "dockerrun_gpu.sh": "2f7ac611428cb0a4d3e36a6b040af4f461cfca8e09252ba0c65fbe105a6a6761",
+      "docs/build.sh": "e21f333201ce75ea7e4a820d505e7b230a5a6048f279b56b0758f1a6cfc338b7",
+      "docs/requirements.txt": "9c33555b3d0cbc983d6dd59f261a242a92d136f2bb1364f300a01824f9eff665",
+      "netlify.toml": "9ae1049a54d5edc1a29b5f34ba7c235c7f0bf3e63802fb8a9f1d421ca79ead0b",
+      "pyproject.toml": "5240593eca9a66c6238177bda7367331def53d054a86b6ef83163567eb3e1dab",
+      "uv.lock": "66a4e4442d7b1f26d220b44ca73c44ff4f1151a86857bb3f93a594819fd08126",
+      ".python-version": "02e735b3dfe1c32833eb550b7ff8ffa17f5f2bc3fa1e7bae61a8f5a3883ce398",
+      ".github/scripts/check_distribution.py": "1b3ea71a1eef084f602092de35a97ceed04beb4ab47da2074690dc89c5c34c3f",
+      ".github/scripts/check_container.py": "0f4dd45635dc3f560d6d7f2721aa23492374ecc27a5b408f25acd36c608c80d5",
+      ".github/workflows/docs_package_checks.yml": "3bd50449d468b4f6606648a66edc9d54e8710577ccd7878f291704391057aa64",
+      ".github/workflows/pypi_publish.yml": "44d20d3daa8e953546acf7e5b01ee61cf54d056b96b09b799ad3cfa65b105062",
+      ".github/workflows/container_checks.yml": "58b24307efa3414c0747e23982ca84822942e62952be886409fd2e3650d3b3e7",
+      ".github/workflows/pytorch_tests.yml": "cd6895c7fc62ee6f0efeff0909fc16078e31adbc61d900db8058548b86714b54",
+      "docs/docs/mlx.md": "0cb74d054b3448a42083dae73a790a81fb3eb6da041691474ffe419328d42ae7",
+      "docs/docs/configurations/evaluation.md": "08dccc460ba982f8636008787344efe36285b5664dcce298cbf7f35a868dbf5c",
+      "docs/docs/references/evaluators.md": "627cf014487123ca67b18974126c8a9873a510ef2bb7d392a5069129ce2be40b",
+      "docs/docs/examples/case-studies/4. Server-side Lighteval for SmolLM2.md": "d20a43f6bbd0fb96b5d0bb65843b6939fe4506c928e5051d8c5b3a479a9664c7",
+      "docs/docs/examples/case-studies/6. Qwen3 Federated LoRA.md": "0e6c10676a580e6135cc65c5708840a97069b2133aac7d4576495786dc5f7dae"
+    },
+    "docs_before_sha256": {
+      "docs/docs/install.md": "495ac1c33737e5c9f477b8d650952840164bbb98957bc6e9ab6632fc55727eb2",
+      "docs/docs/quickstart.md": "6e946cfd836abfe7e87044eaaf0c64d89ed256a6e3e1c2fb47bbd2a641d5065f"
+    },
+    "docs_after_sha256": {
+      "docs/docs/install.md": "a470727062b1ac0d243fc0a19581d76a40e2f08806bc0526bb23d86b08759f8c",
+      "docs/docs/quickstart.md": "c32b0694f2b295c1aca1e48f3328071f3c9637f519f9af02d9af4b44b112acfc"
+    },
+    "accepted_evaluator_sections_preserved_sha256": {
+      "install": "b9ee2f11afd743c1f665b4f1767a6178fca37f224dfbc178ede1e8d1f86a6a96",
+      "quickstart": "845cfe1dd12fc599db1bb236f85ee72613fc553ec5333db8d7d1631fc8580401"
+    },
+    "preservation": "Exactly two prose files differ from accepted integration base at the prose commit. Evaluator sections are byte-identical; MLX/Qwen sections and all production/test/config/dependency/CI files are untouched. Accepted P2 was fast-forwarded only after root handoff; drafts were backed up and restored."
+  },
+  "authority": [
+    {
+      "path": "/tmp/plato-deployment-refresh-plan.json",
+      "sha256": "6d9eca53b96e1e70d6f89617fce2f2a1234fb5d8fc94fa79e387ade605c4fe9e",
+      "bytes": 25609
+    },
+    {
+      "path": "/tmp/plato-deployment-refresh-plan-review.json",
+      "sha256": "98b845c6dd3d1562a327239f4dd96c909b4d8bc6c9db2f24240393423dfb976b",
+      "bytes": 12822
+    },
+    {
+      "path": "/tmp/plato-container-review.json",
+      "sha256": "9239f4fc003134f47c21b8defecc533b3f796319200ca94120b861b3e82fd974",
+      "bytes": 12617
+    },
+    {
+      "path": "/tmp/plato-docs-package-binding-review.json",
+      "sha256": "c42c4deea9bf414388711069c34b48238f6ead704ed5dadce38e605b5e5b1075",
+      "bytes": 40894
+    }
+  ],
+  "primary_external_source": {
+    "url": "https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html",
+    "method": "Opened current official NVIDIA installation guide with web tool during drafting.",
+    "observations": "Host driver, supported container engine, toolkit installation and Docker runtime configuration are prerequisites. Link replaces duplicated pinned 1.17.8 package recipe; no host setup command was executed."
+  },
+  "validation": {
+    "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+    "uv": "0.12.22",
+    "platform": "Darwin arm64; no Linux claim",
+    "docs_build": {
+      "command": "PLATO_DOCS_PYTHON=\"$(uv python find 3.13)\" PLATO_DOCS_ENVIRONMENT=/tmp/plato-deployment-docs/docs-env PLATO_DOCS_BOOTSTRAP_ENVIRONMENT=/tmp/plato-deployment-docs/bootstrap-env PLATO_DOCS_ARTIFACT_DIR=/tmp/plato-deployment-docs/artifacts ./docs/build.sh",
+      "returncode": 0,
+      "environment": {
+        "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+        "executable": "/tmp/plato-deployment-docs/docs-env/bin/python",
+        "prefix": "/tmp/plato-deployment-docs/docs-env",
+        "packages": {
+          "babel": "2.18.0",
+          "backrefs": "8.0",
+          "certifi": "2026.7.22",
+          "charset-normalizer": "3.5.2",
+          "click": "8.5.0",
+          "colorama": "0.4.6",
+          "ghp-import": "2.1.0",
+          "idna": "3.20",
+          "jinja2": "3.1.6",
+          "markdown": "3.11",
+          "markupsafe": "3.0.3",
+          "mergedeep": "1.3.4",
+          "mkdocs": "1.6.1",
+          "mkdocs-get-deps": "0.2.2",
+          "mkdocs-material": "9.7.7",
+          "mkdocs-material-extensions": "1.3.1",
+          "packaging": "26.3",
+          "paginate": "0.5.7",
+          "pathspec": "1.1.1",
+          "platformdirs": "4.12.2",
+          "pygments": "2.21.0",
+          "pymdown-extensions": "12.1",
+          "python-dateutil": "2.9.0.post0",
+          "pyyaml": "6.0.3",
+          "pyyaml-env-tag": "1.1",
+          "requests": "2.34.2",
+          "six": "1.17.0",
+          "urllib3": "2.8.0",
+          "watchdog": "6.0.0"
+        },
+        "requirements_parity": true,
+        "runtime_and_project_absent": true
+      },
+      "output_site": "/tmp/plato-refresh-worktrees/deployment-docs/docs/site",
+      "log": {
+        "path": "/tmp/plato-deployment-docs/artifacts/docs-build.log",
+        "sha256": "5fadb75faa93675208e5dd5914b80bb5e8b34bd25ce8036992edf8ba82e494d7",
+        "bytes": 2524
+      },
+      "note": "Strict build executed after final prose edit and before committing the identical bytes as 8f852a33. Managed interpreter lookup avoids assuming python3.13 is already on PATH. Existing Material advisory and informational unlisted retired pages are not strict-build failures."
+    },
+    "links": {
+      "files": [
+        "docs/docs/install.md",
+        "docs/docs/quickstart.md",
+        "docs/docs/configurations/evaluation.md",
+        "docs/docs/references/evaluators.md",
+        "docs/docs/examples/case-studies/4. Server-side Lighteval for SmolLM2.md",
+        "docs/docs/development.md"
+      ],
+      "rendered_local_links_checked": 417,
+      "evaluator_commands_checked": 13,
+      "commands": [
+        {
+          "page": "docs/docs/install.md",
+          "command": "uv sync --locked --python 3.13 --extra llm_eval",
+          "tokens": [
+            "uv",
+            "sync",
+            "--locked",
+            "--python",
+            "3.13",
+            "--extra",
+            "llm_eval"
+          ]
+        },
+        {
+          "page": "docs/docs/install.md",
+          "command": "uv run --locked --extra llm_eval python -m nltk.downloader punkt punkt_tab",
+          "tokens": [
+            "uv",
+            "run",
+            "--locked",
+            "--extra",
+            "llm_eval",
+            "python",
+            "-m",
+            "nltk.downloader",
+            "punkt",
+            "punkt_tab"
+          ]
+        },
+        {
+          "page": "docs/docs/quickstart.md",
+          "command": "uv sync --locked --python 3.13 --extra llm_eval",
+          "tokens": [
+            "uv",
+            "sync",
+            "--locked",
+            "--python",
+            "3.13",
+            "--extra",
+            "llm_eval"
+          ]
+        },
+        {
+          "page": "docs/docs/quickstart.md",
+          "command": "uv run --locked --extra llm_eval python -m nltk.downloader punkt punkt_tab",
+          "tokens": [
+            "uv",
+            "run",
+            "--locked",
+            "--extra",
+            "llm_eval",
+            "python",
+            "-m",
+            "nltk.downloader",
+            "punkt",
+            "punkt_tab"
+          ]
+        },
+        {
+          "page": "docs/docs/quickstart.md",
+          "command": "uv run --locked --extra llm_eval python plato.py --config configs/HuggingFace/fedavg_smol_smoltalk_smollm2_135m.toml",
+          "tokens": [
+            "uv",
+            "run",
+            "--locked",
+            "--extra",
+            "llm_eval",
+            "python",
+            "plato.py",
+            "--config",
+            "configs/HuggingFace/fedavg_smol_smoltalk_smollm2_135m.toml"
+          ]
+        },
+        {
+          "page": "docs/docs/references/evaluators.md",
+          "command": "uv sync --locked --python 3.13 --extra llm_eval --group test",
+          "tokens": [
+            "uv",
+            "sync",
+            "--locked",
+            "--python",
+            "3.13",
+            "--extra",
+            "llm_eval",
+            "--group",
+            "test"
+          ]
+        },
+        {
+          "page": "docs/docs/references/evaluators.md",
+          "command": "uv run --locked --extra llm_eval python -m nltk.downloader punkt punkt_tab",
+          "tokens": [
+            "uv",
+            "run",
+            "--locked",
+            "--extra",
+            "llm_eval",
+            "python",
+            "-m",
+            "nltk.downloader",
+            "punkt",
+            "punkt_tab"
+          ]
+        },
+        {
+          "page": "docs/docs/references/evaluators.md",
+          "command": "uv run --locked --extra llm_eval --group test python -m pytest tests/llm_eval --test-profile=llm-eval -ra",
+          "tokens": [
+            "uv",
+            "run",
+            "--locked",
+            "--extra",
+            "llm_eval",
+            "--group",
+            "test",
+            "python",
+            "-m",
+            "pytest",
+            "tests/llm_eval",
+            "--test-profile=llm-eval",
+            "-ra"
+          ]
+        },
+        {
+          "page": "docs/docs/references/evaluators.md",
+          "command": "uv run --locked --extra llm_eval --group test python -m pytest tests/llm_eval/test_lighteval_runtime.py -k model_config -ra",
+          "tokens": [
+            "uv",
+            "run",
+            "--locked",
+            "--extra",
+            "llm_eval",
+            "--group",
+            "test",
+            "python",
+            "-m",
+            "pytest",
+            "tests/llm_eval/test_lighteval_runtime.py",
+            "-k",
+            "model_config",
+            "-ra"
+          ]
+        },
+        {
+          "page": "docs/docs/references/evaluators.md",
+          "command": "uv run --locked --extra llm_eval --group test-model-search python -m pytest tests --test-profile=llm-eval -ra",
+          "tokens": [
+            "uv",
+            "run",
+            "--locked",
+            "--extra",
+            "llm_eval",
+            "--group",
+            "test-model-search",
+            "python",
+            "-m",
+            "pytest",
+            "tests",
+            "--test-profile=llm-eval",
+            "-ra"
+          ]
+        },
+        {
+          "page": "docs/docs/examples/case-studies/4. Server-side Lighteval for SmolLM2.md",
+          "command": "uv sync --locked --python 3.13 --extra llm_eval",
+          "tokens": [
+            "uv",
+            "sync",
+            "--locked",
+            "--python",
+            "3.13",
+            "--extra",
+            "llm_eval"
+          ]
+        },
+        {
+          "page": "docs/docs/examples/case-studies/4. Server-side Lighteval for SmolLM2.md",
+          "command": "uv run --locked --extra llm_eval python -m nltk.downloader punkt punkt_tab",
+          "tokens": [
+            "uv",
+            "run",
+            "--locked",
+            "--extra",
+            "llm_eval",
+            "python",
+            "-m",
+            "nltk.downloader",
+            "punkt",
+            "punkt_tab"
+          ]
+        },
+        {
+          "page": "docs/docs/examples/case-studies/4. Server-side Lighteval for SmolLM2.md",
+          "command": "uv run --locked --extra llm_eval python plato.py --config configs/HuggingFace/fedavg_smol_smoltalk_smollm2_135m.toml",
+          "tokens": [
+            "uv",
+            "run",
+            "--locked",
+            "--extra",
+            "llm_eval",
+            "python",
+            "plato.py",
+            "--config",
+            "configs/HuggingFace/fedavg_smol_smoltalk_smollm2_135m.toml"
+          ]
+        }
+      ],
+      "errors": [],
+      "external_links": "External navigation/theme links were not fetched; this audit checks built local page targets and fragments."
+    },
+    "commands": {
+      "execution_checks": [
+        {
+          "name": "mnist-cli",
+          "argv": [
+            "uv",
+            "run",
+            "--locked",
+            "python",
+            "plato.py",
+            "--config",
+            "configs/MNIST/fedavg_lenet5.toml",
+            "--cpu",
+            "--help"
+          ],
+          "cwd": "/tmp/plato-refresh-worktrees/deployment-docs",
+          "returncode": 0,
+          "log": "/tmp/plato-deployment-docs/artifacts/mnist-cli.log",
+          "sha256": "ac7c87ef7f253bb1370c124fab32bbdbebab3de9d079b865c3379368d6345593"
+        },
+        {
+          "name": "basic-cli",
+          "argv": [
+            "uv",
+            "run",
+            "--locked",
+            "python",
+            "examples/basic/basic.py",
+            "-c",
+            "configs/MNIST/fedavg_lenet5.toml",
+            "--cpu",
+            "--help"
+          ],
+          "cwd": "/tmp/plato-refresh-worktrees/deployment-docs",
+          "returncode": 0,
+          "log": "/tmp/plato-deployment-docs/artifacts/basic-cli.log",
+          "sha256": "705ab5a278bff4a7b1a73dad2379b6412685c9a78e014df5362a80083328aceb"
+        },
+        {
+          "name": "fedatt-cli",
+          "argv": [
+            "uv",
+            "run",
+            "--locked",
+            "python",
+            "fedatt.py",
+            "-c",
+            "fedatt_FashionMNIST_lenet5.toml",
+            "--help"
+          ],
+          "cwd": "/tmp/plato-refresh-worktrees/deployment-docs/examples/server_aggregation/fedatt",
+          "returncode": 0,
+          "log": "/tmp/plato-deployment-docs/artifacts/fedatt-cli.log",
+          "sha256": "d6d6845c96c3d362647023be1f6ce1646abc13097f00c638767388dc3e91c1de"
+        },
+        {
+          "name": "ruff-format-help",
+          "argv": [
+            "uv",
+            "run",
+            "--locked",
+            "--group",
+            "dev",
+            "ruff",
+            "format",
+            "--help"
+          ],
+          "cwd": "/tmp/plato-refresh-worktrees/deployment-docs",
+          "returncode": 0,
+          "log": "/tmp/plato-deployment-docs/artifacts/ruff-format-help.log",
+          "sha256": "c2f765ca78aec23413a6ea5fcac7cb5c62121f3f006bce0c758cab99a0019c85"
+        },
+        {
+          "name": "ruff-check-help",
+          "argv": [
+            "uv",
+            "run",
+            "--locked",
+            "--group",
+            "dev",
+            "ruff",
+            "check",
+            "--help"
+          ],
+          "cwd": "/tmp/plato-refresh-worktrees/deployment-docs",
+          "returncode": 0,
+          "log": "/tmp/plato-deployment-docs/artifacts/ruff-check-help.log",
+          "sha256": "aae7a75a970c047855a54b82d238a81b97565dd2cdf1e2a4275ca7ccf8f5b313"
+        },
+        {
+          "name": "ty-check-help",
+          "argv": [
+            "uv",
+            "run",
+            "--locked",
+            "--group",
+            "dev",
+            "ty",
+            "check",
+            "--help"
+          ],
+          "cwd": "/tmp/plato-refresh-worktrees/deployment-docs",
+          "returncode": 0,
+          "log": "/tmp/plato-deployment-docs/artifacts/ty-check-help.log",
+          "sha256": "685c3c1fcdb392879214b0f0c01f486f83de1e28334ab8d2814236db3446be5a"
+        },
+        {
+          "name": "container-static",
+          "argv": [
+            "uv",
+            "run",
+            "--no-project",
+            "--python",
+            "3.13",
+            "python",
+            ".github/scripts/check_container.py",
+            "static",
+            "--artifacts",
+            "/tmp/plato-deployment-docs/artifacts/container-static"
+          ],
+          "cwd": "/tmp/plato-refresh-worktrees/deployment-docs",
+          "returncode": 0,
+          "log": "/tmp/plato-deployment-docs/artifacts/container-static.log",
+          "sha256": "131a532db5755e363bc0d76b60009396f3a9361296416bb77e5cc61b2fe429ed"
+        }
+      ],
+      "shell_blocks": [
+        {
+          "file": "install.md",
+          "script": "curl -LsSf https://astral.sh/uv/install.sh | sh\nsource \"$HOME/.local/bin/env\"",
+          "returncode": 0,
+          "stderr": ""
+        },
+        {
+          "file": "install.md",
+          "script": "git clone https://github.com/TL-System/plato.git\ncd plato\nuv sync --locked --python 3.13",
+          "returncode": 0,
+          "stderr": ""
+        },
+        {
+          "file": "install.md",
+          "script": "uv run --locked python plato.py --config configs/MNIST/fedavg_lenet5.toml --cpu",
+          "returncode": 0,
+          "stderr": ""
+        },
+        {
+          "file": "install.md",
+          "script": "uv sync --locked --python 3.13 --extra mlx",
+          "returncode": 0,
+          "stderr": ""
+        },
+        {
+          "file": "install.md",
+          "script": "UV_PROJECT_ENVIRONMENT=.venv-ssl uv sync --locked --python 3.13 --extra ssl",
+          "returncode": 0,
+          "stderr": ""
+        },
+        {
+          "file": "install.md",
+          "script": "cd examples/server_aggregation/fedatt\nuv run --locked python fedatt.py -c fedatt_FashionMNIST_lenet5.toml",
+          "returncode": 0,
+          "stderr": ""
+        },
+        {
+          "file": "install.md",
+          "script": "uv sync --python 3.13 --extra mlx",
+          "returncode": 0,
+          "stderr": ""
+        },
+        {
+          "file": "install.md",
+          "script": "uv sync --locked --python 3.13 --extra llm_eval\nuv run --locked --extra llm_eval python -m nltk.downloader punkt punkt_tab",
+          "returncode": 0,
+          "stderr": ""
+        },
+        {
+          "file": "install.md",
+          "script": "PLATO_DOCS_PYTHON=\"$(uv python find 3.13)\" ./docs/build.sh",
+          "returncode": 0,
+          "stderr": ""
+        },
+        {
+          "file": "install.md",
+          "script": "uv run --no-project --python 3.13 python .github/scripts/check_distribution.py",
+          "returncode": 0,
+          "stderr": ""
+        },
+        {
+          "file": "install.md",
+          "script": "rm -rf .venv",
+          "returncode": 0,
+          "stderr": ""
+        },
+        {
+          "file": "install.md",
+          "script": "uv cache clean",
+          "returncode": 0,
+          "stderr": ""
+        },
+        {
+          "file": "quickstart.md",
+          "script": "uv sync --locked --python 3.13\nuv run --locked python plato.py --config configs/MNIST/fedavg_lenet5.toml --cpu",
+          "returncode": 0,
+          "stderr": ""
+        },
+        {
+          "file": "quickstart.md",
+          "script": "uv run --locked python examples/basic/basic.py -c configs/MNIST/fedavg_lenet5.toml --cpu",
+          "returncode": 0,
+          "stderr": ""
+        },
+        {
+          "file": "quickstart.md",
+          "script": "uv sync --locked --python 3.13 --extra llm_eval\nuv run --locked --extra llm_eval python -m nltk.downloader punkt punkt_tab",
+          "returncode": 0,
+          "stderr": ""
+        },
+        {
+          "file": "quickstart.md",
+          "script": "uv run --locked --extra llm_eval python plato.py --config configs/HuggingFace/fedavg_smol_smoltalk_smollm2_135m.toml",
+          "returncode": 0,
+          "stderr": ""
+        },
+        {
+          "file": "quickstart.md",
+          "script": "uv run python plato.py --config configs/HuggingFace/fedavg_qwen3_06b_lora.toml --cpu",
+          "returncode": 0,
+          "stderr": ""
+        },
+        {
+          "file": "quickstart.md",
+          "script": "uv sync --python 3.13 --extra mlx\nuv run --extra mlx python plato.py --config configs/MNIST/fedavg_lenet5_mlx.toml",
+          "returncode": 0,
+          "stderr": ""
+        },
+        {
+          "file": "quickstart.md",
+          "script": "docker build -t plato -f Dockerfile .",
+          "returncode": 0,
+          "stderr": ""
+        },
+        {
+          "file": "quickstart.md",
+          "script": "./dockerrun.sh python plato.py --config configs/MNIST/fedavg_lenet5.toml --cpu",
+          "returncode": 0,
+          "stderr": ""
+        },
+        {
+          "file": "quickstart.md",
+          "script": "uv sync --locked --python 3.13 --no-default-groups",
+          "returncode": 0,
+          "stderr": ""
+        },
+        {
+          "file": "quickstart.md",
+          "script": "./dockerrun_gpu.sh nvidia-smi",
+          "returncode": 0,
+          "stderr": ""
+        },
+        {
+          "file": "quickstart.md",
+          "script": "./dockerrun_gpu.sh python plato.py --config configs/MNIST/fedavg_lenet5.toml",
+          "returncode": 0,
+          "stderr": ""
+        },
+        {
+          "file": "quickstart.md",
+          "script": "uv run --locked --group dev ruff format .\nuv run --locked --group dev ruff check . --fix",
+          "returncode": 0,
+          "stderr": ""
+        },
+        {
+          "file": "quickstart.md",
+          "script": "uv run --locked --group dev ty check plato",
+          "returncode": 0,
+          "stderr": ""
+        }
+      ],
+      "docker_cli_available": false,
+      "limits": "CLI help and tool help are argument/entrypoint checks, not training or formatting/type-cleanliness qualification. Container static check inspects source/launcher argument behavior only. No Docker executable is installed; no daemon, image build, container run or GPU computation attempted."
+    },
+    "package": {
+      "command": "uv run --no-project --python 3.13 python .github/scripts/check_distribution.py --output-dir /tmp/plato-deployment-docs/package-qualified",
+      "returncode": 0,
+      "output_was_new": true,
+      "acceptance": {
+        "accepted": true,
+        "source_commit": "8f852a338a1f99f81963bd32584e5f663ea9e942",
+        "wheel_sha256": "5e300e5a00b575557cd0ca5c948d956772fb7229a470bdbead2ac1333ced79dd",
+        "sdist_sha256": "58c184f10dbcebb47643fc92d94c97d1553c36000d744c6dfed26e093d9e7fa1",
+        "sdist_source_tree_bound": true,
+        "sdist_source_binding_sha256": "ab4cf4b37e2db9e369c0fb899b9257c787e26732810250af3bdb5e43ec94a34f",
+        "rebuilt_wheel_payload_matches": true,
+        "installed_wheel_provenance_and_imports": true,
+        "build_constraints_sha256": "284e1018003f55e4ce6fbb5c80b7dad20e86d9ed60ef544d817f1892626326de",
+        "runtime_constraints_sha256": "9c9b82f4c52ba05fb5a1c7e6e841e15fcd69104f9867cf7d7526060055a32709"
+      },
+      "provenance": {
+        "source_commit": "8f852a338a1f99f81963bd32584e5f663ea9e942",
+        "source_status": "",
+        "source_status_scope": "Tracked files only; sdist bytes must match Git blobs.",
+        "source_files": {
+          "pyproject.toml": "5240593eca9a66c6238177bda7367331def53d054a86b6ef83163567eb3e1dab",
+          "uv.lock": "66a4e4442d7b1f26d220b44ca73c44ff4f1151a86857bb3f93a594819fd08126",
+          ".python-version": "02e735b3dfe1c32833eb550b7ff8ffa17f5f2bc3fa1e7bae61a8f5a3883ce398",
+          ".github/scripts/check_distribution.py": "1b3ea71a1eef084f602092de35a97ceed04beb4ab47da2074690dc89c5c34c3f",
+          ".github/workflows/docs_package_checks.yml": "3bd50449d468b4f6606648a66edc9d54e8710577ccd7878f291704391057aa64",
+          ".github/workflows/pypi_publish.yml": "44d20d3daa8e953546acf7e5b01ee61cf54d056b96b09b799ad3cfa65b105062"
+        },
+        "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+        "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+        "uv": "uv 0.12.22 (70fe1196a 2026-10-01 aarch64-apple-darwin)"
+      },
+      "note": "Actual full build/check command executed on the committed prose source: build constraints, archive manifests/source bytes, sdist rebuild, installed-wheel origin/dependency/import and CPU operation checks. Optional workload/model training was not run."
+    },
+    "initial_package_rejection": {
+      "command": "uv run --no-project --python 3.13 python .github/scripts/check_distribution.py",
+      "returncode": 1,
+      "reason": "Sdist bytes differ from frozen Git tree for the two then-uncommitted prose files.",
+      "preserved_artifacts": "/tmp/plato-deployment-docs/package-uncommitted-red",
+      "resolution": "Documented the committed-checkout requirement, committed only the prose, and reran with a new invocation-owned output directory. Rejection outputs were moved intact from task worktree ci-artifacts to the task artifact root; no failed run counted as passing."
+    },
+    "runtime_setup": {
+      "command": "UV_PROJECT_ENVIRONMENT=/tmp/plato-deployment-docs/runtime-env uv sync --locked --python 3.13",
+      "returncode": 0,
+      "log": {
+        "path": "/tmp/plato-deployment-docs/artifacts/runtime-sync.log",
+        "sha256": "8398d838d742270628a749b17386ffddebec23b938e1d3037ccc5a02ed94666a",
+        "bytes": 2268
+      }
+    },
+    "git_diff_check": {
+      "returncode": 0
+    },
+    "docker_availability": {
+      "command": "command -v docker",
+      "returncode": 1,
+      "cli_present": false,
+      "scope": "Docker CLI absent; no local daemon/image/container qualification possible or attempted. No Docker/Colima install or service changes."
+    },
+    "bounded_scope": "Seven execution checks: MNIST/basic/FedAtt CLI help, Ruff format/check and ty help, and actual P1 static container checker. All 25 owned-page shell blocks passed zsh -n. Help commands prove CLI options/entrypoint loading, not training success, applied formatting or a clean typing baseline. Six page rendered audit retains all 13 unchanged evaluator command checks."
+  },
+  "environments": {
+    "owned_docs": "/tmp/plato-deployment-docs/docs-env",
+    "owned_runtime": "/tmp/plato-deployment-docs/runtime-env",
+    "package_install": "Temporary interpreter/environment created and cleaned by the accepted package checker.",
+    "other_environments_mutated": false
+  },
+  "factual_boundaries": [
+    "Python 3.13 remains the only default/qualification interpreter; selected compatible extras differ from tooling/test groups. uv sync does not copy global packages.",
+    "Container configuration places the project environment at /opt/plato/.venv and managed Python at /opt/plato/python outside /root/plato. Quoted mount arguments and --rm were statically exercised, with no actual Docker run.",
+    "Launchers retain Linux host networking/shared memory and root identity; host bind-mount outputs persist and may be root-owned, while container-only dependency changes disappear on removal.",
+    "GPU visibility and CPU execution are not GPU model/driver qualification. Current official NVIDIA host setup guidance is linked instead of copied version pins.",
+    "Accepted evaluator prose is preserved without rerunning Lighteval, model training or NLTK downloads. Existing evaluator/profile Linux gates stay root-owned.",
+    "Package build command uses new output ownership and committed Git source binding. It validates locally and does not publish."
+  ],
+  "artifacts": {
+    "root": "/tmp/plato-deployment-docs",
+    "files": [
+      {
+        "path": "/tmp/plato-deployment-docs/artifacts/basic-cli.log",
+        "sha256": "705ab5a278bff4a7b1a73dad2379b6412685c9a78e014df5362a80083328aceb",
+        "bytes": 732
+      },
+      {
+        "path": "/tmp/plato-deployment-docs/artifacts/command-checks.json",
+        "sha256": "bfea5206533c876de91ebfc6654bea82251638a27a1370ce128d6f7e78cf0e05",
+        "bytes": 8211
+      },
+      {
+        "path": "/tmp/plato-deployment-docs/artifacts/command_checks.py",
+        "sha256": "77bab8bb07b852c9a47c2cb9dae438cd8b305bae5d83d283326f2f4445cc6f20",
+        "bytes": 2698
+      },
+      {
+        "path": "/tmp/plato-deployment-docs/artifacts/container-static/source.json",
+        "sha256": "25a84da7bdb77a9a8b9cbf24a99ee0b404fc9df9e91ae28732cab6653a561c6a",
+        "bytes": 1300
+      },
+      {
+        "path": "/tmp/plato-deployment-docs/artifacts/container-static/static-acceptance.json",
+        "sha256": "990eeba8b0a7263456e25419624ff8db7cbe00321e1a0507221b1f568e0f1ea7",
+        "bytes": 3364
+      },
+      {
+        "path": "/tmp/plato-deployment-docs/artifacts/container-static.log",
+        "sha256": "131a532db5755e363bc0d76b60009396f3a9361296416bb77e5cc61b2fe429ed",
+        "bytes": 121
+      },
+      {
+        "path": "/tmp/plato-deployment-docs/artifacts/docs-build.log",
+        "sha256": "5fadb75faa93675208e5dd5914b80bb5e8b34bd25ce8036992edf8ba82e494d7",
+        "bytes": 2524
+      },
+      {
+        "path": "/tmp/plato-deployment-docs/artifacts/docs-environment.json",
+        "sha256": "3b206cb0e101d69efae22f83063fbfc738dd14504acaa883427937db2880c802",
+        "bytes": 1062
+      },
+      {
+        "path": "/tmp/plato-deployment-docs/artifacts/fedatt-cli.log",
+        "sha256": "d6d6845c96c3d362647023be1f6ce1646abc13097f00c638767388dc3e91c1de",
+        "bytes": 734
+      },
+      {
+        "path": "/tmp/plato-deployment-docs/artifacts/mnist-cli.log",
+        "sha256": "ac7c87ef7f253bb1370c124fab32bbdbebab3de9d079b865c3379368d6345593",
+        "bytes": 732
+      },
+      {
+        "path": "/tmp/plato-deployment-docs/artifacts/package-command.log",
+        "sha256": "0db2b48f902fc822dfb44075899e85c2fe7ef09ef1a1cab044242a54999b8f33",
+        "bytes": 93
+      },
+      {
+        "path": "/tmp/plato-deployment-docs/artifacts/package-qualified-command.log",
+        "sha256": "d1259ed2ec0a0a1991890111879353f967ab16726112737a6c433fe4d6d49efc",
+        "bytes": 683
+      },
+      {
+        "path": "/tmp/plato-deployment-docs/artifacts/rendered-link-command-audit.json",
+        "sha256": "8d62f407120d8560fecd352021b0262c2af3970d67c692048fcb016fd2c4fded",
+        "bytes": 5566
+      },
+      {
+        "path": "/tmp/plato-deployment-docs/artifacts/rendered_audit.py",
+        "sha256": "2be6e489d4af11765313c18e9f479f6e0f0c31807c6d6d58f7b1d091040faa79",
+        "bytes": 4263
+      },
+      {
+        "path": "/tmp/plato-deployment-docs/artifacts/ruff-check-help.log",
+        "sha256": "aae7a75a970c047855a54b82d238a81b97565dd2cdf1e2a4275ca7ccf8f5b313",
+        "bytes": 6292
+      },
+      {
+        "path": "/tmp/plato-deployment-docs/artifacts/ruff-format-help.log",
+        "sha256": "c2f765ca78aec23413a6ea5fcac7cb5c62121f3f006bce0c758cab99a0019c85",
+        "bytes": 4884
+      },
+      {
+        "path": "/tmp/plato-deployment-docs/artifacts/runtime-sync.log",
+        "sha256": "8398d838d742270628a749b17386ffddebec23b938e1d3037ccc5a02ed94666a",
+        "bytes": 2268
+      },
+      {
+        "path": "/tmp/plato-deployment-docs/artifacts/ty-check-help.log",
+        "sha256": "685c3c1fcdb392879214b0f0c01f486f83de1e28334ab8d2814236db3446be5a",
+        "bytes": 7120
+      },
+      {
+        "path": "/tmp/plato-deployment-docs/artifacts/write_receipt.py",
+        "sha256": "b7817fc4bedd61efc6e7d6ee51171e16109eefeab9a9e0bed4d411dfbf1cde3c",
+        "bytes": 9134
+      },
+      {
+        "path": "/tmp/plato-deployment-docs/package-qualified/acceptance.json",
+        "sha256": "d1259ed2ec0a0a1991890111879353f967ab16726112737a6c433fe4d6d49efc",
+        "bytes": 683
+      },
+      {
+        "path": "/tmp/plato-deployment-docs/package-qualified/build-constraints.log",
+        "sha256": "e527c36e8c7872ef4ec38abe028c82a8bc503aa28de6a67ee22efef344c3c76b",
+        "bytes": 550
+      },
+      {
+        "path": "/tmp/plato-deployment-docs/package-qualified/build-constraints.txt",
+        "sha256": "284e1018003f55e4ce6fbb5c80b7dad20e86d9ed60ef544d817f1892626326de",
+        "bytes": 212
+      },
+      {
+        "path": "/tmp/plato-deployment-docs/package-qualified/build.log",
+        "sha256": "89af1649ef45bf248ed73ecfe9660f6d3019fa4053a1be441d373335ad71ced8",
+        "bytes": 610
+      },
+      {
+        "path": "/tmp/plato-deployment-docs/package-qualified/installed-wheel-import.log",
+        "sha256": "97eb0ee1074b28080a6f650a70f4e5dd4b18269b3457daa63eabe8367accfb06",
+        "bytes": 7826
+      },
+      {
+        "path": "/tmp/plato-deployment-docs/package-qualified/installed-wheel.json",
+        "sha256": "67a5249b094463b30ccd7ab92788a3b84e529d3b59172979ca984ffb85d05b60",
+        "bytes": 4683
+      },
+      {
+        "path": "/tmp/plato-deployment-docs/package-qualified/provenance.json",
+        "sha256": "77830d2330de59ef5f5919526e5aaf5518bd40693a38e06e9303805798f82091",
+        "bytes": 985
+      },
+      {
+        "path": "/tmp/plato-deployment-docs/package-qualified/rebuilt-wheel-manifest.json",
+        "sha256": "0d9d5cec358e4a52af9a297b220a0d890d3fc4b689edd206c78b2b251ecbff53",
+        "bytes": 24642
+      },
+      {
+        "path": "/tmp/plato-deployment-docs/package-qualified/runtime-constraints.log",
+        "sha256": "cadc53b211b51ae64568d169e6a5459ab6f72cb8c18c12f2b25c31de10283404",
+        "bytes": 7606
+      },
+      {
+        "path": "/tmp/plato-deployment-docs/package-qualified/runtime-constraints.txt",
+        "sha256": "9c9b82f4c52ba05fb5a1c7e6e841e15fcd69104f9867cf7d7526060055a32709",
+        "bytes": 7268
+      },
+      {
+        "path": "/tmp/plato-deployment-docs/package-qualified/sdist-manifest.json",
+        "sha256": "6f305383ae0536ad1be53c68c83ef5c265f0743cd23df960950a5941b6ed1028",
+        "bytes": 175132
+      },
+      {
+        "path": "/tmp/plato-deployment-docs/package-qualified/sdist-rebuild.log",
+        "sha256": "26b13c9807b2a44b8d5448cd09a133da2877b2ed915495fa859254bbaf08df6d",
+        "bytes": 490
+      },
+      {
+        "path": "/tmp/plato-deployment-docs/package-qualified/sdist-source-binding.json",
+        "sha256": "ab4cf4b37e2db9e369c0fb899b9257c787e26732810250af3bdb5e43ec94a34f",
+        "bytes": 291284
+      },
+      {
+        "path": "/tmp/plato-deployment-docs/package-qualified/wheel-dependencies.log",
+        "sha256": "c969faa1ee3c9cffb3556312a3ce6613defcabaf36d28b18adce0510c4858186",
+        "bytes": 405
+      },
+      {
+        "path": "/tmp/plato-deployment-docs/package-qualified/wheel-environment.log",
+        "sha256": "6e0d68fc4d84feb35cb5eacb74fa0bc598827399e16594078297c9badeaecfe2",
+        "bytes": 466
+      },
+      {
+        "path": "/tmp/plato-deployment-docs/package-qualified/wheel-install.log",
+        "sha256": "36bea72c12f3e611378d91f8edce70c07a631b997402b2ff2da9043ed9c6d938",
+        "bytes": 2339
+      },
+      {
+        "path": "/tmp/plato-deployment-docs/package-qualified/wheel-manifest.json",
+        "sha256": "0d9d5cec358e4a52af9a297b220a0d890d3fc4b689edd206c78b2b251ecbff53",
+        "bytes": 24642
+      },
+      {
+        "path": "/tmp/plato-deployment-docs/package-uncommitted-red/acceptance.json",
+        "sha256": "2efd0436fb16e7c70ab52e981ab5a825a2ce4df6755c9015dc2db441dab6bbe2",
+        "bytes": 131
+      },
+      {
+        "path": "/tmp/plato-deployment-docs/package-uncommitted-red/build-constraints.log",
+        "sha256": "1bd444c04d6ee967675094648ac8396d225ad1ad0f1b5b2bc26224e8583966f7",
+        "bytes": 576
+      },
+      {
+        "path": "/tmp/plato-deployment-docs/package-uncommitted-red/build-constraints.txt",
+        "sha256": "284e1018003f55e4ce6fbb5c80b7dad20e86d9ed60ef544d817f1892626326de",
+        "bytes": 212
+      },
+      {
+        "path": "/tmp/plato-deployment-docs/package-uncommitted-red/build.log",
+        "sha256": "aab28f0f8f540935bae8695cf9d650d7b6b9829a0a3132629a4d09d0a13eb7a2",
+        "bytes": 608
+      },
+      {
+        "path": "/tmp/plato-deployment-docs/package-uncommitted-red/provenance.json",
+        "sha256": "e84daf5b755f479445f36e26c2aae6556bf62067205b1af19b453fae99444e4d",
+        "bytes": 1038
+      },
+      {
+        "path": "/tmp/plato-deployment-docs/package-uncommitted-red/runtime-constraints.log",
+        "sha256": "f4d4de558f46ecac04733d81e53749b262e2d481b6e9f84858bf4b6889c49b0f",
+        "bytes": 7632
+      },
+      {
+        "path": "/tmp/plato-deployment-docs/package-uncommitted-red/runtime-constraints.txt",
+        "sha256": "9c9b82f4c52ba05fb5a1c7e6e841e15fcd69104f9867cf7d7526060055a32709",
+        "bytes": 7268
+      },
+      {
+        "path": "/tmp/plato-deployment-docs/package-uncommitted-red/sdist-manifest.json",
+        "sha256": "299992ba4601b94c9ec64a16ed4ba697b6d375b7586299d4644de6bf0ed52b94",
+        "bytes": 175132
+      },
+      {
+        "path": "/tmp/plato-deployment-docs/package-uncommitted-red/wheel-manifest.json",
+        "sha256": "0d9d5cec358e4a52af9a297b220a0d890d3fc4b689edd206c78b2b251ecbff53",
+        "bytes": 24642
+      }
+    ],
+    "policy": "Raw local logs, environment inventories, validators, positive and negative package receipts retained for fresh review; package distribution hashes are in acceptance. No shared environment cleanup or unrelated file deletion."
+  }
+}

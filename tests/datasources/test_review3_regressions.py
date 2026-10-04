@@ -6,6 +6,7 @@ import io
 import sys
 import threading
 import zipfile
+from typing import TypedDict
 
 import pytest
 import torch
@@ -41,9 +42,17 @@ def zip_bytes(members):
     return output.getvalue()
 
 
+class RecoveryState(TypedDict):
+    payload: bytes
+    hits: list[str]
+    pause: bool
+    entered: threading.Event
+    release: threading.Event
+
+
 @contextlib.contextmanager
 def recovery_server(payload):
-    state = {
+    state: RecoveryState = {
         "payload": payload,
         "hits": [],
         "pause": False,
@@ -64,7 +73,7 @@ def recovery_server(payload):
                     return
             self.wfile.write(body)
 
-        def log_message(self, *args):
+        def log_message(self, format, *args):
             pass
 
     server = http.server.ThreadingHTTPServer(("127.0.0.1", 0), Handler)

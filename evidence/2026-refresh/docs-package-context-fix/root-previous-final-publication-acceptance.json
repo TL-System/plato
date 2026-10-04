@@ -1,0 +1,194 @@
+{
+  "status": "FINAL_HEAD_LOCAL_PUBLICATION_CONDITION_PASSED",
+  "source": "0791c01afcaea96223a925a32ee22882dc437ee2",
+  "tree": "c46423a3a5bb5b75f025b984f0ce706abd0406b0",
+  "gate_source": "2779404ee5a9c5120e33267eee221bb84d46658e",
+  "evidence_only_delta": [
+    "evidence/2026-refresh/deployment-delivery-gate-addendum.json",
+    "evidence/2026-refresh/deployment-failed-output-relocation.json",
+    "evidence/2026-refresh/evaluator-worktree-cleanup-inventory.json",
+    "evidence/2026-refresh/evaluator-worktree-cleanup.json"
+  ],
+  "commands": [
+    {
+      "command": "PLATO_DOCS_PYTHON=\"$(uv python find 3.13)\" PLATO_DOCS_ARTIFACT_DIR=ci-artifacts/docs ./docs/build.sh",
+      "exit": 0
+    },
+    {
+      "command": "uv run --no-project --python 3.13 python .github/scripts/check_distribution.py",
+      "exit": 0
+    },
+    {
+      "command": "/tmp/plato-lighteval-final/env/bin/python .github/scripts/check_container.py static --artifacts /tmp/plato-deployment-integration/final-container-artifacts",
+      "exit": 0
+    },
+    {
+      "command": "/tmp/plato-lighteval-final/env/bin/ruff check . --select I",
+      "ruff_version": "0.16.10 matches lock",
+      "exit": 0
+    }
+  ],
+  "package": {
+    "accepted": true,
+    "source_commit": "0791c01afcaea96223a925a32ee22882dc437ee2",
+    "wheel_sha256": "5e300e5a00b575557cd0ca5c948d956772fb7229a470bdbead2ac1333ced79dd",
+    "sdist_sha256": "87ee09478d1c3afa005e54c46b5acd1876387e271fb679211d0d0b27cd8ee9d8",
+    "sdist_source_tree_bound": true,
+    "sdist_source_binding_sha256": "63b33e7ad5209551863f23502ffbb1b97f9dd5de72cacaa1aa2a311c4ced1126",
+    "rebuilt_wheel_payload_matches": true,
+    "installed_wheel_provenance_and_imports": true,
+    "build_constraints_sha256": "284e1018003f55e4ce6fbb5c80b7dad20e86d9ed60ef544d817f1892626326de",
+    "runtime_constraints_sha256": "9c9b82f4c52ba05fb5a1c7e6e841e15fcd69104f9867cf7d7526060055a32709"
+  },
+  "static": {
+    "accepted": true,
+    "mode": "static",
+    "scope": "Static context and recording-stub checks only",
+    "elapsed_seconds": 0.38
+  },
+  "artifacts": [
+    {
+      "path": "/tmp/plato-deployment-integration/failed-output-relocation.json",
+      "bytes": 4100,
+      "sha256": "4ed8061d637a784a26cb83fbe8952c0163cb78a81cea43d911d5c3ec06b03bb8"
+    },
+    {
+      "path": "/tmp/plato-deployment-integration/final-container-static.log",
+      "bytes": 120,
+      "sha256": "9694467f00874d08b06a5e32b413f2f36f3e2b0361aae98e1d52261e3b209eca"
+    },
+    {
+      "path": "/tmp/plato-deployment-integration/final-docs.log",
+      "bytes": 2574,
+      "sha256": "7f5c058f899a34689fb7a41f276f73928274c1b42045e3d8b270e664d0d6f80c"
+    },
+    {
+      "path": "/tmp/plato-deployment-integration/final-locked-ruff.log",
+      "bytes": 19,
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "path": "/tmp/plato-deployment-integration/final-package.log",
+      "bytes": 683,
+      "sha256": "82b1ac2efa6e1fa79bdbe206cc349881568d28804cd43d93db6f7c686f134d52"
+    },
+    {
+      "path": "/tmp/plato-refresh-worktrees/deployment-integration/ci-artifacts/docs/docs-environment.json",
+      "bytes": 1132,
+      "sha256": "84d8245e64766c6813d4cc86338993c2c827e19dcfc177620c1f7b0b672b593c"
+    },
+    {
+      "path": "/tmp/plato-refresh-worktrees/deployment-integration/ci-artifacts/docs-package/acceptance.json",
+      "bytes": 683,
+      "sha256": "82b1ac2efa6e1fa79bdbe206cc349881568d28804cd43d93db6f7c686f134d52"
+    },
+    {
+      "path": "/tmp/plato-refresh-worktrees/deployment-integration/ci-artifacts/docs-package/build-constraints.log",
+      "bytes": 590,
+      "sha256": "773dc69f5231bf02535d0c4acd64e458a6269a0580980f7b28ca34d8aed59182"
+    },
+    {
+      "path": "/tmp/plato-refresh-worktrees/deployment-integration/ci-artifacts/docs-package/build-constraints.txt",
+      "bytes": 212,
+      "sha256": "284e1018003f55e4ce6fbb5c80b7dad20e86d9ed60ef544d817f1892626326de"
+    },
+    {
+      "path": "/tmp/plato-refresh-worktrees/deployment-integration/ci-artifacts/docs-package/build.log",
+      "bytes": 629,
+      "sha256": "b3e230afcaf3494da550775b1f277bf45274f86618576197b4ece7409c4de216"
+    },
+    {
+      "path": "/tmp/plato-refresh-worktrees/deployment-integration/ci-artifacts/docs-package/distributions/.gitignore",
+      "bytes": 1,
+      "sha256": "684888c0ebb17f374298b65ee2807526c066094c701bcc7ebbe1c1095f494fc1"
+    },
+    {
+      "path": "/tmp/plato-refresh-worktrees/deployment-integration/ci-artifacts/docs-package/distributions/plato_learn-1.4.3-py3-none-any.whl",
+      "bytes": 383621,
+      "sha256": "5e300e5a00b575557cd0ca5c948d956772fb7229a470bdbead2ac1333ced79dd"
+    },
+    {
+      "path": "/tmp/plato-refresh-worktrees/deployment-integration/ci-artifacts/docs-package/distributions/plato_learn-1.4.3.tar.gz",
+      "bytes": 6916788,
+      "sha256": "87ee09478d1c3afa005e54c46b5acd1876387e271fb679211d0d0b27cd8ee9d8"
+    },
+    {
+      "path": "/tmp/plato-refresh-worktrees/deployment-integration/ci-artifacts/docs-package/installed-wheel-import.log",
+      "bytes": 7932,
+      "sha256": "463e7e9c538be399a1cc3b4d31758e3a75e4c147eb89ace48da7e8b2d13a3649"
+    },
+    {
+      "path": "/tmp/plato-refresh-worktrees/deployment-integration/ci-artifacts/docs-package/installed-wheel.json",
+      "bytes": 4716,
+      "sha256": "c67d97c06058b8d6597f039201be2bbc4eb529ee28457182eeb3f3137bf594b3"
+    },
+    {
+      "path": "/tmp/plato-refresh-worktrees/deployment-integration/ci-artifacts/docs-package/provenance.json",
+      "bytes": 985,
+      "sha256": "8256eb6ff4ae94af7492c619fd91259ae8fa186d3eed6c520342073c5d7ddd15"
+    },
+    {
+      "path": "/tmp/plato-refresh-worktrees/deployment-integration/ci-artifacts/docs-package/rebuilt/.gitignore",
+      "bytes": 1,
+      "sha256": "684888c0ebb17f374298b65ee2807526c066094c701bcc7ebbe1c1095f494fc1"
+    },
+    {
+      "path": "/tmp/plato-refresh-worktrees/deployment-integration/ci-artifacts/docs-package/rebuilt/plato_learn-1.4.3-py3-none-any.whl",
+      "bytes": 383621,
+      "sha256": "5e300e5a00b575557cd0ca5c948d956772fb7229a470bdbead2ac1333ced79dd"
+    },
+    {
+      "path": "/tmp/plato-refresh-worktrees/deployment-integration/ci-artifacts/docs-package/rebuilt-wheel-manifest.json",
+      "bytes": 24642,
+      "sha256": "0d9d5cec358e4a52af9a297b220a0d890d3fc4b689edd206c78b2b251ecbff53"
+    },
+    {
+      "path": "/tmp/plato-refresh-worktrees/deployment-integration/ci-artifacts/docs-package/runtime-constraints.log",
+      "bytes": 7646,
+      "sha256": "1ac00e1b6a904adbfd6d526b3a67739a3b5a19f8db4d10135ceccad025436b67"
+    },
+    {
+      "path": "/tmp/plato-refresh-worktrees/deployment-integration/ci-artifacts/docs-package/runtime-constraints.txt",
+      "bytes": 7268,
+      "sha256": "9c9b82f4c52ba05fb5a1c7e6e841e15fcd69104f9867cf7d7526060055a32709"
+    },
+    {
+      "path": "/tmp/plato-refresh-worktrees/deployment-integration/ci-artifacts/docs-package/sdist-manifest.json",
+      "bytes": 187899,
+      "sha256": "0e00eed82c01c57d0f6a53cc93bf3f3795a5be51b1b7092fc2d8c94497d99a62"
+    },
+    {
+      "path": "/tmp/plato-refresh-worktrees/deployment-integration/ci-artifacts/docs-package/sdist-rebuild.log",
+      "bytes": 589,
+      "sha256": "86642ec978dda55d1838ee1ab6da073181ca2ffc9681adfeb9d06b9d77e85083"
+    },
+    {
+      "path": "/tmp/plato-refresh-worktrees/deployment-integration/ci-artifacts/docs-package/sdist-source-binding.json",
+      "bytes": 311017,
+      "sha256": "63b33e7ad5209551863f23502ffbb1b97f9dd5de72cacaa1aa2a311c4ced1126"
+    },
+    {
+      "path": "/tmp/plato-refresh-worktrees/deployment-integration/ci-artifacts/docs-package/wheel-dependencies.log",
+      "bytes": 405,
+      "sha256": "c6176879cf69e3f31a4f79a63ffa94f89001408dd3169dc860638ae93908d2a1"
+    },
+    {
+      "path": "/tmp/plato-refresh-worktrees/deployment-integration/ci-artifacts/docs-package/wheel-environment.log",
+      "bytes": 466,
+      "sha256": "e985afeadb8feed2cca0efbc34ad1bafe6946b08e88cfe7248899d4bbeb8e236"
+    },
+    {
+      "path": "/tmp/plato-refresh-worktrees/deployment-integration/ci-artifacts/docs-package/wheel-install.log",
+      "bytes": 2439,
+      "sha256": "5404c946eaa68b705c3e153aa8c74d3e6f9d6c26e0e130ca58457711d9db156e"
+    },
+    {
+      "path": "/tmp/plato-refresh-worktrees/deployment-integration/ci-artifacts/docs-package/wheel-manifest.json",
+      "bytes": 24642,
+      "sha256": "0d9d5cec358e4a52af9a297b220a0d890d3fc4b689edd206c78b2b251ecbff53"
+    }
+  ],
+  "original_failure": "Preserved with hash-bound relocation; existing .venv-docs retained and used by final default docs build.",
+  "tooling_note": "An additional earlier Ruff0.14.14 invocation also passed but is not qualification authority. Required import check rerun with locked0.16.10, no source/environment/lock changes.",
+  "limits": "Local macOSarm64 only. Exact Linux container/docs/package/PyTorch and hosted preview required before merge. No GPU/arm64container/PyPI/registry publication claim."
+}

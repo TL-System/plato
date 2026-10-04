@@ -1,0 +1,4 @@
+cwd: /var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-package-ok4lv2pb/source/plato_learn-1.4.3
+command: ["uv", "build", "--no-sources", "--build-constraints", "/private/tmp/plato-refresh-worktrees/docs-package-env-bootstrap/ci-artifacts/docs-package/build-constraints.txt", "--python", "3.13", "--wheel", "--out-dir", "/private/tmp/plato-refresh-worktrees/docs-package-env-bootstrap/ci-artifacts/docs-package/rebuilt", "."]
+Building wheel...
+Successfully built /private/tmp/plato-refresh-worktrees/docs-package-env-bootstrap/ci-artifacts/docs-package/rebuilt/plato_learn-1.4.3-py3-none-any.whl

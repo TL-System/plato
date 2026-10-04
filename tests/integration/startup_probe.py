@@ -82,7 +82,7 @@ def client_lifecycle():
                 async def shutdown_failure():
                     raise SentinelError("runner-cleanup-sentinel")
 
-                self.loop.shutdown_asyncgens = shutdown_failure
+                setattr(self.loop, "shutdown_asyncgens", shutdown_failure)
             if OPTIONS.get("configure_fail"):
                 raise SentinelError("configure-sentinel")
 
@@ -194,6 +194,9 @@ def bootstrap():
                 self.gate = self.captured_loop.create_future()
             emit("server_construct", trainer=trainer)
 
+        async def _process_reports(self):
+            raise AssertionError("Probe server does not aggregate reports.")
+
         def configure(self):
             emit("server_configure")
             loop = asyncio.get_event_loop()
@@ -228,12 +231,13 @@ def bootstrap():
 
                     self.loop.run_in_executor(None, executor_job)
 
-        async def _periodic(self, interval):
+        async def _periodic(self, periodic_interval):
             loop = asyncio.get_running_loop()
             LOOPS.append(loop)
             emit("periodic_body", loop=id(loop))
             if OPTIONS.get("self_cancel"):
                 task = asyncio.current_task()
+                assert task is not None
                 loop.call_later(0.001, task.cancel)
                 try:
                     await asyncio.Future()
@@ -272,8 +276,9 @@ def bootstrap():
                         raise SentinelError("start-sentinel")
 
     class BorrowedServer(ProbeServer):
-        def start(self):
+        def start(self, *args, **kwargs):
             # The actual run entrypoint must retain no-argument dispatch.
+            assert not args and not kwargs
             super().start()
 
     if OPTIONS.get("borrowed"):
@@ -304,7 +309,7 @@ def bootstrap():
             app.on_startup.append(startup)
             return app
 
-        web.Application = app_factory
+        setattr(web, "Application", app_factory)
     blocker = None
     if OPTIONS.get("bind"):
         import socket
@@ -314,12 +319,12 @@ def bootstrap():
         blocker.listen()
 
     if CASE in ("client_default", "client_custom"):
-        entry.client_registry.get = lambda **kwargs: ProbeClient()
+        setattr(entry.client_registry, "get", lambda **kwargs: ProbeClient())
         entry.run(1, None, client=ProbeClient() if CASE.endswith("custom") else None)
     elif CASE in ("ordinary", "central"):
-        base.Server._start_clients = staticmethod(
+        setattr(base.Server, "_start_clients", staticmethod(
             lambda **kwargs: emit("launch", as_server=kwargs.get("as_server", False))
-        )
+        ))
         server = BorrowedServer() if OPTIONS.get("borrowed") else ProbeServer()
         try:
             server.run()
@@ -344,8 +349,8 @@ def bootstrap():
             from plato.clients import edge
             from plato.servers import fedavg_cs
 
-            edge.Client = ProbeClient
-            fedavg_cs.Server = ProbeServer
+            setattr(edge, "Client", ProbeClient)
+            setattr(fedavg_cs, "Server", ProbeServer)
             entry.run(3, Config().server.port)
         else:
             entry.run(
@@ -370,9 +375,9 @@ def running_loop_rejection():
             emit("unexpected_resource")
             return ProbeClient()
 
-        entry.client_registry.get = unexpected_factory
+        setattr(entry.client_registry, "get", unexpected_factory)
         server = base.Server.__new__(base.Server)
-        server.configure = lambda: emit("unexpected_resource")
+        setattr(server, "configure", lambda: emit("unexpected_resource"))
         for name, call in (
             ("client", lambda: entry.run(1, None)),
             ("server_run", server.run),

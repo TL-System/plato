@@ -1,0 +1,386 @@
+{
+  "evidence/2026-refresh/docs-package-source-binding-fix/checkout-root.log": {
+    "bytes": 73,
+    "sha256": "fe5fa4ea4646d20632b85e180927d20a22a9b2bb413957603ad3d73f4db2aca6"
+  },
+  "evidence/2026-refresh/docs-package-source-binding-fix/default-validation.json": {
+    "bytes": 1856,
+    "sha256": "f04e313eafa4efe8c7c740d273b2c099705485646a976aaed0c98d3e04589e10"
+  },
+  "evidence/2026-refresh/docs-package-source-binding-fix/existing-external-directory.log": {
+    "bytes": 92,
+    "sha256": "b6d2644dd876b16831a8be781ca4964228c75322047f330658cdf7f986ebbfe1"
+  },
+  "evidence/2026-refresh/docs-package-source-binding-fix/existing-unsupported-tracked-directory.log": {
+    "bytes": 73,
+    "sha256": "fe5fa4ea4646d20632b85e180927d20a22a9b2bb413957603ad3d73f4db2aca6"
+  },
+  "evidence/2026-refresh/docs-package-source-binding-fix/lock-check.log": {
+    "bytes": 51,
+    "sha256": "db0ba7e97a8e2e6aceb94e052e730d9ef27dec474c59638347bd8bc4ba4a1149"
+  },
+  "evidence/2026-refresh/docs-package-source-binding-fix/negative-checks.json": {
+    "bytes": 7306,
+    "sha256": "819e7eb553401072c501f78656dfceb8f41e2ce4d013611e99f9f4b733908c57"
+  },
+  "evidence/2026-refresh/docs-package-source-binding-fix/negative-checks.log": {
+    "bytes": 126,
+    "sha256": "03e678f9e6cecedb339f22f8b4b3e15792e5f328145d12cec97459e84447b6a5"
+  },
+  "evidence/2026-refresh/docs-package-source-binding-fix/negative/actual-altered-tracked-source-build.log": {
+    "bytes": 61,
+    "sha256": "7631aa779b5d3f193cd2649631e65f69ee80e44db1dc20f00f28dc8482682549"
+  },
+  "evidence/2026-refresh/docs-package-source-binding-fix/negative/actual-unrelated-untracked-default-build.log": {
+    "bytes": 85,
+    "sha256": "3216a1f3ebfde85ad6d27223a6b4f4e9a91456971ff9de59b0141b71ea3d0fae"
+  },
+  "evidence/2026-refresh/docs-package-source-binding-fix/negative/altered-tracked-source/acceptance.json": {
+    "bytes": 99,
+    "sha256": "6cf6a569b899a987a58711861d6ddb4830ae42e08a564570179a43d04a52b991"
+  },
+  "evidence/2026-refresh/docs-package-source-binding-fix/negative/altered-tracked-source/build-constraints.log": {
+    "bytes": 614,
+    "sha256": "6163a22a8d3a4daa8ab07fe6fa4adf998fd633ccaaf7912400f9b258546d44c1"
+  },
+  "evidence/2026-refresh/docs-package-source-binding-fix/negative/altered-tracked-source/build-constraints.txt": {
+    "bytes": 212,
+    "sha256": "284e1018003f55e4ce6fbb5c80b7dad20e86d9ed60ef544d817f1892626326de"
+  },
+  "evidence/2026-refresh/docs-package-source-binding-fix/negative/altered-tracked-source/build.log": {
+    "bytes": 690,
+    "sha256": "27629c4a7f409d3f3f5a66ab19450feba290bce9239a9376a9ca59e8dc346a93"
+  },
+  "evidence/2026-refresh/docs-package-source-binding-fix/negative/altered-tracked-source/provenance.json": {
+    "bytes": 1005,
+    "sha256": "fc23895266dcb5668b034853f0401a5d0beb7985c9e43a1abbc4f279a26d6a93"
+  },
+  "evidence/2026-refresh/docs-package-source-binding-fix/negative/altered-tracked-source/runtime-constraints.log": {
+    "bytes": 7670,
+    "sha256": "918b0b508b9eb44e8f227bf411dbe3b160dbe7e8437a660b0e05f46660554a93"
+  },
+  "evidence/2026-refresh/docs-package-source-binding-fix/negative/altered-tracked-source/runtime-constraints.txt": {
+    "bytes": 7268,
+    "sha256": "9c9b82f4c52ba05fb5a1c7e6e841e15fcd69104f9867cf7d7526060055a32709"
+  },
+  "evidence/2026-refresh/docs-package-source-binding-fix/negative/altered-tracked-source/sdist-manifest.json": {
+    "bytes": 157540,
+    "sha256": "8f06304188b6ce822a73880ac479f2578d65ddb468d68d68c147a197144d3e6c"
+  },
+  "evidence/2026-refresh/docs-package-source-binding-fix/negative/altered-tracked-source/wheel-manifest.json": {
+    "bytes": 24595,
+    "sha256": "153f532dd6dd5383a4d1c706602503d19bf5c81b11ec3a394da4e9742a6b24d9"
+  },
+  "evidence/2026-refresh/docs-package-source-binding-fix/negative/docs-package/acceptance.json": {
+    "bytes": 123,
+    "sha256": "a5f59ab11dcf5488c167335200b823532133989a1ec7036ab8b5723f446d2328"
+  },
+  "evidence/2026-refresh/docs-package-source-binding-fix/negative/docs-package/build-constraints.log": {
+    "bytes": 604,
+    "sha256": "094337d61a7a18ebf7f61e21ed3db63fc5420515292a4d5e9a3809aa44ad4876"
+  },
+  "evidence/2026-refresh/docs-package-source-binding-fix/negative/docs-package/build-constraints.txt": {
+    "bytes": 212,
+    "sha256": "284e1018003f55e4ce6fbb5c80b7dad20e86d9ed60ef544d817f1892626326de"
+  },
+  "evidence/2026-refresh/docs-package-source-binding-fix/negative/docs-package/build.log": {
+    "bytes": 650,
+    "sha256": "7d519b9c1944819a367c60d7346b59e8ea80e0ae03ee6e1eccb76ca47b20a233"
+  },
+  "evidence/2026-refresh/docs-package-source-binding-fix/negative/docs-package/provenance.json": {
+    "bytes": 985,
+    "sha256": "eb964f297da18fd4bd8a063c5ae75bde5c192099e192d493673bead0bb485490"
+  },
+  "evidence/2026-refresh/docs-package-source-binding-fix/negative/docs-package/runtime-constraints.log": {
+    "bytes": 7660,
+    "sha256": "2938560cffbaa63b0402c7908caa3a2e238cc0285cb31639212b33a5669fca8e"
+  },
+  "evidence/2026-refresh/docs-package-source-binding-fix/negative/docs-package/runtime-constraints.txt": {
+    "bytes": 7268,
+    "sha256": "9c9b82f4c52ba05fb5a1c7e6e841e15fcd69104f9867cf7d7526060055a32709"
+  },
+  "evidence/2026-refresh/docs-package-source-binding-fix/negative/docs-package/sdist-manifest.json": {
+    "bytes": 157646,
+    "sha256": "a17acf7404dd297961ca40a4be02e65adaacde86a7c015f6687fa0c4da6d1252"
+  },
+  "evidence/2026-refresh/docs-package-source-binding-fix/negative/docs-package/wheel-manifest.json": {
+    "bytes": 24595,
+    "sha256": "de96edbdb4369ee3f215944785750b31bf92c9f86f1ab83822ba78da919f74c7"
+  },
+  "evidence/2026-refresh/docs-package-source-binding-fix/negative/existing-unsupported-untracked-directory.log": {
+    "bytes": 73,
+    "sha256": "fe5fa4ea4646d20632b85e180927d20a22a9b2bb413957603ad3d73f4db2aca6"
+  },
+  "evidence/2026-refresh/docs-package-source-binding-fix/negative/owned-build-failure/acceptance.json": {
+    "bytes": 173,
+    "sha256": "bba64aa1de784344b0363581b3c1c8b84209044007e66e06efff479aaaefc691"
+  },
+  "evidence/2026-refresh/docs-package-source-binding-fix/negative/owned-build-failure/build-constraints.log": {
+    "bytes": 611,
+    "sha256": "085d10c92ec1e8b9fded5ad2400716ef7c95445f74d738714e2c3cb5d82748ac"
+  },
+  "evidence/2026-refresh/docs-package-source-binding-fix/negative/owned-build-failure/build-constraints.txt": {
+    "bytes": 212,
+    "sha256": "284e1018003f55e4ce6fbb5c80b7dad20e86d9ed60ef544d817f1892626326de"
+  },
+  "evidence/2026-refresh/docs-package-source-binding-fix/negative/owned-build-failure/build.log": {
+    "bytes": 411,
+    "sha256": "d7a755f81342acb73ec5509393458c7cd541b05dee8a757bd4c4745eb76b16fe"
+  },
+  "evidence/2026-refresh/docs-package-source-binding-fix/negative/owned-build-failure/provenance.json": {
+    "bytes": 941,
+    "sha256": "a06c7b5f3670c2237c1d289e64e3746d3e371dd5f97b76923ce4fd4e98c2acc3"
+  },
+  "evidence/2026-refresh/docs-package-source-binding-fix/negative/owned-build-failure/runtime-constraints.log": {
+    "bytes": 7667,
+    "sha256": "a1ee67d429c7d37c5f04b7b865dd054b9f44b2727e76fc8edd0e98731a1c9056"
+  },
+  "evidence/2026-refresh/docs-package-source-binding-fix/negative/owned-build-failure/runtime-constraints.txt": {
+    "bytes": 7268,
+    "sha256": "9c9b82f4c52ba05fb5a1c7e6e841e15fcd69104f9867cf7d7526060055a32709"
+  },
+  "evidence/2026-refresh/docs-package-source-binding-fix/negative/owned-output-build-failure-receipt.log": {
+    "bytes": 135,
+    "sha256": "4101f8749a0c55bc56de8582c21271120e3a91eccc4dd361babb6ab11e46208e"
+  },
+  "evidence/2026-refresh/docs-package-source-binding-fix/negative/pre-existing-valid-ci-output.log": {
+    "bytes": 119,
+    "sha256": "e5f0f7f831e041af8fff0ed4d336f98fd97f8eca219d60d783dacff70b2c4fbe"
+  },
+  "evidence/2026-refresh/docs-package-source-binding-fix/ownership-rejections.json": {
+    "bytes": 1554,
+    "sha256": "b651071e3f6feb74c24f75bea8e40c2e9f13f43c19a967d0d32afd1f34c3db15"
+  },
+  "evidence/2026-refresh/docs-package-source-binding-fix/previous-review/historically-accepted-red.json": {
+    "bytes": 547,
+    "sha256": "df1f1a0220fab5720004cdc7ac460f9affbf31705241e1f857df14c120697e6d"
+  },
+  "evidence/2026-refresh/docs-package-source-binding-fix/previous-review/output-boundary-reproduction.json": {
+    "bytes": 1602,
+    "sha256": "374b16c1ebae0073aa8c5d14272d89c0690abe91cf5621595e955a8959528194"
+  },
+  "evidence/2026-refresh/docs-package-source-binding-fix/previous-review/red-provenance.json": {
+    "bytes": 903,
+    "sha256": "d35d64a21929c35d8f1c9f1ffd9e5370dd97b54e0fa44415351b43d940b6fb5b"
+  },
+  "evidence/2026-refresh/docs-package-source-binding-fix/previous-review/red-sdist-manifest.json": {
+    "bytes": 151938,
+    "sha256": "e8176379d9991c1b3490209d4e6ad095fb5ddadb5cbaffd7cf7156d9642a2233"
+  },
+  "evidence/2026-refresh/docs-package-source-binding-fix/previous-review/red-wheel-manifest.json": {
+    "bytes": 24595,
+    "sha256": "de96edbdb4369ee3f215944785750b31bf92c9f86f1ab83822ba78da919f74c7"
+  },
+  "evidence/2026-refresh/docs-package-source-binding-fix/previous-review/review.json": {
+    "bytes": 23654,
+    "sha256": "80063d45b7a11395d28721adb83d39819c2230f45ccc90cede01206d6b800718"
+  },
+  "evidence/2026-refresh/docs-package-source-binding-fix/previous-review/source-provenance.json": {
+    "bytes": 1341,
+    "sha256": "cba82f6e4f19acdb238568c819fa36fe20cb3296d8b2339a49f11f6517c81351"
+  },
+  "evidence/2026-refresh/docs-package-source-binding-fix/release-default-checker.log": {
+    "bytes": 683,
+    "sha256": "7fe67fbcb5372ea2f93f7ffe47543ba6f4765b671ce445943dd34aa81ad93608"
+  },
+  "evidence/2026-refresh/docs-package-source-binding-fix/release-default/package/acceptance.json": {
+    "bytes": 683,
+    "sha256": "7fe67fbcb5372ea2f93f7ffe47543ba6f4765b671ce445943dd34aa81ad93608"
+  },
+  "evidence/2026-refresh/docs-package-source-binding-fix/release-default/package/build-constraints.log": {
+    "bytes": 602,
+    "sha256": "aeb2a35a91285f61f252b9fd6b9a8ed24b9035e562b5ced176c3123181ec7168"
+  },
+  "evidence/2026-refresh/docs-package-source-binding-fix/release-default/package/build-constraints.txt": {
+    "bytes": 212,
+    "sha256": "284e1018003f55e4ce6fbb5c80b7dad20e86d9ed60ef544d817f1892626326de"
+  },
+  "evidence/2026-refresh/docs-package-source-binding-fix/release-default/package/build.log": {
+    "bytes": 647,
+    "sha256": "a8a78f067e1f0b091b88e4278d47d6ece771e0f01879ce58059fa4de251fb7dc"
+  },
+  "evidence/2026-refresh/docs-package-source-binding-fix/release-default/package/installed-wheel-import.log": {
+    "bytes": 7956,
+    "sha256": "261842b60305f8bf8b8429493db355d2de5c3735ae13f215c12cc6271fefb67d"
+  },
+  "evidence/2026-refresh/docs-package-source-binding-fix/release-default/package/installed-wheel.json": {
+    "bytes": 4722,
+    "sha256": "5876589891caffbe90492526f5be1597cf2c805959df5248df266778a9694563"
+  },
+  "evidence/2026-refresh/docs-package-source-binding-fix/release-default/package/provenance.json": {
+    "bytes": 985,
+    "sha256": "eb964f297da18fd4bd8a063c5ae75bde5c192099e192d493673bead0bb485490"
+  },
+  "evidence/2026-refresh/docs-package-source-binding-fix/release-default/package/rebuilt-wheel-manifest.json": {
+    "bytes": 24595,
+    "sha256": "de96edbdb4369ee3f215944785750b31bf92c9f86f1ab83822ba78da919f74c7"
+  },
+  "evidence/2026-refresh/docs-package-source-binding-fix/release-default/package/runtime-constraints.log": {
+    "bytes": 7658,
+    "sha256": "57576d12438f19e7051a407f3319541b0bd68d8c7c5836b5c5d287d6bd1ac3fa"
+  },
+  "evidence/2026-refresh/docs-package-source-binding-fix/release-default/package/runtime-constraints.txt": {
+    "bytes": 7268,
+    "sha256": "9c9b82f4c52ba05fb5a1c7e6e841e15fcd69104f9867cf7d7526060055a32709"
+  },
+  "evidence/2026-refresh/docs-package-source-binding-fix/release-default/package/sdist-manifest.json": {
+    "bytes": 157540,
+    "sha256": "e24c0cf0aa470f44087beddadf2ccef066679b6053cbc1160481d0b0f4d6cd05"
+  },
+  "evidence/2026-refresh/docs-package-source-binding-fix/release-default/package/sdist-rebuild.log": {
+    "bytes": 607,
+    "sha256": "00d70b16e84512b0e216c664f3c5ef512985abebd36c74afc1768156aa69841b"
+  },
+  "evidence/2026-refresh/docs-package-source-binding-fix/release-default/package/sdist-source-binding.json": {
+    "bytes": 263591,
+    "sha256": "de386904613a0172286924f92ca634f8359da468bd7e48008ea5aa1d1996cc4f"
+  },
+  "evidence/2026-refresh/docs-package-source-binding-fix/release-default/package/wheel-dependencies.log": {
+    "bytes": 405,
+    "sha256": "deffcf37d01a508cf5dc9647ffbd748b57e294e6168afcb4c95dbeb9e419ec9b"
+  },
+  "evidence/2026-refresh/docs-package-source-binding-fix/release-default/package/wheel-environment.log": {
+    "bytes": 466,
+    "sha256": "fdaa8ee57059930c1d574be1ff575739e44c766c434fdc332f65a3e51c097174"
+  },
+  "evidence/2026-refresh/docs-package-source-binding-fix/release-default/package/wheel-install.log": {
+    "bytes": 2455,
+    "sha256": "47ab7722f9fd505a44bb35f1a233017f14b839c9a6c8f8f33ff593113af6f0c4"
+  },
+  "evidence/2026-refresh/docs-package-source-binding-fix/release-default/package/wheel-manifest.json": {
+    "bytes": 24595,
+    "sha256": "de96edbdb4369ee3f215944785750b31bf92c9f86f1ab83822ba78da919f74c7"
+  },
+  "evidence/2026-refresh/docs-package-source-binding-fix/requirements-parity.txt": {
+    "bytes": 19891,
+    "sha256": "9c33555b3d0cbc983d6dd59f261a242a92d136f2bb1364f300a01824f9eff665"
+  },
+  "evidence/2026-refresh/docs-package-source-binding-fix/ruff-format.log": {
+    "bytes": 25,
+    "sha256": "fd2299c9f1c6dc869070883e281051bfe93aacf66c1a3b0069f45b4aa410ca50"
+  },
+  "evidence/2026-refresh/docs-package-source-binding-fix/ruff-imports.log": {
+    "bytes": 19,
+    "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+  },
+  "evidence/2026-refresh/docs-package-source-binding-fix/verify.log": {
+    "bytes": 248,
+    "sha256": "46d0aa8f1011d6aa1bbbac9071d54e0051d0688b410b370cfc78a4f1715c6c26"
+  },
+  "evidence/2026-refresh/docs-package-source-binding-fix/workflow-default-checker.log": {
+    "bytes": 683,
+    "sha256": "7fe67fbcb5372ea2f93f7ffe47543ba6f4765b671ce445943dd34aa81ad93608"
+  },
+  "evidence/2026-refresh/docs-package-source-binding-fix/workflow-default/docs/build.log": {
+    "bytes": 3360,
+    "sha256": "5c9ff7cbe87ea77ccd21654cee6d294f7461b7e1d9bb79cd93488c2b76e0564f"
+  },
+  "evidence/2026-refresh/docs-package-source-binding-fix/workflow-default/docs/commit.txt": {
+    "bytes": 41,
+    "sha256": "29a5d71d410d9171324aa6a55ed68d3492c00ffdad6b7b3dbf38bdb574087975"
+  },
+  "evidence/2026-refresh/docs-package-source-binding-fix/workflow-default/docs/docs-environment.json": {
+    "bytes": 1112,
+    "sha256": "6394835b03ec27883ba475c115a8fe85ac6b08e7c993cf9069de45ca870b3959"
+  },
+  "evidence/2026-refresh/docs-package-source-binding-fix/workflow-default/docs/python.txt": {
+    "bytes": 15,
+    "sha256": "8a078b480fefb612930032cc46f81bc6d76b152bac4903485d0c5771f32219ad"
+  },
+  "evidence/2026-refresh/docs-package-source-binding-fix/workflow-default/docs/source-hashes.txt": {
+    "bytes": 321,
+    "sha256": "e4dd55b8e1b5cd1227d62af24637a20a5d7f27a6f2ae35547ae144594b68efc6"
+  },
+  "evidence/2026-refresh/docs-package-source-binding-fix/workflow-default/docs/uv.txt": {
+    "bytes": 55,
+    "sha256": "f8d3c54a13384fc0073e2e99806e82f472fcf8720cc537f1f53d07b260fa01a9"
+  },
+  "evidence/2026-refresh/docs-package-source-binding-fix/workflow-default/package/acceptance.json": {
+    "bytes": 683,
+    "sha256": "7fe67fbcb5372ea2f93f7ffe47543ba6f4765b671ce445943dd34aa81ad93608"
+  },
+  "evidence/2026-refresh/docs-package-source-binding-fix/workflow-default/package/build-constraints.log": {
+    "bytes": 604,
+    "sha256": "f291392c04c97d22e869cb76a03f838db3664152128cea868719ad86d21b7a29"
+  },
+  "evidence/2026-refresh/docs-package-source-binding-fix/workflow-default/package/build-constraints.txt": {
+    "bytes": 212,
+    "sha256": "284e1018003f55e4ce6fbb5c80b7dad20e86d9ed60ef544d817f1892626326de"
+  },
+  "evidence/2026-refresh/docs-package-source-binding-fix/workflow-default/package/build.log": {
+    "bytes": 650,
+    "sha256": "a701d8d64782f9cddf2f603e891338118abdc6653149c3b75e41d7fdf5d249cc"
+  },
+  "evidence/2026-refresh/docs-package-source-binding-fix/workflow-default/package/installed-wheel-import.log": {
+    "bytes": 7960,
+    "sha256": "c03c895f3fce77383857c71828822e7bc3b61432f02b74c71142ae86e9fced07"
+  },
+  "evidence/2026-refresh/docs-package-source-binding-fix/workflow-default/package/installed-wheel.json": {
+    "bytes": 4723,
+    "sha256": "d1388a2a95518c689cf59a2230cf1fdaa9a1ddf6eaf5c4fcd2ae6e939b18eab1"
+  },
+  "evidence/2026-refresh/docs-package-source-binding-fix/workflow-default/package/provenance.json": {
+    "bytes": 985,
+    "sha256": "eb964f297da18fd4bd8a063c5ae75bde5c192099e192d493673bead0bb485490"
+  },
+  "evidence/2026-refresh/docs-package-source-binding-fix/workflow-default/package/rebuilt-wheel-manifest.json": {
+    "bytes": 24595,
+    "sha256": "de96edbdb4369ee3f215944785750b31bf92c9f86f1ab83822ba78da919f74c7"
+  },
+  "evidence/2026-refresh/docs-package-source-binding-fix/workflow-default/package/runtime-constraints.log": {
+    "bytes": 7660,
+    "sha256": "9f977fe51015e4f6bca89259715063a8571e2e9d5964010e8d174fd29242ab1e"
+  },
+  "evidence/2026-refresh/docs-package-source-binding-fix/workflow-default/package/runtime-constraints.txt": {
+    "bytes": 7268,
+    "sha256": "9c9b82f4c52ba05fb5a1c7e6e841e15fcd69104f9867cf7d7526060055a32709"
+  },
+  "evidence/2026-refresh/docs-package-source-binding-fix/workflow-default/package/sdist-manifest.json": {
+    "bytes": 157540,
+    "sha256": "e24c0cf0aa470f44087beddadf2ccef066679b6053cbc1160481d0b0f4d6cd05"
+  },
+  "evidence/2026-refresh/docs-package-source-binding-fix/workflow-default/package/sdist-rebuild.log": {
+    "bytes": 610,
+    "sha256": "7f7ec671d2b9a29ea6227ba5a804aca23bb4887fed768c6f867c47a1ee549950"
+  },
+  "evidence/2026-refresh/docs-package-source-binding-fix/workflow-default/package/sdist-source-binding.json": {
+    "bytes": 263591,
+    "sha256": "de386904613a0172286924f92ca634f8359da468bd7e48008ea5aa1d1996cc4f"
+  },
+  "evidence/2026-refresh/docs-package-source-binding-fix/workflow-default/package/wheel-dependencies.log": {
+    "bytes": 405,
+    "sha256": "cbf5b6256e3c853b0ea7a8c0949fe9b703b00ea85e4fcc0910e3dd80c7941b7d"
+  },
+  "evidence/2026-refresh/docs-package-source-binding-fix/workflow-default/package/wheel-environment.log": {
+    "bytes": 466,
+    "sha256": "38f16831a010e8795621c1f490d00687ecd94778421ae69ff688b4298056ef56"
+  },
+  "evidence/2026-refresh/docs-package-source-binding-fix/workflow-default/package/wheel-install.log": {
+    "bytes": 2458,
+    "sha256": "801491f23ad876cf4eb87f9361461c74f34f518f559d94e9b73a2a154d61daf2"
+  },
+  "evidence/2026-refresh/docs-package-source-binding-fix/workflow-default/package/wheel-manifest.json": {
+    "bytes": 24595,
+    "sha256": "de96edbdb4369ee3f215944785750b31bf92c9f86f1ab83822ba78da919f74c7"
+  },
+  "evidence/2026-refresh/reproductions/docs-package-source-binding-fix/negative-checks.py": {
+    "bytes": 12645,
+    "sha256": "601cf98dfd8e21679f398048d4b1640f2d4e2c8f2a097e8bef6944319c62eb9b"
+  },
+  "evidence/2026-refresh/reproductions/docs-package-source-binding-fix/red/plato_learn-1.4.3.tar.gz": {
+    "bytes": 3592945,
+    "sha256": "a86ca7cea9a2e51fdeeab7d5ffb08fe9c458c8cf3fd1b7af85d032bfef657c5a"
+  },
+  "evidence/2026-refresh/reproductions/docs-package-source-binding-fix/release-command.zsh": {
+    "bytes": 281,
+    "sha256": "9b6bd083bafa348a668a487ac802cb200d64568531cf69178f6938528621e133"
+  },
+  "evidence/2026-refresh/reproductions/docs-package-source-binding-fix/verify.py": {
+    "bytes": 6807,
+    "sha256": "3dbebc5ed4014933ed5e796312ca232e485d188a61a1aad4a37bb1461704a20d"
+  },
+  "evidence/2026-refresh/reproductions/docs-package-source-binding-fix/workflow-command.zsh": {
+    "bytes": 2973,
+    "sha256": "488c4773055c6be56d292665c172d8ad591b04b7bb4504fb70eb7d577b0d8ebb"
+  }
+}

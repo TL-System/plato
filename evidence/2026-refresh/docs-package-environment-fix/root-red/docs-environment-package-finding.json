@@ -1,0 +1,59 @@
+{
+  "id": "ROOT-P2-M3",
+  "severity": "medium",
+  "status": "AUTHOR_REPAIR_REQUIRED",
+  "source": "0c942d7e81171e01bb715c0ba7b82f08900ea56a",
+  "original_reviewed_checker_source": "63f0d2000f0370708b9afe1e2e6a2dc8559b72e1",
+  "title": "The default docs environment enters the subsequent source distribution.",
+  "steps": [
+    "PLATO_DOCS_PYTHON=\"$(uv python find 3.13)\" PLATO_DOCS_ARTIFACT_DIR=ci-artifacts/docs ./docs/build.sh",
+    "uv run --no-project --python 3.13 python .github/scripts/check_distribution.py"
+  ],
+  "outcome": "Strict docs passed using default in-checkout .venv-docs. Package checker failed during uv build with exit2: sdist contains .venv-docs/bin/python absolute external symlink. uv refuses to unpack an included virtual environment.",
+  "observed_scope": "Previous author/reviewer commands deliberately used externally located docs environments. Their successful source/output-boundary proofs remain valid, but did not cover the documented in-checkout docs environment followed by package build.",
+  "required_fix": "Exclude tool-created docs virtual environments from distributions, including .venv-docs and .venv-docs-bootstrap. Reproduce actual documented default docs\u2192package sequence and uv-absent bootstrap variant with in-checkout environments. Verify clean sdist, Git-byte provenance, correct metadata, rebuild and installed wheel. Preserve prior output/source guards and fixtures. Root authorizes only narrow Hatch exclusion changes plus necessary regression evidence, no dependency/version/marker/lock changes.",
+  "separate_root_command_error": "Initial bare ./docs/build.sh correctly rejected system Python3.9; root then used the documented explicit3.13 command. This initial prerequisite rejection is not a repository defect.",
+  "artifacts": [
+    {
+      "path": "/tmp/plato-deployment-integration/publication-docs-system-python-rejection.log",
+      "bytes": 165,
+      "sha256": "307ec09b0689f686951acd2b909c2ae88561bb39772d956e9e48146e3f3e2938"
+    },
+    {
+      "path": "/tmp/plato-deployment-integration/publication-docs.log",
+      "bytes": 3361,
+      "sha256": "4d477fb8580da071774b8544a4ce0e5a82498c2ecd57225e77896b92aed2fd6f"
+    },
+    {
+      "path": "/tmp/plato-deployment-integration/publication-package.log",
+      "bytes": 120,
+      "sha256": "addac66eed1c8efcb2ecd49ad5d4d844925a54c2a162a6289c68050af2160b93"
+    },
+    {
+      "path": "/tmp/plato-refresh-worktrees/deployment-integration/ci-artifacts/docs-package/build.log",
+      "bytes": 913,
+      "sha256": "ab0b8eef3f3b71e504172b32336aef8512e9d7dd3d2c7bf935fe2b30f504013a"
+    },
+    {
+      "path": "/tmp/plato-refresh-worktrees/deployment-integration/ci-artifacts/docs-package/acceptance.json",
+      "bytes": 158,
+      "sha256": "4e9b220e6518899b0dfbe39d6e11cc53b4a58441db320bb0cac83b32617d108c"
+    },
+    {
+      "path": "/tmp/plato-refresh-worktrees/deployment-integration/ci-artifacts/docs-package/provenance.json",
+      "bytes": 985,
+      "sha256": "3e76448492668ed77917814301eb26bca31df650dd057d81a9d6c87087f64f31"
+    },
+    {
+      "path": "/tmp/plato-refresh-worktrees/deployment-integration/ci-artifacts/docs-package/distributions/.gitignore",
+      "bytes": 1,
+      "sha256": "684888c0ebb17f374298b65ee2807526c066094c701bcc7ebbe1c1095f494fc1"
+    },
+    {
+      "path": "/tmp/plato-refresh-worktrees/deployment-integration/ci-artifacts/docs-package/distributions/plato_learn-1.4.3.tar.gz",
+      "bytes": 5426632,
+      "sha256": "206a0cbf2910daaf58cb7d44776ef478d6c967728e00c8e129622fee72f0b36a"
+    }
+  ],
+  "prior_gate": "Conditional local deployment gate remains conditional; final-HEAD package condition failed. No deployment PR was published."
+}

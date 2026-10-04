@@ -1,0 +1,4 @@
+.github/workflows/docs_package_checks.yml:20:35: context "runner" is not allowed here. available contexts are "github", "inputs", "matrix", "needs", "secrets", "strategy", "vars". see https://docs.github.com/en/actions/learn-github-actions/contexts#context-availability for more details [expression]
+   |
+20 |       PLATO_DOCS_ENVIRONMENT: ${{ runner.temp }}/plato-docs/.venv-docs
+   |                                   ^~~~~~~~~~~

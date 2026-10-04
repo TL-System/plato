@@ -1,0 +1,89 @@
+{
+  "schema_version": 1,
+  "recorded_at_utc": "2026-10-04T01:17:06.075213+00:00",
+  "finding": "ROOT-P2-M4",
+  "scope": "Original-author correction; fresh different independent review and root integrated gate required before pushing.",
+  "previous_author_candidate": "24b5e154bd43795ea6b2a47b6c9458fdf3a587ea",
+  "published_remote_rejected_source": "0791c01afcaea96223a925a32ee22882dc437ee2",
+  "frozen_source_commit": "8dd6a604712973c6db050082ccd35f154d59ce56",
+  "source_files_sha256": {
+    ".github/workflows/docs_package_checks.yml": "3af2f950f8b481708640e13abfe5455b8b9d6726df7bd345e54dd8cf6c360d93",
+    ".github/workflows/pypi_publish.yml": "44d20d3daa8e953546acf7e5b01ee61cf54d056b96b09b799ad3cfa65b105062",
+    "docs/build.sh": "e21f333201ce75ea7e4a820d505e7b230a5a6048f279b56b0758f1a6cfc338b7",
+    "docs/requirements.txt": "9c33555b3d0cbc983d6dd59f261a242a92d136f2bb1364f300a01824f9eff665",
+    "netlify.toml": "9ae1049a54d5edc1a29b5f34ba7c235c7f0bf3e63802fb8a9f1d421ca79ead0b",
+    "pyproject.toml": "02972a9e51e828ad1f0cff4ec57911d4468296d36e984aaa345442ba6f201a3a",
+    "uv.lock": "e2a53aaae9a0dd49f5446b490bb3071e86aa3a9a20d6271c9dd30b4ae2dcbff9",
+    ".github/scripts/check_distribution.py": "1b3ea71a1eef084f602092de35a97ceed04beb4ab47da2074690dc89c5c34c3f"
+  },
+  "authorized_source_delta": {
+    ".github/workflows/docs_package_checks.yml": "Moved PLATO_DOCS_ENVIRONMENT from job env to the sole consuming strict-docs step env, preserving its value."
+  },
+  "unchanged_related_publish_workflow": {
+    "file": ".github/workflows/pypi_publish.yml",
+    "sha256": "44d20d3daa8e953546acf7e5b01ee61cf54d056b96b09b799ad3cfa65b105062",
+    "original_and_current_actionlint_pass": true,
+    "same_runner_context_defect_present": false
+  },
+  "remote_actual_failure": {
+    "run_id": 37167176060,
+    "head_sha": "0791c01afcaea96223a925a32ee22882dc437ee2",
+    "event": "push",
+    "conclusion": "failure",
+    "created_jobs": 0,
+    "annotation": "(Line: 20, Col: 31): Unrecognized named-value: 'runner'. Located at position 1 within expression: runner.temp",
+    "url": "https://github.com/TL-System/plato/actions/runs/37167176060",
+    "raw_api_sha256": "2d4deec6f3e3b615f228422a2289de45e14841bd10686d9280835eb92c9ac8ee",
+    "raw_jobs_sha256": "d232081185de70f0bf26e44b5c2a069ca080bf9da48bbc3a067d8670f67d052a",
+    "raw_html_sha256": "596f3ba978d1caa06e5018e60936a3610c00d04b5391a0eefd5badc1c0007d1f"
+  },
+  "validator": {
+    "name": "actionlint",
+    "version": "1.7.12",
+    "version_output": "1.7.12\ninstalled by downloading from release page\nbuilt with go1.26.1 compiler for darwin/arm64\n",
+    "official_release": "https://github.com/rhysd/actionlint/releases/tag/v1.7.12",
+    "archive_url": "https://github.com/rhysd/actionlint/releases/download/v1.7.12/actionlint_1.7.12_darwin_arm64.tar.gz",
+    "archive_sha256": "aba9ced2dee8d27fecca3dc7feb1a7f9a52caefa1eb46f3271ea66b6e0e6953f",
+    "official_checksum_verified": true,
+    "binary_sha256": "8db11704dc296f096216db4db65d86cd7f0ebfdf4c38453a1da276b137b88388",
+    "invocation": [
+      "/tmp/plato-p2-workflow-context-fix/tools/actionlint",
+      "-no-color",
+      ".github/workflows/docs_package_checks.yml",
+      ".github/workflows/pypi_publish.yml"
+    ],
+    "corrected_frozen_source_exit_code": 0,
+    "optional_checks_explicitly_disabled": false
+  },
+  "executed_checks": [
+    "Actionlint reproduced the exact runner-context rejection on the original docs workflow; its bytes also match published0791c01.",
+    "Actionlint passed both corrected frozen docs and unchanged release workflows without ignores or explicit optional-check disable flags.",
+    "Published remote REST metadata reports failure on0791c01 and zero created jobs; the raw public page contains the reported annotation.",
+    "Parsed workflow comparison confirms the sole semantic delta is moving the same docs environment value to its consuming step.",
+    "All other source files, release.created trigger, read-only permissions, secrets placement, action/version pins, runner, timeouts and build/publish commands are unchanged.",
+    "Embedded Python AST and zsh syntax validation passed for both P2 workflows; source whitespace check passed."
+  ],
+  "primary_references": [
+    {
+      "url": "https://docs.github.com/en/actions/reference/workflows-and-actions/contexts#context-availability",
+      "supports": "runner is absent from jobs.<job_id>.env contexts and available in jobs.<job_id>.steps.env."
+    },
+    {
+      "url": "https://github.com/rhysd/actionlint/blob/v1.7.12/docs/checks.md#expression-check",
+      "supports": "Actionlint validates expression context availability at workflow locations."
+    },
+    {
+      "url": "https://github.com/TL-System/plato/actions/runs/37167176060",
+      "supports": "The actual published workflow was rejected before jobs for runner.temp at job-level env."
+    }
+  ],
+  "artifact_manifest_sha256": "b4f46b4bc18d7a0d244458d5baf936e65c1e876490b8637cbd2151005611ee5f",
+  "limits": [
+    "Local macOS arm64 actionlint validation only. No corrected workflow was pushed, remotely dispatched or run on GitHub.",
+    "No docs/package/training runtime tests were repeated for this context-only change. Root's previous0791c01 runtime proof is retained as historical evidence and is not rebound to this source.",
+    "Final integrated source requires root's new gate addendum and real remote jobs before merge; local actionlint does not claim remote runtime success.",
+    "Tool and existing author-owned controller environment only; no root environment or integration checkout was modified.",
+    "Prior candidates and receipts remain preserved; no push, PR update, release or publication occurred.",
+    "The raw GitHub HTML snapshot is preserved byte for byte, including its original whitespace; whitespace validation excludes only that exact raw snapshot."
+  ]
+}

@@ -1,12 +1,17 @@
 """Disconnect cleanup must preserve checkpoints owned by other clients."""
 
 import asyncio
-from types import SimpleNamespace
-from unittest.mock import AsyncMock
 
-from plato.clients.base import Client
 from plato.clients.composable import ComposableClientEvents
 from plato.config import Config
+from tests.test_utils.fakes import (
+    BoundaryClient,
+    IdentityLifecycleStrategy,
+    InMemoryReportingStrategy,
+    NoOpCommunicationStrategy,
+    RecordingPayloadStrategy,
+    StaticTrainingStrategy,
+)
 
 
 def test_disconnect_removes_only_owned_temporary_checkpoints(temp_config, tmp_path):
@@ -14,7 +19,7 @@ def test_disconnect_removes_only_owned_temporary_checkpoints(temp_config, tmp_pa
     model_path.mkdir()
     Config.params["model_path"] = str(model_path)
     Config().clients.shutdown_delay = 0
-    client = Client()
+    client = BoundaryClient()
     client.client_id = 1
     owned = ["1_2_0.25.safetensors", "1_2_0.25.safetensors.pkl", "1_3_1.5.pth"]
     preserved = [
@@ -29,12 +34,14 @@ def test_disconnect_removes_only_owned_temporary_checkpoints(temp_config, tmp_pa
     ]
     for name in owned + preserved:
         (model_path / name).write_text(name)
-    core = SimpleNamespace(
-        owner=client,
-        reserve_disconnect=AsyncMock(return_value=(True, None)),
-        payload_strategy=SimpleNamespace(teardown=lambda context: None),
-        context=None,
+    client._configure_composable(
+        lifecycle_strategy=IdentityLifecycleStrategy(),
+        payload_strategy=RecordingPayloadStrategy(),
+        training_strategy=StaticTrainingStrategy(),
+        reporting_strategy=InMemoryReportingStrategy(),
+        communication_strategy=NoOpCommunicationStrategy(),
     )
+    core = client._require_composable()
     events = ComposableClientEvents("/", core)
     asyncio.run(events.on_disconnect())
     assert {p.name for p in model_path.iterdir()} == set(preserved)

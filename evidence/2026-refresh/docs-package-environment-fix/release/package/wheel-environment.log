@@ -1,0 +1,5 @@
+cwd: /var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-package-msstdb1y
+command: ["uv", "venv", "--python", "3.13", "/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-package-msstdb1y/environment"]
+Using CPython 3.13.16
+Creating virtual environment at: /var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-package-msstdb1y/environment
+Activate with: source /var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-package-msstdb1y/environment/bin/activate

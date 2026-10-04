@@ -1,0 +1,168 @@
+{
+  "source_commit": "959ed3793cc4a2fab003a7f4d29bf33faa951b85",
+  "valid_probe_preserves_payload": true,
+  "rejected_probe_cases": [
+    "absent",
+    "duplicate",
+    "non_mapping",
+    "missing_hostname",
+    "null_hostname",
+    "numeric_hostname"
+  ],
+  "package": {
+    "accepted": true,
+    "source_commit": "959ed3793cc4a2fab003a7f4d29bf33faa951b85",
+    "wheel_sha256": "5e300e5a00b575557cd0ca5c948d956772fb7229a470bdbead2ac1333ced79dd",
+    "sdist_sha256": "d07cfb208f1d33e570be30c9ea16cb9aff62765a4e1dd87062b824fa55d3a945",
+    "sdist_source_tree_bound": true,
+    "sdist_source_binding_sha256": "8a2d8e3f0d3a6f77219cea8bb2416e23b6f0dcfa49137d831db7ca6b81ec1684",
+    "rebuilt_wheel_payload_matches": true,
+    "installed_wheel_provenance_and_imports": true,
+    "build_constraints_sha256": "284e1018003f55e4ce6fbb5c80b7dad20e86d9ed60ef544d817f1892626326de",
+    "runtime_constraints_sha256": "9c9b82f4c52ba05fb5a1c7e6e841e15fcd69104f9867cf7d7526060055a32709"
+  },
+  "static": {
+    "accepted": true,
+    "elapsed_seconds": 0.593,
+    "gpu_compute_tested": false,
+    "launcher_cases": [
+      {
+        "argv": [
+          "run",
+          "--rm",
+          "--net=host",
+          "-v",
+          "/dev/shm:/dev/shm",
+          "-v",
+          "/private/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato launcher hlzpgzfd:/root/plato",
+          "-i",
+          "plato",
+          "/bin/bash"
+        ],
+        "exit": 0,
+        "script": "dockerrun.sh"
+      },
+      {
+        "argv": [
+          "run",
+          "--rm",
+          "--net=host",
+          "-v",
+          "/dev/shm:/dev/shm",
+          "-v",
+          "/private/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato launcher hlzpgzfd:/root/plato",
+          "-i",
+          "plato",
+          "python",
+          "-c",
+          "literal $x `x` $(x)",
+          "a b",
+          ""
+        ],
+        "exit": 0,
+        "script": "dockerrun.sh"
+      },
+      {
+        "argv": [
+          "run",
+          "--rm",
+          "--net=host",
+          "-v",
+          "/dev/shm:/dev/shm",
+          "-v",
+          "/private/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato launcher hlzpgzfd:/root/plato",
+          "-i",
+          "plato",
+          "python",
+          "-c",
+          "literal $x `x` $(x)",
+          "a b",
+          ""
+        ],
+        "exit": 23,
+        "script": "dockerrun.sh"
+      },
+      {
+        "argv": [
+          "run",
+          "--rm",
+          "--net=host",
+          "-v",
+          "/dev/shm:/dev/shm",
+          "-v",
+          "/private/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato launcher hlzpgzfd:/root/plato",
+          "--gpus",
+          "all",
+          "-i",
+          "plato",
+          "/bin/bash"
+        ],
+        "exit": 0,
+        "script": "dockerrun_gpu.sh"
+      },
+      {
+        "argv": [
+          "run",
+          "--rm",
+          "--net=host",
+          "-v",
+          "/dev/shm:/dev/shm",
+          "-v",
+          "/private/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato launcher hlzpgzfd:/root/plato",
+          "--gpus",
+          "all",
+          "-i",
+          "plato",
+          "python",
+          "-c",
+          "literal $x `x` $(x)",
+          "a b",
+          ""
+        ],
+        "exit": 0,
+        "script": "dockerrun_gpu.sh"
+      },
+      {
+        "argv": [
+          "run",
+          "--rm",
+          "--net=host",
+          "-v",
+          "/dev/shm:/dev/shm",
+          "-v",
+          "/private/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato launcher hlzpgzfd:/root/plato",
+          "--gpus",
+          "all",
+          "-i",
+          "plato",
+          "python",
+          "-c",
+          "literal $x `x` $(x)",
+          "a b",
+          ""
+        ],
+        "exit": 23,
+        "script": "dockerrun_gpu.sh"
+      }
+    ],
+    "mode": "static",
+    "required_source_count": 645,
+    "scope": "Static context and recording-stub checks only",
+    "workspace_manifests": [
+      "examples/unlearning/fedunlearning/pyproject.toml",
+      "examples/unlearning/knot/pyproject.toml",
+      "examples/client_selection/pisces/pyproject.toml",
+      "examples/client_selection/polaris/pyproject.toml",
+      "examples/split_learning/llm_split_learning/pyproject.toml",
+      "examples/ssl/calibre/pyproject.toml",
+      "examples/ssl/smog/pyproject.toml",
+      "examples/model_search/anycostfl/pyproject.toml",
+      "examples/model_search/fedrolex/pyproject.toml",
+      "examples/model_search/heterofl/pyproject.toml",
+      "examples/detector/pyproject.toml",
+      "examples/gradient_leakage_attacks/pyproject.toml"
+    ]
+  },
+  "ty": "0.0.84: both changed scripts passed with no added rule suppression",
+  "limits": "No local Docker daemon; native container checks require hosted Linux."
+}
