@@ -132,6 +132,7 @@ def test_urgent_actual_snapshots_numerical_order_cutoff_architecture_and_state(
             trainer.obtain_model_at_time(99, 100.0)
 
 
+@pytest.mark.slow
 def test_real_spawned_worker_train_test_and_history_with_slash_name(tmp_path):
     """The parent consumes the child's actual model and testing artifacts."""
     config = build_minimal_config(model_name="org/model")

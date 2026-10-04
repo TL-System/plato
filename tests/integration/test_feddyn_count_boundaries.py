@@ -40,6 +40,7 @@ class SingleDrawPartition:
 
 
 @pytest.mark.parametrize("mode", ["uniform", "sample"])
+@pytest.mark.slow
 def test_actual_spawn_wrong_first_count_rejected_and_retry(tmp_path, mode):
     output = tmp_path / "result.json"
     command = [
@@ -56,7 +57,9 @@ def test_actual_spawn_wrong_first_count_rejected_and_retry(tmp_path, mode):
     assert len(result["retries"]) == 3
 
 
-@pytest.mark.parametrize("spawn", [False, True])
+@pytest.mark.parametrize(
+    "spawn", [False, pytest.param(True, marks=pytest.mark.slow)]
+)
 def test_parent_realizes_partition_once_without_using_backing_length(tmp_path, spawn):
     if spawn:
         # Full collection replaces example module names. Keep real spawn in

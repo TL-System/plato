@@ -38,6 +38,7 @@ def personal_config(*, spawn=False):
     return config
 
 
+@pytest.mark.slow
 def test_ssl_public_spawn_returns_private_head_and_isolates_identity(tmp_path):
     config = personal_config(spawn=True)
     with configure_environment(config, runtime_root=tmp_path):

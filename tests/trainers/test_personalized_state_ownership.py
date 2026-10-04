@@ -206,6 +206,7 @@ def test_feddyn_exact_legacy_prefix_load_is_same_client_and_canonical_wins(tmp_p
 
 
 @pytest.mark.parametrize("family", ["ditto", "apfl", "feddyn", "fedala"])
+@pytest.mark.slow
 def test_actual_spawn_returns_personal_state_and_optimizer_across_rounds(tmp_path, family):
     if family == "feddyn":
         import json

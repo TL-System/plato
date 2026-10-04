@@ -177,6 +177,7 @@ def rational_round(x, histories, selected, targets, counts, mode):
         "parent",
     ],
 )
+@pytest.mark.slow
 def test_actual_spawned_rejection_retry_and_logical_reuse(tmp_path, defect):
     output = tmp_path / "result.json"
     command = [
@@ -253,7 +254,9 @@ def run_partial(
 
 
 @pytest.mark.parametrize("mode,counts", [("uniform", (2, 2)), ("sample", (1, 3))])
-@pytest.mark.parametrize("spawn", [False, True])
+@pytest.mark.parametrize(
+    "spawn", [False, pytest.param(True, marks=pytest.mark.slow)]
+)
 def test_consecutive_same_client_uses_current_cloud_and_dispatched_history(
     tmp_path, mode, counts, spawn
 ):
@@ -336,6 +339,7 @@ def test_actual_full_participation_first_cloud(tmp_path, mode):
 
 
 @pytest.mark.parametrize("mode,counts", [("uniform", (2, 2)), ("sample", (1, 3))])
+@pytest.mark.slow
 def test_actual_spawn_reused_client_matches_partial_oracle(tmp_path, mode, counts):
     output = tmp_path / "result.json"
     command = [

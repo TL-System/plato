@@ -170,7 +170,9 @@ def test_actual_accepted_b_feddyn_writer_migration(
         assert legacy.read_bytes() == original
 
 
-@pytest.mark.parametrize("spawn", [False, True])
+@pytest.mark.parametrize(
+    "spawn", [False, pytest.param(True, marks=pytest.mark.slow)]
+)
 def test_fedala_memory_only_return_matches_dedicated_rounds(tmp_path, spawn):
     config = build_minimal_config(model_name="org/model")
     config["parameters"]["optimizer"].update(lr=0.1, momentum=0.0)

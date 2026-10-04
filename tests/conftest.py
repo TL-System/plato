@@ -49,6 +49,7 @@ _RUNTIME = {
     _STARTUP + "test_stalled_real_client_is_contained_without_round_success",
 }
 _CORE_RUNTIME = "runtime and not retained_model_search"
+_FAST_CORE = "not runtime and not slow"
 _RETAINED_MODULE = "tests/integration/test_retained_model_search.py"
 _RETAINED = {
     f"{_RETAINED_MODULE}::{name}"
@@ -368,6 +369,13 @@ class _ProfileChecks:
                 "tests/mlx_native --test-profile=mlx-native"
             )
         markexpr = config.getoption("markexpr") or ""
+        self.fast_core = (
+            config.getoption("test_profile") == "mandatory" and markexpr == _FAST_CORE
+        )
+        if markexpr == _FAST_CORE and not self.fast_core:
+            raise pytest.UsageError("fast core partition requires mandatory profile")
+        if self.fast_core and config.getoption("keyword"):
+            raise pytest.UsageError("fast core does not permit keyword filters")
         if "llm_eval" in re.findall(r"\b\w+\b", markexpr) and not self.eval_requested:
             raise pytest.UsageError(
                 "llm_eval marker requires an explicit optional filesystem path "
@@ -416,7 +424,7 @@ class _ProfileChecks:
             self.qualify
             and self.full
             and not self.native_qualification
-            and markexpr not in {"", "runtime", "not runtime", _CORE_RUNTIME}
+            and markexpr not in {"", "runtime", "not runtime", _CORE_RUNTIME, _FAST_CORE}
         ):
             raise pytest.UsageError(f"unapproved full-suite partition: {markexpr!r}")
         if self.retained_qualification:
@@ -624,10 +632,12 @@ class _ProfileChecks:
         for item in items:
             runtime = item.get_closest_marker("runtime") is not None
             retained = item.get_closest_marker("retained_model_search") is not None
+            slow = item.get_closest_marker("slow") is not None
             if not (
                 (partition == "runtime" and not runtime)
                 or (partition == "not runtime" and runtime)
                 or (partition == _CORE_RUNTIME and (not runtime or retained))
+                or (self.fast_core and (runtime or slow))
             ):
                 self.violations.append(f"unexpected deselection: {item.nodeid}")
 
@@ -677,7 +687,7 @@ class _ProfileChecks:
                     self.violations.append(
                         "required tests did not pass: " + ", ".join(sorted(missing))
                     )
-            if partition != "not runtime":
+            if partition not in {"not runtime", _FAST_CORE}:
                 actual = Counter(
                     node.split("[", 1)[0] for node in nodes if node.startswith(_STARTUP)
                 )
@@ -707,6 +717,11 @@ class _ProfileChecks:
             scope = "native complete qualification"
         else:
             scope = "native qualification failed"
+        if self.fast_core:
+            scope = (
+                "fast core (runtime and slow excluded; not full qualification); "
+                "native, Lighteval and Phase4 task qualifications excluded"
+            )
         if self.eval_requested:
             if not self.eval_qualification:
                 scope = "Lighteval focused execution (not complete qualification)"

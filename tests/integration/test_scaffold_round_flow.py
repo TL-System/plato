@@ -274,6 +274,7 @@ def test_shipped_configuration_two_round_independent_rational_oracle(tmp_path):
     run_two_round_scenario(tmp_path)
 
 
+@pytest.mark.slow
 def test_shipped_spawn_pipeline_parent_control_return_with_deadline(tmp_path):
     output = tmp_path / "result.json"
     command = [
@@ -362,6 +363,7 @@ def run_failed_worker_scenario(root, mode):
 
 
 @pytest.mark.parametrize("mode", ["missing", "stale", "model-save", "commit"])
+@pytest.mark.slow
 def test_actual_failed_worker_handoff_refuses_previous_delta(tmp_path, mode):
     output = tmp_path / "result.json"
     command = [
