@@ -48,7 +48,9 @@ def test_feddf_training_strategy_returns_teacher_logits(temp_config):
     context = SimpleNamespace(
         client_id=1,
         current_round=1,
-        algorithm=SimpleNamespace(load_weights=lambda weights: loaded_weights.append(weights)),
+        algorithm=SimpleNamespace(
+            load_weights=lambda weights: loaded_weights.append(weights)
+        ),
         trainer=SimpleNamespace(model=FakeModel(), device="cpu"),
         state={},
     )
@@ -62,14 +64,17 @@ def test_feddf_training_strategy_returns_teacher_logits(temp_config):
     mock_report = SimpleNamespace(num_samples=8)
     async_mock = AsyncMock(return_value=(mock_report, {"weights": torch.ones(1)}))
 
-    with patch.object(
-        feddf_client.DefaultTrainingStrategy,
-        "train",
-        new=async_mock,
-    ) as mock_train, patch.object(
-        feddf_client.time,
-        "perf_counter",
-        side_effect=[10.0, 10.25],
+    with (
+        patch.object(
+            feddf_client.DefaultTrainingStrategy,
+            "train",
+            new=async_mock,
+        ) as mock_train,
+        patch.object(
+            feddf_client.time,
+            "perf_counter",
+            side_effect=[10.0, 10.25],
+        ),
     ):
         report, payload = asyncio.run(strategy.train(context))
 

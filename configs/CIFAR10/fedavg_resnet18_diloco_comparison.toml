@@ -1,0 +1,68 @@
+[clients]
+
+# Type
+type = "simple"
+
+# The total number of clients
+total_clients = 50
+
+# The number of clients selected in each round
+per_round = 50
+
+# Should the clients compute test accuracy locally?
+do_test = false
+
+[server]
+address = "127.0.0.1"
+port = 8022
+
+[data]
+
+# The training and testing dataset
+datasource = "Torchvision"
+dataset_name = "CIFAR10"
+download = true
+
+# Number of samples in each partition
+partition_size = 1000
+
+# IID or non-IID?
+sampler = "iid"
+
+[trainer]
+
+# The type of the trainer
+type = "basic"
+
+# The maximum number of training rounds
+rounds = 20
+
+# The maximum number of clients running concurrently
+max_concurrency = 7
+
+# The target accuracy
+target_accuracy = 0.9
+
+# Match the original FedAvg local training shape while keeping 500 optimizer
+# steps per round, equal to DiLoCo's H.
+epochs = 5
+batch_size = 10
+optimizer = "AdamW"
+lr_scheduler = "LambdaLR"
+
+# The machine learning model
+model_name = "resnet_18"
+
+[algorithm]
+
+# Aggregation algorithm
+type = "fedavg"
+
+[parameters]
+
+[parameters.optimizer]
+lr = 0.0004
+weight_decay = 0.1
+
+[parameters.learning_rate]
+warmup_steps = "1000it"

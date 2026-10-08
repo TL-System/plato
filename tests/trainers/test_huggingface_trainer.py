@@ -30,7 +30,9 @@ class DummyPadTokenizer:
 
         for feature in features:
             pad_width = max_len - len(feature["input_ids"])
-            batch["input_ids"].append(feature["input_ids"] + [self.pad_token_id] * pad_width)
+            batch["input_ids"].append(
+                feature["input_ids"] + [self.pad_token_id] * pad_width
+            )
             batch["attention_mask"].append(
                 feature.get("attention_mask", [1] * len(feature["input_ids"]))
                 + [0] * pad_width

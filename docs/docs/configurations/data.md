@@ -5,6 +5,7 @@
     - `Torchvision`: including torchvision datasets such as MNIST, FashionMNIST, EMNIST, CIFAR10, CIFAR100, CelebA, or STL10 (requires `dataset_name`)
     - `CINIC10`
     - `FEMNIST`: Federated EMNIST
+    - `EVCharging`: per-user EV charging time-series forecasting windows
     - `TinyImageNet`
     - `Purchase`
     - `Texas`
@@ -56,6 +57,20 @@
 
 !!! example "test_path"
     Where the test dataset is located.
+
+!!! tip "EVCharging time-series datasource"
+    `EVCharging` builds per-user hourly time series from the [_Residential electric vehicle charging datasets from apartment buildings_](https://data.mendeley.com/datasets/jbks2rcwyj/1/files/2e3b8ced-9887-4a91-b721-8e510e18a127) [doi: 10.17632/jbks2rcwyj.1]. Each client receives one configured user, so use `sampler = "all_inclusive"` rather than class-label partitioning.
+
+    ```toml
+    [data]
+    datasource = "EVCharging"
+    datasource_path = "runtime/data/ado1/dataset1_ev_charging_reports.csv"
+    garage = "AdO1"  # use "all" for users across garages
+    users = ["AdO1-1", "AdO1-2", "AdO1-3", "AdO1-4"]
+    sampler = "all_inclusive"
+    ```
+
+    The datasource creates `past_values` / `future_values` sliding-window samples. The input feature order is `is_charging`, `energy_scaled`, `hour_sin`, `hour_cos`, `dow_sin`, and `dow_cos`; the reference configs forecast only `is_charging`.
 
 !!! example "sampler"
     How to divide the entire dataset to the clients. The following options are available:

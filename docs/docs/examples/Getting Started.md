@@ -76,3 +76,4 @@ specific workload and environment recorded in its validation evidence.
 - [Composable Trainer API](case-studies/2. Composable Trainer.md)
 
 - [Server-side Lighteval for SmolLM2](case-studies/4. Server-side Lighteval for SmolLM2.md)
+- [Time-Series Forecasting with TimesFM](case-studies/6. Time-Series Forecasting with TimesFM.md)

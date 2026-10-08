@@ -10,7 +10,7 @@ below describe the PyTorch path unless stated otherwise. See
     - `composable` the strategy-based trainer that exposes loss, optimiser, scheduler, data-loader, model-update, and testing strategies directly.
     - `timm_basic` a basic trainer with the [timm](https://timm.fast.ai/) learning rate scheduler.
     - `diff_privacy` a trainer that supports local differential privacy in its training loop by adding noise to the gradients during each step of training.
-    - `HuggingFace` a trainer for Hugging Face causal language models and tokenizers.
+    - `HuggingFace` a trainer for Hugging Face causal language models, tokenizers, and time-series models.
     - `split_learning` a trainer that supports the split learning framework.
     - `self_supervised_learning` a trainer that supports personalized federated learning based on self supervised learning.
     - `gan` a trainer for Generative Adversarial Networks (GANs).
@@ -58,6 +58,20 @@ below describe the PyTorch path unless stated otherwise. See
 
 !!! example "epochs"
     The total number of epochs in local training in each communication round.
+
+!!! example "local_steps_per_round"
+    The DiLoCo local work value `H`, counted as completed client-local optimizer steps between synchronizations.
+
+    `H` is not an epoch count, raw dataloader batch count, or gradient-accumulation micro-batch count. When gradient accumulation is enabled, only batches that trigger `optimizer.step()` increment `H`.
+
+    `H` may be smaller than one epoch. In that case, local training stops mid-epoch after exactly `H` optimizer steps while still running normal trainer cleanup, callback completion, state persistence, and reporting.
+
+    Small-`H` DiLoCo runs use round-aware sampling where supported so a logical client does not replay the same first `H` batches every round. Trainers or samplers that cannot count optimizer steps or advance the local stream faithfully must fail or warn clearly instead of silently approximating DiLoCo.
+
+!!! example "preserve_optimizer_state"
+    Whether client-local optimizer and scheduler state should persist across a logical client's local train runs.
+
+    DiLoCo should set this to `true` with a stateful inner optimizer such as `AdamW`. Optimizer and scheduler state remains client-local and is not transmitted in client-server payloads.
 
 !!! example "batch_size"
     The size of the mini-batch of data in each step (iteration) of the training loop.
@@ -168,6 +182,8 @@ below describe the PyTorch path unless stated otherwise. See
     - `cnn_encoder` (for generating various encoders by extracting from CNN models such as ResNet models)
     - `general_multilayer` (for generating a multi-layer perceptron using a provided configuration)
     - `huggingface` (for [HuggingFace](https://huggingface.co/models) causal language models)
+    - `timesfm` (for Hugging Face TimesFM time-series forecasting models)
+    - `patchtsmixer` (for Hugging Face PatchTSMixer time-series models)
     - `torchvision` (for models from the installed [Torchvision model library](https://docs.pytorch.org/vision/stable/models.html))
 
     The name of the model should be specified below, in `model_name`.
@@ -188,6 +204,8 @@ below describe the PyTorch path unless stated otherwise. See
     - `vgg_x`
     - `dcgan`
     - `multilayer`
+    - `timesfm`
+    - `patchtsmixer`
 
     !!! note "Note"
         If the `model_type` above specified a model repository, supply the name of the model, such as `gpt2`, `HuggingFaceTB/SmolLM2-135M`, or `Qwen/Qwen3-0.6B-Base`, here.
@@ -198,6 +216,21 @@ below describe the PyTorch path unless stated otherwise. See
     An optional tokenizer identifier to use instead of `trainer.model_name`.
 
     This is mainly useful for Hugging Face language-model workloads where the tokenizer/chat template comes from a separate repository.
+
+!!! tip "HuggingFace time-series models"
+    Set `trainer.type = "HuggingFace"` with `model_type = "timesfm"` or `model_type = "patchtsmixer"` to use Plato's time-series collator and MSE testing strategy instead of the tokenizer-based language-model path.
+
+    Common fields include:
+
+    - `context_length`: number of historical time steps in each input window.
+    - `prediction_length`: number of future time steps to forecast.
+    - `num_input_channels`: number of features in `past_values`.
+    - `prediction_channel_indices`: channels to keep/evaluate from model output.
+    - `stride`: sliding-window stride used by the datasource.
+    - `train_ratio` and `val_ratio`: temporal split ratios for per-user windows.
+    - `freq`: TimesFM frequency token (`0` for high-frequency/hourly data).
+
+    TimesFM models are wrapped channel-independently for multivariate tensors; PatchTSMixer configs can use model options such as `mode = "mix_channel"` to mix features jointly. See the [TimesFM case study](../examples/case-studies/6. Time-Series Forecasting with TimesFM.md) for complete configs.
 
 !!! example "model_revision"
     The Hugging Face model revision passed to model configuration and weight

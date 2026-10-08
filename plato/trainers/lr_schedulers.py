@@ -104,8 +104,9 @@ def get(optimizer: optim.Optimizer, iterations_per_epoch: int, **kwargs: str | d
                     for x in lr_params["milestone_steps"].split(",")
                 ]
                 lambdas.append(
-                    lambda it, milestones=milestones: lr_params["gamma"]
-                    ** bisect.bisect(milestones, it)
+                    lambda it, milestones=milestones: (
+                        lr_params["gamma"] ** bisect.bisect(milestones, it)
+                    )
                 )
 
             # Add a linear learning rate warmup if specified

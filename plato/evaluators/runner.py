@@ -26,7 +26,9 @@ def _configured_evaluator_type() -> str | None:
         evaluator_type = evaluation_cfg.get("type")
     else:
         evaluator_type = getattr(evaluation_cfg, "type", None)
-    return evaluator_type if isinstance(evaluator_type, str) and evaluator_type else None
+    return (
+        evaluator_type if isinstance(evaluator_type, str) and evaluator_type else None
+    )
 
 
 def _evaluation_fail_on_error() -> bool:

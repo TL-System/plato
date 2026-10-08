@@ -1,0 +1,77 @@
+# Federated Learning with TimesFM 2.5 (HuggingFace transformers) for EV Charging Prediction
+#
+# Task: Given the past 28 days (672 h) of a user's EV charging behaviour,
+#       predict whether they will be charging in each of the next 168 hours.
+#
+# Dataset: "EV Charging Reports" – AdO1 garage, 4 users
+#   https://data.mendeley.com/datasets/jbks2rcwyj/1
+#
+# Model: google/timesfm-2.5-200m-transformers
+#   Uses Timesfm2P5ModelForPrediction from the transformers library.
+#   Channel-independent: each of the 6 input features is processed as a
+#   separate univariate series; only is_charging is evaluated.
+#
+# Usage:
+#   uv run plato.py -c configs/TimeSeries/timesfm25_transformers_ev_charging.toml
+
+[clients]
+type = "simple"
+total_clients = 1
+per_round = 1
+do_test = true
+
+[server]
+address = "127.0.0.1"
+port = 8000
+simulate_wall_time = false
+checkpoint_path = "checkpoints/timeseries/timesfm25t_ev"
+model_path = "models/timeseries/timesfm25t_ev"
+
+[data]
+datasource = "EVCharging"
+
+datasource_path = "runtime/data/ado1/dataset1_ev_charging_reports.csv"
+
+garage = "Bl2"
+
+# Explicit user IDs to include — one client per user.
+users = ["Bl2-1"]
+sampler = "all_inclusive"
+
+[trainer]
+type = "HuggingFace"
+rounds = 100
+max_concurrency = 1
+model_name = "google/timesfm-2.5-200m-transformers"
+model_type = "timesfm"
+
+context_length    = 672   # 4 × 7 × 24  (model supports up to 16384)
+prediction_length = 128   # model horizon_length is fixed at 128 steps
+
+# Number of input channels:  is_charging, energy_scaled,
+#                            hour_sin, hour_cos, dow_sin, dow_cos
+num_input_channels = 6
+
+# Only evaluate the is_charging channel (index 0)
+prediction_channel_indices = [0]
+
+# Sliding-window stride for dataset creation
+stride = 1    # advance 1 hour at a time to maximise training windows
+
+epochs     = 5
+batch_size = 32
+optimizer  = "Adam"
+
+train_ratio = 0.70
+val_ratio   = 0.15
+
+[algorithm]
+type = "fedavg"
+
+[parameters]
+[parameters.optimizer]
+lr           = 0.0005
+weight_decay = 1e-4
+
+[results]
+types = "round, elapsed_time, mse"

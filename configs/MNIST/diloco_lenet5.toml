@@ -1,0 +1,75 @@
+[clients]
+
+# Type
+type = "simple"
+
+# The total number of clients
+total_clients = 50
+
+# The number of clients selected in each round
+per_round = 50
+
+# Should the clients compute test accuracy locally?
+do_test = false
+
+[server]
+type = "diloco"
+address = "127.0.0.1"
+port = 8001
+random_seed = 1
+simulate_wall_time = true
+
+[server.diloco]
+outer_optimizer = "nesterov"
+outer_learning_rate = 0.7
+outer_momentum = 0.9
+aggregation_weighting = "uniform"
+apply_outer_optimizer_to = "parameters"
+
+[data]
+include = "mnist_iid.toml"
+partition_size = 1000
+
+[trainer]
+
+# The type of the trainer
+type = "basic"
+
+# The maximum number of training rounds
+rounds = 20
+
+# The maximum number of clients running concurrently
+max_concurrency = 7
+
+# The target accuracy
+target_accuracy = 0.99
+
+# The machine learning model
+model_name = "lenet5"
+
+# Number of local optimizer steps per DiLoCo synchronization.
+local_steps_per_round = 500
+preserve_optimizer_state = true
+
+# DiLoCo paper inner-optimizer settings.
+epochs = 5
+batch_size = 32
+optimizer = "AdamW"
+lr_scheduler = "LambdaLR"
+
+[algorithm]
+
+# Weight extraction and model update path reused by DiLoCo.
+type = "fedavg"
+
+[parameters]
+
+[parameters.model]
+num_classes = 10
+
+[parameters.optimizer]
+lr = 0.0004
+weight_decay = 0.1
+
+[parameters.learning_rate]
+warmup_steps = "1000it"

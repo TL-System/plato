@@ -1,0 +1,107 @@
+# Federated Learning with TimesFM2.5 + DiLoCo for EV Charging Prediction
+#
+# Task: Given the past 28 days (672 h) of a user's EV charging behaviour,
+#       predict whether they will be charging in each of the next 128 hours.
+#
+# Dataset: "EV Charging Reports" – mixed high-data users across garages
+#   https://data.mendeley.com/datasets/jbks2rcwyj/1
+#
+# Federated setup: 4 clients, one user each. All clients participate every round.
+#
+# Model: TimesFM (custom, trained from scratch for the small data regime)
+#   – channel-independent: each of the 6 input features is processed
+#     as a separate univariate series; only is_charging is evaluated.
+#
+# DiLoCo uses server.type = "diloco" with algorithm.type = "fedavg" so the
+# standard FedAvg weight extraction/update path is reused for local training.
+# local_steps_per_round counts optimizer steps, not epochs; optimizer state is
+# preserved locally under model_path between DiLoCo synchronizations.
+#
+# Usage:
+#   uv run plato.py -c configs/TimeSeries/timesfm25_ev_charging_top4_mixed_diloco.toml
+
+[clients]
+type = "simple"
+total_clients = 4
+per_round = 4
+do_test = true
+
+[server]
+type = "diloco"
+address = "127.0.0.1"
+port = 8000
+simulate_wall_time = false
+checkpoint_path = "checkpoints/timeseries/timesfm25_ev_top4_mixed_diloco"
+model_path = "models/timeseries/timesfm25_ev_top4_mixed_diloco"
+
+[server.diloco]
+outer_optimizer = "nesterov"
+outer_learning_rate = 0.7
+outer_momentum = 0.9
+aggregation_weighting = "uniform"
+apply_outer_optimizer_to = "parameters"
+
+[data]
+datasource = "EVCharging"
+
+datasource_path = "runtime/data/ado1/dataset1_ev_charging_reports.csv"
+
+# Use explicit users across the whole dataset, not just a single garage.
+garage = "all"
+
+# Explicit user IDs to include — one client per user.
+users = ["Bl2-5", "AsO2-1", "Bl2-1", "AdO1-3"]
+sampler = "all_inclusive"
+random_seed = 42
+
+[trainer]
+type = "HuggingFace"
+rounds = 10
+max_concurrency = 1
+model_name = "google/timesfm-2.5-200m-transformers"
+model_type = "timesfm"
+
+context_length    = 672
+prediction_length = 128   # TimesFM2.5 transformers horizon_length is fixed at 128 steps.
+
+# Number of input channels: is_charging, energy_scaled,
+#                           hour_sin, hour_cos, dow_sin, dow_cos
+num_input_channels = 6
+
+# Only evaluate the is_charging channel (index 0)
+prediction_channel_indices = [0]
+
+patch_length         = 8
+num_hidden_layers    = 4
+hidden_size          = 256
+intermediate_size    = 256
+num_attention_heads  = 4
+head_dim             = 64
+dropout              = 0.1
+
+freq = 0
+
+# Sliding-window stride for dataset creation
+stride = 1
+
+# Number of local optimizer steps per DiLoCo synchronization.
+local_steps_per_round = 1500
+preserve_optimizer_state = true
+
+epochs     = 10
+batch_size = 16
+optimizer  = "AdamW"
+
+train_ratio = 0.70
+val_ratio   = 0.15
+
+[algorithm]
+type = "fedavg"
+
+[parameters]
+[parameters.optimizer]
+lr           = 0.0005
+weight_decay = 1e-4
+
+[results]
+types = "round, elapsed_time, mse"

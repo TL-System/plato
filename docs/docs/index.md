@@ -41,6 +41,7 @@ Welcome to *Plato*, a software framework to facilitate scalable, reproducible, a
     - **[Federated LoRA Fine-Tuning](examples/case-studies/1. LoRA.md)**
     - **[Composable Trainer API](examples/case-studies/2. Composable Trainer.md)**
     - **[Server-side Lighteval for SmolLM2](examples/case-studies/4. Server-side Lighteval for SmolLM2.md)**
+    - **[Time-Series Forecasting with TimesFM](examples/case-studies/6. Time-Series Forecasting with TimesFM.md)**
 
 ## Configuration Settings
 

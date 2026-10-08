@@ -63,6 +63,8 @@ registered_factories = {
     "general_multilayer": general_multilayer.Model,
     "torchvision": torchvision.Model,
     "huggingface": huggingface.Model,
+    "timesfm": huggingface.Model,
+    "patchtsmixer": huggingface.Model,
 }
 
 registered_mlx_models = {"mlx_lenet5": _mlx_lenet5_model}
