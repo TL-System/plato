@@ -1,0 +1,336 @@
+{
+  "candidate": "13e38dafce476286db7e673e7f21343d54416b56",
+  "report_sha256": "c0455ca53f730e9696719d1312e9913ef62dc3064911cca475aa6247faa68c0b",
+  "scope": "Independent FedDyn reviewer1 reference, three count-defect reproductions and receipts. Source/model artifacts and environments remain disposable; this retention is not a corrected-code pass.",
+  "files": [
+    {
+      "archive_path": "acceptance-bindings.json",
+      "original_path": "/private/tmp/plato-phase2c-feddyn-code-review/acceptance-bindings.json",
+      "bytes": 11858,
+      "sha256": "4645387ec5e29d30125d42807ba388d75a05caff729021e721e74c07046bff40"
+    },
+    {
+      "archive_path": "audit_final_inputs.py",
+      "original_path": "/private/tmp/plato-phase2c-feddyn-code-review/audit_final_inputs.py",
+      "bytes": 5205,
+      "sha256": "146cdb0575e2457c01672f452a9c6571f81020cf72ea0a852dcebd8ef9dd9f31"
+    },
+    {
+      "archive_path": "build_final_report.py",
+      "original_path": "/private/tmp/plato-phase2c-feddyn-code-review/build_final_report.py",
+      "bytes": 25236,
+      "sha256": "478714ac45daca1796c668109b24d3219687c7792af550c02f295f2a053a30ba"
+    },
+    {
+      "archive_path": "feddyn_reference.py",
+      "original_path": "/private/tmp/plato-phase2c-feddyn-code-review/feddyn_reference.py",
+      "bytes": 22316,
+      "sha256": "3028ca542112acf494b4d9bc0ea10c8c98df78e49f114b7859ebae0fe5c7f3db"
+    },
+    {
+      "archive_path": "final-callback-count-313.log",
+      "original_path": "/private/tmp/plato-phase2c-feddyn-code-review/final-callback-count-313.log",
+      "bytes": 3770,
+      "sha256": "184c4756a78e19b7a07bb7e1d00a26d2a2fbc4d0ce106a57f5c049d7507e099e"
+    },
+    {
+      "archive_path": "final-callback-count-314.log",
+      "original_path": "/private/tmp/plato-phase2c-feddyn-code-review/final-callback-count-314.log",
+      "bytes": 3770,
+      "sha256": "b2c1953ca6909cb26d0bac44936f42048e8978da81654e440c89b7910982f3f4"
+    },
+    {
+      "archive_path": "final-compatibility-313.log",
+      "original_path": "/private/tmp/plato-phase2c-feddyn-code-review/final-compatibility-313.log",
+      "bytes": 300,
+      "sha256": "bfbaa6ef54ae22f0c5a5f91e359c7b35688c43a49c59dfb85f9ac6bff5624557"
+    },
+    {
+      "archive_path": "final-compatibility-313.xml",
+      "original_path": "/private/tmp/plato-phase2c-feddyn-code-review/final-compatibility-313.xml",
+      "bytes": 3602,
+      "sha256": "f8ca2f1965fb4e8db9fc25a37c0104e490f0308e44f2f27e83163612dd33698a"
+    },
+    {
+      "archive_path": "final-compatibility-314.log",
+      "original_path": "/private/tmp/plato-phase2c-feddyn-code-review/final-compatibility-314.log",
+      "bytes": 240,
+      "sha256": "2fea082ba66865b5f9cfc36b783abfe9ef8395edf2d775aee43c141036aea33c"
+    },
+    {
+      "archive_path": "final-compatibility-314.xml",
+      "original_path": "/private/tmp/plato-phase2c-feddyn-code-review/final-compatibility-314.xml",
+      "bytes": 3602,
+      "sha256": "db32615d5e3d864695bd8fef5e403a538cccc36898777462802f14bee84f5160"
+    },
+    {
+      "archive_path": "final-focused-313.log",
+      "original_path": "/private/tmp/plato-phase2c-feddyn-code-review/final-focused-313.log",
+      "bytes": 352,
+      "sha256": "680f9b77f33ce6f7100e7484e6e9d12ec3a419fdb0f52387f509d61212e3502d"
+    },
+    {
+      "archive_path": "final-focused-313.xml",
+      "original_path": "/private/tmp/plato-phase2c-feddyn-code-review/final-focused-313.xml",
+      "bytes": 35136,
+      "sha256": "9c36d21ba0c03a49e2b822d8f43c5903dfe43baa4aaafcc2aed532b857a429ae"
+    },
+    {
+      "archive_path": "final-focused-314.log",
+      "original_path": "/private/tmp/plato-phase2c-feddyn-code-review/final-focused-314.log",
+      "bytes": 352,
+      "sha256": "55bbe7caed699c732d7df734c07405585f2d4df2df4ef12956a6988f3b7f997f"
+    },
+    {
+      "archive_path": "final-focused-314.xml",
+      "original_path": "/private/tmp/plato-phase2c-feddyn-code-review/final-focused-314.xml",
+      "bytes": 35136,
+      "sha256": "5509ac0aa9140c8ed70aed2e1d781f1953afe53f2e67fb1829d6b206df245bdd"
+    },
+    {
+      "archive_path": "final-independent-313.log",
+      "original_path": "/private/tmp/plato-phase2c-feddyn-code-review/final-independent-313.log",
+      "bytes": 2241,
+      "sha256": "42da4ee3c49ff0e41a7cda910fb21f0086e8cd880d7a05c7a7362d9613840e5d"
+    },
+    {
+      "archive_path": "final-independent-314.log",
+      "original_path": "/private/tmp/plato-phase2c-feddyn-code-review/final-independent-314.log",
+      "bytes": 2010,
+      "sha256": "728283fbb63a7345f593303892da192675d8e7b76ce100c7e20c617f95e34c3d"
+    },
+    {
+      "archive_path": "final-independent-v2-313.log",
+      "original_path": "/private/tmp/plato-phase2c-feddyn-code-review/final-independent-v2-313.log",
+      "bytes": 40138,
+      "sha256": "e7c11300efc04b5ced37671e105f972b07f2c42efdadd10c763e2828c74543a2"
+    },
+    {
+      "archive_path": "final-independent-v2-314.log",
+      "original_path": "/private/tmp/plato-phase2c-feddyn-code-review/final-independent-v2-314.log",
+      "bytes": 40138,
+      "sha256": "8900922f8ecece9cb8231db0226056c6351fdaaaccfa9311911fd0c61100da9c"
+    },
+    {
+      "archive_path": "final-input-audit.json",
+      "original_path": "/private/tmp/plato-phase2c-feddyn-code-review/final-input-audit.json",
+      "bytes": 38827,
+      "sha256": "242d7569ac115ec121067bb8041df07d57e065cb61d11479041dad81b6d402ff"
+    },
+    {
+      "archive_path": "final-input-audit.log",
+      "original_path": "/private/tmp/plato-phase2c-feddyn-code-review/final-input-audit.log",
+      "bytes": 141,
+      "sha256": "82ddeb2136cafd154b597aea3691ba393098a2bffddc70a42e057ad40c410a58"
+    },
+    {
+      "archive_path": "final-observed-environment-313.json",
+      "original_path": "/private/tmp/plato-phase2c-feddyn-code-review/final-observed-environment-313.json",
+      "bytes": 506,
+      "sha256": "19de20f13295fec0cd44f2d191001ec88cac7c04ae6f0fbcde84a790275d5fef"
+    },
+    {
+      "archive_path": "final-observed-environment-314.json",
+      "original_path": "/private/tmp/plato-phase2c-feddyn-code-review/final-observed-environment-314.json",
+      "bytes": 532,
+      "sha256": "26e7e22c0f8d415c3ca01dc11242d6281fa9dcbca4ab743a58dc5ffad769f509"
+    },
+    {
+      "archive_path": "final-origin-manifest.json",
+      "original_path": "/private/tmp/plato-phase2c-feddyn-code-review/final-origin-manifest.json",
+      "bytes": 76007,
+      "sha256": "15cbc6514844b378023ca5fd831b37a927da1ebde695dea76cb38d5558c8b688"
+    },
+    {
+      "archive_path": "final-reference-313.json",
+      "original_path": "/private/tmp/plato-phase2c-feddyn-code-review/final-reference-313.json",
+      "bytes": 35896,
+      "sha256": "77c0fbad765a743bd0153fd17501f1bff9f57417925442235e19647eb4cc75d7"
+    },
+    {
+      "archive_path": "final-reference-313.log",
+      "original_path": "/private/tmp/plato-phase2c-feddyn-code-review/final-reference-313.log",
+      "bytes": 176,
+      "sha256": "da5523500fdfc21b516dcfb45e296c3df4268e31ebfdf63642daf9093ff56160"
+    },
+    {
+      "archive_path": "final-reference-314.json",
+      "original_path": "/private/tmp/plato-phase2c-feddyn-code-review/final-reference-314.json",
+      "bytes": 35896,
+      "sha256": "77c0fbad765a743bd0153fd17501f1bff9f57417925442235e19647eb4cc75d7"
+    },
+    {
+      "archive_path": "final-reference-314.log",
+      "original_path": "/private/tmp/plato-phase2c-feddyn-code-review/final-reference-314.log",
+      "bytes": 176,
+      "sha256": "da5523500fdfc21b516dcfb45e296c3df4268e31ebfdf63642daf9093ff56160"
+    },
+    {
+      "archive_path": "final-reference-results-313.json",
+      "original_path": "/private/tmp/plato-phase2c-feddyn-code-review/final-reference-results-313.json",
+      "bytes": 10911,
+      "sha256": "fb8142cea91750bb0cf92682c618f4d341b04ccc3b44cde5aefa84e5f9652ad6"
+    },
+    {
+      "archive_path": "final-reference-results-314.json",
+      "original_path": "/private/tmp/plato-phase2c-feddyn-code-review/final-reference-results-314.json",
+      "bytes": 10945,
+      "sha256": "d8b4563bdd9510283e4b7ab4668f406d0ba86498cfa6905080576078effc9eb6"
+    },
+    {
+      "archive_path": "final-report-link-audit.json",
+      "original_path": "/private/tmp/plato-phase2c-feddyn-code-review/final-report-link-audit.json",
+      "bytes": 477,
+      "sha256": "54af7e6f8964a37e9f1b5398c66290a7d84b718a62afe4fde4f96e86bcf180f2"
+    },
+    {
+      "archive_path": "final-report-receipt.json",
+      "original_path": "/private/tmp/plato-phase2c-feddyn-code-review/final-report-receipt.json",
+      "bytes": 350,
+      "sha256": "aadb8d8f7cb804673db856a0b289d4bc23b74c8aaab31df3dfd7cec65d1e845d"
+    },
+    {
+      "archive_path": "final-rng-cache-313.log",
+      "original_path": "/private/tmp/plato-phase2c-feddyn-code-review/final-rng-cache-313.log",
+      "bytes": 295,
+      "sha256": "47e4329c9fb7085490b2905482bf55e2d9c29f48f38df5e1cbb73a2db7a7bc55"
+    },
+    {
+      "archive_path": "final-rng-cache-314.log",
+      "original_path": "/private/tmp/plato-phase2c-feddyn-code-review/final-rng-cache-314.log",
+      "bytes": 295,
+      "sha256": "8856240d796a7654195cec2527a5cce9472af3d02614820e029c98f7a1ce7348"
+    },
+    {
+      "archive_path": "final-rng-cache-v2-313.log",
+      "original_path": "/private/tmp/plato-phase2c-feddyn-code-review/final-rng-cache-v2-313.log",
+      "bytes": 4077,
+      "sha256": "5bb39a238ee609c1374df7879f6bca187a57608a95134c64ad561aaf19ff96ee"
+    },
+    {
+      "archive_path": "final-rng-cache-v2-314.log",
+      "original_path": "/private/tmp/plato-phase2c-feddyn-code-review/final-rng-cache-v2-314.log",
+      "bytes": 4077,
+      "sha256": "015f3d960fc425f0b7a1b186388ff53790054183022c58d3edb956d9e8e8dc08"
+    },
+    {
+      "archive_path": "final-ruff.log",
+      "original_path": "/private/tmp/plato-phase2c-feddyn-code-review/final-ruff.log",
+      "bytes": 19,
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "archive_path": "final-runtime-capture-validation.json",
+      "original_path": "/private/tmp/plato-phase2c-feddyn-code-review/final-runtime-capture-validation.json",
+      "bytes": 33532,
+      "sha256": "bf2130d090bce0abed583c5bad144f4baa8e328166f48ac005fa5c35e2b71a5f"
+    },
+    {
+      "archive_path": "final-runtime-capture-validation.log",
+      "original_path": "/private/tmp/plato-phase2c-feddyn-code-review/final-runtime-capture-validation.log",
+      "bytes": 93,
+      "sha256": "f9bf83d397d89325924775096371bfe2ad4df8cbfd2214a3b893c210dbec026d"
+    },
+    {
+      "archive_path": "final-ty-env-313.log",
+      "original_path": "/private/tmp/plato-phase2c-feddyn-code-review/final-ty-env-313.log",
+      "bytes": 3238,
+      "sha256": "34fe0a33c3be616c77f6fb7a8fff2f66730688f9540d24d1f23a5e175cafc7a8"
+    },
+    {
+      "archive_path": "final-ty-env-314.log",
+      "original_path": "/private/tmp/plato-phase2c-feddyn-code-review/final-ty-env-314.log",
+      "bytes": 3238,
+      "sha256": "34fe0a33c3be616c77f6fb7a8fff2f66730688f9540d24d1f23a5e175cafc7a8"
+    },
+    {
+      "archive_path": "origin_checks.py",
+      "original_path": "/private/tmp/plato-phase2c-feddyn-code-review/origin_checks.py",
+      "bytes": 1286,
+      "sha256": "2b08b40afb3e0e85450d860f662b3d6d1bfd1138033c8ce9e055f6d28f0749bd"
+    },
+    {
+      "archive_path": "preparation-receipt.json",
+      "original_path": "/private/tmp/plato-phase2c-feddyn-code-review/preparation-receipt.json",
+      "bytes": 6228,
+      "sha256": "01904049424e6ee757770bf89ed2d370dbf2d19e400d385914dc053c6f3cd8f0"
+    },
+    {
+      "archive_path": "prior-assigned-report.json",
+      "original_path": "/private/tmp/plato-phase2c-feddyn-code-review/prior-assigned-report.json",
+      "bytes": 53471,
+      "sha256": "722409d1420cfe2c063fc5783b36ac6e03d4c8a0bf1b11ed845624d627d06b29"
+    },
+    {
+      "archive_path": "reference-313.json",
+      "original_path": "/private/tmp/plato-phase2c-feddyn-code-review/reference-313.json",
+      "bytes": 35896,
+      "sha256": "77c0fbad765a743bd0153fd17501f1bff9f57417925442235e19647eb4cc75d7"
+    },
+    {
+      "archive_path": "reference-314.json",
+      "original_path": "/private/tmp/plato-phase2c-feddyn-code-review/reference-314.json",
+      "bytes": 35896,
+      "sha256": "77c0fbad765a743bd0153fd17501f1bff9f57417925442235e19647eb4cc75d7"
+    },
+    {
+      "archive_path": "reference.json",
+      "original_path": "/private/tmp/plato-phase2c-feddyn-code-review/reference.json",
+      "bytes": 35896,
+      "sha256": "77c0fbad765a743bd0153fd17501f1bff9f57417925442235e19647eb4cc75d7"
+    },
+    {
+      "archive_path": "results-313.json",
+      "original_path": "/private/tmp/plato-phase2c-feddyn-code-review/results-313.json",
+      "bytes": 10911,
+      "sha256": "fb8142cea91750bb0cf92682c618f4d341b04ccc3b44cde5aefa84e5f9652ad6"
+    },
+    {
+      "archive_path": "results-314.json",
+      "original_path": "/private/tmp/plato-phase2c-feddyn-code-review/results-314.json",
+      "bytes": 10945,
+      "sha256": "d8b4563bdd9510283e4b7ab4668f406d0ba86498cfa6905080576078effc9eb6"
+    },
+    {
+      "archive_path": "reviewer_callback_count_probe.py",
+      "original_path": "/private/tmp/plato-phase2c-feddyn-code-review/reviewer_callback_count_probe.py",
+      "bytes": 2090,
+      "sha256": "a03b65efc9b1c79e7f814a4b52403449ff88ab93b53107f661891ea87b817674"
+    },
+    {
+      "archive_path": "reviewer_candidate_probes.py",
+      "original_path": "/private/tmp/plato-phase2c-feddyn-code-review/reviewer_candidate_probes.py",
+      "bytes": 10606,
+      "sha256": "b7411dcf85f86fabf413bcdc314f5999193a4034f0d590853ff114252a1e65fc"
+    },
+    {
+      "archive_path": "reviewer_rng_cache_probe.py",
+      "original_path": "/private/tmp/plato-phase2c-feddyn-code-review/reviewer_rng_cache_probe.py",
+      "bytes": 3735,
+      "sha256": "805801b7dc4f5bbe6c78d4bb696478043883ff6f0fb78495358726b309c8404f"
+    },
+    {
+      "archive_path": "source_guard/sitecustomize.py",
+      "original_path": "/private/tmp/plato-phase2c-feddyn-code-review/source_guard/sitecustomize.py",
+      "bytes": 1400,
+      "sha256": "4aa39d2c04d5c6d2abc721ef76927aff878c46ac83f0d7fc383ad87ac6985b1e"
+    },
+    {
+      "archive_path": "validate_runtime_captures.py",
+      "original_path": "/private/tmp/plato-phase2c-feddyn-code-review/validate_runtime_captures.py",
+      "bytes": 7917,
+      "sha256": "ba209b7c339d2f171fc2d47b76d60980ccab0e29cba9fadb8e44240d1425fadb"
+    },
+    {
+      "archive_path": "verify_final_report.py",
+      "original_path": "/private/tmp/plato-phase2c-feddyn-code-review/verify_final_report.py",
+      "bytes": 3205,
+      "sha256": "51b531fc8cff01a022fa19a0570396fa8954ed6ddf669d64aeb72d93e3f0c436"
+    }
+  ],
+  "archive": {
+    "path": "evidence/2026-refresh/reproductions/phase2c-feddyn-review1-evidence.tar.gz",
+    "bytes": 109803,
+    "sha256": "3cad3766ec75fa257d1c6a5ea7b88e767b1912c2f70a160d422c52610522143b"
+  }
+}

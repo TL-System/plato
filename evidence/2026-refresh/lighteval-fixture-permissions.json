@@ -1,0 +1,1829 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-03",
+  "status": "AUTHOR_DELTA_COMPLETE_PENDING_FRESH_REVIEW",
+  "finding": "LR1",
+  "source": {
+    "base_commit": "c13a21a6e7a21fbac3b4450750fa940cbe27b8db",
+    "prior_implementation_commit": "e079df6228f9529472c7b3c3d9a2db46a42636a8",
+    "frozen_delta_commit": "52b7ecdf063fd0827ceae05b068e2c55c79aae08",
+    "frozen_tree": "9a1399a87c033331e3b0500bbf79f9dcac267d80",
+    "worktree": "/private/tmp/plato-refresh-worktrees/lighteval-runtime",
+    "branch": "maintenance/2026-lighteval-runtime",
+    "changed_paths": [
+      "tests/llm_eval/test_lighteval_runtime.py"
+    ],
+    "changed_file_sha256": "923813575c9a7e588da27f4f3a1d178ee896b651829234a7306edb33bf381d44",
+    "unchanged_source_and_metadata": {
+      "plato/evaluators/lighteval.py": {
+        "blob": "b41f36e93fe3fe56f21e807dfef560d9db70777f",
+        "sha256": "73a6f9f790ed1810033f4dcdc7c35bba68cd738260462e517dffd946d26b9775",
+        "identical_to_accepted_base": true
+      },
+      "plato/evaluators/lighteval_tasks.py": {
+        "blob": "686a7be1098ef003af8c74d0844224ca7ce2bc59",
+        "sha256": "c5af11e1f9cc71d8cbd0318266690246045049701d00ddd944f45cce121c984f",
+        "identical_to_accepted_base": true
+      },
+      "plato/evaluators/runner.py": {
+        "blob": "554ec687c1350b0b6c8c231c5f935411f6f9a0bb",
+        "sha256": "e08bae291acdcbefee340b8d7c8f41c168a0e00a2d257ff74932514a186985f3",
+        "identical_to_accepted_base": true
+      },
+      "tests/llm_eval/helpers.py": {
+        "blob": "11431f95a624429e8eb02a0fb5a24cbf4d6f2908",
+        "sha256": "0a3c9f230f3de6095791f0930f7e2963aaf2a88a2190f00b8aed01d878614bf1",
+        "identical_to_accepted_base": true
+      },
+      "pyproject.toml": {
+        "blob": "970b50627ce8faf369853f2903fd6a4bb7d86477",
+        "sha256": "51d1ac27ffbec8242f322f8e8fc94be2f389f30aeb90f328d446bf6d4d9cd986",
+        "identical_to_accepted_base": true
+      },
+      "uv.lock": {
+        "blob": "d9d669ca7c5aa8b5345be1a427b1d07c75d9ce2b",
+        "sha256": "6d0c35d74f9d275ac3d7952c14d62838179bcaac1bec08e6eda699771ab7d7ca",
+        "identical_to_accepted_base": true
+      }
+    },
+    "patch": "diff --git a/tests/llm_eval/test_lighteval_runtime.py b/tests/llm_eval/test_lighteval_runtime.py\nindex b2805ca7..cf380984 100644\n--- a/tests/llm_eval/test_lighteval_runtime.py\n+++ b/tests/llm_eval/test_lighteval_runtime.py\n@@ -54,6 +54,33 @@ def runtime_assets(monkeypatch, tmp_path, temp_config):\n     return helpers.make_model_and_tokenizer()\n \n \n+@pytest.fixture\n+def readonly_source_permissions(tmp_path, record_property):\n+    \"\"\"Restore permissions on synthetic sources after all test assertions.\"\"\"\n+    original_modes = {}\n+\n+    def make_readonly(*roots: Path) -> None:\n+        for root in dict.fromkeys(roots):\n+            assert root.resolve().is_relative_to(tmp_path.resolve())\n+            paths = [*root.rglob(\"*\"), root] if root.is_dir() else [root]\n+            for path in paths:\n+                if not path.is_symlink():\n+                    original_modes.setdefault(\n+                        path, stat.S_IMODE(path.stat().st_mode)\n+                    )\n+                    path.chmod(0o555 if path.is_dir() else 0o444)\n+\n+    try:\n+        yield make_readonly\n+    finally:\n+        restored = 0\n+        for path, mode in original_modes.items():\n+            if path.exists() and not path.is_symlink():\n+                path.chmod(mode)\n+                restored += 1\n+        record_property(\"readonly_fixture_permissions_restored\", restored)\n+\n+\n @pytest.mark.parametrize(\"input_source\", [\"current-model\", \"configured-local\"])\n def test_real_preset_pipeline_normalizes_metrics_and_refreshes_exports(\n     runtime_assets, monkeypatch, record_property, tmp_path, input_source\n@@ -315,7 +342,12 @@ def test_real_missing_primary_metric_is_rejected(runtime_assets):\n \n @pytest.mark.parametrize(\"tokenizer_source\", [\"same\", \"separate\"])\n def test_real_readonly_local_source_ignores_old_responses(\n-    runtime_assets, tmp_path, monkeypatch, record_property, tokenizer_source\n+    runtime_assets,\n+    tmp_path,\n+    monkeypatch,\n+    record_property,\n+    tokenizer_source,\n+    readonly_source_permissions,\n ):\n     from lighteval.logging.evaluation_tracker import EvaluationTracker\n     from lighteval.models.transformers.transformers_model import TransformersModelConfig\n@@ -366,11 +398,7 @@ def test_real_readonly_local_source_ignores_old_responses(\n     sentinel = source / \"nested\" / \"preserved.txt\"\n     sentinel.parent.mkdir()\n     sentinel.write_text(\"old source artifacts remain unchanged\")\n-    for directory in {source, tokenizer_directory}:\n-        for path in [*directory.rglob(\"*\"), directory]:\n-            if not path.is_symlink():\n-                path.chmod(0o555 if path.is_dir() else 0o444)\n-    blob.chmod(0o444)\n+    readonly_source_permissions(source, tokenizer_directory, blob)\n     source_before = helpers.snapshot_directory(source)\n     tokenizer_before = helpers.snapshot_directory(tokenizer_directory)\n     blob_before = blob.read_bytes()"
+  },
+  "original_review": {
+    "artifact": {
+      "path": "/tmp/plato-lighteval-runtime-review.json",
+      "sha256": "f034d94fa98c7e291df33a1ad1e3bea2bb6e74d2dcc145ac7c32f9985e3c1e53",
+      "bytes": 20172
+    },
+    "finding": {
+      "id": "LR1",
+      "severity": "low",
+      "path": "tests/llm_eval/test_lighteval_runtime.py",
+      "lines": "369-373",
+      "finding": "Synthetic caller-owned source trees are made read-only for the immutable-source oracle and retained afterward; subsequent shared pytest temporary-directory garbage collection can emit rm_rf Directory not empty warnings on this macOS host.",
+      "evidence": {
+        "path": "/tmp/plato-lighteval-reviewer-absent-unit.log",
+        "sha256": "7761687bbb7e8975ccf15a4023a9ec55e5ce2d519095d8d5b7a8c49b81696043",
+        "bytes": 6726
+      },
+      "impact": "Nonfatal fixture housekeeping. Independent core tests passed 19 cases despite 10 warnings from previous read-only pytest garbage trees. Evaluator-owned copies/exports/output/response caches were all removed and no production cleanup defect was observed.",
+      "suggested_followup": "Optionally restore permissions on synthetic source fixtures after the final source-preservation assertions to allow pytest-managed teardown. No source change is required for this bounded runtime acceptance.",
+      "author_acknowledgement": "Original author acknowledged the observed fixture warning and retained frozen source; no broad test temporary-directory cleanup claim is made."
+    }
+  },
+  "scope": "Test-owned synthetic readonly source fixture permission teardown only. Production evaluator/cache logic, original task/metric assertions, helpers, dependencies, optional profile/ledger and ordinary caller-owned source behavior remain identical.",
+  "implementation": "Test-local yield fixture records original modes only for nonsymlink paths under its own tmp_path before marking directories555/files444. The test performs real inference, source/content/mode/link/blob invariance checks and temporary evaluator artifact cleanup checks while sources remain readonly. Fixture finally restores recorded modes after the test call, on success or exception; symlink paths are not chmodded and roots outside tmp_path are rejected. A teardown property records the actual restored path count.",
+  "environment": {
+    "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+    "executable": "/private/tmp/plato-refresh-worktrees/lighteval-runtime/.venv/bin/python",
+    "packages": {
+      "lighteval": "0.13.0",
+      "xxhash": "3.8.1",
+      "nltk": "3.10.3",
+      "langdetect": "1.0.9",
+      "torch": "2.14.1",
+      "transformers": "5.18.0",
+      "pytest": "9.1.1",
+      "ty": "0.0.84",
+      "ruff": "0.16.10"
+    },
+    "uid": 502
+  },
+  "red": {
+    "root": "/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm",
+    "source_commit": "c13a21a6e7a21fbac3b4450750fa940cbe27b8db",
+    "environment": {
+      "OMP_NUM_THREADS": "1",
+      "MKL_NUM_THREADS": "1",
+      "OPENBLAS_NUM_THREADS": "1",
+      "PYTHONDONTWRITEBYTECODE": "1",
+      "config_file": "tests/config.toml"
+    },
+    "runs": [
+      {
+        "command": [
+          "/private/tmp/plato-refresh-worktrees/lighteval-runtime/.venv/bin/python",
+          "-m",
+          "pytest",
+          "tests/llm_eval/test_lighteval_runtime.py::test_real_readonly_local_source_ignores_old_responses",
+          "-q",
+          "-o",
+          "junit_family=legacy",
+          "--basetemp",
+          "/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/red/basetemp",
+          "--junitxml",
+          "/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/red/run-1.xml"
+        ],
+        "returncode": 0,
+        "deadline_hit": false,
+        "deadline_seconds": 180,
+        "elapsed_seconds": 37.959194666938856,
+        "log": "/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/red/run-1.log",
+        "xml": "/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/red/run-1.xml",
+        "raw_log": {
+          "path": "/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/red/run-1.log",
+          "sha256": "3b082498e58e01086b38efcd0b038d49cb95972651ac254c6a36db426f668c64",
+          "bytes": 728,
+          "raw": "..                                                                       [100%]\n=============================== warnings summary ===============================\ntests/llm_eval/test_lighteval_runtime.py::test_real_readonly_local_source_ignores_old_responses[same]\n  /private/tmp/plato-refresh-worktrees/lighteval-runtime/.venv/lib/python3.13/site-packages/huggingface_hub/utils/_deprecation.py:100: FutureWarning: Deprecated argument(s) used in 'list_models': model_name. Will not be supported from version '2.0'.\n  \n  Use `search` instead.\n    warnings.warn(message, FutureWarning)\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\ntest profile: core scope (native excluded)\n2 passed, 1 warning in 29.32s\n"
+        },
+        "raw_junit": {
+          "path": "/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/red/run-1.xml",
+          "sha256": "e29eedca1f8f53241da5c65d98aff5b998520b192e53df246dc0594b73f22945",
+          "bytes": 9445,
+          "raw": "<?xml version=\"1.0\" encoding=\"utf-8\"?><testsuites name=\"pytest tests\"><testsuite name=\"pytest\" errors=\"0\" failures=\"0\" skipped=\"0\" tests=\"2\" time=\"29.319\" timestamp=\"2026-10-03T18:36:53.605985-04:00\" hostname=\"miami.csl.utoronto.ca\"><testcase classname=\"tests.llm_eval.test_lighteval_runtime\" name=\"test_real_readonly_local_source_ignores_old_responses[same]\" file=\"tests/llm_eval/test_lighteval_runtime.py\" line=\"315\" time=\"15.277\"><properties><property name=\"actual_readonly_source\" value=\"{&quot;tokenizer_source&quot;: &quot;same&quot;, &quot;seeded_response_text&quot;: [[&quot;A&quot;], [&quot;A&quot;], [&quot;A&quot;]], &quot;result&quot;: {&quot;evaluator&quot;: &quot;lighteval&quot;, &quot;primary_metric&quot;: &quot;ifeval_avg&quot;, &quot;metrics&quot;: {&quot;ifeval_avg&quot;: 0.3333333333333333, &quot;hellaswag&quot;: 0.3333333333333333, &quot;arc_easy&quot;: 0.3333333333333333, &quot;arc_challenge&quot;: 0.3333333333333333, &quot;piqa&quot;: 0.3333333333333333, &quot;arc_avg&quot;: 0.3333333333333333}, &quot;higher_is_better&quot;: {&quot;ifeval_avg&quot;: true, &quot;hellaswag&quot;: true, &quot;arc_easy&quot;: true, &quot;arc_challenge&quot;: true, &quot;piqa&quot;: true, &quot;arc_avg&quot;: true}, &quot;metadata&quot;: {&quot;preset&quot;: &quot;smollm_round_fast&quot;, &quot;tasks&quot;: [&quot;ifeval&quot;, &quot;hellaswag&quot;, &quot;arc_easy&quot;, &quot;arc_challenge&quot;, &quot;piqa&quot;], &quot;backend&quot;: &quot;transformers&quot;, &quot;raw_metrics&quot;: {&quot;arc:challenge:0&quot;: {&quot;acc&quot;: 0.3333333333333333, &quot;acc_stderr&quot;: 0.33333333333333337}, &quot;arc:easy:0&quot;: {&quot;acc&quot;: 0.3333333333333333, &quot;acc_stderr&quot;: 0.33333333333333337}, &quot;piqa_hf:0&quot;: {&quot;em&quot;: 0.3333333333333333, &quot;em_stderr&quot;: 0.33333333333333337}, &quot;ifeval:0&quot;: {&quot;prompt_level_strict_acc&quot;: 0.3333333333333333, &quot;prompt_level_strict_acc_stderr&quot;: 0.33333333333333337, &quot;inst_level_strict_acc&quot;: 0.3333333333333333, &quot;inst_level_strict_acc_stderr&quot;: 0.008657241865953338, &quot;prompt_level_loose_acc&quot;: 0.3333333333333333, &quot;prompt_level_loose_acc_stderr&quot;: 0.33333333333333337, &quot;inst_level_loose_acc&quot;: 0.3333333333333333, &quot;inst_level_loose_acc_stderr&quot;: 0.008657241865953338}, &quot;hellaswag:0&quot;: {&quot;em&quot;: 0.3333333333333333, &quot;em_stderr&quot;: 0.33333333333333337}, &quot;arc:_average:0&quot;: {&quot;acc&quot;: 0.3333333333333333, &quot;acc_stderr&quot;: 0.33333333333333337}, &quot;all&quot;: {&quot;acc&quot;: 0.3333333333333333, &quot;acc_stderr&quot;: 0.33333333333333337, &quot;em&quot;: 0.3333333333333333, &quot;em_stderr&quot;: 0.33333333333333337, &quot;prompt_level_strict_acc&quot;: 0.3333333333333333, &quot;prompt_level_strict_acc_stderr&quot;: 0.33333333333333337, &quot;inst_level_strict_acc&quot;: 0.3333333333333333, &quot;inst_level_strict_acc_stderr&quot;: 0.008657241865953338, &quot;prompt_level_loose_acc&quot;: 0.3333333333333333, &quot;prompt_level_loose_acc_stderr&quot;: 0.33333333333333337, &quot;inst_level_loose_acc&quot;: 0.3333333333333333, &quot;inst_level_loose_acc_stderr&quot;: 0.008657241865953338}}}, &quot;artifacts&quot;: {}, &quot;primary_value&quot;: 0.3333333333333333}, &quot;source_tree&quot;: {&quot;.&quot;: {&quot;mode&quot;: 365}, &quot;9ce2f921d2dd37d4&quot;: {&quot;mode&quot;: 365}, &quot;9ce2f921d2dd37d4/piqa_hf|0&quot;: {&quot;mode&quot;: 365}, &quot;9ce2f921d2dd37d4/piqa_hf|0/977adcc6505b60fd&quot;: {&quot;mode&quot;: 365}, &quot;9ce2f921d2dd37d4/piqa_hf|0/977adcc6505b60fd/GENERATIVE.parquet&quot;: {&quot;mode&quot;: 292, &quot;sha256&quot;: &quot;f44f6514f53237bfc86d3c3acdbb2fa2482e5c3ea0dc9d367289e8a47fd38943&quot;}, &quot;config.json&quot;: {&quot;mode&quot;: 292, &quot;sha256&quot;: &quot;86ad7dcc5c7c0a52e134d070f69b1292677668a318961d26ac334e8059add554&quot;}, &quot;generation_config.json&quot;: {&quot;mode&quot;: 292, &quot;sha256&quot;: &quot;522c5cb32c4538f70090791d3ee0720e2c108d4eb76127652bf5dd1347bbde19&quot;}, &quot;model.safetensors&quot;: {&quot;mode&quot;: 493, &quot;link&quot;: &quot;/private/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/red/basetemp/test_real_readonly_local_sourc0/model-blob.safetensors&quot;}, &quot;nested&quot;: {&quot;mode&quot;: 365}, &quot;nested/preserved.txt&quot;: {&quot;mode&quot;: 292, &quot;sha256&quot;: &quot;a0f39e1ce2ab5ae310c043e86dc76b5c1d0af52be210a5da90b7c6f59f24917c&quot;}, &quot;tokenizer.json&quot;: {&quot;mode&quot;: 292, &quot;sha256&quot;: &quot;7a5b652c806adc9560bf9ddb3ee5a95832f92ba20956a944055df998e698639c&quot;}, &quot;tokenizer_config.json&quot;: {&quot;mode&quot;: 292, &quot;sha256&quot;: &quot;36070e1bdd3081a044aaecc7843ca58b82771a9e0737542f954e45545de49d78&quot;}}, &quot;source_unchanged&quot;: true, &quot;readonly_permission_enforced&quot;: true, &quot;owned_copies_and_cache_removed&quot;: true}\" /></properties></testcase><testcase classname=\"tests.llm_eval.test_lighteval_runtime\" name=\"test_real_readonly_local_source_ignores_old_responses[separate]\" file=\"tests/llm_eval/test_lighteval_runtime.py\" line=\"315\" time=\"14.025\"><properties><property name=\"actual_readonly_source\" value=\"{&quot;tokenizer_source&quot;: &quot;separate&quot;, &quot;seeded_response_text&quot;: [[&quot;A&quot;], [&quot;A&quot;], [&quot;A&quot;]], &quot;result&quot;: {&quot;evaluator&quot;: &quot;lighteval&quot;, &quot;primary_metric&quot;: &quot;ifeval_avg&quot;, &quot;metrics&quot;: {&quot;ifeval_avg&quot;: 0.3333333333333333, &quot;hellaswag&quot;: 0.3333333333333333, &quot;arc_easy&quot;: 0.3333333333333333, &quot;arc_challenge&quot;: 0.3333333333333333, &quot;piqa&quot;: 0.3333333333333333, &quot;arc_avg&quot;: 0.3333333333333333}, &quot;higher_is_better&quot;: {&quot;ifeval_avg&quot;: true, &quot;hellaswag&quot;: true, &quot;arc_easy&quot;: true, &quot;arc_challenge&quot;: true, &quot;piqa&quot;: true, &quot;arc_avg&quot;: true}, &quot;metadata&quot;: {&quot;preset&quot;: &quot;smollm_round_fast&quot;, &quot;tasks&quot;: [&quot;ifeval&quot;, &quot;hellaswag&quot;, &quot;arc_easy&quot;, &quot;arc_challenge&quot;, &quot;piqa&quot;], &quot;backend&quot;: &quot;transformers&quot;, &quot;raw_metrics&quot;: {&quot;arc:challenge:0&quot;: {&quot;acc&quot;: 0.3333333333333333, &quot;acc_stderr&quot;: 0.33333333333333337}, &quot;arc:easy:0&quot;: {&quot;acc&quot;: 0.3333333333333333, &quot;acc_stderr&quot;: 0.33333333333333337}, &quot;piqa_hf:0&quot;: {&quot;em&quot;: 0.3333333333333333, &quot;em_stderr&quot;: 0.33333333333333337}, &quot;ifeval:0&quot;: {&quot;prompt_level_strict_acc&quot;: 0.3333333333333333, &quot;prompt_level_strict_acc_stderr&quot;: 0.33333333333333337, &quot;inst_level_strict_acc&quot;: 0.3333333333333333, &quot;inst_level_strict_acc_stderr&quot;: 0.008657241865953338, &quot;prompt_level_loose_acc&quot;: 0.3333333333333333, &quot;prompt_level_loose_acc_stderr&quot;: 0.33333333333333337, &quot;inst_level_loose_acc&quot;: 0.3333333333333333, &quot;inst_level_loose_acc_stderr&quot;: 0.008657241865953338}, &quot;hellaswag:0&quot;: {&quot;em&quot;: 0.3333333333333333, &quot;em_stderr&quot;: 0.33333333333333337}, &quot;arc:_average:0&quot;: {&quot;acc&quot;: 0.3333333333333333, &quot;acc_stderr&quot;: 0.33333333333333337}, &quot;all&quot;: {&quot;acc&quot;: 0.3333333333333333, &quot;acc_stderr&quot;: 0.33333333333333337, &quot;em&quot;: 0.3333333333333333, &quot;em_stderr&quot;: 0.33333333333333337, &quot;prompt_level_strict_acc&quot;: 0.3333333333333333, &quot;prompt_level_strict_acc_stderr&quot;: 0.33333333333333337, &quot;inst_level_strict_acc&quot;: 0.3333333333333333, &quot;inst_level_strict_acc_stderr&quot;: 0.008657241865953338, &quot;prompt_level_loose_acc&quot;: 0.3333333333333333, &quot;prompt_level_loose_acc_stderr&quot;: 0.33333333333333337, &quot;inst_level_loose_acc&quot;: 0.3333333333333333, &quot;inst_level_loose_acc_stderr&quot;: 0.008657241865953338}}}, &quot;artifacts&quot;: {}, &quot;primary_value&quot;: 0.3333333333333333}, &quot;source_tree&quot;: {&quot;.&quot;: {&quot;mode&quot;: 365}, &quot;7d2932ea4dde0706&quot;: {&quot;mode&quot;: 365}, &quot;7d2932ea4dde0706/piqa_hf|0&quot;: {&quot;mode&quot;: 365}, &quot;7d2932ea4dde0706/piqa_hf|0/7d39be84dc2a4394&quot;: {&quot;mode&quot;: 365}, &quot;7d2932ea4dde0706/piqa_hf|0/7d39be84dc2a4394/GENERATIVE.parquet&quot;: {&quot;mode&quot;: 292, &quot;sha256&quot;: &quot;f44f6514f53237bfc86d3c3acdbb2fa2482e5c3ea0dc9d367289e8a47fd38943&quot;}, &quot;config.json&quot;: {&quot;mode&quot;: 292, &quot;sha256&quot;: &quot;86ad7dcc5c7c0a52e134d070f69b1292677668a318961d26ac334e8059add554&quot;}, &quot;generation_config.json&quot;: {&quot;mode&quot;: 292, &quot;sha256&quot;: &quot;522c5cb32c4538f70090791d3ee0720e2c108d4eb76127652bf5dd1347bbde19&quot;}, &quot;model.safetensors&quot;: {&quot;mode&quot;: 493, &quot;link&quot;: &quot;/private/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/red/basetemp/test_real_readonly_local_sourc1/model-blob.safetensors&quot;}, &quot;nested&quot;: {&quot;mode&quot;: 365}, &quot;nested/preserved.txt&quot;: {&quot;mode&quot;: 292, &quot;sha256&quot;: &quot;a0f39e1ce2ab5ae310c043e86dc76b5c1d0af52be210a5da90b7c6f59f24917c&quot;}}, &quot;source_unchanged&quot;: true, &quot;readonly_permission_enforced&quot;: true, &quot;owned_copies_and_cache_removed&quot;: true}\" /></properties></testcase></testsuite></testsuites>"
+        },
+        "junit_cases": [
+          {
+            "name": "test_real_readonly_local_source_ignores_old_responses[same]",
+            "outcome": "passed",
+            "seconds": 15.277,
+            "properties": {
+              "actual_readonly_source": {
+                "tokenizer_source": "same",
+                "seeded_response_text": [
+                  [
+                    "A"
+                  ],
+                  [
+                    "A"
+                  ],
+                  [
+                    "A"
+                  ]
+                ],
+                "result": {
+                  "evaluator": "lighteval",
+                  "primary_metric": "ifeval_avg",
+                  "metrics": {
+                    "ifeval_avg": 0.3333333333333333,
+                    "hellaswag": 0.3333333333333333,
+                    "arc_easy": 0.3333333333333333,
+                    "arc_challenge": 0.3333333333333333,
+                    "piqa": 0.3333333333333333,
+                    "arc_avg": 0.3333333333333333
+                  },
+                  "higher_is_better": {
+                    "ifeval_avg": true,
+                    "hellaswag": true,
+                    "arc_easy": true,
+                    "arc_challenge": true,
+                    "piqa": true,
+                    "arc_avg": true
+                  },
+                  "metadata": {
+                    "preset": "smollm_round_fast",
+                    "tasks": [
+                      "ifeval",
+                      "hellaswag",
+                      "arc_easy",
+                      "arc_challenge",
+                      "piqa"
+                    ],
+                    "backend": "transformers",
+                    "raw_metrics": {
+                      "arc:challenge:0": {
+                        "acc": 0.3333333333333333,
+                        "acc_stderr": 0.33333333333333337
+                      },
+                      "arc:easy:0": {
+                        "acc": 0.3333333333333333,
+                        "acc_stderr": 0.33333333333333337
+                      },
+                      "piqa_hf:0": {
+                        "em": 0.3333333333333333,
+                        "em_stderr": 0.33333333333333337
+                      },
+                      "ifeval:0": {
+                        "prompt_level_strict_acc": 0.3333333333333333,
+                        "prompt_level_strict_acc_stderr": 0.33333333333333337,
+                        "inst_level_strict_acc": 0.3333333333333333,
+                        "inst_level_strict_acc_stderr": 0.008657241865953338,
+                        "prompt_level_loose_acc": 0.3333333333333333,
+                        "prompt_level_loose_acc_stderr": 0.33333333333333337,
+                        "inst_level_loose_acc": 0.3333333333333333,
+                        "inst_level_loose_acc_stderr": 0.008657241865953338
+                      },
+                      "hellaswag:0": {
+                        "em": 0.3333333333333333,
+                        "em_stderr": 0.33333333333333337
+                      },
+                      "arc:_average:0": {
+                        "acc": 0.3333333333333333,
+                        "acc_stderr": 0.33333333333333337
+                      },
+                      "all": {
+                        "acc": 0.3333333333333333,
+                        "acc_stderr": 0.33333333333333337,
+                        "em": 0.3333333333333333,
+                        "em_stderr": 0.33333333333333337,
+                        "prompt_level_strict_acc": 0.3333333333333333,
+                        "prompt_level_strict_acc_stderr": 0.33333333333333337,
+                        "inst_level_strict_acc": 0.3333333333333333,
+                        "inst_level_strict_acc_stderr": 0.008657241865953338,
+                        "prompt_level_loose_acc": 0.3333333333333333,
+                        "prompt_level_loose_acc_stderr": 0.33333333333333337,
+                        "inst_level_loose_acc": 0.3333333333333333,
+                        "inst_level_loose_acc_stderr": 0.008657241865953338
+                      }
+                    }
+                  },
+                  "artifacts": {},
+                  "primary_value": 0.3333333333333333
+                },
+                "source_tree": {
+                  ".": {
+                    "mode": 365
+                  },
+                  "9ce2f921d2dd37d4": {
+                    "mode": 365
+                  },
+                  "9ce2f921d2dd37d4/piqa_hf|0": {
+                    "mode": 365
+                  },
+                  "9ce2f921d2dd37d4/piqa_hf|0/977adcc6505b60fd": {
+                    "mode": 365
+                  },
+                  "9ce2f921d2dd37d4/piqa_hf|0/977adcc6505b60fd/GENERATIVE.parquet": {
+                    "mode": 292,
+                    "sha256": "f44f6514f53237bfc86d3c3acdbb2fa2482e5c3ea0dc9d367289e8a47fd38943"
+                  },
+                  "config.json": {
+                    "mode": 292,
+                    "sha256": "86ad7dcc5c7c0a52e134d070f69b1292677668a318961d26ac334e8059add554"
+                  },
+                  "generation_config.json": {
+                    "mode": 292,
+                    "sha256": "522c5cb32c4538f70090791d3ee0720e2c108d4eb76127652bf5dd1347bbde19"
+                  },
+                  "model.safetensors": {
+                    "mode": 493,
+                    "link": "/private/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/red/basetemp/test_real_readonly_local_sourc0/model-blob.safetensors"
+                  },
+                  "nested": {
+                    "mode": 365
+                  },
+                  "nested/preserved.txt": {
+                    "mode": 292,
+                    "sha256": "a0f39e1ce2ab5ae310c043e86dc76b5c1d0af52be210a5da90b7c6f59f24917c"
+                  },
+                  "tokenizer.json": {
+                    "mode": 292,
+                    "sha256": "7a5b652c806adc9560bf9ddb3ee5a95832f92ba20956a944055df998e698639c"
+                  },
+                  "tokenizer_config.json": {
+                    "mode": 292,
+                    "sha256": "36070e1bdd3081a044aaecc7843ca58b82771a9e0737542f954e45545de49d78"
+                  }
+                },
+                "source_unchanged": true,
+                "readonly_permission_enforced": true,
+                "owned_copies_and_cache_removed": true
+              }
+            }
+          },
+          {
+            "name": "test_real_readonly_local_source_ignores_old_responses[separate]",
+            "outcome": "passed",
+            "seconds": 14.025,
+            "properties": {
+              "actual_readonly_source": {
+                "tokenizer_source": "separate",
+                "seeded_response_text": [
+                  [
+                    "A"
+                  ],
+                  [
+                    "A"
+                  ],
+                  [
+                    "A"
+                  ]
+                ],
+                "result": {
+                  "evaluator": "lighteval",
+                  "primary_metric": "ifeval_avg",
+                  "metrics": {
+                    "ifeval_avg": 0.3333333333333333,
+                    "hellaswag": 0.3333333333333333,
+                    "arc_easy": 0.3333333333333333,
+                    "arc_challenge": 0.3333333333333333,
+                    "piqa": 0.3333333333333333,
+                    "arc_avg": 0.3333333333333333
+                  },
+                  "higher_is_better": {
+                    "ifeval_avg": true,
+                    "hellaswag": true,
+                    "arc_easy": true,
+                    "arc_challenge": true,
+                    "piqa": true,
+                    "arc_avg": true
+                  },
+                  "metadata": {
+                    "preset": "smollm_round_fast",
+                    "tasks": [
+                      "ifeval",
+                      "hellaswag",
+                      "arc_easy",
+                      "arc_challenge",
+                      "piqa"
+                    ],
+                    "backend": "transformers",
+                    "raw_metrics": {
+                      "arc:challenge:0": {
+                        "acc": 0.3333333333333333,
+                        "acc_stderr": 0.33333333333333337
+                      },
+                      "arc:easy:0": {
+                        "acc": 0.3333333333333333,
+                        "acc_stderr": 0.33333333333333337
+                      },
+                      "piqa_hf:0": {
+                        "em": 0.3333333333333333,
+                        "em_stderr": 0.33333333333333337
+                      },
+                      "ifeval:0": {
+                        "prompt_level_strict_acc": 0.3333333333333333,
+                        "prompt_level_strict_acc_stderr": 0.33333333333333337,
+                        "inst_level_strict_acc": 0.3333333333333333,
+                        "inst_level_strict_acc_stderr": 0.008657241865953338,
+                        "prompt_level_loose_acc": 0.3333333333333333,
+                        "prompt_level_loose_acc_stderr": 0.33333333333333337,
+                        "inst_level_loose_acc": 0.3333333333333333,
+                        "inst_level_loose_acc_stderr": 0.008657241865953338
+                      },
+                      "hellaswag:0": {
+                        "em": 0.3333333333333333,
+                        "em_stderr": 0.33333333333333337
+                      },
+                      "arc:_average:0": {
+                        "acc": 0.3333333333333333,
+                        "acc_stderr": 0.33333333333333337
+                      },
+                      "all": {
+                        "acc": 0.3333333333333333,
+                        "acc_stderr": 0.33333333333333337,
+                        "em": 0.3333333333333333,
+                        "em_stderr": 0.33333333333333337,
+                        "prompt_level_strict_acc": 0.3333333333333333,
+                        "prompt_level_strict_acc_stderr": 0.33333333333333337,
+                        "inst_level_strict_acc": 0.3333333333333333,
+                        "inst_level_strict_acc_stderr": 0.008657241865953338,
+                        "prompt_level_loose_acc": 0.3333333333333333,
+                        "prompt_level_loose_acc_stderr": 0.33333333333333337,
+                        "inst_level_loose_acc": 0.3333333333333333,
+                        "inst_level_loose_acc_stderr": 0.008657241865953338
+                      }
+                    }
+                  },
+                  "artifacts": {},
+                  "primary_value": 0.3333333333333333
+                },
+                "source_tree": {
+                  ".": {
+                    "mode": 365
+                  },
+                  "7d2932ea4dde0706": {
+                    "mode": 365
+                  },
+                  "7d2932ea4dde0706/piqa_hf|0": {
+                    "mode": 365
+                  },
+                  "7d2932ea4dde0706/piqa_hf|0/7d39be84dc2a4394": {
+                    "mode": 365
+                  },
+                  "7d2932ea4dde0706/piqa_hf|0/7d39be84dc2a4394/GENERATIVE.parquet": {
+                    "mode": 292,
+                    "sha256": "f44f6514f53237bfc86d3c3acdbb2fa2482e5c3ea0dc9d367289e8a47fd38943"
+                  },
+                  "config.json": {
+                    "mode": 292,
+                    "sha256": "86ad7dcc5c7c0a52e134d070f69b1292677668a318961d26ac334e8059add554"
+                  },
+                  "generation_config.json": {
+                    "mode": 292,
+                    "sha256": "522c5cb32c4538f70090791d3ee0720e2c108d4eb76127652bf5dd1347bbde19"
+                  },
+                  "model.safetensors": {
+                    "mode": 493,
+                    "link": "/private/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/red/basetemp/test_real_readonly_local_sourc1/model-blob.safetensors"
+                  },
+                  "nested": {
+                    "mode": 365
+                  },
+                  "nested/preserved.txt": {
+                    "mode": 292,
+                    "sha256": "a0f39e1ce2ab5ae310c043e86dc76b5c1d0af52be210a5da90b7c6f59f24917c"
+                  }
+                },
+                "source_unchanged": true,
+                "readonly_permission_enforced": true,
+                "owned_copies_and_cache_removed": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "command": [
+          "/private/tmp/plato-refresh-worktrees/lighteval-runtime/.venv/bin/python",
+          "-m",
+          "pytest",
+          "tests/llm_eval/test_lighteval_runtime.py::test_real_readonly_local_source_ignores_old_responses",
+          "-q",
+          "-o",
+          "junit_family=legacy",
+          "--basetemp",
+          "/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/red/basetemp",
+          "--junitxml",
+          "/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/red/run-2.xml"
+        ],
+        "returncode": 1,
+        "deadline_hit": false,
+        "deadline_seconds": 180,
+        "elapsed_seconds": 4.7695711250416934,
+        "log": "/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/red/run-2.log",
+        "xml": "/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/red/run-2.xml",
+        "raw_log": {
+          "path": "/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/red/run-2.log",
+          "sha256": "ee0c8007a9401dab52e1fb73677173bb243b5280b37dae4148cfce8eb0472814",
+          "bytes": 5499,
+          "raw": "EE                                                                       [100%]\n==================================== ERRORS ====================================\n_ ERROR at setup of test_real_readonly_local_source_ignores_old_responses[same] _\n\nself = PosixPath('/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/red/basetemp')\nmode = 448, parents = False, exist_ok = False\n\n    def mkdir(self, mode=0o777, parents=False, exist_ok=False):\n        \"\"\"\n        Create a new directory at this given path.\n        \"\"\"\n        try:\n>           os.mkdir(self, mode)\nE           FileExistsError: [Errno 17] File exists: '/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/red/basetemp'\n\n/Users/bli/.local/share/uv/python/cpython-3.13.16-macos-aarch64-none/lib/python3.13/pathlib/_local.py:722: FileExistsError\n_ ERROR at setup of test_real_readonly_local_source_ignores_old_responses[separate] _\n\nself = PosixPath('/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/red/basetemp')\nmode = 448, parents = False, exist_ok = False\n\n    def mkdir(self, mode=0o777, parents=False, exist_ok=False):\n        \"\"\"\n        Create a new directory at this given path.\n        \"\"\"\n        try:\n>           os.mkdir(self, mode)\nE           FileExistsError: [Errno 17] File exists: '/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/red/basetemp'\n\n/Users/bli/.local/share/uv/python/cpython-3.13.16-macos-aarch64-none/lib/python3.13/pathlib/_local.py:722: FileExistsError\n=============================== warnings summary ===============================\ntests/llm_eval/test_lighteval_runtime.py::test_real_readonly_local_source_ignores_old_responses[same]\ntests/llm_eval/test_lighteval_runtime.py::test_real_readonly_local_source_ignores_old_responses[separate]\n  /private/tmp/plato-refresh-worktrees/lighteval-runtime/.venv/lib/python3.13/site-packages/_pytest/pathlib.py:95: PytestWarning: (rm_rf) error removing /var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/red/basetemp/test_real_readonly_local_sourc0/persistent-model\n  <class 'OSError'>: [Errno 66] Directory not empty: '/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/red/basetemp/test_real_readonly_local_sourc0/persistent-model'\n    warnings.warn(\n\ntests/llm_eval/test_lighteval_runtime.py::test_real_readonly_local_source_ignores_old_responses[same]\ntests/llm_eval/test_lighteval_runtime.py::test_real_readonly_local_source_ignores_old_responses[separate]\n  /private/tmp/plato-refresh-worktrees/lighteval-runtime/.venv/lib/python3.13/site-packages/_pytest/pathlib.py:95: PytestWarning: (rm_rf) error removing /var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/red/basetemp/test_real_readonly_local_sourc0\n  <class 'OSError'>: [Errno 66] Directory not empty: '/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/red/basetemp/test_real_readonly_local_sourc0'\n    warnings.warn(\n\ntests/llm_eval/test_lighteval_runtime.py::test_real_readonly_local_source_ignores_old_responses[same]\ntests/llm_eval/test_lighteval_runtime.py::test_real_readonly_local_source_ignores_old_responses[separate]\n  /private/tmp/plato-refresh-worktrees/lighteval-runtime/.venv/lib/python3.13/site-packages/_pytest/pathlib.py:95: PytestWarning: (rm_rf) error removing /var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/red/basetemp/test_real_readonly_local_sourc1/persistent-model\n  <class 'OSError'>: [Errno 66] Directory not empty: '/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/red/basetemp/test_real_readonly_local_sourc1/persistent-model'\n    warnings.warn(\n\ntests/llm_eval/test_lighteval_runtime.py::test_real_readonly_local_source_ignores_old_responses[same]\ntests/llm_eval/test_lighteval_runtime.py::test_real_readonly_local_source_ignores_old_responses[separate]\n  /private/tmp/plato-refresh-worktrees/lighteval-runtime/.venv/lib/python3.13/site-packages/_pytest/pathlib.py:95: PytestWarning: (rm_rf) error removing /var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/red/basetemp/test_real_readonly_local_sourc1\n  <class 'OSError'>: [Errno 66] Directory not empty: '/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/red/basetemp/test_real_readonly_local_sourc1'\n    warnings.warn(\n\ntests/llm_eval/test_lighteval_runtime.py::test_real_readonly_local_source_ignores_old_responses[same]\ntests/llm_eval/test_lighteval_runtime.py::test_real_readonly_local_source_ignores_old_responses[separate]\n  /private/tmp/plato-refresh-worktrees/lighteval-runtime/.venv/lib/python3.13/site-packages/_pytest/pathlib.py:95: PytestWarning: (rm_rf) error removing /var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/red/basetemp\n  <class 'OSError'>: [Errno 66] Directory not empty: '/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/red/basetemp'\n    warnings.warn(\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\ntest profile: core scope (native excluded)\n=========================== short test summary info ============================\nERROR tests/llm_eval/test_lighteval_runtime.py::test_real_readonly_local_source_ignores_old_responses[same]\nERROR tests/llm_eval/test_lighteval_runtime.py::test_real_readonly_local_source_ignores_old_responses[separate]\n10 warnings, 2 errors in 0.04s\n"
+        },
+        "raw_junit": {
+          "path": "/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/red/run-2.xml",
+          "sha256": "b6c2dc73df8a0ce363219d38a1f41bed9556516b5bc592b21b304ffc6524496d",
+          "bytes": 2295,
+          "raw": "<?xml version=\"1.0\" encoding=\"utf-8\"?><testsuites name=\"pytest tests\"><testsuite name=\"pytest\" errors=\"2\" failures=\"0\" skipped=\"0\" tests=\"2\" time=\"0.037\" timestamp=\"2026-10-03T18:37:28.074908-04:00\" hostname=\"miami.csl.utoronto.ca\"><testcase classname=\"tests.llm_eval.test_lighteval_runtime\" name=\"test_real_readonly_local_source_ignores_old_responses[same]\" file=\"tests/llm_eval/test_lighteval_runtime.py\" line=\"315\" time=\"0.005\"><error message=\"failed on setup with &quot;FileExistsError: [Errno 17] File exists: '/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/red/basetemp'&quot;\">self = PosixPath('/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/red/basetemp')\nmode = 448, parents = False, exist_ok = False\n\n    def mkdir(self, mode=0o777, parents=False, exist_ok=False):\n        \"\"\"\n        Create a new directory at this given path.\n        \"\"\"\n        try:\n&gt;           os.mkdir(self, mode)\nE           FileExistsError: [Errno 17] File exists: '/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/red/basetemp'\n\n/Users/bli/.local/share/uv/python/cpython-3.13.16-macos-aarch64-none/lib/python3.13/pathlib/_local.py:722: FileExistsError</error></testcase><testcase classname=\"tests.llm_eval.test_lighteval_runtime\" name=\"test_real_readonly_local_source_ignores_old_responses[separate]\" file=\"tests/llm_eval/test_lighteval_runtime.py\" line=\"315\" time=\"0.001\"><error message=\"failed on setup with &quot;FileExistsError: [Errno 17] File exists: '/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/red/basetemp'&quot;\">self = PosixPath('/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/red/basetemp')\nmode = 448, parents = False, exist_ok = False\n\n    def mkdir(self, mode=0o777, parents=False, exist_ok=False):\n        \"\"\"\n        Create a new directory at this given path.\n        \"\"\"\n        try:\n&gt;           os.mkdir(self, mode)\nE           FileExistsError: [Errno 17] File exists: '/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/red/basetemp'\n\n/Users/bli/.local/share/uv/python/cpython-3.13.16-macos-aarch64-none/lib/python3.13/pathlib/_local.py:722: FileExistsError</error></testcase></testsuite></testsuites>"
+        },
+        "junit_cases": [
+          {
+            "name": "test_real_readonly_local_source_ignores_old_responses[same]",
+            "outcome": "error",
+            "seconds": 0.005,
+            "properties": {}
+          },
+          {
+            "name": "test_real_readonly_local_source_ignores_old_responses[separate]",
+            "outcome": "error",
+            "seconds": 0.001,
+            "properties": {}
+          }
+        ]
+      }
+    ]
+  },
+  "red_interpretation": "Before fix, both actual readonly same/separate tokenizer Pipeline cases pass first invocation. Reusing exactly the same explicit basetemp fails both cases in pytest fixture setup: rm_rf cannot remove readonly source trees, emits 10 cleanup warnings and fails to recreate base. This is fixture housekeeping; production owned evaluator cache/export/output cleanup had already passed.",
+  "green": {
+    "root": "/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm",
+    "source_commit": "52b7ecdf063fd0827ceae05b068e2c55c79aae08",
+    "environment": {
+      "OMP_NUM_THREADS": "1",
+      "MKL_NUM_THREADS": "1",
+      "OPENBLAS_NUM_THREADS": "1",
+      "PYTHONDONTWRITEBYTECODE": "1",
+      "config_file": "tests/config.toml"
+    },
+    "failure_plugin": "/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/plato_lr1_failure_probe.py",
+    "failure_plugin_sha256": "fb46fe4aa353dcab9fa8428bd404a8fefbedb347a5d571a46e60b2c59fff55b7",
+    "runs": [
+      {
+        "phase": "green",
+        "command": [
+          "/private/tmp/plato-refresh-worktrees/lighteval-runtime/.venv/bin/python",
+          "-m",
+          "pytest",
+          "tests/llm_eval/test_lighteval_runtime.py::test_real_readonly_local_source_ignores_old_responses",
+          "-q",
+          "-o",
+          "junit_family=legacy",
+          "--basetemp",
+          "/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/green/basetemp",
+          "--junitxml",
+          "/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/green/run-1.xml"
+        ],
+        "returncode": 0,
+        "expected_returncode": 0,
+        "deadline_hit": false,
+        "deadline_seconds": 180,
+        "elapsed_seconds": 35.89032525010407,
+        "log": "/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/green/run-1.log",
+        "xml": "/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/green/run-1.xml",
+        "restored_source_modes": {
+          "test_real_readonly_local_sourc1/persistent-model": 493,
+          "test_real_readonly_local_sourc1/persistent-model/9023d802e7e53859": 493,
+          "test_real_readonly_local_sourc1/persistent-model/config.json": 420,
+          "test_real_readonly_local_sourc1/persistent-model/generation_config.json": 420,
+          "test_real_readonly_local_sourc1/persistent-model/nested": 493,
+          "test_real_readonly_local_sourc1/persistent-model/9023d802e7e53859/piqa_hf|0": 493,
+          "test_real_readonly_local_sourc1/persistent-model/nested/preserved.txt": 420,
+          "test_real_readonly_local_sourc1/persistent-model/9023d802e7e53859/piqa_hf|0/9681f1ed7f099607": 493,
+          "test_real_readonly_local_sourc1/persistent-model/9023d802e7e53859/piqa_hf|0/9681f1ed7f099607/GENERATIVE.parquet": 420,
+          "test_real_readonly_local_sourc1/persistent-tokenizer": 493,
+          "test_real_readonly_local_sourc1/persistent-tokenizer/tokenizer_config.json": 420,
+          "test_real_readonly_local_sourc1/persistent-tokenizer/tokenizer.json": 420,
+          "test_real_readonly_local_sourc1/model-blob.safetensors": 384,
+          "test_real_readonly_local_sourc0/persistent-model": 493,
+          "test_real_readonly_local_sourc0/persistent-model/5727fe0ec9ede2ff": 493,
+          "test_real_readonly_local_sourc0/persistent-model/tokenizer_config.json": 420,
+          "test_real_readonly_local_sourc0/persistent-model/config.json": 420,
+          "test_real_readonly_local_sourc0/persistent-model/tokenizer.json": 420,
+          "test_real_readonly_local_sourc0/persistent-model/generation_config.json": 420,
+          "test_real_readonly_local_sourc0/persistent-model/nested": 493,
+          "test_real_readonly_local_sourc0/persistent-model/5727fe0ec9ede2ff/piqa_hf|0": 493,
+          "test_real_readonly_local_sourc0/persistent-model/nested/preserved.txt": 420,
+          "test_real_readonly_local_sourc0/persistent-model/5727fe0ec9ede2ff/piqa_hf|0/5724b5bf7376e1c1": 493,
+          "test_real_readonly_local_sourc0/persistent-model/5727fe0ec9ede2ff/piqa_hf|0/5724b5bf7376e1c1/GENERATIVE.parquet": 420,
+          "test_real_readonly_local_sourc0/model-blob.safetensors": 384
+        },
+        "test_properties": [
+          {
+            "name": "test_real_readonly_local_source_ignores_old_responses[same]",
+            "raw_properties": {
+              "actual_readonly_source": "{\"tokenizer_source\": \"same\", \"seeded_response_text\": [[\"A\"], [\"A\"], [\"A\"]], \"result\": {\"evaluator\": \"lighteval\", \"primary_metric\": \"ifeval_avg\", \"metrics\": {\"ifeval_avg\": 0.3333333333333333, \"hellaswag\": 0.3333333333333333, \"arc_easy\": 0.3333333333333333, \"arc_challenge\": 0.3333333333333333, \"piqa\": 0.3333333333333333, \"arc_avg\": 0.3333333333333333}, \"higher_is_better\": {\"ifeval_avg\": true, \"hellaswag\": true, \"arc_easy\": true, \"arc_challenge\": true, \"piqa\": true, \"arc_avg\": true}, \"metadata\": {\"preset\": \"smollm_round_fast\", \"tasks\": [\"ifeval\", \"hellaswag\", \"arc_easy\", \"arc_challenge\", \"piqa\"], \"backend\": \"transformers\", \"raw_metrics\": {\"hellaswag:0\": {\"em\": 0.3333333333333333, \"em_stderr\": 0.33333333333333337}, \"ifeval:0\": {\"prompt_level_strict_acc\": 0.3333333333333333, \"prompt_level_strict_acc_stderr\": 0.33333333333333337, \"inst_level_strict_acc\": 0.3333333333333333, \"inst_level_strict_acc_stderr\": 0.008657241865953338, \"prompt_level_loose_acc\": 0.3333333333333333, \"prompt_level_loose_acc_stderr\": 0.33333333333333337, \"inst_level_loose_acc\": 0.3333333333333333, \"inst_level_loose_acc_stderr\": 0.008657241865953338}, \"piqa_hf:0\": {\"em\": 0.3333333333333333, \"em_stderr\": 0.33333333333333337}, \"arc:challenge:0\": {\"acc\": 0.3333333333333333, \"acc_stderr\": 0.33333333333333337}, \"arc:easy:0\": {\"acc\": 0.3333333333333333, \"acc_stderr\": 0.33333333333333337}, \"arc:_average:0\": {\"acc\": 0.3333333333333333, \"acc_stderr\": 0.33333333333333337}, \"all\": {\"em\": 0.3333333333333333, \"em_stderr\": 0.33333333333333337, \"prompt_level_strict_acc\": 0.3333333333333333, \"prompt_level_strict_acc_stderr\": 0.33333333333333337, \"inst_level_strict_acc\": 0.3333333333333333, \"inst_level_strict_acc_stderr\": 0.008657241865953338, \"prompt_level_loose_acc\": 0.3333333333333333, \"prompt_level_loose_acc_stderr\": 0.33333333333333337, \"inst_level_loose_acc\": 0.3333333333333333, \"inst_level_loose_acc_stderr\": 0.008657241865953338, \"acc\": 0.3333333333333333, \"acc_stderr\": 0.33333333333333337}}}, \"artifacts\": {}, \"primary_value\": 0.3333333333333333}, \"source_tree\": {\".\": {\"mode\": 365}, \"5727fe0ec9ede2ff\": {\"mode\": 365}, \"5727fe0ec9ede2ff/piqa_hf|0\": {\"mode\": 365}, \"5727fe0ec9ede2ff/piqa_hf|0/5724b5bf7376e1c1\": {\"mode\": 365}, \"5727fe0ec9ede2ff/piqa_hf|0/5724b5bf7376e1c1/GENERATIVE.parquet\": {\"mode\": 292, \"sha256\": \"f44f6514f53237bfc86d3c3acdbb2fa2482e5c3ea0dc9d367289e8a47fd38943\"}, \"config.json\": {\"mode\": 292, \"sha256\": \"86ad7dcc5c7c0a52e134d070f69b1292677668a318961d26ac334e8059add554\"}, \"generation_config.json\": {\"mode\": 292, \"sha256\": \"522c5cb32c4538f70090791d3ee0720e2c108d4eb76127652bf5dd1347bbde19\"}, \"model.safetensors\": {\"mode\": 493, \"link\": \"/private/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/green/basetemp/test_real_readonly_local_sourc0/model-blob.safetensors\"}, \"nested\": {\"mode\": 365}, \"nested/preserved.txt\": {\"mode\": 292, \"sha256\": \"a0f39e1ce2ab5ae310c043e86dc76b5c1d0af52be210a5da90b7c6f59f24917c\"}, \"tokenizer.json\": {\"mode\": 292, \"sha256\": \"7a5b652c806adc9560bf9ddb3ee5a95832f92ba20956a944055df998e698639c\"}, \"tokenizer_config.json\": {\"mode\": 292, \"sha256\": \"36070e1bdd3081a044aaecc7843ca58b82771a9e0737542f954e45545de49d78\"}}, \"source_unchanged\": true, \"readonly_permission_enforced\": true, \"owned_copies_and_cache_removed\": true}",
+              "readonly_fixture_permissions_restored": "12"
+            }
+          },
+          {
+            "name": "test_real_readonly_local_source_ignores_old_responses[separate]",
+            "raw_properties": {
+              "actual_readonly_source": "{\"tokenizer_source\": \"separate\", \"seeded_response_text\": [[\"A\"], [\"A\"], [\"A\"]], \"result\": {\"evaluator\": \"lighteval\", \"primary_metric\": \"ifeval_avg\", \"metrics\": {\"ifeval_avg\": 0.3333333333333333, \"hellaswag\": 0.3333333333333333, \"arc_easy\": 0.3333333333333333, \"arc_challenge\": 0.3333333333333333, \"piqa\": 0.3333333333333333, \"arc_avg\": 0.3333333333333333}, \"higher_is_better\": {\"ifeval_avg\": true, \"hellaswag\": true, \"arc_easy\": true, \"arc_challenge\": true, \"piqa\": true, \"arc_avg\": true}, \"metadata\": {\"preset\": \"smollm_round_fast\", \"tasks\": [\"ifeval\", \"hellaswag\", \"arc_easy\", \"arc_challenge\", \"piqa\"], \"backend\": \"transformers\", \"raw_metrics\": {\"hellaswag:0\": {\"em\": 0.3333333333333333, \"em_stderr\": 0.33333333333333337}, \"ifeval:0\": {\"prompt_level_strict_acc\": 0.3333333333333333, \"prompt_level_strict_acc_stderr\": 0.33333333333333337, \"inst_level_strict_acc\": 0.3333333333333333, \"inst_level_strict_acc_stderr\": 0.008657241865953338, \"prompt_level_loose_acc\": 0.3333333333333333, \"prompt_level_loose_acc_stderr\": 0.33333333333333337, \"inst_level_loose_acc\": 0.3333333333333333, \"inst_level_loose_acc_stderr\": 0.008657241865953338}, \"piqa_hf:0\": {\"em\": 0.3333333333333333, \"em_stderr\": 0.33333333333333337}, \"arc:challenge:0\": {\"acc\": 0.3333333333333333, \"acc_stderr\": 0.33333333333333337}, \"arc:easy:0\": {\"acc\": 0.3333333333333333, \"acc_stderr\": 0.33333333333333337}, \"arc:_average:0\": {\"acc\": 0.3333333333333333, \"acc_stderr\": 0.33333333333333337}, \"all\": {\"em\": 0.3333333333333333, \"em_stderr\": 0.33333333333333337, \"prompt_level_strict_acc\": 0.3333333333333333, \"prompt_level_strict_acc_stderr\": 0.33333333333333337, \"inst_level_strict_acc\": 0.3333333333333333, \"inst_level_strict_acc_stderr\": 0.008657241865953338, \"prompt_level_loose_acc\": 0.3333333333333333, \"prompt_level_loose_acc_stderr\": 0.33333333333333337, \"inst_level_loose_acc\": 0.3333333333333333, \"inst_level_loose_acc_stderr\": 0.008657241865953338, \"acc\": 0.3333333333333333, \"acc_stderr\": 0.33333333333333337}}}, \"artifacts\": {}, \"primary_value\": 0.3333333333333333}, \"source_tree\": {\".\": {\"mode\": 365}, \"9023d802e7e53859\": {\"mode\": 365}, \"9023d802e7e53859/piqa_hf|0\": {\"mode\": 365}, \"9023d802e7e53859/piqa_hf|0/9681f1ed7f099607\": {\"mode\": 365}, \"9023d802e7e53859/piqa_hf|0/9681f1ed7f099607/GENERATIVE.parquet\": {\"mode\": 292, \"sha256\": \"f44f6514f53237bfc86d3c3acdbb2fa2482e5c3ea0dc9d367289e8a47fd38943\"}, \"config.json\": {\"mode\": 292, \"sha256\": \"86ad7dcc5c7c0a52e134d070f69b1292677668a318961d26ac334e8059add554\"}, \"generation_config.json\": {\"mode\": 292, \"sha256\": \"522c5cb32c4538f70090791d3ee0720e2c108d4eb76127652bf5dd1347bbde19\"}, \"model.safetensors\": {\"mode\": 493, \"link\": \"/private/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/green/basetemp/test_real_readonly_local_sourc1/model-blob.safetensors\"}, \"nested\": {\"mode\": 365}, \"nested/preserved.txt\": {\"mode\": 292, \"sha256\": \"a0f39e1ce2ab5ae310c043e86dc76b5c1d0af52be210a5da90b7c6f59f24917c\"}}, \"source_unchanged\": true, \"readonly_permission_enforced\": true, \"owned_copies_and_cache_removed\": true}",
+              "readonly_fixture_permissions_restored": "13"
+            }
+          }
+        ],
+        "raw_log": {
+          "path": "/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/green/run-1.log",
+          "sha256": "1f9c2012b83ddd2b365f7fd8482c8c00456ccd596805d78a189cba921e09391d",
+          "bytes": 728,
+          "raw": "..                                                                       [100%]\n=============================== warnings summary ===============================\ntests/llm_eval/test_lighteval_runtime.py::test_real_readonly_local_source_ignores_old_responses[same]\n  /private/tmp/plato-refresh-worktrees/lighteval-runtime/.venv/lib/python3.13/site-packages/huggingface_hub/utils/_deprecation.py:100: FutureWarning: Deprecated argument(s) used in 'list_models': model_name. Will not be supported from version '2.0'.\n  \n  Use `search` instead.\n    warnings.warn(message, FutureWarning)\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\ntest profile: core scope (native excluded)\n2 passed, 1 warning in 30.67s\n"
+        },
+        "raw_junit": {
+          "path": "/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/green/run-1.xml",
+          "sha256": "7aa381431dca3c113d808f2b97aeba7c56424e18812bede5281b1bbfc2c9e2ac",
+          "bytes": 9585,
+          "raw": "<?xml version=\"1.0\" encoding=\"utf-8\"?><testsuites name=\"pytest tests\"><testsuite name=\"pytest\" errors=\"0\" failures=\"0\" skipped=\"0\" tests=\"2\" time=\"30.675\" timestamp=\"2026-10-03T18:40:22.042122-04:00\" hostname=\"miami.csl.utoronto.ca\"><testcase classname=\"tests.llm_eval.test_lighteval_runtime\" name=\"test_real_readonly_local_source_ignores_old_responses[same]\" file=\"tests/llm_eval/test_lighteval_runtime.py\" line=\"342\" time=\"16.337\"><properties><property name=\"actual_readonly_source\" value=\"{&quot;tokenizer_source&quot;: &quot;same&quot;, &quot;seeded_response_text&quot;: [[&quot;A&quot;], [&quot;A&quot;], [&quot;A&quot;]], &quot;result&quot;: {&quot;evaluator&quot;: &quot;lighteval&quot;, &quot;primary_metric&quot;: &quot;ifeval_avg&quot;, &quot;metrics&quot;: {&quot;ifeval_avg&quot;: 0.3333333333333333, &quot;hellaswag&quot;: 0.3333333333333333, &quot;arc_easy&quot;: 0.3333333333333333, &quot;arc_challenge&quot;: 0.3333333333333333, &quot;piqa&quot;: 0.3333333333333333, &quot;arc_avg&quot;: 0.3333333333333333}, &quot;higher_is_better&quot;: {&quot;ifeval_avg&quot;: true, &quot;hellaswag&quot;: true, &quot;arc_easy&quot;: true, &quot;arc_challenge&quot;: true, &quot;piqa&quot;: true, &quot;arc_avg&quot;: true}, &quot;metadata&quot;: {&quot;preset&quot;: &quot;smollm_round_fast&quot;, &quot;tasks&quot;: [&quot;ifeval&quot;, &quot;hellaswag&quot;, &quot;arc_easy&quot;, &quot;arc_challenge&quot;, &quot;piqa&quot;], &quot;backend&quot;: &quot;transformers&quot;, &quot;raw_metrics&quot;: {&quot;hellaswag:0&quot;: {&quot;em&quot;: 0.3333333333333333, &quot;em_stderr&quot;: 0.33333333333333337}, &quot;ifeval:0&quot;: {&quot;prompt_level_strict_acc&quot;: 0.3333333333333333, &quot;prompt_level_strict_acc_stderr&quot;: 0.33333333333333337, &quot;inst_level_strict_acc&quot;: 0.3333333333333333, &quot;inst_level_strict_acc_stderr&quot;: 0.008657241865953338, &quot;prompt_level_loose_acc&quot;: 0.3333333333333333, &quot;prompt_level_loose_acc_stderr&quot;: 0.33333333333333337, &quot;inst_level_loose_acc&quot;: 0.3333333333333333, &quot;inst_level_loose_acc_stderr&quot;: 0.008657241865953338}, &quot;piqa_hf:0&quot;: {&quot;em&quot;: 0.3333333333333333, &quot;em_stderr&quot;: 0.33333333333333337}, &quot;arc:challenge:0&quot;: {&quot;acc&quot;: 0.3333333333333333, &quot;acc_stderr&quot;: 0.33333333333333337}, &quot;arc:easy:0&quot;: {&quot;acc&quot;: 0.3333333333333333, &quot;acc_stderr&quot;: 0.33333333333333337}, &quot;arc:_average:0&quot;: {&quot;acc&quot;: 0.3333333333333333, &quot;acc_stderr&quot;: 0.33333333333333337}, &quot;all&quot;: {&quot;em&quot;: 0.3333333333333333, &quot;em_stderr&quot;: 0.33333333333333337, &quot;prompt_level_strict_acc&quot;: 0.3333333333333333, &quot;prompt_level_strict_acc_stderr&quot;: 0.33333333333333337, &quot;inst_level_strict_acc&quot;: 0.3333333333333333, &quot;inst_level_strict_acc_stderr&quot;: 0.008657241865953338, &quot;prompt_level_loose_acc&quot;: 0.3333333333333333, &quot;prompt_level_loose_acc_stderr&quot;: 0.33333333333333337, &quot;inst_level_loose_acc&quot;: 0.3333333333333333, &quot;inst_level_loose_acc_stderr&quot;: 0.008657241865953338, &quot;acc&quot;: 0.3333333333333333, &quot;acc_stderr&quot;: 0.33333333333333337}}}, &quot;artifacts&quot;: {}, &quot;primary_value&quot;: 0.3333333333333333}, &quot;source_tree&quot;: {&quot;.&quot;: {&quot;mode&quot;: 365}, &quot;5727fe0ec9ede2ff&quot;: {&quot;mode&quot;: 365}, &quot;5727fe0ec9ede2ff/piqa_hf|0&quot;: {&quot;mode&quot;: 365}, &quot;5727fe0ec9ede2ff/piqa_hf|0/5724b5bf7376e1c1&quot;: {&quot;mode&quot;: 365}, &quot;5727fe0ec9ede2ff/piqa_hf|0/5724b5bf7376e1c1/GENERATIVE.parquet&quot;: {&quot;mode&quot;: 292, &quot;sha256&quot;: &quot;f44f6514f53237bfc86d3c3acdbb2fa2482e5c3ea0dc9d367289e8a47fd38943&quot;}, &quot;config.json&quot;: {&quot;mode&quot;: 292, &quot;sha256&quot;: &quot;86ad7dcc5c7c0a52e134d070f69b1292677668a318961d26ac334e8059add554&quot;}, &quot;generation_config.json&quot;: {&quot;mode&quot;: 292, &quot;sha256&quot;: &quot;522c5cb32c4538f70090791d3ee0720e2c108d4eb76127652bf5dd1347bbde19&quot;}, &quot;model.safetensors&quot;: {&quot;mode&quot;: 493, &quot;link&quot;: &quot;/private/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/green/basetemp/test_real_readonly_local_sourc0/model-blob.safetensors&quot;}, &quot;nested&quot;: {&quot;mode&quot;: 365}, &quot;nested/preserved.txt&quot;: {&quot;mode&quot;: 292, &quot;sha256&quot;: &quot;a0f39e1ce2ab5ae310c043e86dc76b5c1d0af52be210a5da90b7c6f59f24917c&quot;}, &quot;tokenizer.json&quot;: {&quot;mode&quot;: 292, &quot;sha256&quot;: &quot;7a5b652c806adc9560bf9ddb3ee5a95832f92ba20956a944055df998e698639c&quot;}, &quot;tokenizer_config.json&quot;: {&quot;mode&quot;: 292, &quot;sha256&quot;: &quot;36070e1bdd3081a044aaecc7843ca58b82771a9e0737542f954e45545de49d78&quot;}}, &quot;source_unchanged&quot;: true, &quot;readonly_permission_enforced&quot;: true, &quot;owned_copies_and_cache_removed&quot;: true}\" /><property name=\"readonly_fixture_permissions_restored\" value=\"12\" /></properties></testcase><testcase classname=\"tests.llm_eval.test_lighteval_runtime\" name=\"test_real_readonly_local_source_ignores_old_responses[separate]\" file=\"tests/llm_eval/test_lighteval_runtime.py\" line=\"342\" time=\"14.298\"><properties><property name=\"actual_readonly_source\" value=\"{&quot;tokenizer_source&quot;: &quot;separate&quot;, &quot;seeded_response_text&quot;: [[&quot;A&quot;], [&quot;A&quot;], [&quot;A&quot;]], &quot;result&quot;: {&quot;evaluator&quot;: &quot;lighteval&quot;, &quot;primary_metric&quot;: &quot;ifeval_avg&quot;, &quot;metrics&quot;: {&quot;ifeval_avg&quot;: 0.3333333333333333, &quot;hellaswag&quot;: 0.3333333333333333, &quot;arc_easy&quot;: 0.3333333333333333, &quot;arc_challenge&quot;: 0.3333333333333333, &quot;piqa&quot;: 0.3333333333333333, &quot;arc_avg&quot;: 0.3333333333333333}, &quot;higher_is_better&quot;: {&quot;ifeval_avg&quot;: true, &quot;hellaswag&quot;: true, &quot;arc_easy&quot;: true, &quot;arc_challenge&quot;: true, &quot;piqa&quot;: true, &quot;arc_avg&quot;: true}, &quot;metadata&quot;: {&quot;preset&quot;: &quot;smollm_round_fast&quot;, &quot;tasks&quot;: [&quot;ifeval&quot;, &quot;hellaswag&quot;, &quot;arc_easy&quot;, &quot;arc_challenge&quot;, &quot;piqa&quot;], &quot;backend&quot;: &quot;transformers&quot;, &quot;raw_metrics&quot;: {&quot;hellaswag:0&quot;: {&quot;em&quot;: 0.3333333333333333, &quot;em_stderr&quot;: 0.33333333333333337}, &quot;ifeval:0&quot;: {&quot;prompt_level_strict_acc&quot;: 0.3333333333333333, &quot;prompt_level_strict_acc_stderr&quot;: 0.33333333333333337, &quot;inst_level_strict_acc&quot;: 0.3333333333333333, &quot;inst_level_strict_acc_stderr&quot;: 0.008657241865953338, &quot;prompt_level_loose_acc&quot;: 0.3333333333333333, &quot;prompt_level_loose_acc_stderr&quot;: 0.33333333333333337, &quot;inst_level_loose_acc&quot;: 0.3333333333333333, &quot;inst_level_loose_acc_stderr&quot;: 0.008657241865953338}, &quot;piqa_hf:0&quot;: {&quot;em&quot;: 0.3333333333333333, &quot;em_stderr&quot;: 0.33333333333333337}, &quot;arc:challenge:0&quot;: {&quot;acc&quot;: 0.3333333333333333, &quot;acc_stderr&quot;: 0.33333333333333337}, &quot;arc:easy:0&quot;: {&quot;acc&quot;: 0.3333333333333333, &quot;acc_stderr&quot;: 0.33333333333333337}, &quot;arc:_average:0&quot;: {&quot;acc&quot;: 0.3333333333333333, &quot;acc_stderr&quot;: 0.33333333333333337}, &quot;all&quot;: {&quot;em&quot;: 0.3333333333333333, &quot;em_stderr&quot;: 0.33333333333333337, &quot;prompt_level_strict_acc&quot;: 0.3333333333333333, &quot;prompt_level_strict_acc_stderr&quot;: 0.33333333333333337, &quot;inst_level_strict_acc&quot;: 0.3333333333333333, &quot;inst_level_strict_acc_stderr&quot;: 0.008657241865953338, &quot;prompt_level_loose_acc&quot;: 0.3333333333333333, &quot;prompt_level_loose_acc_stderr&quot;: 0.33333333333333337, &quot;inst_level_loose_acc&quot;: 0.3333333333333333, &quot;inst_level_loose_acc_stderr&quot;: 0.008657241865953338, &quot;acc&quot;: 0.3333333333333333, &quot;acc_stderr&quot;: 0.33333333333333337}}}, &quot;artifacts&quot;: {}, &quot;primary_value&quot;: 0.3333333333333333}, &quot;source_tree&quot;: {&quot;.&quot;: {&quot;mode&quot;: 365}, &quot;9023d802e7e53859&quot;: {&quot;mode&quot;: 365}, &quot;9023d802e7e53859/piqa_hf|0&quot;: {&quot;mode&quot;: 365}, &quot;9023d802e7e53859/piqa_hf|0/9681f1ed7f099607&quot;: {&quot;mode&quot;: 365}, &quot;9023d802e7e53859/piqa_hf|0/9681f1ed7f099607/GENERATIVE.parquet&quot;: {&quot;mode&quot;: 292, &quot;sha256&quot;: &quot;f44f6514f53237bfc86d3c3acdbb2fa2482e5c3ea0dc9d367289e8a47fd38943&quot;}, &quot;config.json&quot;: {&quot;mode&quot;: 292, &quot;sha256&quot;: &quot;86ad7dcc5c7c0a52e134d070f69b1292677668a318961d26ac334e8059add554&quot;}, &quot;generation_config.json&quot;: {&quot;mode&quot;: 292, &quot;sha256&quot;: &quot;522c5cb32c4538f70090791d3ee0720e2c108d4eb76127652bf5dd1347bbde19&quot;}, &quot;model.safetensors&quot;: {&quot;mode&quot;: 493, &quot;link&quot;: &quot;/private/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/green/basetemp/test_real_readonly_local_sourc1/model-blob.safetensors&quot;}, &quot;nested&quot;: {&quot;mode&quot;: 365}, &quot;nested/preserved.txt&quot;: {&quot;mode&quot;: 292, &quot;sha256&quot;: &quot;a0f39e1ce2ab5ae310c043e86dc76b5c1d0af52be210a5da90b7c6f59f24917c&quot;}}, &quot;source_unchanged&quot;: true, &quot;readonly_permission_enforced&quot;: true, &quot;owned_copies_and_cache_removed&quot;: true}\" /><property name=\"readonly_fixture_permissions_restored\" value=\"13\" /></properties></testcase></testsuite></testsuites>"
+        },
+        "junit_cases": [
+          {
+            "name": "test_real_readonly_local_source_ignores_old_responses[same]",
+            "outcome": "passed",
+            "seconds": 16.337,
+            "properties": {
+              "actual_readonly_source": {
+                "tokenizer_source": "same",
+                "seeded_response_text": [
+                  [
+                    "A"
+                  ],
+                  [
+                    "A"
+                  ],
+                  [
+                    "A"
+                  ]
+                ],
+                "result": {
+                  "evaluator": "lighteval",
+                  "primary_metric": "ifeval_avg",
+                  "metrics": {
+                    "ifeval_avg": 0.3333333333333333,
+                    "hellaswag": 0.3333333333333333,
+                    "arc_easy": 0.3333333333333333,
+                    "arc_challenge": 0.3333333333333333,
+                    "piqa": 0.3333333333333333,
+                    "arc_avg": 0.3333333333333333
+                  },
+                  "higher_is_better": {
+                    "ifeval_avg": true,
+                    "hellaswag": true,
+                    "arc_easy": true,
+                    "arc_challenge": true,
+                    "piqa": true,
+                    "arc_avg": true
+                  },
+                  "metadata": {
+                    "preset": "smollm_round_fast",
+                    "tasks": [
+                      "ifeval",
+                      "hellaswag",
+                      "arc_easy",
+                      "arc_challenge",
+                      "piqa"
+                    ],
+                    "backend": "transformers",
+                    "raw_metrics": {
+                      "hellaswag:0": {
+                        "em": 0.3333333333333333,
+                        "em_stderr": 0.33333333333333337
+                      },
+                      "ifeval:0": {
+                        "prompt_level_strict_acc": 0.3333333333333333,
+                        "prompt_level_strict_acc_stderr": 0.33333333333333337,
+                        "inst_level_strict_acc": 0.3333333333333333,
+                        "inst_level_strict_acc_stderr": 0.008657241865953338,
+                        "prompt_level_loose_acc": 0.3333333333333333,
+                        "prompt_level_loose_acc_stderr": 0.33333333333333337,
+                        "inst_level_loose_acc": 0.3333333333333333,
+                        "inst_level_loose_acc_stderr": 0.008657241865953338
+                      },
+                      "piqa_hf:0": {
+                        "em": 0.3333333333333333,
+                        "em_stderr": 0.33333333333333337
+                      },
+                      "arc:challenge:0": {
+                        "acc": 0.3333333333333333,
+                        "acc_stderr": 0.33333333333333337
+                      },
+                      "arc:easy:0": {
+                        "acc": 0.3333333333333333,
+                        "acc_stderr": 0.33333333333333337
+                      },
+                      "arc:_average:0": {
+                        "acc": 0.3333333333333333,
+                        "acc_stderr": 0.33333333333333337
+                      },
+                      "all": {
+                        "em": 0.3333333333333333,
+                        "em_stderr": 0.33333333333333337,
+                        "prompt_level_strict_acc": 0.3333333333333333,
+                        "prompt_level_strict_acc_stderr": 0.33333333333333337,
+                        "inst_level_strict_acc": 0.3333333333333333,
+                        "inst_level_strict_acc_stderr": 0.008657241865953338,
+                        "prompt_level_loose_acc": 0.3333333333333333,
+                        "prompt_level_loose_acc_stderr": 0.33333333333333337,
+                        "inst_level_loose_acc": 0.3333333333333333,
+                        "inst_level_loose_acc_stderr": 0.008657241865953338,
+                        "acc": 0.3333333333333333,
+                        "acc_stderr": 0.33333333333333337
+                      }
+                    }
+                  },
+                  "artifacts": {},
+                  "primary_value": 0.3333333333333333
+                },
+                "source_tree": {
+                  ".": {
+                    "mode": 365
+                  },
+                  "5727fe0ec9ede2ff": {
+                    "mode": 365
+                  },
+                  "5727fe0ec9ede2ff/piqa_hf|0": {
+                    "mode": 365
+                  },
+                  "5727fe0ec9ede2ff/piqa_hf|0/5724b5bf7376e1c1": {
+                    "mode": 365
+                  },
+                  "5727fe0ec9ede2ff/piqa_hf|0/5724b5bf7376e1c1/GENERATIVE.parquet": {
+                    "mode": 292,
+                    "sha256": "f44f6514f53237bfc86d3c3acdbb2fa2482e5c3ea0dc9d367289e8a47fd38943"
+                  },
+                  "config.json": {
+                    "mode": 292,
+                    "sha256": "86ad7dcc5c7c0a52e134d070f69b1292677668a318961d26ac334e8059add554"
+                  },
+                  "generation_config.json": {
+                    "mode": 292,
+                    "sha256": "522c5cb32c4538f70090791d3ee0720e2c108d4eb76127652bf5dd1347bbde19"
+                  },
+                  "model.safetensors": {
+                    "mode": 493,
+                    "link": "/private/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/green/basetemp/test_real_readonly_local_sourc0/model-blob.safetensors"
+                  },
+                  "nested": {
+                    "mode": 365
+                  },
+                  "nested/preserved.txt": {
+                    "mode": 292,
+                    "sha256": "a0f39e1ce2ab5ae310c043e86dc76b5c1d0af52be210a5da90b7c6f59f24917c"
+                  },
+                  "tokenizer.json": {
+                    "mode": 292,
+                    "sha256": "7a5b652c806adc9560bf9ddb3ee5a95832f92ba20956a944055df998e698639c"
+                  },
+                  "tokenizer_config.json": {
+                    "mode": 292,
+                    "sha256": "36070e1bdd3081a044aaecc7843ca58b82771a9e0737542f954e45545de49d78"
+                  }
+                },
+                "source_unchanged": true,
+                "readonly_permission_enforced": true,
+                "owned_copies_and_cache_removed": true
+              },
+              "readonly_fixture_permissions_restored": 12
+            }
+          },
+          {
+            "name": "test_real_readonly_local_source_ignores_old_responses[separate]",
+            "outcome": "passed",
+            "seconds": 14.298,
+            "properties": {
+              "actual_readonly_source": {
+                "tokenizer_source": "separate",
+                "seeded_response_text": [
+                  [
+                    "A"
+                  ],
+                  [
+                    "A"
+                  ],
+                  [
+                    "A"
+                  ]
+                ],
+                "result": {
+                  "evaluator": "lighteval",
+                  "primary_metric": "ifeval_avg",
+                  "metrics": {
+                    "ifeval_avg": 0.3333333333333333,
+                    "hellaswag": 0.3333333333333333,
+                    "arc_easy": 0.3333333333333333,
+                    "arc_challenge": 0.3333333333333333,
+                    "piqa": 0.3333333333333333,
+                    "arc_avg": 0.3333333333333333
+                  },
+                  "higher_is_better": {
+                    "ifeval_avg": true,
+                    "hellaswag": true,
+                    "arc_easy": true,
+                    "arc_challenge": true,
+                    "piqa": true,
+                    "arc_avg": true
+                  },
+                  "metadata": {
+                    "preset": "smollm_round_fast",
+                    "tasks": [
+                      "ifeval",
+                      "hellaswag",
+                      "arc_easy",
+                      "arc_challenge",
+                      "piqa"
+                    ],
+                    "backend": "transformers",
+                    "raw_metrics": {
+                      "hellaswag:0": {
+                        "em": 0.3333333333333333,
+                        "em_stderr": 0.33333333333333337
+                      },
+                      "ifeval:0": {
+                        "prompt_level_strict_acc": 0.3333333333333333,
+                        "prompt_level_strict_acc_stderr": 0.33333333333333337,
+                        "inst_level_strict_acc": 0.3333333333333333,
+                        "inst_level_strict_acc_stderr": 0.008657241865953338,
+                        "prompt_level_loose_acc": 0.3333333333333333,
+                        "prompt_level_loose_acc_stderr": 0.33333333333333337,
+                        "inst_level_loose_acc": 0.3333333333333333,
+                        "inst_level_loose_acc_stderr": 0.008657241865953338
+                      },
+                      "piqa_hf:0": {
+                        "em": 0.3333333333333333,
+                        "em_stderr": 0.33333333333333337
+                      },
+                      "arc:challenge:0": {
+                        "acc": 0.3333333333333333,
+                        "acc_stderr": 0.33333333333333337
+                      },
+                      "arc:easy:0": {
+                        "acc": 0.3333333333333333,
+                        "acc_stderr": 0.33333333333333337
+                      },
+                      "arc:_average:0": {
+                        "acc": 0.3333333333333333,
+                        "acc_stderr": 0.33333333333333337
+                      },
+                      "all": {
+                        "em": 0.3333333333333333,
+                        "em_stderr": 0.33333333333333337,
+                        "prompt_level_strict_acc": 0.3333333333333333,
+                        "prompt_level_strict_acc_stderr": 0.33333333333333337,
+                        "inst_level_strict_acc": 0.3333333333333333,
+                        "inst_level_strict_acc_stderr": 0.008657241865953338,
+                        "prompt_level_loose_acc": 0.3333333333333333,
+                        "prompt_level_loose_acc_stderr": 0.33333333333333337,
+                        "inst_level_loose_acc": 0.3333333333333333,
+                        "inst_level_loose_acc_stderr": 0.008657241865953338,
+                        "acc": 0.3333333333333333,
+                        "acc_stderr": 0.33333333333333337
+                      }
+                    }
+                  },
+                  "artifacts": {},
+                  "primary_value": 0.3333333333333333
+                },
+                "source_tree": {
+                  ".": {
+                    "mode": 365
+                  },
+                  "9023d802e7e53859": {
+                    "mode": 365
+                  },
+                  "9023d802e7e53859/piqa_hf|0": {
+                    "mode": 365
+                  },
+                  "9023d802e7e53859/piqa_hf|0/9681f1ed7f099607": {
+                    "mode": 365
+                  },
+                  "9023d802e7e53859/piqa_hf|0/9681f1ed7f099607/GENERATIVE.parquet": {
+                    "mode": 292,
+                    "sha256": "f44f6514f53237bfc86d3c3acdbb2fa2482e5c3ea0dc9d367289e8a47fd38943"
+                  },
+                  "config.json": {
+                    "mode": 292,
+                    "sha256": "86ad7dcc5c7c0a52e134d070f69b1292677668a318961d26ac334e8059add554"
+                  },
+                  "generation_config.json": {
+                    "mode": 292,
+                    "sha256": "522c5cb32c4538f70090791d3ee0720e2c108d4eb76127652bf5dd1347bbde19"
+                  },
+                  "model.safetensors": {
+                    "mode": 493,
+                    "link": "/private/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/green/basetemp/test_real_readonly_local_sourc1/model-blob.safetensors"
+                  },
+                  "nested": {
+                    "mode": 365
+                  },
+                  "nested/preserved.txt": {
+                    "mode": 292,
+                    "sha256": "a0f39e1ce2ab5ae310c043e86dc76b5c1d0af52be210a5da90b7c6f59f24917c"
+                  }
+                },
+                "source_unchanged": true,
+                "readonly_permission_enforced": true,
+                "owned_copies_and_cache_removed": true
+              },
+              "readonly_fixture_permissions_restored": 13
+            }
+          }
+        ]
+      },
+      {
+        "phase": "green",
+        "command": [
+          "/private/tmp/plato-refresh-worktrees/lighteval-runtime/.venv/bin/python",
+          "-m",
+          "pytest",
+          "tests/llm_eval/test_lighteval_runtime.py::test_real_readonly_local_source_ignores_old_responses",
+          "-q",
+          "-o",
+          "junit_family=legacy",
+          "--basetemp",
+          "/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/green/basetemp",
+          "--junitxml",
+          "/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/green/run-2.xml"
+        ],
+        "returncode": 0,
+        "expected_returncode": 0,
+        "deadline_hit": false,
+        "deadline_seconds": 180,
+        "elapsed_seconds": 32.090808666078374,
+        "log": "/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/green/run-2.log",
+        "xml": "/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/green/run-2.xml",
+        "restored_source_modes": {
+          "test_real_readonly_local_sourc1/persistent-model": 493,
+          "test_real_readonly_local_sourc1/persistent-model/9023d802e7e53859": 493,
+          "test_real_readonly_local_sourc1/persistent-model/config.json": 420,
+          "test_real_readonly_local_sourc1/persistent-model/generation_config.json": 420,
+          "test_real_readonly_local_sourc1/persistent-model/nested": 493,
+          "test_real_readonly_local_sourc1/persistent-model/9023d802e7e53859/piqa_hf|0": 493,
+          "test_real_readonly_local_sourc1/persistent-model/nested/preserved.txt": 420,
+          "test_real_readonly_local_sourc1/persistent-model/9023d802e7e53859/piqa_hf|0/9681f1ed7f099607": 493,
+          "test_real_readonly_local_sourc1/persistent-model/9023d802e7e53859/piqa_hf|0/9681f1ed7f099607/GENERATIVE.parquet": 420,
+          "test_real_readonly_local_sourc1/persistent-tokenizer": 493,
+          "test_real_readonly_local_sourc1/persistent-tokenizer/tokenizer_config.json": 420,
+          "test_real_readonly_local_sourc1/persistent-tokenizer/tokenizer.json": 420,
+          "test_real_readonly_local_sourc1/model-blob.safetensors": 384,
+          "test_real_readonly_local_sourc0/persistent-model": 493,
+          "test_real_readonly_local_sourc0/persistent-model/5727fe0ec9ede2ff": 493,
+          "test_real_readonly_local_sourc0/persistent-model/tokenizer_config.json": 420,
+          "test_real_readonly_local_sourc0/persistent-model/config.json": 420,
+          "test_real_readonly_local_sourc0/persistent-model/tokenizer.json": 420,
+          "test_real_readonly_local_sourc0/persistent-model/generation_config.json": 420,
+          "test_real_readonly_local_sourc0/persistent-model/nested": 493,
+          "test_real_readonly_local_sourc0/persistent-model/5727fe0ec9ede2ff/piqa_hf|0": 493,
+          "test_real_readonly_local_sourc0/persistent-model/nested/preserved.txt": 420,
+          "test_real_readonly_local_sourc0/persistent-model/5727fe0ec9ede2ff/piqa_hf|0/5724b5bf7376e1c1": 493,
+          "test_real_readonly_local_sourc0/persistent-model/5727fe0ec9ede2ff/piqa_hf|0/5724b5bf7376e1c1/GENERATIVE.parquet": 420,
+          "test_real_readonly_local_sourc0/model-blob.safetensors": 384
+        },
+        "test_properties": [
+          {
+            "name": "test_real_readonly_local_source_ignores_old_responses[same]",
+            "raw_properties": {
+              "actual_readonly_source": "{\"tokenizer_source\": \"same\", \"seeded_response_text\": [[\"A\"], [\"A\"], [\"A\"]], \"result\": {\"evaluator\": \"lighteval\", \"primary_metric\": \"ifeval_avg\", \"metrics\": {\"ifeval_avg\": 0.3333333333333333, \"hellaswag\": 0.3333333333333333, \"arc_easy\": 0.3333333333333333, \"arc_challenge\": 0.3333333333333333, \"piqa\": 0.3333333333333333, \"arc_avg\": 0.3333333333333333}, \"higher_is_better\": {\"ifeval_avg\": true, \"hellaswag\": true, \"arc_easy\": true, \"arc_challenge\": true, \"piqa\": true, \"arc_avg\": true}, \"metadata\": {\"preset\": \"smollm_round_fast\", \"tasks\": [\"ifeval\", \"hellaswag\", \"arc_easy\", \"arc_challenge\", \"piqa\"], \"backend\": \"transformers\", \"raw_metrics\": {\"arc:challenge:0\": {\"acc\": 0.3333333333333333, \"acc_stderr\": 0.33333333333333337}, \"arc:easy:0\": {\"acc\": 0.3333333333333333, \"acc_stderr\": 0.33333333333333337}, \"piqa_hf:0\": {\"em\": 0.3333333333333333, \"em_stderr\": 0.33333333333333337}, \"ifeval:0\": {\"prompt_level_strict_acc\": 0.3333333333333333, \"prompt_level_strict_acc_stderr\": 0.33333333333333337, \"inst_level_strict_acc\": 0.3333333333333333, \"inst_level_strict_acc_stderr\": 0.008657241865953338, \"prompt_level_loose_acc\": 0.3333333333333333, \"prompt_level_loose_acc_stderr\": 0.33333333333333337, \"inst_level_loose_acc\": 0.3333333333333333, \"inst_level_loose_acc_stderr\": 0.008657241865953338}, \"hellaswag:0\": {\"em\": 0.3333333333333333, \"em_stderr\": 0.33333333333333337}, \"arc:_average:0\": {\"acc\": 0.3333333333333333, \"acc_stderr\": 0.33333333333333337}, \"all\": {\"acc\": 0.3333333333333333, \"acc_stderr\": 0.33333333333333337, \"em\": 0.3333333333333333, \"em_stderr\": 0.33333333333333337, \"prompt_level_strict_acc\": 0.3333333333333333, \"prompt_level_strict_acc_stderr\": 0.33333333333333337, \"inst_level_strict_acc\": 0.3333333333333333, \"inst_level_strict_acc_stderr\": 0.008657241865953338, \"prompt_level_loose_acc\": 0.3333333333333333, \"prompt_level_loose_acc_stderr\": 0.33333333333333337, \"inst_level_loose_acc\": 0.3333333333333333, \"inst_level_loose_acc_stderr\": 0.008657241865953338}}}, \"artifacts\": {}, \"primary_value\": 0.3333333333333333}, \"source_tree\": {\".\": {\"mode\": 365}, \"5727fe0ec9ede2ff\": {\"mode\": 365}, \"5727fe0ec9ede2ff/piqa_hf|0\": {\"mode\": 365}, \"5727fe0ec9ede2ff/piqa_hf|0/5724b5bf7376e1c1\": {\"mode\": 365}, \"5727fe0ec9ede2ff/piqa_hf|0/5724b5bf7376e1c1/GENERATIVE.parquet\": {\"mode\": 292, \"sha256\": \"f44f6514f53237bfc86d3c3acdbb2fa2482e5c3ea0dc9d367289e8a47fd38943\"}, \"config.json\": {\"mode\": 292, \"sha256\": \"86ad7dcc5c7c0a52e134d070f69b1292677668a318961d26ac334e8059add554\"}, \"generation_config.json\": {\"mode\": 292, \"sha256\": \"522c5cb32c4538f70090791d3ee0720e2c108d4eb76127652bf5dd1347bbde19\"}, \"model.safetensors\": {\"mode\": 493, \"link\": \"/private/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/green/basetemp/test_real_readonly_local_sourc0/model-blob.safetensors\"}, \"nested\": {\"mode\": 365}, \"nested/preserved.txt\": {\"mode\": 292, \"sha256\": \"a0f39e1ce2ab5ae310c043e86dc76b5c1d0af52be210a5da90b7c6f59f24917c\"}, \"tokenizer.json\": {\"mode\": 292, \"sha256\": \"7a5b652c806adc9560bf9ddb3ee5a95832f92ba20956a944055df998e698639c\"}, \"tokenizer_config.json\": {\"mode\": 292, \"sha256\": \"36070e1bdd3081a044aaecc7843ca58b82771a9e0737542f954e45545de49d78\"}}, \"source_unchanged\": true, \"readonly_permission_enforced\": true, \"owned_copies_and_cache_removed\": true}",
+              "readonly_fixture_permissions_restored": "12"
+            }
+          },
+          {
+            "name": "test_real_readonly_local_source_ignores_old_responses[separate]",
+            "raw_properties": {
+              "actual_readonly_source": "{\"tokenizer_source\": \"separate\", \"seeded_response_text\": [[\"A\"], [\"A\"], [\"A\"]], \"result\": {\"evaluator\": \"lighteval\", \"primary_metric\": \"ifeval_avg\", \"metrics\": {\"ifeval_avg\": 0.3333333333333333, \"hellaswag\": 0.3333333333333333, \"arc_easy\": 0.3333333333333333, \"arc_challenge\": 0.3333333333333333, \"piqa\": 0.3333333333333333, \"arc_avg\": 0.3333333333333333}, \"higher_is_better\": {\"ifeval_avg\": true, \"hellaswag\": true, \"arc_easy\": true, \"arc_challenge\": true, \"piqa\": true, \"arc_avg\": true}, \"metadata\": {\"preset\": \"smollm_round_fast\", \"tasks\": [\"ifeval\", \"hellaswag\", \"arc_easy\", \"arc_challenge\", \"piqa\"], \"backend\": \"transformers\", \"raw_metrics\": {\"arc:challenge:0\": {\"acc\": 0.3333333333333333, \"acc_stderr\": 0.33333333333333337}, \"arc:easy:0\": {\"acc\": 0.3333333333333333, \"acc_stderr\": 0.33333333333333337}, \"piqa_hf:0\": {\"em\": 0.3333333333333333, \"em_stderr\": 0.33333333333333337}, \"ifeval:0\": {\"prompt_level_strict_acc\": 0.3333333333333333, \"prompt_level_strict_acc_stderr\": 0.33333333333333337, \"inst_level_strict_acc\": 0.3333333333333333, \"inst_level_strict_acc_stderr\": 0.008657241865953338, \"prompt_level_loose_acc\": 0.3333333333333333, \"prompt_level_loose_acc_stderr\": 0.33333333333333337, \"inst_level_loose_acc\": 0.3333333333333333, \"inst_level_loose_acc_stderr\": 0.008657241865953338}, \"hellaswag:0\": {\"em\": 0.3333333333333333, \"em_stderr\": 0.33333333333333337}, \"arc:_average:0\": {\"acc\": 0.3333333333333333, \"acc_stderr\": 0.33333333333333337}, \"all\": {\"acc\": 0.3333333333333333, \"acc_stderr\": 0.33333333333333337, \"em\": 0.3333333333333333, \"em_stderr\": 0.33333333333333337, \"prompt_level_strict_acc\": 0.3333333333333333, \"prompt_level_strict_acc_stderr\": 0.33333333333333337, \"inst_level_strict_acc\": 0.3333333333333333, \"inst_level_strict_acc_stderr\": 0.008657241865953338, \"prompt_level_loose_acc\": 0.3333333333333333, \"prompt_level_loose_acc_stderr\": 0.33333333333333337, \"inst_level_loose_acc\": 0.3333333333333333, \"inst_level_loose_acc_stderr\": 0.008657241865953338}}}, \"artifacts\": {}, \"primary_value\": 0.3333333333333333}, \"source_tree\": {\".\": {\"mode\": 365}, \"9023d802e7e53859\": {\"mode\": 365}, \"9023d802e7e53859/piqa_hf|0\": {\"mode\": 365}, \"9023d802e7e53859/piqa_hf|0/9681f1ed7f099607\": {\"mode\": 365}, \"9023d802e7e53859/piqa_hf|0/9681f1ed7f099607/GENERATIVE.parquet\": {\"mode\": 292, \"sha256\": \"f44f6514f53237bfc86d3c3acdbb2fa2482e5c3ea0dc9d367289e8a47fd38943\"}, \"config.json\": {\"mode\": 292, \"sha256\": \"86ad7dcc5c7c0a52e134d070f69b1292677668a318961d26ac334e8059add554\"}, \"generation_config.json\": {\"mode\": 292, \"sha256\": \"522c5cb32c4538f70090791d3ee0720e2c108d4eb76127652bf5dd1347bbde19\"}, \"model.safetensors\": {\"mode\": 493, \"link\": \"/private/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/green/basetemp/test_real_readonly_local_sourc1/model-blob.safetensors\"}, \"nested\": {\"mode\": 365}, \"nested/preserved.txt\": {\"mode\": 292, \"sha256\": \"a0f39e1ce2ab5ae310c043e86dc76b5c1d0af52be210a5da90b7c6f59f24917c\"}}, \"source_unchanged\": true, \"readonly_permission_enforced\": true, \"owned_copies_and_cache_removed\": true}",
+              "readonly_fixture_permissions_restored": "13"
+            }
+          }
+        ],
+        "raw_log": {
+          "path": "/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/green/run-2.log",
+          "sha256": "f520da9cda0f269d0a4afc067623bd42e571283b8a1cd477d46b6b132153c690",
+          "bytes": 728,
+          "raw": "..                                                                       [100%]\n=============================== warnings summary ===============================\ntests/llm_eval/test_lighteval_runtime.py::test_real_readonly_local_source_ignores_old_responses[same]\n  /private/tmp/plato-refresh-worktrees/lighteval-runtime/.venv/lib/python3.13/site-packages/huggingface_hub/utils/_deprecation.py:100: FutureWarning: Deprecated argument(s) used in 'list_models': model_name. Will not be supported from version '2.0'.\n  \n  Use `search` instead.\n    warnings.warn(message, FutureWarning)\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\ntest profile: core scope (native excluded)\n2 passed, 1 warning in 26.99s\n"
+        },
+        "raw_junit": {
+          "path": "/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/green/run-2.xml",
+          "sha256": "1c803fe3a35d1e103957afd48eef4a353ba533161123a13df72fc3d12196f7d7",
+          "bytes": 9585,
+          "raw": "<?xml version=\"1.0\" encoding=\"utf-8\"?><testsuites name=\"pytest tests\"><testsuite name=\"pytest\" errors=\"0\" failures=\"0\" skipped=\"0\" tests=\"2\" time=\"26.988\" timestamp=\"2026-10-03T18:40:57.849401-04:00\" hostname=\"miami.csl.utoronto.ca\"><testcase classname=\"tests.llm_eval.test_lighteval_runtime\" name=\"test_real_readonly_local_source_ignores_old_responses[same]\" file=\"tests/llm_eval/test_lighteval_runtime.py\" line=\"342\" time=\"14.153\"><properties><property name=\"actual_readonly_source\" value=\"{&quot;tokenizer_source&quot;: &quot;same&quot;, &quot;seeded_response_text&quot;: [[&quot;A&quot;], [&quot;A&quot;], [&quot;A&quot;]], &quot;result&quot;: {&quot;evaluator&quot;: &quot;lighteval&quot;, &quot;primary_metric&quot;: &quot;ifeval_avg&quot;, &quot;metrics&quot;: {&quot;ifeval_avg&quot;: 0.3333333333333333, &quot;hellaswag&quot;: 0.3333333333333333, &quot;arc_easy&quot;: 0.3333333333333333, &quot;arc_challenge&quot;: 0.3333333333333333, &quot;piqa&quot;: 0.3333333333333333, &quot;arc_avg&quot;: 0.3333333333333333}, &quot;higher_is_better&quot;: {&quot;ifeval_avg&quot;: true, &quot;hellaswag&quot;: true, &quot;arc_easy&quot;: true, &quot;arc_challenge&quot;: true, &quot;piqa&quot;: true, &quot;arc_avg&quot;: true}, &quot;metadata&quot;: {&quot;preset&quot;: &quot;smollm_round_fast&quot;, &quot;tasks&quot;: [&quot;ifeval&quot;, &quot;hellaswag&quot;, &quot;arc_easy&quot;, &quot;arc_challenge&quot;, &quot;piqa&quot;], &quot;backend&quot;: &quot;transformers&quot;, &quot;raw_metrics&quot;: {&quot;arc:challenge:0&quot;: {&quot;acc&quot;: 0.3333333333333333, &quot;acc_stderr&quot;: 0.33333333333333337}, &quot;arc:easy:0&quot;: {&quot;acc&quot;: 0.3333333333333333, &quot;acc_stderr&quot;: 0.33333333333333337}, &quot;piqa_hf:0&quot;: {&quot;em&quot;: 0.3333333333333333, &quot;em_stderr&quot;: 0.33333333333333337}, &quot;ifeval:0&quot;: {&quot;prompt_level_strict_acc&quot;: 0.3333333333333333, &quot;prompt_level_strict_acc_stderr&quot;: 0.33333333333333337, &quot;inst_level_strict_acc&quot;: 0.3333333333333333, &quot;inst_level_strict_acc_stderr&quot;: 0.008657241865953338, &quot;prompt_level_loose_acc&quot;: 0.3333333333333333, &quot;prompt_level_loose_acc_stderr&quot;: 0.33333333333333337, &quot;inst_level_loose_acc&quot;: 0.3333333333333333, &quot;inst_level_loose_acc_stderr&quot;: 0.008657241865953338}, &quot;hellaswag:0&quot;: {&quot;em&quot;: 0.3333333333333333, &quot;em_stderr&quot;: 0.33333333333333337}, &quot;arc:_average:0&quot;: {&quot;acc&quot;: 0.3333333333333333, &quot;acc_stderr&quot;: 0.33333333333333337}, &quot;all&quot;: {&quot;acc&quot;: 0.3333333333333333, &quot;acc_stderr&quot;: 0.33333333333333337, &quot;em&quot;: 0.3333333333333333, &quot;em_stderr&quot;: 0.33333333333333337, &quot;prompt_level_strict_acc&quot;: 0.3333333333333333, &quot;prompt_level_strict_acc_stderr&quot;: 0.33333333333333337, &quot;inst_level_strict_acc&quot;: 0.3333333333333333, &quot;inst_level_strict_acc_stderr&quot;: 0.008657241865953338, &quot;prompt_level_loose_acc&quot;: 0.3333333333333333, &quot;prompt_level_loose_acc_stderr&quot;: 0.33333333333333337, &quot;inst_level_loose_acc&quot;: 0.3333333333333333, &quot;inst_level_loose_acc_stderr&quot;: 0.008657241865953338}}}, &quot;artifacts&quot;: {}, &quot;primary_value&quot;: 0.3333333333333333}, &quot;source_tree&quot;: {&quot;.&quot;: {&quot;mode&quot;: 365}, &quot;5727fe0ec9ede2ff&quot;: {&quot;mode&quot;: 365}, &quot;5727fe0ec9ede2ff/piqa_hf|0&quot;: {&quot;mode&quot;: 365}, &quot;5727fe0ec9ede2ff/piqa_hf|0/5724b5bf7376e1c1&quot;: {&quot;mode&quot;: 365}, &quot;5727fe0ec9ede2ff/piqa_hf|0/5724b5bf7376e1c1/GENERATIVE.parquet&quot;: {&quot;mode&quot;: 292, &quot;sha256&quot;: &quot;f44f6514f53237bfc86d3c3acdbb2fa2482e5c3ea0dc9d367289e8a47fd38943&quot;}, &quot;config.json&quot;: {&quot;mode&quot;: 292, &quot;sha256&quot;: &quot;86ad7dcc5c7c0a52e134d070f69b1292677668a318961d26ac334e8059add554&quot;}, &quot;generation_config.json&quot;: {&quot;mode&quot;: 292, &quot;sha256&quot;: &quot;522c5cb32c4538f70090791d3ee0720e2c108d4eb76127652bf5dd1347bbde19&quot;}, &quot;model.safetensors&quot;: {&quot;mode&quot;: 493, &quot;link&quot;: &quot;/private/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/green/basetemp/test_real_readonly_local_sourc0/model-blob.safetensors&quot;}, &quot;nested&quot;: {&quot;mode&quot;: 365}, &quot;nested/preserved.txt&quot;: {&quot;mode&quot;: 292, &quot;sha256&quot;: &quot;a0f39e1ce2ab5ae310c043e86dc76b5c1d0af52be210a5da90b7c6f59f24917c&quot;}, &quot;tokenizer.json&quot;: {&quot;mode&quot;: 292, &quot;sha256&quot;: &quot;7a5b652c806adc9560bf9ddb3ee5a95832f92ba20956a944055df998e698639c&quot;}, &quot;tokenizer_config.json&quot;: {&quot;mode&quot;: 292, &quot;sha256&quot;: &quot;36070e1bdd3081a044aaecc7843ca58b82771a9e0737542f954e45545de49d78&quot;}}, &quot;source_unchanged&quot;: true, &quot;readonly_permission_enforced&quot;: true, &quot;owned_copies_and_cache_removed&quot;: true}\" /><property name=\"readonly_fixture_permissions_restored\" value=\"12\" /></properties></testcase><testcase classname=\"tests.llm_eval.test_lighteval_runtime\" name=\"test_real_readonly_local_source_ignores_old_responses[separate]\" file=\"tests/llm_eval/test_lighteval_runtime.py\" line=\"342\" time=\"12.796\"><properties><property name=\"actual_readonly_source\" value=\"{&quot;tokenizer_source&quot;: &quot;separate&quot;, &quot;seeded_response_text&quot;: [[&quot;A&quot;], [&quot;A&quot;], [&quot;A&quot;]], &quot;result&quot;: {&quot;evaluator&quot;: &quot;lighteval&quot;, &quot;primary_metric&quot;: &quot;ifeval_avg&quot;, &quot;metrics&quot;: {&quot;ifeval_avg&quot;: 0.3333333333333333, &quot;hellaswag&quot;: 0.3333333333333333, &quot;arc_easy&quot;: 0.3333333333333333, &quot;arc_challenge&quot;: 0.3333333333333333, &quot;piqa&quot;: 0.3333333333333333, &quot;arc_avg&quot;: 0.3333333333333333}, &quot;higher_is_better&quot;: {&quot;ifeval_avg&quot;: true, &quot;hellaswag&quot;: true, &quot;arc_easy&quot;: true, &quot;arc_challenge&quot;: true, &quot;piqa&quot;: true, &quot;arc_avg&quot;: true}, &quot;metadata&quot;: {&quot;preset&quot;: &quot;smollm_round_fast&quot;, &quot;tasks&quot;: [&quot;ifeval&quot;, &quot;hellaswag&quot;, &quot;arc_easy&quot;, &quot;arc_challenge&quot;, &quot;piqa&quot;], &quot;backend&quot;: &quot;transformers&quot;, &quot;raw_metrics&quot;: {&quot;arc:challenge:0&quot;: {&quot;acc&quot;: 0.3333333333333333, &quot;acc_stderr&quot;: 0.33333333333333337}, &quot;arc:easy:0&quot;: {&quot;acc&quot;: 0.3333333333333333, &quot;acc_stderr&quot;: 0.33333333333333337}, &quot;piqa_hf:0&quot;: {&quot;em&quot;: 0.3333333333333333, &quot;em_stderr&quot;: 0.33333333333333337}, &quot;ifeval:0&quot;: {&quot;prompt_level_strict_acc&quot;: 0.3333333333333333, &quot;prompt_level_strict_acc_stderr&quot;: 0.33333333333333337, &quot;inst_level_strict_acc&quot;: 0.3333333333333333, &quot;inst_level_strict_acc_stderr&quot;: 0.008657241865953338, &quot;prompt_level_loose_acc&quot;: 0.3333333333333333, &quot;prompt_level_loose_acc_stderr&quot;: 0.33333333333333337, &quot;inst_level_loose_acc&quot;: 0.3333333333333333, &quot;inst_level_loose_acc_stderr&quot;: 0.008657241865953338}, &quot;hellaswag:0&quot;: {&quot;em&quot;: 0.3333333333333333, &quot;em_stderr&quot;: 0.33333333333333337}, &quot;arc:_average:0&quot;: {&quot;acc&quot;: 0.3333333333333333, &quot;acc_stderr&quot;: 0.33333333333333337}, &quot;all&quot;: {&quot;acc&quot;: 0.3333333333333333, &quot;acc_stderr&quot;: 0.33333333333333337, &quot;em&quot;: 0.3333333333333333, &quot;em_stderr&quot;: 0.33333333333333337, &quot;prompt_level_strict_acc&quot;: 0.3333333333333333, &quot;prompt_level_strict_acc_stderr&quot;: 0.33333333333333337, &quot;inst_level_strict_acc&quot;: 0.3333333333333333, &quot;inst_level_strict_acc_stderr&quot;: 0.008657241865953338, &quot;prompt_level_loose_acc&quot;: 0.3333333333333333, &quot;prompt_level_loose_acc_stderr&quot;: 0.33333333333333337, &quot;inst_level_loose_acc&quot;: 0.3333333333333333, &quot;inst_level_loose_acc_stderr&quot;: 0.008657241865953338}}}, &quot;artifacts&quot;: {}, &quot;primary_value&quot;: 0.3333333333333333}, &quot;source_tree&quot;: {&quot;.&quot;: {&quot;mode&quot;: 365}, &quot;9023d802e7e53859&quot;: {&quot;mode&quot;: 365}, &quot;9023d802e7e53859/piqa_hf|0&quot;: {&quot;mode&quot;: 365}, &quot;9023d802e7e53859/piqa_hf|0/9681f1ed7f099607&quot;: {&quot;mode&quot;: 365}, &quot;9023d802e7e53859/piqa_hf|0/9681f1ed7f099607/GENERATIVE.parquet&quot;: {&quot;mode&quot;: 292, &quot;sha256&quot;: &quot;f44f6514f53237bfc86d3c3acdbb2fa2482e5c3ea0dc9d367289e8a47fd38943&quot;}, &quot;config.json&quot;: {&quot;mode&quot;: 292, &quot;sha256&quot;: &quot;86ad7dcc5c7c0a52e134d070f69b1292677668a318961d26ac334e8059add554&quot;}, &quot;generation_config.json&quot;: {&quot;mode&quot;: 292, &quot;sha256&quot;: &quot;522c5cb32c4538f70090791d3ee0720e2c108d4eb76127652bf5dd1347bbde19&quot;}, &quot;model.safetensors&quot;: {&quot;mode&quot;: 493, &quot;link&quot;: &quot;/private/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/green/basetemp/test_real_readonly_local_sourc1/model-blob.safetensors&quot;}, &quot;nested&quot;: {&quot;mode&quot;: 365}, &quot;nested/preserved.txt&quot;: {&quot;mode&quot;: 292, &quot;sha256&quot;: &quot;a0f39e1ce2ab5ae310c043e86dc76b5c1d0af52be210a5da90b7c6f59f24917c&quot;}}, &quot;source_unchanged&quot;: true, &quot;readonly_permission_enforced&quot;: true, &quot;owned_copies_and_cache_removed&quot;: true}\" /><property name=\"readonly_fixture_permissions_restored\" value=\"13\" /></properties></testcase></testsuite></testsuites>"
+        },
+        "junit_cases": [
+          {
+            "name": "test_real_readonly_local_source_ignores_old_responses[same]",
+            "outcome": "passed",
+            "seconds": 14.153,
+            "properties": {
+              "actual_readonly_source": {
+                "tokenizer_source": "same",
+                "seeded_response_text": [
+                  [
+                    "A"
+                  ],
+                  [
+                    "A"
+                  ],
+                  [
+                    "A"
+                  ]
+                ],
+                "result": {
+                  "evaluator": "lighteval",
+                  "primary_metric": "ifeval_avg",
+                  "metrics": {
+                    "ifeval_avg": 0.3333333333333333,
+                    "hellaswag": 0.3333333333333333,
+                    "arc_easy": 0.3333333333333333,
+                    "arc_challenge": 0.3333333333333333,
+                    "piqa": 0.3333333333333333,
+                    "arc_avg": 0.3333333333333333
+                  },
+                  "higher_is_better": {
+                    "ifeval_avg": true,
+                    "hellaswag": true,
+                    "arc_easy": true,
+                    "arc_challenge": true,
+                    "piqa": true,
+                    "arc_avg": true
+                  },
+                  "metadata": {
+                    "preset": "smollm_round_fast",
+                    "tasks": [
+                      "ifeval",
+                      "hellaswag",
+                      "arc_easy",
+                      "arc_challenge",
+                      "piqa"
+                    ],
+                    "backend": "transformers",
+                    "raw_metrics": {
+                      "arc:challenge:0": {
+                        "acc": 0.3333333333333333,
+                        "acc_stderr": 0.33333333333333337
+                      },
+                      "arc:easy:0": {
+                        "acc": 0.3333333333333333,
+                        "acc_stderr": 0.33333333333333337
+                      },
+                      "piqa_hf:0": {
+                        "em": 0.3333333333333333,
+                        "em_stderr": 0.33333333333333337
+                      },
+                      "ifeval:0": {
+                        "prompt_level_strict_acc": 0.3333333333333333,
+                        "prompt_level_strict_acc_stderr": 0.33333333333333337,
+                        "inst_level_strict_acc": 0.3333333333333333,
+                        "inst_level_strict_acc_stderr": 0.008657241865953338,
+                        "prompt_level_loose_acc": 0.3333333333333333,
+                        "prompt_level_loose_acc_stderr": 0.33333333333333337,
+                        "inst_level_loose_acc": 0.3333333333333333,
+                        "inst_level_loose_acc_stderr": 0.008657241865953338
+                      },
+                      "hellaswag:0": {
+                        "em": 0.3333333333333333,
+                        "em_stderr": 0.33333333333333337
+                      },
+                      "arc:_average:0": {
+                        "acc": 0.3333333333333333,
+                        "acc_stderr": 0.33333333333333337
+                      },
+                      "all": {
+                        "acc": 0.3333333333333333,
+                        "acc_stderr": 0.33333333333333337,
+                        "em": 0.3333333333333333,
+                        "em_stderr": 0.33333333333333337,
+                        "prompt_level_strict_acc": 0.3333333333333333,
+                        "prompt_level_strict_acc_stderr": 0.33333333333333337,
+                        "inst_level_strict_acc": 0.3333333333333333,
+                        "inst_level_strict_acc_stderr": 0.008657241865953338,
+                        "prompt_level_loose_acc": 0.3333333333333333,
+                        "prompt_level_loose_acc_stderr": 0.33333333333333337,
+                        "inst_level_loose_acc": 0.3333333333333333,
+                        "inst_level_loose_acc_stderr": 0.008657241865953338
+                      }
+                    }
+                  },
+                  "artifacts": {},
+                  "primary_value": 0.3333333333333333
+                },
+                "source_tree": {
+                  ".": {
+                    "mode": 365
+                  },
+                  "5727fe0ec9ede2ff": {
+                    "mode": 365
+                  },
+                  "5727fe0ec9ede2ff/piqa_hf|0": {
+                    "mode": 365
+                  },
+                  "5727fe0ec9ede2ff/piqa_hf|0/5724b5bf7376e1c1": {
+                    "mode": 365
+                  },
+                  "5727fe0ec9ede2ff/piqa_hf|0/5724b5bf7376e1c1/GENERATIVE.parquet": {
+                    "mode": 292,
+                    "sha256": "f44f6514f53237bfc86d3c3acdbb2fa2482e5c3ea0dc9d367289e8a47fd38943"
+                  },
+                  "config.json": {
+                    "mode": 292,
+                    "sha256": "86ad7dcc5c7c0a52e134d070f69b1292677668a318961d26ac334e8059add554"
+                  },
+                  "generation_config.json": {
+                    "mode": 292,
+                    "sha256": "522c5cb32c4538f70090791d3ee0720e2c108d4eb76127652bf5dd1347bbde19"
+                  },
+                  "model.safetensors": {
+                    "mode": 493,
+                    "link": "/private/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/green/basetemp/test_real_readonly_local_sourc0/model-blob.safetensors"
+                  },
+                  "nested": {
+                    "mode": 365
+                  },
+                  "nested/preserved.txt": {
+                    "mode": 292,
+                    "sha256": "a0f39e1ce2ab5ae310c043e86dc76b5c1d0af52be210a5da90b7c6f59f24917c"
+                  },
+                  "tokenizer.json": {
+                    "mode": 292,
+                    "sha256": "7a5b652c806adc9560bf9ddb3ee5a95832f92ba20956a944055df998e698639c"
+                  },
+                  "tokenizer_config.json": {
+                    "mode": 292,
+                    "sha256": "36070e1bdd3081a044aaecc7843ca58b82771a9e0737542f954e45545de49d78"
+                  }
+                },
+                "source_unchanged": true,
+                "readonly_permission_enforced": true,
+                "owned_copies_and_cache_removed": true
+              },
+              "readonly_fixture_permissions_restored": 12
+            }
+          },
+          {
+            "name": "test_real_readonly_local_source_ignores_old_responses[separate]",
+            "outcome": "passed",
+            "seconds": 12.796,
+            "properties": {
+              "actual_readonly_source": {
+                "tokenizer_source": "separate",
+                "seeded_response_text": [
+                  [
+                    "A"
+                  ],
+                  [
+                    "A"
+                  ],
+                  [
+                    "A"
+                  ]
+                ],
+                "result": {
+                  "evaluator": "lighteval",
+                  "primary_metric": "ifeval_avg",
+                  "metrics": {
+                    "ifeval_avg": 0.3333333333333333,
+                    "hellaswag": 0.3333333333333333,
+                    "arc_easy": 0.3333333333333333,
+                    "arc_challenge": 0.3333333333333333,
+                    "piqa": 0.3333333333333333,
+                    "arc_avg": 0.3333333333333333
+                  },
+                  "higher_is_better": {
+                    "ifeval_avg": true,
+                    "hellaswag": true,
+                    "arc_easy": true,
+                    "arc_challenge": true,
+                    "piqa": true,
+                    "arc_avg": true
+                  },
+                  "metadata": {
+                    "preset": "smollm_round_fast",
+                    "tasks": [
+                      "ifeval",
+                      "hellaswag",
+                      "arc_easy",
+                      "arc_challenge",
+                      "piqa"
+                    ],
+                    "backend": "transformers",
+                    "raw_metrics": {
+                      "arc:challenge:0": {
+                        "acc": 0.3333333333333333,
+                        "acc_stderr": 0.33333333333333337
+                      },
+                      "arc:easy:0": {
+                        "acc": 0.3333333333333333,
+                        "acc_stderr": 0.33333333333333337
+                      },
+                      "piqa_hf:0": {
+                        "em": 0.3333333333333333,
+                        "em_stderr": 0.33333333333333337
+                      },
+                      "ifeval:0": {
+                        "prompt_level_strict_acc": 0.3333333333333333,
+                        "prompt_level_strict_acc_stderr": 0.33333333333333337,
+                        "inst_level_strict_acc": 0.3333333333333333,
+                        "inst_level_strict_acc_stderr": 0.008657241865953338,
+                        "prompt_level_loose_acc": 0.3333333333333333,
+                        "prompt_level_loose_acc_stderr": 0.33333333333333337,
+                        "inst_level_loose_acc": 0.3333333333333333,
+                        "inst_level_loose_acc_stderr": 0.008657241865953338
+                      },
+                      "hellaswag:0": {
+                        "em": 0.3333333333333333,
+                        "em_stderr": 0.33333333333333337
+                      },
+                      "arc:_average:0": {
+                        "acc": 0.3333333333333333,
+                        "acc_stderr": 0.33333333333333337
+                      },
+                      "all": {
+                        "acc": 0.3333333333333333,
+                        "acc_stderr": 0.33333333333333337,
+                        "em": 0.3333333333333333,
+                        "em_stderr": 0.33333333333333337,
+                        "prompt_level_strict_acc": 0.3333333333333333,
+                        "prompt_level_strict_acc_stderr": 0.33333333333333337,
+                        "inst_level_strict_acc": 0.3333333333333333,
+                        "inst_level_strict_acc_stderr": 0.008657241865953338,
+                        "prompt_level_loose_acc": 0.3333333333333333,
+                        "prompt_level_loose_acc_stderr": 0.33333333333333337,
+                        "inst_level_loose_acc": 0.3333333333333333,
+                        "inst_level_loose_acc_stderr": 0.008657241865953338
+                      }
+                    }
+                  },
+                  "artifacts": {},
+                  "primary_value": 0.3333333333333333
+                },
+                "source_tree": {
+                  ".": {
+                    "mode": 365
+                  },
+                  "9023d802e7e53859": {
+                    "mode": 365
+                  },
+                  "9023d802e7e53859/piqa_hf|0": {
+                    "mode": 365
+                  },
+                  "9023d802e7e53859/piqa_hf|0/9681f1ed7f099607": {
+                    "mode": 365
+                  },
+                  "9023d802e7e53859/piqa_hf|0/9681f1ed7f099607/GENERATIVE.parquet": {
+                    "mode": 292,
+                    "sha256": "f44f6514f53237bfc86d3c3acdbb2fa2482e5c3ea0dc9d367289e8a47fd38943"
+                  },
+                  "config.json": {
+                    "mode": 292,
+                    "sha256": "86ad7dcc5c7c0a52e134d070f69b1292677668a318961d26ac334e8059add554"
+                  },
+                  "generation_config.json": {
+                    "mode": 292,
+                    "sha256": "522c5cb32c4538f70090791d3ee0720e2c108d4eb76127652bf5dd1347bbde19"
+                  },
+                  "model.safetensors": {
+                    "mode": 493,
+                    "link": "/private/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/green/basetemp/test_real_readonly_local_sourc1/model-blob.safetensors"
+                  },
+                  "nested": {
+                    "mode": 365
+                  },
+                  "nested/preserved.txt": {
+                    "mode": 292,
+                    "sha256": "a0f39e1ce2ab5ae310c043e86dc76b5c1d0af52be210a5da90b7c6f59f24917c"
+                  }
+                },
+                "source_unchanged": true,
+                "readonly_permission_enforced": true,
+                "owned_copies_and_cache_removed": true
+              },
+              "readonly_fixture_permissions_restored": 13
+            }
+          }
+        ]
+      },
+      {
+        "phase": "injected-failure",
+        "command": [
+          "/private/tmp/plato-refresh-worktrees/lighteval-runtime/.venv/bin/python",
+          "-m",
+          "pytest",
+          "tests/llm_eval/test_lighteval_runtime.py::test_real_readonly_local_source_ignores_old_responses[same]",
+          "-p",
+          "plato_lr1_failure_probe",
+          "-q",
+          "-o",
+          "junit_family=legacy",
+          "--basetemp",
+          "/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/injected-failure/basetemp",
+          "--junitxml",
+          "/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/injected-failure/run-1.xml"
+        ],
+        "returncode": 1,
+        "expected_returncode": 1,
+        "deadline_hit": false,
+        "deadline_seconds": 180,
+        "elapsed_seconds": 19.9678417078685,
+        "log": "/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/injected-failure/run-1.log",
+        "xml": "/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/injected-failure/run-1.xml",
+        "restored_source_modes": {
+          "test_real_readonly_local_sourc0/persistent-model": 493,
+          "test_real_readonly_local_sourc0/persistent-model/tokenizer_config.json": 420,
+          "test_real_readonly_local_sourc0/persistent-model/config.json": 420,
+          "test_real_readonly_local_sourc0/persistent-model/tokenizer.json": 420,
+          "test_real_readonly_local_sourc0/persistent-model/71107784a816a1c5": 493,
+          "test_real_readonly_local_sourc0/persistent-model/generation_config.json": 420,
+          "test_real_readonly_local_sourc0/persistent-model/nested": 493,
+          "test_real_readonly_local_sourc0/persistent-model/71107784a816a1c5/piqa_hf|0": 493,
+          "test_real_readonly_local_sourc0/persistent-model/nested/preserved.txt": 420,
+          "test_real_readonly_local_sourc0/persistent-model/71107784a816a1c5/piqa_hf|0/3f6ca5bfbb68e0c3": 493,
+          "test_real_readonly_local_sourc0/persistent-model/71107784a816a1c5/piqa_hf|0/3f6ca5bfbb68e0c3/GENERATIVE.parquet": 420,
+          "test_real_readonly_local_sourc0/model-blob.safetensors": 384
+        },
+        "test_properties": [
+          {
+            "name": "test_real_readonly_local_source_ignores_old_responses[same]",
+            "raw_properties": {
+              "actual_readonly_source": "{\"tokenizer_source\": \"same\", \"seeded_response_text\": [[\"A\"], [\"A\"], [\"A\"]], \"result\": {\"evaluator\": \"lighteval\", \"primary_metric\": \"ifeval_avg\", \"metrics\": {\"ifeval_avg\": 0.3333333333333333, \"hellaswag\": 0.3333333333333333, \"arc_easy\": 0.3333333333333333, \"arc_challenge\": 0.3333333333333333, \"piqa\": 0.3333333333333333, \"arc_avg\": 0.3333333333333333}, \"higher_is_better\": {\"ifeval_avg\": true, \"hellaswag\": true, \"arc_easy\": true, \"arc_challenge\": true, \"piqa\": true, \"arc_avg\": true}, \"metadata\": {\"preset\": \"smollm_round_fast\", \"tasks\": [\"ifeval\", \"hellaswag\", \"arc_easy\", \"arc_challenge\", \"piqa\"], \"backend\": \"transformers\", \"raw_metrics\": {\"piqa_hf:0\": {\"em\": 0.3333333333333333, \"em_stderr\": 0.33333333333333337}, \"hellaswag:0\": {\"em\": 0.3333333333333333, \"em_stderr\": 0.33333333333333337}, \"ifeval:0\": {\"prompt_level_strict_acc\": 0.3333333333333333, \"prompt_level_strict_acc_stderr\": 0.33333333333333337, \"inst_level_strict_acc\": 0.3333333333333333, \"inst_level_strict_acc_stderr\": 0.008657241865953338, \"prompt_level_loose_acc\": 0.3333333333333333, \"prompt_level_loose_acc_stderr\": 0.33333333333333337, \"inst_level_loose_acc\": 0.3333333333333333, \"inst_level_loose_acc_stderr\": 0.008657241865953338}, \"arc:challenge:0\": {\"acc\": 0.3333333333333333, \"acc_stderr\": 0.33333333333333337}, \"arc:easy:0\": {\"acc\": 0.3333333333333333, \"acc_stderr\": 0.33333333333333337}, \"arc:_average:0\": {\"acc\": 0.3333333333333333, \"acc_stderr\": 0.33333333333333337}, \"all\": {\"em\": 0.3333333333333333, \"em_stderr\": 0.33333333333333337, \"prompt_level_strict_acc\": 0.3333333333333333, \"prompt_level_strict_acc_stderr\": 0.33333333333333337, \"inst_level_strict_acc\": 0.3333333333333333, \"inst_level_strict_acc_stderr\": 0.008657241865953338, \"prompt_level_loose_acc\": 0.3333333333333333, \"prompt_level_loose_acc_stderr\": 0.33333333333333337, \"inst_level_loose_acc\": 0.3333333333333333, \"inst_level_loose_acc_stderr\": 0.008657241865953338, \"acc\": 0.3333333333333333, \"acc_stderr\": 0.33333333333333337}}}, \"artifacts\": {}, \"primary_value\": 0.3333333333333333}, \"source_tree\": {\".\": {\"mode\": 365}, \"71107784a816a1c5\": {\"mode\": 365}, \"71107784a816a1c5/piqa_hf|0\": {\"mode\": 365}, \"71107784a816a1c5/piqa_hf|0/3f6ca5bfbb68e0c3\": {\"mode\": 365}, \"71107784a816a1c5/piqa_hf|0/3f6ca5bfbb68e0c3/GENERATIVE.parquet\": {\"mode\": 292, \"sha256\": \"f44f6514f53237bfc86d3c3acdbb2fa2482e5c3ea0dc9d367289e8a47fd38943\"}, \"config.json\": {\"mode\": 292, \"sha256\": \"86ad7dcc5c7c0a52e134d070f69b1292677668a318961d26ac334e8059add554\"}, \"generation_config.json\": {\"mode\": 292, \"sha256\": \"522c5cb32c4538f70090791d3ee0720e2c108d4eb76127652bf5dd1347bbde19\"}, \"model.safetensors\": {\"mode\": 493, \"link\": \"/private/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/injected-failure/basetemp/test_real_readonly_local_sourc0/model-blob.safetensors\"}, \"nested\": {\"mode\": 365}, \"nested/preserved.txt\": {\"mode\": 292, \"sha256\": \"a0f39e1ce2ab5ae310c043e86dc76b5c1d0af52be210a5da90b7c6f59f24917c\"}, \"tokenizer.json\": {\"mode\": 292, \"sha256\": \"7a5b652c806adc9560bf9ddb3ee5a95832f92ba20956a944055df998e698639c\"}, \"tokenizer_config.json\": {\"mode\": 292, \"sha256\": \"36070e1bdd3081a044aaecc7843ca58b82771a9e0737542f954e45545de49d78\"}}, \"source_unchanged\": true, \"readonly_permission_enforced\": true, \"owned_copies_and_cache_removed\": true}",
+              "readonly_fixture_permissions_restored": "12"
+            }
+          }
+        ],
+        "raw_log": {
+          "path": "/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/injected-failure/run-1.log",
+          "sha256": "52ee651f994ee52dbb04bfd7a3f06018a5e516fd57089621702bdb47c16bea29",
+          "bytes": 14616,
+          "raw": "F                                                                        [100%]\n=================================== FAILURES ===================================\n_________ test_real_readonly_local_source_ignores_old_responses[same] __________\n\nitem = <Function test_real_readonly_local_source_ignores_old_responses[same]>\n\n    @pytest.hookimpl(wrapper=True)\n    def pytest_runtest_call(item):\n        result = yield\n        if item.nodeid.endswith(\"test_real_readonly_local_source_ignores_old_responses[same]\"):\n            fixture = item.funcargs[\"tmp_path\"]\n            assert stat.S_IMODE((fixture / \"persistent-model\").stat().st_mode) == 0o555\n            assert stat.S_IMODE((fixture / \"model-blob.safetensors\").stat().st_mode) == 0o444\n>           raise RuntimeError(\"LR1 injected test-call failure after all real source-immutability assertions\")\nE           RuntimeError: LR1 injected test-call failure after all real source-immutability assertions\n\n/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/plato_lr1_failure_probe.py:11: RuntimeError\n---------------------------- Captured stderr setup -----------------------------\n\nCreating parquet from Arrow format:   0%|          | 0/1 [00:00<?, ?ba/s]\nCreating parquet from Arrow format: 100%|██████████| 1/1 [00:00<00:00, 1824.40ba/s]\n\nCreating parquet from Arrow format:   0%|          | 0/1 [00:00<?, ?ba/s]\nCreating parquet from Arrow format: 100%|██████████| 1/1 [00:00<00:00, 6492.73ba/s]\n\nCreating parquet from Arrow format:   0%|          | 0/1 [00:00<?, ?ba/s]\nCreating parquet from Arrow format: 100%|██████████| 1/1 [00:00<00:00, 7307.15ba/s]\n\nCreating parquet from Arrow format:   0%|          | 0/1 [00:00<?, ?ba/s]\nCreating parquet from Arrow format: 100%|██████████| 1/1 [00:00<00:00, 8756.38ba/s]\n\nCreating parquet from Arrow format:   0%|          | 0/1 [00:00<?, ?ba/s]\nCreating parquet from Arrow format: 100%|██████████| 1/1 [00:00<00:00, 9532.51ba/s]\n----------------------------- Captured stderr call -----------------------------\n\nWriting model shards:   0%|          | 0/1 [00:00<?, ?it/s]\nWriting model shards: 100%|██████████| 1/1 [00:00<00:00, 1252.78it/s]\n\nGenerating validation split: 0 examples [00:00, ? examples/s]\nGenerating validation split: 3 examples [00:00, 2155.35 examples/s]\n[transformers] `torch_dtype` is deprecated! Use `dtype` instead!\n\nLoading weights:   0%|          | 0/16 [00:00<?, ?it/s]\nLoading weights: 100%|██████████| 16/16 [00:00<00:00, 16946.68it/s]\n\nSplits:   0%|          | 0/1 [00:00<?, ?it/s]\n\nGreedy generation:   0%|          | 0/3 [00:00<?, ?it/s]\u001b[A[transformers] The following generation flags are not valid and may be ignored: ['temperature']. Set `TRANSFORMERS_VERBOSITY=info` for more details.\n\n\n                                                        \u001b[A\nSplits: 100%|██████████| 1/1 [00:00<00:00, 147.82it/s]\n\nCreating parquet from Arrow format:   0%|          | 0/1 [00:00<?, ?ba/s]\nCreating parquet from Arrow format: 100%|██████████| 1/1 [00:00<00:00, 4198.50ba/s]\n\nGenerating train split: 0 examples [00:00, ? examples/s]\nGenerating train split: 3 examples [00:00, 1548.86 examples/s]\n\nWriting model shards:   0%|          | 0/1 [00:00<?, ?it/s]\nWriting model shards: 100%|██████████| 1/1 [00:00<00:00, 1582.16it/s]\n\nGenerating validation split: 0 examples [00:00, ? examples/s]\nGenerating validation split: 3 examples [00:00, 2801.18 examples/s]\n\nGenerating validation split: 0 examples [00:00, ? examples/s]\nGenerating validation split: 3 examples [00:00, 3382.50 examples/s]\n\nGenerating validation split: 0 examples [00:00, ? examples/s]\nGenerating validation split: 3 examples [00:00, 3453.05 examples/s]\n\nGenerating validation split: 0 examples [00:00, ? examples/s]\nGenerating validation split: 3 examples [00:00, 3161.54 examples/s]\n\nLoading weights:   0%|          | 0/16 [00:00<?, ?it/s]\nLoading weights: 100%|██████████| 16/16 [00:00<00:00, 18472.02it/s]\n\nSplits:   0%|          | 0/2 [00:00<?, ?it/s]\n\nGreedy generation:   0%|          | 0/3 [00:00<?, ?it/s]\u001b[A\n\n                                                        \u001b[A\n\nGreedy generation:   0%|          | 0/6 [00:00<?, ?it/s]\u001b[A\n\n                                                        \u001b[A\nSplits: 100%|██████████| 2/2 [00:00<00:00, 155.98it/s]\n\nCreating parquet from Arrow format:   0%|          | 0/1 [00:00<?, ?ba/s]\nCreating parquet from Arrow format: 100%|██████████| 1/1 [00:00<00:00, 4447.83ba/s]\n\nCreating parquet from Arrow format:   0%|          | 0/1 [00:00<?, ?ba/s]\nCreating parquet from Arrow format: 100%|██████████| 1/1 [00:00<00:00, 5683.34ba/s]\n\nCreating parquet from Arrow format:   0%|          | 0/1 [00:00<?, ?ba/s]\nCreating parquet from Arrow format: 100%|██████████| 1/1 [00:00<00:00, 5849.80ba/s]\n\nGenerating train split: 0 examples [00:00, ? examples/s]\nGenerating train split: 3 examples [00:00, 2064.46 examples/s]\n\nGenerating train split: 0 examples [00:00, ? examples/s]\nGenerating train split: 3 examples [00:00, 1944.21 examples/s]\n\nGenerating train split: 0 examples [00:00, ? examples/s]\nGenerating train split: 3 examples [00:00, 1863.58 examples/s]\n\n0it [00:00, ?it/s]\n\n  0%|          | 0/6 [00:00<?, ?it/s]\u001b[A\n100%|██████████| 6/6 [00:00<00:00, 1839.34it/s]\n\n1it [00:00, 268.81it/s]\n\nCreating parquet from Arrow format:   0%|          | 0/1 [00:00<?, ?ba/s]\nCreating parquet from Arrow format: 100%|██████████| 1/1 [00:00<00:00, 4443.12ba/s]\n\nCreating parquet from Arrow format:   0%|          | 0/1 [00:00<?, ?ba/s]\nCreating parquet from Arrow format: 100%|██████████| 1/1 [00:00<00:00, 5384.22ba/s]\n\nGenerating train split: 0 examples [00:00, ? examples/s]\nGenerating train split: 3 examples [00:00, 2108.40 examples/s]\n\nGenerating train split: 0 examples [00:00, ? examples/s]\nGenerating train split: 3 examples [00:00, 2114.06 examples/s]\n\nSampling bootstrap iterations:   0%|          | 0/1000 [00:00<?, ?it/s]\nSampling bootstrap iterations: 100%|██████████| 1000/1000 [00:00<00:00, 1150700.69it/s]\n\nSampling bootstrap iterations:   0%|          | 0/1000 [00:00<?, ?it/s]\nSampling bootstrap iterations: 100%|██████████| 1000/1000 [00:00<00:00, 1206299.68it/s]\n------------------------------ Captured log call -------------------------------\nINFO     lighteval.pipeline:pipeline.py:254 --- INIT SEEDS ---\nINFO     lighteval.pipeline:pipeline.py:211 --- LOADING TASKS ---\nINFO     lighteval.tasks.registry:registry.py:379 Loaded 647 task configs in 0.1 seconds\nWARNING  lighteval.tasks.lighteval_task:lighteval_task.py:277 Careful, the task piqa_hf is using evaluation data to build the few shot examples.\nINFO     lighteval.utils.parallelism:parallelism.py:127 Test gather tensor\nINFO     lighteval.utils.parallelism:parallelism.py:130 gathered_tensor tensor([0]), should be [0]\nINFO     lighteval.pipeline:pipeline.py:178 --- LOADING MODEL ---\nINFO     lighteval.models.transformers.transformers_model:transformers_model.py:447 Tokenizer truncation and padding size set to the left side.\nINFO     lighteval.models.transformers.transformers_model:transformers_model.py:367 Model parallel was set to False, max memory set to None and device map to None\nWARNING  transformers.configuration_utils:logging.py:340 `torch_dtype` is deprecated! Use `dtype` instead!\nINFO     lighteval.models.transformers.transformers_model:transformers_model.py:222 Using Data Parallelism, putting model on device cpu\nINFO     lighteval.utils.cache_management:cache_management.py:106 [CACHING] Initializing data cache\nINFO     lighteval.utils.cache_management:cache_management.py:412 Cache: Starting to process 3/3 samples (not found in cache) for tasks piqa_hf|0 (3f6ca5bfbb68e0c3, GENERATIVE)\nWARNING  lighteval.data:data.py:206 You cannot select the number of dataset splits for a generative evaluation at the moment. Automatically inferring.\nWARNING  transformers.generation.configuration_utils:logging.py:340 The following generation flags are not valid and may be ignored: ['temperature']. Set `TRANSFORMERS_VERBOSITY=info` for more details.\nINFO     lighteval.utils.cache_management:cache_management.py:358 Cached 3 samples of piqa_hf|0 (3f6ca5bfbb68e0c3, GENERATIVE) at /private/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/injected-failure/basetemp/test_real_readonly_local_sourc0/persistent-model/71107784a816a1c5/piqa_hf|0/3f6ca5bfbb68e0c3/GENERATIVE.parquet.\nINFO     root:lighteval.py:104 [Lighteval] Preparing model reference (1/5).\nINFO     root:lighteval.py:112 [Lighteval] Copying configured local artifacts for evaluation.\nINFO     root:lighteval.py:104 [Lighteval] Initializing Lighteval for 5 task(s) (2/5).\nINFO     lighteval.pipeline:pipeline.py:254 --- INIT SEEDS ---\nINFO     lighteval.pipeline:pipeline.py:211 --- LOADING TASKS ---\nINFO     lighteval.tasks.registry:registry.py:379 Loaded 647 task configs in 0.0 seconds\nWARNING  lighteval.tasks.lighteval_task:lighteval_task.py:277 Careful, the task piqa_hf is using evaluation data to build the few shot examples.\nWARNING  lighteval.tasks.lighteval_task:lighteval_task.py:277 Careful, the task arc:challenge is using evaluation data to build the few shot examples.\nWARNING  lighteval.tasks.lighteval_task:lighteval_task.py:277 Careful, the task hellaswag is using evaluation data to build the few shot examples.\nWARNING  lighteval.tasks.lighteval_task:lighteval_task.py:277 Careful, the task arc:easy is using evaluation data to build the few shot examples.\nWARNING  lighteval.tasks.lighteval_task:lighteval_task.py:277 Careful, the task ifeval is using evaluation data to build the few shot examples.\nINFO     lighteval.utils.parallelism:parallelism.py:127 Test gather tensor\nINFO     lighteval.utils.parallelism:parallelism.py:130 gathered_tensor tensor([0]), should be [0]\nINFO     lighteval.pipeline:pipeline.py:178 --- LOADING MODEL ---\nINFO     lighteval.models.transformers.transformers_model:transformers_model.py:447 Tokenizer truncation and padding size set to the left side.\nINFO     lighteval.models.transformers.transformers_model:transformers_model.py:367 Model parallel was set to False, max memory set to None and device map to None\nINFO     lighteval.models.transformers.transformers_model:transformers_model.py:222 Using Data Parallelism, putting model on device cpu\nINFO     lighteval.utils.cache_management:cache_management.py:106 [CACHING] Initializing data cache\nINFO     root:lighteval.py:104 [Lighteval] Running benchmark tasks (3/5).\nINFO     lighteval.pipeline:pipeline.py:335 --- RUNNING MODEL ---\nINFO     lighteval.pipeline:pipeline.py:318 Running SamplingMethod.GENERATIVE requests\nINFO     lighteval.utils.cache_management:cache_management.py:412 Cache: Starting to process 9/9 samples (not found in cache) for tasks hellaswag|0 (6610d849d5ecb828, GENERATIVE),piqa_hf|0 (3f6ca5bfbb68e0c3, GENERATIVE),ifeval|0 (b75fed823f89ab06, GENERATIVE)\nWARNING  lighteval.data:data.py:206 You cannot select the number of dataset splits for a generative evaluation at the moment. Automatically inferring.\nINFO     lighteval.utils.cache_management:cache_management.py:358 Cached 3 samples of hellaswag|0 (6610d849d5ecb828, GENERATIVE) at /var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-u0rq09kb/model/dcf0b06bba59d047/hellaswag|0/6610d849d5ecb828/GENERATIVE.parquet.\nINFO     lighteval.utils.cache_management:cache_management.py:358 Cached 3 samples of piqa_hf|0 (3f6ca5bfbb68e0c3, GENERATIVE) at /var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-u0rq09kb/model/dcf0b06bba59d047/piqa_hf|0/3f6ca5bfbb68e0c3/GENERATIVE.parquet.\nINFO     lighteval.utils.cache_management:cache_management.py:358 Cached 3 samples of ifeval|0 (b75fed823f89ab06, GENERATIVE) at /var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-u0rq09kb/model/dcf0b06bba59d047/ifeval|0/b75fed823f89ab06/GENERATIVE.parquet.\nINFO     lighteval.pipeline:pipeline.py:318 Running SamplingMethod.LOGPROBS requests\nINFO     lighteval.utils.cache_management:cache_management.py:412 Cache: Starting to process 6/6 samples (not found in cache) for tasks arc:easy|0 (bc0fbac0f6dd9b05, LOGPROBS),arc:challenge|0 (e5bff8009a142683, LOGPROBS)\nWARNING  lighteval.models.transformers.transformers_model:transformers_model.py:938 batch size is set to 1 (it should be understood as '1 times the maximum number of choices per sample, 2')\nINFO     lighteval.utils.cache_management:cache_management.py:358 Cached 3 samples of arc:easy|0 (bc0fbac0f6dd9b05, LOGPROBS) at /var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-u0rq09kb/model/dcf0b06bba59d047/arc:easy|0/bc0fbac0f6dd9b05/LOGPROBS.parquet.\nINFO     lighteval.utils.cache_management:cache_management.py:358 Cached 3 samples of arc:challenge|0 (e5bff8009a142683, LOGPROBS) at /var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-u0rq09kb/model/dcf0b06bba59d047/arc:challenge|0/e5bff8009a142683/LOGPROBS.parquet.\nINFO     lighteval.pipeline:pipeline.py:349 --- POST-PROCESSING MODEL RESPONSES ---\nINFO     lighteval.pipeline:pipeline.py:376 --- COMPUTING METRICS ---\nINFO     lighteval.metrics.utils.stderr:stderr.py:87 Bootstrapping agg_inst_level_acc's stderr with 1 seeds.\nINFO     lighteval.metrics.utils.stderr:stderr.py:87 Bootstrapping agg_inst_level_acc's stderr with 1 seeds.\nINFO     root:lighteval.py:104 [Lighteval] Collecting evaluation metrics (4/5).\nINFO     root:lighteval.py:104 [Lighteval] Normalizing evaluation metrics (5/5).\n=============================== warnings summary ===============================\ntests/llm_eval/test_lighteval_runtime.py::test_real_readonly_local_source_ignores_old_responses[same]\n  /private/tmp/plato-refresh-worktrees/lighteval-runtime/.venv/lib/python3.13/site-packages/huggingface_hub/utils/_deprecation.py:100: FutureWarning: Deprecated argument(s) used in 'list_models': model_name. Will not be supported from version '2.0'.\n  \n  Use `search` instead.\n    warnings.warn(message, FutureWarning)\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\ntest profile: core scope (native excluded)\n=========================== short test summary info ============================\nFAILED tests/llm_eval/test_lighteval_runtime.py::test_real_readonly_local_source_ignores_old_responses[same]\n1 failed, 1 warning in 14.88s\n"
+        },
+        "raw_junit": {
+          "path": "/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/injected-failure/run-1.xml",
+          "sha256": "d97409645af7c9b29ce9b0e80a43fac04d8141dfb53cbd21e2ebfe0f7ab77d78",
+          "bytes": 6046,
+          "raw": "<?xml version=\"1.0\" encoding=\"utf-8\"?><testsuites name=\"pytest tests\"><testsuite name=\"pytest\" errors=\"0\" failures=\"1\" skipped=\"0\" tests=\"1\" time=\"14.878\" timestamp=\"2026-10-03T18:41:29.798837-04:00\" hostname=\"miami.csl.utoronto.ca\"><testcase classname=\"tests.llm_eval.test_lighteval_runtime\" name=\"test_real_readonly_local_source_ignores_old_responses[same]\" file=\"tests/llm_eval/test_lighteval_runtime.py\" line=\"342\" time=\"14.840\"><properties><property name=\"actual_readonly_source\" value=\"{&quot;tokenizer_source&quot;: &quot;same&quot;, &quot;seeded_response_text&quot;: [[&quot;A&quot;], [&quot;A&quot;], [&quot;A&quot;]], &quot;result&quot;: {&quot;evaluator&quot;: &quot;lighteval&quot;, &quot;primary_metric&quot;: &quot;ifeval_avg&quot;, &quot;metrics&quot;: {&quot;ifeval_avg&quot;: 0.3333333333333333, &quot;hellaswag&quot;: 0.3333333333333333, &quot;arc_easy&quot;: 0.3333333333333333, &quot;arc_challenge&quot;: 0.3333333333333333, &quot;piqa&quot;: 0.3333333333333333, &quot;arc_avg&quot;: 0.3333333333333333}, &quot;higher_is_better&quot;: {&quot;ifeval_avg&quot;: true, &quot;hellaswag&quot;: true, &quot;arc_easy&quot;: true, &quot;arc_challenge&quot;: true, &quot;piqa&quot;: true, &quot;arc_avg&quot;: true}, &quot;metadata&quot;: {&quot;preset&quot;: &quot;smollm_round_fast&quot;, &quot;tasks&quot;: [&quot;ifeval&quot;, &quot;hellaswag&quot;, &quot;arc_easy&quot;, &quot;arc_challenge&quot;, &quot;piqa&quot;], &quot;backend&quot;: &quot;transformers&quot;, &quot;raw_metrics&quot;: {&quot;piqa_hf:0&quot;: {&quot;em&quot;: 0.3333333333333333, &quot;em_stderr&quot;: 0.33333333333333337}, &quot;hellaswag:0&quot;: {&quot;em&quot;: 0.3333333333333333, &quot;em_stderr&quot;: 0.33333333333333337}, &quot;ifeval:0&quot;: {&quot;prompt_level_strict_acc&quot;: 0.3333333333333333, &quot;prompt_level_strict_acc_stderr&quot;: 0.33333333333333337, &quot;inst_level_strict_acc&quot;: 0.3333333333333333, &quot;inst_level_strict_acc_stderr&quot;: 0.008657241865953338, &quot;prompt_level_loose_acc&quot;: 0.3333333333333333, &quot;prompt_level_loose_acc_stderr&quot;: 0.33333333333333337, &quot;inst_level_loose_acc&quot;: 0.3333333333333333, &quot;inst_level_loose_acc_stderr&quot;: 0.008657241865953338}, &quot;arc:challenge:0&quot;: {&quot;acc&quot;: 0.3333333333333333, &quot;acc_stderr&quot;: 0.33333333333333337}, &quot;arc:easy:0&quot;: {&quot;acc&quot;: 0.3333333333333333, &quot;acc_stderr&quot;: 0.33333333333333337}, &quot;arc:_average:0&quot;: {&quot;acc&quot;: 0.3333333333333333, &quot;acc_stderr&quot;: 0.33333333333333337}, &quot;all&quot;: {&quot;em&quot;: 0.3333333333333333, &quot;em_stderr&quot;: 0.33333333333333337, &quot;prompt_level_strict_acc&quot;: 0.3333333333333333, &quot;prompt_level_strict_acc_stderr&quot;: 0.33333333333333337, &quot;inst_level_strict_acc&quot;: 0.3333333333333333, &quot;inst_level_strict_acc_stderr&quot;: 0.008657241865953338, &quot;prompt_level_loose_acc&quot;: 0.3333333333333333, &quot;prompt_level_loose_acc_stderr&quot;: 0.33333333333333337, &quot;inst_level_loose_acc&quot;: 0.3333333333333333, &quot;inst_level_loose_acc_stderr&quot;: 0.008657241865953338, &quot;acc&quot;: 0.3333333333333333, &quot;acc_stderr&quot;: 0.33333333333333337}}}, &quot;artifacts&quot;: {}, &quot;primary_value&quot;: 0.3333333333333333}, &quot;source_tree&quot;: {&quot;.&quot;: {&quot;mode&quot;: 365}, &quot;71107784a816a1c5&quot;: {&quot;mode&quot;: 365}, &quot;71107784a816a1c5/piqa_hf|0&quot;: {&quot;mode&quot;: 365}, &quot;71107784a816a1c5/piqa_hf|0/3f6ca5bfbb68e0c3&quot;: {&quot;mode&quot;: 365}, &quot;71107784a816a1c5/piqa_hf|0/3f6ca5bfbb68e0c3/GENERATIVE.parquet&quot;: {&quot;mode&quot;: 292, &quot;sha256&quot;: &quot;f44f6514f53237bfc86d3c3acdbb2fa2482e5c3ea0dc9d367289e8a47fd38943&quot;}, &quot;config.json&quot;: {&quot;mode&quot;: 292, &quot;sha256&quot;: &quot;86ad7dcc5c7c0a52e134d070f69b1292677668a318961d26ac334e8059add554&quot;}, &quot;generation_config.json&quot;: {&quot;mode&quot;: 292, &quot;sha256&quot;: &quot;522c5cb32c4538f70090791d3ee0720e2c108d4eb76127652bf5dd1347bbde19&quot;}, &quot;model.safetensors&quot;: {&quot;mode&quot;: 493, &quot;link&quot;: &quot;/private/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/injected-failure/basetemp/test_real_readonly_local_sourc0/model-blob.safetensors&quot;}, &quot;nested&quot;: {&quot;mode&quot;: 365}, &quot;nested/preserved.txt&quot;: {&quot;mode&quot;: 292, &quot;sha256&quot;: &quot;a0f39e1ce2ab5ae310c043e86dc76b5c1d0af52be210a5da90b7c6f59f24917c&quot;}, &quot;tokenizer.json&quot;: {&quot;mode&quot;: 292, &quot;sha256&quot;: &quot;7a5b652c806adc9560bf9ddb3ee5a95832f92ba20956a944055df998e698639c&quot;}, &quot;tokenizer_config.json&quot;: {&quot;mode&quot;: 292, &quot;sha256&quot;: &quot;36070e1bdd3081a044aaecc7843ca58b82771a9e0737542f954e45545de49d78&quot;}}, &quot;source_unchanged&quot;: true, &quot;readonly_permission_enforced&quot;: true, &quot;owned_copies_and_cache_removed&quot;: true}\" /><property name=\"readonly_fixture_permissions_restored\" value=\"12\" /></properties><failure message=\"RuntimeError: LR1 injected test-call failure after all real source-immutability assertions\">item = &lt;Function test_real_readonly_local_source_ignores_old_responses[same]&gt;\n\n    @pytest.hookimpl(wrapper=True)\n    def pytest_runtest_call(item):\n        result = yield\n        if item.nodeid.endswith(\"test_real_readonly_local_source_ignores_old_responses[same]\"):\n            fixture = item.funcargs[\"tmp_path\"]\n            assert stat.S_IMODE((fixture / \"persistent-model\").stat().st_mode) == 0o555\n            assert stat.S_IMODE((fixture / \"model-blob.safetensors\").stat().st_mode) == 0o444\n&gt;           raise RuntimeError(\"LR1 injected test-call failure after all real source-immutability assertions\")\nE           RuntimeError: LR1 injected test-call failure after all real source-immutability assertions\n\n/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/plato_lr1_failure_probe.py:11: RuntimeError</failure></testcase></testsuite></testsuites>"
+        },
+        "junit_cases": [
+          {
+            "name": "test_real_readonly_local_source_ignores_old_responses[same]",
+            "outcome": "failed",
+            "seconds": 14.84,
+            "properties": {
+              "actual_readonly_source": {
+                "tokenizer_source": "same",
+                "seeded_response_text": [
+                  [
+                    "A"
+                  ],
+                  [
+                    "A"
+                  ],
+                  [
+                    "A"
+                  ]
+                ],
+                "result": {
+                  "evaluator": "lighteval",
+                  "primary_metric": "ifeval_avg",
+                  "metrics": {
+                    "ifeval_avg": 0.3333333333333333,
+                    "hellaswag": 0.3333333333333333,
+                    "arc_easy": 0.3333333333333333,
+                    "arc_challenge": 0.3333333333333333,
+                    "piqa": 0.3333333333333333,
+                    "arc_avg": 0.3333333333333333
+                  },
+                  "higher_is_better": {
+                    "ifeval_avg": true,
+                    "hellaswag": true,
+                    "arc_easy": true,
+                    "arc_challenge": true,
+                    "piqa": true,
+                    "arc_avg": true
+                  },
+                  "metadata": {
+                    "preset": "smollm_round_fast",
+                    "tasks": [
+                      "ifeval",
+                      "hellaswag",
+                      "arc_easy",
+                      "arc_challenge",
+                      "piqa"
+                    ],
+                    "backend": "transformers",
+                    "raw_metrics": {
+                      "piqa_hf:0": {
+                        "em": 0.3333333333333333,
+                        "em_stderr": 0.33333333333333337
+                      },
+                      "hellaswag:0": {
+                        "em": 0.3333333333333333,
+                        "em_stderr": 0.33333333333333337
+                      },
+                      "ifeval:0": {
+                        "prompt_level_strict_acc": 0.3333333333333333,
+                        "prompt_level_strict_acc_stderr": 0.33333333333333337,
+                        "inst_level_strict_acc": 0.3333333333333333,
+                        "inst_level_strict_acc_stderr": 0.008657241865953338,
+                        "prompt_level_loose_acc": 0.3333333333333333,
+                        "prompt_level_loose_acc_stderr": 0.33333333333333337,
+                        "inst_level_loose_acc": 0.3333333333333333,
+                        "inst_level_loose_acc_stderr": 0.008657241865953338
+                      },
+                      "arc:challenge:0": {
+                        "acc": 0.3333333333333333,
+                        "acc_stderr": 0.33333333333333337
+                      },
+                      "arc:easy:0": {
+                        "acc": 0.3333333333333333,
+                        "acc_stderr": 0.33333333333333337
+                      },
+                      "arc:_average:0": {
+                        "acc": 0.3333333333333333,
+                        "acc_stderr": 0.33333333333333337
+                      },
+                      "all": {
+                        "em": 0.3333333333333333,
+                        "em_stderr": 0.33333333333333337,
+                        "prompt_level_strict_acc": 0.3333333333333333,
+                        "prompt_level_strict_acc_stderr": 0.33333333333333337,
+                        "inst_level_strict_acc": 0.3333333333333333,
+                        "inst_level_strict_acc_stderr": 0.008657241865953338,
+                        "prompt_level_loose_acc": 0.3333333333333333,
+                        "prompt_level_loose_acc_stderr": 0.33333333333333337,
+                        "inst_level_loose_acc": 0.3333333333333333,
+                        "inst_level_loose_acc_stderr": 0.008657241865953338,
+                        "acc": 0.3333333333333333,
+                        "acc_stderr": 0.33333333333333337
+                      }
+                    }
+                  },
+                  "artifacts": {},
+                  "primary_value": 0.3333333333333333
+                },
+                "source_tree": {
+                  ".": {
+                    "mode": 365
+                  },
+                  "71107784a816a1c5": {
+                    "mode": 365
+                  },
+                  "71107784a816a1c5/piqa_hf|0": {
+                    "mode": 365
+                  },
+                  "71107784a816a1c5/piqa_hf|0/3f6ca5bfbb68e0c3": {
+                    "mode": 365
+                  },
+                  "71107784a816a1c5/piqa_hf|0/3f6ca5bfbb68e0c3/GENERATIVE.parquet": {
+                    "mode": 292,
+                    "sha256": "f44f6514f53237bfc86d3c3acdbb2fa2482e5c3ea0dc9d367289e8a47fd38943"
+                  },
+                  "config.json": {
+                    "mode": 292,
+                    "sha256": "86ad7dcc5c7c0a52e134d070f69b1292677668a318961d26ac334e8059add554"
+                  },
+                  "generation_config.json": {
+                    "mode": 292,
+                    "sha256": "522c5cb32c4538f70090791d3ee0720e2c108d4eb76127652bf5dd1347bbde19"
+                  },
+                  "model.safetensors": {
+                    "mode": 493,
+                    "link": "/private/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/injected-failure/basetemp/test_real_readonly_local_sourc0/model-blob.safetensors"
+                  },
+                  "nested": {
+                    "mode": 365
+                  },
+                  "nested/preserved.txt": {
+                    "mode": 292,
+                    "sha256": "a0f39e1ce2ab5ae310c043e86dc76b5c1d0af52be210a5da90b7c6f59f24917c"
+                  },
+                  "tokenizer.json": {
+                    "mode": 292,
+                    "sha256": "7a5b652c806adc9560bf9ddb3ee5a95832f92ba20956a944055df998e698639c"
+                  },
+                  "tokenizer_config.json": {
+                    "mode": 292,
+                    "sha256": "36070e1bdd3081a044aaecc7843ca58b82771a9e0737542f954e45545de49d78"
+                  }
+                },
+                "source_unchanged": true,
+                "readonly_permission_enforced": true,
+                "owned_copies_and_cache_removed": true
+              },
+              "readonly_fixture_permissions_restored": 12
+            }
+          }
+        ]
+      },
+      {
+        "phase": "injected-failure",
+        "command": [
+          "/private/tmp/plato-refresh-worktrees/lighteval-runtime/.venv/bin/python",
+          "-m",
+          "pytest",
+          "tests/llm_eval/test_lighteval_runtime.py::test_real_readonly_local_source_ignores_old_responses[same]",
+          "-q",
+          "-o",
+          "junit_family=legacy",
+          "--basetemp",
+          "/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/injected-failure/basetemp",
+          "--junitxml",
+          "/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/injected-failure/run-2.xml"
+        ],
+        "returncode": 0,
+        "expected_returncode": 0,
+        "deadline_hit": false,
+        "deadline_seconds": 180,
+        "elapsed_seconds": 22.8279513749294,
+        "log": "/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/injected-failure/run-2.log",
+        "xml": "/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/injected-failure/run-2.xml",
+        "restored_source_modes": {
+          "test_real_readonly_local_sourc0/persistent-model": 493,
+          "test_real_readonly_local_sourc0/persistent-model/tokenizer_config.json": 420,
+          "test_real_readonly_local_sourc0/persistent-model/config.json": 420,
+          "test_real_readonly_local_sourc0/persistent-model/tokenizer.json": 420,
+          "test_real_readonly_local_sourc0/persistent-model/71107784a816a1c5": 493,
+          "test_real_readonly_local_sourc0/persistent-model/generation_config.json": 420,
+          "test_real_readonly_local_sourc0/persistent-model/nested": 493,
+          "test_real_readonly_local_sourc0/persistent-model/71107784a816a1c5/piqa_hf|0": 493,
+          "test_real_readonly_local_sourc0/persistent-model/nested/preserved.txt": 420,
+          "test_real_readonly_local_sourc0/persistent-model/71107784a816a1c5/piqa_hf|0/3f6ca5bfbb68e0c3": 493,
+          "test_real_readonly_local_sourc0/persistent-model/71107784a816a1c5/piqa_hf|0/3f6ca5bfbb68e0c3/GENERATIVE.parquet": 420,
+          "test_real_readonly_local_sourc0/model-blob.safetensors": 384
+        },
+        "test_properties": [
+          {
+            "name": "test_real_readonly_local_source_ignores_old_responses[same]",
+            "raw_properties": {
+              "actual_readonly_source": "{\"tokenizer_source\": \"same\", \"seeded_response_text\": [[\"A\"], [\"A\"], [\"A\"]], \"result\": {\"evaluator\": \"lighteval\", \"primary_metric\": \"ifeval_avg\", \"metrics\": {\"ifeval_avg\": 0.3333333333333333, \"hellaswag\": 0.3333333333333333, \"arc_easy\": 0.3333333333333333, \"arc_challenge\": 0.3333333333333333, \"piqa\": 0.3333333333333333, \"arc_avg\": 0.3333333333333333}, \"higher_is_better\": {\"ifeval_avg\": true, \"hellaswag\": true, \"arc_easy\": true, \"arc_challenge\": true, \"piqa\": true, \"arc_avg\": true}, \"metadata\": {\"preset\": \"smollm_round_fast\", \"tasks\": [\"ifeval\", \"hellaswag\", \"arc_easy\", \"arc_challenge\", \"piqa\"], \"backend\": \"transformers\", \"raw_metrics\": {\"arc:challenge:0\": {\"acc\": 0.3333333333333333, \"acc_stderr\": 0.33333333333333337}, \"arc:easy:0\": {\"acc\": 0.3333333333333333, \"acc_stderr\": 0.33333333333333337}, \"piqa_hf:0\": {\"em\": 0.3333333333333333, \"em_stderr\": 0.33333333333333337}, \"ifeval:0\": {\"prompt_level_strict_acc\": 0.3333333333333333, \"prompt_level_strict_acc_stderr\": 0.33333333333333337, \"inst_level_strict_acc\": 0.3333333333333333, \"inst_level_strict_acc_stderr\": 0.008657241865953338, \"prompt_level_loose_acc\": 0.3333333333333333, \"prompt_level_loose_acc_stderr\": 0.33333333333333337, \"inst_level_loose_acc\": 0.3333333333333333, \"inst_level_loose_acc_stderr\": 0.008657241865953338}, \"hellaswag:0\": {\"em\": 0.3333333333333333, \"em_stderr\": 0.33333333333333337}, \"arc:_average:0\": {\"acc\": 0.3333333333333333, \"acc_stderr\": 0.33333333333333337}, \"all\": {\"acc\": 0.3333333333333333, \"acc_stderr\": 0.33333333333333337, \"em\": 0.3333333333333333, \"em_stderr\": 0.33333333333333337, \"prompt_level_strict_acc\": 0.3333333333333333, \"prompt_level_strict_acc_stderr\": 0.33333333333333337, \"inst_level_strict_acc\": 0.3333333333333333, \"inst_level_strict_acc_stderr\": 0.008657241865953338, \"prompt_level_loose_acc\": 0.3333333333333333, \"prompt_level_loose_acc_stderr\": 0.33333333333333337, \"inst_level_loose_acc\": 0.3333333333333333, \"inst_level_loose_acc_stderr\": 0.008657241865953338}}}, \"artifacts\": {}, \"primary_value\": 0.3333333333333333}, \"source_tree\": {\".\": {\"mode\": 365}, \"71107784a816a1c5\": {\"mode\": 365}, \"71107784a816a1c5/piqa_hf|0\": {\"mode\": 365}, \"71107784a816a1c5/piqa_hf|0/3f6ca5bfbb68e0c3\": {\"mode\": 365}, \"71107784a816a1c5/piqa_hf|0/3f6ca5bfbb68e0c3/GENERATIVE.parquet\": {\"mode\": 292, \"sha256\": \"f44f6514f53237bfc86d3c3acdbb2fa2482e5c3ea0dc9d367289e8a47fd38943\"}, \"config.json\": {\"mode\": 292, \"sha256\": \"86ad7dcc5c7c0a52e134d070f69b1292677668a318961d26ac334e8059add554\"}, \"generation_config.json\": {\"mode\": 292, \"sha256\": \"522c5cb32c4538f70090791d3ee0720e2c108d4eb76127652bf5dd1347bbde19\"}, \"model.safetensors\": {\"mode\": 493, \"link\": \"/private/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/injected-failure/basetemp/test_real_readonly_local_sourc0/model-blob.safetensors\"}, \"nested\": {\"mode\": 365}, \"nested/preserved.txt\": {\"mode\": 292, \"sha256\": \"a0f39e1ce2ab5ae310c043e86dc76b5c1d0af52be210a5da90b7c6f59f24917c\"}, \"tokenizer.json\": {\"mode\": 292, \"sha256\": \"7a5b652c806adc9560bf9ddb3ee5a95832f92ba20956a944055df998e698639c\"}, \"tokenizer_config.json\": {\"mode\": 292, \"sha256\": \"36070e1bdd3081a044aaecc7843ca58b82771a9e0737542f954e45545de49d78\"}}, \"source_unchanged\": true, \"readonly_permission_enforced\": true, \"owned_copies_and_cache_removed\": true}",
+              "readonly_fixture_permissions_restored": "12"
+            }
+          }
+        ],
+        "raw_log": {
+          "path": "/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/injected-failure/run-2.log",
+          "sha256": "72e8868fffebff26aebb45c9c5b2d92b13c85fc87d9c4490b138244d64203895",
+          "bytes": 728,
+          "raw": ".                                                                        [100%]\n=============================== warnings summary ===============================\ntests/llm_eval/test_lighteval_runtime.py::test_real_readonly_local_source_ignores_old_responses[same]\n  /private/tmp/plato-refresh-worktrees/lighteval-runtime/.venv/lib/python3.13/site-packages/huggingface_hub/utils/_deprecation.py:100: FutureWarning: Deprecated argument(s) used in 'list_models': model_name. Will not be supported from version '2.0'.\n  \n  Use `search` instead.\n    warnings.warn(message, FutureWarning)\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\ntest profile: core scope (native excluded)\n1 passed, 1 warning in 16.95s\n"
+        },
+        "raw_junit": {
+          "path": "/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/injected-failure/run-2.xml",
+          "sha256": "b786f09dd52921e83e4ba135c81fa4c663d66268c4aee6f2ee7d86fd1776462b",
+          "bytes": 5083,
+          "raw": "<?xml version=\"1.0\" encoding=\"utf-8\"?><testsuites name=\"pytest tests\"><testsuite name=\"pytest\" errors=\"0\" failures=\"0\" skipped=\"0\" tests=\"1\" time=\"16.953\" timestamp=\"2026-10-03T18:41:50.012321-04:00\" hostname=\"miami.csl.utoronto.ca\"><testcase classname=\"tests.llm_eval.test_lighteval_runtime\" name=\"test_real_readonly_local_source_ignores_old_responses[same]\" file=\"tests/llm_eval/test_lighteval_runtime.py\" line=\"342\" time=\"16.915\"><properties><property name=\"actual_readonly_source\" value=\"{&quot;tokenizer_source&quot;: &quot;same&quot;, &quot;seeded_response_text&quot;: [[&quot;A&quot;], [&quot;A&quot;], [&quot;A&quot;]], &quot;result&quot;: {&quot;evaluator&quot;: &quot;lighteval&quot;, &quot;primary_metric&quot;: &quot;ifeval_avg&quot;, &quot;metrics&quot;: {&quot;ifeval_avg&quot;: 0.3333333333333333, &quot;hellaswag&quot;: 0.3333333333333333, &quot;arc_easy&quot;: 0.3333333333333333, &quot;arc_challenge&quot;: 0.3333333333333333, &quot;piqa&quot;: 0.3333333333333333, &quot;arc_avg&quot;: 0.3333333333333333}, &quot;higher_is_better&quot;: {&quot;ifeval_avg&quot;: true, &quot;hellaswag&quot;: true, &quot;arc_easy&quot;: true, &quot;arc_challenge&quot;: true, &quot;piqa&quot;: true, &quot;arc_avg&quot;: true}, &quot;metadata&quot;: {&quot;preset&quot;: &quot;smollm_round_fast&quot;, &quot;tasks&quot;: [&quot;ifeval&quot;, &quot;hellaswag&quot;, &quot;arc_easy&quot;, &quot;arc_challenge&quot;, &quot;piqa&quot;], &quot;backend&quot;: &quot;transformers&quot;, &quot;raw_metrics&quot;: {&quot;arc:challenge:0&quot;: {&quot;acc&quot;: 0.3333333333333333, &quot;acc_stderr&quot;: 0.33333333333333337}, &quot;arc:easy:0&quot;: {&quot;acc&quot;: 0.3333333333333333, &quot;acc_stderr&quot;: 0.33333333333333337}, &quot;piqa_hf:0&quot;: {&quot;em&quot;: 0.3333333333333333, &quot;em_stderr&quot;: 0.33333333333333337}, &quot;ifeval:0&quot;: {&quot;prompt_level_strict_acc&quot;: 0.3333333333333333, &quot;prompt_level_strict_acc_stderr&quot;: 0.33333333333333337, &quot;inst_level_strict_acc&quot;: 0.3333333333333333, &quot;inst_level_strict_acc_stderr&quot;: 0.008657241865953338, &quot;prompt_level_loose_acc&quot;: 0.3333333333333333, &quot;prompt_level_loose_acc_stderr&quot;: 0.33333333333333337, &quot;inst_level_loose_acc&quot;: 0.3333333333333333, &quot;inst_level_loose_acc_stderr&quot;: 0.008657241865953338}, &quot;hellaswag:0&quot;: {&quot;em&quot;: 0.3333333333333333, &quot;em_stderr&quot;: 0.33333333333333337}, &quot;arc:_average:0&quot;: {&quot;acc&quot;: 0.3333333333333333, &quot;acc_stderr&quot;: 0.33333333333333337}, &quot;all&quot;: {&quot;acc&quot;: 0.3333333333333333, &quot;acc_stderr&quot;: 0.33333333333333337, &quot;em&quot;: 0.3333333333333333, &quot;em_stderr&quot;: 0.33333333333333337, &quot;prompt_level_strict_acc&quot;: 0.3333333333333333, &quot;prompt_level_strict_acc_stderr&quot;: 0.33333333333333337, &quot;inst_level_strict_acc&quot;: 0.3333333333333333, &quot;inst_level_strict_acc_stderr&quot;: 0.008657241865953338, &quot;prompt_level_loose_acc&quot;: 0.3333333333333333, &quot;prompt_level_loose_acc_stderr&quot;: 0.33333333333333337, &quot;inst_level_loose_acc&quot;: 0.3333333333333333, &quot;inst_level_loose_acc_stderr&quot;: 0.008657241865953338}}}, &quot;artifacts&quot;: {}, &quot;primary_value&quot;: 0.3333333333333333}, &quot;source_tree&quot;: {&quot;.&quot;: {&quot;mode&quot;: 365}, &quot;71107784a816a1c5&quot;: {&quot;mode&quot;: 365}, &quot;71107784a816a1c5/piqa_hf|0&quot;: {&quot;mode&quot;: 365}, &quot;71107784a816a1c5/piqa_hf|0/3f6ca5bfbb68e0c3&quot;: {&quot;mode&quot;: 365}, &quot;71107784a816a1c5/piqa_hf|0/3f6ca5bfbb68e0c3/GENERATIVE.parquet&quot;: {&quot;mode&quot;: 292, &quot;sha256&quot;: &quot;f44f6514f53237bfc86d3c3acdbb2fa2482e5c3ea0dc9d367289e8a47fd38943&quot;}, &quot;config.json&quot;: {&quot;mode&quot;: 292, &quot;sha256&quot;: &quot;86ad7dcc5c7c0a52e134d070f69b1292677668a318961d26ac334e8059add554&quot;}, &quot;generation_config.json&quot;: {&quot;mode&quot;: 292, &quot;sha256&quot;: &quot;522c5cb32c4538f70090791d3ee0720e2c108d4eb76127652bf5dd1347bbde19&quot;}, &quot;model.safetensors&quot;: {&quot;mode&quot;: 493, &quot;link&quot;: &quot;/private/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/injected-failure/basetemp/test_real_readonly_local_sourc0/model-blob.safetensors&quot;}, &quot;nested&quot;: {&quot;mode&quot;: 365}, &quot;nested/preserved.txt&quot;: {&quot;mode&quot;: 292, &quot;sha256&quot;: &quot;a0f39e1ce2ab5ae310c043e86dc76b5c1d0af52be210a5da90b7c6f59f24917c&quot;}, &quot;tokenizer.json&quot;: {&quot;mode&quot;: 292, &quot;sha256&quot;: &quot;7a5b652c806adc9560bf9ddb3ee5a95832f92ba20956a944055df998e698639c&quot;}, &quot;tokenizer_config.json&quot;: {&quot;mode&quot;: 292, &quot;sha256&quot;: &quot;36070e1bdd3081a044aaecc7843ca58b82771a9e0737542f954e45545de49d78&quot;}}, &quot;source_unchanged&quot;: true, &quot;readonly_permission_enforced&quot;: true, &quot;owned_copies_and_cache_removed&quot;: true}\" /><property name=\"readonly_fixture_permissions_restored\" value=\"12\" /></properties></testcase></testsuite></testsuites>"
+        },
+        "junit_cases": [
+          {
+            "name": "test_real_readonly_local_source_ignores_old_responses[same]",
+            "outcome": "passed",
+            "seconds": 16.915,
+            "properties": {
+              "actual_readonly_source": {
+                "tokenizer_source": "same",
+                "seeded_response_text": [
+                  [
+                    "A"
+                  ],
+                  [
+                    "A"
+                  ],
+                  [
+                    "A"
+                  ]
+                ],
+                "result": {
+                  "evaluator": "lighteval",
+                  "primary_metric": "ifeval_avg",
+                  "metrics": {
+                    "ifeval_avg": 0.3333333333333333,
+                    "hellaswag": 0.3333333333333333,
+                    "arc_easy": 0.3333333333333333,
+                    "arc_challenge": 0.3333333333333333,
+                    "piqa": 0.3333333333333333,
+                    "arc_avg": 0.3333333333333333
+                  },
+                  "higher_is_better": {
+                    "ifeval_avg": true,
+                    "hellaswag": true,
+                    "arc_easy": true,
+                    "arc_challenge": true,
+                    "piqa": true,
+                    "arc_avg": true
+                  },
+                  "metadata": {
+                    "preset": "smollm_round_fast",
+                    "tasks": [
+                      "ifeval",
+                      "hellaswag",
+                      "arc_easy",
+                      "arc_challenge",
+                      "piqa"
+                    ],
+                    "backend": "transformers",
+                    "raw_metrics": {
+                      "arc:challenge:0": {
+                        "acc": 0.3333333333333333,
+                        "acc_stderr": 0.33333333333333337
+                      },
+                      "arc:easy:0": {
+                        "acc": 0.3333333333333333,
+                        "acc_stderr": 0.33333333333333337
+                      },
+                      "piqa_hf:0": {
+                        "em": 0.3333333333333333,
+                        "em_stderr": 0.33333333333333337
+                      },
+                      "ifeval:0": {
+                        "prompt_level_strict_acc": 0.3333333333333333,
+                        "prompt_level_strict_acc_stderr": 0.33333333333333337,
+                        "inst_level_strict_acc": 0.3333333333333333,
+                        "inst_level_strict_acc_stderr": 0.008657241865953338,
+                        "prompt_level_loose_acc": 0.3333333333333333,
+                        "prompt_level_loose_acc_stderr": 0.33333333333333337,
+                        "inst_level_loose_acc": 0.3333333333333333,
+                        "inst_level_loose_acc_stderr": 0.008657241865953338
+                      },
+                      "hellaswag:0": {
+                        "em": 0.3333333333333333,
+                        "em_stderr": 0.33333333333333337
+                      },
+                      "arc:_average:0": {
+                        "acc": 0.3333333333333333,
+                        "acc_stderr": 0.33333333333333337
+                      },
+                      "all": {
+                        "acc": 0.3333333333333333,
+                        "acc_stderr": 0.33333333333333337,
+                        "em": 0.3333333333333333,
+                        "em_stderr": 0.33333333333333337,
+                        "prompt_level_strict_acc": 0.3333333333333333,
+                        "prompt_level_strict_acc_stderr": 0.33333333333333337,
+                        "inst_level_strict_acc": 0.3333333333333333,
+                        "inst_level_strict_acc_stderr": 0.008657241865953338,
+                        "prompt_level_loose_acc": 0.3333333333333333,
+                        "prompt_level_loose_acc_stderr": 0.33333333333333337,
+                        "inst_level_loose_acc": 0.3333333333333333,
+                        "inst_level_loose_acc_stderr": 0.008657241865953338
+                      }
+                    }
+                  },
+                  "artifacts": {},
+                  "primary_value": 0.3333333333333333
+                },
+                "source_tree": {
+                  ".": {
+                    "mode": 365
+                  },
+                  "71107784a816a1c5": {
+                    "mode": 365
+                  },
+                  "71107784a816a1c5/piqa_hf|0": {
+                    "mode": 365
+                  },
+                  "71107784a816a1c5/piqa_hf|0/3f6ca5bfbb68e0c3": {
+                    "mode": 365
+                  },
+                  "71107784a816a1c5/piqa_hf|0/3f6ca5bfbb68e0c3/GENERATIVE.parquet": {
+                    "mode": 292,
+                    "sha256": "f44f6514f53237bfc86d3c3acdbb2fa2482e5c3ea0dc9d367289e8a47fd38943"
+                  },
+                  "config.json": {
+                    "mode": 292,
+                    "sha256": "86ad7dcc5c7c0a52e134d070f69b1292677668a318961d26ac334e8059add554"
+                  },
+                  "generation_config.json": {
+                    "mode": 292,
+                    "sha256": "522c5cb32c4538f70090791d3ee0720e2c108d4eb76127652bf5dd1347bbde19"
+                  },
+                  "model.safetensors": {
+                    "mode": 493,
+                    "link": "/private/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/injected-failure/basetemp/test_real_readonly_local_sourc0/model-blob.safetensors"
+                  },
+                  "nested": {
+                    "mode": 365
+                  },
+                  "nested/preserved.txt": {
+                    "mode": 292,
+                    "sha256": "a0f39e1ce2ab5ae310c043e86dc76b5c1d0af52be210a5da90b7c6f59f24917c"
+                  },
+                  "tokenizer.json": {
+                    "mode": 292,
+                    "sha256": "7a5b652c806adc9560bf9ddb3ee5a95832f92ba20956a944055df998e698639c"
+                  },
+                  "tokenizer_config.json": {
+                    "mode": 292,
+                    "sha256": "36070e1bdd3081a044aaecc7843ca58b82771a9e0737542f954e45545de49d78"
+                  }
+                },
+                "source_unchanged": true,
+                "readonly_permission_enforced": true,
+                "owned_copies_and_cache_removed": true
+              },
+              "readonly_fixture_permissions_restored": 12
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "green_interpretation": "After frozen fixture-only fix, both unchanged readonly runtime cases pass twice with the same explicit basetemp. All source_unchanged/PermissionError/555source-root/1/3realmetrics/owned-evaluator-cleanup oracles pass before teardown. Then a separate external hook raises an intentional test-call error AFTER one real readonly case completed all assertions and verifies sources are STILL555/444 at that point; fixture teardown nonetheless restores modes, and the next same-node run on the same basetemp passes. No pytest rm_rf or PytestWarning cleanup messages occur in any of the four fixed-source invocations.",
+  "failure_probe": {
+    "plugin": {
+      "path": "/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/plato_lr1_failure_probe.py",
+      "sha256": "fb46fe4aa353dcab9fa8428bd404a8fefbedb347a5d571a46e60b2c59fff55b7",
+      "bytes": 543,
+      "raw": "import stat\nimport pytest\n\n@pytest.hookimpl(wrapper=True)\ndef pytest_runtest_call(item):\n    result = yield\n    if item.nodeid.endswith(\"test_real_readonly_local_source_ignores_old_responses[same]\"):\n        fixture = item.funcargs[\"tmp_path\"]\n        assert stat.S_IMODE((fixture / \"persistent-model\").stat().st_mode) == 0o555\n        assert stat.S_IMODE((fixture / \"model-blob.safetensors\").stat().st_mode) == 0o444\n        raise RuntimeError(\"LR1 injected test-call failure after all real source-immutability assertions\")\n    return result\n"
+    },
+    "classification": "Injected test-call failure after genuine Pipeline inference and all existing assertions, not an upstream/production failure or additional collected runtime node. Expected pytest exit1 is deliberate and followed by a passing reused-basetemp invocation."
+  },
+  "runtime_inventory": {
+    "source_commit": "52b7ecdf063fd0827ceae05b068e2c55c79aae08",
+    "command": [
+      "/private/tmp/plato-refresh-worktrees/lighteval-runtime/.venv/bin/python",
+      "-m",
+      "pytest",
+      "tests/llm_eval",
+      "--collect-only",
+      "-q"
+    ],
+    "returncode": 0,
+    "node_count": 11,
+    "runtime_nodes": [
+      "tests/llm_eval/test_lighteval_runtime.py::test_real_preset_pipeline_normalizes_metrics_and_refreshes_exports[current-model]",
+      "tests/llm_eval/test_lighteval_runtime.py::test_real_preset_pipeline_normalizes_metrics_and_refreshes_exports[configured-local]",
+      "tests/llm_eval/test_lighteval_runtime.py::test_real_piqa_prompt_and_preset_task_contract",
+      "tests/llm_eval/test_lighteval_runtime.py::test_real_model_config_failure_clears_stale_results_and_exports[False]",
+      "tests/llm_eval/test_lighteval_runtime.py::test_real_model_config_failure_clears_stale_results_and_exports[True]",
+      "tests/llm_eval/test_lighteval_runtime.py::test_real_missing_primary_metric_is_rejected",
+      "tests/llm_eval/test_lighteval_runtime.py::test_real_readonly_local_source_ignores_old_responses[same]",
+      "tests/llm_eval/test_lighteval_runtime.py::test_real_readonly_local_source_ignores_old_responses[separate]",
+      "tests/llm_eval/test_lighteval_runtime.py::test_failure_after_actual_inference_cleans_local_copies[False]",
+      "tests/llm_eval/test_lighteval_runtime.py::test_failure_after_actual_inference_cleans_local_copies[True]",
+      "tests/llm_eval/test_lighteval_runtime.py::test_real_hub_style_response_cache_is_per_run"
+    ],
+    "nodes_identical_to_accepted_inventory": true,
+    "log": "/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/runtime-collection.log"
+  },
+  "runtime_inventory_artifact": {
+    "path": "/tmp/plato-lighteval-lr1-runtime-inventory.json",
+    "sha256": "c5c14566a7ed5f9cfb6d72ffe214629d983068b1ac083cd0d0731625388945cb",
+    "bytes": 1702,
+    "raw": "{\n  \"source_commit\": \"52b7ecdf063fd0827ceae05b068e2c55c79aae08\",\n  \"command\": [\n    \"/private/tmp/plato-refresh-worktrees/lighteval-runtime/.venv/bin/python\",\n    \"-m\",\n    \"pytest\",\n    \"tests/llm_eval\",\n    \"--collect-only\",\n    \"-q\"\n  ],\n  \"returncode\": 0,\n  \"node_count\": 11,\n  \"runtime_nodes\": [\n    \"tests/llm_eval/test_lighteval_runtime.py::test_real_preset_pipeline_normalizes_metrics_and_refreshes_exports[current-model]\",\n    \"tests/llm_eval/test_lighteval_runtime.py::test_real_preset_pipeline_normalizes_metrics_and_refreshes_exports[configured-local]\",\n    \"tests/llm_eval/test_lighteval_runtime.py::test_real_piqa_prompt_and_preset_task_contract\",\n    \"tests/llm_eval/test_lighteval_runtime.py::test_real_model_config_failure_clears_stale_results_and_exports[False]\",\n    \"tests/llm_eval/test_lighteval_runtime.py::test_real_model_config_failure_clears_stale_results_and_exports[True]\",\n    \"tests/llm_eval/test_lighteval_runtime.py::test_real_missing_primary_metric_is_rejected\",\n    \"tests/llm_eval/test_lighteval_runtime.py::test_real_readonly_local_source_ignores_old_responses[same]\",\n    \"tests/llm_eval/test_lighteval_runtime.py::test_real_readonly_local_source_ignores_old_responses[separate]\",\n    \"tests/llm_eval/test_lighteval_runtime.py::test_failure_after_actual_inference_cleans_local_copies[False]\",\n    \"tests/llm_eval/test_lighteval_runtime.py::test_failure_after_actual_inference_cleans_local_copies[True]\",\n    \"tests/llm_eval/test_lighteval_runtime.py::test_real_hub_style_response_cache_is_per_run\"\n  ],\n  \"nodes_identical_to_accepted_inventory\": true,\n  \"log\": \"/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/runtime-collection.log\"\n}\n"
+  },
+  "runtime_collection_log": {
+    "path": "/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/runtime-collection.log",
+    "sha256": "37b80df99634a3520324e84391376f78770f00378e5be0f3e07981dee336fb8e",
+    "bytes": 1229,
+    "raw": "tests/llm_eval/test_lighteval_runtime.py::test_real_preset_pipeline_normalizes_metrics_and_refreshes_exports[current-model]\ntests/llm_eval/test_lighteval_runtime.py::test_real_preset_pipeline_normalizes_metrics_and_refreshes_exports[configured-local]\ntests/llm_eval/test_lighteval_runtime.py::test_real_piqa_prompt_and_preset_task_contract\ntests/llm_eval/test_lighteval_runtime.py::test_real_model_config_failure_clears_stale_results_and_exports[False]\ntests/llm_eval/test_lighteval_runtime.py::test_real_model_config_failure_clears_stale_results_and_exports[True]\ntests/llm_eval/test_lighteval_runtime.py::test_real_missing_primary_metric_is_rejected\ntests/llm_eval/test_lighteval_runtime.py::test_real_readonly_local_source_ignores_old_responses[same]\ntests/llm_eval/test_lighteval_runtime.py::test_real_readonly_local_source_ignores_old_responses[separate]\ntests/llm_eval/test_lighteval_runtime.py::test_failure_after_actual_inference_cleans_local_copies[False]\ntests/llm_eval/test_lighteval_runtime.py::test_failure_after_actual_inference_cleans_local_copies[True]\ntests/llm_eval/test_lighteval_runtime.py::test_real_hub_style_response_cache_is_per_run\n\ntest profile: core scope (native excluded)\n11 tests collected in 0.05s\n"
+  },
+  "focused_checks": [
+    {
+      "name": "ruff_import_order",
+      "command": [
+        ".venv/bin/ruff",
+        "check",
+        "tests/llm_eval/test_lighteval_runtime.py",
+        "--select",
+        "I"
+      ],
+      "returncode": 0,
+      "log": "/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/ruff_import_order.log",
+      "raw_log": {
+        "path": "/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/ruff_import_order.log",
+        "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+        "bytes": 19,
+        "raw": "All checks passed!\n"
+      }
+    },
+    {
+      "name": "installed_scoped_ty",
+      "command": [
+        ".venv/bin/ty",
+        "check",
+        "plato/evaluators",
+        "tests/evaluators",
+        "tests/llm_eval"
+      ],
+      "returncode": 0,
+      "log": "/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/installed_scoped_ty.log",
+      "raw_log": {
+        "path": "/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/installed_scoped_ty.log",
+        "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+        "bytes": 19,
+        "raw": "All checks passed!\n"
+      }
+    },
+    {
+      "name": "core_scoped_ty",
+      "command": [
+        ".venv-core/bin/ty",
+        "check",
+        "plato/evaluators",
+        "tests/evaluators"
+      ],
+      "returncode": 0,
+      "log": "/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/core_scoped_ty.log",
+      "raw_log": {
+        "path": "/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/core_scoped_ty.log",
+        "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+        "bytes": 19,
+        "raw": "All checks passed!\n"
+      }
+    },
+    {
+      "name": "patch_whitespace",
+      "command": [
+        "git",
+        "diff",
+        "--check",
+        "c13a21a6e7a21fbac3b4450750fa940cbe27b8db",
+        "HEAD"
+      ],
+      "returncode": 0,
+      "log": "/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/patch_whitespace.log",
+      "raw_log": {
+        "path": "/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-lr1-kyxotzhm/patch_whitespace.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0,
+        "raw": ""
+      }
+    }
+  ],
+  "proof_summary": {
+    "before_fix_first_run": [
+      "passed",
+      "passed"
+    ],
+    "before_fix_repeated_run": [
+      "error",
+      "error"
+    ],
+    "after_fix_regular_runs": [
+      [
+        "passed",
+        "passed"
+      ],
+      [
+        "passed",
+        "passed"
+      ]
+    ],
+    "after_fix_injected_failure_then_repeat": [
+      [
+        "failed"
+      ],
+      [
+        "passed"
+      ]
+    ],
+    "restored_path_counts": [
+      [
+        12,
+        13
+      ],
+      [
+        12,
+        13
+      ],
+      [
+        12
+      ],
+      [
+        12
+      ]
+    ],
+    "accepted_runtime_nodes": 11,
+    "new_collected_nodes": 0,
+    "production_changes": 0
+  },
+  "limits": [
+    "Actual metrics use controlled offline rows for installed API integration, not benchmark accuracy/performance.",
+    "Full 11-case runtime suite was not rerun for this fixture-only delta; the two affected nodes were qualified twice, and one node was also qualified through injected test failure and repeat. Original accepted full suite evidence remains separately source-bound.",
+    "Every runtime child ran serially with thread pools capped at one and a process-group deadline of 180 seconds; no deadline was hit.",
+    "Owned red/green evidence temp root is preserved; no unrelated existing pytest trees were cleaned or modified by the author. The red repeat itself necessarily exercised pytest cleanup of its own explicit basetemp.",
+    "Only fixture permission restoration is added; no generic cleanup of caller-owned source paths or global cache safety claim.",
+    "Fresh delta review and final profile/docs source binding/integration remain root-owned."
+  ],
+  "recorded_at_utc": "2026-10-03 22:44:53 UTC"
+}

@@ -1,0 +1,124 @@
+{
+  "schema_version": 1,
+  "reviewer": "/root/lighteval_plan_review2",
+  "review_type": "fresh independent bounded corrected-design review; no repository edits, dependency installations, behavioral qualification, or nested agents",
+  "artifact": {
+    "path": "/tmp/plato-lighteval-profile-plan.json",
+    "revision": 2,
+    "sha256": "8a457832ca649ba39e7ba4f39175aec35e111e00e8856068641ac324ce4015fe"
+  },
+  "correction_receipt": {
+    "path": "/tmp/plato-lighteval-profile-plan-correction.json",
+    "sha256": "c98fa7f03fdde36e3ccf47b25e6108917043d83e4318bd9ae7c53d64cc69b0b1"
+  },
+  "prior_review": {
+    "path": "/tmp/plato-lighteval-profile-plan-review.json",
+    "sha256": "7f5a0d599b8b4ee65519cc329723f994f6a49d121abdb523992ce1daa259f342"
+  },
+  "preserved_original": {
+    "path": "/tmp/plato-lighteval-profile-plan.v1.json",
+    "sha256": "7d61abae346522ecde23dde6b1c23abd65fa909fc99e989876a5c07fdf2d46ab",
+    "byte_identity_verified": true
+  },
+  "verdict": "ACCEPT",
+  "unresolved_findings": {
+    "critical": 0,
+    "high": 0,
+    "medium": 0,
+    "low": 0
+  },
+  "findings": [],
+  "closed_findings": [
+    {
+      "id": "LP-P1-01",
+      "severity": "medium",
+      "status": "closed_in_design",
+      "basis": [
+        "ci.env now defines persistent step-level UV_PROJECT_ENVIRONMENT; environment_scope explicitly covers sync, metadata, provisioning, preflight, pytest, artifact verification and dependency-present typing, including split-step repetition.",
+        "All post-sync Python commands use uv run --no-sync --python 3.13 or the exact owned interpreter; ty runs under the same persistent environment.",
+        "A stdlib-only interpreter receipt checks configured environment against sys.prefix/sys.exec_prefix, Python 3.13, venv identity and lexical executable ownership before optional imports; acceptance and typing evidence compare the receipt.",
+        "LP11 requires actual uv environment-selection regression using distinguishable default and owned environments; intentionally omitted/wrong environment must fail identity before optional imports.",
+        "The interpreter receipt is mandatory in successful artifacts; package presence cannot substitute for environment identity."
+      ]
+    },
+    {
+      "id": "LP-P1-02",
+      "severity": "medium",
+      "status": "closed_in_design",
+      "basis": [
+        "Fresh actual-NLTK children replace nltk.data.path with explicitly owned fixture roots and clear cache; NLTK_DATA alone is explicitly insufficient.",
+        "For each required resource separately the other resource is real, verified, and present, while the omitted resource and zip alternatives are absent.",
+        "The same child proves actual omitted nltk.data.find raises LookupError, verifies the other lookup lies in the fixture root, and invokes actual production preflight with the restricted path preserved.",
+        "Before invocation import/download sentinels establish zero pipeline/Registry imports and downloads; the error must be the actual scoped missing-resource failure, not a fabricated find function.",
+        "Receipts record exact environment, NLTK source/version, fixture/resource hashes, effective paths, actual lookup results, production source hash, scoped error and sentinel events.",
+        "Negative harness isolation remains child-local; successful production preflight still uses ordinary actual installed resource paths."
+      ]
+    }
+  ],
+  "verified_source_evidence": {
+    "nltk_data_py": {
+      "path": "/tmp/plato-refresh-worktrees/lighteval-runtime/.venv/lib/python3.13/site-packages/nltk/data.py",
+      "sha256": "cda75896c3639541f3c3b811d647354dc5829774c2f201a7c942896f5cb99dc8",
+      "lines": "145-169",
+      "observation": "NLTK_DATA prepends entries; home, prefix and system fallback paths remain. The corrected design removes those paths only inside actual negative-test children."
+    },
+    "archive_profile_observation": {
+      "path": "/tmp/plato-refresh-worktrees/archive-profile",
+      "head": "cda33622677c55679589bb04e42dc3b6397691a8",
+      "tree": "a95ab057bf98f094a085c71c9e6652370afa78f5",
+      "status_short": "",
+      "implementation_commit": "591d706b01bed27fb4ec8687b2f5a298740560e7",
+      "implementation_tree": "fbd062de4471d8b980188aefb62c8ff1a151e60e",
+      "interpretation": "Read-only observation of completed archive author delivery; does not replace root acceptance or final integrated-base binding."
+    }
+  },
+  "verified_authority_hashes": [
+    {
+      "path": "/tmp/plato-mlx-profile-plan.json",
+      "sha256": "81a5a557b1ad018384da9b9290e0648048696af244c486849c653a09f0bea32b",
+      "matches": true
+    },
+    {
+      "path": "/tmp/plato-mlx-profile-plan-review2.json",
+      "sha256": "f7ed47c61715d649c4fe905bf13a1797e42a706c32ead03aa5d7e871d0169c00",
+      "matches": true
+    },
+    {
+      "path": "/tmp/plato-archive-shortlist-plan.json",
+      "sha256": "c66577eac31a2eeaba68f29e2fee53760def2477184521bd1f2536e76507573f",
+      "matches": true
+    },
+    {
+      "path": "/tmp/plato-archive-shortlist-plan-review3.json",
+      "sha256": "3fbeb6b47b5392515172b574bd9b0d11f427e5d6af4a72ba2c2d3057be8483be",
+      "matches": true
+    }
+  ],
+  "preservation_checks": {
+    "original_revision_preserved": true,
+    "unchanged_top_level_contracts": [
+      "decisions",
+      "command_contract",
+      "hook_contract",
+      "required_implementation_base",
+      "runtime_author_handoff",
+      "ledger_contract",
+      "ownership",
+      "support_limits",
+      "acceptance_gate",
+      "deferred_bindings"
+    ],
+    "meaning": "Revision 2 changes only correction-related design text and receipts. Exact core/base routing, original Config/RNG helper behavior, native383 and retained19 guards, full Counter ledgers, strict outcome checks, optional pre-import boundary, artifact limits, shared-file serialization and root-owned metadata remain required.",
+    "separate_cache_design": "Not reopened or changed by this review."
+  },
+  "assessed_without_additional_findings": [
+    "Persistent CI environment and identity evidence close the wrong-default-environment false-green path.",
+    "Per-resource real absence-before-preflight evidence closes NLTK fallback false-green path.",
+    "Canonical filesystem and pyargs boundary routing, default pre-import exclusions, inert initializers, focused/complete distinction and cross-family conflicts remain specified.",
+    "Named qualification still requires exact independently reviewed full node Counters and strict collect/setup/call/teardown outcomes; collect-only cannot claim execution.",
+    "No new package pins, security claims, full-runtime count or fabricated behavior claims are introduced.",
+    "Final accepted evaluator inventory/resource trace, accepted archive delivery, integrated source/lock and measured Linux CPU qualification are explicitly deferred and remain implementation acceptance requirements."
+  ],
+  "acceptance_boundary": "Corrected planning artifact is accepted with zero unresolved critical/high/medium findings. Root may authorize implementation only after accepted archive-profile handoff and final accepted evaluator source/inventory/resource/lock binding. This review does not claim implementation or runtime qualification.",
+  "work_performed": "Read original/corrected plan and correction/prior-review receipts; verify exact hashes and authority bindings; compare unchanged contract sections; inspect actual installed NLTK search-path construction and frozen archive Git provenance. Wrote only this /tmp review JSON. No behavioral runs, environment mutation, source edits or nested agents."
+}

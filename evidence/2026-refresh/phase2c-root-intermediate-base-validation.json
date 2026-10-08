@@ -1,0 +1,40 @@
+{
+  "decision": "PASS for exact intermediate source-archive base profile on Python3.13; not final Phase2 qualification",
+  "candidate": "15e0cebd78ec6752b9aae1e922b33e22e168387f",
+  "tree": "9c9ce313f88552968b487388d681eda82384abfc",
+  "includes": "Accepted A79da, original B00e, C general fixes plus SCAFFOLD review2 lifecycle corrections and portable historical writer.",
+  "excludes": "B resume supplement a058, final FedDyn implementation, accepted D changes and final prose are not in this intermediate.",
+  "source_archive": "/tmp/plato-phase2-root/15e-source-archive",
+  "no_git_directory": true,
+  "source_file_blobs_verified_after_run": 979,
+  "source_files_changed": [],
+  "python": "3.13.16",
+  "environment": "/tmp/plato-phase2-root/c-base-313",
+  "result": {
+    "passed": 797,
+    "skipped": 4,
+    "deselected": 48,
+    "seconds": 204.36,
+    "exit_code": 0,
+    "warnings_reported": 0,
+    "profile_guard": "PASS; no unexpected exclusions. Four historical-writer migration cases included and pass without Git history."
+  },
+  "expected_skips": [
+    "One base-profile optional Opacus module skip",
+    "Three base-profile optional Nanochat integration skips"
+  ],
+  "runtime_scope": "All48 runtime-marked startup cases intentionally omitted by documented base profile; full mandatory execution remains final qualification.",
+  "command": "PYTHONPATH=/tmp/plato-phase2-root/15e-source-archive PYTHONDONTWRITEBYTECODE=1 HF_HUB_OFFLINE=1 HF_DATASETS_OFFLINE=1 TOKENIZERS_PARALLELISM=false OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 CUDA_VISIBLE_DEVICES='' /tmp/plato-phase2-root/c-base-313/bin/python -m pytest tests --test-profile=base -m 'not runtime' -ra --basetemp=/tmp/plato-phase2-root/15e-archive-base-313 --junitxml=/tmp/plato-phase2-root/15e-archive-base-313.xml",
+  "cwd": "/tmp/plato-phase2-root/15e-source-archive",
+  "receipts": [
+    {
+      "path": "/tmp/plato-phase2-root/15e-archive-base-313.log",
+      "sha256": "032f84e1ad44a35e8ab017968a323b93c351e571f92b4ab7cf7a9507abc4e45e"
+    },
+    {
+      "path": "/tmp/plato-phase2-root/15e-archive-base-313.xml",
+      "sha256": "472a72ea20e1a37ed4bbc23379428279a997d558d46b84811866ce4da9081e36"
+    }
+  ],
+  "closure_limit": "ROOT-2C-02 production fixture acceptance still requires fresh independent review3; this root run supplies actual full source-archive profile evidence. Final combined source both interpreter/profile runs remain required."
+}

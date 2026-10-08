@@ -1,0 +1,212 @@
+{
+  "schema_version": 1,
+  "reviewer": "/root/mlx_native_review",
+  "date": "2026-10-03",
+  "decision": "CHANGES_REQUESTED",
+  "summary": "One material F17 final-dispatch gap remains after the client-selection report hook. Native controls, real training, checkpoints, transport, RNG replay, device/mode handling, and disclosed eager measurements otherwise pass the reviewed bounded scope.",
+  "reviewed_identity": {
+    "source_commit": "589249b77e81b164549ec65e47daccec87794277",
+    "source_tree": "a6300438bd3a3ac48d8cfebdba301fd05664fc6d",
+    "base_commit": "dcf787c012e30bcd7680a4398d54f946fde958e5",
+    "evidence_commit": "6582dc9394733003a94461bbf74ab6b115790986",
+    "receipt": "evidence/2026-refresh/phase3-mlx-native.json",
+    "receipt_sha256": "f2d7ae7964c7a2d213c6e05ab20d08c07cbd4856f128e2de9f0a609dfe3f4b27",
+    "bundle": "evidence/2026-refresh/reproductions/phase3-mlx-native-qualification.tar.gz",
+    "bundle_sha256": "41a8353cbdead3d54dc5d16d6f2c316c3026c875bc124d911d9355f6c279e228",
+    "integrated_commit_at_handoff": "3ad876fbf843f49912a03e76186e07cffc02b690",
+    "independent_review_worktree": "/tmp/plato-mlx-native-review-source",
+    "scratch": "/tmp/plato-mlx-native-review-artifacts",
+    "runtime_origins_verified": true,
+    "all_19_candidate_file_hashes_match": true,
+    "tracked_review_source_clean_at_completion": true,
+    "integrated_worktree_edited": false
+  },
+  "authorization": {
+    "shell": "zsh -lc",
+    "nested_agents": 0,
+    "installations": 0,
+    "production_or_test_source_edits": 0,
+    "remote_or_PR_actions": 0,
+    "shared_environment_changes": 0,
+    "environment": "Read-only use of /tmp/plato-phase3-mlx/env with PYTHONPATH selecting the immutable reviewer worktree; executable and imported runtime origins recorded.",
+    "created_resources": [
+      "Detached reviewer worktree",
+      "Task-owned extracted evidence, probes, runtime artifacts and copy of real MNIST cache"
+    ],
+    "cleanup": "Retained for root and original author; no unrelated resources changed."
+  },
+  "accepted_guidance_read": [
+    "AGENTS.md",
+    "/tmp/plato-refresh-next-prompts/phase3_mlx.txt",
+    "evidence/2026-refresh/plan.md: Phase 3A",
+    "evidence/2026-refresh/mlx-roadmap.json: A1/A2, selected P1 and E1-E8",
+    "evidence/2026-refresh/mlx-roadmap-review.json",
+    "evidence/2026-refresh/plan-review-3.json",
+    "evidence/2026-refresh/plan-addendum.json: MLX handoff",
+    "evidence/2026-refresh/plan-addendum-acceptance.json",
+    "evidence/2026-refresh/baseline-findings.json: F17 and prior MLX evidence",
+    "evidence/2026-refresh/phase2-final-local-acceptance.json",
+    "Integration worktree: evidence/2026-refresh/phase2-final-linux-acceptance.json",
+    "Integration worktree: evidence/2026-refresh/phase2-delivery.json"
+  ],
+  "findings": [
+    {
+      "id": "MLX-NATIVE-R1-01",
+      "severity": "high",
+      "material": true,
+      "criterion": "A1/F17, E1/E2: validate every effective input and preserve report/tree alignment before direct, legacy or delta arithmetic.",
+      "title": "The final ingress check precedes a mutable report hook, allowing malformed trees and observable report/tree reassociation to reach aggregation.",
+      "location": {
+        "path": "plato/servers/fedavg.py",
+        "line": 226
+      },
+      "cause": "Schema and original-object position checks finish at lines207-221. client_selection_strategy.on_reports_received then receives mutable self.updates and context at line226. There is no corresponding validation after that hook and before aggregation dispatch at lines235-237. Payload trees shared by updates and weights_received can change, and the report list can reorder independently of the effective tree list.",
+      "reproduction": [
+        {
+          "path": "/tmp/plato-mlx-native-review-artifacts/dispatch_probe.py",
+          "result": "/tmp/plato-mlx-native-review-artifacts/dispatch-results.json",
+          "log": "/tmp/plato-mlx-native-review-artifacts/dispatch.log",
+          "setup": "Actual native LeNet, Algorithm, Server and FedAvg strategy; valid float32 client trees and 8/24 sample counts pass earlier preflight. The late selector hook changes client 2 fc3.bias from shape(10,) to broadcastable shape(1,). Both arrival orders exercised.",
+          "observed": "Direct and legacy dispatch both perform weighted arithmetic without rejection and load ten 3.25 values. Delta dispatch revalidates and rejects before arithmetic with global parameters unchanged."
+        },
+        {
+          "path": "/tmp/plato-mlx-native-review-artifacts/alignment_probe.py",
+          "result": "/tmp/plato-mlx-native-review-artifacts/alignment-results.json",
+          "log": "/tmp/plato-mlx-native-review-artifacts/alignment.log",
+          "setup": "Same-schema bias arrays 1 and 4, sample counts 8/24. The late selector hook reverses the update/report list while weights_received remains in its original positional order.",
+          "observed": "Direct, legacy and delta dispatch all accept the observable reassociation and load approximately 1.75 instead of the independently expected 3.25."
+        }
+      ],
+      "impact": "F17 remains bypassable on the supported extension boundary. Result/load validation cannot recover original malformed shapes after broadcasting, and schema validation alone cannot detect report/tree pairing changes.",
+      "requested_change": "Preserve the captured owned baseline and earlier raw/weights hook checks. After on_reports_received, immediately before dispatch, validate effective eligible trees and sample/count contracts and reject observable report/tree reassociation. Include late-selector shape/count/order negative regressions for direct/legacy/delta, both arrival orders and zero-weight eligible inputs. Unlabeled deep-copy replacements should retain the accepted positional contract.",
+      "acceptance_after_repair": "Both reviewer probes must reject before aggregation arithmetic or global load, with the global model unchanged; existing valid independently trained 8/24 results and native/affected tests must continue to pass. Require a fresh identity-bound independent review.",
+      "root_notified": true
+    }
+  ],
+  "separate_unresolved_context": [
+    {
+      "origin": "Known separate profile-review finding supplied by root; not newly discovered or counted here.",
+      "issue": "Default collection imports MLX via existing eager tree/registry imports before the profile guard, contrary to the accepted no-import promise.",
+      "status": "Unresolved at this review identity; original profile author owns the correction.",
+      "implication": "This report's native runtime checks do not grant full-profile/integration acceptance."
+    }
+  ],
+  "independent_tests": [
+    {
+      "command": "PYTHONPATH=/tmp/plato-mlx-native-review-source PYTHONDONTWRITEBYTECODE=1 /tmp/plato-phase3-mlx/env/bin/python -m pytest tests/mlx_native -q --basetemp=/tmp/plato-mlx-native-review-artifacts/pytest --junitxml=/tmp/plato-mlx-native-review-artifacts/native-tests.xml",
+      "passed": 283,
+      "failed": 0,
+      "skipped": 0,
+      "seconds": 39.87,
+      "log": "/tmp/plato-mlx-native-review-artifacts/native-tests.log",
+      "junit": "/tmp/plato-mlx-native-review-artifacts/native-tests.xml"
+    },
+    {
+      "command": "PYTHONPATH=/tmp/plato-mlx-native-review-source PYTHONDONTWRITEBYTECODE=1 /tmp/plato-phase3-mlx/env/bin/python -m pytest tests/models/test_model_registry.py tests/servers/test_fedavg_strategy.py tests/algorithms -q --basetemp=/tmp/plato-mlx-native-review-artifacts/affected-pytest --junitxml=/tmp/plato-mlx-native-review-artifacts/affected-tests.xml",
+      "passed": 80,
+      "failed": 0,
+      "skipped": 0,
+      "seconds": 0.33,
+      "log": "/tmp/plato-mlx-native-review-artifacts/affected-tests.log",
+      "junit": "/tmp/plato-mlx-native-review-artifacts/affected-tests.xml"
+    },
+    {
+      "command": "PYTHONPATH=/tmp/plato-mlx-native-review-source PYTHONDONTWRITEBYTECODE=1 /tmp/plato-phase3-mlx/env/bin/python -B /tmp/plato-mlx-native-review-artifacts/phase3-mlx-native/reproduction/replay_mnist.py --repo /tmp/plato-mlx-native-review-source --root /tmp/plato-mlx-native-review-artifacts/mnist-review-run --cache /tmp/plato-mlx-native-review-artifacts/mnist-cache",
+      "status": "PASS",
+      "actual_entrypoint": "plato.py",
+      "dataset": "Real cached Torchvision MNIST: 60000 train and 10000 test; no download. Owned copy of author cache.",
+      "bounded_case": "32/16 dataset subsets, two logical 8-sample clients, one physical reused worker, one epoch/round, model_seed 17, native Metal.",
+      "comm_simulation": true,
+      "simulate_wall_time": true,
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [],
+      "survivors": [],
+      "seconds": 15.86899762507528,
+      "receipt": "/tmp/plato-mlx-native-review-artifacts/mnist-review-run/result.json",
+      "log": "/tmp/plato-mlx-native-review-artifacts/mnist-review.log",
+      "qualification": "/tmp/plato-mlx-native-review-artifacts/mnist-review-run/qualification.json"
+    },
+    {
+      "command": "Independent dispatch_probe.py and alignment_probe.py against exact source via PYTHONPATH.",
+      "status": "MATERIAL_FAILURE_REPRODUCED",
+      "cases": 9,
+      "results": [
+        "dispatch-results.json",
+        "alignment-results.json"
+      ]
+    }
+  ],
+  "bounded_criteria_review": {
+    "E1": "CHANGES_REQUESTED: complete key/container/length/shape/None preflight and owned-baseline implementation pass raw, weight-hook and callback tests, including zero weights and both arrival orders; late selector-hook dispatch and pairing remain unguarded.",
+    "E2": "PASS for existing valid paths: independent 8/24 SGD and Adam LeNets train from the same baseline, change weights, transport real trees, and direct/delta/legacy results match every leaf of float64 NumPy weighted reference cast to float32 within rtol 1e-5/atol 1e-6. Late observable report reordering remains the finding above.",
+    "E3": "PASS: owned extraction does not share memory with live native arrays; retained baseline survives local training. Native checkpoint/real codecs preserve tree/dtype/values/predictions and subsequent training changes parameters. Malformed late tree/load inputs reject without partial mutation. Float16 transport probe and explicit bfloat16 rejection are distinct from float32 training qualification.",
+    "E4": "PASS: fresh actual no-flag Metal two-client 8/24 socket run uses comm_simulation=false and real codec processors; independently checks received trained trees and weighted global result. Both clients return, server closes naturally, no forced containment/survivors, and port rebind passes. Fresh real cached-MNIST plato.py run separately retains/documentedly labels communication and wall-time simulation.",
+    "E5": "PASS: actual observed factory/train/eval/load scopes cover no flags,CPU,mps,both with CPU precedence, callerCPU/custom stream and failures. Native dropout/BatchNorm exercise deterministic evaluation, unchanged statistics, prior per-submodule mode restoration, and explicit training mode. Alias updates and unsupported/backend conflict/missing dependency cases are covered. Prebuilt lazy graphs are explicitly excluded from migration claims.",
+    "E6": "PASS: native norm 5/threshold 2 epsilon-adjusted reference update; disabled/below threshold/zero/invalid/nonfinite paths; original norm and one optimizer update; caller custom strategies retain control; jit request rejects explicitly.",
+    "E7": "PASS: fresh/reversed/reused logical-client streams replay initial weights, order, Python/NumPy/Torchvision transforms, masks, losses and trained weights. Logical client/master seed/round change intended local stream. Four caller RNG domains restore on seeded factory/training/data failure; legacy unseeded behavior persists. Tagged 0.32.3 random binding supports inspected key restoration. Promise remains same-environment replay.",
+    "E8": "PASS AS AUDITED AUTHOR EVIDENCE, not a new measurement: synchronized fixed 256-sample runs, batches 8/32/64, 18 numerical runs/27 workers with three repetitions, 100 steps after 10 warmups,10-round retention, all genuine two-worker intervals overlap; nine real three-round 8/24 socket sessions. Source binding and all three disclosed late deltas are verified. No compiled comparison or speedup claim; eager remains default."
+  },
+  "evidence_audit": {
+    "report": "/tmp/plato-mlx-native-review-artifacts/artifact-audit.json",
+    "archive_members_including_manifest": 832,
+    "manifest_entries_verified": 831,
+    "manifest_mismatches": 0,
+    "measured_source_files_verified": 21,
+    "measured_source_mismatches": 0,
+    "measured_to_candidate_deltas": [
+      "plato/models/registry.py: native-name backend conflict and scoped alias factory; measured framework=mlx numerical path unchanged.",
+      "tests/mlx_native/socket_harness.py: genuine MNIST plato.py branch; measured socket_native branch unchanged.",
+      "tests/mlx_native/test_phase3_selection.py: two post-E8 negative/placement cases."
+    ],
+    "exact_measured_source_preserved": true,
+    "E8_remeasured": false,
+    "E8_remeasurement_reason": "No optimization adopted and no new speed claim; concurrent root integration work would also violate the isolated measurement window.",
+    "archived_red_green": "Reviewed preserved baseline 34 failed/1 passed and first-green 35 passed logs; receipt honestly separates later exact merged-baseline replay from original pre-fix execution. Existing affected assertions were not edited/weakened.",
+    "archived_failures_retained": true,
+    "root_integration_native_result": "283 passed, 0 skipped attributed to root at 3ad876f; independently reran exact native source here.",
+    "full_base_and_mandatory_gate": "Root-owned; not claimed by this reviewer."
+  },
+  "environment": {
+    "details": "/tmp/plato-mlx-native-review-artifacts/review-environment.json",
+    "python": "3.13.16",
+    "platform": "macOS 27.0 arm64",
+    "mlx": "0.32.3",
+    "mlx_metal": "0.32.3",
+    "numpy": "2.5.3",
+    "torch": "2.14.1",
+    "torchvision": "0.29.1",
+    "metal_available": true,
+    "normal_default_device": "Device(gpu, 0)",
+    "lock_sha256": "573b10c2ba1a2317e02f9e40c6181359cafab6f6e0a0f9be12bb256cb276fe1d"
+  },
+  "upstream_verification": [
+    "https://raw.githubusercontent.com/ml-explore/mlx/v0.32.3/python/src/random.cpp",
+    "https://ml-explore.github.io/mlx/build/html/python/_autosummary/mlx.core.stream.html",
+    "Installed 0.32.3 module/optimizer source identities recorded in the verified author environment artifact."
+  ],
+  "limitations_accepted": [
+    "Native Apple CPU/Metal and Python 3.13 qualification only.",
+    "Float32 training; float16 host transport probe only; bfloat16 conversion explicitly rejected.",
+    "Weight-only checkpoints; optimizer/RNG/scheduler or mid-step resume unselected.",
+    "Deep-copied unlabeled hook replacements have positional semantics; arbitrary same-schema semantic swaps are not diagnosable.",
+    "Existing caller lazy graphs keep original placement.",
+    "Same-environment RNG replay; cross-device numerical tolerance, no bitwise portability promise.",
+    "No new models, broad backend/algorithm conversion, scheduler/accumulation parity, compile feature or speedup claim."
+  ],
+  "completion": "Review complete for the frozen identities above. Source/evidence retained. Root assigns the one material runtime correction and the known separate profile correction to their original authors, then obtains fresh reviews.",
+  "independent_process_port_audit": [
+    {
+      "receipt": "/tmp/plato-mlx-native-review-artifacts/pytest/test_real_native_lenet_two_cli0/socket/result.json",
+      "port": 58203,
+      "rebind": true,
+      "survivors": []
+    },
+    {
+      "receipt": "/tmp/plato-mlx-native-review-artifacts/mnist-review-run/result.json",
+      "port": 59812,
+      "rebind": true,
+      "survivors": []
+    }
+  ]
+}

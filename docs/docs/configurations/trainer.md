@@ -1,13 +1,16 @@
+Trainer settings are backend-specific. The optimizer, scheduler, and loss lists
+below describe the PyTorch path unless stated otherwise. See
+[Native MLX](../mlx.md) for the native LeNet-5/MNIST configuration and limits.
+
 !!! example "type"
     The type of the trainer. The following types are available:
 
     - `basic` a basic trainer with a standard training loop.
+    - `mlx` the native Apple Silicon trainer for the LeNet-5/MNIST reference.
     - `composable` the strategy-based trainer that exposes loss, optimiser, scheduler, data-loader, model-update, and testing strategies directly.
     - `timm_basic` a basic trainer with the [timm](https://timm.fast.ai/) learning rate scheduler.
     - `diff_privacy` a trainer that supports local differential privacy in its training loop by adding noise to the gradients during each step of training.
     - `HuggingFace` a trainer for Hugging Face causal language models, tokenizers, and time-series models.
-    - `nanochat` a trainer for Nanochat language-model workloads.
-    - `lerobot` a trainer for LeRobot / SmolVLA workloads.
     - `split_learning` a trainer that supports the split learning framework.
     - `self_supervised_learning` a trainer that supports personalized federated learning based on self supervised learning.
     - `gan` a trainer for Generative Adversarial Networks (GANs).
@@ -95,7 +98,6 @@
     - `Adam`
     - `Adadelta`
     - `Adagrad`
-    - `AdaHessian` (from the `torch_optimizer` package)
     - `AdamW`
     - `SparseAdam`
     - `Adamax`
@@ -121,17 +123,18 @@
     - `CyclicLR`
     - `CosineAnnealingWarmRestarts`
 
-    Alternatively, all four schedulers from [timm](https://timm.fast.ai/schedulers) are supported if `lr_scheduler` is specified as `timm` and `trainer -> type` is specified as `timm_basic`. For example, to use the `SGDR` scheduler, we specify `cosine` as `sched` in its arguments (`parameters -> learning_rate`):
+    Alternatively, all four schedulers from [timm](https://timm.fast.ai/schedulers) are supported if `lr_scheduler` is specified as `timm` and `trainer -> type` is specified as `timm_basic`. For example, to use the `SGDR` scheduler, we specify `cosine` as `sched` in its arguments (`parameters -> learning_rate`) in this configuration fragment:
 
     ```toml
     [trainer]
     type = "timm_basic"
+    lr_scheduler = "timm"
 
     [parameters]
 
     [parameters.learning_rate]
-    sched = cosine
-    min_lr = 1.e-6
+    sched = "cosine"
+    min_lr = 1.0e-6
     warmup_lr = 0.0001
     warmup_epochs = 3
     cooldown_epochs = 10
@@ -181,20 +184,17 @@
     - `huggingface` (for [HuggingFace](https://huggingface.co/models) causal language models)
     - `timesfm` (for Hugging Face TimesFM time-series forecasting models)
     - `patchtsmixer` (for Hugging Face PatchTSMixer time-series models)
-    - `torch_hub` (for models from [PyTorch Hub](https://pytorch.org/hub/))
-    - `vit` (for Vision Transformer models from [HuggingFace](https://huggingface.co/models), [Tokens-to-Token ViT](https://github.com/yitu-opensource/T2T-ViT), and [Deep Vision Transformer](https://github.com/zhoudaquan/dvit_repo))
-    - `smolvla` (for LeRobot / SmolVLA robotics policies)
+    - `torchvision` (for models from the installed [Torchvision model library](https://docs.pytorch.org/vision/stable/models.html))
 
     The name of the model should be specified below, in `model_name`.
 
-    !!! note "Note"
-        For `vit`, please replace the `/` in model name from [https://huggingface.co/models](https://huggingface.co/models) with `@`. For example, use `google@vit-base-patch16-224-in21k` instead of `google/vit-base-patch16-224-in21k`. If you do not want to use the pretrained weights, set `parameters -> model -> pretrained` to `false`, as in the following example:
-
-        ```toml
-        [parameters]
-        [parameters.model]
-        pretrained = false
-        ```
+    !!! note "Retired legacy ViT factory"
+        The former `model_type = "vit"` factory and its `@`-encoded model names
+        are archived. See [archived research examples](../examples/archived.md)
+        for historical source and restoration. This retirement is specific to
+        Plato's old factory; generic Hugging Face and Torchvision models are
+        separate. The current `huggingface` factory serves causal language models
+        and is not a replacement image-classification ViT factory.
 
 !!! example "model_name"
     The name of the machine learning model. The following options are available:
@@ -204,13 +204,11 @@
     - `vgg_x`
     - `dcgan`
     - `multilayer`
-    - `nanochat`
-    - `smolvla`
     - `timesfm`
     - `patchtsmixer`
 
     !!! note "Note"
-        If the `model_type` above specified a model repository, supply the name of the model, such as `gpt2`, `HuggingFaceTB/SmolLM2-135M`, or `smolvla`, here.
+        If the `model_type` above specified a model repository, supply the name of the model, such as `gpt2`, `HuggingFaceTB/SmolLM2-135M`, or `Qwen/Qwen3-0.6B-Base`, here.
 
         For `resnet_x`, x = 18, 34, 50, 101, or 152; for `vgg_x`, x = 11, 13, 16, or 19.
 
@@ -233,3 +231,29 @@
     - `freq`: TimesFM frequency token (`0` for high-frequency/hourly data).
 
     TimesFM models are wrapped channel-independently for multivariate tensors; PatchTSMixer configs can use model options such as `mode = "mix_channel"` to mix features jointly. See the [TimesFM case study](../examples/case-studies/6. Time-Series Forecasting with TimesFM.md) for complete configs.
+
+!!! example "model_revision"
+    The Hugging Face model revision passed to model configuration and weight
+    loaders. Use an immutable commit SHA for reproducible runs. When omitted,
+    existing configurations retain the default `main` revision.
+
+!!! example "tokenizer_revision"
+    The Hugging Face tokenizer revision. If omitted and the tokenizer repository
+    matches `model_name`, it inherits `model_revision`. A different tokenizer
+    repository defaults to `main`; set its own immutable revision explicitly.
+
+!!! example "model_dtype"
+    The dtype used when loading a Hugging Face model. The
+    [Qwen3 reference](../examples/case-studies/6. Qwen3 Federated LoRA.md) uses
+    `float32` and the `--cpu` command-line flag for its CPU execution path.
+
+!!! example "model_seed / training_seed (MLX)"
+    Optional seeds for native model construction and local training respectively.
+    Training streams are scoped by logical client, round, and epoch. Omitted seeds
+    retain legacy unseeded behavior. See [reproducibility controls](../mlx.md#reproducibility-and-training-controls).
+
+!!! example "clip_grad_norm (MLX)"
+    Optional global gradient norm limit for the default native training step.
+    Must be finite and nonnegative; omitted means no clipping. Zero is valid.
+
+The former PyTorch Hub model adapter and AdaHessian optimizer variant are retired. Use the installed torchvision factory and the ordinary Adam unlearning recipe for the retained paths. Historical source and environments are in the [Torch Hub archive](https://github.com/TL-System/plato/tree/main/archives/retired/torch-hub) and [AdaHessian archive](https://github.com/TL-System/plato/tree/main/archives/retired/adahessian).

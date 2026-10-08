@@ -1,0 +1,73 @@
+{
+  "status": "REVIEWED_COMPONENTS_INTEGRATED_PENDING_PUBLICATION_GATE_AND_REMOTE_QUALIFICATION",
+  "head": "ebbe993b1cfbe1a23662d9c5fb280bfa27fe8c1c",
+  "source_equivalent_to_final_docs_review": "8f852a338a1f99f81963bd32584e5f663ea9e942",
+  "evidence_only_delta": [
+    "evidence/2026-refresh/deployment-docs-review.json",
+    "evidence/2026-refresh/deployment-docs.json",
+    "evidence/2026-refresh/llm-final-cleanup-inventory.json",
+    "evidence/2026-refresh/llm-final-worktree-cleanup.json"
+  ],
+  "components": {
+    "container": {
+      "source": "da2ffde66e8ae5d893ceed9bb73d801680c150b6",
+      "files": {
+        "Dockerfile": "4e67953be6d90fcc73fb52a44fd05914494af625c529990f9366b662041b6a82",
+        ".dockerignore": "b90144eaa006aa9954e2f878fcfcbc6d1fa369027582e6f51f4b0500d23ce5da",
+        "dockerrun.sh": "6bbcb5530e5343b0fcb0fd675235f72081efa5fdcfd5fc464e1b28f3eedefee4",
+        "dockerrun_gpu.sh": "2f7ac611428cb0a4d3e36a6b040af4f461cfca8e09252ba0c65fbe105a6a6761",
+        ".github/workflows/container_checks.yml": "58b24307efa3414c0747e23982ca84822942e62952be886409fd2e3650d3b3e7",
+        ".github/scripts/check_container.py": "0f4dd45635dc3f560d6d7f2721aa23492374ecc27a5b408f25acd36c608c80d5"
+      }
+    },
+    "docs-package": {
+      "source": "63f0d2000f0370708b9afe1e2e6a2dc8559b72e1",
+      "files": {
+        "netlify.toml": "9ae1049a54d5edc1a29b5f34ba7c235c7f0bf3e63802fb8a9f1d421ca79ead0b",
+        "docs/requirements.txt": "9c33555b3d0cbc983d6dd59f261a242a92d136f2bb1364f300a01824f9eff665",
+        "docs/build.sh": "e21f333201ce75ea7e4a820d505e7b230a5a6048f279b56b0758f1a6cfc338b7",
+        ".github/workflows/pypi_publish.yml": "44d20d3daa8e953546acf7e5b01ee61cf54d056b96b09b799ad3cfa65b105062",
+        ".github/workflows/docs_package_checks.yml": "3bd50449d468b4f6606648a66edc9d54e8710577ccd7878f291704391057aa64",
+        ".github/scripts/check_distribution.py": "1b3ea71a1eef084f602092de35a97ceed04beb4ab47da2074690dc89c5c34c3f"
+      }
+    },
+    "prose": {
+      "source": "8f852a338a1f99f81963bd32584e5f663ea9e942",
+      "files": {
+        "docs/docs/install.md": "a470727062b1ac0d243fc0a19581d76a40e2f08806bc0526bb23d86b08759f8c",
+        "docs/docs/quickstart.md": "c32b0694f2b295c1aca1e48f3328071f3c9637f519f9af02d9af4b44b112acfc"
+      }
+    }
+  },
+  "metadata_reconciliation": "Only accepted P2 Hatch build exclusions applied over reviewed evaluator metadata; lock unchanged.",
+  "lock_sha256": "66a4e4442d7b1f26d220b44ca73c44ff4f1151a86857bb3f93a594819fd08126",
+  "reviews": {
+    "plato-container-review": {
+      "path": "/tmp/plato-container-review.json",
+      "sha256": "9239f4fc003134f47c21b8defecc533b3f796319200ca94120b861b3e82fd974"
+    },
+    "plato-docs-package-binding-review": {
+      "path": "/tmp/plato-docs-package-binding-review.json",
+      "sha256": "c42c4deea9bf414388711069c34b48238f6ead704ed5dadce38e605b5e5b1075"
+    },
+    "plato-deployment-docs-review": {
+      "path": "/tmp/plato-deployment-docs-review.json",
+      "sha256": "a98cc1fce776dc36620d7630253bb19b465253212f163322bd970d1cdf592c97"
+    }
+  },
+  "static_container": {
+    "accepted": true,
+    "mode": "static",
+    "scope": "Static context and recording-stub checks only",
+    "elapsed_seconds": 0.539
+  },
+  "ruff": "All checks passed!",
+  "local_author_and_reviewer_validation": "P3 author and fresh reviewer independently executed strict docs, command/link checks and full package checker on source-equivalent8f, including Git-bound sdist payload, clean rebuild and outside-checkout installed-wheel CPU imports. P2 fresh review independently repeated both actual defaults and ownership/source negatives. P1 actual Docker execution remains unperformed locally.",
+  "publication_condition": "Run final-HEAD strict docs, static container and full package checker after gate/evidence commits, preserving actual default output behavior and all source/archive exclusion checks.",
+  "merge_conditions": [
+    "PR421 evaluator parent merged first.",
+    "Exact Linux PyTorch, container CPU and docs/package jobs succeed with source-bound artifacts verified.",
+    "Hosted Netlify preview succeeds and serves the updated docs."
+  ],
+  "limitations": "No local Docker daemon, GPU or arm64-container qualification; no PyPI release or registry publication. Failed historical package attempts and source-bound corrective reviews remain preserved."
+}

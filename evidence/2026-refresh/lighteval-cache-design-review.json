@@ -1,0 +1,118 @@
+{
+  "schema_version": 1,
+  "reviewer": "/root/lighteval_design_review",
+  "review_type": "fresh independent bounded design review, no implementation edits",
+  "artifact": {
+    "path": "/tmp/plato-lighteval-cache-design.json",
+    "sha256": "8004a28147385b27609d517fb8f8ce33e82d7a02782e92b32b39f5aaf06b522a",
+    "revision": 1
+  },
+  "verdict": "ACCEPT",
+  "unresolved_findings": {
+    "critical": 0,
+    "high": 0,
+    "medium": 0,
+    "low": 0
+  },
+  "findings": [],
+  "verified_receipts": [
+    {
+      "path": "/tmp/plato-refresh-worktrees/lighteval-runtime/plato/evaluators/lighteval.py",
+      "sha256": "ef7054f80022d0cbbfaab1721c6386a0fbecdf9734373ca1d919c33ffe353b76",
+      "expected_sha256": "ef7054f80022d0cbbfaab1721c6386a0fbecdf9734373ca1d919c33ffe353b76",
+      "matches": true
+    },
+    {
+      "path": "/tmp/plato-refresh-worktrees/lighteval-runtime/plato/evaluators/runner.py",
+      "sha256": "e08bae291acdcbefee340b8d7c8f41c168a0e00a2d257ff74932514a186985f3",
+      "expected_sha256": "e08bae291acdcbefee340b8d7c8f41c168a0e00a2d257ff74932514a186985f3",
+      "matches": true
+    },
+    {
+      "path": "/tmp/plato-refresh-worktrees/lighteval-runtime/.venv/lib/python3.13/site-packages/lighteval/utils/cache_management.py",
+      "sha256": "cfcefa97ab153fec086f7bfcd6f46cfb2caf2addb666b647df68eaf535945a06",
+      "expected_sha256": "cfcefa97ab153fec086f7bfcd6f46cfb2caf2addb666b647df68eaf535945a06",
+      "matches": true
+    },
+    {
+      "path": "/tmp/plato-refresh-worktrees/lighteval-runtime/.venv/lib/python3.13/site-packages/lighteval/models/transformers/transformers_model.py",
+      "sha256": "bc69dfde1759500dd4adfb03b776c28397ef9577d4ab8d8fb8101637decef130",
+      "expected_sha256": "bc69dfde1759500dd4adfb03b776c28397ef9577d4ab8d8fb8101637decef130",
+      "matches": true
+    },
+    {
+      "path": "/tmp/plato-refresh-worktrees/lighteval-runtime/.venv/lib/python3.13/site-packages/lighteval/pipeline.py",
+      "sha256": "644bd0def1dfc0e8a258be455954da40c8603df5110fb52a89da1ea10fcd8fa7",
+      "expected_sha256": "644bd0def1dfc0e8a258be455954da40c8603df5110fb52a89da1ea10fcd8fa7",
+      "matches": true
+    },
+    {
+      "path": "/tmp/plato-lighteval-cache-probe.py",
+      "sha256": "ad3c5a67779ca0fed465b151df0ab2ca20fe45079633ab083058e927f8763ed6",
+      "expected_sha256": "ad3c5a67779ca0fed465b151df0ab2ca20fe45079633ab083058e927f8763ed6",
+      "matches": true
+    },
+    {
+      "path": "/tmp/plato-lighteval-cache-red.log",
+      "sha256": "849482b20363d3d85027df7923e31bcd4dd81dda926c8bea73a7112766412568",
+      "expected_sha256": "849482b20363d3d85027df7923e31bcd4dd81dda926c8bea73a7112766412568",
+      "matches": true
+    },
+    {
+      "path": "/tmp/plato-lighteval-dependency-checks/command-semantics.json",
+      "sha256": "5085b7db4b13d5fa91569cb765a05fd01f061743e76d5af6a7bbfeac5e1dc9f9",
+      "expected_sha256": "5085b7db4b13d5fa91569cb765a05fd01f061743e76d5af6a7bbfeac5e1dc9f9",
+      "matches": true
+    },
+    {
+      "path": "/Users/bli/.local/share/uv/python/cpython-3.13.16-macos-aarch64-none/lib/python3.13/tempfile.py",
+      "sha256": "7350d7f75ca8d6e4752c377777a315dc26eb4ecd3b6c9c0951bffddc576f030f",
+      "expected_sha256": "7350d7f75ca8d6e4752c377777a315dc26eb4ecd3b6c9c0951bffddc576f030f",
+      "matches": true
+    }
+  ],
+  "evidence": [
+    {
+      "path": "/tmp/plato-refresh-worktrees/lighteval-runtime/.venv/lib/python3.13/site-packages/lighteval/utils/cache_management.py",
+      "lines": "78-94,145-151,385-386",
+      "fact": "SampleCache immediately mkdir/load under Path(expanduser(cache_dir))/model_name/config hash; model_dump hash includes public cache_dir and model_name, without checkpoint weight bytes; cached supports None after construction only."
+    },
+    {
+      "path": "/tmp/plato-refresh-worktrees/lighteval-runtime/.venv/lib/python3.13/site-packages/lighteval/models/abstract_model.py",
+      "sha256": "aec27a8474e4333249e13a7e533a5be6c7f5fc9e59b577a51d504383ffac551a",
+      "lines": "41-93",
+      "fact": "Public ModelConfig cache_dir inherited by TransformersModelConfig; no response cache disable field in inspected config."
+    },
+    {
+      "path": "/tmp/plato-refresh-worktrees/lighteval-runtime/.venv/lib/python3.13/site-packages/lighteval/models/transformers/transformers_model.py",
+      "lines": "146-168,200-238",
+      "fact": "Public TransformersModelConfig and constructor construct SampleCache before return; model/tokenizer loaded via ordinary configured references."
+    },
+    {
+      "path": "/tmp/plato-refresh-worktrees/lighteval-runtime/.venv/lib/python3.13/site-packages/lighteval/pipeline.py",
+      "lines": "148",
+      "fact": "Pipeline unconditionally initializes model._cache registry; private postconstructor disable would not be sound."
+    },
+    {
+      "path": "/tmp/plato-refresh-worktrees/lighteval-runtime/plato/evaluators/lighteval.py",
+      "lines": "271-333,389-449,473-494",
+      "fact": "Current export branch and configured fallback branch are separable; output context lives through evaluate/get_results; public cache_dir forwarding and fallback ownership fit existing contexts."
+    },
+    {
+      "path": "/Users/bli/.local/share/uv/python/cpython-3.13.16-macos-aarch64-none/lib/python3.13/tempfile.py",
+      "lines": "896-939",
+      "fact": "Python 3.13 TemporaryDirectory strict cleanup retries PermissionError by resetting owned path/parent permissions, including nested read-only trees."
+    },
+    {
+      "path": "/tmp/plato-lighteval-cache-red.log",
+      "fact": "Observed weights hashes differ A to B, all five real task caches persist, second run logs 9/9 generative and 6/6 logprob cached, scores remain 2/3 and guarded probe raises stale-response assertion."
+    },
+    {
+      "path": "/tmp/plato-lighteval-dependency-checks/command-semantics.json",
+      "fact": "Dependency command evidence shows syncing uv run without extra retains Lighteval 0.13 but replaces xxhash 3.8.1 with incompatible 4.0.1; extra restores 3.8.1."
+    }
+  ],
+  "rationale": "Independent full copy confines absolute-path cache creation and any artifact writes to owned storage. Same-directory identity dedup, default symlink dereference, owner write/search on copied model root, strict context cleanup and public per-run cache_dir close the reproduced stale-response defect without private APIs or a new loader framework. Current-model export retains its existing single materialization. Source immutability and rare-fallback copy cost are explicit.",
+  "implementation_gates": "Acceptance authorizes implementing the bounded design only. LC1-LC7, current-model export regression, actual read-only/partial-copy/nested cleanup, raw source-bound red/green and independent code review remain required; this report is neither implementation acceptance nor runtime qualification.",
+  "limits": "Stable sources during copy are assumed and concurrent checkpoint publication/GPU/distributed qualification are not claimed. Broken or cyclic links fail explicitly; no guessed pruning of copied stale cache artifacts. No reviewed source files were modified."
+}

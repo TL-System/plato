@@ -1,0 +1,105 @@
+{
+  "accepted": true,
+  "base_prefix": "/opt/plato/python/cpython-3.13.16-linux-x86_64-gnu",
+  "cudnn_version": 92400,
+  "distributions": {
+    "cuda-toolkit": {
+      "direct_url": null,
+      "location": "/opt/plato/.venv/lib/python3.13/site-packages",
+      "version": "13.0.3.0"
+    },
+    "nvidia-cudnn-cu13": {
+      "direct_url": null,
+      "location": "/opt/plato/.venv/lib/python3.13/site-packages",
+      "version": "9.24.0.43"
+    },
+    "plato-learn": {
+      "direct_url": "{\"url\":\"file:///root/plato\",\"dir_info\":{\"editable\":true}}",
+      "location": "/opt/plato/.venv/lib/python3.13/site-packages",
+      "version": "1.4.3"
+    },
+    "torch": {
+      "direct_url": null,
+      "location": "/opt/plato/.venv/lib/python3.13/site-packages",
+      "version": "2.14.1"
+    },
+    "torchvision": {
+      "direct_url": null,
+      "location": "/opt/plato/.venv/lib/python3.13/site-packages",
+      "version": "0.29.1"
+    }
+  },
+  "executable": "/opt/plato/.venv/bin/python",
+  "gpu_compute_tested": false,
+  "hostname": "f2b425c8975d",
+  "imports": {
+    "accelerate": "/opt/plato/.venv/lib/python3.13/site-packages/accelerate/__init__.py",
+    "aiohttp": "/opt/plato/.venv/lib/python3.13/site-packages/aiohttp/__init__.py",
+    "datasets": "/opt/plato/.venv/lib/python3.13/site-packages/datasets/__init__.py",
+    "evaluate": "/opt/plato/.venv/lib/python3.13/site-packages/evaluate/__init__.py",
+    "numpy": "/opt/plato/.venv/lib/python3.13/site-packages/numpy/__init__.py",
+    "peft": "/opt/plato/.venv/lib/python3.13/site-packages/peft/__init__.py",
+    "plato": "/root/plato/plato/__init__.py",
+    "scipy": "/opt/plato/.venv/lib/python3.13/site-packages/scipy/__init__.py",
+    "socketio": "/opt/plato/.venv/lib/python3.13/site-packages/socketio/__init__.py",
+    "tenseal": "/opt/plato/.venv/lib/python3.13/site-packages/tenseal/__init__.py",
+    "timm": "/opt/plato/.venv/lib/python3.13/site-packages/timm/__init__.py",
+    "torch": "/opt/plato/.venv/lib/python3.13/site-packages/torch/__init__.py",
+    "torch_optimizer": "/opt/plato/.venv/lib/python3.13/site-packages/torch_optimizer/__init__.py",
+    "torchvision": "/opt/plato/.venv/lib/python3.13/site-packages/torchvision/__init__.py",
+    "transformers": "/opt/plato/.venv/lib/python3.13/site-packages/transformers/__init__.py",
+    "zstd": "/opt/plato/.venv/lib/python3.13/site-packages/zstd.cpython-313-x86_64-linux-gnu.so"
+  },
+  "loaded_cuda_cudnn_libraries": [
+    "/opt/plato/.venv/lib/python3.13/site-packages/cuda/bindings/_internal/driver.cpython-313-x86_64-linux-gnu.so",
+    "/opt/plato/.venv/lib/python3.13/site-packages/cuda/bindings/_internal/runtime.cpython-313-x86_64-linux-gnu.so",
+    "/opt/plato/.venv/lib/python3.13/site-packages/cuda/bindings/_internal/runtime_ptds.cpython-313-x86_64-linux-gnu.so",
+    "/opt/plato/.venv/lib/python3.13/site-packages/cuda/bindings/_internal/utils.cpython-313-x86_64-linux-gnu.so",
+    "/opt/plato/.venv/lib/python3.13/site-packages/cuda/bindings/cydriver.cpython-313-x86_64-linux-gnu.so",
+    "/opt/plato/.venv/lib/python3.13/site-packages/cuda/bindings/cyruntime.cpython-313-x86_64-linux-gnu.so",
+    "/opt/plato/.venv/lib/python3.13/site-packages/cuda/bindings/driver.cpython-313-x86_64-linux-gnu.so",
+    "/opt/plato/.venv/lib/python3.13/site-packages/cuda/bindings/runtime.cpython-313-x86_64-linux-gnu.so",
+    "/opt/plato/.venv/lib/python3.13/site-packages/nvidia/cu13/lib/libcublas.so.13",
+    "/opt/plato/.venv/lib/python3.13/site-packages/nvidia/cu13/lib/libcublasLt.so.13",
+    "/opt/plato/.venv/lib/python3.13/site-packages/nvidia/cu13/lib/libcudart.so.13",
+    "/opt/plato/.venv/lib/python3.13/site-packages/nvidia/cu13/lib/libcufft.so.12",
+    "/opt/plato/.venv/lib/python3.13/site-packages/nvidia/cu13/lib/libnvrtc-builtins.so.13.0",
+    "/opt/plato/.venv/lib/python3.13/site-packages/nvidia/cu13/lib/libnvrtc.so.13",
+    "/opt/plato/.venv/lib/python3.13/site-packages/nvidia/cudnn/lib/libcudnn.so.9",
+    "/opt/plato/.venv/lib/python3.13/site-packages/nvidia/cudnn/lib/libcudnn_graph.so.9",
+    "/opt/plato/.venv/lib/python3.13/site-packages/nvidia/nccl/lib/libnccl.so.2",
+    "/opt/plato/.venv/lib/python3.13/site-packages/torch/lib/libc10_cuda.so",
+    "/opt/plato/.venv/lib/python3.13/site-packages/torch/lib/libtorch_cuda.so",
+    "/opt/plato/.venv/lib/python3.13/site-packages/torchvision.libs/libcudart.faf08d9a.so.13"
+  ],
+  "lock_sha256": "66a4e4442d7b1f26d220b44ca73c44ff4f1151a86857bb3f93a594819fd08126",
+  "mounted": false,
+  "nvcc": "nvcc: NVIDIA (R) Cuda compiler driver\nCopyright (c) 2005-2025 NVIDIA Corporation\nBuilt on Wed_Aug_20_01:58:59_PM_PDT_2025\nCuda compilation tools, release 13.0, V13.0.88\nBuild cuda_13.0.r13.0/compiler.36424714_0\n",
+  "os_packages": "adduser\t3.137ubuntu1\napt\t2.8.3\nbase-files\t13ubuntu10.4\nbase-passwd\t3.6.3build1\nbash\t5.2.21-2ubuntu4\nbinutils\t2.42-4ubuntu2.10\nbinutils-common:amd64\t2.42-4ubuntu2.10\nbinutils-x86-64-linux-gnu\t2.42-4ubuntu2.10\nbsdutils\t1:2.39.3-9ubuntu6.5\nbuild-essential\t12.10ubuntu1\nbzip2\t1.0.8-5.1build0.1\nca-certificates\t20260601~24.04.1\ncoreutils\t9.4-3ubuntu6.2\ncpp\t4:13.2.0-7ubuntu1\ncpp-13\t13.3.0-6ubuntu2~24.04.1\ncpp-13-x86-64-linux-gnu\t13.3.0-6ubuntu2~24.04.1\ncpp-x86-64-linux-gnu\t4:13.2.0-7ubuntu1\ncuda-cccl-13-0\t13.0.85-1\ncuda-command-line-tools-13-0\t13.0.3-1\ncuda-compat-13-0\t580.126.20-1ubuntu1\ncuda-compiler-13-0\t13.0.3-1\ncuda-crt-13-0\t13.0.88-1\ncuda-cudart-13-0\t13.0.96-1\ncuda-cudart-dev-13-0\t13.0.96-1\ncuda-culibos-dev-13-0\t13.0.85-1\ncuda-cuobjdump-13-0\t13.0.85-1\ncuda-cupti-13-0\t13.0.85-1\ncuda-cupti-dev-13-0\t13.0.85-1\ncuda-cuxxfilt-13-0\t13.0.85-1\ncuda-driver-dev-13-0\t13.0.96-1\ncuda-gdb-13-0\t13.0.85-1\ncuda-keyring\t1.1-1\ncuda-libraries-13-0\t13.0.3-1\ncuda-libraries-dev-13-0\t13.0.3-1\ncuda-minimal-build-13-0\t13.0.3-1\ncuda-nsight-compute-13-0\t13.0.3-1\ncuda-nvcc-13-0\t13.0.88-1\ncuda-nvdisasm-13-0\t13.0.85-1\ncuda-nvml-dev-13-0\t13.0.87-1\ncuda-nvprune-13-0\t13.0.85-1\ncuda-nvrtc-13-0\t13.0.88-1\ncuda-nvrtc-dev-13-0\t13.0.88-1\ncuda-nvtx-13-0\t13.0.85-1\ncuda-opencl-13-0\t13.0.85-1\ncuda-profiler-api-13-0\t13.0.85-1\ncuda-sandbox-dev-13-0\t13.0.85-1\ncuda-sanitizer-13-0\t13.0.85-1\ncuda-toolkit-13-0-config-common\t13.0.96-1\ncuda-toolkit-13-config-common\t13.0.96-1\ncuda-toolkit-config-common\t13.0.96-1\ndash\t0.5.12-6ubuntu5\ndebconf\t1.5.86ubuntu1\ndebianutils\t5.17build1\ndiffutils\t1:3.10-1build1\ndirmngr\t2.4.4-2ubuntu17.4\ndpkg\t1.22.6ubuntu6.5\ndpkg-dev\t1.22.6ubuntu6.5\ne2fsprogs\t1.47.0-2.4~exp1ubuntu4.1\nfindutils\t4.9.0-5build1\ng++\t4:13.2.0-7ubuntu1\ng++-13\t13.3.0-6ubuntu2~24.04.1\ng++-13-x86-64-linux-gnu\t13.3.0-6ubuntu2~24.04.1\ng++-x86-64-linux-gnu\t4:13.2.0-7ubuntu1\ngcc\t4:13.2.0-7ubuntu1\ngcc-13\t13.3.0-6ubuntu2~24.04.1\ngcc-13-base:amd64\t13.3.0-6ubuntu2~24.04.1\ngcc-13-x86-64-linux-gnu\t13.3.0-6ubuntu2~24.04.1\ngcc-14-base:amd64\t14.2.0-4ubuntu2~24.04.1\ngcc-x86-64-linux-gnu\t4:13.2.0-7ubuntu1\ngnupg\t2.4.4-2ubuntu17.4\ngnupg-utils\t2.4.4-2ubuntu17.4\ngnupg2\t2.4.4-2ubuntu17.4\ngpg\t2.4.4-2ubuntu17.4\ngpg-agent\t2.4.4-2ubuntu17.4\ngpgconf\t2.4.4-2ubuntu17.4\ngpgsm\t2.4.4-2ubuntu17.4\ngpgv\t2.4.4-2ubuntu17.4\ngrep\t3.11-4build1\ngzip\t1.12-1ubuntu3.1\nhostname\t3.23+nmu2ubuntu2\ninit-system-helpers\t1.66ubuntu1\nkeyboxd\t2.4.4-2ubuntu17.4\nlibacl1:amd64\t2.3.2-1build1.1\nlibapt-pkg6.0t64:amd64\t2.8.3\nlibasan8:amd64\t14.2.0-4ubuntu2~24.04.1\nlibassuan0:amd64\t2.5.6-1build1\nlibatomic1:amd64\t14.2.0-4ubuntu2~24.04.1\nlibattr1:amd64\t1:2.5.2-1build1.1\nlibaudit-common\t1:3.1.2-2.1build1.1\nlibaudit1:amd64\t1:3.1.2-2.1build1.1\nlibbinutils:amd64\t2.42-4ubuntu2.10\nlibblkid1:amd64\t2.39.3-9ubuntu6.5\nlibbz2-1.0:amd64\t1.0.8-5.1build0.1\nlibc-bin\t2.39-0ubuntu8.7\nlibc-dev-bin\t2.39-0ubuntu8.7\nlibc6:amd64\t2.39-0ubuntu8.7\nlibc6-dev:amd64\t2.39-0ubuntu8.7\nlibcap-ng0:amd64\t0.8.4-2build2\nlibcap2:amd64\t1:2.66-5ubuntu2.2\nlibcc1-0:amd64\t14.2.0-4ubuntu2~24.04.1\nlibcom-err2:amd64\t1.47.0-2.4~exp1ubuntu4.1\nlibcrypt-dev:amd64\t1:4.4.36-4build1\nlibcrypt1:amd64\t1:4.4.36-4build1\nlibctf-nobfd0:amd64\t2.42-4ubuntu2.10\nlibctf0:amd64\t2.42-4ubuntu2.10\nlibcublas-13-0\t13.1.1.3-1\nlibcublas-dev-13-0\t13.1.1.3-1\nlibcufft-13-0\t12.0.0.61-1\nlibcufft-dev-13-0\t12.0.0.61-1\nlibcufile-13-0\t1.15.1.6-1\nlibcufile-dev-13-0\t1.15.1.6-1\nlibcurand-13-0\t10.4.0.35-1\nlibcurand-dev-13-0\t10.4.0.35-1\nlibcusolver-13-0\t12.0.4.66-1\nlibcusolver-dev-13-0\t12.0.4.66-1\nlibcusparse-13-0\t12.6.3.3-1\nlibcusparse-dev-13-0\t12.6.3.3-1\nlibdb5.3t64:amd64\t5.3.28+dfsg2-7\nlibdebconfclient0:amd64\t0.271ubuntu3\nlibdpkg-perl\t1.22.6ubuntu6.5\nlibext2fs2t64:amd64\t1.47.0-2.4~exp1ubuntu4.1\nlibffi8:amd64\t3.4.6-1build1\nlibgcc-13-dev:amd64\t13.3.0-6ubuntu2~24.04.1\nlibgcc-s1:amd64\t14.2.0-4ubuntu2~24.04.1\nlibgcrypt20:amd64\t1.10.3-2build1\nlibgdbm-compat4t64:amd64\t1.23-5.1build1\nlibgdbm6t64:amd64\t1.23-5.1build1\nlibgmp10:amd64\t2:6.3.0+dfsg-2ubuntu6.1\nlibgnutls30t64:amd64\t3.8.3-1.1ubuntu3.5\nlibgomp1:amd64\t14.2.0-4ubuntu2~24.04.1\nlibgpg-error0:amd64\t1.47-3build2.1\nlibgprofng0:amd64\t2.42-4ubuntu2.10\nlibhogweed6t64:amd64\t3.9.1-2.2build1.1\nlibhwasan0:amd64\t14.2.0-4ubuntu2~24.04.1\nlibidn2-0:amd64\t2.3.7-2build1.1\nlibisl23:amd64\t0.26-3build1.1\nlibitm1:amd64\t14.2.0-4ubuntu2~24.04.1\nlibjansson4:amd64\t2.14-2build2\nlibksba8:amd64\t1.6.6-1build1\nlibldap2:amd64\t2.6.10+dfsg-0ubuntu0.24.04.1\nliblsan0:amd64\t14.2.0-4ubuntu2~24.04.1\nliblz4-1:amd64\t1.9.4-1build1.1\nliblzma5:amd64\t5.6.1+really5.4.5-1ubuntu0.2\nlibmd0:amd64\t1.1.0-2build1.1\nlibmount1:amd64\t2.39.3-9ubuntu6.5\nlibmpc3:amd64\t1.3.1-1build1.1\nlibmpfr6:amd64\t4.2.1-1build1.1\nlibnccl-dev\t2.28.3-1+cuda13.0\nlibnccl2\t2.28.3-1+cuda13.0\nlibncursesw6:amd64\t6.4+20240113-1ubuntu2\nlibnettle8t64:amd64\t3.9.1-2.2build1.1\nlibnpp-13-0\t13.0.1.2-1\nlibnpp-dev-13-0\t13.0.1.2-1\nlibnpth0t64:amd64\t1.6-3.1build1\nlibnvfatbin-13-0\t13.0.85-1\nlibnvfatbin-dev-13-0\t13.0.85-1\nlibnvjitlink-13-0\t13.0.88-1\nlibnvjitlink-dev-13-0\t13.0.88-1\nlibnvjpeg-13-0\t13.0.1.86-1\nlibnvjpeg-dev-13-0\t13.0.1.86-1\nlibnvptxcompiler-13-0\t13.0.88-1\nlibnvvm-13-0\t13.0.88-1\nlibp11-kit0:amd64\t0.25.3-4ubuntu2.1\nlibpam-modules:amd64\t1.5.3-5ubuntu5.5\nlibpam-modules-bin\t1.5.3-5ubuntu5.5\nlibpam-runtime\t1.5.3-5ubuntu5.5\nlibpam0g:amd64\t1.5.3-5ubuntu5.5\nlibpcre2-8-0:amd64\t10.42-4ubuntu2.1\nlibperl5.38t64:amd64\t5.38.2-3.2ubuntu0.2\nlibproc2-0:amd64\t2:4.0.4-4ubuntu3.2\nlibquadmath0:amd64\t14.2.0-4ubuntu2~24.04.1\nlibreadline8t64:amd64\t8.2-4build1\nlibsasl2-2:amd64\t2.1.28+dfsg1-5ubuntu3.1\nlibsasl2-modules-db:amd64\t2.1.28+dfsg1-5ubuntu3.1\nlibseccomp2:amd64\t2.5.5-1ubuntu3.1\nlibselinux1:amd64\t3.5-2ubuntu2.1\nlibsemanage-common\t3.5-1build5\nlibsemanage2:amd64\t3.5-1build5\nlibsepol2:amd64\t3.5-2build1\nlibsframe1:amd64\t2.42-4ubuntu2.10\nlibsmartcols1:amd64\t2.39.3-9ubuntu6.5\nlibsqlite3-0:amd64\t3.45.1-1ubuntu2.5\nlibss2:amd64\t1.47.0-2.4~exp1ubuntu4.1\nlibssl3t64:amd64\t3.0.13-0ubuntu3.9\nlibstdc++-13-dev:amd64\t13.3.0-6ubuntu2~24.04.1\nlibstdc++6:amd64\t14.2.0-4ubuntu2~24.04.1\nlibsystemd0:amd64\t255.4-1ubuntu8.14\nlibtasn1-6:amd64\t4.19.0-3ubuntu0.24.04.2\nlibtinfo6:amd64\t6.4+20240113-1ubuntu2\nlibtsan2:amd64\t14.2.0-4ubuntu2~24.04.1\nlibubsan1:amd64\t14.2.0-4ubuntu2~24.04.1\nlibudev1:amd64\t255.4-1ubuntu8.14\nlibunistring5:amd64\t1.1-2build1.1\nlibuuid1:amd64\t2.39.3-9ubuntu6.5\nlibxxhash0:amd64\t0.8.2-2build1\nlibzstd1:amd64\t1.5.5+dfsg2-2build1.1\nlinux-libc-dev:amd64\t6.8.0-110.110\nlogin\t1:4.13+dfsg1-4ubuntu3.2\nlogsave\t1.47.0-2.4~exp1ubuntu4.1\nlto-disabled-list\t47\nmake\t4.3-4.1build2\nmawk\t1.3.4.20240123-1build1\nmount\t2.39.3-9ubuntu6.5\nncurses-base\t6.4+20240113-1ubuntu2\nncurses-bin\t6.4+20240113-1ubuntu2\nnsight-compute-2025.3.1\t2025.3.1.4-1\nopenssl\t3.0.13-0ubuntu3.9\npasswd\t1:4.13+dfsg1-4ubuntu3.2\npatch\t2.7.6-7build3\nperl\t5.38.2-3.2ubuntu0.2\nperl-base\t5.38.2-3.2ubuntu0.2\nperl-modules-5.38\t5.38.2-3.2ubuntu0.2\npinentry-curses\t1.2.1-3ubuntu5\nprocps\t2:4.0.4-4ubuntu3.2\nreadline-common\t8.2-4build1\nrpcsvc-proto\t1.4.2-0ubuntu7\nsed\t4.9-2build1\nsensible-utils\t0.0.22\nsysvinit-utils\t3.08-6ubuntu3\ntar\t1.35+dfsg-3build1\nubuntu-keyring\t2023.11.28.1\nunminimize\t0.2.1\nutil-linux\t2.39.3-9ubuntu6.5\nxz-utils\t5.6.1+really5.4.5-1ubuntu0.2\nzlib1g:amd64\t1:1.3.dfsg-3.1ubuntu2.1\n",
+  "os_release": "PRETTY_NAME=\"Ubuntu 24.04.4 LTS\"\nNAME=\"Ubuntu\"\nVERSION_ID=\"24.04\"\nVERSION=\"24.04.4 LTS (Noble Numbat)\"\nVERSION_CODENAME=noble\nID=ubuntu\nID_LIKE=debian\nHOME_URL=\"https://www.ubuntu.com/\"\nSUPPORT_URL=\"https://help.ubuntu.com/\"\nBUG_REPORT_URL=\"https://bugs.launchpad.net/ubuntu/\"\nPRIVACY_POLICY_URL=\"https://www.ubuntu.com/legal/terms-and-policies/privacy-policy\"\nUBUNTU_CODENAME=noble\nLOGO=ubuntu-logo\n",
+  "package_freeze": "accelerate==1.15.0\naiohappyeyeballs==2.7.1\naiohttp==3.14.3\naiosignal==1.4.0\nannotated-doc==0.0.5\nanyio==4.15.1\nattrs==26.1.0\nbeautifulsoup4==4.15.0\nbidict==0.24.1\nboto3==1.43.106\nbotocore==1.43.106\ncertifi==2026.7.22\ncharset-normalizer==3.5.2\nclick==8.5.0\ncuda-bindings==13.4.3\ncuda-pathfinder==1.8.3\ncuda-toolkit==13.0.3.0\ndatasets==5.0.1\ndill==0.4.1\nevaluate==0.4.6\nfilelock==4.0.9\nfrozenlist==1.8.0\nfsspec==2026.6.0\ngdown==6.4.1\nh11==0.16.0\nhf-xet==1.6.0\nhttpcore==1.0.9\nhttpx==0.28.1\nhuggingface-hub==1.33.0\nidna==3.20\njinja2==3.1.6\njmespath==1.1.0\nmarkdown-it-py==4.2.0\nmarkupsafe==3.0.3\nmdurl==0.1.2\nmpmath==1.3.0\nmultidict==6.9.1\nmultiprocess==0.70.19\nmunch==4.0.0\nnetworkx==3.7\nnumpy==2.5.3\nnvidia-cublas==13.1.1.3\nnvidia-cuda-cupti==13.0.85\nnvidia-cuda-nvrtc==13.0.88\nnvidia-cuda-runtime==13.0.96\nnvidia-cudnn-cu13==9.24.0.43\nnvidia-cufft==12.0.0.61\nnvidia-cufile==1.15.1.6\nnvidia-curand==10.4.0.35\nnvidia-cusolver==12.0.4.66\nnvidia-cusparse==12.6.3.3\nnvidia-cusparselt-cu13==0.8.1\nnvidia-nccl-cu13==2.30.7\nnvidia-nvjitlink==13.4.92\nnvidia-nvshmem-cu13==3.4.5\nnvidia-nvtx==13.0.85\npackaging==26.3\npandas==3.0.6\npeft==0.21.2\npillow==12.3.0\n-e file:///root/plato\npropcache==0.5.4\npsutil==7.2.2\npyarrow==25.0.1\npygments==2.21.0\npysocks==1.7.1\npython-dateutil==2.9.0.post0\npython-engineio==4.14.0\npython-socketio==5.17.0\npytorch-ranger==0.1.1\npyyaml==6.0.3\nregex==2026.9.29\nrequests==2.34.2\nrich==15.0.0\ns3transfer==0.19.2\nsafetensors==0.8.0\nscipy==1.18.1\nsetuptools==84.0.0\nshellingham==1.5.4\nsimple-websocket==1.1.0\nsix==1.17.0\nsoupsieve==2.10\nsympy==1.14.0\ntenseal==0.3.18\ntimm==1.0.30\ntokenizers==0.23.2\ntorch==2.14.1\ntorch-optimizer==0.3.0\ntorchvision==0.29.1\ntqdm==4.70.1\ntransformers==5.18.0\ntriton==3.8.0\ntyper==0.27.2\ntyping-extensions==4.16.0\nurllib3==2.8.0\nwsproto==1.3.2\nxxhash==4.0.1\nyarl==1.25.1\nzstd==1.5.7.2\n",
+  "prefix": "/opt/plato/.venv",
+  "python": "3.13.16 (main, Oct  1 2026, 20:59:14) [Clang 22.1.3 ]",
+  "scope": "Linux amd64 CPU imports and startup",
+  "torch_cuda_build": "13.0",
+  "torch_version": "2.14.1+cu130",
+  "torchvision_cpu_nms": [
+    0
+  ],
+  "uv": "uv 0.12.22 (x86_64-unknown-linux-musl)",
+  "uv_pip_check": "Using Python 3.13.16 environment at: /opt/plato/.venv\nChecked 99 packages in 45ms\nAll installed packages are compatible\n",
+  "workspace_manifests": [
+    "examples/unlearning/fedunlearning/pyproject.toml",
+    "examples/unlearning/knot/pyproject.toml",
+    "examples/client_selection/pisces/pyproject.toml",
+    "examples/client_selection/polaris/pyproject.toml",
+    "examples/split_learning/llm_split_learning/pyproject.toml",
+    "examples/ssl/calibre/pyproject.toml",
+    "examples/ssl/smog/pyproject.toml",
+    "examples/model_search/anycostfl/pyproject.toml",
+    "examples/model_search/fedrolex/pyproject.toml",
+    "examples/model_search/heterofl/pyproject.toml",
+    "examples/detector/pyproject.toml",
+    "examples/gradient_leakage_attacks/pyproject.toml"
+  ]
+}

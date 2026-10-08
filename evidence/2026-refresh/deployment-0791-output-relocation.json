@@ -1,0 +1,217 @@
+{
+  "status": "PRESERVED_BY_RELOCATION",
+  "publication": "0791c01afcaea96223a925a32ee22882dc437ee2",
+  "old_path": "/tmp/plato-refresh-worktrees/deployment-integration/ci-artifacts",
+  "preserved_path": "/tmp/plato-deployment-integration/preserved-0791-publication-ci-artifacts",
+  "records": [
+    {
+      "path": "docs",
+      "mode": 493,
+      "mtime_ns": 1791076017284825763,
+      "kind": "directory"
+    },
+    {
+      "path": "docs/docs-environment.json",
+      "mode": 420,
+      "mtime_ns": 1791076017284897471,
+      "kind": "file",
+      "bytes": 1132,
+      "sha256": "84d8245e64766c6813d4cc86338993c2c827e19dcfc177620c1f7b0b672b593c"
+    },
+    {
+      "path": "docs-package",
+      "mode": 493,
+      "mtime_ns": 1791076044086691882,
+      "kind": "directory"
+    },
+    {
+      "path": "docs-package/acceptance.json",
+      "mode": 420,
+      "mtime_ns": 1791076044086777507,
+      "kind": "file",
+      "bytes": 683,
+      "sha256": "82b1ac2efa6e1fa79bdbe206cc349881568d28804cd43d93db6f7c686f134d52"
+    },
+    {
+      "path": "docs-package/build-constraints.log",
+      "mode": 420,
+      "mtime_ns": 1791076018141214338,
+      "kind": "file",
+      "bytes": 590,
+      "sha256": "773dc69f5231bf02535d0c4acd64e458a6269a0580980f7b28ca34d8aed59182"
+    },
+    {
+      "path": "docs-package/build-constraints.txt",
+      "mode": 420,
+      "mtime_ns": 1791076018141353713,
+      "kind": "file",
+      "bytes": 212,
+      "sha256": "284e1018003f55e4ce6fbb5c80b7dad20e86d9ed60ef544d817f1892626326de"
+    },
+    {
+      "path": "docs-package/build.log",
+      "mode": 420,
+      "mtime_ns": 1791076020275580651,
+      "kind": "file",
+      "bytes": 629,
+      "sha256": "b3e230afcaf3494da550775b1f277bf45274f86618576197b4ece7409c4de216"
+    },
+    {
+      "path": "docs-package/distributions",
+      "mode": 493,
+      "mtime_ns": 1791076020168192235,
+      "kind": "directory"
+    },
+    {
+      "path": "docs-package/distributions/.gitignore",
+      "mode": 420,
+      "mtime_ns": 1791076018174804130,
+      "kind": "file",
+      "bytes": 1,
+      "sha256": "684888c0ebb17f374298b65ee2807526c066094c701bcc7ebbe1c1095f494fc1"
+    },
+    {
+      "path": "docs-package/distributions/plato_learn-1.4.3-py3-none-any.whl",
+      "mode": 420,
+      "mtime_ns": 1791076020167979110,
+      "kind": "file",
+      "bytes": 383621,
+      "sha256": "5e300e5a00b575557cd0ca5c948d956772fb7229a470bdbead2ac1333ced79dd"
+    },
+    {
+      "path": "docs-package/distributions/plato_learn-1.4.3.tar.gz",
+      "mode": 420,
+      "mtime_ns": 1791076019696744782,
+      "kind": "file",
+      "bytes": 6916788,
+      "sha256": "87ee09478d1c3afa005e54c46b5acd1876387e271fb679211d0d0b27cd8ee9d8"
+    },
+    {
+      "path": "docs-package/installed-wheel-import.log",
+      "mode": 420,
+      "mtime_ns": 1791076041743580446,
+      "kind": "file",
+      "bytes": 7932,
+      "sha256": "463e7e9c538be399a1cc3b4d31758e3a75e4c147eb89ace48da7e8b2d13a3649"
+    },
+    {
+      "path": "docs-package/installed-wheel.json",
+      "mode": 420,
+      "mtime_ns": 1791076042252440316,
+      "kind": "file",
+      "bytes": 4716,
+      "sha256": "c67d97c06058b8d6597f039201be2bbc4eb529ee28457182eeb3f3137bf594b3"
+    },
+    {
+      "path": "docs-package/provenance.json",
+      "mode": 420,
+      "mtime_ns": 1791076018122239963,
+      "kind": "file",
+      "bytes": 985,
+      "sha256": "8256eb6ff4ae94af7492c619fd91259ae8fa186d3eed6c520342073c5d7ddd15"
+    },
+    {
+      "path": "docs-package/rebuilt",
+      "mode": 493,
+      "mtime_ns": 1791076021171336059,
+      "kind": "directory"
+    },
+    {
+      "path": "docs-package/rebuilt/.gitignore",
+      "mode": 420,
+      "mtime_ns": 1791076020918938479,
+      "kind": "file",
+      "bytes": 1,
+      "sha256": "684888c0ebb17f374298b65ee2807526c066094c701bcc7ebbe1c1095f494fc1"
+    },
+    {
+      "path": "docs-package/rebuilt/plato_learn-1.4.3-py3-none-any.whl",
+      "mode": 420,
+      "mtime_ns": 1791076021171144434,
+      "kind": "file",
+      "bytes": 383621,
+      "sha256": "5e300e5a00b575557cd0ca5c948d956772fb7229a470bdbead2ac1333ced79dd"
+    },
+    {
+      "path": "docs-package/rebuilt-wheel-manifest.json",
+      "mode": 420,
+      "mtime_ns": 1791076021204381684,
+      "kind": "file",
+      "bytes": 24642,
+      "sha256": "0d9d5cec358e4a52af9a297b220a0d890d3fc4b689edd206c78b2b251ecbff53"
+    },
+    {
+      "path": "docs-package/runtime-constraints.log",
+      "mode": 420,
+      "mtime_ns": 1791076018160225130,
+      "kind": "file",
+      "bytes": 7646,
+      "sha256": "1ac00e1b6a904adbfd6d526b3a67739a3b5a19f8db4d10135ceccad025436b67"
+    },
+    {
+      "path": "docs-package/runtime-constraints.txt",
+      "mode": 420,
+      "mtime_ns": 1791076018160384171,
+      "kind": "file",
+      "bytes": 7268,
+      "sha256": "9c9b82f4c52ba05fb5a1c7e6e841e15fcd69104f9867cf7d7526060055a32709"
+    },
+    {
+      "path": "docs-package/sdist-manifest.json",
+      "mode": 420,
+      "mtime_ns": 1791076020423902609,
+      "kind": "file",
+      "bytes": 187899,
+      "sha256": "0e00eed82c01c57d0f6a53cc93bf3f3795a5be51b1b7092fc2d8c94497d99a62"
+    },
+    {
+      "path": "docs-package/sdist-rebuild.log",
+      "mode": 420,
+      "mtime_ns": 1791076021196228726,
+      "kind": "file",
+      "bytes": 589,
+      "sha256": "86642ec978dda55d1838ee1ab6da073181ca2ffc9681adfeb9d06b9d77e85083"
+    },
+    {
+      "path": "docs-package/sdist-source-binding.json",
+      "mode": 420,
+      "mtime_ns": 1791076020559910774,
+      "kind": "file",
+      "bytes": 311017,
+      "sha256": "63b33e7ad5209551863f23502ffbb1b97f9dd5de72cacaa1aa2a311c4ced1126"
+    },
+    {
+      "path": "docs-package/wheel-dependencies.log",
+      "mode": 420,
+      "mtime_ns": 1791076021892900136,
+      "kind": "file",
+      "bytes": 405,
+      "sha256": "c6176879cf69e3f31a4f79a63ffa94f89001408dd3169dc860638ae93908d2a1"
+    },
+    {
+      "path": "docs-package/wheel-environment.log",
+      "mode": 420,
+      "mtime_ns": 1791076021216429100,
+      "kind": "file",
+      "bytes": 466,
+      "sha256": "e985afeadb8feed2cca0efbc34ad1bafe6946b08e88cfe7248899d4bbeb8e236"
+    },
+    {
+      "path": "docs-package/wheel-install.log",
+      "mode": 420,
+      "mtime_ns": 1791076021850852136,
+      "kind": "file",
+      "bytes": 2439,
+      "sha256": "5404c946eaa68b705c3e153aa8c74d3e6f9d6c26e0e130ca58457711d9db156e"
+    },
+    {
+      "path": "docs-package/wheel-manifest.json",
+      "mode": 420,
+      "mtime_ns": 1791076020423341400,
+      "kind": "file",
+      "bytes": 24642,
+      "sha256": "0d9d5cec358e4a52af9a297b220a0d890d3fc4b689edd206c78b2b251ecbff53"
+    }
+  ],
+  "preserved": "Allbytes,symlinks,modes,mtimes identical; previous0791 acceptance/logs stillpreservedexternally. Defaultdocs environment retained forcorrectedfinalcheck."
+}

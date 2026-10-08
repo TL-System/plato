@@ -1,0 +1,84 @@
+{
+  "finding_id": "2C-11",
+  "status": "OPEN_INTERNAL_RESEARCH_DESIGN_DISPOSITION",
+  "scope": "FedDyn shifted quadratic plus linear global penalty, and label-ID-based adaptive alpha",
+  "primary_source": "https://raw.githubusercontent.com/alpemreacar/FedDyn/master/utils_general.py",
+  "retained_source": "/tmp/plato-phase2c-scratch/feddyn-author-utils_general.py",
+  "source_sha256": "6e79b259456475934b71cddc797b8dcf1e66818bd543465ad02225b6e506eca5",
+  "source_lines": {
+    "optimizer_decay": 190,
+    "linear_regularizer": 219
+  },
+  "initial_weight": 2.0,
+  "global_weight": 2.0,
+  "history": 0.0,
+  "alpha": 0.1,
+  "lr": 0.1,
+  "records": [
+    {
+      "adaptive_alpha": false,
+      "labels": [
+        0,
+        0
+      ],
+      "samples": 2,
+      "actual_alpha": 0.10000000149011612,
+      "actual_regularizer_gradient": -0.20000000298023224,
+      "actual_next_weight": 2.0200000002980234,
+      "author_next_weight": 2.0,
+      "author_effective_regularizer_gradient": 0.0
+    },
+    {
+      "adaptive_alpha": true,
+      "labels": [
+        0,
+        0
+      ],
+      "samples": 2,
+      "actual_alpha": 0.10000000149011612,
+      "actual_regularizer_gradient": -0.20000000298023224,
+      "actual_next_weight": 2.0200000002980234,
+      "author_next_weight": 2.0,
+      "author_effective_regularizer_gradient": 0.0
+    },
+    {
+      "adaptive_alpha": true,
+      "labels": [
+        0,
+        1
+      ],
+      "samples": 2,
+      "actual_alpha": 0.07500000298023224,
+      "actual_regularizer_gradient": -0.15000000596046448,
+      "actual_next_weight": 2.0150000005960464,
+      "author_next_weight": 2.0,
+      "author_effective_regularizer_gradient": 0.0
+    },
+    {
+      "adaptive_alpha": true,
+      "labels": [
+        1,
+        1
+      ],
+      "samples": 2,
+      "actual_alpha": 0.10000000149011612,
+      "actual_regularizer_gradient": -0.20000000298023224,
+      "actual_next_weight": 2.0200000002980234,
+      "author_next_weight": 2.0,
+      "author_effective_regularizer_gradient": 0.0
+    }
+  ],
+  "current_equations_preserved": true,
+  "bounded_fix_applied": "All-zero labels now reach the existing zero-weight fallback, avoiding 0/0 NaN. Nonzero behavior and the objective remain unchanged.",
+  "requested_root_disposition": "Root revisedAstra design andfreshreview remainpendingacceptedimplementationhandoff. 2C-11 remainsinternalopen, notwaived/archive/external; no equation rewrite in sixreviewfixes.",
+  "implementation_commit": "e65241c19448b74dcb57fc48bfe388152f3a3e58",
+  "probe_command": "PYTHONPATH=. OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 /tmp/plato-phase2c-313/bin/python /tmp/plato-phase2c-scratch/feddyn_disposition_probe.py",
+  "probe_source": {
+    "path": "/tmp/plato-phase2c-scratch/feddyn_disposition_probe.py",
+    "bytes": 3445,
+    "sha256": "bdc41326d83e94521018a7a45fb0b062423fcec7d29981e4158913947d646a13"
+  },
+  "equation_fix_not_authorized_or_implemented": true,
+  "closure_requirement": "Root bounded independent primary-source design+review, then explicit original-author implementation/review if selected; this is an open internal finding and cannot be counted as complete/waived/external. F20 accepted unsquared norm policy unchanged.",
+  "bounded_checkpoint_migration_correction": "TRAINING-2C-02 exactoldwriter root+'_feddyn_grad_'+id+'.pth' lookup fixed and actualacceptedBwriter default/custom/trailing-root cases verified; read-onlylegacy/canonicalprecedence/client0isolation. No objective/adaptivealpha change."
+}

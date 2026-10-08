@@ -113,7 +113,7 @@ def test_split_learning_smoke(monkeypatch):
         trainer = trainer_mod.Trainer(model=lambda: SimpleNamespace())
         trainer.context.client_id = 0
         trainer.gradients = []
-        trainer.cut_layer_grad = None
+        setattr(trainer, "cut_layer_grad", None)
 
         trainer.callback_handler.call_event("on_train_run_start", trainer, {})
         trainer.callback_handler.call_event(
@@ -123,7 +123,7 @@ def test_split_learning_smoke(monkeypatch):
 
 
 @pytest.mark.integration
-def test_mpc_training_smoke(monkeypatch):
+def test_mpc_training_smoke(monkeypatch, tmp_path):
     """Smoke test ensuring MPC training strategy registers sample counts."""
     config = build_minimal_config(
         trainer_type="basic",
@@ -134,14 +134,8 @@ def test_mpc_training_smoke(monkeypatch):
     )
 
     with configure_environment(config):
-        round_store_calls = []
-
-        class DummyRoundStore:
-            def record_client_samples(self, client_id, num_samples):
-                round_store_calls.append((client_id, num_samples))
-
-        dummy_store = DummyRoundStore()
-        round_store = cast(RoundInfoStore, dummy_store)
+        round_store = RoundInfoStore(storage_dir=tmp_path)
+        round_store.initialise_round(1, [1])
         strategy_mod = import_module("plato.clients.strategies.mpc")
         strategy = strategy_mod.MPCTrainingStrategy(round_store)
 
@@ -162,4 +156,4 @@ def test_mpc_training_smoke(monkeypatch):
         client_context.client_id = 1
 
         async_run(strategy.train(client_context))
-        assert round_store_calls == [(1, 3)]
+        assert round_store.load_state().client_samples == {1: 3}

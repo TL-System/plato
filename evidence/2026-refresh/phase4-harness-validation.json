@@ -1,0 +1,977 @@
+{
+  "schema_version": 1,
+  "status": "Implemented shared harness; no family qualification; pending fresh independent review",
+  "source_binding": {
+    "worktree": "/private/tmp/plato-refresh-worktrees/phase4-harness",
+    "base_commit": "b3e912e5253734d27e983fe59a69d9ccb22b34f8",
+    "accepted_runtime_source_commit": "d2ed4bcbc46684ac60dfdb1505ff764029ee48e9",
+    "source_commit": "a5c236ce73e3590d4fd99f30afd56a8f819c1e02",
+    "source_tree": "0f22e86e2d7b8f16a994d6d0ac5ffacc5ba8d682",
+    "dirty_before_evidence": "",
+    "source_manifest": [
+      {
+        "path": "tests/examples_phase4/__init__.py",
+        "sha256": "5daf9fad2d7bcc3373fe3650e4e46e7cbc286c109d98e63f1f81ac75454873a7",
+        "bytes": 72
+      },
+      {
+        "path": "tests/examples_phase4/common.py",
+        "sha256": "b0bbc2b9971122e7f39bb9fd572e0a27a042c315ea0227b4cb01f0dde4132327",
+        "bytes": 23983
+      },
+      {
+        "path": "tests/examples_phase4/cases.json",
+        "sha256": "972adcc85aa4d64d31dc9049b72e323a124846a01965ba3171c04b591e11b3d7",
+        "bytes": 242040
+      },
+      {
+        "path": "tests/test_examples_phase4_contract.py",
+        "sha256": "4f25687d7fff1c110f12b380628d7c15300d9747062b3a25cfd28538c69c2fd2",
+        "bytes": 23707
+      },
+      {
+        "path": "tests/conftest.py",
+        "sha256": "13f1438ebc3d59850be1a645c689ef8bb2023f2b2ea14f7f2b5aa43f1d354549",
+        "bytes": 44702
+      }
+    ],
+    "execution_binding": "Final helper/policy checks executed against these exact final source contents while the source changes were uncommitted, then source-only commit froze the same contents. Final collection and real guard work continued across the source commit with unchanged source; full source hashes and raw child copies bind execution. No runtime source changes occurred."
+  },
+  "authority": [
+    {
+      "path": "/tmp/plato-phase4-harness-design.json",
+      "sha256": "0b01acff4e03d725f239af1fcc8d6f778fb1817ce69cb313f947391fcd14d502",
+      "bytes": 55546
+    },
+    {
+      "path": "/tmp/plato-phase4-harness-design-review.json",
+      "sha256": "e97e3149a52639c9d13c7507d2e946eec50e1b0c775675255579ad25bc8b62f0",
+      "bytes": 20137
+    },
+    {
+      "path": "/tmp/plato-phase4-family-plan.json",
+      "sha256": "07d90034e89b83283c9b592550ebe17a1ea3a28a9fa2fbc292cc328db4977e4b",
+      "bytes": 543551
+    },
+    {
+      "path": "/tmp/plato-phase4-family-plan-review.json",
+      "sha256": "1fb78cdc19f530f9e17258d5e8481e54703f846b1aa8b7160112a9af18e477aa",
+      "bytes": 24400
+    }
+  ],
+  "scope": {
+    "owned_source_files": [
+      "tests/examples_phase4/__init__.py",
+      "tests/examples_phase4/common.py",
+      "tests/examples_phase4/cases.json",
+      "tests/test_examples_phase4_contract.py",
+      "tests/conftest.py"
+    ],
+    "public_helpers": [
+      "run_case",
+      "configured_case",
+      "emit",
+      "source_snapshot"
+    ],
+    "inert_package": true,
+    "profile": "examples-phase4",
+    "task_rows": 12,
+    "family_count": 58,
+    "source_inventory_count": 399,
+    "config_binding_count": 136,
+    "task_states": {
+      "P4-aggregation": "draft",
+      "P4-core": "draft",
+      "P4-detector": "draft",
+      "P4-fei": "draft",
+      "P4-leakage": "draft",
+      "P4-personalization": "draft",
+      "P4-privacy-hierarchy": "draft",
+      "P4-proof-reconcile": "draft",
+      "P4-scheduling": "draft",
+      "P4-split-hf": "draft",
+      "P4-ssl": "draft",
+      "P4-unlearning": "draft"
+    },
+    "all_cases_empty": true,
+    "all_accepted_source_hashes_unchanged": true,
+    "all_owned_paths_and_bindings_exactly_match_accepted_plan": true,
+    "family_qualification_performed": false
+  },
+  "environments": [
+    {
+      "executable": "/tmp/plato-phase4-harness-author/env/bin/python",
+      "prefix": "/tmp/plato-phase4-harness-author/env",
+      "version": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+      "packages": {
+        "pytest": "9.1.1",
+        "torch": "2.14.1",
+        "numpy": "2.5.3",
+        "psutil": "7.2.2",
+        "opacus": "1.6.0",
+        "kazoo": "2.11.0",
+        "gymnasium": "1.3.0",
+        "ptflops": "0.7.5",
+        "mlx": "0.32.3",
+        "mlx-metal": "0.32.3",
+        "lighteval": "0.13.0",
+        "nltk": "3.10.3",
+        "lightly": null,
+        "hydra-core": null
+      }
+    },
+    {
+      "executable": "/tmp/plato-phase4-harness-author/core-env/bin/python",
+      "prefix": "/tmp/plato-phase4-harness-author/core-env",
+      "version": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+      "packages": {
+        "pytest": "9.1.1",
+        "torch": "2.14.1",
+        "numpy": "2.5.3",
+        "psutil": "7.2.2",
+        "opacus": "1.6.0",
+        "kazoo": "2.11.0",
+        "gymnasium": "1.3.0",
+        "ptflops": "0.7.5",
+        "mlx": null,
+        "mlx-metal": null,
+        "lighteval": null,
+        "nltk": null,
+        "lightly": null,
+        "hydra-core": null
+      }
+    }
+  ],
+  "provisioning": {
+    "shell": "zsh -lc",
+    "only_owned_environments": true,
+    "commands": [
+      "UV_PROJECT_ENVIRONMENT=/tmp/plato-phase4-harness-author/env uv sync --locked --python 3.13 --group test-model-search --group dev --extra mlx --extra llm_eval",
+      "NLTK_DATA=/tmp/plato-phase4-harness-author/nltk_data /tmp/plato-phase4-harness-author/env/bin/python -m nltk.downloader -d /tmp/plato-phase4-harness-author/nltk_data punkt punkt_tab",
+      "UV_PROJECT_ENVIRONMENT=/tmp/plato-phase4-harness-author/core-env uv sync --locked --python 3.13 --group test-model-search"
+    ],
+    "pyproject": {
+      "path": "/private/tmp/plato-refresh-worktrees/phase4-harness/pyproject.toml",
+      "sha256": "fcc830f9fac66f2e2f28bef0d715bea3eb1300105a4239bb33cce8f62b71b398",
+      "bytes": 4102
+    },
+    "lock": {
+      "path": "/private/tmp/plato-refresh-worktrees/phase4-harness/uv.lock",
+      "sha256": "66a4e4442d7b1f26d220b44ca73c44ff4f1151a86857bb3f93a594819fd08126",
+      "bytes": 755641
+    },
+    "python_version_file": {
+      "path": "/private/tmp/plato-refresh-worktrees/phase4-harness/.python-version",
+      "sha256": "02e735b3dfe1c32833eb550b7ff8ffa17f5f2bc3fa1e7bae61a8f5a3883ce398",
+      "bytes": 5
+    },
+    "note": "uv default dev group remains part of the second locked sync. Root and other agents environments were not synchronized."
+  },
+  "validation": {
+    "harness": {
+      "counts": {
+        "tests": 65,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "junit": {
+        "path": "/tmp/plato-phase4-harness-author/artifacts/harness-release.xml",
+        "sha256": "da22968e2a2d5730c4f0604402b024175a5e41ea24f3132d07e8573a665c2bcd",
+        "bytes": 10770
+      },
+      "log": {
+        "path": "/tmp/plato-phase4-harness-author/artifacts/harness-release.log",
+        "sha256": "395054d53f102fed5e7f756dd4208bb3f1dc28c66a567032a961a4839ceb53c3",
+        "bytes": 163
+      }
+    },
+    "existing_policy": {
+      "counts": {
+        "tests": 245,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "junit": {
+        "path": "/tmp/plato-phase4-harness-author/artifacts/existing-policy-final.xml",
+        "sha256": "73f9dd91ccb8a89da1141729fe553ee650a0d0c2c142536d4ecbfc66d3517a09",
+        "bytes": 55799
+      },
+      "log": {
+        "path": "/tmp/plato-phase4-harness-author/artifacts/existing-policy-final.log",
+        "sha256": "f7eaea153cd01f35ceca684137c2b295101773c611a705957923b39911d004f8",
+        "bytes": 991
+      }
+    }
+  },
+  "collections": [
+    {
+      "scope": "core",
+      "before_count": 1635,
+      "final_count": 1700,
+      "exact_previous_nodes_retained": true,
+      "added_nodes": [
+        "tests/test_examples_phase4_contract.py::test_inert_import_and_standard_library_helpers",
+        "tests/test_examples_phase4_contract.py::test_draft_ownership_matches_frozen_authority",
+        "tests/test_examples_phase4_contract.py::test_ordinary_collection_excludes_before_import[arguments0]",
+        "tests/test_examples_phase4_contract.py::test_ordinary_collection_excludes_before_import[arguments1]",
+        "tests/test_examples_phase4_contract.py::test_ordinary_collection_excludes_before_import[arguments2]",
+        "tests/test_examples_phase4_contract.py::test_ordinary_collection_excludes_before_import[arguments3]",
+        "tests/test_examples_phase4_contract.py::test_ordinary_collection_excludes_before_import[arguments4]",
+        "tests/test_examples_phase4_contract.py::test_bad_scope_or_filters_reject_before_import[arguments0]",
+        "tests/test_examples_phase4_contract.py::test_bad_scope_or_filters_reject_before_import[arguments1]",
+        "tests/test_examples_phase4_contract.py::test_bad_scope_or_filters_reject_before_import[arguments2]",
+        "tests/test_examples_phase4_contract.py::test_bad_scope_or_filters_reject_before_import[arguments3]",
+        "tests/test_examples_phase4_contract.py::test_bad_scope_or_filters_reject_before_import[arguments4]",
+        "tests/test_examples_phase4_contract.py::test_bad_scope_or_filters_reject_before_import[arguments5]",
+        "tests/test_examples_phase4_contract.py::test_bad_scope_or_filters_reject_before_import[arguments6]",
+        "tests/test_examples_phase4_contract.py::test_bad_scope_or_filters_reject_before_import[arguments7]",
+        "tests/test_examples_phase4_contract.py::test_bad_scope_or_filters_reject_before_import[arguments8]",
+        "tests/test_examples_phase4_contract.py::test_bad_scope_or_filters_reject_before_import[arguments9]",
+        "tests/test_examples_phase4_contract.py::test_bad_scope_or_filters_reject_before_import[arguments10]",
+        "tests/test_examples_phase4_contract.py::test_bad_scope_or_filters_reject_before_import[arguments11]",
+        "tests/test_examples_phase4_contract.py::test_pyargs_aliases_reject_before_import[tests.examples_phase4.test_core-]",
+        "tests/test_examples_phase4_contract.py::test_pyargs_aliases_reject_before_import[examples_phase4.test_core-tests]",
+        "tests/test_examples_phase4_contract.py::test_pyargs_aliases_reject_before_import[test_core-tests/examples_phase4]",
+        "tests/test_examples_phase4_contract.py::test_environment_and_configured_filters_reject[False]",
+        "tests/test_examples_phase4_contract.py::test_environment_and_configured_filters_reject[True]",
+        "tests/test_examples_phase4_contract.py::test_complete_and_collection_only_labels[False]",
+        "tests/test_examples_phase4_contract.py::test_complete_and_collection_only_labels[True]",
+        "tests/test_examples_phase4_contract.py::test_ledger_damage_cannot_execute_or_qualify[draft]",
+        "tests/test_examples_phase4_contract.py::test_ledger_damage_cannot_execute_or_qualify[empty]",
+        "tests/test_examples_phase4_contract.py::test_ledger_damage_cannot_execute_or_qualify[missing]",
+        "tests/test_examples_phase4_contract.py::test_ledger_damage_cannot_execute_or_qualify[extra]",
+        "tests/test_examples_phase4_contract.py::test_ledger_damage_cannot_execute_or_qualify[duplicate]",
+        "tests/test_examples_phase4_contract.py::test_ledger_damage_cannot_execute_or_qualify[substituted]",
+        "tests/test_examples_phase4_contract.py::test_skip_xfail_and_errors_fail_even_focused[False-import pytest\\ndef test_case():\\n    pytest.skip(\"call skip\")\\n]",
+        "tests/test_examples_phase4_contract.py::test_skip_xfail_and_errors_fail_even_focused[False-import pytest\\n@pytest.fixture(autouse=True)\\ndef f():\\n    pytest.skip(\"setup skip\")\\ndef test_case():\\n    pass\\n]",
+        "tests/test_examples_phase4_contract.py::test_skip_xfail_and_errors_fail_even_focused[False-import pytest\\n@pytest.fixture(autouse=True)\\ndef f():\\n    yield\\n    pytest.skip(\"teardown skip\")\\ndef test_case():\\n    pass\\n]",
+        "tests/test_examples_phase4_contract.py::test_skip_xfail_and_errors_fail_even_focused[False-import pytest\\npytest.skip(\"collection skip\", allow_module_level=True)\\n]",
+        "tests/test_examples_phase4_contract.py::test_skip_xfail_and_errors_fail_even_focused[False-import pytest\\n@pytest.mark.xfail\\ndef test_case():\\n    assert False\\n]",
+        "tests/test_examples_phase4_contract.py::test_skip_xfail_and_errors_fail_even_focused[False-import pytest\\n@pytest.mark.xfail\\ndef test_case():\\n    pass\\n]",
+        "tests/test_examples_phase4_contract.py::test_skip_xfail_and_errors_fail_even_focused[False-import pytest\\n@pytest.fixture(autouse=True)\\ndef f():\\n    raise ValueError(\"setup failure\")\\ndef test_case():\\n    pass\\n]",
+        "tests/test_examples_phase4_contract.py::test_skip_xfail_and_errors_fail_even_focused[False-import pytest\\n@pytest.fixture(autouse=True)\\ndef f():\\n    yield\\n    raise ValueError(\"teardown failure\")\\ndef test_case():\\n    pass\\n]",
+        "tests/test_examples_phase4_contract.py::test_skip_xfail_and_errors_fail_even_focused[True-import pytest\\ndef test_case():\\n    pytest.skip(\"call skip\")\\n]",
+        "tests/test_examples_phase4_contract.py::test_skip_xfail_and_errors_fail_even_focused[True-import pytest\\n@pytest.fixture(autouse=True)\\ndef f():\\n    pytest.skip(\"setup skip\")\\ndef test_case():\\n    pass\\n]",
+        "tests/test_examples_phase4_contract.py::test_skip_xfail_and_errors_fail_even_focused[True-import pytest\\n@pytest.fixture(autouse=True)\\ndef f():\\n    yield\\n    pytest.skip(\"teardown skip\")\\ndef test_case():\\n    pass\\n]",
+        "tests/test_examples_phase4_contract.py::test_skip_xfail_and_errors_fail_even_focused[True-import pytest\\npytest.skip(\"collection skip\", allow_module_level=True)\\n]",
+        "tests/test_examples_phase4_contract.py::test_skip_xfail_and_errors_fail_even_focused[True-import pytest\\n@pytest.mark.xfail\\ndef test_case():\\n    assert False\\n]",
+        "tests/test_examples_phase4_contract.py::test_skip_xfail_and_errors_fail_even_focused[True-import pytest\\n@pytest.mark.xfail\\ndef test_case():\\n    pass\\n]",
+        "tests/test_examples_phase4_contract.py::test_skip_xfail_and_errors_fail_even_focused[True-import pytest\\n@pytest.fixture(autouse=True)\\ndef f():\\n    raise ValueError(\"setup failure\")\\ndef test_case():\\n    pass\\n]",
+        "tests/test_examples_phase4_contract.py::test_skip_xfail_and_errors_fail_even_focused[True-import pytest\\n@pytest.fixture(autouse=True)\\ndef f():\\n    yield\\n    raise ValueError(\"teardown failure\")\\ndef test_case():\\n    pass\\n]",
+        "tests/test_examples_phase4_contract.py::test_focused_and_spoofed_marker",
+        "tests/test_examples_phase4_contract.py::test_canonical_symlink_boundary",
+        "tests/test_examples_phase4_contract.py::test_config_provenance_overlay_and_restoration",
+        "tests/test_examples_phase4_contract.py::test_real_nested_list_null_and_include_errors",
+        "tests/test_examples_phase4_contract.py::test_real_worker_natural_exit_identity_and_numeric_events[.]",
+        "tests/test_examples_phase4_contract.py::test_real_worker_natural_exit_identity_and_numeric_events[example]",
+        "tests/test_examples_phase4_contract.py::test_real_failed_workers_retain_evidence_and_contain[assertion]",
+        "tests/test_examples_phase4_contract.py::test_real_failed_workers_retain_evidence_and_contain[malformed]",
+        "tests/test_examples_phase4_contract.py::test_real_failed_workers_retain_evidence_and_contain[timeout]",
+        "tests/test_examples_phase4_contract.py::test_real_failed_workers_retain_evidence_and_contain[missing_dependency]",
+        "tests/test_examples_phase4_contract.py::test_real_failed_workers_retain_evidence_and_contain[wrong_origin]",
+        "tests/test_examples_phase4_contract.py::test_real_failed_workers_retain_evidence_and_contain[bad_success]",
+        "tests/test_examples_phase4_contract.py::test_real_failed_workers_retain_evidence_and_contain[invalid_provenance]",
+        "tests/test_examples_phase4_contract.py::test_frozen_spec_and_worker_binding_precedes_launch",
+        "tests/test_examples_phase4_contract.py::test_unrelated_process_identity_is_never_signaled",
+        "tests/test_examples_phase4_contract.py::test_finally_cleanup_is_recorded_and_fails",
+        "tests/test_examples_phase4_contract.py::test_original_nonzero_exit_and_serial_execution_guard"
+      ],
+      "node_counter_sha256": "eaeb3d30e6370de60ae2db71fd8db427da681c471f6ed183545fa20b54d44c44",
+      "before": {
+        "path": "/tmp/plato-phase4-harness-author/artifacts/before-core.json",
+        "sha256": "ddd976e53967bb77273bbcdb798449a73f014fa8000221e1d1d1e4712e85c155",
+        "bytes": 195230
+      },
+      "after": {
+        "path": "/tmp/plato-phase4-harness-author/artifacts/final-core.json",
+        "sha256": "1d5a6b4deac366da0eb05b7625fa413559ffb7d35b718684a49bfd9d69806cdb",
+        "bytes": 203690
+      },
+      "imports": {
+        "path": "/tmp/plato-phase4-harness-author/artifacts/final-core-imports.json",
+        "sha256": "27454b624ee69defde1170c47d6576b07e4b7bcb0bf8c8a5c821fdd423e0c042",
+        "bytes": 207
+      }
+    },
+    {
+      "scope": "runtime",
+      "before_count": 51,
+      "final_count": 51,
+      "exact_previous_nodes_retained": true,
+      "added_nodes": [],
+      "node_counter_sha256": "7a1c8a5412dfcdba2b830b738e9e91d35b458d937ccc649fd13b1542c00ad8d2",
+      "before": {
+        "path": "/tmp/plato-phase4-harness-author/artifacts/before-runtime.json",
+        "sha256": "5957c3b459b25ee6f301284d2888309122db355830a58f85016d84ce3539b92d",
+        "bytes": 6424
+      },
+      "after": {
+        "path": "/tmp/plato-phase4-harness-author/artifacts/final-runtime.json",
+        "sha256": "b651c73a9d39532894d641ed08ec3cf73aefde1079e61094cca8960f1a76c0f3",
+        "bytes": 6539
+      },
+      "imports": {
+        "path": "/tmp/plato-phase4-harness-author/artifacts/final-runtime-imports.json",
+        "sha256": "27454b624ee69defde1170c47d6576b07e4b7bcb0bf8c8a5c821fdd423e0c042",
+        "bytes": 207
+      },
+      "startup_count": 48,
+      "feddyn_count": 3
+    },
+    {
+      "scope": "retained",
+      "before_count": 19,
+      "final_count": 19,
+      "exact_previous_nodes_retained": true,
+      "added_nodes": [],
+      "node_counter_sha256": "4b5001c00cc30c2b4d52c156f000e36e8d66f43c32bd8903ad3f655acdba6ee6",
+      "before": {
+        "path": "/tmp/plato-phase4-harness-author/artifacts/before-retained.json",
+        "sha256": "3d3bcab822a75927a69bd6948cc7bcd82da769ffd8528c28808e239a601b0ec6",
+        "bytes": 2266
+      },
+      "after": {
+        "path": "/tmp/plato-phase4-harness-author/artifacts/final-retained.json",
+        "sha256": "a1d6ecfbb5b6e2ce7b71786030f518d3aebe9b26ad7e9f6e9639b4501e7dd83c",
+        "bytes": 2383
+      },
+      "imports": {
+        "path": "/tmp/plato-phase4-harness-author/artifacts/final-retained-imports.json",
+        "sha256": "cb7d3eabefe41c3ea79ae5446271ee855a906a3c967a88892bc24f3617b1dd03",
+        "bytes": 82
+      }
+    },
+    {
+      "scope": "native",
+      "before_count": 383,
+      "final_count": 383,
+      "exact_previous_nodes_retained": true,
+      "added_nodes": [],
+      "node_counter_sha256": "973b41277a9266a0e39868e692d0b2c736095ef00b414e0902d1b0d4151a04bc",
+      "before": {
+        "path": "/tmp/plato-phase4-harness-author/artifacts/before-native.json",
+        "sha256": "61a3dc43af33da894610b386a4fcdac1d4372dd54c5e2d0422fc846fb97e1bbd",
+        "bytes": 53442
+      },
+      "after": {
+        "path": "/tmp/plato-phase4-harness-author/artifacts/final-native.json",
+        "sha256": "4728244ddb047f5f486aa2df3df4b5d12545507f85c130be3774a77a4070c1e6",
+        "bytes": 53555
+      },
+      "imports": {
+        "path": "/tmp/plato-phase4-harness-author/artifacts/final-native-imports.json",
+        "sha256": "cb7d3eabefe41c3ea79ae5446271ee855a906a3c967a88892bc24f3617b1dd03",
+        "bytes": 82
+      }
+    },
+    {
+      "scope": "eval",
+      "before_count": 11,
+      "final_count": 11,
+      "exact_previous_nodes_retained": true,
+      "added_nodes": [],
+      "node_counter_sha256": "30a286aac10776b7c47b1f84a7dab742e1502d1267395dda326a19fcb08e8edb",
+      "before": {
+        "path": "/tmp/plato-phase4-harness-author/artifacts/before-eval.json",
+        "sha256": "3fb4a548cf9dd0d02e132fddea5f252d194ca11616d4067a7e01baf9b500721a",
+        "bytes": 1590
+      },
+      "after": {
+        "path": "/tmp/plato-phase4-harness-author/artifacts/final-eval.json",
+        "sha256": "219fe20dcc673938ae15aa7f9b2159d72f439373eb6ddf725913b791a06cf249",
+        "bytes": 1699
+      },
+      "imports": {
+        "path": "/tmp/plato-phase4-harness-author/artifacts/final-eval-imports.json",
+        "sha256": "cb7d3eabefe41c3ea79ae5446271ee855a906a3c967a88892bc24f3617b1dd03",
+        "bytes": 82
+      }
+    }
+  ],
+  "optional_absent_boundary": [
+    {
+      "scope": "default",
+      "count": 1700,
+      "receipt": {
+        "path": "/tmp/plato-phase4-harness-author/artifacts/absent-default.json",
+        "sha256": "d707a3409516a6267b74349f511ef4abb4498fc0a39c680c890527160e52f813",
+        "bytes": 203625
+      },
+      "imports": {
+        "path": "/tmp/plato-phase4-harness-author/artifacts/absent-default-imports.json",
+        "sha256": "27454b624ee69defde1170c47d6576b07e4b7bcb0bf8c8a5c821fdd423e0c042",
+        "bytes": 207
+      }
+    },
+    {
+      "scope": "dot",
+      "count": 1700,
+      "receipt": {
+        "path": "/tmp/plato-phase4-harness-author/artifacts/absent-dot.json",
+        "sha256": "5469d476861e33e691219fe3aaac298fc95665decf7863a0632927873ccbcdd4",
+        "bytes": 203626
+      },
+      "imports": {
+        "path": "/tmp/plato-phase4-harness-author/artifacts/absent-dot-imports.json",
+        "sha256": "27454b624ee69defde1170c47d6576b07e4b7bcb0bf8c8a5c821fdd423e0c042",
+        "bytes": 207
+      }
+    },
+    {
+      "scope": "tests",
+      "count": 1700,
+      "receipt": {
+        "path": "/tmp/plato-phase4-harness-author/artifacts/absent-tests.json",
+        "sha256": "09c4a88d798d81bd15a930ecb9f580202ba6dab7d6c369aed7c7dd9768b6cd6b",
+        "bytes": 203634
+      },
+      "imports": {
+        "path": "/tmp/plato-phase4-harness-author/artifacts/absent-tests-imports.json",
+        "sha256": "27454b624ee69defde1170c47d6576b07e4b7bcb0bf8c8a5c821fdd423e0c042",
+        "bytes": 207
+      }
+    },
+    {
+      "scope": "base",
+      "count": 1700,
+      "receipt": {
+        "path": "/tmp/plato-phase4-harness-author/artifacts/absent-base.json",
+        "sha256": "fa7b5eee47fc4d8df0bdba6b4fa7a2ae1509e60db8015c5077435c9c80d2b6b4",
+        "bytes": 203659
+      },
+      "imports": {
+        "path": "/tmp/plato-phase4-harness-author/artifacts/absent-base-imports.json",
+        "sha256": "27454b624ee69defde1170c47d6576b07e4b7bcb0bf8c8a5c821fdd423e0c042",
+        "bytes": 207
+      }
+    },
+    {
+      "scope": "mandatory",
+      "count": 1700,
+      "receipt": {
+        "path": "/tmp/plato-phase4-harness-author/artifacts/absent-mandatory.json",
+        "sha256": "e5ca636120e7e22b8c21306d451ac230614f5c8f91199d1fb797c35bdd30590b",
+        "bytes": 203674
+      },
+      "imports": {
+        "path": "/tmp/plato-phase4-harness-author/artifacts/absent-mandatory-imports.json",
+        "sha256": "27454b624ee69defde1170c47d6576b07e4b7bcb0bf8c8a5c821fdd423e0c042",
+        "bytes": 207
+      }
+    },
+    {
+      "scope": "runtime",
+      "count": 51,
+      "receipt": {
+        "path": "/tmp/plato-phase4-harness-author/artifacts/absent-runtime.json",
+        "sha256": "c458eedfbd0b963ac78ef13170d69d6052fbaa5b550f40c7db1b78579c945603",
+        "bytes": 6513
+      },
+      "imports": {
+        "path": "/tmp/plato-phase4-harness-author/artifacts/absent-runtime-imports.json",
+        "sha256": "27454b624ee69defde1170c47d6576b07e4b7bcb0bf8c8a5c821fdd423e0c042",
+        "bytes": 207
+      }
+    },
+    {
+      "scope": "retained",
+      "count": 19,
+      "receipt": {
+        "path": "/tmp/plato-phase4-harness-author/artifacts/absent-retained.json",
+        "sha256": "3d844eeacd06588954802377ed0dbc361c2af068abab4bc2990cf3b789990f13",
+        "bytes": 2357
+      },
+      "imports": {
+        "path": "/tmp/plato-phase4-harness-author/artifacts/absent-retained-imports.json",
+        "sha256": "cb7d3eabefe41c3ea79ae5446271ee855a906a3c967a88892bc24f3617b1dd03",
+        "bytes": 82
+      }
+    }
+  ],
+  "real_guard_rejections": [
+    {
+      "name": "draft",
+      "command": [
+        "/tmp/plato-phase4-harness-author/env/bin/python",
+        "/tmp/plato-phase4-harness-author/collection_launcher.py",
+        "/tmp/plato-phase4-harness-author/artifacts/guard-draft-imports.json",
+        "tests/examples_phase4/test_fei.py",
+        "--test-profile=examples-phase4",
+        "--collect-only",
+        "--collect-only",
+        "-q",
+        "-p",
+        "no:cacheprovider"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/phase4-harness",
+      "status": 4,
+      "log": "/tmp/plato-phase4-harness-author/artifacts/guard-draft.log"
+    },
+    {
+      "name": "filter",
+      "command": [
+        "/tmp/plato-phase4-harness-author/env/bin/python",
+        "/tmp/plato-phase4-harness-author/collection_launcher.py",
+        "/tmp/plato-phase4-harness-author/artifacts/guard-filter-imports.json",
+        "tests/examples_phase4/test_fei.py",
+        "--test-profile=examples-phase4",
+        "-k",
+        "normalize",
+        "--collect-only",
+        "-q",
+        "-p",
+        "no:cacheprovider"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/phase4-harness",
+      "status": 4,
+      "log": "/tmp/plato-phase4-harness-author/artifacts/guard-filter.log"
+    },
+    {
+      "name": "broad",
+      "command": [
+        "/tmp/plato-phase4-harness-author/env/bin/python",
+        "/tmp/plato-phase4-harness-author/collection_launcher.py",
+        "/tmp/plato-phase4-harness-author/artifacts/guard-broad-imports.json",
+        "tests",
+        "--test-profile=examples-phase4",
+        "--collect-only",
+        "-q",
+        "-p",
+        "no:cacheprovider"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/phase4-harness",
+      "status": 4,
+      "log": "/tmp/plato-phase4-harness-author/artifacts/guard-broad.log"
+    },
+    {
+      "name": "conflict",
+      "command": [
+        "/tmp/plato-phase4-harness-author/env/bin/python",
+        "/tmp/plato-phase4-harness-author/collection_launcher.py",
+        "/tmp/plato-phase4-harness-author/artifacts/guard-conflict-imports.json",
+        "tests/examples_phase4/test_fei.py",
+        "--test-profile=mandatory",
+        "--collect-only",
+        "-q",
+        "-p",
+        "no:cacheprovider"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/phase4-harness",
+      "status": 4,
+      "log": "/tmp/plato-phase4-harness-author/artifacts/guard-conflict.log"
+    },
+    {
+      "name": "pyargs-root",
+      "command": [
+        "/tmp/plato-phase4-harness-author/env/bin/python",
+        "/tmp/plato-phase4-harness-author/collection_launcher.py",
+        "/tmp/plato-phase4-harness-author/artifacts/guard-pyargs-root-imports.json",
+        "--pyargs",
+        "tests.examples_phase4.test_fei",
+        "--collect-only",
+        "-q",
+        "-p",
+        "no:cacheprovider"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/phase4-harness",
+      "status": 4,
+      "log": "/tmp/plato-phase4-harness-author/artifacts/guard-pyargs-root.log"
+    },
+    {
+      "name": "pyargs-tests",
+      "command": [
+        "/tmp/plato-phase4-harness-author/env/bin/python",
+        "/tmp/plato-phase4-harness-author/collection_launcher.py",
+        "/tmp/plato-phase4-harness-author/artifacts/guard-pyargs-tests-imports.json",
+        "--pyargs",
+        "examples_phase4.test_fei",
+        "--collect-only",
+        "-q",
+        "-p",
+        "no:cacheprovider"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/phase4-harness/tests",
+      "status": 4,
+      "log": "/tmp/plato-phase4-harness-author/artifacts/guard-pyargs-tests.log"
+    },
+    {
+      "name": "pyargs-phase4",
+      "command": [
+        "/tmp/plato-phase4-harness-author/env/bin/python",
+        "/tmp/plato-phase4-harness-author/collection_launcher.py",
+        "/tmp/plato-phase4-harness-author/artifacts/guard-pyargs-phase4-imports.json",
+        "--pyargs",
+        "test_fei",
+        "--collect-only",
+        "-q",
+        "-p",
+        "no:cacheprovider"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/phase4-harness/tests/examples_phase4",
+      "status": 4,
+      "log": "/tmp/plato-phase4-harness-author/artifacts/guard-pyargs-phase4.log"
+    },
+    {
+      "name": "marker",
+      "command": [
+        "/tmp/plato-phase4-harness-author/env/bin/python",
+        "/tmp/plato-phase4-harness-author/collection_launcher.py",
+        "/tmp/plato-phase4-harness-author/artifacts/guard-marker-imports.json",
+        "tests",
+        "-m",
+        "examples_phase4",
+        "--collect-only",
+        "-q",
+        "-p",
+        "no:cacheprovider"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/phase4-harness",
+      "status": 4,
+      "log": "/tmp/plato-phase4-harness-author/artifacts/guard-marker.log"
+    },
+    {
+      "name": "mixed",
+      "command": [
+        "/tmp/plato-phase4-harness-author/env/bin/python",
+        "/tmp/plato-phase4-harness-author/collection_launcher.py",
+        "/tmp/plato-phase4-harness-author/artifacts/guard-mixed-imports.json",
+        "tests/examples_phase4/test_fei.py",
+        "tests/mlx_native",
+        "--collect-only",
+        "-q",
+        "-p",
+        "no:cacheprovider"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/phase4-harness",
+      "status": 4,
+      "log": "/tmp/plato-phase4-harness-author/artifacts/guard-mixed.log"
+    }
+  ],
+  "helper_worker_receipts": [
+    {
+      "path": "/tmp/plato-phase4-harness-author/contract-temp-release/test_finally_cleanup_is_record0/fallback/result.json",
+      "sha256": "206a69c09fe12b00aa7c99508e9d2712393b5655e79348ff53d2157ec50a10a1",
+      "case_id": "contract",
+      "returncode": -9,
+      "timed_out": false,
+      "forced": [
+        "finally-KILL:81902"
+      ],
+      "survivors": [],
+      "errors": [
+        "containment error: RuntimeError: deliberate communicate failure",
+        "worker did not exit naturally with valid evidence",
+        "missing unique final parent success event",
+        "missing initial worker_started event",
+        "missing configured event",
+        "missing source provenance"
+      ],
+      "command": [
+        "/tmp/plato-phase4-harness-author/env/bin/python",
+        "-B",
+        "-m",
+        "tests.examples_phase4.contract_worker"
+      ],
+      "cwd": "/private/tmp/plato-phase4-harness-author/contract-temp-release/test_finally_cleanup_is_record0/repo"
+    },
+    {
+      "path": "/tmp/plato-phase4-harness-author/contract-temp-release/test_real_failed_workers_retai0/failure/result.json",
+      "sha256": "4ca1259ab1d812fed2bc274a5478a5173daa3eb9d7646e26df1f3dae1b4013b1",
+      "case_id": "contract",
+      "returncode": 1,
+      "timed_out": false,
+      "forced": [],
+      "survivors": [],
+      "errors": [
+        "worker did not exit naturally with valid evidence",
+        "missing unique final parent success event",
+        "failed, skipped, or mismatched case event",
+        "worker traceback or asynchronous diagnostic"
+      ],
+      "command": [
+        "/tmp/plato-phase4-harness-author/env/bin/python",
+        "-B",
+        "-m",
+        "tests.examples_phase4.contract_worker"
+      ],
+      "cwd": "/private/tmp/plato-phase4-harness-author/contract-temp-release/test_real_failed_workers_retai0/repo"
+    },
+    {
+      "path": "/tmp/plato-phase4-harness-author/contract-temp-release/test_real_failed_workers_retai1/failure/result.json",
+      "sha256": "d32eee8c9f98fe53974717f35922dbb88743f64f179180d2451f10ddc5518d6a",
+      "case_id": "contract",
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [],
+      "survivors": [],
+      "errors": [
+        "worker did not exit naturally with valid evidence"
+      ],
+      "command": [
+        "/tmp/plato-phase4-harness-author/env/bin/python",
+        "-B",
+        "-m",
+        "tests.examples_phase4.contract_worker"
+      ],
+      "cwd": "/private/tmp/plato-phase4-harness-author/contract-temp-release/test_real_failed_workers_retai1/repo"
+    },
+    {
+      "path": "/tmp/plato-phase4-harness-author/contract-temp-release/test_real_failed_workers_retai2/failure/result.json",
+      "sha256": "f431dbb27082879a14978787b63862d95da34923ec134fe0d949cce0232efd9b",
+      "case_id": "contract",
+      "returncode": -15,
+      "timed_out": true,
+      "forced": [
+        "TERM"
+      ],
+      "survivors": [],
+      "errors": [
+        "worker did not exit naturally with valid evidence",
+        "missing unique final parent success event",
+        "missing source provenance"
+      ],
+      "command": [
+        "/tmp/plato-phase4-harness-author/env/bin/python",
+        "-B",
+        "-m",
+        "tests.examples_phase4.contract_worker"
+      ],
+      "cwd": "/private/tmp/plato-phase4-harness-author/contract-temp-release/test_real_failed_workers_retai2/repo"
+    },
+    {
+      "path": "/tmp/plato-phase4-harness-author/contract-temp-release/test_real_failed_workers_retai3/failure/result.json",
+      "sha256": "f02b5c7029495d5d459e00366798e4f1e4dc2862fa9d4f0ccefb6b64a2703706",
+      "case_id": "contract",
+      "returncode": 1,
+      "timed_out": false,
+      "forced": [],
+      "survivors": [],
+      "errors": [
+        "worker did not exit naturally with valid evidence",
+        "missing unique final parent success event",
+        "failed, skipped, or mismatched case event",
+        "worker traceback or asynchronous diagnostic"
+      ],
+      "command": [
+        "/tmp/plato-phase4-harness-author/env/bin/python",
+        "-B",
+        "-m",
+        "tests.examples_phase4.contract_worker"
+      ],
+      "cwd": "/private/tmp/plato-phase4-harness-author/contract-temp-release/test_real_failed_workers_retai3/repo"
+    },
+    {
+      "path": "/tmp/plato-phase4-harness-author/contract-temp-release/test_real_failed_workers_retai4/failure/result.json",
+      "sha256": "dd13408b87a4c072fcfbc44bf1e21301f70bc1ff79ad4762a9e3611ab0095c3b",
+      "case_id": "contract",
+      "returncode": 1,
+      "timed_out": false,
+      "forced": [],
+      "survivors": [],
+      "errors": [
+        "worker did not exit naturally with valid evidence",
+        "missing unique final parent success event",
+        "source identity mismatch",
+        "worker traceback or asynchronous diagnostic"
+      ],
+      "command": [
+        "/tmp/plato-phase4-harness-author/env/bin/python",
+        "-B",
+        "-m",
+        "tests.examples_phase4.contract_worker"
+      ],
+      "cwd": "/private/tmp/plato-phase4-harness-author/contract-temp-release/test_real_failed_workers_retai4/repo"
+    },
+    {
+      "path": "/tmp/plato-phase4-harness-author/contract-temp-release/test_real_failed_workers_retai5/failure/result.json",
+      "sha256": "88ce1ec3f84e457b63da159c9f1cca7879d680dd70b201ca447ec1ddd1508a1d",
+      "case_id": "contract",
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [],
+      "survivors": [],
+      "errors": [
+        "missing unique final parent success event"
+      ],
+      "command": [
+        "/tmp/plato-phase4-harness-author/env/bin/python",
+        "-B",
+        "-m",
+        "tests.examples_phase4.contract_worker"
+      ],
+      "cwd": "/private/tmp/plato-phase4-harness-author/contract-temp-release/test_real_failed_workers_retai5/repo"
+    },
+    {
+      "path": "/tmp/plato-phase4-harness-author/contract-temp-release/test_real_failed_workers_retai6/failure/result.json",
+      "sha256": "e2f0e4950062b1a4f70a0406e3fa1cca1e099407cd238fdb3801d01eb7b0a891",
+      "case_id": "contract",
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [],
+      "survivors": [],
+      "errors": [
+        "worker did not exit naturally with valid evidence"
+      ],
+      "command": [
+        "/tmp/plato-phase4-harness-author/env/bin/python",
+        "-B",
+        "-m",
+        "tests.examples_phase4.contract_worker"
+      ],
+      "cwd": "/private/tmp/plato-phase4-harness-author/contract-temp-release/test_real_failed_workers_retai6/repo"
+    },
+    {
+      "path": "/tmp/plato-phase4-harness-author/contract-temp-release/test_real_worker_natural_exit_0/success/result.json",
+      "sha256": "0d86d851f977d63a3e5d139d113529af675bf1cae4d9944cce34eebde6c104d5",
+      "case_id": "contract",
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [],
+      "survivors": [],
+      "errors": [],
+      "command": [
+        "/tmp/plato-phase4-harness-author/env/bin/python",
+        "-B",
+        "-m",
+        "tests.examples_phase4.contract_worker"
+      ],
+      "cwd": "/private/tmp/plato-phase4-harness-author/contract-temp-release/test_real_worker_natural_exit_0/repo"
+    },
+    {
+      "path": "/tmp/plato-phase4-harness-author/contract-temp-release/test_real_worker_natural_exit_1/success/result.json",
+      "sha256": "12ab22903d93284f6321ce54ffdb378e2620f136f3b9b90c6c989a27f52f795a",
+      "case_id": "contract",
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [],
+      "survivors": [],
+      "errors": [],
+      "command": [
+        "/tmp/plato-phase4-harness-author/env/bin/python",
+        "-B",
+        "-m",
+        "tests.examples_phase4.contract_worker"
+      ],
+      "cwd": "/private/tmp/plato-phase4-harness-author/contract-temp-release/test_real_worker_natural_exit_1/repo/example"
+    },
+    {
+      "path": "/tmp/plato-phase4-harness-author/contract-temp-release/test_unrelated_process_identit0/unrelated/result.json",
+      "sha256": "e3ae476760e1f491d433f93491154af2b93d2520edbdfddd86d387c21454043f",
+      "case_id": "contract",
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [],
+      "survivors": [],
+      "errors": [],
+      "command": [
+        "/tmp/plato-phase4-harness-author/env/bin/python",
+        "-B",
+        "-m",
+        "tests.examples_phase4.contract_worker"
+      ],
+      "cwd": "/private/tmp/plato-phase4-harness-author/contract-temp-release/test_unrelated_process_identit0/repo"
+    }
+  ],
+  "red_green": {
+    "initial_helper_contract": {
+      "log": {
+        "path": "/tmp/plato-phase4-harness-author/artifacts/harness-initial.log",
+        "sha256": "84c069cae69f8bc2e5352630cdb769dacbf3799bc00a3175c5a6e1ba8b246ae9",
+        "bytes": 44440
+      },
+      "junit": {
+        "path": "/tmp/plato-phase4-harness-author/artifacts/harness-initial.xml",
+        "sha256": "b0153e3afefeef491e5a4c92fba16e30eda9ede0b81f61d7fe1aeef72f266b9e",
+        "bytes": 55434
+      },
+      "outcome": "8 failed /44 passed /9 errors: focused-label assertion wording and nonexistent fixture __init__ assumptions; corrected test harness fixtures and assertions."
+    },
+    "existing_policy_red": {
+      "log": {
+        "path": "/tmp/plato-phase4-harness-author/artifacts/existing-policy.log",
+        "sha256": "a5febc76fb21a52a4482ac8224c7895c07d1238a9624ece901bdeb11318f2637",
+        "bytes": 11711
+      },
+      "junit": {
+        "path": "/tmp/plato-phase4-harness-author/artifacts/existing-policy.xml",
+        "sha256": "f6186ff6cb99310bb2f65bb46eedc3b15332c50d91519dbb45243a4490c09ada",
+        "bytes": 66002
+      },
+      "outcome": "6 failed /239 passed: Phase4 report access evaluated report.failed outside Phase4 for older test doubles; narrowed guard before access."
+    },
+    "intermediate_worker_origin_red": {
+      "log": {
+        "path": "/tmp/plato-phase4-harness-author/artifacts/harness-final.log",
+        "sha256": "68454c7da24a6827433299aad68ef3b71e3a67cbe8122fddc050ae3b87027c45",
+        "bytes": 28263
+      },
+      "junit": {
+        "path": "/tmp/plato-phase4-harness-author/artifacts/harness-final.xml",
+        "sha256": "e2e73e020aebc1fdf98b44ea7e38c41e813c59ae63915b6b3a96bf085bbfa84e",
+        "bytes": 38943
+      },
+      "outcome": "2 failed /62 passed: contract entrypoint shadow from repo-first worker sys.path; moved the explicitly reviewed example directory ahead of repo inside configured context; wrong-origin case still rejects."
+    },
+    "green": {
+      "harness": {
+        "counts": {
+          "tests": 65,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "junit": {
+          "path": "/tmp/plato-phase4-harness-author/artifacts/harness-release.xml",
+          "sha256": "da22968e2a2d5730c4f0604402b024175a5e41ea24f3132d07e8573a665c2bcd",
+          "bytes": 10770
+        },
+        "log": {
+          "path": "/tmp/plato-phase4-harness-author/artifacts/harness-release.log",
+          "sha256": "395054d53f102fed5e7f756dd4208bb3f1dc28c66a567032a961a4839ceb53c3",
+          "bytes": 163
+        }
+      },
+      "existing_policy": {
+        "counts": {
+          "tests": 245,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "junit": {
+          "path": "/tmp/plato-phase4-harness-author/artifacts/existing-policy-final.xml",
+          "sha256": "73f9dd91ccb8a89da1141729fe553ee650a0d0c2c142536d4ecbfc66d3517a09",
+          "bytes": 55799
+        },
+        "log": {
+          "path": "/tmp/plato-phase4-harness-author/artifacts/existing-policy-final.log",
+          "sha256": "f7eaea153cd01f35ceca684137c2b295101773c611a705957923b39911d004f8",
+          "bytes": 991
+        }
+      }
+    },
+    "negative_probe_meaning": "Expected rejected policy subprocesses and failed workers verify harness behavior only. Their real errors and nonzero statuses are retained, not counted as passing family behavior."
+  },
+  "raw_artifact_archive": {
+    "path": "/tmp/plato-phase4-harness-author/phase4-harness-raw-evidence.tar.gz",
+    "sha256": "4d2476f1c53d3724bae7228b05eda6f079a608c855e834e3bf86d7e3a0e2aa45",
+    "bytes": 2644207
+  },
+  "quality": {
+    "ruff_import_check": "Passed for all four owned Python files; cases.json is data.",
+    "git_diff_check": "passed",
+    "production_changes": false,
+    "metadata_lock_workflow_changes": false,
+    "nested_agents": false,
+    "push_pr_publication_or_external_messages": false
+  },
+  "limits": [
+    "All12 ownership rows remain draft/empty; every strict task is deliberately ineligible until reviewed case/node/spec inventories are frozen.",
+    "No family worker or algorithm implementation, FEI production repair, research-semantic qualification, or all-family execution was performed.",
+    "Native/evaluator/retained and full core evidence here is exact collection and policy verification; their training/runtime suites were not repeated.",
+    "Synthetic policy/worker/config probes are test infrastructure evidence, not support claims for any example family.",
+    "Fresh independent implementation review and later serial root ledger freeze/family receipts remain required."
+  ]
+}

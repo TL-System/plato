@@ -1,0 +1,207 @@
+{
+  "exit_status": 0,
+  "mlx_distribution_version": "0.32.3",
+  "platform": [
+    "Darwin",
+    "arm64"
+  ],
+  "backend_spec_lookups": [
+    {
+      "module": "mlx",
+      "inside_preflight": false,
+      "upstream_presence_query": true
+    },
+    {
+      "module": "mlx",
+      "inside_preflight": true,
+      "upstream_presence_query": false
+    },
+    {
+      "module": "mlx.core",
+      "inside_preflight": true,
+      "upstream_presence_query": false
+    },
+    {
+      "module": "mlx._reprlib_fix",
+      "inside_preflight": true,
+      "upstream_presence_query": false
+    },
+    {
+      "module": "mlx.__array_api_info",
+      "inside_preflight": true,
+      "upstream_presence_query": false
+    },
+    {
+      "module": "mlx.nn",
+      "inside_preflight": true,
+      "upstream_presence_query": false
+    },
+    {
+      "module": "mlx.nn.init",
+      "inside_preflight": true,
+      "upstream_presence_query": false
+    },
+    {
+      "module": "mlx.nn.losses",
+      "inside_preflight": true,
+      "upstream_presence_query": false
+    },
+    {
+      "module": "mlx.nn.layers",
+      "inside_preflight": true,
+      "upstream_presence_query": false
+    },
+    {
+      "module": "mlx.nn.layers.activations",
+      "inside_preflight": true,
+      "upstream_presence_query": false
+    },
+    {
+      "module": "mlx.nn.layers.base",
+      "inside_preflight": true,
+      "upstream_presence_query": false
+    },
+    {
+      "module": "mlx.utils",
+      "inside_preflight": true,
+      "upstream_presence_query": false
+    },
+    {
+      "module": "mlx.nn.layers.containers",
+      "inside_preflight": true,
+      "upstream_presence_query": false
+    },
+    {
+      "module": "mlx.nn.layers.convolution",
+      "inside_preflight": true,
+      "upstream_presence_query": false
+    },
+    {
+      "module": "mlx.nn.layers.convolution_transpose",
+      "inside_preflight": true,
+      "upstream_presence_query": false
+    },
+    {
+      "module": "mlx.nn.layers.distributed",
+      "inside_preflight": true,
+      "upstream_presence_query": false
+    },
+    {
+      "module": "mlx.nn.layers.linear",
+      "inside_preflight": true,
+      "upstream_presence_query": false
+    },
+    {
+      "module": "mlx.nn.layers.quantized",
+      "inside_preflight": true,
+      "upstream_presence_query": false
+    },
+    {
+      "module": "mlx.nn.layers.dropout",
+      "inside_preflight": true,
+      "upstream_presence_query": false
+    },
+    {
+      "module": "mlx.nn.layers.embedding",
+      "inside_preflight": true,
+      "upstream_presence_query": false
+    },
+    {
+      "module": "mlx.nn.layers.normalization",
+      "inside_preflight": true,
+      "upstream_presence_query": false
+    },
+    {
+      "module": "mlx.nn.layers.pooling",
+      "inside_preflight": true,
+      "upstream_presence_query": false
+    },
+    {
+      "module": "mlx.nn.layers.positional_encoding",
+      "inside_preflight": true,
+      "upstream_presence_query": false
+    },
+    {
+      "module": "mlx.nn.layers.recurrent",
+      "inside_preflight": true,
+      "upstream_presence_query": false
+    },
+    {
+      "module": "mlx.nn.layers.transformer",
+      "inside_preflight": true,
+      "upstream_presence_query": false
+    },
+    {
+      "module": "mlx.nn.utils",
+      "inside_preflight": true,
+      "upstream_presence_query": false
+    },
+    {
+      "module": "mlx.nn.layers.upsample",
+      "inside_preflight": true,
+      "upstream_presence_query": false
+    },
+    {
+      "module": "mlx.optimizers",
+      "inside_preflight": true,
+      "upstream_presence_query": false
+    },
+    {
+      "module": "mlx.optimizers.optimizers",
+      "inside_preflight": true,
+      "upstream_presence_query": false
+    },
+    {
+      "module": "mlx.optimizers.schedulers",
+      "inside_preflight": true,
+      "upstream_presence_query": false
+    }
+  ],
+  "backend_modules": [
+    "mlx",
+    "mlx._reprlib_fix",
+    "mlx.__array_api_info",
+    "mlx.core.metal",
+    "mlx.core.cuda",
+    "mlx.core.random",
+    "mlx.core.fft",
+    "mlx.core.linalg",
+    "mlx.core.fast",
+    "mlx.core.distributed",
+    "mlx.core",
+    "mlx.nn.init",
+    "mlx.nn.losses",
+    "mlx.utils",
+    "mlx.nn.layers.base",
+    "mlx.nn.layers.activations",
+    "mlx.nn.layers.containers",
+    "mlx.nn.layers.convolution",
+    "mlx.nn.layers.convolution_transpose",
+    "mlx.nn.layers.quantized",
+    "mlx.nn.layers.linear",
+    "mlx.nn.layers.distributed",
+    "mlx.nn.layers.dropout",
+    "mlx.nn.layers.embedding",
+    "mlx.nn.layers.normalization",
+    "mlx.nn.layers.pooling",
+    "mlx.nn.layers.positional_encoding",
+    "mlx.nn.layers.recurrent",
+    "mlx.nn.utils",
+    "mlx.nn.layers.transformer",
+    "mlx.nn.layers.upsample",
+    "mlx.nn.layers",
+    "mlx.nn",
+    "mlx.optimizers.optimizers",
+    "mlx.optimizers.schedulers",
+    "mlx.optimizers"
+  ],
+  "native_test_modules": [
+    "tests.mlx_native.test_phase3_tree_contract"
+  ],
+  "native_frontdoor_modules": [
+    "plato.trainers.mlx",
+    "plato.algorithms.mlx_fedavg",
+    "plato.models.mlx.lenet5"
+  ],
+  "production_conftest_loaded": true
+}

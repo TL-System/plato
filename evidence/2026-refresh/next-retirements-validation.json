@@ -1,0 +1,190 @@
+{
+  "schema_version": 1,
+  "status": "author validation complete; independent implementation acceptance pending",
+  "recorded_at_utc": "2026-10-04T04:08:39.083253+00:00",
+  "source": {
+    "worktree": "/tmp/plato-refresh-worktrees/additional-retirements",
+    "base_commit": "c1359992f70533c0f2a47d30742f9b14295da882",
+    "source_head": "35e251f388ef14a688764106f71e340dc3ccc952",
+    "source_tree": "d6237c0e9187f70ae01cd7442ad7df99f6e6fc37",
+    "dirty": "",
+    "changed_source_sha256": {
+      ".github/scripts/check_container.py": "150333f88559723414273a54d6bc4c2ad8408caeb5ec84f76b82f75e905522ca",
+      "configs/CIFAR10/fedavg_resnet18_torchvision.toml": "33e218cd7bdedccc9f836b53edd7e28a6b4e9e842816e10fe15cb0aee1daf71a",
+      "configs/TinyImageNet/fedavg_alexnet.toml": "7208d88d3c919ba9e17a12a4c6f11dbb2b3552326a8be4e7acb052a1a3b54f53",
+      "configs/TinyImageNet/fedavg_googlenet.toml": "79882247bfcfa4e502408b318b48cef83369dbadac9f811148487e8798a9f242",
+      "configs/TinyImageNet/fedavg_inceptionv3.toml": "7576bced855fa9b9ea72ac920836edd354d6a8296dc3952eab1b31cf83418125",
+      "configs/TinyImageNet/fedavg_shufflenet.toml": "d6006168835f7b91e5224449a9c6feb723d159cc6100b0d7619007c87fcb7044",
+      "configs/TinyImageNet/fedavg_squeezenet.toml": "a2b4a753b0b78db1fd8b72749683e3738837693185e23d29de56a2b9dd8b2d4e",
+      "docs/docs/configurations/trainer.md": "df608665645ba22e0adb6ee27a37d666035a520e837a673dbc311f6b895c2e8d",
+      "docs/docs/examples/algorithms/4. Federated Unlearning.md": "48f29c393988efc18b4cf44768025c66108d11d7fa5d40eb3d74b453ab1c5598",
+      "evidence/2026-refresh/additional-retirements-ledger.json": "b654540d190c58e69e0a7d223b3fd59ab39d3d0f18b38fa7cffbe599f8e8f458",
+      "evidence/2026-refresh/fei-post-retirement-ledger.json": "7d18beab505f3f23cb6b14785c35b4d7a3b5b425b9dd541769e43bcd7b80167a",
+      "evidence/2026-refresh/plato-next-retirements-plan-review.json": "a93502a267b86617ff3bde0d30462179c219f0bbc279354d0c049dfddcd0ecb8",
+      "evidence/2026-refresh/plato-next-retirements-plan.json": "a49502dca7146305f37c94a404ff7735c7507d79d3968b5a813f09e304442716",
+      "examples/model_search/anycostfl/example_ResNet.toml": "f6ae45c764ecaee6d925ee76303b64afacf5f100448c32bde7851481014511f8",
+      "examples/model_search/fedrolex/example_ResNet.toml": "f6ae45c764ecaee6d925ee76303b64afacf5f100448c32bde7851481014511f8",
+      "examples/model_search/heterofl/heterofl_resnet18_dynamic.toml": "1da0ef4948816d777a038381145bd433649a37c022b784e33396f3dcc0272f23",
+      "examples/model_search/sysheterofl/config_ResNet152.toml": "b132e201ef12cce0345353278e49e511f64dacc5964f47aac5293574f4311dc9",
+      "examples/unlearning/fedunlearning/fedunlearning.py": "17857f977adf44da98896638420b539b240593097ce0f0b6996b036a1835567f",
+      "examples/unlearning/fedunlearning/fedunlearning_MNIST_lenet5.toml": "7d66615ab124863b2efedc05bde97d755a2cba1745e2144e82b23506e3c27356",
+      "examples/unlearning/fedunlearning/fedunlearning_client.py": "c05781d1c80a45a03bd6cdac77c139ce8a068ee0c319610f75702aed71597d43",
+      "examples/unlearning/fedunlearning/fedunlearning_server.py": "c09efdcd32595e890ed40be7d507bb013439087b36ddbc035a2c4738718b6331",
+      "examples/unlearning/fedunlearning/unlearning_iid.py": "aeb1ab00020d6239390a62e88a7e0690999a573792a52cc226ed6bb400a6e620",
+      "examples/unlearning/knot/fedunlearning_server.py": "4940f65775c1b4290a2e3dfb2af825774341538c73fd9d0ca4883008d254371a",
+      "examples/unlearning/knot/unlearning_iid.py": "b21b4cead0f7fdf1c4f029b1c23c792140eace31a71aea4528ba6e9a0eb54135",
+      "plato/config.py": "dc1d55b5cd8c426cac0dedfdb27420e1b1b72d14b10b9b969a61e977f0369299",
+      "plato/models/registry.py": "2bcb04070cddcd22aee88e4f72fddb0a2e72acb8c597425e4f4544e4427d8fe4",
+      "plato/models/torchvision.py": "7cc927e354a061cd88f9a0ea381942e05cfc3b2a41d834ec7a3f056a376b9720",
+      "plato/samplers/registry.py": "8d28cd275e119465fefb9878981eb509cd20f7d409dd1d23773cccf2a1faf25f",
+      "plato/trainers/optimizers.py": "1c8945967a228ecba15ec6a337cd2adf97d7389482cb4d421a45872a5c8f5ede",
+      "plato/utils/retired_backends.py": "fd3ad34336f3d757482e7f9684cd2f1447a39bd6d823774334f5cc3775ee20e4",
+      "pyproject.toml": "2975b5f5643a1fd46ef62d78de8104a86e20b50446ad6f5a2041a6448b8fcf9e",
+      "tests/examples_phase4/cases.json": "b654540d190c58e69e0a7d223b3fd59ab39d3d0f18b38fa7cffbe599f8e8f458",
+      "tests/samplers/test_partition_contracts.py": "d81d4ac7882b908e6eab7e0ceb81763bed8ba8252d5114987f922c61be59123f",
+      "tests/test_additional_retirements.py": "b61e4f1653c8639f980d6dc0e4e132aae7afdafbfbe440d7803fec7045ac0805",
+      "tests/test_examples_phase4_contract.py": "dbf1b4a705af29f9b7651417d11ea668bc8c3ffb6b61069ddda4dce6e19c9d02",
+      "tests/test_fei_retirement.py": "51598d5ea64ca84cc802df1e3dbaacc8fd435b81c70d6e756181dd398fd6de02",
+      "tests/test_model_search_retirement.py": "daf64be479e3eae3569776cf2a78b463fc63d9137a315c9fc3c937ba6425c27c",
+      "uv.lock": "a92cabf03754db2647c90eff2cfeed8e6737fe8e9eb20efcba81fe90c46432bd"
+    }
+  },
+  "scope": "Five reviewed bounded retirements; no whole-codebase or Phase4 family qualification claim.",
+  "validation": {
+    "unique_focused_cases_passed": 237,
+    "unchanged_initial_noncontract_cases_passed": 116,
+    "initial_contract_failures": 23,
+    "initial_failure_reason": "Miniature worker fixture copied config.py but omitted newly imported retired_backends.py. Fixed by copying that real dependency; whole contract rerun100 passed.",
+    "final_runs": [
+      {
+        "name": "final-retirement",
+        "passed": 31,
+        "xml_path": "/tmp/plato-next-retirements-final-retirement.xml",
+        "xml_sha256": "cd03855a919804a1100a518783504d86a16e3588eb539fe24043aa86ebd042c7",
+        "log_path": "/tmp/plato-next-retirements-final-retirement.log",
+        "log_sha256": "341784c00716e97eaf1b3c291fb7b6592177356bb9a24428d690c2ccceea6fa5"
+      },
+      {
+        "name": "contract",
+        "passed": 100,
+        "xml_path": "/tmp/plato-next-retirements-contract.xml",
+        "xml_sha256": "d4a47302aa687bc91af5f78ecda73f6d935c0477111060e2fd2c9e1ad7d5f54a",
+        "log_path": "/tmp/plato-next-retirements-contract.log",
+        "log_sha256": "61c68af6c51a16e9cdcaeaf8d65f0081744d895c836b1c530a444dfa5cc49638"
+      },
+      {
+        "name": "model-search",
+        "passed": 19,
+        "xml_path": "/tmp/plato-next-retirements-model-search.xml",
+        "xml_sha256": "7a5525531d34390265bdb98dea2fe3380943b8420bd44efe0c1122f385670bad",
+        "log_path": "/tmp/plato-next-retirements-model-search.log",
+        "log_sha256": "274eebb56382356f03689d46fe9abc02650e4d9ce8498d60d476901de1145e95"
+      }
+    ],
+    "collection": {
+      "mandatory": {
+        "collected": 1765,
+        "phase4_excluded": true,
+        "log_path": "/tmp/plato-next-retirements-mandatory-collection.log",
+        "sha256": "87a7298ed9edab8630b5bc48d790f50bd93f557dd8b749261bc5fe800eadd246"
+      },
+      "base": {
+        "collected": 1765,
+        "phase4_excluded": true,
+        "log_path": "/tmp/plato-next-retirements-base-collection.log",
+        "sha256": "e0bc0f48b2d3700ebe19822be28e998b780fb6823809e25e484b34c42eaa29a0"
+      }
+    },
+    "archive_rows_independently_verified": 60,
+    "lock_removed_only": [
+      "torch-optimizer",
+      "pytorch-ranger"
+    ],
+    "unrelated_locked_versions_unchanged": true,
+    "installed_torchvision_cpu_and_adam_recipe_training_passed": true,
+    "rendered_local_links_checked": 101,
+    "docs_log": {
+      "path": "/tmp/plato-next-retirements-docs.log",
+      "sha256": "e528984492ea2ef6a323e811ca04bad44ba3211c433191e7a0ecbf3ba83648a1"
+    },
+    "package_artifacts": [
+      {
+        "path": "/tmp/plato-next-retirements-dist/plato_learn-1.4.3-py3-none-any.whl",
+        "sha256": "78f1863d38025ae3b44a67872bd0fcb2480abef136a85fcafea2a736916d9dc4",
+        "files": 211
+      },
+      {
+        "path": "/tmp/plato-next-retirements-dist/plato_learn-1.4.3.tar.gz",
+        "sha256": "49a4568ecbd7b95bd5cdb0c5a3f9d7f035d58cd3644d49cbce2ec83cc61f67db",
+        "files": 1530
+      }
+    ],
+    "package_archives_excluded": true,
+    "ruff_import_order_passed": true,
+    "diff_whitespace_passed": true
+  },
+  "limitations": [
+    "Retained model-search behavior uses the existing bounded19-case profile; generic unlearning/SSL/detector families remain draft.",
+    "Historical BERT diagnostic is tiny random offline BERT only; older split recipes were retired by authorized consolidation.",
+    "Pytest reports existing temporary-directory cleanup warnings; no test failures remain in selected scopes.",
+    "Root typing/CI/container branches still require source/ledger reconciliation after integration."
+  ],
+  "retained_raw_outputs": [
+    {
+      "path": "evidence/2026-refresh/next-retirements-validation/final-retirement.xml",
+      "sha256": "cd03855a919804a1100a518783504d86a16e3588eb539fe24043aa86ebd042c7",
+      "bytes": 4585
+    },
+    {
+      "path": "evidence/2026-refresh/next-retirements-validation/final-retirement.log",
+      "sha256": "341784c00716e97eaf1b3c291fb7b6592177356bb9a24428d690c2ccceea6fa5",
+      "bytes": 5165
+    },
+    {
+      "path": "evidence/2026-refresh/next-retirements-validation/contract.xml",
+      "sha256": "d4a47302aa687bc91af5f78ecda73f6d935c0477111060e2fd2c9e1ad7d5f54a",
+      "bytes": 16000
+    },
+    {
+      "path": "evidence/2026-refresh/next-retirements-validation/contract.log",
+      "sha256": "61c68af6c51a16e9cdcaeaf8d65f0081744d895c836b1c530a444dfa5cc49638",
+      "bytes": 5257
+    },
+    {
+      "path": "evidence/2026-refresh/next-retirements-validation/model-search.xml",
+      "sha256": "7a5525531d34390265bdb98dea2fe3380943b8420bd44efe0c1122f385670bad",
+      "bytes": 2724
+    },
+    {
+      "path": "evidence/2026-refresh/next-retirements-validation/model-search.log",
+      "sha256": "274eebb56382356f03689d46fe9abc02650e4d9ce8498d60d476901de1145e95",
+      "bytes": 5177
+    },
+    {
+      "path": "evidence/2026-refresh/next-retirements-validation/mandatory-collection.log",
+      "sha256": "87a7298ed9edab8630b5bc48d790f50bd93f557dd8b749261bc5fe800eadd246",
+      "bytes": 198283
+    },
+    {
+      "path": "evidence/2026-refresh/next-retirements-validation/base-collection.log",
+      "sha256": "e0bc0f48b2d3700ebe19822be28e998b780fb6823809e25e484b34c42eaa29a0",
+      "bytes": 198107
+    },
+    {
+      "path": "evidence/2026-refresh/next-retirements-validation/docs.log",
+      "sha256": "e528984492ea2ef6a323e811ca04bad44ba3211c433191e7a0ecbf3ba83648a1",
+      "bytes": 1203
+    },
+    {
+      "path": "evidence/2026-refresh/next-retirements-validation/build.log",
+      "sha256": "cb87bafe762ee0b909fa53511e952e905556506530d17062d5e22447ef854de3",
+      "bytes": 143
+    }
+  ],
+  "initial_run_raw_output": {
+    "path": "/tmp/plato-next-retirements-focused.xml",
+    "sha256": "c9c83b435c82bba52c34966ca3c58a9922fa965795c22bee130f7f4081b34de0",
+    "distributed": false,
+    "reason": "Initial run's passing116 noncontract cases and repaired23 fixture failures; successful contract rerun retained separately."
+  }
+}

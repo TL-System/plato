@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import math
 from collections.abc import Mapping
 from typing import Any, Dict, cast
 
@@ -29,13 +30,24 @@ class FedAvgHEAggregationStrategy(AggregationStrategy):
         weights_received,
         context: ServerContext,
     ) -> dict | None:
+        if len(updates) != len(weights_received):
+            raise ValueError("HE report/payload cardinality mismatch.")
         if not weights_received:
             return None
 
         # MaskCrypt alternates between mask tensors and encrypted weights.
         # Skip aggregation when the payload lacks the serialized model structure.
-        if not all(isinstance(payload, Mapping) for payload in weights_received):
+        mappings = [isinstance(payload, Mapping) for payload in weights_received]
+        if not any(mappings):
             return None
+        if not all(mappings):
+            raise ValueError("Cannot mix HE model payloads and mask payloads.")
+        counts = [update.report.num_samples for update in updates]
+        total_samples = sum(counts)
+        if any(
+            not math.isfinite(count) or count < 0 for count in counts
+        ) or not math.isfinite(total_samples):
+            raise ValueError("HE sample counts must be finite and nonnegative.")
 
         server_obj = getattr(context, "server", None)
         if server_obj is None:
@@ -53,9 +65,12 @@ class FedAvgHEAggregationStrategy(AggregationStrategy):
                 "Server must expose 'weight_shapes' and 'para_nums' for HE aggregation."
             )
 
-        aggregated = fedavg_hybrid(updates, weights_received)
-        server.encrypted_model = aggregated
+        for payload in weights_received:
+            homo_enc.validate_encrypted_model(payload, sum(para_nums.values()))
+        if total_samples == 0:
+            return baseline_weights
 
+        aggregated = fedavg_hybrid(updates, weights_received)
         decrypted_weights = homo_enc.decrypt_weights(
             aggregated, weight_shapes, para_nums
         )
@@ -63,5 +78,6 @@ class FedAvgHEAggregationStrategy(AggregationStrategy):
         encrypted_part = aggregated.get("encrypted_weights")
         if encrypted_part is not None and not isinstance(encrypted_part, bytes):
             aggregated["encrypted_weights"] = encrypted_part.serialize()
+        server.encrypted_model = aggregated
 
         return decrypted_weights

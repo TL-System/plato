@@ -33,6 +33,8 @@ class ParallelIterator:
         # terminates, this iterator will terminates.
         # The `StopIteration` raised inside that shortest loader's `__next__`
         # method will in turn gets out of this `__next__` method.
+        if not self.loader_iters:
+            raise StopIteration
         batches = [next(loader_iter) for loader_iter in self.loader_iters]
         return self.defined_compound_loader.combine_batch(batches)
 
@@ -65,7 +67,7 @@ class ParallelDataLoader:
         return ParallelIterator(self)
 
     def __len__(self):
-        return min(len(loader) for loader in self.loaders)
+        return min((len(loader) for loader in self.loaders), default=0)
 
     def combine_batch(self, batches):
         """Customize the behavior of combining batches here."""
@@ -103,6 +105,8 @@ class SequentialIterator:
         # terminates, this iterator will terminates.
         # The `StopIteration` raised inside that shortest loader's `__next__`
         # method will in turn gets out of this `__next__` method.
+        if not self.loader_iters:
+            raise StopIteration
         cur_loader_idx = np.digitize(self.batch_idx, self.loaders_batch_bound)
 
         # if completed the final loader, we just recycle to the final loader

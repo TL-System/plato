@@ -1,0 +1,172 @@
+{
+  "schema_version": 1,
+  "status": "plan-only; requires fresh independent Sol/high review before implementation",
+  "scope": "Retire FEI only; archive immutable original source and remove its active qualification surface.",
+  "base": {
+    "original_commit": "3d4e08b26972e114d87ef39795e01f4dfa554b94",
+    "original_tree": "16602a4bd057c30ec2bf195b926d6f2d405774dd",
+    "integration_commit": "e81248dae1844fb5bc66a8d880c9a17b485606ac",
+    "integration_tree": "ff5fcc51936fdca4e324ffc9aadd878522832291",
+    "integration_path": "/private/tmp/plato-refresh-worktrees/phase4-integration",
+    "dirty": ""
+  },
+  "moved_files": [
+    {
+      "original_path": "examples/reinforcement_learning/fei/fei.py",
+      "archive_path": "archives/retired/fei/original/examples/reinforcement_learning/fei/fei.py",
+      "disposition": "moved",
+      "git_mode": "100644",
+      "git_blob": "539228a3210f30cd7b21d779b3fdef070d348252",
+      "sha256": "d624ac5d2ebaedc1c6c2e6262678314531376db16b81ed775d3014a0dc21f870",
+      "bytes": 456
+    },
+    {
+      "original_path": "examples/reinforcement_learning/fei/fei_CIFAR10_resnet18.toml",
+      "archive_path": "archives/retired/fei/original/examples/reinforcement_learning/fei/fei_CIFAR10_resnet18.toml",
+      "disposition": "moved",
+      "git_mode": "100644",
+      "git_blob": "4a005d46c97ae1bf925d440ba6d028348af91316",
+      "sha256": "2a03ce665614c0a2b2a667801d5600aa1ae2ad4974601b5c7b2211dcc744562c",
+      "bytes": 3185
+    },
+    {
+      "original_path": "examples/reinforcement_learning/fei/fei_FashionMNIST_lenet5.toml",
+      "archive_path": "archives/retired/fei/original/examples/reinforcement_learning/fei/fei_FashionMNIST_lenet5.toml",
+      "disposition": "moved",
+      "git_mode": "100644",
+      "git_blob": "1b536666ea801570835735f5c437e94d0e34e649",
+      "sha256": "6b7dfae3c2c4ac3bdee861adac0d183b950c119f20b5fb0635afcafbeafd2bb3",
+      "bytes": 3103
+    },
+    {
+      "original_path": "examples/reinforcement_learning/fei/fei_agent.py",
+      "archive_path": "archives/retired/fei/original/examples/reinforcement_learning/fei/fei_agent.py",
+      "disposition": "moved",
+      "git_mode": "100644",
+      "git_blob": "6b5ba75b58b33fa94a2707da964a7ca683ca48d4",
+      "sha256": "ee186f5858e3362576d35bad2a3f4c7bf48f7a08ba1daab7f64895194c77da34",
+      "bytes": 11089
+    },
+    {
+      "original_path": "examples/reinforcement_learning/fei/fei_client.py",
+      "archive_path": "archives/retired/fei/original/examples/reinforcement_learning/fei/fei_client.py",
+      "disposition": "moved",
+      "git_mode": "100644",
+      "git_blob": "603924c0991ac53c83327e40b42bf72b36145072",
+      "sha256": "2dd8fa26e9d505537c0fd660ff40f37fc84954c626e0efba84ac0490b22b5e71",
+      "bytes": 2890
+    },
+    {
+      "original_path": "examples/reinforcement_learning/fei/fei_server.py",
+      "archive_path": "archives/retired/fei/original/examples/reinforcement_learning/fei/fei_server.py",
+      "disposition": "moved",
+      "git_mode": "100644",
+      "git_blob": "38c13a579fe13e21da8ce49d27407cd0769c21b7",
+      "sha256": "8493f3859b862d28214e34a5c5c3edea26bc01febc9752e09c343f65caa19a74",
+      "bytes": 3642
+    }
+  ],
+  "copied_context": [
+    {
+      "source_commit": "3d4e08b26972e114d87ef39795e01f4dfa554b94",
+      "paths": [
+        "LICENSE",
+        "pyproject.toml",
+        "uv.lock"
+      ]
+    },
+    {
+      "source_commit": "e81248dae1844fb5bc66a8d880c9a17b485606ac",
+      "paths": [
+        "tests/examples_phase4/cases.json"
+      ],
+      "purpose": "Byte-exact pre-retirement ledger with seven frozen FEI cases; historical rejected qualification inventory, never active tests."
+    }
+  ],
+  "evidence": {
+    "review": {
+      "path": "/tmp/plato-phase4-fei-code-review.json",
+      "sha256": "80094b3cec8272a8f44456ef2df4244579f9076990885e299b83b09d4e1f11d1"
+    },
+    "raw_artifacts": {
+      "path": "/tmp/plato-phase4-fei-code-review-artifacts.tgz",
+      "sha256": "3061941926be598c454532b62b909fbb5bc3ba17bc780004767514967d6db44e"
+    },
+    "archive_policy": "Copy review JSON byte-exact into archive evidence. Preserve raw artifacts locally and record its SHA256 and non-distribution status; do not check in raw tarball containing third-party research PDF. Record paths/commits of abandoned repair/CI worktrees as unaccepted history and never import their code.",
+    "disposition": "Unqualified historical implementation: research-semantic state mismatch; strict repaired qualification 6 passed / 1 failed; no accepted repair and no accuracy/benchmark claims."
+  },
+  "owned_paths": [
+    "examples/reinforcement_learning/fei/*",
+    "archives/retired/fei/**",
+    "archives/retired/README.md",
+    "tests/examples_phase4/cases.json",
+    "tests/conftest.py:_load_phase4_ledger",
+    "tests/test_examples_phase4_contract.py:test_draft_ownership_matches_frozen_authority",
+    "tests/test_fei_retirement.py"
+  ],
+  "archive": {
+    "manifest": "Follow existing archives/retired manifests: original commit/tree, reviewed retirement plan digest, per-file mode/blob/SHA256/bytes/disposition; context rows identify their distinct source commits. Retain license and source pointers; no upstream revision inferred.",
+    "readme": "Explain retired scope, exact original restoration checkout, unresolved findings and failed qualification, generic RL retained, dependencies/assets not qualified.",
+    "build_policy": "Existing Hatch sdist archives/** and wheel packages=[plato], pytest recurse exclusion, Ruff exclusion already cover destination; verify built wheel and sdist omit FEI archive and obsolete active source."
+  },
+  "active_ledger_amendment": {
+    "pre_retirement_ledger_sha256": "3e2aaca8daf3343ec4e7d31960185606f86992653b0772b0255adca47834a44d",
+    "authority_preservation": "Keep four authority SHA256 values and historical /tmp plans unchanged. Add retirement_amendment metadata binding reviewed plan, archived prior ledger, prior counts/hashes and exact removed paths/task/bindings; recompute only active path_map/config_bindings digests.",
+    "remove_task": "P4-fei",
+    "remove_source_paths": [
+      "examples/reinforcement_learning/fei/fei.py",
+      "examples/reinforcement_learning/fei/fei_CIFAR10_resnet18.toml",
+      "examples/reinforcement_learning/fei/fei_FashionMNIST_lenet5.toml",
+      "examples/reinforcement_learning/fei/fei_agent.py",
+      "examples/reinforcement_learning/fei/fei_client.py",
+      "examples/reinforcement_learning/fei/fei_server.py"
+    ],
+    "remove_config_bindings": [
+      {
+        "config": "examples/reinforcement_learning/fei/fei_CIFAR10_resnet18.toml",
+        "owner": "P4-fei",
+        "entrypoint_candidates": [
+          "examples/reinforcement_learning/fei/fei.py"
+        ],
+        "include_consumers": [],
+        "kind": "leaf-or-multi-mode-config",
+        "assignment": "Author resolves any multiple candidates into explicit case branches; all listed utilities/entrypoints remain inventoried. Include-only fragments inherit consuming leaf behavioral proof."
+      },
+      {
+        "config": "examples/reinforcement_learning/fei/fei_FashionMNIST_lenet5.toml",
+        "owner": "P4-fei",
+        "entrypoint_candidates": [
+          "examples/reinforcement_learning/fei/fei.py"
+        ],
+        "include_consumers": [],
+        "kind": "leaf-or-multi-mode-config",
+        "assignment": "Author resolves any multiple candidates into explicit case branches; all listed utilities/entrypoints remain inventoried. Include-only fragments inherit consuming leaf behavioral proof."
+      }
+    ],
+    "new_counts": {
+      "tasks": 11,
+      "paths": 393,
+      "families": 57,
+      "config_bindings": 134
+    },
+    "guard": "Adjust exact owner count to eleven, preserving schema, duplicate owner/module/worker/family, frozen/nonempty, case digest, all explicit-module and exact-node qualification guards. Remaining eleven task objects and remaining 393 inventory entries unchanged; no fake empty FEI owner.",
+    "tests": "Update draft inventory contract for 11/393/134; add independent exact delta check against archived prior ledger, reject missing/extra owner, absent FEI owner rejection, and preserve draft qualification rejection."
+  },
+  "reference_audit": {
+    "observed": "No FEI docs/runtime/workspace references outside FEI source and phase4 ledger. No FEI-specific workspace or dependency declaration. Generic RL policies/agent/server remain available and covered by tests/utils/test_rl_payload_utilities.py; gymnasium serves retained rl_agent API and stays in rl extra.",
+    "action": "Add FEI row to archive index; search all tracked active refs/config include bindings/docs/workflows/package metadata again and edit only confirmed FEI refs. CI owner handles workflow simplification; retirement does not introduce FEI CI job."
+  },
+  "validation": [
+    "Verify archive files byte/mode/Git-blob/SHA256 against independently pinned inventory; test byte and mode mutations fail and six originals absent.",
+    "Verify copied license/context per source commit and prior ledger identity; exact active ledger delta, recomputed digests, no FEI family in qualification.",
+    "Run focused pytest tests/test_fei_retirement.py tests/test_examples_phase4_contract.py and tests/utils/test_rl_payload_utilities.py in existing suitable environment; execute Phase4 collection/selector contract tests, no 65-minute whole-suite rerun.",
+    "Build local wheel and sdist using existing build tooling and inspect archive/source exclusions; inspect ordinary collection excluding archives and Phase4 workers.",
+    "Run focused Ruff import checks; independent fresh code review after implementation before root integration/publication."
+  ],
+  "non_goals": [
+    "No source repair or numeric-oracle tolerance change.",
+    "No generic RL removal or gymnasium dependency removal.",
+    "No integration of dc93e49f or 7a2da68e abandoned repairs/CI.",
+    "No old research PDF republishing or historical qualification rewrite."
+  ]
+}

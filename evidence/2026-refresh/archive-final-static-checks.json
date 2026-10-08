@@ -1,0 +1,112 @@
+{
+  "head": "6bf8836d06072c7946cdfb5499a09e4bce459805",
+  "commands": {
+    "lock": {
+      "command": [
+        "uv",
+        "lock",
+        "--check"
+      ],
+      "returncode": 0,
+      "log_sha256": "996d042f548e0fe4859fe04b4f2bedeef6c88833af6974ee5a201108041bbf3c"
+    },
+    "ruff": {
+      "command": [
+        "/tmp/plato-archive-integration/env/bin/python",
+        "-m",
+        "ruff",
+        "check",
+        ".",
+        "--select",
+        "I"
+      ],
+      "returncode": 0,
+      "log_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    "ty": {
+      "command": [
+        "/tmp/plato-archive-integration/env/bin/python",
+        "-m",
+        "ty",
+        "check",
+        "--output-format",
+        "concise"
+      ],
+      "returncode": 1,
+      "log_sha256": "46777e5397c1e768196b3cdb441cd29dfc98153c26144bcad16d7c11f01eb09a"
+    },
+    "ty-stager": {
+      "command": [
+        "/tmp/plato-archive-integration/env/bin/python",
+        "-m",
+        "ty",
+        "check",
+        ".github/scripts/stage_ci_artifacts.py",
+        "--output-format",
+        "concise",
+        "--error-on-warning"
+      ],
+      "returncode": 0,
+      "log_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    }
+  },
+  "typing_diagnostics": 337,
+  "owned_paths": [
+    ".github/scripts/stage_ci_artifacts.py",
+    "examples/gradient_leakage_attacks/dlg_model.py",
+    "examples/model_search/anycostfl/anycostfl.py",
+    "examples/model_search/fedrolex/fedrolex.py",
+    "examples/model_search/heterofl/heterofl.py",
+    "plato/algorithms/mlx_fedavg.py",
+    "plato/algorithms/registry.py",
+    "plato/models/registry.py",
+    "plato/servers/fedavg.py",
+    "plato/trainers/mlx.py",
+    "plato/trainers/registry.py",
+    "plato/utils/retired_backends.py",
+    "plato/utils/tree.py",
+    "tests/clients/test_feddf_strategy.py",
+    "tests/conftest.py",
+    "tests/datasources/test_huggingface_datasource.py",
+    "tests/integration/model_search_retention_worker.py",
+    "tests/integration/test_event_loop_startup.py",
+    "tests/integration/test_retained_model_search.py",
+    "tests/integration/utils.py",
+    "tests/mlx_import_audit_runner.py",
+    "tests/mlx_native/__init__.py",
+    "tests/mlx_native/benchmark.py",
+    "tests/mlx_native/helpers.py",
+    "tests/mlx_native/seed_probe.py",
+    "tests/mlx_native/socket_harness.py",
+    "tests/mlx_native/socket_probe.py",
+    "tests/mlx_native/test_phase3_controls.py",
+    "tests/mlx_native/test_phase3_dispatch.py",
+    "tests/mlx_native/test_phase3_rng.py",
+    "tests/mlx_native/test_phase3_runtime.py",
+    "tests/mlx_native/test_phase3_selection.py",
+    "tests/mlx_native/test_phase3_socket.py",
+    "tests/mlx_native/test_phase3_tree_contract.py",
+    "tests/servers/test_feddf_server_strategy.py",
+    "tests/test_mlx_import_contract.py",
+    "tests/test_mlx_profile_contract.py",
+    "tests/test_model_search_profile_contract.py",
+    "tests/test_model_search_retirement.py",
+    "tests/test_retired_backends.py",
+    "tests/trainers/test_dp_data_loader_strategy.py"
+  ],
+  "allowed_preexisting_diagnostics": [
+    [
+      "tests/datasources/test_huggingface_datasource.py",
+      "99",
+      "5",
+      "invalid-assignment"
+    ],
+    [
+      "tests/datasources/test_huggingface_datasource.py",
+      "100",
+      "5",
+      "invalid-assignment"
+    ]
+  ],
+  "owned_violations": []
+}

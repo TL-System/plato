@@ -1,0 +1,50 @@
+{
+  "status": "ACCEPT_EXACT_SOURCE_LINUX_QUALIFICATION_FOR_PR418_MERGE",
+  "utc": "2026-10-03T19:03:18.393628+00:00",
+  "published_head": "1130ff0250ee26a49328e15cf5596f430c468c9d",
+  "ci_merge_commit": "f3f165d921dcc015e5d8ea0647e388235d4801de",
+  "ci_run": 37143836327,
+  "ci_url": "https://github.com/TL-System/plato/actions/runs/37143836327",
+  "profiles": [
+    {
+      "profile": "base",
+      "passed": 1275,
+      "skipped": 1,
+      "warnings": 10
+    },
+    {
+      "profile": "mandatory",
+      "passed": 1282,
+      "skipped": 0,
+      "warnings": 27
+    },
+    {
+      "profile": "runtime",
+      "passed": 51,
+      "skipped": 0,
+      "warnings": 0
+    }
+  ],
+  "coverage_percent": "74",
+  "runtime_records": 55,
+  "numeric": "Independent actual 2/6-weighted FedAvg and four-round Fraction FedDyn/control/resume endpoint, history and full CPU RNG audit passed.",
+  "typing": {
+    "total": 657,
+    "groups": {
+      "inactive_archive": 27,
+      "retained_reproduction": 33,
+      "active_source_unchanged": 12,
+      "pinned_vendor": 324,
+      "tests_unchanged": 261
+    }
+  },
+  "artifact_audit_sha256": "630d772f739c6865bb3671a6058e20a63648c24fa0cdf14ed6fd857cb8219951",
+  "local_gate_sha256": "2d46046e83eb2ad9ac9c4f0f7e2e753cf81f788518cb6bca209d5502395c5d0c",
+  "retained_bundle": {
+    "name": "llm-final-linux-qualification.tar.gz",
+    "bytes": 3654793,
+    "sha256": "4dc9c50263ec9981466f615b7d5448c94c06b38a2bc49de9e16913f75d04ab08"
+  },
+  "python_policy": "3.13 sole default and CI; no new 3.14 support claim.",
+  "limitations": "Local Qwen CLI observation is bound to the earlier candidate; corrected-source qualification and unchanged normal-vocabulary numerical hashes are recorded. No training-quality or full optimizer-resume claim."
+}

@@ -2,7 +2,7 @@
 
 Plato supports an optional `[evaluation]` section for **structured server-side evaluation**. This runs **after** the trainer's regular test metric (for example accuracy or perplexity) and records named benchmark metrics under the `evaluation_` prefix in the runtime CSV.
 
-Use this section when you want benchmark-style outputs such as IFEval, ARC, HellaSwag, PIQA, or Nanochat CORE instead of only a single scalar test metric.
+Use this section when you want benchmark-style outputs such as IFEval, ARC, HellaSwag, or PIQA instead of only a single scalar test metric.
 
 ## When evaluation runs
 
@@ -23,10 +23,6 @@ If `[evaluation]` is omitted, Plato only records the trainer's normal scalar met
     Built-in values include:
 
     - `lighteval` for Hugging Face's Lighteval benchmark runner.
-    - `nanochat_core` for Nanochat's CORE benchmark. **Requires `trainer.type = "nanochat"`.**
-      This evaluator is not registered in the general evaluator registry; it is wired
-      internally by the nanochat trainer. Using it with any other trainer type produces
-      no evaluation output and no error.
 
 !!! example "fail_on_error"
     Whether evaluator failures should abort the run.
@@ -35,16 +31,45 @@ If `[evaluation]` is omitted, Plato only records the trainer's normal scalar met
 
     When `false`, Plato logs the evaluator exception and continues without structured evaluation metrics. Set this to `true` when the evaluation itself is a required part of the experiment.
 
+Unknown or retired evaluator types fail during resolution. `fail_on_error`
+controls failures during evaluation, not unsupported backend selection.
+
 ## Built-in evaluators
 
 | Evaluator | Install path | Primary output style | Typical use |
 | --- | --- | --- | --- |
-| `lighteval` | `uv sync --extra llm_eval` | Named benchmark metrics such as `ifeval_avg` and `arc_avg` | Server-side LLM evaluation |
-| `nanochat_core` | `uv sync --extra nanochat` | `core_metric` | Nanochat benchmark runs — requires `trainer.type = "nanochat"` and a trained Nanochat tokenizer under `~/.cache/nanochat/tokenizer/` |
+| `lighteval` | `uv sync --locked --python 3.13 --extra llm_eval` | Named benchmark metrics such as `ifeval_avg` and `arc_avg` | Server-side LLM evaluation |
 
 ## Lighteval
 
 Plato's Lighteval adapter wraps the `lighteval` package and normalizes its task outputs into CSV-friendly metrics.
+
+Install the `llm_eval` extra and the NLTK `punkt` and `punkt_tab` resources as
+shown in [Installation](../install.md#optional-server-side-llm-evaluation-with-lighteval).
+Include `--extra llm_eval` on syncing `uv run` commands. Use a separate
+environment for the incompatible `ssl` extra.
+
+### Model artifacts and response caches
+
+When the current model and tokenizer both provide `save_pretrained()`, Plato
+exports them to a fresh temporary directory for each evaluation. This ensures
+that later federated rounds evaluate their current weights rather than reuse
+responses from an earlier round.
+
+Otherwise, the adapter falls back to `trainer.model_name` and
+`trainer.tokenizer_name` (the latter defaults to the model reference). Existing
+local directories are copied in full into independent temporary directories;
+if both references resolve to the same directory, it is copied once. The
+configured source directories, including read-only sources, remain unchanged.
+Large checkpoints and existing cache files can make this fallback expensive
+in disk space and copy time. The normal current-model export path does not
+perform this additional copy.
+
+Plato uses fresh per-evaluation response-cache configuration and removes its
+owned temporary model copies, exports, output directories, and response caches
+on success or failure. This does not clear ordinary Hugging Face download
+caches. Keep local source artifacts stable during copying: the fallback does
+not provide an atomic snapshot while another process writes checkpoints.
 
 ### Supported options
 
@@ -160,52 +185,6 @@ Plato also exports detailed Lighteval task metrics as additional CSV columns whe
 - `evaluation_piqa_em`
 
 These columns are added to the CSV automatically the first time they appear.
-
-## Nanochat CORE
-
-Nanochat's CORE benchmark is also available through `[evaluation]`.
-
-!!! note "Tokenizer required"
-    `nanochat_core` does not just need the `nanochat` Python dependencies. It also
-    requires a trained Nanochat tokenizer under `~/.cache/nanochat/tokenizer/`
-    (notably `tokenizer.pkl` and `token_bytes.pt`).
-
-    Plato can download the CORE evaluation bundle automatically, but it does **not**
-    create the tokenizer automatically.
-
-    See [Nanochat in Plato](examples/case-studies/5. Nanochat in Plato.md) for the
-    full setup sequence, including tokenizer training.
-
-### Supported options
-
-!!! example "bundle_dir"
-    Optional directory containing the downloaded CORE evaluation bundle.
-
-    If omitted, Plato resolves the Nanochat base directory automatically and downloads the bundle when needed.
-
-!!! example "max_per_task"
-    Optional cap on the number of examples per CORE task.
-
-    Default value: `-1`, which means use all available examples.
-
-### Example
-
-!!! warning "Requires the nanochat trainer"
-    `nanochat_core` is only wired up when `trainer.type = "nanochat"`. The nanochat
-    trainer creates the evaluator internally rather than looking it up in the registry.
-    Setting `[evaluation] type = "nanochat_core"` with any other trainer type silently
-    produces no evaluation output.
-
-```toml
-[trainer]
-type = "nanochat"
-
-[evaluation]
-type = "nanochat_core"
-max_per_task = 16
-```
-
-This evaluator exports `core_metric`, which can be listed in `[results].types`.
 
 ## Results logging
 

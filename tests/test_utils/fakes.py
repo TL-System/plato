@@ -15,6 +15,7 @@ from typing import Dict, Optional
 import torch
 from torch.utils.data import TensorDataset
 
+from plato.clients.base import Client
 from plato.clients.strategies.base import (
     ClientContext,
     CommunicationStrategy,
@@ -24,6 +25,28 @@ from plato.clients.strategies.base import (
     TrainingStrategy,
 )
 from plato.servers.strategies.base import AggregationStrategy, ServerContext
+
+
+class BoundaryClient(Client):
+    """Concrete client for checkpoint and composable-boundary tests."""
+
+    async def _train(self):
+        raise AssertionError("Unexpected training at checkpoint boundary.")
+
+    def configure(self) -> None:
+        raise AssertionError("Unexpected configuration at checkpoint boundary.")
+
+    def _load_data(self) -> None:
+        raise AssertionError("Unexpected data load at checkpoint boundary.")
+
+    def _allocate_data(self) -> None:
+        raise AssertionError("Unexpected allocation at checkpoint boundary.")
+
+    def _load_payload(self, server_payload) -> None:
+        raise AssertionError("Unexpected payload load at checkpoint boundary.")
+
+    async def _obtain_model_at_time(self, client_id, requested_time):
+        raise AssertionError("Unexpected model lookup at checkpoint boundary.")
 
 
 class FakeModel(torch.nn.Module):

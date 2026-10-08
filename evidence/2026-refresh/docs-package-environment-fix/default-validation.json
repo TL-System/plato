@@ -1,0 +1,76 @@
+{
+  "source_commit": "06ba679690f090aacf7e6a95a6dffd74b81ffad3",
+  "accepted": true,
+  "builds": {
+    "default": {
+      "source_commit": "06ba679690f090aacf7e6a95a6dffd74b81ffad3",
+      "accepted": true,
+      "checkout": "/tmp/plato-refresh-worktrees/docs-package-env-default",
+      "command": [
+        "uv",
+        "run",
+        "--no-project",
+        "--python",
+        "3.13",
+        "python",
+        ".github/scripts/check_distribution.py"
+      ],
+      "sdist_sha256": "2568b2c97cd289657e32f2324d12b01e02c700e8d54149bdfa5c9de8a492d1b8",
+      "wheel_sha256": "d00d2c2acd5e5867e6a818fe3bc4132db8f92e00f47017da35e5a3159a60ba96",
+      "git_tree_bound_members": 1298,
+      "only_generated_exception": {
+        "PKG-INFO": "08e03ffe8434783a17ca65294fd3c65c5f189a2ec3e0d70e1590a1b553654a7a"
+      },
+      "requires_dist_extras_and_requires_python_parity": true,
+      "clean_rebuild_and_installed_wheel_proof": true
+    },
+    "bootstrap": {
+      "source_commit": "06ba679690f090aacf7e6a95a6dffd74b81ffad3",
+      "accepted": true,
+      "checkout": "/tmp/plato-refresh-worktrees/docs-package-env-bootstrap",
+      "command": [
+        "uv",
+        "run",
+        "--no-project",
+        "--python",
+        "3.13",
+        "python",
+        ".github/scripts/check_distribution.py"
+      ],
+      "sdist_sha256": "2568b2c97cd289657e32f2324d12b01e02c700e8d54149bdfa5c9de8a492d1b8",
+      "wheel_sha256": "d00d2c2acd5e5867e6a818fe3bc4132db8f92e00f47017da35e5a3159a60ba96",
+      "git_tree_bound_members": 1298,
+      "only_generated_exception": {
+        "PKG-INFO": "08e03ffe8434783a17ca65294fd3c65c5f189a2ec3e0d70e1590a1b553654a7a"
+      },
+      "requires_dist_extras_and_requires_python_parity": true,
+      "clean_rebuild_and_installed_wheel_proof": true
+    },
+    "release": {
+      "source_commit": "06ba679690f090aacf7e6a95a6dffd74b81ffad3",
+      "accepted": true,
+      "checkout": "/tmp/plato-refresh-worktrees/docs-package-env-release",
+      "command": [
+        "uv",
+        "run",
+        "--no-project",
+        "--python",
+        "3.13",
+        "python",
+        ".github/scripts/check_distribution.py"
+      ],
+      "sdist_sha256": "2568b2c97cd289657e32f2324d12b01e02c700e8d54149bdfa5c9de8a492d1b8",
+      "wheel_sha256": "d00d2c2acd5e5867e6a818fe3bc4132db8f92e00f47017da35e5a3159a60ba96",
+      "git_tree_bound_members": 1298,
+      "only_generated_exception": {
+        "PKG-INFO": "08e03ffe8434783a17ca65294fd3c65c5f189a2ec3e0d70e1590a1b553654a7a"
+      },
+      "requires_dist_extras_and_requires_python_parity": true,
+      "clean_rebuild_and_installed_wheel_proof": true
+    }
+  },
+  "fresh_docs_requirement_parity": true,
+  "docs_dependency_count": 29,
+  "workflow_and_netlify_syntax_and_publication_boundary": true,
+  "default_and_bootstrap_environments_retained_and_excluded": true
+}

@@ -1,0 +1,246 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-03",
+  "review_type": "Fresh independent read-only documentation and prose review",
+  "reviewer": "/root/llm_docs_review",
+  "decision": "ACCEPT_DOCUMENTATION_SCOPE",
+  "unresolved_findings": {
+    "critical": 0,
+    "high": 0,
+    "medium": 0,
+    "low": 0
+  },
+  "findings": [],
+  "source": {
+    "worktree": "/tmp/plato-refresh-worktrees/llm-retirement-docs",
+    "reviewed_commit": "f4898e5f8cbf3a8a92c28d1227c4b03c17429773",
+    "documentation_source_commit": "489b54439e343aa7a22d21c18f2f9bc9c0f1a16b",
+    "baseline_commit": "9ee92c52307cd3ecdce0c7416708c504bdb52137",
+    "clean_worktree": true,
+    "receipt_only_delta_after_documentation_source": true,
+    "changed_files_sha256": {
+      "archives/retired/lerobot/README.md": "6017d10b7717806f79653414b9e59e0445e492ae530bb8f9cbc8c1b5356f79d2",
+      "archives/retired/nanochat/README.md": "e49235c6623a45cf35b069cd4e8d7bd4ab309290a770875c5decf67cfb1f0be3",
+      "docs/docs/configurations/evaluation.md": "1eb66018ff17dbbab6f6105f3b62ed4a0b5531d317b7c0b0307a0df4f9866ba1",
+      "docs/docs/configurations/overview.md": "808d2d6bcbff15d9e99c9d1259fd9188f5db3fbed4d47c2df74bea6b9ad10c7c",
+      "docs/docs/configurations/parameters.md": "fe2890c51b28f4b096f2ccd6806c6653c6230b8cfb728fbf5e2106c1e1932121",
+      "docs/docs/configurations/results.md": "98fd5c33992cd60b74e2919b52cfd68d649ed4769f4546b5cc1e7efb96cc3f4b",
+      "docs/docs/configurations/server.md": "e31e1e612c1a37ef8f97cf6287e17df15c7454ad887785fc499585a56dabe1b2",
+      "docs/docs/configurations/trainer.md": "50c552db89dc0c3983b84c297e6efc8589f4514199b3d5bb9e87872f4d49f3ec",
+      "docs/docs/development.md": "8fa3ea07a7cf2db766363ec989e7c7ab74e188968c650f0d11505eca11572a4e",
+      "docs/docs/examples/Getting Started.md": "9d46e3f6eac6a68b05a83ed55adad503bff806f2061e3f25d2de5d6c9948e187",
+      "docs/docs/examples/case-studies/1. LoRA.md": "10eb7b89e2317918c9436ad449f75b356d5004a5cd4589c45a56a1e5dcb2fc17",
+      "docs/docs/examples/case-studies/3. SmolVLA Trainer with LeRobot.md": "31e4e793c8c105bb29154acc3cedda6beb6d44c52153074f233fa1e5f6a1dab5",
+      "docs/docs/examples/case-studies/5. Nanochat in Plato.md": "913bb1bed53c51afc4c53b48030029e57cc9b33761d03d063ed9fe2644213ce0",
+      "docs/docs/examples/case-studies/6. Qwen3 Federated LoRA.md": "35bf8865666ff4d4548d050245b863d9a807f312ba22ef2dec00f5f784796240",
+      "docs/docs/index.md": "eda5b85b7db199402a40d25085e0cbf33b7936e60f6619555a4e4a624c9cbcf6",
+      "docs/docs/install.md": "ede4b1e58c539b560413222752b8f668aeddab9cd29395be11e2a4a2d5e7c8d1",
+      "docs/docs/quickstart.md": "888f985c636b44bd950ec227c24d7012e0c7f8118991678b2cf1978eaed0d7a5",
+      "docs/docs/references/evaluators.md": "b1285df00132e7e1882dc937ee0c1a9e71f04d9191fe1e2413f24cb0eb09da71",
+      "docs/docs/references/trainers.md": "7e4f0d3dd09e99b739b9932270cdc868007bc1e9b1088387368cd40ad14c4be3",
+      "docs/mkdocs.yml": "00aa4144b2ca32402361f9c784e4de4f8860af3c4e15a40a7c2fa6b13b095c0f",
+      "docs/third_party.md": "66ff76d81de89aa3184e1dc6f8f9a4663ebf32c8b452a8fe48464a172ca7073b",
+      "evidence/2026-refresh/llm-retirement-docs-validation.json": "3be0c7363fd28c4c316fae8257c3cd23e518afc2b3ef10b618e921ac16daed6b"
+    },
+    "docs_author_receipt_sha256": "3be0c7363fd28c4c316fae8257c3cd23e518afc2b3ef10b618e921ac16daed6b"
+  },
+  "plan": {
+    "path": "/tmp/plato-llm-retirement-plan.json",
+    "sha256": "c2a5a34a32bc3f41228efb61e542e575fcd863861c68ead856b5d6453208b62e",
+    "approved_review_path": "/tmp/plato-llm-retirement-plan-review.json",
+    "approved_review_sha256": "ba20ec92c2d1323203edf081218c317fe3dd7ba7e175a2cc4997d0806a0aca1a"
+  },
+  "peer_sources": {
+    "archive_worktree": "/tmp/plato-refresh-worktrees/retire-llm-backends",
+    "archive_commit": "321c5311ac3f4bd4c92e398c73b5a9d5d8b53ad4",
+    "qwen_worktree": "/tmp/plato-refresh-worktrees/qwen-reference",
+    "qwen_worktree_head": "9ee92c52307cd3ecdce0c7416708c504bdb52137",
+    "qwen_implementation_is_uncommitted": true,
+    "qwen_current_files_sha256": {
+      "configs/HuggingFace/fedavg_qwen3_06b_lora.toml": "7eaf129397f425b917f691051762a2602cc6771a2052ce393f1334d1cbf1c35a",
+      "examples/huggingface/qualify_qwen3.py": "2e1d3b6f9fa04ecdf2ddbf5e04957f39a00f7599c6ca4bf14d8f3af7ae8490c8",
+      "tests/test_utils/qwen3.py": "bce8340b4a1d099aade32b20f84841372f5265d575067b340fa1196c6f3b0297",
+      "tests/fixtures/qwen3/PROVENANCE.txt": "aa890d67099e9ec249c14bc22df241a5d040158f9185e3e02636a80585520a3c",
+      "plato/utils/huggingface.py": "91b687453fc318a8fdfc27d75ac432b83a1ac04b1fcbdc67426b820efb683c9b",
+      "plato/trainers/huggingface.py": "4275cb43788503ffac4c17ce194e653fdd3dd82ca62a0a635a746675753f0d99"
+    },
+    "qwen_files_changed_since_docs_author_receipt": [
+      "configs/HuggingFace/fedavg_qwen3_06b_lora.toml",
+      "plato/trainers/huggingface.py"
+    ],
+    "binding_limit": "Current uncommitted peer files were read for prose accuracy; final integrated implementation/source/evidence binding remains a root acceptance gate."
+  },
+  "review_basis": [
+    {
+      "area": "Supported navigation, setup and references",
+      "assessment": "Accept",
+      "evidence": "Qwen3 replaces retired Nanochat/SmolVLA navigation in Home, Getting Started, installation, quick start and MkDocs nav. Active evaluator/trainer/server/developer/result/config reference text removes retired backend entries and CORE hooks while preserving general Hugging Face/LoRA and Lighteval guidance. The two original case-study paths remain rendered retirement notices, linking archive provenance and the Qwen guide. Robotics retirement explicitly says there is no maintained robotics replacement."
+    },
+    {
+      "area": "Pinned model, fixture and license provenance",
+      "assessment": "Accept",
+      "evidence": "Guide/config agree on Qwen/Qwen3-0.6B-Base and model/tokenizer revision da87bfb608c14b7cf20ba1ce41287e8de496c0cd. Native Qwen3 causal-LM loading has no remote-code path. The local official checkpoint header contains 596049920 BF16 parameters and occupies 1192135096 bytes, matching the stated parameter count and approximate serialized weight size. The pinned official model card/license support the base causal model and Apache-2.0 statements. Five original-prose training records and two disjoint validation records agree with fixture PROVENANCE.txt. Docs distinguish model and dataset licenses and make no claim that model weights or upstream datasets are vendored.",
+      "primary_sources": [
+        "https://huggingface.co/Qwen/Qwen3-0.6B-Base/blob/da87bfb608c14b7cf20ba1ce41287e8de496c0cd/README.md",
+        "https://huggingface.co/Qwen/Qwen3-0.6B-Base/blob/da87bfb608c14b7cf20ba1ce41287e8de496c0cd/LICENSE"
+      ]
+    },
+    {
+      "area": "Archive and historical restoration prose",
+      "assessment": "Accept",
+      "evidence": "48 Nanochat and 21 LeRobot archived original files byte-match baseline 9ee92c52307cd3ecdce0c7416708c504bdb52137 and their manifests. The historical commit records Nanochat gitlink c75fe54aa7c1fa881701c246f9427bcbe4eee5a4 and its upstream URL. All 54 inert upstream tarball files verify against hashes; copied MIT notice is byte-identical to tarball LICENSE and retains Andrej Karpathy copyright. Historical worktree commands name an available commit and correct submodule path. Capture Python/uv/lock provenance is distinguished from successful historical execution; no unsupported universal Python 3.14 failure is asserted."
+    },
+    {
+      "area": "Reference command, revisions and stopping behavior",
+      "assessment": "Accept",
+      "evidence": "Current peer TOML agrees with the documented exact config path, two clients, one round, one epoch, CPU FP32 command, serial client training, batch size 1, max_length 64, AdamW rate and LoRA targets/rank/alpha/dropout. Current null target_perplexity setting enables the perplexity label without a threshold stop; the later CLI log reports perplexity 131.47 and explicitly stops at its one-round budget. Artifact identity helper agrees with the same-repository revision inheritance and independent tokenizer default-main descriptions."
+    },
+    {
+      "area": "Qualification measurements and limitations",
+      "assessment": "Accept",
+      "evidence": "The directly read qualification.json hash and contents exactly match the documentation author's receipt. Guide correctly distinguishes tiny offline architecture tests, actual pinned pretrained qualification, and plato.py socket/process launch. 14.87 seconds and 4258660352 bytes/about 3.97 GiB are stated only for one shared-base qualification process with serial logical clients of sizes 2 and 3. It reports frozen base, adapter update/weighted aggregation/reload checks and finite held-out perplexity without a benchmark/convergence claim. The original source/receipt makes no false claim that the normal CLI had passed at authoring time."
+    },
+    {
+      "area": "Adapter checkpoint description",
+      "assessment": "Accept",
+      "evidence": "Current trainer exports PEFT adapters through save_pretrained with embedding export disabled for q_proj/v_proj, writes the adapter tree in Plato's safetensors checkpoint, and writes .hf JSON artifact identity/config plus .pkl run-history sidecar. Load restores via set_peft_model_state_dict into the wrapper, checks identity/key/shape, and retains the base. Guide correctly says this is adapter checkpoint/reload and does not imply full optimizer-state resume."
+    }
+  ],
+  "independent_checks": {
+    "strict_mkdocs_build": {
+      "command": [
+        "/tmp/plato-llm-docs-venv/bin/python",
+        "-m",
+        "mkdocs",
+        "build",
+        "--strict",
+        "--config-file",
+        "docs/mkdocs.yml",
+        "--site-dir",
+        "/tmp/plato-llm-docs-review/site"
+      ],
+      "cwd": "/tmp/plato-refresh-worktrees/llm-retirement-docs",
+      "exit_code": 0,
+      "log_path": "/tmp/plato-llm-docs-review/mkdocs-build.log",
+      "log_sha256": "a242d46c7259577a64d812a58b99632f40601dc902e696e018358e587701f164"
+    },
+    "rendered_links": {
+      "html_pages": 43,
+      "relative_path_hrefs": 1921,
+      "additional_site_root_path_hrefs": 42,
+      "local_fragment_hrefs": 404,
+      "missing_paths": [],
+      "missing_fragments": []
+    },
+    "old_url_pages": [
+      "examples/case-studies/3. SmolVLA Trainer with LeRobot/index.html",
+      "examples/case-studies/5. Nanochat in Plato/index.html"
+    ],
+    "repository_provenance_links": {
+      "checked": 14,
+      "missing": []
+    },
+    "archive_originals": [
+      {
+        "backend": "nanochat",
+        "manifest_sha256": "4f923c1a60c1153290ab0c024066a4d113a2e077059b80424f42f526ff5711e9",
+        "historical_commit": "9ee92c52307cd3ecdce0c7416708c504bdb52137",
+        "files_verified_against_baseline": 48,
+        "mismatches": []
+      },
+      {
+        "backend": "lerobot",
+        "manifest_sha256": "06735f7c441f86aaec6208b5dd67fd6a36a55a6aa009267bbd8b6900bc4818f5",
+        "historical_commit": "9ee92c52307cd3ecdce0c7416708c504bdb52137",
+        "files_verified_against_baseline": 21,
+        "mismatches": []
+      }
+    ],
+    "nanochat_upstream": {
+      "tarball_sha256": "6fa7ddcccbe290af3fbf1abddf04478e3589aa5d37a83dc498ffed1e05081a8a",
+      "files_verified": 54,
+      "mismatches": [],
+      "license_sha256": "42bb09f339a8af8b90d3b4969b6f6e4ba4aff3b5c614103b031fccdf71c8f772"
+    },
+    "documentation_hash_mismatches": [],
+    "whitespace_diff_check_exit_code": 0,
+    "local_fixture_splits_disjoint": true,
+    "official_checkpoint_header": {
+      "header_bytes_read": 35256,
+      "tensors": 310,
+      "dtype": "BF16",
+      "base_parameters": 596049920,
+      "file_bytes": 1192135096,
+      "scope": "Metadata/header read only; no model execution or new weight download."
+    }
+  },
+  "supplied_execution_evidence": {
+    "pretrained": {
+      "path": "/tmp/plato-qwen-validation/real-pretrained/qualification.json",
+      "sha256": "8d2a489c9eb9196f1e2aad8e8f4469423e8be9ff14f8178a13e494d7d8ec70b3",
+      "recorded_result_matches_receipt": true,
+      "scope": "Single qualification process with one shared frozen base, serial logical clients and the production server object.",
+      "elapsed_seconds": 14.867641290882602,
+      "peak_rss_bytes": 4258660352,
+      "independently_rerun": false
+    },
+    "later_normal_cli": {
+      "receipt_sha256": "10d3120a7a4d2af4f755f2c569d058c0060fd427e48c364b67cc71e66119d760",
+      "log_sha256": "42c6bd6964cb48eef386d77b28a2a18cb7d9f640651e2c10f783c138b5ca26dd",
+      "result": {
+        "command": [
+          "/tmp/plato-phase2-integration/final-mandatory-313/bin/python",
+          "plato.py",
+          "--config",
+          "configs/HuggingFace/fedavg_qwen3_06b_lora.toml",
+          "--cpu",
+          "--base",
+          "/tmp/plato-qwen-validation/cli-final",
+          "--port",
+          "53056"
+        ],
+        "cwd": "/tmp/plato-refresh-worktrees/qwen-reference",
+        "port": 53056,
+        "returncode": 0,
+        "watchdog_containment": false,
+        "natural_exit": true,
+        "elapsed_seconds": 50.79552904097363,
+        "peak_combined_rss_bytes_observed": 11547475968,
+        "rss_sampling_seconds": 0.5,
+        "maximum_group_processes": 4,
+        "survivors_after_exit": [],
+        "descendant_shutdown_grace_seconds": 10,
+        "log": "/tmp/plato-qwen-validation/cli-final/plato.log"
+      },
+      "logged_perplexity": 131.47,
+      "one_resource_tracker_semaphore_warning": true,
+      "independently_rerun": false,
+      "scope": "Parent-supplied later receipt/log independently read; this is later evidence, outside the original documentation source commit."
+    }
+  },
+  "nonblocking_recommendations": [
+    {
+      "reason": "The successful normal CLI receipt became available after the reviewed documentation was authored.",
+      "action": "Add a separate short normal-CLI observation to the guide after binding the final implementation receipt. Report 50.80 seconds, sampled combined RSS 11547475968 bytes/about 10.75 GiB across at most four processes at a 0.5-second sampling interval, natural exit 0, and no survivors after the bounded 10-second descendant shutdown grace. Acknowledge the one resource_tracker semaphore cleanup warning. Keep these measurements separate from the 14.87-second/3.97-GiB shared-base qualifier and do not present a sampled RSS maximum as a hardware guarantee."
+    }
+  ],
+  "root_integration_gates": [
+    "Integrate the archive payloads and documentation README changes together, then recheck archive/provenance links in the final tree.",
+    "Integrate the pinned config, fixture, runtime implementation and stable evidence/2026-refresh/qwen-reference-validation.json receipt; rebind execution evidence to the final code/config hashes.",
+    "Reclassify final-tree retired references after retirement integration removes the baseline docs/nanochat_integration_checklist.md. Its exact archived original already verifies in the peer manifest.",
+    "Any later documentation addendum is a new source change; keep this original-source acceptance distinct and source-bind/recheck the resulting final documentation."
+  ],
+  "artifacts": {
+    "verification_script": "/tmp/plato-llm-docs-review/verify.py",
+    "verification_script_sha256": "85f57f4ea2821d5e96744aa49a2bb839294684256f2631cb9df997fcf5451db7",
+    "verification_output": "/tmp/plato-llm-docs-review/verification.json",
+    "verification_output_sha256": "cfd7996fbe9f353c7f996553760efccd4cd821ae756bfed5503c51567b6aec81"
+  },
+  "limits": [
+    "Read-only review of repository and peer files; only isolated scratch verification/report/build artifacts were created.",
+    "No source/code edits, subagents, external review service, broad runtime qualification, dependency installation or shared environment changes.",
+    "Pretrained and CLI results were independently read and correlated with source; neither execution was rerun by this reviewer.",
+    "Historical restoration commands were source-verified; no historical environment was executed.",
+    "External archive/receipt main-branch URLs are expected to become valid with delivery; final publication binding is not certified by this split-worktree documentation review."
+  ]
+}

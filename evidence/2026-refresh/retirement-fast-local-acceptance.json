@@ -1,0 +1,22 @@
+{
+  "status": "PASS_INTEGRATED_RETIREMENT_FAST_AND_CONFIGURED_TYPING",
+  "source_commit": "21a4bb8b163ff0e796c1ae91e7badb647e09cac9",
+  "python": "3.13.16",
+  "ty": "0.0.84",
+  "passed": 1718,
+  "deselected": 105,
+  "warnings": 30,
+  "pytest_seconds": 314.31,
+  "wall_seconds": 347.66,
+  "profile": "locked dev / mandatory / not runtime and not slow",
+  "raw_directory": "/tmp/plato-retirement-fast-21a4bb8b",
+  "artifacts": {
+    "mandatory.xml": "e314374a51ee6a1272f55d89d72f4b5fd6194e40083d015b2d2bceedce21abd1",
+    "mandatory.log": "d3c828c79434350f2c884f9429da85af7cb7cacef0364b95a8515591638b6249",
+    "ty.log": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+    "ruff.log": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+    "coverage.json": "95d84443fcdb17221c24241ce937f740baa2706f611f771b0d0d41bb7c87a453",
+    "commit.txt": "6a8f48b7bb0c47c54c20068451a9588c84a8044e99021a820c54e41e750e2c03"
+  },
+  "limits": "Fresh hosted final-source checks still required; retained-model-search19 separately qualified by author/reviewer, not claimed as part of fast suite. All Phase4 family ownership rows remain draft."
+}

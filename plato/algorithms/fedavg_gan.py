@@ -30,14 +30,14 @@ class Algorithm(fedavg.Algorithm):
             for name, current_weight in weight_gen.items():
                 baseline = baseline_weights_gen[name]
 
-                delta = current_weight - baseline
+                delta = self._compute_tensor_delta(current_weight, baseline, name)
                 delta_gen[name] = delta
 
             delta_disc = OrderedDict()
             for name, current_weight in weight_disc.items():
                 baseline = baseline_weights_disc[name]
 
-                delta = current_weight - baseline
+                delta = self._compute_tensor_delta(current_weight, baseline, name)
                 delta_disc[name] = delta
 
             deltas.append((delta_gen, delta_disc))
@@ -51,11 +51,11 @@ class Algorithm(fedavg.Algorithm):
 
         updated_weights_gen = OrderedDict()
         for name, weight in baseline_weights_gen.items():
-            updated_weights_gen[name] = weight + update_gen[name]
+            updated_weights_gen[name] = self._apply_tensor_delta(weight, update_gen[name], name)
 
         updated_weights_disc = OrderedDict()
         for name, weight in baseline_weights_disc.items():
-            updated_weights_disc[name] = weight + update_disc[name]
+            updated_weights_disc[name] = self._apply_tensor_delta(weight, update_disc[name], name)
 
         return updated_weights_gen, updated_weights_disc
 
@@ -67,8 +67,9 @@ class Algorithm(fedavg.Algorithm):
             generator = getattr(model, "generator")
             discriminator = getattr(model, "discriminator")
 
-        gen_weight = generator.cpu().state_dict()
-        disc_weight = discriminator.cpu().state_dict()
+        # The base extraction owns CPU copies without moving either network.
+        gen_weight = super().extract_weights(generator)
+        disc_weight = super().extract_weights(discriminator)
 
         return gen_weight, disc_weight
 

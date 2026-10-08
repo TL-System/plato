@@ -1,0 +1,1779 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-03T11:10:36.170758+00:00",
+  "role": "Fresh independent SCAFFOLD reviewer4; requested Sol xhigh; no nested agents.",
+  "decision": "PASS",
+  "acceptance": "PASS_BOUNDED",
+  "finding": "F27",
+  "summary": "Exact13e closes medium F27-R3-01: otherwise-successful direct training now completes fallible training-step end and real model-update cleanup before final acceptance. Independent present/absent canonical probes, actual direct/process/spawn flows and reconstructed/reused retries are green on3.13/3.14. Accepted SCAFFOLD and shared generic contracts are preserved within this review scope. No material finding; one optional low recommendation concerns repeated idempotent rejection cleanup after canonical-write failure.",
+  "finding_counts": {
+    "critical": 0,
+    "high": 0,
+    "medium": 0,
+    "low": 1
+  },
+  "findings": [],
+  "low_recommendations": [
+    {
+      "id": "F27-R4-L01",
+      "severity": "low",
+      "status": "OPTIONAL_RECOMMENDATION",
+      "title": "Canonical acceptance-write failure dispatches rejection cleanup twice.",
+      "accepted_criterion_fails": false,
+      "primary_location": {
+        "file": "plato/trainers/strategies/algorithms/scaffold_strategy.py",
+        "line": 332
+      },
+      "supporting_locations": [
+        {
+          "file": "plato/trainers/composable.py",
+          "line": 478
+        },
+        {
+          "file": "plato/trainers/composable.py",
+          "line": 435
+        }
+      ],
+      "observed": "Inject OSError at actual os.replace for the canonical control file after otherwise-successful train/end/True cleanup. Strategy acceptance catches it and runs False cleanup; direct train_model or no-token train_process catches the same error and runs False cleanup again. Post-run flags are[True,False,False] in all four direct/process x present/absent cases each version. Initialization cleanup is excluded.",
+      "impact": "No observed control corruption or accepted failure: exact prior canonical bytes/absence survive, ci returns to1, outbound is refused, optimizer/context handles are released, original OSError remains visible, and both reconstructed/reused retries equal .62/.9/-.1. This is redundant public cleanup dispatch, not a material lifecycle rejection failure.",
+      "recommendation": "Consider assigning one owner for rejection after acceptance-write failure while retaining the same idempotent control discard and original error visibility. No broader transaction framework is requested.",
+      "reproduction": {
+        "script": {
+          "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final_lifecycle_checks.py",
+          "bytes": 13129,
+          "sha256": "fdd32eb8cf188821dc2b6755d751d9bfbfa49bb5ae7569cdbfeaf7be32724127"
+        },
+        "command": "zsh -lc '/tmp/plato-phase2c-313/bin/python -B /tmp/plato-phase2c-scaffold-code-review-4/run_final_command.py --python /tmp/plato-phase2c-313/bin/python --label reproduce-rejection-owner --script /tmp/plato-phase2c-scaffold-code-review-4/final_lifecycle_checks.py'",
+        "second_interpreter": "/tmp/plato-phase2c-314/bin/python",
+        "case_ids": [
+          "fresh-train_model-prior0-replace1",
+          "fresh-train_model-prior1-replace1",
+          "fresh-train_process-prior0-replace1",
+          "fresh-train_process-prior1-replace1"
+        ],
+        "evidence_runs": [
+          {
+            "label": "independent313",
+            "root": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/independent313-f0a2ccb285f6409aba794c60fd3960cf",
+            "exit_code": 0,
+            "duration_seconds": 79.71155970892869,
+            "receipts": {
+              "execution.json": {
+                "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/independent313-f0a2ccb285f6409aba794c60fd3960cf/execution.json",
+                "bytes": 2378,
+                "sha256": "04753a1fd0a032e78542ef3fdf3ee182833c9c8a015acc4904165d82d6803d62"
+              },
+              "raw.log": {
+                "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/independent313-f0a2ccb285f6409aba794c60fd3960cf/raw.log",
+                "bytes": 58572,
+                "sha256": "dac167e1718243ec873fd55103b817f9456ebdda8b12f0d96cb0fb35afa37be0"
+              },
+              "source-before.json": {
+                "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/independent313-f0a2ccb285f6409aba794c60fd3960cf/source-before.json",
+                "bytes": 181040,
+                "sha256": "5aab0284663d26f9734d75f42acba2e5959b02df4649a931ef0119c38c940ac5"
+              },
+              "source-after.json": {
+                "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/independent313-f0a2ccb285f6409aba794c60fd3960cf/source-after.json",
+                "bytes": 181040,
+                "sha256": "5aab0284663d26f9734d75f42acba2e5959b02df4649a931ef0119c38c940ac5"
+              },
+              "supplement-results.json": {
+                "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/independent313-f0a2ccb285f6409aba794c60fd3960cf/supplement-results.json",
+                "bytes": 192638,
+                "sha256": "504ec201f23b1496ec2932bd9155c60ddc389b2ec83307ec6c9c2c7e5e50ee8c"
+              }
+            },
+            "command": "/tmp/plato-phase2c-313/bin/python -B /tmp/plato-phase2c-scaffold-code-review-4/final_lifecycle_checks.py",
+            "source_unchanged": true
+          },
+          {
+            "label": "independent314",
+            "root": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/independent314-f3b43c07e2814b7cbc10383c83dbcd6c",
+            "exit_code": 0,
+            "duration_seconds": 90.45037804194726,
+            "receipts": {
+              "execution.json": {
+                "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/independent314-f3b43c07e2814b7cbc10383c83dbcd6c/execution.json",
+                "bytes": 2378,
+                "sha256": "0288fc1e9360acf586d9085b08d80d928593d2764de62477e912de846fe4e453"
+              },
+              "raw.log": {
+                "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/independent314-f3b43c07e2814b7cbc10383c83dbcd6c/raw.log",
+                "bytes": 58624,
+                "sha256": "7b3f5df7a3155f6be7e5f213c8d363687dc009ad5ac5685956baede5560f9d21"
+              },
+              "source-before.json": {
+                "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/independent314-f3b43c07e2814b7cbc10383c83dbcd6c/source-before.json",
+                "bytes": 181040,
+                "sha256": "5aab0284663d26f9734d75f42acba2e5959b02df4649a931ef0119c38c940ac5"
+              },
+              "source-after.json": {
+                "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/independent314-f3b43c07e2814b7cbc10383c83dbcd6c/source-after.json",
+                "bytes": 181040,
+                "sha256": "5aab0284663d26f9734d75f42acba2e5959b02df4649a931ef0119c38c940ac5"
+              },
+              "supplement-results.json": {
+                "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/independent314-f3b43c07e2814b7cbc10383c83dbcd6c/supplement-results.json",
+                "bytes": 192734,
+                "sha256": "b9b23f88c06c9b35eb00adbc2bb2dfac21aca93478dd2d1384b4dd072376ea18"
+              }
+            },
+            "command": "/tmp/plato-phase2c-314/bin/python -B /tmp/plato-phase2c-scaffold-code-review-4/final_lifecycle_checks.py",
+            "source_unchanged": true
+          }
+        ]
+      }
+    }
+  ],
+  "review_scope": {
+    "included": [
+      "Accepted F27 A01-A10 preservation",
+      "Shared local end/cleanup/direct acceptance lifecycle",
+      "Deferred worker/model-save/export/current-token/parent-load acceptance",
+      "SCAFFOLD server raw and postcallback validation/known-state rollback boundary",
+      "Four accepted general corrections and B selection-owned persistence/codec handoff preservation",
+      "Portable actual historical FedDyn writer to explicit read-only migration reader contract"
+    ],
+    "excluded": [
+      "FedDyn full numerical algorithm, assigned to a separate reviewer",
+      "Final source/prose or whole Phase2C acceptance, owned by root",
+      "Fresh minimal base provisioning/full mandatory or runtime suite",
+      "GPU, full optional stack, privacy-budget, convergence, full server/optimizer restart",
+      "Killed process, arbitrary composed-plugin/external callback side effects, arbitrary custom code throwing after its own irreversible commit"
+    ]
+  },
+  "candidate": {
+    "source": "/private/tmp/plato-refresh-worktrees/training-final-review",
+    "commit": "13e38dafce476286db7e673e7f21343d54416b56",
+    "tree": "9fe8cfb039d0d97fc5b2c95a459de4c73c6d1b51",
+    "tracked_status": "clean",
+    "tracked_git_blobs_verified": 1006,
+    "source_manifest_sha256": "6522e0a09125b55d31b85faba0a8c0559dc9ed48aca2c2df351bd4baf86c0540",
+    "manifest_file": {
+      "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-source-manifest.json",
+      "bytes": 181040,
+      "sha256": "5aab0284663d26f9734d75f42acba2e5959b02df4649a931ef0119c38c940ac5"
+    },
+    "exact_diffs": {
+      "baseline15e": {
+        "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/candidate-vs-baseline15e.diff",
+        "bytes": 641967,
+        "sha256": "e2159e0c28a4d45f091212cf2648cc463f05740bcec56fefe2a3a96e63bb9201"
+      },
+      "general-f977": {
+        "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/candidate-vs-general-f977.diff",
+        "bytes": 1002368,
+        "sha256": "dd2997e31126e831b9e6fb4f1e5f4f920dc524ad7df6d96b604b6ab0ff0b55a6"
+      },
+      "B-resume": {
+        "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/candidate-vs-B-resume.diff",
+        "bytes": 1993507,
+        "sha256": "1e599074ca934a0358d36c1d20c5cddee7d397300c686e8ac6893e70c229486d"
+      },
+      "implementation7d": {
+        "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/candidate-vs-implementation7d.diff",
+        "bytes": 78731,
+        "sha256": "ceec90b8d5d5d516c6649bb71176f56f6604a6d7e87f57b6b540f306c1583a8b"
+      }
+    },
+    "implementation_change": "Cleanup correction e33adcba7b5ca9fdee6fadfda395ab4d13d22e0a; final13e differs from7d310 only in four evidence JSON files.",
+    "key_import_hashes": [
+      {
+        "name": "Config",
+        "path": "/private/tmp/plato-refresh-worktrees/training-final-review/plato/config.py",
+        "sha256": "c96aed26f35e2cbf2e54153dbb7099cd8ba3c8042ff5cf467d2e954cbb95308e"
+      },
+      {
+        "name": "ComposableTrainer",
+        "path": "/private/tmp/plato-refresh-worktrees/training-final-review/plato/trainers/composable.py",
+        "sha256": "0a4549f08fa1afaec3ab7814930dcfc59cd671bb8b1a608862a4c58a480093a5"
+      },
+      {
+        "name": "SCAFFOLDUpdateStrategy",
+        "path": "/private/tmp/plato-refresh-worktrees/training-final-review/plato/trainers/strategies/algorithms/scaffold_strategy.py",
+        "sha256": "4363134ffffc73d59a6f5872a8120a85983ea57b7f6908ccba03235f0a81a10c"
+      }
+    ],
+    "initialized_submodule": {
+      "path": "/private/tmp/plato-refresh-worktrees/training-final-review/external/nanochat",
+      "gitlink": "c75fe54aa7c1fa881701c246f9427bcbe4eee5a4",
+      "tracked_files_verified": 54,
+      "known_setup_transition": "Root initialized the unchanged gitlink during this review; earlier top-level source manifests did not include submodule content.",
+      "qualification": "Final guards and receipt reconciliation bind initialized exact pin; HEAD/tree/tracked implementation unchanged; final submodule manifest preserved."
+    }
+  },
+  "baseline_red_and_final_green": {
+    "baseline": {
+      "commit": "15e0cebd78ec6752b9aae1e922b33e22e168387f",
+      "tree": "9c9ce313f88552968b487388d681eda82384abfc",
+      "known_failing_source": true,
+      "source": "/private/tmp/plato-refresh-worktrees/scaffold-review3",
+      "cwd_and_pythonpath_explicitly_bound": true,
+      "all_tracked_files_and_preexisting_ignored_caches_unchanged": true
+    },
+    "preparation_receipt": {
+      "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/preparation-receipt.json",
+      "bytes": 13210,
+      "sha256": "332062a1482758e9d28950a8e23de0c94e91d8d0e1a11e7a0e18cf567ad2d538"
+    },
+    "baseline_matrix": {
+      "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/baseline-matrix.json",
+      "bytes": 43131,
+      "sha256": "37196009b986624985252c41fe1560e7b7f3312913b9054cae9517b5aa7c3081"
+    },
+    "frozen_matrix_definition": {
+      "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/acceptance-matrix.json",
+      "bytes": 11641,
+      "sha256": "08ed3041ed68c47ea920250dde5c27a7756a74603fa46e7600ec12fde4e33288"
+    },
+    "baseline_controls": {
+      "cases_per_interpreter": 24,
+      "implementation_acceptance_exit_per_interpreter": 1,
+      "otherwise_successful_direct_cleanup_red_per_interpreter": 2,
+      "direct_success_ordering_red_per_interpreter": 2,
+      "required_green_per_interpreter": 20,
+      "low_duplicate_post_run_false_cleanup_per_interpreter": 8,
+      "known_defect_retry": [
+        0.601,
+        0.895,
+        -0.005
+      ],
+      "required_rejection_retry": [
+        0.62,
+        0.9,
+        -0.1
+      ],
+      "success_reference": "31/50, 9/10, -1/10 from independent Fraction arithmetic",
+      "visible_primary_and_secondary_errors": "Both messages verified in real formatted caller/child tracebacks; ordinary multiprocessing parent errors remain generic.",
+      "harness_validation_exit_code": 0,
+      "harness_errors_in_final_runs": 0,
+      "ruff_import_check": "exit0, target-version py313"
+    },
+    "baseline_interpretation": "24 cases per version: otherwise-successful direct cleanup fails both prior-present/absent cases; direct success-order diagnostics also red. Deferred process/spawn and end-only rejection controls are green. Baseline implementation exits1; validate_baseline exit0 means expected red/green discrimination only, never a passing implementation.",
+    "baseline_critical_observation": "After cleanup ran then raised, old direct train_model had already persisted ci1->.9 and enabled outbound; ordinary1->2->1/fresh reconstruction retained.9 and retry was .601/.895/-.005 instead of .62/.9/-.1. Raw model from the failed run was measured; this review does not require arbitrary model/plugin rollback beyond the demonstrated control/eligibility boundary.",
+    "final_critical_observation": "Each direct/process/spawn cleanup-only case retains prior bytes or absence, returns ci1, denies outbound and releases optimizer/context handles. Ordinary1->2->1 and fresh reconstruction preserve only the pre-failure canonical state. Both reconstructed/reused successful retry probes yield .62/.9/-.1. Successful controls legitimately retain.9 and the next-round success reference is .601/.895/-.005.",
+    "final_matrix": {
+      "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-lifecycle-matrix.json",
+      "bytes": 26787,
+      "sha256": "0f87adb0dd04234904f9366a3759b11fa6463f1c038f5974080dbeafcdac4b3b"
+    },
+    "final_required_green_per_interpreter": 24,
+    "final_required_red_per_interpreter": 0,
+    "axes": {
+      "interfaces": [
+        "train_model",
+        "train_process",
+        "real spawn"
+      ],
+      "prior_canonical": [
+        "absent",
+        "present-ci1"
+      ],
+      "faults": [
+        "none",
+        "end-only",
+        "cleanup-only",
+        "end-and-cleanup"
+      ]
+    },
+    "frozen_raw_exit_codes": [
+      1,
+      1
+    ],
+    "frozen_harness_limitation": "The original frozen exception collector follows cause/context but not ExceptionGroup members. Only direct end+cleanup present/absent falsely report secondary invisibility, two cases per version. Original script and raw exit1 evidence are preserved. Actual formatted tracebacks show both errors; strict validate_final_matrix accepts only those exact two collector errors and exits0. Eight additional actual group-member cases per version independently verify RuntimeError/KeyboardInterrupt primaries, secondary error, group identity and both public messages.",
+    "exception_visibility": "Train-model and handoff rejection preserve primary/secondary errors through BaseExceptionGroup (auto ExceptionGroup when all members are Exceptions). Ordinary multiprocessing parent error remains a failed-worker ValueError; actual child traceback/events retain details. No demand for arbitrary external-side-effect rollback.",
+    "cleanup_owner_disposition": "Original F27-R3-L01 end failure duplication is resolved: post-run end-only/both faults dispatch one False. Cleanup-only fault legitimately attempts one True then one False. Distinct initialization False is excluded. Residual acceptance-write duplication is optional F27-R4-L01, separately recorded.",
+    "baseline_runs": [
+      {
+        "execution": {
+          "command": "/tmp/plato-phase2c-313/bin/python -B /private/tmp/plato-phase2c-scaffold-code-review-4/lifecycle_probe.py",
+          "shell": [
+            "zsh",
+            "-lc"
+          ],
+          "cwd": "/private/tmp/plato-refresh-worktrees/scaffold-review3",
+          "env_overrides": {
+            "PYTHONDONTWRITEBYTECODE": "1",
+            "PYTHONPATH": "/private/tmp/plato-refresh-worktrees/scaffold-review3",
+            "PYTHONPYCACHEPREFIX": "/private/tmp/plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-313-20261003T092409Z-7229f56f429e4b0195b350a4dac026c5/cache/pycache",
+            "OMP_NUM_THREADS": "1",
+            "MKL_NUM_THREADS": "1",
+            "PYTEST_ADDOPTS": "",
+            "TMPDIR": "/private/tmp/plato-phase2c-scaffold-code-review-4/t/a40a2650",
+            "XDG_CACHE_HOME": "/private/tmp/plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-313-20261003T092409Z-7229f56f429e4b0195b350a4dac026c5/cache",
+            "MPLCONFIGDIR": "/private/tmp/plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-313-20261003T092409Z-7229f56f429e4b0195b350a4dac026c5/mpl",
+            "RUFF_CACHE_DIR": "/private/tmp/plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-313-20261003T092409Z-7229f56f429e4b0195b350a4dac026c5/ruff",
+            "config_file": "/private/tmp/plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-313-20261003T092409Z-7229f56f429e4b0195b350a4dac026c5/bootstrap/config.toml",
+            "PLATO_PROBE_SOURCE": "/private/tmp/plato-refresh-worktrees/scaffold-review3",
+            "PLATO_PROBE_RUN_ROOT": "/private/tmp/plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-313-20261003T092409Z-7229f56f429e4b0195b350a4dac026c5",
+            "PLATO_PROBE_INTERFACES": "[\"train_model\", \"train_process\", \"spawn\"]"
+          },
+          "exit_code": 1,
+          "duration_seconds": 188.72118945908733,
+          "deadline_seconds": 600,
+          "source_unchanged": true,
+          "source_manifest_sha256": "81e96e55d770ecd71dc02f0b81212a554722744309297bd29cfa540abf099987",
+          "script_hashes": {
+            "source_adapter.py": "4b0e6819bc97335861a334160bdcb6d646ba5bdc6e1bbaf3b6886de6c304c11d",
+            "lifecycle_probe.py": "fc816584f7de493708bd11f5ab3976b7e4e056f9995e9e8590cb4e4a2807b729",
+            "run_probe.py": "44a33b9db610007c4a04e22efa6a009a7a394bbea443205f11366e08457b8fa7"
+          },
+          "raw_log": "/private/tmp/plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-313-20261003T092409Z-7229f56f429e4b0195b350a4dac026c5/raw.log",
+          "raw_log_sha256": "782eaf73fdbd06e78f9454776ed75bd70549cd4556d6f351ce4d66f1ab609cd0",
+          "acceptance_results": "/private/tmp/plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-313-20261003T092409Z-7229f56f429e4b0195b350a4dac026c5/acceptance-results.json",
+          "acceptance_results_sha256": "fd98eccec396f6b1a11f94239688392701ad7c9551eedccc60c2b96f09b6d173"
+        },
+        "receipts": [
+          {
+            "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-313-20261003T092409Z-7229f56f429e4b0195b350a4dac026c5/execution.json",
+            "bytes": 2654,
+            "sha256": "ddf944f131d9d53b965a025bc430927890b004ddcf0ea85430c46c5cadbaf7eb"
+          },
+          {
+            "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-313-20261003T092409Z-7229f56f429e4b0195b350a4dac026c5/raw.log",
+            "bytes": 71735,
+            "sha256": "782eaf73fdbd06e78f9454776ed75bd70549cd4556d6f351ce4d66f1ab609cd0"
+          },
+          {
+            "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-313-20261003T092409Z-7229f56f429e4b0195b350a4dac026c5/acceptance-results.json",
+            "bytes": 260207,
+            "sha256": "fd98eccec396f6b1a11f94239688392701ad7c9551eedccc60c2b96f09b6d173"
+          },
+          {
+            "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-313-20261003T092409Z-7229f56f429e4b0195b350a4dac026c5/source-before.json",
+            "bytes": 232038,
+            "sha256": "cda17ad58db2cb1172f55fec2c2da031f5aeaecb18fa357852d0e8394980dbdd"
+          },
+          {
+            "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-313-20261003T092409Z-7229f56f429e4b0195b350a4dac026c5/source-after.json",
+            "bytes": 232038,
+            "sha256": "cda17ad58db2cb1172f55fec2c2da031f5aeaecb18fa357852d0e8394980dbdd"
+          }
+        ]
+      },
+      {
+        "execution": {
+          "command": "/tmp/plato-phase2c-314/bin/python -B /private/tmp/plato-phase2c-scaffold-code-review-4/lifecycle_probe.py",
+          "shell": [
+            "zsh",
+            "-lc"
+          ],
+          "cwd": "/private/tmp/plato-refresh-worktrees/scaffold-review3",
+          "env_overrides": {
+            "PYTHONDONTWRITEBYTECODE": "1",
+            "PYTHONPATH": "/private/tmp/plato-refresh-worktrees/scaffold-review3",
+            "PYTHONPYCACHEPREFIX": "/private/tmp/plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-314-20261003T092409Z-1cb0cb24556a4c158c66452cdd2bfaa4/cache/pycache",
+            "OMP_NUM_THREADS": "1",
+            "MKL_NUM_THREADS": "1",
+            "PYTEST_ADDOPTS": "",
+            "TMPDIR": "/private/tmp/plato-phase2c-scaffold-code-review-4/t/0eb291b7",
+            "XDG_CACHE_HOME": "/private/tmp/plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-314-20261003T092409Z-1cb0cb24556a4c158c66452cdd2bfaa4/cache",
+            "MPLCONFIGDIR": "/private/tmp/plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-314-20261003T092409Z-1cb0cb24556a4c158c66452cdd2bfaa4/mpl",
+            "RUFF_CACHE_DIR": "/private/tmp/plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-314-20261003T092409Z-1cb0cb24556a4c158c66452cdd2bfaa4/ruff",
+            "config_file": "/private/tmp/plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-314-20261003T092409Z-1cb0cb24556a4c158c66452cdd2bfaa4/bootstrap/config.toml",
+            "PLATO_PROBE_SOURCE": "/private/tmp/plato-refresh-worktrees/scaffold-review3",
+            "PLATO_PROBE_RUN_ROOT": "/private/tmp/plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-314-20261003T092409Z-1cb0cb24556a4c158c66452cdd2bfaa4",
+            "PLATO_PROBE_INTERFACES": "[\"train_model\", \"train_process\", \"spawn\"]"
+          },
+          "exit_code": 1,
+          "duration_seconds": 217.01788170798682,
+          "deadline_seconds": 600,
+          "source_unchanged": true,
+          "source_manifest_sha256": "81e96e55d770ecd71dc02f0b81212a554722744309297bd29cfa540abf099987",
+          "script_hashes": {
+            "source_adapter.py": "4b0e6819bc97335861a334160bdcb6d646ba5bdc6e1bbaf3b6886de6c304c11d",
+            "lifecycle_probe.py": "fc816584f7de493708bd11f5ab3976b7e4e056f9995e9e8590cb4e4a2807b729",
+            "run_probe.py": "44a33b9db610007c4a04e22efa6a009a7a394bbea443205f11366e08457b8fa7"
+          },
+          "raw_log": "/private/tmp/plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-314-20261003T092409Z-1cb0cb24556a4c158c66452cdd2bfaa4/raw.log",
+          "raw_log_sha256": "67efe8b5555805da1033b9272b827abe4aff325ef83fbe28f8f25271f5b860aa",
+          "acceptance_results": "/private/tmp/plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-314-20261003T092409Z-1cb0cb24556a4c158c66452cdd2bfaa4/acceptance-results.json",
+          "acceptance_results_sha256": "fbc5aed951b9fd24a9f22fe6a3cfec3cb59d005b4054fc3f389178bf812ddb49"
+        },
+        "receipts": [
+          {
+            "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-314-20261003T092409Z-1cb0cb24556a4c158c66452cdd2bfaa4/execution.json",
+            "bytes": 2654,
+            "sha256": "3078c9a5918bf9e869a9713f869c21fd5601c46f862ffa8aa490623a21201715"
+          },
+          {
+            "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-314-20261003T092409Z-1cb0cb24556a4c158c66452cdd2bfaa4/raw.log",
+            "bytes": 71891,
+            "sha256": "67efe8b5555805da1033b9272b827abe4aff325ef83fbe28f8f25271f5b860aa"
+          },
+          {
+            "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-314-20261003T092409Z-1cb0cb24556a4c158c66452cdd2bfaa4/acceptance-results.json",
+            "bytes": 260467,
+            "sha256": "fbc5aed951b9fd24a9f22fe6a3cfec3cb59d005b4054fc3f389178bf812ddb49"
+          },
+          {
+            "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-314-20261003T092409Z-1cb0cb24556a4c158c66452cdd2bfaa4/source-before.json",
+            "bytes": 232038,
+            "sha256": "cda17ad58db2cb1172f55fec2c2da031f5aeaecb18fa357852d0e8394980dbdd"
+          },
+          {
+            "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-314-20261003T092409Z-1cb0cb24556a4c158c66452cdd2bfaa4/source-after.json",
+            "bytes": 232038,
+            "sha256": "cda17ad58db2cb1172f55fec2c2da031f5aeaecb18fa357852d0e8394980dbdd"
+          }
+        ]
+      }
+    ],
+    "final_frozen_runs": [
+      {
+        "execution": {
+          "command": "/tmp/plato-phase2c-313/bin/python -B /private/tmp/plato-phase2c-scaffold-code-review-4/lifecycle_probe.py",
+          "shell": [
+            "zsh",
+            "-lc"
+          ],
+          "cwd": "/private/tmp/plato-refresh-worktrees/training-final-review",
+          "env_overrides": {
+            "PYTHONDONTWRITEBYTECODE": "1",
+            "PYTHONPATH": "/private/tmp/plato-refresh-worktrees/training-final-review",
+            "PYTHONPYCACHEPREFIX": "/private/tmp/plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-313-20261003T102614Z-22a32d5bc01b49fbae7612057fec9987/cache/pycache",
+            "OMP_NUM_THREADS": "1",
+            "MKL_NUM_THREADS": "1",
+            "PYTEST_ADDOPTS": "",
+            "TMPDIR": "/private/tmp/plato-phase2c-scaffold-code-review-4/t/0470b59a",
+            "XDG_CACHE_HOME": "/private/tmp/plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-313-20261003T102614Z-22a32d5bc01b49fbae7612057fec9987/cache",
+            "MPLCONFIGDIR": "/private/tmp/plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-313-20261003T102614Z-22a32d5bc01b49fbae7612057fec9987/mpl",
+            "RUFF_CACHE_DIR": "/private/tmp/plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-313-20261003T102614Z-22a32d5bc01b49fbae7612057fec9987/ruff",
+            "config_file": "/private/tmp/plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-313-20261003T102614Z-22a32d5bc01b49fbae7612057fec9987/bootstrap/config.toml",
+            "PLATO_PROBE_SOURCE": "/private/tmp/plato-refresh-worktrees/training-final-review",
+            "PLATO_PROBE_RUN_ROOT": "/private/tmp/plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-313-20261003T102614Z-22a32d5bc01b49fbae7612057fec9987",
+            "PLATO_PROBE_INTERFACES": "[\"train_model\", \"train_process\", \"spawn\"]"
+          },
+          "exit_code": 1,
+          "duration_seconds": 183.1909999579657,
+          "deadline_seconds": 600,
+          "source_unchanged": true,
+          "source_manifest_sha256": "6522e0a09125b55d31b85faba0a8c0559dc9ed48aca2c2df351bd4baf86c0540",
+          "script_hashes": {
+            "source_adapter.py": "4b0e6819bc97335861a334160bdcb6d646ba5bdc6e1bbaf3b6886de6c304c11d",
+            "lifecycle_probe.py": "fc816584f7de493708bd11f5ab3976b7e4e056f9995e9e8590cb4e4a2807b729",
+            "run_probe.py": "44a33b9db610007c4a04e22efa6a009a7a394bbea443205f11366e08457b8fa7"
+          },
+          "raw_log": "/private/tmp/plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-313-20261003T102614Z-22a32d5bc01b49fbae7612057fec9987/raw.log",
+          "raw_log_sha256": "a6176d72016afd4cf0c6f56c5410490adf78596ba8fc70c6883a48fde74106f1",
+          "acceptance_results": "/private/tmp/plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-313-20261003T102614Z-22a32d5bc01b49fbae7612057fec9987/acceptance-results.json",
+          "acceptance_results_sha256": "de3b83a019ea1871c2ad1268efe5ca4e54ecff814ef280f05fc621737d348b79"
+        },
+        "receipts": [
+          {
+            "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-313-20261003T102614Z-22a32d5bc01b49fbae7612057fec9987/execution.json",
+            "bytes": 2668,
+            "sha256": "82ab238dc28c3b6530b0672a9d0f151870fff68224eddf680eee42675d82b6c9"
+          },
+          {
+            "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-313-20261003T102614Z-22a32d5bc01b49fbae7612057fec9987/raw.log",
+            "bytes": 73998,
+            "sha256": "a6176d72016afd4cf0c6f56c5410490adf78596ba8fc70c6883a48fde74106f1"
+          },
+          {
+            "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-313-20261003T102614Z-22a32d5bc01b49fbae7612057fec9987/acceptance-results.json",
+            "bytes": 258731,
+            "sha256": "de3b83a019ea1871c2ad1268efe5ca4e54ecff814ef280f05fc621737d348b79"
+          },
+          {
+            "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-313-20261003T102614Z-22a32d5bc01b49fbae7612057fec9987/source-before.json",
+            "bytes": 181040,
+            "sha256": "5aab0284663d26f9734d75f42acba2e5959b02df4649a931ef0119c38c940ac5"
+          },
+          {
+            "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-313-20261003T102614Z-22a32d5bc01b49fbae7612057fec9987/source-after.json",
+            "bytes": 181040,
+            "sha256": "5aab0284663d26f9734d75f42acba2e5959b02df4649a931ef0119c38c940ac5"
+          }
+        ]
+      },
+      {
+        "execution": {
+          "command": "/tmp/plato-phase2c-314/bin/python -B /private/tmp/plato-phase2c-scaffold-code-review-4/lifecycle_probe.py",
+          "shell": [
+            "zsh",
+            "-lc"
+          ],
+          "cwd": "/private/tmp/plato-refresh-worktrees/training-final-review",
+          "env_overrides": {
+            "PYTHONDONTWRITEBYTECODE": "1",
+            "PYTHONPATH": "/private/tmp/plato-refresh-worktrees/training-final-review",
+            "PYTHONPYCACHEPREFIX": "/private/tmp/plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-314-20261003T102614Z-5b204c199b3e4af197df4bb638c4fbf9/cache/pycache",
+            "OMP_NUM_THREADS": "1",
+            "MKL_NUM_THREADS": "1",
+            "PYTEST_ADDOPTS": "",
+            "TMPDIR": "/private/tmp/plato-phase2c-scaffold-code-review-4/t/67e0d0d5",
+            "XDG_CACHE_HOME": "/private/tmp/plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-314-20261003T102614Z-5b204c199b3e4af197df4bb638c4fbf9/cache",
+            "MPLCONFIGDIR": "/private/tmp/plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-314-20261003T102614Z-5b204c199b3e4af197df4bb638c4fbf9/mpl",
+            "RUFF_CACHE_DIR": "/private/tmp/plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-314-20261003T102614Z-5b204c199b3e4af197df4bb638c4fbf9/ruff",
+            "config_file": "/private/tmp/plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-314-20261003T102614Z-5b204c199b3e4af197df4bb638c4fbf9/bootstrap/config.toml",
+            "PLATO_PROBE_SOURCE": "/private/tmp/plato-refresh-worktrees/training-final-review",
+            "PLATO_PROBE_RUN_ROOT": "/private/tmp/plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-314-20261003T102614Z-5b204c199b3e4af197df4bb638c4fbf9",
+            "PLATO_PROBE_INTERFACES": "[\"train_model\", \"train_process\", \"spawn\"]"
+          },
+          "exit_code": 1,
+          "duration_seconds": 211.744971124921,
+          "deadline_seconds": 600,
+          "source_unchanged": true,
+          "source_manifest_sha256": "6522e0a09125b55d31b85faba0a8c0559dc9ed48aca2c2df351bd4baf86c0540",
+          "script_hashes": {
+            "source_adapter.py": "4b0e6819bc97335861a334160bdcb6d646ba5bdc6e1bbaf3b6886de6c304c11d",
+            "lifecycle_probe.py": "fc816584f7de493708bd11f5ab3976b7e4e056f9995e9e8590cb4e4a2807b729",
+            "run_probe.py": "44a33b9db610007c4a04e22efa6a009a7a394bbea443205f11366e08457b8fa7"
+          },
+          "raw_log": "/private/tmp/plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-314-20261003T102614Z-5b204c199b3e4af197df4bb638c4fbf9/raw.log",
+          "raw_log_sha256": "84a350b75d78f7089e06ee351caa0d318a74611bfbee5725017800e6ee46df9b",
+          "acceptance_results": "/private/tmp/plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-314-20261003T102614Z-5b204c199b3e4af197df4bb638c4fbf9/acceptance-results.json",
+          "acceptance_results_sha256": "0dd0f844183de2ebd077381cf2346687c7787eb03742371a3aa41f72bf76cc77"
+        },
+        "receipts": [
+          {
+            "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-314-20261003T102614Z-5b204c199b3e4af197df4bb638c4fbf9/execution.json",
+            "bytes": 2667,
+            "sha256": "9d106d75dce965aece3b2a8ff654463735ce46663e065d8007fd9d5f2aadc413"
+          },
+          {
+            "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-314-20261003T102614Z-5b204c199b3e4af197df4bb638c4fbf9/raw.log",
+            "bytes": 74154,
+            "sha256": "84a350b75d78f7089e06ee351caa0d318a74611bfbee5725017800e6ee46df9b"
+          },
+          {
+            "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-314-20261003T102614Z-5b204c199b3e4af197df4bb638c4fbf9/acceptance-results.json",
+            "bytes": 258991,
+            "sha256": "0dd0f844183de2ebd077381cf2346687c7787eb03742371a3aa41f72bf76cc77"
+          },
+          {
+            "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-314-20261003T102614Z-5b204c199b3e4af197df4bb638c4fbf9/source-before.json",
+            "bytes": 181040,
+            "sha256": "5aab0284663d26f9734d75f42acba2e5959b02df4649a931ef0119c38c940ac5"
+          },
+          {
+            "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-314-20261003T102614Z-5b204c199b3e4af197df4bb638c4fbf9/source-after.json",
+            "bytes": 181040,
+            "sha256": "5aab0284663d26f9734d75f42acba2e5959b02df4649a931ef0119c38c940ac5"
+          }
+        ]
+      }
+    ],
+    "supplemental_live_checks_per_interpreter": {
+      "independent313": {
+        "groups": 8,
+        "math": 4,
+        "fresh_retries": 10,
+        "server": 4,
+        "total": 26,
+        "green": 26,
+        "low_duplicate_replace_cleanup_cases": 4
+      },
+      "independent314": {
+        "groups": 8,
+        "math": 4,
+        "fresh_retries": 10,
+        "server": 4,
+        "total": 26,
+        "green": 26,
+        "low_duplicate_replace_cleanup_cases": 4
+      }
+    }
+  },
+  "source_review": {
+    "direct_acceptance": {
+      "locations": [
+        {
+          "file": "plato/trainers/composable.py",
+          "line": 457
+        },
+        {
+          "file": "plato/trainers/composable.py",
+          "line": 461
+        },
+        {
+          "file": "plato/trainers/composable.py",
+          "line": 465
+        },
+        {
+          "file": "plato/trainers/composable.py",
+          "line": 467
+        }
+      ],
+      "finding": "Successful local training, exactly one fallible end attempt and successful model-update cleanup precede final direct acceptance. Exception path attempts rejection and finally clears step-dispatch context handles. Deferred flag skips acceptance while retaining provisional controls."
+    },
+    "process_owner": {
+      "location": {
+        "file": "plato/trainers/composable.py",
+        "line": 430
+      },
+      "finding": "model_finished differentiates failed train_model (which owns rejection) from later save/export/direct handoff failures (which train_process owns); useful primary/secondary errors grouped."
+    },
+    "worker_acceptance": {
+      "location": {
+        "file": "plato/trainers/composable.py",
+        "line": 884
+      },
+      "finding": "Require actual clean worker completion, current token and client identity, then model load, strategy state load, then parent acceptance. Failure paths refuse current-round outbound data; accepted files/controls survive failed-save/stale/missing/parent-commit tests."
+    },
+    "server_boundary": {
+      "locations": [
+        {
+          "file": "examples/customized_client_training/scaffold/scaffold_server.py",
+          "line": 70
+        },
+        {
+          "file": "examples/customized_client_training/scaffold/scaffold_server.py",
+          "line": 138
+        },
+        {
+          "file": "examples/customized_client_training/scaffold/scaffold_server.py",
+          "line": 170
+        },
+        {
+          "file": "examples/customized_client_training/scaffold/scaffold_server.py",
+          "line": 175
+        }
+      ],
+      "finding": "Raw weights/controls validated before staging, postcallback batch checks run after receive/aggregation events. Commit is marked only after aggregation callbacks and final validation. Precommit exception restores known model/control tensors; evaluation/reporting after commit retains the committed round."
+    }
+  },
+  "accepted_criteria": [
+    {
+      "id": "A01",
+      "status": "PRESERVED_AND_AFFECTED_CHECKS_PASS",
+      "evidence": "Preserved corrected core/V2 source plus four new independent float64 real-SGD Fraction checks per version: g=0 gives y=.9, ci=0, delta=-1; g=[3,1] gives y=.4, ci=2, delta=1. Existing equation regressions pass. Baseline15e already has corrected math; its new red control is the cleanup acceptance boundary, not the pre-correction equation source."
+    },
+    {
+      "id": "A02",
+      "status": "PRESERVED_AND_AFFECTED_CHECKS_PASS",
+      "evidence": "Actual shipped Config/optimizer factory tests at .1/.025, next-round LR, invalid rates/groups, scheduler boundaries and captured executed LR pass; unchanged SCAFFOLD rate-validation source reconciled with accepted review3."
+    },
+    {
+      "id": "A03",
+      "status": "PRESERVED_AND_AFFECTED_CHECKS_PASS",
+      "evidence": "Parameter/buffer/frozen/excluded ownership, schema and finite-value tests pass; exact accepted SCAFFOLD strategy blob preserved. No source helper supplies the independent numeric expected values."
+    },
+    {
+      "id": "A04",
+      "status": "PRESERVED_AND_AFFECTED_CHECKS_PASS",
+      "evidence": "Accumulation tails, real completed/skipped updates, empty rounds and V2 pass. Real CPU GradScaler success/overflow and clipping boundary tests pass; unscale-before-clip source preserved. No GPU qualification claimed."
+    },
+    {
+      "id": "A05",
+      "status": "PRESERVED_AND_AFFECTED_CHECKS_PASS",
+      "evidence": "Independent canonical-present/absent end/cleanup and atomic replace failures retain prior bytes or absence and ci ownership; ordinary1->2->1 and fresh reconstruction remain correct. Ten additional cases per version execute successful retries on both reconstructed and reused trainers against .62/.9/-.1. Existing two-round ownership, path, historical-control and failure tests pass."
+    },
+    {
+      "id": "A06",
+      "status": "PRESERVED_AND_AFFECTED_CHECKS_PASS",
+      "evidence": "Real inbound/train/outbound paths and actual multiprocessing spawn pass. Source orders end and successful cleanup before model save/export; child retains provisional controls, exports current token, parent validates token/client ID, loads model and controls, then accepts. Existing actual missing/stale/model-save/parent-commit failure subprocess tests pass and refuse stale outbound deltas. Frozen successful spawn event traces prove save/export/load/parent-accept order."
+    },
+    {
+      "id": "A07",
+      "status": "PRESERVED_AND_AFFECTED_CHECKS_PASS",
+      "evidence": "Existing shipped public TOML two-round unequal/equal-count rational-oracle tests and actual processor/server wiring pass, including the same unchanged 60-second spawn test on3.14 after ordinary read-only installed-library cache use. Exact accepted SCAFFOLD model/client/server/oracle behavior preserved; independent additional scalar retry reference uses Fraction arithmetic."
+    },
+    {
+      "id": "A08",
+      "status": "PRESERVED_AND_AFFECTED_CHECKS_PASS",
+      "evidence": "Fixed server raw/post-callback checks are byte-identical to15e. Existing malformed payload/sample/buffer/callback tests pass. Four new independent server cases each version reject raw NaN and post-receive NaN, restore known x=1/c=2 on aggregation callback failure, and retain committed x=8/c=13/3 on postcommit evaluation failure. Input tensors and staging/handler ownership checked."
+    },
+    {
+      "id": "A09",
+      "status": "PRESERVED_AND_AFFECTED_CHECKS_PASS",
+      "evidence": "Existing real raw-optimizer momentum/Adam and V2 composition tests pass; source and shipped momentum=.9 TOML preserved. No optimizer-specific mean-gradient or convergence claim added."
+    },
+    {
+      "id": "A10",
+      "status": "PRESERVED_AND_AFFECTED_CHECKS_PASS",
+      "evidence": "Exact commit/tree, actual imports, main/submodule hashes, preserved-source diffs, raw commands/versions/durations/configuration and focused JUnit inventories retained.186 distinct selected affected IDs have passing evidence each version;3.14 is185 original passes plus one unchanged passing retry. Scoped source Ruff import policy passes. Prior design/docs acceptance carried by source reconciliation; final prose/root acceptance remains root-owned."
+    }
+  ],
+  "preserved_generic_contracts": {
+    "source_audit": {
+      "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/source-audit.json",
+      "bytes": 19823,
+      "sha256": "b1696ae90cacfdedbbbe2af179339368adbd0af8b33f58d384b16b0dc66b1bff"
+    },
+    "A_and_D": {
+      "audit": {
+        "A": {
+          "revision": "79da1f97d8a12fe97402750cc32c7b3e8f5cdf6e",
+          "comparison_base": "fda60becedfa6236c11d415b87a868b52789a41e",
+          "owned_non_evidence_paths": 61,
+          "paths": [
+            "archives/legacy_datalib/LICENSE",
+            "archives/legacy_datalib/README.md",
+            "archives/legacy_datalib/__init__.py",
+            "archives/legacy_datalib/audio_extraction_tools.py",
+            "archives/legacy_datalib/data_utils.py",
+            "archives/legacy_datalib/flickr30kE_utils.py",
+            "archives/legacy_datalib/frames_extraction_tools.py",
+            "archives/legacy_datalib/gym_utils/__init__.py",
+            "archives/legacy_datalib/gym_utils/gym_trim.py",
+            "archives/legacy_datalib/modality_data_anntation_tools.py",
+            "archives/legacy_datalib/modality_extraction_base.py",
+            "archives/legacy_datalib/parse_datasets.py",
+            "archives/legacy_datalib/refer_utils/__init__.py",
+            "archives/legacy_datalib/refer_utils/referitgame_utils.py",
+            "archives/legacy_datalib/tiny_data_tools.py",
+            "archives/legacy_datalib/video_transform.py",
+            "plato/config.py",
+            "plato/datasources/_image_folder.py",
+            "plato/datasources/_vector_cache.py",
+            "plato/datasources/base.py",
+            "plato/datasources/cinic10.py",
+            "plato/datasources/datalib/__init__.py",
+            "plato/datasources/datalib/audio_extraction_tools.py",
+            "plato/datasources/datalib/data_utils.py",
+            "plato/datasources/datalib/flickr30kE_utils.py",
+            "plato/datasources/datalib/frames_extraction_tools.py",
+            "plato/datasources/datalib/gym_utils/__init__.py",
+            "plato/datasources/datalib/gym_utils/gym_trim.py",
+            "plato/datasources/datalib/modality_data_anntation_tools.py",
+            "plato/datasources/datalib/modality_extraction_base.py",
+            "plato/datasources/datalib/parse_datasets.py",
+            "plato/datasources/datalib/refer_utils/__init__.py",
+            "plato/datasources/datalib/refer_utils/referitgame_utils.py",
+            "plato/datasources/datalib/tiny_data_tools.py",
+            "plato/datasources/datalib/video_transform.py",
+            "plato/datasources/purchase.py",
+            "plato/datasources/texas.py",
+            "plato/datasources/tiny_imagenet.py",
+            "plato/datasources/torchvision.py",
+            "plato/samplers/all_inclusive.py",
+            "plato/samplers/base.py",
+            "plato/samplers/dirichlet.py",
+            "plato/samplers/distribution_noniid.py",
+            "plato/samplers/iid.py",
+            "plato/samplers/label_quantity_noniid.py",
+            "plato/samplers/mixed_label_quantity_noniid.py",
+            "plato/samplers/modality_iid.py",
+            "plato/samplers/modality_quantity_noniid.py",
+            "plato/samplers/orthogonal.py",
+            "plato/samplers/sample_quantity_noniid.py",
+            "plato/samplers/sampler_utils.py",
+            "plato/utils/archive.py",
+            "tests/datasources/test_download_contracts.py",
+            "tests/datasources/test_local_datasets.py",
+            "tests/datasources/test_review2_regressions.py",
+            "tests/datasources/test_review3_regressions.py",
+            "tests/datasources/test_review4_regressions.py",
+            "tests/datasources/test_review_regressions.py",
+            "tests/samplers/test_partition_contracts.py",
+            "tests/test_config_loader.py",
+            "tests/utils/test_archive.py"
+          ],
+          "differences": []
+        },
+        "D": {
+          "revision": "96323afa094a37584844275cc04bf1e1eedfaa0d",
+          "comparison_base": "00eeb9dcdd2b513e64db9408969356037e09bb8e",
+          "owned_non_evidence_paths": 45,
+          "paths": [
+            "archives/legacy_rl_env/LICENSE",
+            "archives/legacy_rl_env/README.md",
+            "archives/legacy_rl_env/rl_env.py",
+            "cleanup.py",
+            "plato/clients/strategies/mpc.py",
+            "plato/mpc/round_store.py",
+            "plato/processors/compress.py",
+            "plato/processors/decompress.py",
+            "plato/processors/feature.py",
+            "plato/processors/model_dequantize.py",
+            "plato/processors/model_dequantize_qsgd.py",
+            "plato/processors/model_quantize.py",
+            "plato/processors/model_quantize_qsgd.py",
+            "plato/processors/model_randomized_response.py",
+            "plato/processors/mpc_model_encrypt_additive.py",
+            "plato/processors/mpc_model_encrypt_shamir.py",
+            "plato/processors/unstructured_pruning.py",
+            "plato/serialization/safetensor.py",
+            "plato/servers/fedavg_he.py",
+            "plato/servers/strategies/aggregation/he.py",
+            "plato/servers/strategies/mpc.py",
+            "plato/utils/count_parameters.py",
+            "plato/utils/data_loaders.py",
+            "plato/utils/homo_enc.py",
+            "plato/utils/reinforcement_learning/policies/base.py",
+            "plato/utils/reinforcement_learning/policies/ddpg.py",
+            "plato/utils/reinforcement_learning/policies/sac.py",
+            "plato/utils/reinforcement_learning/policies/td3.py",
+            "plato/utils/rl_env.py",
+            "plato/utils/s3.py",
+            "plato/utils/toml_writer.py",
+            "plato/utils/tree.py",
+            "plato/utils/unary_encoding.py",
+            "tests/clients/test_client_lifecycle_variants.py",
+            "tests/integration/test_smoke_configs.py",
+            "tests/mpc/test_mpc_regressions.py",
+            "tests/mpc/test_round_store_contracts.py",
+            "tests/processors/test_payload_regressions.py",
+            "tests/servers/test_he_payload_regressions.py",
+            "tests/servers/test_runtime_s3_contract.py",
+            "tests/utils/test_cleanup.py",
+            "tests/utils/test_rl_payload_utilities.py",
+            "tests/utils/test_s3.py",
+            "tests/utils/test_safetensor_serialization.py",
+            "tests/utils/test_shared_payload_utilities.py"
+          ],
+          "differences": []
+        }
+      },
+      "method_note": "Own git-diff comparison sets (A61,D45) include a broader set than root's named47A/44D preservation subsets; every path in each stated own set has identical exact git entry. No replacement of root's subset counts implied."
+    },
+    "four_general_f977": [
+      {
+        "contract": "AMP unscale before clip/overflow",
+        "source": "plato/trainers/strategies/training_step.py",
+        "result": "Exact accepted blob preserved; real CPU AMP clipping-success/overflow parameterized tests pass each version."
+      },
+      {
+        "contract": "Complete owned suffix worker cleanup",
+        "source": "plato/trainers/base.py",
+        "result": "Exact accepted blob preserved; slash/long and unrelated-owner worker cleanup tests pass each version."
+      },
+      {
+        "contract": "Actual old FedDyn writer compatibility",
+        "source": "plato/trainers/strategies/algorithms/feddyn_strategy.py:662",
+        "result": "Deliberately reconciled to explicit read_legacy_history reader. Byte-identical accepted00e writer fixture and license/provenance validated; four old writer/reader cases pass each version including no-Git source archive. Canonical precedence/same-client fallback/original bytes/read-only behavior preserved. No FedDyn numerical algorithm verdict."
+      },
+      {
+        "contract": "Per-client FedALA save_state=False",
+        "source": "plato/trainers/strategies/algorithms/fedala_strategy.py",
+        "result": "Exact accepted blob preserved; real direct/spawn reused-versus-dedicated multiround memory-only tests pass each version."
+      }
+    ],
+    "B_resume": "Accepted a058 shared server production diff contains authorized checkpoint filename/path codec handoff and related filename naming only; selector persistence/startup semantics are preserved. Whole tests/servers/test_server_resume_rng.py plus merged checkpoint runtime agreement pass on both versions. ROOT-2BC-01 now uses independent Random(9) reference and unrelated global draws, checks five resumed selections and separate NumPy persistence; no production RNG persistence redesign.",
+    "portable_fixture": {
+      "provenance": {
+        "path": "/private/tmp/plato-refresh-worktrees/training-final-review/tests/fixtures/feddyn_accepted_b.py",
+        "bytes": 19751,
+        "sha256": "623f2ddc1cb4e30cd6e0b1320f48fc30815db855891206924cd9150a5e0a8e1a"
+      },
+      "git_blob": "8a19b21e3ac708aa3db51b6fea7bdb08502efe72",
+      "source_archive": {
+        "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/portable-source-receipt.json",
+        "bytes": 376,
+        "sha256": "41f149d39c99d3cb9c0682a9a88aeddf948356f7ee0e87556e6272b327574d4c"
+      },
+      "post_test_reconciliation": {
+        "all_tracked_files_match": 1006,
+        "git_metadata_absent": true
+      },
+      "cases_per_version": 4,
+      "runs": [
+        {
+          "label": "portable313",
+          "root": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/portable313-676f73e248a445069ea3c99813972056",
+          "exit_code": 0,
+          "duration_seconds": 11.5042888331227,
+          "receipts": {
+            "execution.json": {
+              "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/portable313-676f73e248a445069ea3c99813972056/execution.json",
+              "bytes": 3257,
+              "sha256": "2b8df39ea3a2031ebf65459d00c8f495194f8aa9a8847ca3cc344811f1edfb55"
+            },
+            "raw.log": {
+              "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/portable313-676f73e248a445069ea3c99813972056/raw.log",
+              "bytes": 586,
+              "sha256": "3a2748a51a687e941f538ac2718fe07f8960d6decfb745141f277d36e1622712"
+            },
+            "junit.xml": {
+              "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/portable313-676f73e248a445069ea3c99813972056/junit.xml",
+              "bytes": 857,
+              "sha256": "b5c303bbcf92285b04d1f73c929846c19b183d4aeebd352aaba6b0eafd7333fa"
+            },
+            "import-origins.json": {
+              "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/portable313-676f73e248a445069ea3c99813972056/import-origins.json",
+              "bytes": 724,
+              "sha256": "b2ef134668fbb1445aad4f8acbe234ff2e72adebdbab337c5283915d7c1a49c1"
+            },
+            "source-before.json": {
+              "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/portable313-676f73e248a445069ea3c99813972056/source-before.json",
+              "bytes": 181040,
+              "sha256": "5aab0284663d26f9734d75f42acba2e5959b02df4649a931ef0119c38c940ac5"
+            },
+            "source-after.json": {
+              "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/portable313-676f73e248a445069ea3c99813972056/source-after.json",
+              "bytes": 181040,
+              "sha256": "5aab0284663d26f9734d75f42acba2e5959b02df4649a931ef0119c38c940ac5"
+            }
+          },
+          "command": "/tmp/plato-phase2c-313/bin/python -B /private/tmp/plato-phase2c-scaffold-code-review-4/pytest_entry.py",
+          "source_unchanged": true
+        },
+        {
+          "label": "portable314",
+          "root": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/portable314-68c3247de8f740978c00103c4543d0de",
+          "exit_code": 0,
+          "duration_seconds": 12.889222332974896,
+          "receipts": {
+            "execution.json": {
+              "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/portable314-68c3247de8f740978c00103c4543d0de/execution.json",
+              "bytes": 3259,
+              "sha256": "ad93c76bc54da725552e1211dfd5ec59f46307531310ca37c30c2bfda15188fc"
+            },
+            "raw.log": {
+              "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/portable314-68c3247de8f740978c00103c4543d0de/raw.log",
+              "bytes": 584,
+              "sha256": "76f831200a3b749c2abdc6f410bdca52b0b62c8aa9162843048be6f420455099"
+            },
+            "junit.xml": {
+              "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/portable314-68c3247de8f740978c00103c4543d0de/junit.xml",
+              "bytes": 857,
+              "sha256": "d87f1172b5f3dfe92cb9fdd79239be8b54c948863889c8d99525286cacefdcfa"
+            },
+            "import-origins.json": {
+              "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/portable314-68c3247de8f740978c00103c4543d0de/import-origins.json",
+              "bytes": 724,
+              "sha256": "b2ef134668fbb1445aad4f8acbe234ff2e72adebdbab337c5283915d7c1a49c1"
+            },
+            "source-before.json": {
+              "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/portable314-68c3247de8f740978c00103c4543d0de/source-before.json",
+              "bytes": 181040,
+              "sha256": "5aab0284663d26f9734d75f42acba2e5959b02df4649a931ef0119c38c940ac5"
+            },
+            "source-after.json": {
+              "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/portable314-68c3247de8f740978c00103c4543d0de/source-after.json",
+              "bytes": 181040,
+              "sha256": "5aab0284663d26f9734d75f42acba2e5959b02df4649a931ef0119c38c940ac5"
+            }
+          },
+          "command": "/tmp/plato-phase2c-314/bin/python -B /private/tmp/plato-phase2c-scaffold-code-review-4/pytest_entry.py",
+          "source_unchanged": true
+        }
+      ]
+    }
+  },
+  "independent_affected_tests": {
+    "selected_nodes": [
+      "tests/trainers/test_scaffold_strategy.py",
+      "tests/integration/test_scaffold_round_flow.py",
+      "tests/integration/test_scaffold_callback_lifecycle.py",
+      "tests/trainers/test_review_training_boundaries.py",
+      "tests/servers/test_server_resume_rng.py",
+      "tests/integration/test_checkpoint_runtime_agreement.py",
+      "tests/trainers/test_checkpoint_path_contract.py::test_long_logical_model_name_default_save_load_stays_in_filename_limit",
+      "tests/trainers/test_checkpoint_path_contract.py::test_real_spawned_worker_train_test_and_history_with_slash_name",
+      "tests/trainers/test_training_update_contract.py::test_accumulation_run_epoch_and_exception_cleanup",
+      "tests/trainers/test_training_update_contract.py::test_gradient_clipping_limits_real_updates_including_accumulation_tail",
+      "tests/trainers/test_training_update_contract.py::test_real_grad_scaler_overflow_does_not_dispatch_optimizer_update",
+      "tests/trainers/test_training_update_contract.py::test_fedprox_origin_and_nonzero_analytical_gradient",
+      "tests/trainers/test_training_update_contract.py::test_personalization_freezes_restore_model_ownership_after_failure"
+    ],
+    "affected_test_ids": [
+      "tests/trainers/test_scaffold_strategy.py::test_independent_main_equations[gradients0-0.9-0.0-SCAFFOLDUpdateStrategy]",
+      "tests/trainers/test_scaffold_strategy.py::test_independent_main_equations[gradients0-0.9-0.0-SCAFFOLDUpdateStrategyV2]",
+      "tests/trainers/test_scaffold_strategy.py::test_independent_main_equations[gradients1-0.4-2.0-SCAFFOLDUpdateStrategy]",
+      "tests/trainers/test_scaffold_strategy.py::test_independent_main_equations[gradients1-0.4-2.0-SCAFFOLDUpdateStrategyV2]",
+      "tests/trainers/test_scaffold_strategy.py::test_real_accumulation_updates_tail_and_empty_round[SCAFFOLDUpdateStrategy-1]",
+      "tests/trainers/test_scaffold_strategy.py::test_real_accumulation_updates_tail_and_empty_round[SCAFFOLDUpdateStrategy-3]",
+      "tests/trainers/test_scaffold_strategy.py::test_real_accumulation_updates_tail_and_empty_round[SCAFFOLDUpdateStrategy-4]",
+      "tests/trainers/test_scaffold_strategy.py::test_real_accumulation_updates_tail_and_empty_round[SCAFFOLDUpdateStrategyV2-1]",
+      "tests/trainers/test_scaffold_strategy.py::test_real_accumulation_updates_tail_and_empty_round[SCAFFOLDUpdateStrategyV2-3]",
+      "tests/trainers/test_scaffold_strategy.py::test_real_accumulation_updates_tail_and_empty_round[SCAFFOLDUpdateStrategyV2-4]",
+      "tests/trainers/test_scaffold_strategy.py::test_skipped_update_is_not_corrected",
+      "tests/trainers/test_scaffold_strategy.py::test_invalid_executed_rate_fails_before_update[0.0]",
+      "tests/trainers/test_scaffold_strategy.py::test_invalid_executed_rate_fails_before_update[-0.1]",
+      "tests/trainers/test_scaffold_strategy.py::test_invalid_executed_rate_fails_before_update[nan]",
+      "tests/trainers/test_scaffold_strategy.py::test_invalid_executed_rate_fails_before_update[inf]",
+      "tests/trainers/test_scaffold_strategy.py::test_missing_optimizer_and_post_step_rate_capture_then_tail_rejection",
+      "tests/trainers/test_scaffold_strategy.py::test_final_tail_denominator_uses_executed_rate_before_post_hook",
+      "tests/trainers/test_scaffold_strategy.py::test_parameter_identity_reordered_equal_groups_buffers_and_exclusions",
+      "tests/trainers/test_scaffold_strategy.py::test_invalid_controls_fail_before_mutation[bad0]",
+      "tests/trainers/test_scaffold_strategy.py::test_invalid_controls_fail_before_mutation[bad1]",
+      "tests/trainers/test_scaffold_strategy.py::test_invalid_controls_fail_before_mutation[bad2]",
+      "tests/trainers/test_scaffold_strategy.py::test_invalid_controls_fail_before_mutation[bad3]",
+      "tests/trainers/test_scaffold_strategy.py::test_generic_optimizer_composition_matches_independent_raw_updates[SCAFFOLDUpdateStrategy-momentum]",
+      "tests/trainers/test_scaffold_strategy.py::test_generic_optimizer_composition_matches_independent_raw_updates[SCAFFOLDUpdateStrategy-adam]",
+      "tests/trainers/test_scaffold_strategy.py::test_generic_optimizer_composition_matches_independent_raw_updates[SCAFFOLDUpdateStrategyV2-momentum]",
+      "tests/trainers/test_scaffold_strategy.py::test_generic_optimizer_composition_matches_independent_raw_updates[SCAFFOLDUpdateStrategyV2-adam]",
+      "tests/trainers/test_scaffold_strategy.py::test_exact_legacy_load_canonical_precedence_and_client_zero_isolation[example]",
+      "tests/trainers/test_scaffold_strategy.py::test_exact_legacy_load_canonical_precedence_and_client_zero_isolation[prefix]",
+      "tests/trainers/test_scaffold_strategy.py::test_exact_legacy_load_canonical_precedence_and_client_zero_isolation[canonical]",
+      "tests/trainers/test_scaffold_strategy.py::test_persistence_and_worker_state_failures_cannot_emit_old_delta",
+      "tests/trainers/test_scaffold_strategy.py::test_direct_callback_failure_keeps_only_accepted_controls[False]",
+      "tests/trainers/test_scaffold_strategy.py::test_direct_callback_failure_keeps_only_accepted_controls[True]",
+      "tests/integration/test_scaffold_round_flow.py::test_shipped_configuration_two_round_independent_rational_oracle",
+      "tests/integration/test_scaffold_round_flow.py::test_shipped_spawn_pipeline_parent_control_return_with_deadline",
+      "tests/integration/test_scaffold_round_flow.py::test_actual_failed_worker_handoff_refuses_previous_delta[missing]",
+      "tests/integration/test_scaffold_round_flow.py::test_actual_failed_worker_handoff_refuses_previous_delta[stale]",
+      "tests/integration/test_scaffold_round_flow.py::test_actual_failed_worker_handoff_refuses_previous_delta[model-save]",
+      "tests/integration/test_scaffold_round_flow.py::test_actual_failed_worker_handoff_refuses_previous_delta[commit]",
+      "tests/integration/test_scaffold_round_flow.py::test_reused_and_reconstructed_clients_match_dedicated_two_round_controls",
+      "tests/integration/test_scaffold_round_flow.py::test_actual_shipped_optimizer_lr_and_next_round_rate[0.1]",
+      "tests/integration/test_scaffold_round_flow.py::test_actual_shipped_optimizer_lr_and_next_round_rate[0.025]",
+      "tests/integration/test_scaffold_round_flow.py::test_config_loads_exact_shipped_toml_before_optimizer_overrides[0.1]",
+      "tests/integration/test_scaffold_round_flow.py::test_config_loads_exact_shipped_toml_before_optimizer_overrides[0.025]",
+      "tests/integration/test_scaffold_round_flow.py::test_equal_count_model_update_reduces_to_uniform_reference",
+      "tests/integration/test_scaffold_round_flow.py::test_unmodified_shipped_momentum_optimizer_composition",
+      "tests/integration/test_scaffold_round_flow.py::test_reused_processors_rebind_and_missing_inbound_c_clears_previous_round",
+      "tests/integration/test_scaffold_round_flow.py::test_all_server_deltas_validated_before_model_or_control_commit[None]",
+      "tests/integration/test_scaffold_round_flow.py::test_all_server_deltas_validated_before_model_or_control_commit[malformed1]",
+      "tests/integration/test_scaffold_round_flow.py::test_all_server_deltas_validated_before_model_or_control_commit[malformed2]",
+      "tests/integration/test_scaffold_round_flow.py::test_all_server_deltas_validated_before_model_or_control_commit[malformed3]",
+      "tests/integration/test_scaffold_round_flow.py::test_all_server_deltas_validated_before_model_or_control_commit[malformed4]",
+      "tests/integration/test_scaffold_round_flow.py::test_server_buffer_payloads_keep_inherited_aggregation_policy",
+      "tests/integration/test_scaffold_round_flow.py::test_actual_report_path_rejects_every_malformed_model_before_commit[nan-0-0]",
+      "tests/integration/test_scaffold_round_flow.py::test_actual_report_path_rejects_every_malformed_model_before_commit[nan-0-1]",
+      "tests/integration/test_scaffold_round_flow.py::test_actual_report_path_rejects_every_malformed_model_before_commit[nan-2-0]",
+      "tests/integration/test_scaffold_round_flow.py::test_actual_report_path_rejects_every_malformed_model_before_commit[nan-2-1]",
+      "tests/integration/test_scaffold_round_flow.py::test_actual_report_path_rejects_every_malformed_model_before_commit[missing-0-0]",
+      "tests/integration/test_scaffold_round_flow.py::test_actual_report_path_rejects_every_malformed_model_before_commit[missing-0-1]",
+      "tests/integration/test_scaffold_round_flow.py::test_actual_report_path_rejects_every_malformed_model_before_commit[missing-2-0]",
+      "tests/integration/test_scaffold_round_flow.py::test_actual_report_path_rejects_every_malformed_model_before_commit[missing-2-1]",
+      "tests/integration/test_scaffold_round_flow.py::test_actual_report_path_rejects_every_malformed_model_before_commit[broadcast-0-0]",
+      "tests/integration/test_scaffold_round_flow.py::test_actual_report_path_rejects_every_malformed_model_before_commit[broadcast-0-1]",
+      "tests/integration/test_scaffold_round_flow.py::test_actual_report_path_rejects_every_malformed_model_before_commit[broadcast-2-0]",
+      "tests/integration/test_scaffold_round_flow.py::test_actual_report_path_rejects_every_malformed_model_before_commit[broadcast-2-1]",
+      "tests/integration/test_scaffold_round_flow.py::test_actual_report_path_rejects_every_malformed_model_before_commit[unknown-0-0]",
+      "tests/integration/test_scaffold_round_flow.py::test_actual_report_path_rejects_every_malformed_model_before_commit[unknown-0-1]",
+      "tests/integration/test_scaffold_round_flow.py::test_actual_report_path_rejects_every_malformed_model_before_commit[unknown-2-0]",
+      "tests/integration/test_scaffold_round_flow.py::test_actual_report_path_rejects_every_malformed_model_before_commit[unknown-2-1]",
+      "tests/integration/test_scaffold_round_flow.py::test_actual_report_path_rejects_every_malformed_model_before_commit[non-tensor-0-0]",
+      "tests/integration/test_scaffold_round_flow.py::test_actual_report_path_rejects_every_malformed_model_before_commit[non-tensor-0-1]",
+      "tests/integration/test_scaffold_round_flow.py::test_actual_report_path_rejects_every_malformed_model_before_commit[non-tensor-2-0]",
+      "tests/integration/test_scaffold_round_flow.py::test_actual_report_path_rejects_every_malformed_model_before_commit[non-tensor-2-1]",
+      "tests/integration/test_scaffold_round_flow.py::test_actual_report_path_rejects_every_malformed_model_before_commit[frozen-0-0]",
+      "tests/integration/test_scaffold_round_flow.py::test_actual_report_path_rejects_every_malformed_model_before_commit[frozen-0-1]",
+      "tests/integration/test_scaffold_round_flow.py::test_actual_report_path_rejects_every_malformed_model_before_commit[frozen-2-0]",
+      "tests/integration/test_scaffold_round_flow.py::test_actual_report_path_rejects_every_malformed_model_before_commit[frozen-2-1]",
+      "tests/integration/test_scaffold_round_flow.py::test_actual_report_path_rejects_every_malformed_model_before_commit[buffer-0-0]",
+      "tests/integration/test_scaffold_round_flow.py::test_actual_report_path_rejects_every_malformed_model_before_commit[buffer-0-1]",
+      "tests/integration/test_scaffold_round_flow.py::test_actual_report_path_rejects_every_malformed_model_before_commit[buffer-2-0]",
+      "tests/integration/test_scaffold_round_flow.py::test_actual_report_path_rejects_every_malformed_model_before_commit[buffer-2-1]",
+      "tests/integration/test_scaffold_round_flow.py::test_actual_report_path_validates_samples_before_control_staging[-1-0]",
+      "tests/integration/test_scaffold_round_flow.py::test_actual_report_path_validates_samples_before_control_staging[-1-1]",
+      "tests/integration/test_scaffold_round_flow.py::test_actual_report_path_validates_samples_before_control_staging[nan-0]",
+      "tests/integration/test_scaffold_round_flow.py::test_actual_report_path_validates_samples_before_control_staging[nan-1]",
+      "tests/integration/test_scaffold_round_flow.py::test_actual_report_path_validates_samples_before_control_staging[inf-0]",
+      "tests/integration/test_scaffold_round_flow.py::test_actual_report_path_validates_samples_before_control_staging[inf-1]",
+      "tests/integration/test_scaffold_callback_lifecycle.py::test_actual_report_callbacks_reject_and_clear_before_successful_retry[receive]",
+      "tests/integration/test_scaffold_callback_lifecycle.py::test_actual_report_callbacks_reject_and_clear_before_successful_retry[metadata]",
+      "tests/integration/test_scaffold_callback_lifecycle.py::test_actual_report_callbacks_reject_and_clear_before_successful_retry[model]",
+      "tests/integration/test_scaffold_callback_lifecycle.py::test_actual_report_callbacks_reject_and_clear_before_successful_retry[pending]",
+      "tests/integration/test_scaffold_callback_lifecycle.py::test_actual_report_callbacks_reject_and_clear_before_successful_retry[delta]",
+      "tests/integration/test_scaffold_callback_lifecycle.py::test_actual_report_callbacks_reject_and_clear_before_successful_retry[committed-control]",
+      "tests/integration/test_scaffold_callback_lifecycle.py::test_actual_report_callbacks_reject_and_clear_before_successful_retry[aggregate]",
+      "tests/integration/test_scaffold_callback_lifecycle.py::test_actual_report_callbacks_reject_and_clear_before_successful_retry[aggregate-model]",
+      "tests/integration/test_scaffold_callback_lifecycle.py::test_actual_report_callbacks_reject_and_clear_before_successful_retry[aggregate-control]",
+      "tests/integration/test_scaffold_callback_lifecycle.py::test_actual_report_callbacks_reject_and_clear_before_successful_retry[load]",
+      "tests/integration/test_scaffold_callback_lifecycle.py::test_actual_report_callbacks_reject_and_clear_before_successful_retry[arithmetic]",
+      "tests/integration/test_scaffold_callback_lifecycle.py::test_actual_report_callbacks_reject_and_clear_before_successful_retry[postcommit]",
+      "tests/integration/test_scaffold_callback_lifecycle.py::test_fallible_end_hook_rejects_before_acceptance_and_releases_ownership[False-False-False-train_model]",
+      "tests/integration/test_scaffold_callback_lifecycle.py::test_fallible_end_hook_rejects_before_acceptance_and_releases_ownership[False-False-False-train_process]",
+      "tests/integration/test_scaffold_callback_lifecycle.py::test_fallible_end_hook_rejects_before_acceptance_and_releases_ownership[False-False-True-train_model]",
+      "tests/integration/test_scaffold_callback_lifecycle.py::test_fallible_end_hook_rejects_before_acceptance_and_releases_ownership[False-False-True-train_process]",
+      "tests/integration/test_scaffold_callback_lifecycle.py::test_fallible_end_hook_rejects_before_acceptance_and_releases_ownership[False-True-False-train_model]",
+      "tests/integration/test_scaffold_callback_lifecycle.py::test_fallible_end_hook_rejects_before_acceptance_and_releases_ownership[False-True-False-train_process]",
+      "tests/integration/test_scaffold_callback_lifecycle.py::test_fallible_end_hook_rejects_before_acceptance_and_releases_ownership[False-True-True-train_model]",
+      "tests/integration/test_scaffold_callback_lifecycle.py::test_fallible_end_hook_rejects_before_acceptance_and_releases_ownership[False-True-True-train_process]",
+      "tests/integration/test_scaffold_callback_lifecycle.py::test_fallible_end_hook_rejects_before_acceptance_and_releases_ownership[True-False-False-train_model]",
+      "tests/integration/test_scaffold_callback_lifecycle.py::test_fallible_end_hook_rejects_before_acceptance_and_releases_ownership[True-False-False-train_process]",
+      "tests/integration/test_scaffold_callback_lifecycle.py::test_fallible_end_hook_rejects_before_acceptance_and_releases_ownership[True-False-True-train_model]",
+      "tests/integration/test_scaffold_callback_lifecycle.py::test_fallible_end_hook_rejects_before_acceptance_and_releases_ownership[True-False-True-train_process]",
+      "tests/integration/test_scaffold_callback_lifecycle.py::test_fallible_end_hook_rejects_before_acceptance_and_releases_ownership[True-True-False-train_model]",
+      "tests/integration/test_scaffold_callback_lifecycle.py::test_fallible_end_hook_rejects_before_acceptance_and_releases_ownership[True-True-False-train_process]",
+      "tests/integration/test_scaffold_callback_lifecycle.py::test_fallible_end_hook_rejects_before_acceptance_and_releases_ownership[True-True-True-train_model]",
+      "tests/integration/test_scaffold_callback_lifecycle.py::test_fallible_end_hook_rejects_before_acceptance_and_releases_ownership[True-True-True-train_process]",
+      "tests/integration/test_scaffold_callback_lifecycle.py::test_actual_spawned_successful_run_cleanup_rejects_before_parent_acceptance[False]",
+      "tests/integration/test_scaffold_callback_lifecycle.py::test_actual_spawned_successful_run_cleanup_rejects_before_parent_acceptance[True]",
+      "tests/trainers/test_review_training_boundaries.py::test_real_amp_clipping_unscaled_success_and_overflow[False-8.0-2.0-False]",
+      "tests/trainers/test_review_training_boundaries.py::test_real_amp_clipping_unscaled_success_and_overflow[False-8.0-2.0-True]",
+      "tests/trainers/test_review_training_boundaries.py::test_real_amp_clipping_unscaled_success_and_overflow[False-65536.0-10.0-False]",
+      "tests/trainers/test_review_training_boundaries.py::test_real_amp_clipping_unscaled_success_and_overflow[False-65536.0-10.0-True]",
+      "tests/trainers/test_review_training_boundaries.py::test_real_amp_clipping_unscaled_success_and_overflow[True-8.0-2.0-False]",
+      "tests/trainers/test_review_training_boundaries.py::test_real_amp_clipping_unscaled_success_and_overflow[True-8.0-2.0-True]",
+      "tests/trainers/test_review_training_boundaries.py::test_real_amp_clipping_unscaled_success_and_overflow[True-65536.0-10.0-False]",
+      "tests/trainers/test_review_training_boundaries.py::test_real_amp_clipping_unscaled_success_and_overflow[True-65536.0-10.0-True]",
+      "tests/trainers/test_review_training_boundaries.py::test_actual_worker_cleanup_full_names_and_unrelated_owners[toy]",
+      "tests/trainers/test_review_training_boundaries.py::test_actual_worker_cleanup_full_names_and_unrelated_owners[org/model]",
+      "tests/trainers/test_review_training_boundaries.py::test_actual_worker_cleanup_full_names_and_unrelated_owners[xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx]",
+      "tests/trainers/test_review_training_boundaries.py::test_actual_accepted_b_feddyn_writer_migration[False-False]",
+      "tests/trainers/test_review_training_boundaries.py::test_actual_accepted_b_feddyn_writer_migration[False-True]",
+      "tests/trainers/test_review_training_boundaries.py::test_actual_accepted_b_feddyn_writer_migration[True-False]",
+      "tests/trainers/test_review_training_boundaries.py::test_actual_accepted_b_feddyn_writer_migration[True-True]",
+      "tests/trainers/test_review_training_boundaries.py::test_fedala_memory_only_return_matches_dedicated_rounds[False]",
+      "tests/trainers/test_review_training_boundaries.py::test_fedala_memory_only_return_matches_dedicated_rounds[True]",
+      "tests/servers/test_server_resume_rng.py::test_actual_checkpoint_continues_selection_through_run[zero-configured-seed-ordinary]",
+      "tests/servers/test_server_resume_rng.py::test_actual_checkpoint_continues_selection_through_run[zero-configured-seed-central]",
+      "tests/servers/test_server_resume_rng.py::test_actual_checkpoint_continues_selection_through_run[zero-no-seed-ordinary]",
+      "tests/servers/test_server_resume_rng.py::test_actual_checkpoint_continues_selection_through_run[zero-no-seed-central]",
+      "tests/servers/test_server_resume_rng.py::test_actual_checkpoint_continues_selection_through_run[one-configured-seed-ordinary]",
+      "tests/servers/test_server_resume_rng.py::test_actual_checkpoint_continues_selection_through_run[one-configured-seed-central]",
+      "tests/servers/test_server_resume_rng.py::test_actual_checkpoint_continues_selection_through_run[one-no-seed-ordinary]",
+      "tests/servers/test_server_resume_rng.py::test_actual_checkpoint_continues_selection_through_run[one-no-seed-central]",
+      "tests/servers/test_server_resume_rng.py::test_actual_checkpoint_continues_selection_through_run[many-configured-seed-ordinary]",
+      "tests/servers/test_server_resume_rng.py::test_actual_checkpoint_continues_selection_through_run[many-configured-seed-central]",
+      "tests/servers/test_server_resume_rng.py::test_actual_checkpoint_continues_selection_through_run[many-no-seed-ordinary]",
+      "tests/servers/test_server_resume_rng.py::test_actual_checkpoint_continues_selection_through_run[many-no-seed-central]",
+      "tests/servers/test_server_resume_rng.py::test_legacy_global_rng_tuple_remains_readable[ordinary]",
+      "tests/servers/test_server_resume_rng.py::test_legacy_global_rng_tuple_remains_readable[central]",
+      "tests/servers/test_server_resume_rng.py::test_fresh_run_keeps_configured_seed_or_initial_selection_state[configured-seed-ordinary]",
+      "tests/servers/test_server_resume_rng.py::test_fresh_run_keeps_configured_seed_or_initial_selection_state[configured-seed-central]",
+      "tests/servers/test_server_resume_rng.py::test_fresh_run_keeps_configured_seed_or_initial_selection_state[no-seed-ordinary]",
+      "tests/servers/test_server_resume_rng.py::test_fresh_run_keeps_configured_seed_or_initial_selection_state[no-seed-central]",
+      "tests/servers/test_server_resume_rng.py::test_custom_resume_override_owns_selection_state_without_session_flag[ordinary]",
+      "tests/servers/test_server_resume_rng.py::test_custom_resume_override_owns_selection_state_without_session_flag[central]",
+      "tests/servers/test_server_resume_rng.py::test_malformed_resume_propagates_before_process_or_socket_start[current_round.pkl-UnpicklingError-ordinary]",
+      "tests/servers/test_server_resume_rng.py::test_malformed_resume_propagates_before_process_or_socket_start[current_round.pkl-UnpicklingError-central]",
+      "tests/servers/test_server_resume_rng.py::test_malformed_resume_propagates_before_process_or_socket_start[numpy_prng_state_2.pkl-UnpicklingError-ordinary]",
+      "tests/servers/test_server_resume_rng.py::test_malformed_resume_propagates_before_process_or_socket_start[numpy_prng_state_2.pkl-UnpicklingError-central]",
+      "tests/servers/test_server_resume_rng.py::test_malformed_resume_propagates_before_process_or_socket_start[prng_state_2.pkl-UnpicklingError-ordinary]",
+      "tests/servers/test_server_resume_rng.py::test_malformed_resume_propagates_before_process_or_socket_start[prng_state_2.pkl-UnpicklingError-central]",
+      "tests/servers/test_server_resume_rng.py::test_malformed_resume_propagates_before_process_or_socket_start[checkpoint_lenet5_2.safetensors-SafetensorError-ordinary]",
+      "tests/servers/test_server_resume_rng.py::test_malformed_resume_propagates_before_process_or_socket_start[checkpoint_lenet5_2.safetensors-SafetensorError-central]",
+      "tests/integration/test_checkpoint_runtime_agreement.py::test_server_save_resume_restores_round_rng_weights_and_history[lenet5]",
+      "tests/integration/test_checkpoint_runtime_agreement.py::test_server_save_resume_restores_round_rng_weights_and_history[org/model]",
+      "tests/integration/test_checkpoint_runtime_agreement.py::test_server_save_resume_restores_round_rng_weights_and_history[org_model]",
+      "tests/integration/test_checkpoint_runtime_agreement.py::test_server_save_resume_restores_round_rng_weights_and_history[../model]",
+      "tests/integration/test_checkpoint_runtime_agreement.py::test_server_save_resume_restores_round_rng_weights_and_history[xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx]",
+      "tests/integration/test_checkpoint_runtime_agreement.py::test_server_simulated_writer_to_actual_supplied_filename_reader",
+      "tests/integration/test_checkpoint_runtime_agreement.py::test_client_simulated_writers_and_server_reader_do_not_alias_names[False]",
+      "tests/integration/test_checkpoint_runtime_agreement.py::test_client_simulated_writers_and_server_reader_do_not_alias_names[True]",
+      "tests/integration/test_checkpoint_runtime_agreement.py::test_actual_personalized_outbound_hook_to_local_layer_reader[False]",
+      "tests/integration/test_checkpoint_runtime_agreement.py::test_actual_personalized_outbound_hook_to_local_layer_reader[True]",
+      "tests/integration/test_checkpoint_runtime_agreement.py::test_urgent_snapshot_numeric_selection_and_owned_cleanup_agree",
+      "tests/trainers/test_checkpoint_path_contract.py::test_long_logical_model_name_default_save_load_stays_in_filename_limit[org/modelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodel]",
+      "tests/trainers/test_checkpoint_path_contract.py::test_long_logical_model_name_default_save_load_stays_in_filename_limit[ordinary_modelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodel]",
+      "tests/trainers/test_checkpoint_path_contract.py::test_long_logical_model_name_default_save_load_stays_in_filename_limit[xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx]",
+      "tests/trainers/test_checkpoint_path_contract.py::test_real_spawned_worker_train_test_and_history_with_slash_name",
+      "tests/trainers/test_training_update_contract.py::test_accumulation_run_epoch_and_exception_cleanup",
+      "tests/trainers/test_training_update_contract.py::test_gradient_clipping_limits_real_updates_including_accumulation_tail",
+      "tests/trainers/test_training_update_contract.py::test_real_grad_scaler_overflow_does_not_dispatch_optimizer_update[False]",
+      "tests/trainers/test_training_update_contract.py::test_real_grad_scaler_overflow_does_not_dispatch_optimizer_update[True]",
+      "tests/trainers/test_training_update_contract.py::test_fedprox_origin_and_nonzero_analytical_gradient[0.0-l2]",
+      "tests/trainers/test_training_update_contract.py::test_fedprox_origin_and_nonzero_analytical_gradient[0.1-l2]",
+      "tests/trainers/test_training_update_contract.py::test_fedprox_origin_and_nonzero_analytical_gradient[0.1-l1]",
+      "tests/trainers/test_training_update_contract.py::test_personalization_freezes_restore_model_ownership_after_failure[fedper]",
+      "tests/trainers/test_training_update_contract.py::test_personalization_freezes_restore_model_ownership_after_failure[fedrep]",
+      "tests/trainers/test_training_update_contract.py::test_personalization_freezes_restore_model_ownership_after_failure[lgfedavg]"
+    ],
+    "counts": {
+      "distinct_selected_ids_per_version": 186,
+      "python313": {
+        "single_run": {
+          "passed": 186,
+          "failed": 0,
+          "skipped": 0
+        }
+      },
+      "python314": {
+        "initial_run": {
+          "passed": 185,
+          "failed": 1,
+          "skipped": 0
+        },
+        "isolated_cold_library_retry": {
+          "passed": 0,
+          "failed": 1
+        },
+        "readonly_library_cache_retry": {
+          "passed": 1,
+          "failed": 0
+        },
+        "distinct_ids_with_passing_evidence": 186,
+        "unresolved_selected_ids": []
+      }
+    },
+    "runs": [
+      {
+        "label": "affected313",
+        "root": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/affected313-75b889de7776439e992d5c9f1eb8acb8",
+        "exit_code": 0,
+        "duration_seconds": 428.8682960839942,
+        "receipts": {
+          "execution.json": {
+            "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/affected313-75b889de7776439e992d5c9f1eb8acb8/execution.json",
+            "bytes": 5313,
+            "sha256": "02f9cf17d2215573217a5fe498e3b7e1dfcde898badea3aef0a196029ad9e229"
+          },
+          "raw.log": {
+            "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/affected313-75b889de7776439e992d5c9f1eb8acb8/raw.log",
+            "bytes": 760,
+            "sha256": "bee5ffb58e5e189d7492e4eba167e71ae31e0361e6bca5e3f88fd5efe897c648"
+          },
+          "junit.xml": {
+            "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/affected313-75b889de7776439e992d5c9f1eb8acb8/junit.xml",
+            "bytes": 32533,
+            "sha256": "6f63984e36b80e0e2df2dab16838c14e5787303a90b850aa770b8ac52b91bf33"
+          },
+          "import-origins.json": {
+            "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/affected313-75b889de7776439e992d5c9f1eb8acb8/import-origins.json",
+            "bytes": 691,
+            "sha256": "3a5d95ee3f86a43cb20ac3b1cc949820da0ffc6918df3c1a57d5aa4f73183d71"
+          },
+          "source-before.json": {
+            "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/affected313-75b889de7776439e992d5c9f1eb8acb8/source-before.json",
+            "bytes": 181040,
+            "sha256": "5aab0284663d26f9734d75f42acba2e5959b02df4649a931ef0119c38c940ac5"
+          },
+          "source-after.json": {
+            "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/affected313-75b889de7776439e992d5c9f1eb8acb8/source-after.json",
+            "bytes": 181040,
+            "sha256": "5aab0284663d26f9734d75f42acba2e5959b02df4649a931ef0119c38c940ac5"
+          }
+        },
+        "command": "/tmp/plato-phase2c-313/bin/python -B /private/tmp/plato-phase2c-scaffold-code-review-4/pytest_entry.py",
+        "source_unchanged": true
+      },
+      {
+        "label": "affected314",
+        "root": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/affected314-1a9f14a60aaf4688b6ba89738318d9ba",
+        "exit_code": 1,
+        "duration_seconds": 481.5826064159628,
+        "receipts": {
+          "execution.json": {
+            "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/affected314-1a9f14a60aaf4688b6ba89738318d9ba/execution.json",
+            "bytes": 5313,
+            "sha256": "cf9f64e070595605c75ddd9668ba375b0365dcfa07013c9e7046cc83637870ce"
+          },
+          "raw.log": {
+            "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/affected314-1a9f14a60aaf4688b6ba89738318d9ba/raw.log",
+            "bytes": 4320,
+            "sha256": "18f3d19b67e884d70c78691702e81d892059d181f9bfc2b4e7f403c255a74fec"
+          },
+          "junit.xml": {
+            "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/affected314-1a9f14a60aaf4688b6ba89738318d9ba/junit.xml",
+            "bytes": 36252,
+            "sha256": "8363cbe971606ced0e8ee44e8b9c9f18b282cdcd6db5e79588fccb219e3bce00"
+          },
+          "import-origins.json": {
+            "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/affected314-1a9f14a60aaf4688b6ba89738318d9ba/import-origins.json",
+            "bytes": 691,
+            "sha256": "3a5d95ee3f86a43cb20ac3b1cc949820da0ffc6918df3c1a57d5aa4f73183d71"
+          },
+          "source-before.json": {
+            "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/affected314-1a9f14a60aaf4688b6ba89738318d9ba/source-before.json",
+            "bytes": 181040,
+            "sha256": "5aab0284663d26f9734d75f42acba2e5959b02df4649a931ef0119c38c940ac5"
+          },
+          "source-after.json": {
+            "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/affected314-1a9f14a60aaf4688b6ba89738318d9ba/source-after.json",
+            "bytes": 181040,
+            "sha256": "5aab0284663d26f9734d75f42acba2e5959b02df4649a931ef0119c38c940ac5"
+          }
+        },
+        "command": "/tmp/plato-phase2c-314/bin/python -B /private/tmp/plato-phase2c-scaffold-code-review-4/pytest_entry.py",
+        "source_unchanged": true
+      },
+      {
+        "label": "isolated-spawn314",
+        "root": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/isolated-spawn314-a58ea478b390423481f2bc692abf0beb",
+        "exit_code": 1,
+        "duration_seconds": 72.65113708400168,
+        "receipts": {
+          "execution.json": {
+            "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/isolated-spawn314-a58ea478b390423481f2bc692abf0beb/execution.json",
+            "bytes": 3323,
+            "sha256": "3d6ada8015e1f2400684c0cad3df2924dd1a3f0f4dd65f8673273ed67f6de359"
+          },
+          "raw.log": {
+            "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/isolated-spawn314-a58ea478b390423481f2bc692abf0beb/raw.log",
+            "bytes": 4168,
+            "sha256": "f912e7f22261498f09f822aee90a7781304b0c69e6207c99b42885d51a4586be"
+          },
+          "junit.xml": {
+            "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/isolated-spawn314-a58ea478b390423481f2bc692abf0beb/junit.xml",
+            "bytes": 4162,
+            "sha256": "54467e93c130af260bcaf29db83aaa50055315dd6ba6f97d4edd3e52b2902a60"
+          },
+          "import-origins.json": {
+            "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/isolated-spawn314-a58ea478b390423481f2bc692abf0beb/import-origins.json",
+            "bytes": 691,
+            "sha256": "3a5d95ee3f86a43cb20ac3b1cc949820da0ffc6918df3c1a57d5aa4f73183d71"
+          },
+          "source-before.json": {
+            "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/isolated-spawn314-a58ea478b390423481f2bc692abf0beb/source-before.json",
+            "bytes": 181040,
+            "sha256": "5aab0284663d26f9734d75f42acba2e5959b02df4649a931ef0119c38c940ac5"
+          },
+          "source-after.json": {
+            "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/isolated-spawn314-a58ea478b390423481f2bc692abf0beb/source-after.json",
+            "bytes": 181040,
+            "sha256": "5aab0284663d26f9734d75f42acba2e5959b02df4649a931ef0119c38c940ac5"
+          }
+        },
+        "command": "/tmp/plato-phase2c-314/bin/python -B /private/tmp/plato-phase2c-scaffold-code-review-4/pytest_entry.py",
+        "source_unchanged": true
+      },
+      {
+        "label": "library-cache-spawn314",
+        "root": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/library-cache-spawn314-0e88e359130d48028f1dea158cef3cbc",
+        "exit_code": 0,
+        "duration_seconds": 29.7822587499395,
+        "receipts": {
+          "execution.json": {
+            "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/library-cache-spawn314-0e88e359130d48028f1dea158cef3cbc/execution.json",
+            "bytes": 3298,
+            "sha256": "96844972b92c98ed9fd52d270cd68694e246c6231359eb71030da609a908df9e"
+          },
+          "raw.log": {
+            "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/library-cache-spawn314-0e88e359130d48028f1dea158cef3cbc/raw.log",
+            "bytes": 585,
+            "sha256": "f209693a21be9834e7a3134bc960ca91e01d70132bb8f568f60c8eaa929869f0"
+          },
+          "junit.xml": {
+            "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/library-cache-spawn314-0e88e359130d48028f1dea158cef3cbc/junit.xml",
+            "bytes": 410,
+            "sha256": "adcf172c6d9d6d3a56e61d44394db659d18caa5d67d4798fe3a69ccee885c38b"
+          },
+          "import-origins.json": {
+            "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/library-cache-spawn314-0e88e359130d48028f1dea158cef3cbc/import-origins.json",
+            "bytes": 691,
+            "sha256": "3a5d95ee3f86a43cb20ac3b1cc949820da0ffc6918df3c1a57d5aa4f73183d71"
+          },
+          "source-before.json": {
+            "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/library-cache-spawn314-0e88e359130d48028f1dea158cef3cbc/source-before.json",
+            "bytes": 181040,
+            "sha256": "5aab0284663d26f9734d75f42acba2e5959b02df4649a931ef0119c38c940ac5"
+          },
+          "source-after.json": {
+            "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/library-cache-spawn314-0e88e359130d48028f1dea158cef3cbc/source-after.json",
+            "bytes": 181040,
+            "sha256": "5aab0284663d26f9734d75f42acba2e5959b02df4649a931ef0119c38c940ac5"
+          },
+          "bytecode-policy.json": {
+            "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/library-cache-spawn314-0e88e359130d48028f1dea158cef3cbc/bytecode-policy.json",
+            "bytes": 303,
+            "sha256": "151e07dcb3e58d6aac880e47647721e6348a67cc1837dca9d08d99d7601138af"
+          }
+        },
+        "command": "/tmp/plato-phase2c-314/bin/python -B /tmp/plato-phase2c-scaffold-code-review-4/pytest_library_cache_entry.py",
+        "source_unchanged": true
+      }
+    ],
+    "timeout_results_and_resolution": "Two 3.14 failures are retained: the same 60-second delivered spawn test timed out with all installed-library bytecode reads forced through an empty reviewer cache. It passed unchanged with ordinary read-only installed-library bytecode, no source bytecode, same immutable source/profile/assertions/deadline. This supports a harness cache-policy cost; it is not proof of blanket platform performance.",
+    "warning_classification": "One PytestAssertRewriteWarning about already-imported anyio per pytest run; reviewer bootstrap imports production before plugin startup. No warning filter or profile guard changed.",
+    "ruff": {
+      "command": "zsh -lc '/tmp/plato-phase2c-313/bin/python -B -m ruff check --select I --cache-dir /tmp/plato-phase2c-scaffold-code-review-4/ruff-final plato/trainers/composable.py plato/servers/base.py tests/integration/test_scaffold_callback_lifecycle.py tests/integration/scaffold_cleanup_worker.py tests/integration/test_checkpoint_runtime_agreement.py tests/trainers/test_review_training_boundaries.py'",
+      "cwd": "/private/tmp/plato-refresh-worktrees/training-final-review",
+      "exit_code": 0,
+      "receipt": {
+        "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-source-ruff.log",
+        "bytes": 19,
+        "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+      },
+      "scope": "Repository import-order policy on changed shared/correction paths; no --fix/source mutation."
+    }
+  },
+  "environment_receipts": [
+    {
+      "label": "environment313",
+      "root": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/environment313-000130da53d541c0bb262ebac9520a4c",
+      "exit_code": 0,
+      "duration_seconds": 10.843157875118777,
+      "receipts": {
+        "execution.json": {
+          "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/environment313-000130da53d541c0bb262ebac9520a4c/execution.json",
+          "bytes": 2404,
+          "sha256": "1a3bc4a87519b3b392c6d736c5ac5e6cdfc3883ae79617040a9495560e51500e"
+        },
+        "raw.log": {
+          "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/environment313-000130da53d541c0bb262ebac9520a4c/raw.log",
+          "bytes": 1654,
+          "sha256": "bc6080a82f21b767eb510498febb2c822274896227e7b8a7c7fe6e247e324034"
+        },
+        "source-before.json": {
+          "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/environment313-000130da53d541c0bb262ebac9520a4c/source-before.json",
+          "bytes": 181040,
+          "sha256": "5aab0284663d26f9734d75f42acba2e5959b02df4649a931ef0119c38c940ac5"
+        },
+        "source-after.json": {
+          "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/environment313-000130da53d541c0bb262ebac9520a4c/source-after.json",
+          "bytes": 181040,
+          "sha256": "5aab0284663d26f9734d75f42acba2e5959b02df4649a931ef0119c38c940ac5"
+        },
+        "environment.json": {
+          "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/environment313-000130da53d541c0bb262ebac9520a4c/environment.json",
+          "bytes": 1654,
+          "sha256": "bc6080a82f21b767eb510498febb2c822274896227e7b8a7c7fe6e247e324034"
+        }
+      },
+      "command": "/tmp/plato-phase2c-313/bin/python -B /tmp/plato-phase2c-scaffold-code-review-4/environment_entry.py",
+      "source_unchanged": true
+    },
+    {
+      "label": "environment314",
+      "root": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/environment314-84ef4b0c300c4855a37285670564f658",
+      "exit_code": 0,
+      "duration_seconds": 12.383606916991994,
+      "receipts": {
+        "execution.json": {
+          "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/environment314-84ef4b0c300c4855a37285670564f658/execution.json",
+          "bytes": 2404,
+          "sha256": "0683432655ad43b337a1048cf923a569b9bf3bf2eaf0bfe657564980a1012797"
+        },
+        "raw.log": {
+          "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/environment314-84ef4b0c300c4855a37285670564f658/raw.log",
+          "bytes": 1688,
+          "sha256": "74fb3911dba7b8d5392507f2946de565585c4b1712ab5b1ef114bd0ec9aac9e9"
+        },
+        "source-before.json": {
+          "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/environment314-84ef4b0c300c4855a37285670564f658/source-before.json",
+          "bytes": 181040,
+          "sha256": "5aab0284663d26f9734d75f42acba2e5959b02df4649a931ef0119c38c940ac5"
+        },
+        "source-after.json": {
+          "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/environment314-84ef4b0c300c4855a37285670564f658/source-after.json",
+          "bytes": 181040,
+          "sha256": "5aab0284663d26f9734d75f42acba2e5959b02df4649a931ef0119c38c940ac5"
+        },
+        "environment.json": {
+          "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/environment314-84ef4b0c300c4855a37285670564f658/environment.json",
+          "bytes": 1688,
+          "sha256": "74fb3911dba7b8d5392507f2946de565585c4b1712ab5b1ef114bd0ec9aac9e9"
+        }
+      },
+      "command": "/tmp/plato-phase2c-314/bin/python -B /tmp/plato-phase2c-scaffold-code-review-4/environment_entry.py",
+      "source_unchanged": true
+    }
+  ],
+  "profile_limits": {
+    "supplied_environments": "Existing3.13.16/3.14.8 macOS ARM64 CPU; torch2.14.1, numpy2.5.3, pytest9.1.1, Opacus1.6.0 installed. Full package versions and origins in hashed environment receipts. No installs/upgrades/profile guard weakening; SSL environments not used.",
+    "base": "Focused --test-profile base affected subset in supplied existing environments, not freshly provisioned minimal base; root owns fresh true-base omission qualification.",
+    "mandatory": "Unchanged mandatory startup prerequisite/profile guard and32-case collection checked on both versions after root initialized exact nanochat gitlink. Collection is not32 executed tests or a full mandatory-stack claim.",
+    "mandatory_guard_runs": [
+      {
+        "label": "mandatory-guard313",
+        "root": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/mandatory-guard313-1aae89ee66fa4a0c84058406c623c108",
+        "exit_code": 0,
+        "duration_seconds": 14.365448666969314,
+        "receipts": {
+          "execution.json": {
+            "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/mandatory-guard313-1aae89ee66fa4a0c84058406c623c108/execution.json",
+            "bytes": 2413,
+            "sha256": "f665c1627c9a84e3c008bdd5768868f7229e83ccc83beab0a361ba6883a31915"
+          },
+          "raw.log": {
+            "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/mandatory-guard313-1aae89ee66fa4a0c84058406c623c108/raw.log",
+            "bytes": 3826,
+            "sha256": "ae34687ecbd9166f66e0245c77a5d79c5be6997ffc178dd3325c6adc8b551c25"
+          },
+          "source-before.json": {
+            "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/mandatory-guard313-1aae89ee66fa4a0c84058406c623c108/source-before.json",
+            "bytes": 181040,
+            "sha256": "5aab0284663d26f9734d75f42acba2e5959b02df4649a931ef0119c38c940ac5"
+          },
+          "source-after.json": {
+            "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/mandatory-guard313-1aae89ee66fa4a0c84058406c623c108/source-after.json",
+            "bytes": 181040,
+            "sha256": "5aab0284663d26f9734d75f42acba2e5959b02df4649a931ef0119c38c940ac5"
+          },
+          "mandatory-guard.json": {
+            "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/mandatory-guard313-1aae89ee66fa4a0c84058406c623c108/mandatory-guard.json",
+            "bytes": 399,
+            "sha256": "6c0167c78c121d108c8a6e291ac44d7fdddb3fc81a8c2dddf4b9eb29a86fade5"
+          }
+        },
+        "command": "/tmp/plato-phase2c-313/bin/python -B /tmp/plato-phase2c-scaffold-code-review-4/mandatory_guard_entry.py",
+        "source_unchanged": true
+      },
+      {
+        "label": "mandatory-guard314",
+        "root": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/mandatory-guard314-3a41501cca6f41edb1e58acd7d2bb8f0",
+        "exit_code": 0,
+        "duration_seconds": 16.21720837499015,
+        "receipts": {
+          "execution.json": {
+            "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/mandatory-guard314-3a41501cca6f41edb1e58acd7d2bb8f0/execution.json",
+            "bytes": 2412,
+            "sha256": "3a2570ede492c8b6909f7d75f2948dfb37f4a673edc120e2ba97c02cd9ad44a5"
+          },
+          "raw.log": {
+            "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/mandatory-guard314-3a41501cca6f41edb1e58acd7d2bb8f0/raw.log",
+            "bytes": 3766,
+            "sha256": "d766d00adb72514dc9cc1af9f8e3b853c71520db8b1b583dff40991f3abbc7c3"
+          },
+          "source-before.json": {
+            "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/mandatory-guard314-3a41501cca6f41edb1e58acd7d2bb8f0/source-before.json",
+            "bytes": 181040,
+            "sha256": "5aab0284663d26f9734d75f42acba2e5959b02df4649a931ef0119c38c940ac5"
+          },
+          "source-after.json": {
+            "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/mandatory-guard314-3a41501cca6f41edb1e58acd7d2bb8f0/source-after.json",
+            "bytes": 181040,
+            "sha256": "5aab0284663d26f9734d75f42acba2e5959b02df4649a931ef0119c38c940ac5"
+          },
+          "mandatory-guard.json": {
+            "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/mandatory-guard314-3a41501cca6f41edb1e58acd7d2bb8f0/mandatory-guard.json",
+            "bytes": 399,
+            "sha256": "6c0167c78c121d108c8a6e291ac44d7fdddb3fc81a8c2dddf4b9eb29a86fade5"
+          }
+        },
+        "command": "/tmp/plato-phase2c-314/bin/python -B /tmp/plato-phase2c-scaffold-code-review-4/mandatory_guard_entry.py",
+        "source_unchanged": true
+      }
+    ],
+    "author_carry_forward": {
+      "attribution_only": true,
+      "bound_evidence": [
+        {
+          "path": "/private/tmp/plato-refresh-worktrees/training-final-review/evidence/2026-refresh/phase2c-feddyn-validation.json",
+          "bytes": 56795,
+          "sha256": "1beca9f0465a6afa30c7aaf2ddb1334bfdcc1beccc09feb2656456c8a727e440"
+        },
+        {
+          "path": "/private/tmp/plato-refresh-worktrees/training-final-review/evidence/2026-refresh/phase2c-feddyn-facts.json",
+          "bytes": 7711,
+          "sha256": "31e724a60a09d548f66621ff8d2b384670ddd22b8ff9c97cc2ebd9975cafbd7e"
+        },
+        {
+          "path": "/private/tmp/plato-refresh-worktrees/training-final-review/evidence/2026-refresh/phase2c-validation.json",
+          "bytes": 680887,
+          "sha256": "529428b8eb7ec8dbf884f8361ea1617532a155695db9fca231200778333818ca"
+        }
+      ],
+      "verified_logs_and_junits": [
+        {
+          "path": "/tmp/plato-phase2c-feddyn-implementation/final-base-not-runtime-314.log",
+          "bytes": 6365,
+          "sha256": "809bc2c9d83041c2e4affbd0bec62a9ec3d3791dfb2940a514cd809d13cd3bd9"
+        },
+        {
+          "path": "/tmp/plato-phase2c-feddyn-implementation/final-base-not-runtime-314.xml",
+          "bytes": 189601,
+          "sha256": "ec175575fc24fd86b7b95a36b62d39afc8c521b6a242d9af1efb1c99a67f460f"
+        },
+        {
+          "path": "/tmp/plato-phase2c-feddyn-implementation/final-base-not-runtime-313.log",
+          "bytes": 6317,
+          "sha256": "7a744f507a7bf922bbe25a6fa5f03bc3e23272afa192785975e37748db4208b6"
+        },
+        {
+          "path": "/tmp/plato-phase2c-feddyn-implementation/final-base-not-runtime-313.xml",
+          "bytes": 189599,
+          "sha256": "7d0ecae07bcd6e489ffe81cbe3412f074312284a949961eec0ec49f1971da9fc"
+        },
+        {
+          "path": "/tmp/plato-phase2c-feddyn-implementation/final-mandatory-not-runtime-314.log",
+          "bytes": 6506,
+          "sha256": "4332d284c0358117b7613f0049ef4a5fbd5ca97cac9e30970467333190188a48"
+        },
+        {
+          "path": "/tmp/plato-phase2c-feddyn-implementation/final-mandatory-not-runtime-314.xml",
+          "bytes": 189164,
+          "sha256": "7fda8dc0f3a1072692e341d61fcd515fdcccb9868514ea66516edf5b0606c51f"
+        },
+        {
+          "path": "/tmp/plato-phase2c-feddyn-implementation/final-mandatory-not-runtime-313.log",
+          "bytes": 6518,
+          "sha256": "d2cd0930a7678d71b52c5a26e3ec069cbf8460580dd032808177b232847fa6ff"
+        },
+        {
+          "path": "/tmp/plato-phase2c-feddyn-implementation/final-mandatory-not-runtime-313.xml",
+          "bytes": 189163,
+          "sha256": "9bf0de982f4e8661650d1e3922a92a98631e791edce8f40a786ff00a513984f5"
+        },
+        {
+          "path": "/tmp/plato-phase2c-feddyn-implementation/combined-mandatory-runtime-314.log",
+          "bytes": 269,
+          "sha256": "85bd0f3726317b2384719c5b9187e6f4ce5c88097eed5677fec538b6ac4a526c"
+        },
+        {
+          "path": "/tmp/plato-phase2c-feddyn-implementation/combined-mandatory-runtime-314.xml",
+          "bytes": 7971,
+          "sha256": "16a9aafb17491f502746913db7a7f7723cc73b13608e90a69276584eff829809"
+        },
+        {
+          "path": "/tmp/plato-phase2c-feddyn-implementation/combined-mandatory-runtime-313.log",
+          "bytes": 329,
+          "sha256": "2d11952235a5f45451102d8f1f5e5a45b66dd8f7bea843e15dd387f914009278"
+        },
+        {
+          "path": "/tmp/plato-phase2c-feddyn-implementation/combined-mandatory-runtime-313.xml",
+          "bytes": 7971,
+          "sha256": "05fe9a1c2f125151e4f8d46296ac36d7ad3e8f3869229eed7cf7e81cf347fc1f"
+        }
+      ],
+      "production_examples_configs_integration_git_entries_identical_05a9_to_final": 768,
+      "description": "Receipt binds author final evidence; own broader768-entry source comparison contains author238-blob runtime subset. Author51 runtime cases each ran05a9 and full non-runtime reruns ran7d; final13e changes evidence only. These are carried author results, not independent reruns, not fresh minimal provisioning and not a whole-phase verdict."
+    }
+  },
+  "receipts": {
+    "inputs": [
+      {
+        "path": "/Users/bli/Playground/plato/AGENTS.md",
+        "bytes": 3119,
+        "sha256": "b50f87f31ea3d87076952d8b7d2d8af067132fbf877d80f8780c208fb45527ec"
+      },
+      {
+        "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2c-scaffold-design.json",
+        "bytes": 30634,
+        "sha256": "f323f3aa9d824df44a1043b2d6aff9c8a963c42964f6e6685108c59b25fc3a89"
+      },
+      {
+        "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2c-scaffold-acceptance.json",
+        "bytes": 1194,
+        "sha256": "40b202708a4cfdbe6f299e75249c1a19921e410ec4ab7b5e3c6323f536ca8d37"
+      },
+      {
+        "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2c-scaffold-code-review-3.json",
+        "bytes": 128196,
+        "sha256": "63d4969b6bff08e51bde979eb3d8ac61289ca539e1332b3ac96a8ceeda6010dd"
+      },
+      {
+        "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2c-scaffold-code-review.json",
+        "bytes": 194941,
+        "sha256": "455f6467dd6986a1de751f0a9dea6bfef4d9ca4c16746ce38239b2b77a3bb7d7"
+      },
+      {
+        "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2c-scaffold-code-review-2.json",
+        "bytes": 232060,
+        "sha256": "aa00c76f5e3fbe3eb2f419ed277620c32f382b8dabb99f4a3e5c190308162eb1"
+      },
+      {
+        "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2c-general-acceptance.json",
+        "bytes": 1178,
+        "sha256": "3fb81f4f332e1a4665e0af22e99989dba19daa8fc140db99a8cab1dd78cfef2d"
+      },
+      {
+        "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2b-resume-acceptance.json",
+        "bytes": 1644,
+        "sha256": "53bfc5b628762ffb1e3c95a4309701f0a5beea364c0df28fc788171b12279219"
+      },
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/training-final-review/evidence/2026-refresh/phase2c-feddyn-validation.json",
+        "bytes": 56795,
+        "sha256": "1beca9f0465a6afa30c7aaf2ddb1334bfdcc1beccc09feb2656456c8a727e440"
+      },
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/training-final-review/evidence/2026-refresh/phase2c-feddyn-facts.json",
+        "bytes": 7711,
+        "sha256": "31e724a60a09d548f66621ff8d2b384670ddd22b8ff9c97cc2ebd9975cafbd7e"
+      },
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/training-final-review/evidence/2026-refresh/phase2c-feddyn-delivery-receipt.json",
+        "bytes": 6383,
+        "sha256": "aeb0299f3082465d8e71f1e48dceba74109fb599a9a08527620cd9b775f84058"
+      },
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/training-final-review/evidence/2026-refresh/phase2c-validation.json",
+        "bytes": 680887,
+        "sha256": "529428b8eb7ec8dbf884f8361ea1617532a155695db9fca231200778333818ca"
+      }
+    ],
+    "scratch_scripts": [
+      {
+        "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/source_adapter.py",
+        "bytes": 5655,
+        "sha256": "4b0e6819bc97335861a334160bdcb6d646ba5bdc6e1bbaf3b6886de6c304c11d"
+      },
+      {
+        "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/lifecycle_probe.py",
+        "bytes": 24198,
+        "sha256": "fc816584f7de493708bd11f5ab3976b7e4e056f9995e9e8590cb4e4a2807b729"
+      },
+      {
+        "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/run_probe.py",
+        "bytes": 4699,
+        "sha256": "44a33b9db610007c4a04e22efa6a009a7a394bbea443205f11366e08457b8fa7"
+      },
+      {
+        "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/validate_baseline.py",
+        "bytes": 8052,
+        "sha256": "b19af9fabebdddc5fad7e9f53975cb7bb8f1875f5cb391465222440d17858cf3"
+      },
+      {
+        "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/write_receipt.py",
+        "bytes": 11733,
+        "sha256": "149e77a742fb2950887063b45bcdfc2518579f770975cfeabac921636ef42dd5"
+      },
+      {
+        "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/run_final_command.py",
+        "bytes": 4995,
+        "sha256": "3960f9e0d3e3aeb1828710faadb3fca5e358fcaaeefe8361971aa630f9af62ea"
+      },
+      {
+        "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/pytest_entry.py",
+        "bytes": 709,
+        "sha256": "55a05045bf12164e8bda5133d68d88c7b4a6c155bf8be49b7666380a4cd32bd5"
+      },
+      {
+        "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/pytest_library_cache_entry.py",
+        "bytes": 1647,
+        "sha256": "4c437fa1d467de8b564502f37e5465209fba1b9512f14433f13c9a21a2eff5f4"
+      },
+      {
+        "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final_lifecycle_checks.py",
+        "bytes": 13129,
+        "sha256": "fdd32eb8cf188821dc2b6755d751d9bfbfa49bb5ae7569cdbfeaf7be32724127"
+      },
+      {
+        "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/validate_final_matrix.py",
+        "bytes": 3966,
+        "sha256": "ee371e5ea44acad060acdae016e1ea88f7311c974704b7c5ac64fc77734bb6be"
+      },
+      {
+        "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/mandatory_guard_entry.py",
+        "bytes": 958,
+        "sha256": "3d5a641f1ff2eedebe996104efdce396ef0e689b6de81f99e5bb1d73d1ed4146"
+      },
+      {
+        "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/environment_entry.py",
+        "bytes": 1360,
+        "sha256": "fc74d60122f46e9b09cac60d71de83593071a6a9b1f4439a0ed6398b51dd0e41"
+      },
+      {
+        "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/source_audit.py",
+        "bytes": 8846,
+        "sha256": "05ce5ee8c5501f80c576cd2bce524f6364034e5dd03ca78b518a4f5ea7662aa3"
+      },
+      {
+        "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/qualify_receipts.py",
+        "bytes": 8448,
+        "sha256": "82be3487df3be6d9e13ced6bde678bd974e30dc0d7540815c0638f0b51e503bf"
+      },
+      {
+        "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/write_final_report.py",
+        "bytes": 24611,
+        "sha256": "f953f55d75f92b91acf161d5f2af256adafc4dc680225b1a7c52eef037ff5477"
+      }
+    ],
+    "prior_reviewer_scripts_preserved": [
+      {
+        "path": "/private/tmp/plato-phase2c-scaffold-code-review-3/reproduce_cleanup_failure.py",
+        "bytes": 1470,
+        "sha256": "fc554616f81a72ac11d0f85e9c040481678f4a4c3d5196865fb6e59464f675ea"
+      },
+      {
+        "path": "/private/tmp/plato-phase2c-scaffold-code-review-3/cleanup_acceptance_probe.py",
+        "bytes": 4299,
+        "sha256": "b70a501db6c586bab917ac6541afc3d08e016697b210ff099db42a9b6a0399a7"
+      },
+      {
+        "path": "/private/tmp/plato-phase2c-scaffold-code-review-3/independent_checks.py",
+        "bytes": 14073,
+        "sha256": "720e78a5cf4e04bf4278f5eb5495bdfe5f1b93b36ab0a8ebe663964f875f1651"
+      }
+    ],
+    "qualification": {
+      "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-qualification-receipt.json",
+      "bytes": 136365,
+      "sha256": "a7413d8b0bca03b2d8817829db9ea389c574ad9c7ff3d10073dc6efd92f7b8e7"
+    },
+    "qualification_log": {
+      "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-qualification.log",
+      "bytes": 197,
+      "sha256": "a93b9bbffac19d6a9b2f87f71855c07c1e8499d0fcedf1ee792c19ff3be66785"
+    },
+    "matrix_validation_log": {
+      "path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-matrix-validation.log",
+      "bytes": 246,
+      "sha256": "85a359a87899306fa42d3809b9e36070c4b70d5d01941953c16a9d519e5ab884"
+    },
+    "scratch_root": "/private/tmp/plato-phase2c-scaffold-code-review-4",
+    "source_binding": "Every parent/worker command records exact immutable cwd/PYTHONPATH/import source origins. -B and disabled bytecode writes; caches/logs/configuration/short TMPDIR under owned unique roots. Final source and initialized nanochat tracked hashes preserved. Portable archive matches all1006 tracked files with no.git."
+  },
+  "workflow": {
+    "all_shell_commands": "zsh -lc",
+    "nested_agents": 0,
+    "agent_polling": 0,
+    "author_live_worktree_reads": 0,
+    "production_test_doc_edits": 0,
+    "dependency_or_environment_mutations": 0,
+    "commits_or_pushes": 0,
+    "root_write": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2c-scaffold-code-review-4.json",
+    "scratch_and_preparation_preserved": true
+  },
+  "bounded_verdict": "Independent SCAFFOLD/shared lifecycle correction and stated preservation scope PASS at exact13e/9fe8. F27-R3-01 closed by this review; original end/cleanup-owner low duplication corrected. One optional acceptance-write duplicate-cleanup recommendation remains without an accepted-criterion failure. Root owns final source/prose/phase acceptance; FedDyn numerical review is separate."
+}

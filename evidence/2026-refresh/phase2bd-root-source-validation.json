@@ -1,0 +1,182 @@
+{
+  "scope": "Root immutable-source preservation check; not component acceptance or final phase runtime qualification.",
+  "candidate": "09b9b941bc4a816b62d8ed33ad993455f6f05da5",
+  "candidate_tree": "5bb90f8f97aba8085a54ff3c534d9424705a6867",
+  "production_preservation": {
+    "accepted_B": {
+      "commit": "00eeb9dcdd2b513e64db9408969356037e09bb8e",
+      "paths_checked": 11,
+      "mismatches": [],
+      "blobs": {
+        "examples/async/port/port_server.py": {
+          "before": "f68f372ecef7926230c1d1b99a94ec3acd34906b",
+          "combined": "f68f372ecef7926230c1d1b99a94ec3acd34906b"
+        },
+        "plato/callbacks/handler.py": {
+          "before": "1a4ac9855a6bb65bcd1ba71f58070556d8949992",
+          "combined": "1a4ac9855a6bb65bcd1ba71f58070556d8949992"
+        },
+        "plato/clients/base.py": {
+          "before": "2eaebbced8eda9fffcf122c8500f8075b8860ed3",
+          "combined": "2eaebbced8eda9fffcf122c8500f8075b8860ed3"
+        },
+        "plato/clients/composable.py": {
+          "before": "34d09904334d12379ff1aa8dbf41c441873bcf99",
+          "combined": "34d09904334d12379ff1aa8dbf41c441873bcf99"
+        },
+        "plato/clients/strategies/defaults.py": {
+          "before": "a36dc6fc68a75a322dba94096f43dbb80fda3619",
+          "combined": "a36dc6fc68a75a322dba94096f43dbb80fda3619"
+        },
+        "plato/clients/transport.py": {
+          "before": "9685239d6dfd5e7ca881e4c863496dd01fc9155a",
+          "combined": "9685239d6dfd5e7ca881e4c863496dd01fc9155a"
+        },
+        "plato/servers/base.py": {
+          "before": "058dc7e21d26990ae0b9c6f458dacb40caac0858",
+          "combined": "058dc7e21d26990ae0b9c6f458dacb40caac0858"
+        },
+        "plato/servers/fedavg.py": {
+          "before": "10cd1a9cd8940ba5f7245824cd6b53a703d60a6c",
+          "combined": "10cd1a9cd8940ba5f7245824cd6b53a703d60a6c"
+        },
+        "plato/servers/fedavg_cs.py": {
+          "before": "a6b576479e8dbccfa100a826621a0f0bab1b8645",
+          "combined": "a6b576479e8dbccfa100a826621a0f0bab1b8645"
+        },
+        "plato/servers/strategies/aggregation/fedavg.py": {
+          "before": "f4045b7e3a030d67843300f1f1fe1a731d701c66",
+          "combined": "f4045b7e3a030d67843300f1f1fe1a731d701c66"
+        },
+        "plato/servers/strategies/aggregation/port.py": {
+          "before": "6896ede3bd1d3819df7b0fbb5677a6c71af92602",
+          "combined": "6896ede3bd1d3819df7b0fbb5677a6c71af92602"
+        }
+      }
+    },
+    "corrected_D": {
+      "commit": "f8aa0e9815b702f9d414ebe85a85eb48f9a982a1",
+      "paths_checked": 29,
+      "mismatches": [],
+      "blobs": {
+        "cleanup.py": {
+          "before": "c9e06a01df7977b5a2d7949dfcf29a6ad1c4d69e",
+          "combined": "c9e06a01df7977b5a2d7949dfcf29a6ad1c4d69e"
+        },
+        "plato/clients/strategies/mpc.py": {
+          "before": "77be221cc26905bba34e0345157092a355cab821",
+          "combined": "77be221cc26905bba34e0345157092a355cab821"
+        },
+        "plato/mpc/round_store.py": {
+          "before": "d6287a21d64f9f00e7fc69c1c8f850d3901e8863",
+          "combined": "d6287a21d64f9f00e7fc69c1c8f850d3901e8863"
+        },
+        "plato/processors/compress.py": {
+          "before": "ff112fcd8a3a0b1cad540106c200022efbda9909",
+          "combined": "ff112fcd8a3a0b1cad540106c200022efbda9909"
+        },
+        "plato/processors/decompress.py": {
+          "before": "11adef78dc79e8903a74006e6ede77d3c695c951",
+          "combined": "11adef78dc79e8903a74006e6ede77d3c695c951"
+        },
+        "plato/processors/feature.py": {
+          "before": "f6afaf81b9a10cc0333cd2022028ae6e63eb59e6",
+          "combined": "f6afaf81b9a10cc0333cd2022028ae6e63eb59e6"
+        },
+        "plato/processors/model_dequantize.py": {
+          "before": "2fd797f1d7b466a4465a0cdfb44e749adaa761ef",
+          "combined": "2fd797f1d7b466a4465a0cdfb44e749adaa761ef"
+        },
+        "plato/processors/model_dequantize_qsgd.py": {
+          "before": "50006f73508e47f1e3ee030c1e0c4baa82ed22a6",
+          "combined": "50006f73508e47f1e3ee030c1e0c4baa82ed22a6"
+        },
+        "plato/processors/model_quantize.py": {
+          "before": "b0891370563c42757fda3a53c1876f5b24fb690b",
+          "combined": "b0891370563c42757fda3a53c1876f5b24fb690b"
+        },
+        "plato/processors/model_quantize_qsgd.py": {
+          "before": "412fa73a722cf739d6d2ad0994f8ed2d2ba4d973",
+          "combined": "412fa73a722cf739d6d2ad0994f8ed2d2ba4d973"
+        },
+        "plato/processors/model_randomized_response.py": {
+          "before": "f8d91592aa034d9ee601ed1b44792748237a822e",
+          "combined": "f8d91592aa034d9ee601ed1b44792748237a822e"
+        },
+        "plato/processors/mpc_model_encrypt_additive.py": {
+          "before": "6feb32d5624f2847d923e98fa35f720ef855add2",
+          "combined": "6feb32d5624f2847d923e98fa35f720ef855add2"
+        },
+        "plato/processors/mpc_model_encrypt_shamir.py": {
+          "before": "f7d96befb3cdbaa0f923c475e25dd6b4341c1967",
+          "combined": "f7d96befb3cdbaa0f923c475e25dd6b4341c1967"
+        },
+        "plato/processors/unstructured_pruning.py": {
+          "before": "202acb57f41ff6abcd8bf4bc53e791864f27d68a",
+          "combined": "202acb57f41ff6abcd8bf4bc53e791864f27d68a"
+        },
+        "plato/serialization/safetensor.py": {
+          "before": "460a1196bb59bf84cef360cf5d95e4b6c45497df",
+          "combined": "460a1196bb59bf84cef360cf5d95e4b6c45497df"
+        },
+        "plato/servers/fedavg_he.py": {
+          "before": "cac16eaac4b5d148ce0d65e815eaa99a56339869",
+          "combined": "cac16eaac4b5d148ce0d65e815eaa99a56339869"
+        },
+        "plato/servers/strategies/aggregation/he.py": {
+          "before": "48fbfb2a7f7cb0f71057312e509091b6cc3cfbb4",
+          "combined": "48fbfb2a7f7cb0f71057312e509091b6cc3cfbb4"
+        },
+        "plato/servers/strategies/mpc.py": {
+          "before": "94c91644a05777874bf4e9e3cdedb3b54bc8218e",
+          "combined": "94c91644a05777874bf4e9e3cdedb3b54bc8218e"
+        },
+        "plato/utils/count_parameters.py": {
+          "before": "af8139152431e053494fb54251c9771f7e04d644",
+          "combined": "af8139152431e053494fb54251c9771f7e04d644"
+        },
+        "plato/utils/data_loaders.py": {
+          "before": "80f0e808c7ac9940c6051dcfd66eaf91bb6c80fe",
+          "combined": "80f0e808c7ac9940c6051dcfd66eaf91bb6c80fe"
+        },
+        "plato/utils/homo_enc.py": {
+          "before": "e550f019b927ef9dcc8374aa266d41144100bbfe",
+          "combined": "e550f019b927ef9dcc8374aa266d41144100bbfe"
+        },
+        "plato/utils/reinforcement_learning/policies/base.py": {
+          "before": "539d08f9064bf8884f271b86f0832afbec2640f8",
+          "combined": "539d08f9064bf8884f271b86f0832afbec2640f8"
+        },
+        "plato/utils/reinforcement_learning/policies/ddpg.py": {
+          "before": "ae0519fe71bb0256db7a6f5907418fa96fd95223",
+          "combined": "ae0519fe71bb0256db7a6f5907418fa96fd95223"
+        },
+        "plato/utils/reinforcement_learning/policies/sac.py": {
+          "before": "cd197ed0505ddc1d9ce7a0044c16383dd7cd1dd0",
+          "combined": "cd197ed0505ddc1d9ce7a0044c16383dd7cd1dd0"
+        },
+        "plato/utils/reinforcement_learning/policies/td3.py": {
+          "before": "da3add8210bda40e7239d3d36a26447bbf7dcae9",
+          "combined": "da3add8210bda40e7239d3d36a26447bbf7dcae9"
+        },
+        "plato/utils/s3.py": {
+          "before": "926ce3af7973d0f93f2442886e457d36d7612414",
+          "combined": "926ce3af7973d0f93f2442886e457d36d7612414"
+        },
+        "plato/utils/toml_writer.py": {
+          "before": "8873aef7058307b0866e9322c4bf5e56ecff9330",
+          "combined": "8873aef7058307b0866e9322c4bf5e56ecff9330"
+        },
+        "plato/utils/tree.py": {
+          "before": "a646a30c440dcb2b8adeaadbfcca3ab8f2e49b74",
+          "combined": "a646a30c440dcb2b8adeaadbfcca3ab8f2e49b74"
+        },
+        "plato/utils/unary_encoding.py": {
+          "before": "d442bcaeed5309d0aeb4c8ebecdfbdfafffeef99",
+          "combined": "d442bcaeed5309d0aeb4c8ebecdfbdfafffeef99"
+        }
+      }
+    }
+  },
+  "tracked_s3_test_sha256": "e09c7ed694713815463b3be34939b9f4873b2b1b5930600f9c8f47b85d84c3e0"
+}

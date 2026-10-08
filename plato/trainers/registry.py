@@ -9,26 +9,21 @@ from plato.config import Config
 from plato.trainers import (
     basic,
     composable,
+    fedprox,
     gan,
     pfedgraph,
     split_learning,
 )
-from plato.trainers import (
-    lerobot as lerobot_trainer,
-)
-from plato.trainers import (
-    nanochat as nanochat_trainer,
-)
+from plato.utils.retired_backends import raise_if_retired
 
 registered_trainers = {
     "composable": composable.ComposableTrainer,
     "basic": basic.Trainer,
+    "fedprox": fedprox.Trainer,
     "timm_basic": basic.TrainerWithTimmScheduler,
     "gan": gan.Trainer,
     "pfedgraph": pfedgraph.Trainer,
     "split_learning": split_learning.Trainer,
-    "nanochat": nanochat_trainer.Trainer,
-    "lerobot": lerobot_trainer.Trainer,
 }
 
 
@@ -37,6 +32,10 @@ def _resolve_trainer_name(trainer_config) -> str:
     trainer_type_attr = getattr(trainer_config, "type", None)
     trainer_type = trainer_type_attr if isinstance(trainer_type_attr, str) else None
     framework = getattr(trainer_config, "framework", "")
+    if (framework.lower() == "mlx" and trainer_type not in (None, "mlx")) or (
+        trainer_type == "mlx" and framework and framework.lower() != "mlx"
+    ):
+        raise ValueError("MLX trainer type and framework must select the same backend.")
 
     if not trainer_type and framework:
         if framework.lower() == "mlx":
@@ -50,6 +49,7 @@ def get(model=None, callbacks=None):
     """Get the trainer with the provided name."""
     config = Config().trainer
     trainer_name = _resolve_trainer_name(config)
+    raise_if_retired(trainer_name, category="trainer")
     logging.info("Trainer: %s", trainer_name)
 
     if trainer_name == "diff_privacy":

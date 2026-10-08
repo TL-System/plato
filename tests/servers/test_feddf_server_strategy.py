@@ -16,9 +16,9 @@ from torch.utils.data import TensorDataset
 from plato.config import Config
 
 _TESTS_ROOT = Path(__file__).resolve().parent
-_FEDDF_DIR = _TESTS_ROOT.parent.parent / "examples" / "server_aggregation" / "feddf"
-if str(_FEDDF_DIR) not in sys.path:
-    sys.path.insert(0, str(_FEDDF_DIR))
+_FEDDF_DIR = (
+    _TESTS_ROOT.parent.parent / "examples" / "server_aggregation" / "feddf"
+)
 
 
 def _load_module(module_name: str, path: Path) -> Any:
@@ -31,8 +31,13 @@ def _load_module(module_name: str, path: Path) -> Any:
     if loader is None:
         raise RuntimeError(f"Loader missing for {path}")
 
-    loader.exec_module(module)
-    return module
+    previous_path = sys.path[:]
+    try:
+        sys.path.insert(0, str(_FEDDF_DIR))
+        loader.exec_module(module)
+        return module
+    finally:
+        sys.path[:] = previous_path
 
 
 feddf_algorithm = _load_module(
@@ -92,7 +97,7 @@ def test_feddf_server_process_reports_distills_global_model(temp_config):
 
     trainer = SimpleNamespace(model=TinyStudent(), device="cpu")
     algorithm = feddf_algorithm.Algorithm(trainer=trainer)
-    strategy = feddf_server_strategy.FedDFAggregationStrategy(
+    strategy = feddf_server.FedDFAggregationStrategy(
         proxy_set_size=4,
         proxy_seed=1,
         temperature=1.0,

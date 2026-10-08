@@ -1,0 +1,650 @@
+{
+  "schema_version": 1,
+  "reviewer": "/root/phase4_harness_event_error_review",
+  "recorded_at_utc": "2026-10-04T01:47:45.924528+00:00",
+  "verdict": "ACCEPT",
+  "unresolved_findings": {
+    "critical": 0,
+    "high": 0,
+    "medium": 0,
+    "low": 0
+  },
+  "findings": [],
+  "scope": "Fresh independent software-quality implementation review of the child-event validation/first-serialization exception handling and exact locally owned child cleanup fix. Focused synthetic test helpers and collection inventories only.",
+  "acceptance_boundary": "Accept this immutable harness fix for integration within its accepted four-helper API and bounded child-registration design. This review supplies no family qualification, production training result, publication approval, or general promise to contain descendants whose ownership was never independently observed.",
+  "source_binding": {
+    "worktree": "/tmp/plato-refresh-worktrees/phase4-harness-fix3",
+    "base_commit": "35ed9be16493a60b0e1e03b9873940744f7c2041",
+    "source_commit": "04129d5aca7d0f35896279f56903c24f8c80eb1f",
+    "source_tree": "510c1736fbb0731f520f2c712deb6c10453745f4",
+    "evidence_commit": "86a1eb7847d07c170241907f0128c014e3b28aca",
+    "status_porcelain": "",
+    "changed_source_files": [
+      "tests/examples_phase4/common.py",
+      "tests/test_examples_phase4_contract.py"
+    ],
+    "source_manifest": [
+      {
+        "path": "/tmp/plato-refresh-worktrees/phase4-harness-fix3/tests/examples_phase4/common.py",
+        "sha256": "4972ffc23cc0a552e78c48477e7e7921c4ecbfd8a429961d898b226602a4cfc0",
+        "bytes": 41040
+      },
+      {
+        "path": "/tmp/plato-refresh-worktrees/phase4-harness-fix3/tests/test_examples_phase4_contract.py",
+        "sha256": "8e57817c9191e7139949366b025c47a13f1e8145805fd04106c483acd864bddd",
+        "bytes": 49967
+      },
+      {
+        "path": "/tmp/plato-refresh-worktrees/phase4-harness-fix3/tests/examples_phase4/cases.json",
+        "sha256": "972adcc85aa4d64d31dc9049b72e323a124846a01965ba3171c04b591e11b3d7",
+        "bytes": 242040
+      },
+      {
+        "path": "/tmp/plato-refresh-worktrees/phase4-harness-fix3/tests/conftest.py",
+        "sha256": "765fd2c96a67118f78b0a6c7f7fe134f9a73dfc5ecce25e35e684686da2bfd81",
+        "bytes": 44832
+      },
+      {
+        "path": "/tmp/plato-refresh-worktrees/phase4-harness-fix3/pyproject.toml",
+        "sha256": "fcc830f9fac66f2e2f28bef0d715bea3eb1300105a4239bb33cce8f62b71b398",
+        "bytes": 4102
+      },
+      {
+        "path": "/tmp/plato-refresh-worktrees/phase4-harness-fix3/uv.lock",
+        "sha256": "66a4e4442d7b1f26d220b44ca73c44ff4f1151a86857bb3f93a594819fd08126",
+        "bytes": 755641
+      }
+    ],
+    "author_receipt": {
+      "path": "/tmp/plato-refresh-worktrees/phase4-harness-fix3/evidence/2026-refresh/phase4-harness-fix3-validation.json",
+      "sha256": "f2ae54c3e84bfa9598f2688157635fe06bc1edca14e98b2911e11dc6833c2124",
+      "bytes": 62236
+    }
+  },
+  "authority": [
+    {
+      "path": "/tmp/plato-phase4-harness-fix2-design.json",
+      "sha256": "d0dc41d4412659f6b3b3591f8ea9d2821332e90076e0660f53d0edf6aba8092a",
+      "bytes": 7316
+    },
+    {
+      "path": "/tmp/plato-phase4-child-protocol-review.json",
+      "sha256": "061a3d2bd78c577c2a2d569651c7920d74d6e5ff9b1b77754d0124cbedbf83e0",
+      "bytes": 6191
+    },
+    {
+      "path": "/tmp/plato-phase4-harness-fix-review.json",
+      "sha256": "4324c5a434eabba49452c3c1ff3e64822c56d3ab7a2eb04c3611c6b7501c0531",
+      "bytes": 207978
+    },
+    {
+      "path": "/tmp/plato-phase4-harness-registration-review-interruption.json",
+      "sha256": "5403d311f760d5f2d1d0bb25b93fe30ec19de8e94f05440eda5863330c0cc3f3",
+      "bytes": 2325
+    }
+  ],
+  "control_flow_assessment": {
+    "guarded_first_write": "emit now derives optional current OS descendant/create-time proof, then performs reserved-field validation, child-identity normalization, stale-owned rejection and first event serialization within the same guarded child-registration error path. Oversized timestamp normalization rejects safely; JSON TypeError, ValueError and RecursionError paths are covered.",
+    "trusted_failure_evidence": "Failure records use the trusted run case environment and reporter OS identity, bounded exception text, request identity and optional OS-derived local child identity. Caller-provided unserializable or reserved fields are never serialized again. A failure event is sufficient for run_case rejection even when the worker catches the exception, emits success and exits with status zero.",
+    "cleanup_authority": "Local cleanup receives only a pid/create-time proven by current OS descendant lineage before validating caller timestamp data. Every signal rechecks that exact creation identity. Unrelated candidate metadata supplies no local signal authority. Unknown/unproven children remain subject to the accepted truthful ownership limit.",
+    "normal_paths_and_bounds": "All four public helper signatures are unchanged. Matching accepted child receipts, natural genuine child exits, bounded rejection/missing/partial acknowledgment handling, raw-event limits and the supervisor lifecycle retain their contract behavior. An unrelated stale identity may be acknowledged already_gone because the claimed exact identity is absent; it does not own or signal the currently alive unrelated process."
+  },
+  "independent_validation": {
+    "all_candidate_contracts": {
+      "command": "PYTHONDONTWRITEBYTECODE=1 reviewer-env/bin/python -B -m pytest tests/test_examples_phase4_contract.py -q -p no:cacheprovider --basetemp=reviewer/contract-temp --junitxml=reviewer/artifacts/contracts.xml",
+      "counts": {
+        "tests": 100,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "seconds": 123.295,
+      "junit": {
+        "path": "/tmp/plato-phase4-harness-event-error-review/artifacts/contracts.xml",
+        "sha256": "244100c1dfee8185cdeee7f54102bc608e16c3564fec85b4b868da94552427b6",
+        "bytes": 16001
+      },
+      "log": {
+        "path": "/tmp/plato-phase4-harness-event-error-review/artifacts/contracts.log",
+        "sha256": "1c5e8819ce5e374622c48d5734ae9870aaa8f11004f6e7d3173d7e898f300b47",
+        "bytes": 255
+      }
+    },
+    "reviewer_owned_integration_probes": {
+      "count": 24,
+      "passed": 24,
+      "expected_durable_failure_cases": 22,
+      "normal_controls": 2,
+      "summary": {
+        "path": "/tmp/plato-phase4-harness-event-error-review/artifacts/independent-probes.json",
+        "sha256": "1ba69ccb03caf7258a520a0a2325ef04afdea490bd4f7ff395f6eb3e768bfee2",
+        "bytes": 39822
+      },
+      "names": [
+        "timestamp-none",
+        "timestamp-bool",
+        "timestamp-text",
+        "timestamp-list",
+        "timestamp-zero",
+        "timestamp-negative",
+        "timestamp-nan",
+        "timestamp-infinity",
+        "timestamp-overflow",
+        "nested-unserializable",
+        "circular-details",
+        "recursive-overlimit-details",
+        "nonfinite-details",
+        "oversized-details-number",
+        "nonstring-mapping-key",
+        "unserializable-case",
+        "reserved-registration-id",
+        "reserved-created",
+        "reserved-monotonic",
+        "unrelated-overflow",
+        "unrelated-serialize",
+        "unrelated-reserved",
+        "unrelated-stale-control",
+        "valid-detached-natural"
+      ],
+      "assertions": "Durable result/stdout/stderr, caught RuntimeError plus success/zero-exit still rejected, one trusted ChildRegistrationError failure, bounded failure text, exact OS-derived local cleanup identity with no survivor for malformed real-child metadata; unrelated fixtures remain alive and excluded from owned process identities before fixture cleanup; valid detached natural child and accepted stale unrelated already_gone control remain successful."
+    },
+    "independent_red_green": {
+      "comparisons": 2,
+      "executions": 4,
+      "passed": true,
+      "summary": {
+        "path": "/tmp/plato-phase4-harness-event-error-review/artifacts/independent-red-green.json",
+        "sha256": "a6e381cce00e3a77c2a4712bc11da8f3493d2543500acbe7c2b33e4131bc667c",
+        "bytes": 3250
+      },
+      "outcome": "Immutable base emit raises ValueError/TypeError before durable failure and leaves the reviewer-created detached child alive for oversized timestamps and unserializable case identity. Candidate emits trusted durable failure, raises RuntimeError and cleans that exact child. Fixture owners recover only their own exact identities."
+    },
+    "collections": [
+      {
+        "command": [
+          "/tmp/plato-phase4-harness-event-error-review/env/bin/python",
+          "/tmp/plato-phase4-harness-event-error-review/collection_launcher.py",
+          "/tmp/plato-phase4-harness-event-error-review/artifacts/core-nodes.json",
+          "tests",
+          "--test-profile=mandatory",
+          "--collect-only",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--basetemp=/tmp/plato-phase4-harness-event-error-review/core-collection-temp"
+        ],
+        "status": 0,
+        "elapsed": 12.42628608387895,
+        "node_count": 1735,
+        "exact_author_nodes_match": true,
+        "ordered_author_nodes_match": true,
+        "imported_phase4_worker_modules": []
+      },
+      {
+        "command": [
+          "/tmp/plato-phase4-harness-event-error-review/env/bin/python",
+          "/tmp/plato-phase4-harness-event-error-review/collection_launcher.py",
+          "/tmp/plato-phase4-harness-event-error-review/artifacts/native-nodes.json",
+          "tests/mlx_native",
+          "--test-profile=mlx-native",
+          "--collect-only",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--basetemp=/tmp/plato-phase4-harness-event-error-review/native-collection-temp"
+        ],
+        "status": 0,
+        "elapsed": 12.080455084098503,
+        "node_count": 383,
+        "exact_author_nodes_match": true,
+        "ordered_author_nodes_match": true,
+        "imported_phase4_worker_modules": []
+      },
+      {
+        "command": [
+          "/tmp/plato-phase4-harness-event-error-review/env/bin/python",
+          "/tmp/plato-phase4-harness-event-error-review/collection_launcher.py",
+          "/tmp/plato-phase4-harness-event-error-review/artifacts/runtime-nodes.json",
+          "tests",
+          "--test-profile=mandatory",
+          "-m",
+          "runtime and not retained_model_search",
+          "--collect-only",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--basetemp=/tmp/plato-phase4-harness-event-error-review/runtime-collection-temp"
+        ],
+        "status": 0,
+        "elapsed": 11.837296792073175,
+        "node_count": 51,
+        "exact_author_nodes_match": true,
+        "ordered_author_nodes_match": true,
+        "imported_phase4_worker_modules": []
+      },
+      {
+        "command": [
+          "/tmp/plato-phase4-harness-event-error-review/env/bin/python",
+          "/tmp/plato-phase4-harness-event-error-review/collection_launcher.py",
+          "/tmp/plato-phase4-harness-event-error-review/artifacts/retained-nodes.json",
+          "tests/integration/test_retained_model_search.py",
+          "--test-profile=mandatory",
+          "-m",
+          "retained_model_search",
+          "--collect-only",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--basetemp=/tmp/plato-phase4-harness-event-error-review/retained-collection-temp"
+        ],
+        "status": 0,
+        "elapsed": 11.396501749986783,
+        "node_count": 19,
+        "exact_author_nodes_match": true,
+        "ordered_author_nodes_match": true,
+        "imported_phase4_worker_modules": []
+      },
+      {
+        "command": [
+          "/tmp/plato-phase4-harness-event-error-review/env/bin/python",
+          "/tmp/plato-phase4-harness-event-error-review/collection_launcher.py",
+          "/tmp/plato-phase4-harness-event-error-review/artifacts/eval-nodes.json",
+          "tests/llm_eval",
+          "--test-profile=llm-eval",
+          "--collect-only",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--basetemp=/tmp/plato-phase4-harness-event-error-review/eval-collection-temp"
+        ],
+        "status": 0,
+        "elapsed": 16.50220958306454,
+        "node_count": 11,
+        "exact_author_nodes_match": true,
+        "ordered_author_nodes_match": true,
+        "imported_phase4_worker_modules": []
+      }
+    ],
+    "typing": {
+      "status": 0,
+      "output": {
+        "path": "/tmp/plato-phase4-harness-event-error-review/artifacts/typing.log",
+        "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+        "bytes": 19
+      }
+    },
+    "ruff": {
+      "status": 0,
+      "output": {
+        "path": "/tmp/plato-phase4-harness-event-error-review/artifacts/ruff.log",
+        "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+        "bytes": 19
+      }
+    },
+    "source_and_evidence_audit": {
+      "matched_receipt_hash_bindings": 104,
+      "accepted_source_hashes_unchanged": 399,
+      "draft_empty_tasks_unchanged": 12,
+      "public_signatures_unchanged": true,
+      "audit": {
+        "path": "/tmp/plato-phase4-harness-event-error-review/artifacts/source-evidence-audit.json",
+        "sha256": "83cf808e77b5635c7f5636920b5a2f8f885dd95ac293b62592230b9ecc973955",
+        "bytes": 32093
+      }
+    },
+    "final_exact_process_identity_audit": {
+      "identities": 120,
+      "live_matching_identities": 0,
+      "audit": {
+        "path": "/tmp/plato-phase4-harness-event-error-review/artifacts/final-process-audit.json",
+        "sha256": "486603a3d7eb82c0d15d04a1b63dd3e7f4269bdfd7ec031f0687f9fd74e01e30",
+        "bytes": 34660
+      }
+    }
+  },
+  "inventory_assessment": {
+    "exact_current_nodes": {
+      "core": 1735,
+      "native": 383,
+      "runtime": 51,
+      "retained": 19,
+      "eval": 11
+    },
+    "runtime_partition": {
+      "startup": 48,
+      "feddyn": 3
+    },
+    "prior_core_nodes_retained": 1727,
+    "additional_contract_nodes": 8,
+    "prior_contract_nodes_retained": 92,
+    "current_contracts": 100,
+    "all_five_fresh_node_sets_match_author": true,
+    "phase4_worker_modules_imported_by_collections": [],
+    "existing_245_policy_gate": "Author receipts/log/JUnit hashes independently matched; unchanged policy source inspected and exact inventories independently re-collected. The 245 policy executions were not repeated because this fix changes only helper error handling and eight helper contracts."
+  },
+  "fixture_adjustments": [
+    {
+      "fixture": "recursive-details",
+      "initial_expectation": "1,500 nested arrays would force JSON RecursionError.",
+      "observed": "Python 3.13 serialized this depth. The valid registration was contained and run_case correctly failed on forced cleanup; this supplied no serialization-error result.",
+      "adjustment": "New recursive-overlimit-details fixture used 12,000 nested arrays, produced durable ChildRegistrationError with exact local cleanup, and passed. Original raw result remains preserved."
+    },
+    {
+      "fixture": "unrelated-stale",
+      "initial_expectation": "A stale unrelated creation identity would be rejected.",
+      "observed": "The accepted protocol legitimately returned already_gone for the nonexistent claimed exact creation identity, leaving the currently alive unrelated process untouched and outside ownership.",
+      "adjustment": "New unrelated-stale-control fixture asserts accepted already_gone success, no forced action, unrelated liveness and no owned identity. Original raw result remains preserved."
+    }
+  ],
+  "review_execution": {
+    "nested_agents": false,
+    "candidate_source_edits": false,
+    "publication": false,
+    "external_messages": false,
+    "shell": "zsh -lc",
+    "owned_environment": "/tmp/plato-phase4-harness-event-error-review/env",
+    "owned_scratch": "/tmp/plato-phase4-harness-event-error-review",
+    "provisioning": "UV_PROJECT_ENVIRONMENT=reviewer/env uv sync --locked --python 3.13 --group test-model-search --group dev --extra mlx --extra llm_eval",
+    "prior_environments_mutated": false,
+    "nltk_resources": "Read-only copied author NLTK resources into new reviewer-owned scratch; no prior environment synchronized.",
+    "fixture_cleanup": "Only reviewer-created controlled subprocess identities were recovered. Final read-only audit sent no signals."
+  },
+  "limitations": [
+    "The prior interrupted review remains explicitly incomplete and supplies no acceptance; this report is a fresh independent review.",
+    "The full training/runtime suites, policy245 execution and any draft-family qualification were not repeated. Fresh inventory collection is collection evidence only.",
+    "Disk failure preventing any event/result write is not made durable by this patch. No such IO reliability guarantee is added.",
+    "Unproven live direct hints never authorize signals. If OS ownership is unavailable before a creator dies, containment cannot be claimed solely from caller metadata."
+  ],
+  "review_artifact_manifest": [
+    {
+      "path": "/tmp/plato-phase4-harness-event-error-review/artifacts/circular-details.json",
+      "sha256": "7c34f3e5a43390fa0987894dd3b504c84eddf57b54678bc18e3c5a3157353fd8",
+      "bytes": 1609
+    },
+    {
+      "path": "/tmp/plato-phase4-harness-event-error-review/artifacts/contracts.log",
+      "sha256": "1c5e8819ce5e374622c48d5734ae9870aaa8f11004f6e7d3173d7e898f300b47",
+      "bytes": 255
+    },
+    {
+      "path": "/tmp/plato-phase4-harness-event-error-review/artifacts/contracts.xml",
+      "sha256": "244100c1dfee8185cdeee7f54102bc608e16c3564fec85b4b868da94552427b6",
+      "bytes": 16001
+    },
+    {
+      "path": "/tmp/plato-phase4-harness-event-error-review/artifacts/controls.log",
+      "sha256": "79c2c7c35371f8eb98b08284e6d39ac0942b32b44e9bc86049307027bf909c84",
+      "bytes": 423
+    },
+    {
+      "path": "/tmp/plato-phase4-harness-event-error-review/artifacts/core-collection.json",
+      "sha256": "09a5348c3b1d07b7cc68ad501a9c53aedf12335cdbfc7f6906e25427c21b449a",
+      "bytes": 620
+    },
+    {
+      "path": "/tmp/plato-phase4-harness-event-error-review/artifacts/core-collection.log",
+      "sha256": "1b90b212fca6d392dde408c1f60390d39fbf2f6865426053c3b6f4a0af50bbed",
+      "bytes": 195280
+    },
+    {
+      "path": "/tmp/plato-phase4-harness-event-error-review/artifacts/core-nodes.json",
+      "sha256": "9daa0cefda242a1b39e3346c4314010c799f85ed3ee7edfc0c82788238e39f55",
+      "bytes": 207364
+    },
+    {
+      "path": "/tmp/plato-phase4-harness-event-error-review/artifacts/eval-collection.json",
+      "sha256": "2a6c455a6d02978a140071df04bc196976842e8595f91cb70a58ca7fa4476ebd",
+      "bytes": 626
+    },
+    {
+      "path": "/tmp/plato-phase4-harness-event-error-review/artifacts/eval-collection.log",
+      "sha256": "4d6c7e194447e20680a9eccd109d614ea4b837a963f05f680e4328d77d909c2b",
+      "bytes": 1440
+    },
+    {
+      "path": "/tmp/plato-phase4-harness-event-error-review/artifacts/eval-nodes.json",
+      "sha256": "0a5a961467dab0f6ceff836a33611c3cd9eae0a9c5ff790e4e5f3e061295b768",
+      "bytes": 1294
+    },
+    {
+      "path": "/tmp/plato-phase4-harness-event-error-review/artifacts/final-process-audit.json",
+      "sha256": "486603a3d7eb82c0d15d04a1b63dd3e7f4269bdfd7ec031f0687f9fd74e01e30",
+      "bytes": 34660
+    },
+    {
+      "path": "/tmp/plato-phase4-harness-event-error-review/artifacts/independent-probes-complete.log",
+      "sha256": "634e973e650ac96b58c729b8bbbaf561f362711c76633272512e560235b9b14a",
+      "bytes": 28
+    },
+    {
+      "path": "/tmp/plato-phase4-harness-event-error-review/artifacts/independent-probes-final.log",
+      "sha256": "7b1d60ddf12d06b2df8d499e53c7a26e42cba5cbef94bc01b577d2dfd95b183c",
+      "bytes": 485
+    },
+    {
+      "path": "/tmp/plato-phase4-harness-event-error-review/artifacts/independent-probes.json",
+      "sha256": "1ba69ccb03caf7258a520a0a2325ef04afdea490bd4f7ff395f6eb3e768bfee2",
+      "bytes": 39822
+    },
+    {
+      "path": "/tmp/plato-phase4-harness-event-error-review/artifacts/independent-probes.log",
+      "sha256": "aafc39a0dfd611d690302dd935c1e5df9521f49bbe9ae3ddb9df803ab4c26f16",
+      "bytes": 483
+    },
+    {
+      "path": "/tmp/plato-phase4-harness-event-error-review/artifacts/independent-red-green.json",
+      "sha256": "a6e381cce00e3a77c2a4712bc11da8f3493d2543500acbe7c2b33e4131bc667c",
+      "bytes": 3250
+    },
+    {
+      "path": "/tmp/plato-phase4-harness-event-error-review/artifacts/independent-red-green.log",
+      "sha256": "156867cfb639c25288f97ba899cff19b10e049eee9743c166781bacb5c98194b",
+      "bytes": 52
+    },
+    {
+      "path": "/tmp/plato-phase4-harness-event-error-review/artifacts/native-collection.json",
+      "sha256": "834577810322b086133c706a01b87548bbe5babae9640ca51f83fea8362e31b9",
+      "bytes": 636
+    },
+    {
+      "path": "/tmp/plato-phase4-harness-event-error-review/artifacts/native-collection.log",
+      "sha256": "b9765d88c9bd905ad30ddadbf760e0d68e081c36e38a5f3d04f2c5e5adcf358f",
+      "bytes": 50680
+    },
+    {
+      "path": "/tmp/plato-phase4-harness-event-error-review/artifacts/native-nodes.json",
+      "sha256": "2e730bce5677e7f97e8b270ab6a33604513a75cc4ac8769a47402f8c6b8f9886",
+      "bytes": 53140
+    },
+    {
+      "path": "/tmp/plato-phase4-harness-event-error-review/artifacts/nested-unserializable.json",
+      "sha256": "5b336f6ff6bac7b6b676e4e06cd6e84e080c38a8a93affd514791f157a415532",
+      "bytes": 1652
+    },
+    {
+      "path": "/tmp/plato-phase4-harness-event-error-review/artifacts/nonfinite-details.json",
+      "sha256": "7f8a87550ea97d8409b4d8b4c63cef62c31f9990947267b9e4a11dbd7bbaedce",
+      "bytes": 1640
+    },
+    {
+      "path": "/tmp/plato-phase4-harness-event-error-review/artifacts/nonstring-mapping-key.json",
+      "sha256": "522a34ef1bf6b93a04ceea8e3bf8781900123e8a6a697fc90043f4ba17bda92e",
+      "bytes": 1657
+    },
+    {
+      "path": "/tmp/plato-phase4-harness-event-error-review/artifacts/oversized-details-number.json",
+      "sha256": "d18eead92566c01d6cd0e4544e1a85f1373d94d4958866d531c90f27a0c28ae3",
+      "bytes": 1738
+    },
+    {
+      "path": "/tmp/plato-phase4-harness-event-error-review/artifacts/provision.log",
+      "sha256": "5079569bd2c0d249c2340b5df63c0f0bcf5417bc09c3fc249423623cd833997c",
+      "bytes": 3935
+    },
+    {
+      "path": "/tmp/plato-phase4-harness-event-error-review/artifacts/recursive-overlimit-details.json",
+      "sha256": "4fb969103f862d7160418487496643c6540e471f7760e481eec250accb9ca4fc",
+      "bytes": 1703
+    },
+    {
+      "path": "/tmp/plato-phase4-harness-event-error-review/artifacts/reserved-created.json",
+      "sha256": "af2feb1f06d5edab769fc10e99ff8e0143815cabe7868318dcf1e90b178d6494",
+      "bytes": 1611
+    },
+    {
+      "path": "/tmp/plato-phase4-harness-event-error-review/artifacts/reserved-monotonic.json",
+      "sha256": "56b72e78ae304eae8ca0cb57d36654406c0aa89e7604312d8fad6eee9adb81f6",
+      "bytes": 1622
+    },
+    {
+      "path": "/tmp/plato-phase4-harness-event-error-review/artifacts/reserved-registration-id.json",
+      "sha256": "56b0d92fcb7581a997f1516a71eb5b90718df9c9866617345e57027632e88e07",
+      "bytes": 1652
+    },
+    {
+      "path": "/tmp/plato-phase4-harness-event-error-review/artifacts/retained-collection.json",
+      "sha256": "8908e94f6d24f858d0d9962372eb5752f404c2ad3bebdaf03b633988559150f8",
+      "bytes": 708
+    },
+    {
+      "path": "/tmp/plato-phase4-harness-event-error-review/artifacts/retained-collection.log",
+      "sha256": "c31731c34a0e596d3e01aa2ea705c2484d9f6c6af016f961ceea764f17d7e743",
+      "bytes": 1967
+    },
+    {
+      "path": "/tmp/plato-phase4-harness-event-error-review/artifacts/retained-nodes.json",
+      "sha256": "94cbc3b9bc6949dda3cbbdc31d8191aed7703b779cf66bd36e6af50cd1cd9c40",
+      "bytes": 1894
+    },
+    {
+      "path": "/tmp/plato-phase4-harness-event-error-review/artifacts/ruff.log",
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "bytes": 19
+    },
+    {
+      "path": "/tmp/plato-phase4-harness-event-error-review/artifacts/runtime-collection.json",
+      "sha256": "d6318609f3db80dd4e0c64d26b7b7f16182585b2e13d62899f77beabf78a4226",
+      "bytes": 680
+    },
+    {
+      "path": "/tmp/plato-phase4-harness-event-error-review/artifacts/runtime-collection.log",
+      "sha256": "80020f518acfe7054bf2e83851af52810f2f5474ed7a2eaca40acce7c6ca5fcf",
+      "bytes": 5950
+    },
+    {
+      "path": "/tmp/plato-phase4-harness-event-error-review/artifacts/runtime-nodes.json",
+      "sha256": "82453ac19627dbc0304fb0e1c58ec2996afc1409a151e09d663ecda441dafad1",
+      "bytes": 6078
+    },
+    {
+      "path": "/tmp/plato-phase4-harness-event-error-review/artifacts/source-evidence-audit.json",
+      "sha256": "83cf808e77b5635c7f5636920b5a2f8f885dd95ac293b62592230b9ecc973955",
+      "bytes": 32093
+    },
+    {
+      "path": "/tmp/plato-phase4-harness-event-error-review/artifacts/timestamp-bool.json",
+      "sha256": "35ff0a2af1300f566cff8424202d33276e4793180b63cf3204754f32923b0272",
+      "bytes": 1596
+    },
+    {
+      "path": "/tmp/plato-phase4-harness-event-error-review/artifacts/timestamp-infinity.json",
+      "sha256": "d6a3fe8f17ae66331a4de04daa60c277e115476f33e9e3374065b947a60aa350",
+      "bytes": 1627
+    },
+    {
+      "path": "/tmp/plato-phase4-harness-event-error-review/artifacts/timestamp-list.json",
+      "sha256": "41429fb5414107a39c7379b26a2044c1001f5b1748c745fc50a889d9b6714ca6",
+      "bytes": 1597
+    },
+    {
+      "path": "/tmp/plato-phase4-harness-event-error-review/artifacts/timestamp-nan.json",
+      "sha256": "ff8637cda14cf06cda7472f4ce550c742b8ff9f4d76a83757b3a44273103a22b",
+      "bytes": 1602
+    },
+    {
+      "path": "/tmp/plato-phase4-harness-event-error-review/artifacts/timestamp-negative.json",
+      "sha256": "c8ab68243eac4d0bdaffda2fe1901b5cfa3c7817cdf5c6a1d15aaf9fd3f9590b",
+      "bytes": 1624
+    },
+    {
+      "path": "/tmp/plato-phase4-harness-event-error-review/artifacts/timestamp-none.json",
+      "sha256": "9f40414159d65dd20d4f1e01f33f2ff290e7bf0815609dc4bdfd332b23b45e02",
+      "bytes": 1597
+    },
+    {
+      "path": "/tmp/plato-phase4-harness-event-error-review/artifacts/timestamp-overflow.json",
+      "sha256": "581248537c3ba364e62da2446ef4ab69b49864c34bd253fce10f651d0665e70a",
+      "bytes": 1626
+    },
+    {
+      "path": "/tmp/plato-phase4-harness-event-error-review/artifacts/timestamp-text.json",
+      "sha256": "ecdcbea758ab84fb05d99a190719433b7c55c473dd4c4a4f242b5b6e4a17457c",
+      "bytes": 1597
+    },
+    {
+      "path": "/tmp/plato-phase4-harness-event-error-review/artifacts/timestamp-zero.json",
+      "sha256": "dea527e7698593108c6b61089169debff2b3f246ea3a07e78bada93d4e89aae4",
+      "bytes": 1604
+    },
+    {
+      "path": "/tmp/plato-phase4-harness-event-error-review/artifacts/typing.log",
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "bytes": 19
+    },
+    {
+      "path": "/tmp/plato-phase4-harness-event-error-review/artifacts/unrelated-overflow.json",
+      "sha256": "8f2ff7dfd888c3e45e16cf7433ff27fdea5d22cc0decf26fc9702524d1b6ebb1",
+      "bytes": 1516
+    },
+    {
+      "path": "/tmp/plato-phase4-harness-event-error-review/artifacts/unrelated-reserved.json",
+      "sha256": "261fc7f36fd13540532b19cdbb013cdd206e63576378b23fb3aed56e59cb4a97",
+      "bytes": 1510
+    },
+    {
+      "path": "/tmp/plato-phase4-harness-event-error-review/artifacts/unrelated-serialize.json",
+      "sha256": "37e598a3f835b0ff458ae6e52d5e0fb9073811a701de1c23c1ec12dfe3eba10d",
+      "bytes": 1531
+    },
+    {
+      "path": "/tmp/plato-phase4-harness-event-error-review/artifacts/unrelated-stale-control.json",
+      "sha256": "ee897283c78d65b776103b08beb31820c8ddbb361364c9033cf928d4dd98b371",
+      "bytes": 1091
+    },
+    {
+      "path": "/tmp/plato-phase4-harness-event-error-review/artifacts/unserializable-case.json",
+      "sha256": "654119f98fa3d1b45cc1a5698fb755dea277ba1e5c3e9945252660a352d444d4",
+      "bytes": 1643
+    },
+    {
+      "path": "/tmp/plato-phase4-harness-event-error-review/artifacts/valid-detached-natural.json",
+      "sha256": "38c9d9b37096fbfd8f4c7a7ece8dbe40555908cac62ddc401dec64b1c9c2f03e",
+      "bytes": 1086
+    },
+    {
+      "path": "/tmp/plato-phase4-harness-event-error-review/reviewer_probes.py",
+      "sha256": "528bb6191272cc6d5bcb73f471336d2ed928c8c792096e80b2eaef08ac42d551",
+      "bytes": 9471
+    },
+    {
+      "path": "/tmp/plato-phase4-harness-event-error-review/red_green_probe.py",
+      "sha256": "f01906269d38564336ffd14805cbefe85b94b09caa9816b72cb67fd4897df080",
+      "bytes": 2936
+    },
+    {
+      "path": "/tmp/plato-phase4-harness-event-error-review/review_controls.py",
+      "sha256": "ef94f388f83b3dc103f9b054a6907a9b58a4db10a1dfbec8188a0ea621a2270c",
+      "bytes": 5880
+    },
+    {
+      "path": "/tmp/plato-phase4-harness-event-error-review/collection_launcher.py",
+      "sha256": "a8a3c4b07175a8127a9b77add1d9edde99e4a69b54dcc5786d6e15f4d4041491",
+      "bytes": 655
+    },
+    {
+      "path": "/tmp/plato-phase4-harness-event-error-review/finalize_review.py",
+      "sha256": "e950684077d2ca714753ac3ffce06d1e45bdec6b605bcaf3d85ed2fec6c210d8",
+      "bytes": 13107
+    }
+  ]
+}

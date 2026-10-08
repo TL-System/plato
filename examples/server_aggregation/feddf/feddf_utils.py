@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Sized
 from typing import Any
 
 import torch
@@ -29,6 +30,8 @@ def select_proxy_subset(
     seed: int,
 ) -> tuple[Subset, list[int]]:
     """Build a deterministic subset of the shared proxy dataset."""
+    if not isinstance(dataset, Sized):
+        raise TypeError("FedDF requires a sized proxy dataset.")
     total_examples = len(dataset)
     if total_examples == 0:
         raise ValueError("FedDF proxy dataset is empty.")

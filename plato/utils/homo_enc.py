@@ -57,12 +57,11 @@ def encrypt_weights(
         weights_vector = np.append(weights_vector, weight)
 
     # Step 2: set up the indices for encrypted weights
-    encrypt_indices = None
     if indices is None:
         encrypt_indices = np.arange(len(weights_vector)).tolist()
     else:
-        encrypt_indices = indices
-    encrypt_indices.sort()
+        encrypt_indices = sorted(indices)
+    _validate_indices(encrypt_indices, len(weights_vector))
 
     # Step 3: separate weights into encrypted and unencrypted ones
     unencrypted_weights = np.delete(weights_vector, encrypt_indices)
@@ -120,6 +119,8 @@ def decrypt_weights(
     # Step 1: decrypt the encrypted weights
     plaintext_weights_vector = None
     unencrypted_weights, encrypted_weights, indices = extract_encrypted_model(data)
+    expected_length = sum(para_nums.values())
+    validate_encrypted_model(data, expected_length)
 
     if len(indices) != 0:
         decrypted_vector = np.array(encrypted_weights.decrypt())
@@ -150,6 +151,32 @@ def decrypt_weights(
         weight_index = weight_index + 1
 
     return decrypted_weights
+
+
+def _validate_indices(indices, vector_size: int) -> None:
+    if any(
+        not isinstance(idx, (int, np.integer)) or not 0 <= idx < vector_size
+        for idx in indices
+    ) or len(indices) != len(set(indices)):
+        raise ValueError(
+            "HE mask indices must be unique integers within the model size."
+        )
+
+
+def validate_encrypted_model(data: Mapping[str, Any], vector_size: int) -> None:
+    """Validate the hybrid model layout before arithmetic or reconstruction."""
+    unencrypted, encrypted, indices = extract_encrypted_model(data)
+    _validate_indices(indices, vector_size)
+    plain = np.asarray(unencrypted)
+    if plain.ndim != 1 or len(plain) + len(indices) != vector_size:
+        raise ValueError("HE plaintext/mask length does not match the model size.")
+    if not np.isfinite(plain).all():
+        raise ValueError("HE plaintext must be finite.")
+    if bool(indices) != (encrypted is not None):
+        raise ValueError("HE encrypted vector and mask must be present together.")
+    if encrypted is not None and not isinstance(encrypted, bytes):
+        if encrypted.size() != len(indices):
+            raise ValueError("HE encrypted vector length does not match the mask.")
 
 
 def wrap_encrypted_model(unencrypted_weights, encrypted_weights, indices):

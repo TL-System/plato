@@ -1,0 +1,80 @@
+{
+  "date": "2026-10-03",
+  "status": "EXPLICIT_USER_INSTRUCTIONS_SUPERSEDE_EARLIER_PLAN_BOUNDARIES",
+  "publication": {
+    "date": "2026-10-03",
+    "user_instruction": "Merge PRs (and start new PRs) based on your own judgment call, writing the PR description yourself. I will not manually merge PRs.",
+    "effect": "Root writes PR descriptions and may ready/merge coherent validated batches and open subsequent PRs without asking user to merge. This supersedes earlier no-main-merge boundary and delegation of final PR-description writing.",
+    "current": "PR417 Phase1+Phase2 remains draft while Linux qualification is pending. Use normal repository checks and protect exact head when merging."
+  },
+  "archives": {
+    "status": "USER_EXPLICITLY_SELECTED_ALL_SHORTLIST_CANDIDATES_FOR_ARCHIVAL",
+    "date": "2026-10-03",
+    "question": "Other archival candidates, perhaps MobileNet?",
+    "recommendations": [
+      {
+        "path": "examples/model_search/pfedrlnas/MobileNetV3",
+        "priority": "strong candidate",
+        "basis": "Custom NAS supernet directly imports VIT.nasvit_wrapper; retiring together may remove the need to relocate its shared NAS closure. Existing accepted plan still preserves it until a reviewed disposition change."
+      },
+      {
+        "paths": [
+          "examples/model_search/fedrlnas",
+          "examples/model_search/pfedrlnas/DARTS"
+        ],
+        "priority": "assess together",
+        "basis": "Duplicated vendored DARTS implementations, legacy Variable/.data and hard-coded CUDA; research utility and maintenance burden determine retirement, not age alone."
+      },
+      {
+        "path": "examples/model_search/fedtp",
+        "priority": "already selected ViT dependency boundary",
+        "basis": "Supplied configs use the retiring ViT factory."
+      },
+      {
+        "paths": [
+          "examples/model_search/anycostfl/vit.py",
+          "examples/model_search/fedrolex/vit.py"
+        ],
+        "priority": "strong variant candidates",
+        "basis": "Independent ViT variants; preserve ResNet paths and shared entrypoints."
+      },
+      {
+        "path": "examples/model_search/heterofl/mobilenetv3.py",
+        "priority": "lower priority branch candidate",
+        "basis": "Independent custom MobileNet implementation; preserve HeteroFL ResNet. No NASViT dependency."
+      }
+    ],
+    "already_outdated": [
+      "norm_bounding",
+      "fjord",
+      "fl_maml",
+      "cs_maml"
+    ],
+    "source": "https://docs.pytorch.org/vision/main/models/mobilenetv3.html",
+    "boundary": "Archive pFedRLNAS MobileNetV3, FedRLNAS, pFedRLNAS DARTS, FedTP, AnyCostFL and FedRolex ViT-specific variants, and HeteroFL custom MobileNetV3 branch. Preserve HeteroFL/AnyCostFL/FedRolex ResNet paths and shared active logic. Existing outdated families remain historical and get accurate indexing. This supersedes the accepted addendum requirement to preserve MobileNetV3/DARTS and to extract a shared NAS closure solely for those retired consumers. Verify any other active consumers before retiring shared code; retain provenance/licenses/reproduction. Root obtains bounded archive-boundary plan/review in Phase4 before implementation.",
+    "authorization": "2026-10-03: Archive everything on your recommended short list."
+  },
+  "python": {
+    "date": "2026-10-03",
+    "instruction": "Proceed to simplify to 3.13 and revisit 3.14 later (CI work does not need it).",
+    "active_python": "3.13",
+    "effect": "Python3.13 is sole active CI and qualification target for remaining refresh. Retain existing3.14 compatibility fixes and historical evidence; do not artificially exclude3.14 through upper bounds. Revisit broader3.14 support later. Root explicitly handed this policy to activeCIauthor and freshreviewer."
+  },
+  "cleanup": {
+    "instruction": "Clean up the herdr workspaces and worktree tasks are completed and their related PRs are merged.",
+    "interpretation": "Close only task-owned completed agent workspaces and remove owned worktrees/scratch after their associated PR is merged. Preserve user workspaces w1/wR, rootw2, root .venv and shared caches/environments."
+  },
+  "current": "PR417 remains unmerged pending the reviewed CI correction and successful Python3.13 Linux qualification.",
+  "latest_retirement_update": {
+    "timestamp": "2026-10-03T16:20:51.754446+00:00",
+    "nanochat": "User explicitly instructed retiring Nanochat and replacing it with a new, modern, open-source LLM.",
+    "lerobot": "User explicitly instructed 'Retire LeRobot too.' Archive LeRobot and dedicated SmolVLA integration unconditionally.",
+    "conditional_request_superseded": true,
+    "rationale": "Explicit product-scope decisions. Do not misrepresent the retired integrations as unavoidable Python 3.14 package blockers.",
+    "evidence": "Pinned Nanochat PyO3 0.23.5 build fails Python3.14; current published rustbpe works. LeRobot conflicts with refreshed core floors on both interpreters, but an isolated LeRobot0.6.1 training/SmolVLA install and real imports passed Python3.14 after NumPy2.2.6 source build. Neither retirement is described as an unavoidable Python3.14 requirement.",
+    "preservation": "Archive original source, licenses/provenance, configs and reproduction notes; remove active registrations/extras/workspace/test/docs references coherently.",
+    "replacement": "Select a current small openly licensed LLM through existing Hugging Face/PEFT integration, with real training and adapter validation.",
+    "python_policy": "3.13 remains default/CI until user changes it.",
+    "codex_agents": "Use internal collaboration mechanism; herdr reserved for Claude."
+  }
+}

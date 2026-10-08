@@ -5,10 +5,11 @@ This module provides a differential privacy trainer that uses the composable
 trainer pattern with custom strategies and callbacks instead of inheritance.
 """
 
+import copy
 import logging
 import time
 from collections.abc import Callable, Iterable
-from typing import Optional
+from typing import Any, Optional
 
 import torch
 import torch.nn as nn
@@ -24,28 +25,25 @@ from plato.config import Config
 from plato.trainers.composable import ComposableTrainer
 from plato.trainers.strategies.base import (
     DataLoaderStrategy,
+    ModelUpdateStrategy,
     OptimizerStrategy,
     TrainingContext,
     TrainingStepStrategy,
 )
+from plato.utils.checkpoint_paths import checkpoint_name
 
 
 class DifferentialPrivacyCallback(TrainerCallback):
     """
     Callback to handle differential privacy setup and cleanup.
 
-    This callback wraps the model with GradSampleModule at training start
-    and cleans up the state dict at training end.
+    PrivacyEngine owns wrapping. This callback releases its hooks at run end.
     """
 
     def on_train_run_start(self, trainer, config, **kwargs):
-        """Wrap model with GradSampleModule for differential privacy."""
-        trainer.model = GradSampleModule(trainer.model)
-
-        logging.info(
-            "[Client #%s] Model wrapped with GradSampleModule for differential privacy.",
-            trainer.client_id,
-        )
+        """Synchronize the plain model before PrivacyEngine wraps it."""
+        trainer.context.model = trainer.model
+        trainer.model_state_dict = None
 
     def on_train_run_end(self, trainer, config, **kwargs):
         """
@@ -54,10 +52,10 @@ class DifferentialPrivacyCallback(TrainerCallback):
         After GradSampleModule conversion, state_dict names have a '_module' prefix.
         We need to save weights with the original layer names without the prefix.
         """
-        trainer.model_state_dict = {
-            k[8:] if "_module." in k else k: v
-            for k, v in trainer.model.state_dict().items()
-        }
+        if isinstance(trainer.model, GradSampleModule):
+            trainer.model = trainer.model.to_standard_module()
+        trainer.context.model = trainer.model
+        trainer.model_state_dict = None
 
         logging.info(
             "[Client #%s] Cleaned up GradSampleModule wrapper from state dict.",
@@ -209,7 +207,8 @@ class DPOptimizerStrategy(OptimizerStrategy):
         )
 
         # Create privacy engine
-        self.privacy_engine = PrivacyEngine(accountant="rdp", secure_mode=False)
+        if self.privacy_engine is None:
+            self.privacy_engine = PrivacyEngine(accountant="rdp", secure_mode=False)
 
         # Make model, optimizer, and data loader private
         private_result = self.privacy_engine.make_private_with_epsilon(
@@ -228,6 +227,8 @@ class DPOptimizerStrategy(OptimizerStrategy):
             )
 
         private_model, private_optimizer, private_train_loader = private_result[:3]
+        if not isinstance(private_model, nn.Module):
+            raise RuntimeError("PrivacyEngine did not return a wrapped model")
         context.state["privacy_engine_metadata"] = private_result[3:]
 
         # Update context with private train loader
@@ -238,6 +239,49 @@ class DPOptimizerStrategy(OptimizerStrategy):
         context.model = private_model
 
         return private_optimizer
+
+
+class DPAccountingStateStrategy(ModelUpdateStrategy):
+    """Return Opacus accounting from successful workers to their logical client.
+
+    This preserves the library ledger in memory across runs and reassignment.
+    Calibration remains per run; this is not a global privacy-budget promise or
+    a durable ledger for interrupted child processes or application restarts.
+    """
+
+    def __init__(self, optimizer_strategy: DPOptimizerStrategy):
+        self.optimizer_strategy = optimizer_strategy
+        self._client_id = 0
+        self._client_states: dict[int, Any] = {}
+
+    @property
+    def requires_worker_state(self) -> bool:
+        return True
+
+    def get_worker_state(self, context: TrainingContext) -> Any:
+        engine = self.optimizer_strategy.privacy_engine
+        if engine is None:
+            raise RuntimeError("DP worker has no privacy accountant.")
+        return copy.deepcopy(engine.accountant.state_dict())
+
+    def load_worker_state(self, state: Any, context: TrainingContext) -> None:
+        if not isinstance(state, dict):
+            raise ValueError("DP worker accounting state is missing.")
+        engine = self.optimizer_strategy.privacy_engine
+        if engine is None:
+            engine = PrivacyEngine(accountant="rdp", secure_mode=False)
+            self.optimizer_strategy.privacy_engine = engine
+        # Use Opacus' supported decoder, including its mechanism check.
+        engine.accountant.load_state_dict(copy.deepcopy(state))
+
+    def on_client_id_changed(self, context: TrainingContext) -> None:
+        if self.optimizer_strategy.privacy_engine is not None:
+            self._client_states[self._client_id] = self.get_worker_state(context)
+        self.optimizer_strategy.privacy_engine = None
+        self._client_id = context.client_id
+        context.state.pop("privacy_engine_metadata", None)
+        if context.client_id in self._client_states:
+            self.load_worker_state(self._client_states[context.client_id], context)
 
 
 class DPTrainingStepStrategy(TrainingStepStrategy):
@@ -273,6 +317,8 @@ class DPTrainingStepStrategy(TrainingStepStrategy):
         Returns:
             Loss value for this step
         """
+        if not isinstance(optimizer, DPOptimizer):
+            raise TypeError("DP training requires an Opacus DPOptimizer")
         optimizer.zero_grad(set_to_none=True)
 
         outputs = model(examples)
@@ -286,6 +332,9 @@ class DPTrainingStepStrategy(TrainingStepStrategy):
             loss.backward()
 
         optimizer.step()
+        # BatchMemoryManager still clips/accumulates each physical batch, but
+        # only the last part of a logical batch updates weights/accounting.
+        context.state["optimizer_step_completed"] = not optimizer._is_last_step_skipped
 
         return loss
 
@@ -340,7 +389,7 @@ class Trainer(ComposableTrainer):
             optimizer_strategy=dp_optimizer_strategy,
             training_step_strategy=dp_training_step_strategy,
             lr_scheduler_strategy=None,  # Uses DefaultLRSchedulerStrategy
-            model_update_strategy=None,  # Uses NoOpUpdateStrategy
+            model_update_strategy=DPAccountingStateStrategy(dp_optimizer_strategy),
             data_loader_strategy=dp_data_loader_strategy,
         )
 
@@ -354,11 +403,43 @@ class Trainer(ComposableTrainer):
         if len(errors) > 0:
             fixed_model = ModuleValidator.fix(model)
             self.model = fixed_model
+            self.context.model = fixed_model
             errors = ModuleValidator.validate(fixed_model, strict=False)
             assert len(errors) == 0
             logging.info("Model validated and fixed for differential privacy.")
 
+    def save_model(self, filename=None, location=None):
+        """Snapshot plain model keys without removing live Opacus hooks."""
+        model = self._require_model()
+        if not isinstance(model, GradSampleModule) or self.model_state_dict is not None:
+            return super().save_model(filename, location)
+
+        previous_state = self.model_state_dict
+        try:
+            self.model_state_dict = model.get_submodule("_module").state_dict()
+            return super().save_model(filename, location)
+        finally:
+            self.model_state_dict = previous_state
+
     def train_model(self, config, trainset, sampler, **kwargs):
+        """Train with reusable Opacus hooks and exception-safe unwrapping.
+
+        The accountant is retained across these runs. Epsilon calibration is
+        per run, as in Opacus; this is not a global federated privacy budget.
+        """
+        try:
+            return self._train_model_private(config, trainset, sampler, **kwargs)
+        finally:
+            if isinstance(self.context.model, GradSampleModule):
+                self.model = self.context.model.to_standard_module()
+            elif isinstance(self.model, GradSampleModule):
+                self.model = self.model.to_standard_module()
+            self.context.model = self.model
+            self.model_state_dict = None
+            self._require_model().zero_grad(set_to_none=True)
+            self.context.state["optimizer_step_completed"] = False
+
+    def _train_model_private(self, config, trainset, sampler, **kwargs):
         """
         Training loop with BatchMemoryManager for differential privacy.
 
@@ -380,6 +461,7 @@ class Trainer(ComposableTrainer):
 
         # Strategy hook: on_train_start
         self.model_update_strategy.on_train_start(self.context)
+        self.loss_strategy.on_train_start(self.context)
 
         # Create data loader using strategy (creates Subset)
         self.train_loader = self.data_loader_strategy.create_train_loader(
@@ -499,18 +581,14 @@ class Trainer(ComposableTrainer):
                     # Store last loss in context
                     self.context.state["last_loss"] = loss.item()
 
-                    # Strategy hook: after optimizer step
-                    self.optimizer_strategy.on_optimizer_step(
-                        self.optimizer, self.context
-                    )
-
-                    # Strategy hook: after_step
-                    self.model_update_strategy.after_step(self.context)
-
-                    # Callbacks: step end
-                    self.callback_handler.call_event(
-                        "on_train_step_end", self, config, batch=batch_id, loss=loss
-                    )
+                    if self.context.state["optimizer_step_completed"]:
+                        self.optimizer_strategy.on_optimizer_step(
+                            self.optimizer, self.context
+                        )
+                        self.model_update_strategy.after_step(self.context)
+                        self.callback_handler.call_event(
+                            "on_train_step_end", self, config, batch=batch_id, loss=loss
+                        )
 
             # LR scheduler step
             self.lr_scheduler_strategy.step(self.lr_scheduler, self.context)
@@ -536,8 +614,9 @@ class Trainer(ComposableTrainer):
             ):
                 model.cpu()
                 training_time = time.perf_counter() - tic
-                filename = (
-                    f"{self.client_id}_{self.current_epoch}_{training_time}.safetensors"
+                filename = checkpoint_name(
+                    self.client_id, self.current_epoch, str(training_time),
+                    suffix=".safetensors",
                 )
                 self.save_model(filename)
                 model.to(self.device)

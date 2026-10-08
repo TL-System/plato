@@ -1,0 +1,90 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-03",
+  "base_commit": "a8bdf23d775ce159ad44f6737309057acb1ff0a4",
+  "base_tree": "87e57de47463bed19c54de548b749798f17dcf09",
+  "uv_lock_sha256": "46236f61039c07a844bbddaa185c32582b6f4436203bd719aa8e7dcfdbd26e89",
+  "python": "3.13.16",
+  "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+  "packages": {
+    "lighteval": "0.13.0",
+    "torch": "2.14.1",
+    "transformers": "5.18.0",
+    "datasets": "5.0.1",
+    "xxhash": "4.0.1",
+    "nltk": "3.10.3",
+    "langdetect": "1.0.9"
+  },
+  "install": {
+    "command": "uv sync --locked --python 3.13 --extra llm_eval --group dev",
+    "log": "Using CPython 3.13.16\nCreating virtual environment at: .venv\nResolved 268 packages in 11ms\n   Building plato-learn @ file:///private/tmp/plato-refresh-worktrees/lighteval-runtime\n      Built plato-learn @ file:///private/tmp/plato-refresh-worktrees/lighteval-runtime\nPrepared 1 package in 263ms\nInstalled 177 packages in 636ms\n + absl-py==2.5.0\n + accelerate==1.15.0\n + aenum==3.1.15\n + agent-client-protocol==0.12.1\n + aiobotocore==3.9.2\n + aiohappyeyeballs==2.7.1\n + aiohttp==3.14.3\n + aioitertools==0.13.0\n + aiosignal==1.4.0\n + annotated-doc==0.0.5\n + annotated-types==0.8.0\n + antlr4-python3-runtime==4.13.2\n + anyio==4.15.1\n + attrs==26.1.0\n + beautifulsoup4==4.15.0\n + bidict==0.24.1\n + boto3==1.43.106\n + botocore==1.43.106\n + certifi==2026.7.22\n + chardet==6.0.0.post1\n + charset-normalizer==3.5.2\n + click==8.5.0\n + cloudpickle==3.1.2\n + colorama==0.4.6\n + colorlog==6.12.0\n + coverage==7.16.2\n + dataproperty==1.1.1\n + datasets==5.0.1\n + debugpy==1.8.22\n + defusedxml==0.7.1\n + dill==0.4.1\n + docstring-parser==0.18.0\n + evaluate==0.4.6\n + farama-notifications==0.0.6\n + fastapi==0.142.2\n + filelock==4.0.9\n + frozenlist==1.8.0\n + fsspec==2026.6.0\n + gdown==6.4.1\n + gitdb==4.0.12\n + gitpython==3.2.0\n + gymnasium==1.3.0\n + h11==0.16.0\n + hf-xet==1.6.0\n + httpcore==1.0.9\n + httpcore2==2.13.1\n + httpx==0.28.1\n + httpx2==2.13.1\n + huggingface-hub==1.33.0\n + idna==3.20\n + ijson==3.5.1\n + iniconfig==2.3.0\n + inspect-ai==0.3.275\n + jinja2==3.1.6\n + jiter==0.17.0\n + jmespath==1.1.0\n + joblib==1.6.0\n + jsonlines==4.0.0\n + jsonpatch==1.33\n + jsonpath-ng==1.8.0\n + jsonpointer==3.1.1\n + jsonref==1.1.0\n + jsonschema==4.26.0\n + jsonschema-specifications==2025.9.1\n + kazoo==2.11.0\n + langcodes==3.5.1\n + langdetect==1.0.9\n + latex2sympy2-extended==1.0.6\n + lighteval==0.13.0\n + linkify-it-py==2.2.0\n + lxml==6.1.3\n + markdown-it-py==4.2.0\n + markupsafe==3.0.3\n + mbstrdecoder==1.1.5\n + mdit-py-plugins==0.6.1\n + mdurl==0.1.2\n + mmh3==5.3.1\n + mpmath==1.3.0\n + multidict==6.9.1\n + multiprocess==0.70.19\n + munch==4.0.0\n + narwhals==2.26.0\n + nest-asyncio2==1.7.3\n + networkx==3.7\n + nltk==3.10.3\n + numpy==2.5.3\n + opacus==1.6.0\n + openai==3.23.0\n + opentelemetry-api==1.45.0\n + opt-einsum==3.4.0\n + packaging==26.3\n + pandas==3.0.6\n + pathlib-abc==0.5.2\n + pathvalidate==3.3.1\n + peft==0.21.2\n + pillow==12.3.0\n + platformdirs==4.12.2\n + plato-learn==1.4.3 (from file:///private/tmp/plato-refresh-worktrees/lighteval-runtime)\n + pluggy==1.6.0\n + portalocker==4.4.0\n + propcache==0.5.4\n + protobuf==7.36.2\n + psutil==7.2.2\n + pyarrow==25.0.1\n + pycountry==26.2.16\n + pydantic==2.13.5\n + pydantic-core==2.46.5\n + pygments==2.21.0\n + pysocks==1.7.1\n + pytablewriter==1.2.1\n + pytest==9.1.1\n + pytest-cov==7.1.0\n + python-dateutil==2.9.0.post0\n + python-dotenv==1.2.4\n + python-engineio==4.14.0\n + python-socketio==5.17.0\n + pytorch-ranger==0.1.1\n + pytz==2026.4\n + pyyaml==6.0.3\n + referencing==0.37.0\n + regex==2026.9.29\n + requests==2.34.2\n + rich==15.0.0\n + rouge-score==0.1.2\n + rpds-py==2026.6.3\n + ruff==0.16.10\n + s3fs==2026.6.0\n + s3transfer==0.19.2\n + sacrebleu==2.6.0\n + safetensors==0.8.0\n + scikit-learn==1.9.1\n + scipy==1.18.1\n + semver==3.1.0\n + sentencepiece==0.2.2\n + setuptools==84.0.0\n + shellingham==1.5.4\n + shortuuid==1.0.13\n + simple-websocket==1.1.0\n + six==1.17.0\n + smmap==5.0.3\n + sniffio==1.3.1\n + soupsieve==2.10\n + starlette==1.7.0\n + sympy==1.14.0\n + tabledata==1.3.5\n + tabulate==0.10.0\n + tcolorpy==0.1.7\n + tenacity==9.1.4\n + tenseal==0.3.18\n + termcolor==2.3.0\n + textual==8.2.8\n + threadpoolctl==3.7.0\n + tiktoken==0.14.0\n + timm==1.0.30\n + tokenizers==0.23.2\n + torch==2.14.1\n + torch-optimizer==0.3.0\n + torchvision==0.29.1\n + tqdm==4.70.1\n + transformers==5.18.0\n + truststore==0.10.4\n + ty==0.0.84\n + typepy==1.3.5\n + typer==0.27.2\n + typing-extensions==4.16.0\n + typing-inspection==0.4.4\n + universal-pathlib==0.3.10\n + urllib3==2.8.0\n + uvicorn==0.54.0\n + wrapt==2.5.0\n + wsproto==1.3.2\n + xxhash==4.0.1\n + yarl==1.25.1\n + zipfile-zstd==0.0.4\n + zipp==4.1.0\n + zstandard==0.25.0\n + zstd==1.5.7.2\n"
+  },
+  "reproduction": {
+    "command": "PYTHONPATH=. config_file=tests/config.toml .venv/bin/python -u /tmp/plato-lighteval-probe.py",
+    "script": "import json\nimport os\nimport tempfile\nfrom pathlib import Path\n\nos.environ['HF_HUB_OFFLINE'] = '1'\nos.environ['HF_DATASETS_OFFLINE'] = '1'\nos.environ['TOKENIZERS_PARALLELISM'] = 'false'\nos.environ['ACCELERATE_USE_CPU'] = 'true'\n\nimport torch\nfrom datasets import Dataset\nfrom tokenizers import Tokenizer\nfrom tokenizers.models import WordLevel\nfrom tokenizers.pre_tokenizers import Whitespace\nfrom transformers import GPT2Config, GPT2LMHeadModel, PreTrainedTokenizerFast\n\nfrom plato.evaluators.lighteval import LightevalModelReference, _run_lighteval_pipeline\nfrom plato.evaluators.lighteval_tasks import piqa_hf\n\nwith tempfile.TemporaryDirectory(prefix='plato-lighteval-probe-') as temp:\n    root = Path(temp)\n    data = root / 'data'\n    data.mkdir()\n    Dataset.from_list([\n        {'goal':'first', 'sol1':'correct', 'sol2':'incorrect', 'label':0},\n        {'goal':'second', 'sol1':'incorrect', 'sol2':'correct', 'label':1},\n    ]).to_parquet(str(data / 'validation.parquet'))\n    piqa_hf.hf_repo = str(data)\n    vocab = {'A':0, 'B':1, '[EOS]':2, '[UNK]':3}\n    backend = Tokenizer(WordLevel(vocab=vocab, unk_token='[UNK]'))\n    backend.pre_tokenizer = Whitespace()\n    tokenizer = PreTrainedTokenizerFast(tokenizer_object=backend, eos_token='[EOS]', unk_token='[UNK]', pad_token='[EOS]', model_max_length=64)\n    model = GPT2LMHeadModel(GPT2Config(vocab_size=4, n_positions=64, n_embd=8, n_layer=1, n_head=1, bos_token_id=2, eos_token_id=2, pad_token_id=2))\n    with torch.no_grad():\n        for parameter in model.parameters():\n            parameter.zero_()\n    model_dir = root / 'model'\n    model.save_pretrained(model_dir)\n    tokenizer.save_pretrained(model_dir)\n    raw = _run_lighteval_pipeline(model_reference=LightevalModelReference(str(model_dir), str(model_dir)), tasks=['piqa'], backend='transformers', config={'device':'cpu', 'max_length':64, 'dtype':'float32'})\n    print(json.dumps({'raw':raw, 'model_files':[str(p.relative_to(model_dir)) for p in model_dir.rglob('*') if p.is_file()]}, sort_keys=True))\n",
+    "log": "\nCreating parquet from Arrow format:   0%|          | 0/1 [00:00<?, ?ba/s]\nCreating parquet from Arrow format: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 786.04ba/s]\n\nWriting model shards:   0%|          | 0/1 [00:00<?, ?it/s]\nWriting model shards: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 927.74it/s]\n[INFO][16:53:49]: --- INIT SEEDS ---\n[INFO][16:53:49]: --- LOADING TASKS ---\n/private/tmp/plato-refresh-worktrees/lighteval-runtime/.venv/lib/python3.13/site-packages/huggingface_hub/utils/_deprecation.py:100: FutureWarning: Deprecated argument(s) used in 'list_models': model_name. Will not be supported from version '2.0'.\n\nUse `search` instead.\n  warnings.warn(message, FutureWarning)\n[INFO][16:53:49]: Loaded 647 task configs in 0.1 seconds\n[WARNING][16:53:49]: Careful, the task piqa_hf is using evaluation data to build the few shot examples.\n\nGenerating validation split: 0 examples [00:00, ? examples/s]\nGenerating validation split: 2 examples [00:00, 671.57 examples/s]\n[INFO][16:53:49]: Test gather tensor\n[INFO][16:53:49]: gathered_tensor tensor([0]), should be [0]\n[INFO][16:53:49]: --- LOADING MODEL ---\n[INFO][16:53:49]: Tokenizer truncation and padding size set to the left side.\n[INFO][16:53:49]: Model parallel was set to False, max memory set to None and device map to None\n[transformers] `torch_dtype` is deprecated! Use `dtype` instead!\n\nLoading weights:   0%|          | 0/16 [00:00<?, ?it/s]\nLoading weights: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 16/16 [00:00<00:00, 16380.00it/s]\n[INFO][16:53:49]: Using Data Parallelism, putting model on device cpu\n[INFO][16:53:49]: [CACHING] Initializing data cache\n[INFO][16:53:49]: --- RUNNING MODEL ---\n[INFO][16:53:49]: Running SamplingMethod.GENERATIVE requests\n[INFO][16:53:49]: Cache: Starting to process 2/2 samples (not found in cache) for tasks piqa_hf|0 (19257b0fa7c5bdd7, GENERATIVE)\n[WARNING][16:53:49]: You cannot select the number of dataset splits for a generative evaluation at the moment. Automatically inferring.\n\nSplits:   0%|          | 0/1 [00:00<?, ?it/s]\n\nGreedy generation:   0%|          | 0/2 [00:00<?, ?it/s]\u001b[A[transformers] The following generation flags are not valid and may be ignored: ['temperature']. Set `TRANSFORMERS_VERBOSITY=info` for more details.\n\n\n                                                        \u001b[A\nSplits: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 107.52it/s]\n\nCreating parquet from Arrow format:   0%|          | 0/1 [00:00<?, ?ba/s]\nCreating parquet from Arrow format: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 3679.21ba/s]\n[INFO][16:53:49]: Cached 2 samples of piqa_hf|0 (19257b0fa7c5bdd7, GENERATIVE) at /var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-probe-t86qpeq2/model/78badcf64ce3fac1/piqa_hf|0/19257b0fa7c5bdd7/GENERATIVE.parquet.\n\nGenerating train split: 0 examples [00:00, ? examples/s]\nGenerating train split: 2 examples [00:00, 1187.01 examples/s]\n[INFO][16:53:49]: --- POST-PROCESSING MODEL RESPONSES ---\n[INFO][16:53:49]: --- COMPUTING METRICS ---\nTraceback (most recent call last):\n  File \"/tmp/plato-lighteval-probe.py\", line 41, in <module>\n    raw = _run_lighteval_pipeline(model_reference=LightevalModelReference(str(model_dir), str(model_dir)), tasks=['piqa'], backend='transformers', config={'device':'cpu', 'max_length':64, 'dtype':'float32'})\n  File \"/private/tmp/plato-refresh-worktrees/lighteval-runtime/plato/evaluators/lighteval.py\", line 401, in _run_lighteval_pipeline\n    pipeline.evaluate()\n    ~~~~~~~~~~~~~~~~~^^\n  File \"/private/tmp/plato-refresh-worktrees/lighteval-runtime/.venv/lib/python3.13/site-packages/lighteval/pipeline.py\", line 291, in evaluate\n    self._compute_metrics(outputs)\n    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^\n  File \"/private/tmp/plato-refresh-worktrees/lighteval-runtime/.venv/lib/python3.13/site-packages/lighteval/pipeline.py\", line 399, in _compute_metrics\n    self.evaluation_tracker.details_logger.log(task_name, doc, response, output)\n    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/private/tmp/plato-refresh-worktrees/lighteval-runtime/.venv/lib/python3.13/site-packages/lighteval/logging/info_loggers.py\", line 272, in log\n    hash.example = xxhash.xxh64(doc.query).hexdigest()\n                   ~~~~~~~~~~~~^^^^^^^^^^^\nTypeError: Strings must be encoded before hashing\n",
+    "result": "Actual local model loading, generation, and response caching succeeded; Pipeline metric detail logging raised TypeError before final result aggregation."
+  },
+  "primary_sources": [
+    {
+      "url": "https://github.com/ifduyue/python-xxhash/blob/master/CHANGELOG.rst",
+      "fact": "xxhash4.0.0 removed str input; callers must encode bytes."
+    },
+    {
+      "url": "https://pypi.org/pypi/xxhash/json",
+      "fact": "Latest stable3.x is3.8.1, uploaded2026-07-06."
+    }
+  ],
+  "installed_source": {
+    ".venv/lib/python3.13/site-packages/lighteval/logging/info_loggers.py": {
+      "sha256": "5d199154339cb0028521db41fb42f59d1506ab10cf2bc09095d2645ecb3ff18d",
+      "relevant_lines": [
+        272,
+        273,
+        274,
+        282
+      ]
+    },
+    ".venv/lib/python3.13/site-packages/lighteval/tasks/lighteval_task.py": {
+      "sha256": "50447911427e7cbfdb4ffd7a59a83324486ae1b69efbcc39d574033fc69e3493",
+      "relevant_lines": [
+        156
+      ]
+    },
+    ".venv/lib/python3.13/site-packages/lighteval/utils/cache_management.py": {
+      "sha256": "cfcefa97ab153fec086f7bfcd6f46cfb2caf2addb666b647df68eaf535945a06",
+      "relevant_lines": [
+        88,
+        91,
+        140
+      ]
+    }
+  },
+  "proposed_serialized_dependency_change": {
+    "owner": "root",
+    "files": [
+      "pyproject.toml",
+      "uv.lock"
+    ],
+    "llm_eval_requirement": "xxhash>=3.8.1,<4",
+    "nltk_override": "Keep existing authorized nltk==3.10.3 override and its upstream metadata exception.",
+    "constraint_reason": "Lighteval0.13.0 uses xxhash string hashing; Datasets5.0.1 has no xxhash version constraint. Restrict the evaluation profile to the newest compatible major version.",
+    "status": "Proposed, no manifest or lock edits made by evaluator author."
+  },
+  "normalization_red": {
+    "command": ".venv/bin/python -m pytest tests/evaluators/test_lighteval.py::test_lighteval_normalizes_current_fewshot_task_keys -q",
+    "log": "F                                                                        [100%]\n=================================== FAILURES ===================================\n_____________ test_lighteval_normalizes_current_fewshot_task_keys ______________\n\ntemp_config = <plato.config.Config object at 0x124f586e0>\n\n    def test_lighteval_normalizes_current_fewshot_task_keys(temp_config):\n        from plato.evaluators.lighteval import _normalize_metrics\n    \n>       assert _normalize_metrics(\n            {\n                \"ifeval|0\": {\n                    \"prompt_level_strict_acc\": 0.30,\n                    \"prompt_level_loose_acc\": 0.50,\n                    \"inst_level_strict_acc\": 0.99,\n                },\n                \"hellaswag|0\": {\"exact_match\": 0.44},\n                \"arc:easy|0\": {\"loglikelihood_acc\": 0.35},\n                \"arc:challenge|0\": {\"loglikelihood_acc\": 0.25},\n                \"piqa_hf|0\": {\"exact_match\": 0.61},\n                \"all\": {\"exact_match\": 0.99},\n            }\n        ) == {\n            \"ifeval_avg\": 0.40,\n            \"hellaswag\": 0.44,\n            \"arc_easy\": 0.35,\n            \"arc_challenge\": 0.25,\n            \"arc_avg\": 0.30,\n            \"piqa\": 0.61,\n        }\nE       AssertionError: assert {} == {'ifeval_avg'...e': 0.25, ...}\nE         \nE         Right contains 6 more items:\nE         {'arc_avg': 0.3,\nE          'arc_challenge': 0.25,\nE          'arc_easy': 0.35,\nE          'hellaswag': 0.44,\nE          'ifeval_avg': 0.4,\nE          'piqa': 0.61}\nE         Use -v to get more diff\n\ntests/evaluators/test_lighteval.py:580: AssertionError\ntest profile: core scope (native excluded)\n=========================== short test summary info ============================\nFAILED tests/evaluators/test_lighteval.py::test_lighteval_normalizes_current_fewshot_task_keys\n1 failed in 0.07s\n",
+    "result": "Compatibility helper probe: current internal tracker task|fewshot dictionaries return no metrics with the original helper. This is not a public Pipeline failure: EvaluationTracker.generate_final_dict replaces | with :, and original Plato normalization already handles final task:0 keys.",
+    "scope_correction": {
+      "source": ".venv/lib/python3.13/site-packages/lighteval/logging/evaluation_tracker.py:382",
+      "public_pipeline_keys": "task:0",
+      "internal_cache_and_tracker_keys": "task|0",
+      "classification": "Compatibility improvement only, not a public Pipeline defect."
+    }
+  },
+  "limits": [
+    "Synthetic controlled rows establish installed API integration only, not public benchmark accuracy or performance.",
+    "The installed NLTK metadata conflict remains explicit.",
+    "Configured local-reference cache freshness is under investigation."
+  ]
+}

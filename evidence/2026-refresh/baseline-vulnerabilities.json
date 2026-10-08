@@ -1,0 +1,557 @@
+{
+  "dependencies": [
+    {
+      "name": "accelerate",
+      "version": "1.15.0",
+      "vulns": []
+    },
+    {
+      "name": "aiohappyeyeballs",
+      "version": "2.7.1",
+      "vulns": []
+    },
+    {
+      "name": "aiohttp",
+      "version": "3.14.3",
+      "vulns": []
+    },
+    {
+      "name": "aiosignal",
+      "version": "1.4.0",
+      "vulns": []
+    },
+    {
+      "name": "annotated-doc",
+      "version": "0.0.5",
+      "vulns": []
+    },
+    {
+      "name": "annotated-types",
+      "version": "0.8.0",
+      "vulns": []
+    },
+    {
+      "name": "anyio",
+      "version": "4.15.1",
+      "vulns": []
+    },
+    {
+      "name": "attrs",
+      "version": "26.1.0",
+      "vulns": []
+    },
+    {
+      "name": "beautifulsoup4",
+      "version": "4.15.0",
+      "vulns": []
+    },
+    {
+      "name": "bidict",
+      "version": "0.24.1",
+      "vulns": []
+    },
+    {
+      "name": "boto3",
+      "version": "1.43.106",
+      "vulns": []
+    },
+    {
+      "name": "botocore",
+      "version": "1.43.106",
+      "vulns": []
+    },
+    {
+      "name": "certifi",
+      "version": "2026.7.22",
+      "vulns": []
+    },
+    {
+      "name": "charset-normalizer",
+      "version": "3.5.2",
+      "vulns": []
+    },
+    {
+      "name": "click",
+      "version": "8.5.0",
+      "vulns": []
+    },
+    {
+      "name": "cloudpickle",
+      "version": "3.1.2",
+      "vulns": []
+    },
+    {
+      "name": "datasets",
+      "version": "5.0.1",
+      "vulns": []
+    },
+    {
+      "name": "dill",
+      "version": "0.4.1",
+      "vulns": []
+    },
+    {
+      "name": "evaluate",
+      "version": "0.4.6",
+      "vulns": []
+    },
+    {
+      "name": "farama-notifications",
+      "version": "0.0.6",
+      "vulns": []
+    },
+    {
+      "name": "filelock",
+      "version": "4.0.9",
+      "vulns": []
+    },
+    {
+      "name": "frozenlist",
+      "version": "1.8.0",
+      "vulns": []
+    },
+    {
+      "name": "fsspec",
+      "version": "2026.6.0",
+      "vulns": []
+    },
+    {
+      "name": "gdown",
+      "version": "6.4.1",
+      "vulns": []
+    },
+    {
+      "name": "googleapis-common-protos",
+      "version": "1.75.5",
+      "vulns": []
+    },
+    {
+      "name": "gymnasium",
+      "version": "1.3.0",
+      "vulns": []
+    },
+    {
+      "name": "h11",
+      "version": "0.16.0",
+      "vulns": []
+    },
+    {
+      "name": "hf-xet",
+      "version": "1.6.0",
+      "vulns": []
+    },
+    {
+      "name": "httpcore",
+      "version": "1.0.9",
+      "vulns": []
+    },
+    {
+      "name": "httpx",
+      "version": "0.28.1",
+      "vulns": []
+    },
+    {
+      "name": "huggingface-hub",
+      "version": "1.33.0",
+      "vulns": []
+    },
+    {
+      "name": "idna",
+      "version": "3.20",
+      "vulns": []
+    },
+    {
+      "name": "iniconfig",
+      "version": "2.3.0",
+      "vulns": []
+    },
+    {
+      "name": "jinja2",
+      "version": "3.1.6",
+      "vulns": []
+    },
+    {
+      "name": "jmespath",
+      "version": "1.1.0",
+      "vulns": []
+    },
+    {
+      "name": "kazoo",
+      "version": "2.11.0",
+      "vulns": []
+    },
+    {
+      "name": "markdown-it-py",
+      "version": "4.2.0",
+      "vulns": []
+    },
+    {
+      "name": "markupsafe",
+      "version": "3.0.3",
+      "vulns": []
+    },
+    {
+      "name": "mdurl",
+      "version": "0.1.2",
+      "vulns": []
+    },
+    {
+      "name": "mlx",
+      "version": "0.32.3",
+      "vulns": []
+    },
+    {
+      "name": "mlx-metal",
+      "version": "0.32.3",
+      "vulns": []
+    },
+    {
+      "name": "mpmath",
+      "version": "1.3.0",
+      "vulns": []
+    },
+    {
+      "name": "multidict",
+      "version": "6.9.1",
+      "vulns": []
+    },
+    {
+      "name": "multiprocess",
+      "version": "0.70.19",
+      "vulns": []
+    },
+    {
+      "name": "munch",
+      "version": "4.0.0",
+      "vulns": []
+    },
+    {
+      "name": "networkx",
+      "version": "3.7",
+      "vulns": []
+    },
+    {
+      "name": "numpy",
+      "version": "2.5.3",
+      "vulns": []
+    },
+    {
+      "name": "opacus",
+      "version": "1.6.0",
+      "vulns": []
+    },
+    {
+      "name": "opentelemetry-api",
+      "version": "1.45.0",
+      "vulns": []
+    },
+    {
+      "name": "opentelemetry-exporter-http-transport",
+      "version": "0.66b0",
+      "vulns": []
+    },
+    {
+      "name": "opentelemetry-exporter-otlp-common",
+      "version": "0.66b0",
+      "vulns": []
+    },
+    {
+      "name": "opentelemetry-exporter-otlp-proto-common",
+      "version": "1.45.0",
+      "vulns": []
+    },
+    {
+      "name": "opentelemetry-exporter-otlp-proto-http",
+      "version": "1.45.0",
+      "vulns": []
+    },
+    {
+      "name": "opentelemetry-proto",
+      "version": "1.45.0",
+      "vulns": []
+    },
+    {
+      "name": "opentelemetry-sdk",
+      "version": "1.45.0",
+      "vulns": []
+    },
+    {
+      "name": "opentelemetry-semantic-conventions",
+      "version": "0.66b0",
+      "vulns": []
+    },
+    {
+      "name": "opt-einsum",
+      "version": "3.4.0",
+      "vulns": []
+    },
+    {
+      "name": "packaging",
+      "version": "26.3",
+      "vulns": []
+    },
+    {
+      "name": "pandas",
+      "version": "3.0.6",
+      "vulns": []
+    },
+    {
+      "name": "peft",
+      "version": "0.21.2",
+      "vulns": []
+    },
+    {
+      "name": "pillow",
+      "version": "12.3.0",
+      "vulns": []
+    },
+    {
+      "name": "platformdirs",
+      "version": "4.12.2",
+      "vulns": []
+    },
+    {
+      "name": "plato-learn",
+      "skip_reason": "distribution marked as editable"
+    },
+    {
+      "name": "pluggy",
+      "version": "1.6.0",
+      "vulns": []
+    },
+    {
+      "name": "propcache",
+      "version": "0.5.4",
+      "vulns": []
+    },
+    {
+      "name": "protobuf",
+      "version": "7.36.2",
+      "vulns": []
+    },
+    {
+      "name": "psutil",
+      "version": "7.2.2",
+      "vulns": []
+    },
+    {
+      "name": "pyarrow",
+      "version": "25.0.1",
+      "vulns": []
+    },
+    {
+      "name": "pydantic",
+      "version": "2.13.5",
+      "vulns": []
+    },
+    {
+      "name": "pydantic-core",
+      "version": "2.46.5",
+      "vulns": []
+    },
+    {
+      "name": "pygments",
+      "version": "2.21.0",
+      "vulns": []
+    },
+    {
+      "name": "pysocks",
+      "version": "1.7.1",
+      "vulns": []
+    },
+    {
+      "name": "pytest",
+      "version": "9.1.1",
+      "vulns": []
+    },
+    {
+      "name": "python-dateutil",
+      "version": "2.9.0.post0",
+      "vulns": []
+    },
+    {
+      "name": "python-engineio",
+      "version": "4.14.0",
+      "vulns": []
+    },
+    {
+      "name": "python-socketio",
+      "version": "5.17.0",
+      "vulns": []
+    },
+    {
+      "name": "pytorch-ranger",
+      "version": "0.1.1",
+      "vulns": []
+    },
+    {
+      "name": "pyyaml",
+      "version": "6.0.3",
+      "vulns": []
+    },
+    {
+      "name": "regex",
+      "version": "2026.9.29",
+      "vulns": []
+    },
+    {
+      "name": "requests",
+      "version": "2.34.2",
+      "vulns": []
+    },
+    {
+      "name": "rich",
+      "version": "15.0.0",
+      "vulns": []
+    },
+    {
+      "name": "ruff",
+      "version": "0.16.10",
+      "vulns": []
+    },
+    {
+      "name": "s3transfer",
+      "version": "0.19.2",
+      "vulns": []
+    },
+    {
+      "name": "safetensors",
+      "version": "0.8.0",
+      "vulns": []
+    },
+    {
+      "name": "scipy",
+      "version": "1.18.1",
+      "vulns": []
+    },
+    {
+      "name": "setuptools",
+      "version": "84.0.0",
+      "vulns": []
+    },
+    {
+      "name": "shellingham",
+      "version": "1.5.4",
+      "vulns": []
+    },
+    {
+      "name": "simple-websocket",
+      "version": "1.1.0",
+      "vulns": []
+    },
+    {
+      "name": "six",
+      "version": "1.17.0",
+      "vulns": []
+    },
+    {
+      "name": "soupsieve",
+      "version": "2.10",
+      "vulns": []
+    },
+    {
+      "name": "sympy",
+      "version": "1.14.0",
+      "vulns": []
+    },
+    {
+      "name": "tenseal",
+      "version": "0.3.18",
+      "vulns": []
+    },
+    {
+      "name": "tiktoken",
+      "version": "0.14.0",
+      "vulns": []
+    },
+    {
+      "name": "timm",
+      "version": "1.0.30",
+      "vulns": []
+    },
+    {
+      "name": "tokenizers",
+      "version": "0.23.2",
+      "vulns": []
+    },
+    {
+      "name": "torch",
+      "version": "2.14.1",
+      "vulns": []
+    },
+    {
+      "name": "torch-optimizer",
+      "version": "0.3.0",
+      "vulns": []
+    },
+    {
+      "name": "torchvision",
+      "version": "0.29.1",
+      "vulns": []
+    },
+    {
+      "name": "tqdm",
+      "version": "4.70.1",
+      "vulns": []
+    },
+    {
+      "name": "transformers",
+      "version": "5.18.0",
+      "vulns": []
+    },
+    {
+      "name": "ty",
+      "version": "0.0.84",
+      "vulns": []
+    },
+    {
+      "name": "typer",
+      "version": "0.27.2",
+      "vulns": []
+    },
+    {
+      "name": "typing-extensions",
+      "version": "4.16.0",
+      "vulns": []
+    },
+    {
+      "name": "typing-inspection",
+      "version": "0.4.4",
+      "vulns": []
+    },
+    {
+      "name": "urllib3",
+      "version": "2.8.0",
+      "vulns": []
+    },
+    {
+      "name": "wandb",
+      "version": "0.30.0",
+      "vulns": []
+    },
+    {
+      "name": "wsproto",
+      "version": "1.3.2",
+      "vulns": []
+    },
+    {
+      "name": "xxhash",
+      "version": "4.0.1",
+      "vulns": []
+    },
+    {
+      "name": "yarl",
+      "version": "1.25.1",
+      "vulns": []
+    },
+    {
+      "name": "zstd",
+      "version": "1.5.7.2",
+      "vulns": []
+    }
+  ],
+  "fixes": [],
+  "observed_date": "2026-10-02",
+  "baseline_commit": "5b8359bd40bbe65c7753e71f6627c490f9aa144f",
+  "command": "uvx pip-audit --path /tmp/plato-python314-env/lib/python3.14/site-packages --skip-editable --progress-spinner off --format json"
+}

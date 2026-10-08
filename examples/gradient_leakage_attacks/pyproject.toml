@@ -5,6 +5,10 @@ description = "Gradient Leakage in Production Federated Learning"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
-    "lpips",
-    "matplotlib",
+    "plato-learn>=1.4.3",
+    "lpips>=0.1.4",
+    "matplotlib>=3.11.2",
 ]
+
+[tool.uv.sources]
+plato-learn = { workspace = true }

@@ -1,0 +1,194 @@
+{
+  "schema_version": 1,
+  "backend": "torch-hub",
+  "retired_at": "2026-10-04",
+  "pre_retirement_plato_commit": "c1359992f70533c0f2a47d30742f9b14295da882",
+  "pre_retirement_plato_tree": "9e75b3b2f306677fabc6f9214658bfeacd152dc5",
+  "plan_sha256": "a49502dca7146305f37c94a404ff7735c7507d79d3968b5a813f09e304442716",
+  "plan_review_sha256": "a93502a267b86617ff3bde0d30462179c219f0bbc279354d0c049dfddcd0ecb8",
+  "files": [
+    {
+      "original_path": "plato/models/torch_hub.py",
+      "archive_path": "archives/retired/torch-hub/original/plato/models/torch_hub.py",
+      "disposition": "moved",
+      "git_mode": "100644",
+      "git_blob": "396d64ff7fd5b1cdca91e5304f1d836ba6ff6cd8",
+      "sha256": "0aab79ad209628a5a55724c7006bcb829c029e966693ef6019f79ea7922d524a",
+      "bytes": 998,
+      "source_commit": "c1359992f70533c0f2a47d30742f9b14295da882"
+    },
+    {
+      "original_path": "configs/CIFAR10/fedavg_resnet18_torchhub.toml",
+      "archive_path": "archives/retired/torch-hub/original/configs/CIFAR10/fedavg_resnet18_torchhub.toml",
+      "disposition": "moved",
+      "git_mode": "100644",
+      "git_blob": "db74cd002e403de392de77e7064f33eb8595a502",
+      "sha256": "2ca99bb45498a605dcd2b202aa4e5aee30a23e517a5d318288db11ffa5230483",
+      "bytes": 1123,
+      "source_commit": "c1359992f70533c0f2a47d30742f9b14295da882"
+    },
+    {
+      "original_path": "plato/models/registry.py",
+      "archive_path": "archives/retired/torch-hub/original/plato/models/registry.py",
+      "disposition": "copied-context",
+      "git_mode": "100644",
+      "git_blob": "ab6c4274e6ab48df406ce2a2bdb7696a4e1c03de",
+      "sha256": "da678f995c7e9cae467999168c754c763314e58021bfa4e8a7818772a994e781",
+      "bytes": 5924,
+      "source_commit": "c1359992f70533c0f2a47d30742f9b14295da882"
+    },
+    {
+      "original_path": "configs/TinyImageNet/fedavg_alexnet.toml",
+      "archive_path": "archives/retired/torch-hub/original/configs/TinyImageNet/fedavg_alexnet.toml",
+      "disposition": "copied-context",
+      "git_mode": "100644",
+      "git_blob": "ecb237f1f7af5a6da4675f3793e1a141f9d685c4",
+      "sha256": "f635d90fc2b0b0e5534ed60cd832a13340478a8e74ecf521bce1ee2f16babbca",
+      "bytes": 1133,
+      "source_commit": "c1359992f70533c0f2a47d30742f9b14295da882"
+    },
+    {
+      "original_path": "configs/TinyImageNet/fedavg_googlenet.toml",
+      "archive_path": "archives/retired/torch-hub/original/configs/TinyImageNet/fedavg_googlenet.toml",
+      "disposition": "copied-context",
+      "git_mode": "100644",
+      "git_blob": "4eee7e77fd9192e2184f0e40a0893c5d8012dec4",
+      "sha256": "1c4d0d931b5ae326c4497882b3f1b131580f65bfada2b09e9f120920f16faea2",
+      "bytes": 1135,
+      "source_commit": "c1359992f70533c0f2a47d30742f9b14295da882"
+    },
+    {
+      "original_path": "configs/TinyImageNet/fedavg_inceptionv3.toml",
+      "archive_path": "archives/retired/torch-hub/original/configs/TinyImageNet/fedavg_inceptionv3.toml",
+      "disposition": "copied-context",
+      "git_mode": "100644",
+      "git_blob": "c2e04b786f6438440adca3d8b5d3153b5f34b4bf",
+      "sha256": "8f9bba13b7279f0da0df2b0ab68a2767770f96c4485ecc2ec92942f339c87aa0",
+      "bytes": 1138,
+      "source_commit": "c1359992f70533c0f2a47d30742f9b14295da882"
+    },
+    {
+      "original_path": "configs/TinyImageNet/fedavg_shufflenet.toml",
+      "archive_path": "archives/retired/torch-hub/original/configs/TinyImageNet/fedavg_shufflenet.toml",
+      "disposition": "copied-context",
+      "git_mode": "100644",
+      "git_blob": "aa896496e09afd105347f01f6efb2fd68370aad1",
+      "sha256": "343ad1fe87cda2dfde085afbf7f468c0c5a560cb5bf4fc897693ed8a41b95a6f",
+      "bytes": 1144,
+      "source_commit": "c1359992f70533c0f2a47d30742f9b14295da882"
+    },
+    {
+      "original_path": "configs/TinyImageNet/fedavg_squeezenet.toml",
+      "archive_path": "archives/retired/torch-hub/original/configs/TinyImageNet/fedavg_squeezenet.toml",
+      "disposition": "copied-context",
+      "git_mode": "100644",
+      "git_blob": "a891fd0a4382bc0f6c9b56d84f38c04f234d6ce8",
+      "sha256": "14b43298f97ccdfb196b324c31eb887c5fe136e77642d87da7746698431a7fc1",
+      "bytes": 1139,
+      "source_commit": "c1359992f70533c0f2a47d30742f9b14295da882"
+    },
+    {
+      "original_path": "examples/model_search/anycostfl/example_ResNet.toml",
+      "archive_path": "archives/retired/torch-hub/original/examples/model_search/anycostfl/example_ResNet.toml",
+      "disposition": "copied-context",
+      "git_mode": "100644",
+      "git_blob": "0217f0b11b9583b8d3a999f2f58c46324ecddd96",
+      "sha256": "4a74ee96d86be5786c935e3454cec0a1ea2861010d82112699ab01d77a07cbb5",
+      "bytes": 1664,
+      "source_commit": "c1359992f70533c0f2a47d30742f9b14295da882"
+    },
+    {
+      "original_path": "examples/model_search/fedrolex/example_ResNet.toml",
+      "archive_path": "archives/retired/torch-hub/original/examples/model_search/fedrolex/example_ResNet.toml",
+      "disposition": "copied-context",
+      "git_mode": "100644",
+      "git_blob": "0217f0b11b9583b8d3a999f2f58c46324ecddd96",
+      "sha256": "4a74ee96d86be5786c935e3454cec0a1ea2861010d82112699ab01d77a07cbb5",
+      "bytes": 1664,
+      "source_commit": "c1359992f70533c0f2a47d30742f9b14295da882"
+    },
+    {
+      "original_path": "examples/model_search/heterofl/heterofl_resnet18_dynamic.toml",
+      "archive_path": "archives/retired/torch-hub/original/examples/model_search/heterofl/heterofl_resnet18_dynamic.toml",
+      "disposition": "copied-context",
+      "git_mode": "100644",
+      "git_blob": "3839a9143dbc31bf6c884010fda3f50115cc9d6c",
+      "sha256": "361563886ce2a5eca689d8d1702fb8778874614c9c5bc77d6f2775eb01fd42aa",
+      "bytes": 1662,
+      "source_commit": "c1359992f70533c0f2a47d30742f9b14295da882"
+    },
+    {
+      "original_path": "examples/model_search/sysheterofl/config_ResNet152.toml",
+      "archive_path": "archives/retired/torch-hub/original/examples/model_search/sysheterofl/config_ResNet152.toml",
+      "disposition": "copied-context",
+      "git_mode": "100644",
+      "git_blob": "e8a1ecc67acf5b10049fcf73ac30aa8a0dd6af9b",
+      "sha256": "e4e9b28df53fa3bc78f19aa53e0753c36d67a90dbba9a2e37ec583da5b354f87",
+      "bytes": 1831,
+      "source_commit": "c1359992f70533c0f2a47d30742f9b14295da882"
+    },
+    {
+      "original_path": "docs/docs/configurations/trainer.md",
+      "archive_path": "archives/retired/torch-hub/original/docs/docs/configurations/trainer.md",
+      "disposition": "copied-context",
+      "git_mode": "100644",
+      "git_blob": "5e48a63615fbcdcfe1576fdac1248d2d8d7acd26",
+      "sha256": "f2f59461e3987c909f243533f39f14ac2b79058a66d7d25794dbf055ac3c5a0f",
+      "bytes": 9214,
+      "source_commit": "c1359992f70533c0f2a47d30742f9b14295da882"
+    },
+    {
+      "original_path": "LICENSE",
+      "archive_path": "archives/retired/torch-hub/original/LICENSE",
+      "disposition": "copied-context",
+      "git_mode": "100644",
+      "git_blob": "261eeb9e9f8b2b4b0d119366dda99c6fd7d35c64",
+      "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+      "bytes": 11357,
+      "source_commit": "c1359992f70533c0f2a47d30742f9b14295da882"
+    },
+    {
+      "original_path": "pyproject.toml",
+      "archive_path": "archives/retired/torch-hub/original/pyproject.toml",
+      "disposition": "copied-context",
+      "git_mode": "100644",
+      "git_blob": "42601adc31e213a0ab008361ef53223826fcd770",
+      "sha256": "4c68adebeb88bba969a5d5c08a874644b1d40ccff241761dd7f2bd201b6ba3d3",
+      "bytes": 4189,
+      "source_commit": "c1359992f70533c0f2a47d30742f9b14295da882"
+    },
+    {
+      "original_path": "uv.lock",
+      "archive_path": "archives/retired/torch-hub/original/uv.lock",
+      "disposition": "copied-context",
+      "git_mode": "100644",
+      "git_blob": "419ce6bf04e2ca46520dcf1e05a36ac134cdc63c",
+      "sha256": "66a4e4442d7b1f26d220b44ca73c44ff4f1151a86857bb3f93a594819fd08126",
+      "bytes": 755641,
+      "source_commit": "c1359992f70533c0f2a47d30742f9b14295da882"
+    },
+    {
+      "original_path": "tests/examples_phase4/cases.json",
+      "archive_path": "archives/retired/torch-hub/original/tests/examples_phase4/cases.json",
+      "disposition": "copied-context",
+      "git_mode": "100644",
+      "git_blob": "e232ca35c0f024a6aa79b6c0362d412fa8b331f3",
+      "sha256": "7d18beab505f3f23cb6b14785c35b4d7a3b5b425b9dd541769e43bcd7b80167a",
+      "bytes": 240990,
+      "source_commit": "c1359992f70533c0f2a47d30742f9b14295da882"
+    }
+  ],
+  "inventory_sha256": "ccb5e27d69e63cdfa5f1159975cadbf30dc1432d996f7da502d837501a7ff20f",
+  "evidence": [
+    {
+      "archive_path": "archives/retired/torch-hub/evidence/plato-next-retirements-plan.json",
+      "sha256": "a49502dca7146305f37c94a404ff7735c7507d79d3968b5a813f09e304442716",
+      "bytes": 50862
+    },
+    {
+      "archive_path": "archives/retired/torch-hub/evidence/plato-next-retirements-plan-review.json",
+      "sha256": "a93502a267b86617ff3bde0d30462179c219f0bbc279354d0c049dfddcd0ecb8",
+      "bytes": 2498
+    }
+  ]
+}

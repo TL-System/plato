@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "status": "CLEAN_AUTHOR_CANDIDATE_FOR_FRESH_INDEPENDENT_REVIEW",
+  "starting_commit": "13e38dafce476286db7e673e7f21343d54416b56",
+  "implementation_commit": "fac9c65161f699fd94c7d264a519715fedd2bc4c",
+  "implementation_tree": "05b9c7a27e90ef10334af85041dd5a8d5cb28616",
+  "evidence_body_commit": "9f1d52c8cc4c520cf17796361e83f7ebf9d4dab2",
+  "evidence_body_tree": "cab99ca3caf8b20e1e82c23c202afb1ff282a8c9",
+  "evidence_body_parent": "fac9c65161f699fd94c7d264a519715fedd2bc4c",
+  "evidence_files": {
+    "phase2c-feddyn-count-fixes-validation.json": {
+      "sha256": "0352d54214cfdb32d7790f35a3071579a6bc75e1781b79d1af41bde6ca673458",
+      "bytes": 157348,
+      "git_blob": "64c6e1d6a947c26ee39ed8840ed04a4dcaf6a17d"
+    },
+    "phase2c-feddyn-count-fixes-facts.json": {
+      "sha256": "2b8154918100e23f20ba27c2f9c269030b7bf54a2fb1675c5d678bae64247a8e",
+      "bytes": 4466,
+      "git_blob": "914809f71d14389dfd741d04b31d498a85853250"
+    }
+  },
+  "qualification_each_version": {
+    "affected_passed": 308,
+    "skipped": 0,
+    "pytest_warnings": 0,
+    "new_regressions_passed": 20,
+    "red_regressions_failed": 19,
+    "red_guard_already_passed": 1,
+    "real_entrypoint_process_groups": 7,
+    "forced_shutdowns": 0,
+    "survivors": 0,
+    "explicit_owned_source_ty": "PASS with actual --python environments"
+  },
+  "supersession": "Only count-boundary and explicit typing claims plus overview docstring are superseded. All 13e historical reports, shared lifecycle/SCAFFOLD implementation and reviewed dependencies remain unchanged. No full-profile/48-startup rerun claimed for this correction.",
+  "preservation": {
+    "unchanged_other_existing_tracked_files": 1002,
+    "equations_config_bundle_rng_ast_nodes_unchanged": [
+      "plato/trainers/strategies/algorithms/feddyn_strategy.py:effective_alpha",
+      "plato/trainers/strategies/algorithms/feddyn_strategy.py:settings_from_config",
+      "plato/trainers/strategies/algorithms/feddyn_strategy.py:FedDynLossStrategy",
+      "plato/trainers/strategies/algorithms/feddyn_strategy.py:FedDynLossStrategyFromConfig",
+      "examples/customized_client_training/feddyn/feddyn_server.py:Server.aggregate_weights",
+      "examples/customized_client_training/feddyn/feddyn_server.py:Server._snapshot",
+      "examples/customized_client_training/feddyn/feddyn_server.py:Server._validate_rng",
+      "examples/customized_client_training/feddyn/feddyn_server.py:Server._resume_from_checkpoint",
+      "examples/customized_client_training/feddyn/feddyn_server.py:Server.start"
+    ],
+    "docstring_executable_ast_unchanged": true
+  },
+  "public_facts": "phase2c-feddyn-count-fixes-facts.json; no standalone prose edit.",
+  "pending": [
+    "Fresh independent FedDyn reviewer assigned by root",
+    "Final source-bound Astra prose reconciliation",
+    "Root final combined qualification, gate and acceptance"
+  ],
+  "receipt_identity_note": "Final receipt commit/tree supplied in clean handoff and own scratch final-candidate.json to avoid a self-referential hash."
+}

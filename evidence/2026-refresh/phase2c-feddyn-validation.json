@@ -1,0 +1,1293 @@
+{
+  "schema_version": 1,
+  "status": "IMPLEMENTED_DUAL_VERSION_QUALIFIED_FRESH_REVIEW_PENDING",
+  "implementation_commit": "7d310b90d698a7be4aa9a184dc415f7dbb401e5b",
+  "implementation_tree": "019018a41c14b76ca974e148373d9aa8a66bb827",
+  "initial_implementation_commit": "8a43d96aa093021fd4677ba3bbd2193d8a744221",
+  "final_production_commit": "05a9f00b8a4d54c233c1a9c00ef9ce2c4467480c",
+  "test_isolation_commit": "7d310b90",
+  "historical_prior_candidate": "15e0cebd78ec6752b9aae1e922b33e22e168387f",
+  "dependency_merges": {
+    "A": "abf27a34db3e40fc743f329d40bed5dae4dc70f7",
+    "B": {
+      "premerge": "15e0cebd78ec6752b9aae1e922b33e22e168387f",
+      "accepted_b": "a058a2ef8d230ca2e34dbf1c91e6eaac0b0205ac",
+      "conflicts": true,
+      "restored_draft_sha256": "d7595d180ec24be5ec1e1c754af48b5f29686b7484813f7c2bcfad95f01f72c9",
+      "status": "MERGED",
+      "merge": "1fe8b63940c21eca23b91e9f79281171e80f0cbc",
+      "parents": [
+        "15e0cebd78ec6752b9aae1e922b33e22e168387f",
+        "a058a2ef8d230ca2e34dbf1c91e6eaac0b0205ac"
+      ],
+      "tree": "af6317a3b438f4ef99e8a7bac6ac3a434850eabc",
+      "conflict_resolution": "Only _save_random_states signature/docstring: retain C checkpoint_root argument and accepted B docstring. B startup guards and self.prng_state persistence merged unchanged."
+    },
+    "D": {
+      "merge_commit": "f25530b1dc2d92d1a7a64ace89c18bdfcfe4e1e8",
+      "parents": [
+        "8a43d96aa093021fd4677ba3bbd2193d8a744221",
+        "96323afa094a37584844275cc04bf1e1eedfaa0d"
+      ],
+      "tree": "71358cbf03c0d6110ed2654c2a646cb7aef2932d",
+      "accepted_D": "96323afa094a37584844275cc04bf1e1eedfaa0d",
+      "review_sha256": "ea5c8a01719582167ae2a78b7a9cca11384679b71c5933379bcbfbf284533186",
+      "conflicts": false,
+      "native_metadata_compatibility_removed": true,
+      "command": "zsh -lc git merge --no-ff 96323afa094a37584844275cc04bf1e1eedfaa0d -m 'Integrated the accepted payload serialization and utility dependency.'"
+    }
+  },
+  "root_inputs": {
+    "phase2c-feddyn-acceptance.json": {
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2c-feddyn-acceptance.json",
+      "bytes": 1570,
+      "sha256": "7ceed23ecbdcb73119863bb5ab9b1c0372d3f7dfb9101ace6a1100bcbcbca6c0"
+    },
+    "phase2c-feddyn-design.json": {
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2c-feddyn-design.json",
+      "bytes": 87391,
+      "sha256": "62c5d61805c49ccc06f99776d0da820c5b27cffeb5916754ddb16bb3135c1d5b"
+    },
+    "phase2c-feddyn-design-review-2.json": {
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2c-feddyn-design-review-2.json",
+      "bytes": 68742,
+      "sha256": "454aa4b5d6503e2d3fbdc572719620983bab13cd7fbd5e59df8a3dc254e0f0e1"
+    },
+    "phase2c-scaffold-code-review-3.json": {
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2c-scaffold-code-review-3.json",
+      "bytes": 128196,
+      "sha256": "63d4969b6bff08e51bde979eb3d8ac61289ca539e1332b3ac96a8ceeda6010dd"
+    },
+    "phase2a-acceptance.json": {
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2a-acceptance.json",
+      "bytes": 2974,
+      "sha256": "21fc799903097a0424106e3792ddcdb71f6ae0c8b5f361a9276a89e6d8c973da"
+    },
+    "phase2b-resume-acceptance.json": {
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2b-resume-acceptance.json",
+      "bytes": 1644,
+      "sha256": "53bfc5b628762ffb1e3c95a4309701f0a5beea364c0df28fc788171b12279219"
+    },
+    "phase2d-acceptance.json": {
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2d-acceptance.json",
+      "bytes": 1503,
+      "sha256": "611b8b8fef34fd90e1f25da4ce2cf6c05c2e94979afafdaf190c3155f4a3cff2"
+    },
+    "phase2d-review-3.json": {
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2d-review-3.json",
+      "bytes": 106655,
+      "sha256": "ea5c8a01719582167ae2a78b7a9cca11384679b71c5933379bcbfbf284533186"
+    },
+    "phase2cd-wire-dependency-handoff.json": {
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2cd-wire-dependency-handoff.json",
+      "bytes": 2366,
+      "sha256": "511ce0cbc2ca5a846127d330802cb72a886fa5902adc0e447a0bfb6286878ac9"
+    },
+    "phase2bc-root-resume-validation.json": {
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2bc-root-resume-validation.json",
+      "bytes": 4853,
+      "sha256": "a5083318f489852bce152ad66037c771cde75247bc15c83e87e9dd00164826ee"
+    }
+  },
+  "sources": {
+    "examples/customized_client_training/feddyn/feddyn.py": {
+      "blob": "a1487bbcc9b43f6608138d7636e41cd4dc6ed53a",
+      "sha256": "559e4171711a0d16a1cb7513085336d12ee85d7d6eb7e0c49d3af6cfad893710"
+    },
+    "examples/customized_client_training/feddyn/feddyn_MNIST_lenet5.toml": {
+      "blob": "e1f6190d35596d844206a57e3003fc5b3ce2a1a7",
+      "sha256": "dcfea2e1d461a51bfd3232e4a17dfc1f15a46ebd3cba6d2ffb152dab1a354cb8"
+    },
+    "examples/customized_client_training/feddyn/feddyn_client.py": {
+      "blob": "dc47651164523ca20a7556ef46b42cc5a9c939b5",
+      "sha256": "b9d28a20d1a6f69dffddb42e2e6755f98bdf0a53be288655498794831bba8bfc"
+    },
+    "examples/customized_client_training/feddyn/feddyn_server.py": {
+      "blob": "9019efa604a17c4ee5cb67c4d8645f53b0c383b1",
+      "sha256": "3c59025f6a0d052b988ebc9e9909129c34f1534ffe27205d4bc67ccd43ab276a"
+    },
+    "examples/customized_client_training/feddyn/feddyn_trainer.py": {
+      "blob": "773d55b58a5a484c624aaf6663610e35c5310724",
+      "sha256": "3dd093ccb595a53f1c153db215d97f4f76b7b473864fab7ba9c13dffbea775ca"
+    },
+    "plato/trainers/composable.py": {
+      "blob": "7bea3d06c1d5b4b23aacc9a98ef37631b39abd83",
+      "sha256": "0a4549f08fa1afaec3ab7814930dcfc59cd671bb8b1a608862a4c58a480093a5"
+    },
+    "plato/trainers/strategies/algorithms/feddyn_strategy.py": {
+      "blob": "f258627da89de59e649f8a6aa844575a9b528052",
+      "sha256": "53017a085b7047dddcc0f467f5d2c1fc91c66a1921febf107db0f09cd7fd7d4c"
+    },
+    "tests/integration/feddyn_entrypoint.py": {
+      "blob": "fd96e5b5bd223339ff1b28bb0cb0e62262dde390",
+      "sha256": "b81642b3902440369e58810d14132064eb016d82fc32759a9159f2f0d2b17f10"
+    },
+    "tests/integration/feddyn_entrypoint_harness.py": {
+      "blob": "a2352b233dc03b9a5476108c502e8bd70f56be7b",
+      "sha256": "e485adaa7922049f3c4e66b8eba31a45c7387bbbba39fae238df77a2430f519b"
+    },
+    "tests/integration/feddyn_rejection_worker.py": {
+      "blob": "2cec4826f0d41f5ce58a7250a8fbd05ed4d132bf",
+      "sha256": "4af0810e8ca568a6e1ab0c7c5295f07e627a43dac44943f02a34b71fd4a615ad"
+    },
+    "tests/integration/feddyn_round_worker.py": {
+      "blob": "ea1d76a683b88f46343d3dd1be49df976fb25fde",
+      "sha256": "186d124f054b75e9275b491d46d61cf9a872772bc5b1aff9b8db2c09b5d532bd"
+    },
+    "tests/integration/scaffold_cleanup_worker.py": {
+      "blob": "ae0de334a938e3b0b266ef19af2b38f746a965aa",
+      "sha256": "8dc26767b1f32fd193f6c4919fadb106ae3e1402923fd7a7d85c07a6ff0e4e96"
+    },
+    "tests/integration/test_checkpoint_runtime_agreement.py": {
+      "blob": "84771ba2f8a953f5bc2d09867bb9c3173f6fd01e",
+      "sha256": "5a7eb818c1b73fd5468a8a94f4184824f41d055e956402b9e2fc90f368ccdb77"
+    },
+    "tests/integration/test_feddyn_entrypoint.py": {
+      "blob": "65404acf3c8b85b9b1b8bfb84933d7443aaa1cb7",
+      "sha256": "91462fb25e11e7b6062f74d955fb99c5dbd93b4753b5d06f5bfceadc546c91eb"
+    },
+    "tests/integration/test_feddyn_round_flow.py": {
+      "blob": "0ea830f54f28adfe816631e19799ae76047a1a92",
+      "sha256": "b75032b94a7fa6559c4d642b8f97bb21be7f9eea231b2e8863b239c7d1cee5d0"
+    },
+    "tests/integration/test_scaffold_callback_lifecycle.py": {
+      "blob": "dd46ba5b14b8b4981b51d56592b5332e4fa653f5",
+      "sha256": "9450c99fc68c084b33146b26a1293a5fc6b5af121736c5fda9e1dc1332109276"
+    },
+    "tests/trainers/test_feddyn_strategy.py": {
+      "blob": "c7cb3e98c876b68426adc9786f33021a962b7218",
+      "sha256": "4f5f23163a39756f9a0638f0ccf2624c4ea66707fcc2af041cfb05ce0c396b26"
+    },
+    "tests/trainers/test_personalized_state_ownership.py": {
+      "blob": "1a9dd98efd90891c300a8a7861b18484c39507f5",
+      "sha256": "1c2e72a7c0689e37a284b14992ae546943f646df10bd1de0aed023ec97551923"
+    },
+    "tests/trainers/test_review_training_boundaries.py": {
+      "blob": "4f114b0c146e9493d01984118f1900ee6a02177b",
+      "sha256": "cc52ca179df91e93a58d5f9da4be1cbd077a910b3fdf8d69de11cab25da37b67"
+    },
+    "tests/trainers/test_training_update_contract.py": {
+      "blob": "62dcc85cc8dd392aac95146fe856d75365644fa9",
+      "sha256": "3f4c319f7f46eac46f4f65240c68ddb3d9bd8686b0c414a1347b9438b5d38613"
+    }
+  },
+  "environments": {
+    "313": {
+      "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+      "executable": "/tmp/plato-phase2c-313/bin/python",
+      "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+      "packages": {
+        "torch": "2.14.1",
+        "opacus": "1.6.0",
+        "numpy": "2.5.3",
+        "pytest": "9.1.1",
+        "timm": "1.0.30",
+        "safetensors": "0.8.0",
+        "python-socketio": "5.17.0",
+        "aiohttp": "3.14.3",
+        "kazoo": "2.11.0",
+        "gymnasium": "1.3.0",
+        "tiktoken": "0.14.0"
+      },
+      "uv_lock_sha256": "573b10c2ba1a2317e02f9e40c6181359cafab6f6e0a0f9be12bb256cb276fe1d",
+      "pyproject_sha256": "799bd7ba1865b097fdc8ca84a7b70337794e338de4aa9a6a13f6a4c1b9156246"
+    },
+    "314": {
+      "python": "3.14.8 (main, Sep 30 2026, 17:55:09) [Clang 21.0.0 (clang-2100.3.34.2)]",
+      "executable": "/private/tmp/plato-phase2c-314/bin/python",
+      "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+      "packages": {
+        "torch": "2.14.1",
+        "opacus": "1.6.0",
+        "numpy": "2.5.3",
+        "pytest": "9.1.1",
+        "timm": "1.0.30",
+        "safetensors": "0.8.0",
+        "python-socketio": "5.17.0",
+        "aiohttp": "3.14.3",
+        "kazoo": "2.11.0",
+        "gymnasium": "1.3.0",
+        "tiktoken": "0.14.0"
+      },
+      "uv_lock_sha256": "573b10c2ba1a2317e02f9e40c6181359cafab6f6e0a0f9be12bb256cb276fe1d",
+      "pyproject_sha256": "799bd7ba1865b097fdc8ca84a7b70337794e338de4aa9a6a13f6a4c1b9156246"
+    }
+  },
+  "red_green": {
+    "313": {
+      "FedDyn": {
+        "path": "/tmp/plato-phase2c-feddyn-implementation/feddyn-numerical-old-red313.log",
+        "bytes": 17552,
+        "sha256": "95238308a45aaf4c4b13e8f4a5e12f85fe93615ad2904141f74a42d41713055b"
+      },
+      "SCAFFOLD_tracked": {
+        "path": "/tmp/plato-phase2c-feddyn-implementation/scaffold-tracked-red313.log",
+        "bytes": 9417,
+        "sha256": "b1f2004c222e74026b772ff3a19701f4eb30fdde54969cab863cc48b5a23d570"
+      },
+      "SCAFFOLD_original_replay_red": {
+        "path": "/tmp/plato-phase2c-feddyn-implementation/scaffold-review3-red313.log",
+        "bytes": 13195,
+        "sha256": "0db64850af2bf616dcf539b0eaeff28d6a65d2fdc5b11881741512dad7b73f58"
+      },
+      "SCAFFOLD_original_replay_green": {
+        "path": "/tmp/plato-phase2c-feddyn-implementation/scaffold-review3-green313.log",
+        "bytes": 13558,
+        "sha256": "b76f3a75704839cf16f97b90f66494629a0a87311f08b29eeae205acad64b2d3"
+      },
+      "SCAFFOLD_focused_green": {
+        "path": "/tmp/plato-phase2c-feddyn-implementation/scaffold-axes-pass313.log",
+        "bytes": 100,
+        "sha256": "2e6b65464775fb5c9ed6f6a85070fccd6a6b9a082374c7f1d525936c317a9e03"
+      },
+      "no_git_archive_migration_green": {
+        "path": "/tmp/plato-phase2c-feddyn-implementation/archive-fixture313.log",
+        "bytes": 113,
+        "sha256": "8af95d79bad1277bf0fa4a4733b4e16c28874d81a275970c93ed51043b96bc36"
+      }
+    },
+    "314": {
+      "FedDyn": {
+        "path": "/tmp/plato-phase2c-feddyn-implementation/feddyn-numerical-old-red314.log",
+        "bytes": 17552,
+        "sha256": "68f93984a25a7b672809e77b19583ec03bbf425ea25ecd139c4784fffb82dfec"
+      },
+      "SCAFFOLD_tracked": {
+        "path": "/tmp/plato-phase2c-feddyn-implementation/scaffold-tracked-red314.log",
+        "bytes": 9417,
+        "sha256": "8b4029a2e0e00cbc6809ad206d7db99bfeba449f1b8529160213726e4ab44441"
+      },
+      "SCAFFOLD_original_replay_red": {
+        "path": "/tmp/plato-phase2c-feddyn-implementation/scaffold-review3-red314.log",
+        "bytes": 13213,
+        "sha256": "7de75b2abf70a5c9a35288047d23eaf08bb4d31c35595b261ac855d61ba72ab1"
+      },
+      "SCAFFOLD_original_replay_green": {
+        "path": "/tmp/plato-phase2c-feddyn-implementation/scaffold-review3-green314.log",
+        "bytes": 13576,
+        "sha256": "32dbda70cf503ff9c0a4791bcaa4b8794ab1a06f4765366519eea6ee7b88bb19"
+      },
+      "SCAFFOLD_focused_green": {
+        "path": "/tmp/plato-phase2c-feddyn-implementation/scaffold-axes-pass314.log",
+        "bytes": 100,
+        "sha256": "98ba3d0a35cfe5f00b70b85b8ecf5daa99cfd07d1e2b1728857180a1e072346d"
+      },
+      "no_git_archive_migration_green": {
+        "path": "/tmp/plato-phase2c-feddyn-implementation/archive-fixture314.log",
+        "bytes": 113,
+        "sha256": "8af95d79bad1277bf0fa4a4733b4e16c28874d81a275970c93ed51043b96bc36"
+      }
+    }
+  },
+  "numerical_red": "Exact own16-case draft on 1fe no-Git source: 13 failed/3 passed each version. Draft SHA d7595d180ec24be5ec1e1c754af48b5f29686b7484813f7c2bcfad95f01f72c9 preserved. Scalar zero-origin legacy endpoint2.02 fails expected2; nonzero/sign/labels/count validation failures meaningful.",
+  "scaffold_red": "Exact immutable15e: tracked independent end/cleanup axes2 failed/14 passed each; original independent replay2 direct failures/2 deferred passes each. Corrected same replay all4 pass each. Tracked30 cases green each including actual spawn and canonical-present/absent retry; originals untouched.",
+  "profiles": {
+    "final-mandatory-not-runtime-313": {
+      "head": "7d310b90d698a7be4aa9a184dc415f7dbb401e5b",
+      "command": "OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2c-313/bin/python -m pytest tests --test-profile mandatory -m 'not runtime' -q --basetemp /tmp/plato-phase2c-feddyn-implementation/final-mandatory-not-runtime-313 --junitxml /tmp/plato-phase2c-feddyn-implementation/final-mandatory-not-runtime-313.xml",
+      "shell": "zsh -lc",
+      "profile": "mandatory",
+      "partition": "not runtime",
+      "python_environment": "/tmp/plato-phase2c-313",
+      "exit_code": 0,
+      "seconds": 769.5715618338436,
+      "log": "/tmp/plato-phase2c-feddyn-implementation/final-mandatory-not-runtime-313.log",
+      "sha256": "d2cd0930a7678d71b52c5a26e3ec069cbf8460580dd032808177b232847fa6ff",
+      "summary": "1231 passed, 1 skipped, 51 deselected, 17 warnings in 763.02s (0:12:43)",
+      "junit": {
+        "path": "/tmp/plato-phase2c-feddyn-implementation/final-mandatory-not-runtime-313.xml",
+        "bytes": 189163,
+        "sha256": "9bf0de982f4e8661650d1e3922a92a98631e791edce8f40a786ff00a513984f5"
+      },
+      "counts": {
+        "tests": 1232,
+        "passed": 1231,
+        "failed": 0,
+        "skipped": 1
+      }
+    },
+    "final-mandatory-not-runtime-314": {
+      "head": "7d310b90d698a7be4aa9a184dc415f7dbb401e5b",
+      "command": "OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2c-314/bin/python -m pytest tests --test-profile mandatory -m 'not runtime' -q --basetemp /tmp/plato-phase2c-feddyn-implementation/final-mandatory-not-runtime-314 --junitxml /tmp/plato-phase2c-feddyn-implementation/final-mandatory-not-runtime-314.xml",
+      "shell": "zsh -lc",
+      "profile": "mandatory",
+      "partition": "not runtime",
+      "python_environment": "/tmp/plato-phase2c-314",
+      "exit_code": 0,
+      "seconds": 842.550791791873,
+      "log": "/tmp/plato-phase2c-feddyn-implementation/final-mandatory-not-runtime-314.log",
+      "sha256": "4332d284c0358117b7613f0049ef4a5fbd5ca97cac9e30970467333190188a48",
+      "summary": "1231 passed, 1 skipped, 51 deselected, 17 warnings in 835.52s (0:13:55)",
+      "junit": {
+        "path": "/tmp/plato-phase2c-feddyn-implementation/final-mandatory-not-runtime-314.xml",
+        "bytes": 189164,
+        "sha256": "7fda8dc0f3a1072692e341d61fcd515fdcccb9868514ea66516edf5b0606c51f"
+      },
+      "counts": {
+        "tests": 1232,
+        "passed": 1231,
+        "failed": 0,
+        "skipped": 1
+      }
+    },
+    "final-base-not-runtime-313": {
+      "head": "7d310b90d698a7be4aa9a184dc415f7dbb401e5b",
+      "command": "OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2c-313/bin/python -m pytest tests --test-profile base -m 'not runtime' -q --basetemp /tmp/plato-phase2c-feddyn-implementation/final-base-not-runtime-313 --junitxml /tmp/plato-phase2c-feddyn-implementation/final-base-not-runtime-313.xml",
+      "shell": "zsh -lc",
+      "profile": "base",
+      "partition": "not runtime",
+      "python_environment": "/tmp/plato-phase2c-313",
+      "exit_code": 0,
+      "seconds": 765.3687022500671,
+      "log": "/tmp/plato-phase2c-feddyn-implementation/final-base-not-runtime-313.log",
+      "sha256": "7a744f507a7bf922bbe25a6fa5f03bc3e23272afa192785975e37748db4208b6",
+      "summary": "1229 passed, 3 skipped, 51 deselected, 17 warnings in 760.02s (0:12:40)",
+      "junit": {
+        "path": "/tmp/plato-phase2c-feddyn-implementation/final-base-not-runtime-313.xml",
+        "bytes": 189599,
+        "sha256": "7d0ecae07bcd6e489ffe81cbe3412f074312284a949961eec0ec49f1971da9fc"
+      },
+      "counts": {
+        "tests": 1232,
+        "passed": 1229,
+        "failed": 0,
+        "skipped": 3
+      }
+    },
+    "final-base-not-runtime-314": {
+      "head": "7d310b90d698a7be4aa9a184dc415f7dbb401e5b",
+      "command": "OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2c-314/bin/python -m pytest tests --test-profile base -m 'not runtime' -q --basetemp /tmp/plato-phase2c-feddyn-implementation/final-base-not-runtime-314 --junitxml /tmp/plato-phase2c-feddyn-implementation/final-base-not-runtime-314.xml",
+      "shell": "zsh -lc",
+      "profile": "base",
+      "partition": "not runtime",
+      "python_environment": "/tmp/plato-phase2c-314",
+      "exit_code": 0,
+      "seconds": 839.6064041669015,
+      "log": "/tmp/plato-phase2c-feddyn-implementation/final-base-not-runtime-314.log",
+      "sha256": "809bc2c9d83041c2e4affbd0bec62a9ec3d3791dfb2940a514cd809d13cd3bd9",
+      "summary": "1229 passed, 3 skipped, 51 deselected, 17 warnings in 833.90s (0:13:53)",
+      "junit": {
+        "path": "/tmp/plato-phase2c-feddyn-implementation/final-base-not-runtime-314.xml",
+        "bytes": 189601,
+        "sha256": "ec175575fc24fd86b7b95a36b62d39afc8c521b6a242d9af1efb1c99a67f460f"
+      },
+      "counts": {
+        "tests": 1232,
+        "passed": 1229,
+        "failed": 0,
+        "skipped": 3
+      }
+    }
+  },
+  "runtime": {
+    "313": {
+      "head": "05a9f00b8a4d54c233c1a9c00ef9ce2c4467480c",
+      "command": "OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2c-313/bin/python -m pytest tests --test-profile mandatory -m runtime -q --basetemp /tmp/plato-phase2c-feddyn-implementation/combined-mandatory-runtime-313 --junitxml /tmp/plato-phase2c-feddyn-implementation/combined-mandatory-runtime-313.xml",
+      "shell": "zsh -lc",
+      "profile": "mandatory",
+      "partition": "runtime",
+      "python_environment": "/tmp/plato-phase2c-313",
+      "exit_code": 0,
+      "seconds": 668.1595383340027,
+      "log": "/tmp/plato-phase2c-feddyn-implementation/combined-mandatory-runtime-313.log",
+      "sha256": "2d11952235a5f45451102d8f1f5e5a45b66dd8f7bea843e15dd387f914009278",
+      "summary": "51 passed, 1232 deselected in 659.89s (0:10:59)",
+      "junit": {
+        "path": "/tmp/plato-phase2c-feddyn-implementation/combined-mandatory-runtime-313.xml",
+        "bytes": 7971,
+        "sha256": "05fe9a1c2f125151e4f8d46296ac36d7ad3e8f3869229eed7cf7e81cf347fc1f"
+      },
+      "source_attribution": "Executed at 05a9f00b. Later 7d310b changes only one unrelated FedDyn test-isolation branch; all production/runtime test and harness blobs are identical."
+    },
+    "314": {
+      "head": "05a9f00b8a4d54c233c1a9c00ef9ce2c4467480c",
+      "command": "OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2c-314/bin/python -m pytest tests --test-profile mandatory -m runtime -q --basetemp /tmp/plato-phase2c-feddyn-implementation/combined-mandatory-runtime-314 --junitxml /tmp/plato-phase2c-feddyn-implementation/combined-mandatory-runtime-314.xml",
+      "shell": "zsh -lc",
+      "profile": "mandatory",
+      "partition": "runtime",
+      "python_environment": "/tmp/plato-phase2c-314",
+      "exit_code": 0,
+      "seconds": 689.3806555839255,
+      "log": "/tmp/plato-phase2c-feddyn-implementation/combined-mandatory-runtime-314.log",
+      "sha256": "85bd0f3726317b2384719c5b9187e6f4ce5c88097eed5677fec538b6ac4a526c",
+      "summary": "51 passed, 1232 deselected in 680.58s (0:11:20)",
+      "junit": {
+        "path": "/tmp/plato-phase2c-feddyn-implementation/combined-mandatory-runtime-314.xml",
+        "bytes": 7971,
+        "sha256": "16a9aafb17491f502746913db7a7f7723cc73b13608e90a69276584eff829809"
+      },
+      "source_attribution": "Executed at 05a9f00b. Later 7d310b changes only one unrelated FedDyn test-isolation branch; all production/runtime test and harness blobs are identical."
+    }
+  },
+  "acceptance_criteria": {
+    "FD-A01": {
+      "tests": [
+        "test_loss_matches_independent_scalar_equation",
+        "test_zero_alpha_is_exact_task_loss"
+      ],
+      "status": "IMPLEMENTED_DUAL_VERSION_QUALIFIED_REVIEW_PENDING"
+    },
+    "FD-A02": {
+      "tests": [
+        "test_three_round_actual_partial_participation"
+      ],
+      "status": "IMPLEMENTED_DUAL_VERSION_QUALIFIED_REVIEW_PENDING"
+    },
+    "FD-A03": {
+      "tests": [
+        "test_three_round_actual_partial_participation"
+      ],
+      "status": "IMPLEMENTED_DUAL_VERSION_QUALIFIED_REVIEW_PENDING"
+    },
+    "FD-A04": {
+      "tests": [
+        "test_multiple_participants_preserve_inactive_history_population_mean",
+        "test_actual_full_participation_first_cloud"
+      ],
+      "status": "IMPLEMENTED_DUAL_VERSION_QUALIFIED_REVIEW_PENDING"
+    },
+    "FD-A05": {
+      "tests": [
+        "test_sample_alpha_uses_population_counts_never_labels",
+        "test_classification_permutation_preserves_full_objective_gradient",
+        "test_realized_partition_count_uses_sampler_not_global_backing_data",
+        "test_actual_local_schema_buffer_and_count_mutation_rolls_back"
+      ],
+      "status": "IMPLEMENTED_DUAL_VERSION_QUALIFIED_REVIEW_PENDING"
+    },
+    "FD-A06": {
+      "tests": [
+        "test_full_example_rejects_invalid_configuration",
+        "test_full_sample_vector_is_required_and_finite",
+        "test_optimizer_configuration_is_not_silently_coerced",
+        "test_effective_alpha_overflow_and_underflow_are_rejected"
+      ],
+      "status": "IMPLEMENTED_DUAL_VERSION_QUALIFIED_REVIEW_PENDING"
+    },
+    "FD-A07": {
+      "tests": [
+        "test_optimizer_parameter_identity_and_static_full_state",
+        "test_actual_local_schema_buffer_and_count_mutation_rolls_back"
+      ],
+      "status": "IMPLEMENTED_DUAL_VERSION_QUALIFIED_REVIEW_PENDING"
+    },
+    "FD-A08": {
+      "tests": [
+        "test_accumulated_tail_and_skips_count_only_real_updates",
+        "test_empty_or_all_skipped_attempt_refuses_outbound_and_valid_retry"
+      ],
+      "status": "IMPLEMENTED_DUAL_VERSION_QUALIFIED_REVIEW_PENDING"
+    },
+    "FD-A09": {
+      "tests": [
+        "test_actual_spawn_reused_client_matches_partial_oracle",
+        "test_consecutive_same_client_uses_current_cloud_and_dispatched_history",
+        "test_actual_spawn_returns_personal_state_and_optimizer_across_rounds"
+      ],
+      "status": "IMPLEMENTED_DUAL_VERSION_QUALIFIED_REVIEW_PENDING"
+    },
+    "FD-A10": {
+      "tests": [
+        "test_actual_spawned_rejection_retry_and_logical_reuse"
+      ],
+      "status": "IMPLEMENTED_DUAL_VERSION_QUALIFIED_REVIEW_PENDING"
+    },
+    "FD-A11": {
+      "tests": [
+        "test_whole_batch_rejection_preserves_every_history_and_retry_identity",
+        "test_callback_and_partial_load_boundary",
+        "test_actual_inbound_whole_dispatch_validation_before_mutation"
+      ],
+      "status": "IMPLEMENTED_DUAL_VERSION_QUALIFIED_REVIEW_PENDING"
+    },
+    "FD-A12": {
+      "tests": [
+        "test_complete_bundle_round_two_to_three_matches_rational_reference",
+        "test_rejected_bundle_preserves_model_history_live_rng_and_previous_pending",
+        "test_failed_bundle_serialization_preserves_previous_canonical_bytes",
+        "test_pending_resume_handoff_is_atomic_and_consumed_once",
+        "test_actual_shipped_run_resume_matches_four_round_control_and_rng"
+      ],
+      "status": "IMPLEMENTED_DUAL_VERSION_QUALIFIED_REVIEW_PENDING"
+    },
+    "FD-A13": {
+      "tests": [
+        "test_shipped_mnist_shaped_lenet_spawn_and_real_socket_cloud",
+        "test_actual_shipped_run_resume_matches_four_round_control_and_rng"
+      ],
+      "status": "IMPLEMENTED_DUAL_VERSION_QUALIFIED_REVIEW_PENDING"
+    },
+    "FD-A14": {
+      "tests": [
+        "Fresh independent FD/SCAFFOLD implementation and Astra prose reviews remain root-owned gates."
+      ],
+      "status": "ROOT_CODE_PROSE_GATE_PENDING"
+    },
+    "FD-A15": {
+      "tests": [
+        "test_actual_accepted_b_feddyn_writer_migration",
+        "test_legacy_actual_writer_weight_bias_and_corruption_are_inspection_only",
+        "test_feddyn_exact_legacy_prefix_load_is_same_client_and_canonical_wins"
+      ],
+      "status": "IMPLEMENTED_DUAL_VERSION_QUALIFIED_REVIEW_PENDING"
+    }
+  },
+  "test_contract_reconciliation": "ROOT-2BC-01 now uses seed9 private Random reference, actual initial selection plus five continued choices, seven unrelated global draws, NumPy/model/round/history/root assertions and five ordinary/slash/collision/240-char names. Production B RNG preserved.",
+  "warnings": "Visible17 Opacus warnings expected in DP experiments: secure RNG5, RDP order3, backward hook4, nonzero budget2 and distinct Subset identity3. No blanket filter or global suppression. Torch distributed elastic prints platform redirect notice in mandatory prerequisite imports. Native tokenizer skip only where allowed by existing exact profile.",
+  "development_failures_retained": [
+    "Initial direct FDmetadata native leaves were ndarray on1fe; exact acceptedD resolves this. Removed all production/test scalar adaptations, actual codec tested.",
+    "Expanded cleanup-call counter initially included start-of-run reset; corrected test scopes count to post-end cleanup ownership.",
+    "LeNet independent h+(y-x) vs h+y-x differs by float32 rounding; history assertions use design-authorized atol/rtol1e-6 rather than exact bit equality. Scalar Fraction assertions stay1e-12.",
+    "Changing sampler cardinality caused out-of-range batch read: dedicated local stable loader now checks before physical batch fetch.",
+    "Combined05a base profile failed one real-spawn test because another example import replaced feddyn_trainer module. Test-only isolated guarded interpreter fixed class identity; numerical/full-parent-state assertions retained. Failed full logs/XML preserved; no claim oldfullbase passed.",
+    "Underflow test first chose a coefficient that remained representable; corrected boundary to smallest float64 subnormal5e-324. No production change was needed."
+  ],
+  "limits": [
+    "No whole-C or Phase2 acceptance; fresh FD/SCAFFOLD/prose reviews and root phase gate still required.",
+    "CPU synthetic fixtures and real local sockets only; no MNIST accuracy, finite-SGD convergence, active author-clipping equivalence, CUDA or GPU replay claim.",
+    "Complete committed-round replay only; no in-flight/global optimizer/client restart protocol or arbitrary external callback side-effect transaction.",
+    "Read-only legacy history inspection cannot implicitly continue old mathematically different trajectory; explicit fresh warm-start histories zero and new UUID.",
+    "Inherited server close exits normally with process status0; client entrypoints naturally return. Listener/registration/network are actual, not intercepted.",
+    "No D/A production edits; accepted28D and22A blobs preserved exactly. No standalone prose/CI/metadata/conftest/manifest edits or push."
+  ],
+  "owned_scratch_inventory": [
+    "/tmp/plato-phase2c-feddyn-implementation",
+    "/tmp/plato-phase2c-313",
+    "/tmp/plato-phase2c-314",
+    "/tmp/plato-phase2c-scratch",
+    "/tmp/plato-phase2c-fixes",
+    "/tmp/plato-phase2c-ssl",
+    "/tmp/plato-phase2c-ssl314"
+  ],
+  "raw_inventory": {
+    "scaffold-intermediate-scratch-inventory.json": {
+      "bytes": 907139,
+      "sha256": "4d0f66ae6227b717679dc78285bbf5c7d353ae7d86bccedda15b74148a0c64e8"
+    },
+    "scaffold-review3-green314.log": {
+      "bytes": 13576,
+      "sha256": "32dbda70cf503ff9c0a4791bcaa4b8794ab1a06f4765366519eea6ee7b88bb19"
+    },
+    "d-focused314.log": {
+      "bytes": 272,
+      "sha256": "ba318f587a1103668c2d374fb35dfad9f836d3091843c4372325e4f51689a82b"
+    },
+    "final-mandatory-not-runtime-314.xml": {
+      "bytes": 189164,
+      "sha256": "7fda8dc0f3a1072692e341d61fcd515fdcccb9868514ea66516edf5b0606c51f"
+    },
+    "scaffold-review2-committed-checks-314.log": {
+      "bytes": 38,
+      "sha256": "d63ab3df51a50c66f9c57056288c7d4faf9dce413552d89215714320ac2b748e"
+    },
+    "scaffold-review2-committed-archive-313.json": {
+      "bytes": 675,
+      "sha256": "899918051c6eabf27aa480109706444d1a12feb503e6055b82f36e60de581e99"
+    },
+    "entrypoint-rounds313.log": {
+      "bytes": 2663,
+      "sha256": "eb3fb9d3fde4eb3350369458450cdf443271deec3418ffaba7515f97e15f6dc7"
+    },
+    "scaffold-review2-committed-probe-314.json": {
+      "bytes": 656,
+      "sha256": "aae2cf34e6ed20b53bd7ab314c39de9d299c1e08dc05afaa756877e527be9831"
+    },
+    "dependency-merge.json": {
+      "bytes": 7633,
+      "sha256": "8c1a4cab76141060551693867de0e9ba15b962ae3dd4c2ea9921ad21c9682113"
+    },
+    "scaffold-review2-committed-checks-314.json": {
+      "bytes": 657,
+      "sha256": "e64dca988e993e882d0922c89d2716e92ab34da5f295a78e2589351b520398b2"
+    },
+    "final-mandatory-not-runtime-313.json": {
+      "bytes": 880,
+      "sha256": "564f794eb7134e1213c193fba4b651a669e4e9b2686c0d9e7d61ba538cd4be05"
+    },
+    "scaffold-review2-committed-probe-clean-314.json": {
+      "bytes": 678,
+      "sha256": "c6ad8b0da76117e1ab03230a5d6a71305a1c7f36966a7fe6314f918f5320be57"
+    },
+    "scaffold-review2-committed-archive-qualified-313.json": {
+      "bytes": 713,
+      "sha256": "d0dbed9717d0a04524fa8c135ee60cee404a788a2afd35290d1f075e3781e08a"
+    },
+    "feddyn-core313.log": {
+      "bytes": 181,
+      "sha256": "92aef9ab76bc10abeef9a886d3390930eabe8968dd55bb12e22fc5dbe923d3a9"
+    },
+    "scaffold-axes-pass313.log": {
+      "bytes": 100,
+      "sha256": "2e6b65464775fb5c9ed6f6a85070fccd6a6b9a082374c7f1d525936c317a9e03"
+    },
+    "feddyn-scalar-red313.log": {
+      "bytes": 16517,
+      "sha256": "1049d945ffe93ad695d981628ae5cad274cbb6354a2867f5ee336d6be38bd5df"
+    },
+    "d-merged-entry314.log": {
+      "bytes": 110,
+      "sha256": "d7118c253d9f66fd7a40316dbc1c0238f18b6bdccb08c24ddb178f2841eb4231"
+    },
+    "adapt_scaffold_review2.py": {
+      "bytes": 3138,
+      "sha256": "acf8f1399496355783f394a34962270c769c47279c27a500ac35646c8873e853"
+    },
+    "build_validation.py": {
+      "bytes": 10382,
+      "sha256": "46d00ff6903a5c73d266b203c9348aba1e0aa9c1dce7b8b940be2d4a57b97e30"
+    },
+    "portable313.log": {
+      "bytes": 113,
+      "sha256": "8af95d79bad1277bf0fa4a4733b4e16c28874d81a275970c93ed51043b96bc36"
+    },
+    "scaffold-review2-committed-archive-313.log": {
+      "bytes": 24,
+      "sha256": "2028ba6db36217caa7fef84beb95d2dc85a351046b3f0bba11abbd701d70c1b7"
+    },
+    "combined-mandatory-runtime-313.xml": {
+      "bytes": 7971,
+      "sha256": "05fe9a1c2f125151e4f8d46296ac36d7ad3e8f3869229eed7cf7e81cf347fc1f"
+    },
+    "feddyn-numerical-old-red313.log": {
+      "bytes": 17552,
+      "sha256": "95238308a45aaf4c4b13e8f4a5e12f85fe93615ad2904141f74a42d41713055b"
+    },
+    "environment314.json": {
+      "bytes": 673,
+      "sha256": "2985af12012f4c3fd577241557289e07479f2928430f25d0bfc116b0351de5e4"
+    },
+    "feddyn-rounds-spawn313.log": {
+      "bytes": 100,
+      "sha256": "52e0e78e437ef65b816d24da60d0737be1a548bc298503c649b4901c80c988ee"
+    },
+    "feddyn-red-runner.py": {
+      "bytes": 315,
+      "sha256": "e3451575d36e00e7a744e780597a3cb6c1fb89be4355034f32ab39ebb83a4cf9"
+    },
+    "scaffold-review2-red313.log": {
+      "bytes": 57303,
+      "sha256": "fd4e3064d4b05b50adfcaf0621b77fcfe1de8548f566690134e8392d92010d44"
+    },
+    "entrypoint-rounds314.log": {
+      "bytes": 2663,
+      "sha256": "d3d6f99bc7d6d5f097daae6d393e9d7bd3010a994343166533d56a9d3bcbe5da"
+    },
+    "inbound-scope-pass313.log": {
+      "bytes": 7895,
+      "sha256": "8f5d5992547546c2372348482088e55f4ed7fd5e01504f999a85ce214aeac2d2"
+    },
+    "scaffold-review2-committed-checks-313.log": {
+      "bytes": 38,
+      "sha256": "d63ab3df51a50c66f9c57056288c7d4faf9dce413552d89215714320ac2b748e"
+    },
+    "worker-rejection-dev313.log": {
+      "bytes": 126,
+      "sha256": "3119b119ad1a99e497217dfa835642b839334061abd34f1787488d6622fc9236"
+    },
+    "entrypoint-dev313.log": {
+      "bytes": 5450,
+      "sha256": "7146dcca6f3d69dca9128e24aac9c59e8223e76b579ea9304eefd176b7e5160f"
+    },
+    "scaffold-review2-red-313.json": {
+      "bytes": 1111,
+      "sha256": "288c6451fd1447074c5354b727d3a9ea35eef0d86fdc86054065573273d09856"
+    },
+    "d-focused313.log": {
+      "bytes": 272,
+      "sha256": "b59d6f94fe4fa58cb0ac0cd71507b01812357812e880ac98bcdec21db8a7fc3d"
+    },
+    "final-mandatory-not-runtime-313.xml": {
+      "bytes": 189163,
+      "sha256": "9bf0de982f4e8661650d1e3922a92a98631e791edce8f40a786ff00a513984f5"
+    },
+    "ty-composable-current.log": {
+      "bytes": 19,
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    "scaffold-review3-green313.log": {
+      "bytes": 13558,
+      "sha256": "b76f3a75704839cf16f97b90f66494629a0a87311f08b29eeae205acad64b2d3"
+    },
+    "ty-final7d.log": {
+      "bytes": 19,
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    "feddyn-numerical-old-red314.log": {
+      "bytes": 17552,
+      "sha256": "68f93984a25a7b672809e77b19583ec03bbf425ea25ecd139c4784fffb82dfec"
+    },
+    "combined-mandatory-runtime-314.xml": {
+      "bytes": 7971,
+      "sha256": "16a9aafb17491f502746913db7a7f7723cc73b13608e90a69276584eff829809"
+    },
+    "scaffold_review2_runs.py": {
+      "bytes": 3107,
+      "sha256": "56ada21dc0b710328cffd2bfdb76051c157961fd80ffed4b5229c48169389970"
+    },
+    "d-merged-entry313.log": {
+      "bytes": 110,
+      "sha256": "052a90b5cecf5f49da927af858a437de73e27e19f7f397055b92583a1a95d4a1"
+    },
+    "scaffold-axes-pass314.log": {
+      "bytes": 100,
+      "sha256": "98ba3d0a35cfe5f00b70b85b8ecf5daa99cfd07d1e2b1728857180a1e072346d"
+    },
+    "dependency-production-blobs.json": {
+      "bytes": 10085,
+      "sha256": "4d6c673078f01b492407b8004e125dfb92ffbc8ceef77aace87b1430ccf8afb2"
+    },
+    "source-archive-0f177.json": {
+      "bytes": 337,
+      "sha256": "7f093fececb938ee767ef583250e10fb33c1c5efe6d6f5b85842f909504513ad"
+    },
+    "ruff-final7d.log": {
+      "bytes": 19,
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    "scaffold-review2-committed-archive-qualified-314.log": {
+      "bytes": 113,
+      "sha256": "8af95d79bad1277bf0fa4a4733b4e16c28874d81a275970c93ed51043b96bc36"
+    },
+    "ty-final-draft.log": {
+      "bytes": 19,
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    "scaffold-review2-qualified314.log": {
+      "bytes": 99,
+      "sha256": "83975f7abb679f50002c0d6c3164b85e3e6d8ad1d91f6bae28e7042b39673295"
+    },
+    "final-base-not-runtime-313.xml": {
+      "bytes": 189599,
+      "sha256": "7d0ecae07bcd6e489ffe81cbe3412f074312284a949961eec0ec49f1971da9fc"
+    },
+    "archive-fixture314.log": {
+      "bytes": 113,
+      "sha256": "8af95d79bad1277bf0fa4a4733b4e16c28874d81a275970c93ed51043b96bc36"
+    },
+    "scaffold-review2-committed-probe-clean-314.log": {
+      "bytes": 19817,
+      "sha256": "fe569b700b95f9328ebfa14eadf5bbcda9cddd1e6b510f93950b64535da07215"
+    },
+    "build_scaffold_intermediate_evidence.py": {
+      "bytes": 12478,
+      "sha256": "ed9750125baf29c1137b715e4041cb56ce29cdffb69bc6ec705b854306350dd0"
+    },
+    "environment313.json": {
+      "bytes": 647,
+      "sha256": "d550cf44fae2b08f3fe3bb887381c1240ea887fdb17c31eaaf05b806ff2e655f"
+    },
+    "ty-final.log": {
+      "bytes": 19,
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    "validate_combined.initial.py": {
+      "bytes": 1377,
+      "sha256": "7054f6676c396e681ca61f2d568e95a9c12099471a2061663d991666cda32b0c"
+    },
+    "preserved-feddyn-test-draft.py": {
+      "bytes": 3904,
+      "sha256": "d7595d180ec24be5ec1e1c754af48b5f29686b7484813f7c2bcfad95f01f72c9"
+    },
+    "combined-base-not-runtime-314.xml": {
+      "bytes": 195554,
+      "sha256": "c73b8c765b284f91cf76e2ea79e79a88a0f7e7146238acb4fa5256340c6df53d"
+    },
+    "scaffold-review2-committed-green-314.log": {
+      "bytes": 5138,
+      "sha256": "c9c026d9373b16271073c690ada9335b59d4d1858647a869bf74c89e2802bdea"
+    },
+    "scaffold-review2-red-immutable-313.json": {
+      "bytes": 1481,
+      "sha256": "934ac1a26286f113186af45062702bea0bf9aa2c694d656583475e91b76f5444"
+    },
+    "import-spawn314.log": {
+      "bytes": 100,
+      "sha256": "6cd309a6a652efa392e63bd0b52a15d19585eaa03bb4b06e19596141c904d03e"
+    },
+    "scaffold-cleanup-final313.log": {
+      "bytes": 100,
+      "sha256": "e79cd6e1ffb09ea49ade91b4deb10acfb555558b40b961abe0896ec9c99eb7ea"
+    },
+    "validate_combined.py": {
+      "bytes": 1418,
+      "sha256": "7f59e36ba73c81d27540b0f46c0debd2c1469440ea15642c749a5986bb2e6831"
+    },
+    "config-overflow-green313.log": {
+      "bytes": 99,
+      "sha256": "649be9ce276ad5d02177a316bb8589b588e5e686d761735ec2bdd5568bb734b8"
+    },
+    "final-mandatory-not-runtime-314.json": {
+      "bytes": 879,
+      "sha256": "2c6c714370305befbf55125df3001c14ef80149aab400c0a286d0d60963e3b04"
+    },
+    "feddyn-checkpoints313.log": {
+      "bytes": 114,
+      "sha256": "b80481a4206d5692dc94bfd22c44400284c42ff6dd619f9836d743d0c22f069c"
+    },
+    "feddyn-mixed-core313.log": {
+      "bytes": 8224,
+      "sha256": "94dd8b370631aa4d55710b2de80460237eb9c8c5387a73ca1ab2dd5cf0bfbe53"
+    },
+    "scaffold-review2-committed-probe-clean-313.json": {
+      "bytes": 678,
+      "sha256": "e6a9cf50635c634ed96cb0b79bea0b93249b3df5a8cd98b18f9803987e8a0ef7"
+    },
+    "scaffold-review2-committed-checks-313.json": {
+      "bytes": 657,
+      "sha256": "a394cd1cb0b4af5027034447a1792341f52a49f6a5229f99198d439b478dd037"
+    },
+    "archive-fixture313.log": {
+      "bytes": 113,
+      "sha256": "8af95d79bad1277bf0fa4a4733b4e16c28874d81a275970c93ed51043b96bc36"
+    },
+    "scaffold-review2-committed-probe-clean-313.log": {
+      "bytes": 19799,
+      "sha256": "3d04f000706118f28036fa22e05322a94d39703340dbf3912d3cd19770b384a2"
+    },
+    "scaffold-review2-committed-probe-313.json": {
+      "bytes": 656,
+      "sha256": "9089508f8580f3c384677c87866ef395055fb0c0a069f971922225b51cf98b19"
+    },
+    "final-base-not-runtime-314.xml": {
+      "bytes": 189601,
+      "sha256": "ec175575fc24fd86b7b95a36b62d39afc8c521b6a242d9af1efb1c99a67f460f"
+    },
+    "scaffold-review2-qualified313.log": {
+      "bytes": 99,
+      "sha256": "5a84374e2bf56ac6fe7000d91cc2e0abfa514170dff2262561fe2a60f4c4e4cb"
+    },
+    "scaffold-cleanup-spawn313.log": {
+      "bytes": 14549,
+      "sha256": "c81b800f0c723e1e04e547ccbe7c65f1638eb3993e1c31564e222c6ddf6e874d"
+    },
+    "scaffold-review2-committed-archive-qualified-313.log": {
+      "bytes": 113,
+      "sha256": "a020c6b2837a6fb6e4e87f8f1e4c21e68c35fc749c60929f2699a50b8c9026f4"
+    },
+    "feddyn-boundaries313.log": {
+      "bytes": 113,
+      "sha256": "5658d7ad8b81f780d1712e34bccc726091e20ac1eb066148d1db5de7867f8af0"
+    },
+    "accepted-d-wire313.log": {
+      "bytes": 275,
+      "sha256": "58566ec8887ed37a249f53907b9cff59717b51ec2202e1b3b2ae877b7b9ba492"
+    },
+    "feddyn-skips313.log": {
+      "bytes": 113,
+      "sha256": "e104760a6b9e88e22366d9ced533cc4abf7e6ed0623c416496727b305e424038"
+    },
+    "before-phase2c-validation.json": {
+      "bytes": 675989,
+      "sha256": "e54e4c6f3e7170f416e7b9769c0f171698d99a2278186951a3436fc6bf5cb453"
+    },
+    "feddyn-merged-old-red313.log": {
+      "bytes": 16553,
+      "sha256": "6e6f2a68f30e2a89782e024905c0c4d3b3cc0f0f119ead70cb52c4e6f6505a2a"
+    },
+    "personal-fd313.log": {
+      "bytes": 180,
+      "sha256": "12d68ef0bbfdc5381cfef07ec07cd3e86af6437b3ae5f7982f0254896beda7a6"
+    },
+    "scaffold-cleanup-final314.log": {
+      "bytes": 100,
+      "sha256": "659b9493a1a35a96a53438104feda50535fbfb80f698c061451a30ca732c5624"
+    },
+    "import-spawn313.log": {
+      "bytes": 100,
+      "sha256": "9df78fc9429343b6e24957282bd7b725203a602b18a5acb34927e9e4df7246da"
+    },
+    "scaffold-review2-committed-green-313.log": {
+      "bytes": 5090,
+      "sha256": "179d0a62aa80b52dd11c251bc7dd0b4aba645a61eb27cdff6c0f1fe9addae1e3"
+    },
+    "combined-base-not-runtime-313.xml": {
+      "bytes": 194165,
+      "sha256": "aaf8935f9fbf7a36a17a0697278378544e2d5dab7227662ad73a9cccb90b224f"
+    },
+    "ty-composable-baseline.log": {
+      "bytes": 19,
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    "inbound-scope313.log": {
+      "bytes": 19057,
+      "sha256": "953f60790b783a6e3bd4caeb2e8deadd153b6bc686c12675a6b90a43f9a2f2fb"
+    },
+    "scaffold-review2-committed-archive-qualified-314.json": {
+      "bytes": 713,
+      "sha256": "3a9b5904c52bac1b444ea3310bd217668b66034b6fe6acd5b043f92e73219ca8"
+    },
+    "source-archive-0f177.tar": {
+      "bytes": 9113600,
+      "sha256": "dfcbd2ffaab4f176767526e2fd74e7f4cc77c78939bf4e3af9804536fbe2e077"
+    },
+    "scaffold-review3-red313.log": {
+      "bytes": 13195,
+      "sha256": "0db64850af2bf616dcf539b0eaeff28d6a65d2fdc5b11881741512dad7b73f58"
+    },
+    "ruff-current.log": {
+      "bytes": 7010,
+      "sha256": "7067802548bf430cf469bbdc4b41166e2289bbdbc56a288c8b4d7625ba06eeb4"
+    },
+    "scaffold-review2-red-final-314.json": {
+      "bytes": 1473,
+      "sha256": "a35024009bc4a6958ac1b40b72e0bd8667f9e5686d493186c0519fd884123480"
+    },
+    "combined-base-not-runtime-313.json": {
+      "bytes": 874,
+      "sha256": "4f6b7ce2eeb1ca0e0e426879e541b7bf0e4e7d43f8bb1cbd46bff7b62ba3707e"
+    },
+    "before-phase2c-scaffold-facts.json": {
+      "bytes": 25464,
+      "sha256": "aed07e346cd7195eac6341de9e882113e4aeffbb208b054c2df6cfdce946501e"
+    },
+    "scaffold-tracked-red313.log": {
+      "bytes": 9417,
+      "sha256": "b1f2004c222e74026b772ff3a19701f4eb30fdde54969cab863cc48b5a23d570"
+    },
+    "old-source.tar": {
+      "bytes": 9205760,
+      "sha256": "7dcc83da3d43002c7a0f6ac5f53ae472e67a412489b7f3d7efe87aeeca8b23ca"
+    },
+    "feddyn-rounds-green313.log": {
+      "bytes": 11442,
+      "sha256": "fa1c28f62f1c2dfec8b458c86e89e49832a7ea8c20a073eb413470082fec5c23"
+    },
+    "final-base-not-runtime-313.log": {
+      "bytes": 6317,
+      "sha256": "7a744f507a7bf922bbe25a6fa5f03bc3e23272afa192785975e37748db4208b6"
+    },
+    "record_scaffold_boundary_command.py": {
+      "bytes": 1945,
+      "sha256": "f9aa9e25efd211ea1bc8d7f5c628bed0df5860f6d5ce3b9132d7fffb7c09e0b2"
+    },
+    "scaffold-review2-fixed314.log": {
+      "bytes": 99,
+      "sha256": "f845eaf5117e863a664e54310073036e818a448ea119e1157befbe16455a3732"
+    },
+    "scaffold-review2-committed-green-314.json": {
+      "bytes": 975,
+      "sha256": "1bd44d7334d068d91550e9abc711d3b6bfabea16755b1d4bd832d7bc5f750330"
+    },
+    "scaffold-axes-final313.log": {
+      "bytes": 71819,
+      "sha256": "b948f89a1ae76dd0d46c54e9fd48269522c68f270a8dfa656ad13f790c14c0e2"
+    },
+    "ty-composable-comparison.json": {
+      "bytes": 214,
+      "sha256": "0a102134dd01247aec2982f08dd2c7103ec734c85a373de848813040e77fc211"
+    },
+    "combined-base-not-runtime-314.log": {
+      "bytes": 12960,
+      "sha256": "742fcbdd0079a6cff73a28b7606d1888cd08b1fcb8c425f5f27a8316ff7ad693"
+    },
+    "scaffold-review2-committed-probe-314.log": {
+      "bytes": 8032,
+      "sha256": "31697e54f9670e4985649700d0d9bc0360d903fb19451567c9157f857f10e1e5"
+    },
+    "scaffold-cleanup-all314.log": {
+      "bytes": 14671,
+      "sha256": "abb6c33b5facec1c577831963e1214acbde47866ca917f9e51dfbc0eb46abe13"
+    },
+    "final-base-not-runtime-313.json": {
+      "bytes": 855,
+      "sha256": "0231a67916d1c29a56229bbb3a8918cc99d9c0f4ed5522c0ac2a572fab120813"
+    },
+    "config-overflow313.log": {
+      "bytes": 1604,
+      "sha256": "87d34f62cf939186a5b343624cf483387503186fa8a80dd0fb61aea424803a4f"
+    },
+    "scaffold-review2-final313.log": {
+      "bytes": 13773,
+      "sha256": "d9ace1eeea12037010b48bb3db925525d4dc7e333869cf6cd74a8999c6e8d17f"
+    },
+    "scaffold-review2-red-immutable-313.log": {
+      "bytes": 58532,
+      "sha256": "50fcdff99cdfb0ce3e81ee93ae4e5dcdc23020f0dcced97096870e3ef845418a"
+    },
+    "final-source.tar": {
+      "bytes": 9574400,
+      "sha256": "1055bb00189ca119f04f009a022dfb8ad0690ef0163da6655b1ab5bed9ec87e8"
+    },
+    "scaffold-review2-fixed313.log": {
+      "bytes": 99,
+      "sha256": "e07cf3ea2f75a57c4af107165a06eebecbe08d801151fd5e0c8513beca4b5599"
+    },
+    "final-base-not-runtime-314.log": {
+      "bytes": 6365,
+      "sha256": "809bc2c9d83041c2e4affbd0bec62a9ec3d3791dfb2940a514cd809d13cd3bd9"
+    },
+    "scaffold-tracked-red314.log": {
+      "bytes": 9417,
+      "sha256": "8b4029a2e0e00cbc6809ad206d7db99bfeba449f1b8529160213726e4ab44441"
+    },
+    "write_facts.py": {
+      "bytes": 7094,
+      "sha256": "46a29d41824115919bafc1d9e21ae82f24121c93f1bcd033d3c920eaf4f5685c"
+    },
+    "d-dependency-merge.json": {
+      "bytes": 609,
+      "sha256": "3b520f6fe856a0c75effb622650037ab885fa466fc64d727e05ec8ffc70f94d6"
+    },
+    "scaffold-review3-red314.log": {
+      "bytes": 13213,
+      "sha256": "7de75b2abf70a5c9a35288047d23eaf08bb4d31c35595b261ac855d61ba72ab1"
+    },
+    "scaffold-review2-final314.log": {
+      "bytes": 13773,
+      "sha256": "0729eaa16d5014a028d5cab26f53b9a618f7e0983d754c5a9092fea0b03b0901"
+    },
+    "scaffold-review2-committed-probe-313.log": {
+      "bytes": 8032,
+      "sha256": "2eb8d6364ad188dfa5757d4df1ffa3fecc1416ce67fb700bdade04c31b8200f6"
+    },
+    "scaffold-review2-green-313.json": {
+      "bytes": 954,
+      "sha256": "22a3037616448a26d060253cabd91c66e81664cc312ae5adb263a902aaf20191"
+    },
+    "worker-rejection314.log": {
+      "bytes": 127,
+      "sha256": "227be43a75220d1864b907a14f1faa70f313a621aa48d2ccf609133f6c3db7df"
+    },
+    "b-resume-dependency-merge.json": {
+      "bytes": 684,
+      "sha256": "9a89a102df6db92a8e083e13c7b2500a5a55d66890d7538608d887f3910eab65"
+    },
+    "scaffold-axes-final314.log": {
+      "bytes": 71819,
+      "sha256": "2566c3cb2ef1d85c8fd41e39dc81ec41848ad6590cad30cdbb739db5b86a5e94"
+    },
+    "combined-base-not-runtime-313.log": {
+      "bytes": 12131,
+      "sha256": "ceb438e216eafe7022f2e9c5564c5f7c237ae3e85cda3b333b422f35055c035f"
+    },
+    "combined-mandatory-runtime-314.json": {
+      "bytes": 843,
+      "sha256": "348331878ff96537c5055f44690e2efc918e89be41f060843733721b3a04f0be"
+    },
+    "ruff-final.log": {
+      "bytes": 19,
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    "final-mandatory-not-runtime-314.log": {
+      "bytes": 6506,
+      "sha256": "4332d284c0358117b7613f0049ef4a5fbd5ca97cac9e30970467333190188a48"
+    },
+    "scaffold-review2-red-final-314.log": {
+      "bytes": 80243,
+      "sha256": "3caae847f4b15711f98cea8da155fdcf6a14ef4336bc3326ddef9ee540d62cf8"
+    },
+    "scaffold-review2-probe313.log": {
+      "bytes": 19679,
+      "sha256": "66f828a1e2cf7b3ad2c38315aedbced17c567e04e45d5ea3d76c6c394281286c"
+    },
+    "scaffold-review2-green-313.log": {
+      "bytes": 5090,
+      "sha256": "faafc1e99d5e39b7a35bc20a94240e88c0eab19f6529100ab2e357d648db630c"
+    },
+    "combined-mandatory-runtime-313.json": {
+      "bytes": 843,
+      "sha256": "be24e9f2f150f3a8458cf58654b6f3a7d44dd6e15481a83a84e5c3a6b3f54c54"
+    },
+    "nonspawn-fd313.log": {
+      "bytes": 7962,
+      "sha256": "5e40d05a556b9a210921aa36992a125dc466f0e3da253f83fcc4b3ae04a7793e"
+    },
+    "scaffold-review2-green-314.json": {
+      "bytes": 955,
+      "sha256": "af6fb2bc7750c7b32878056d845f034fe8ca2ef7f8273af2a96acf6694cbd335"
+    },
+    "feddyn-rounds-green3-313.log": {
+      "bytes": 2360,
+      "sha256": "9b03d43299b277d5913c0d2f7e92eef90bd077cffc7f647808b7ebf089d298f8"
+    },
+    "combined-mandatory-runtime-313.log": {
+      "bytes": 329,
+      "sha256": "2d11952235a5f45451102d8f1f5e5a45b66dd8f7bea843e15dd387f914009278"
+    },
+    "late-bounds313.log": {
+      "bytes": 115,
+      "sha256": "c939b5b44e7c8fc71a0437a94bad6353c876af9d4312e80137ed495ea7cff437"
+    },
+    "preserved-feddyn-test-draft.json": {
+      "bytes": 366,
+      "sha256": "ec58eac95d98199ff8218956ca23ba349f40ddc0b3a15130d3b04ba946156edb"
+    },
+    "scaffold-review2-green-314.log": {
+      "bytes": 5138,
+      "sha256": "2ab2d925230517be7226f53786fa7a39747e5b24328ec1e5a903663f85c8f85a"
+    },
+    "before-phase2c-feddyn-disposition.json": {
+      "bytes": 3486,
+      "sha256": "4d9ff6109bdeb47f7634129ecd736ad6ea95c0f457f99d378b44b8387083c6d8"
+    },
+    "feddyn-rounds-green2-313.log": {
+      "bytes": 58807,
+      "sha256": "3d68ccdba8cf2dc50be41d2145b8179f1331596636d4832d289fbf8672f02a40"
+    },
+    "combined-base-not-runtime-314.json": {
+      "bytes": 874,
+      "sha256": "a311e1b71e8c46e9733ba6c8123cbae0d4dd4bff2872dc205bcb1cb27b1cf22d"
+    },
+    "scaffold-review2-red-final-313.json": {
+      "bytes": 1473,
+      "sha256": "37cb6069d852f53b7849c54558007ed465342c94a2520ca8af30d1479ebb09fd"
+    },
+    "scaffold-review2-probe314.log": {
+      "bytes": 19697,
+      "sha256": "811891438f8a80c27fa60a11aba275f43710f12c3e5bbf27ff1d04b3c4095086"
+    },
+    "scaffold-review2-red-313.log": {
+      "bytes": 6529,
+      "sha256": "d2e863fab09b3d2ad61bb813d334f3b51b050ac57542e0b2b198a72bafe28a78"
+    },
+    "scaffold-review2-red-final-313.log": {
+      "bytes": 80245,
+      "sha256": "a4f437fc953afa60c7ac5c9f24b138a1a9368a44b98876d62264b6267e63ac12"
+    },
+    "final-mandatory-not-runtime-313.log": {
+      "bytes": 6518,
+      "sha256": "d2cd0930a7678d71b52c5a26e3ec069cbf8460580dd032808177b232847fa6ff"
+    },
+    "feddyn-sealed313.log": {
+      "bytes": 180,
+      "sha256": "538aa57ccb219c3680f4b45d1007591c2b5a972d81e040ce714f514e5ba26921"
+    },
+    "combined-mandatory-runtime-314.log": {
+      "bytes": 269,
+      "sha256": "85bd0f3726317b2384719c5b9187e6f4ce5c88097eed5677fec538b6ac4a526c"
+    },
+    "final-base-not-runtime-314.json": {
+      "bytes": 855,
+      "sha256": "b79b971c69296d431a919778b82b8caf4f719db7a98507fd67c03f056641ceb3"
+    },
+    "ty-current.log": {
+      "bytes": 19,
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    "test_scaffold_callback_lifecycle.py": {
+      "bytes": 9340,
+      "sha256": "816499d3c791e5cc197d7a5a66e13359a6325b5843fefc9ec5a8ed28505b881c"
+    },
+    "nonspawn-fd314.log": {
+      "bytes": 8044,
+      "sha256": "571304108aaf6b04602a6b2fb02cad176c9d08879bcb5131248bd179f73a26eb"
+    },
+    "scaffold-review2-committed-green-313.json": {
+      "bytes": 975,
+      "sha256": "138edcffb2db7141539114f6418b1f439c2f51b5584675400e774af76fcb5991"
+    }
+  },
+  "evidence_commit_identity": "Published in a subsequent dedicated receipt commit to avoid a self-referential commit hash.",
+  "real_weighted_socket_qualification": {
+    "313": {
+      "result": {
+        "path": "/tmp/plato-phase2c-feddyn-implementation/combined-mandatory-runtime-313/test_real_two_client_cpu_socke0/round/result.json",
+        "bytes": 16464,
+        "sha256": "9c7733d972d0b432fb4e2e31c001395c9181fb83570768ef34dec1637d2dc844"
+      },
+      "samples": [
+        2,
+        6
+      ],
+      "max_error": 1.4901161193847656e-08,
+      "parameter_errors": {
+        "linear.weight": 1.4901161193847656e-08,
+        "linear.bias": 2.9103830456733704e-10
+      },
+      "natural_success": true,
+      "survivors": []
+    },
+    "314": {
+      "result": {
+        "path": "/tmp/plato-phase2c-feddyn-implementation/combined-mandatory-runtime-314/test_real_two_client_cpu_socke0/round/result.json",
+        "bytes": 16508,
+        "sha256": "fd879aee2f73d0d609c76397faa03be813540ab699f22551993bb5b109957e94"
+      },
+      "samples": [
+        2,
+        6
+      ],
+      "max_error": 1.4901161193847656e-08,
+      "parameter_errors": {
+        "linear.weight": 1.4901161193847656e-08,
+        "linear.bias": 2.9103830456733704e-10
+      },
+      "natural_success": true,
+      "survivors": []
+    }
+  },
+  "runtime_case_inventory": {
+    "313": {
+      "startup_cases": 48,
+      "feddyn_entrypoint_cases": 3
+    },
+    "314": {
+      "startup_cases": 48,
+      "feddyn_entrypoint_cases": 3
+    }
+  },
+  "source_identical_runtime_carry_forward": {
+    "executed_commit": "05a9f00b8a4d54c233c1a9c00ef9ce2c4467480c",
+    "final_implementation_commit": "7d310b90d698a7be4aa9a184dc415f7dbb401e5b",
+    "only_intervening_source_change": "FedDyn-only test branch in tests/trainers/test_personalized_state_ownership.py isolates its import namespace via guarded subprocess; no production/runtime test/harness/config difference.",
+    "diff": "tests/trainers/test_personalized_state_ownership.py | 18 ++++++++++++++++--\n 1 file changed, 16 insertions(+), 2 deletions(-)",
+    "no_repeat_reason": "All51 runtime cases passed; unrelated test-only import isolation is fully covered by rerun base/mandatory non-runtime profiles. No extra startup rerun solely for evidence commits.",
+    "verified_production_and_integration_blobs": 238,
+    "differences": []
+  },
+  "checks": {
+    "ruff": {
+      "path": "/tmp/plato-phase2c-feddyn-implementation/ruff-final7d.log",
+      "bytes": 19,
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    "ty": {
+      "path": "/tmp/plato-phase2c-feddyn-implementation/ty-final7d.log",
+      "bytes": 19,
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    "composable_baseline_comparison": {
+      "path": "/tmp/plato-phase2c-feddyn-implementation/ty-composable-comparison.json",
+      "bytes": 214,
+      "sha256": "0a102134dd01247aec2982f08dd2c7103ec734c85a373de848813040e77fc211"
+    },
+    "dependency_blob_comparison": {
+      "path": "/tmp/plato-phase2c-feddyn-implementation/dependency-production-blobs.json",
+      "bytes": 10085,
+      "sha256": "4d6c673078f01b492407b8004e125dfb92ffbc8ceef77aace87b1430ccf8afb2"
+    },
+    "profiling_runner": {
+      "path": "/tmp/plato-phase2c-feddyn-implementation/validate_combined.py",
+      "bytes": 1418,
+      "sha256": "7f59e36ba73c81d27540b0f46c0debd2c1469440ea15642c749a5986bb2e6831"
+    }
+  },
+  "known_warnings": {
+    "total_each_non_runtime_profile": 17,
+    "categories": {
+      "secure_rng_disabled": 5,
+      "rdp_order_boundary": 3,
+      "torch_full_backward_hook": 4,
+      "spent_budget_epsilon_calibration": 2,
+      "new_subset_dataset_identity": 3
+    },
+    "blanket_filters_added": false,
+    "privacy_limit": "Accounting state retained and measured; no global privacy-budget guarantee. make_private_with_epsilon warns it calibrates as if starting from zero."
+  },
+  "qualifying_profile_skip_policy": {
+    "base": "3 exact allowed Nanochat omissions; Opacus is installed and its actual tests run.",
+    "mandatory": "1 exact allowed absence of callable native rustbpe.Tokenizer; real Nanochat model/trainer cases run.",
+    "native_nanochat_pin": "c75fe54aa7c1fa881701c246f9427bcbe4eee5a4",
+    "submodule_command": "zsh -lc git submodule update --init external/nanochat; initialized exact existing pin, never updated gitlink."
+  },
+  "primary_source_receipts": [
+    {
+      "path": "/tmp/plato-phase2c-feddyn-design/utils_general.py",
+      "sha256": "6e79b259456475934b71cddc797b8dcf1e66818bd543465ad02225b6e506eca5"
+    },
+    {
+      "path": "/tmp/plato-phase2c-feddyn-design/utils_methods.py",
+      "sha256": "87026e71e3826893f3176359ce45bedfde858919f304b40e4ba564e214892d4d"
+    }
+  ]
+}

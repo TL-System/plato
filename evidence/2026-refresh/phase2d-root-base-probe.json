@@ -1,0 +1,29 @@
+{
+  "candidate_commit": "aa232791f04d93eb9de09ed6c596ac714db5b605",
+  "decision": "CHANGES_REQUESTED",
+  "findings": [
+    {
+      "id": "ROOT-2D-01",
+      "severity": "medium",
+      "title": "New optional-dependency imports break clean base-profile test collection.",
+      "paths": [
+        "tests/mpc/test_round_store_contracts.py:6",
+        "tests/utils/test_rl_payload_utilities.py:8"
+      ],
+      "observed": "A fresh locked test-base environment without Kazoo/Gymnasium fails collection with two ModuleNotFoundError errors. No test body runs.",
+      "required": "Preserve clean base collection and useful behavioral tests without broad skips, adding runtime optional packages to base metadata, or weakening mandatory prerequisites. These tests already use a fake lock adapter and an action-space data contract; keep those contracts testable independently of optional packages, and retain actual-package qualification in the mandatory profile where relevant."
+    }
+  ],
+  "environment": {
+    "python": "Python 3.13.16",
+    "profile": "uv sync --project /tmp/plato-refresh-worktrees/payloads --locked --python 3.13 --no-default-groups --group test-base",
+    "environment_path": "/tmp/plato-phase2-root/base-313"
+  },
+  "command": "HF_HUB_OFFLINE=1 HF_DATASETS_OFFLINE=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 TOKENIZERS_PARALLELISM=false /tmp/plato-phase2-root/base-313/bin/python -m pytest tests --collect-only --test-profile=base -m 'not runtime' -q",
+  "cwd": "/tmp/plato-refresh-worktrees/payloads",
+  "exit_code": 2,
+  "log": "/tmp/plato-phase2-root/d-base-collection.log",
+  "log_sha256": "34c7f4f2ba8a7c70a66150a53313d81cebaa5c6e07e2053843bc9c012471af81",
+  "error_output": "\n___________ ERROR collecting tests/mpc/test_round_store_contracts.py ___________\nImportError while importing test module '/private/tmp/plato-refresh-worktrees/payloads/tests/mpc/test_round_store_contracts.py'.\nHint: make sure your test modules/packages have valid Python names.\nTraceback:\n/Users/bli/.local/share/uv/python/cpython-3.13.16-macos-aarch64-none/lib/python3.13/importlib/__init__.py:88: in import_module\n    return _bootstrap._gcd_import(name[level:], package, level)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests/mpc/test_round_store_contracts.py:6: in <module>\n    from kazoo.exceptions import LockTimeout\nE   ModuleNotFoundError: No module named 'kazoo'\n__________ ERROR collecting tests/utils/test_rl_payload_utilities.py ___________\nImportError while importing test module '/private/tmp/plato-refresh-worktrees/payloads/tests/utils/test_rl_payload_utilities.py'.\nHint: make sure your test modules/packages have valid Python names.\nTraceback:\n/Users/bli/.local/share/uv/python/cpython-3.13.16-macos-aarch64-none/lib/python3.13/importlib/__init__.py:88: in import_module\n    return _bootstrap._gcd_import(name[level:], package, level)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests/utils/test_rl_payload_utilities.py:8: in <module>\n    from gymnasium import spaces\nE   ModuleNotFoundError: No module named 'gymnasium'\n=========================== short test summary info ============================\nERROR tests/mpc/test_round_store_contracts.py\nERROR tests/utils/test_rl_payload_utilities.py\n!!!!!!!!!!!!!!!!!!! Interrupted: 2 errors during collection !!!!!!!!!!!!!!!!!!!!\n373/421 tests collected (48 deselected), 2 errors in 0.29s\n",
+  "scope": "Exact committed 2D candidate; no source edits. Python 3.13 executed; Python 3.14 still requires correction validation."
+}

@@ -1,0 +1,1514 @@
+{
+  "schema_version": 1,
+  "finding_id": "ROOT-2C-COLLECTION-01",
+  "review_kind": "Fresh independent immutable-candidate count-collection harness review",
+  "reviewed_at_utc": "2026-10-03T13:31:59.710863+00:00",
+  "verdict": "PASS_BOUNDED",
+  "finding_status": "CORRECTED_IN_REVIEWED_CANDIDATE",
+  "material_findings": [],
+  "summary": "The guarded helper corrects the full-collection spawn identity failure while preserving all 20 count-boundary cases, all 18 original assertions, all state comparisons, real multiprocessing, and original numerical/deadline checks. Independent whole-suite collection plus selected execution passes 36 cases on each Python version. No tracked worker survivors. Approval is limited to the three-file count correction over accepted DP base f342.",
+  "reviewer": {
+    "independent_of_author": true,
+    "nested_agents": false,
+    "shell": "zsh -lc",
+    "scratch": "/private/tmp/plato-phase2-count-collection-review"
+  },
+  "candidate": {
+    "source": "/tmp/plato-refresh-worktrees/count-collection-review",
+    "commit": "0fbc1162994c05041105b1860fc8cb02582d21f3",
+    "tree": "55caefff33db4c0f41c3ac35d5ff661424f1fb88",
+    "implementation_commit": "05468d5db1632c525f7f3dc9ac11ab12cf2cb0cd",
+    "count_correction_base": "f342a5a6021cee938e0b880eca5919e09ace1981",
+    "independent_red_baseline": "2633f8394c142ec04db13743b54a427e04c2aed7",
+    "author_validation_evidence": {
+      "path": "/tmp/plato-refresh-worktrees/count-collection-review/evidence/2026-refresh/phase2c-count-collection-validation.json",
+      "sha256": "cabff482713fdc55ecd8cafc839321104a1c316d32ee494d1bc796076c62fe8a"
+    },
+    "exact_test_helper_diff": {
+      "path": "/private/tmp/plato-phase2-count-collection-review/reviewed-test-helper.diff",
+      "bytes": 5041,
+      "sha256": "86b5ad477b153573b248a4ed754455089a4d4c38a1a84f8664e767b6e3ad0e74"
+    },
+    "exact_three_file_diff": {
+      "path": "/private/tmp/plato-phase2-count-collection-review/reviewed-count-correction.diff",
+      "bytes": 44934,
+      "sha256": "69c5de6acaafc0bcc5bc6a9e40b0980fbcbe62e2f685c38df769598047b9bfa5"
+    }
+  },
+  "criteria": [
+    {
+      "criterion": "Review exact immutable baseline-to-candidate diff and commit ancestry; allow only count-boundary tests/helpers and evidence within this correction.",
+      "status": "PASS"
+    },
+    {
+      "criterion": "Preserve all 20 original parameterized count-boundary cases and every numerical/state assertion.",
+      "status": "PASS"
+    },
+    {
+      "criterion": "Use guarded standalone-process isolation for collection-sensitive spawn; execute the helper through its actual module entrypoint.",
+      "status": "PASS"
+    },
+    {
+      "criterion": "Preserve real multiprocessing spawn, normal production training, and worker acceptance; no mocks, guard changes, skip/exclusion changes, numeric tolerance relaxation, or timeout weakening.",
+      "status": "PASS"
+    },
+    {
+      "criterion": "Parent sampler.get is called exactly once and retains the realized [7, 13] partition over a 100-item backing TensorDataset.",
+      "status": "PASS"
+    },
+    {
+      "criterion": "Report, returned payload, and accepted worker-state count all equal 2; endpoint remains 1.622 with abs=1e-12.",
+      "status": "PASS"
+    },
+    {
+      "criterion": "Corrupted spawned count remains rejected in uniform and sample modes; preserve all model/parameter/gradient/dispatch/server/checkpoint rollback assertions and all three rational retries.",
+      "status": "PASS"
+    },
+    {
+      "criterion": "Preserve missing-history-count resume rollback of committed state, authority, pending RNG, snapshots, live RNG, checkpoint bytes, then corrected-count retry and committed round 3.",
+      "status": "PASS"
+    },
+    {
+      "criterion": "Preserve both callback events and four malformed count/key types, rollback and no pending state, unchanged checkpoint bytes, successful retry/counts and saved round 2.",
+      "status": "PASS"
+    },
+    {
+      "criterion": "Independent green runs must collect tests in full and select all 20 count-boundary tests under both Python 3.13 and Python 3.14; record zero skips, exit status and exact selected node identities.",
+      "status": "PASS"
+    },
+    {
+      "criterion": "Compare independent two-case full-collection red baselines to candidate behavior; retain root full-suite failure and isolation receipt references with verified log hashes.",
+      "status": "PASS"
+    },
+    {
+      "criterion": "Observe actual multiprocessing workers and helper execution, require worker completion and no surviving tracked descendants; do not rerun unrelated full suites or create mirror tests.",
+      "status": "PASS"
+    },
+    {
+      "criterion": "If DP correction is in candidate ancestry, compare its protected test and evidence blobs byte-for-byte with f342a5a6021cee938e0b880eca5919e09ace1981; do not repeat DP review.",
+      "status": "PASS"
+    },
+    {
+      "criterion": "Keep source and environments unchanged; disable bytecode and redirect all generated artifacts/caches to scratch.",
+      "status": "PASS"
+    }
+  ],
+  "source_DP_CI_preservation": {
+    "candidate_commit": "0fbc1162994c05041105b1860fc8cb02582d21f3",
+    "candidate_tree": "55caefff33db4c0f41c3ac35d5ff661424f1fb88",
+    "count_correction_base": "f342a5a6021cee938e0b880eca5919e09ace1981",
+    "independent_red_baseline": "2633f8394c142ec04db13743b54a427e04c2aed7",
+    "base_is_ancestor": true,
+    "exact_count_correction_files": [
+      "A\tevidence/2026-refresh/phase2c-count-collection-validation.json",
+      "A\ttests/integration/feddyn_partition_worker.py",
+      "M\ttests/integration/test_feddyn_count_boundaries.py"
+    ],
+    "unchanged_ast_objects": [
+      "SingleDrawPartition",
+      "test_actual_spawn_wrong_first_count_rejected_and_retry",
+      "test_nonzero_history_requires_saved_observed_count",
+      "test_inactive_callback_count_types_rejected_before_commit"
+    ],
+    "all_test_decorators_unchanged": true,
+    "original_assertions": 18,
+    "retained_original_assertions": 18,
+    "new_test_assertions": 23,
+    "original_partition_scenario_statements_preserved": true,
+    "protected_files": {
+      "tests/trainers/test_dp_data_loader_strategy.py": {
+        "sha256": "3f95d8d7942f173290852ab6c3f803b41c01831f4e008b285b473d7962df93bc",
+        "blob": "73eed9161913f7edaa271e7271007448231ad4c7"
+      },
+      "evidence/2026-refresh/phase2c-dp-typing-gate-validation.json": {
+        "sha256": "a03c9f0baa584c1544ad095d145294c1e12e8632719dfd2cf441bf0cb130619d",
+        "blob": "de3bffad65b1bd5dc8c52a2a472dd448ee5e01de"
+      },
+      "tests/conftest.py": {
+        "sha256": "3eb55a1fa7c0fd5428c296c1bcd7300b23b0ade3d276f5c687af3b9bd78304c7",
+        "blob": "bfe33dfa0df0fbd679ccda29474a9400d8f6b1d6"
+      },
+      "tests/integration/feddyn_count_worker.py": {
+        "sha256": "ad0dcb7acc45af04857ac0847966cbc67f83267cb72e7ce8759a2ddf43821602",
+        "blob": "08565afc00c12b605f63ba9b4f52766f3be58b12"
+      },
+      "tests/integration/feddyn_round_worker.py": {
+        "sha256": "186d124f054b75e9275b491d46d61cf9a872772bc5b1aff9b8db2c09b5d532bd",
+        "blob": "ea1d76a683b88f46343d3dd1be49df976fb25fde"
+      },
+      "tests/integration/feddyn_rejection_worker.py": {
+        "sha256": "4af0810e8ca568a6e1ab0c7c5295f07e627a43dac44943f02a34b71fd4a615ad",
+        "blob": "2cec4826f0d41f5ce58a7250a8fbd05ed4d132bf"
+      },
+      "tests/integration/test_feddyn_round_flow.py": {
+        "sha256": "b75032b94a7fa6559c4d642b8f97bb21be7f9eea231b2e8863b239c7d1cee5d0",
+        "blob": "0ea830f54f28adfe816631e19799ae76047a1a92"
+      },
+      ".github/workflows/pytorch_tests.yml": {
+        "sha256": "699c768a6fdb27bc75a0bae7ba7d333ddd39570bb2070bbb800fad020fc5f42e",
+        "blob": "ffd442d2c63d053b28409132329c61a96b4eed55"
+      },
+      "pyproject.toml": {
+        "sha256": "799bd7ba1865b097fdc8ca84a7b70337794e338de4aa9a6a13f6a4c1b9156246",
+        "blob": "28803a3d78188ee508c9e572bd8ac7eff406fedc"
+      },
+      "uv.lock": {
+        "sha256": "573b10c2ba1a2317e02f9e40c6181359cafab6f6e0a0f9be12bb256cb276fe1d",
+        "blob": "31729888535c7f0eae277b2fe0133ad9814cc4d4"
+      }
+    },
+    "preserved_directory_trees_vs_dp_base": {
+      "plato": {
+        "base": "5ecf74149d8028a1f34ab085e911ef73610b3aa5",
+        "candidate": "5ecf74149d8028a1f34ab085e911ef73610b3aa5"
+      },
+      "examples": {
+        "base": "0c665e0d7433a5acf49e5f4041f0a146ac6afee7",
+        "candidate": "0c665e0d7433a5acf49e5f4041f0a146ac6afee7"
+      },
+      "configs": {
+        "base": "3f40196521834cbaa60eeb008500fc3d4365c874",
+        "candidate": "3f40196521834cbaa60eeb008500fc3d4365c874"
+      },
+      "docs": {
+        "base": "896ea8d9377231f5ac7e95e1adeb102d842fa228",
+        "candidate": "896ea8d9377231f5ac7e95e1adeb102d842fa228"
+      },
+      ".github": {
+        "base": "d0f4fa42de873cc003f02b478e77987af773044a",
+        "candidate": "d0f4fa42de873cc003f02b478e77987af773044a"
+      }
+    },
+    "directory_trees_vs_integrated_baseline": {
+      "plato": {
+        "integrated": "5ecf74149d8028a1f34ab085e911ef73610b3aa5",
+        "candidate": "5ecf74149d8028a1f34ab085e911ef73610b3aa5"
+      },
+      "examples": {
+        "integrated": "133cd0c831caeb158dc020e4ee4bc1690deb1397",
+        "candidate": "0c665e0d7433a5acf49e5f4041f0a146ac6afee7"
+      },
+      "configs": {
+        "integrated": "3f40196521834cbaa60eeb008500fc3d4365c874",
+        "candidate": "3f40196521834cbaa60eeb008500fc3d4365c874"
+      },
+      "docs": {
+        "integrated": "993a47d492c4bfb7ba32474067e1c7d33787c2e2",
+        "candidate": "896ea8d9377231f5ac7e95e1adeb102d842fa228"
+      },
+      ".github": {
+        "integrated": "ffca0d79b56c12b3518b9898eea689e69c20986d",
+        "candidate": "d0f4fa42de873cc003f02b478e77987af773044a"
+      }
+    },
+    "integration_scope_note": "Candidate is a component branch. Relative to integrated 2633, production/config trees match; inherited docs/CI/evidence differences predate this correction. Approval covers only the three-file delta from accepted DP base f342, not replacing integrated branch history.",
+    "submodule_status": " c75fe54aa7c1fa881701c246f9427bcbe4eee5a4 external/nanochat (c75fe54)\n 1ccb152cea43fcbc3cd517a45c12c65734f8ace3 plato/models/dvit (heads/master)\n 0f63dc9558f4d192de926504dbddfa1b3f5db6ca plato/models/t2tvit (main-28-g0f63dc9)\n",
+    "historical_tracked_dvit_cpython37_files": 131,
+    "initial_source_status": "",
+    "final_source_status": "",
+    "final_submodule_status": "c75fe54aa7c1fa881701c246f9427bcbe4eee5a4 external/nanochat (c75fe54)\n 1ccb152cea43fcbc3cd517a45c12c65734f8ace3 plato/models/dvit (heads/master)\n 0f63dc9558f4d192de926504dbddfa1b3f5db6ca plato/models/t2tvit (main-28-g0f63dc9)"
+  },
+  "accepted_DP_review_and_acceptance_preservation": {
+    "phase2-dp-typing-review.json": {
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2-dp-typing-review.json",
+      "bytes": 171897,
+      "sha256": "d1c06f792fb68b1c81a45f56f01cd39702d1eeb7e73bc584c206d25b062e6393",
+      "keys": [
+        "schema_version",
+        "finding_id",
+        "review_kind",
+        "reviewed_at_utc",
+        "verdict",
+        "finding_status",
+        "material_findings",
+        "summary",
+        "reviewer",
+        "candidate",
+        "scope_preservation",
+        "assertion_and_execution_preservation",
+        "runtime_change_review",
+        "typing_and_owned_CI_gate",
+        "independent_validation",
+        "baseline_full_suite_evidence_carry_forward",
+        "author_evidence_reconciliation",
+        "review_receipts",
+        "resource_and_write_scope",
+        "handoff_state"
+      ],
+      "unchanged_after_review": true
+    },
+    "phase2-dp-typing-acceptance.json": {
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2-dp-typing-acceptance.json",
+      "bytes": 644,
+      "sha256": "8e77200138a6db9484864eedf1cf71f2a951a13312ccebcae5eeb6b7780905ce",
+      "keys": [
+        "status",
+        "finding",
+        "candidate",
+        "tree",
+        "review_sha256",
+        "validation",
+        "remaining"
+      ],
+      "unchanged_after_review": true
+    }
+  },
+  "DP_scope": "Protected DP test and validation evidence match f342 byte-for-byte. Existing root review/acceptance remain unchanged and their hash linkage validates. DP typing/runtime task was not repeated.",
+  "harness_isolation_review": {
+    "shell": "zsh -lc",
+    "bytecode_policy": "-B and PYTHONDONTWRITEBYTECODE=1 prohibit writes; existing site-package bytecode remains readable; no all-library relocation or cold bytecode-cache prefix policy",
+    "PYTHONPYCACHEPREFIX": null,
+    "timeout_locations": {
+      "tests/integration/test_feddyn_count_boundaries.py": [
+        {
+          "line": 49,
+          "seconds": 90
+        },
+        {
+          "line": 69,
+          "seconds": 90
+        }
+      ],
+      "tests/integration/test_feddyn_round_flow.py": [
+        {
+          "line": 190,
+          "seconds": 100
+        },
+        {
+          "line": 274,
+          "seconds": 100
+        },
+        {
+          "line": 350,
+          "seconds": 90
+        }
+      ],
+      "tests/trainers/test_personalized_state_ownership.py": [
+        {
+          "line": 222,
+          "seconds": 100
+        }
+      ]
+    },
+    "independent_ruff": {
+      "argv": [
+        "/tmp/plato-phase2-integration/mandatory-313/bin/ruff",
+        "check",
+        "tests/integration/test_feddyn_count_boundaries.py",
+        "tests/integration/feddyn_partition_worker.py",
+        "--select",
+        "I",
+        "--no-cache"
+      ],
+      "environment_overrides": {
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "RUFF_CACHE_DIR": "/tmp/plato-phase2-count-collection-review/ruff-cache"
+      },
+      "exit_code": 0,
+      "stdout": "All checks passed!\n"
+    },
+    "isolation_review": {
+      "helper_module_entrypoint": "python -m tests.integration.feddyn_partition_worker",
+      "shared_scenario": "tests.integration.test_feddyn_count_boundaries._run_single_partition",
+      "spawn_config_preserved": true,
+      "standalone_canonical_import_pattern": "__main__ imports run from tests.integration.feddyn_partition_worker, so observer class pickle resolves through a canonical module; worker __mp_main__ does not execute the guarded scenario.",
+      "failure_propagation": "Imports are unconditional; worker assertions raise normally; helper exit status, observation files, numerical outputs and active-child state are asserted. There is no exception catch or fallback path in the new helper.",
+      "observer_effect": "Only reads sampler.indices/length, trainer.trainset length and attempt count at epoch start; writes observations. It never calls sampler.get or iterates/draws the sampler, never loads batches or alters optimizer/model/config.",
+      "new_assertions_in_helper": 9,
+      "existing_failure_guards_unchanged": true
+    }
+  },
+  "independent_interpreters": {
+    "313": {
+      "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+      "executable": "/tmp/plato-phase2-integration/mandatory-313/bin/python",
+      "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+      "packages": {
+        "torch": "2.14.1",
+        "numpy": "2.5.3",
+        "pytest": "9.1.1",
+        "ruff": "0.16.10",
+        "opacus": "1.6.0",
+        "platformdirs": "4.12.2",
+        "pytest-cov": "7.1.0",
+        "anyio": "4.15.1"
+      }
+    },
+    "314": {
+      "python": "3.14.8 (main, Sep 30 2026, 17:55:09) [Clang 21.0.0 (clang-2100.3.34.2)]",
+      "executable": "/private/tmp/plato-phase2c-314/bin/python",
+      "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+      "packages": {
+        "torch": "2.14.1",
+        "numpy": "2.5.3",
+        "pytest": "9.1.1",
+        "ruff": "0.16.10",
+        "opacus": "1.6.0",
+        "platformdirs": "4.12.2",
+        "pytest-cov": "7.1.0",
+        "anyio": "4.15.1"
+      }
+    }
+  },
+  "independent_full_collection_red_green": {
+    "red-313": {
+      "commit": "2633f8394c142ec04db13743b54a427e04c2aed7",
+      "tree": "b68556b4fc2170c7e84c533645e76a5f7ab2685c",
+      "cwd": "/private/tmp/plato-refresh-worktrees/phase2-integrated-validation",
+      "argv": [
+        "/tmp/plato-phase2-integration/mandatory-313/bin/python",
+        "-B",
+        "-m",
+        "pytest",
+        "tests",
+        "-k",
+        "test_parent_realizes_partition_once_without_using_backing_length",
+        "-p",
+        "no:cacheprovider",
+        "-q",
+        "--basetemp=/private/tmp/plato-phase2-count-collection-review/runs/red-313/pytest-temp",
+        "--junitxml=/private/tmp/plato-phase2-count-collection-review/runs/red-313/results.xml"
+      ],
+      "launcher": [
+        "zsh",
+        "-lc",
+        "/tmp/plato-phase2-integration/mandatory-313/bin/python -B -m pytest tests -k test_parent_realizes_partition_once_without_using_backing_length -p no:cacheprovider -q --basetemp=/private/tmp/plato-phase2-count-collection-review/runs/red-313/pytest-temp --junitxml=/private/tmp/plato-phase2-count-collection-review/runs/red-313/results.xml"
+      ],
+      "origins": {
+        "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+        "executable": "/tmp/plato-phase2-integration/mandatory-313/bin/python",
+        "origins": {
+          "plato": "/private/tmp/plato-refresh-worktrees/phase2-integrated-validation/plato/__init__.py",
+          "tests": "/private/tmp/plato-refresh-worktrees/phase2-integrated-validation/tests/__init__.py",
+          "torch": "/tmp/plato-phase2-integration/mandatory-313/lib/python3.13/site-packages/torch/__init__.py",
+          "numpy": "/tmp/plato-phase2-integration/mandatory-313/lib/python3.13/site-packages/numpy/__init__.py",
+          "pytest": "/tmp/plato-phase2-integration/mandatory-313/lib/python3.13/site-packages/pytest/__init__.py"
+        }
+      },
+      "exit_code": 1,
+      "seconds": 9.303211458027363,
+      "log": "/private/tmp/plato-phase2-count-collection-review/runs/red-313/pytest.log",
+      "log_sha256": "9e5d6e14d116f7bea21af7bca558f96dd8dd019bbc20bfa0777cf7239bdeddbd",
+      "xml_sha256": "eac1d7ed9820c5985d1d8ccaf6436596de7512e0595a66226d5c9ebd6a821de7",
+      "summaries": [
+        "1 failed, 1 passed, 1301 deselected in 1.74s"
+      ],
+      "cases": [
+        {
+          "classname": "tests.integration.test_feddyn_count_boundaries",
+          "name": "test_parent_realizes_partition_once_without_using_backing_length[False]",
+          "outcome": "passed"
+        },
+        {
+          "classname": "tests.integration.test_feddyn_count_boundaries",
+          "name": "test_parent_realizes_partition_once_without_using_backing_length[True]",
+          "outcome": "failed"
+        }
+      ],
+      "survivors": [],
+      "initial_source_status": "",
+      "final_source_status": "",
+      "final_head": "2633f8394c142ec04db13743b54a427e04c2aed7",
+      "scope": "Whole tests suite collected; keyword-selected checks only. No full-profile qualification claim.",
+      "process_observation": "ps descendant sampling; completed worker acceptance is additionally checked by test assertions.",
+      "outcome_counts": {
+        "passed": 1,
+        "failed": 1
+      },
+      "receipt": {
+        "path": "/private/tmp/plato-phase2-count-collection-review/runs/red-313/receipt.json",
+        "bytes": 3752,
+        "sha256": "4758191410cfe4eb998838e42645f2d87364d7b8740146bcca70fdf31964f2d5"
+      },
+      "raw_log": {
+        "path": "/private/tmp/plato-phase2-count-collection-review/runs/red-313/pytest.log",
+        "bytes": 5925,
+        "sha256": "9e5d6e14d116f7bea21af7bca558f96dd8dd019bbc20bfa0777cf7239bdeddbd"
+      },
+      "raw_xml": {
+        "path": "/private/tmp/plato-phase2-count-collection-review/runs/red-313/results.xml",
+        "bytes": 5415,
+        "sha256": "eac1d7ed9820c5985d1d8ccaf6436596de7512e0595a66226d5c9ebd6a821de7"
+      },
+      "pytest_warning_count_reported": 0,
+      "warnings_scope": "Counts warnings reported by the pytest log; successful helpers retain the existing capture_output behavior. No warning filter was added or changed.",
+      "observed_descendant_processes": 3,
+      "full_collection": {
+        "root_argument": "tests",
+        "total_collected": 1303,
+        "selected": 2
+      },
+      "expected_failure": "spawn=True fails before training at multiprocessing PlainSGD pickling after whole-suite collection; spawn=False passes."
+    },
+    "red-314": {
+      "commit": "2633f8394c142ec04db13743b54a427e04c2aed7",
+      "tree": "b68556b4fc2170c7e84c533645e76a5f7ab2685c",
+      "cwd": "/private/tmp/plato-refresh-worktrees/phase2-integrated-validation",
+      "argv": [
+        "/tmp/plato-phase2c-314/bin/python",
+        "-B",
+        "-m",
+        "pytest",
+        "tests",
+        "-k",
+        "test_parent_realizes_partition_once_without_using_backing_length",
+        "-p",
+        "no:cacheprovider",
+        "-q",
+        "--basetemp=/private/tmp/plato-phase2-count-collection-review/runs/red-314/pytest-temp",
+        "--junitxml=/private/tmp/plato-phase2-count-collection-review/runs/red-314/results.xml"
+      ],
+      "launcher": [
+        "zsh",
+        "-lc",
+        "/tmp/plato-phase2c-314/bin/python -B -m pytest tests -k test_parent_realizes_partition_once_without_using_backing_length -p no:cacheprovider -q --basetemp=/private/tmp/plato-phase2-count-collection-review/runs/red-314/pytest-temp --junitxml=/private/tmp/plato-phase2-count-collection-review/runs/red-314/results.xml"
+      ],
+      "origins": {
+        "python": "3.14.8 (main, Sep 30 2026, 17:55:09) [Clang 21.0.0 (clang-2100.3.34.2)]",
+        "executable": "/private/tmp/plato-phase2c-314/bin/python",
+        "origins": {
+          "plato": "/private/tmp/plato-refresh-worktrees/phase2-integrated-validation/plato/__init__.py",
+          "tests": "/private/tmp/plato-refresh-worktrees/phase2-integrated-validation/tests/__init__.py",
+          "torch": "/private/tmp/plato-phase2c-314/lib/python3.14/site-packages/torch/__init__.py",
+          "numpy": "/private/tmp/plato-phase2c-314/lib/python3.14/site-packages/numpy/__init__.py",
+          "pytest": "/private/tmp/plato-phase2c-314/lib/python3.14/site-packages/pytest/__init__.py"
+        }
+      },
+      "exit_code": 1,
+      "seconds": 9.493356249993667,
+      "log": "/private/tmp/plato-phase2-count-collection-review/runs/red-314/pytest.log",
+      "log_sha256": "4ea040e80b15ad244a4647be07d3f5af6d6bcccad3c5ec895aa91814becdb65f",
+      "xml_sha256": "b4aac3f76ab6fe2d5bdb90b9fa29df859b1016a2bea360919403626a4ef21d6b",
+      "summaries": [
+        "1 failed, 1 passed, 1301 deselected in 1.89s"
+      ],
+      "cases": [
+        {
+          "classname": "tests.integration.test_feddyn_count_boundaries",
+          "name": "test_parent_realizes_partition_once_without_using_backing_length[False]",
+          "outcome": "passed"
+        },
+        {
+          "classname": "tests.integration.test_feddyn_count_boundaries",
+          "name": "test_parent_realizes_partition_once_without_using_backing_length[True]",
+          "outcome": "failed"
+        }
+      ],
+      "survivors": [],
+      "initial_source_status": "",
+      "final_source_status": "",
+      "final_head": "2633f8394c142ec04db13743b54a427e04c2aed7",
+      "scope": "Whole tests suite collected; keyword-selected checks only. No full-profile qualification claim.",
+      "process_observation": "ps descendant sampling; completed worker acceptance is additionally checked by test assertions.",
+      "outcome_counts": {
+        "passed": 1,
+        "failed": 1
+      },
+      "receipt": {
+        "path": "/private/tmp/plato-phase2-count-collection-review/runs/red-314/receipt.json",
+        "bytes": 3816,
+        "sha256": "af790639acd7c24d6f7ee029565660a87ffb2736875a3983d6a95d4785cb9196"
+      },
+      "raw_log": {
+        "path": "/private/tmp/plato-phase2-count-collection-review/runs/red-314/pytest.log",
+        "bytes": 6706,
+        "sha256": "4ea040e80b15ad244a4647be07d3f5af6d6bcccad3c5ec895aa91814becdb65f"
+      },
+      "raw_xml": {
+        "path": "/private/tmp/plato-phase2-count-collection-review/runs/red-314/results.xml",
+        "bytes": 6803,
+        "sha256": "b4aac3f76ab6fe2d5bdb90b9fa29df859b1016a2bea360919403626a4ef21d6b"
+      },
+      "pytest_warning_count_reported": 0,
+      "warnings_scope": "Counts warnings reported by the pytest log; successful helpers retain the existing capture_output behavior. No warning filter was added or changed.",
+      "observed_descendant_processes": 3,
+      "full_collection": {
+        "root_argument": "tests",
+        "total_collected": 1303,
+        "selected": 2
+      },
+      "expected_failure": "spawn=True fails before training at multiprocessing PlainSGD pickling after whole-suite collection; spawn=False passes."
+    },
+    "green-313": {
+      "commit": "0fbc1162994c05041105b1860fc8cb02582d21f3",
+      "tree": "55caefff33db4c0f41c3ac35d5ff661424f1fb88",
+      "cwd": "/private/tmp/plato-refresh-worktrees/count-collection-review",
+      "argv": [
+        "/tmp/plato-phase2-integration/mandatory-313/bin/python",
+        "-B",
+        "-m",
+        "pytest",
+        "tests",
+        "-k",
+        "test_feddyn_count_boundaries or test_actual_spawned_rejection_retry_and_logical_reuse or test_actual_spawn_reused_client_matches_partial_oracle or (test_actual_spawn_returns_personal_state_and_optimizer_across_rounds and feddyn)",
+        "-p",
+        "no:cacheprovider",
+        "-q",
+        "--basetemp=/private/tmp/plato-phase2-count-collection-review/runs/green-313/pytest-temp",
+        "--junitxml=/private/tmp/plato-phase2-count-collection-review/runs/green-313/results.xml"
+      ],
+      "launcher": [
+        "zsh",
+        "-lc",
+        "/tmp/plato-phase2-integration/mandatory-313/bin/python -B -m pytest tests -k 'test_feddyn_count_boundaries or test_actual_spawned_rejection_retry_and_logical_reuse or test_actual_spawn_reused_client_matches_partial_oracle or (test_actual_spawn_returns_personal_state_and_optimizer_across_rounds and feddyn)' -p no:cacheprovider -q --basetemp=/private/tmp/plato-phase2-count-collection-review/runs/green-313/pytest-temp --junitxml=/private/tmp/plato-phase2-count-collection-review/runs/green-313/results.xml"
+      ],
+      "origins": {
+        "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+        "executable": "/tmp/plato-phase2-integration/mandatory-313/bin/python",
+        "origins": {
+          "plato": "/private/tmp/plato-refresh-worktrees/count-collection-review/plato/__init__.py",
+          "tests": "/private/tmp/plato-refresh-worktrees/count-collection-review/tests/__init__.py",
+          "torch": "/tmp/plato-phase2-integration/mandatory-313/lib/python3.13/site-packages/torch/__init__.py",
+          "numpy": "/tmp/plato-phase2-integration/mandatory-313/lib/python3.13/site-packages/numpy/__init__.py",
+          "pytest": "/tmp/plato-phase2-integration/mandatory-313/lib/python3.13/site-packages/pytest/__init__.py"
+        }
+      },
+      "environment_overrides": {
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "GIT_OPTIONAL_LOCKS": "0",
+        "TMPDIR": "/private/tmp/plato-phase2-count-collection-review/runs/green-313/temp",
+        "XDG_CACHE_HOME": "/private/tmp/plato-phase2-count-collection-review/runs/green-313/cache",
+        "MPLCONFIGDIR": "/private/tmp/plato-phase2-count-collection-review/runs/green-313/matplotlib",
+        "HF_HOME": "/private/tmp/plato-phase2-count-collection-review/runs/green-313/huggingface",
+        "TORCH_HOME": "/private/tmp/plato-phase2-count-collection-review/runs/green-313/torch",
+        "OMP_NUM_THREADS": "1",
+        "OPENBLAS_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "VECLIB_MAXIMUM_THREADS": "1",
+        "NUMEXPR_NUM_THREADS": "1"
+      },
+      "exit_code": 0,
+      "seconds": 461.91898816707544,
+      "log": "/private/tmp/plato-phase2-count-collection-review/runs/green-313/pytest.log",
+      "log_sha256": "1fcd60474e0d7876009a485d958d92dd82e4d39be976599697af030a53c0ff97",
+      "xml_sha256": "4ecb9136eeb2700f4cb298f73fadb93d1841c048f3a8058154f548d49a5efe03",
+      "summaries": [
+        "36 passed, 1267 deselected in 456.36s (0:07:36)"
+      ],
+      "cases": [
+        {
+          "classname": "tests.integration.test_feddyn_count_boundaries",
+          "name": "test_actual_spawn_wrong_first_count_rejected_and_retry[uniform]",
+          "outcome": "passed"
+        },
+        {
+          "classname": "tests.integration.test_feddyn_count_boundaries",
+          "name": "test_actual_spawn_wrong_first_count_rejected_and_retry[sample]",
+          "outcome": "passed"
+        },
+        {
+          "classname": "tests.integration.test_feddyn_count_boundaries",
+          "name": "test_parent_realizes_partition_once_without_using_backing_length[False]",
+          "outcome": "passed"
+        },
+        {
+          "classname": "tests.integration.test_feddyn_count_boundaries",
+          "name": "test_parent_realizes_partition_once_without_using_backing_length[True]",
+          "outcome": "passed"
+        },
+        {
+          "classname": "tests.integration.test_feddyn_count_boundaries",
+          "name": "test_nonzero_history_requires_saved_observed_count[False-1-uniform]",
+          "outcome": "passed"
+        },
+        {
+          "classname": "tests.integration.test_feddyn_count_boundaries",
+          "name": "test_nonzero_history_requires_saved_observed_count[False-1-sample]",
+          "outcome": "passed"
+        },
+        {
+          "classname": "tests.integration.test_feddyn_count_boundaries",
+          "name": "test_nonzero_history_requires_saved_observed_count[False-2-uniform]",
+          "outcome": "passed"
+        },
+        {
+          "classname": "tests.integration.test_feddyn_count_boundaries",
+          "name": "test_nonzero_history_requires_saved_observed_count[False-2-sample]",
+          "outcome": "passed"
+        },
+        {
+          "classname": "tests.integration.test_feddyn_count_boundaries",
+          "name": "test_nonzero_history_requires_saved_observed_count[True-1-uniform]",
+          "outcome": "passed"
+        },
+        {
+          "classname": "tests.integration.test_feddyn_count_boundaries",
+          "name": "test_nonzero_history_requires_saved_observed_count[True-1-sample]",
+          "outcome": "passed"
+        },
+        {
+          "classname": "tests.integration.test_feddyn_count_boundaries",
+          "name": "test_nonzero_history_requires_saved_observed_count[True-2-uniform]",
+          "outcome": "passed"
+        },
+        {
+          "classname": "tests.integration.test_feddyn_count_boundaries",
+          "name": "test_nonzero_history_requires_saved_observed_count[True-2-sample]",
+          "outcome": "passed"
+        },
+        {
+          "classname": "tests.integration.test_feddyn_count_boundaries",
+          "name": "test_inactive_callback_count_types_rejected_before_commit[bool-value-on_weights_received]",
+          "outcome": "passed"
+        },
+        {
+          "classname": "tests.integration.test_feddyn_count_boundaries",
+          "name": "test_inactive_callback_count_types_rejected_before_commit[bool-value-on_weights_aggregated]",
+          "outcome": "passed"
+        },
+        {
+          "classname": "tests.integration.test_feddyn_count_boundaries",
+          "name": "test_inactive_callback_count_types_rejected_before_commit[float-value-on_weights_received]",
+          "outcome": "passed"
+        },
+        {
+          "classname": "tests.integration.test_feddyn_count_boundaries",
+          "name": "test_inactive_callback_count_types_rejected_before_commit[float-value-on_weights_aggregated]",
+          "outcome": "passed"
+        },
+        {
+          "classname": "tests.integration.test_feddyn_count_boundaries",
+          "name": "test_inactive_callback_count_types_rejected_before_commit[numpy-value-on_weights_received]",
+          "outcome": "passed"
+        },
+        {
+          "classname": "tests.integration.test_feddyn_count_boundaries",
+          "name": "test_inactive_callback_count_types_rejected_before_commit[numpy-value-on_weights_aggregated]",
+          "outcome": "passed"
+        },
+        {
+          "classname": "tests.integration.test_feddyn_count_boundaries",
+          "name": "test_inactive_callback_count_types_rejected_before_commit[float-key-on_weights_received]",
+          "outcome": "passed"
+        },
+        {
+          "classname": "tests.integration.test_feddyn_count_boundaries",
+          "name": "test_inactive_callback_count_types_rejected_before_commit[float-key-on_weights_aggregated]",
+          "outcome": "passed"
+        },
+        {
+          "classname": "tests.integration.test_feddyn_round_flow",
+          "name": "test_actual_spawned_rejection_retry_and_logical_reuse[exit]",
+          "outcome": "passed"
+        },
+        {
+          "classname": "tests.integration.test_feddyn_round_flow",
+          "name": "test_actual_spawned_rejection_retry_and_logical_reuse[save]",
+          "outcome": "passed"
+        },
+        {
+          "classname": "tests.integration.test_feddyn_round_flow",
+          "name": "test_actual_spawned_rejection_retry_and_logical_reuse[missing]",
+          "outcome": "passed"
+        },
+        {
+          "classname": "tests.integration.test_feddyn_round_flow",
+          "name": "test_actual_spawned_rejection_retry_and_logical_reuse[corrupt]",
+          "outcome": "passed"
+        },
+        {
+          "classname": "tests.integration.test_feddyn_round_flow",
+          "name": "test_actual_spawned_rejection_retry_and_logical_reuse[token]",
+          "outcome": "passed"
+        },
+        {
+          "classname": "tests.integration.test_feddyn_round_flow",
+          "name": "test_actual_spawned_rejection_retry_and_logical_reuse[client]",
+          "outcome": "passed"
+        },
+        {
+          "classname": "tests.integration.test_feddyn_round_flow",
+          "name": "test_actual_spawned_rejection_retry_and_logical_reuse[round]",
+          "outcome": "passed"
+        },
+        {
+          "classname": "tests.integration.test_feddyn_round_flow",
+          "name": "test_actual_spawned_rejection_retry_and_logical_reuse[key]",
+          "outcome": "passed"
+        },
+        {
+          "classname": "tests.integration.test_feddyn_round_flow",
+          "name": "test_actual_spawned_rejection_retry_and_logical_reuse[shape]",
+          "outcome": "passed"
+        },
+        {
+          "classname": "tests.integration.test_feddyn_round_flow",
+          "name": "test_actual_spawned_rejection_retry_and_logical_reuse[nan]",
+          "outcome": "passed"
+        },
+        {
+          "classname": "tests.integration.test_feddyn_round_flow",
+          "name": "test_actual_spawned_rejection_retry_and_logical_reuse[equation]",
+          "outcome": "passed"
+        },
+        {
+          "classname": "tests.integration.test_feddyn_round_flow",
+          "name": "test_actual_spawned_rejection_retry_and_logical_reuse[model]",
+          "outcome": "passed"
+        },
+        {
+          "classname": "tests.integration.test_feddyn_round_flow",
+          "name": "test_actual_spawned_rejection_retry_and_logical_reuse[parent]",
+          "outcome": "passed"
+        },
+        {
+          "classname": "tests.integration.test_feddyn_round_flow",
+          "name": "test_actual_spawn_reused_client_matches_partial_oracle[uniform-counts0]",
+          "outcome": "passed"
+        },
+        {
+          "classname": "tests.integration.test_feddyn_round_flow",
+          "name": "test_actual_spawn_reused_client_matches_partial_oracle[sample-counts1]",
+          "outcome": "passed"
+        },
+        {
+          "classname": "tests.trainers.test_personalized_state_ownership",
+          "name": "test_actual_spawn_returns_personal_state_and_optimizer_across_rounds[feddyn]",
+          "outcome": "passed"
+        }
+      ],
+      "survivors": [],
+      "initial_source_status": "",
+      "final_source_status": "",
+      "final_head": "0fbc1162994c05041105b1860fc8cb02582d21f3",
+      "scope": "Whole tests suite collected; keyword-selected checks only. No full-profile qualification claim.",
+      "process_observation": "ps descendant sampling; completed worker acceptance is additionally checked by test assertions.",
+      "outcome_counts": {
+        "passed": 36
+      },
+      "receipt": {
+        "path": "/private/tmp/plato-phase2-count-collection-review/runs/green-313/receipt.json",
+        "bytes": 46780,
+        "sha256": "63b8f808ea72d476da528cc9191fb7b8e39b3d4d50bb0d9b0618c4c0a92cf22b"
+      },
+      "raw_log": {
+        "path": "/private/tmp/plato-phase2-count-collection-review/runs/green-313/pytest.log",
+        "bytes": 128,
+        "sha256": "1fcd60474e0d7876009a485d958d92dd82e4d39be976599697af030a53c0ff97"
+      },
+      "raw_xml": {
+        "path": "/private/tmp/plato-phase2-count-collection-review/runs/green-313/results.xml",
+        "bytes": 6019,
+        "sha256": "4ecb9136eeb2700f4cb298f73fadb93d1841c048f3a8058154f548d49a5efe03"
+      },
+      "pytest_warning_count_reported": 0,
+      "warnings_scope": "Counts warnings reported by the pytest log; successful helpers retain the existing capture_output behavior. No warning filter was added or changed.",
+      "observed_descendant_processes": 129,
+      "full_collection": {
+        "root_argument": "tests",
+        "total_collected": 1303,
+        "selected": 36
+      },
+      "selected_case_groups": {
+        "count_boundaries": 20,
+        "existing_rejection_retry_variants": 13,
+        "existing_partial_spawn_references": 2,
+        "existing_personal_state_spawn_path": 1
+      }
+    },
+    "green-314": {
+      "commit": "0fbc1162994c05041105b1860fc8cb02582d21f3",
+      "tree": "55caefff33db4c0f41c3ac35d5ff661424f1fb88",
+      "cwd": "/private/tmp/plato-refresh-worktrees/count-collection-review",
+      "argv": [
+        "/tmp/plato-phase2c-314/bin/python",
+        "-B",
+        "-m",
+        "pytest",
+        "tests",
+        "-k",
+        "test_feddyn_count_boundaries or test_actual_spawned_rejection_retry_and_logical_reuse or test_actual_spawn_reused_client_matches_partial_oracle or (test_actual_spawn_returns_personal_state_and_optimizer_across_rounds and feddyn)",
+        "-p",
+        "no:cacheprovider",
+        "-q",
+        "--basetemp=/private/tmp/plato-phase2-count-collection-review/runs/green-314/pytest-temp",
+        "--junitxml=/private/tmp/plato-phase2-count-collection-review/runs/green-314/results.xml"
+      ],
+      "launcher": [
+        "zsh",
+        "-lc",
+        "/tmp/plato-phase2c-314/bin/python -B -m pytest tests -k 'test_feddyn_count_boundaries or test_actual_spawned_rejection_retry_and_logical_reuse or test_actual_spawn_reused_client_matches_partial_oracle or (test_actual_spawn_returns_personal_state_and_optimizer_across_rounds and feddyn)' -p no:cacheprovider -q --basetemp=/private/tmp/plato-phase2-count-collection-review/runs/green-314/pytest-temp --junitxml=/private/tmp/plato-phase2-count-collection-review/runs/green-314/results.xml"
+      ],
+      "origins": {
+        "python": "3.14.8 (main, Sep 30 2026, 17:55:09) [Clang 21.0.0 (clang-2100.3.34.2)]",
+        "executable": "/private/tmp/plato-phase2c-314/bin/python",
+        "origins": {
+          "plato": "/private/tmp/plato-refresh-worktrees/count-collection-review/plato/__init__.py",
+          "tests": "/private/tmp/plato-refresh-worktrees/count-collection-review/tests/__init__.py",
+          "torch": "/private/tmp/plato-phase2c-314/lib/python3.14/site-packages/torch/__init__.py",
+          "numpy": "/private/tmp/plato-phase2c-314/lib/python3.14/site-packages/numpy/__init__.py",
+          "pytest": "/private/tmp/plato-phase2c-314/lib/python3.14/site-packages/pytest/__init__.py"
+        }
+      },
+      "environment_overrides": {
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "GIT_OPTIONAL_LOCKS": "0",
+        "TMPDIR": "/private/tmp/plato-phase2-count-collection-review/runs/green-314/temp",
+        "XDG_CACHE_HOME": "/private/tmp/plato-phase2-count-collection-review/runs/green-314/cache",
+        "MPLCONFIGDIR": "/private/tmp/plato-phase2-count-collection-review/runs/green-314/matplotlib",
+        "HF_HOME": "/private/tmp/plato-phase2-count-collection-review/runs/green-314/huggingface",
+        "TORCH_HOME": "/private/tmp/plato-phase2-count-collection-review/runs/green-314/torch",
+        "OMP_NUM_THREADS": "1",
+        "OPENBLAS_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "VECLIB_MAXIMUM_THREADS": "1",
+        "NUMEXPR_NUM_THREADS": "1"
+      },
+      "exit_code": 0,
+      "seconds": 481.8775327501353,
+      "log": "/private/tmp/plato-phase2-count-collection-review/runs/green-314/pytest.log",
+      "log_sha256": "b88a427cb71ec640312651d80584a97c3bd1d9c89450598b5a43b01b6f90c40e",
+      "xml_sha256": "8eb7e1b8f2b5346c8a809caebae74af20a915a67bd60e724611f6ef2f9b429d8",
+      "summaries": [
+        "36 passed, 1267 deselected in 476.48s (0:07:56)"
+      ],
+      "cases": [
+        {
+          "classname": "tests.integration.test_feddyn_count_boundaries",
+          "name": "test_actual_spawn_wrong_first_count_rejected_and_retry[uniform]",
+          "outcome": "passed"
+        },
+        {
+          "classname": "tests.integration.test_feddyn_count_boundaries",
+          "name": "test_actual_spawn_wrong_first_count_rejected_and_retry[sample]",
+          "outcome": "passed"
+        },
+        {
+          "classname": "tests.integration.test_feddyn_count_boundaries",
+          "name": "test_parent_realizes_partition_once_without_using_backing_length[False]",
+          "outcome": "passed"
+        },
+        {
+          "classname": "tests.integration.test_feddyn_count_boundaries",
+          "name": "test_parent_realizes_partition_once_without_using_backing_length[True]",
+          "outcome": "passed"
+        },
+        {
+          "classname": "tests.integration.test_feddyn_count_boundaries",
+          "name": "test_nonzero_history_requires_saved_observed_count[False-1-uniform]",
+          "outcome": "passed"
+        },
+        {
+          "classname": "tests.integration.test_feddyn_count_boundaries",
+          "name": "test_nonzero_history_requires_saved_observed_count[False-1-sample]",
+          "outcome": "passed"
+        },
+        {
+          "classname": "tests.integration.test_feddyn_count_boundaries",
+          "name": "test_nonzero_history_requires_saved_observed_count[False-2-uniform]",
+          "outcome": "passed"
+        },
+        {
+          "classname": "tests.integration.test_feddyn_count_boundaries",
+          "name": "test_nonzero_history_requires_saved_observed_count[False-2-sample]",
+          "outcome": "passed"
+        },
+        {
+          "classname": "tests.integration.test_feddyn_count_boundaries",
+          "name": "test_nonzero_history_requires_saved_observed_count[True-1-uniform]",
+          "outcome": "passed"
+        },
+        {
+          "classname": "tests.integration.test_feddyn_count_boundaries",
+          "name": "test_nonzero_history_requires_saved_observed_count[True-1-sample]",
+          "outcome": "passed"
+        },
+        {
+          "classname": "tests.integration.test_feddyn_count_boundaries",
+          "name": "test_nonzero_history_requires_saved_observed_count[True-2-uniform]",
+          "outcome": "passed"
+        },
+        {
+          "classname": "tests.integration.test_feddyn_count_boundaries",
+          "name": "test_nonzero_history_requires_saved_observed_count[True-2-sample]",
+          "outcome": "passed"
+        },
+        {
+          "classname": "tests.integration.test_feddyn_count_boundaries",
+          "name": "test_inactive_callback_count_types_rejected_before_commit[bool-value-on_weights_received]",
+          "outcome": "passed"
+        },
+        {
+          "classname": "tests.integration.test_feddyn_count_boundaries",
+          "name": "test_inactive_callback_count_types_rejected_before_commit[bool-value-on_weights_aggregated]",
+          "outcome": "passed"
+        },
+        {
+          "classname": "tests.integration.test_feddyn_count_boundaries",
+          "name": "test_inactive_callback_count_types_rejected_before_commit[float-value-on_weights_received]",
+          "outcome": "passed"
+        },
+        {
+          "classname": "tests.integration.test_feddyn_count_boundaries",
+          "name": "test_inactive_callback_count_types_rejected_before_commit[float-value-on_weights_aggregated]",
+          "outcome": "passed"
+        },
+        {
+          "classname": "tests.integration.test_feddyn_count_boundaries",
+          "name": "test_inactive_callback_count_types_rejected_before_commit[numpy-value-on_weights_received]",
+          "outcome": "passed"
+        },
+        {
+          "classname": "tests.integration.test_feddyn_count_boundaries",
+          "name": "test_inactive_callback_count_types_rejected_before_commit[numpy-value-on_weights_aggregated]",
+          "outcome": "passed"
+        },
+        {
+          "classname": "tests.integration.test_feddyn_count_boundaries",
+          "name": "test_inactive_callback_count_types_rejected_before_commit[float-key-on_weights_received]",
+          "outcome": "passed"
+        },
+        {
+          "classname": "tests.integration.test_feddyn_count_boundaries",
+          "name": "test_inactive_callback_count_types_rejected_before_commit[float-key-on_weights_aggregated]",
+          "outcome": "passed"
+        },
+        {
+          "classname": "tests.integration.test_feddyn_round_flow",
+          "name": "test_actual_spawned_rejection_retry_and_logical_reuse[exit]",
+          "outcome": "passed"
+        },
+        {
+          "classname": "tests.integration.test_feddyn_round_flow",
+          "name": "test_actual_spawned_rejection_retry_and_logical_reuse[save]",
+          "outcome": "passed"
+        },
+        {
+          "classname": "tests.integration.test_feddyn_round_flow",
+          "name": "test_actual_spawned_rejection_retry_and_logical_reuse[missing]",
+          "outcome": "passed"
+        },
+        {
+          "classname": "tests.integration.test_feddyn_round_flow",
+          "name": "test_actual_spawned_rejection_retry_and_logical_reuse[corrupt]",
+          "outcome": "passed"
+        },
+        {
+          "classname": "tests.integration.test_feddyn_round_flow",
+          "name": "test_actual_spawned_rejection_retry_and_logical_reuse[token]",
+          "outcome": "passed"
+        },
+        {
+          "classname": "tests.integration.test_feddyn_round_flow",
+          "name": "test_actual_spawned_rejection_retry_and_logical_reuse[client]",
+          "outcome": "passed"
+        },
+        {
+          "classname": "tests.integration.test_feddyn_round_flow",
+          "name": "test_actual_spawned_rejection_retry_and_logical_reuse[round]",
+          "outcome": "passed"
+        },
+        {
+          "classname": "tests.integration.test_feddyn_round_flow",
+          "name": "test_actual_spawned_rejection_retry_and_logical_reuse[key]",
+          "outcome": "passed"
+        },
+        {
+          "classname": "tests.integration.test_feddyn_round_flow",
+          "name": "test_actual_spawned_rejection_retry_and_logical_reuse[shape]",
+          "outcome": "passed"
+        },
+        {
+          "classname": "tests.integration.test_feddyn_round_flow",
+          "name": "test_actual_spawned_rejection_retry_and_logical_reuse[nan]",
+          "outcome": "passed"
+        },
+        {
+          "classname": "tests.integration.test_feddyn_round_flow",
+          "name": "test_actual_spawned_rejection_retry_and_logical_reuse[equation]",
+          "outcome": "passed"
+        },
+        {
+          "classname": "tests.integration.test_feddyn_round_flow",
+          "name": "test_actual_spawned_rejection_retry_and_logical_reuse[model]",
+          "outcome": "passed"
+        },
+        {
+          "classname": "tests.integration.test_feddyn_round_flow",
+          "name": "test_actual_spawned_rejection_retry_and_logical_reuse[parent]",
+          "outcome": "passed"
+        },
+        {
+          "classname": "tests.integration.test_feddyn_round_flow",
+          "name": "test_actual_spawn_reused_client_matches_partial_oracle[uniform-counts0]",
+          "outcome": "passed"
+        },
+        {
+          "classname": "tests.integration.test_feddyn_round_flow",
+          "name": "test_actual_spawn_reused_client_matches_partial_oracle[sample-counts1]",
+          "outcome": "passed"
+        },
+        {
+          "classname": "tests.trainers.test_personalized_state_ownership",
+          "name": "test_actual_spawn_returns_personal_state_and_optimizer_across_rounds[feddyn]",
+          "outcome": "passed"
+        }
+      ],
+      "survivors": [],
+      "initial_source_status": "",
+      "final_source_status": "",
+      "final_head": "0fbc1162994c05041105b1860fc8cb02582d21f3",
+      "scope": "Whole tests suite collected; keyword-selected checks only. No full-profile qualification claim.",
+      "process_observation": "ps descendant sampling; completed worker acceptance is additionally checked by test assertions.",
+      "outcome_counts": {
+        "passed": 36
+      },
+      "receipt": {
+        "path": "/private/tmp/plato-phase2-count-collection-review/runs/green-314/receipt.json",
+        "bytes": 54702,
+        "sha256": "eccd52ba68aa0cfdf11596d729091232227130f1b3f46ef98924e650bb8df559"
+      },
+      "raw_log": {
+        "path": "/private/tmp/plato-phase2-count-collection-review/runs/green-314/pytest.log",
+        "bytes": 128,
+        "sha256": "b88a427cb71ec640312651d80584a97c3bd1d9c89450598b5a43b01b6f90c40e"
+      },
+      "raw_xml": {
+        "path": "/private/tmp/plato-phase2-count-collection-review/runs/green-314/results.xml",
+        "bytes": 6019,
+        "sha256": "8eb7e1b8f2b5346c8a809caebae74af20a915a67bd60e724611f6ef2f9b429d8"
+      },
+      "pytest_warning_count_reported": 0,
+      "warnings_scope": "Counts warnings reported by the pytest log; successful helpers retain the existing capture_output behavior. No warning filter was added or changed.",
+      "observed_descendant_processes": 128,
+      "full_collection": {
+        "root_argument": "tests",
+        "total_collected": 1303,
+        "selected": 36
+      },
+      "selected_case_groups": {
+        "count_boundaries": 20,
+        "existing_rejection_retry_variants": 13,
+        "existing_partial_spawn_references": 2,
+        "existing_personal_state_spawn_path": 1
+      }
+    }
+  },
+  "independent_actual_parent_child_observations": {
+    "green-313": {
+      "parent_result": {
+        "calls": 1,
+        "report_count": 2,
+        "worker_count": 2,
+        "endpoint": 1.622,
+        "worker_epochs": 2,
+        "no_active_children": true
+      },
+      "worker_epochs": [
+        {
+          "pid": 14651,
+          "start_method": "spawn",
+          "indices": [
+            7,
+            13
+          ],
+          "backing_items": 100,
+          "count": 2
+        },
+        {
+          "pid": 14651,
+          "start_method": "spawn",
+          "indices": [
+            7,
+            13
+          ],
+          "backing_items": 100,
+          "count": 2
+        }
+      ],
+      "parent_result_artifact": {
+        "path": "/private/tmp/plato-phase2-count-collection-review/runs/green-313/pytest-temp/test_parent_realizes_partition1/partition-result.json",
+        "bytes": 131,
+        "sha256": "4331243847f419bd3dbc8f383e093c8b59688b113d441408b25ed41fe49c7183"
+      },
+      "worker_observation_artifact": {
+        "path": "/private/tmp/plato-phase2-count-collection-review/runs/green-313/pytest-temp/test_parent_realizes_partition1/run/worker-partition.json",
+        "bytes": 280,
+        "sha256": "7015d8951f1aa77953191b5dd33646eb8e43d691044fcc2aa4331d0ce8782e09"
+      },
+      "observed_helper_process": {
+        "pid": 14605,
+        "ppid": 14016,
+        "started": "Sat Oct 3 09:23:27 2026",
+        "command": "/tmp/plato-phase2-integration/mandatory-313/bin/python -m tests.integration.feddyn_partition_worker /private/tmp/plato-phase2-count-collection-review/runs/green-313/pytest-temp/test_parent_realizes_partition1/run /private/tmp/plato-phase2-count-collection-review/runs/green-313/pytest-temp/test_parent_realizes_partition1/partition-result.json"
+      },
+      "observed_worker_process": {
+        "pid": 14651,
+        "ppid": 14605,
+        "started": "Sat Oct 3 09:23:31 2026",
+        "command": "/tmp/plato-phase2-integration/mandatory-313/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=10) --multiprocessing-fork"
+      },
+      "completion_evidence": "Helper returned successfully; unchanged production joins the child and rejects a nonzero exit before accepting worker state. Parent accepted count 2 and endpoint 1.622. Helper asserted mp.active_children() empty; independent ps descendant monitoring found no survivors after pytest completion.",
+      "observed_worker_completion_and_no_survivors": true,
+      "survivors": []
+    },
+    "green-314": {
+      "parent_result": {
+        "calls": 1,
+        "report_count": 2,
+        "worker_count": 2,
+        "endpoint": 1.622,
+        "worker_epochs": 2,
+        "no_active_children": true
+      },
+      "worker_epochs": [
+        {
+          "pid": 14678,
+          "start_method": "spawn",
+          "indices": [
+            7,
+            13
+          ],
+          "backing_items": 100,
+          "count": 2
+        },
+        {
+          "pid": 14678,
+          "start_method": "spawn",
+          "indices": [
+            7,
+            13
+          ],
+          "backing_items": 100,
+          "count": 2
+        }
+      ],
+      "parent_result_artifact": {
+        "path": "/private/tmp/plato-phase2-count-collection-review/runs/green-314/pytest-temp/test_parent_realizes_partition1/partition-result.json",
+        "bytes": 131,
+        "sha256": "4331243847f419bd3dbc8f383e093c8b59688b113d441408b25ed41fe49c7183"
+      },
+      "worker_observation_artifact": {
+        "path": "/private/tmp/plato-phase2-count-collection-review/runs/green-314/pytest-temp/test_parent_realizes_partition1/run/worker-partition.json",
+        "bytes": 280,
+        "sha256": "4b69320aa153980c55c313516a738fc405fa1eeff360c147d0fbd5d152fc6501"
+      },
+      "observed_helper_process": {
+        "pid": 14631,
+        "ppid": 14019,
+        "started": "Sat Oct 3 09:23:30 2026",
+        "command": "/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python -m tests.integration.feddyn_partition_worker /private/tmp/plato-phase2-count-collection-review/runs/green-314/pytest-temp/test_parent_realizes_partition1/run /private/tmp/plato-phase2-count-collection-review/runs/green-314/pytest-temp/test_parent_realizes_partition1/partition-result.json"
+      },
+      "observed_worker_process": {
+        "pid": 14678,
+        "ppid": 14631,
+        "started": "Sat Oct 3 09:23:34 2026",
+        "command": "/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=10) --multiprocessing-fork"
+      },
+      "completion_evidence": "Helper returned successfully; unchanged production joins the child and rejects a nonzero exit before accepting worker state. Parent accepted count 2 and endpoint 1.622. Helper asserted mp.active_children() empty; independent ps descendant monitoring found no survivors after pytest completion.",
+      "observed_worker_completion_and_no_survivors": true,
+      "survivors": []
+    }
+  },
+  "author_evidence_reconciliation": {
+    "candidate_evidence": {
+      "path": "/tmp/plato-refresh-worktrees/count-collection-review/evidence/2026-refresh/phase2c-count-collection-validation.json",
+      "sha256": "cabff482713fdc55ecd8cafc839321104a1c316d32ee494d1bc796076c62fe8a"
+    },
+    "raw_inventory_verified": [
+      {
+        "path": "/tmp/plato-phase2c-count-collection-fix/assertion-preservation.json",
+        "bytes": 951,
+        "sha256": "8743edba2c7ff9f28e4ed6a6310ad55fff28b6ae2d6ab2892bc114a72d67c17e"
+      },
+      {
+        "path": "/tmp/plato-phase2c-count-collection-fix/build_evidence.py",
+        "bytes": 8137,
+        "sha256": "e9e64bf371f7db519af0a4d1b15f1109f2493f87e2046d5f6a3636ec5ba16997"
+      },
+      {
+        "path": "/tmp/plato-phase2c-count-collection-fix/collection-import-identities.json",
+        "bytes": 438,
+        "sha256": "9745419cc7adc3ac3c45345285ad03a2590f54c6e84e0d0f82801cd20006cbc7"
+      },
+      {
+        "path": "/tmp/plato-phase2c-count-collection-fix/collection_identity_probe.py",
+        "bytes": 642,
+        "sha256": "d9a1b304bfb8bf884ba32be0862d6baf736b0b943d57bbe94e0ddca54ff4b7ff"
+      },
+      {
+        "path": "/tmp/plato-phase2c-count-collection-fix/full-correction.diff",
+        "bytes": 5041,
+        "sha256": "86b5ad477b153573b248a4ed754455089a4d4c38a1a84f8664e767b6e3ad0e74"
+      },
+      {
+        "path": "/tmp/plato-phase2c-count-collection-fix/green-313.json",
+        "bytes": 887,
+        "sha256": "c55cb89642ec8ac3e8df91b42c1ca76074d703fcf8bbcb0405aef90c99a0214c"
+      },
+      {
+        "path": "/tmp/plato-phase2c-count-collection-fix/green-313.log",
+        "bytes": 128,
+        "sha256": "44d49bf75f7d0bed9cd8f0d085a2eb98f07da4c0479888419bb0173d77eeeadc"
+      },
+      {
+        "path": "/tmp/plato-phase2c-count-collection-fix/green-313.xml",
+        "bytes": 6019,
+        "sha256": "633160f54f2ee95f9cc62cc5e1cf7d106acfeeded03cda976f16628253e41081"
+      },
+      {
+        "path": "/tmp/plato-phase2c-count-collection-fix/green-314.json",
+        "bytes": 888,
+        "sha256": "c2923bad406a5c7ffd0093898ee95780e8e936842043e31dd239c12a1038f9ff"
+      },
+      {
+        "path": "/tmp/plato-phase2c-count-collection-fix/green-314.log",
+        "bytes": 128,
+        "sha256": "4d6b6028fb790bde0becfb8e416320cfd08d1d6ba90a34bdfc8dbed32669d313"
+      },
+      {
+        "path": "/tmp/plato-phase2c-count-collection-fix/green-314.xml",
+        "bytes": 6019,
+        "sha256": "40fa7a8c9c88cd7e29e481da5ea71c423c327bdb872af52ee2d71432cb4a346b"
+      },
+      {
+        "path": "/tmp/plato-phase2c-count-collection-fix/identity-collection.log",
+        "bytes": 296,
+        "sha256": "ce08019eb482647a44a1b70cd9a8fb79d10994f2796b165a3a3d3d63b8cc18d6"
+      },
+      {
+        "path": "/tmp/plato-phase2c-count-collection-fix/original-test_feddyn_count_boundaries.py",
+        "bytes": 7232,
+        "sha256": "1102a37c5b739ce9fa50f534d0804b12fecee93302d83841d05c8bd4cf671a3c"
+      },
+      {
+        "path": "/tmp/plato-phase2c-count-collection-fix/red-313.json",
+        "bytes": 713,
+        "sha256": "2466ba9c335bcaa2e12fe13a42575478dc7026d97e9affab8d550aa6ee178162"
+      },
+      {
+        "path": "/tmp/plato-phase2c-count-collection-fix/red-313.log",
+        "bytes": 5887,
+        "sha256": "c7a7e90010880ad124cc6328395f87d158a95bb3367e8492320260a04a7f9dba"
+      },
+      {
+        "path": "/tmp/plato-phase2c-count-collection-fix/red-313.xml",
+        "bytes": 5396,
+        "sha256": "4fd0c7bc445f196ed738ef9f74442785e66a0e86ffb471235115f388d6c519a6"
+      },
+      {
+        "path": "/tmp/plato-phase2c-count-collection-fix/red-314.json",
+        "bytes": 713,
+        "sha256": "50e7e9298866d36c67b3dbeb5e44e02cf6839ea322cb4147bbe3ff033681fcab"
+      },
+      {
+        "path": "/tmp/plato-phase2c-count-collection-fix/red-314.log",
+        "bytes": 6668,
+        "sha256": "5d900f9567dfb6f0ec880692b1213980a597c56f723d62094a496777cfd3cb43"
+      },
+      {
+        "path": "/tmp/plato-phase2c-count-collection-fix/red-314.xml",
+        "bytes": 6784,
+        "sha256": "f57cc615a34ac0e0b7056ae3aef1e4877cfb8966f7702c45fad3cb885ed5b6ba"
+      },
+      {
+        "path": "/tmp/plato-phase2c-count-collection-fix/root-count-isolation-313-receipt.json",
+        "bytes": 673,
+        "sha256": "0a1bdf20fd3bbcaeb4770e2e9e074c2db6451eb888d94c043407d34dd4407053"
+      },
+      {
+        "path": "/tmp/plato-phase2c-count-collection-fix/root-count-isolation-313.log",
+        "bytes": 5899,
+        "sha256": "dbb92c431b6de218311ae9e9e31fa95af0e9b1603352813e759a22e281cea077"
+      },
+      {
+        "path": "/tmp/plato-phase2c-count-collection-fix/root-count-isolation-313.xml",
+        "bytes": 5402,
+        "sha256": "16840ef45577144b75dcb3dcbdd2c975f99219d71550d1939c7e4a9b68936632"
+      },
+      {
+        "path": "/tmp/plato-phase2c-count-collection-fix/ruff-313.json",
+        "bytes": 618,
+        "sha256": "1a37adc64ae9a7389412a8b6c66252fadc5db15ac1cb6c2bccb2e7dbe9da7038"
+      },
+      {
+        "path": "/tmp/plato-phase2c-count-collection-fix/ruff-313.log",
+        "bytes": 19,
+        "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+      },
+      {
+        "path": "/tmp/plato-phase2c-count-collection-fix/ruff-314.json",
+        "bytes": 619,
+        "sha256": "3561015bf2d9cef60af274acb6d1fe014c5351f061e956f4d53d6bb4bb34cfdb"
+      },
+      {
+        "path": "/tmp/plato-phase2c-count-collection-fix/ruff-314.log",
+        "bytes": 19,
+        "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+      },
+      {
+        "path": "/tmp/plato-phase2c-count-collection-fix/run_checks.py",
+        "bytes": 1616,
+        "sha256": "4d3057edcb750703c530ac10b1f00bc9aa49d3333592b83a513a7e36e4d65979"
+      }
+    ],
+    "executions_verified": {
+      "red-313": {
+        "exit_code": 1,
+        "counts": {
+          "tests": 2,
+          "passed": 1,
+          "failed": 1,
+          "skipped": 0
+        },
+        "command": "OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2c-313/bin/python -m pytest tests -k test_parent_realizes_partition_once_without_using_backing_length -q --basetemp /tmp/plato-phase2c-count-collection-fix/red-313 --junitxml /tmp/plato-phase2c-count-collection-fix/red-313.xml",
+        "log_sha256": "c7a7e90010880ad124cc6328395f87d158a95bb3367e8492320260a04a7f9dba"
+      },
+      "red-314": {
+        "exit_code": 1,
+        "counts": {
+          "tests": 2,
+          "passed": 1,
+          "failed": 1,
+          "skipped": 0
+        },
+        "command": "OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2c-314/bin/python -m pytest tests -k test_parent_realizes_partition_once_without_using_backing_length -q --basetemp /tmp/plato-phase2c-count-collection-fix/red-314 --junitxml /tmp/plato-phase2c-count-collection-fix/red-314.xml",
+        "log_sha256": "5d900f9567dfb6f0ec880692b1213980a597c56f723d62094a496777cfd3cb43"
+      },
+      "green-313": {
+        "exit_code": 0,
+        "counts": {
+          "tests": 36,
+          "passed": 36,
+          "failed": 0,
+          "skipped": 0
+        },
+        "command": "OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2c-313/bin/python -m pytest tests -k 'test_feddyn_count_boundaries or test_actual_spawned_rejection_retry_and_logical_reuse or test_actual_spawn_reused_client_matches_partial_oracle or (test_actual_spawn_returns_personal_state_and_optimizer_across_rounds and feddyn)' -q --basetemp /tmp/plato-phase2c-count-collection-fix/green-313 --junitxml /tmp/plato-phase2c-count-collection-fix/green-313.xml",
+        "log_sha256": "44d49bf75f7d0bed9cd8f0d085a2eb98f07da4c0479888419bb0173d77eeeadc"
+      },
+      "green-314": {
+        "exit_code": 0,
+        "counts": {
+          "tests": 36,
+          "passed": 36,
+          "failed": 0,
+          "skipped": 0
+        },
+        "command": "OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2c-314/bin/python -m pytest tests -k 'test_feddyn_count_boundaries or test_actual_spawned_rejection_retry_and_logical_reuse or test_actual_spawn_reused_client_matches_partial_oracle or (test_actual_spawn_returns_personal_state_and_optimizer_across_rounds and feddyn)' -q --basetemp /tmp/plato-phase2c-count-collection-fix/green-314 --junitxml /tmp/plato-phase2c-count-collection-fix/green-314.xml",
+        "log_sha256": "4d6b6028fb790bde0becfb8e416320cfd08d1d6ba90a34bdfc8dbed32669d313"
+      },
+      "ruff-313": {
+        "exit_code": 0,
+        "counts": null,
+        "command": "OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2c-313/bin/ruff check tests/integration/test_feddyn_count_boundaries.py tests/integration/feddyn_partition_worker.py --select I",
+        "log_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+      },
+      "ruff-314": {
+        "exit_code": 0,
+        "counts": null,
+        "command": "OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2c-314/bin/ruff check tests/integration/test_feddyn_count_boundaries.py tests/integration/feddyn_partition_worker.py --select I",
+        "log_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+      }
+    },
+    "sources_and_exact_test_diff_verified": true,
+    "author_worker_observations_verified": {
+      "313": {
+        "calls": 1,
+        "report_count": 2,
+        "worker_count": 2,
+        "endpoint": 1.622,
+        "worker_epochs": 2,
+        "no_active_children": true
+      },
+      "314": {
+        "calls": 1,
+        "report_count": 2,
+        "worker_count": 2,
+        "endpoint": 1.622,
+        "worker_epochs": 2,
+        "no_active_children": true
+      }
+    },
+    "limits": [
+      "CPU/macOS arm64 test-harness correction; no production bug or GPU claim inferred.",
+      "Full collection with selected execution is not a full-suite pass claim.",
+      "Frozen DP correction remains separate and untouched for independent review.",
+      "Fresh independent review of this separate correction and root integration acceptance remain pending."
+    ],
+    "whole_phase_acceptance_claimed": false
+  },
+  "baseline_full_suite_carry_forward": {
+    "commit": "2633f8394c142ec04db13743b54a427e04c2aed7",
+    "pytest_exit_code": 1,
+    "full_suite_summary": "===== 1 failed, 1301 passed, 1 skipped, 17 warnings in 1397.16s (0:23:17) ======",
+    "qualification_status": "FAILED; never accepted or relabeled by this review",
+    "runtime_and_entrypoint_passed": 51,
+    "warnings_summary_original": " ===============================\ntests/trainers/test_dp_data_loader_strategy.py::test_dp_actual_time_snapshot_writer_to_plain_urgent_reader\ntests/trainers/test_dp_data_loader_strategy.py::test_actual_spawned_dp_rounds_return_accounting_and_isolate_clients\ntests/trainers/test_dp_data_loader_strategy.py::test_actual_dp_consecutive_training_exchange_checkpoint_and_accounting\ntests/trainers/test_dp_data_loader_strategy.py::test_actual_dp_physical_batches_only_report_real_updates_and_cleanup\ntests/trainers/test_dp_data_loader_strategy.py::test_dp_memory_splitting_matches_logical_batch_parameter_reference\n  /tmp/plato-phase2-integration/mandatory-313/lib/python3.13/site-packages/opacus/privacy_engine.py:98: UserWarning: Secure RNG turned off. This is perfectly fine for experimentation as it allows for much faster training performance, but remember to turn it on and retrain one last time before production with ``secure_mode`` turned on.\n    warnings.warn(\n\ntests/trainers/test_dp_data_loader_strategy.py::test_dp_actual_time_snapshot_writer_to_plain_urgent_reader\ntests/trainers/test_dp_data_loader_strategy.py::test_actual_dp_consecutive_training_exchange_checkpoint_and_accounting\ntests/trainers/test_dp_data_loader_strategy.py::test_actual_dp_physical_batches_only_report_real_updates_and_cleanup\n  /tmp/plato-phase2-integration/mandatory-313/lib/python3.13/site-packages/opacus/accountants/analysis/rdp.py:332: UserWarning: Optimal order is the largest alpha. Please consider expanding the range of alphas to get a tighter privacy bound.\n    warnings.warn(\n\ntests/trainers/test_dp_data_loader_strategy.py::test_dp_actual_time_snapshot_writer_to_plain_urgent_reader\ntests/trainers/test_dp_data_loader_strategy.py::test_actual_dp_consecutive_training_exchange_checkpoint_and_accounting\ntests/trainers/test_dp_data_loader_strategy.py::test_actual_dp_physical_batches_only_report_real_updates_and_cleanup\ntests/trainers/test_dp_data_loader_strategy.py::test_dp_memory_splitting_matches_logical_batch_parameter_reference\n  /private/tmp/plato-refresh-worktrees/phase2-integrated-validation/plato/trainers/diff_privacy.py:332: UserWarning: Full backward hook is firing when gradients are computed with respect to module outputs since no inputs require gradients. See https://docs.pytorch.org/docs/main/generated/torch.nn.Module.html#torch.nn.Module.register_full_backward_hook for more details.\n    loss.backward()\n\ntests/trainers/test_dp_data_loader_strategy.py::test_actual_dp_consecutive_training_exchange_checkpoint_and_accounting\ntests/trainers/test_dp_data_loader_strategy.py::test_actual_dp_physical_batches_only_report_real_updates_and_cleanup\n  /tmp/plato-phase2-integration/mandatory-313/lib/python3.13/site-packages/opacus/privacy_engine.py:576: UserWarning: You're calling make_private_with_epsilon with non-zero privacy budget already spent. Returned noise_multiplier assumes zero starting point, so your overall privacy budget will be higher.\n    warnings.warn(\n\ntests/trainers/test_dp_data_loader_strategy.py::test_actual_dp_consecutive_training_exchange_checkpoint_and_accounting\n  /tmp/plato-phase2-integration/mandatory-313/lib/python3.13/site-packages/opacus/privacy_engine.py:156: UserWarning: PrivacyEngine detected new dataset object. Was: <torch.utils.data.dataset.Subset object at 0x14098aea0>, got: <torch.utils.data.dataset.Subset object at 0x141072690>. Privacy accounting works per dataset, please initialize new PrivacyEngine if you're using different dataset. You can ignore this warning if two datasets above represent the same logical dataset\n    warnings.warn(\n\ntests/trainers/test_dp_data_loader_strategy.py::test_actual_dp_physical_batches_only_report_real_updates_and_cleanup\n  /tmp/plato-phase2-integration/mandatory-313/lib/python3.13/site-packages/opacus/privacy_engine.py:156: UserWarning: PrivacyEngine detected new dataset object. Was: <torch.utils.data.dataset.Subset object at 0x13f7548d0>, got: <torch.utils.data.dataset.Subset object at 0x140d36be0>. Privacy accounting works per dataset, please initialize new PrivacyEngine if you're using different dataset. You can ignore this warning if two datasets above represent the same logical dataset\n    warnings.warn(\n\ntests/trainers/test_dp_data_loader_strategy.py::test_actual_dp_physical_batches_only_report_real_updates_and_cleanup\n  /tmp/plato-phase2-integration/mandatory-313/lib/python3.13/site-packages/opacus/privacy_engine.py:156: UserWarning: PrivacyEngine detected new dataset object. Was: <torch.utils.data.dataset.Subset object at 0x13f7548d0>, got: <torch.utils.data.dataset.Subset object at 0x1404d8750>. Privacy accounting works per dataset, please initialize new PrivacyEngine if you're using different dataset. You can ignore this warning if two datasets above represent the same logical dataset\n    warnings.warn(\n\n",
+    "log_path": "/tmp/plato-phase2-integration/runs/mandatory-313-204b8ad90aae/pytest.log",
+    "log_sha256": "31bb3dc7f48995f643bf71854ee11d1e9dd31d36d55510c5d5ff6134af8dd57e",
+    "xml_path": "/tmp/plato-phase2-integration/runs/mandatory-313-204b8ad90aae/results.xml",
+    "xml_sha256": "d8e58076b877b631abf59caf6033ed1a7989211b5b13666c970c57b82a2bba1e",
+    "receipt_path": "/tmp/plato-phase2-integration/runs/mandatory-313-204b8ad90aae/receipt.json",
+    "receipt_sha256": "50863d6f7d43cb020fbb281830ef9b72bd59cea54dcd88252e4b1501035d7c41",
+    "fresh_final_full_suite_required_after_integration": true
+  },
+  "review_receipts": [
+    {
+      "path": "/private/tmp/plato-phase2-count-collection-review/preparation.json",
+      "bytes": 9552,
+      "sha256": "5d12a1e026e17f684fdba66578549c58dcb70f7276ddb5fa9d47452a181e300b"
+    },
+    {
+      "path": "/private/tmp/plato-phase2-count-collection-review/source-preservation.json",
+      "bytes": 5124,
+      "sha256": "06045a870211f61d5adc056b7970ed7881787728c5e98a6580173603068f7acc"
+    },
+    {
+      "path": "/private/tmp/plato-phase2-count-collection-review/harness-isolation-audit.json",
+      "bytes": 2387,
+      "sha256": "0cf59755262ca762d8d0686cb76f077ab2e154448156ecb64baba13988a4e5e6"
+    },
+    {
+      "path": "/private/tmp/plato-phase2-count-collection-review/author-evidence-audit.json",
+      "bytes": 10018,
+      "sha256": "4f6af8dedf323bac45ad3d031b9ab9428ff34bd0bdea971e76dd554d834612c3"
+    },
+    {
+      "path": "/private/tmp/plato-phase2-count-collection-review/baseline-full-suite-carry-forward.json",
+      "bytes": 15285,
+      "sha256": "3cdb888bb1b2a4c45d60c87b8b6cb520aa7d4f7189615780210faa5cfc959e5c"
+    },
+    {
+      "path": "/private/tmp/plato-phase2-count-collection-review/root-dp-evidence-preservation-before.json",
+      "bytes": 1207,
+      "sha256": "d504d2789d8251d28f63bb13b03a843f601cd386355ddd9ea2bd6c32ac4e2472"
+    },
+    {
+      "path": "/private/tmp/plato-phase2-count-collection-review/green-interpreters.json",
+      "bytes": 906,
+      "sha256": "786ee105e32a1385526104db5aa607194b1bbb3f7949985efe384fe478308dbd"
+    },
+    {
+      "path": "/private/tmp/plato-phase2-count-collection-review/run_selected.py",
+      "bytes": 6721,
+      "sha256": "01a130ff56d60b2844be68f46140ed60d97e2ab6be1ff01ccaa9bdbbb1dc513e"
+    },
+    {
+      "path": "/private/tmp/plato-phase2-count-collection-review/build_final_report.py",
+      "bytes": 12653,
+      "sha256": "40a0436b12d5a089ef09a99e99398334ffa046bf9006ac355820b6265f9225e2"
+    }
+  ],
+  "limits": [
+    "Selected execution after full collection is not a full-suite or whole-phase acceptance claim.",
+    "Original integrated 2633 full run remains FAILED: 1301 passed, 1 expected skip, 1 known count failure, 17 notices; 51 runtime/entrypoint cases passed. Fresh final full qualification remains required after integration.",
+    "Review covers CPU/macOS arm64 harness behavior on Python 3.13.16 and 3.14.8, with torch 2.14.1; no GPU or unrelated production numerics claim.",
+    "Candidate is a component branch. Relative to integrated 2633, production/config trees match; inherited docs/CI/evidence differences predate this correction. Approval covers only the three-file delta from accepted DP base f342, not replacing integrated branch history.",
+    "Process sampling verifies observed descendants, and the specific helper/worker PIDs are independently matched. Worker success additionally follows unchanged production exit-code/acceptance guards and the helper active-child assertion."
+  ],
+  "resource_and_write_scope": {
+    "source_unchanged": true,
+    "historical_tracked_DViT_cache_files_untouched": 131,
+    "environments_read_only": [
+      "/tmp/plato-phase2-integration/mandatory-313",
+      "/tmp/plato-phase2c-314"
+    ],
+    "all_generated_caches_and_test_artifacts_in_scratch": true,
+    "project_bytecode_writes_disabled": true,
+    "all_library_cold_bytecode_cache_policy": false,
+    "source_edits_commits_pushes_cleanup": false,
+    "only_root_write": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2-count-collection-review.json"
+  },
+  "whole_phase_acceptance_claimed": false,
+  "handoff_state": "RETURNED_FOR_ROOT_BOUNDED_ACCEPTANCE_AND_INTEGRATION; reviewer idle after report."
+}

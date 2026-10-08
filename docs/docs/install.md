@@ -1,148 +1,152 @@
 # Installation
 
-Plato uses `uv` as its package manager, which is a modern, fast Python package manager that provides significant performance improvements over `conda` environments. To install `uv`, refer to its [official documentation](https://docs.astral.sh/uv/getting-started/installation/), or simply run the following commands:
+Use Python 3.13 and [uv](https://docs.astral.sh/uv/getting-started/installation/)
+to install Plato from its checked-in manifest and lockfile. The repository's
+build and CI tools use uv 0.12.22. To install uv:
 
 ```bash
 curl -LsSf https://astral.sh/uv/install.sh | sh
-source $HOME/.local/bin/env
+source "$HOME/.local/bin/env"
 ```
 
-To upgrade `uv`, run the command:
-
-```
-uv self update
-```
-
-To start working with Plato, first clone its git repository:
+Clone the repository and provision its environment:
 
 ```bash
-git clone git@github.com:TL-System/plato.git
+git clone https://github.com/TL-System/plato.git
 cd plato
+uv sync --locked --python 3.13
 ```
 
-You can run Plato using `uv run`, using one of its configuration files:
+Run a reference workload from the repository root:
 
 ```bash
-uv run plato.py -c configs/MNIST/fedavg_lenet5.toml
+uv run --locked python plato.py --config configs/MNIST/fedavg_lenet5.toml --cpu
 ```
 
-In order to run any of the examples, first run the following command to include all global Python packages in a local Python environment:
+See [Quick Start](quickstart.md) for device selection, output paths and Docker
+launch commands.
+
+`uv sync` installs the selected project dependencies into `.venv`; it does not
+copy all globally installed Python packages. Optional **extras** select runtime
+features with `--extra`, while **dependency groups** select tooling or test
+requirements with `--group` (for example, `--group docs`). Select only the extras
+needed by a workload:
 
 ```bash
-uv sync
+uv sync --locked --python 3.13 --extra mlx
 ```
 
-In case you need optional dependency groups, you can install them with:
+The `ssl` and `llm_eval` extras are declared incompatible. `uv sync --all-extras`
+fails for this project; use separate environments for self-supervised workloads
+and Lighteval. For example, provision SSL separately with:
 
 ```bash
-uv sync --all-extras
+UV_PROJECT_ENVIRONMENT=.venv-ssl uv sync --locked --python 3.13 --extra ssl
 ```
 
-or:
-
-```bash
-uv sync --extra mlx
-```
-
-where `mlx` is the name of the dependency group.
+Use the same environment selection and extra when running that workload.
 
 Useful extras in the current root package include:
 
 - `llm_eval` for server-side Lighteval evaluation
-- `nanochat` for Nanochat training and CORE evaluation
 - `mlx` for Apple Silicon MLX workloads
 - `dp`, `rl`, and `mpc` for specialized research workloads
 
-Each example should be run in its own directory:
+Most example directories use the root project dependencies. Follow each
+example's instructions for its entrypoint and config; for example:
 
 ```bash
 cd examples/server_aggregation/fedatt
-uv run fedatt.py -c fedatt_FashionMNIST_lenet5.toml
+uv run --locked python fedatt.py -c fedatt_FashionMNIST_lenet5.toml
 ```
 
-This will make sure that any additional Python packages, specified in the local `pyproject.toml` configuration, will be installed first.
+Some examples have their own `pyproject.toml` and are registered as workspace
+members in the root manifest. Running uv from one of those directories selects
+that member and its additional dependencies. A directory without its own
+manifest does not gain extra packages just by changing into it.
 
 ### Optional: MLX Backend for Apple Silicon
 
-To use MLX as a backend alternative to PyTorch on Apple Silicon devices, install the MLX dependencies:
+The native MLX reference is LeNet-5/MNIST with FedAvg on Apple Silicon. Install
+its optional extra with the default Python 3.13 interpreter:
 
 ```bash
-uv sync --extra mlx
+uv sync --python 3.13 --extra mlx
 ```
 
-See the [Quick Start guide](quickstart.md#using-mlx-as-a-backend) for configuration details.
+Use `uv run --extra mlx` when launching the workload. See [Native MLX](mlx.md)
+for runnable commands, supported controls, and native CPU/Metal qualification.
+The normal Linux core CI suite does not qualify this backend.
 
 ### Optional: Server-side LLM Evaluation with Lighteval
 
-To enable `evaluation.type = "lighteval"`, install the evaluator stack:
+To enable `evaluation.type = "lighteval"`, install the locked evaluator stack
+and provision the two NLTK tokenizer resources used by its task registry:
 
 ```bash
-uv sync --extra llm_eval
+uv sync --locked --python 3.13 --extra llm_eval
+uv run --locked --extra llm_eval python -m nltk.downloader punkt punkt_tab
 ```
 
-This installs `lighteval` together with the runtime dependencies used by Plato's built-in Lighteval adapter.
+Provision `punkt` and `punkt_tab` before offline use; they are data resources,
+not Python packages. The evaluator extra includes `langdetect` and Lighteval.
+Keep `--extra llm_eval` on **every syncing `uv run` command** for evaluation.
+A later plain `uv run` can select the default shared dependencies, including
+an incompatible xxhash major version, even when Lighteval remains installed.
+The extra constrains xxhash to the compatible 3.x line. Use a direct environment
+interpreter or `uv run --no-sync` only after that environment has been provisioned
+with the compatible locked extra; neither command repairs a changed environment.
 
 See:
 
 - [Evaluation](configurations/evaluation.md) for the configuration contract
 - [Server-side Lighteval for SmolLM2](examples/case-studies/4. Server-side Lighteval for SmolLM2.md) for an end-to-end example
 
-### Optional: Nanochat Training and CORE Evaluation
+### Qwen3 Federated LoRA
 
-To use Nanochat workloads or the `nanochat_core` evaluator, install:
+The Qwen3 reference uses the standard Hugging Face and PEFT dependencies from
+`uv sync`. Use Python 3.13, the default qualification and CI target. See
+[Qwen3 Federated LoRA](examples/case-studies/6. Qwen3 Federated LoRA.md)
+for the pinned model, local data, CPU command, and validation scope.
+
+### Building the Documentation
+
+From the repository root with Python 3.13 available, run:
 
 ```bash
-uv sync --extra nanochat
+PLATO_DOCS_PYTHON="$(uv python find 3.13)" ./docs/build.sh
 ```
 
-Nanochat also requires the `external/nanochat` git submodule, and the Rust tokenizer extension must be built before running the Nanochat configs successfully.
+The script uses uv 0.12.22, bootstrapping it in `.venv-docs-bootstrap` if needed.
+It provisions the locked docs-only group in `.venv-docs`, checks the generated
+`docs/requirements.txt` against the lockfile, and runs a strict MkDocs build.
+The HTML output is in `docs/site`. This environment does not install Plato,
+PyTorch or Lighteval. Set `PLATO_DOCS_ENVIRONMENT` to use another dedicated docs
+environment; the application `.venv` is not a valid destination.
 
-See [Nanochat in Plato](examples/case-studies/5. Nanochat in Plato.md) for the full step-by-step setup, including:
+### Building the `plato-learn` PyPI Package
 
-- `git submodule update --init --recursive`
-- installing `maturin` and building `rustbpe`
-- preparing the tokenizer required by CORE evaluation
-- running `configs/Nanochat/synthetic_micro.toml` and `configs/Nanochat/parquet_micro.toml`
+With uv 0.12.22 installed, run the same package check used by the release
+workflow from a committed checkout:
 
-### Optional: SmolVLA + LeRobot Robotics Stack
-
-The LeRobot / SmolVLA path is intentionally kept separate from the default Plato install so the root environment stays lean.
-
-!!! warning "Migration note"
-    Older runbooks may still reference `uv sync --extra robotics`.
-    That root-package extra no longer exists. Use a dedicated environment that already has the LeRobot / SmolVLA stack installed, then verify it with:
-
-    ```bash
-    uv run python -c "import lerobot; print(lerobot.__version__)"
-    ```
-
-See [SmolVLA Trainer with LeRobot](examples/case-studies/3. SmolVLA Trainer with LeRobot.md) for the current setup guidance, configuration contract, and troubleshooting notes.
-
-### Building the `plato-learn` PyPi Package
-
-The `plato-learn` PyPi package will be automatically built and published by a GitHub action workflow every time a release is created on GitHub. To build the package manually, follow these steps:
-
-1. Clean previous builds (optional):
 ```bash
-rm -rf dist/ build/ *.egg-info
+uv run --no-project --python 3.13 python .github/scripts/check_distribution.py
 ```
 
-2. Build the package:
-```bash
-uv build
-```
+The check compares archive source bytes with Git HEAD, so commit tracked source
+changes before running it. Generated build outputs are excluded.
 
-3. Publish to PyPI:
-    ```bash
-    uv publish
-    ```
+This builds the wheel and source distribution with build dependencies constrained
+from `uv.lock`, checks their contents, rebuilds a wheel from the source archive,
+and installs the wheel in an isolated Python 3.13 environment for import and CPU
+operation checks. It downloads the required build and runtime dependencies.
+Distributions, logs and validation receipts go to `ci-artifacts/docs-package`.
+That output directory must not already exist; use `--output-dir` to select a new
+path outside the repository or beneath `ci-artifacts` for another run.
 
-    Or if you need to specify the PyPi token explicitly:
-    ```bash
-    uv publish --token <your-pypi-token>
-    ```
-
-The `uv` tool will handle all the build process using the modern, PEP 517-compliant `hatchling` backend specified in `pyproject.toml`, making it much simpler than the old `python setup.py sdist bdist_wheel` approach.
+The check does not publish a package. The release-created GitHub workflow is
+configured to publish its validated distributions using the repository's PyPI
+token.
 
 ### Uninstalling Plato
 

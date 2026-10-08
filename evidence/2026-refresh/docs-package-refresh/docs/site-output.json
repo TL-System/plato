@@ -1,0 +1,8 @@
+{
+  "root_working_directory": "/private/tmp/plato-refresh-worktrees/docs-package-refresh",
+  "publish_directory": "docs/site",
+  "index_exists": true,
+  "index_sha256": "b8aaf649aefc3896ebeb4d820cb3cf2eb9fdc652129c03c9708017f8a6cf4102",
+  "regular_files": 93,
+  "netlify_hosted_preview_executed": false
+}

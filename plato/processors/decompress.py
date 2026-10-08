@@ -21,6 +21,8 @@ class Processor(base.Processor):
     def process(self, data: Any) -> Any:
         """Implements a Processor for decompressing a numpy array."""
         if isinstance(data, list):
+            if not data:
+                return []
             ret = []
             datashape_feature = data[0][0]
             datatype_feature = data[0][1]
@@ -34,13 +36,10 @@ class Processor(base.Processor):
                 datacom_feature = np.frombuffer(
                     datacom_feature, datatype_feature
                 ).reshape(datashape_feature)
-                if len(datashape_target) > 0 and datashape_target[0] == 0:
-                    datacom_target = np.zeros(datashape_target)
-                else:
-                    datacom_target = zstd.decompress(datacom_target)
-                    datacom_target = np.frombuffer(
-                        datacom_target, datatype_target
-                    ).reshape(datashape_target)
+                datacom_target = zstd.decompress(datacom_target)
+                datacom_target = np.frombuffer(datacom_target, datatype_target).reshape(
+                    datashape_target
+                )
                 ret.append((datacom_feature, datacom_target))
         else:
             shape, dtype, modelcom = data

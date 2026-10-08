@@ -1,0 +1,233 @@
+{
+  "schema_version": 1,
+  "written_at_utc": "2026-10-03T13:37:47.168960+00:00",
+  "role": "Independent Phase2 Astra medium gate; bounded integration-correction addendum",
+  "decision": "AUTHORIZE_CORRECTED_INTEGRATION",
+  "scope": "Authorize root to integrate only the reviewed test/evidence corrections into2633 and perform the planned fresh final qualification. Not final execution PASS, Linux CI PASS or phase delivery. Original phase2-gate.json remains unchanged and all its substantive criteria and later-phase boundaries remain in force.",
+  "original_gate": {
+    "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2-gate.json",
+    "sha256": "fcb6d70a71a425eeba0a30444da42b49a1fa5b69cca38354efff6a48baa4101a",
+    "bytes": 26829
+  },
+  "material_findings": [],
+  "reviewed_source": {
+    "integrated_base_commit": "2633f8394c142ec04db13743b54a427e04c2aed7",
+    "integrated_base_tree": "b68556b4fc2170c7e84c533645e76a5f7ab2685c",
+    "DP_correction_commit": "f342a5a6021cee938e0b880eca5919e09ace1981",
+    "DP_correction_tree": "3d0aebd30e1d4adfcdf835bad758eb72d3179c1e",
+    "corrected_component_commit": "0fbc1162994c05041105b1860fc8cb02582d21f3",
+    "corrected_component_tree": "55caefff33db4c0f41c3ac35d5ff661424f1fb88",
+    "proposed_corrected_merge_tree": "d01f51fbf01ceaed78339e10bc3b39aa5ed1724b",
+    "permitted_changed_paths": [
+      "evidence/2026-refresh/phase2c-count-collection-validation.json",
+      "evidence/2026-refresh/phase2c-dp-typing-gate-validation.json",
+      "tests/integration/feddyn_partition_worker.py",
+      "tests/integration/test_feddyn_count_boundaries.py",
+      "tests/trainers/test_dp_data_loader_strategy.py"
+    ],
+    "changed_source_hashes": [
+      {
+        "path": "evidence/2026-refresh/phase2c-count-collection-validation.json",
+        "blob": "987c8615196de5475826ad56fb64714e834083b6",
+        "sha256": "cabff482713fdc55ecd8cafc839321104a1c316d32ee494d1bc796076c62fe8a"
+      },
+      {
+        "path": "evidence/2026-refresh/phase2c-dp-typing-gate-validation.json",
+        "blob": "de3bffad65b1bd5dc8c52a2a472dd448ee5e01de",
+        "sha256": "a03c9f0baa584c1544ad095d145294c1e12e8632719dfd2cf441bf0cb130619d"
+      },
+      {
+        "path": "tests/integration/feddyn_partition_worker.py",
+        "blob": "cb6112fa950fea94e33e1571b9d9671aeeee1c90",
+        "sha256": "38d2d552d87826410cfd79a9ffceaba83d3023fc028554337b7838865ee9f1ac"
+      },
+      {
+        "path": "tests/integration/test_feddyn_count_boundaries.py",
+        "blob": "6bc519193cbace7108844167f65ecd13be9e5f2e",
+        "sha256": "17f1fab24a9d0f7dd2d23c2b03a0c7329c8476d6e385cb24deec38880b204790"
+      },
+      {
+        "path": "tests/trainers/test_dp_data_loader_strategy.py",
+        "blob": "73eed9161913f7edaa271e7271007448231ad4c7",
+        "sha256": "3f95d8d7942f173290852ab6c3f803b41c01831f4e008b285b473d7962df93bc"
+      }
+    ],
+    "preservation": "Independently verified proposed tree differs from2633 in exactly five paths, with all five blobs matching the reviewed candidate. DP test and author receipt are identical to accepted f342. Production, docs, configs, dependency metadata, CI, shared fixtures and all other tests are unchanged from integrated2633.",
+    "component_branch_caution": "The component candidate inherits older docs/CI than2633; it must not replace root history wholesale. This authorization is for proposed d01f51f tree, whose docs/CI are byte-identical to2633. Apparent candidate-versus2633 docs/CI differences in component reviews are inherited ancestry differences, not authorized regressions.",
+    "root_evidence_overlay": "Root review/acceptance/reproduction/execution evidence is a separate overlay under evidence/2026-refresh. Record eventual corrected commit/tree and exact overlay diff; non-evidence source must match the proposed corrected merge tree."
+  },
+  "finding_dispositions": [
+    {
+      "id": "ROOT-2C-TYPING-01",
+      "status": "CLOSED_IN_REVIEWED_CORRECTION",
+      "review": "phase2-dp-typing-review.json",
+      "review_sha256": "d1c06f792fb68b1c81a45f56f01cd39702d1eeb7e73bc584c206d25b062e6393",
+      "basis": "Fresh independent review closes23 protected DP test diagnostics using explicit runtime narrowing, correct CPU fixture types and compatible callback signatures. All35 prior assertion ASTs/control contexts,3 numerical checks with original tolerances, exception/training/checkpoint guards and public calls are preserved;19 narrowing assertions strengthen checks. Seven actual Opacus tests, scoped explicit-environment ty and Ruff pass each interpreter with17 visible notices. No production/CI change, suppression, expanded allowance, mock or skip. Count correction preserves both accepted DP blobs."
+    },
+    {
+      "id": "ROOT-2C-COLLECTION-01",
+      "status": "CLOSED_IN_REVIEWED_CORRECTION",
+      "review": "phase2-count-collection-review.json",
+      "review_sha256": "221c87950448d1d42b17334d9fc75fdfc6128a0ca396ea8452acdc7e0488c44c",
+      "basis": "Independent whole-suite collection reproduces1 failure/1 pass/1301 deselected on2633 on both interpreters. Guarded canonical-module helper isolates the collection-sensitive example class identity while exercising real spawn and ordinary production training/acceptance. After collecting1303 tests, all36 selected cases pass each version, including all20 count-boundary cases and existing spawn/rejection/reuse paths. All18 original assertions, numerical/state comparisons and deadlines remain; no mocks, skips or fixture/guard weakening.",
+      "actual_parent_child_contract": "Both versions observe parent get exactly once, child spawn indices[7,13] from backing100, count2 across report/payload/accepted worker state, endpoint1.622 at absolute1e-12 and two child epochs. Worker/helper completion and no tracked survivors verified. Wrong counts, callback mutations, checkpoint rollback and rational retries remain tested."
+    }
+  ],
+  "initial_2633_run": {
+    "status": "FAIL_RETAINED_NOT_FINAL_QUALIFICATION",
+    "passed": 1301,
+    "expected_native_tokenizer_skip": 1,
+    "failed": 1,
+    "known_Opacus_notices": 17,
+    "runtime_cases_passed": 51,
+    "pytest_seconds": 1397.16,
+    "runner_command_wall_seconds": 1422.922,
+    "source_audit": "Archived before/after source audits are identical, PASS,1562 tracked source/submodule records. Archive hash and all111 manifest members independently verified in this addendum.",
+    "failure": "Spawned parent partition case fails with whole-suite collection through generic feddyn_trainer.PlainSGD module/class identity replacement; this is retained as failed aggregate evidence even after bounded correction acceptance.",
+    "other_initial_results": "Initial build/wheel install/import/serialization/path smoke, no-Git legacy inspection and Ruff were passing historical results. Final corrected-source checks remain required; no failed aggregate is promoted or carried as PASS.",
+    "typing": "Initial full ty685: vendor324/archive27/reproduction31/unchanged active19/changed tests255/unchanged tests29, zero changed active-production diagnostics. The23 protected DP test blockers are corrected locally. Full final classification and unchanged owned-file CI gate must rerun; no blanket clean typing claim or broader allowlist. Existing two HF allowances remain Phase3-owned."
+  },
+  "prepared_execution_plan": {
+    "status": "ACCEPTED_FOR_EXECUTION_NOT_EXECUTED",
+    "source": "/tmp/plato-refresh-worktrees/phase2-final-validation",
+    "environments": [
+      {
+        "profile": "mandatory-313",
+        "python": "3.13",
+        "path": "/tmp/plato-phase2-integration/final-mandatory-313"
+      },
+      {
+        "profile": "mandatory-314",
+        "python": "3.14",
+        "path": "/tmp/plato-phase2-integration/final-mandatory-314"
+      },
+      {
+        "profile": "base-313",
+        "python": "3.13",
+        "path": "/tmp/plato-phase2-integration/final-base-313"
+      },
+      {
+        "profile": "base-314",
+        "python": "3.14",
+        "path": "/tmp/plato-phase2-integration/final-base-314"
+      }
+    ],
+    "freshness": "Create new detached source at eventual corrected root commit; initialize exact pinned submodules. Provision all FOUR new final-* environments. Preserve user .venv and initial failed-run source/environment. Abort on unexpected preexisting final target rather than silently reuse it.",
+    "concurrency": "At most TWO profiles concurrently: mandatory3.13/3.14 pair first, then base3.13/3.14 pair. Distinct fresh environments and external basetemp/JUnit/log/coverage; shared committed source immutable during each pair and numerical libraries single-threaded. Root-reported64GiB/10 logical CPUs and audited dynamic ports, distinct runtime roots and identity-scoped descendant monitoring support this bounded local schedule. Retain/diagnose any failure without deadline relaxation.",
+    "bytecode": "No generated core/test bytecode may preexist. Explicitly account for131 upstream-tracked DViT CPython3.7 cache files, unused by3.13/3.14; retain those pinned historical bytes. Disable new project bytecode writes. Compile/read normal installed-library caches with uv; no global empty PYTHONPYCACHEPREFIX.",
+    "tooling": "Runner and source auditor are byte-identical to their original gated versions. They record execution and source identity; root remains responsible for authorizing-gate/source mapping, actual cases/results/skip-warning audit and imported parent/worker origins. Source auditor limitations around ignored caches are addressed by fresh-source and explicit bytecode inventory.",
+    "timing": "No timeout/profile/guard changes. Local full-profile concurrent timings do not establish Linux split-job timing or coverage. Audit actual exact-source Linux CI against existing20-minute base/mandatory,16-minute runtime and90-minute job budgets. Initial full mandatory local wall time includes runtime and is not directly comparable to a CI non-runtime step."
+  },
+  "preserved_gate_and_pending_requirements": [
+    {
+      "criteria": "G1-G4",
+      "state": "PRESERVED_WITH_BOUNDED_SOURCE_AMENDMENT",
+      "owner": "root",
+      "requirement": "Keep original accepted numerical/component/prose/CI reviews and mappings. This addendum changes only the five reviewed test/evidence paths and final qualification source/environment locations; record exact integrated mapping and evidence overlay."
+    },
+    {
+      "criteria": "G5-G6",
+      "state": "PENDING_FRESH_FINAL_EXECUTION",
+      "owner": "root",
+      "requirement": "Rerun all four full profiles on corrected source, including all51 runtime tests per mandatory interpreter, all20 count cases,7 real DP tests, original numerical/worker/entrypoint/resume/S3/native codec/lifecycle/ownership coverage. Base intentionally deselects51 runtime cases. No final profile count inferred from selected green reviews or initial failed suite."
+    },
+    {
+      "criteria": "G5-G7",
+      "state": "PENDING_RESULT_AUDIT",
+      "owner": "root",
+      "requirement": "Before/after source/submodule/import audits, exact lock/interpreter/package and effective invocation receipts; actual JUnit/node inventory/skips/xfails/warnings. Mandatory allows only absent native Nanochat tokenizer at this phase; base only documented optional omissions. Classify actual notices rather than suppress them. Preserve natural success versus negative watchdog containment, numerical tolerances, deadlines and no-survivor assertions."
+    },
+    {
+      "criteria": "G7",
+      "state": "PENDING_FINAL_CORRECTED_SOURCE_CHECKS",
+      "owner": "root",
+      "requirement": "Final wheel/sdist build and isolated installation/import/path/serialization checks, no-Git selected legacy-reader checks, lock/diff/Ruff, full typing classification and existing owned-file CI gate. Retain exact artifacts/log hashes. Initial checks are historical evidence, not final-source substitutes."
+    },
+    {
+      "criteria": "G8",
+      "state": "PENDING_PLATFORM_AND_DELIVERY",
+      "owner": "root",
+      "requirement": "After audited local qualification, push exact corrected source, audit exact-source Linux3.13/3.14 CI with timing/coverage/guard evidence, update PR and record root combined acceptance/delivery. Retain then clean only owned resources; Phase3 starts after Phase2 delivery."
+    }
+  ],
+  "unchanged_limits": "Python3.13 default and3.14 core qualification; no blanket clean security/typing/full optional/GPU support. No security questionnaire, new provenance ledger, numerical redesign or later-scope expansion. Phase3 bounded MLX/HF/LeRobot/Nanochat; Phase4 ViT archives/FEI; Phase5 two MkDocs links, DP per-run/legacy unsquared FedProx wording and other assigned documentation/delivery work remain as originally assigned.",
+  "evidence_interpretation": "Preparation-time pending-count-review wording in final-correction-combination.json is superseded by the exact hashed fresh review and root acceptance. Independent selected green runs after full collection close this defect locally; they are not full-suite acceptance. Historical red probes and the original2633 FAIL remain intact.",
+  "review_method": "No numerical/component re-review or broad execution. Read bounded reviews/acceptances/current plan, verified exact immutable commit/tree/clean tracked state, proposed five-path merge and DP preservation, original gate hash, two acceptance/review links,20 selected retained review receipt hashes, and111 archived initial-run evidence members. Tooling preservation checked byte-for-byte. No source edits, merges, commits, pushes, installs, cleanup, nested agents or next-phase work.",
+  "sources": [
+    {
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2-gate.json",
+      "sha256": "fcb6d70a71a425eeba0a30444da42b49a1fa5b69cca38354efff6a48baa4101a",
+      "bytes": 26829
+    },
+    {
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2-dp-typing-review.json",
+      "sha256": "d1c06f792fb68b1c81a45f56f01cd39702d1eeb7e73bc584c206d25b062e6393",
+      "bytes": 171897
+    },
+    {
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2-dp-typing-acceptance.json",
+      "sha256": "8e77200138a6db9484864eedf1cf71f2a951a13312ccebcae5eeb6b7780905ce",
+      "bytes": 644
+    },
+    {
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2-count-collection-review.json",
+      "sha256": "221c87950448d1d42b17334d9fc75fdfc6128a0ca396ea8452acdc7e0488c44c",
+      "bytes": 75743
+    },
+    {
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2-count-collection-acceptance.json",
+      "sha256": "9438466b5f2691c139090168783a472fe7a612af1103b119696d9fd0662ca178",
+      "bytes": 1511
+    },
+    {
+      "path": "/tmp/plato-phase2-root/final-correction-combination.json",
+      "sha256": "50cb98df948b45a202796aea55b2d4e76131c1a94f36881c29f379ff66a971d3",
+      "bytes": 700
+    },
+    {
+      "path": "/tmp/plato-phase2-root/integration-plan.json",
+      "sha256": "3fdd46f8eeaf27363f8dbc29a5f0bcfd85f93bd40ebe6c743e990389ad1e1c98",
+      "bytes": 5914
+    },
+    {
+      "path": "/tmp/plato-phase2-root/run_integration_profile.py",
+      "sha256": "d761ad3dfbf3e5aa64382bf86b9dbf8ddd9412244d0faa538f5153e7f7b8a2a4",
+      "bytes": 6462
+    },
+    {
+      "path": "/tmp/plato-phase2-root/audit_source.py",
+      "sha256": "7a5a810e64c01a15f14a6578f38e03896f063f81dc6297c285bbf8e3040463b1",
+      "bytes": 2482
+    },
+    {
+      "path": "/tmp/plato-phase2-integration/initial-full-313-failure-summary.json",
+      "sha256": "504bee2490332c0be417573d9d61fd0abcc0489a30a09c78957a0a058335e07e",
+      "bytes": 3906
+    }
+  ],
+  "scratch_receipts": [
+    {
+      "path": "/tmp/plato-phase2-gate/corrections/verification.json",
+      "sha256": "0bcba0aaf6bc83df19b0a35021eca760665f9c333f91192c75440a21b659e38a"
+    },
+    {
+      "path": "/tmp/plato-phase2-gate/corrections/initial-archive-verification.json",
+      "sha256": "5e0682c35dc1c510d76fb6b506612b05c66ecc6ecd240b8908bf4412bc590ff2"
+    }
+  ],
+  "initial_reproduction_archive": {
+    "manifest": {
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/reproductions/phase2-initial-integration-2633-evidence-manifest.json",
+      "sha256": "c168868dbd3296379375abafe22b548550145de5ddd427a2bdbc14efe7d1d339"
+    },
+    "archive": {
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/reproductions/phase2-initial-integration-2633-evidence.tar.gz",
+      "sha256": "b6b24cd0a585ef31f264091ae0392aeda3e1c05ba48268addc25e42128237242"
+    },
+    "members_verified": 111,
+    "source_status": "PASS",
+    "source_records": 1562,
+    "source_before_after_equal": true,
+    "qualification": "INITIAL_RUN_FAIL_RETAINED"
+  }
+}

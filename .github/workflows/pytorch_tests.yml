@@ -1,36 +1,98 @@
 name: PyTorch CI Tests
 permissions:
   contents: read
-  pull-requests: read
 
 on:
   push:
     branches: [main]
   pull_request:
     branches: [main]
-  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   PyTorch-Tests:
-    runs-on: ubuntu-latest
+    name: Python 3.13 / supported-default
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    defaults:
+      run:
+        shell: zsh -lc ". {0}"
+    env:
+      CUDA_VISIBLE_DEVICES: ""
+      OMP_NUM_THREADS: "1"
+      MKL_NUM_THREADS: "1"
+      TOKENIZERS_PARALLELISM: "false"
+      UV_PROJECT_ENVIRONMENT: ${{ github.workspace }}/.venv-mandatory
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v5
+      - name: Checkout source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          submodules: recursive
+          persist-credentials: false
 
-      - name: Install uv
-        uses: astral-sh/setup-uv@v4
-
-      - name: Training workloads
-        shell: bash -l {0}
+      - name: Provision zsh
+        shell: python {0}
+        timeout-minutes: 3
         run: |
-          uv sync --all-extras
-          uv run pytest tests
-          uv run plato.py -c configs/MNIST/fedavg_lenet5.toml
-          uv run plato.py -c configs/MNIST/fedavg_cross_silo_lenet5.toml
-          uv run plato.py -c configs/HuggingFace/fedavg_opt_lora.toml
-          uv run plato.py -c configs/MNIST/fedavg_async_lenet5.toml
-          uv run plato.py -c configs/MNIST/fedavg_lenet5_noniid.toml
+          import subprocess
+          subprocess.run(["sudo", "apt-get", "update"], check=True)
+          subprocess.run(["sudo", "apt-get", "install", "-y", "zsh"], check=True)
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.13"
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+        with:
+          version: "0.12.22"
+
+      - name: Record provenance and check lock
+        timeout-minutes: 2
+        run: |
+          set -eu
+          mkdir -p ci-artifacts
+          git rev-parse HEAD > ci-artifacts/commit.txt
+          git submodule status --recursive > ci-artifacts/submodules.txt
+          sha256sum uv.lock > ci-artifacts/lock.txt
+          python --version > ci-artifacts/python.txt
+          uv --version > ci-artifacts/uv.txt
+          uv lock --check
+
+      - name: Sync mandatory profile
+        timeout-minutes: 5
+        run: |
+          set -eu
+          uv sync --locked --python 3.13 --no-default-groups --group dev
+          uv pip freeze --python "$UV_PROJECT_ENVIRONMENT/bin/python" > ci-artifacts/mandatory-packages.txt
+
+      - name: Fast mandatory core suite
+        timeout-minutes: 10
+        env:
+          HF_HUB_OFFLINE: "1"
+          HF_DATASETS_OFFLINE: "1"
+        run: |
+          set -euo pipefail
+          uv run --no-sync --python 3.13 python -m pytest tests --test-profile=mandatory -m "not runtime and not slow" -ra --durations=20 --basetemp="${{ runner.temp }}/plato-fast-tmp" --junitxml=ci-artifacts/mandatory.xml --cov=plato --cov-report=term --cov-report=json:ci-artifacts/coverage.json 2>&1 | tee ci-artifacts/mandatory.log
+
+      - name: Ruff and fatal configured typing
+        timeout-minutes: 3
+        run: |
+          set -euo pipefail
+          uv run --no-sync --python 3.13 ruff check . --select I | tee ci-artifacts/ruff.log
+          uv run --no-sync --python 3.13 ty --version > ci-artifacts/ty-version.txt
+          uv run --no-sync --python 3.13 ty check --output-format concise --error-on-warning 2>&1 | tee ci-artifacts/ty.log
+
+      - name: Upload fast core outputs
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: pytorch-fast-3.13-${{ github.run_attempt }}
+          path: ci-artifacts/
+          retention-days: 14
+          if-no-files-found: warn

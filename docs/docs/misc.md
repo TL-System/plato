@@ -12,14 +12,14 @@ If runtime exceptions occur that prevent a federated learning session from runni
 !!! warning "Client Timeout Issues"
     **Issue:** The time that a client waits for the server to respond before disconnecting is too short. This could happen when training with large neural network models. If you get an `AssertionError` saying that there are not enough launched clients for the server to select, this could be the reason. But make sure you first check if it is due to the *out of CUDA memory* error.
 
-    **Potential solutions:** Add `ping_timeout` in the `server` section in your configuration file. The default value for `ping_timeout` is 360 (seconds).
+    **Potential solutions:** The default `server.ping_timeout` is 3600 seconds. Measure the delays in the affected session and check for failed or memory-constrained clients before overriding it in your configuration file.
 
-    For example, when running on [Compute Canada resources](https://github.com/TL-System/plato/blob/main/docs/Running.md) with the CIFAR-10 dataset and the ResNet-18 model, and if 10 clients are selected per round, `ping_timeout` needs to be 360 when clients' local datasets are non-iid by symmetric Dirichlet distribution with the concentration of 0.01. Consider an even larger number if you run with larger models and more clients.
+    Choose an override from observed response delays for your workload. See the [Digital Research Alliance of Canada guide](ccdb.md) for cluster preparation and job management.
 
 !!! warning "Process Cleanup"
     **Issue:** Running processes have not been terminated from previous runs.
 
-    **Potential solutions:** Use the command `pkill python` to terminate them so that there will not be CUDA errors in the upcoming run.
+    **Potential solutions:** Stop the identified training session with `Ctrl-C`. For a scheduled cluster job, cancel its specific job ID as described in the [cluster guide](ccdb.md#manage-the-job), then verify that the session has released its resources before restarting.
 
 ## Client simulation mode
 
@@ -35,7 +35,26 @@ In contrast, if server asynchronous mode is activated (`server:synchronous` set 
 
 ## Running unit tests
 
-All unit tests are in the `tests/` directory. These tests are designed to be standalone and executed separately. For example, the command `python lr_schedule_tests.py` runs the unit tests for learning rate schedules.
+Tests are in `tests/`. From the repository root, provision Python 3.13 and run focused learning-rate scheduler coverage:
+
+```bash
+uv sync --locked --python 3.13 --group test-model-search
+uv run --locked --group test-model-search python -m pytest tests/trainers/test_lr_scheduler_registry.py -ra
+```
+
+For the mandatory core suite, including retained model-search tests, use:
+
+```bash
+uv run --locked --group test-model-search python -m pytest tests --test-profile=mandatory -ra
+```
+
+Ordinary `pytest tests` and this mandatory command exclude native MLX,
+Lighteval runtime, and Phase 4 example qualification directories. Follow the
+separate [native MLX checks](mlx.md#run-native-checks),
+[Lighteval runtime qualification](references/evaluators.md#optional-runtime-qualification),
+and the repository's `tests/examples_phase4/cases.json` inventory and
+`tests/conftest.py` policy for those checks.
+A core pass does not establish example-family or optional-backend qualification.
 
 ## Running Continuous Integration tests as GitHub actions
 

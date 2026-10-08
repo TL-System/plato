@@ -1,0 +1,2 @@
+cwd: /tmp/plato-p2-generated-fix
+command: ["/tmp/plato-p2-generated-fix/workflow-environment/.venv-docs/bin/python", "-c", "raise SystemExit(29)"]

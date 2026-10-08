@@ -1,0 +1,33 @@
+{
+  "candidate": "f9772f61d52dfe0f4a3281252d23b8303ec237d2",
+  "tree": "bf326217a40916013091145a73cba040535dcab4",
+  "scope": "Root source-archive portability plus base regression check; not full profile acceptance or integrated phase qualification",
+  "source_archive": "/tmp/plato-phase2-root/f977-source-archive",
+  "source_file_blobs_verified_after_run": 959,
+  "source_files_changed": [],
+  "python": "3.13.16",
+  "environment": "/tmp/plato-phase2-root/c-base-313",
+  "result": {
+    "passed": 574,
+    "skipped": 4,
+    "deselected": 52,
+    "seconds": 172.08,
+    "exit_code": 1,
+    "profile_guard": "Correctly rejects four deliberate migration-test deselections;48runtime omissions are allowedbase policy",
+    "warnings_reported": 0
+  },
+  "known_excluded_failure": "ROOT-2C-02 exact historical gitshow dependency reproduced separately in phase2c-root-source-archive-probe.json",
+  "command": "PYTHONPATH=/tmp/plato-phase2-root/f977-source-archive PYTHONDONTWRITEBYTECODE=1 HF_HUB_OFFLINE=1 HF_DATASETS_OFFLINE=1 TOKENIZERS_PARALLELISM=false OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 CUDA_VISIBLE_DEVICES='' /tmp/plato-phase2-root/c-base-313/bin/python -m pytest tests --test-profile=base -m 'not runtime' -k 'not actual_accepted_b_feddyn_writer_migration' -ra --basetemp=/tmp/plato-phase2-root/f977-archive-base-313 --junitxml=/tmp/plato-phase2-root/f977-archive-base-313.xml",
+  "cwd": "/tmp/plato-phase2-root/f977-source-archive",
+  "receipts": [
+    {
+      "path": "/tmp/plato-phase2-root/f977-archive-base-313.log",
+      "sha256": "be30d7b950d99bdcce4e6880c170601bb6c1061873adb1714afb847c757833d4"
+    },
+    {
+      "path": "/tmp/plato-phase2-root/f977-archive-base-313.xml",
+      "sha256": "102e76173a41c42ebc433a38e6cb2e792b55e36fa4fa16fb7c187b735cad7443"
+    }
+  ],
+  "followup": "After original author corrects portable fixture, include all cases in final exact combined source mandatory/base qualification; do not weaken profile guard."
+}

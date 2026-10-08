@@ -1,0 +1,407 @@
+{
+  "schema_version": 1,
+  "status": "AUTHOR_SOURCE_FROZEN_BOUND_CHECKS_PASSED; independent combined review and Linux qualification remain root gates",
+  "source_commit": "1a7fea6f4fbd0232032332958f4354067e306342",
+  "source_tree": "a262d291a186da09aedfeb79126b0945199a252a",
+  "base": "cc0cf8dc4d95bfe2d5661aada43bb9cfe6c72f2a",
+  "base_tree": "c557993770b697f16da2a7c1d5265e6d00c59c6a",
+  "root_handoff_sha256": "7dcf2c6b02d96f78e25fff508750d27e76b627cb7c28e7e9ecd5880f64ba4425",
+  "accepted_plan": {
+    "path": "evidence/2026-refresh/lighteval-profile-plan.json",
+    "sha256": "8a457832ca649ba39e7ba4f39175aec35e111e00e8856068641ac324ce4015fe",
+    "review_sha256": "953261a846d0d19658279a99f688f465f741f3ad040806a9e2cb5a7ccf727529"
+  },
+  "accepted_archive": {
+    "source": "591d706b01bed27fb4ec8687b2f5a298740560e7",
+    "review_sha256": "26dc3cfbf5ef7bd56df83ada4fea99fe82d05e88eefa2c87a173eaf8d732537e"
+  },
+  "accepted_runtime": {
+    "source": "e079df6228f9529472c7b3c3d9a2db46a42636a8",
+    "integrated_reviewed_source": "c1bdae78456b6a8b16d2b78d16ab6ec973067b06",
+    "review_sha256": "f034d94fa98c7e291df33a1ad1e3bea2bb6e74d2dcc145ac7c32f9985e3c1e53",
+    "nonblocking_low": "Read-only synthetic fixtures can cause later pytest garbage cleanup warnings; production owned paths clean. No runtime/source semantic change required for accepted baseline."
+  },
+  "source_bindings": {
+    "tests/conftest.py": {
+      "before": "cf5bbbd976dd977396177892bc4997d7ad84c7e6e2f2163c6852d19c9aa65aee",
+      "after": "2d5323021b000249805712282c2ee5281eaa3c4fc65a55a65e8215acfe14a54f",
+      "changed": true
+    },
+    ".github/workflows/pytorch_tests.yml": {
+      "before": "697c6ae0c39fa7fd42766f8161f350944e90108b3dad852148da952acfcc9317",
+      "after": "cd6895c7fc62ee6f0efeff0909fc16078e31adbc61d900db8058548b86714b54",
+      "changed": true
+    },
+    ".github/scripts/stage_ci_artifacts.py": {
+      "before": "f9142f03c92469aceed4aa06ae5b8bb04699c89042dd156f0b4783392ca85b24",
+      "after": "f42387c37fa6de4774dc2a04fd6536ff812223aec7a31393f1de20d8fa1bf547",
+      "changed": true
+    },
+    "pyproject.toml": {
+      "before": "6c313baf90888edeb24c42828b93411ab1f075e2cf1197663299f46dccbfadcd",
+      "after": "fcc830f9fac66f2e2f28bef0d715bea3eb1300105a4239bb33cce8f62b71b398",
+      "changed": true
+    },
+    "uv.lock": {
+      "before": "66a4e4442d7b1f26d220b44ca73c44ff4f1151a86857bb3f93a594819fd08126",
+      "after": "66a4e4442d7b1f26d220b44ca73c44ff4f1151a86857bb3f93a594819fd08126",
+      "changed": false
+    },
+    "tests/mlx_native/cases.json": {
+      "before": "c168dc33a4d4e7ed70079e09c3de70f5b318d543c035ec13de2826b48e1175bb",
+      "after": "c168dc33a4d4e7ed70079e09c3de70f5b318d543c035ec13de2826b48e1175bb",
+      "changed": false
+    },
+    "tests/test_mlx_profile_contract.py": {
+      "before": "c26c766a599d235f6841aafe82f178b7fd8a3ae02d8362420d0d4f7e95dd8088",
+      "after": "c26c766a599d235f6841aafe82f178b7fd8a3ae02d8362420d0d4f7e95dd8088",
+      "changed": false
+    },
+    "tests/test_model_search_profile_contract.py": {
+      "before": "fc8f8b300afab10bf5cc6f97b670aeba0e996b708202e14aeaeee015f5712e92",
+      "after": "fc8f8b300afab10bf5cc6f97b670aeba0e996b708202e14aeaeee015f5712e92",
+      "changed": false
+    },
+    "plato/evaluators/lighteval.py": {
+      "before": "73a6f9f790ed1810033f4dcdc7c35bba68cd738260462e517dffd946d26b9775",
+      "after": "73a6f9f790ed1810033f4dcdc7c35bba68cd738260462e517dffd946d26b9775",
+      "changed": false
+    },
+    "plato/evaluators/lighteval_tasks.py": {
+      "before": "c5af11e1f9cc71d8cbd0318266690246045049701d00ddd944f45cce121c984f",
+      "after": "c5af11e1f9cc71d8cbd0318266690246045049701d00ddd944f45cce121c984f",
+      "changed": false
+    },
+    "tests/evaluators/test_lighteval.py": {
+      "before": "2eeab12061ee21c5998ae2de33922f807e832b0852a3ed22e348ae6b6534309e",
+      "after": "2eeab12061ee21c5998ae2de33922f807e832b0852a3ed22e348ae6b6534309e",
+      "changed": false
+    },
+    "tests/evaluators/test_lighteval_materialization.py": {
+      "before": "8bca619ee48202357a77a1def751cd10426fd26c6a63c6ed3bd6d2bf5daf4844",
+      "after": "8bca619ee48202357a77a1def751cd10426fd26c6a63c6ed3bd6d2bf5daf4844",
+      "changed": false
+    },
+    "tests/llm_eval/__init__.py": {
+      "before": "50f6badeb74c56f691f86099db5363ab7ce0f551b0ad9dda09e5ca0d762bcabf",
+      "after": "50f6badeb74c56f691f86099db5363ab7ce0f551b0ad9dda09e5ca0d762bcabf",
+      "changed": false
+    },
+    "tests/llm_eval/helpers.py": {
+      "before": "0a3c9f230f3de6095791f0930f7e2963aaf2a88a2190f00b8aed01d878614bf1",
+      "after": "0a3c9f230f3de6095791f0930f7e2963aaf2a88a2190f00b8aed01d878614bf1",
+      "changed": false
+    },
+    "tests/llm_eval/test_lighteval_runtime.py": {
+      "before": "1f55137024bbc8fdfcf894aef97088ef07ca545c63f518e4e1d5ae4db5faaa14",
+      "after": "1f55137024bbc8fdfcf894aef97088ef07ca545c63f518e4e1d5ae4db5faaa14",
+      "changed": false
+    },
+    "tests/test_llm_eval_profile_contract.py": {
+      "before": null,
+      "after": "19e81abd34c9c689d840a73e4f5d54f9c3c3a73ca7360d3db2eca7b5ac5e74bc",
+      "changed": true
+    },
+    "tests/llm_eval/cases.json": {
+      "before": null,
+      "after": "557fd7e5af010e49c7a687b5632c22ef80cc0db4f6639c8ce67fda20d9b7dded",
+      "changed": true
+    }
+  },
+  "ownership": {
+    "changed_paths": [
+      "tests/conftest.py",
+      ".github/workflows/pytorch_tests.yml",
+      ".github/scripts/stage_ci_artifacts.py",
+      "pyproject.toml",
+      "tests/test_llm_eval_profile_contract.py",
+      "tests/llm_eval/cases.json"
+    ],
+    "pyproject_exception": "Exactly one llm_eval pytest marker; frozen fcc830f9. Root separately assigned archives/** exclusion to P2; no dependency/workspace/lock edit.",
+    "inert_initializer": "Existing sole docstring unchanged; no child conftest.",
+    "no_other_owner_edits": true
+  },
+  "preserved_function_ast": {
+    "_full_suite": true,
+    "_native_prerequisites": true,
+    "_load_native_ledger": true,
+    "isolate_test_state": true,
+    "temp_config": true
+  },
+  "ledger": {
+    "path": "tests/llm_eval/cases.json",
+    "sha256": "557fd7e5af010e49c7a687b5632c22ef80cc0db4f6639c8ce67fda20d9b7dded",
+    "cases": [
+      {
+        "nodeid": "tests/llm_eval/test_lighteval_runtime.py::test_real_preset_pipeline_normalizes_metrics_and_refreshes_exports[current-model]",
+        "criteria": [
+          "LE1",
+          "LE2",
+          "LE3"
+        ]
+      },
+      {
+        "nodeid": "tests/llm_eval/test_lighteval_runtime.py::test_real_preset_pipeline_normalizes_metrics_and_refreshes_exports[configured-local]",
+        "criteria": [
+          "LE1",
+          "LE2",
+          "LE3"
+        ]
+      },
+      {
+        "nodeid": "tests/llm_eval/test_lighteval_runtime.py::test_real_piqa_prompt_and_preset_task_contract",
+        "criteria": [
+          "LE2"
+        ]
+      },
+      {
+        "nodeid": "tests/llm_eval/test_lighteval_runtime.py::test_real_model_config_failure_clears_stale_results_and_exports[False]",
+        "criteria": [
+          "LE3",
+          "LE4"
+        ]
+      },
+      {
+        "nodeid": "tests/llm_eval/test_lighteval_runtime.py::test_real_model_config_failure_clears_stale_results_and_exports[True]",
+        "criteria": [
+          "LE3",
+          "LE4"
+        ]
+      },
+      {
+        "nodeid": "tests/llm_eval/test_lighteval_runtime.py::test_real_missing_primary_metric_is_rejected",
+        "criteria": [
+          "LE2",
+          "LE4"
+        ]
+      },
+      {
+        "nodeid": "tests/llm_eval/test_lighteval_runtime.py::test_real_readonly_local_source_ignores_old_responses[same]",
+        "criteria": [
+          "LE3"
+        ]
+      },
+      {
+        "nodeid": "tests/llm_eval/test_lighteval_runtime.py::test_real_readonly_local_source_ignores_old_responses[separate]",
+        "criteria": [
+          "LE3"
+        ]
+      },
+      {
+        "nodeid": "tests/llm_eval/test_lighteval_runtime.py::test_failure_after_actual_inference_cleans_local_copies[False]",
+        "criteria": [
+          "LE3",
+          "LE4"
+        ]
+      },
+      {
+        "nodeid": "tests/llm_eval/test_lighteval_runtime.py::test_failure_after_actual_inference_cleans_local_copies[True]",
+        "criteria": [
+          "LE3",
+          "LE4"
+        ]
+      },
+      {
+        "nodeid": "tests/llm_eval/test_lighteval_runtime.py::test_real_hub_style_response_cache_is_per_run",
+        "criteria": [
+          "LE3"
+        ]
+      }
+    ],
+    "count": 11,
+    "criteria_mapping_note": "LE1 is limited to the two actual Pipeline metric cases. PIQA prompt/task Registry contract is LE2; it does not independently execute Pipeline."
+  },
+  "checks": {
+    "red": {
+      "final_test_source_sha256": "19e81abd34c9c689d840a73e4f5d54f9c3c3a73ca7360d3db2eca7b5ac5e74bc",
+      "production_hook_base": "cc0cf8dc4d95bfe2d5661aada43bb9cfe6c72f2a",
+      "selected_result": "29 failed,47 deselected",
+      "log": "logs/final-policy-red.log"
+    },
+    "installed_policy_evaluator": "264 passed,0 skipped/warnings before final dependency-absence harness correction; installed branch material assertions unchanged.",
+    "final_affected_installed": "24 passed,52 deselected against frozen test source, including actual production graphs/resources/uv identity/CI gate/ledger.",
+    "absent_policy": "245 passed,0 skipped/warnings against frozen test source in fresh locked test-base environment.",
+    "cpu11": {
+      "command": "Persistent step environment + exact extracted .github/workflows/pytorch_tests.yml Lighteval CPU qualification script (raw run-ci-step.zsh).",
+      "platform": [
+        "Darwin",
+        "arm64"
+      ],
+      "result": "11 passed,1 accepted upstream Hugging Face Hub deprecation warning in 79.88s",
+      "source_commit": "1a7fea6f4fbd0232032332958f4354067e306342",
+      "ledger_sha256": "557fd7e5af010e49c7a687b5632c22ef80cc0db4f6639c8ce67fda20d9b7dded",
+      "acceptance": true,
+      "log": "frozen-ci/llm-eval.log",
+      "junit": "frozen-ci/llm-eval.xml",
+      "raw_properties": "frozen-ci/llm-eval-acceptance.json raw_runtime_properties"
+    },
+    "collections": [
+      {
+        "label": "base",
+        "command": [
+          "/tmp/plato-lighteval-profile/base-env/bin/python",
+          "-m",
+          "pytest",
+          "tests",
+          "--test-profile=base",
+          "-m",
+          "not runtime",
+          "--collect-only",
+          "-q",
+          "-p",
+          "no:cacheprovider"
+        ],
+        "status": 0,
+        "nodes": 1558,
+        "optional_nodes": 0,
+        "native_nodes": 0,
+        "profile_sha256": "2d5323021b000249805712282c2ee5281eaa3c4fc65a55a65e8215acfe14a54f"
+      },
+      {
+        "label": "mandatory",
+        "command": [
+          "/tmp/plato-lighteval-profile/env/bin/python",
+          "-m",
+          "pytest",
+          "tests",
+          "--test-profile=mandatory",
+          "-m",
+          "not runtime",
+          "--collect-only",
+          "-q",
+          "-p",
+          "no:cacheprovider"
+        ],
+        "status": 0,
+        "nodes": 1565,
+        "optional_nodes": 0,
+        "native_nodes": 0,
+        "profile_sha256": "2d5323021b000249805712282c2ee5281eaa3c4fc65a55a65e8215acfe14a54f"
+      },
+      {
+        "label": "runtime",
+        "command": [
+          "/tmp/plato-lighteval-profile/env/bin/python",
+          "-m",
+          "pytest",
+          "tests",
+          "--test-profile=mandatory",
+          "-m",
+          "runtime and not retained_model_search",
+          "--collect-only",
+          "-q",
+          "-p",
+          "no:cacheprovider"
+        ],
+        "status": 0,
+        "nodes": 51,
+        "optional_nodes": 0,
+        "native_nodes": 0,
+        "profile_sha256": "2d5323021b000249805712282c2ee5281eaa3c4fc65a55a65e8215acfe14a54f"
+      },
+      {
+        "label": "retained",
+        "command": [
+          "/tmp/plato-lighteval-profile/env/bin/python",
+          "-m",
+          "pytest",
+          "tests/integration/test_retained_model_search.py",
+          "--test-profile=mandatory",
+          "-m",
+          "retained_model_search",
+          "--collect-only",
+          "-q",
+          "-p",
+          "no:cacheprovider"
+        ],
+        "status": 0,
+        "nodes": 19,
+        "optional_nodes": 0,
+        "native_nodes": 0,
+        "profile_sha256": "2d5323021b000249805712282c2ee5281eaa3c4fc65a55a65e8215acfe14a54f"
+      },
+      {
+        "label": "combined",
+        "command": [
+          "/tmp/plato-lighteval-profile/env/bin/python",
+          "-m",
+          "pytest",
+          "tests",
+          "--test-profile=llm-eval",
+          "--collect-only",
+          "-q",
+          "-p",
+          "no:cacheprovider"
+        ],
+        "status": 0,
+        "nodes": 1646,
+        "optional_nodes": 11,
+        "native_nodes": 0,
+        "profile_sha256": "2d5323021b000249805712282c2ee5281eaa3c4fc65a55a65e8215acfe14a54f"
+      },
+      {
+        "label": "native",
+        "command": [
+          "/tmp/plato-lighteval-profile/native-env/bin/python",
+          "-m",
+          "pytest",
+          "tests/mlx_native",
+          "--test-profile=mlx-native",
+          "--collect-only",
+          "-q",
+          "-p",
+          "no:cacheprovider"
+        ],
+        "status": 0,
+        "nodes": 383,
+        "optional_nodes": 0,
+        "native_nodes": 383,
+        "profile_sha256": "2d5323021b000249805712282c2ee5281eaa3c4fc65a55a65e8215acfe14a54f"
+      }
+    ],
+    "actual_dependency_negatives": [
+      "Fresh locked test-base: Lighteval/langdetect absent, default xxhash4.0.1; scoped rejection and zero real Lighteval import events.",
+      "Separate locked optional env with only langdetect uninstalled: Lighteval 0.13/xxhash3.8.1/NLTK3.10.3 present; scoped real ModuleNotFound rejection before Registry."
+    ],
+    "resources": "For each punkt/punkt_tab separately, real other resource copied into owned fixture, actual nltk.data.path replaced in fresh child, real LookupError proven before production preflight; zero pipeline/import/download events. Full receipts are JUnit actual_resource_guard properties in logs/frozen-policy.xml and logs/final-policy.xml.",
+    "native_retained_installed_sentinels": "Actual installed Lighteval 0.13.0: native383 and retained19 productioncollections pass, zero real Lighteval imports or optional test modules (logs/*-installed-import-audit.json).",
+    "typing_present": "Frozen CI exact9-owned-path ty --error-on-warning: identity tuple plus All checks passed; explicitdot-directory stager clean.",
+    "typing_absent": "Full ty --python fresh base env:333 historical diagnostics,0owned violations, original two datasource allowances unchanged (logs/ty-absent-guard.json).",
+    "ruff": "ruff check . --select I passed",
+    "lock": "uv lock --check passed; SHA66a4e4442d7b1f26d220b44ca73c44ff4f1151a86857bb3f93a594819fd08126 unchanged"
+  },
+  "plan_validation": {
+    "LP01": "Real production default/tests/core/base/mandatory runtime and core pyargs import sentinels in both installed and absent environments; native and retained installed sentinel receipts.",
+    "LP02": "Canonical and alias pyargs backstops, pure early cross-profile/mixed-native conflicts, exact filesystem boundary, focused mini-project actual hook routing.",
+    "LP03": "Actual installed and absent package preflight, actual missinglangdetect, separate actual NLTK resource negatives before Registry/download.",
+    "LP04": "Named filter matrix, PYTEST_ADDOPTS, subset/core-only/dropped/duplicate actual hook sessions, strict Counter schema/traversal/criteria coverage; actual 11 collect-only explicitly nonexecution.",
+    "LP05": "Focused real collect skip/importorskip/setup skip/call skip/xfail/strict xfail/xpass/setup failure/teardown failure tests; named ledger pass requirements; inherited core assertions preserved.",
+    "LP06": "Config/full-suite/RNG fixtures AST unchanged and accepted core tests source-preserved; root integrated full core execution remains gate.",
+    "LP07": "Native383 ledger hash/source unchanged, actual383 collection and oldprofile tests pass; retained19/runtime51 actualcollection and oldarchive guard tests pass.",
+    "LP08": "Frozen-source actual CPU11 and exact CI gate; Linux root execution remains required, no accuracy/performance claim.",
+    "LP09": "Exact independent collection/JUnit/outcome/source/identity mutation gate and scoped artifactstager weights/symlink exclusions; old no-follow/race/required records tests preserved.",
+    "LP10": "Dependency-present/absent typing guard, explicitstager, Ruff/lock/source checks; fresh combined review active against rootd2ed.",
+    "LP11": "Actual uv --no-sync environment selection with distinguishable .venv; missing/wrongidentity fails before optional imports; persistent CI env and identity-bound prerequisite/runtime/ty/artifact receipts."
+  },
+  "history_and_limits": [
+    "Initial 30fail/1pass red retained. Initial 8 oldguard failures were only an altered summary substring; original exact literal preserved. Later 9 new failures were overbroad focused-label substring assertions; corrected to reject exact Lighteval complete claim. No old assertion weakened.",
+    "Initial CI resource hash path used unresolved /tmp versus resolved /private/tmp. Productionprovisioning now resolves target; final exact step passed.",
+    "A repeated owned --basetemp run hit1 pass/10 setup errors due to readonly synthetic source directories from prior accepted runtime fixture. Raw failure retained in reused-basetemp-ci; old tree moved, freshfrozen run passes. No runtime/helper edits. Root separately integrated original-author LR1 permission-restoration52b into candidate d2ed; exactcurrenttest fixture file needs finalsource rebind.",
+    "Actual CPU run qualifies bounded deterministic offline fixture integration, cache/failure/source-nonmutation behavior; no external benchmark accuracy, performance, GPU/distributed/all IFEval claim.",
+    "Native evidence is actual preflight+383 collection, not new native execution qualification. Root owns fresh combined full core/native/retained qualification."
+  ],
+  "pending_root_gates": [
+    "Fresh independent review of combined d2ed4bcbc46684ac60dfdb1505ff764029ee48e9 (profile1a7 plus LR1 fixture52b).",
+    "Rebind runtime test fixture hash and actual11 result after independently reviewed LR1 cleanup; node inventory11 unchanged.",
+    "Actual Linux Python3.13 CI provision/CPU11 plus final root combined core/native/retained/type/artifact qualification.",
+    "Root serialized P2 archives/** packaging exclusion reconciliation, without dependency/lock changes."
+  ],
+  "reproduction": {
+    "path": "evidence/2026-refresh/reproductions/lighteval-profile-policy.tar.gz",
+    "sha256": "9f26aaa559ec451f4a2f1d7585a70c00a9f12697236a8bb73c8cac8bd3d3accd",
+    "bytes": 200885,
+    "raw_members": 86,
+    "uncompressed_bytes": 1575125,
+    "excluded": "No model tensors/checkpoints/Parquet/HF cache/NLTK corpus payloads; small logs/JSON/JUnit metrics and harnesses only."
+  }
+}

@@ -1,0 +1,488 @@
+{
+  "schema_version": 1,
+  "review_date": "2026-10-02",
+  "reviewer": "Fresh independent startup design reviewer",
+  "requested_reviewer_profile": "gpt-6.1-sol xhigh",
+  "decision": "CHANGES_REQUESTED",
+  "acceptance": "CHANGES_REQUESTED",
+  "result": "changes_requested",
+  "reviewed_design": {
+    "path": "evidence/2026-refresh/startup-design.json",
+    "sha256": "f807adc5806fd5ac382176c60a8208e6516c3333ce4561bc61be6f44d0f58876"
+  },
+  "reviewed_design_sha256": "f807adc5806fd5ac382176c60a8208e6516c3333ce4561bc61be6f44d0f58876",
+  "reviewed_plan": {
+    "path": "evidence/2026-refresh/plan.md",
+    "sha256": "edb9a58cc7915a940854f16d5029fe97434703bf2f75eca0dcb96de2d0f0eb15",
+    "authority": "User identifies this plan as approved; its stale proposed-status wording does not override that instruction.",
+    "review": "Entire plan read. F01 and Phase 1B acceptance, Phase 1A ordering, compatibility and scope constraints assessed."
+  },
+  "baseline_commit": "5b8359bd40bbe65c7753e71f6627c490f9aa144f",
+  "scope": "Independent design review against unchanged baseline source and installed asyncio/aiohttp implementations. Review covers synchronous extension compatibility, loop ownership, failure propagation, complexity and meaningful real-socket test feasibility. API interaction probes model design choices in memory; they are not an implementation or green qualification of F01.",
+  "authorization": {
+    "guidance_read": "AGENTS.md",
+    "sole_write": "evidence/2026-refresh/startup-design-review.json",
+    "shell": "/bin/zsh -lc (exec_command shell=/bin/zsh, login=true)",
+    "agents_spawned": 0,
+    "installs_performed": 0,
+    "implementation_edits": 0,
+    "design_edits": 0,
+    "plan_edits": 0,
+    "commits_created": 0,
+    "probe_files_created": 0,
+    "bytecode_writes_disabled": true,
+    "phase_1a_gate_respected": true
+  },
+  "summary": "The Python 3.14 baseline failures and aiohttp close ownership are confirmed. Keeping synchronous dispatch and separate Runner/aiohttp owners is defensible. Approval is withheld for one demonstrated external-client compatibility regression and two lifecycle specifications requiring clarification and targeted tests. The proposed two-client smoke is meaningful and structurally feasible, but has not been executed.",
+  "findings_by_severity": {
+    "critical": [],
+    "high": [
+      {
+        "id": "SDR-01",
+        "title": "Unconditionally replacing an existing current loop breaks supplied synchronous clients and preconstructed subclasses.",
+        "locations": [
+          {
+            "path": "evidence/2026-refresh/startup-design.json",
+            "line": 43,
+            "pointer": "/design/ordinary_client"
+          },
+          {
+            "path": "evidence/2026-refresh/startup-design.json",
+            "line": 44,
+            "pointer": "/design/server_scope"
+          },
+          {
+            "path": "evidence/2026-refresh/startup-design.json",
+            "line": 71,
+            "pointer": "/handoff/assumptions/1"
+          },
+          {
+            "path": "plato/client.py",
+            "line": 73
+          },
+          {
+            "path": "plato/client.py",
+            "line": 87
+          },
+          {
+            "path": "plato/client.py",
+            "line": 89
+          },
+          {
+            "path": "plato/servers/base.py",
+            "line": 328
+          },
+          {
+            "path": "evidence/2026-refresh/plan.md",
+            "line": 231
+          }
+        ],
+        "evidence": "On both Python 3.13.16 and 3.14.8, a caller installed a non-running loop and constructed a supplied synchronous client whose __init__ captured that loop and created a Future. Its configure queued Future completion on the captured loop. Actual baseline plato.client.run(1, None, client=client) printed RESULT ready and left the loop open. Modeling line 43 with a new Runner around configure/start_client instead raised 'got Future <Future pending> attached to a different loop'. Runner also cleared the current-loop registration while leaving the caller's loop open. This is an API-interaction reproduction of the design choice, not a patched runtime test.",
+        "impact": "The fresh-loop rule silently removes a working synchronous embedding/custom-client contract on both supported Python versions. A supplied client and an ordinary Server instance are already constructed before run enters its proposed scope; putting only configure and factories inside the new scope cannot move their existing Futures, Tasks or loop-bound transports. The line 71 assertion that independently owned loops were not previously supported is too broad: the baseline demonstrably uses the caller's current non-running loop.",
+        "requested_change": "Define and preserve the existing-current-loop case separately from fresh-process startup. Specify borrowing versus ownership, current-loop restoration, and treatment of resources created before entrypoint invocation. Do not close a borrowed client loop as an incidental startup fix. If the desired contract deliberately excludes this working case, obtain an explicit compatibility/scope decision from root instead of describing the behavior as preserved. Keep the ordinary fresh-process regression as a separate case.",
+        "acceptance": "On both interpreters, retain a regression using the actual supplied-client entrypoint with a pending Future created on an already current non-running loop; it completes on that loop and leaves caller ownership intact. Cover an external synchronous server override with a resource created before run and its existing start signature. Separately prove the original no-current-loop case is fixed without a fixture-created loop.",
+        "confidence": "Demonstrated baseline compatibility plus direct reproduction of the proposed fresh-Runner behavior."
+      }
+    ],
+    "medium": [
+      {
+        "id": "SDR-02",
+        "title": "Define how failure signaling is disabled before aiohttp's internal teardown, not only after start unwinds.",
+        "locations": [
+          {
+            "path": "evidence/2026-refresh/startup-design.json",
+            "line": 47,
+            "pointer": "/design/close_ownership"
+          },
+          {
+            "path": "evidence/2026-refresh/startup-design.json",
+            "line": 48,
+            "pointer": "/design/scheduled_failures"
+          },
+          {
+            "path": "evidence/2026-refresh/startup-design.json",
+            "line": 57,
+            "pointer": "/tests/green/2"
+          },
+          {
+            "path": "evidence/2026-refresh/startup-design.json",
+            "line": 58,
+            "pointer": "/tests/green/3"
+          },
+          {
+            "path": "plato/servers/base.py",
+            "line": 403
+          },
+          {
+            "path": ".venv/lib/python3.13/site-packages/aiohttp/web.py",
+            "line": 429
+          },
+          {
+            "path": ".venv/lib/python3.13/site-packages/aiohttp/web.py",
+            "line": 505
+          }
+        ],
+        "evidence": "Both installed run_app versions cancel/gather tasks inside their own finally before returning to the outer scope. A real run_app API probe raised setup-sentinel in on_startup, then canceled a supervised periodic task whose finally raised periodic-finalizer-sentinel. A sibling had an asynchronous cancellation finalizer. A done callback that ignored only task.cancelled(), retrieved the exception and stopped the active loop caused run_app to raise 'Event loop stopped before Future completed.' with setup-sentinel only in __context__; the loop remained open and one sibling remained pending. With no asynchronous sibling the same callback appeared harmless, so a simple single-sentinel test misses the failure. The probe subsequently let the sibling finish and closed its owned loop.",
+        "impact": "The design requires teardown disarming, but leaves its mechanism and exception precedence unspecified while insisting web.run_app remain unchanged. Disarming in an outer finally is too late for aiohttp's internal cancellation. An exception raised while handling cancellation makes task.cancelled() false; stopping then can interrupt aiohttp cleanup, mask the unrelated setup exception, and cause a second cancellation to interrupt a sibling's finalizer.",
+        "requested_change": "Specify a public-API mechanism that prevents stop signaling for shutdown-induced failures before aiohttp cancellation callbacks run, including failures converted from CancelledError in a finalizer. Task cancellation state is one possible input; do not depend on aiohttp or Runner private state. State deterministic precedence between an independent start/setup exception, an active periodic/edge failure, and a teardown-only failure. Retain teardown exceptions as diagnostics without replacing the original setup failure.",
+        "acceptance": "Add a real-run_app subprocess case combining an on_startup or bind failure, a supervised task that raises during cancellation, and a sibling that awaits in its finalizer. The synchronous caller receives the original setup exception, the sibling finishes, cleanup is not interrupted, and the loop closes without a second shutdown attempt or unawaited-coroutine warning. Keep the normal active-task-failure cases too.",
+        "confidence": "Reproduced on both interpreters using real aiohttp and asyncio; this is a design-specification gap, not a claim that an unimplemented supervisor already has this bug."
+      },
+      {
+        "id": "SDR-03",
+        "title": "Finite executor shutdown does not establish bounded overall loop teardown.",
+        "locations": [
+          {
+            "path": "evidence/2026-refresh/startup-design.json",
+            "line": 43,
+            "pointer": "/design/ordinary_client"
+          },
+          {
+            "path": "evidence/2026-refresh/startup-design.json",
+            "line": 47,
+            "pointer": "/design/close_ownership"
+          },
+          {
+            "path": "evidence/2026-refresh/startup-design.json",
+            "line": 52,
+            "pointer": "/tests/execution"
+          },
+          {
+            "path": "evidence/2026-refresh/startup-design.json",
+            "line": 55,
+            "pointer": "/tests/green/0"
+          },
+          {
+            "path": "evidence/2026-refresh/plan.md",
+            "line": 245
+          },
+          {
+            "path": ".venv/lib/python3.13/site-packages/aiohttp/web.py",
+            "line": 429
+          },
+          {
+            "path": ".venv/lib/python3.13/site-packages/aiohttp/web.py",
+            "line": 523
+          },
+          {
+            "path": "/Users/bli/.local/share/uv/python/cpython-3.13.16-macos-aarch64-none/lib/python3.13/asyncio/runners.py",
+            "line": 65
+          },
+          {
+            "path": "/Users/bli/.local/share/uv/python/cpython-3.13.16-macos-aarch64-none/lib/python3.13/asyncio/runners.py",
+            "line": 199
+          }
+        ],
+        "evidence": "Runner.close and aiohttp._cancel_tasks both gather canceled tasks without a deadline; shutdown_asyncgens also has no outer deadline. Runner's default executor budget is 300 seconds, exceeding the proposed 30-second bootstrap process deadline. On both interpreters, separate probes showed Runner.close after a returned main coroutine and run_app after a startup-sentinel remaining stuck when a pending task caught cancellation and continued awaiting. Each printed its cancellation marker and required the parent subprocess.run two-second timeout to kill and reap it. The manual scope's stated cancel/gather sequence has the same unbounded stage before its finite executor shutdown.",
+        "impact": "The design's cooperative cleanup tests cannot support a general bounded-shutdown claim. The proposed test-process deadline provides containment but is different from an entrypoint returning, releasing its loop and propagating its original error. In the run_app failure case, an unbounded gather delays the setup exception indefinitely. This matters directly to the approved plan's bounded shutdown and failure-propagation requirement.",
+        "requested_change": "Make the bound and its owner explicit for cancellation gathering, async-generator finalization and executor cleanup. Distinguish cooperative natural cleanup from watchdog-contained noncooperation; do not label watchdog termination graceful loop finalization. Add a negative teardown probe and agree with root on any needed scope handoff rather than turning F01 into a general lifecycle framework. If retaining Runner/run_app unchanged means production cleanup relies on cooperative extension code, record that limitation and show exactly how the subprocess acceptance contains and reports it.",
+        "acceptance": "A teardown-stall subprocess test finishes within the documented overall deadline, records the original failure and the exact stage that stalled, reaps all owned processes, and classifies forced termination as containment rather than a passing graceful-cleanup result. Passing ordinary startup/failure tests must return naturally and finalize their tasks/generators; a tiny completed executor job alone is insufficient evidence for the bound.",
+        "confidence": "Unbounded library stages confirmed by source and timeout-guarded API probes on both interpreters."
+      }
+    ],
+    "low": []
+  },
+  "accepted_design_elements": [
+    "No implementation before Phase 1A acceptance; no Python 3.14 default promotion before Phase 1C and the phase gate.",
+    "Preserving synchronous configure and dynamically dispatched start avoids placing external loop-driving overrides inside an already running loop.",
+    "Preserving edge startup's direct start call and absence of the server.run periodic task matches the baseline.",
+    "The default edge server/client share asyncio Events; one loop for both is necessary.",
+    "Runner entering before synchronous extension hooks and a post-configure copy_context preserve fresh-process current-loop access and configuration ContextVars.",
+    "run_app closes even a supplied loop. Avoiding Runner ownership of that same aiohttp loop is correct and independently confirmed.",
+    "Rejecting invocation inside an already running loop before coroutine/resource creation is an appropriate boundary; notebook nesting is outside F01.",
+    "Restricting supervision to the two F01-scheduled tasks avoids an unnecessary global Socket.IO exception policy.",
+    "Keeping spawn policy, transport, checkpoint cleanup, research equations and os._exit unchanged respects the bounded F01 ownership envelope.",
+    "The real-round test must not count os._exit as evidence of Python finally execution or watchdog kills as normal shutdown."
+  ],
+  "complexity_assessment": {
+    "disposition": "No independent blocker for unnecessary complexity.",
+    "reasoning": "Different ordinary-client and aiohttp lifecycle owners are justified by installed close semantics and synchronous subclass dispatch. A small private sharing scope across server.run, base.start and the edge branch is defensible. The design should remain local to the assigned files and two scheduled tasks; do not introduce a generalized task/process manager or an AppRunner rewrite to address the findings.",
+    "implementation_obligations": [
+      "Make ownership and exception precedence directly reviewable rather than hiding them in multiple implicit scope states.",
+      "A ContextVar must not become a substitute for an explicit definition of caller-owned loop compatibility.",
+      "Reinspect the Phase 1A-selected asyncio/aiohttp versions before implementation."
+    ]
+  },
+  "real_socket_test_feasibility": {
+    "assessment": "Structurally feasible and meaningful; full Plato two-client training round not executed.",
+    "concrete_baseline_support": [
+      {
+        "path": "plato/servers/base.py",
+        "line": 440,
+        "detail": "_start_clients accepts a supplied client instance and spawns actual plato.client.run targets. Module-level model/datasource/callback classes and a guarded helper main can remain picklable."
+      },
+      {
+        "path": "plato/clients/simple.py",
+        "line": 18,
+        "detail": "Existing model, datasource and callback injection points allow tiny real factories without replacing the client runtime or its training strategy."
+      },
+      {
+        "path": "plato/clients/strategies/defaults.py",
+        "line": 53,
+        "detail": "Custom datasource is constructed in each child after the explicit client ID is set, allowing deterministic 2- versus 6-sample datasets selected from Config.args.id."
+      },
+      {
+        "path": "plato/samplers/all_inclusive.py",
+        "line": 27,
+        "detail": "Samples all examples; num_samples returns the realized 2/6 lengths without relying on open IID/Dirichlet defects."
+      },
+      {
+        "path": "plato/trainers/composable.py",
+        "line": 778,
+        "detail": "Omitting max_concurrency takes the actual in-client training path and avoids extra trainer workers while retaining two spawned client processes."
+      },
+      {
+        "path": "plato/processors/registry.py",
+        "line": 103,
+        "detail": "Default outbound/inbound processors use safetensor_encode/safetensor_decode."
+      },
+      {
+        "path": "plato/clients/strategies/defaults.py",
+        "line": 483,
+        "detail": "comm_simulation=false uses actual Socket.IO chunks and payload completion rather than checkpoint-file transport."
+      },
+      {
+        "path": "plato/callbacks/client.py",
+        "line": 22,
+        "detail": "on_inbound_processed can capture a cloned received baseline; on_outbound_ready can capture the real report and independently trained weights before encoding."
+      },
+      {
+        "path": "plato/servers/fedavg.py",
+        "line": 175,
+        "detail": "weights_received/on_weights_received expose actual decoded received updates; weights_aggregated/on_weights_aggregated expose the resulting aggregate without replacing aggregation."
+      },
+      {
+        "path": "plato/servers/strategies/aggregation/fedavg.py",
+        "line": 53,
+        "detail": "Floating model state with reports of 2 and 6 samples admits the stated weighted numerical reference."
+      },
+      {
+        "path": "plato/servers/base.py",
+        "line": 1472,
+        "detail": "Close hooks occur before os._exit; durable flushed per-process markers are essential. Socket.IO disconnect and TCP close provide a plausible natural client exit, which the test must prove."
+      }
+    ],
+    "required_harness_details": [
+      "Use a real importable helper with a main guard; factories and callback classes must be module-level. Ensure the same isolated TOML is available to spawned imports.",
+      "Disable server.do_test and clients.do_test, enable CPU explicitly, use an ordinary model name and default nonaccumulating SGD, and omit trainer.max_concurrency.",
+      "Clone observed tensors at the relevant hooks; capture server baseline before aggregation and map each real received payload/report to its client ID.",
+      "Use the real transport processors and actual FedAvg path. Require both independently trained models to change and compare the final model to the weighted reference from received weights.",
+      "Track owned process identities before server os._exit; group/descendant cleanup is a harness obligation, not new production supervision.",
+      "Require normal exits and released port for the success case. Startup/periodic failure and deliberate stall cases must report forced containment separately."
+    ],
+    "executed_socket_evidence": "A raw real aiohttp TCP HTTP GET plus SIGTERM cleanup passed in each installed interpreter with port=0, body real-socket-ok, on_cleanup marker, loop.is_closed()==True, empty stderr and exit code zero. This proves local socket and signal-test feasibility only; it is not the planned Plato/Socket.IO/training smoke."
+  },
+  "checks_performed": [
+    {
+      "id": "C01",
+      "kind": "read_only_snapshot",
+      "command": "git rev-parse HEAD; git status --short; git diff --exit-code; git diff --cached --exit-code; shasum -a 256 evidence/2026-refresh/startup-design.json evidence/2026-refresh/plan.md",
+      "result": "HEAD matches the design baseline; tracked worktree/index unchanged; design and plan hashes match recorded identities. evidence/ was already untracked at review start."
+    },
+    {
+      "id": "C02",
+      "kind": "source_review",
+      "command": "cat AGENTS.md; nl -ba and bounded sed reads of the entire plan and design; rg searches and targeted source reads",
+      "result": "Read guidance, complete approved plan, baseline client/run/server start branches, edge sharing, periodic scheduling, spawn paths, shutdown, composable clients/training, processors, aggregation and existing integration helpers. No reliance on earlier reviewer conclusions for runtime findings.",
+      "inspected_paths": [
+        "AGENTS.md",
+        "evidence/2026-refresh/startup-design.json",
+        "evidence/2026-refresh/plan.md",
+        "plato/client.py",
+        "plato/servers/base.py",
+        "plato/servers/fedavg.py",
+        "plato/servers/fedavg_cs.py",
+        "plato/clients/base.py",
+        "plato/clients/simple.py",
+        "plato/clients/composable.py",
+        "plato/clients/edge.py",
+        "plato/clients/strategies/defaults.py",
+        "plato/algorithms/fedavg.py",
+        "plato/servers/strategies/aggregation/fedavg.py",
+        "plato/trainers/composable.py",
+        "plato/processors/registry.py",
+        "plato/samplers/all_inclusive.py",
+        "tests/integration/utils.py",
+        "plato/config.py",
+        "plato/callbacks/handler.py",
+        "plato/callbacks/server.py",
+        "plato/callbacks/client.py",
+        "plato/trainers/basic.py",
+        ".venv/lib/python3.13/site-packages/socketio/async_client.py",
+        ".venv/lib/python3.13/site-packages/engineio/async_client.py"
+      ]
+    },
+    {
+      "id": "C03",
+      "kind": "installed_api_review",
+      "command": "PYTHONDONTWRITEBYTECODE=1 <interpreter> -B - [inline inspect.getsource/getsourcefile/getsourcelines and SHA256 probes]",
+      "environments": [
+        {
+          "interpreter": ".venv/bin/python",
+          "version": "CPython 3.13.16",
+          "aiohttp": "3.14.3"
+        },
+        {
+          "interpreter": "/tmp/plato-python314-env/bin/python",
+          "version": "CPython 3.14.8",
+          "aiohttp": "3.14.3"
+        }
+      ],
+      "result": "Confirmed 3.14 get_event_loop requires an installed loop; Runner __enter__ initializes and sets its loop/context; Runner cleanup unbounded task gathering precedes 300-second executor shutdown; run_app closes supplied loop and omits shutdown_default_executor.",
+      "run_app_function_source_sha256_both_environments": "4a70706234546281916480949fe4ad51bc314278264872831556011dfd4701f3"
+    },
+    {
+      "id": "C04",
+      "kind": "fresh_process_baseline_reproductions",
+      "command": "PYTHONDONTWRITEBYTECODE=1 .venv/bin/python -B - [parent subprocess.run([target_interpreter, '-B', '-c', inline_probe], timeout=30)]",
+      "result": "Actual client.run supplied-client and registry branches fail on 3.14 at client.py:89 after CONFIGURED, without CLIENT_BODY. Custom edge fails at client.py:57 after both configure markers, without client body/server start; the unawaited-coroutine warning is also present. Corrected minimal server subclasses reproduce ordinary/central Server.run failures at base.py:372/358; direct actual Server.start with real Socket.IO/aiohttp construction fails at base.py:407 before binding. All failure messages are 'There is no current event loop in thread MainThread', with quoted thread name in the actual traceback.",
+      "controls": "Separate 3.13 client probes print CONFIGURED and CLIENT_BODY. Ordinary/central synchronous start overrides drive the current loop and print SERVER_START/PERIODIC_BODY. A 3.13 edge override returning immediately prints SERVER_START but does not execute the queued client body; this is not a passing edge-runtime test.",
+      "limitations": "The registry factory was a lightweight substitute and custom-edge classes were minimal synchronous substitutes. Full default registry training and default edge factories were not behaviorally qualified. Direct Server.start was reproduced only on 3.14; the separate raw aiohttp socket controls are not a 3.13 Plato direct-start control.",
+      "discarded_probe_errors": "An initial minimal server constructor attempt omitted Config.params and failed in LogProgressCallback before startup. Those errors are harness setup failures, not F01 evidence. Corrected probes bypassed filesystem-producing constructors using minimal subclass state and called the actual unchanged run/start methods.",
+      "corrected_server_probe_command": "PYTHONDONTWRITEBYTECODE=1 .venv/bin/python -B - <<'PY'\nimport os, subprocess, json\ncommon='''import asyncio\nfrom types import SimpleNamespace\nfrom collections import namedtuple\nfrom plato.config import Config\nConfig._instance=object.__new__(Config)\nConfig.args=SimpleNamespace(id=0,port=None,resume=False)\nConfig.server=SimpleNamespace(address='127.0.0.1',port=0)\nConfig.clients=SimpleNamespace(type='simple',total_clients=2,per_round=2)\nConfig.algorithm=SimpleNamespace(type='fedavg')\nConfig.trainer=namedtuple('TrainerConfig','rounds')(1)\nfrom plato.servers.base import Server\nclass ProbeServer(Server):\n def __init__(self): self.disable_clients=True;self.periodic_interval=1\n def configure(self): print('CONFIGURED',flush=True)\n async def _periodic(self,interval): print('PERIODIC_BODY',flush=True)\n def start(self):\n  print('SERVER_START',flush=True)\n  asyncio.get_event_loop().run_until_complete(asyncio.sleep(0))\n'''\nprobes={\n 'ordinary_server':'ProbeServer().run()',\n 'central_server':\"Config.algorithm.cross_silo=True;Server._start_clients=staticmethod(lambda **kw: print('CHILD_LAUNCH',flush=True));ProbeServer().run()\",\n 'direct_start':\"server=object.__new__(Server);server.ping_interval=1;server.ping_timeout=1;server.start(port=0)\"\n}\nfor interpreter in ('.venv/bin/python','/tmp/plato-python314-env/bin/python'):\n for name,script in probes.items():\n  if interpreter=='.venv/bin/python' and name=='direct_start': continue\n  r=subprocess.run([interpreter,'-B','-c',common+'\\n'+script],capture_output=True,text=True,timeout=30,env={**os.environ,'PYTHONDONTWRITEBYTECODE':'1'})\n  print(json.dumps({'interpreter':interpreter,'probe':name,'returncode':r.returncode,'stdout':r.stdout,'stderr':r.stderr}),flush=True)\nPY"
+    },
+    {
+      "id": "C05",
+      "kind": "external_synchronous_compatibility_probe",
+      "interpreters": [
+        ".venv/bin/python",
+        "/tmp/plato-python314-env/bin/python"
+      ],
+      "deadline_seconds_per_child": 30,
+      "result": "Actual baseline client.run succeeds with a supplied client owning a pending Future on the current non-running loop; the fresh-Runner model fails on both versions with a different-loop RuntimeError. No stderr. Caller loop stays open, but Runner clears its current registration.",
+      "reproduction": [
+        "Install ambient = asyncio.new_event_loop(); asyncio.set_event_loop(ambient) before constructing the external client. This is intentional for testing existing embedding compatibility, not a claimed fresh-process green regression.",
+        "Client.__init__: self.loop = asyncio.get_event_loop(); self.ready = self.loop.create_future().",
+        "Client.configure: self.loop.call_soon(self.ready.set_result, 'ready').",
+        "Client.start_client: print('RESULT', await self.ready).",
+        "Actual baseline: plato.client.run(1, None, client=Client()) prints RESULT ready.",
+        "Design interaction: client = Client(); with asyncio.Runner() as runner: client.configure(); runner.run(client.start_client(), context=contextvars.copy_context()) raises the different-loop RuntimeError.",
+        "The probe closes its own ambient loop afterward."
+      ]
+    },
+    {
+      "id": "C06",
+      "kind": "double_close_negative_control",
+      "interpreters": [
+        ".venv/bin/python",
+        "/tmp/plato-python314-env/bin/python"
+      ],
+      "deadline_seconds_per_child": 30,
+      "result": "A real web.run_app inside a Runner using runner.get_loop(), with on_startup raising ValueError('startup-sentinel'), produces RuntimeError('Event loop is closed') from Runner cleanup and an unawaited shutdown_asyncgens warning on both versions. Confirms why the design must avoid this ownership combination."
+    },
+    {
+      "id": "C07",
+      "kind": "teardown_supervision_api_probe",
+      "interpreters": [
+        ".venv/bin/python",
+        "/tmp/plato-python314-env/bin/python"
+      ],
+      "deadline_seconds_per_child": 15,
+      "result": "Real run_app on_startup setup-sentinel plus a supervised cancellation-finalizer exception and an asynchronously finalizing sibling yields the secondary loop-stopped RuntimeError, open loop and one pending sibling on both versions when disarming occurs only after run_app unwinds. A single-task version did not reproduce the interrupted cleanup; the sibling case is necessary. Probe-owned cleanup afterward printed SIBLING_FINALIZED and closed the loop.",
+      "reproduction": [
+        "Create and install a probe-owned loop; create periodic and sibling tasks before real web.run_app.",
+        "Periodic awaits an unfinished Future and raises ValueError('periodic-finalizer-sentinel') in finally.",
+        "Sibling awaits an unfinished Future, then awaits asyncio.sleep(0.01) and prints SIBLING_FINALIZED in finally.",
+        "Periodic done callback returns for task.cancelled(), otherwise retrieves task.exception() and calls loop.stop() while the outer scope phase remains active.",
+        "Application.on_startup raises RuntimeError('setup-sentinel').",
+        "run_app performs its own cancellation before outer teardown; callback sees task.cancelling()==1 and task.cancelled()==False.",
+        "Observed: EXCEPTION RuntimeError Event loop stopped before Future completed.; CONTEXT RuntimeError('setup-sentinel'); AFTER_START_CLOSED False PENDING 1.",
+        "After disarming the callback, the probe runs asyncio.sleep(0.02) to complete sibling finalization and closes its owned loop."
+      ]
+    },
+    {
+      "id": "C08",
+      "kind": "bounded_cleanup_negative_api_probes",
+      "command": "PYTHONDONTWRITEBYTECODE=1 .venv/bin/python -B - <<'PY'\nimport os, subprocess, json\nscripts={\n 'runner_cancel_does_not_finish': '''import asyncio\nasync def pending():\n try: await asyncio.Future()\n except asyncio.CancelledError:\n  print('CANCELLATION_OBSERVED_BUT_STILL_PENDING',flush=True)\n  await asyncio.Future()\nasync def main():\n asyncio.create_task(pending())\n await asyncio.sleep(0)\n print('MAIN_RETURNED',flush=True)\nwith asyncio.Runner() as runner: runner.run(main())\nprint('CLEANUP_RETURNED',flush=True)\n''',\n 'run_app_cancel_does_not_finish': '''import asyncio\nfrom aiohttp import web\nloop=asyncio.new_event_loop();asyncio.set_event_loop(loop)\nasync def pending():\n try: await asyncio.Future()\n except asyncio.CancelledError:\n  print('CANCELLATION_OBSERVED_BUT_STILL_PENDING',flush=True)\n  await asyncio.Future()\nloop.create_task(pending())\napp=web.Application()\nasync def startup(app):\n print('STARTUP_SENTINEL',flush=True)\n raise ValueError('startup-sentinel')\napp.on_startup.append(startup)\nweb.run_app(app,host='127.0.0.1',port=0,loop=loop,print=None,handle_signals=False)\n'''\n}\nfor interpreter in ('.venv/bin/python','/tmp/plato-python314-env/bin/python'):\n for name,script in scripts.items():\n  try:\n   r=subprocess.run([interpreter,'-B','-c',script],capture_output=True,text=True,timeout=2,env={**os.environ,'PYTHONDONTWRITEBYTECODE':'1'})\n   print(json.dumps({'interpreter':interpreter,'probe':name,'deadline_exceeded':False,'returncode':r.returncode,'stdout':r.stdout,'stderr':r.stderr}),flush=True)\n  except subprocess.TimeoutExpired as exc:\n   output=exc.stdout.decode() if isinstance(exc.stdout,bytes) else exc.stdout\n   error=exc.stderr.decode() if isinstance(exc.stderr,bytes) else exc.stderr\n   print(json.dumps({'interpreter':interpreter,'probe':name,'deadline_exceeded':True,'deadline_seconds':2,'stdout':output,'stderr':error,'cleanup':'subprocess.run killed and waited for its direct child'}),flush=True)\nPY",
+      "result": "Runner and run_app cancellation-gather probes each exceed the two-second child deadline on both interpreters after printing CANCELLATION_OBSERVED_BUT_STILL_PENDING. Parent subprocess.run kills and waits for each direct child. This is expected negative evidence of an unbounded library stage, not a passing graceful-shutdown test."
+    },
+    {
+      "id": "C09",
+      "kind": "real_aiohttp_socket_and_signal_feasibility",
+      "command": "PYTHONDONTWRITEBYTECODE=1 .venv/bin/python -B - <<'PY'\nimport os, subprocess, json, urllib.request, re, select, time\nscript='''import asyncio,json\nfrom aiohttp import web\nloop=asyncio.new_event_loop();asyncio.set_event_loop(loop)\napp=web.Application()\nasync def get(request): return web.Response(text='real-socket-ok')\nasync def cleaned(app): print('APP_CLEANUP',flush=True)\napp.router.add_get('/',get);app.on_cleanup.append(cleaned)\ntry:\n web.run_app(app,host='127.0.0.1',port=0,loop=loop,print=lambda text: print('BOUND',text,flush=True))\nfinally:\n print('LOOP_CLOSED',loop.is_closed(),flush=True)\n asyncio.set_event_loop(None)\n'''\nfor interpreter in ('.venv/bin/python','/tmp/plato-python314-env/bin/python'):\n p=subprocess.Popen([interpreter,'-B','-c',script],stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True,env={**os.environ,'PYTHONDONTWRITEBYTECODE':'1'})\n try:\n  readable,_,_=select.select([p.stdout],[],[],10)\n  if not readable: raise TimeoutError('socket bind marker timeout')\n  ready=p.stdout.readline()\n  match=re.search(r'http://127\\.0\\.0\\.1:(\\d+)',ready)\n  if not match: raise AssertionError(ready)\n  url=match.group(0)\n  with urllib.request.urlopen(url,timeout=5) as response: body=response.read().decode()\n  p.terminate()\n  out,err=p.communicate(timeout=5)\n  print(json.dumps({'interpreter':interpreter,'probe':'real_aiohttp_socket_and_sigterm','returncode':p.returncode,'stdout':ready+out,'stderr':err,'http_body':body,'forced_kill':False}),flush=True)\n finally:\n  if p.poll() is None:\n   p.kill();p.communicate(timeout=5)\nPY",
+      "result": [
+        {
+          "interpreter": ".venv/bin/python",
+          "port": 50342,
+          "http_body": "real-socket-ok",
+          "cleanup_marker": "APP_CLEANUP",
+          "loop_closed": true,
+          "exit_code": 0,
+          "stderr": "",
+          "forced_kill": false
+        },
+        {
+          "interpreter": "/tmp/plato-python314-env/bin/python",
+          "port": 50344,
+          "http_body": "real-socket-ok",
+          "cleanup_marker": "APP_CLEANUP",
+          "loop_closed": true,
+          "exit_code": 0,
+          "stderr": "",
+          "forced_kill": false
+        }
+      ],
+      "limitations": "Raw aiohttp only. No Plato training round, Socket.IO exchange, numerical aggregate or actual spawned-client cleanup was executed."
+    },
+    {
+      "id": "C10",
+      "kind": "primary_documentation_cross_check",
+      "sources": [
+        "https://docs.python.org/3.14/library/asyncio-runner.html",
+        "https://docs.python.org/3.14/library/asyncio-eventloop.html",
+        "https://docs.aiohttp.org/en/stable/_modules/aiohttp/web.html"
+      ],
+      "result": "Cross-checked documented current-loop, Runner initialization/context/cleanup, loop stop/close and aiohttp run_app behavior against installed source. Installed source and actual subprocess behavior govern the findings."
+    }
+  ],
+  "snapshot": {
+    "baseline_commit_at_start": "5b8359bd40bbe65c7753e71f6627c490f9aa144f",
+    "baseline_commit_before_review_write": "5b8359bd40bbe65c7753e71f6627c490f9aa144f",
+    "design_sha256_at_start": "f807adc5806fd5ac382176c60a8208e6516c3333ce4561bc61be6f44d0f58876",
+    "design_sha256_before_review_write": "f807adc5806fd5ac382176c60a8208e6516c3333ce4561bc61be6f44d0f58876",
+    "plan_sha256_at_start": "edb9a58cc7915a940854f16d5029fe97434703bf2f75eca0dcb96de2d0f0eb15",
+    "plan_sha256_before_review_write": "edb9a58cc7915a940854f16d5029fe97434703bf2f75eca0dcb96de2d0f0eb15",
+    "tracked_diff_empty_before_review_write": true,
+    "inspected_file_hashes": {
+      "AGENTS.md": "b50f87f31ea3d87076952d8b7d2d8af067132fbf877d80f8780c208fb45527ec",
+      "evidence/2026-refresh/startup-design.json": "f807adc5806fd5ac382176c60a8208e6516c3333ce4561bc61be6f44d0f58876",
+      "evidence/2026-refresh/plan.md": "edb9a58cc7915a940854f16d5029fe97434703bf2f75eca0dcb96de2d0f0eb15",
+      "plato/client.py": "65e8d4659084232aeb191883b3db61fdcf2a6e34c9ba8844912d60307956bd1e",
+      "plato/servers/base.py": "4682ff21c227a86f0ab9e6a6a279f4f4f8500110296aedeff50421c291f4fd15",
+      "plato/servers/fedavg.py": "610005f1648e1aac8c57763ae2a2876350ac78a2d65a76a5a49aba16d399c016",
+      "plato/servers/fedavg_cs.py": "abba9815dd3ab358c5c035770353cd76cee5ebeb0c2b02cb0312205d04d88d0c",
+      "plato/clients/base.py": "93f45c535b9bf3151f06a67bb7bd1356f054a906821ead6605e2bb8f9a39ee4b",
+      "plato/clients/simple.py": "c88220ec85ea614257648cb956a89624d11c03a944357c683aafb333e51b2a2e",
+      "plato/clients/composable.py": "d05f5da7db56940afe8624b7f92bcfa525f2ee0c9916c7222baee0d6d3d62ec6",
+      "plato/clients/edge.py": "b721db2b2267d0cc2c7fba94053bd732d2991b45031558d1445448671bb433e7",
+      "plato/clients/strategies/defaults.py": "6052a9c70180752fc1c1f07329ecbc9d2af8d9b0faa512c35754f6706913b144",
+      "plato/algorithms/fedavg.py": "512006d85daa070cd7a7a595b849a96ba70805bc88aa41d329b340dc4edc0258",
+      "plato/servers/strategies/aggregation/fedavg.py": "8ea8d4dda63bd3070220613bda7fcadec5adcc785a8ee587acc7447d8517fbf0",
+      "plato/trainers/composable.py": "6f515dc078295b571552e34afde369168fded499a5ebe26083863a02320ba331",
+      "plato/processors/registry.py": "0019dd6dd602c8254cbd03581298ab89ce3040e7d4b112dc3bf000fff4883a09",
+      "plato/samplers/all_inclusive.py": "7650875a5b05fd21f24018e92e7b75940e48aef527bf12dfba45c7d475a3ca18",
+      "tests/integration/utils.py": "677414d3ded15337e9990806858fbd76c30f13975cc816074f2b0ef881a25bd2"
+    },
+    "installed_python313_source_files": {
+      "/Users/bli/Playground/plato/.venv/lib/python3.13/site-packages/aiohttp/web.py": {
+        "line": 444,
+        "sha256": "82ccb14523d65778998cf51b391ddd206729d639b696d06d5f090f87dd5ca374"
+      },
+      "/Users/bli/.local/share/uv/python/cpython-3.13.16-macos-aarch64-none/lib/python3.13/asyncio/runners.py": {
+        "line": 65,
+        "sha256": "6b95ce20871b9e39c260c95d51a5f21153bbf8ca8cfe2b53156b6261620652da"
+      },
+      "/Users/bli/.local/share/uv/python/cpython-3.13.16-macos-aarch64-none/lib/python3.13/asyncio/base_events.py": {
+        "line": 690,
+        "sha256": "8bde9b41993d4d903675fd6b74593568aa0e0d695c62138ce26fe4a2fa32234e"
+      }
+    }
+  },
+  "limitations": [
+    "No implementation of the design exists in this review. Findings about proposed behavior use source reasoning and explicitly identified in-memory API interaction probes.",
+    "No packages installed, existing unit suite run, lock/profile accepted or Python support/default promoted.",
+    "The planned real Plato two-client smoke and proposed green regressions remain unexecuted. Structural feasibility and raw aiohttp socket success cannot substitute for their later evidence.",
+    "Production os._exit remains unchanged and cannot prove Python finalization. Broader child supervision and unrelated training/transport defects remain outside this design review."
+  ],
+  "next_step": "Root resolves SDR-01 through SDR-03 in the design/acceptance handoff, obtains review of the revised exact design hash, and starts implementation only after Phase 1A acceptance."
+}

@@ -1,0 +1,16 @@
+{
+  "verified_files": 374,
+  "archives": [
+    {
+      "path": "archives/retired/legacy-vit/dvit-upstream-1ccb152cea43fcbc3cd517a45c12c65734f8ace3.tar.gz",
+      "sha256": "00e3a0cdbcb2e43955127f7b79c905668e98f0d635b411e030e1e3b7ac3236ca",
+      "pin": "1ccb152cea43fcbc3cd517a45c12c65734f8ace3"
+    },
+    {
+      "path": "archives/retired/legacy-vit/t2tvit-upstream-0f63dc9558f4d192de926504dbddfa1b3f5db6ca.tar.gz",
+      "sha256": "7f9bfbc25c8d4e555580c46fbeeb4507d13ea71c0c0144bedf4751954c350aa8",
+      "pin": "0f63dc9558f4d192de926504dbddfa1b3f5db6ca"
+    }
+  ],
+  "status": "PASS_BEFORE_GITLINK_DETACH"
+}

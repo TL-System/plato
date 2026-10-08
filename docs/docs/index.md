@@ -33,12 +33,14 @@ Welcome to *Plato*, a software framework to facilitate scalable, reproducible, a
     - **[Model Pruning](examples/algorithms/13. Model Pruning Algorithms.md)**
     - **[Gradient Leakage Attacks and Defences](examples/algorithms/14. Gradient Leakage Attacks and Defences.md)**
 
+    ### Archived Research
+    - **[Archived research examples](examples/archived.md)**
+
     ### Case Studies
+    - **[Qwen3 Federated LoRA](examples/case-studies/6. Qwen3 Federated LoRA.md)**
     - **[Federated LoRA Fine-Tuning](examples/case-studies/1. LoRA.md)**
     - **[Composable Trainer API](examples/case-studies/2. Composable Trainer.md)**
-    - **[SmolVLA Trainer with LeRobot](examples/case-studies/3. SmolVLA Trainer with LeRobot.md)**
     - **[Server-side Lighteval for SmolLM2](examples/case-studies/4. Server-side Lighteval for SmolLM2.md)**
-    - **[Nanochat in Plato](examples/case-studies/5. Nanochat in Plato.md)**
     - **[Time-Series Forecasting with TimesFM](examples/case-studies/6. Time-Series Forecasting with TimesFM.md)**
 
 ## Configuration Settings

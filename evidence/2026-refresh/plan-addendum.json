@@ -1,0 +1,385 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-02",
+  "status": "Policy reconciliation and concrete handoff only; no implementation or additional approval gate.",
+  "baseline_commit": "5b8359bd40bbe65c7753e71f6627c490f9aa144f",
+  "immutable_plan": {
+    "path": "evidence/2026-refresh/plan.md",
+    "sha256": "edb9a58cc7915a940854f16d5029fe97434703bf2f75eca0dcb96de2d0f0eb15",
+    "policy": "Preserve the original reviewed file. This addendum supersedes only conflicting Python-default, optimization and archival wording under the latest explicit user instruction."
+  },
+  "source_sha256": {
+    "plan.md": "edb9a58cc7915a940854f16d5029fe97434703bf2f75eca0dcb96de2d0f0eb15",
+    "phase1a-acceptance.json": "10c330d418d49a4ac43a0844290f272583232f9d7515d18dfc9cb31bf0c9beaf",
+    "phase1a-review.json": "4a27a339a3bc174ca378bba80c8214f9dc5ac536417d7f64f38eff3eb58a26f1",
+    "design-acceptance.json": "ff4d6acde0d0312b49b9767be5210b55fb4db0e8fb5727203c148b63d123693a",
+    "design-revision-review.json": "0535b3ccbac91a264317bd8fb9314465a0379155bc7113de99a27a9b66b7be39",
+    "startup-design.json": "0a5e2c57102fa4beae7f4b4ceb6e091fd61e8af49b966f023bc57dfa6714ae47",
+    "mlx-roadmap.json": "76093b75c76e304117bd32f59d0eabf59bf726a2aaff051d82aa429761945ea9",
+    "test-ci-design.json": "13f3d272e921d05afd2b3457ff977374528ea4653ff1ca8c238b5b945f5b9ef2",
+    "archive-candidates.json": "063206ca530b3cf650257a44c04348e52e8893e0879bea849ac9b0cf5259e9d0",
+    "aggregation-input-probes.json": "3415944b801a8737f9e8cfab13e7b38740334517dd9a2372820f27613364ea4e",
+    "vit-initialization-probe.json": "d3c8fceb58d4d0fad63422bb8ce07b73d46e03d51bb7d5459b019c1ebeb5641c",
+    "fedprox-gradient-probe.json": "b432e646e568d493956b6c56f89a9ccaf2c8cfa75da32c801f3a558a73f321b2"
+  },
+  "authority": {
+    "python": "Retain .python-version=3.13 and requires-python>=3.13. Execute Python 3.14 core forward-compatibility checks where dependencies permit; do not promote the default automatically, claim whole-stack compatibility or force a LeRobot replacement. A failure remains visible and blocks the affected support claim, not completion of the supported 3.13 refresh.",
+    "optimizations": "Necessary optimizations are authorized when measurements or demonstrated behavior justify them and substantive acceptance remains intact. No gratuitous syntax churn, generic supervision framework or new research program.",
+    "archives": "Root may archive obsolete modules/examples and associated integrations after evidence review without another permission request. ViT is explicitly selected for archival, not upgrade/repair. Preserve dependent active components, original source, authorship, licenses and pinned historical reproduction information.",
+    "unchanged": "Existing implementers and file owners remain assigned. Root serializes shared-file handoffs; no nested agents. Preserve phase order, independent Sol xhigh task review, Astra medium phase gates, exact-commit/diff evidence and root-only integration/commits/push/PR. No new review or approval gate is introduced.",
+    "scope": "No research-equation rewrite or authentication/transport redesign is selected. Preserve trusted-peer-only pickle/security criteria and strong real-runtime acceptance. Larger unselected MLX proposals remain outside this refresh."
+  },
+  "accepted_work": {
+    "phase_1a": {
+      "commit": "7304703905189baf771032f1cd923a37f66ed97f",
+      "acceptance": "phase1a-acceptance.json",
+      "review": "phase1a-review.json",
+      "state": "Accepted candidate, not an assertion that the root checkout has integrated it or that Phase 1 is complete.",
+      "retain": [
+        "Locked profile/workspace relationships, tested ranges and artifact checks; do not redo or churn accepted versions without new evidence.",
+        "Authorized NLTK 3.10.3 workspace override, SSL/llm_eval exclusion and unsuppressed advisory PYSEC-2026-3740 / CVE-2026-81726. The earlier baseline-clear audit does not describe this evaluation profile.",
+        "Ordinary outside-workspace wheel/sdist dependency resolution does not apply the uv override and selects upstream NLTK 3.9.1; document this boundary rather than claim identical tested installs.",
+        "Robotics remains separately provisioned and unqualified until executed; its 3.13 binary resolution versus 3.14 NumPy-wheel constraint does not require replacing LeRobot."
+      ]
+    },
+    "designs": {
+      "acceptance": "design-acceptance.json",
+      "review": "design-revision-review.json",
+      "artifacts": [
+        "startup-design.json",
+        "mlx-roadmap.json",
+        "test-ci-design.json"
+      ],
+      "state": "Accepted design contracts; older startup/MLX review findings are resolved at design level, not proof of implemented runtime support."
+    }
+  },
+  "phase_handoffs": [
+    {
+      "id": "1B",
+      "owner": "Existing startup implementer",
+      "depends_on": "Accepted 1A candidate",
+      "files": [
+        "plato/client.py",
+        "plato/servers/base.py: startup paths only",
+        "tests/integration/test_event_loop_startup.py",
+        "tests/integration/test_runtime_smoke.py and delivered test-only helpers"
+      ],
+      "contract": "Follow accepted startup-design.json: public current-loop acquisition, borrowed-loop compatibility, preserved synchronous extension dispatch, two-task failure monitoring, primary-error precedence and owned-loop cleanup; no generic lifecycle rewrite.",
+      "acceptance": "Fresh raw and separate caller-loop probes on 3.13/3.14. Actual socket round with comm_simulation=false, two independently trained real clients (2/6 samples), actual payload/report identity and numerically verified weighting. Natural success, isolated ports/paths, 90-second round deadline and owned-descendant 5+5-second containment on negative paths; watchdog kills never pass regular success."
+    },
+    {
+      "id": "1C",
+      "owner": "Existing test/CI implementer",
+      "depends_on": "Delivered 1B paths and 1A manifest/lock handoff",
+      "files": [
+        "tests/conftest.py",
+        "tests/integration/utils.py",
+        "tests/trainers/test_dp_data_loader_strategy.py",
+        "tests/test_nanochat_integration.py",
+        "tests/clients/test_feddf_strategy.py: import isolation only",
+        "tests/servers/test_feddf_server_strategy.py: import isolation only",
+        "tests/datasources/test_huggingface_datasource.py: test worker-count optimization only",
+        ".github/workflows/pytorch_tests.yml",
+        "pyproject.toml and uv.lock: serialized test-base/group metadata only"
+      ],
+      "contract": "Implement accepted fixed base/mandatory profiles, prerequisite/skip enforcement, exception-safe fixture restoration and bounded CPU matrix. Verify .python-version stays 3.13. Do not change accepted package selections merely for group metadata.",
+      "acceptance": "Mandatory DP/MPC and initialized Nanochat synthetic nodes execute; only the specifically allowed absent native-tokenizer skip remains. Preserve 1B real smoke, comparable coverage, actual warning counts and 59 first-party typing locations/60 emitted messages with 324 vendor messages separately disposed. F13 is not closed by fixture isolation. Complete Phase 1 gate and root delivery before Phase 2."
+    },
+    {
+      "id": "2B",
+      "owner": "Existing aggregation/runtime implementer",
+      "depends_on": "Phase 1 gate",
+      "files": [
+        "plato/servers/fedavg.py",
+        "plato/servers/strategies/aggregation/fedavg.py",
+        "tests/servers/test_fedavg_strategy.py"
+      ],
+      "contract": "Add F18 to current assignment; coordinate with 3A/F17 validation capability without changing unrelated algorithm schemas. Existing F10/F11 and security tasks remain. F11 retains the limited examples/async/port/port_server.py writer handoff and real weights_aggregated-to-historical-retrieval numerical regression.",
+      "acceptance": "F18 ledger below plus existing runtime/identity/payload criteria. Finish shared server work before the narrow 3A ingress handoff."
+    },
+    {
+      "id": "2C",
+      "owner": "Existing trainer/algorithm implementer",
+      "depends_on": "Phase 1 gate and serialized shared trainer edits",
+      "files": [
+        "plato/trainers/strategies/algorithms/fedprox_strategy.py",
+        "tests/trainers/strategies/: focused FedProx regression",
+        "configs/MNIST/fedprox_lenet5.toml: coordinate with 4A",
+        "examples/customized_client_training/fedprox/: entrypoint/config coordination with 4A"
+      ],
+      "contract": "Add F20; preserve F07/F08/F14 and other substantive trainer checks. Remove F19/ViT repair and migration from this assignment; coordinate adapter/registry retirement with existing archive owner in Phase 4.",
+      "acceptance": "F20 ledger below. A repaired reference command must invoke the proximal loss strategy; changing optimizer FedProx to SGD alone must not silently turn the experiment into FedAvg."
+    },
+    {
+      "id": "3A",
+      "owner": "Existing MLX implementer",
+      "depends_on": "2B shared-server and 2D/F12 handoffs",
+      "files": [
+        "plato/algorithms/mlx_fedavg.py",
+        "plato/trainers/mlx.py",
+        "plato/models/mlx/",
+        "plato/servers/fedavg.py: narrow MLX pre-aggregation capability after 2B",
+        "MLX registry branches and focused native tests"
+      ],
+      "contract": "Retain accepted A1/A2, selected clipping/reproducibility P1 and bounded E8 measurement. Validate raw and hook-transformed eligible trees before every direct/legacy/delta dispatch; include zero-weight eligible trees and both arrival orders. Preserve no-flag Metal/caller streams, explicit CPU precedence, mode restoration and owned baseline snapshots. Compilation only if measured beneficial with parity; eager remains default.",
+      "acceptance": "Execute E1–E7 with two independently trained 8/24-sample client models, numerical leaf reference, actual sockets, snapshots and no mutation on malformed input. E8 has a bounded measurement budget. Full resume/E9, new models, broad conversion/scheduler parity and telemetry are not selected."
+    },
+    {
+      "id": "4A/4B then 5",
+      "owner": "Existing example/archive/documentation owners",
+      "depends_on": "Prior phase gates; no archive moves in 1C",
+      "files": [
+        "ViT and other archive inventory below",
+        "pyproject.toml, uv.lock, .gitmodules, registry and exclusions by root-serialized owner handoff",
+        "docs/docs/configurations/trainer.md",
+        "docs/docs/examples/algorithms/10. Algorithms based on Neural Architecture Search and Model Search.md",
+        "docs/docs/references/clients.md",
+        "docs/third_party.md",
+        "docs/mkdocs.yml if archive index navigation changes"
+      ],
+      "contract": "Perform authorized coherent archival, remove active support references and preserve historical records. Existing code owners make their relevant core/metadata changes via explicit root handoff; this addendum does not replace implementers.",
+      "acceptance": "Executed meaningful smokes for every retained supported family; confirmed active defects close. Archived/externally blocked status is explicit and never counted as passing support. Revalidate lock, package contents, imports, docs and affected non-ViT/NAS examples after moves."
+    }
+  ],
+  "new_findings": [
+    {
+      "id": "F18",
+      "status": "Confirmed, open repair",
+      "owner": "2B",
+      "evidence": "aggregation-input-probes.json",
+      "defect": "Negative/nonfinite sample counts enter arithmetic; excess payloads are silently ignored.",
+      "acceptance": [
+        "Reject negative, NaN and infinite counts and mismatched report/payload cardinality before weighted arithmetic or global mutation, in direct-weight and delta flows.",
+        "Preserve valid weighting and documented zero-count/feature behavior; do not invent an integer-only requirement.",
+        "Coordinate report/tree order and MLX F17 validation across raw and transformed inputs; do not mask invalid input by dropping a client but retaining its weight."
+      ]
+    },
+    {
+      "id": "F19",
+      "status": "Confirmed; selected for archival, not repaired; archival execution pending",
+      "owner": "Existing 4A/4B archive owner with 2C registry/adapter and root manifest handoffs",
+      "evidence": "vit-initialization-probe.json",
+      "defect": "ResolutionAdjustedModel retains checkpoint weights when pretrained=false.",
+      "acceptance": [
+        "Retain the actual local-checkpoint probe and defect description as historical evidence.",
+        "Archive the coherent ViT boundary below and remove active selection/support references. Do not upgrade Transformers/timm/vendor code or fix initialization for this retired path.",
+        "Do not label F19 fixed; close its disposition only when archival, reference cleanup and dependent-active-component checks pass."
+      ]
+    },
+    {
+      "id": "F20",
+      "status": "Confirmed, open repair",
+      "owner": "2C; 4A reference config and 5 docs coordination",
+      "evidence": "fedprox-gradient-probe.json",
+      "files": [
+        "plato/trainers/strategies/algorithms/fedprox_strategy.py",
+        "configs/MNIST/fedprox_lenet5.toml",
+        "examples/customized_client_training/fedprox/fedprox.py",
+        "examples/customized_client_training/fedprox/fedprox_trainer.py",
+        "docs/docs/examples/algorithms/5. Algorithms with Customized Client Training Loops.md",
+        "docs/docs/references/trainers.md"
+      ],
+      "policy": "Preserve the existing named legacy unsquared-L2 objective/default and document its distinction from paper squared-L2; repair zero-distance differentiation and mu=0 without silently changing nonzero-distance equations. A separate paper-faithful mode is not required for this task.",
+      "acceptance": [
+        "At the initial global snapshot, finite gradients for mu=0 and positive mu; mu=0 gradients match the base loss exactly within numerical tolerance.",
+        "For nonzero distance, compare the legacy objective's gradients against an independent analytical/numerical reference; preserve existing supported l1 behavior.",
+        "A real reference-config/entrypoint smoke performs finite parameter-changing training using the proximal loss strategy; eliminate the nonexistent FedProx optimizer selection.",
+        "Remove false claims of squared-norm/identical-reference gradients; cite historical compatibility honestly. No new research experiment or approval gate is needed to preserve that policy."
+      ]
+    }
+  ],
+  "vit_archival": {
+    "decision": "Minimum safe boundary: retire the obsolete adapter/ViT experiments while preserving MobileNetV3 and its shared NAS implementation. No evidence presently justifies retiring the whole pFedRLNAS parent bundle.",
+    "archive_root": "Proposed archive/2026-refresh/<original-path>; existing archive owner may use the repository's archive convention with an exact old-to-new map. All implementation moves happen in owned tasks, not this addendum.",
+    "retire": [
+      {
+        "paths": [
+          "plato/models/vit.py"
+        ],
+        "action": "Archive ResolutionAdjustedModel, DeepViT, T2TVIT and the ViT factory; remove vit import and registered_factories['vit'] from plato/models/registry.py. No F19 repair."
+      },
+      {
+        "paths": [
+          "plato/models/dvit",
+          "plato/models/t2tvit"
+        ],
+        "action": "Retire active gitlinks and their .gitmodules entries; retain a pinned historical archive/manifest and all upstream/nested licenses. Do not update upstream revisions or leave these under active plato package discovery.",
+        "pins": [
+          {
+            "path": "plato/models/dvit",
+            "url": "https://github.com/zhoudaquan/dvit_repo",
+            "commit": "1ccb152cea43fcbc3cd517a45c12c65734f8ace3",
+            "licenses": [
+              "LICENSE",
+              "lib_deit/LICENSE",
+              "utils/progress/LICENSE"
+            ]
+          },
+          {
+            "path": "plato/models/t2tvit",
+            "url": "https://github.com/yitu-opensource/T2T-ViT",
+            "commit": "0f63dc9558f4d192de926504dbddfa1b3f5db6ca",
+            "licenses": [
+              "LICENSE"
+            ]
+          }
+        ]
+      },
+      {
+        "paths": [
+          "configs/ViT/fedavg_cifar10_dvit.toml",
+          "configs/ViT/fedavg_cifar10_swinv2.toml",
+          "configs/ViT/fedavg_cifar10_t2tvit14.toml",
+          "configs/ViT/fedavg_tinyimagenet_levit.toml"
+        ],
+        "action": "Archive all four: each selects model_type=vit, including SwinV2 and LeViT; do not migrate them to a different trainer/model implementation."
+      },
+      {
+        "paths": [
+          "examples/model_search/fedtp/fedtp.py",
+          "examples/model_search/fedtp/fedtp_algorithm.py",
+          "examples/model_search/fedtp/fedtp_server.py",
+          "examples/model_search/fedtp/hypernetworks.py",
+          "examples/model_search/fedtp/FedTP_CIFAR10_ViT_NonIID03_scratch.toml",
+          "examples/model_search/fedtp/FedTP_CIFAR10_T2TVIT14_NonIID03_scratch.toml"
+        ],
+        "action": "Archive this dependent FedTP experiment as a coherent bundle; both provided configs select the retired vit factory. Preserve paper/source attribution and known environment limitations."
+      },
+      {
+        "paths": [
+          "examples/model_search/pfedrlnas/VIT/"
+        ],
+        "action": "Archive the seven top-level experiment Python files, pyproject.toml and unneeded NASViT training/evaluation assets. First preserve the shared support closure below at a neutral active path; never move the whole directory out of reach while MobileNetV3 still imports it."
+      }
+    ],
+    "mobilenet_dependency_edges": [
+      {
+        "consumer": "examples/model_search/pfedrlnas/MobileNetV3/model/architect.py",
+        "imports": [
+          "VIT.nasvit_wrapper.architect.Architect"
+        ],
+        "detail": "Actual inheritance, not an optional import. Base architect eagerly imports its model and config."
+      },
+      {
+        "consumer": "examples/model_search/pfedrlnas/MobileNetV3/model/mobilenetv3_supernet.py",
+        "imports": [
+          "VIT.nasvit_wrapper.attentive_nas_dynamic_model.AttentiveNasDynamicModel",
+          "VIT.nasvit_wrapper.dynamic_layers.DynamicConvBnActLayer",
+          "VIT.nasvit_wrapper.dynamic_layers.DynamicLinearLayer",
+          "VIT.nasvit_wrapper.dynamic_layers.DynamicMBConvLayer",
+          "VIT.nasvit_wrapper.dynamic_layers.DynamicShortcutLayer",
+          "VIT.nasvit_wrapper.NASViT.models.modules.nn_utils.int2list",
+          "VIT.nasvit_wrapper.NASViT.models.modules.static_layers.MobileInvertedResidualBlock"
+        ],
+        "detail": "NASViT.models.__init__ imports model_factory; dynamic/static models load transformer and convolution utility modules. Retain eager-import closure even when MobileNetV3 does not execute transformer layers."
+      }
+    ],
+    "shared_support": {
+      "source_root": "examples/model_search/pfedrlnas/VIT/nasvit_wrapper/",
+      "proposed_active_root": "examples/model_search/pfedrlnas/shared_nas/",
+      "preserve_relative_files": [
+        "architect.py",
+        "attentive_nas_dynamic_model.py",
+        "config.py",
+        "dynamic_layers.py",
+        "NASViT/models/__init__.py",
+        "NASViT/models/model_factory.py",
+        "NASViT/models/attentive_nas_dynamic_model.py",
+        "NASViT/models/attentive_nas_static_model.py",
+        "NASViT/models/modules/__init__.py",
+        "NASViT/models/modules/activations.py",
+        "NASViT/models/modules/dynamic_layers.py",
+        "NASViT/models/modules/dynamic_ops.py",
+        "NASViT/models/modules/nn_base.py",
+        "NASViT/models/modules/nn_utils.py",
+        "NASViT/models/modules/static_layers.py",
+        "NASViT/models/modules/transformer.py"
+      ],
+      "licenses_and_provenance": [
+        "Preserve NASViT/LICENSE (existing Attribution-NonCommercial 4.0 text), copyright headers and README/upstream attribution with the retained support code and historical archive.",
+        "Record baseline commit and content hashes for vendored NASViT; no unverified upstream SHA is invented. Preserve original tree reconstruction instructions for the experiment.",
+        "Retain necessary package boundaries and resources discovered by the owned closure check; do not trim eagerly imported modules just because they look ViT-specific."
+      ],
+      "change_limit": "Relocate/rebind imports only as needed to separate shared support from retired experiments. Preserve numerical implementation and class/state interfaces; do not modernize NASViT or Apex for retired ViT training.",
+      "handoff_files": [
+        "examples/model_search/pfedrlnas/MobileNetV3/model/architect.py",
+        "examples/model_search/pfedrlnas/MobileNetV3/model/mobilenetv3_supernet.py",
+        "examples/model_search/pfedrlnas/MobileNetV3/pyproject.toml: declare actually required shared imports with root lock owner"
+      ],
+      "dependencies": "Verify used yacs, fvcore, timm and Torch dependencies against accepted profiles; do not import requirements from archived NASViT command-line training wholesale.",
+      "acceptance": [
+        "Run MobileNetV3 import/initialization from its documented example directory and root invocation without old VIT directory on sys.path; resolve imports relative to actual locations, not accidental caller cwd.",
+        "Execute a bounded sampled-subnet forward/backward parameter update and subnet extraction/aggregation check. Compare pre/post-relocation outputs, parameter shapes/state keys and updates on the same seeded weights/input; preserve architecture choices.",
+        "If the baseline already fails, retain the exact failure and disposition under the existing example owner; do not claim archival preserved supported behavior from import-only evidence or silently skip/retire MobileNetV3.",
+        "Remove active imports of VIT.nasvit_wrapper after migration; retain its historical spelling only in archive/evidence. No active runtime code may import the archive."
+      ]
+    },
+    "preserve_unrelated": [
+      "external/nanochat stays pinned and active; no blanket submodule removal.",
+      "pFedRLNAS/DARTS and MobileNetV3 remain separately owned active audit paths; no retirement inferred from the parent name.",
+      "AnyCostFL/FedRolex have independent local vit.py implementations and ViT configs; FjORD's is already archived. They do not consume plato.models.vit or the retired gitlinks. Do not remove their ResNet branches or shared entrypoints by keyword. No ViT upgrade/repair campaign is selected: if those ViT-only variants prove obsolete, the existing owner may archive them coherently under current authorization while retaining functional non-ViT paths."
+    ],
+    "active_reference_cleanup": [
+      "plato/models/registry.py: retire factory/import; preserve other model factories and explicit unsupported-model errors.",
+      "pyproject.toml/uv.lock: remove VIT workspace member and stale dvit/t2tvit/VIT tool paths after relocation; preserve MobileNetV3 local Plato dependency and needed yacs/shared dependencies. Root updates metadata without unrelated version churn.",
+      ".gitmodules and package/build/CI submodule discovery: remove active DViT/T2T requirements and exclude historical archives from shipped runtime code; retain license/provenance records.",
+      "docs/docs/configurations/trainer.md: remove vit supported-factory claim; NAS/model-search chapter: replace active VIT/FedTP run commands with archival status and retain unrelated examples.",
+      "Update affected tests/exclusions/docs links: registry no longer advertises archived models, normal model imports work without retired submodules, lock and wheel/sdist checks pass. Tests for retained components remain mandatory."
+    ],
+    "historical_reproduction": "Record archive path map, exact Plato baseline, upstream URLs/SHAs, original commands/configs, dependency/OS/tool requirements and known defects including F19. Reproduce the original layout in a separate historical checkout with pinned submodule update; never fetch latest branches or promise compatibility with the refresh environment."
+  },
+  "other_archival_handoffs": [
+    {
+      "owner": "2D existing utility owner; 4B/5 index",
+      "path": "plato/utils/rl_env.py",
+      "action": "Archive the unused legacy Gym environment after rechecking tracked/import references; preserve the separately used plato/utils/reinforcement_learning package and FEI audit. Document four-value step/shape/event-loop limitations rather than repair the retired module."
+    },
+    {
+      "owner": "2A existing datasource owner; 4B/5 index",
+      "path": "plato/datasources/datalib/",
+      "action": "Archive the unused legacy multimodal helper bundle if the recorded internal-only dependency closure still holds. Preserve code/license/reproduction and REFER defect evidence; remove its active typing repair assignments. Do not retire registered datasources or archive-containment tests for active datasource/evaluator extraction."
+    },
+    {
+      "owner": "4B existing archive owner; 5 docs",
+      "path": "examples/outdated/",
+      "action": "Retain the four existing families and 20 files; consolidate archive status without an unnecessary rename. Replace the active FL-MAML illustration in docs/docs/references/clients.md. Archived defects are historical, not fixed."
+    }
+  ],
+  "remaining_coverage": [
+    {
+      "phase": "1",
+      "remaining": "1B implementation/runtime and 1C base/mandatory profiles, fixture isolation, Linux CPU 3.13/3.14 evidence and phase gate. Accepted 1A is not redone; its NLTK/installer/platform limits remain visible."
+    },
+    {
+      "phase": "2A",
+      "remaining": "Config F13, Dirichlet F15, IID F16, active datasource/sampler correctness and 3.13/3.14 archive containment. Datalib archive replaces repair only after closure and reference cleanup."
+    },
+    {
+      "phase": "2B",
+      "remaining": "F10/F11/F18, sync/async/buffered/split/cross-silo lifecycle and selection, callback/context integrity, session-to-client binding, bounded socket payload rejection and cleanup; retain real numerical round."
+    },
+    {
+      "phase": "2C",
+      "remaining": "F07/F08/F14/F20, optimizer/scheduler/gradient/checkpoint, DP/GAN/personalization/split paths, targeted modern API checks. F19 goes to archival; active behavior tests are not waived."
+    },
+    {
+      "phase": "2D",
+      "remaining": "S3 F02–F05, collisions F12, HE/MPC/serialization/processors, active shared/RL utilities and cleanup. Keep trusted-peer pickle boundary and archive-containment/security acceptance."
+    },
+    {
+      "phase": "3",
+      "remaining": "MLX F17 plus accepted selected controls and real two-client tests; F06 LeRobot configs and F09 HF normalization; real PEFT/HF, separate robotics, Nanochat tokenizer/build/CORE and Lighteval qualification with disclosed advisory. No forced Python 3.14 robotics replacement."
+    },
+    {
+      "phase": "4",
+      "remaining": "Executed meaningful smokes for all retained basic/customization, aggregation/async/selection, training/personalization/SSL, split/security/three-layer/unlearning, pruning/search, RL/detector/leakage and Nanochat families from original inventory; coherent ViT and evidence-backed legacy archives, preserved MobileNetV3 shared NAS. Close confirmed active bugs; unexecuted commands and assigned fixes are intermediate/blocked, not support."
+    },
+    {
+      "phase": "5",
+      "remaining": "Two broken MkDocs links, config/API/backend/archive/reference docs, dependency/advisory claims, package reproducibility, action/container/Netlify review, final locked CI and audit disposition. Docker remains unavailable locally: use an available runner/host before claiming container success. GitHub app/SSH publication path is available."
+    }
+  ],
+  "completion_policy": "Preserve phase order 1 -> 2 -> 3 -> 4 -> 5 and existing gates. Required supported-path regressions and meaningful runtime checks execute; archived paths have complete provenance and no active dependencies/support claims. Necessary archive/reference/lock changes receive existing independent review, not a new permission gate. No new coding or test work is performed by this addendum.",
+  "genuine_scope_conflicts": [],
+  "write_scope": "Only evidence/2026-refresh/plan-addendum.json. No changes to plan.md, implementation, other evidence, commits, push or agents."
+}

@@ -7,6 +7,65 @@ This framework makes extensive use of object oriented subclassing with the help 
 
 ---
 
+## Fast CI and full qualification
+
+Automatic CI uses Python 3.13 and one locked mandatory development environment:
+
+```sh
+uv sync --locked --python 3.13 --no-default-groups --group dev
+uv run --no-sync --python 3.13 python -m pytest tests --test-profile=mandatory \
+    -m "not runtime and not slow" -ra --durations=20
+uv run --no-sync --python 3.13 ruff check . --select I
+uv run --no-sync --python 3.13 ty check --output-format concise --error-on-warning
+```
+
+The fast core retains in-process training, ordinary integration checks, profile
+and import audits, and required DP/MPC checks. It excludes the runtime startup
+and containment partition and 35 reviewed cases that run actual spawned training
+workers or repeated subprocess training. Only those functions or their `spawn=True`
+parameters carry `slow`; the mixed tests' `spawn=False` cases remain automatic.
+Both Ruff and configured typing must pass. Typing retains the inherited optional
+unresolved-import policy; this does not certify every optional package API.
+
+Use **PyTorch Full Qualification** (`pytorch_qualification.yml`) from the Actions
+**Run workflow** menu before releases or when changing spawned training, startup,
+containment, or the optional CPU qualifications. It preserves fresh base and
+mandatory environments, the full non-runtime suite including slow cases, runtime
+startup and containment tests, retained model-search checks, and real CPU
+Lighteval qualification with their exact artifact acceptance gates. The automatic
+**Python 3.13 / supported-default** check reports fast core validation. Docs/package
+and container checks also remain automatic; superseded pull-request runs cancel.
+
+The full core partitions remain available locally without excluding `slow`:
+
+```sh
+uv run --no-sync --python 3.13 python -m pytest tests --test-profile=mandatory \
+    -m "not runtime" -ra
+uv run --no-sync --python 3.13 python -m pytest tests --test-profile=mandatory \
+    -m "runtime and not retained_model_search" -ra
+```
+
+Plain `pytest tests` also retains slow tests. Native Apple Silicon MLX,
+Lighteval, and other optional example modules keep their explicit profile boundaries;
+the manual PyTorch workflow does not qualify all native or optional example tasks.
+
+The preceding successful Linux qualification took about 64 minutes. Its measured
+case durations project a 6–8 minute fast automatic run, with a target of at most
+10 minutes; those estimates need a hosted run of the final commit. Fast artifacts
+contain logs, JUnit, coverage, and commit/lock/package provenance, with pytest
+temporary files outside the upload directory. Full qualification retains its
+larger staged artifacts and source ledgers.
+
+## Native MLX development
+
+The Apple Silicon backend has a separate `ComposableMLXTrainer` with native
+MLX strategy interfaces and the LeNet-5/MNIST reference. Read
+[Native MLX](mlx.md) before adapting a model or hook: device streams, parameter
+trees, positional report associations, and checkpoint state have explicit
+contracts. Standard core test runs exclude native tests; use the guide's
+`tests/mlx_native --test-profile=mlx-native` command for full native qualification
+on Python 3.13 with CPU and Metal available.
+
 ## Configuration Parameters
 
 All configuration parameters are globally accessed using the Singleton `Config` class (found in `config.py`). They are read from a configuration file when the clients and the servers launch, and the configuration file follows the TOML format for the sake of simplicity and readability.
@@ -61,7 +120,7 @@ If the model type is not supplied by the configuration file, the model name is u
 
 Plato also supports optional **structured evaluators** under `plato/evaluators/`.
 These run after the trainer's normal testing strategy and are intended for
-benchmark-style outputs such as Lighteval or Nanochat CORE.
+benchmark-style outputs such as Lighteval.
 
 The key pieces are:
 
@@ -74,6 +133,12 @@ Evaluator implementations should return a compact set of summary metrics in
 `EvaluationResult.metrics` and put heavier nested details into
 `EvaluationResult.metadata`. The server logger automatically exports summary
 metrics to the runtime CSV under the `evaluation_` prefix.
+
+For optional Lighteval development, keep `--extra llm_eval` on syncing runtime
+commands and provision NLTK `punkt` and `punkt_tab` explicitly. Core evaluator
+unit tests do not replace real Pipeline checks. See the
+[optional runtime qualification contract](references/evaluators.md#optional-runtime-qualification)
+for the strict profile, focused commands, and validation scope.
 
 For a worked example, see [Evaluators](references/evaluators.md) and the
 [Server-side Lighteval for SmolLM2](examples/case-studies/4. Server-side Lighteval for SmolLM2.md)
@@ -216,7 +281,7 @@ model = partial(
 
 If a custom `DataSource` is needed for a custom training session, one can subclass from the `base.DataSource` class.
 
-Example excerpt from `examples/custom_model.py`:
+Example excerpt from `examples/basic/basic.py`:
 
 ```python
 from pathlib import Path

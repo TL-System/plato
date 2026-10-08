@@ -1,0 +1,14 @@
+{
+  "finding": "F27",
+  "decision": "DESIGN ACCEPTED FOR IMPLEMENTATION; finding remains open",
+  "design": "phase2c-scaffold-design.json",
+  "design_sha256": "f323f3aa9d824df44a1043b2d6aff9c8a963c42964f6e6685108c59b25fc3a89",
+  "review": "phase2c-scaffold-design-review.json",
+  "review_sha256": "8eb83f21091827d03534db1b8c4e23a6f239b5df4f82363b4c9ead5a60b3258d",
+  "review_result": "PASS, no material findings",
+  "authority": "User-authorized necessary bugfixes; independently reviewed bounded clarification to accepted Phase2C plan. No additional user approval required.",
+  "implementation_owner": "Original Phase2C author, plato-phase2-training inwZ",
+  "writing_owner": "Fresh Astra writing task for standalone README/public-doc prose, from actual implementation facts; independently reviewed beforePhase2closure. Code/tests/docstrings remain2C.",
+  "scope": "Exact core/example/doc paths and all A01-A10 checks in accepted design. F20 legacy unsquarednorm unchanged; shared runtime F07 edits still await accepted2B handoff.",
+  "closure": "Only after independent implementation and writing reviews, integrated tests and phasegate; this acceptance is not a passing production result."
+}

@@ -1,0 +1,82 @@
+name: Docs and package checks
+permissions:
+  contents: read
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  docs-package:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    defaults:
+      run:
+        shell: zsh -lc ". {0}"
+    env:
+      PLATO_DOCS_ENVIRONMENT: ${{ runner.temp }}/plato-docs/.venv-docs
+      PLATO_DOCS_ARTIFACT_DIR: ${{ github.workspace }}/ci-artifacts/docs
+      CUDA_VISIBLE_DEVICES: ""
+      OMP_NUM_THREADS: "1"
+      MKL_NUM_THREADS: "1"
+      TOKENIZERS_PARALLELISM: "false"
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Provision zsh
+        shell: python {0}
+        timeout-minutes: 3
+        run: |
+          import subprocess
+          subprocess.run(["sudo", "apt-get", "update"], check=True)
+          subprocess.run(["sudo", "apt-get", "install", "-y", "zsh"], check=True)
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.13"
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+        with:
+          version: "0.12.22"
+
+      - name: Record docs provenance and validate build configuration
+        run: |
+          set -eu
+          mkdir -p ci-artifacts/docs
+          git rev-parse HEAD > ci-artifacts/docs/commit.txt
+          sha256sum uv.lock netlify.toml docs/build.sh docs/requirements.txt > ci-artifacts/docs/source-hashes.txt
+          python --version > ci-artifacts/docs/python.txt
+          uv --version > ci-artifacts/docs/uv.txt
+          sh -n docs/build.sh
+          python - <<'PY'
+          import tomllib
+          from pathlib import Path
+          configuration = tomllib.loads(Path("netlify.toml").read_text())
+          assert configuration["build"]["base"] == "."
+          assert configuration["build"]["publish"] == "docs/site"
+          assert configuration["build"]["command"] == "./docs/build.sh"
+          assert configuration["build"]["environment"]["PYTHON_VERSION"] == "3.13"
+          PY
+
+      - name: Build strict docs and verify locked requirements parity
+        run: ./docs/build.sh > ci-artifacts/docs/build.log 2>&1
+
+      - name: Build and validate distributions
+        run: python .github/scripts/check_distribution.py
+
+      - name: Upload docs and package evidence
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: docs-package-${{ github.sha }}
+          path: ci-artifacts
+          if-no-files-found: error

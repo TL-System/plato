@@ -1,0 +1,4 @@
+cwd: /var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-package-pk0x01i4/source/plato_learn-1.4.3
+command: ["uv", "build", "--no-sources", "--build-constraints", "/private/tmp/plato-p2-final/package/build-constraints.txt", "--python", "3.13", "--wheel", "--out-dir", "/private/tmp/plato-p2-final/package/rebuilt", "."]
+Building wheel...
+Successfully built /private/tmp/plato-p2-final/package/rebuilt/plato_learn-1.4.3-py3-none-any.whl

@@ -1,0 +1,508 @@
+{
+  "schema_version": 1,
+  "generated_utc": "2026-10-03T07:24:19.809792+00:00",
+  "task": "Phase 2B supplemental generic server resume RNG correction (F28).",
+  "status": "Implemented and validated; awaiting fresh root-commissioned independent review.",
+  "identities": {
+    "accepted_original_b_commit": "00eeb9dcdd2b513e64db9408969356037e09bb8e",
+    "phase2_initial_baseline_commit": "fda60becedfa6236c11d415b87a868b52789a41e",
+    "final_implementation_commit": "c0d05c26cca58d020dbb480e2aa0bbae9f4f8e7e",
+    "evidence_commit": {
+      "identity": "The evidence-only child commit containing this file; its exact full hash is returned with the candidate.",
+      "resolve_command": "git log -1 --format=%H -- evidence/2026-refresh/phase2b-resume-validation.json",
+      "self_hash_policy": "No self-referential commit hash is embedded in its own tracked contents."
+    },
+    "working_source_sha256": {
+      "plato/servers/base.py": "0737a129696bb0766b8de2d08aba6b9dafe9be053c8207b7a861928bf161fd1f",
+      "tests/servers/test_server_resume_rng.py": "f6aac62ce183de8c965ace00d1b5813f065e1b09759c552308c94b7582041a1c",
+      "tests/integration/test_event_loop_startup.py": "a92c9ee2347e2113cd65b7949c922ac5bbf1846f4caeca30a128db580c79751e",
+      "tests/integration/startup_harness.py": "988f216f9367b1e9e8156bad62d3c03a813e26d32f919981ae227f5d8754642e",
+      "tests/integration/startup_probe.py": "e6c9bb2bf39616fe3a6745da528690a578e7416837e0914578ec688d2851b34f",
+      "evidence/2026-refresh/phase2b-validation.json": "21df488a8716dac0214b86d99b04f547635794c4ef9eea387b67a28bc35b55a9",
+      "uv.lock": "573b10c2ba1a2317e02f9e40c6181359cafab6f6e0a0f9be12bb256cb276fe1d",
+      "pyproject.toml": "799bd7ba1865b097fdc8ca84a7b70337794e338de4aa9a6a13f6a4c1b9156246",
+      ".python-version": "02e735b3dfe1c32833eb550b7ff8ffa17f5f2bc3fa1e7bae61a8f5a3883ce398"
+    },
+    "baseline_source_sha256": {
+      "plato/servers/base.py": "a8d2acec980b6d888b7425ebaec290d8e31d1d32152fd994ca933313f37551f8",
+      "tests/integration/test_event_loop_startup.py": "a92c9ee2347e2113cd65b7949c922ac5bbf1846f4caeca30a128db580c79751e",
+      "tests/integration/startup_harness.py": "988f216f9367b1e9e8156bad62d3c03a813e26d32f919981ae227f5d8754642e",
+      "tests/integration/startup_probe.py": "e6c9bb2bf39616fe3a6745da528690a578e7416837e0914578ec688d2851b34f",
+      "evidence/2026-refresh/phase2b-validation.json": "21df488a8716dac0214b86d99b04f547635794c4ef9eea387b67a28bc35b55a9",
+      "uv.lock": "573b10c2ba1a2317e02f9e40c6181359cafab6f6e0a0f9be12bb256cb276fe1d",
+      "pyproject.toml": "799bd7ba1865b097fdc8ca84a7b70337794e338de4aa9a6a13f6a4c1b9156246",
+      ".python-version": "02e735b3dfe1c32833eb550b7ff8ffa17f5f2bc3fa1e7bae61a8f5a3883ce398"
+    },
+    "root_evidence_sha256": {
+      "/Users/bli/Playground/plato/evidence/2026-refresh/server-resume-rng-probe.json": "40f09d88509f1ebb21c6d05cde97b60ca3322e6a420ad0d71d6bc9a6a45b1c5c",
+      "/Users/bli/Playground/plato/evidence/2026-refresh/phase2c-feddyn-design-review.json": "e2b46a83c1a098e4b9d19e123b4c8c92fb1298f0a41515c4663e523aaae3522a"
+    }
+  },
+  "scope": {
+    "authorized_paths": [
+      "plato/servers/base.py: Server.run startup seeding only",
+      "tests/servers/test_server_resume_rng.py",
+      "evidence/2026-refresh/phase2b-resume-validation.json"
+    ],
+    "implementation": "Apply configured random_seed only for fresh startup in ordinary and central branches. Keep custom resume overrides authoritative without requiring resumed_session. Restore/launch order and fresh seed timing are preserved.",
+    "original_report": "phase2b-validation.json remains byte-for-byte unchanged; its accepted results are historical and are not counted as newly executed checks.",
+    "handoff": "Root integrates this reviewed supplement at a clean C boundary, preserving C's checkpoint codec edits and rerunning combined checkpoint/startup validation. No C/A/D branch was merged or edited."
+  },
+  "audit_coverage": [
+    "Actual FedAvg.configure, ComposableTrainer save/load, generic checkpoint writer/reader, Server.run and RandomSelectionStrategy; only socket listener and process launch boundaries are replaced.",
+    "Configured seed 17 and no configured seed, ordinary and central startup, three subsequent selections against an independent random.Random stream, current_round/resumed_session/model and three NumPy draws.",
+    "Fresh startup with and without configured seed preserves intended selection stream; custom resume override retains its state without setting the base session flag.",
+    "Malformed current round, NumPy RNG, Python RNG and Safetensors model errors propagate before process launch, periodic task creation or socket start in both branches (eight negative cases).",
+    "All 48 unchanged Phase 1 startup regressions on both interpreters: loop ownership, exception precedence, teardown, edge/central paths, real unequal-sample socket aggregation and stalled-client containment.",
+    "Global Python versus selection-owned state and lazy context refresh probed through actual persistence, startup and selection on both interpreters."
+  ],
+  "findings": [
+    {
+      "id": "F28",
+      "status": "Corrected; independent supplemental review pending.",
+      "before": "Checkpoint resume was reseeded after successful restoration, restarting selection at [9,7].",
+      "after": "Resume continues [5,3], [9,5], [2,1]; fresh seed behavior and custom resume ownership are preserved."
+    },
+    {
+      "id": "B-RESUME-01",
+      "status": "Confirmed additional checkpoint-state mismatch; reported to root, outside this startup-only correction.",
+      "locations": [
+        "plato/servers/base.py:_save_random_states",
+        "plato/servers/base.py:_select_clients_with_strategy"
+      ],
+      "trigger": "One unrelated random.random() draw after the second selection and before actual save_to_checkpoint.",
+      "cause": "Checkpoint saves random.getstate(), while uninterrupted selection resumes from self.prng_state/context.state. They can differ at save time.",
+      "uninterrupted": [
+        [
+          5,
+          3
+        ],
+        [
+          9,
+          5
+        ],
+        [
+          2,
+          1
+        ]
+      ],
+      "resumed": [
+        [
+          9,
+          5
+        ],
+        [
+          2,
+          1
+        ],
+        [
+          4,
+          7
+        ]
+      ],
+      "proof": "Actual writer/reader/run plus actual selection reproduce on both interpreters. Control without unrelated draw continues correctly. No persisted state format or save/restore policy was broadened."
+    }
+  ],
+  "context_bookkeeping": "Configure copies the pre-resume state into context; restore updates self.prng_state and global random. Context is stale before the first selection but _select_clients_with_strategy refreshes it before the strategy runs and preserves equality afterward. No distinct selection failure was found from this lazy refresh; arbitrary pre-selection context consumers are not qualified.",
+  "environment": {
+    "uv": "0.12.22",
+    "default_and_minimum": "Python 3.13 unchanged.",
+    "interpreters": [
+      {
+        "python": "3.13.16",
+        "executable": "/tmp/plato-phase2b-runtime/venv313/bin/python",
+        "host": "macOS-27.0-arm64-arm-64bit-Mach-O",
+        "versions": {
+          "torch": "2.14.1",
+          "numpy": "2.5.3",
+          "pytest": "9.1.1",
+          "python-socketio": "5.17.0",
+          "aiohttp": "3.14.3",
+          "safetensors": "0.8.0"
+        },
+        "provisioning": {
+          "status": "Existing author-owned isolated locked-dev environment reused.",
+          "original_command": "UV_PROJECT_ENVIRONMENT=/tmp/plato-phase2b-runtime/venv313 uv sync --locked --group dev --python 3.13",
+          "new_sync_performed": false
+        }
+      },
+      {
+        "python": "3.14.8",
+        "executable": "/private/tmp/plato-phase2b-runtime/venv314/bin/python",
+        "host": "macOS-27.0-arm64-arm-64bit-Mach-O",
+        "versions": {
+          "torch": "2.14.1",
+          "numpy": "2.5.3",
+          "pytest": "9.1.1",
+          "python-socketio": "5.17.0",
+          "aiohttp": "3.14.3",
+          "safetensors": "0.8.0"
+        },
+        "provisioning": {
+          "status": "Existing author-owned isolated locked-dev environment reused.",
+          "original_command": "UV_PROJECT_ENVIRONMENT=/tmp/plato-phase2b-runtime/venv314 uv sync --locked --group dev --python 3.14",
+          "new_sync_performed": false
+        }
+      }
+    ],
+    "thread_controls": "OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1",
+    "shell": "Every shell invocation uses zsh -lc.",
+    "isolation": "Only author-owned existing environments/scratch used; root .venv and all other worktrees/environments untouched.",
+    "submodule": "Existing pinned external/nanochat c75fe54aa7c1fa881701c246f9427bcbe4eee5a4 retained; no upstream revision changed."
+  },
+  "runs": {
+    "3.13.16": {
+      "red": {
+        "production_commit": "00eeb9dcdd2b513e64db9408969356037e09bb8e",
+        "command": "OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2b-runtime/venv313/bin/python -m pytest tests/servers/test_server_resume_rng.py -q --basetemp=/tmp/plato-phase2b-runtime/resume-supplement/red-behavior313 > /tmp/plato-phase2b-runtime/resume-supplement/red-behavior313.log 2>&1",
+        "exit_code": 1,
+        "passed": 14,
+        "failed": 4,
+        "failure_contracts": [
+          "Configured-seed actual checkpoint resume: ordinary and central.",
+          "Custom resume override without resumed_session flag: both branches."
+        ],
+        "actual_continuations": [
+          [
+            9,
+            7
+          ],
+          [
+            5,
+            6
+          ],
+          [
+            5,
+            3
+          ]
+        ],
+        "expected_continuations": [
+          [
+            5,
+            3
+          ],
+          [
+            9,
+            5
+          ],
+          [
+            2,
+            1
+          ]
+        ],
+        "state_preservation": "Round 2, resumed_session, model and NumPy assertions passed before the selection mismatch.",
+        "log": {
+          "path": "/tmp/plato-phase2b-runtime/resume-supplement/red-behavior313.log",
+          "sha256": "166e3103ad71ffab28f26dff522d7940f0e5f627e061bf686c31e2e2bf8ad204"
+        }
+      },
+      "green_focused": {
+        "implementation_commit": "c0d05c26cca58d020dbb480e2aa0bbae9f4f8e7e",
+        "command": "OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2b-runtime/venv313/bin/python -m pytest tests/servers/test_server_resume_rng.py tests/servers/test_personalized_selection_strategy.py tests/servers/test_split_learning_selection_strategy.py -q --basetemp=/tmp/plato-phase2b-runtime/resume-supplement/green-focused313 > /tmp/plato-phase2b-runtime/resume-supplement/green-focused313.log 2>&1",
+        "exit_code": 0,
+        "passed": 25,
+        "new_resume_cases": 18,
+        "unchanged_selection_cases": 7,
+        "failed": 0,
+        "skipped": 0,
+        "warnings": 1,
+        "warning_reason": "3.13 existing _current_startup_loop uses get_event_loop without a current loop; no suppression added.",
+        "log": {
+          "path": "/tmp/plato-phase2b-runtime/resume-supplement/green-focused313.log",
+          "sha256": "ce733846d71217a4cc25b66252b67e0aa27ac885df3b8ddec441ed4305aecf2b"
+        }
+      },
+      "green_startup": {
+        "implementation_commit": "c0d05c26cca58d020dbb480e2aa0bbae9f4f8e7e",
+        "command": "OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2b-runtime/venv313/bin/python -m pytest tests/integration/test_event_loop_startup.py -q --basetemp=/tmp/plato-phase2b-runtime/resume-supplement/startup313 > /tmp/plato-phase2b-runtime/resume-supplement/startup313.log 2>&1",
+        "exit_code": 0,
+        "passed": 48,
+        "failed": 0,
+        "skipped": 0,
+        "warnings": 0,
+        "elapsed_seconds": 429.36,
+        "subprocess_records": 48,
+        "surviving_owned_descendants": 0,
+        "expected_negative_path_watchdogs": 5,
+        "watchdog_disposition": "Four deliberate noncooperative-teardown cases plus one stalled real client; all passed their containment/error assertions. Ordinary socket completion was natural.",
+        "real_two_client_socket": {
+          "returncode": 0,
+          "timed_out": false,
+          "forced": [],
+          "survivors": [],
+          "clients": {
+            "2": {
+              "pid": 73185,
+              "samples": 2
+            },
+            "1": {
+              "pid": 73186,
+              "samples": 6
+            }
+          },
+          "max_absolute_error": {
+            "linear.weight": 1.4901161193847656e-08,
+            "linear.bias": 2.9103830456733704e-10
+          },
+          "numerical_values": "See shared independent_socket_reference; both new runs produced the same deterministic tensors."
+        },
+        "log": {
+          "path": "/tmp/plato-phase2b-runtime/resume-supplement/startup313.log",
+          "sha256": "0464cebaa302a28418d7e5a0b41d4f7b1773b0036e25770dc6290ae1dd8d2731"
+        }
+      },
+      "rng_bookkeeping_probe": {
+        "command": "PYTHONPATH=/private/tmp/plato-refresh-worktrees/runtime OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2b-runtime/venv313/bin/python /tmp/plato-phase2b-runtime/resume-supplement/selection_state_probe.py > /tmp/plato-phase2b-runtime/resume-supplement/selection-state313.json 2> /tmp/plato-phase2b-runtime/resume-supplement/selection-state313.stderr",
+        "exit_code": 0,
+        "results": {
+          "path": "/tmp/plato-phase2b-runtime/resume-supplement/selection-state313.json",
+          "sha256": "a0fc68b24f382df4399d70bad81d07e699560911f16b2cf245d5027bd7e5364f"
+        }
+      },
+      "new_green_total": 73
+    },
+    "3.14.8": {
+      "red": {
+        "production_commit": "00eeb9dcdd2b513e64db9408969356037e09bb8e",
+        "command": "OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2b-runtime/venv314/bin/python -m pytest tests/servers/test_server_resume_rng.py -q --basetemp=/tmp/plato-phase2b-runtime/resume-supplement/red-behavior314 > /tmp/plato-phase2b-runtime/resume-supplement/red-behavior314.log 2>&1",
+        "exit_code": 1,
+        "passed": 14,
+        "failed": 4,
+        "failure_contracts": [
+          "Configured-seed actual checkpoint resume: ordinary and central.",
+          "Custom resume override without resumed_session flag: both branches."
+        ],
+        "actual_continuations": [
+          [
+            9,
+            7
+          ],
+          [
+            5,
+            6
+          ],
+          [
+            5,
+            3
+          ]
+        ],
+        "expected_continuations": [
+          [
+            5,
+            3
+          ],
+          [
+            9,
+            5
+          ],
+          [
+            2,
+            1
+          ]
+        ],
+        "state_preservation": "Round 2, resumed_session, model and NumPy assertions passed before the selection mismatch.",
+        "log": {
+          "path": "/tmp/plato-phase2b-runtime/resume-supplement/red-behavior314.log",
+          "sha256": "8e52ac832fd88042a978d8056f46e1e86a6a3c9551616c0d3004d375b1886e45"
+        }
+      },
+      "green_focused": {
+        "implementation_commit": "c0d05c26cca58d020dbb480e2aa0bbae9f4f8e7e",
+        "command": "OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2b-runtime/venv314/bin/python -m pytest tests/servers/test_server_resume_rng.py tests/servers/test_personalized_selection_strategy.py tests/servers/test_split_learning_selection_strategy.py -q --basetemp=/tmp/plato-phase2b-runtime/resume-supplement/green-focused314 > /tmp/plato-phase2b-runtime/resume-supplement/green-focused314.log 2>&1",
+        "exit_code": 0,
+        "passed": 25,
+        "new_resume_cases": 18,
+        "unchanged_selection_cases": 7,
+        "failed": 0,
+        "skipped": 0,
+        "warnings": 0,
+        "warning_reason": null,
+        "log": {
+          "path": "/tmp/plato-phase2b-runtime/resume-supplement/green-focused314.log",
+          "sha256": "bc4375117ef9b33bb819c21d4dcc9c6fa72474712ace3da1564eaf5ba5bde34d"
+        }
+      },
+      "green_startup": {
+        "implementation_commit": "c0d05c26cca58d020dbb480e2aa0bbae9f4f8e7e",
+        "command": "OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2b-runtime/venv314/bin/python -m pytest tests/integration/test_event_loop_startup.py -q --basetemp=/tmp/plato-phase2b-runtime/resume-supplement/startup314 > /tmp/plato-phase2b-runtime/resume-supplement/startup314.log 2>&1",
+        "exit_code": 0,
+        "passed": 48,
+        "failed": 0,
+        "skipped": 0,
+        "warnings": 0,
+        "elapsed_seconds": 441.73,
+        "subprocess_records": 48,
+        "surviving_owned_descendants": 0,
+        "expected_negative_path_watchdogs": 5,
+        "watchdog_disposition": "Four deliberate noncooperative-teardown cases plus one stalled real client; all passed their containment/error assertions. Ordinary socket completion was natural.",
+        "real_two_client_socket": {
+          "returncode": 0,
+          "timed_out": false,
+          "forced": [],
+          "survivors": [],
+          "clients": {
+            "2": {
+              "pid": 73191,
+              "samples": 2
+            },
+            "1": {
+              "pid": 73192,
+              "samples": 6
+            }
+          },
+          "max_absolute_error": {
+            "linear.weight": 1.4901161193847656e-08,
+            "linear.bias": 2.9103830456733704e-10
+          },
+          "numerical_values": "See shared independent_socket_reference; both new runs produced the same deterministic tensors."
+        },
+        "log": {
+          "path": "/tmp/plato-phase2b-runtime/resume-supplement/startup314.log",
+          "sha256": "afe4a55bb9c27e121847aeaf24cb805860644cbf557ef6e86978e335cc0b918e"
+        }
+      },
+      "rng_bookkeeping_probe": {
+        "command": "PYTHONPATH=/private/tmp/plato-refresh-worktrees/runtime OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2b-runtime/venv314/bin/python /tmp/plato-phase2b-runtime/resume-supplement/selection_state_probe.py > /tmp/plato-phase2b-runtime/resume-supplement/selection-state314.json 2> /tmp/plato-phase2b-runtime/resume-supplement/selection-state314.stderr",
+        "exit_code": 0,
+        "results": {
+          "path": "/tmp/plato-phase2b-runtime/resume-supplement/selection-state314.json",
+          "sha256": "a0fc68b24f382df4399d70bad81d07e699560911f16b2cf245d5027bd7e5364f"
+        }
+      },
+      "new_green_total": 73
+    }
+  },
+  "independent_socket_reference": {
+    "method": "Convert each actual received client tensor to NumPy Float64; independently sum tensor * samples and divide by total 8. Compare each parameter with the actual server aggregate.",
+    "clients": {
+      "2": {
+        "samples": 2,
+        "weights": {
+          "linear.weight": [
+            [
+              0.20861299335956573,
+              -0.1127939447760582
+            ],
+            [
+              -0.30861300230026245,
+              0.41279396414756775
+            ]
+          ],
+          "linear.bias": [
+            -0.0024593861307948828,
+            0.0024593889247626066
+          ]
+        }
+      },
+      "1": {
+        "samples": 6,
+        "weights": {
+          "linear.weight": [
+            [
+              0.1755179464817047,
+              -0.08649551123380661
+            ],
+            [
+              -0.27551794052124023,
+              0.38649553060531616
+            ]
+          ],
+          "linear.bias": [
+            -0.0070069595240056515,
+            0.007006970699876547
+          ]
+        }
+      }
+    },
+    "actual_aggregate": {
+      "linear.weight": [
+        [
+          0.18379171192646027,
+          -0.0930701196193695
+        ],
+        [
+          -0.283791720867157,
+          0.39307013154029846
+        ]
+      ],
+      "linear.bias": [
+        -0.005870066117495298,
+        0.005870074965059757
+      ]
+    },
+    "float64_reference": {
+      "linear.weight": [
+        [
+          0.18379170820116997,
+          -0.0930701196193695
+        ],
+        [
+          -0.2837917059659958,
+          0.39307013899087906
+        ]
+      ],
+      "linear.bias": [
+        -0.005870066175702959,
+        0.005870075256098062
+      ]
+    },
+    "max_absolute_error": {
+      "linear.weight": 1.4901161193847656e-08,
+      "linear.bias": 2.9103830456733704e-10
+    },
+    "both_runs_identical": true,
+    "raw_result_hashes_and_per_interpreter_reference": {
+      "path": "/tmp/plato-phase2b-runtime/resume-supplement/startup-summary.json",
+      "sha256": "0124f825219c71f18adcf94063b0c9535b7bba4871a9aad2b37f353261cb934e"
+    }
+  },
+  "checks": {
+    "commands": [
+      "/tmp/plato-phase2b-runtime/venv313/bin/ruff check plato/servers/base.py tests/servers/test_server_resume_rng.py --select I",
+      "/tmp/plato-phase2b-runtime/venv313/bin/ruff format --check tests/servers/test_server_resume_rng.py",
+      "git diff --check"
+    ],
+    "results": "All passed; new code lines are at most 88 columns.",
+    "independent_numerical_summary_command": "OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2b-runtime/venv313/bin/python /tmp/plato-phase2b-runtime/resume-supplement/summarize_startup.py"
+  },
+  "harness_correction": {
+    "reason": "First collection attempt imported base.Server before a configured test environment, triggering Config's module-default argparse handling (exit 3; zero cases on both interpreters). Imports were deferred inside configured helpers; no production change preceded the 4-failed/14-passed behavior red.",
+    "initial_commands": [
+      "OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2b-runtime/venv313/bin/python -m pytest tests/servers/test_server_resume_rng.py -q --basetemp=/tmp/plato-phase2b-runtime/resume-supplement/red313 > /tmp/plato-phase2b-runtime/resume-supplement/red313.log 2>&1",
+      "OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2b-runtime/venv314/bin/python -m pytest tests/servers/test_server_resume_rng.py -q --basetemp=/tmp/plato-phase2b-runtime/resume-supplement/red314 > /tmp/plato-phase2b-runtime/resume-supplement/red314.log 2>&1"
+    ],
+    "initial_logs": [
+      {
+        "path": "/tmp/plato-phase2b-runtime/resume-supplement/red313.log",
+        "sha256": "09b8adba461be9d6f8ad1dc586c5c1157352ee94d8dad64e9b5cd96da9fc7791"
+      },
+      {
+        "path": "/tmp/plato-phase2b-runtime/resume-supplement/red314.log",
+        "sha256": "1d95b4f30b44975b3c91653a337160fe677db94f523a9d8e85b59fdb58710aa0"
+      }
+    ]
+  },
+  "limitations": [
+    "F28 is qualified at the real persistence/startup/selection boundary, not full resumed network training, mid-round recovery or GPU replay.",
+    "B-RESUME-01 needs root's explicit persistence-policy disposition; the current supplement intentionally preserves existing checkpoint save semantics.",
+    "Central startup branch uses actual generic FedAvg configuration with external edge-process launch intercepted; no full cross-silo resumed training claim.",
+    "Combined C checkpoint codec and final combined S3 validation remain root integration work. Actual urgent trainer snapshots/F26 remain C's independent ownership."
+  ],
+  "owned_temporary_resources": {
+    "new_scratch": "/tmp/plato-phase2b-runtime/resume-supplement",
+    "contents": "Red/green logs, pytest checkpoints and startup subprocess artifacts, per-interpreter environment/identity JSON, RNG bookkeeping probe and summary/evidence scripts, commit messages.",
+    "existing_environments": "/tmp/plato-phase2b-runtime/venv313 and venv314 retained.",
+    "processes": "No owned startup descendants survive any of the 96 new startup records.",
+    "retention": "Retain raw logs and scratch until root acceptance; no workspace closure, evidence cleanup, push or merge.",
+    "supplemental_scripts": [
+      {
+        "path": "/tmp/plato-phase2b-runtime/resume-supplement/selection_state_probe.py",
+        "sha256": "b7fa95fbd4bdb57a158c3afae9055981986de7cc18df3c007af58428e255d943"
+      },
+      {
+        "path": "/tmp/plato-phase2b-runtime/resume-supplement/summarize_startup.py",
+        "sha256": "09702b71f1ae8507b2d430398926a4570abe1e00be3583e167bc3a4ddb4da07a"
+      }
+    ]
+  }
+}

@@ -1,0 +1,317 @@
+[
+  {
+    "argv": [
+      "docker",
+      "info",
+      "--format",
+      "{{json .}}"
+    ],
+    "cwd": "/home/runner/work/plato/plato",
+    "elapsed_seconds": 0.416,
+    "exit_code": 0,
+    "log": "docker-info-initial.log"
+  },
+  {
+    "argv": [
+      "df",
+      "-h",
+      "/home/runner/work/plato/plato",
+      "/var/lib/docker"
+    ],
+    "cwd": "/home/runner/work/plato/plato",
+    "elapsed_seconds": 0.012,
+    "exit_code": 0,
+    "log": "df-initial.log"
+  },
+  {
+    "argv": [
+      "docker",
+      "system",
+      "df"
+    ],
+    "cwd": "/home/runner/work/plato/plato",
+    "elapsed_seconds": 0.032,
+    "exit_code": 0,
+    "log": "docker-disk-initial.log"
+  },
+  {
+    "argv": [
+      "docker",
+      "info",
+      "--format",
+      "{{json .}}"
+    ],
+    "cwd": "/home/runner/work/plato/plato",
+    "elapsed_seconds": 0.066,
+    "exit_code": 0,
+    "log": "docker-info-before.log"
+  },
+  {
+    "argv": [
+      "df",
+      "-h",
+      "/home/runner/work/plato/plato",
+      "/var/lib/docker"
+    ],
+    "cwd": "/home/runner/work/plato/plato",
+    "elapsed_seconds": 0.002,
+    "exit_code": 0,
+    "log": "df-before.log"
+  },
+  {
+    "argv": [
+      "docker",
+      "system",
+      "df"
+    ],
+    "cwd": "/home/runner/work/plato/plato",
+    "elapsed_seconds": 0.032,
+    "exit_code": 0,
+    "log": "docker-disk-before.log"
+  },
+  {
+    "argv": [
+      "docker",
+      "buildx",
+      "imagetools",
+      "inspect",
+      "nvidia/cuda:13.0.3-devel-ubuntu24.04@sha256:b7ae301dea2c162444795462ce17a05f6a516e5a75944b57af5b88540a1a2266"
+    ],
+    "cwd": "/home/runner/work/plato/plato",
+    "elapsed_seconds": 0.616,
+    "exit_code": 0,
+    "log": "base-manifest.log"
+  },
+  {
+    "argv": [
+      "docker",
+      "buildx",
+      "imagetools",
+      "inspect",
+      "--raw",
+      "nvidia/cuda:13.0.3-devel-ubuntu24.04@sha256:b7ae301dea2c162444795462ce17a05f6a516e5a75944b57af5b88540a1a2266"
+    ],
+    "cwd": "/home/runner/work/plato/plato",
+    "elapsed_seconds": 0.618,
+    "exit_code": 0,
+    "log": "base-manifest-raw.log"
+  },
+  {
+    "argv": [
+      "docker",
+      "buildx",
+      "imagetools",
+      "inspect",
+      "ghcr.io/astral-sh/uv:0.12.22@sha256:f513a91fc62fe7c17567eee97230dd198e43edb8a9fbecca843714a4358fe1bc"
+    ],
+    "cwd": "/home/runner/work/plato/plato",
+    "elapsed_seconds": 0.466,
+    "exit_code": 0,
+    "log": "uv-manifest.log"
+  },
+  {
+    "argv": [
+      "docker",
+      "buildx",
+      "imagetools",
+      "inspect",
+      "--raw",
+      "ghcr.io/astral-sh/uv:0.12.22@sha256:f513a91fc62fe7c17567eee97230dd198e43edb8a9fbecca843714a4358fe1bc"
+    ],
+    "cwd": "/home/runner/work/plato/plato",
+    "elapsed_seconds": 0.466,
+    "exit_code": 0,
+    "log": "uv-manifest-raw.log"
+  },
+  {
+    "argv": [
+      "docker",
+      "build",
+      "--pull",
+      "--progress=plain",
+      "--platform",
+      "linux/amd64",
+      "--iidfile",
+      "/home/runner/work/_temp/plato-container-artifacts/image-id.txt",
+      "--build-arg",
+      "PLATO_SOURCE_COMMIT=65a88bdfdf3e2418e356971c7d3e225b48c1d3da",
+      "-t",
+      "plato",
+      "."
+    ],
+    "cwd": "/home/runner/work/plato/plato",
+    "elapsed_seconds": 118.795,
+    "exit_code": 0,
+    "log": "build.log"
+  },
+  {
+    "argv": [
+      "docker",
+      "image",
+      "inspect",
+      "plato"
+    ],
+    "cwd": "/home/runner/work/plato/plato",
+    "elapsed_seconds": 0.016,
+    "exit_code": 0,
+    "log": "image-inspect.log"
+  },
+  {
+    "argv": [
+      "docker",
+      "history",
+      "--no-trunc",
+      "plato"
+    ],
+    "cwd": "/home/runner/work/plato/plato",
+    "elapsed_seconds": 0.064,
+    "exit_code": 0,
+    "log": "image-history.log"
+  },
+  {
+    "argv": [
+      "docker",
+      "run",
+      "--rm",
+      "--network=none",
+      "-e",
+      "CUDA_VISIBLE_DEVICES=",
+      "-e",
+      "HF_HUB_OFFLINE=1",
+      "-e",
+      "HF_DATASETS_OFFLINE=1",
+      "--mount",
+      "type=bind,src=/home/runner/work/plato/plato/.github/scripts/check_container.py,dst=/tmp/check_container.py,readonly",
+      "plato",
+      "python",
+      "/tmp/check_container.py",
+      "inside",
+      "--expected-lock",
+      "66a4e4442d7b1f26d220b44ca73c44ff4f1151a86857bb3f93a594819fd08126"
+    ],
+    "cwd": "/home/runner/work/plato/plato",
+    "elapsed_seconds": 18.062,
+    "exit_code": 0,
+    "log": "unmounted-cpu.log"
+  },
+  {
+    "argv": [
+      "docker",
+      "container",
+      "inspect",
+      "f2b425c8975d"
+    ],
+    "cwd": "/home/runner/work/plato/plato",
+    "elapsed_seconds": 0.016,
+    "exit_code": 1,
+    "log": "unmounted-auto-removal.log"
+  },
+  {
+    "argv": [
+      "docker",
+      "run",
+      "--rm",
+      "--network=none",
+      "plato",
+      "python",
+      "plato.py",
+      "--help"
+    ],
+    "cwd": "/home/runner/work/plato/plato",
+    "elapsed_seconds": 17.411,
+    "exit_code": 0,
+    "log": "cli-help.log"
+  },
+  {
+    "argv": [
+      "/home/runner/work/plato/plato/dockerrun.sh",
+      "uv",
+      "run",
+      "--no-sync",
+      "python",
+      ".github/scripts/check_container.py",
+      "inside",
+      "--expected-lock",
+      "66a4e4442d7b1f26d220b44ca73c44ff4f1151a86857bb3f93a594819fd08126",
+      "--mounted"
+    ],
+    "cwd": "/tmp/plato mounted checkout jc_t92ti/source with spaces",
+    "elapsed_seconds": 18.514,
+    "exit_code": 0,
+    "log": "mounted-cpu.log"
+  },
+  {
+    "argv": [
+      "docker",
+      "container",
+      "inspect",
+      "runnervm8df0l"
+    ],
+    "cwd": "/home/runner/work/plato/plato",
+    "elapsed_seconds": 0.016,
+    "exit_code": 1,
+    "log": "mounted-auto-removal.log"
+  },
+  {
+    "argv": [
+      "/home/runner/work/plato/plato/dockerrun.sh",
+      "python",
+      "-c",
+      "import json,socket,sys; print('PLATO_CONTAINER_PROBE_JSON='+json.dumps({'hostname':socket.gethostname(), 'args':sys.argv[1:]})); raise SystemExit(23)",
+      "a b",
+      "literal $x `x` $(x)",
+      ""
+    ],
+    "cwd": "/tmp/plato mounted checkout jc_t92ti/source with spaces",
+    "elapsed_seconds": 0.215,
+    "exit_code": 23,
+    "log": "mounted-exit.log"
+  },
+  {
+    "argv": [
+      "docker",
+      "container",
+      "inspect",
+      "runnervm8df0l"
+    ],
+    "cwd": "/home/runner/work/plato/plato",
+    "elapsed_seconds": 0.016,
+    "exit_code": 1,
+    "log": "mounted-exit-auto-removal.log"
+  },
+  {
+    "argv": [
+      "docker",
+      "info",
+      "--format",
+      "{{json .}}"
+    ],
+    "cwd": "/home/runner/work/plato/plato",
+    "elapsed_seconds": 0.064,
+    "exit_code": 0,
+    "log": "docker-info-after.log"
+  },
+  {
+    "argv": [
+      "df",
+      "-h",
+      "/home/runner/work/plato/plato",
+      "/var/lib/docker"
+    ],
+    "cwd": "/home/runner/work/plato/plato",
+    "elapsed_seconds": 0.002,
+    "exit_code": 0,
+    "log": "df-after.log"
+  },
+  {
+    "argv": [
+      "docker",
+      "system",
+      "df"
+    ],
+    "cwd": "/home/runner/work/plato/plato",
+    "elapsed_seconds": 0.064,
+    "exit_code": 0,
+    "log": "docker-disk-after.log"
+  }
+]

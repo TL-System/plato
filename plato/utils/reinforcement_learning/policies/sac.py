@@ -203,7 +203,7 @@ class DeterministicPolicy(nn.Module):
 
 class Policy(base.Policy):
     def __init__(self, state_dim, action_space):
-        super().__init__(state_dim, action_space)
+        super().__init__(state_dim, action_space.shape[0])
 
         # Initialize NNs
         self.critic = QNetwork(
@@ -260,7 +260,7 @@ class Policy(base.Policy):
             Config().algorithm.replay_size,
             Config().algorithm.replay_seed,
         )
-        self.alpha = Config().algorithm.alpha
+        self.alpha = 0 if Config().algorithm.deterministic else Config().algorithm.alpha
         if not Config().algorithm.deterministic:
             self.automatic_entropy_tuning = Config().algorithm.automatic_entropy_tuning
 
@@ -282,8 +282,8 @@ class Policy(base.Policy):
             state_batch = torch.FloatTensor(state_batch).to(self.device)
             next_state_batch = torch.FloatTensor(next_state_batch).to(self.device)
             action_batch = torch.FloatTensor(action_batch).to(self.device)
-            reward_batch = torch.FloatTensor(reward_batch).to(self.device).unsqueeze(1)
-            mask_batch = torch.FloatTensor(mask_batch).to(self.device).unsqueeze(1)
+            reward_batch = torch.FloatTensor(reward_batch).to(self.device)
+            mask_batch = torch.FloatTensor(mask_batch).to(self.device)
 
             with torch.no_grad():
                 next_state_action, next_state_log_pi, _ = self.actor.sample(
@@ -330,7 +330,7 @@ class Policy(base.Policy):
                 alpha_loss.backward()
                 self.alpha_optimizer.step()
 
-                self.alpha = self.log_alpha.exp()
+                self.alpha = self.log_alpha.exp().detach()
                 alpha_tlogs = self.alpha.clone()  # For TensorboardX logs
             else:
                 alpha_loss = torch.tensor(0.0).to(self.device)

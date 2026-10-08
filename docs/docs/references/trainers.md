@@ -1,5 +1,10 @@
 # Trainers
 
+For Apple Silicon, `plato.trainers.mlx.ComposableMLXTrainer` provides separate
+native MLX strategies and `MLXTrainingContext`. The APIs below describe the
+PyTorch composable trainer. See [Native MLX](../mlx.md) for native construction,
+stream and mode handling, transport, weight-only checkpoints, and qualification.
+
 ## Strategy-Based Trainer Architecture
 
 Plato trainers use the same composition model as clients and servers. Every
@@ -59,7 +64,7 @@ same strategy stack in every round.
 Structured evaluators are layered **after** the testing strategy. In other
 words, `TestingStrategy` still returns the trainer's scalar metric (accuracy,
 perplexity, loss, and so on), and an optional `[evaluation]` section can then
-run a named benchmark adapter such as Lighteval or Nanochat CORE. See
+run a named benchmark adapter such as Lighteval. See
 [Evaluators](evaluators.md) for that layer.
 
 Each concrete strategy inherits optional `setup`/`teardown` hooks. To fire

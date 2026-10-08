@@ -24,7 +24,7 @@ class Trainer(ComposableTrainer):
         context.state['server_control_variate'] = server_control_variate
 
     After training, the client returns the control variate delta via:
-        payload = trainer.get_update_payload(context)
+        payload = trainer.model_update_strategy.get_update_payload(trainer.context)
         delta = payload['control_variate_delta']
     """
 
@@ -45,20 +45,6 @@ class Trainer(ComposableTrainer):
         # Store additional_data for server control variate
         # This maintains compatibility with the server-side code
         self.additional_data = None
-
-    def set_client_id(self, client_id):
-        """
-        Set the client ID for this trainer.
-
-        Args:
-            client_id: The client ID
-        """
-        super().set_client_id(client_id)
-
-        # Pass additional_data (server control variate) to context
-        if self.additional_data is not None:
-            # This will be picked up by the SCAFFOLD strategy in on_train_start
-            self.context.state["server_control_variate"] = self.additional_data
 
     @property
     def client_control_variate_delta(self):

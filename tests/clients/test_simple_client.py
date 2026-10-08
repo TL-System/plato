@@ -177,7 +177,8 @@ def test_simple_client_subprocess_payload_excludes_local_state_sidecar(
     temp_config, monkeypatch, tmp_path
 ):
     """Subprocess persistence uses a sidecar without changing server payloads."""
-    model_path = Path(tmp_path) / "models" / "pretrained"
+    # Match the model_path written by configure_environment for spawned workers.
+    model_path = Path(tmp_path) / "models"
     checkpoint_path = Path(tmp_path) / "checkpoints"
     model_path.mkdir(parents=True, exist_ok=True)
     checkpoint_path.mkdir(parents=True, exist_ok=True)

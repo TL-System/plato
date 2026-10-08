@@ -1,0 +1,123 @@
+{
+  "schema_version": 1,
+  "created_at_utc": "2026-10-03T22:18:59.208382+00:00",
+  "author": "/root/container_author",
+  "code_commit": "da2ffde66e8ae5d893ceed9bb73d801680c150b6",
+  "base_commit": "6bf8836d06072c7946cdfb5499a09e4bce459805",
+  "branch": "maintenance/2026-container-refresh",
+  "worktree": "/private/tmp/plato-refresh-worktrees/container-refresh",
+  "owned_code_paths": [
+    "Dockerfile",
+    ".dockerignore",
+    "dockerrun.sh",
+    "dockerrun_gpu.sh",
+    ".github/workflows/container_checks.yml",
+    ".github/scripts/check_container.py"
+  ],
+  "file_sha256": {
+    "Dockerfile": "4e67953be6d90fcc73fb52a44fd05914494af625c529990f9366b662041b6a82",
+    ".dockerignore": "b90144eaa006aa9954e2f878fcfcbc6d1fa369027582e6f51f4b0500d23ce5da",
+    "dockerrun.sh": "6bbcb5530e5343b0fcb0fd675235f72081efa5fdcfd5fc464e1b28f3eedefee4",
+    "dockerrun_gpu.sh": "2f7ac611428cb0a4d3e36a6b040af4f461cfca8e09252ba0c65fbe105a6a6761",
+    ".github/workflows/container_checks.yml": "58b24307efa3414c0747e23982ca84822942e62952be886409fd2e3650d3b3e7",
+    ".github/scripts/check_container.py": "0f4dd45635dc3f560d6d7f2721aa23492374ecc27a5b408f25acd36c608c80d5",
+    "pyproject.toml": "8aaa7414717fa17841900d377d89851547677ba2ae93963afef79fc5490ba610",
+    "uv.lock": "e2a53aaae9a0dd49f5446b490bb3071e86aa3a9a20d6271c9dd30b4ae2dcbff9",
+    ".python-version": "02e735b3dfe1c32833eb550b7ff8ffa17f5f2bc3fa1e7bae61a8f5a3883ce398",
+    ".github/workflows/pytorch_tests.yml": "697c6ae0c39fa7fd42766f8161f350944e90108b3dad852148da952acfcc9317"
+  },
+  "accepted_plan": {
+    "path": "/tmp/plato-deployment-refresh-plan.json",
+    "sha256": "6d9eca53b96e1e70d6f89617fce2f2a1234fb5d8fc94fa79e387ade605c4fe9e"
+  },
+  "source_evidence_sha256": "c0d213f97e059d51a997f804e87087ac31d2071d25449021a37fc4fd1a211893",
+  "plan_review": {
+    "path": "/tmp/plato-deployment-refresh-plan-review.json",
+    "sha256": "98b845c6dd3d1562a327239f4dd96c909b4d8bc6c9db2f24240393423dfb976b",
+    "verdict": "ACCEPT",
+    "scope": "Plan only"
+  },
+  "local_static_checks_passed": true,
+  "actual_image_build_executed": false,
+  "actual_cpu_container_executed": false,
+  "actual_sdk_reclamation_executed": false,
+  "gpu_compute_tested": false,
+  "gpu_launcher_stub_tested": true,
+  "docker_cli_present": false,
+  "host": "macOS-27.0-arm64-arm-64bit-Mach-O",
+  "commands_receipt": "local/commands.json",
+  "static_receipt": "local/static/static-acceptance.json",
+  "degradation_receipt": "local/degradation/negative-checks.json",
+  "images": {
+    "base": "nvidia/cuda:13.0.3-devel-ubuntu24.04@sha256:b7ae301dea2c162444795462ce17a05f6a516e5a75944b57af5b88540a1a2266",
+    "uv": "ghcr.io/astral-sh/uv:0.12.22@sha256:f513a91fc62fe7c17567eee97230dd198e43edb8a9fbecca843714a4358fe1bc",
+    "base_amd64_manifest": "sha256:7d56ebe2b7cd864a60dca3c8b2d0a39f8fc110417e8253e32505c3387f59119c",
+    "uv_amd64_manifest": "sha256:0f1da8ef29dfee2fc8490653fe306c0242e653a160b56278d468997afc65a314",
+    "identity_source": "Accepted independently verified plan; actual build still pending"
+  },
+  "locked_runtime": {
+    "torch": "2.14.1",
+    "torchvision": "0.29.1",
+    "cuda-toolkit": "13.0.3.0",
+    "nvidia-cudnn-cu13": "9.24.0.43",
+    "python": "3.13",
+    "uv": "0.12.22"
+  },
+  "cuda_rationale": "13.0.3 refreshes the old 13.0.1 patch and matches locked torch; observed newer overall 13.4.2 diverges from the locked toolkit. Selected devel base retains nvcc and excludes OS cuDNN 9.14 because locked torch supplies cuDNN 9.24. Actual loaded-library checks remain mandatory.",
+  "actions": {
+    "actions/checkout": {
+      "version": "v7.0.1",
+      "sha": "3d3c42e5aac5ba805825da76410c181273ba90b1"
+    },
+    "actions/setup-python": {
+      "version": "v7.0.0",
+      "sha": "5fda3b95a4ea91299a34e894583c3862153e4b97"
+    },
+    "actions/upload-artifact": {
+      "version": "v7.0.1",
+      "sha": "043fb46d1a93c77aae656e7c1c64a875d1fc6a0a"
+    }
+  },
+  "ci_resource_contract": {
+    "default_runner": "ubuntu-24.04",
+    "larger_runner_provisioned": false,
+    "optional_runner_variable": "PLATO_CONTAINER_RUNNER",
+    "standard_documented_storage_gb": 14,
+    "base_compressed_bytes": 3973716026,
+    "minimum_measured_free_bytes": 37580963840,
+    "reclamation": "When initially below floor, remove only fixed unused Android/.NET/Swift SDK trees on a disposable GitHub-hosted Ubuntu 24.04 VM; never user/self-hosted machines, Python toolcache, Docker or checkout contents",
+    "reclamation_paths": [
+      "/usr/local/lib/android",
+      "/usr/share/dotnet",
+      "/usr/share/swift"
+    ],
+    "measurement": "Record initial/before/after df, disk usage, docker system df, SDK sizes/removal logs and command elapsed times; fail if final floor is not met",
+    "claim_limit": "The 35 GiB floor is a conservative planning threshold. Only actual Linux build proves sufficiency; cleanup availability/capacity is not asserted.",
+    "primary_sources": [
+      "https://github.com/actions/runner-images/blob/main/images/ubuntu/Ubuntu2404-Readme.md",
+      "https://github.com/actions/runner-images/blob/main/images/ubuntu/scripts/build/install-dotnetcore-sdk.sh",
+      "https://github.com/actions/runner-images/blob/main/images/ubuntu/scripts/build/install-swift.sh",
+      "https://docs.github.com/en/actions/reference/runners/github-hosted-runners"
+    ]
+  },
+  "pending_required_checks": [
+    "Fresh independent Sol implementation review against exact code/evidence commits",
+    "Root runs actual reviewed Linux workflow on final integrated source SHA and verifies resource/build artifacts",
+    "Actual unmounted CPU imports, native torchvision NMS, cuDNN wheel loading, nvcc/OS/version/lock/env provenance and CLI --help",
+    "Actual checkout-with-spaces mount with invalid unchanged host .venv, exact argv forwarding, exit 23 propagation and --rm auto-removal",
+    "Actual image/context sentinel exclusions, all retained workspace manifests, image ID/inspect/history, pinned registry manifests and build context-byte logs"
+  ],
+  "explicit_nonclaims": [
+    "GPU compute/driver qualification",
+    "Linux arm64 acceptance",
+    "Image reproducibility across changing apt or managed Python patch inputs",
+    "Remote CI success",
+    "Publication/push/PR/deployment"
+  ],
+  "prose_handoff": {
+    "normal_launch": "Build image plato; run ./dockerrun.sh or ./dockerrun_gpu.sh from a checkout matching the image lock. Optional command args forward exactly; non-TTY use retains stdin without requesting a TTY.",
+    "environment": "Editable root project at /root/plato; uv-managed Python at /opt/plato/python and UV_PROJECT_ENVIRONMENT/PATH at /opt/plato/.venv survive the host mount; default sync omits dev groups.",
+    "persistence": "Default root identity is preserved. Ordinary rootful Linux Docker can produce root-owned files in the writable checkout mount; mounted outputs persist after --rm. Container-only dependency changes are lost on exit.",
+    "review_note": "DEPLOY-PLAN-L1 stays a P3 documentation obligation; no UID redesign was introduced."
+  }
+}

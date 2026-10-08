@@ -1,0 +1,369 @@
+FFFFFFFFFFFFFFFFFFFF                                                     [100%]
+=================================== FAILURES ===================================
+__________ test_core_scope_excludes_native_before_import[arguments0] ___________
+
+project = namespace(root=PosixPath('/private/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/pytest-of-bli/pytest-193/test_core_...   for violation in sorted(set(self.violations)):\n                terminalreporter.write_line(violation, red=True)\n')
+arguments = []
+
+    @pytest.mark.parametrize("arguments", [[], ["tests"], ["."], ["tests", "--test-profile=base"],
+                                           ["tests", "--test-profile=mandatory"],
+                                           ["--pyargs", "tests"], ["--pyargs", "tests.test_core"],
+                                           ["--pyargs", "tests.test_mlx_native_suffix"]])
+    def test_core_scope_excludes_native_before_import(project, arguments):
+        result = run_pytest(project, *arguments)
+        assert result.returncode == 0, result.output
+>       assert events(project) == []
+E       AssertionError: assert ['native-coll...ative-import'] == []
+E
+E         Left contains 2 more items, first extra item: 'native-collector'
+E         Use -v to get more diff
+
+tests/test_mlx_profile_contract.py:138: AssertionError
+__________ test_core_scope_excludes_native_before_import[arguments1] ___________
+
+project = namespace(root=PosixPath('/private/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/pytest-of-bli/pytest-193/test_core_...   for violation in sorted(set(self.violations)):\n                terminalreporter.write_line(violation, red=True)\n')
+arguments = ['tests']
+
+    @pytest.mark.parametrize("arguments", [[], ["tests"], ["."], ["tests", "--test-profile=base"],
+                                           ["tests", "--test-profile=mandatory"],
+                                           ["--pyargs", "tests"], ["--pyargs", "tests.test_core"],
+                                           ["--pyargs", "tests.test_mlx_native_suffix"]])
+    def test_core_scope_excludes_native_before_import(project, arguments):
+        result = run_pytest(project, *arguments)
+        assert result.returncode == 0, result.output
+>       assert events(project) == []
+E       AssertionError: assert ['native-coll...ative-import'] == []
+E
+E         Left contains 2 more items, first extra item: 'native-collector'
+E         Use -v to get more diff
+
+tests/test_mlx_profile_contract.py:138: AssertionError
+__________ test_core_scope_excludes_native_before_import[arguments2] ___________
+
+project = namespace(root=PosixPath('/private/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/pytest-of-bli/pytest-193/test_core_...   for violation in sorted(set(self.violations)):\n                terminalreporter.write_line(violation, red=True)\n')
+arguments = ['.']
+
+    @pytest.mark.parametrize("arguments", [[], ["tests"], ["."], ["tests", "--test-profile=base"],
+                                           ["tests", "--test-profile=mandatory"],
+                                           ["--pyargs", "tests"], ["--pyargs", "tests.test_core"],
+                                           ["--pyargs", "tests.test_mlx_native_suffix"]])
+    def test_core_scope_excludes_native_before_import(project, arguments):
+        result = run_pytest(project, *arguments)
+        assert result.returncode == 0, result.output
+>       assert events(project) == []
+E       AssertionError: assert ['native-coll...ative-import'] == []
+E
+E         Left contains 2 more items, first extra item: 'native-collector'
+E         Use -v to get more diff
+
+tests/test_mlx_profile_contract.py:138: AssertionError
+__________ test_core_scope_excludes_native_before_import[arguments3] ___________
+
+project = namespace(root=PosixPath('/private/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/pytest-of-bli/pytest-193/test_core_...   for violation in sorted(set(self.violations)):\n                terminalreporter.write_line(violation, red=True)\n')
+arguments = ['tests', '--test-profile=base']
+
+    @pytest.mark.parametrize("arguments", [[], ["tests"], ["."], ["tests", "--test-profile=base"],
+                                           ["tests", "--test-profile=mandatory"],
+                                           ["--pyargs", "tests"], ["--pyargs", "tests.test_core"],
+                                           ["--pyargs", "tests.test_mlx_native_suffix"]])
+    def test_core_scope_excludes_native_before_import(project, arguments):
+        result = run_pytest(project, *arguments)
+        assert result.returncode == 0, result.output
+>       assert events(project) == []
+E       AssertionError: assert ['native-coll...ative-import'] == []
+E
+E         Left contains 2 more items, first extra item: 'native-collector'
+E         Use -v to get more diff
+
+tests/test_mlx_profile_contract.py:138: AssertionError
+__________ test_core_scope_excludes_native_before_import[arguments4] ___________
+
+project = namespace(root=PosixPath('/private/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/pytest-of-bli/pytest-193/test_core_...   for violation in sorted(set(self.violations)):\n                terminalreporter.write_line(violation, red=True)\n')
+arguments = ['tests', '--test-profile=mandatory']
+
+    @pytest.mark.parametrize("arguments", [[], ["tests"], ["."], ["tests", "--test-profile=base"],
+                                           ["tests", "--test-profile=mandatory"],
+                                           ["--pyargs", "tests"], ["--pyargs", "tests.test_core"],
+                                           ["--pyargs", "tests.test_mlx_native_suffix"]])
+    def test_core_scope_excludes_native_before_import(project, arguments):
+        result = run_pytest(project, *arguments)
+        assert result.returncode == 0, result.output
+>       assert events(project) == []
+E       AssertionError: assert ['native-coll...ative-import'] == []
+E
+E         Left contains 2 more items, first extra item: 'native-collector'
+E         Use -v to get more diff
+
+tests/test_mlx_profile_contract.py:138: AssertionError
+__________ test_core_scope_excludes_native_before_import[arguments5] ___________
+
+project = namespace(root=PosixPath('/private/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/pytest-of-bli/pytest-193/test_core_...   for violation in sorted(set(self.violations)):\n                terminalreporter.write_line(violation, red=True)\n')
+arguments = ['--pyargs', 'tests']
+
+    @pytest.mark.parametrize("arguments", [[], ["tests"], ["."], ["tests", "--test-profile=base"],
+                                           ["tests", "--test-profile=mandatory"],
+                                           ["--pyargs", "tests"], ["--pyargs", "tests.test_core"],
+                                           ["--pyargs", "tests.test_mlx_native_suffix"]])
+    def test_core_scope_excludes_native_before_import(project, arguments):
+        result = run_pytest(project, *arguments)
+        assert result.returncode == 0, result.output
+>       assert events(project) == []
+E       AssertionError: assert ['native-coll...ative-import'] == []
+E
+E         Left contains 2 more items, first extra item: 'native-collector'
+E         Use -v to get more diff
+
+tests/test_mlx_profile_contract.py:138: AssertionError
+__________ test_core_scope_excludes_native_before_import[arguments6] ___________
+
+project = namespace(root=PosixPath('/private/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/pytest-of-bli/pytest-193/test_core_...   for violation in sorted(set(self.violations)):\n                terminalreporter.write_line(violation, red=True)\n')
+arguments = ['--pyargs', 'tests.test_core']
+
+    @pytest.mark.parametrize("arguments", [[], ["tests"], ["."], ["tests", "--test-profile=base"],
+                                           ["tests", "--test-profile=mandatory"],
+                                           ["--pyargs", "tests"], ["--pyargs", "tests.test_core"],
+                                           ["--pyargs", "tests.test_mlx_native_suffix"]])
+    def test_core_scope_excludes_native_before_import(project, arguments):
+        result = run_pytest(project, *arguments)
+        assert result.returncode == 0, result.output
+        assert events(project) == []
+>       assert "core scope (native excluded)" in result.output
+E       AssertionError: assert 'core scope (native excluded)' in '.                                                                        [100%]\n1 passed in 0.00s\n'
+E        +  where '.                                                                        [100%]\n1 passed in 0.00s\n' = CompletedProcess(args=['/tmp/plato-llm-integration/base-313/bin/python', '-m', 'pytest', '-q', '--pyargs', 'tests.test...dout='.                                                                        [100%]\n1 passed in 0.00s\n', stderr='').output
+
+tests/test_mlx_profile_contract.py:139: AssertionError
+__________ test_core_scope_excludes_native_before_import[arguments7] ___________
+
+project = namespace(root=PosixPath('/private/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/pytest-of-bli/pytest-193/test_core_...   for violation in sorted(set(self.violations)):\n                terminalreporter.write_line(violation, red=True)\n')
+arguments = ['--pyargs', 'tests.test_mlx_native_suffix']
+
+    @pytest.mark.parametrize("arguments", [[], ["tests"], ["."], ["tests", "--test-profile=base"],
+                                           ["tests", "--test-profile=mandatory"],
+                                           ["--pyargs", "tests"], ["--pyargs", "tests.test_core"],
+                                           ["--pyargs", "tests.test_mlx_native_suffix"]])
+    def test_core_scope_excludes_native_before_import(project, arguments):
+        result = run_pytest(project, *arguments)
+        assert result.returncode == 0, result.output
+        assert events(project) == []
+>       assert "core scope (native excluded)" in result.output
+E       AssertionError: assert 'core scope (native excluded)' in '.                                                                        [100%]\n1 passed in 0.00s\n'
+E        +  where '.                                                                        [100%]\n1 passed in 0.00s\n' = CompletedProcess(args=['/tmp/plato-llm-integration/base-313/bin/python', '-m', 'pytest', '-q', '--pyargs', 'tests.test...dout='.                                                                        [100%]\n1 passed in 0.00s\n', stderr='').output
+
+tests/test_mlx_profile_contract.py:139: AssertionError
+_ test_canonical_native_pyargs_rejected_before_import[options0-tests.mlx_native] _
+
+project = namespace(root=PosixPath('/private/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/pytest-of-bli/pytest-193/test_canon...   for violation in sorted(set(self.violations)):\n                terminalreporter.write_line(violation, red=True)\n')
+target = 'tests.mlx_native', options = []
+
+    @pytest.mark.parametrize("target", ["tests.mlx_native", "tests.mlx_native.test_native",
+                                        "tests.mlx_native.test_native::test_native[one]"])
+    @pytest.mark.parametrize("options", [[], ["--test-profile=base"], ["--test-profile=mandatory"],
+                                         ["--collect-only"]])
+    def test_canonical_native_pyargs_rejected_before_import(project, target, options):
+        result = run_pytest(project, "--pyargs", target, *options)
+>       assert result.returncode != 0
+E       AssertionError: assert 0 != 0
+E        +  where 0 = CompletedProcess(args=['/tmp/plato-llm-integration/base-313/bin/python', '-m', 'pytest', '-q', '--pyargs', 'tests.mlx_...dout='..                                                                       [100%]\n2 passed in 0.01s\n', stderr='').returncode
+
+tests/test_mlx_profile_contract.py:158: AssertionError
+_ test_canonical_native_pyargs_rejected_before_import[options0-tests.mlx_native.test_native] _
+
+project = namespace(root=PosixPath('/private/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/pytest-of-bli/pytest-193/test_canon...   for violation in sorted(set(self.violations)):\n                terminalreporter.write_line(violation, red=True)\n')
+target = 'tests.mlx_native.test_native', options = []
+
+    @pytest.mark.parametrize("target", ["tests.mlx_native", "tests.mlx_native.test_native",
+                                        "tests.mlx_native.test_native::test_native[one]"])
+    @pytest.mark.parametrize("options", [[], ["--test-profile=base"], ["--test-profile=mandatory"],
+                                         ["--collect-only"]])
+    def test_canonical_native_pyargs_rejected_before_import(project, target, options):
+        result = run_pytest(project, "--pyargs", target, *options)
+>       assert result.returncode != 0
+E       AssertionError: assert 0 != 0
+E        +  where 0 = CompletedProcess(args=['/tmp/plato-llm-integration/base-313/bin/python', '-m', 'pytest', '-q', '--pyargs', 'tests.mlx_...dout='..                                                                       [100%]\n2 passed in 0.01s\n', stderr='').returncode
+
+tests/test_mlx_profile_contract.py:158: AssertionError
+_ test_canonical_native_pyargs_rejected_before_import[options0-tests.mlx_native.test_native::test_native[one]] _
+
+project = namespace(root=PosixPath('/private/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/pytest-of-bli/pytest-193/test_canon...   for violation in sorted(set(self.violations)):\n                terminalreporter.write_line(violation, red=True)\n')
+target = 'tests.mlx_native.test_native::test_native[one]', options = []
+
+    @pytest.mark.parametrize("target", ["tests.mlx_native", "tests.mlx_native.test_native",
+                                        "tests.mlx_native.test_native::test_native[one]"])
+    @pytest.mark.parametrize("options", [[], ["--test-profile=base"], ["--test-profile=mandatory"],
+                                         ["--collect-only"]])
+    def test_canonical_native_pyargs_rejected_before_import(project, target, options):
+        result = run_pytest(project, "--pyargs", target, *options)
+>       assert result.returncode != 0
+E       AssertionError: assert 0 != 0
+E        +  where 0 = CompletedProcess(args=['/tmp/plato-llm-integration/base-313/bin/python', '-m', 'pytest', '-q', '--pyargs', 'tests.mlx_...dout='.                                                                        [100%]\n1 passed in 0.01s\n', stderr='').returncode
+
+tests/test_mlx_profile_contract.py:158: AssertionError
+_ test_canonical_native_pyargs_rejected_before_import[options1-tests.mlx_native] _
+
+project = namespace(root=PosixPath('/private/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/pytest-of-bli/pytest-193/test_canon...   for violation in sorted(set(self.violations)):\n                terminalreporter.write_line(violation, red=True)\n')
+target = 'tests.mlx_native', options = ['--test-profile=base']
+
+    @pytest.mark.parametrize("target", ["tests.mlx_native", "tests.mlx_native.test_native",
+                                        "tests.mlx_native.test_native::test_native[one]"])
+    @pytest.mark.parametrize("options", [[], ["--test-profile=base"], ["--test-profile=mandatory"],
+                                         ["--collect-only"]])
+    def test_canonical_native_pyargs_rejected_before_import(project, target, options):
+        result = run_pytest(project, "--pyargs", target, *options)
+>       assert result.returncode != 0
+E       AssertionError: assert 0 != 0
+E        +  where 0 = CompletedProcess(args=['/tmp/plato-llm-integration/base-313/bin/python', '-m', 'pytest', '-q', '--pyargs', 'tests.mlx_...dout='..                                                                       [100%]\n2 passed in 0.01s\n', stderr='').returncode
+
+tests/test_mlx_profile_contract.py:158: AssertionError
+_ test_canonical_native_pyargs_rejected_before_import[options1-tests.mlx_native.test_native] _
+
+project = namespace(root=PosixPath('/private/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/pytest-of-bli/pytest-193/test_canon...   for violation in sorted(set(self.violations)):\n                terminalreporter.write_line(violation, red=True)\n')
+target = 'tests.mlx_native.test_native', options = ['--test-profile=base']
+
+    @pytest.mark.parametrize("target", ["tests.mlx_native", "tests.mlx_native.test_native",
+                                        "tests.mlx_native.test_native::test_native[one]"])
+    @pytest.mark.parametrize("options", [[], ["--test-profile=base"], ["--test-profile=mandatory"],
+                                         ["--collect-only"]])
+    def test_canonical_native_pyargs_rejected_before_import(project, target, options):
+        result = run_pytest(project, "--pyargs", target, *options)
+>       assert result.returncode != 0
+E       AssertionError: assert 0 != 0
+E        +  where 0 = CompletedProcess(args=['/tmp/plato-llm-integration/base-313/bin/python', '-m', 'pytest', '-q', '--pyargs', 'tests.mlx_...dout='..                                                                       [100%]\n2 passed in 0.01s\n', stderr='').returncode
+
+tests/test_mlx_profile_contract.py:158: AssertionError
+_ test_canonical_native_pyargs_rejected_before_import[options1-tests.mlx_native.test_native::test_native[one]] _
+
+project = namespace(root=PosixPath('/private/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/pytest-of-bli/pytest-193/test_canon...   for violation in sorted(set(self.violations)):\n                terminalreporter.write_line(violation, red=True)\n')
+target = 'tests.mlx_native.test_native::test_native[one]'
+options = ['--test-profile=base']
+
+    @pytest.mark.parametrize("target", ["tests.mlx_native", "tests.mlx_native.test_native",
+                                        "tests.mlx_native.test_native::test_native[one]"])
+    @pytest.mark.parametrize("options", [[], ["--test-profile=base"], ["--test-profile=mandatory"],
+                                         ["--collect-only"]])
+    def test_canonical_native_pyargs_rejected_before_import(project, target, options):
+        result = run_pytest(project, "--pyargs", target, *options)
+>       assert result.returncode != 0
+E       AssertionError: assert 0 != 0
+E        +  where 0 = CompletedProcess(args=['/tmp/plato-llm-integration/base-313/bin/python', '-m', 'pytest', '-q', '--pyargs', 'tests.mlx_...dout='.                                                                        [100%]\n1 passed in 0.01s\n', stderr='').returncode
+
+tests/test_mlx_profile_contract.py:158: AssertionError
+_ test_canonical_native_pyargs_rejected_before_import[options2-tests.mlx_native] _
+
+project = namespace(root=PosixPath('/private/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/pytest-of-bli/pytest-193/test_canon...   for violation in sorted(set(self.violations)):\n                terminalreporter.write_line(violation, red=True)\n')
+target = 'tests.mlx_native', options = ['--test-profile=mandatory']
+
+    @pytest.mark.parametrize("target", ["tests.mlx_native", "tests.mlx_native.test_native",
+                                        "tests.mlx_native.test_native::test_native[one]"])
+    @pytest.mark.parametrize("options", [[], ["--test-profile=base"], ["--test-profile=mandatory"],
+                                         ["--collect-only"]])
+    def test_canonical_native_pyargs_rejected_before_import(project, target, options):
+        result = run_pytest(project, "--pyargs", target, *options)
+>       assert result.returncode != 0
+E       AssertionError: assert 0 != 0
+E        +  where 0 = CompletedProcess(args=['/tmp/plato-llm-integration/base-313/bin/python', '-m', 'pytest', '-q', '--pyargs', 'tests.mlx_...dout='..                                                                       [100%]\n2 passed in 0.01s\n', stderr='').returncode
+
+tests/test_mlx_profile_contract.py:158: AssertionError
+_ test_canonical_native_pyargs_rejected_before_import[options2-tests.mlx_native.test_native] _
+
+project = namespace(root=PosixPath('/private/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/pytest-of-bli/pytest-193/test_canon...   for violation in sorted(set(self.violations)):\n                terminalreporter.write_line(violation, red=True)\n')
+target = 'tests.mlx_native.test_native', options = ['--test-profile=mandatory']
+
+    @pytest.mark.parametrize("target", ["tests.mlx_native", "tests.mlx_native.test_native",
+                                        "tests.mlx_native.test_native::test_native[one]"])
+    @pytest.mark.parametrize("options", [[], ["--test-profile=base"], ["--test-profile=mandatory"],
+                                         ["--collect-only"]])
+    def test_canonical_native_pyargs_rejected_before_import(project, target, options):
+        result = run_pytest(project, "--pyargs", target, *options)
+>       assert result.returncode != 0
+E       AssertionError: assert 0 != 0
+E        +  where 0 = CompletedProcess(args=['/tmp/plato-llm-integration/base-313/bin/python', '-m', 'pytest', '-q', '--pyargs', 'tests.mlx_...dout='..                                                                       [100%]\n2 passed in 0.01s\n', stderr='').returncode
+
+tests/test_mlx_profile_contract.py:158: AssertionError
+_ test_canonical_native_pyargs_rejected_before_import[options2-tests.mlx_native.test_native::test_native[one]] _
+
+project = namespace(root=PosixPath('/private/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/pytest-of-bli/pytest-193/test_canon...   for violation in sorted(set(self.violations)):\n                terminalreporter.write_line(violation, red=True)\n')
+target = 'tests.mlx_native.test_native::test_native[one]'
+options = ['--test-profile=mandatory']
+
+    @pytest.mark.parametrize("target", ["tests.mlx_native", "tests.mlx_native.test_native",
+                                        "tests.mlx_native.test_native::test_native[one]"])
+    @pytest.mark.parametrize("options", [[], ["--test-profile=base"], ["--test-profile=mandatory"],
+                                         ["--collect-only"]])
+    def test_canonical_native_pyargs_rejected_before_import(project, target, options):
+        result = run_pytest(project, "--pyargs", target, *options)
+>       assert result.returncode != 0
+E       AssertionError: assert 0 != 0
+E        +  where 0 = CompletedProcess(args=['/tmp/plato-llm-integration/base-313/bin/python', '-m', 'pytest', '-q', '--pyargs', 'tests.mlx_...dout='.                                                                        [100%]\n1 passed in 0.01s\n', stderr='').returncode
+
+tests/test_mlx_profile_contract.py:158: AssertionError
+_ test_canonical_native_pyargs_rejected_before_import[options3-tests.mlx_native] _
+
+project = namespace(root=PosixPath('/private/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/pytest-of-bli/pytest-193/test_canon...   for violation in sorted(set(self.violations)):\n                terminalreporter.write_line(violation, red=True)\n')
+target = 'tests.mlx_native', options = ['--collect-only']
+
+    @pytest.mark.parametrize("target", ["tests.mlx_native", "tests.mlx_native.test_native",
+                                        "tests.mlx_native.test_native::test_native[one]"])
+    @pytest.mark.parametrize("options", [[], ["--test-profile=base"], ["--test-profile=mandatory"],
+                                         ["--collect-only"]])
+    def test_canonical_native_pyargs_rejected_before_import(project, target, options):
+        result = run_pytest(project, "--pyargs", target, *options)
+>       assert result.returncode != 0
+E       AssertionError: assert 0 != 0
+E        +  where 0 = CompletedProcess(args=['/tmp/plato-llm-integration/base-313/bin/python', '-m', 'pytest', '-q', '--pyargs', 'tests.mlx_...ve.py::test_native[one]\ntests/mlx_native/test_native.py::test_native[two]\n\n2 tests collected in 0.00s\n', stderr='').returncode
+
+tests/test_mlx_profile_contract.py:158: AssertionError
+_ test_canonical_native_pyargs_rejected_before_import[options3-tests.mlx_native.test_native] _
+
+project = namespace(root=PosixPath('/private/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/pytest-of-bli/pytest-193/test_canon...   for violation in sorted(set(self.violations)):\n                terminalreporter.write_line(violation, red=True)\n')
+target = 'tests.mlx_native.test_native', options = ['--collect-only']
+
+    @pytest.mark.parametrize("target", ["tests.mlx_native", "tests.mlx_native.test_native",
+                                        "tests.mlx_native.test_native::test_native[one]"])
+    @pytest.mark.parametrize("options", [[], ["--test-profile=base"], ["--test-profile=mandatory"],
+                                         ["--collect-only"]])
+    def test_canonical_native_pyargs_rejected_before_import(project, target, options):
+        result = run_pytest(project, "--pyargs", target, *options)
+>       assert result.returncode != 0
+E       AssertionError: assert 0 != 0
+E        +  where 0 = CompletedProcess(args=['/tmp/plato-llm-integration/base-313/bin/python', '-m', 'pytest', '-q', '--pyargs', 'tests.mlx_...ve.py::test_native[one]\ntests/mlx_native/test_native.py::test_native[two]\n\n2 tests collected in 0.00s\n', stderr='').returncode
+
+tests/test_mlx_profile_contract.py:158: AssertionError
+_ test_canonical_native_pyargs_rejected_before_import[options3-tests.mlx_native.test_native::test_native[one]] _
+
+project = namespace(root=PosixPath('/private/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/pytest-of-bli/pytest-193/test_canon...   for violation in sorted(set(self.violations)):\n                terminalreporter.write_line(violation, red=True)\n')
+target = 'tests.mlx_native.test_native::test_native[one]'
+options = ['--collect-only']
+
+    @pytest.mark.parametrize("target", ["tests.mlx_native", "tests.mlx_native.test_native",
+                                        "tests.mlx_native.test_native::test_native[one]"])
+    @pytest.mark.parametrize("options", [[], ["--test-profile=base"], ["--test-profile=mandatory"],
+                                         ["--collect-only"]])
+    def test_canonical_native_pyargs_rejected_before_import(project, target, options):
+        result = run_pytest(project, "--pyargs", target, *options)
+>       assert result.returncode != 0
+E       AssertionError: assert 0 != 0
+E        +  where 0 = CompletedProcess(args=['/tmp/plato-llm-integration/base-313/bin/python', '-m', 'pytest', '-q', '--pyargs', 'tests.mlx_...'], returncode=0, stdout='tests/mlx_native/test_native.py::test_native[one]\n\n1 test collected in 0.00s\n', stderr='').returncode
+
+tests/test_mlx_profile_contract.py:158: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_mlx_profile_contract.py::test_core_scope_excludes_native_before_import[arguments0]
+FAILED tests/test_mlx_profile_contract.py::test_core_scope_excludes_native_before_import[arguments1]
+FAILED tests/test_mlx_profile_contract.py::test_core_scope_excludes_native_before_import[arguments2]
+FAILED tests/test_mlx_profile_contract.py::test_core_scope_excludes_native_before_import[arguments3]
+FAILED tests/test_mlx_profile_contract.py::test_core_scope_excludes_native_before_import[arguments4]
+FAILED tests/test_mlx_profile_contract.py::test_core_scope_excludes_native_before_import[arguments5]
+FAILED tests/test_mlx_profile_contract.py::test_core_scope_excludes_native_before_import[arguments6]
+FAILED tests/test_mlx_profile_contract.py::test_core_scope_excludes_native_before_import[arguments7]
+FAILED tests/test_mlx_profile_contract.py::test_canonical_native_pyargs_rejected_before_import[options0-tests.mlx_native]
+FAILED tests/test_mlx_profile_contract.py::test_canonical_native_pyargs_rejected_before_import[options0-tests.mlx_native.test_native]
+FAILED tests/test_mlx_profile_contract.py::test_canonical_native_pyargs_rejected_before_import[options0-tests.mlx_native.test_native::test_native[one]]
+FAILED tests/test_mlx_profile_contract.py::test_canonical_native_pyargs_rejected_before_import[options1-tests.mlx_native]
+FAILED tests/test_mlx_profile_contract.py::test_canonical_native_pyargs_rejected_before_import[options1-tests.mlx_native.test_native]
+FAILED tests/test_mlx_profile_contract.py::test_canonical_native_pyargs_rejected_before_import[options1-tests.mlx_native.test_native::test_native[one]]
+FAILED tests/test_mlx_profile_contract.py::test_canonical_native_pyargs_rejected_before_import[options2-tests.mlx_native]
+FAILED tests/test_mlx_profile_contract.py::test_canonical_native_pyargs_rejected_before_import[options2-tests.mlx_native.test_native]
+FAILED tests/test_mlx_profile_contract.py::test_canonical_native_pyargs_rejected_before_import[options2-tests.mlx_native.test_native::test_native[one]]
+FAILED tests/test_mlx_profile_contract.py::test_canonical_native_pyargs_rejected_before_import[options3-tests.mlx_native]
+FAILED tests/test_mlx_profile_contract.py::test_canonical_native_pyargs_rejected_before_import[options3-tests.mlx_native.test_native]
+FAILED tests/test_mlx_profile_contract.py::test_canonical_native_pyargs_rejected_before_import[options3-tests.mlx_native.test_native::test_native[one]]
+20 failed, 66 deselected in 2.97s

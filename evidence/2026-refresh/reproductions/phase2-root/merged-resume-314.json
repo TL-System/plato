@@ -1,0 +1,985 @@
+{
+  "python": "3.14.8 (main, Sep 30 2026, 17:55:09) [Clang 21.0.0 (clang-2100.3.34.2)]",
+  "source": "/tmp/plato-phase2-root/1fe-source-archive/plato/__init__.py",
+  "cases": 16,
+  "passed": 16,
+  "results": [
+    {
+      "central": false,
+      "model_name": "lenet5",
+      "unrelated_draws": 0,
+      "expected": [
+        [
+          5,
+          3
+        ],
+        [
+          9,
+          5
+        ],
+        [
+          2,
+          1
+        ],
+        [
+          4,
+          7
+        ],
+        [
+          7,
+          5
+        ]
+      ],
+      "observed": {
+        "actual": [
+          [
+            5,
+            3
+          ],
+          [
+            9,
+            5
+          ],
+          [
+            2,
+            1
+          ],
+          [
+            4,
+            7
+          ],
+          [
+            7,
+            5
+          ]
+        ],
+        "round": 2
+      },
+      "files": [
+        "checkpoint_lenet5_2.safetensors",
+        "checkpoint_lenet5_2.safetensors.pkl",
+        "current_round.pkl",
+        "numpy_prng_state_2.pkl",
+        "prng_state_2.pkl"
+      ],
+      "save_did_not_mutate_rng": true,
+      "model_round_history_numpy_restored": true
+    },
+    {
+      "central": false,
+      "model_name": "lenet5",
+      "unrelated_draws": 7,
+      "expected": [
+        [
+          5,
+          3
+        ],
+        [
+          9,
+          5
+        ],
+        [
+          2,
+          1
+        ],
+        [
+          4,
+          7
+        ],
+        [
+          7,
+          5
+        ]
+      ],
+      "observed": {
+        "actual": [
+          [
+            5,
+            3
+          ],
+          [
+            9,
+            5
+          ],
+          [
+            2,
+            1
+          ],
+          [
+            4,
+            7
+          ],
+          [
+            7,
+            5
+          ]
+        ],
+        "round": 2
+      },
+      "files": [
+        "checkpoint_lenet5_2.safetensors",
+        "checkpoint_lenet5_2.safetensors.pkl",
+        "current_round.pkl",
+        "numpy_prng_state_2.pkl",
+        "prng_state_2.pkl"
+      ],
+      "save_did_not_mutate_rng": true,
+      "model_round_history_numpy_restored": true
+    },
+    {
+      "central": false,
+      "model_name": "org/model",
+      "unrelated_draws": 0,
+      "expected": [
+        [
+          5,
+          3
+        ],
+        [
+          9,
+          5
+        ],
+        [
+          2,
+          1
+        ],
+        [
+          4,
+          7
+        ],
+        [
+          7,
+          5
+        ]
+      ],
+      "observed": {
+        "actual": [
+          [
+            5,
+            3
+          ],
+          [
+            9,
+            5
+          ],
+          [
+            2,
+            1
+          ],
+          [
+            4,
+            7
+          ],
+          [
+            7,
+            5
+          ]
+        ],
+        "round": 2
+      },
+      "files": [
+        "checkpoint_~c87c0c64d2fb215b38496b07952d86526559fee390c98b0f383fef0d230107f4_2.safetensors",
+        "checkpoint_~c87c0c64d2fb215b38496b07952d86526559fee390c98b0f383fef0d230107f4_2.safetensors.pkl",
+        "current_round.pkl",
+        "numpy_prng_state_2.pkl",
+        "prng_state_2.pkl"
+      ],
+      "save_did_not_mutate_rng": true,
+      "model_round_history_numpy_restored": true
+    },
+    {
+      "central": false,
+      "model_name": "org/model",
+      "unrelated_draws": 7,
+      "expected": [
+        [
+          5,
+          3
+        ],
+        [
+          9,
+          5
+        ],
+        [
+          2,
+          1
+        ],
+        [
+          4,
+          7
+        ],
+        [
+          7,
+          5
+        ]
+      ],
+      "observed": {
+        "actual": [
+          [
+            5,
+            3
+          ],
+          [
+            9,
+            5
+          ],
+          [
+            2,
+            1
+          ],
+          [
+            4,
+            7
+          ],
+          [
+            7,
+            5
+          ]
+        ],
+        "round": 2
+      },
+      "files": [
+        "checkpoint_~c87c0c64d2fb215b38496b07952d86526559fee390c98b0f383fef0d230107f4_2.safetensors",
+        "checkpoint_~c87c0c64d2fb215b38496b07952d86526559fee390c98b0f383fef0d230107f4_2.safetensors.pkl",
+        "current_round.pkl",
+        "numpy_prng_state_2.pkl",
+        "prng_state_2.pkl"
+      ],
+      "save_did_not_mutate_rng": true,
+      "model_round_history_numpy_restored": true
+    },
+    {
+      "central": false,
+      "model_name": "org_model",
+      "unrelated_draws": 0,
+      "expected": [
+        [
+          5,
+          3
+        ],
+        [
+          9,
+          5
+        ],
+        [
+          2,
+          1
+        ],
+        [
+          4,
+          7
+        ],
+        [
+          7,
+          5
+        ]
+      ],
+      "observed": {
+        "actual": [
+          [
+            5,
+            3
+          ],
+          [
+            9,
+            5
+          ],
+          [
+            2,
+            1
+          ],
+          [
+            4,
+            7
+          ],
+          [
+            7,
+            5
+          ]
+        ],
+        "round": 2
+      },
+      "files": [
+        "checkpoint_org_model_2.safetensors",
+        "checkpoint_org_model_2.safetensors.pkl",
+        "current_round.pkl",
+        "numpy_prng_state_2.pkl",
+        "prng_state_2.pkl"
+      ],
+      "save_did_not_mutate_rng": true,
+      "model_round_history_numpy_restored": true
+    },
+    {
+      "central": false,
+      "model_name": "org_model",
+      "unrelated_draws": 7,
+      "expected": [
+        [
+          5,
+          3
+        ],
+        [
+          9,
+          5
+        ],
+        [
+          2,
+          1
+        ],
+        [
+          4,
+          7
+        ],
+        [
+          7,
+          5
+        ]
+      ],
+      "observed": {
+        "actual": [
+          [
+            5,
+            3
+          ],
+          [
+            9,
+            5
+          ],
+          [
+            2,
+            1
+          ],
+          [
+            4,
+            7
+          ],
+          [
+            7,
+            5
+          ]
+        ],
+        "round": 2
+      },
+      "files": [
+        "checkpoint_org_model_2.safetensors",
+        "checkpoint_org_model_2.safetensors.pkl",
+        "current_round.pkl",
+        "numpy_prng_state_2.pkl",
+        "prng_state_2.pkl"
+      ],
+      "save_did_not_mutate_rng": true,
+      "model_round_history_numpy_restored": true
+    },
+    {
+      "central": false,
+      "model_name": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+      "unrelated_draws": 0,
+      "expected": [
+        [
+          5,
+          3
+        ],
+        [
+          9,
+          5
+        ],
+        [
+          2,
+          1
+        ],
+        [
+          4,
+          7
+        ],
+        [
+          7,
+          5
+        ]
+      ],
+      "observed": {
+        "actual": [
+          [
+            5,
+            3
+          ],
+          [
+            9,
+            5
+          ],
+          [
+            2,
+            1
+          ],
+          [
+            4,
+            7
+          ],
+          [
+            7,
+            5
+          ]
+        ],
+        "round": 2
+      },
+      "files": [
+        "current_round.pkl",
+        "numpy_prng_state_2.pkl",
+        "prng_state_2.pkl",
+        "~tdeb2c7d617bd42e8cb5c716c5b9c6a5fdfac7f71f61c430eb629a02b5ddb545c.safetensors",
+        "~tdeb2c7d617bd42e8cb5c716c5b9c6a5fdfac7f71f61c430eb629a02b5ddb545c.safetensors.pkl"
+      ],
+      "save_did_not_mutate_rng": true,
+      "model_round_history_numpy_restored": true
+    },
+    {
+      "central": false,
+      "model_name": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+      "unrelated_draws": 7,
+      "expected": [
+        [
+          5,
+          3
+        ],
+        [
+          9,
+          5
+        ],
+        [
+          2,
+          1
+        ],
+        [
+          4,
+          7
+        ],
+        [
+          7,
+          5
+        ]
+      ],
+      "observed": {
+        "actual": [
+          [
+            5,
+            3
+          ],
+          [
+            9,
+            5
+          ],
+          [
+            2,
+            1
+          ],
+          [
+            4,
+            7
+          ],
+          [
+            7,
+            5
+          ]
+        ],
+        "round": 2
+      },
+      "files": [
+        "current_round.pkl",
+        "numpy_prng_state_2.pkl",
+        "prng_state_2.pkl",
+        "~tdeb2c7d617bd42e8cb5c716c5b9c6a5fdfac7f71f61c430eb629a02b5ddb545c.safetensors",
+        "~tdeb2c7d617bd42e8cb5c716c5b9c6a5fdfac7f71f61c430eb629a02b5ddb545c.safetensors.pkl"
+      ],
+      "save_did_not_mutate_rng": true,
+      "model_round_history_numpy_restored": true
+    },
+    {
+      "central": true,
+      "model_name": "lenet5",
+      "unrelated_draws": 0,
+      "expected": [
+        [
+          5,
+          3
+        ],
+        [
+          9,
+          5
+        ],
+        [
+          2,
+          1
+        ],
+        [
+          4,
+          7
+        ],
+        [
+          7,
+          5
+        ]
+      ],
+      "observed": {
+        "actual": [
+          [
+            5,
+            3
+          ],
+          [
+            9,
+            5
+          ],
+          [
+            2,
+            1
+          ],
+          [
+            4,
+            7
+          ],
+          [
+            7,
+            5
+          ]
+        ],
+        "round": 2
+      },
+      "files": [
+        "checkpoint_lenet5_2.safetensors",
+        "checkpoint_lenet5_2.safetensors.pkl",
+        "current_round.pkl",
+        "numpy_prng_state_2.pkl",
+        "prng_state_2.pkl"
+      ],
+      "save_did_not_mutate_rng": true,
+      "model_round_history_numpy_restored": true
+    },
+    {
+      "central": true,
+      "model_name": "lenet5",
+      "unrelated_draws": 7,
+      "expected": [
+        [
+          5,
+          3
+        ],
+        [
+          9,
+          5
+        ],
+        [
+          2,
+          1
+        ],
+        [
+          4,
+          7
+        ],
+        [
+          7,
+          5
+        ]
+      ],
+      "observed": {
+        "actual": [
+          [
+            5,
+            3
+          ],
+          [
+            9,
+            5
+          ],
+          [
+            2,
+            1
+          ],
+          [
+            4,
+            7
+          ],
+          [
+            7,
+            5
+          ]
+        ],
+        "round": 2
+      },
+      "files": [
+        "checkpoint_lenet5_2.safetensors",
+        "checkpoint_lenet5_2.safetensors.pkl",
+        "current_round.pkl",
+        "numpy_prng_state_2.pkl",
+        "prng_state_2.pkl"
+      ],
+      "save_did_not_mutate_rng": true,
+      "model_round_history_numpy_restored": true
+    },
+    {
+      "central": true,
+      "model_name": "org/model",
+      "unrelated_draws": 0,
+      "expected": [
+        [
+          5,
+          3
+        ],
+        [
+          9,
+          5
+        ],
+        [
+          2,
+          1
+        ],
+        [
+          4,
+          7
+        ],
+        [
+          7,
+          5
+        ]
+      ],
+      "observed": {
+        "actual": [
+          [
+            5,
+            3
+          ],
+          [
+            9,
+            5
+          ],
+          [
+            2,
+            1
+          ],
+          [
+            4,
+            7
+          ],
+          [
+            7,
+            5
+          ]
+        ],
+        "round": 2
+      },
+      "files": [
+        "checkpoint_~c87c0c64d2fb215b38496b07952d86526559fee390c98b0f383fef0d230107f4_2.safetensors",
+        "checkpoint_~c87c0c64d2fb215b38496b07952d86526559fee390c98b0f383fef0d230107f4_2.safetensors.pkl",
+        "current_round.pkl",
+        "numpy_prng_state_2.pkl",
+        "prng_state_2.pkl"
+      ],
+      "save_did_not_mutate_rng": true,
+      "model_round_history_numpy_restored": true
+    },
+    {
+      "central": true,
+      "model_name": "org/model",
+      "unrelated_draws": 7,
+      "expected": [
+        [
+          5,
+          3
+        ],
+        [
+          9,
+          5
+        ],
+        [
+          2,
+          1
+        ],
+        [
+          4,
+          7
+        ],
+        [
+          7,
+          5
+        ]
+      ],
+      "observed": {
+        "actual": [
+          [
+            5,
+            3
+          ],
+          [
+            9,
+            5
+          ],
+          [
+            2,
+            1
+          ],
+          [
+            4,
+            7
+          ],
+          [
+            7,
+            5
+          ]
+        ],
+        "round": 2
+      },
+      "files": [
+        "checkpoint_~c87c0c64d2fb215b38496b07952d86526559fee390c98b0f383fef0d230107f4_2.safetensors",
+        "checkpoint_~c87c0c64d2fb215b38496b07952d86526559fee390c98b0f383fef0d230107f4_2.safetensors.pkl",
+        "current_round.pkl",
+        "numpy_prng_state_2.pkl",
+        "prng_state_2.pkl"
+      ],
+      "save_did_not_mutate_rng": true,
+      "model_round_history_numpy_restored": true
+    },
+    {
+      "central": true,
+      "model_name": "org_model",
+      "unrelated_draws": 0,
+      "expected": [
+        [
+          5,
+          3
+        ],
+        [
+          9,
+          5
+        ],
+        [
+          2,
+          1
+        ],
+        [
+          4,
+          7
+        ],
+        [
+          7,
+          5
+        ]
+      ],
+      "observed": {
+        "actual": [
+          [
+            5,
+            3
+          ],
+          [
+            9,
+            5
+          ],
+          [
+            2,
+            1
+          ],
+          [
+            4,
+            7
+          ],
+          [
+            7,
+            5
+          ]
+        ],
+        "round": 2
+      },
+      "files": [
+        "checkpoint_org_model_2.safetensors",
+        "checkpoint_org_model_2.safetensors.pkl",
+        "current_round.pkl",
+        "numpy_prng_state_2.pkl",
+        "prng_state_2.pkl"
+      ],
+      "save_did_not_mutate_rng": true,
+      "model_round_history_numpy_restored": true
+    },
+    {
+      "central": true,
+      "model_name": "org_model",
+      "unrelated_draws": 7,
+      "expected": [
+        [
+          5,
+          3
+        ],
+        [
+          9,
+          5
+        ],
+        [
+          2,
+          1
+        ],
+        [
+          4,
+          7
+        ],
+        [
+          7,
+          5
+        ]
+      ],
+      "observed": {
+        "actual": [
+          [
+            5,
+            3
+          ],
+          [
+            9,
+            5
+          ],
+          [
+            2,
+            1
+          ],
+          [
+            4,
+            7
+          ],
+          [
+            7,
+            5
+          ]
+        ],
+        "round": 2
+      },
+      "files": [
+        "checkpoint_org_model_2.safetensors",
+        "checkpoint_org_model_2.safetensors.pkl",
+        "current_round.pkl",
+        "numpy_prng_state_2.pkl",
+        "prng_state_2.pkl"
+      ],
+      "save_did_not_mutate_rng": true,
+      "model_round_history_numpy_restored": true
+    },
+    {
+      "central": true,
+      "model_name": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+      "unrelated_draws": 0,
+      "expected": [
+        [
+          5,
+          3
+        ],
+        [
+          9,
+          5
+        ],
+        [
+          2,
+          1
+        ],
+        [
+          4,
+          7
+        ],
+        [
+          7,
+          5
+        ]
+      ],
+      "observed": {
+        "actual": [
+          [
+            5,
+            3
+          ],
+          [
+            9,
+            5
+          ],
+          [
+            2,
+            1
+          ],
+          [
+            4,
+            7
+          ],
+          [
+            7,
+            5
+          ]
+        ],
+        "round": 2
+      },
+      "files": [
+        "current_round.pkl",
+        "numpy_prng_state_2.pkl",
+        "prng_state_2.pkl",
+        "~tdeb2c7d617bd42e8cb5c716c5b9c6a5fdfac7f71f61c430eb629a02b5ddb545c.safetensors",
+        "~tdeb2c7d617bd42e8cb5c716c5b9c6a5fdfac7f71f61c430eb629a02b5ddb545c.safetensors.pkl"
+      ],
+      "save_did_not_mutate_rng": true,
+      "model_round_history_numpy_restored": true
+    },
+    {
+      "central": true,
+      "model_name": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+      "unrelated_draws": 7,
+      "expected": [
+        [
+          5,
+          3
+        ],
+        [
+          9,
+          5
+        ],
+        [
+          2,
+          1
+        ],
+        [
+          4,
+          7
+        ],
+        [
+          7,
+          5
+        ]
+      ],
+      "observed": {
+        "actual": [
+          [
+            5,
+            3
+          ],
+          [
+            9,
+            5
+          ],
+          [
+            2,
+            1
+          ],
+          [
+            4,
+            7
+          ],
+          [
+            7,
+            5
+          ]
+        ],
+        "round": 2
+      },
+      "files": [
+        "current_round.pkl",
+        "numpy_prng_state_2.pkl",
+        "prng_state_2.pkl",
+        "~tdeb2c7d617bd42e8cb5c716c5b9c6a5fdfac7f71f61c430eb629a02b5ddb545c.safetensors",
+        "~tdeb2c7d617bd42e8cb5c716c5b9c6a5fdfac7f71f61c430eb629a02b5ddb545c.safetensors.pkl"
+      ],
+      "save_did_not_mutate_rng": true,
+      "model_round_history_numpy_restored": true
+    }
+  ],
+  "limits": "Real save/load/run/selection; configure preserves the constructed model, child launch and network start are intercepted. Not a resumed network round."
+}

@@ -1,0 +1,271 @@
+{
+  "status": "Revised after accepted MR-01/02/03 and advisory MR-04; selected implementation scope recorded. Ready for fresh independent review; no implementation performed.",
+  "date": "2026-10-02",
+  "baseline": "5b8359bd40bbe65c7753e71f6627c490f9aa144f",
+  "unchanged_inputs_sha256": {
+    "plan.md": "edb9a58cc7915a940854f16d5029fe97434703bf2f75eca0dcb96de2d0f0eb15"
+  },
+  "evidence_limits": "Read-only code/API inspection from the original roadmap and supplied independent review evidence; no new runtime/benchmark/installation ran in this revision. Only startup-design.json and mlx-roadmap.json are written. The plan and both review artifacts are unchanged. Review CPU/native probes and root Metal success remain attributed evidence, not fresh qualification by this planner.",
+  "current_support": {
+    "positive_evidence": "baseline-findings.json records root's MLX 0.32.3 Metal probe in /tmp/plato-python314-env: tiny NHWC LeNet train/test/save and delta extraction passed. It does not establish real federated transport or full resume support.",
+    "installed": "Read metadata in /tmp/plato-python314-env: Python 3.14.8, mlx and mlx-metal 0.32.3, installed macosx_26_0_arm64 wheels; host macOS 27.0 arm64. The repository .venv Python 3.13.16 currently has no MLX distribution. Do not skip a required 3.13 MLX job and call it validated; root/1A must provide the accepted profile later.",
+    "model_config": "Only plato/models/mlx/lenet5.py is registered (mlx_lenet5). Only configs/MNIST/fedavg_lenet5_mlx.toml explicitly selects MLX; no dedicated MLX example or test file was found. It uses simple clients, FedAvg, Adam learning_rate=0.001, Torchvision MNIST via mnist_iid.toml, max_concurrency=1, simulated wall time, and client outbound/server inbound Safetensors processors. comm_simulation is omitted and defaults true, so this config is not a real socket-payload qualification.",
+    "training": "plato/trainers/mlx.py provides native value_and_grad, optimizer.update and mx.eval(model.parameters(), optimizer.state), NumPy/Torch-to-MLX batching, NHWC conversion and classification evaluation. Adam/AdamW/SGD/Lion have native implementations. The loader is sequential; num_workers is reserved. train() runs inline even with max_concurrency, while server process count/batching still uses that setting.",
+    "aggregation": "plato/algorithms/mlx_fedavg.py exports NumPy-backed parameter trees; shared FedAvgAggregationStrategy supports nested NumPy values and ordinarily prefers direct weight averaging. Its delta path also needs qualification. MLX distributed all-reduce is not a replacement for federated sample weighting or Plato's client selection. Review EC-04/05 reproduced malformed client input being broadcast/underweighted into an apparently valid aggregate before load_weights; validation of only the result cannot detect this. Review EC-07 confirmed that extraction can expose writable NumPy views aliasing live MLX buffers.",
+    "persistence": "save_model/load_model use Plato's shared Safetensors tree envelope plus a pickled RunHistory sidecar. They restore model parameters, not optimizer, scheduler, training cursor or RNG continuation. Shared .safetensors suffix does not guarantee compatibility with native MLX flat files or another framework's architecture.",
+    "architecture_boundary": "MLX LeNet uses two unpadded convolutions, a 256-to-120 linear layer and raw logits. PyTorch LeNet uses a padded first convolution, a third convolution and log-softmax. Existing checkpoints and direct speed comparisons are not interchangeable; do not silently reshape/transpose between these models or claim parity from their names.",
+    "dependencies": "The root package still requires torch/torchvision and model/algorithm registries import PyTorch integrations. The supplied MNIST data and sampler paths use them. A NumPy-backed MLX loader does not make Plato a Torch-free installation."
+  },
+  "upstream_comparison": [
+    {
+      "area": "Tree validation",
+      "api": "Module.update(parameters, strict=True) permits partial parameter dictionaries and does not enforce matching array shapes; it can mutate earlier leaves before a later error.",
+      "implication": "F17 requires full preflight before binary arithmetic or model.update and before every received eligible tree enters either direct-weight or delta aggregation. Capture an independent baseline; strict Module.update and post-aggregate checks alone cannot prevent corruption. Preserve valid None/container behavior and explicitly reject array/None mismatches.",
+      "sources": [
+        "module_source"
+      ]
+    },
+    {
+      "area": "Gradient clipping and optimizer names",
+      "api": "optimizers.clip_grad_norm(grads, max_norm) returns clipped gradients and original global L2 norm. Native 0.32.3 uses scale min(max_norm/(norm+1e-6), 1) and rejects negative thresholds. SGD accepts momentum; the exported RMSprop spelling differs from Plato's RMSProp lookup, and there is no Momentum class in the inspected exports.",
+      "implication": "Plato's clip_grad_norm argument currently only warns; optimizer aliases rmsprop/momentum are omitted by its getattr filter. Reproduce these requested-option cases before narrow compatibility repairs; do not add an optimizer catalog or silently reinterpret research settings.",
+      "sources": [
+        "optimizer_source",
+        "clipping"
+      ]
+    },
+    {
+      "area": "Device and model mode",
+      "api": "mx.stream(device) scopes default device/stream; Apple unified memory does not mean all operations execute on CPU. Module.train()/eval() control layers such as Dropout.",
+      "implication": "Selected repair: distinguish explicit --cpu/--mps from Config.device() fallback. With neither flag use the MLX caller/default device (normally Metal on this Apple host), not the generic cpu string. Scope graph construction and execution; preserve caller defaults on success/error. Train/eval switching is selected; review EC-06 demonstrates its absence using mode-sensitive models, which LeNet alone cannot reveal.",
+      "sources": [
+        "stream",
+        "unified_memory",
+        "module_source"
+      ]
+    },
+    {
+      "area": "RNG and compilation",
+      "api": "mx.random.seed seeds the global PRNG; key/split support explicit streams. mx.compile requires changing model/optimizer state to be captured or passed; random.state must also be captured for stochastic compiled models.",
+      "implication": "Selected reproducibility work must seed model initialization separately from local training and account for reassigned logical clients in reused workers. Compilation is conditional on measurement and state-capture correctness; do not wrap callback-heavy orchestration.",
+      "sources": [
+        "random_source",
+        "seed",
+        "compile"
+      ]
+    },
+    {
+      "area": "Resume, serialization and precision",
+      "api": "Optimizer.state is assignable, but does not include every constructor hyperparameter. Native MLX supports Safetensors; NumPy conversion can materialize/copy arrays and cannot directly represent MLX bfloat16 through the ordinary conversion path.",
+      "implication": "Retain Plato's existing envelope and weight-only promise. Define a separate resume artifact if selected. Qualify float32 first; do not introduce silent bfloat16 casts, protocol changes or a zero-copy claim merely because Metal uses unified memory.",
+      "sources": [
+        "optimizers",
+        "saving",
+        "numpy"
+      ]
+    }
+  ],
+  "approved_work": [
+    {
+      "id": "A1",
+      "priority": 0,
+      "scope": "Phase 3A/F17: validate missing/extra keys, exact sequence lengths/container kinds, array/None compatibility and leaf shapes before arithmetic or any model mutation. Apply the same contract to every eligible received tree before either direct-weight or delta aggregation, including zero-weight eligible reports and broadcast-compatible shapes. Validate transformed aggregation inputs again when hooks can change them; validate aggregate/load outputs defensively too.",
+      "acceptance": [
+        "E1",
+        "E2",
+        "E3"
+      ],
+      "ownership_cost": "Medium: MLX algorithm/trainer validation plus root-assigned narrow shared FedAvg server integration in plato/servers/fedavg.py after 2B. Coordinate with F17; reuse one optional MLX validation capability without changing unrelated algorithms, equations or external subclass signatures. Shared codec/F12 remains 2D-owned."
+    },
+    {
+      "id": "A2",
+      "priority": 0,
+      "scope": "Selected existing-path repairs: backend mismatch errors, device routing, explicit train/eval mode, current optimizer compatibility, lazy evaluation/callback correctness, serialization and weight restoration. Reproduce remaining candidates before fixing. Review confirms mode and alias gaps; preserve valid LeNet/FedAvg behavior. Working clipping and justified seed control are now selected as P1, not awaiting another feature decision.",
+      "acceptance": [
+        "E2",
+        "E3",
+        "E4",
+        "E5"
+      ],
+      "ownership_cost": "Medium: focused native Apple Silicon tests and serialized registry/config handoffs. MLX routing reads existing CLI flags locally; no shared Config.device behavior change. Keep research equations and unrelated PyTorch behavior intact."
+    }
+  ],
+  "optional_proposals": [
+    {
+      "id": "P2",
+      "priority": 1,
+      "title": "Measure memory and end-to-end cost before optimization",
+      "recommendation": "Bounded E8 qualification measurements are selected; a maintained telemetry/dashboard service is not. No default memory limit or concurrency change without measured need.",
+      "design": "Use mx.get_active_memory/get_peak_memory/get_cache_memory and reset_peak_memory, plus per-process RSS. Force model/optimizer/loss evaluation and synchronize relevant streams around timing. Separate data conversion, training, NumPy extraction, encode/decode, aggregation, checkpoint IO and full-round elapsed time. Report cold start, warm median/p95 and client-count scaling. MLX counters omit Python/NumPy/Torch and are not system RSS; unified-memory pressure is shared across processes.",
+      "acceptance": [
+        "E8"
+      ],
+      "maintenance": "Low for a fixed evidence script, medium for stable dashboards/CI thresholds. Use already accepted measurement tools or stdlib; any new psutil/dev dependency belongs to 1A/root. Avoid cache clearing each batch, OS-wide memory changes or inferring leaks from retained allocator cache."
+    },
+    {
+      "id": "P3",
+      "priority": 2,
+      "title": "Targeted eager/JIT performance improvement",
+      "recommendation": "Necessary optimization is authorized, but adoption is evidence-gated: use E8 to show benefit first. Prefer a small measured eager-path improvement; compilation remains off/default-eager unless its full-round benefit and correctness pass. Do not add speculative compilation infrastructure.",
+      "design": "If selected, compile a stable numerical training step with explicit model.state, optimizer.state and stochastic RNG state. Keep callbacks, logging, serialization and lifecycle outside the graph; recreate/invalidate captures after model or optimizer replacement. Account for partial batches/recompilation and short federated rounds where compile cost may dominate.",
+      "acceptance": "E8 plus equal initialization/data/RNG eager-versus-compiled loss, parameter, optimizer-step and callback comparisons over multiple rounds and a partial last batch. Enable only with a repeatable benefit beyond noise (suggested >=10% warm-step median) and no material full-round or peak-memory regression; report cold-start break-even rather than promise a speedup.",
+      "maintenance": "Medium-to-high: cache invalidation and MLX-version/device matrix. No new library required. Mixed precision, async execution and custom Metal kernels are excluded unless a separate measured workload justifies them."
+    },
+    {
+      "id": "P4",
+      "priority": 2,
+      "title": "Future scheduler/accumulation parity and optimizer-boundary resume",
+      "recommendation": "Roadmap only. Neither full resume nor broad scheduler/accumulation parity is selected. If later chosen, resume is restricted to completed optimizer-step boundaries with empty accumulation windows; no arbitrary microbatch recovery.",
+      "design": "Future schedules advance on committed optimizer updates; future accumulation uses sample-correct normalization and one partial-tail flush with F08-compatible callbacks. A resumable checkpoint may be committed only after optimizer update, scheduler/clipping/callback bookkeeping and pending-gradient reset complete. Persist model, optimizer constructor/state, next unconsumed batch/round cursor, schedule and applicable RNG/sampler state at that boundary. Defer a mid-window request to the next legitimate boundary or reject it clearly; never discard gradients or force an early optimizer step merely to checkpoint. Retain existing weight-only checkpoint behavior until a separate versioned resume artifact is selected.",
+      "acceptance": [
+        "E9"
+      ],
+      "maintenance": "High and unselected: schema/versioning, atomic commit and backward-read tests with F07/F08/F12 owners. No pending-gradient/microbatch persistence in this proposal. Do not retain optimizer momentum across rounds or change federation semantics without an explicit choice."
+    },
+    {
+      "id": "P5",
+      "priority": 3,
+      "title": "One useful additional model and maintained Apple Silicon qualification",
+      "recommendation": "After controls/measurement, choose one small CIFAR10 CNN only if it serves an actual study; use it to exercise three-channel layout and mode-sensitive behavior. Do not add a model zoo. Sustained CI requires an explicitly funded/available native arm64 runner.",
+      "acceptance": "E2-E5 on the new model/config, deterministic evaluation with Dropout or normalization if used, parameter-changing two-client aggregation and documented memory budget. Define aggregation treatment for nontrainable/integer state before introducing it. CI runs actual required MLX tests on both Python versions; missing Metal/profile is a failed prerequisite, not a passing skipped job.",
+      "maintenance": "Medium for one model/config and dataset caching; recurring runner/OS/Metal/lock validation cost. A one-off Apple Silicon acceptance run is already required by 3A; a persistent CI service and new model are optional expansion."
+    }
+  ],
+  "acceptance_experiments": {
+    "common": "Future execution after accepted phase prerequisites on native Apple Silicon and locked MLX profiles. Python 3.13 is the selected default and requires a real MLX environment; run Python 3.14 core comparisons as forward-compatibility evidence. Record exact interpreter/lock/diff, OS/chip/RAM, device/stream, seed/data/config, commands and tolerances. Numerical tests <=60s, tiny socket round <=120s, benchmark <=10min with owned-process containment; no dataset download in bounded tests. Existing missing 3.13 MLX remains a profile prerequisite, not a passing skip. Optional robotics incompatibility on 3.14 is not a full-refresh blocker. No E1-E9 implementation campaign ran in this revision.",
+    "E1": "F17 red/green on independent deep-copied LeNet trees: missing/extra early/late keys, short/long sequences, container differences, array/None mismatches and broadcastable/nonbroadcastable shapes. Exercise compute_weight_deltas, update_weights, both load paths and actual server pre-aggregation integration with one valid and one malformed 8/24-sample client in BOTH arrival orders, on direct-weight and delta paths (plus legacy aggregate_weights dispatch). Require rejection before any weighted arithmetic/aggregation hook or global load, unchanged model and owned baseline, and preserved report/tree alignment. Include a weights_received hook introducing a late malformed tree to verify final pre-dispatch validation; retain valid 8/24 weighted results.",
+    "E2": "Two independently trained MLX LeNets start from one captured float32 baseline, use distinct deterministic 8/24-sample NHWC datasets and real native SGD/Adam steps. Require finite loss and changed parameters on each client. Use actual reports/payloads and shared server aggregation; compare every leaf with a float64 NumPy sample-weighted reference cast to target dtype (initial rtol=1e-5, atol=1e-6). Separately exercise direct-weight and delta/update paths; do not fabricate deltas as a substitute for training. Capture independent owned copies of initial/received/final weights; run the shared validation integration before direct and delta dispatch so valid tests exercise the same guarded path as E1.",
+    "E3": "Round-trip actual extracted parameters through configured encode/decode processors and existing checkpoint save/load; verify tree shape, supported dtype, values and predictions, including a subsequent valid training update. Test malformed input without partial model mutation after F12/F17. Float16 and bfloat16 transport are separate explicit capability probes; reject unsupported representation rather than silently advertise lossless mixed precision. Include borrowed-view versus owned-snapshot tests: np.shares_memory/mutation checks for explicit copies and immutable retained baseline across subsequent training. Keep extraction view limitations documented; do not mutate borrowed live arrays to build negative fixtures.",
+    "E4": "After F01 and shared serialization repairs, launch actual server/client synchronous entrypoints for a two-client one-round MLX socket smoke with clients.comm_simulation=false, isolated loopback port/runtime directories, real processors and parameter-changing training. Compare received updates and server result as E2; track client descendants, natural exit status and port release. On error/timeout terminate/reap only owned descendants and preserve the failure. Also run the documented MNIST config with a bounded override and cached data; label its default communication simulation accurately.",
+    "E5": "Backend matrix: valid MLX selection, incompatible framework/model, missing optional dependency and unchanged unrelated PyTorch imports. Device matrix includes the documented NO-FLAG command (Metal on the normal Apple default), --cpu, --mps, both flags (cpu precedence), unavailable Metal and a caller-installed CPU/custom stream. Observe operation placement during factory initialization, training, evaluation and weight restoration; check caller device/default-stream restoration after every success and injected failure. Do not use context.device alone as evidence or claim prebuilt lazy graphs migrated. Test mode-sensitive Dropout/BatchNorm behavior, explicit training entry, repeated deterministic evaluation, unchanged evaluation statistics and restoration of prior/submodule modes after evaluation failure. Reproduce optimizer alias failures before narrow corrections.",
+    "E6": "Clipping: tree gradients with norm 5 and threshold 2 must yield the native epsilon-adjusted scale and correct SGD parameter update; include below-threshold, zero gradients, zero threshold, invalid negative/NaN/infinite thresholds and nonfinite gradients. Disabled clipping matches baseline numerically. Check original norm reporting and exactly one optimizer update; custom strategies retain control.",
+    "E7": "RNG: two fresh processes with identical master seed/logical client/round replay initialization, sample order, stochastic masks, losses and final weights on the same environment. Changing seed or logical client changes the intended local stream; changing PID/launch order does not. Distinct rounds do not reuse the same masks. Test Torchvision stochastic transforms separately; server selection and sampler seeds retain existing semantics. Cross-device comparisons use documented tolerances, not bitwise guarantees. Reassign logical client IDs repeatedly within one physical worker/trainer (A,B,A across distinct rounds) and compare each stream with independently launched logical-client runs. Verify reassignment order and physical worker count do not change the intended logical stream, while caller RNG restoration and legacy unseeded behavior follow the documented contract.",
+    "E8": "Benchmark fixed LeNet/data at batch sizes 8/32/64; 10 warmup steps then 100 measured steps, three fresh-process repetitions, isolated then two-client execution. Synchronize before/after measured segments; reset peak after warmup and report peak/active/cache/RSS and post-round retention over 10 rounds. Hold initialization/data/optimizer fixed; include full-round cold start and serialize/aggregate costs. Do not compare the differently structured stock PyTorch LeNet as an equal-work speed benchmark. Memory growth investigation distinguishes live retained trees from reusable cache. Record actual physical worker count, max_concurrency and all simulation flags separately from logical clients/per_round. Include two genuinely simultaneous client processes for concurrent memory pressure; supplied max_concurrency=1 cannot establish that. Measure real wall-clock time rather than simulated round time.",
+    "E9": "Roadmap-only experiment if later selected. Define a step as a completed optimizer update, including its scheduler/clipping/callback bookkeeping and empty pending-gradient window. For accumulation use a deterministic batch-independent model (no Dropout/BatchNorm large-batch oracle): 1/3/4/5 microbatches with window 4 and unequal tail sizes must match normalized reference and update counts. Separately test stochastic resume: N committed updates uninterrupted versus K committed updates, atomic checkpoint/restart, then N-K; compare weights, optimizer/schedule state, next batch, RNG and counts. Requests after 1 or 3 microbatches of a window must be explicitly rejected/deferred and must not produce a resumable checkpoint, discard gradients or force a premature update. Include a committed partial-tail boundary; old weight-only files remain readable without claiming full resume."
+  },
+  "platform_and_integration": [
+    "Official 0.32.3 installation docs list native Apple Silicon Python >=3.10/macOS >=14 and separate Linux CPU/CUDA backends. PyPI metadata checked today includes standard cp313/cp314 macOS arm64 wheels tagged 14/15/26 and matching mlx-metal versions. Plato keeps Python >=3.13; wheel presence is not runtime qualification on every listed OS. Installed 26-tag wheels do not imply all 0.32.3 wheels require macOS 26. Latest root policy retains Python 3.13 as default; 3.14 core checks provide forward-compatibility evidence.",
+    "Upstream Linux mlx[cpu] requires glibc >=2.35; CUDA extras have additional GPU/toolkit/driver requirements (see install source). Neither Linux CPU nor CUDA has been qualified for Plato MLX here. Apple CPU execution is a useful reference, not evidence that Metal training is CPU-only. Do not infer Windows support from artifact filenames or add a Linux support commitment incidentally.",
+    "Root/1A owns manifests, platform markers and lock selection; recheck actual 0.32.3 backend wheel constraints against its accepted profile. Do not use Ubuntu --all-extras as the sole MLX gate or remove Torch dependencies during this work.",
+    "3A owns MLX trainer/algorithm/model/config; registry changes remain serialized. NEW root handoff: after 2B, 3A may edit the narrow pre-aggregation integration in plato/servers/fedavg.py to call the F17 MLX validator before all direct/delta dispatch. 2D still owns shared codec/F12; 2C owns F07/F08 contracts; 2A owns shared Config/samplers; 1B/2B own lifecycle. Read existing cpu/mps flags locally without changing shared Config.device. Existing pickle-bearing transport/history remains trusted-peer only.",
+    "Defer architecture conversion, mixed-framework federation, more federated algorithms, MLX-LM/LoRA, quantized training, distributed sharding and Torch-free packaging until a user-selected workload supplies acceptance criteria and maintenance ownership. Native MLX APIs make some feasible; availability alone is not justification."
+  ],
+  "sources": {
+    "release": "https://github.com/ml-explore/mlx/releases/tag/v0.32.3",
+    "install": "https://ml-explore.github.io/mlx/build/html/install.html",
+    "package_metadata": [
+      "https://pypi.org/pypi/mlx/0.32.3/json",
+      "https://pypi.org/pypi/mlx-metal/0.32.3/json",
+      "https://pypi.org/pypi/mlx-cpu/0.32.3/json"
+    ],
+    "optimizer_source": "https://github.com/ml-explore/mlx/blob/v0.32.3/python/mlx/optimizers/optimizers.py",
+    "module_source": "https://github.com/ml-explore/mlx/blob/v0.32.3/python/mlx/nn/layers/base.py",
+    "random_source": "https://github.com/ml-explore/mlx/blob/v0.32.3/python/src/random.cpp",
+    "clipping": "https://ml-explore.github.io/mlx/build/html/python/_autosummary/mlx.optimizers.clip_grad_norm.html",
+    "optimizers": "https://ml-explore.github.io/mlx/build/html/python/optimizers.html",
+    "stream": "https://ml-explore.github.io/mlx/build/html/python/_autosummary/mlx.core.stream.html",
+    "unified_memory": "https://ml-explore.github.io/mlx/build/html/usage/unified_memory.html",
+    "seed": "https://ml-explore.github.io/mlx/build/html/python/_autosummary/mlx.core.random.seed.html",
+    "compile": "https://ml-explore.github.io/mlx/build/html/usage/compile.html",
+    "memory": "https://ml-explore.github.io/mlx/build/html/python/memory_management.html",
+    "peak_memory": "https://ml-explore.github.io/mlx/build/html/python/_autosummary/mlx.core.get_peak_memory.html",
+    "lazy_evaluation": "https://ml-explore.github.io/mlx/build/html/usage/lazy_evaluation.html",
+    "saving": "https://ml-explore.github.io/mlx/build/html/usage/saving_and_loading.html",
+    "numpy": "https://ml-explore.github.io/mlx/build/html/usage/numpy.html"
+  },
+  "source_precision": "Official live docs identify 0.32.3 but some cached subpages still identify 0.32.2 and contain stale prose. Version-sensitive conclusions above were cross-checked against installed 0.32.3 source/stubs and fetched tagged source. Tagged optimizer/module/random-source SHA256 respectively: 25a57fe00ff9ae1fe836cd504506e16d0e9d890112daed05cef0e2bcb95f7714; ec749e1d50fd1a5e57e0aedc8e6eb13fc697e630f59333a0e24aee62a8dc7f0f; cef4536a58d36b49ced10945c764fd7534cb6046fa9284ca24d70d81c273a1f8. Proposed experiments are not claimed as results.",
+  "revision": {
+    "review": "mlx-roadmap-review.json",
+    "review_sha256": "a6861265a4a8e2235fa43e511034503e490e2e39c18fdb1c5c5979a56306be40",
+    "supersedes_sha256": "9599cf4031b98f2c8b638826ca17cfb05d36b2220f6a0a30c06edaa26ae1c2a8",
+    "authority": "Latest user/root steering authorizes necessary optimizations and selects existing correctness repairs plus working clipping, explicit train/eval mode, device routing and justified reproducibility improvements. It also assigns the narrow shared FedAvg server validation handoff to 3A after 2B. These instructions supersede earlier unselected wording without editing plan.md."
+  },
+  "related_startup_design_sha256": "0a5e2c57102fa4beae7f4b4ceb6e091fd61e8af49b966f023bc57dfa6714ae47",
+  "current_selection": {
+    "selected": [
+      "A1 existing F17 repairs plus pre-aggregation validation on every received eligible tree",
+      "A2 supported-path repairs including explicit model modes and device routing",
+      "P1 working clipping and justified reproducibility controls, preserving disabled/unseeded defaults",
+      "Bounded E8 measurements and necessary optimizations justified by evidence"
+    ],
+    "conditional": "Compilation adoption requires measured benefit and numerical/lifecycle parity before enabling; eager remains the default. An ignored jit argument must not be advertised as working compilation.",
+    "not_selected": [
+      "Broad cross-framework model conversion",
+      "Full resume or arbitrary microbatch recovery",
+      "New models",
+      "Broad scheduler/accumulation parity",
+      "Persistent telemetry service or expanded platform support"
+    ],
+    "python_policy": "Python 3.13 is root-selected default due robotics constraints; Python 3.14 core checks are forward-compatibility evidence. An optional 3.14 robotics incompatibility does not block the full refresh or justify a broad lifecycle framework."
+  },
+  "pre_aggregation_contract": {
+    "handoff": "Root assigns plato/servers/fedavg.py _process_reports validation integration narrowly to 3A after 2B, coordinated with F17. Any additional shared aggregation-strategy edit requires an explicit root handoff; no generic codec schema policy or protocol change.",
+    "placement": "Capture an owned copy of the current MLX baseline before processing received-weight hooks. Validate every eligible decoded model-weight payload against that baseline before any weighted arithmetic; do not wait for load_weights. Validate the effective tree list after weights_received/on_weights_received transformations as well, immediately before direct strategy aggregation, external aggregate_weights dispatch or delta computation. Reject report/tree count or ordering misalignment; do not truncate zip, omit malformed leaves or silently exclude a client while retaining its denominator weight.",
+    "integration": "Expose/reuse the MLX algorithm validation capability and invoke it conditionally from the shared server for the MLX full-weight contract. Existing algorithms without that capability and non-weight/feature workflows keep their contracts; no blanket redefinition of all research payload schemas. Validate all eligible trees before processing the first one arithmetically, including valid-first/malformed-last arrival.",
+    "failure": "Error identifies logical client and offending path. Reject the round before aggregation/load changes global model state; do not produce a partially averaged result. Both arrival orders and all three dispatch paths must be covered, with an unchanged owned baseline and global model after failure."
+  },
+  "device_and_mode_contract": {
+    "no_flags": "Use mx.default_device() captured from the caller, normally Device(gpu,0) on the qualified Apple host. Preserve the documented no-flag Metal quickstart. Do not route from Config.device() cpu fallback, and do not override a caller who intentionally scoped a different MLX default.",
+    "explicit_flags": "--cpu selects mx.cpu; --mps selects the MLX GPU/Metal path and errors clearly if unavailable. If both are present, preserve existing CLI cpu precedence. Use existing flags; no new backend/device configuration surface and no reliance on Torch MPS availability to infer MLX Metal support.",
+    "scope": "Use public mx.stream(device) for model factory initialization, graph construction in train/test and checkpoint/load restoration, with exception-safe restoration of caller default device AND default streams. A supplied preconstructed model may already contain lazy operations placed by its caller: scopes cannot retroactively reroute that graph. Test factory placement and document this boundary rather than claiming to migrate existing lazy work.",
+    "modes": "Enter training mode explicitly at training-run start; evaluation enters eval mode and restores the prior mode in finally, including an evaluation exception. Preserve intentionally different submodule modes when restoring a custom model. Verify stochastic behavior and normalization state rather than asserting mode flags alone."
+  },
+  "host_array_ownership": {
+    "current_contract": "Treat extract_weights/_to_host_array results as borrowed, read-only-by-contract views unless explicitly copied; they may be writable NumPy arrays sharing live MLX buffers. This revision does not promise snapshot isolation or add blanket copies to the hot path.",
+    "owned_snapshots": "At baseline retention, delayed comparison/checkpoint observation or any caller that may mutate/retain past a model update, recursively copy each array (np.array(leaf, copy=True)) preserving container structure. Capture server baseline before hooks/aggregation; copy client before/after and received-payload evidence at observation time. Malformed-input fixtures must be independent deep copies, never aliases of model parameters or of their reference oracle.",
+    "consumers": "Validation and aggregation must not modify borrowed input leaves in place. Synchronous conversion/encoding may consume borrowed arrays while their owner remains stable; deferred consumers must snapshot. A future copy-removal/in-place optimization needs ownership tests and measurement first.",
+    "acceptance": "E1/E3 assert snapshots share no mutable storage with live weights, mutating a copied fixture cannot change the source model, and later training cannot change a saved baseline. Test/document existing borrowed alias behavior explicitly; do not count mutating a borrowed view as failure of an unpromised owned-snapshot contract."
+  },
+  "selected_controls": [
+    {
+      "id": "P1",
+      "priority": 1,
+      "title": "Explicit clipping and reproducible local-training controls",
+      "recommendation": "Implement working native clipping and justified reproducibility controls now, retaining disabled/unseeded defaults. No additional permission is required for this selected scope; broader parity work remains separate.",
+      "design": "Apply native global-norm clipping immediately before optimizer.update when requested, disabled by default. Validate finite nonnegative thresholds, with zero deliberately zeroing gradients; fail clearly on nonfinite gradients when clipping is requested rather than silently replacing them. Preserve custom training strategies. Add only the minimal documented seed/config surface needed: separate model-initialization seed from stable logical-client/round/epoch local-training streams; never derive from PID or randomized Python hash, reseed every batch, or repurpose server/data seeds. Recompute local stream identity when a physical worker is reassigned to a different logical client, not only in the trainer constructor.",
+      "boundaries": "Seed before model construction when initialization determinism is requested; server baseline broadcast still gives clients the same starting weights. Control Python loader shuffle, NumPy and Torchvision transforms as well as MLX RNG at defined local-run boundaries; restore caller RNG state where an embedded scoped operation promises not to alter it. Keep explicit unseeded behavior and existing selection/partition streams. Promise same-environment replay only; do not claim cross-device bitwise equality.",
+      "acceptance": [
+        "E6",
+        "E7"
+      ],
+      "maintenance": "Low for native clipping; medium for seed derivation/configuration and four RNG domains. No new runtime dependency. Any future accumulation must clip the normalized accumulated update exactly once.",
+      "status": "Selected by latest user/root instruction; implement proportionately with red/green tests."
+    }
+  ],
+  "implementation_handoff": {
+    "sequence": [
+      "After 2B handoff and relevant F12 prerequisites, implement A1 server ingress/algorithm/trainer validation together with E1-E4.",
+      "Implement selected mode/device repairs and clipping/reproducibility controls with E5-E7; preserve no-flag Metal and caller ownership/defaults.",
+      "Run bounded E8 measurements; adopt necessary optimization only on measured benefit and preserved E1-E7 behavior. E9/full resume/new models/conversion remain future proposals."
+    ],
+    "python_default": "Root selects 3.13 due robotics constraints. Keep 3.14 core results visible but do not block full refresh on optional integration incompatibility. Original planner owns later plan.md reconciliation.",
+    "archival_policy": "Separate user authorization: after evidence review, root may archive genuinely obsolete external integrations/algorithms when modernization is not worthwhile. Preserve dependency/compatibility notes and paper references; clean active registry, config, documentation and workspace references coherently. This does not authorize silently dropping supported startup/MLX paths or expanding these repair scopes.",
+    "review_gate": "Obtain fresh independent review of these exact revised artifacts. Findings are addressed in design, not declared implemented or validated; preserve approved plan.md and existing review evidence."
+  },
+  "finding_dispositions": [
+    {
+      "id": "MR-01",
+      "severity": "high",
+      "disposition": "Addressed in selected correctness scope; implementation pending.",
+      "resolution": "Root-assigned 3A-after-2B FedAvg handoff; validate every eligible raw/effective tree against an owned baseline before all direct/delta dispatch, with both arrival orders and malformed-input rejection before arithmetic."
+    },
+    {
+      "id": "MR-02",
+      "severity": "medium",
+      "disposition": "Addressed in selected device repair.",
+      "resolution": "No-flag preserves native/caller MLX default (normally Metal); explicit cpu/mps routing is distinct from generic Config fallback; initialize/train/evaluate/restore under scopes with caller-default restoration tests."
+    },
+    {
+      "id": "MR-03",
+      "severity": "medium",
+      "disposition": "Addressed by narrowing the unselected future resume proposal.",
+      "resolution": "Only completed optimizer-step/empty-window checkpoints; defer/reject mid-window requests, define committed steps and separate batch-independent accumulation oracle from stochastic resume."
+    },
+    {
+      "id": "MR-04",
+      "severity": "low advisory",
+      "disposition": "Addressed in ownership documentation and acceptance.",
+      "resolution": "Extraction is borrowed/read-only by contract, not an owned snapshot. Deep-copy baselines, delayed observations and malformed fixtures; preserve input nonmutation and test snapshot isolation without blanket hot-path copies."
+    }
+  ]
+}

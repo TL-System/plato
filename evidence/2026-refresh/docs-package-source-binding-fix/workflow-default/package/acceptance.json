@@ -1,0 +1,12 @@
+{
+  "accepted": true,
+  "source_commit": "63f0d2000f0370708b9afe1e2e6a2dc8559b72e1",
+  "wheel_sha256": "d00d2c2acd5e5867e6a818fe3bc4132db8f92e00f47017da35e5a3159a60ba96",
+  "sdist_sha256": "a6b70edef64f1b1defc5bd6aac40a37976e57f49d29cc280c0c4033c0bb552b3",
+  "sdist_source_tree_bound": true,
+  "sdist_source_binding_sha256": "de386904613a0172286924f92ca634f8359da468bd7e48008ea5aa1d1996cc4f",
+  "rebuilt_wheel_payload_matches": true,
+  "installed_wheel_provenance_and_imports": true,
+  "build_constraints_sha256": "284e1018003f55e4ce6fbb5c80b7dad20e86d9ed60ef544d817f1892626326de",
+  "runtime_constraints_sha256": "9c9b82f4c52ba05fb5a1c7e6e841e15fcd69104f9867cf7d7526060055a32709"
+}

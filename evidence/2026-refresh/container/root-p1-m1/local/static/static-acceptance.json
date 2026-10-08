@@ -1,0 +1,142 @@
+{
+  "accepted": true,
+  "elapsed_seconds": 0.376,
+  "gpu_compute_tested": false,
+  "launcher_cases": [
+    {
+      "argv": [
+        "run",
+        "--rm",
+        "--net=host",
+        "-v",
+        "/dev/shm:/dev/shm",
+        "-v",
+        "/private/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato launcher sjwii7zg:/root/plato",
+        "-i",
+        "plato",
+        "/bin/bash"
+      ],
+      "exit": 0,
+      "script": "dockerrun.sh"
+    },
+    {
+      "argv": [
+        "run",
+        "--rm",
+        "--net=host",
+        "-v",
+        "/dev/shm:/dev/shm",
+        "-v",
+        "/private/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato launcher sjwii7zg:/root/plato",
+        "-i",
+        "plato",
+        "python",
+        "-c",
+        "literal $x `x` $(x)",
+        "a b",
+        ""
+      ],
+      "exit": 0,
+      "script": "dockerrun.sh"
+    },
+    {
+      "argv": [
+        "run",
+        "--rm",
+        "--net=host",
+        "-v",
+        "/dev/shm:/dev/shm",
+        "-v",
+        "/private/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato launcher sjwii7zg:/root/plato",
+        "-i",
+        "plato",
+        "python",
+        "-c",
+        "literal $x `x` $(x)",
+        "a b",
+        ""
+      ],
+      "exit": 23,
+      "script": "dockerrun.sh"
+    },
+    {
+      "argv": [
+        "run",
+        "--rm",
+        "--net=host",
+        "-v",
+        "/dev/shm:/dev/shm",
+        "-v",
+        "/private/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato launcher sjwii7zg:/root/plato",
+        "--gpus",
+        "all",
+        "-i",
+        "plato",
+        "/bin/bash"
+      ],
+      "exit": 0,
+      "script": "dockerrun_gpu.sh"
+    },
+    {
+      "argv": [
+        "run",
+        "--rm",
+        "--net=host",
+        "-v",
+        "/dev/shm:/dev/shm",
+        "-v",
+        "/private/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato launcher sjwii7zg:/root/plato",
+        "--gpus",
+        "all",
+        "-i",
+        "plato",
+        "python",
+        "-c",
+        "literal $x `x` $(x)",
+        "a b",
+        ""
+      ],
+      "exit": 0,
+      "script": "dockerrun_gpu.sh"
+    },
+    {
+      "argv": [
+        "run",
+        "--rm",
+        "--net=host",
+        "-v",
+        "/dev/shm:/dev/shm",
+        "-v",
+        "/private/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato launcher sjwii7zg:/root/plato",
+        "--gpus",
+        "all",
+        "-i",
+        "plato",
+        "python",
+        "-c",
+        "literal $x `x` $(x)",
+        "a b",
+        ""
+      ],
+      "exit": 23,
+      "script": "dockerrun_gpu.sh"
+    }
+  ],
+  "mode": "static",
+  "required_source_count": 645,
+  "scope": "Static context and recording-stub checks only",
+  "workspace_manifests": [
+    "examples/unlearning/fedunlearning/pyproject.toml",
+    "examples/unlearning/knot/pyproject.toml",
+    "examples/client_selection/pisces/pyproject.toml",
+    "examples/client_selection/polaris/pyproject.toml",
+    "examples/split_learning/llm_split_learning/pyproject.toml",
+    "examples/ssl/calibre/pyproject.toml",
+    "examples/ssl/smog/pyproject.toml",
+    "examples/model_search/anycostfl/pyproject.toml",
+    "examples/model_search/fedrolex/pyproject.toml",
+    "examples/model_search/heterofl/pyproject.toml",
+    "examples/detector/pyproject.toml",
+    "examples/gradient_leakage_attacks/pyproject.toml"
+  ]
+}

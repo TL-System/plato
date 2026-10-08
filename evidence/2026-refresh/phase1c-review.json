@@ -1,0 +1,246 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-02",
+  "decision": "CHANGES_REQUESTED",
+  "summary": "Two medium defects in changed test/CI behavior: ordinary root-level developer selections are treated as full qualification, and the typing gate rejects a verified clean result. Explicit qualification, installed-profile tests, fixture restoration and accepted startup preservation otherwise verified. Linux CI remains a separate root execution gate.",
+  "reviewer": {
+    "role": "Fresh root-created independent reviewer",
+    "delegation": 0,
+    "nested_reviews": "Supplemental implementer-created reviews were not used as acceptance. Root observations were reproduced independently."
+  },
+  "identity": {
+    "candidate_commit": "845255cdf358869d260699a9ef0786e37514e9f4",
+    "candidate_tree": "9dc04f712518f6a126395983d0675b15134a0626",
+    "accepted_base_commit": "213b321c3cfb31d0f82c0b315efe50dcbf7dee20",
+    "accepted_base_tree": "77d6110e57346f6f01b427f418a9bb24ad79a2a9",
+    "worktree": "/private/tmp/plato-refresh-worktrees/test-ci",
+    "head_matches_candidate": true,
+    "diff_sha256": "ff54a432045b1f47da1e258ac00cc1d7eff90a5531dcadbd056139310be933b2",
+    "diff_summary": "12 files, 1514 insertions, 122 deletions. Runtime and all three accepted startup helpers are byte-identical to 1B; startup suite changes are exactly eight added marker/spacing lines.",
+    "base_manifest_sha256": "fecc507660f280019ccc6869bde5bd886f26685cfa2361fdab7f4ee60d7f4dfa",
+    "base_lock_sha256": "a7d30a4f7f2f824d656cf934b148d315fc1380817d3dd93e5070057b6cee58f6",
+    "candidate_manifest_sha256": "799bd7ba1865b097fdc8ca84a7b70337794e338de4aa9a6a13f6a4c1b9156246",
+    "candidate_lock_sha256": "573b10c2ba1a2317e02f9e40c6181359cafab6f6e0a0f9be12bb256cb276fe1d",
+    "lock_comparison": "Parsed lock equality after removing only the two new test-base metadata arrays; all 278 package records and versions unchanged.",
+    "python_policy": ".python-version remains 3.13; requires-python remains >=3.13; 3.14 is core forward compatibility.",
+    "submodule_pins": {
+      "external/nanochat": "c75fe54aa7c1fa881701c246f9427bcbe4eee5a4",
+      "plato/models/dvit": "1ccb152cea43fcbc3cd517a45c12c65734f8ace3",
+      "plato/models/t2tvit": "0f63dc9558f4d192de926504dbddfa1b3f5db6ca"
+    }
+  },
+  "input_sha256": {
+    "AGENTS.md": "b50f87f31ea3d87076952d8b7d2d8af067132fbf877d80f8780c208fb45527ec",
+    "/Users/bli/Playground/plato/evidence/2026-refresh/test-ci-design.json": "13f3d272e921d05afd2b3457ff977374528ea4653ff1ca8c238b5b945f5b9ef2",
+    "/Users/bli/Playground/plato/evidence/2026-refresh/design-revision-review.json": "0535b3ccbac91a264317bd8fb9314465a0379155bc7113de99a27a9b66b7be39",
+    "/Users/bli/Playground/plato/evidence/2026-refresh/plan-addendum.json": "5b51b0fb7ed6f68d9fce7176335b3e7be5e5f178a2788590912aa2396a487709",
+    "/Users/bli/Playground/plato/evidence/2026-refresh/phase1b-acceptance.json": "b6f1a35ed1b54499d2e3c1a8d5ab3bee5a3e47a2c967b73a6b909ba1e09d0444",
+    "evidence/2026-refresh/test-ci-validation.json": "d11d80926933ac1d27c3f84874d45d2ace079ceb3688e0da2c57899006e9241b",
+    "pyproject.toml": "799bd7ba1865b097fdc8ca84a7b70337794e338de4aa9a6a13f6a4c1b9156246",
+    "uv.lock": "573b10c2ba1a2317e02f9e40c6181359cafab6f6e0a0f9be12bb256cb276fe1d"
+  },
+  "findings": [
+    {
+      "id": "P1C-R01",
+      "severity": "medium",
+      "file": "tests/conftest.py",
+      "line": 85,
+      "related_lines": [
+        111,
+        112,
+        211,
+        223,
+        231
+      ],
+      "title": "Preserve ordinary root-level pytest selections without an explicit profile.",
+      "defect": "_full_suite examines only positional root paths. Therefore tests -k, tests -m integration and tests --deselect are implicitly qualified despite intentional developer selection and no --test-profile. Required-node and deselection checks turn successful focused runs into failures.",
+      "reproduction": "UV_PROJECT_ENVIRONMENT=/tmp/plato-phase1c-test-ci/mandatory-313 uv run --no-sync --python 3.13 pytest tests -k test_round_info_store_local -p no:cacheprovider -q (review basetemp under /tmp/plato-phase1c-review). Same result on mandatory-314.",
+      "observed": "The selected test passes, but exit is 1 with 1 passed/298 deselected and required-tests/startup/deselection violations. Ordinary -m integration collection exits 1 with 9 collected; ordinary --deselect collection exits 1 with 298 collected. In base environments the root -k invocation exits 4 on unrelated absent Opacus before collection. File-scoped -k and file-target runs exit 0.",
+      "impact": "Common focused developer commands fail even when the selected tests pass, violating the accepted focused-command boundary. The evidence only checked -k with a file argument and missed this root-argument case.",
+      "bounded_fix": "Distinguish an unfiltered implicit full-suite invocation from intentional keyword/marker/deselection selection when no explicit --test-profile is present. Keep default mandatory behavior for an unfiltered full suite and keep explicit CI profiles rejecting exclusions, missing required nodes, unexpected skips/xfails and deselection.",
+      "validation": "On both interpreters, ordinary root -k should pass one existing test, ordinary root -m/--deselect collection should succeed, and the same explicit-profile omission probes must still fail. No profile framework or runtime/helper change is needed."
+    },
+    {
+      "id": "P1C-R02",
+      "severity": "medium",
+      "file": ".github/workflows/pytorch_tests.yml",
+      "line": 151,
+      "related_lines": [
+        131,
+        132,
+        133,
+        134,
+        152,
+        153
+      ],
+      "title": "Accept a verified clean typing result.",
+      "defect": "The Python gate unconditionally requires Found in ty.log. A successful clean ty check exits 0 and prints All checks passed!, so the step fails after diagnostics are eliminated.",
+      "reproduction": "In each mandatory environment, uv run --no-sync --python 3.13 (or 3.14) ty check /tmp/plato-phase1c-review/clean_typing.py --output-format concise; feed its actual output into the unchanged extracted workflow Python block.",
+      "observed": "Both ty invocations exit 0 with zero diagnostics and All checks passed!; both exact workflow gate replays exit 1 at line 151. Current full-repository 404-diagnostic status-1 output passes the gate, as intended by the accepted baseline policy.",
+      "impact": "The new CI gate rejects a valid successful result. This does not block the current 404-diagnostic baseline, but creates an unnecessary CI failure when the baseline is repaired.",
+      "bounded_fix": "Pass the captured ty_status into the embedded checker and accept status 0 with verified clean output. Retain rejection of tool failures/unrecognized output and unexpected diagnostics in owned files for baseline status-1 reports. Preserve raw output and current classified diagnostics; do not add suppression or a zero-error requirement.",
+      "validation": "Replay clean status-0 output, the existing classified status-1 baseline, a new-owned diagnostic, missing report output and a tool invocation failure. Reviewer verified that the current gate already rejects the last three negative paths."
+    }
+  ],
+  "verification": {
+    "execution": "All shell invocations used /bin/zsh -lc. Existing four profiles were reused without installation or mutation. PYTHONDONTWRITEBYTECODE=1, no pytest cache, reviewer basetemp paths, and CPU/offline environment were used. Full command/result records and raw logs are in reviewer scratch.",
+    "environments": {
+      "root": "/tmp/plato-phase1c-test-ci",
+      "profiles": [
+        "base-313",
+        "base-314",
+        "mandatory-313",
+        "mandatory-314"
+      ],
+      "python_versions": [
+        "3.13.16",
+        "3.14.8"
+      ],
+      "platform": "macOS 27 arm64",
+      "shared_versions": {
+        "torch": "2.14.1",
+        "datasets": "5.0.1",
+        "pytest": "9.1.1",
+        "pytest-cov": "7.1.0",
+        "coverage": "7.16.2"
+      },
+      "prerequisites": "opacus/kazoo/gymnasium/tiktoken absent in both base profiles, present in both mandatory profiles."
+    },
+    "collection": {
+      "command": "UV_PROJECT_ENVIRONMENT=<profile> uv run --no-sync --python <version> python -B -m pytest tests --collect-only --test-profile=<base|mandatory> -m <not runtime|runtime> -q -p no:cacheprovider",
+      "results": "Each interpreter: base core 249 items with 48 runtime deselections; mandatory core 251 items with 48 runtime deselections; mandatory runtime 48 items with 251 core deselections. All exit 0. Named required nodes and complete accepted startup count retained. Separate marker collection gives startup_runtime=3 and startup_containment=6."
+    },
+    "installed_profile_tests": {
+      "targets": [
+        "tests/clients/test_feddf_strategy.py",
+        "tests/servers/test_feddf_server_strategy.py",
+        "tests/datasources/test_huggingface_datasource.py",
+        "tests/test_nanochat_integration.py",
+        "tests/mpc/test_mpc.py",
+        "tests/integration/test_smoke_configs.py",
+        "tests/trainers/test_dp_data_loader_strategy.py (mandatory)"
+      ],
+      "command": "UV_PROJECT_ENVIRONMENT=<profile> uv run --no-sync --python <version> python -B -m pytest <targets> --test-profile=<base|mandatory> -q -ra -p no:cacheprovider --basetemp=<review scratch>",
+      "results": "Each base: 20 passed/3 declared Nanochat skips. Each mandatory: 24 passed/1 permitted native-tokenizer skip, including both initialized real Nanochat trainer tests, both DP tests and all required MPC tests. All exit 0, no pytest warnings."
+    },
+    "fixtures": {
+      "command": "UV_PROJECT_ENVIRONMENT=<mandatory profile> PYTHONPATH=<repository> uv run --no-sync --python <version> python -B -m pytest -p tests.conftest /tmp/plato-phase1c-review/test_restoration.py -p no:cacheprovider -q --basetemp=<review scratch>",
+      "results": "8 independent probes passed on each interpreter: nested body/setup/write failures restore prior Config object/class state/env/argv; absolute input paths stay under a temporary runtime root; optional sections detach/restore; real FedDF loader failures and Nanochat body failure restore sys.path; Python/NumPy/CPU Torch RNG and path changes restore between tests."
+    },
+    "startup_subset": {
+      "command": "UV_PROJECT_ENVIRONMENT=<mandatory profile> uv run --no-sync --python <version> python -B -m pytest tests/integration/test_event_loop_startup.py -k \"test_fresh_entrypoint_executes_scheduled_work or test_preconstructed_borrowed_loop_resources_survive or test_real_two_client_cpu_socket_round or test_post_launch_failure_keeps_primary_error_and_contains_children\" -q -ra -p no:cacheprovider --basetemp=<review scratch>",
+      "results": "13 passed/35 intentionally deselected on each interpreter; wall time 82.90s/87.17s. Seven fresh startup variants, four borrowed-loop cases, actual two-client weighted CPU socket round and post-launch failure case passed. All 26 retained subprocess results have zero timeouts/forced actions/survivors. Socket rounds exit naturally with received/trained/aggregate/close events and test numerical assertions passing. This focused invocation deliberately has no explicit qualification profile."
+    },
+    "negative_enforcement": {
+      "command_records": "/tmp/plato-phase1c-review/negative-checks.json",
+      "count": 18,
+      "results": "Every probe failed with its expected enforcement message. Mandatory-in-base and missing initialized source on both interpreters; missing each required opacus/kazoo/gymnasium/tiktoken via an in-memory import blocker; unexpected collection/setup/call/teardown skips; xfail/xpass; ignored required DP module; omitted whole startup partition; silent removal of a required MPC node; explicit-profile keyword deselection. No package/source renames or environment changes."
+    },
+    "developer_commands": "On both interpreters file-scoped base -k: 1 passed/2 deselected, exit 0; base server file: 6 passed, exit 0. Ordinary root selections fail as P1C-R01 records.",
+    "capability_and_imports": "Fresh profile rustbpe is the vendored namespace with no callable Tokenizer; the native skip is honest. sys.path restores after success/failure and transitive ModuleNotFoundError propagates. Cached/injected rustbpe modules are consulted: a no-callable module returns false, a callable stub returns true. Injected callable stubs force the real round-trip to run and fail on both interpreters, rather than qualify a fake backend. Existing profiles and tests do not claim installed native-tokenizer qualification. No additional cache framework is required for this Phase 1C decision.",
+    "typing": "Independent full ty output is byte-identical to retained 404-message logs on both interpreters; exit 1 preserved. The 384 baseline plus 20 accepted-1B-helper additions are explained and those helpers are unchanged. No 1C-owned diagnostic additions or new suppressions. Exact workflow script accepts the classified baseline, rejects new-owned diagnostic/missing report/invocation failure, but rejects clean output as P1C-R02 records.",
+    "checks": {
+      "uv lock --check": "Passed; 278 packages.",
+      "uv run --no-sync --python 3.13 ruff check . --select I": "Passed with scratch RUFF_CACHE_DIR.",
+      "actionlint -shellcheck= .github/workflows/pytorch_tests.yml": "Passed."
+    }
+  },
+  "evidence_assessment": {
+    "integrity": "All 42 referenced candidate artifact path/SHA256 pairs and all recorded source hashes match. JUnit suites independently inspected: each interpreter base 246 passed/4 skip reports (missing Opacus module accounts two omitted tests), mandatory 250 passed/one native skip, runtime 48 passed/no skips; no failure/error elements. These complete-run counts are implementer evidence, not an assertion of independent broad reruns.",
+    "coverage": "Raw approximately 43% is honestly scoped to mandatory core, excluding startup subprocess coverage. Independently recomputed the comparable 219 unchanged files: baseline 6765/15314 = 44.1753%; both candidates 6886/15314 = 44.9654%. The seven reporting-only omissions and 1B/analyzer denominator differences are disclosed; no measurement exclusions added.",
+    "warnings": "None in independent installed-profile targeted runs. Installed datasets 5.0.1 explicitly pools for num_proc>=1, so preprocessing_num_proc=None correctly removes the test fork cause while retaining real Dataset.map/tokenization/grouping assertions. No global suppression or production worker/default change.",
+    "workflow": "Root working directory, interpreter selection, separate UV_PROJECT_ENVIRONMENT paths, explicit freeze --python paths, pinned recursive submodules and Nanochat gitlink/source checks are valid for the Ubuntu layout. CI executes base core, initialized mandatory core and all 48 runtime cases with explicit profiles, bounded steps and always-uploaded artifacts. 45-minute job/12-minute test bounds are finite and proportionate to the retained roughly 7-minute startup partition; design initial shorter estimates are not claimed as achieved.",
+    "actions": "Read-only official release/tag checks verified every workflow SHA: checkout v7.0.1, setup-python v7.0.0, setup-uv v10.2.0, upload-artifact v7.0.1.",
+    "linux_runtime": "Unavailable locally. macOS execution, lock resolution, syntax and action provenance do not qualify Linux. Root must run published GitHub Ubuntu CI before Phase 2, as already specified by the user. This pending gate is not reported as a new local implementation defect."
+  },
+  "official_action_sources": [
+    "https://github.com/actions/checkout/releases/tag/v7.0.1",
+    "https://github.com/actions/setup-python/releases/tag/v7.0.0",
+    "https://github.com/astral-sh/setup-uv/releases/tag/v10.2.0",
+    "https://github.com/actions/upload-artifact/releases/tag/v7.0.1"
+  ],
+  "reviewer_artifacts": {
+    "profiles": {
+      "path": "/tmp/plato-phase1c-review/profiles.json",
+      "sha256": "4d0f6411a012dd78184cdff74739fe4b318900d158e64957510731f6319ee6a0",
+      "records": 8
+    },
+    "runtime-checks": {
+      "path": "/tmp/plato-phase1c-review/runtime-checks.json",
+      "sha256": "75c541ef5612b4b6746749eeb0b9b4c1cb80227c78f9086b050f68cbd37d9e0e",
+      "records": 4
+    },
+    "fixtures": {
+      "path": "/tmp/plato-phase1c-review/fixtures.json",
+      "sha256": "9b95cac5b84e7b64d3dfa079f2f59007d8850e44a81dfdd2373a25fd649b766b",
+      "records": 2
+    },
+    "negative-checks": {
+      "path": "/tmp/plato-phase1c-review/negative-checks.json",
+      "sha256": "9f4b6480b570b8178319c80a56a1bfec3b10bc05209e0cdc26c201b9c0d76efe",
+      "records": 18
+    },
+    "developer-checks": {
+      "path": "/tmp/plato-phase1c-review/developer-checks.json",
+      "sha256": "cfdab05e5e3d1923bcba845a8ed64b0ffd801b5308bc754976faad66a4f7a99c",
+      "records": 12
+    },
+    "typing-checks": {
+      "path": "/tmp/plato-phase1c-review/typing-checks.json",
+      "sha256": "84bc61a62f2373f242737285c173495a2216d5dcac0517f53a66d843edea9b23",
+      "records": 4
+    },
+    "marker-checks": {
+      "path": "/tmp/plato-phase1c-review/marker-checks.json",
+      "sha256": "0d4c87ec779b57e8ade1b794c0bc026c264ff883e35efb4599921fb8de2f518a",
+      "records": 6
+    },
+    "environment": {
+      "path": "/tmp/plato-phase1c-review/environment.json",
+      "sha256": "33a70ca1160f476d7d4c7f28093d02195f993b9f3eba4bfb95aeeebc4df03066",
+      "records": 4
+    },
+    "artifact-validation": {
+      "path": "/tmp/plato-phase1c-review/artifact-validation.json",
+      "sha256": "c4e788c771c3163114085b81fd6c097afa9ef81cbcb914898925327da27ba1f1",
+      "records": null
+    },
+    "typing-negative-checks.json": {
+      "path": "/tmp/plato-phase1c-review/typing-negative-checks.json",
+      "sha256": "0572a3f77bd0cb895e843c593d2e8b637fc5c186db423b049f709bfd86da85a5"
+    },
+    "test_restoration.py": {
+      "path": "/tmp/plato-phase1c-review/test_restoration.py",
+      "sha256": "a9290f856825265f65edca5801fdb00fe80e8b780c75c297e9b67435cc85cc2f"
+    },
+    "preflight_probe.py": {
+      "path": "/tmp/plato-phase1c-review/preflight_probe.py",
+      "sha256": "50cdb8f8145e2578d444b18fd161833bf8841c23cfd5b116f0077935ed9a139a"
+    },
+    "capability_probe.py": {
+      "path": "/tmp/plato-phase1c-review/capability_probe.py",
+      "sha256": "4dabf9607038552714f182a4991c571c5a15adbfae9060fc44d80c78b8ae1e0d"
+    },
+    "typing_workflow_gate.py": {
+      "path": "/tmp/plato-phase1c-review/typing_workflow_gate.py",
+      "sha256": "c76481cb2ff39777d69c91d7116b55114d9d98b2ffa8cac25408aa6d125199d4"
+    },
+    "injected_callable_probe.py": {
+      "path": "/tmp/plato-phase1c-review/injected_callable_probe.py",
+      "sha256": "85586055b5d34d0f84007798321bf3a6cd6cc268be1fb259289c84caf4662590"
+    }
+  },
+  "integrity": {
+    "sole_durable_write": "/Users/bli/Playground/plato/evidence/2026-refresh/phase1c-review.json",
+    "scratch_root": "/tmp/plato-phase1c-review",
+    "tracked_regular_files_checked": 892,
+    "tracked_changes": [],
+    "worktree_status": "clean",
+    "source_or_manifest_edits": 0,
+    "environment_installs_or_mutations": 0,
+    "commits_or_pushes": 0,
+    "external_messages": 0,
+    "agents_spawned": 0,
+    "required_remaining": "Two bounded test/CI fixes, exact revised-candidate review of those fixes, and the existing root Linux/Phase 1 gate. Do not change accepted runtime/helpers or repeat unaffected broad suites."
+  }
+}

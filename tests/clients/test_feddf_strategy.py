@@ -15,22 +15,28 @@ import torch
 from tests.test_utils.fakes import FakeModel
 
 _TESTS_ROOT = Path(__file__).resolve().parent
-_FEDDF_DIR = _TESTS_ROOT.parent.parent / "examples" / "server_aggregation" / "feddf"
-if str(_FEDDF_DIR) not in sys.path:
-    sys.path.insert(0, str(_FEDDF_DIR))
-
-_FEDDF_CLIENT_PATH = _FEDDF_DIR / "feddf_client.py"
-_FEDDF_SPEC = importlib.util.spec_from_file_location(
-    "feddf_client_module", _FEDDF_CLIENT_PATH
+_FEDDF_DIR = (
+    _TESTS_ROOT.parent.parent / "examples" / "server_aggregation" / "feddf"
 )
-if _FEDDF_SPEC is None:
-    raise RuntimeError(f"Unable to load spec for {_FEDDF_CLIENT_PATH}")
+_PREVIOUS_PATH = sys.path[:]
+try:
+    if str(_FEDDF_DIR) not in sys.path:
+        sys.path.insert(0, str(_FEDDF_DIR))
 
-feddf_client = cast(Any, importlib.util.module_from_spec(_FEDDF_SPEC))
-loader = _FEDDF_SPEC.loader
-if loader is None:
-    raise RuntimeError(f"Loader missing for {_FEDDF_CLIENT_PATH}")
-loader.exec_module(feddf_client)
+    _FEDDF_CLIENT_PATH = _FEDDF_DIR / "feddf_client.py"
+    _FEDDF_SPEC = importlib.util.spec_from_file_location(
+        "feddf_client_module", _FEDDF_CLIENT_PATH
+    )
+    if _FEDDF_SPEC is None:
+        raise RuntimeError(f"Unable to load spec for {_FEDDF_CLIENT_PATH}")
+
+    feddf_client = cast(Any, importlib.util.module_from_spec(_FEDDF_SPEC))
+    loader = _FEDDF_SPEC.loader
+    if loader is None:
+        raise RuntimeError(f"Loader missing for {_FEDDF_CLIENT_PATH}")
+    loader.exec_module(feddf_client)
+finally:
+    sys.path[:] = _PREVIOUS_PATH
 
 
 def test_feddf_training_strategy_returns_teacher_logits(temp_config):

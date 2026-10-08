@@ -1,0 +1,90 @@
+{
+  "candidate": "1fe8b63940c21eca23b91e9f79281171e80f0cbc",
+  "tree": "af6317a3b438f4ef99e8a7bac6ac3a434850eabc",
+  "scope": "Root independent acceptedB resume/persistence plus C checkpoint-codec merge check; exact committed archive, not evolving FedDyn source.",
+  "source_archive": "/tmp/plato-phase2-root/1fe-source-archive",
+  "tracked_blobs_verified_after_runs": 982,
+  "production_behavior": "PASS16cases each Python3.13.16/3.14.8",
+  "matrix": {
+    "server": [
+      "ordinary",
+      "central startup branch"
+    ],
+    "model_names": [
+      "lenet5",
+      "org/model",
+      "org_model",
+      "240 x characters"
+    ],
+    "unrelated_global_draws": [
+      0,
+      7
+    ]
+  },
+  "verified": [
+    "Actual save_to_checkpoint, trainer writer/reader and inherited Server.run resume path",
+    "Five actual continued client selections match uninterrupted control and independent random.Random reference",
+    "Model, round2, run history and NumPy restoration",
+    "Save does not mutate live global Python, owned selection or NumPy RNG",
+    "Ordinary/slash/underscore/long filenames distinct, within root and <=255bytes"
+  ],
+  "limits": "Configuration preserves constructed model; process launch and network start intercepted. Not a resumed network experiment.",
+  "finding": {
+    "id": "ROOT-2BC-01",
+    "kind": "Integration test contract mismatch",
+    "severity": "medium",
+    "status": "Original C author correction required before final candidate",
+    "file": "tests/integration/test_checkpoint_runtime_agreement.py",
+    "line": 67,
+    "actual": "4 failed, 6 passed in 0.14s; four cases expect unrelated global random.seed9 rather than selection-owned stream. NumPy comparison matches.",
+    "required": "Retain RNG/model/round/history assertions; derive independent expected continuation from authoritative server selection state, explicitly distinguish unrelated global draws and exercise real selection. Do not revert accepted B semantics or weaken/skip checks."
+  },
+  "probe_commands": {
+    "313": "PYTHONPATH=/tmp/plato-phase2-root/1fe-source-archive PYTHONDONTWRITEBYTECODE=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 /tmp/plato-phase2-root/c-base-313/bin/python /tmp/plato-phase2-root/merged_checkpoint_resume_probe.py",
+    "314": "PYTHONPATH=/tmp/plato-phase2-root/1fe-source-archive PYTHONDONTWRITEBYTECODE=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 /tmp/plato-phase2-root/c-base-314/bin/python /tmp/plato-phase2-root/merged_checkpoint_resume_probe.py"
+  },
+  "module_command": "PYTHONPATH=/tmp/plato-phase2-root/1fe-source-archive PYTHONDONTWRITEBYTECODE=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 /tmp/plato-phase2-root/c-base-313/bin/python -m pytest tests/integration/test_checkpoint_runtime_agreement.py --test-profile=base -q --basetemp=/tmp/plato-phase2-root/merged-resume-module-313",
+  "harness_corrections": "Initial independent probes failed before the first case because their nested runtime directory was not created; fixed only root scratch mkdir and retained initial scripts/errors. Initial selected legacy cases also triggered expected profile deselection guard; full module rerun removes that ambiguity. No production source changed.",
+  "receipts": [
+    {
+      "path": "/tmp/plato-phase2-root/merged_checkpoint_resume_probe.py",
+      "sha256": "071cfd4c348c772eeefe9aae682048b2766895eaf2ec02e1f60c4cf990ea15a2"
+    },
+    {
+      "path": "/tmp/plato-phase2-root/merged_checkpoint_resume_probe.initial.py",
+      "sha256": "67838f65d2ef3bb0a255feccb00c881aad261c407596a3ad9090e32cf0a8667d"
+    },
+    {
+      "path": "/tmp/plato-phase2-root/merged-resume-313.json",
+      "sha256": "85a3540833f9d48ecf2749b1df8052e5b2a329283666f0b47ee466ee6f841555"
+    },
+    {
+      "path": "/tmp/plato-phase2-root/merged-resume-314.json",
+      "sha256": "d653d6a497336f3713971fde08b85e06eb05c7fc2a702207931f0d032bf890fb"
+    },
+    {
+      "path": "/tmp/plato-phase2-root/merged-resume-313.stderr",
+      "sha256": "66ff5571e0255aef053cf7c9a7fcf9063a71dc64add6c3e174b06d7b72ecd918"
+    },
+    {
+      "path": "/tmp/plato-phase2-root/merged-resume-314.stderr",
+      "sha256": "ea0f5cefb507c9140d1016a476f681ce9a065fc6dbfb28b7f01d790a9866d9f8"
+    },
+    {
+      "path": "/tmp/plato-phase2-root/merged-resume-313.initial.stderr",
+      "sha256": "eccd120a5b5e8632937bd600ae6a94e5f0ad05d5593f4dd1c4008a8c024909f7"
+    },
+    {
+      "path": "/tmp/plato-phase2-root/merged-resume-314.initial.stderr",
+      "sha256": "41be81ff2945c3713a99eb5204ad0fdfe65bcdbfb2e2cdb5f64da77af142e1b4"
+    },
+    {
+      "path": "/tmp/plato-phase2-root/merged-resume-old-test-313.log",
+      "sha256": "9701d1b3f26ef357c5b3a0014ab816673ec917377898d14091cf35d53170424b"
+    },
+    {
+      "path": "/tmp/plato-phase2-root/merged-resume-module-313.log",
+      "sha256": "fc5b8a56d8d21e2e47b9ef569e07debb591a7270ee8342bfd6b9306727e571b9"
+    }
+  ]
+}

@@ -2,9 +2,12 @@
 name = "fedunlearning"
 version = "0.1.0"
 description = "Federated Unlearning"
-readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
-    "catboost",
-    "scikit-learn",
+    "plato-learn>=1.4.3",
+    "catboost>=1.2.10",
+    "scikit-learn>=1.9.1",
 ]
+
+[tool.uv.sources]
+plato-learn = { workspace = true }

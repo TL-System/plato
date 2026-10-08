@@ -1,0 +1,94 @@
+site_name: Plato
+site_url: https://platodocs.netlify.app/
+repo_url: https://github.com/TL-System/plato
+repo_name: TL-System/plato
+theme:
+  name: material
+  icon:
+    repo: fontawesome/brands/github
+  font:
+    text: Inter
+    code: Google Sans Code 
+  palette:
+    # Light mode
+    - scheme: astral-light
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: astral-dark
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.footer
+    - navigation.instant
+    #- navigation.tabs
+    - content.code.copy
+    # - content.action.edit
+    # - content.action.view
+    - content.tooltips
+    - content.version # enables the version dropdown in the header
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.arithmatex:
+      generic: true
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/TL-System/plato
+extra_javascript:
+  - javascripts/katex.js
+  - https://unpkg.com/katex@0/dist/katex.min.js
+  - https://unpkg.com/katex@0/dist/contrib/auto-render.min.js
+extra_css:
+  - https://unpkg.com/katex@0/dist/katex.min.css
+  - stylesheets/extra.css
+nav:
+  - Home: index.md
+  - Installation: install.md
+  - Quick Start: quickstart.md
+  - Examples:
+      - Getting Started: examples/Getting Started.md
+      - Algorithms:
+          - Server Aggregation Algorithms: examples/algorithms/1. Server Aggregation Algorithms.md
+          - Secure Aggregation with Homomorphic Encryption: examples/algorithms/2. Secure Aggregation with Homomorphic Encryption.md
+          - Asynchronous Federated Learning: examples/algorithms/3. Asynchronous Federated Learning Algorithms.md
+          - Federated Unlearning: examples/algorithms/4. Federated Unlearning.md
+          - Customized Client Training Loops: examples/algorithms/5. Algorithms with Customized Client Training Loops.md
+          - Client Selection Algorithms: examples/algorithms/6. Client Selection Algorithms.md
+          - Split Learning Algorithms: examples/algorithms/7. Split Learning Algorithms.md
+          - Personalized Federated Learning: examples/algorithms/8. Personalized Federated Learning Algorithms.md
+          - Self-Supervised Personalized FL: examples/algorithms/9. Personalized Federated Learning Algorithms based on Self-Supervised Learning.md
+          - Neural Architecture Search: examples/algorithms/10. Algorithms based on Neural Architecture Search and Model Search.md
+          - Three-layer Federated Learning: examples/algorithms/11. Three-layer Federated Learning Algorithms.md
+          - Poisoning Detection: examples/algorithms/12. Poisoning Detection Algorithms.md
+          - Model Pruning: examples/algorithms/13. Model Pruning Algorithms.md
+          - Gradient Leakage Attacks and Defences: examples/algorithms/14. Gradient Leakage Attacks and Defences.md
+      - Case Studies:
+          - Federated LoRA Fine-Tuning: examples/case-studies/1. LoRA.md
+          - Composable Trainer API: examples/case-studies/2. Composable Trainer.md
+          - SmolVLA Trainer with LeRobot: examples/case-studies/3. SmolVLA Trainer with LeRobot.md
+          - Server-side Lighteval for SmolLM2: examples/case-studies/4. Server-side Lighteval for SmolLM2.md
+          - Nanochat in Plato: examples/case-studies/5. Nanochat in Plato.md
+  - Configuration Settings:
+      - Overview: configurations/overview.md
+      - General: configurations/general.md
+      - Clients: configurations/clients.md
+      - Server: configurations/server.md
+      - Evaluation: configurations/evaluation.md
+      - Data: configurations/data.md
+      - Trainer: configurations/trainer.md
+      - Algorithm: configurations/algorithm.md
+      - Results: configurations/results.md
+      - Parameters: configurations/parameters.md
+  - API Reference:
+      - Clients: references/clients.md
+      - Servers: references/servers.md
+      - Trainers: references/trainers.md
+      - Evaluators: references/evaluators.md
+  - Developer's Guide: development.md
+  - Deployment Guide: deployment.md
+  - Digital Research Alliance of Canada: ccdb.md
+  - Miscellaneous Notes: misc.md

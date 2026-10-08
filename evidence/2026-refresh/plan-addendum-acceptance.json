@@ -1,0 +1,10 @@
+{
+  "date": "2026-10-02",
+  "decision": "ACCEPTED",
+  "accepted_by": "root orchestrator",
+  "artifact": "plan-addendum.json",
+  "artifact_sha256": "5b51b0fb7ed6f68d9fce7176335b3e7be5e5f178a2788590912aa2396a487709",
+  "review": "plan-addendum-review.json",
+  "review_sha256": "cdece905ec46179d9332c4167d4cc6fec3ab17632ebadccba5614160197be0c2",
+  "scope": "Policy and task handoff acceptance only; archival implementation and dependent-component validation remain pending."
+}

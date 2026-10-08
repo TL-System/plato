@@ -1,0 +1,13 @@
+{
+  "date": "2026-10-02",
+  "decision": "ACCEPTED_FOR_INTEGRATION",
+  "accepted_by": "root orchestrator",
+  "candidate": "80539c3f5bfd3f56acfd67d61fba291ea3315f3b",
+  "gate": "phase1-gate.json",
+  "gate_sha256": "d7d5526b70a67612c44ccba48e37bdb0ed669cb62ca23460a03a5f021ddfc276",
+  "conditions": [
+    "Full merged locked validation before publication.",
+    "Finalize factual description, commit evidence, push and open draft PR.",
+    "Verify Linux CPU 3.13/3.14 jobs before Phase 2 or cleanup."
+  ]
+}

@@ -1,0 +1,1205 @@
+{
+  "schema_version": 1,
+  "written_at_utc": "2026-10-03T11:15:38.520029+00:00",
+  "role": "Fresh independent FedDyn implementation reviewer; no nested agents or author consultation",
+  "verdict": "REQUEST_CHANGES",
+  "finding_counts": {
+    "critical": 0,
+    "high": 0,
+    "medium": 3,
+    "low": 1
+  },
+  "findings": [
+    {
+      "id": "FD-C-R01",
+      "severity": "medium",
+      "title": "First uniform dispatch accepts a corrupted positive worker sample count",
+      "location": {
+        "path": "plato/trainers/strategies/algorithms/feddyn_strategy.py",
+        "line": 627,
+        "end_line": 637
+      },
+      "related_location": {
+        "path": "examples/customized_client_training/feddyn/feddyn_client.py",
+        "line": 63,
+        "end_line": 67
+      },
+      "criteria_failed": [
+        "FD-A05",
+        "FD-A10"
+      ],
+      "reproduction": "reviewer_candidate_probes.py::count_probe: real max_concurrency child trains a 2-item sampler, saves the valid endpoint/history/token bundle, then changes only worker-state num_samples from 2 to 3. On its first uniform dispatch expected_count_or_null is None.",
+      "observed": "Both Python versions accept the parent result, emit report/payload count 3, and server commits round1 with observed_counts={1:3}; actual sampler cardinality is 2. Cloud remains correctly 1.433, so this is count provenance/acceptance failure, not an incorrect gradient claim. The identical corruption is rejected in sample mode.",
+      "cause": "Worker count is compared only with a previously known/configured dispatch count. No independent current-attempt realized count binds first uniform parent handoff; report count is then overwritten with the sidecar value.",
+      "required_behavior": "Bind and validate the current realized partition count in the parent before accepting the sidecar/outbound result. Wrong worker count must roll back and send no update, including when the server had no previous count.",
+      "evidence": [
+        "independent-313",
+        "independent-314"
+      ],
+      "probe_result_case": "spawn_positive_count_corruption/uniform"
+    },
+    {
+      "id": "FD-C-R02",
+      "severity": "medium",
+      "title": "Resume accepts loss of the count cache for a client with nonzero history",
+      "location": {
+        "path": "examples/customized_client_training/feddyn/feddyn_server.py",
+        "line": 617,
+        "end_line": 639
+      },
+      "criteria_failed": [
+        "FD-A12",
+        "FD-A05"
+      ],
+      "reproduction": "reviewer_candidate_probes.py::bundle_count_probe: commit clients1 and2 with counts2 each, save the real round2 bundle, remove only counts[1] while retaining nonzero history1 and all model/config/RNG/token fields, and load fresh objects. Dispatch client1 with a now-3-item partition.",
+      "observed": "Both versions accept the incomplete bundle, dispatch client1 with expected_count_or_null=None, accept its changed count3 and commit round3. Persisted h1 is approximately -0.378, proving it was previously trained and needed its realized count binding.",
+      "cause": "Validation checks present count entries and only requires a nonempty map at positive rounds. It does not reject a missing count for a client whose saved history proves prior participation.",
+      "required_behavior": "Reject this inconsistent bundle before changing live/pending state. Preserve fixed-data count provenance through continuation; at minimum a nonzero stored history must have a validated observed count.",
+      "evidence": [
+        "independent-313",
+        "independent-314"
+      ],
+      "probe_result_case": "bundle_missing_observed_count"
+    },
+    {
+      "id": "FD-C-R03",
+      "severity": "medium",
+      "title": "Receive callback can commit an invalid boolean inactive count",
+      "location": {
+        "path": "examples/customized_client_training/feddyn/feddyn_server.py",
+        "line": 359
+      },
+      "related_location": {
+        "path": "examples/customized_client_training/feddyn/feddyn_server.py",
+        "line": 439,
+        "end_line": 447
+      },
+      "criteria_failed": [
+        "FD-A11"
+      ],
+      "reproduction": "reviewer_callback_count_probe.py: commit client2 at count1. During the next valid client1 round, on_weights_received changes only inactive observed_counts[2] from int1 to boolTrue.",
+      "observed": "Both versions commit round2 with observed_counts[2] of type bool. Subsequent save_to_checkpoint raises \"FedDyn checkpoint sample count must be a positive integer.\" Previous canonical bytes remain at round1; live model/history/round have advanced.",
+      "cause": "Python dictionary equality treats 1 and True as equal, bypassing the precommit authority guard. Staging preserves the invalid inactive entry; count validity is checked only during later bundle validation.",
+      "required_behavior": "Use type-sensitive comparison/validation for FedDyn-owned count state before arithmetic/commit. Reject and roll back this owned-state mutation; no arbitrary external callback side-effect transaction is requested.",
+      "evidence": [
+        "callback-count-313",
+        "callback-count-314"
+      ]
+    }
+  ],
+  "low_findings": [
+    {
+      "id": "FD-C-L01",
+      "severity": "low",
+      "title": "Explicit owned-source type check reports five diagnostics",
+      "criteria": [
+        "FD-A14"
+      ],
+      "locations": [
+        {
+          "path": "examples/customized_client_training/feddyn/feddyn_trainer.py",
+          "line": 71,
+          "reason": "loader.sampler annotated Iterable is passed to len without Sized narrowing"
+        },
+        {
+          "path": "plato/trainers/strategies/algorithms/feddyn_strategy.py",
+          "line": 429,
+          "reason": "Optional context.model passed to Module-only helper without narrowing"
+        },
+        {
+          "path": "plato/trainers/strategies/algorithms/feddyn_strategy.py",
+          "line": 499,
+          "reason": "Optional context.model passed to Module-only helper without narrowing"
+        },
+        {
+          "path": "plato/trainers/strategies/algorithms/feddyn_strategy.py",
+          "line": 570,
+          "reason": "Optional context.model passed to Module-only helper without narrowing"
+        },
+        {
+          "path": "plato/trainers/strategies/algorithms/feddyn_strategy.py",
+          "line": 682,
+          "reason": "Optional context.model passed to Module-only helper without narrowing"
+        }
+      ],
+      "command": "zsh -lc '/tmp/plato-phase2c-313/bin/ty check --python /tmp/plato-phase2c-313/bin/python examples/customized_client_training/feddyn plato/trainers/strategies/algorithms/feddyn_strategy.py'",
+      "result": "Exit1, five invalid-argument-type diagnostics under explicit 3.13 and3.14 environments. Runtime validation is present; no runtime failure asserted from these annotations.",
+      "remediation": "Narrow the Sized sampler and use the existing context_model validation helper or equivalent explicit Module narrowing.",
+      "logs": [
+        {
+          "path": "/tmp/plato-phase2c-feddyn-code-review/final-ty-env-313.log",
+          "bytes": 3238,
+          "sha256": "34fe0a33c3be616c77f6fb7a8fff2f66730688f9540d24d1f23a5e175cafc7a8"
+        },
+        {
+          "path": "/tmp/plato-phase2c-feddyn-code-review/final-ty-env-314.log",
+          "bytes": 3238,
+          "sha256": "34fe0a33c3be616c77f6fb7a8fff2f66730688f9540d24d1f23a5e175cafc7a8"
+        }
+      ]
+    }
+  ],
+  "reviewed_candidate": {
+    "path": "/tmp/plato-refresh-worktrees/training-final-review",
+    "commit": "13e38dafce476286db7e673e7f21343d54416b56",
+    "tree": "9fe8cfb039d0d97fc5b2c95a459de4c73c6d1b51",
+    "base_commit": "1fe8b63940c21eca23b91e9f79281171e80f0cbc",
+    "tracked_source_clean_at_end": true
+  },
+  "accepted_contract": {
+    "design_sha256": "62c5d61805c49ccc06f99776d0da820c5b27cffeb5916754ddb16bb3135c1d5b",
+    "design_review_sha256": "454aa4b5d6503e2d3fbdc572719620983bab13cd7fbd5e59df8a3dc254e0f0e1",
+    "root_acceptance": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2c-feddyn-acceptance.json",
+    "design_reopened": false,
+    "concrete_numerical_reference_inconsistencies": []
+  },
+  "summary": "Correct accepted objective/history/population algebra and valid-path CPU integration are independently confirmed. Three count-state acceptance/coherence defects remain, so all FD-A01..15 are not accepted.",
+  "criterion_mapping": [
+    {
+      "id": "FD-A01",
+      "status": "PASS_IN_REVIEWED_CPU_SCOPE",
+      "actual_test_functions": [
+        {
+          "file": "tests/trainers/test_feddyn_strategy.py",
+          "function": "test_loss_matches_independent_scalar_equation",
+          "parameter_cases_each_version": 3
+        },
+        {
+          "file": "tests/trainers/test_feddyn_strategy.py",
+          "function": "test_zero_alpha_is_exact_task_loss",
+          "parameter_cases_each_version": 1
+        }
+      ],
+      "matched_unique_pytest_cases_each_version": 4,
+      "execution_ids": [
+        "focused-313",
+        "focused-314"
+      ],
+      "related_findings": [],
+      "overlap_policy": "Cases shared by multiple FD criteria are counted once in the242 unique executions per version; FD-A12/13 share two actual-entrypoint resume cases.",
+      "independent_evidence": [
+        "pure-reference-313",
+        "pure-reference-314"
+      ]
+    },
+    {
+      "id": "FD-A02",
+      "status": "PASS_IN_REVIEWED_CPU_SCOPE",
+      "actual_test_functions": [
+        {
+          "file": "tests/integration/test_feddyn_round_flow.py",
+          "function": "test_three_round_actual_partial_participation",
+          "parameter_cases_each_version": 8
+        }
+      ],
+      "matched_unique_pytest_cases_each_version": 8,
+      "execution_ids": [
+        "focused-313",
+        "focused-314"
+      ],
+      "related_findings": [],
+      "overlap_policy": "Cases shared by multiple FD criteria are counted once in the242 unique executions per version; FD-A12/13 share two actual-entrypoint resume cases.",
+      "independent_evidence": [
+        "independent-313",
+        "independent-314"
+      ]
+    },
+    {
+      "id": "FD-A03",
+      "status": "PASS_IN_REVIEWED_CPU_SCOPE",
+      "actual_test_functions": [
+        {
+          "file": "tests/integration/test_feddyn_round_flow.py",
+          "function": "test_three_round_actual_partial_participation",
+          "parameter_cases_each_version": 8
+        }
+      ],
+      "matched_unique_pytest_cases_each_version": 8,
+      "execution_ids": [
+        "focused-313",
+        "focused-314"
+      ],
+      "related_findings": [],
+      "overlap_policy": "Cases shared by multiple FD criteria are counted once in the242 unique executions per version; FD-A12/13 share two actual-entrypoint resume cases.",
+      "independent_evidence": [
+        "independent-313",
+        "independent-314"
+      ]
+    },
+    {
+      "id": "FD-A04",
+      "status": "PASS_IN_REVIEWED_CPU_SCOPE",
+      "actual_test_functions": [
+        {
+          "file": "tests/integration/test_feddyn_round_flow.py",
+          "function": "test_multiple_participants_preserve_inactive_history_population_mean",
+          "parameter_cases_each_version": 2
+        },
+        {
+          "file": "tests/integration/test_feddyn_round_flow.py",
+          "function": "test_actual_full_participation_first_cloud",
+          "parameter_cases_each_version": 2
+        }
+      ],
+      "matched_unique_pytest_cases_each_version": 4,
+      "execution_ids": [
+        "focused-313",
+        "focused-314"
+      ],
+      "related_findings": [],
+      "overlap_policy": "Cases shared by multiple FD criteria are counted once in the242 unique executions per version; FD-A12/13 share two actual-entrypoint resume cases.",
+      "independent_evidence": [
+        "pure-reference-313",
+        "pure-reference-314"
+      ]
+    },
+    {
+      "id": "FD-A05",
+      "status": "FAIL",
+      "actual_test_functions": [
+        {
+          "file": "tests/trainers/test_feddyn_strategy.py",
+          "function": "test_classification_permutation_preserves_full_objective_gradient",
+          "parameter_cases_each_version": 1
+        },
+        {
+          "file": "tests/trainers/test_feddyn_strategy.py",
+          "function": "test_sample_alpha_uses_population_counts_never_labels",
+          "parameter_cases_each_version": 5
+        },
+        {
+          "file": "tests/integration/test_feddyn_round_flow.py",
+          "function": "test_actual_local_schema_buffer_and_count_mutation_rolls_back",
+          "parameter_cases_each_version": 8
+        },
+        {
+          "file": "tests/integration/test_feddyn_round_flow.py",
+          "function": "test_realized_partition_count_uses_sampler_not_global_backing_data",
+          "parameter_cases_each_version": 2
+        }
+      ],
+      "matched_unique_pytest_cases_each_version": 16,
+      "execution_ids": [
+        "focused-313",
+        "focused-314"
+      ],
+      "related_findings": [
+        "FD-C-R01",
+        "FD-C-R02"
+      ],
+      "overlap_policy": "Cases shared by multiple FD criteria are counted once in the242 unique executions per version; FD-A12/13 share two actual-entrypoint resume cases.",
+      "independent_evidence": [
+        "independent-313",
+        "independent-314"
+      ]
+    },
+    {
+      "id": "FD-A06",
+      "status": "PASS_IN_REVIEWED_CPU_SCOPE",
+      "actual_test_functions": [
+        {
+          "file": "tests/trainers/test_feddyn_strategy.py",
+          "function": "test_full_example_rejects_invalid_configuration",
+          "parameter_cases_each_version": 22
+        },
+        {
+          "file": "tests/trainers/test_feddyn_strategy.py",
+          "function": "test_full_sample_vector_is_required_and_finite",
+          "parameter_cases_each_version": 9
+        },
+        {
+          "file": "tests/trainers/test_feddyn_strategy.py",
+          "function": "test_optimizer_configuration_is_not_silently_coerced",
+          "parameter_cases_each_version": 8
+        },
+        {
+          "file": "tests/trainers/test_feddyn_strategy.py",
+          "function": "test_effective_alpha_overflow_and_underflow_are_rejected",
+          "parameter_cases_each_version": 2
+        }
+      ],
+      "matched_unique_pytest_cases_each_version": 41,
+      "execution_ids": [
+        "focused-313",
+        "focused-314"
+      ],
+      "related_findings": [],
+      "overlap_policy": "Cases shared by multiple FD criteria are counted once in the242 unique executions per version; FD-A12/13 share two actual-entrypoint resume cases.",
+      "independent_evidence": [
+        "pure-reference-313",
+        "pure-reference-314"
+      ]
+    },
+    {
+      "id": "FD-A07",
+      "status": "PASS_IN_REVIEWED_CPU_SCOPE",
+      "actual_test_functions": [
+        {
+          "file": "tests/integration/test_feddyn_round_flow.py",
+          "function": "test_actual_local_schema_buffer_and_count_mutation_rolls_back",
+          "parameter_cases_each_version": 8
+        },
+        {
+          "file": "tests/integration/test_feddyn_round_flow.py",
+          "function": "test_optimizer_parameter_identity_and_static_full_state",
+          "parameter_cases_each_version": 6
+        }
+      ],
+      "matched_unique_pytest_cases_each_version": 14,
+      "execution_ids": [
+        "focused-313",
+        "focused-314"
+      ],
+      "related_findings": [],
+      "overlap_policy": "Cases shared by multiple FD criteria are counted once in the242 unique executions per version; FD-A12/13 share two actual-entrypoint resume cases.",
+      "independent_evidence": [
+        "focused-313",
+        "focused-314"
+      ]
+    },
+    {
+      "id": "FD-A08",
+      "status": "PASS_IN_REVIEWED_CPU_SCOPE",
+      "actual_test_functions": [
+        {
+          "file": "tests/integration/test_feddyn_round_flow.py",
+          "function": "test_accumulated_tail_and_skips_count_only_real_updates",
+          "parameter_cases_each_version": 4
+        },
+        {
+          "file": "tests/integration/test_feddyn_round_flow.py",
+          "function": "test_empty_or_all_skipped_attempt_refuses_outbound_and_valid_retry",
+          "parameter_cases_each_version": 2
+        }
+      ],
+      "matched_unique_pytest_cases_each_version": 6,
+      "execution_ids": [
+        "focused-313",
+        "focused-314"
+      ],
+      "related_findings": [],
+      "overlap_policy": "Cases shared by multiple FD criteria are counted once in the242 unique executions per version; FD-A12/13 share two actual-entrypoint resume cases.",
+      "independent_evidence": [
+        "independent-313",
+        "independent-314",
+        "pure-reference-313",
+        "pure-reference-314"
+      ]
+    },
+    {
+      "id": "FD-A09",
+      "status": "PASS_IN_REVIEWED_CPU_SCOPE",
+      "actual_test_functions": [
+        {
+          "file": "tests/integration/test_feddyn_round_flow.py",
+          "function": "test_consecutive_same_client_uses_current_cloud_and_dispatched_history",
+          "parameter_cases_each_version": 4
+        },
+        {
+          "file": "tests/integration/test_feddyn_round_flow.py",
+          "function": "test_actual_spawn_reused_client_matches_partial_oracle",
+          "parameter_cases_each_version": 2
+        },
+        {
+          "file": "tests/trainers/test_personalized_state_ownership.py",
+          "function": "test_actual_spawn_returns_personal_state_and_optimizer_across_rounds",
+          "parameter_cases_each_version": 1
+        }
+      ],
+      "matched_unique_pytest_cases_each_version": 7,
+      "execution_ids": [
+        "focused-313",
+        "focused-314"
+      ],
+      "related_findings": [],
+      "overlap_policy": "Cases shared by multiple FD criteria are counted once in the242 unique executions per version; FD-A12/13 share two actual-entrypoint resume cases.",
+      "independent_evidence": [
+        "independent-313",
+        "independent-314"
+      ]
+    },
+    {
+      "id": "FD-A10",
+      "status": "PARTIAL_FAIL",
+      "actual_test_functions": [
+        {
+          "file": "tests/integration/test_feddyn_round_flow.py",
+          "function": "test_actual_spawned_rejection_retry_and_logical_reuse",
+          "parameter_cases_each_version": 13
+        }
+      ],
+      "matched_unique_pytest_cases_each_version": 13,
+      "execution_ids": [
+        "focused-313",
+        "focused-314"
+      ],
+      "related_findings": [
+        "FD-C-R01"
+      ],
+      "overlap_policy": "Cases shared by multiple FD criteria are counted once in the242 unique executions per version; FD-A12/13 share two actual-entrypoint resume cases.",
+      "independent_evidence": [
+        "independent-313",
+        "independent-314"
+      ]
+    },
+    {
+      "id": "FD-A11",
+      "status": "PARTIAL_FAIL",
+      "actual_test_functions": [
+        {
+          "file": "tests/integration/test_feddyn_round_flow.py",
+          "function": "test_whole_batch_rejection_preserves_every_history_and_retry_identity",
+          "parameter_cases_each_version": 40
+        },
+        {
+          "file": "tests/integration/test_feddyn_round_flow.py",
+          "function": "test_callback_and_partial_load_boundary",
+          "parameter_cases_each_version": 12
+        },
+        {
+          "file": "tests/integration/test_feddyn_round_flow.py",
+          "function": "test_actual_inbound_whole_dispatch_validation_before_mutation",
+          "parameter_cases_each_version": 22
+        }
+      ],
+      "matched_unique_pytest_cases_each_version": 74,
+      "execution_ids": [
+        "focused-313",
+        "focused-314"
+      ],
+      "related_findings": [
+        "FD-C-R03"
+      ],
+      "overlap_policy": "Cases shared by multiple FD criteria are counted once in the242 unique executions per version; FD-A12/13 share two actual-entrypoint resume cases.",
+      "independent_evidence": [
+        "callback-count-313",
+        "callback-count-314"
+      ]
+    },
+    {
+      "id": "FD-A12",
+      "status": "PARTIAL_FAIL",
+      "actual_test_functions": [
+        {
+          "file": "tests/integration/test_feddyn_round_flow.py",
+          "function": "test_pending_resume_handoff_is_atomic_and_consumed_once",
+          "parameter_cases_each_version": 5
+        },
+        {
+          "file": "tests/integration/test_feddyn_round_flow.py",
+          "function": "test_complete_bundle_round_two_to_three_matches_rational_reference",
+          "parameter_cases_each_version": 6
+        },
+        {
+          "file": "tests/integration/test_feddyn_round_flow.py",
+          "function": "test_rejected_bundle_preserves_model_history_live_rng_and_previous_pending",
+          "parameter_cases_each_version": 13
+        },
+        {
+          "file": "tests/integration/test_feddyn_round_flow.py",
+          "function": "test_failed_bundle_serialization_preserves_previous_canonical_bytes",
+          "parameter_cases_each_version": 1
+        },
+        {
+          "file": "tests/integration/test_feddyn_entrypoint.py",
+          "function": "test_actual_shipped_run_resume_matches_four_round_control_and_rng",
+          "parameter_cases_each_version": 2
+        }
+      ],
+      "matched_unique_pytest_cases_each_version": 27,
+      "execution_ids": [
+        "focused-313",
+        "focused-314"
+      ],
+      "related_findings": [
+        "FD-C-R02"
+      ],
+      "overlap_policy": "Cases shared by multiple FD criteria are counted once in the242 unique executions per version; FD-A12/13 share two actual-entrypoint resume cases.",
+      "independent_evidence": [
+        "independent-313",
+        "independent-314",
+        "runtime-capture-validation",
+        "rng-cache-313",
+        "rng-cache-314"
+      ]
+    },
+    {
+      "id": "FD-A13",
+      "status": "PASS_IN_REVIEWED_CPU_SCOPE",
+      "actual_test_functions": [
+        {
+          "file": "tests/integration/test_feddyn_entrypoint.py",
+          "function": "test_actual_shipped_run_resume_matches_four_round_control_and_rng",
+          "parameter_cases_each_version": 2
+        },
+        {
+          "file": "tests/integration/test_feddyn_entrypoint.py",
+          "function": "test_shipped_mnist_shaped_lenet_spawn_and_real_socket_cloud",
+          "parameter_cases_each_version": 1
+        }
+      ],
+      "matched_unique_pytest_cases_each_version": 3,
+      "execution_ids": [
+        "focused-313",
+        "focused-314"
+      ],
+      "related_findings": [],
+      "overlap_policy": "Cases shared by multiple FD criteria are counted once in the242 unique executions per version; FD-A12/13 share two actual-entrypoint resume cases.",
+      "independent_evidence": [
+        "runtime-capture-validation"
+      ]
+    },
+    {
+      "id": "FD-A14",
+      "status": "PARTIAL_TYPING_AND_SEPARATE_PROSE_GATE_PENDING",
+      "actual_test_functions": [],
+      "matched_unique_pytest_cases_each_version": 0,
+      "execution_ids": [
+        "input-audit",
+        "scoped-import-and-type-checks"
+      ],
+      "related_findings": [
+        "FD-C-L01"
+      ],
+      "overlap_policy": "Cases shared by multiple FD criteria are counted once in the242 unique executions per version; FD-A12/13 share two actual-entrypoint resume cases.",
+      "independent_evidence": [
+        "input-audit",
+        "pure-reference-313",
+        "pure-reference-314"
+      ]
+    },
+    {
+      "id": "FD-A15",
+      "status": "PASS_IN_REVIEWED_CPU_SCOPE",
+      "actual_test_functions": [
+        {
+          "file": "tests/trainers/test_feddyn_strategy.py",
+          "function": "test_legacy_actual_writer_weight_bias_and_corruption_are_inspection_only",
+          "parameter_cases_each_version": 1
+        },
+        {
+          "file": "tests/trainers/test_review_training_boundaries.py",
+          "function": "test_actual_accepted_b_feddyn_writer_migration",
+          "parameter_cases_each_version": 4
+        },
+        {
+          "file": "tests/trainers/test_personalized_state_ownership.py",
+          "function": "test_feddyn_exact_legacy_prefix_load_is_same_client_and_canonical_wins",
+          "parameter_cases_each_version": 1
+        }
+      ],
+      "matched_unique_pytest_cases_each_version": 6,
+      "execution_ids": [
+        "focused-313",
+        "focused-314"
+      ],
+      "related_findings": [],
+      "overlap_policy": "Cases shared by multiple FD criteria are counted once in the242 unique executions per version; FD-A12/13 share two actual-entrypoint resume cases.",
+      "independent_evidence": [
+        "input-audit",
+        "focused-313",
+        "focused-314"
+      ]
+    }
+  ],
+  "executions": [
+    {
+      "id": "focused-313",
+      "command": "zsh -lc 'PYTHONPATH=/tmp/plato-refresh-worktrees/training-final-review:/tmp/plato-phase2c-feddyn-code-review:/tmp/plato-phase2c-feddyn-code-review/source_guard PYTHONDONTWRITEBYTECODE=1 TMPDIR=/tmp/fdc13 XDG_CACHE_HOME=/tmp/plato-phase2c-feddyn-code-review/cache-313 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2c-313/bin/python -B -m pytest tests/trainers/test_feddyn_strategy.py tests/integration/test_feddyn_round_flow.py tests/integration/test_feddyn_entrypoint.py tests/trainers/test_review_training_boundaries.py::test_actual_accepted_b_feddyn_writer_migration tests/trainers/test_personalized_state_ownership.py::test_feddyn_exact_legacy_prefix_load_is_same_client_and_canonical_wins '\"'\"'tests/trainers/test_personalized_state_ownership.py::test_actual_spawn_returns_personal_state_and_optimizer_across_rounds[feddyn]'\"'\"' -p origin_checks -p no:cacheprovider -q --basetemp /tmp/fdc13/focused --junitxml /tmp/plato-phase2c-feddyn-code-review/final-focused-313.xml > /tmp/plato-phase2c-feddyn-code-review/final-focused-313.log 2>&1'",
+      "cwd": "/tmp/plato-refresh-worktrees/training-final-review",
+      "exit_code": 0,
+      "passed": 222,
+      "skipped": 0,
+      "failed": 0,
+      "log": {
+        "path": "/tmp/plato-phase2c-feddyn-code-review/final-focused-313.log",
+        "bytes": 352,
+        "sha256": "680f9b77f33ce6f7100e7484e6e9d12ec3a419fdb0f52387f509d61212e3502d"
+      },
+      "junit": {
+        "path": "/tmp/plato-phase2c-feddyn-code-review/final-focused-313.xml",
+        "bytes": 35136,
+        "sha256": "9c36d21ba0c03a49e2b822d8f43c5903dfe43baa4aaafcc2aed532b857a429ae"
+      },
+      "scope": "Scoped tests only; not a complete base/mandatory suite qualification"
+    },
+    {
+      "id": "compatibility-313",
+      "command": "zsh -lc 'PYTHONPATH=/tmp/plato-refresh-worktrees/training-final-review:/tmp/plato-phase2c-feddyn-code-review:/tmp/plato-phase2c-feddyn-code-review/source_guard PYTHONDONTWRITEBYTECODE=1 TMPDIR=/tmp/fdc13 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2c-313/bin/python -B -m pytest tests/integration/test_checkpoint_runtime_agreement.py tests/trainers/test_training_update_contract.py::test_fedprox_origin_and_nonzero_analytical_gradient tests/trainers/test_training_update_contract.py::test_fedprox_rejects_invalid_penalty tests/trainers/test_training_update_contract.py::test_fedprox_refreshes_received_weights_each_run tests/trainers/test_training_update_contract.py::test_real_fedprox_reference_config_activates_proximal_training --test-profile mandatory -p origin_checks -p no:cacheprovider -q --basetemp /tmp/fdc13/compatibility --junitxml /tmp/plato-phase2c-feddyn-code-review/final-compatibility-313.xml > /tmp/plato-phase2c-feddyn-code-review/final-compatibility-313.log 2>&1'",
+      "cwd": "/tmp/plato-refresh-worktrees/training-final-review",
+      "exit_code": 0,
+      "passed": 20,
+      "skipped": 0,
+      "failed": 0,
+      "log": {
+        "path": "/tmp/plato-phase2c-feddyn-code-review/final-compatibility-313.log",
+        "bytes": 300,
+        "sha256": "bfbaa6ef54ae22f0c5a5f91e359c7b35688c43a49c59dfb85f9ac6bff5624557"
+      },
+      "junit": {
+        "path": "/tmp/plato-phase2c-feddyn-code-review/final-compatibility-313.xml",
+        "bytes": 3602,
+        "sha256": "f8ca2f1965fb4e8db9fc25a37c0104e490f0308e44f2f27e83163612dd33698a"
+      },
+      "scope": "Scoped tests only; not a complete base/mandatory suite qualification"
+    },
+    {
+      "id": "independent-313",
+      "command": "zsh -lc 'PYTHONPATH=/tmp/plato-refresh-worktrees/training-final-review:/tmp/plato-phase2c-feddyn-code-review:/tmp/plato-phase2c-feddyn-code-review/source_guard PYTHONDONTWRITEBYTECODE=1 TMPDIR=/tmp/fdc13 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2c-313/bin/python -B /tmp/plato-phase2c-feddyn-code-review/reviewer_candidate_probes.py /tmp/fdc13/independent-v2 > /tmp/plato-phase2c-feddyn-code-review/final-independent-v2-313.log 2>&1'",
+      "cwd": "/tmp/plato-refresh-worktrees/training-final-review",
+      "exit_code": 0,
+      "script": {
+        "path": "/tmp/plato-phase2c-feddyn-code-review/reviewer_candidate_probes.py",
+        "bytes": 10606,
+        "sha256": "b7411dcf85f86fabf413bcdc314f5999193a4034f0d590853ff114252a1e65fc"
+      },
+      "log": {
+        "path": "/tmp/plato-phase2c-feddyn-code-review/final-independent-v2-313.log",
+        "bytes": 40138,
+        "sha256": "e7c11300efc04b5ced37671e105f972b07f2c42efdadd10c763e2828c74543a2"
+      },
+      "result": {
+        "path": "/tmp/fdc13/independent-v2/results.json",
+        "bytes": 29241,
+        "sha256": "685520b3ebc045c8d2b31009412c691fd321a804d7088ecabde9101712ad9daf"
+      },
+      "meaning": "Executable completed; exposed defects are explicit result statuses, not passing acceptance"
+    },
+    {
+      "id": "callback-count-313",
+      "command": "zsh -lc 'PYTHONPATH=/tmp/plato-refresh-worktrees/training-final-review:/tmp/plato-phase2c-feddyn-code-review:/tmp/plato-phase2c-feddyn-code-review/source_guard PYTHONDONTWRITEBYTECODE=1 TMPDIR=/tmp/fdc13 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 /tmp/plato-phase2c-313/bin/python -B /tmp/plato-phase2c-feddyn-code-review/reviewer_callback_count_probe.py /tmp/fdc13/callback-count > /tmp/plato-phase2c-feddyn-code-review/final-callback-count-313.log 2>&1'",
+      "cwd": "/tmp/plato-refresh-worktrees/training-final-review",
+      "exit_code": 0,
+      "script": {
+        "path": "/tmp/plato-phase2c-feddyn-code-review/reviewer_callback_count_probe.py",
+        "bytes": 2090,
+        "sha256": "a03b65efc9b1c79e7f814a4b52403449ff88ab93b53107f661891ea87b817674"
+      },
+      "log": {
+        "path": "/tmp/plato-phase2c-feddyn-code-review/final-callback-count-313.log",
+        "bytes": 3770,
+        "sha256": "184c4756a78e19b7a07bb7e1d00a26d2a2fbc4d0ce106a57f5c049d7507e099e"
+      },
+      "result": {
+        "path": "/tmp/fdc13/callback-count/results.json",
+        "bytes": 316,
+        "sha256": "3481d86f02539c54ad2685147870f8d14a0f03b908b5fa2418b2fc0d376816e2"
+      },
+      "meaning": "Executable completed; exposed defects are explicit result statuses, not passing acceptance"
+    },
+    {
+      "id": "rng-cache-313",
+      "command": "zsh -lc 'PYTHONPATH=/tmp/plato-refresh-worktrees/training-final-review:/tmp/plato-phase2c-feddyn-code-review:/tmp/plato-phase2c-feddyn-code-review/source_guard PYTHONDONTWRITEBYTECODE=1 TMPDIR=/tmp/fdc13 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 /tmp/plato-phase2c-313/bin/python -B /tmp/plato-phase2c-feddyn-code-review/reviewer_rng_cache_probe.py /tmp/fdc13/rng-cache-v2 > /tmp/plato-phase2c-feddyn-code-review/final-rng-cache-v2-313.log 2>&1'",
+      "cwd": "/tmp/plato-refresh-worktrees/training-final-review",
+      "exit_code": 0,
+      "script": {
+        "path": "/tmp/plato-phase2c-feddyn-code-review/reviewer_rng_cache_probe.py",
+        "bytes": 3735,
+        "sha256": "805801b7dc4f5bbe6c78d4bb696478043883ff6f0fb78495358726b309c8404f"
+      },
+      "log": {
+        "path": "/tmp/plato-phase2c-feddyn-code-review/final-rng-cache-v2-313.log",
+        "bytes": 4077,
+        "sha256": "5bb39a238ee609c1374df7879f6bca187a57608a95134c64ad561aaf19ff96ee"
+      },
+      "result": {
+        "path": "/tmp/fdc13/rng-cache-v2/results.json",
+        "bytes": 393,
+        "sha256": "d387f85a2d941a358379de67247a8dcb44b528f43d1d5c39dc440b5aed85b87e"
+      },
+      "meaning": "Executable completed; exposed defects are explicit result statuses, not passing acceptance"
+    },
+    {
+      "id": "pure-reference-313",
+      "command": "zsh -lc 'TMPDIR=/tmp/fdc13 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 /tmp/plato-phase2c-313/bin/python -I -B /tmp/plato-phase2c-feddyn-code-review/feddyn_reference.py --reference /tmp/plato-phase2c-feddyn-code-review/final-reference-313.json --results /tmp/plato-phase2c-feddyn-code-review/final-reference-results-313.json > /tmp/plato-phase2c-feddyn-code-review/final-reference-313.log 2>&1'",
+      "exit_code": 0,
+      "result": {
+        "path": "/tmp/plato-phase2c-feddyn-code-review/final-reference-results-313.json",
+        "bytes": 10911,
+        "sha256": "fb8142cea91750bb0cf92682c618f4d341b04ccc3b44cde5aefa84e5f9652ad6"
+      },
+      "log": {
+        "path": "/tmp/plato-phase2c-feddyn-code-review/final-reference-313.log",
+        "bytes": 176,
+        "sha256": "da5523500fdfc21b516dcfb45e296c3df4268e31ebfdf63642daf9093ff56160"
+      },
+      "check_groups": 51,
+      "closed_form_grid_cases": 64,
+      "accepted_exact_trajectory_fields": 54
+    },
+    {
+      "id": "focused-314",
+      "command": "zsh -lc 'PYTHONPATH=/tmp/plato-refresh-worktrees/training-final-review:/tmp/plato-phase2c-feddyn-code-review:/tmp/plato-phase2c-feddyn-code-review/source_guard PYTHONDONTWRITEBYTECODE=1 TMPDIR=/tmp/fdc14 XDG_CACHE_HOME=/tmp/plato-phase2c-feddyn-code-review/cache-314 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2c-314/bin/python -B -m pytest tests/trainers/test_feddyn_strategy.py tests/integration/test_feddyn_round_flow.py tests/integration/test_feddyn_entrypoint.py tests/trainers/test_review_training_boundaries.py::test_actual_accepted_b_feddyn_writer_migration tests/trainers/test_personalized_state_ownership.py::test_feddyn_exact_legacy_prefix_load_is_same_client_and_canonical_wins '\"'\"'tests/trainers/test_personalized_state_ownership.py::test_actual_spawn_returns_personal_state_and_optimizer_across_rounds[feddyn]'\"'\"' -p origin_checks -p no:cacheprovider -q --basetemp /tmp/fdc14/focused --junitxml /tmp/plato-phase2c-feddyn-code-review/final-focused-314.xml > /tmp/plato-phase2c-feddyn-code-review/final-focused-314.log 2>&1'",
+      "cwd": "/tmp/plato-refresh-worktrees/training-final-review",
+      "exit_code": 0,
+      "passed": 222,
+      "skipped": 0,
+      "failed": 0,
+      "log": {
+        "path": "/tmp/plato-phase2c-feddyn-code-review/final-focused-314.log",
+        "bytes": 352,
+        "sha256": "55bbe7caed699c732d7df734c07405585f2d4df2df4ef12956a6988f3b7f997f"
+      },
+      "junit": {
+        "path": "/tmp/plato-phase2c-feddyn-code-review/final-focused-314.xml",
+        "bytes": 35136,
+        "sha256": "5509ac0aa9140c8ed70aed2e1d781f1953afe53f2e67fb1829d6b206df245bdd"
+      },
+      "scope": "Scoped tests only; not a complete base/mandatory suite qualification"
+    },
+    {
+      "id": "compatibility-314",
+      "command": "zsh -lc 'PYTHONPATH=/tmp/plato-refresh-worktrees/training-final-review:/tmp/plato-phase2c-feddyn-code-review:/tmp/plato-phase2c-feddyn-code-review/source_guard PYTHONDONTWRITEBYTECODE=1 TMPDIR=/tmp/fdc14 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2c-314/bin/python -B -m pytest tests/integration/test_checkpoint_runtime_agreement.py tests/trainers/test_training_update_contract.py::test_fedprox_origin_and_nonzero_analytical_gradient tests/trainers/test_training_update_contract.py::test_fedprox_rejects_invalid_penalty tests/trainers/test_training_update_contract.py::test_fedprox_refreshes_received_weights_each_run tests/trainers/test_training_update_contract.py::test_real_fedprox_reference_config_activates_proximal_training --test-profile mandatory -p origin_checks -p no:cacheprovider -q --basetemp /tmp/fdc14/compatibility --junitxml /tmp/plato-phase2c-feddyn-code-review/final-compatibility-314.xml > /tmp/plato-phase2c-feddyn-code-review/final-compatibility-314.log 2>&1'",
+      "cwd": "/tmp/plato-refresh-worktrees/training-final-review",
+      "exit_code": 0,
+      "passed": 20,
+      "skipped": 0,
+      "failed": 0,
+      "log": {
+        "path": "/tmp/plato-phase2c-feddyn-code-review/final-compatibility-314.log",
+        "bytes": 240,
+        "sha256": "2fea082ba66865b5f9cfc36b783abfe9ef8395edf2d775aee43c141036aea33c"
+      },
+      "junit": {
+        "path": "/tmp/plato-phase2c-feddyn-code-review/final-compatibility-314.xml",
+        "bytes": 3602,
+        "sha256": "db32615d5e3d864695bd8fef5e403a538cccc36898777462802f14bee84f5160"
+      },
+      "scope": "Scoped tests only; not a complete base/mandatory suite qualification"
+    },
+    {
+      "id": "independent-314",
+      "command": "zsh -lc 'PYTHONPATH=/tmp/plato-refresh-worktrees/training-final-review:/tmp/plato-phase2c-feddyn-code-review:/tmp/plato-phase2c-feddyn-code-review/source_guard PYTHONDONTWRITEBYTECODE=1 TMPDIR=/tmp/fdc14 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2c-314/bin/python -B /tmp/plato-phase2c-feddyn-code-review/reviewer_candidate_probes.py /tmp/fdc14/independent-v2 > /tmp/plato-phase2c-feddyn-code-review/final-independent-v2-314.log 2>&1'",
+      "cwd": "/tmp/plato-refresh-worktrees/training-final-review",
+      "exit_code": 0,
+      "script": {
+        "path": "/tmp/plato-phase2c-feddyn-code-review/reviewer_candidate_probes.py",
+        "bytes": 10606,
+        "sha256": "b7411dcf85f86fabf413bcdc314f5999193a4034f0d590853ff114252a1e65fc"
+      },
+      "log": {
+        "path": "/tmp/plato-phase2c-feddyn-code-review/final-independent-v2-314.log",
+        "bytes": 40138,
+        "sha256": "8900922f8ecece9cb8231db0226056c6351fdaaaccfa9311911fd0c61100da9c"
+      },
+      "result": {
+        "path": "/tmp/fdc14/independent-v2/results.json",
+        "bytes": 29259,
+        "sha256": "da84e24b5f3bb5e1ec5a4b0a6348fec382058b86eb7257fa708e2dd979df7bab"
+      },
+      "meaning": "Executable completed; exposed defects are explicit result statuses, not passing acceptance"
+    },
+    {
+      "id": "callback-count-314",
+      "command": "zsh -lc 'PYTHONPATH=/tmp/plato-refresh-worktrees/training-final-review:/tmp/plato-phase2c-feddyn-code-review:/tmp/plato-phase2c-feddyn-code-review/source_guard PYTHONDONTWRITEBYTECODE=1 TMPDIR=/tmp/fdc14 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 /tmp/plato-phase2c-314/bin/python -B /tmp/plato-phase2c-feddyn-code-review/reviewer_callback_count_probe.py /tmp/fdc14/callback-count > /tmp/plato-phase2c-feddyn-code-review/final-callback-count-314.log 2>&1'",
+      "cwd": "/tmp/plato-refresh-worktrees/training-final-review",
+      "exit_code": 0,
+      "script": {
+        "path": "/tmp/plato-phase2c-feddyn-code-review/reviewer_callback_count_probe.py",
+        "bytes": 2090,
+        "sha256": "a03b65efc9b1c79e7f814a4b52403449ff88ab93b53107f661891ea87b817674"
+      },
+      "log": {
+        "path": "/tmp/plato-phase2c-feddyn-code-review/final-callback-count-314.log",
+        "bytes": 3770,
+        "sha256": "b2c1953ca6909cb26d0bac44936f42048e8978da81654e440c89b7910982f3f4"
+      },
+      "result": {
+        "path": "/tmp/fdc14/callback-count/results.json",
+        "bytes": 316,
+        "sha256": "3481d86f02539c54ad2685147870f8d14a0f03b908b5fa2418b2fc0d376816e2"
+      },
+      "meaning": "Executable completed; exposed defects are explicit result statuses, not passing acceptance"
+    },
+    {
+      "id": "rng-cache-314",
+      "command": "zsh -lc 'PYTHONPATH=/tmp/plato-refresh-worktrees/training-final-review:/tmp/plato-phase2c-feddyn-code-review:/tmp/plato-phase2c-feddyn-code-review/source_guard PYTHONDONTWRITEBYTECODE=1 TMPDIR=/tmp/fdc14 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 /tmp/plato-phase2c-314/bin/python -B /tmp/plato-phase2c-feddyn-code-review/reviewer_rng_cache_probe.py /tmp/fdc14/rng-cache-v2 > /tmp/plato-phase2c-feddyn-code-review/final-rng-cache-v2-314.log 2>&1'",
+      "cwd": "/tmp/plato-refresh-worktrees/training-final-review",
+      "exit_code": 0,
+      "script": {
+        "path": "/tmp/plato-phase2c-feddyn-code-review/reviewer_rng_cache_probe.py",
+        "bytes": 3735,
+        "sha256": "805801b7dc4f5bbe6c78d4bb696478043883ff6f0fb78495358726b309c8404f"
+      },
+      "log": {
+        "path": "/tmp/plato-phase2c-feddyn-code-review/final-rng-cache-v2-314.log",
+        "bytes": 4077,
+        "sha256": "015f3d960fc425f0b7a1b186388ff53790054183022c58d3edb956d9e8e8dc08"
+      },
+      "result": {
+        "path": "/tmp/fdc14/rng-cache-v2/results.json",
+        "bytes": 393,
+        "sha256": "d387f85a2d941a358379de67247a8dcb44b528f43d1d5c39dc440b5aed85b87e"
+      },
+      "meaning": "Executable completed; exposed defects are explicit result statuses, not passing acceptance"
+    },
+    {
+      "id": "pure-reference-314",
+      "command": "zsh -lc 'TMPDIR=/tmp/fdc14 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 /tmp/plato-phase2c-314/bin/python -I -B /tmp/plato-phase2c-feddyn-code-review/feddyn_reference.py --reference /tmp/plato-phase2c-feddyn-code-review/final-reference-314.json --results /tmp/plato-phase2c-feddyn-code-review/final-reference-results-314.json > /tmp/plato-phase2c-feddyn-code-review/final-reference-314.log 2>&1'",
+      "exit_code": 0,
+      "result": {
+        "path": "/tmp/plato-phase2c-feddyn-code-review/final-reference-results-314.json",
+        "bytes": 10945,
+        "sha256": "d8b4563bdd9510283e4b7ab4668f406d0ba86498cfa6905080576078effc9eb6"
+      },
+      "log": {
+        "path": "/tmp/plato-phase2c-feddyn-code-review/final-reference-314.log",
+        "bytes": 176,
+        "sha256": "da5523500fdfc21b516dcfb45e296c3df4268e31ebfdf63642daf9093ff56160"
+      },
+      "check_groups": 51,
+      "closed_form_grid_cases": 64,
+      "accepted_exact_trajectory_fields": 54
+    },
+    {
+      "id": "input-audit",
+      "command": "zsh -lc '/tmp/plato-phase2c-313/bin/python -I -B audit_final_inputs.py > final-input-audit.log 2>&1'",
+      "cwd": "/tmp/plato-phase2c-feddyn-code-review",
+      "exit_code": 0,
+      "script": {
+        "path": "/tmp/plato-phase2c-feddyn-code-review/audit_final_inputs.py",
+        "bytes": 5205,
+        "sha256": "146cdb0575e2457c01672f452a9c6571f81020cf72ea0a852dcebd8ef9dd9f31"
+      },
+      "result": {
+        "path": "/tmp/plato-phase2c-feddyn-code-review/final-input-audit.json",
+        "bytes": 38827,
+        "sha256": "242d7569ac115ec121067bb8041df07d57e065cb61d11479041dad81b6d402ff"
+      },
+      "log": {
+        "path": "/tmp/plato-phase2c-feddyn-code-review/final-input-audit.log",
+        "bytes": 141,
+        "sha256": "82ddeb2136cafd154b597aea3691ba393098a2bffddc70a42e057ad40c410a58"
+      },
+      "scope": "Read-only source/raw evidence audit or strict post-capture comparison; no additional production case executions"
+    },
+    {
+      "id": "runtime-capture-validation",
+      "command": "zsh -lc 'OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 /tmp/plato-phase2c-313/bin/python -I -B validate_runtime_captures.py > final-runtime-capture-validation.log 2>&1'",
+      "cwd": "/tmp/plato-phase2c-feddyn-code-review",
+      "exit_code": 0,
+      "script": {
+        "path": "/tmp/plato-phase2c-feddyn-code-review/validate_runtime_captures.py",
+        "bytes": 7917,
+        "sha256": "ba209b7c339d2f171fc2d47b76d60980ccab0e29cba9fadb8e44240d1425fadb"
+      },
+      "result": {
+        "path": "/tmp/plato-phase2c-feddyn-code-review/final-runtime-capture-validation.json",
+        "bytes": 33532,
+        "sha256": "bf2130d090bce0abed583c5bad144f4baa8e328166f48ac005fa5c35e2b71a5f"
+      },
+      "log": {
+        "path": "/tmp/plato-phase2c-feddyn-code-review/final-runtime-capture-validation.log",
+        "bytes": 93,
+        "sha256": "f9bf83d397d89325924775096371bfe2ad4df8cbfd2214a3b893c210dbec026d"
+      },
+      "scope": "Read-only source/raw evidence audit or strict post-capture comparison; no additional production case executions"
+    },
+    {
+      "id": "scoped-import-and-type-checks",
+      "cwd": "/tmp/plato-refresh-worktrees/training-final-review",
+      "commands": [
+        "zsh -lc '/tmp/plato-phase2c-313/bin/ruff check --no-cache --select I examples/customized_client_training/feddyn plato/trainers/strategies/algorithms/feddyn_strategy.py'",
+        "zsh -lc '/tmp/plato-phase2c-313/bin/ty check --python /tmp/plato-phase2c-313/bin/python examples/customized_client_training/feddyn plato/trainers/strategies/algorithms/feddyn_strategy.py'",
+        "zsh -lc '/tmp/plato-phase2c-313/bin/ty check --python /tmp/plato-phase2c-314/bin/python examples/customized_client_training/feddyn plato/trainers/strategies/algorithms/feddyn_strategy.py'"
+      ],
+      "exit_codes": [
+        0,
+        1,
+        1
+      ],
+      "logs": [
+        {
+          "path": "/tmp/plato-phase2c-feddyn-code-review/final-ruff.log",
+          "bytes": 19,
+          "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+        },
+        {
+          "path": "/tmp/plato-phase2c-feddyn-code-review/final-ty-env-313.log",
+          "bytes": 3238,
+          "sha256": "34fe0a33c3be616c77f6fb7a8fff2f66730688f9540d24d1f23a5e175cafc7a8"
+        },
+        {
+          "path": "/tmp/plato-phase2c-feddyn-code-review/final-ty-env-314.log",
+          "bytes": 3238,
+          "sha256": "34fe0a33c3be616c77f6fb7a8fff2f66730688f9540d24d1f23a5e175cafc7a8"
+        }
+      ]
+    }
+  ],
+  "unique_counts": {
+    "pytest_cases_each_python": 242,
+    "FD_focused_each": 222,
+    "B_F20_compatibility_each": 20,
+    "pytest_total_two_versions": 484,
+    "unique_nodes_each": 242,
+    "failures_or_skips_in_pytest": 0,
+    "independent_candidate_scenarios_each": 12,
+    "independent_expected_pass_each": 9,
+    "independent_exposed_defects_each": 3,
+    "pure_reference_check_groups_each": 51,
+    "closed_form_grid_cases_each": 64,
+    "actual_shipped_runtime_pytest_cases_each": 3,
+    "actual_shipped_process_runs_each": 7,
+    "strict_capture_comparison_groups_two_versions": 18,
+    "strict_float64_capture_fields": 416,
+    "no_double_counting": "Pure reference, independent scenario, and post-capture comparison groups are not extra pytest cases. Two resume tests overlap FD-A12/13. Author carried-forward full suites are not reviewer executions."
+  },
+  "environments": {
+    "313": {
+      "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+      "executable": "/tmp/plato-phase2c-313/bin/python",
+      "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+      "packages": {
+        "torch": "2.14.1",
+        "opacus": "1.6.0",
+        "numpy": "2.5.3",
+        "pytest": "9.1.1",
+        "timm": "1.0.30",
+        "safetensors": "0.8.0",
+        "python-socketio": "5.17.0",
+        "aiohttp": "3.14.3",
+        "kazoo": "2.11.0",
+        "gymnasium": "1.3.0",
+        "tiktoken": "0.14.0"
+      },
+      "uv_lock_sha256": "573b10c2ba1a2317e02f9e40c6181359cafab6f6e0a0f9be12bb256cb276fe1d",
+      "pyproject_sha256": "799bd7ba1865b097fdc8ca84a7b70337794e338de4aa9a6a13f6a4c1b9156246"
+    },
+    "314": {
+      "python": "3.14.8 (main, Sep 30 2026, 17:55:09) [Clang 21.0.0 (clang-2100.3.34.2)]",
+      "executable": "/private/tmp/plato-phase2c-314/bin/python",
+      "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+      "packages": {
+        "torch": "2.14.1",
+        "opacus": "1.6.0",
+        "numpy": "2.5.3",
+        "pytest": "9.1.1",
+        "timm": "1.0.30",
+        "safetensors": "0.8.0",
+        "python-socketio": "5.17.0",
+        "aiohttp": "3.14.3",
+        "kazoo": "2.11.0",
+        "gymnasium": "1.3.0",
+        "tiktoken": "0.14.0"
+      },
+      "uv_lock_sha256": "573b10c2ba1a2317e02f9e40c6181359cafab6f6e0a0f9be12bb256cb276fe1d",
+      "pyproject_sha256": "799bd7ba1865b097fdc8ca84a7b70337794e338de4aa9a6a13f6a4c1b9156246"
+    }
+  },
+  "independently_observed_environment_metadata": [
+    {
+      "path": "/tmp/plato-phase2c-feddyn-code-review/final-observed-environment-313.json",
+      "bytes": 506,
+      "sha256": "19de20f13295fec0cd44f2d191001ec88cac7c04ae6f0fbcde84a790275d5fef"
+    },
+    {
+      "path": "/tmp/plato-phase2c-feddyn-code-review/final-observed-environment-314.json",
+      "bytes": 532,
+      "sha256": "26e7e22c0f8d415c3ca01dc11242d6281fa9dcbca4ab743a58dc5ffad769f509"
+    }
+  ],
+  "environment_limits": "Existing3.13.16/3.14.8 macOS ARM64 CPU environments used read-only. No installation, SSL variant, fresh minimal base profile, Linux, GPU or whole optional-stack qualification.",
+  "source_and_raw_receipt_audit": {
+    "path": "/tmp/plato-phase2c-feddyn-code-review/final-input-audit.json",
+    "bytes": 38827,
+    "sha256": "242d7569ac115ec121067bb8041df07d57e065cb61d11479041dad81b6d402ff"
+  },
+  "source_checks_summary": {
+    "declared_source_receipts_verified": 20,
+    "author_raw_receipts_verified": 154,
+    "accepted_dependencies_are_ancestors": true,
+    "no_B_startup_selection_semantic_diff_from_1fe": true,
+    "runtime_carry_forward_source_differences": [
+      "evidence/2026-refresh/phase2c-feddyn-delivery-receipt.json",
+      "evidence/2026-refresh/phase2c-feddyn-facts.json",
+      "evidence/2026-refresh/phase2c-feddyn-validation.json",
+      "evidence/2026-refresh/phase2c-validation.json",
+      "tests/trainers/test_personalized_state_ownership.py"
+    ],
+    "historical_writer_fixture_verified_against_git_blob": "623f2ddc1cb4e30cd6e0b1320f48fc30815db855891206924cd9150a5e0a8e1a",
+    "nanochat_checkout_setup_transition": "Nanochat initially uninitialized; root initialized unchanged pinned gitlink before final qualification",
+    "nanochat_pin": "c75fe54aa7c1fa881701c246f9427bcbe4eee5a4"
+  },
+  "dependency_review_context": {
+    "scope": "Root-provided SCAFFOLD acceptance context; not re-reviewed here and does not close the independent FedDyn findings.",
+    "F27-R3-01": "Closed by fresh SCAFFOLD review4 on this exact candidate; one optional LOW duplicate rejection cleanup remains accepted by root.",
+    "review": {
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2c-scaffold-code-review-4.json",
+      "bytes": 117506,
+      "sha256": "ecded9d6b645910a5c2b1149181593ab131fd0e404c4bc59a03db18c75cb8d42"
+    },
+    "acceptance": {
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2c-scaffold-implementation-acceptance.json",
+      "bytes": 1786,
+      "sha256": "bcc7b020c77a61d7bdaed1f6b91ac5862958ff6c4e9dffebdd7f0946b5aed51c"
+    }
+  },
+  "import_provenance": {
+    "manifest": {
+      "path": "/tmp/plato-phase2c-feddyn-code-review/final-origin-manifest.json",
+      "bytes": 76007,
+      "sha256": "15cbc6514844b378023ca5fd831b37a927da1ebde695dea76cb38d5558c8b688"
+    },
+    "parent_cwd": "/tmp/plato-refresh-worktrees/training-final-review",
+    "spawn_worker_cwd": "Inherited immutable checkout; real socket entrypoints intentionally use their own /tmp/fdc13|14 runtime directories with immutable PYTHONPATH.",
+    "mechanism": "Reviewer-owned sitecustomize PathFinder guard plus parent module-origin assertions; pytest Popen wrapper appends provenance guard only, preserving supplied immutable PYTHONPATH and normal cwd.",
+    "no_metadata_repair": "Native scalar types asserted after actual production deserialize/transport; no .item/coercion repairing metadata."
+  },
+  "runtime_capture_validation": {
+    "path": "/tmp/plato-phase2c-feddyn-code-review/final-runtime-capture-validation.json",
+    "bytes": 33532,
+    "sha256": "bf2130d090bce0abed583c5bad144f4baa8e328166f48ac005fa5c35e2b71a5f"
+  },
+  "runtime_shutdown": {
+    "actual_rounds_and_oracle_checked": true,
+    "inherited_exit0_not_sole_success_evidence": true,
+    "process_identity_observations_rechecked": 150,
+    "surviving_observed_owned_processes": [],
+    "deadline_or_watchdog_kills_in_success_cases": false
+  },
+  "checks": {
+    "ruff": {
+      "exit_code": 0,
+      "command": "zsh -lc '/tmp/plato-phase2c-313/bin/ruff check --no-cache --select I examples/customized_client_training/feddyn plato/trainers/strategies/algorithms/feddyn_strategy.py'",
+      "log": {
+        "path": "/tmp/plato-phase2c-feddyn-code-review/final-ruff.log",
+        "bytes": 19,
+        "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+      }
+    },
+    "ty": {
+      "exit_code_each": 1,
+      "diagnostics_each": 5,
+      "logs": [
+        {
+          "path": "/tmp/plato-phase2c-feddyn-code-review/final-ty-env-313.log",
+          "bytes": 3238,
+          "sha256": "34fe0a33c3be616c77f6fb7a8fff2f66730688f9540d24d1f23a5e175cafc7a8"
+        },
+        {
+          "path": "/tmp/plato-phase2c-feddyn-code-review/final-ty-env-314.log",
+          "bytes": 3238,
+          "sha256": "34fe0a33c3be616c77f6fb7a8fff2f66730688f9540d24d1f23a5e175cafc7a8"
+        }
+      ]
+    }
+  },
+  "scripts": [
+    {
+      "path": "/tmp/plato-phase2c-feddyn-code-review/feddyn_reference.py",
+      "bytes": 22316,
+      "sha256": "3028ca542112acf494b4d9bc0ea10c8c98df78e49f114b7859ebae0fe5c7f3db"
+    },
+    {
+      "path": "/tmp/plato-phase2c-feddyn-code-review/reviewer_candidate_probes.py",
+      "bytes": 10606,
+      "sha256": "b7411dcf85f86fabf413bcdc314f5999193a4034f0d590853ff114252a1e65fc"
+    },
+    {
+      "path": "/tmp/plato-phase2c-feddyn-code-review/reviewer_callback_count_probe.py",
+      "bytes": 2090,
+      "sha256": "a03b65efc9b1c79e7f814a4b52403449ff88ab93b53107f661891ea87b817674"
+    },
+    {
+      "path": "/tmp/plato-phase2c-feddyn-code-review/reviewer_rng_cache_probe.py",
+      "bytes": 3735,
+      "sha256": "805801b7dc4f5bbe6c78d4bb696478043883ff6f0fb78495358726b309c8404f"
+    },
+    {
+      "path": "/tmp/plato-phase2c-feddyn-code-review/validate_runtime_captures.py",
+      "bytes": 7917,
+      "sha256": "ba209b7c339d2f171fc2d47b76d60980ccab0e29cba9fadb8e44240d1425fadb"
+    },
+    {
+      "path": "/tmp/plato-phase2c-feddyn-code-review/audit_final_inputs.py",
+      "bytes": 5205,
+      "sha256": "146cdb0575e2457c01672f452a9c6571f81020cf72ea0a852dcebd8ef9dd9f31"
+    },
+    {
+      "path": "/tmp/plato-phase2c-feddyn-code-review/build_final_report.py",
+      "bytes": 25236,
+      "sha256": "478714ac45daca1796c668109b24d3219687c7792af550c02f295f2a053a30ba"
+    },
+    {
+      "path": "/tmp/plato-phase2c-feddyn-code-review/origin_checks.py",
+      "bytes": 1286,
+      "sha256": "2b08b40afb3e0e85450d860f662b3d6d1bfd1138033c8ce9e055f6d28f0749bd"
+    },
+    {
+      "path": "/tmp/plato-phase2c-feddyn-code-review/source_guard/sitecustomize.py",
+      "bytes": 1400,
+      "sha256": "4aa39d2c04d5c6d2abc721ef76927aff878c46ac83f0d7fc383ad87ac6985b1e"
+    },
+    {
+      "path": "/tmp/plato-phase2c-feddyn-code-review/verify_final_report.py",
+      "bytes": 3205,
+      "sha256": "51b531fc8cff01a022fa19a0570396fa8954ed6ddf669d64aeb72d93e3f0c436"
+    }
+  ],
+  "reference_artifacts": [
+    {
+      "path": "/tmp/plato-phase2c-feddyn-code-review/reference.json",
+      "bytes": 35896,
+      "sha256": "77c0fbad765a743bd0153fd17501f1bff9f57417925442235e19647eb4cc75d7"
+    },
+    {
+      "path": "/tmp/plato-phase2c-feddyn-code-review/preparation-receipt.json",
+      "bytes": 6228,
+      "sha256": "01904049424e6ee757770bf89ed2d370dbf2d19e400d385914dc053c6f3cd8f0"
+    },
+    {
+      "path": "/tmp/plato-phase2c-feddyn-code-review/final-reference-313.json",
+      "bytes": 35896,
+      "sha256": "77c0fbad765a743bd0153fd17501f1bff9f57417925442235e19647eb4cc75d7"
+    },
+    {
+      "path": "/tmp/plato-phase2c-feddyn-code-review/final-reference-314.json",
+      "bytes": 35896,
+      "sha256": "77c0fbad765a743bd0153fd17501f1bff9f57417925442235e19647eb4cc75d7"
+    }
+  ],
+  "retained_setup_failures": [
+    {
+      "files": [
+        {
+          "path": "/tmp/plato-phase2c-feddyn-code-review/final-independent-313.log",
+          "bytes": 2241,
+          "sha256": "42da4ee3c49ff0e41a7cda910fb21f0086e8cd880d7a05c7a7362d9613840e5d"
+        },
+        {
+          "path": "/tmp/plato-phase2c-feddyn-code-review/final-independent-314.log",
+          "bytes": 2010,
+          "sha256": "728283fbb63a7345f593303892da192675d8e7b76ce100c7e20c617f95e34c3d"
+        }
+      ],
+      "cause": "Reviewer forgot to create individual runtime roots before configure_environment; fixed in owned probe only. No candidate execution verdict inferred."
+    },
+    {
+      "files": [
+        {
+          "path": "/tmp/plato-phase2c-feddyn-code-review/final-rng-cache-313.log",
+          "bytes": 295,
+          "sha256": "47e4329c9fb7085490b2905482bf55e2d9c29f48f38df5e1cbb73a2db7a7bc55"
+        },
+        {
+          "path": "/tmp/plato-phase2c-feddyn-code-review/final-rng-cache-314.log",
+          "bytes": 295,
+          "sha256": "8856240d796a7654195cec2527a5cce9472af3d02614820e029c98f7a1ce7348"
+        }
+      ],
+      "cause": "Reviewer imported server base before installing test config, invoking CLI parsing of its scratch argument. Moved import inside configured environment; candidate unchanged."
+    }
+  ],
+  "limits": [
+    "No complete C/Phase2 approval, documentation review, new design, protocol/security questionnaire or feature request.",
+    "Final source-bound Astra prose and independent prose review remain root-owned separate gates; FD-A14 records that pending work.",
+    "Synthetic deterministic CPU numerical and actual local sockets/spawn; no MNIST accuracy, new convergence theorem, active author-clipping, momentum, AMP, scheduler or GPU replay equivalence.",
+    "Complete committed-round continuation tested; no in-flight, arbitrary external datasource RNG or external callback side-effect rollback claim.",
+    "Generic B selection-owned persistence is preserved and not described as global Python replay; FedDyn separately promises and tests complete CPU RNG restoration.",
+    "SCAFFOLD/general cleanup not re-reviewed; only direct FD successful-cleanup failure/rollback/retry and its relevant shared source were checked.",
+    "Author full base/mandatory receipts audited, not independently rerun or counted as fresh minimal base provisioning. No profile guards changed.",
+    "Source/test/docs/env dependencies untouched; only owned scratch and this assigned ROOT report written. No manual cleanup, commits, pushes or nested agents."
+  ],
+  "root_next_action": "Original implementer repairs FD-C-R01..03 within accepted contract, reconciles FD-C-L01, then fresh independent verification of an exact frozen revision. This report does not close2C-11."
+}

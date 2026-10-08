@@ -1,0 +1,22 @@
+{
+  "status": "REVIEWED_REMOTE_CORRECTIONS_INTEGRATED_PENDING_GATE_AND_FINAL_CHECKS",
+  "source": "c046775645d3926621f8902c6bc3ee97698020fa",
+  "previous_publication": "0791c01afcaea96223a925a32ee22882dc437ee2",
+  "changed_source": {
+    ".github/workflows/docs_package_checks.yml": "8dd6a604712973c6db050082ccd35f154d59ce56",
+    "Dockerfile": "1d26c7926c2f4c0fd83823650612757816ef8142",
+    ".github/scripts/check_container.py": "1d26c7926c2f4c0fd83823650612757816ef8142"
+  },
+  "reviews": {
+    "docs-workflow-context-review.json": "ddbe7a853f1785bca73e31abb339f4d261ec61cb344f0a03b51059b8a5157444",
+    "container-bytecode-cleanup-review.json": "fbf7757f22b2deafef1c1d079fb4cde978d9ef9ebe982cda9b3edd9d1228e442"
+  },
+  "all_other_source_unchanged": true,
+  "dependencies_lock_and_pins_unchanged": true,
+  "remote_failures": {
+    "docs": "GitHub rejected job-level runner context beforejobs; fixed consuming-step context independently actionlint red/green.",
+    "container": "ActualimagebuiltandCPU/mount/forwardingpassed; host fixture cleanup failedrootbytecode. Corrected image flag and acceptedreceiptaftercleanup reviewed locally; actual rerun required."
+  },
+  "final_conditions": "Exact finalHEAD strict docs/defaultpackage/staticcontainer/lockedRuff; newactualLinuxdocs/container/PyTorch and finalpreview source/content binding beforemerge.",
+  "preview079_scope": "Publicreadydeploy exact079 andtwoarticles match localbuild. PrivatebuildlogAPI401; runtime/config is inference from successfulbuild+committedassertions andNetlifyfileprecedence, not private inventory."
+}

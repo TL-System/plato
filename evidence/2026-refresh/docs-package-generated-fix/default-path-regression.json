@@ -1,0 +1,54 @@
+{
+  "source_commit": "f1963eb906228c287f9787251f4319339ca7ee78",
+  "accepted": true,
+  "dirty_generated_sentinels_remain_in_checkout_and_are_absent_from_archive": true,
+  "workflow_and_release_sdist_sha256_identical": true,
+  "builds": {
+    "workflow_default_after_docs_and_dirty_outputs": {
+      "source_commit": "f1963eb906228c287f9787251f4319339ca7ee78",
+      "checkout": "/private/tmp/plato-refresh-worktrees/docs-package-fix-workflow",
+      "command": [
+        "/Users/bli/.local/share/uv/python/cpython-3.13-macos-aarch64-none/bin/python3.13",
+        ".github/scripts/check_distribution.py"
+      ],
+      "default_output_path": "ci-artifacts/docs-package",
+      "accepted": true,
+      "sdist_sha256": "74ceec3e74f18a51cef73285d271daa16dedf2a03a6076405621bd2c0b3d68b1",
+      "wheel_sha256": "d00d2c2acd5e5867e6a818fe3bc4132db8f92e00f47017da35e5a3159a60ba96",
+      "sdist_member_count": 1211,
+      "generated_docs_members": [],
+      "transient_ci_members": [],
+      "forbidden_members": [],
+      "tracked_plato_source_count": 209,
+      "retained_workspace_manifest_count": 12,
+      "required_and_optional_metadata_parity": true,
+      "installed_direct_url_and_outside_imports": true,
+      "clean_from_sdist_rebuild_matching_payload_and_metadata": true,
+      "tracked_source_status": "",
+      "all_untracked_status": "?? ci-artifacts/docs-package/acceptance.json\n?? ci-artifacts/docs-package/build-constraints.txt\n?? ci-artifacts/docs-package/installed-wheel.json\n?? ci-artifacts/docs-package/provenance.json\n?? ci-artifacts/docs-package/rebuilt-wheel-manifest.json\n?? ci-artifacts/docs-package/runtime-constraints.txt\n?? ci-artifacts/docs-package/sdist-manifest.json\n?? ci-artifacts/docs-package/wheel-manifest.json\n?? ci-artifacts/docs/commit.txt\n?? ci-artifacts/docs/docs-environment.json\n?? ci-artifacts/docs/python.txt\n?? ci-artifacts/docs/source-hashes.txt\n?? ci-artifacts/docs/uv.txt\n?? ci-artifacts/stale-run/probe.json\n"
+    },
+    "release_default_without_docs": {
+      "source_commit": "f1963eb906228c287f9787251f4319339ca7ee78",
+      "checkout": "/private/tmp/plato-refresh-worktrees/docs-package-fix-release",
+      "command": [
+        "/Users/bli/.local/share/uv/python/cpython-3.13-macos-aarch64-none/bin/python3.13",
+        ".github/scripts/check_distribution.py"
+      ],
+      "default_output_path": "ci-artifacts/docs-package",
+      "accepted": true,
+      "sdist_sha256": "74ceec3e74f18a51cef73285d271daa16dedf2a03a6076405621bd2c0b3d68b1",
+      "wheel_sha256": "d00d2c2acd5e5867e6a818fe3bc4132db8f92e00f47017da35e5a3159a60ba96",
+      "sdist_member_count": 1211,
+      "generated_docs_members": [],
+      "transient_ci_members": [],
+      "forbidden_members": [],
+      "tracked_plato_source_count": 209,
+      "retained_workspace_manifest_count": 12,
+      "required_and_optional_metadata_parity": true,
+      "installed_direct_url_and_outside_imports": true,
+      "clean_from_sdist_rebuild_matching_payload_and_metadata": true,
+      "tracked_source_status": "",
+      "all_untracked_status": "?? ci-artifacts/docs-package/acceptance.json\n?? ci-artifacts/docs-package/build-constraints.txt\n?? ci-artifacts/docs-package/installed-wheel.json\n?? ci-artifacts/docs-package/provenance.json\n?? ci-artifacts/docs-package/rebuilt-wheel-manifest.json\n?? ci-artifacts/docs-package/runtime-constraints.txt\n?? ci-artifacts/docs-package/sdist-manifest.json\n?? ci-artifacts/docs-package/wheel-manifest.json\n"
+    }
+  }
+}

@@ -2,9 +2,11 @@
 name = "AnyCostFL"
 version = "0.1.0"
 description = "Efficient On-Demand Federated Learning over Heterogeneous Edge Device"
-readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
-    "einops",
-    "ptflops"
+    "plato-learn>=1.4.3",
+    "ptflops>=0.7.5"
 ]
+
+[tool.uv.sources]
+plato-learn = { workspace = true }

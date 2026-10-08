@@ -1,0 +1,63 @@
+{
+  "source_worker_sha256": "bdeb04929d4c9b15e6118964ab166ca7b4d0b921858d89df60c7574c1d9de760",
+  "overlay": {
+    "clients": {
+      "total_clients": 2,
+      "per_round": 2,
+      "comm_simulation": false,
+      "compute_comm_time": false,
+      "do_test": false
+    },
+    "server": {
+      "port": 51450,
+      "simulate_wall_time": false,
+      "random_seed": 1234
+    },
+    "trainer": {
+      "rounds": 1,
+      "epochs": 1,
+      "batch_size": 2,
+      "max_concurrency": 2
+    },
+    "data": {
+      "download": false,
+      "sampler": "all_inclusive",
+      "testset_sampler": "all_inclusive",
+      "testset_size": 2
+    },
+    "parameters": {
+      "limitation": {
+        "activated": false
+      }
+    }
+  },
+  "observations": [
+    {
+      "event": "aggregation_oracle",
+      "pid": 3269,
+      "max_error": 1.1920928955078125e-07,
+      "weighting": "uniform channel average",
+      "parameter_tensors": 56
+    },
+    {
+      "event": "aggregation_rounding_and_norm_ties",
+      "pid": 3269,
+      "reordered_near_ties": [
+        {
+          "tensor": "layer4.0.conv2.weight",
+          "max_weight_error": 1.862645149230957e-09,
+          "max_norm_error": 5.960464477539063e-08,
+          "min_adjacent_norm_gap": 0.0
+        }
+      ]
+    },
+    {
+      "event": "channel_alignment_oracle",
+      "pid": 3269,
+      "max_error": 0.0,
+      "parameter_tensors": 56,
+      "weighting": "uniform average over clients containing each channel"
+    }
+  ],
+  "interpretation": "Finite-precision baseline addition/subtraction can reorder norm near ties. Compare independent uniform aggregation before real sorting, then independently index the actual pre-sort tensors. Existing tolerances and all 56 parameter tensors remain checked."
+}

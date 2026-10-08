@@ -1,0 +1,207 @@
+{
+  "schema_version": 1,
+  "review_type": "Fresh independent read-only retirement implementation review",
+  "reviewer": "/root/retirement_review",
+  "completed_at": "2026-10-03T17:07:28.935882+00:00",
+  "decision": "ACCEPT_RETIREMENT_IMPLEMENTATION",
+  "repository_worktree": "/tmp/plato-refresh-worktrees/retire-llm-backends",
+  "baseline_commit": "9ee92c52307cd3ecdce0c7416708c504bdb52137",
+  "reviewed_commit": "321c5311ac3f4bd4c92e398c73b5a9d5d8b53ad4",
+  "clean_worktree_before_and_after": true,
+  "plan": {
+    "path": "/tmp/plato-llm-retirement-plan.json",
+    "sha256": "c2a5a34a32bc3f41228efb61e542e575fcd863861c68ead856b5d6453208b62e"
+  },
+  "design_review": {
+    "path": "/tmp/plato-llm-retirement-plan-review.json",
+    "sha256": "ba20ec92c2d1323203edf081218c317fe3dd7ba7e175a2cc4997d0806a0aca1a",
+    "decision": "ACCEPT_DESIGN"
+  },
+  "author_receipt": {
+    "path": "/tmp/plato-refresh-worktrees/retire-llm-backends/evidence/2026-refresh/llm-retirement-validation.json",
+    "sha256": "2b9034fff2263d66d118b7e12d2eab82580e2166a1705bacfaa1e3bc55b8dd7c",
+    "source_hashes": 96,
+    "archive_hashes": 73,
+    "all_fingerprints_verified": true,
+    "all_12_referenced_log_fingerprints_verified": true
+  },
+  "unresolved_findings": {
+    "critical": 0,
+    "high": 0,
+    "medium": 0,
+    "low": 0
+  },
+  "findings": [],
+  "review_basis": [
+    {
+      "area": "Archive closure and provenance",
+      "assessment": "Accept",
+      "evidence": "48 Nanochat plus 21 LeRobot original snapshots exactly match baseline Git bytes, lengths, SHA256, Git blob identities and modes. No unmanifested originals. All 25 deleted regular files are preserved; Nanochat gitlink is the sole additional deletion. Upstream tar content independently equals the complete pinned Nanochat Git tree: 54 blobs and executable modes at c75fe54aa7c1fa881701c246f9427bcbe4eee5a4. Tar has no links/devices/absolute/traversal paths; MIT/Andrej Karpathy notice exactly equals upstream LICENSE and the separate notice copy."
+    },
+    {
+      "area": "Supported runtime retirement",
+      "assessment": "Accept",
+      "evidence": "Removed the owned runtime modules, Nanochat/LeRobot/SmolVLA registry imports and entries, Nanochat processor utility and active gitlink/.gitmodules entry. Active plato/tests/configs/CI/package sweep finds retired names only in the diagnostic map and retirement regression tests. CORE-specific state/logging/result hooks are removed; generic structured logging and evaluation/checkpoint contracts remain."
+    },
+    {
+      "area": "Retired selections fail closed",
+      "assessment": "Accept",
+      "evidence": "Existing regression tests pass. Independent probes reject inferred and mixed-case model names, explicit datasource overrides, mixed-case trainer names, and retired evaluator types even when dynamically registered, allow_missing=True, or fail_on_error=False. Factory/evaluation execution cannot bypass retirement; errors point to archive and migration destinations."
+    },
+    {
+      "area": "Generic HF/PEFT/evaluation preservation",
+      "assessment": "Accept",
+      "evidence": "Eight relevant generic HF model/trainer/datasource, LoRA/FedAvg algorithm and Lighteval/base evaluator modules remain byte-identical to baseline. Generic adapter metadata coverage is retained with neutral wording. Actual generic evaluator results including metrics, metadata and artifacts survive persisted test-state reload; unrelated state survives, and disabled evaluation clears only generic evaluation keys. Focused evaluator/trainer/FedAvg/split-learning suites pass."
+    },
+    {
+      "area": "Test profile enforcement and collection ledger",
+      "assessment": "Accept",
+      "evidence": "DP/MPC/RL prerequisite-negative probes all fail correctly; the exact original absent-Opacus base skip remains permitted and unexpected retirement skips are rejected. Remaining mandatory node set, runtime set/startup counts and deselection/session-finish enforcement are AST-identical to baseline. Candidate collection is 1308 mandatory/1301 base; independent set comparison with the hashed 1303-case baseline log exactly matches the removal/addition ledger (1284 preserved, 19 removed, 24 added). Base omits only the existing seven DP cases. Archives recurse to zero tests."
+    },
+    {
+      "area": "Package/archive containment and lock boundary",
+      "assessment": "Accept",
+      "evidence": "Independent wheel and sdist built from the exact reviewed commit contain zero archive paths, external Nanochat paths or retired Plato runtime modules. Hatch/Ruff/ty/pytest archive exclusions are explicit and scope-limited. Locked package set moves 277 to 267, removes exactly the documented ten packages, adds none, and leaves every retained external package record (including versions, sources, hashes and dependency metadata) unchanged. uv lock --check passes."
+    },
+    {
+      "area": "Owned CI changes",
+      "assessment": "Accept within author scope",
+      "evidence": "Workflow diff replaces only the retired Nanochat test target with the retirement tests and diagnostic utility in the owned type guard. Matrix/helper delivery is separately root-owned; this review does not claim the old author matrix is the final integrated CI configuration."
+    }
+  ],
+  "independent_validation": [
+    {
+      "command": "PYTHONDONTWRITEBYTECODE=1 HF_HUB_OFFLINE=1 HF_DATASETS_OFFLINE=1 /tmp/plato-retirement-mandatory-313/bin/python -m pytest tests/test_retired_backends.py tests/evaluators tests/trainers/test_composable_trainer.py tests/algorithms/test_fedavg_algorithm.py tests/servers/test_fedavg_strategy.py tests/servers/test_split_learning_selection_strategy.py --test-profile=mandatory -q -p no:cacheprovider --basetemp=/tmp/plato-retirement-review/pytest-runtime",
+      "exit_code": 0,
+      "result": "143 passed in 0.62s; no skips."
+    },
+    {
+      "command": "Mandatory tests --collect-only using Python 3.13.16 with cacheprovider disabled",
+      "exit_code": 0,
+      "result": "1308 collected; exact ledger confirmed."
+    },
+    {
+      "command": "Base tests --collect-only using isolated author base Python 3.13.16 with cacheprovider disabled",
+      "exit_code": 0,
+      "result": "1301 collected; exactly seven existing DP nodes absent."
+    },
+    {
+      "command": "pytest archives --collect-only -q -p no:cacheprovider",
+      "exit_code": 5,
+      "result": "Expected no-tests-collected exit; zero archive tests."
+    },
+    {
+      "command": "/tmp/plato-retirement-mandatory-313/bin/python /tmp/plato-retirement-review/check-integrity.py",
+      "exit_code": 0,
+      "result": "Exact original/upstream Git object closure, receipt fingerprints, and retained lock records verified."
+    },
+    {
+      "command": "/tmp/plato-retirement-mandatory-313/bin/python /tmp/plato-retirement-review/check-behavior.py",
+      "exit_code": 0,
+      "result": "12 independent retired registry/evaluator negative paths, three mandatory prerequisite negative paths, strict skip behavior, generic checkpoint round-trip, and distribution containment verified."
+    },
+    {
+      "command": "/tmp/plato-retirement-mandatory-313/bin/python /tmp/plato-retirement-review/check-collection.py",
+      "exit_code": 0,
+      "result": "Exact collection ledger and all 12 receipt log hashes verified."
+    },
+    {
+      "command": "uv build --no-build-isolation --python /tmp/plato-retirement-mandatory-313/bin/python --sdist --wheel --out-dir /tmp/plato-retirement-review/dist",
+      "exit_code": 0,
+      "result": "Reviewed commit builds; wheel 426 entries, sdist 1353 entries; zero retired/archive payloads."
+    },
+    {
+      "command": "uv lock --check --python 3.13",
+      "exit_code": 0,
+      "result": "Resolved 268 packages including workspace metadata; current lock."
+    },
+    {
+      "command": "/tmp/plato-retirement-mandatory-313/bin/ruff check . --select I",
+      "exit_code": 0,
+      "result": "All checks passed."
+    },
+    {
+      "command": "git diff --check 9ee92c52307cd3ecdce0c7416708c504bdb52137..HEAD; git status --porcelain=v1 --untracked-files=all",
+      "exit_code": 0,
+      "result": "Clean diff and worktree."
+    }
+  ],
+  "independent_artifacts": {
+    "integrity-and-lock.json": {
+      "path": "/tmp/plato-retirement-review/integrity-and-lock.json",
+      "sha256": "102376436ddb81ff631b90b23bbb16dc7917da232f41bb653aa55b79ea2d49de"
+    },
+    "behavior-and-build.json": {
+      "path": "/tmp/plato-retirement-review/behavior-and-build.json",
+      "sha256": "f07d158866ffdcd228a3a9c08be28a4041fdd7f02dc8a1cb025b03360d92f491"
+    },
+    "collection-ledger.json": {
+      "path": "/tmp/plato-retirement-review/collection-ledger.json",
+      "sha256": "0d2fe801cab59c35f4c96ffda6777d1d00a2a1fadc57a6fb9eae4a4d74642b99"
+    },
+    "focused-tests.log": {
+      "path": "/tmp/plato-retirement-review/focused-tests.log",
+      "sha256": "4b21c6ad2a92d92ee20b7a3fd48f651a3110f1bfad2cfafc3e9f68b2647a7005"
+    },
+    "collection-mandatory.log": {
+      "path": "/tmp/plato-retirement-review/collection-mandatory.log",
+      "sha256": "325bec7ff93280d1e392c35bb99a830599b69df3cccf634f5c5c1bdcb80c5bd1"
+    },
+    "collection-base.log": {
+      "path": "/tmp/plato-retirement-review/collection-base.log",
+      "sha256": "1f62af83a43b338caf00066c6fb547daf65f92d623467bfc757dd5791974c469"
+    },
+    "archive-collection.log": {
+      "path": "/tmp/plato-retirement-review/archive-collection.log",
+      "sha256": "b77b30fffdaf0df67886db72dd1a6824a7bbcd109fe42552036e1d177951e851"
+    },
+    "build.log": {
+      "path": "/tmp/plato-retirement-review/build.log",
+      "sha256": "5c60e909e1a5671a01b8e69e0d268219facde497d583a35e4a082e46231b7b46"
+    },
+    "lock-check.log": {
+      "path": "/tmp/plato-retirement-review/lock-check.log",
+      "sha256": "7774956de13430ebbcb0a6c1ce1a37fd5e08185bf227744fff55300108b971b9"
+    },
+    "ruff.log": {
+      "path": "/tmp/plato-retirement-review/ruff.log",
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    "check-integrity.py": {
+      "path": "/tmp/plato-retirement-review/check-integrity.py",
+      "sha256": "6e99ac3060f3685333184fed6ad61feb9cced8e388647a2ec9cf4798679f7ee2"
+    },
+    "check-behavior.py": {
+      "path": "/tmp/plato-retirement-review/check-behavior.py",
+      "sha256": "0a3919e74544390f6c0c285d12656ca0695ec8dba027d575e76a40ad4f8c04aa"
+    },
+    "check-collection.py": {
+      "path": "/tmp/plato-retirement-review/check-collection.py",
+      "sha256": "dc9151ac7831b7584438b1c9dd89755e4571a2893645fbcd543f909c2d583737"
+    }
+  },
+  "reviewed_distributions": {
+    "plato_learn-1.4.3-py3-none-any.whl": {
+      "entries": 426,
+      "sha256": "13a78a2b2b8d7bdeab9cd7d02951b314672a78eb522a04877441d3023093ba87",
+      "retired_payloads": 0
+    },
+    "plato_learn-1.4.3.tar.gz": {
+      "entries": 1353,
+      "sha256": "e4e59a75f178bc38374617e25689222fa80cc38fa48f0381218400911edf7aa1",
+      "retired_payloads": 0
+    }
+  },
+  "integration_notes": [
+    "Acceptance covers the retirement owner's exact commit. Integrate separately owned archive READMEs/public migration notices and the Qwen replacement config before final public delivery so runtime diagnostic destinations exist.",
+    "Root must retain the newer Phase 2 CI helper and Python 3.13-only configuration during three-way integration, then run the final integrated checks and Linux acceptance gate.",
+    "Archive material, manifests and immutable historical evidence should remain byte-preserved through integration."
+  ],
+  "limits": [
+    "No repository source edits, commits, nested agents or external review service used. Only reviewer-owned scratch reports/scripts/artifacts were written.",
+    "Existing author environments were used for read-only command execution; no installs/syncs or environment mutation performed.",
+    "No full-suite execution or broad type rerun was performed; collection, focused execution and independent probes cover this implementation scope. Root owns final integrated qualification.",
+    "No Python 3.14, Qwen/HF replacement changes, pretrained-weight execution or docs build is certified by this retirement-only review.",
+    "Baseline collection is independently parsed from its hash-verified author log; the original Nanochat-enabled baseline suite was not re-executed."
+  ]
+}

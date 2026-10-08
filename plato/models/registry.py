@@ -5,7 +5,7 @@ Having a registry of all available classes is convenient for retrieving an insta
 based on a configuration at run-time.
 """
 
-from typing import Any, Dict, TypedDict, cast
+from typing import Any, TypedDict, cast
 
 from plato.config import Config
 from plato.models import (
@@ -15,18 +15,40 @@ from plato.models import (
     huggingface,
     lenet5,
     multilayer,
-    nanochat,
     resnet,
-    smolvla,
-    torch_hub,
+    torchvision,
     vgg,
-    vit,
 )
+from plato.utils.retired_backends import raise_if_retired
 
-try:  # pragma: no cover - optional MLX models
-    from plato.models.mlx import lenet5 as mlx_lenet5
-except ImportError:  # pragma: no cover
-    mlx_lenet5 = cast(Any, None)
+_MLX_UNLOADED = object()
+mlx_lenet5 = cast(Any, _MLX_UNLOADED)
+
+
+def _load_mlx_lenet5() -> Any:
+    """Load the native model only after an explicit MLX selection."""
+    global mlx_lenet5
+    if mlx_lenet5 is _MLX_UNLOADED:
+        try:
+            from plato.models.mlx import lenet5 as native_lenet5
+        except ImportError as exc:
+            raise ImportError(
+                "MLX models require the optional mlx dependency on Apple Silicon."
+            ) from exc
+        mlx_lenet5 = native_lenet5
+        if registered_mlx_models.get("mlx_lenet5") is _mlx_lenet5_model:
+            registered_mlx_models["mlx_lenet5"] = native_lenet5.Model
+    if mlx_lenet5 is None:
+        raise ImportError(
+            "MLX models require the optional mlx dependency on Apple Silicon."
+        )
+    return mlx_lenet5
+
+
+def _mlx_lenet5_model(**kwargs: Any) -> Any:
+    """Keep the built-in factory callable before its native module is loaded."""
+    return _load_mlx_lenet5().Model(**kwargs)
+
 
 registered_models = {
     "lenet5": lenet5.Model,
@@ -39,18 +61,13 @@ registered_factories = {
     "vgg": vgg.Model,
     "cnn_encoder": cnn_encoder.Model,
     "general_multilayer": general_multilayer.Model,
-    "torch_hub": torch_hub.Model,
+    "torchvision": torchvision.Model,
     "huggingface": huggingface.Model,
-    "vit": vit.Model,
-    "nanochat": nanochat.Model,
-    "smolvla": smolvla.Model,
     "timesfm": huggingface.Model,
     "patchtsmixer": huggingface.Model,
 }
 
-registered_mlx_models = {}
-if mlx_lenet5 is not None:
-    registered_mlx_models["mlx_lenet5"] = mlx_lenet5.Model
+registered_mlx_models = {"mlx_lenet5": _mlx_lenet5_model}
 
 
 class ModelKwargs(TypedDict, total=False):
@@ -102,6 +119,8 @@ def get(**kwargs: Any) -> Any:
     if not model_type and model_name:
         model_type = model_name.split("_")[0]
 
+    raise_if_retired(model_type, category="model")
+
     # Get model parameters
     model_params: dict[str, Any] = {}
     if "model_params" in kwargs:
@@ -116,20 +135,35 @@ def get(**kwargs: Any) -> Any:
     safe_params = {k: v for k, v in model_params.items() if k != "framework"}
 
     framework = model_framework.lower()
-    if framework == "mlx":
+    mlx_name = model_name.lower().startswith("mlx_")
+    if framework == "mlx" or mlx_name:
+        if framework and framework != "mlx":
+            raise ValueError("MLX model name conflicts with the requested framework.")
+        parameter_framework = str(model_params.get("framework", "mlx")).lower()
+        if parameter_framework != "mlx":
+            raise ValueError(
+                "MLX model selection conflicts with parameters.model.framework."
+            )
+        _load_mlx_lenet5()
         candidate_keys = []
         if model_type:
-            candidate_keys.append(f"{framework}_{model_type}")
+            candidate_keys.append(f"mlx_{model_type}")
             candidate_keys.append(model_type)
         if model_name:
             candidate_keys.append(model_name)
         for key in candidate_keys:
             key_lower = key.lower()
             if key_lower in registered_mlx_models:
-                return registered_mlx_models[key_lower](**safe_params)
-    elif model_name and model_name.lower() in registered_mlx_models:
-        return registered_mlx_models[model_name.lower()](**safe_params)
+                from plato.trainers.mlx import _resolve_device, _rng_scope, mx
 
+                with (
+                    mx.stream(_resolve_device()),
+                    _rng_scope(getattr(config.trainer, "model_seed", None)),
+                ):
+                    model = registered_mlx_models[key_lower](**safe_params)
+                    mx.eval(model.state)
+                    return model
+        raise ValueError(f"No native MLX model registered for: {model_name}")
     if model_type in registered_models:
         registered_model = registered_models[model_type]
         return registered_model(**safe_params)

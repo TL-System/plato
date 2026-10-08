@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "frozen_source_commit": "e079df6228f9529472c7b3c3d9a2db46a42636a8",
+  "lock_sha256": "6d0c35d74f9d275ac3d7952c14d62838179bcaac1bec08e6eda699771ab7d7ca",
+  "runtime_nodes": [
+    "tests/llm_eval/test_lighteval_runtime.py::test_real_preset_pipeline_normalizes_metrics_and_refreshes_exports[current-model]",
+    "tests/llm_eval/test_lighteval_runtime.py::test_real_preset_pipeline_normalizes_metrics_and_refreshes_exports[configured-local]",
+    "tests/llm_eval/test_lighteval_runtime.py::test_real_piqa_prompt_and_preset_task_contract",
+    "tests/llm_eval/test_lighteval_runtime.py::test_real_model_config_failure_clears_stale_results_and_exports[False]",
+    "tests/llm_eval/test_lighteval_runtime.py::test_real_model_config_failure_clears_stale_results_and_exports[True]",
+    "tests/llm_eval/test_lighteval_runtime.py::test_real_missing_primary_metric_is_rejected",
+    "tests/llm_eval/test_lighteval_runtime.py::test_real_readonly_local_source_ignores_old_responses[same]",
+    "tests/llm_eval/test_lighteval_runtime.py::test_real_readonly_local_source_ignores_old_responses[separate]",
+    "tests/llm_eval/test_lighteval_runtime.py::test_failure_after_actual_inference_cleans_local_copies[False]",
+    "tests/llm_eval/test_lighteval_runtime.py::test_failure_after_actual_inference_cleans_local_copies[True]",
+    "tests/llm_eval/test_lighteval_runtime.py::test_real_hub_style_response_cache_is_per_run"
+  ],
+  "runtime_node_count": 11,
+  "required_optional_distributions": [
+    "lighteval==0.13.0",
+    "langdetect>=1.0.9,<2",
+    "xxhash>=3.8.1,<4",
+    "nltk==3.10.3 (existing authorized override)"
+  ],
+  "actual_nltk_resources": [
+    "tokenizers/punkt",
+    "tokenizers/punkt_tab"
+  ],
+  "resource_reason": "Installed Lighteval Registry imports IFEval instructions_utils, which checks these two resources and downloads them at import if absent. No other corpora are demanded by the executed keyword-only IFEval rows.",
+  "local_asset_construction": "Real GPT2 causal model (one layer, one head, eight hidden dimensions), WordLevel/PreTrainedTokenizerFast, three local parquet rows per task, original upstream task names/prompts/metrics. Fixture generation is limited to one token; public task configuration is unchanged.",
+  "execution": {
+    "command": ".venv/bin/python -m pytest tests/llm_eval -q -o junit_family=legacy --junitxml=/tmp/plato-lighteval-runtime-final.xml",
+    "result": "11 passed, 1 upstream Hugging Face Hub deprecation warning in79.86 seconds.",
+    "log": "/tmp/plato-lighteval-runtime-final.log"
+  },
+  "profile_owner": "Root serializes accepted optional profile integration and ledger; evaluator author does not edit shared conftest/CI/manifest beyond the root dependency cherry-pick.",
+  "run_command_requirement": "Use locked uv sync --extra llm_eval followed by direct owned interpreter/uv run --no-sync, or retain --extra llm_eval on every syncing uv run. Root reproduced plain uv run replacing compatible xxhash3.8.1 with incompatible4.0.1 while leaving Lighteval installed.",
+  "limits": [
+    "Runtime qualification uses controlled offline rows, not public benchmark accuracy or performance.",
+    "Configured local fallback independently copies whole directories once per distinct model/tokenizer source; large checkpoints can require substantial disk space and time.",
+    "No atomic snapshot or concurrent checkpoint writer guarantee; no GPU/distributed backend qualification."
+  ]
+}

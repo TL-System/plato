@@ -1,0 +1,35 @@
+{
+  "candidate_commit": "b728a5b71d0945828dcf288a39b796b1e0fb4ec7",
+  "candidate_tree": "b0879eb78803b379d6888d4cc208fd8f914eb610",
+  "candidate_clean": true,
+  "environment": {
+    "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+    "optional_available": {
+      "opacus": false,
+      "kazoo": false,
+      "gymnasium": false,
+      "tiktoken": false
+    }
+  },
+  "command": "HF_HUB_OFFLINE=1 HF_DATASETS_OFFLINE=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 TOKENIZERS_PARALLELISM=false /tmp/plato-phase2-root/base-313/bin/python -m pytest tests --test-profile=base -m 'not runtime' -ra --junitxml=/tmp/plato-phase2-root/a-base-313.xml",
+  "cwd": "/tmp/plato-refresh-worktrees/data",
+  "imported_plato": "/private/tmp/plato-refresh-worktrees/data/plato/__init__.py",
+  "exit_code": 0,
+  "result": {
+    "passed": 387,
+    "permitted_skip_reports": 4,
+    "deselected_runtime": 48,
+    "seconds": 10.31
+  },
+  "artifacts": {
+    "a-base-313.log": {
+      "path": "/tmp/plato-phase2-root/a-base-313.log",
+      "sha256": "049a9b4947327a060d0d81eec3d696c4ef269c3bcccaef310d76239fea9bc7de"
+    },
+    "a-base-313.xml": {
+      "path": "/tmp/plato-phase2-root/a-base-313.xml",
+      "sha256": "cf51371993d057e729818cb60cbce510b76ba66b796a8f35f90f6b0b3f1f3e15"
+    }
+  },
+  "limits": "Root clean-base preflight on Python 3.13 only; not a replacement for fresh independent review, Python 3.14, merged-tree qualification, or installed artifact isolation. Environment editable installation points to D; main process source import verified from exact A candidate working directory."
+}

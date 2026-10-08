@@ -82,7 +82,7 @@
     Default value: `true`
 
     !!! note "Structured evaluators"
-        The optional `[evaluation]` section runs as part of this server-side test flow. If you want Lighteval or Nanochat CORE metrics, keep `server.do_test = true`.
+        The optional `[evaluation]` section runs as part of this server-side test flow. If you want Lighteval metrics, keep `server.do_test = true`.
 
 !!! example "model_path"
     The path to the pretrained and trained models.
@@ -108,7 +108,6 @@
     A list of processors to apply on the payload right after receiving. Multiple processors are permitted.
 
     - `model_decompress` Decompress model parameters. Must be placed as the first processor if `model_compress` is applied on the client side.
- `outbound_feature_ndarrays`.
     - `model_dequantize` Dequantize model parameters back to the 32-bit floating number format.
     - `model_dequantize_qsgd` Dequantize model parameters quantized with QSGD.
 

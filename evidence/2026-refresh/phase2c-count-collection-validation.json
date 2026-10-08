@@ -1,0 +1,600 @@
+{
+  "schema_version": 1,
+  "finding": "ROOT-2C-COLLECTION-01",
+  "status": "FIXED_FULL_COLLECTION_DUAL_VERSION_QUALIFIED_FRESH_REVIEW_PENDING",
+  "starting_commit": "f342a5a6021cee938e0b880eca5919e09ace1981",
+  "frozen_dp_correction_commit": "f342a5a6021cee938e0b880eca5919e09ace1981",
+  "root_original_integrated_candidate": "2633f8394c142ec04db13743b54a427e04c2aed7",
+  "implementation_commit": "05468d5db1632c525f7f3dc9ac11ab12cf2cb0cd",
+  "implementation_tree": "48f46d1885e99780dff6546903daaca9efadd1f1",
+  "implementation_parent": "f342a5a6021cee938e0b880eca5919e09ace1981",
+  "evidence_commit_identity_note": "Exact final evidence commit/tree supplied in clean handoff and own scratch final-candidate.json to avoid self-reference.",
+  "sources": {
+    "tests/integration/feddyn_partition_worker.py": {
+      "path": "tests/integration/feddyn_partition_worker.py",
+      "bytes": 1988,
+      "sha256": "38d2d552d87826410cfd79a9ffceaba83d3023fc028554337b7838865ee9f1ac",
+      "git_blob": "cb6112fa950fea94e33e1571b9d9671aeeee1c90"
+    },
+    "tests/integration/test_feddyn_count_boundaries.py": {
+      "path": "tests/integration/test_feddyn_count_boundaries.py",
+      "bytes": 8609,
+      "sha256": "17f1fab24a9d0f7dd2d23c2b03a0c7329c8476d6e385cb24deec38880b204790",
+      "git_blob": "6bc519193cbace7108844167f65ecd13be9e5f2e"
+    }
+  },
+  "root_original_reproduction": {
+    "count-isolation-313.log": {
+      "path": "/tmp/plato-phase2c-count-collection-fix/root-count-isolation-313.log",
+      "bytes": 5899,
+      "sha256": "dbb92c431b6de218311ae9e9e31fa95af0e9b1603352813e759a22e281cea077"
+    },
+    "count-isolation-313.xml": {
+      "path": "/tmp/plato-phase2c-count-collection-fix/root-count-isolation-313.xml",
+      "bytes": 5402,
+      "sha256": "16840ef45577144b75dcb3dcbdd2c975f99219d71550d1939c7e4a9b68936632"
+    },
+    "count-isolation-313-receipt.json": {
+      "path": "/tmp/plato-phase2c-count-collection-fix/root-count-isolation-313-receipt.json",
+      "bytes": 673,
+      "sha256": "0a1bdf20fd3bbcaeb4770e2e9e074c2db6451eb888d94c043407d34dd4407053"
+    }
+  },
+  "diagnosis": {
+    "cause": "Full pytest collection imports the same round-flow source as both tests.integration.test_feddyn_round_flow and test_feddyn_round_flow. Its module loader replaces sys.modules[feddyn_trainer], leaving earlier PlainSGD class objects inconsistent with the canonical module attribute. Real spawn pickling fails before any optimizer run.",
+    "actual_collection_identity_probe": {
+      "tests.integration.test_feddyn_round_flow": {
+        "path": "/private/tmp/plato-refresh-worktrees/training/tests/integration/test_feddyn_round_flow.py",
+        "module_identity": 4906226832,
+        "plain_sgd_is_current": false
+      },
+      "test_feddyn_round_flow": {
+        "path": "/private/tmp/plato-refresh-worktrees/training/tests/integration/test_feddyn_round_flow.py",
+        "module_identity": 4906236192,
+        "plain_sgd_is_current": true
+      }
+    },
+    "probe_command": "zsh -lc PYTHONPATH=/tmp/plato-phase2c-count-collection-fix OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 /tmp/plato-phase2c-313/bin/python -m pytest tests -k test_parent_realizes_partition_once_without_using_backing_length --collect-only -q -p collection_identity_probe",
+    "probe_receipts": [
+      {
+        "path": "/tmp/plato-phase2c-count-collection-fix/collection_identity_probe.py",
+        "bytes": 642,
+        "sha256": "d9a1b304bfb8bf884ba32be0862d6baf736b0b943d57bbe94e0ddca54ff4b7ff"
+      },
+      {
+        "path": "/tmp/plato-phase2c-count-collection-fix/collection-import-identities.json",
+        "bytes": 438,
+        "sha256": "9745419cc7adc3ac3c45345285ad03a2590f54c6e84e0d0f82801cd20006cbc7"
+      },
+      {
+        "path": "/tmp/plato-phase2c-count-collection-fix/identity-collection.log",
+        "bytes": 296,
+        "sha256": "ce08019eb482647a44a1b70cd9a8fb79d10994f2796b165a3a3d3d63b8cc18d6"
+      }
+    ]
+  },
+  "fix": "Move the unchanged single-partition scenario/assertions into a private shared test function. The existing spawn=True case launches a guarded standalone interpreter, which runs that same function through actual trainer max_concurrency spawn; spawn=False still runs it directly under full collection. A real child epoch callback records actual sampler indices/count/backing size without fetching batches or changing sampling/model/optimizer. The subprocess retains a90second limit consistent with existing FedDyn count helpers and propagates nonzero exits.",
+  "assertion_and_scope_preservation": {
+    "base": "f342a5a6021cee938e0b880eca5919e09ace1981",
+    "original_assertions": 18,
+    "original_assertions_retained_exact_ast": 18,
+    "unchanged_other_count_tests_ast": [
+      "test_actual_spawn_wrong_first_count_rejected_and_retry",
+      "test_nonzero_history_requires_saved_observed_count",
+      "test_inactive_callback_count_types_rejected_before_commit"
+    ],
+    "single_draw_partition_class_ast_unchanged": true,
+    "test_functions_and_parameter_decorators_preserved": [
+      "test_actual_spawn_wrong_first_count_rejected_and_retry",
+      "test_parent_realizes_partition_once_without_using_backing_length",
+      "test_nonzero_history_requires_saved_observed_count",
+      "test_inactive_callback_count_types_rejected_before_commit"
+    ],
+    "frozen_dp_file_sha256": "3f95d8d7942f173290852ab6c3f803b41c01831f4e008b285b473d7962df93bc",
+    "frozen_dp_receipt_sha256": "a03c9f0baa584c1544ad095d145294c1e12e8632719dfd2cf441bf0cb130619d",
+    "production_diff": ""
+  },
+  "unchanged_production_DP_CI_and_other_existing_sources": true,
+  "environments": {
+    "313": {
+      "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+      "executable": "/tmp/plato-phase2c-313/bin/python",
+      "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+      "packages": {
+        "torch": "2.14.1",
+        "opacus": "1.6.0",
+        "pytest": "9.1.1",
+        "ty": "0.0.84",
+        "ruff": "0.16.10"
+      },
+      "environment": "/tmp/plato-phase2c-313",
+      "provisioning": "Existing owned locked group-dev environment; no borrowed/root environment or re-provisioning."
+    },
+    "314": {
+      "python": "3.14.8 (main, Sep 30 2026, 17:55:09) [Clang 21.0.0 (clang-2100.3.34.2)]",
+      "executable": "/private/tmp/plato-phase2c-314/bin/python",
+      "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+      "packages": {
+        "torch": "2.14.1",
+        "opacus": "1.6.0",
+        "pytest": "9.1.1",
+        "ty": "0.0.84",
+        "ruff": "0.16.10"
+      },
+      "environment": "/tmp/plato-phase2c-314",
+      "provisioning": "Existing owned locked group-dev environment; no borrowed/root environment or re-provisioning."
+    }
+  },
+  "executions": {
+    "red-313": {
+      "name": "red-313",
+      "command": "OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2c-313/bin/python -m pytest tests -k test_parent_realizes_partition_once_without_using_backing_length -q --basetemp /tmp/plato-phase2c-count-collection-fix/red-313 --junitxml /tmp/plato-phase2c-count-collection-fix/red-313.xml",
+      "shell": "zsh -lc",
+      "head": "f342a5a6021cee938e0b880eca5919e09ace1981",
+      "python_environment": "/tmp/plato-phase2c-313",
+      "exit_code": 1,
+      "seconds": 6.817869833204895,
+      "log": "/tmp/plato-phase2c-count-collection-fix/red-313.log",
+      "log_sha256": "c7a7e90010880ad124cc6328395f87d158a95bb3367e8492320260a04a7f9dba",
+      "junit": {
+        "path": "/tmp/plato-phase2c-count-collection-fix/red-313.xml",
+        "bytes": 5396,
+        "sha256": "4fd0c7bc445f196ed738ef9f74442785e66a0e86ffb471235115f388d6c519a6"
+      },
+      "counts": {
+        "tests": 2,
+        "passed": 1,
+        "failed": 1,
+        "skipped": 0
+      },
+      "test_ids": [
+        "tests.integration.test_feddyn_count_boundaries::test_parent_realizes_partition_once_without_using_backing_length[False]",
+        "tests.integration.test_feddyn_count_boundaries::test_parent_realizes_partition_once_without_using_backing_length[True]"
+      ],
+      "log_tail": [
+        "INFO     root:registry.py:122 Client: Using Processor for receiving payload: safetensor_decode",
+        "INFO     plato.clients.strategies.defaults:defaults.py:338 \u001b[93m\u001b[1m[Client #1] Started training in communication round #1.\u001b[0m",
+        "=========================== short test summary info ============================",
+        "FAILED tests/integration/test_feddyn_count_boundaries.py::test_parent_realizes_partition_once_without_using_backing_length[True]",
+        "1 failed, 1 passed, 1301 deselected in 1.04s"
+      ]
+    },
+    "red-314": {
+      "name": "red-314",
+      "command": "OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2c-314/bin/python -m pytest tests -k test_parent_realizes_partition_once_without_using_backing_length -q --basetemp /tmp/plato-phase2c-count-collection-fix/red-314 --junitxml /tmp/plato-phase2c-count-collection-fix/red-314.xml",
+      "shell": "zsh -lc",
+      "head": "f342a5a6021cee938e0b880eca5919e09ace1981",
+      "python_environment": "/tmp/plato-phase2c-314",
+      "exit_code": 1,
+      "seconds": 6.245696832891554,
+      "log": "/tmp/plato-phase2c-count-collection-fix/red-314.log",
+      "log_sha256": "5d900f9567dfb6f0ec880692b1213980a597c56f723d62094a496777cfd3cb43",
+      "junit": {
+        "path": "/tmp/plato-phase2c-count-collection-fix/red-314.xml",
+        "bytes": 6784,
+        "sha256": "f57cc615a34ac0e0b7056ae3aef1e4877cfb8966f7702c45fad3cb885ed5b6ba"
+      },
+      "counts": {
+        "tests": 2,
+        "passed": 1,
+        "failed": 1,
+        "skipped": 0
+      },
+      "test_ids": [
+        "tests.integration.test_feddyn_count_boundaries::test_parent_realizes_partition_once_without_using_backing_length[False]",
+        "tests.integration.test_feddyn_count_boundaries::test_parent_realizes_partition_once_without_using_backing_length[True]"
+      ],
+      "log_tail": [
+        "INFO     root:registry.py:122 Client: Using Processor for receiving payload: safetensor_decode",
+        "INFO     plato.clients.strategies.defaults:defaults.py:338 \u001b[93m\u001b[1m[Client #1] Started training in communication round #1.\u001b[0m",
+        "=========================== short test summary info ============================",
+        "FAILED tests/integration/test_feddyn_count_boundaries.py::test_parent_realizes_partition_once_without_using_backing_length[True]",
+        "1 failed, 1 passed, 1301 deselected in 0.90s"
+      ]
+    },
+    "green-313": {
+      "name": "green-313",
+      "command": "OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2c-313/bin/python -m pytest tests -k 'test_feddyn_count_boundaries or test_actual_spawned_rejection_retry_and_logical_reuse or test_actual_spawn_reused_client_matches_partial_oracle or (test_actual_spawn_returns_personal_state_and_optimizer_across_rounds and feddyn)' -q --basetemp /tmp/plato-phase2c-count-collection-fix/green-313 --junitxml /tmp/plato-phase2c-count-collection-fix/green-313.xml",
+      "shell": "zsh -lc",
+      "head": "05468d5db1632c525f7f3dc9ac11ab12cf2cb0cd",
+      "python_environment": "/tmp/plato-phase2c-313",
+      "exit_code": 0,
+      "seconds": 434.7710967909079,
+      "log": "/tmp/plato-phase2c-count-collection-fix/green-313.log",
+      "log_sha256": "44d49bf75f7d0bed9cd8f0d085a2eb98f07da4c0479888419bb0173d77eeeadc",
+      "junit": {
+        "path": "/tmp/plato-phase2c-count-collection-fix/green-313.xml",
+        "bytes": 6019,
+        "sha256": "633160f54f2ee95f9cc62cc5e1cf7d106acfeeded03cda976f16628253e41081"
+      },
+      "counts": {
+        "tests": 36,
+        "passed": 36,
+        "failed": 0,
+        "skipped": 0
+      },
+      "test_ids": [
+        "tests.integration.test_feddyn_count_boundaries::test_actual_spawn_wrong_first_count_rejected_and_retry[uniform]",
+        "tests.integration.test_feddyn_count_boundaries::test_actual_spawn_wrong_first_count_rejected_and_retry[sample]",
+        "tests.integration.test_feddyn_count_boundaries::test_parent_realizes_partition_once_without_using_backing_length[False]",
+        "tests.integration.test_feddyn_count_boundaries::test_parent_realizes_partition_once_without_using_backing_length[True]",
+        "tests.integration.test_feddyn_count_boundaries::test_nonzero_history_requires_saved_observed_count[False-1-uniform]",
+        "tests.integration.test_feddyn_count_boundaries::test_nonzero_history_requires_saved_observed_count[False-1-sample]",
+        "tests.integration.test_feddyn_count_boundaries::test_nonzero_history_requires_saved_observed_count[False-2-uniform]",
+        "tests.integration.test_feddyn_count_boundaries::test_nonzero_history_requires_saved_observed_count[False-2-sample]",
+        "tests.integration.test_feddyn_count_boundaries::test_nonzero_history_requires_saved_observed_count[True-1-uniform]",
+        "tests.integration.test_feddyn_count_boundaries::test_nonzero_history_requires_saved_observed_count[True-1-sample]",
+        "tests.integration.test_feddyn_count_boundaries::test_nonzero_history_requires_saved_observed_count[True-2-uniform]",
+        "tests.integration.test_feddyn_count_boundaries::test_nonzero_history_requires_saved_observed_count[True-2-sample]",
+        "tests.integration.test_feddyn_count_boundaries::test_inactive_callback_count_types_rejected_before_commit[bool-value-on_weights_received]",
+        "tests.integration.test_feddyn_count_boundaries::test_inactive_callback_count_types_rejected_before_commit[bool-value-on_weights_aggregated]",
+        "tests.integration.test_feddyn_count_boundaries::test_inactive_callback_count_types_rejected_before_commit[float-value-on_weights_received]",
+        "tests.integration.test_feddyn_count_boundaries::test_inactive_callback_count_types_rejected_before_commit[float-value-on_weights_aggregated]",
+        "tests.integration.test_feddyn_count_boundaries::test_inactive_callback_count_types_rejected_before_commit[numpy-value-on_weights_received]",
+        "tests.integration.test_feddyn_count_boundaries::test_inactive_callback_count_types_rejected_before_commit[numpy-value-on_weights_aggregated]",
+        "tests.integration.test_feddyn_count_boundaries::test_inactive_callback_count_types_rejected_before_commit[float-key-on_weights_received]",
+        "tests.integration.test_feddyn_count_boundaries::test_inactive_callback_count_types_rejected_before_commit[float-key-on_weights_aggregated]",
+        "tests.integration.test_feddyn_round_flow::test_actual_spawned_rejection_retry_and_logical_reuse[exit]",
+        "tests.integration.test_feddyn_round_flow::test_actual_spawned_rejection_retry_and_logical_reuse[save]",
+        "tests.integration.test_feddyn_round_flow::test_actual_spawned_rejection_retry_and_logical_reuse[missing]",
+        "tests.integration.test_feddyn_round_flow::test_actual_spawned_rejection_retry_and_logical_reuse[corrupt]",
+        "tests.integration.test_feddyn_round_flow::test_actual_spawned_rejection_retry_and_logical_reuse[token]",
+        "tests.integration.test_feddyn_round_flow::test_actual_spawned_rejection_retry_and_logical_reuse[client]",
+        "tests.integration.test_feddyn_round_flow::test_actual_spawned_rejection_retry_and_logical_reuse[round]",
+        "tests.integration.test_feddyn_round_flow::test_actual_spawned_rejection_retry_and_logical_reuse[key]",
+        "tests.integration.test_feddyn_round_flow::test_actual_spawned_rejection_retry_and_logical_reuse[shape]",
+        "tests.integration.test_feddyn_round_flow::test_actual_spawned_rejection_retry_and_logical_reuse[nan]",
+        "tests.integration.test_feddyn_round_flow::test_actual_spawned_rejection_retry_and_logical_reuse[equation]",
+        "tests.integration.test_feddyn_round_flow::test_actual_spawned_rejection_retry_and_logical_reuse[model]",
+        "tests.integration.test_feddyn_round_flow::test_actual_spawned_rejection_retry_and_logical_reuse[parent]",
+        "tests.integration.test_feddyn_round_flow::test_actual_spawn_reused_client_matches_partial_oracle[uniform-counts0]",
+        "tests.integration.test_feddyn_round_flow::test_actual_spawn_reused_client_matches_partial_oracle[sample-counts1]",
+        "tests.trainers.test_personalized_state_ownership::test_actual_spawn_returns_personal_state_and_optimizer_across_rounds[feddyn]"
+      ],
+      "log_tail": [
+        "....................................                                     [100%]",
+        "36 passed, 1267 deselected in 429.94s (0:07:09)"
+      ]
+    },
+    "green-314": {
+      "name": "green-314",
+      "command": "OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2c-314/bin/python -m pytest tests -k 'test_feddyn_count_boundaries or test_actual_spawned_rejection_retry_and_logical_reuse or test_actual_spawn_reused_client_matches_partial_oracle or (test_actual_spawn_returns_personal_state_and_optimizer_across_rounds and feddyn)' -q --basetemp /tmp/plato-phase2c-count-collection-fix/green-314 --junitxml /tmp/plato-phase2c-count-collection-fix/green-314.xml",
+      "shell": "zsh -lc",
+      "head": "05468d5db1632c525f7f3dc9ac11ab12cf2cb0cd",
+      "python_environment": "/tmp/plato-phase2c-314",
+      "exit_code": 0,
+      "seconds": 459.73505866597407,
+      "log": "/tmp/plato-phase2c-count-collection-fix/green-314.log",
+      "log_sha256": "4d6b6028fb790bde0becfb8e416320cfd08d1d6ba90a34bdfc8dbed32669d313",
+      "junit": {
+        "path": "/tmp/plato-phase2c-count-collection-fix/green-314.xml",
+        "bytes": 6019,
+        "sha256": "40fa7a8c9c88cd7e29e481da5ea71c423c327bdb872af52ee2d71432cb4a346b"
+      },
+      "counts": {
+        "tests": 36,
+        "passed": 36,
+        "failed": 0,
+        "skipped": 0
+      },
+      "test_ids": [
+        "tests.integration.test_feddyn_count_boundaries::test_actual_spawn_wrong_first_count_rejected_and_retry[uniform]",
+        "tests.integration.test_feddyn_count_boundaries::test_actual_spawn_wrong_first_count_rejected_and_retry[sample]",
+        "tests.integration.test_feddyn_count_boundaries::test_parent_realizes_partition_once_without_using_backing_length[False]",
+        "tests.integration.test_feddyn_count_boundaries::test_parent_realizes_partition_once_without_using_backing_length[True]",
+        "tests.integration.test_feddyn_count_boundaries::test_nonzero_history_requires_saved_observed_count[False-1-uniform]",
+        "tests.integration.test_feddyn_count_boundaries::test_nonzero_history_requires_saved_observed_count[False-1-sample]",
+        "tests.integration.test_feddyn_count_boundaries::test_nonzero_history_requires_saved_observed_count[False-2-uniform]",
+        "tests.integration.test_feddyn_count_boundaries::test_nonzero_history_requires_saved_observed_count[False-2-sample]",
+        "tests.integration.test_feddyn_count_boundaries::test_nonzero_history_requires_saved_observed_count[True-1-uniform]",
+        "tests.integration.test_feddyn_count_boundaries::test_nonzero_history_requires_saved_observed_count[True-1-sample]",
+        "tests.integration.test_feddyn_count_boundaries::test_nonzero_history_requires_saved_observed_count[True-2-uniform]",
+        "tests.integration.test_feddyn_count_boundaries::test_nonzero_history_requires_saved_observed_count[True-2-sample]",
+        "tests.integration.test_feddyn_count_boundaries::test_inactive_callback_count_types_rejected_before_commit[bool-value-on_weights_received]",
+        "tests.integration.test_feddyn_count_boundaries::test_inactive_callback_count_types_rejected_before_commit[bool-value-on_weights_aggregated]",
+        "tests.integration.test_feddyn_count_boundaries::test_inactive_callback_count_types_rejected_before_commit[float-value-on_weights_received]",
+        "tests.integration.test_feddyn_count_boundaries::test_inactive_callback_count_types_rejected_before_commit[float-value-on_weights_aggregated]",
+        "tests.integration.test_feddyn_count_boundaries::test_inactive_callback_count_types_rejected_before_commit[numpy-value-on_weights_received]",
+        "tests.integration.test_feddyn_count_boundaries::test_inactive_callback_count_types_rejected_before_commit[numpy-value-on_weights_aggregated]",
+        "tests.integration.test_feddyn_count_boundaries::test_inactive_callback_count_types_rejected_before_commit[float-key-on_weights_received]",
+        "tests.integration.test_feddyn_count_boundaries::test_inactive_callback_count_types_rejected_before_commit[float-key-on_weights_aggregated]",
+        "tests.integration.test_feddyn_round_flow::test_actual_spawned_rejection_retry_and_logical_reuse[exit]",
+        "tests.integration.test_feddyn_round_flow::test_actual_spawned_rejection_retry_and_logical_reuse[save]",
+        "tests.integration.test_feddyn_round_flow::test_actual_spawned_rejection_retry_and_logical_reuse[missing]",
+        "tests.integration.test_feddyn_round_flow::test_actual_spawned_rejection_retry_and_logical_reuse[corrupt]",
+        "tests.integration.test_feddyn_round_flow::test_actual_spawned_rejection_retry_and_logical_reuse[token]",
+        "tests.integration.test_feddyn_round_flow::test_actual_spawned_rejection_retry_and_logical_reuse[client]",
+        "tests.integration.test_feddyn_round_flow::test_actual_spawned_rejection_retry_and_logical_reuse[round]",
+        "tests.integration.test_feddyn_round_flow::test_actual_spawned_rejection_retry_and_logical_reuse[key]",
+        "tests.integration.test_feddyn_round_flow::test_actual_spawned_rejection_retry_and_logical_reuse[shape]",
+        "tests.integration.test_feddyn_round_flow::test_actual_spawned_rejection_retry_and_logical_reuse[nan]",
+        "tests.integration.test_feddyn_round_flow::test_actual_spawned_rejection_retry_and_logical_reuse[equation]",
+        "tests.integration.test_feddyn_round_flow::test_actual_spawned_rejection_retry_and_logical_reuse[model]",
+        "tests.integration.test_feddyn_round_flow::test_actual_spawned_rejection_retry_and_logical_reuse[parent]",
+        "tests.integration.test_feddyn_round_flow::test_actual_spawn_reused_client_matches_partial_oracle[uniform-counts0]",
+        "tests.integration.test_feddyn_round_flow::test_actual_spawn_reused_client_matches_partial_oracle[sample-counts1]",
+        "tests.trainers.test_personalized_state_ownership::test_actual_spawn_returns_personal_state_and_optimizer_across_rounds[feddyn]"
+      ],
+      "log_tail": [
+        "....................................                                     [100%]",
+        "36 passed, 1267 deselected in 454.65s (0:07:34)"
+      ]
+    },
+    "ruff-313": {
+      "name": "ruff-313",
+      "command": "OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2c-313/bin/ruff check tests/integration/test_feddyn_count_boundaries.py tests/integration/feddyn_partition_worker.py --select I",
+      "shell": "zsh -lc",
+      "head": "05468d5db1632c525f7f3dc9ac11ab12cf2cb0cd",
+      "python_environment": "/tmp/plato-phase2c-313",
+      "exit_code": 0,
+      "seconds": 0.01895312499254942,
+      "log": "/tmp/plato-phase2c-count-collection-fix/ruff-313.log",
+      "log_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "log_tail": [
+        "All checks passed!"
+      ]
+    },
+    "ruff-314": {
+      "name": "ruff-314",
+      "command": "OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2c-314/bin/ruff check tests/integration/test_feddyn_count_boundaries.py tests/integration/feddyn_partition_worker.py --select I",
+      "shell": "zsh -lc",
+      "head": "05468d5db1632c525f7f3dc9ac11ab12cf2cb0cd",
+      "python_environment": "/tmp/plato-phase2c-314",
+      "exit_code": 0,
+      "seconds": 0.019676083931699395,
+      "log": "/tmp/plato-phase2c-count-collection-fix/ruff-314.log",
+      "log_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "log_tail": [
+        "All checks passed!"
+      ]
+    }
+  },
+  "full_collection_contract": "All invocations use pytest tests plus -k; every test module is collected. No module-only invocation, import-order change, selected-case skip or mock replaces real multiprocessing. Both green runs select36existing cases:20count boundaries,13worker rejection/retry variants,2partial participation spawn references and1previously guarded FedDyn personalization spawn path.",
+  "actual_parent_child_observations": {
+    "313": {
+      "child_record": {
+        "path": "/tmp/plato-phase2c-count-collection-fix/green-313/test_parent_realizes_partition1/run/worker-partition.json",
+        "bytes": 280,
+        "sha256": "ac92fc8dcfa3df9046ce82a6cdc0ae254a951336c56d8e94b913f80ef14aefcc"
+      },
+      "epochs": [
+        {
+          "pid": 13373,
+          "start_method": "spawn",
+          "indices": [
+            7,
+            13
+          ],
+          "backing_items": 100,
+          "count": 2
+        },
+        {
+          "pid": 13373,
+          "start_method": "spawn",
+          "indices": [
+            7,
+            13
+          ],
+          "backing_items": 100,
+          "count": 2
+        }
+      ],
+      "parent_result": {
+        "path": "/tmp/plato-phase2c-count-collection-fix/green-313/test_parent_realizes_partition1/partition-result.json",
+        "bytes": 131,
+        "sha256": "4331243847f419bd3dbc8f383e093c8b59688b113d441408b25ed41fe49c7183"
+      },
+      "parent_observed": {
+        "calls": 1,
+        "report_count": 2,
+        "worker_count": 2,
+        "endpoint": 1.622,
+        "worker_epochs": 2,
+        "no_active_children": true
+      }
+    },
+    "314": {
+      "child_record": {
+        "path": "/tmp/plato-phase2c-count-collection-fix/green-314/test_parent_realizes_partition1/run/worker-partition.json",
+        "bytes": 280,
+        "sha256": "e41afbb256b9013625114b982e8577fff827f977c9283a2e83344137136a935c"
+      },
+      "epochs": [
+        {
+          "pid": 13376,
+          "start_method": "spawn",
+          "indices": [
+            7,
+            13
+          ],
+          "backing_items": 100,
+          "count": 2
+        },
+        {
+          "pid": 13376,
+          "start_method": "spawn",
+          "indices": [
+            7,
+            13
+          ],
+          "backing_items": 100,
+          "count": 2
+        }
+      ],
+      "parent_result": {
+        "path": "/tmp/plato-phase2c-count-collection-fix/green-314/test_parent_realizes_partition1/partition-result.json",
+        "bytes": 131,
+        "sha256": "4331243847f419bd3dbc8f383e093c8b59688b113d441408b25ed41fe49c7183"
+      },
+      "parent_observed": {
+        "calls": 1,
+        "report_count": 2,
+        "worker_count": 2,
+        "endpoint": 1.622,
+        "worker_epochs": 2,
+        "no_active_children": true
+      }
+    }
+  },
+  "numerical_and_sampling_preservation": "Parent get()==1; same actual subset[7,13] out of100 backing rows observed in both real worker epochs; report and accepted worker count2; original endpoint1.622 at absolute tolerance1e-12. Existing Fraction/control retry references and every prior count assertion remain unchanged.",
+  "full_diff": "diff --git a/tests/integration/feddyn_partition_worker.py b/tests/integration/feddyn_partition_worker.py\nnew file mode 100644\nindex 00000000..cb6112fa\n--- /dev/null\n+++ b/tests/integration/feddyn_partition_worker.py\n@@ -0,0 +1,58 @@\n+\"\"\"Guard the real single-partition parent/worker oracle from pytest imports.\"\"\"\n+\n+import json\n+import multiprocessing as mp\n+import os\n+import sys\n+from pathlib import Path\n+\n+from plato.callbacks.trainer import TrainerCallback\n+from tests.integration.test_feddyn_count_boundaries import _run_single_partition\n+\n+\n+class ObservePartition(TrainerCallback):\n+    \"\"\"Record the actual sampler from each epoch of the spawned worker.\"\"\"\n+\n+    def __init__(self, path):\n+        self.path = path\n+        self.epochs = []\n+\n+    def on_train_epoch_start(self, trainer, config, **kwargs):\n+        sampler = trainer.train_loader.sampler\n+        assert list(sampler.indices) == [7, 13]\n+        assert len(sampler) == 2\n+        assert len(trainer.trainset) == 100\n+        self.epochs.append(\n+            {\n+                \"pid\": os.getpid(),\n+                \"start_method\": mp.get_start_method(),\n+                \"indices\": list(sampler.indices),\n+                \"backing_items\": len(trainer.trainset),\n+                \"count\": trainer.context.state[\"feddyn_attempt_count\"],\n+            }\n+        )\n+        self.path.write_text(json.dumps(self.epochs, indent=2))\n+\n+\n+def run(root):\n+    observation = root / \"worker-partition.json\"\n+    result = _run_single_partition(\n+        root, spawn=True, observer=ObservePartition(observation)\n+    )\n+    epochs = json.loads(observation.read_text())\n+    assert len(epochs) == 2\n+    for epoch in epochs:\n+        assert epoch[\"pid\"] != os.getpid()\n+        assert epoch[\"start_method\"] == \"spawn\"\n+        assert epoch[\"indices\"] == [7, 13]\n+        assert epoch[\"backing_items\"] == 100 and epoch[\"count\"] == 2\n+    assert not mp.active_children()\n+    return {**result, \"worker_epochs\": len(epochs), \"no_active_children\": True}\n+\n+\n+if __name__ == \"__main__\":\n+    from tests.integration.feddyn_partition_worker import run as guarded_run\n+\n+    root, output = map(Path, sys.argv[1:3])\n+    root.mkdir(parents=True, exist_ok=True)\n+    output.write_text(json.dumps(guarded_run(root), indent=2))\ndiff --git a/tests/integration/test_feddyn_count_boundaries.py b/tests/integration/test_feddyn_count_boundaries.py\nindex c0e3f921..6bc51919 100644\n--- a/tests/integration/test_feddyn_count_boundaries.py\n+++ b/tests/integration/test_feddyn_count_boundaries.py\n@@ -58,10 +58,35 @@ def test_actual_spawn_wrong_first_count_rejected_and_retry(tmp_path, mode):\n \n @pytest.mark.parametrize(\"spawn\", [False, True])\n def test_parent_realizes_partition_once_without_using_backing_length(tmp_path, spawn):\n+    if spawn:\n+        # Full collection replaces example module names. Keep real spawn in\n+        # the same guarded interpreter pattern as the other FedDyn workers.\n+        output = tmp_path / \"partition-result.json\"\n+        command = [\n+            sys.executable, \"-m\", \"tests.integration.feddyn_partition_worker\",\n+            str(tmp_path / \"run\"), str(output),\n+        ]\n+        completed = subprocess.run(\n+            [\"zsh\", \"-lc\", shlex.join(command)],\n+            capture_output=True, text=True, timeout=90,\n+        )\n+        assert completed.returncode == 0, completed.stdout + completed.stderr\n+        result = json.loads(output.read_text())\n+        assert result[\"calls\"] == 1\n+        assert result[\"report_count\"] == result[\"worker_count\"] == 2\n+        assert result[\"endpoint\"] == pytest.approx(1.622, abs=1e-12)\n+        assert result[\"worker_epochs\"] == 2 and result[\"no_active_children\"]\n+        return\n+    _run_single_partition(tmp_path, spawn=False)\n+\n+\n+def _run_single_partition(tmp_path, spawn, observer=None):\n     # The parent object records get() calls; the worker must receive this\n     # same realized two-index partition, not draw a new partition itself.\n     with configure_environment(configuration(spawn=spawn), runtime_root=tmp_path):\n         s, c = server(), client(1)\n+        if observer is not None:\n+            c.trainer.callback_handler.add_callback(observer)\n         response, payload = dispatch(s, [1])[1]\n         c.current_round = c._context.current_round = response[\"current_round\"]\n         c.lifecycle_strategy.process_server_response(c._context, response)\n@@ -77,6 +102,12 @@ def test_parent_realizes_partition_once_without_using_backing_length(tmp_path, s\n         assert report.num_samples == weights[1][\"num_samples\"] == 2\n         assert c.trainer.model_update_strategy.result[\"num_samples\"] == 2\n         assert weights[0][\"theta\"].item() == pytest.approx(1.622, abs=1e-12)\n+        return {\n+            \"calls\": context.sampler.calls,\n+            \"report_count\": report.num_samples,\n+            \"worker_count\": c.trainer.model_update_strategy.result[\"num_samples\"],\n+            \"endpoint\": weights[0][\"theta\"].item(),\n+        }\n \n \n @pytest.mark.parametrize(\"mode\", [\"uniform\", \"sample\"])\n",
+  "diff_receipt": {
+    "path": "/tmp/plato-phase2c-count-collection-fix/full-correction.diff",
+    "bytes": 5041,
+    "sha256": "86b5ad477b153573b248a4ed754455089a4d4c38a1a84f8664e767b6e3ad0e74"
+  },
+  "warnings": "Actual log summaries retained. No global warning filter, no suppression or skip policy change.",
+  "raw_scratch_inventory": [
+    {
+      "path": "/tmp/plato-phase2c-count-collection-fix/assertion-preservation.json",
+      "bytes": 951,
+      "sha256": "8743edba2c7ff9f28e4ed6a6310ad55fff28b6ae2d6ab2892bc114a72d67c17e"
+    },
+    {
+      "path": "/tmp/plato-phase2c-count-collection-fix/build_evidence.py",
+      "bytes": 8137,
+      "sha256": "e9e64bf371f7db519af0a4d1b15f1109f2493f87e2046d5f6a3636ec5ba16997"
+    },
+    {
+      "path": "/tmp/plato-phase2c-count-collection-fix/collection-import-identities.json",
+      "bytes": 438,
+      "sha256": "9745419cc7adc3ac3c45345285ad03a2590f54c6e84e0d0f82801cd20006cbc7"
+    },
+    {
+      "path": "/tmp/plato-phase2c-count-collection-fix/collection_identity_probe.py",
+      "bytes": 642,
+      "sha256": "d9a1b304bfb8bf884ba32be0862d6baf736b0b943d57bbe94e0ddca54ff4b7ff"
+    },
+    {
+      "path": "/tmp/plato-phase2c-count-collection-fix/full-correction.diff",
+      "bytes": 5041,
+      "sha256": "86b5ad477b153573b248a4ed754455089a4d4c38a1a84f8664e767b6e3ad0e74"
+    },
+    {
+      "path": "/tmp/plato-phase2c-count-collection-fix/green-313.json",
+      "bytes": 887,
+      "sha256": "c55cb89642ec8ac3e8df91b42c1ca76074d703fcf8bbcb0405aef90c99a0214c"
+    },
+    {
+      "path": "/tmp/plato-phase2c-count-collection-fix/green-313.log",
+      "bytes": 128,
+      "sha256": "44d49bf75f7d0bed9cd8f0d085a2eb98f07da4c0479888419bb0173d77eeeadc"
+    },
+    {
+      "path": "/tmp/plato-phase2c-count-collection-fix/green-313.xml",
+      "bytes": 6019,
+      "sha256": "633160f54f2ee95f9cc62cc5e1cf7d106acfeeded03cda976f16628253e41081"
+    },
+    {
+      "path": "/tmp/plato-phase2c-count-collection-fix/green-314.json",
+      "bytes": 888,
+      "sha256": "c2923bad406a5c7ffd0093898ee95780e8e936842043e31dd239c12a1038f9ff"
+    },
+    {
+      "path": "/tmp/plato-phase2c-count-collection-fix/green-314.log",
+      "bytes": 128,
+      "sha256": "4d6b6028fb790bde0becfb8e416320cfd08d1d6ba90a34bdfc8dbed32669d313"
+    },
+    {
+      "path": "/tmp/plato-phase2c-count-collection-fix/green-314.xml",
+      "bytes": 6019,
+      "sha256": "40fa7a8c9c88cd7e29e481da5ea71c423c327bdb872af52ee2d71432cb4a346b"
+    },
+    {
+      "path": "/tmp/plato-phase2c-count-collection-fix/identity-collection.log",
+      "bytes": 296,
+      "sha256": "ce08019eb482647a44a1b70cd9a8fb79d10994f2796b165a3a3d3d63b8cc18d6"
+    },
+    {
+      "path": "/tmp/plato-phase2c-count-collection-fix/original-test_feddyn_count_boundaries.py",
+      "bytes": 7232,
+      "sha256": "1102a37c5b739ce9fa50f534d0804b12fecee93302d83841d05c8bd4cf671a3c"
+    },
+    {
+      "path": "/tmp/plato-phase2c-count-collection-fix/red-313.json",
+      "bytes": 713,
+      "sha256": "2466ba9c335bcaa2e12fe13a42575478dc7026d97e9affab8d550aa6ee178162"
+    },
+    {
+      "path": "/tmp/plato-phase2c-count-collection-fix/red-313.log",
+      "bytes": 5887,
+      "sha256": "c7a7e90010880ad124cc6328395f87d158a95bb3367e8492320260a04a7f9dba"
+    },
+    {
+      "path": "/tmp/plato-phase2c-count-collection-fix/red-313.xml",
+      "bytes": 5396,
+      "sha256": "4fd0c7bc445f196ed738ef9f74442785e66a0e86ffb471235115f388d6c519a6"
+    },
+    {
+      "path": "/tmp/plato-phase2c-count-collection-fix/red-314.json",
+      "bytes": 713,
+      "sha256": "50e7e9298866d36c67b3dbeb5e44e02cf6839ea322cb4147bbe3ff033681fcab"
+    },
+    {
+      "path": "/tmp/plato-phase2c-count-collection-fix/red-314.log",
+      "bytes": 6668,
+      "sha256": "5d900f9567dfb6f0ec880692b1213980a597c56f723d62094a496777cfd3cb43"
+    },
+    {
+      "path": "/tmp/plato-phase2c-count-collection-fix/red-314.xml",
+      "bytes": 6784,
+      "sha256": "f57cc615a34ac0e0b7056ae3aef1e4877cfb8966f7702c45fad3cb885ed5b6ba"
+    },
+    {
+      "path": "/tmp/plato-phase2c-count-collection-fix/root-count-isolation-313-receipt.json",
+      "bytes": 673,
+      "sha256": "0a1bdf20fd3bbcaeb4770e2e9e074c2db6451eb888d94c043407d34dd4407053"
+    },
+    {
+      "path": "/tmp/plato-phase2c-count-collection-fix/root-count-isolation-313.log",
+      "bytes": 5899,
+      "sha256": "dbb92c431b6de218311ae9e9e31fa95af0e9b1603352813e759a22e281cea077"
+    },
+    {
+      "path": "/tmp/plato-phase2c-count-collection-fix/root-count-isolation-313.xml",
+      "bytes": 5402,
+      "sha256": "16840ef45577144b75dcb3dcbdd2c975f99219d71550d1939c7e4a9b68936632"
+    },
+    {
+      "path": "/tmp/plato-phase2c-count-collection-fix/ruff-313.json",
+      "bytes": 618,
+      "sha256": "1a37adc64ae9a7389412a8b6c66252fadc5db15ac1cb6c2bccb2e7dbe9da7038"
+    },
+    {
+      "path": "/tmp/plato-phase2c-count-collection-fix/ruff-313.log",
+      "bytes": 19,
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "path": "/tmp/plato-phase2c-count-collection-fix/ruff-314.json",
+      "bytes": 619,
+      "sha256": "3561015bf2d9cef60af274acb6d1fe014c5351f061e956f4d53d6bb4bb34cfdb"
+    },
+    {
+      "path": "/tmp/plato-phase2c-count-collection-fix/ruff-314.log",
+      "bytes": 19,
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "path": "/tmp/plato-phase2c-count-collection-fix/run_checks.py",
+      "bytes": 1616,
+      "sha256": "4d3057edcb750703c530ac10b1f00bc9aa49d3333592b83a513a7e36e4d65979"
+    }
+  ],
+  "resource_ownership": {
+    "own_scratch": "/tmp/plato-phase2c-count-collection-fix",
+    "environments": [
+      "/tmp/plato-phase2c-313",
+      "/tmp/plato-phase2c-314"
+    ],
+    "root": "Only provided failure artifacts read/copied. Root immutable checkout, environment and running full suite untouched.",
+    "retained_resources": "All previous owned scratch/environments retained; no push or cleanup."
+  },
+  "limits": [
+    "CPU/macOS arm64 test-harness correction; no production bug or GPU claim inferred.",
+    "Full collection with selected execution is not a full-suite pass claim.",
+    "Frozen DP correction remains separate and untouched for independent review.",
+    "Fresh independent review of this separate correction and root integration acceptance remain pending."
+  ],
+  "whole_phase_acceptance_claimed": false
+}

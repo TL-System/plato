@@ -163,14 +163,18 @@ class Server(fedavg.Server):
 
     async def _process_reports(self):
         """Process the client reports by aggregating their weights."""
-        # To pass the client_id == 0 assertion during aggregation
-        trainer = self.require_trainer()
-        trainer.set_client_id(0)
-
+        self._validate_aggregation_inputs(
+            self.updates, [update.payload for update in self.updates]
+        )
         weights_received = [update.payload for update in self.updates]
 
         weights_received = self.weights_received(weights_received)
         self.callback_handler.call_event("on_weights_received", self, weights_received)
+        self._validate_aggregation_inputs(self.updates, weights_received)
+
+        # To pass the client_id == 0 assertion during aggregation
+        trainer = self.require_trainer()
+        trainer.set_client_id(0)
 
         # Extract the current model weights as the baseline
         algorithm = self.require_algorithm()
@@ -244,20 +248,10 @@ class Server(fedavg.Server):
             # Testing the updated model directly at the server
             logging.info("[%s] Started model testing.", self)
             self.accuracy = trainer.test(self.testset, self.testset_sampler)
-
-            # Extract CORE evaluation results if available (Nanochat CORE evaluation)
-            if (
-                hasattr(trainer, "context")
-                and "nanochat_core_results" in trainer.context.state
-            ):
-                core_results = trainer.context.state["nanochat_core_results"]
-                self._core_metric = core_results.get("core_metric", None)
-
-            core_metric = getattr(self, "_core_metric", None)
-            if core_metric is not None:
+            if hasattr(Config().trainer, "target_perplexity"):
                 logging.info(
                     fonts.colourize(
-                        f"[{self}] Average Centered CORE benchmark metric: {100 * core_metric:.2f}%\n"
+                        f"[{self}] Global model perplexity: {self.accuracy:.2f}\n"
                     )
                 )
             else:
@@ -270,20 +264,10 @@ class Server(fedavg.Server):
             # Test the aggregated model directly at the edge server
             logging.info("[%s] Started model testing.", self)
             self.accuracy = trainer.test(self.testset, self.testset_sampler)
-
-            # Extract CORE evaluation results if available (Nanochat CORE evaluation)
-            if (
-                hasattr(trainer, "context")
-                and "nanochat_core_results" in trainer.context.state
-            ):
-                core_results = trainer.context.state["nanochat_core_results"]
-                self._core_metric = core_results.get("core_metric", None)
-
-            core_metric = getattr(self, "_core_metric", None)
-            if core_metric is not None:
+            if hasattr(Config().trainer, "target_perplexity"):
                 logging.info(
                     fonts.colourize(
-                        f"[{self}] Average Centered CORE benchmark metric: {100 * core_metric:.2f}%\n"
+                        f"[{self}] Global model perplexity: {self.accuracy:.2f}\n"
                     )
                 )
             else:

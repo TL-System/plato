@@ -1,0 +1,93 @@
+[
+  {
+    "name": "static",
+    "argv": [
+      "zsh",
+      "-lc",
+      "uv run --no-project --python 3.13 python .github/scripts/check_container.py static --artifacts /tmp/plato-container-frozen-checks/static"
+    ],
+    "cwd": "/private/tmp/plato-refresh-worktrees/container-refresh",
+    "exit_code": 0,
+    "elapsed_seconds": 0.434,
+    "log": "static.log",
+    "source_commit": "da2ffde66e8ae5d893ceed9bb73d801680c150b6"
+  },
+  {
+    "name": "degradation",
+    "argv": [
+      "zsh",
+      "-lc",
+      "uv run --no-project --python 3.13 python /tmp/plato-container-validation.py /tmp/plato-refresh-worktrees/container-refresh /tmp/plato-container-frozen-checks/degradation"
+    ],
+    "cwd": "/private/tmp/plato-refresh-worktrees/container-refresh",
+    "exit_code": 0,
+    "elapsed_seconds": 0.263,
+    "log": "degradation.log",
+    "source_commit": "da2ffde66e8ae5d893ceed9bb73d801680c150b6"
+  },
+  {
+    "name": "ruff",
+    "argv": [
+      "zsh",
+      "-lc",
+      "uvx --python 3.13 ruff==0.16.10 check .github/scripts/check_container.py --select E,F,I"
+    ],
+    "cwd": "/private/tmp/plato-refresh-worktrees/container-refresh",
+    "exit_code": 0,
+    "elapsed_seconds": 0.072,
+    "log": "ruff.log",
+    "source_commit": "da2ffde66e8ae5d893ceed9bb73d801680c150b6"
+  },
+  {
+    "name": "ruff-format",
+    "argv": [
+      "zsh",
+      "-lc",
+      "uvx --python 3.13 ruff==0.16.10 format --check .github/scripts/check_container.py"
+    ],
+    "cwd": "/private/tmp/plato-refresh-worktrees/container-refresh",
+    "exit_code": 0,
+    "elapsed_seconds": 0.033,
+    "log": "ruff-format.log",
+    "source_commit": "da2ffde66e8ae5d893ceed9bb73d801680c150b6"
+  },
+  {
+    "name": "actionlint",
+    "argv": [
+      "zsh",
+      "-lc",
+      "/tmp/plato-container-local-checks/actionlint -oneline .github/workflows/container_checks.yml"
+    ],
+    "cwd": "/private/tmp/plato-refresh-worktrees/container-refresh",
+    "exit_code": 0,
+    "elapsed_seconds": 0.012,
+    "log": "actionlint.log",
+    "source_commit": "da2ffde66e8ae5d893ceed9bb73d801680c150b6"
+  },
+  {
+    "name": "diff",
+    "argv": [
+      "zsh",
+      "-lc",
+      "git diff --check"
+    ],
+    "cwd": "/private/tmp/plato-refresh-worktrees/container-refresh",
+    "exit_code": 0,
+    "elapsed_seconds": 0.02,
+    "log": "diff.log",
+    "source_commit": "da2ffde66e8ae5d893ceed9bb73d801680c150b6"
+  },
+  {
+    "name": "tool-versions",
+    "argv": [
+      "zsh",
+      "-lc",
+      "uv --version; /tmp/plato-container-local-checks/actionlint -version"
+    ],
+    "cwd": "/private/tmp/plato-refresh-worktrees/container-refresh",
+    "exit_code": 0,
+    "elapsed_seconds": 0.02,
+    "log": "tool-versions.log",
+    "source_commit": "da2ffde66e8ae5d893ceed9bb73d801680c150b6"
+  }
+]

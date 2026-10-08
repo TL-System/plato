@@ -2,18 +2,34 @@
 
 In `examples/`, we included a wide variety of examples that showed how federated learning algorithms in the research literature can be implemented using Plato by customizing the `client`, `server`, `algorithm`, and `trainer` classes.
 
-### Dataset Preparation
+### Prepare the environment and assets
 
-When you run an example for the first time, Plato downloads the required datasets automatically before training begins. Depending on the dataset size and your connection speed, the first round may take a little longer while the assets are prepared.
+Use Python 3.13 and the checked-in lockfile. From the repository root, the
+base environment is provisioned with:
 
-Plato uses [uv](https://docs.astral.sh/uv/) for hierarchical dependency management. Example-specific packages are defined in local `pyproject.toml` files rather than in the top-level directory.
+```bash
+uv sync --locked --python 3.13
+```
 
-To run an example with its dependencies, you need to run `uv sync` first in the top-level directory, navigate to the directory containing the example, and then use `uv run` to run the example.
+Most examples inherit the root dependencies. Some are workspace members with
+additional packages in their local `pyproject.toml`; shared optional features
+use root extras. Follow [Installation](../install.md) for workspace selection
+and separate environments for incompatible extras such as `ssl` and `llm_eval`.
+Keep the selected extra on syncing `uv run --locked` commands.
 
-!!! tip "Note"
-    To make sure that all dependencies are properly loaded, always run `uv run` from within the directory containing the example.
+Follow the particular example's recipe for its working directory, entrypoint,
+config, datasets, and model checkpoints. Some data sources download assets on
+first use; others require preparation or external access before training.
+See the [Qwen3 reference](case-studies/6. Qwen3 Federated LoRA.md) and
+[Lighteval preparation](../install.md#optional-server-side-llm-evaluation-with-lighteval)
+for those specific workloads.
 
-Plato supports both Linux with NVIDIA GPUs and macOS with M1/M2/M4/M4 GPUs. It will automatically detect and use these GPUs when they are present.
+CPU, CUDA, and Apple Silicon execution depend on the selected backend and
+workload. See [Quick Start](../quickstart.md) for device flags and
+[Native MLX](../mlx.md) for the bounded Apple CPU/Metal reference and checks.
+A chapter or config in this index does not establish validated support for
+every dataset, algorithm, or device combination; qualification applies to the
+specific workload and environment recorded in its validation evidence.
 
 ---
 
@@ -45,16 +61,19 @@ Plato supports both Linux with NVIDIA GPUs and macOS with M1/M2/M4/M4 GPUs. It w
 
 - [Model Pruning Algorithms](algorithms/13. Model Pruning Algorithms.md)
 
+- [Gradient Leakage Attacks and Defences](algorithms/14. Gradient Leakage Attacks and Defences.md)
+
+## Archived Research
+
+- [Archived research examples](archived.md)
+
 ## Case Studies
+
+- [Qwen3 Federated LoRA](case-studies/6. Qwen3 Federated LoRA.md)
 
 - [Federated LoRA Fine-Tuning](case-studies/1. LoRA.md)
 
 - [Composable Trainer API](case-studies/2. Composable Trainer.md)
 
 - [Server-side Lighteval for SmolLM2](case-studies/4. Server-side Lighteval for SmolLM2.md)
-
-- [SmolVLA Trainer with LeRobot](case-studies/3. SmolVLA Trainer with LeRobot.md)
-
-- [Nanochat in Plato](case-studies/5. Nanochat in Plato.md)
-
 - [Time-Series Forecasting with TimesFM](case-studies/6. Time-Series Forecasting with TimesFM.md)

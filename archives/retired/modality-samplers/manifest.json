@@ -1,0 +1,104 @@
+{
+  "schema_version": 1,
+  "backend": "modality-samplers",
+  "retired_at": "2026-10-04",
+  "pre_retirement_plato_commit": "c1359992f70533c0f2a47d30742f9b14295da882",
+  "pre_retirement_plato_tree": "9e75b3b2f306677fabc6f9214658bfeacd152dc5",
+  "plan_sha256": "a49502dca7146305f37c94a404ff7735c7507d79d3968b5a813f09e304442716",
+  "plan_review_sha256": "a93502a267b86617ff3bde0d30462179c219f0bbc279354d0c049dfddcd0ecb8",
+  "files": [
+    {
+      "original_path": "plato/samplers/modality_iid.py",
+      "archive_path": "archives/retired/modality-samplers/original/plato/samplers/modality_iid.py",
+      "disposition": "moved",
+      "git_mode": "100644",
+      "git_blob": "9c13ab845f093c3ad373991e921137c2bb9db1d6",
+      "sha256": "99ace5dc9b594a87032eb5721bbf4ed2f90f4f8a24d28009a3b70f7e933b86ee",
+      "bytes": 1187,
+      "source_commit": "c1359992f70533c0f2a47d30742f9b14295da882"
+    },
+    {
+      "original_path": "plato/samplers/modality_quantity_noniid.py",
+      "archive_path": "archives/retired/modality-samplers/original/plato/samplers/modality_quantity_noniid.py",
+      "disposition": "moved",
+      "git_mode": "100644",
+      "git_blob": "5110d90b0381366e50436cbab697007e6f6031db",
+      "sha256": "0aca2d6b833392748877f6b596e6919dcef4165a0f2da0918d60e484544438b9",
+      "bytes": 1855,
+      "source_commit": "c1359992f70533c0f2a47d30742f9b14295da882"
+    },
+    {
+      "original_path": "plato/samplers/registry.py",
+      "archive_path": "archives/retired/modality-samplers/original/plato/samplers/registry.py",
+      "disposition": "copied-context",
+      "git_mode": "100644",
+      "git_blob": "fd0c43cd3a63ff11ba878e91ebe9b6afcf3e45c2",
+      "sha256": "301af46f7ce7b14be4e0f34f61c0844f9383978b6dc7c9a134136b4b6e90ad24",
+      "bytes": 1993,
+      "source_commit": "c1359992f70533c0f2a47d30742f9b14295da882"
+    },
+    {
+      "original_path": "tests/samplers/test_partition_contracts.py",
+      "archive_path": "archives/retired/modality-samplers/original/tests/samplers/test_partition_contracts.py",
+      "disposition": "copied-context",
+      "git_mode": "100644",
+      "git_blob": "9c040cf1f06189efe8f14f21320351523d7e9114",
+      "sha256": "f167c48a81e6c23e20ec3568735e08421c6cc9dc6535259ccd4a66d09a5dfd10",
+      "bytes": 14466,
+      "source_commit": "c1359992f70533c0f2a47d30742f9b14295da882"
+    },
+    {
+      "original_path": "LICENSE",
+      "archive_path": "archives/retired/modality-samplers/original/LICENSE",
+      "disposition": "copied-context",
+      "git_mode": "100644",
+      "git_blob": "261eeb9e9f8b2b4b0d119366dda99c6fd7d35c64",
+      "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+      "bytes": 11357,
+      "source_commit": "c1359992f70533c0f2a47d30742f9b14295da882"
+    },
+    {
+      "original_path": "pyproject.toml",
+      "archive_path": "archives/retired/modality-samplers/original/pyproject.toml",
+      "disposition": "copied-context",
+      "git_mode": "100644",
+      "git_blob": "42601adc31e213a0ab008361ef53223826fcd770",
+      "sha256": "4c68adebeb88bba969a5d5c08a874644b1d40ccff241761dd7f2bd201b6ba3d3",
+      "bytes": 4189,
+      "source_commit": "c1359992f70533c0f2a47d30742f9b14295da882"
+    },
+    {
+      "original_path": "uv.lock",
+      "archive_path": "archives/retired/modality-samplers/original/uv.lock",
+      "disposition": "copied-context",
+      "git_mode": "100644",
+      "git_blob": "419ce6bf04e2ca46520dcf1e05a36ac134cdc63c",
+      "sha256": "66a4e4442d7b1f26d220b44ca73c44ff4f1151a86857bb3f93a594819fd08126",
+      "bytes": 755641,
+      "source_commit": "c1359992f70533c0f2a47d30742f9b14295da882"
+    },
+    {
+      "original_path": "tests/examples_phase4/cases.json",
+      "archive_path": "archives/retired/modality-samplers/original/tests/examples_phase4/cases.json",
+      "disposition": "copied-context",
+      "git_mode": "100644",
+      "git_blob": "e232ca35c0f024a6aa79b6c0362d412fa8b331f3",
+      "sha256": "7d18beab505f3f23cb6b14785c35b4d7a3b5b425b9dd541769e43bcd7b80167a",
+      "bytes": 240990,
+      "source_commit": "c1359992f70533c0f2a47d30742f9b14295da882"
+    }
+  ],
+  "inventory_sha256": "5a35220ef328d1a4f1f33ef28aaf2277eb7edc70fe1d3bcd8ade290682572eaf",
+  "evidence": [
+    {
+      "archive_path": "archives/retired/modality-samplers/evidence/plato-next-retirements-plan.json",
+      "sha256": "a49502dca7146305f37c94a404ff7735c7507d79d3968b5a813f09e304442716",
+      "bytes": 50862
+    },
+    {
+      "archive_path": "archives/retired/modality-samplers/evidence/plato-next-retirements-plan-review.json",
+      "sha256": "a93502a267b86617ff3bde0d30462179c219f0bbc279354d0c049dfddcd0ecb8",
+      "bytes": 2498
+    }
+  ]
+}

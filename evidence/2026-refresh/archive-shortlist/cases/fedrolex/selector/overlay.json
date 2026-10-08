@@ -1,0 +1,31 @@
+{
+  "clients": {
+    "total_clients": 2,
+    "per_round": 2,
+    "comm_simulation": false,
+    "compute_comm_time": false,
+    "do_test": false
+  },
+  "server": {
+    "port": 56763,
+    "simulate_wall_time": false,
+    "random_seed": 1234
+  },
+  "trainer": {
+    "rounds": 1,
+    "epochs": 1,
+    "batch_size": 2,
+    "max_concurrency": 2
+  },
+  "data": {
+    "download": false,
+    "sampler": "all_inclusive",
+    "testset_sampler": "all_inclusive",
+    "testset_size": 2
+  },
+  "parameters": {
+    "limitation": {
+      "activated": false
+    }
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "id": "ROOT-2B-01",
+  "candidate": "b3b038efa376b060e1c01f1da39173240768a019",
+  "status": "Confirmed root probe; independent reviewer requested to assess",
+  "title": "Concurrent urgent requests overwrite logical assignment when stale reports share a reused physical worker.",
+  "command": "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=/tmp/plato-refresh-worktrees/runtime OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 /Users/bli/Playground/plato/.venv/bin/python /tmp/plato-phase2-root/urgent_shared_sid.py",
+  "source": "import asyncio\nimport json\nimport pickle\nimport tempfile\nfrom pathlib import Path\nfrom types import SimpleNamespace\nfrom unittest.mock import AsyncMock\n\nfrom tests.integration.utils import build_minimal_config, configure_environment\nfrom tests.servers.test_runtime_transport import assigned_server, report_bytes\n\nasync def scenario():\n    server = assigned_server()\n    server.clients[100][\"client_id\"] = 9\n    server._session_assignments.clear()\n    server.training_clients = {}\n    server.training_sids = []\n    server.selected_clients = [9]\n    server.current_reported_clients = {9: True}\n    server.current_round = 3\n    server.request_update = server.asynchronous_mode = server.simulate_wall_time = True\n    server.reported_clients = [\n        (100 + index, client_id, {\n            \"client_id\": client_id, \"starting_round\": 1, \"start_time\": 0,\n            \"sid\": \"worker\", \"report\": pickle.loads(report_bytes(client_id)),\n        })\n        for index, client_id in enumerate([7, 2])\n    ]\n    server.should_request_update = lambda **kwargs: True\n    server.sio = SimpleNamespace(emit=AsyncMock())\n    await server._process_clients(server.reported_clients[0])\n    result = {\n        \"requests\": [{\"event\": call.args[0], \"client_id\": call.args[1][\"client_id\"], \"room\": call.kwargs[\"room\"]} for call in server.sio.emit.await_args_list],\n        \"assignments\": dict(server._session_assignments),\n        \"training_clients\": list(server.training_clients),\n        \"training_sids\": list(server.training_sids),\n    }\n    try:\n        await server._client_report_arrived(\"worker\", 7, report_bytes(7))\n        result[\"first_response\"] = \"accepted\"\n    except Exception as error:\n        result[\"first_response\"] = {\"error\": type(error).__name__, \"message\": str(error)}\n    print(\"PROBE_RESULT\", json.dumps(result))\n\nwith tempfile.TemporaryDirectory(prefix=\"plato-urgent-sid-probe-\") as temporary:\n    with configure_environment(build_minimal_config(), runtime_root=Path(temporary)):\n        asyncio.run(scenario())\n",
+  "result": {
+    "requests": [
+      {
+        "event": "request_update",
+        "client_id": 7,
+        "room": "worker"
+      },
+      {
+        "event": "request_update",
+        "client_id": 2,
+        "room": "worker"
+      }
+    ],
+    "assignments": {
+      "worker": 2
+    },
+    "training_clients": [
+      7,
+      2
+    ],
+    "training_sids": [
+      "worker",
+      "worker"
+    ],
+    "first_response": {
+      "error": "ValueError",
+      "message": "Session does not match a current logical client assignment."
+    }
+  },
+  "log_sha256": "c3a214f06a5d19cbe47faa077efa520ecb358a5527dd60dc312b620ef0ee3841",
+  "boundary": "Actual _process_clients request loop and _client_report_arrived from the exact B candidate; existing assigned_server fixture, synthetic retained stale queue, AsyncMock outbound emit, forced staleness predicate. Not a fresh real multi-round socket run.",
+  "expected": "Do not overwrite one outstanding logical assignment with a second urgent request on the same physical session. Accept and finish every requested response without duplicate training_sids or deadlock; preserve concurrent requests to distinct workers and wrong-session rejection."
+}

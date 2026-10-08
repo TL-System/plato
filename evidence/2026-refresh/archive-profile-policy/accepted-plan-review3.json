@@ -1,0 +1,203 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-03",
+  "reviewer": "Fresh independent read-only revision-3 review",
+  "plan_path": "/tmp/plato-archive-shortlist-plan.json",
+  "plan_sha256": "c66577eac31a2eeaba68f29e2fee53760def2477184521bd1f2536e76507573f",
+  "plan_revision": 3,
+  "prior_review_path": "/tmp/plato-archive-shortlist-plan-review2.json",
+  "prior_review_sha256": "2584e5d3d5af21873a54b3e8159fcc26307f8bb5b33a283421df51c54db74bbf",
+  "decision": "APPROVE_PLAN",
+  "implementation_accepted": false,
+  "native_profile_accepted": false,
+  "scope": "Plan review only. No repository edits, staging, commits, dependency resolution or installs, pytest execution, runtime probes, heavy training, nested agents or remote actions. This report does not accept archive implementation or native-profile delivery.",
+  "source": {
+    "worktree": "/tmp/plato-refresh-worktrees/llm-integrated",
+    "accepted_tree": "d230cd65244b4e8fc030778ad02c8760615f863f",
+    "object_type": "tree",
+    "head_commit": "7beda2a8257e5c1e2a7aeef45314f01f143fd6b4",
+    "index_matches_accepted_tree": true,
+    "tracked_worktree_matches_index": true,
+    "provenance_requirement": "At implementation, bind the actual accepted pre-retirement commit/tree or reviewed successor. The planning tree is not a commit."
+  },
+  "publication": {
+    "worktree": "/tmp/plato-refresh-worktrees/llm-publication",
+    "commit": "1130ff0250ee26a49328e15cf5596f430c468c9d",
+    "tree": "82af1367f106218d0de98f46775c011e0afd930c",
+    "tracked_and_untracked_status_clean": true,
+    "active_source_matches_planning_tree": true,
+    "differences": "Exactly 19 additional evidence/2026-refresh files; no change or deletion of planning-tree paths."
+  },
+  "authorization": {
+    "shortlist_path": "/tmp/plato-refresh-next-prompts/phase4-additional-archive-shortlist.json",
+    "shortlist_sha256": "fb605925b3d936113a563bdb02d607a28b25c26be3b5b446c531d0d8c4232b31",
+    "scope_record": "evidence/2026-refresh/user-scope-update-2026-10-03.json",
+    "scope_record_source_sha256": "48314def908632108eb1e435f10cc082f3724a4bbd31d4e52296146c85251987",
+    "scope_confirmed": true,
+    "boundary": "Legacy ViT/FedTP, complete pFedRLNAS including MobileNetV3/DARTS/shared NASViT, FedRLNAS DARTS, AnyCostFL/FedRolex local ViT branches and HeteroFL local MobileNetV3 branch retire. Independent retained ResNets, shared active model-search logic, adjacent SysHeteroFL and generic Hugging Face/Torchvision capabilities remain.",
+    "python": "Python 3.13 sole active/default/CI qualification target; no new 3.14 upper bound."
+  },
+  "prior_findings": [
+    {
+      "id": "ARP-01",
+      "status": "RESOLVED_AT_PLAN_LEVEL",
+      "basis": "Real random-rate 0.5/1.0 socket rounds use the explicit limitation.activated=false overlay and recorded RNG control. Each of the three families also has a distinct activated=true real-ptflops budget case without binary-search endpoint assumptions. These contracts are unchanged from revision2; execution remains pending."
+    },
+    {
+      "id": "ARP-02",
+      "status": "RESOLVED_AT_PLAN_LEVEL",
+      "basis": "Dedicated test-model-search dependency group includes the existing mandatory test group plus already-locked ptflops. All dependency-bearing local entrypoint probes remain in the doubly marked dedicated module, whose stdlib/pytest-only collection and worker isolation preserve root base/dev collection semantics. The required guard delta is now explicitly assigned and serialized."
+    },
+    {
+      "id": "ARP-03",
+      "status": "RESOLVED_AT_PLAN_LEVEL",
+      "basis": "All new/edited Python paths, including tests/conftest.py and the new guard-regression module, are owned by the no-new-diagnostics typing gate. Existing historical allowance tuples remain unchanged; the modified staging script requires an explicit same-environment check if dot-directory discovery omits it."
+    },
+    {
+      "id": "ARP-02-R2",
+      "status": "RESOLVED_AT_PLAN_LEVEL",
+      "basis": "The plan now authorizes a minimal tests/conftest.py follow-up by the same native-profile owner only after completed independent native delivery review/acceptance. It binds the future accepted base and specifies the exact compound deselection predicate, runtime required/startup inventories, unchanged protections, independent 19-case gate and bounded positive/negative verification. The archive author remains prohibited from independently editing shared conftest."
+    }
+  ],
+  "findings": [],
+  "verified": {
+    "full_plan_reviewed": true,
+    "primary_source_inventory_records_including_duplicates": 266,
+    "source_records_including_shared_baseline_alias": 267,
+    "unique_source_inventory_records": 199,
+    "duplicate_inventory_disagreements": 0,
+    "immutable_source_modes_blobs_sha256_bytes_match": true,
+    "tracked_worktree_bytes_and_executable_modes_match": true,
+    "moved_first_party_and_vendored_files": 109,
+    "retained_model_search_files": 31,
+    "existing_outdated_files": 20,
+    "families": 7,
+    "upstream_gitlink_snapshots": [
+      {
+        "path": "plato/models/dvit",
+        "pin": "1ccb152cea43fcbc3cd517a45c12c65734f8ace3",
+        "files": 352,
+        "exact_path_mode_blob_sha256_byte_inventory_match": true,
+        "nested_gitlinks": 0
+      },
+      {
+        "path": "plato/models/t2tvit",
+        "pin": "0f63dc9558f4d192de926504dbddfa1b3f5db6ca",
+        "files": 22,
+        "exact_path_mode_blob_sha256_byte_inventory_match": true,
+        "nested_gitlinks": 0
+      }
+    ],
+    "directory_closure": {
+      "pfedrlnas": {
+        "source_files": 79,
+        "exact_move_closure": true
+      },
+      "fedrlnas": {
+        "source_files": 14,
+        "exact_move_closure": true
+      },
+      "fedtp": {
+        "source_files": 6,
+        "exact_move_closure": true
+      },
+      "anycostfl": {
+        "source_files": 10,
+        "retained_files": 8,
+        "exact_move_plus_retained_closure": true
+      },
+      "fedrolex": {
+        "source_files": 10,
+        "retained_files": 8,
+        "exact_move_plus_retained_closure": true
+      },
+      "heterofl": {
+        "source_files": 9,
+        "retained_files": 8,
+        "exact_move_plus_retained_closure": true
+      }
+    },
+    "revision2_authority_source_family_upstream_retained_control_historical_and_documentation_fields_unchanged": true,
+    "revision3_active_inventory_only_addition": "tests/conftest.py, identical to its existing inspected control record",
+    "revision3_new_path_only_addition": "tests/test_model_search_profile_contract.py",
+    "prior2_static_import_closure_basis": "The previously independently reviewed import scan is unchanged by this JSON revision. This review re-inspected the directly affected immutable entrypoint/registry/algorithm selections; it did not rerun the full-repository AST scan.",
+    "old_guard_incompatibility_independently_confirmed": true,
+    "old_guard_details": "The planning-source conftest accepts deselections only for exact runtime/not runtime, and selects _RUNTIME only for exact runtime. It cannot support the new compound expression unchanged. The separately inspected native candidate also retains those exact-string predicates; the plan correctly requires a subsequent reviewed delta.",
+    "serialized_owner_handoff_explicit": true,
+    "implementation_base_binding_explicit": true,
+    "archive_author_shared_conftest_prohibition_consistent_with_owner_handoff": true,
+    "workflow_guard_group_artifact_typing_integration_atomic_after_review": true,
+    "core_partition_contract": {
+      "exact_expression": "runtime and not retained_model_search",
+      "deselection_truth_table": "Only items lacking runtime OR carrying retained_model_search may be deselected by the exact approved compound partition; runtime without retained_model_search is protected.",
+      "required_runtime_nodes": "Same existing _RUNTIME set; three required socket/containment nodes in the immutable baseline.",
+      "startup_inventory": "Same exact _STARTUP_CASES function/count inventory; sum48 in planning and inspected native candidate. Final accepted native authoritative inventory must remain unchanged.",
+      "required_non_runtime_nodes": "Unchanged _REQUIRED DP/MPC presence/pass enforcement in base/mandatory non-runtime partitions; no requirement to collect them inside the targeted retained module.",
+      "expression_boundary": "Preserve accepted empty/unfiltered, runtime, not runtime and finalized native invocation modes; add only the exact compound full-suite expression. Reject unapproved equivalent or expanded expressions. Required/selected runtime -k removals and --ignore/--ignore-glob/--deselect exclusions fail.",
+      "skip_boundary": "Unchanged exact base missing-Opacus node/reason/absence exception only; mandatory opacus/kazoo/gymnasium imports remain. Unexpected skips, xfails/xpasses, required omissions and required cases not passing remain failures. No dedicated-partition skip exception."
+    },
+    "dedicated_gate": {
+      "expected_case_count": 19,
+      "expected_case_names_unique": true,
+      "case_names_unchanged_from_revision2": true,
+      "group": "test-model-search",
+      "group_entries": [
+        {
+          "include-group": "test"
+        },
+        "ptflops>=0.7.5"
+      ],
+      "test_file": "tests/integration/test_retained_model_search.py",
+      "invocation": "python -m pytest tests/integration/test_retained_model_search.py --test-profile=mandatory -m retained_model_search",
+      "markers": [
+        "runtime",
+        "retained_model_search"
+      ],
+      "collection": "stdlib/pytest only; dependency-bearing imports occur in worker after Config initialization",
+      "inventory_verifier": "Exact collection node IDs and JUnit testcase names, each expected case once, no extra/omitted/duplicate cases, failures/errors/skips/xfail/xpass. Separate gate remains mandatory and authoritative.",
+      "artifact_contract": "Six model-search records join EXPECTED_RECORDS; existing top-level regular-file and non-unit-folder policy retains logs/XML/JSON/packages and model-search-tmp without weakening prior records.",
+      "bounds": "25-minute dedicated step; socket90s, budget30s, DLG90s, SysHeteroFL180s, selector/import15s; 5+5-second descendant containment; exhausted budgets fail."
+    },
+    "guard_verification_plan": "Four accepted collect-only partition receipts, unapproved expression and required-runtime -k negative receipts, deselection truth-table and required/startup/pass/skip/xfail/exclusion unit checks, dedicated missing/duplicate/skip/failure artifact rejection and exact base missing-Opacus negative probe. Guard subprocess30s and real collection120s deadlines. Actual final partition suites and all19 behavior cases remain required.",
+    "native_policy_regression_required": true,
+    "archive_integrity_original_bytes_modes_notices_snapshots_and_distribution_contracts_preserved": true,
+    "executed_behavioral_acceptance_claimed": false,
+    "full_phase4_acceptance_claimed": false,
+    "source_publication_and_plan_identities_unchanged_at_final_check": true
+  },
+  "control_identities_sha256": {
+    "tests/conftest.py": "24798dced0175024ca57cc08c331b7671faefd6f19883ea4df4e245ba7273de5",
+    "pyproject.toml": "2c194cf625de70ceea14b737c2b2f4c64ea68dbde23039464f97015216752edf",
+    ".github/workflows/pytorch_tests.yml": "9901a1766341a9b9369a31ede1a5f8d94429eaf2e74c66f7a77c2520324e703b",
+    ".github/scripts/stage_ci_artifacts.py": "df7030fd29802baa0fd4858deb2f4047e02a305a2862a3432d9a63764a8671c2"
+  },
+  "native_candidate_observation": {
+    "acceptance_status": "Separate review remains outside this plan review. These identities are observations, not the authorized future application base.",
+    "profile_worktree": "/tmp/plato-refresh-worktrees/mlx-profile",
+    "profile_commit": "d3dcf05985d5f7ff8a836d8974dc5346cd10e790",
+    "profile_tree": "25eaaa7b6da0b420b758141d5a835b464c314d8a",
+    "runtime_integration_worktree": "/tmp/plato-refresh-worktrees/mlx-integration",
+    "runtime_integration_commit": "3ad876fbf843f49912a03e76186e07cffc02b690",
+    "runtime_integration_tree": "e1dc275df7f119adbaf236f90ecbe957ba8dbd0c",
+    "both_commits_control_hashes": {
+      "tests/conftest.py": "8e458b0925c1a83c32fa3869a4e9f229b27cdb77f10b56a7f66c3f933a9f7739",
+      "tests/mlx_native/cases.json": "e8beb9cc735425ee678b0f11ba6d83747b5766748abf8de40609314b92eaa49f",
+      "pyproject.toml": "bd6e032489a67e61e2c8a022de6b4335e600c8f537ff128c3412a39d56dffd24",
+      ".github/workflows/pytorch_tests.yml": "9901a1766341a9b9369a31ede1a5f8d94429eaf2e74c66f7a77c2520324e703b"
+    },
+    "inspected_native_policy": "Core ignores the native directory before collection; explicit native paths trigger prerequisites; mlx-native full qualification prohibits filters and checks exact reviewed cases.json collection/pass inventory. Native marker/path/preflight and no-skip policies must remain unchanged by the later archive delta."
+  },
+  "implementation_review_requirements": [
+    "Root first accepts the completed independently reviewed native delivery, records that actual commit/tree, conftest SHA256, native inventory path/hash, pyproject/workflow hashes and finalized native contract, then assigns the same native-profile owner the narrow guard follow-up. Neither current candidate nor planning conftest is automatically accepted as the application base.",
+    "Review the delta on that bound base with before/after hashes, exact diff and positive/negative guard receipts. Verify native policy, inventory and accepted profile tests are preserved. If the actual accepted native contract conflicts with the exact archive partition, amend/review the plan before implementation instead of widening grammar silently.",
+    "Integrate reviewed guard, runtime expression, dedicated group/step, artifact records and typing ownership sequentially and atomically. Verify actual final source/lock/environment identities before reusing receipts.",
+    "Independently review all19 real behavioral receipts, numerical aggregation/channel/roll oracles, real sockets, resource selection and required no-skip/collection/JUnit gate before retained-support claims.",
+    "Review immutable archive inventories, copied byte/mode mutation rejection, original notice closure, inert exact-pin snapshots, distribution exclusions, clean import and documentation links."
+  ],
+  "review_limitations": [
+    "No pytest/smoke/collection execution, dependency lock/sync, type check, documentation build or distribution build occurred. All are future implementation acceptance gates.",
+    "Plan review validates the contract and immutable evidence; it does not establish behavioral correctness of retained algorithms, selectors, sockets, budget search or channel alignment.",
+    "Online license references were not re-fetched. Original source/notice retention and unknown source-revision disclosure are plan contracts; unknown vendor revisions remain unknown.",
+    "The future reviewed native application-base identities remain deliberately unbound until root acceptance. This is an explicit scheduling gate, not evidence of a pass."
+  ]
+}

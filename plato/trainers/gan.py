@@ -8,6 +8,7 @@ https://pytorch.org/tutorials/beginner/dcgan_faces_tutorial.html
 import logging
 import math
 import os
+import pickle
 from collections.abc import Callable
 from typing import Optional, cast
 
@@ -27,6 +28,11 @@ from plato.trainers.strategies.base import (
     TestingStrategy,
     TrainingContext,
     TrainingStepStrategy,
+)
+from plato.utils.checkpoint_paths import (
+    checkpoint_name,
+    checkpoint_path,
+    checkpoint_sidecar,
 )
 
 
@@ -295,7 +301,7 @@ class GANTestingStrategy(TestingStrategy):
             model: GAN model with generator
             config: Testing configuration dictionary
             testset: Test dataset
-            sampler: Optional data sampler (unused for GAN testing)
+            sampler: Optional evaluation partition sampler
             context: Training context with device info
 
         Returns:
@@ -306,8 +312,13 @@ class GANTestingStrategy(TestingStrategy):
 
         perplexity = -1
 
+        sampler_obj = sampler
+        if sampler is not None and not isinstance(sampler, torch.utils.data.Sampler):
+            get_sampler = getattr(sampler, "get", None)
+            if callable(get_sampler):
+                sampler_obj = get_sampler()
         test_loader = torch.utils.data.DataLoader(
-            testset, batch_size=config["batch_size"], shuffle=True
+            testset, batch_size=config["batch_size"], shuffle=False, sampler=sampler_obj
         )
 
         real_features, fake_features = [], []
@@ -316,7 +327,7 @@ class GANTestingStrategy(TestingStrategy):
                 real_examples = real_examples.to(context.device)
 
                 noise = torch.randn(
-                    config["batch_size"], model.nz, 1, 1, device=context.device
+                    len(real_examples), model.nz, 1, 1, device=context.device
                 )
                 fake_examples = model.generator(noise)
 
@@ -330,6 +341,8 @@ class GANTestingStrategy(TestingStrategy):
                 real_features.extend(list(feature_real))
                 fake_features.extend(list(feature_fake))
 
+            if len(real_features) < 2:
+                raise ValueError("GAN FID evaluation requires at least two samples.")
             real_features, fake_features = (
                 np.stack(real_features),
                 np.stack(fake_features),
@@ -357,8 +370,8 @@ class GANTestingStrategy(TestingStrategy):
         """
         # Since the input to InceptionV3 needs to be at least 75x75,
         # we will pad the input image if needed.
-        hpad = math.ceil((75 - inputs.size(dim=-2)) / 2)
-        vpad = math.ceil((75 - inputs.size(dim=-1)) / 2)
+        hpad = math.ceil((75 - inputs.size(dim=-1)) / 2)
+        vpad = math.ceil((75 - inputs.size(dim=-2)) / 2)
         hpad, vpad = max(0, hpad), max(0, vpad)
         pad = nn.ZeroPad2d((hpad, hpad, vpad, vpad))
         inputs = pad(inputs)
@@ -367,10 +380,7 @@ class GANTestingStrategy(TestingStrategy):
         features = None
         with torch.no_grad():
             features = self.inception_model(inputs)
-        features = features.cpu()
-        features = np.array(features)
-
-        return features
+        return features.detach().cpu().numpy()
 
     def _calculate_fid(self, real_features, fake_features):
         """
@@ -453,6 +463,10 @@ class Trainer(ComposableTrainer):
             filename: Optional filename (without path)
             location: Optional directory path
         """
+        # Worker and urgent snapshots share the ordinary tree reader contract.
+        # Historical default/explicit .pth pairs retain their existing format.
+        if filename is not None and filename.endswith(".safetensors"):
+            return super().save_model(filename, location)
         model_path = Config().params["model_path"] if location is None else location
         model_name = Config().trainer.model_name
 
@@ -463,14 +477,35 @@ class Trainer(ComposableTrainer):
             pass
 
         if filename is not None:
-            net_gen_path = f"{model_path}/Generator_{filename}"
-            net_disc_path = f"{model_path}/Discriminator_{filename}"
+            # Resolve the explicit anchor before adding companion prefixes.
+            # Otherwise 'nested/../pair.pth' aliases both networks to one file,
+            # and an escaping anchor fails only after writing the pair.
+            filename = os.path.relpath(
+                checkpoint_path(model_path, filename), os.path.realpath(model_path)
+            )
+            net_gen_path = checkpoint_path(model_path, f"Generator_{filename}")
+            net_disc_path = checkpoint_path(model_path, f"Discriminator_{filename}")
         else:
-            net_gen_path = f"{model_path}/Generator_{model_name}.pth"
-            net_disc_path = f"{model_path}/Discriminator_{model_name}.pth"
+            net_gen_path = checkpoint_path(
+                model_path, checkpoint_name("Generator", model_name, suffix=".pth")
+            )
+            net_disc_path = checkpoint_path(
+                model_path, checkpoint_name("Discriminator", model_name, suffix=".pth")
+            )
 
+        history_name = filename if filename is not None else checkpoint_name(
+            model_name, suffix=".pth"
+        )
+        history_path = checkpoint_sidecar(
+            model_path, checkpoint_path(model_path, history_name)
+        )
+        os.makedirs(os.path.dirname(net_gen_path), exist_ok=True)
+        os.makedirs(os.path.dirname(net_disc_path), exist_ok=True)
         torch.save(self.generator.state_dict(), net_gen_path)
         torch.save(self.discriminator.state_dict(), net_disc_path)
+        os.makedirs(os.path.dirname(history_path), exist_ok=True)
+        with open(history_path, "wb") as history_file:
+            pickle.dump(self.run_history, history_file)
 
         if self.client_id == 0:
             logging.info(
@@ -503,13 +538,23 @@ class Trainer(ComposableTrainer):
         """
         model_path = Config().params["model_path"] if location is None else location
         model_name = Config().trainer.model_name
+        if (filename is not None and filename.endswith(".safetensors")
+                and os.path.isfile(checkpoint_path(model_path, filename))):
+            return super().load_model(filename, location)
 
         if filename is not None:
-            net_gen_path = f"{model_path}/Generator_{filename}"
-            net_disc_path = f"{model_path}/Discriminator_{filename}"
+            filename = os.path.relpath(
+                checkpoint_path(model_path, filename), os.path.realpath(model_path)
+            )
+            net_gen_path = checkpoint_path(model_path, f"Generator_{filename}")
+            net_disc_path = checkpoint_path(model_path, f"Discriminator_{filename}")
         else:
-            net_gen_path = f"{model_path}/Generator_{model_name}.pth"
-            net_disc_path = f"{model_path}/Discriminator_{model_name}.pth"
+            net_gen_path = checkpoint_path(
+                model_path, checkpoint_name("Generator", model_name, suffix=".pth")
+            )
+            net_disc_path = checkpoint_path(
+                model_path, checkpoint_name("Discriminator", model_name, suffix=".pth")
+            )
 
         if self.client_id == 0:
             logging.info(
@@ -534,7 +579,36 @@ class Trainer(ComposableTrainer):
                 net_disc_path,
             )
 
-        self.generator.load_state_dict(torch.load(net_gen_path, weights_only=False))
-        self.discriminator.load_state_dict(
-            torch.load(net_disc_path, weights_only=False)
+        history_name = filename if filename is not None else checkpoint_name(
+            model_name, suffix=".pth"
         )
+        history_path = checkpoint_sidecar(
+            model_path, checkpoint_path(model_path, history_name)
+        )
+        # GAN checkpoints historically contain torch.save data, including
+        # worker files whose supplied name ends in .safetensors. File handles
+        # avoid torch.load's suffix-based Safetensors dispatch for these files.
+        with open(net_gen_path, "rb") as generator_file:
+            generator_state = torch.load(
+                generator_file, map_location="cpu", weights_only=True
+            )
+        with open(net_disc_path, "rb") as discriminator_file:
+            discriminator_state = torch.load(
+                discriminator_file, map_location="cpu", weights_only=True
+            )
+        self.generator.load_state_dict(generator_state)
+        self.discriminator.load_state_dict(discriminator_state)
+        if os.path.isfile(history_path):
+            with open(history_path, "rb") as history_file:
+                self.run_history = pickle.load(history_file)
+
+    def pause_training(self):
+        """Remove this worker's ordinary artifacts and any historical GAN pair."""
+        super().pause_training()
+        if hasattr(Config().trainer, "max_concurrency"):
+            worker = checkpoint_name(Config().trainer.model_name, self.client_id,
+                                     Config().params["run_id"], suffix=".safetensors")
+            for prefix in ("Generator", "Discriminator"):
+                path = checkpoint_path(Config().params["model_path"], f"{prefix}_{worker}")
+                if os.path.isfile(path):
+                    os.remove(path)

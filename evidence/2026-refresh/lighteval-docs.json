@@ -1,0 +1,555 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-03T21:57:30.924515+00:00",
+  "status": "DRAFT_ACCEPTED_LOCAL_DOCUMENTATION_AND_PROFILE_REBOUND_PENDING_LINUX_AND_ROOT_PUBLICATION_GATES",
+  "publication_gate": {
+    "ready": false,
+    "completed": [
+      "Fresh independent documentation review ACCEPT with zero findings; six reader-facing files unchanged.",
+      "Accepted combined runtime/profile/LR1 source d2ed4bcbc46684ac60dfdb1505ff764029ee48e9 and exact 11-case ledger bound to both fresh reviews.",
+      "Documented strict optional command executed by independent docs reviewer: 11 actual CPU cases passed; focused command passed 2; combined command collected 1646 with exact optional11 and no native cases.",
+      "Assembled final source 86573a123c4166e5f9124e46f9ccef33505fc6cf and evidence head b3e912e5253734d27e983fe59a69d9ccb22b34f8 preserve the accepted six docs and combined runtime/test/profile/dependency/CI source."
+    ],
+    "required": [
+      "Root Linux Python 3.13 locked provisioning and optional/combined qualification with actual runtime and artifact evidence.",
+      "Root final integrated qualification, receipt review and explicit publication gate acceptance; this local rebinding does not declare global completion."
+    ],
+    "reader_prose": "Accepted commands describe the implemented profile. Remaining Linux/integration/publication bookkeeping stays in this receipt; no reader-facing prose changed."
+  },
+  "source": {
+    "base_commit": "c1bdae78456b6a8b16d2b78d16ab6ec973067b06",
+    "docs_commit": "3dcd7f9bfa1d32821a1544c9bcbc8b0fb80d8f78",
+    "docs_tree": "0cef360ac14377b19ceec25a24576f365bccd8d8",
+    "docs_before_sha256": {
+      "docs/docs/configurations/evaluation.md": "1eb66018ff17dbbab6f6105f3b62ed4a0b5531d317b7c0b0307a0df4f9866ba1",
+      "docs/docs/development.md": "96ae93b80908f36d27bf8faaed16ac6e70c8966f07ba38155a1cbdad1026e057",
+      "docs/docs/examples/case-studies/4. Server-side Lighteval for SmolLM2.md": "394f0ddd860b1c01aa3d9ba450a32ea2199719f8fd6cd2ddc4e930d808c1d98e",
+      "docs/docs/install.md": "8f7e57f4c0c72df67d769af788bcb9ece2d6907f823513fec17692644b21340b",
+      "docs/docs/quickstart.md": "1cd72bfbaf114d44b3c1b177c0d38709c8e7e939d2780f29b040139b713a4d0b",
+      "docs/docs/references/evaluators.md": "b1285df00132e7e1882dc937ee0c1a9e71f04d9191fe1e2413f24cb0eb09da71"
+    },
+    "docs_after_sha256": {
+      "docs/docs/configurations/evaluation.md": "08dccc460ba982f8636008787344efe36285b5664dcce298cbf7f35a868dbf5c",
+      "docs/docs/development.md": "9fcaa651c861444ca36220d4732a7496087bbd51aff501b6aa8de44977ddf6f0",
+      "docs/docs/examples/case-studies/4. Server-side Lighteval for SmolLM2.md": "d20a43f6bbd0fb96b5d0bb65843b6939fe4506c928e5051d8c5b3a479a9664c7",
+      "docs/docs/install.md": "495ac1c33737e5c9f477b8d650952840164bbb98957bc6e9ab6632fc55727eb2",
+      "docs/docs/quickstart.md": "6e946cfd836abfe7e87044eaaf0c64d89ed256a6e3e1c2fb47bbd2a641d5065f",
+      "docs/docs/references/evaluators.md": "627cf014487123ca67b18974126c8a9873a510ef2bb7d392a5069129ce2be40b"
+    },
+    "inspected_repository_sha256": {
+      "pyproject.toml": "6c313baf90888edeb24c42828b93411ab1f075e2cf1197663299f46dccbfadcd",
+      "uv.lock": "66a4e4442d7b1f26d220b44ca73c44ff4f1151a86857bb3f93a594819fd08126",
+      "plato/evaluators/lighteval.py": "73a6f9f790ed1810033f4dcdc7c35bba68cd738260462e517dffd946d26b9775",
+      "plato/evaluators/lighteval_tasks.py": "c5af11e1f9cc71d8cbd0318266690246045049701d00ddd944f45cce121c984f",
+      "plato/evaluators/runner.py": "e08bae291acdcbefee340b8d7c8f41c168a0e00a2d257ff74932514a186985f3",
+      "configs/HuggingFace/fedavg_smol_smoltalk_smollm2_135m.toml": "899ef9b1289c8fd08f7caafe754768cf1e13520caecc981bf24c7ac726f165fa",
+      "tests/llm_eval/test_lighteval_runtime.py": "1f55137024bbc8fdfcf894aef97088ef07ca545c63f518e4e1d5ae4db5faaa14",
+      "tests/llm_eval/helpers.py": "0a3c9f230f3de6095791f0930f7e2963aaf2a88a2190f00b8aed01d878614bf1"
+    },
+    "external_inputs_sha256": {
+      "/tmp/plato-lighteval-profile-plan.json": "8a457832ca649ba39e7ba4f39175aec35e111e00e8856068641ac324ce4015fe",
+      "/tmp/plato-lighteval-profile-plan-review2.json": "953261a846d0d19658279a99f688f465f741f3ad040806a9e2cb5a7ccf727529",
+      "/tmp/plato-refresh-worktrees/lighteval-runtime/evidence/2026-refresh/lighteval-runtime-qualification.json": "dce1aef82b4ab7c02603c6b4d9eb8a4953cba4ae34be1d315da9c353de32d0be",
+      "/tmp/plato-lighteval-dependency-checks/command-semantics.json": "5085b7db4b13d5fa91569cb765a05fd01f061743e76d5af6a7bbfeac5e1dc9f9",
+      "/tmp/plato-archive-integration/docs-all-extras-red.log": "e4535c59d52f38cf45e064fd47ebfb7309daa524ed7b7b8285490bb522da21ff"
+    },
+    "frozen_runtime_reference": "e079df6228f9529472c7b3c3d9a2db46a42636a8",
+    "runtime_source_match": "Local lighteval.py, lighteval_tasks.py and real runtime test module are byte-identical to the frozen runtime worktree at authoring time.",
+    "historical_authoring_note": "base_commit, docs_commit/tree, inspected_repository_sha256, frozen_runtime_reference and runtime_source_match record the original authoring snapshot. The accepted_rebinding section supersedes their pending implementation status without rewriting historical hashes.",
+    "accepted_rebinding": {
+      "recorded_at_utc": "2026-10-03T23:30:23.071374+00:00",
+      "previous_receipt_sha256": "74b0b5a5e498855e5c1eee86cf15e6a0b7eed691268c49eacb7a5b856df4c4f3",
+      "previous_receipt_commit": "efbfecaacf3d77e2932d2df9665f14d4ee4f0ca5",
+      "combined_source_commit": "d2ed4bcbc46684ac60dfdb1505ff764029ee48e9",
+      "combined_source_tree": "5a4c1d53e1715ecb38df5e7e16f9369d5c029750",
+      "profile_source_commit": "1a7fea6f4fbd0232032332958f4354067e306342",
+      "lr1_fixture_source_commit": "52b7ecdf063fd0827ceae05b068e2c55c79aae08",
+      "assembled_final_source_commit": "86573a123c4166e5f9124e46f9ccef33505fc6cf",
+      "assembled_final_evidence_commit": "b3e912e5253734d27e983fe59a69d9ccb22b34f8",
+      "accepted_source_sha256": {
+        "pyproject.toml": "fcc830f9fac66f2e2f28bef0d715bea3eb1300105a4239bb33cce8f62b71b398",
+        "uv.lock": "66a4e4442d7b1f26d220b44ca73c44ff4f1151a86857bb3f93a594819fd08126",
+        "tests/conftest.py": "2d5323021b000249805712282c2ee5281eaa3c4fc65a55a65e8215acfe14a54f",
+        "tests/llm_eval/cases.json": "557fd7e5af010e49c7a687b5632c22ef80cc0db4f6639c8ce67fda20d9b7dded",
+        "tests/llm_eval/helpers.py": "0a3c9f230f3de6095791f0930f7e2963aaf2a88a2190f00b8aed01d878614bf1",
+        "tests/llm_eval/test_lighteval_runtime.py": "923813575c9a7e588da27f4f3a1d178ee896b651829234a7306edb33bf381d44",
+        "plato/evaluators/lighteval.py": "73a6f9f790ed1810033f4dcdc7c35bba68cd738260462e517dffd946d26b9775",
+        "plato/evaluators/lighteval_tasks.py": "c5af11e1f9cc71d8cbd0318266690246045049701d00ddd944f45cce121c984f",
+        "plato/evaluators/runner.py": "e08bae291acdcbefee340b8d7c8f41c168a0e00a2d257ff74932514a186985f3",
+        "configs/HuggingFace/fedavg_smol_smoltalk_smollm2_135m.toml": "899ef9b1289c8fd08f7caafe754768cf1e13520caecc981bf24c7ac726f165fa",
+        ".github/workflows/pytorch_tests.yml": "cd6895c7fc62ee6f0efeff0909fc16078e31adbc61d900db8058548b86714b54",
+        ".github/scripts/stage_ci_artifacts.py": "f42387c37fa6de4774dc2a04fd6536ff812223aec7a31393f1de20d8fa1bf547",
+        "tests/test_llm_eval_profile_contract.py": "19e81abd34c9c689d840a73e4f5d54f9c3c3a73ca7360d3db2eca7b5ac5e74bc"
+      },
+      "reviews": {
+        "documentation": {
+          "path": "/tmp/plato-lighteval-docs-review.json",
+          "sha256": "ad6da0d7ebf67c9cf297138af245640f5f7ef957b841532b96ac39dd3ea4a278",
+          "verdict": "ACCEPT",
+          "findings": []
+        },
+        "profile_and_lr1": {
+          "path": "/tmp/plato-lighteval-profile-cleanup-review.json",
+          "sha256": "9d22ba1577f86a546eec5ba3a3f92d465e76b64c08d77d694c49ed23a196d80b",
+          "verdict": "ACCEPT_COMBINED_SOURCE; Linux execution remains an explicit root gate",
+          "findings": []
+        }
+      },
+      "identity_checks": {
+        "six_docs_byte_identical_to_accepted_docs_and_final_heads": true,
+        "reviewed_source_hashes_match_combined_and_final_heads": true,
+        "production_tests_metadata_lock_and_ci_trees_unchanged_between_combined_and_final_heads": true,
+        "receipt_is_only_author_worktree_change": true
+      },
+      "scope": "Evidence-only source comparison and review incorporation. No prose/source/config/dependency/environment edits, downloads, runtime reruns or publication action in this rebinding."
+    }
+  },
+  "validation": {
+    "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+    "tool_versions": {
+      "mkdocs": "1.6.1",
+      "mkdocs-material": "9.7.7",
+      "Markdown": "3.11"
+    },
+    "tooling_environment": {
+      "path": "/tmp/plato-lighteval-docs-tooling",
+      "provision_command": "UV_PROJECT_ENVIRONMENT=/tmp/plato-lighteval-docs-tooling uv sync --locked --python 3.13 --only-group docs --no-install-project",
+      "returncode": 0,
+      "scope": "Task-owned docs-only environment; no other environment mutations."
+    },
+    "strict_mkdocs": {
+      "command": [
+        "/tmp/plato-lighteval-docs-tooling/bin/python",
+        "-m",
+        "mkdocs",
+        "build",
+        "--strict",
+        "--config-file",
+        "docs/mkdocs.yml",
+        "--site-dir",
+        "/tmp/plato-lighteval-docs-validation/site"
+      ],
+      "returncode": 0,
+      "log_sha256": "2d28bbd67d37def28c40491860507a0e905e23327b6a018d17db12b4f19580e7",
+      "observations": "Existing Material advisory banner and informational unlisted retired Nanochat/LeRobot pages remain; strict build succeeds."
+    },
+    "checks": {
+      "files": [
+        "docs/docs/configurations/evaluation.md",
+        "docs/docs/development.md",
+        "docs/docs/examples/case-studies/4. Server-side Lighteval for SmolLM2.md",
+        "docs/docs/install.md",
+        "docs/docs/quickstart.md",
+        "docs/docs/references/evaluators.md"
+      ],
+      "rendered_links_checked": 412,
+      "errors": [],
+      "evaluator_commands": [
+        {
+          "file": "docs/docs/examples/case-studies/4. Server-side Lighteval for SmolLM2.md",
+          "command": "uv sync --locked --python 3.13 --extra llm_eval",
+          "check": "Syntax/extra/group/resource/target checked; runtime not executed."
+        },
+        {
+          "file": "docs/docs/examples/case-studies/4. Server-side Lighteval for SmolLM2.md",
+          "command": "uv run --locked --extra llm_eval python -m nltk.downloader punkt punkt_tab",
+          "check": "Syntax/extra/group/resource/target checked; runtime not executed."
+        },
+        {
+          "file": "docs/docs/examples/case-studies/4. Server-side Lighteval for SmolLM2.md",
+          "command": "uv run --locked --extra llm_eval python plato.py --config configs/HuggingFace/fedavg_smol_smoltalk_smollm2_135m.toml",
+          "check": "Syntax/extra/group/resource/target checked; runtime not executed."
+        },
+        {
+          "file": "docs/docs/install.md",
+          "command": "uv sync --locked --python 3.13 --extra llm_eval",
+          "check": "Syntax/extra/group/resource/target checked; runtime not executed."
+        },
+        {
+          "file": "docs/docs/install.md",
+          "command": "uv run --locked --extra llm_eval python -m nltk.downloader punkt punkt_tab",
+          "check": "Syntax/extra/group/resource/target checked; runtime not executed."
+        },
+        {
+          "file": "docs/docs/quickstart.md",
+          "command": "uv sync --locked --python 3.13 --extra llm_eval",
+          "check": "Syntax/extra/group/resource/target checked; runtime not executed."
+        },
+        {
+          "file": "docs/docs/quickstart.md",
+          "command": "uv run --locked --extra llm_eval python -m nltk.downloader punkt punkt_tab",
+          "check": "Syntax/extra/group/resource/target checked; runtime not executed."
+        },
+        {
+          "file": "docs/docs/quickstart.md",
+          "command": "uv run --locked --extra llm_eval python plato.py --config configs/HuggingFace/fedavg_smol_smoltalk_smollm2_135m.toml",
+          "check": "Syntax/extra/group/resource/target checked; runtime not executed."
+        },
+        {
+          "file": "docs/docs/references/evaluators.md",
+          "command": "uv sync --locked --python 3.13 --extra llm_eval --group test",
+          "check": "Syntax/extra/group/resource/target checked; runtime not executed."
+        },
+        {
+          "file": "docs/docs/references/evaluators.md",
+          "command": "uv run --locked --extra llm_eval python -m nltk.downloader punkt punkt_tab",
+          "check": "Syntax/extra/group/resource/target checked; runtime not executed."
+        },
+        {
+          "file": "docs/docs/references/evaluators.md",
+          "command": "uv run --locked --extra llm_eval --group test python -m pytest tests/llm_eval --test-profile=llm-eval -ra",
+          "check": "Syntax/extra/group/resource/target checked; runtime not executed."
+        },
+        {
+          "file": "docs/docs/references/evaluators.md",
+          "command": "uv run --locked --extra llm_eval --group test python -m pytest tests/llm_eval/test_lighteval_runtime.py -k model_config -ra",
+          "check": "Syntax/extra/group/resource/target checked; runtime not executed."
+        },
+        {
+          "file": "docs/docs/references/evaluators.md",
+          "command": "uv run --locked --extra llm_eval --group test-model-search python -m pytest tests --test-profile=llm-eval -ra",
+          "check": "Syntax/extra/group/resource/target checked; runtime not executed."
+        }
+      ],
+      "dependency_dryruns": [
+        {
+          "name": "eval",
+          "command": [
+            "uv",
+            "sync",
+            "--locked",
+            "--dry-run",
+            "--python",
+            "3.13",
+            "--extra",
+            "llm_eval"
+          ],
+          "returncode": 0,
+          "log_sha256": "a90ab9177b0b3d0da8de6b878db90722b95bb9fa27c235c0811ecf25b68a6abd",
+          "compatible_xxhash_selected": true
+        },
+        {
+          "name": "eval-test",
+          "command": [
+            "uv",
+            "sync",
+            "--locked",
+            "--dry-run",
+            "--python",
+            "3.13",
+            "--extra",
+            "llm_eval",
+            "--group",
+            "test"
+          ],
+          "returncode": 0,
+          "log_sha256": "c4f583bc34aca02c0e24ee5de268104b671414bdb55b83bc5f1b1f6e51c95c2a",
+          "compatible_xxhash_selected": true
+        },
+        {
+          "name": "eval-combined",
+          "command": [
+            "uv",
+            "sync",
+            "--locked",
+            "--dry-run",
+            "--python",
+            "3.13",
+            "--extra",
+            "llm_eval",
+            "--group",
+            "test-model-search"
+          ],
+          "returncode": 0,
+          "log_sha256": "5636437407f16fdbfa4d8aa8c8ae4d43e1daa8663f5566d0ed0b1f33a87b8744",
+          "compatible_xxhash_selected": true
+        },
+        {
+          "name": "conflicting-all-extras",
+          "command": [
+            "uv",
+            "sync",
+            "--locked",
+            "--dry-run",
+            "--python",
+            "3.13",
+            "--all-extras"
+          ],
+          "returncode": 2,
+          "log_sha256": "ade9bcfa3c036204dcd0808fc2caa6e4881aa0c51725e6f9b120f3bf002ba78b",
+          "compatible_xxhash_selected": false
+        }
+      ],
+      "protected_files_unchanged": 325,
+      "profile_status": "Historical author checks used the accepted plan only. The accepted_local_review_validation section now binds the implemented profile and actual independent local execution; Linux and root final publication gates remain open.",
+      "limits": "Original docs-author validation did not execute training, NLTK downloads or runtime collection. Later independent reviewer activity is separately attributed in accepted_local_review_validation; the evidence-only rebind executes no runtime tests."
+    },
+    "git_diff_check": {
+      "returncode": 0
+    },
+    "accepted_local_review_validation": {
+      "attribution": "Results below were executed by the fresh independent reviewers, not rerun by this evidence-only author update.",
+      "platform": {
+        "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+        "executable": "/tmp/plato-lighteval-docs-review-eval-env/bin/python",
+        "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+        "packages": {
+          "lighteval": "0.13.0",
+          "xxhash": "3.8.1",
+          "nltk": "3.10.3",
+          "langdetect": "1.0.9",
+          "torch": "2.14.1",
+          "transformers": "5.18.0",
+          "datasets": "5.0.1",
+          "pytest": "9.1.1",
+          "ptflops": "0.7.5"
+        }
+      },
+      "strict_mkdocs": {
+        "command": "/tmp/plato-lighteval-docs-review-docs-env/bin/python -m mkdocs build --strict --config-file docs/mkdocs.yml --site-dir /tmp/plato-lighteval-docs-review-artifacts/site",
+        "returncode": 0,
+        "observation": "Existing Material advisory banner and informational unlisted retired Nanochat/LeRobot pages remain; strict build passes."
+      },
+      "rendered_local_links_checked": 412,
+      "evaluator_commands_checked": 13,
+      "actual_command_checks": [
+        {
+          "name": "nltk-provision-owned",
+          "command": "uv run --locked --extra llm_eval python -m nltk.downloader punkt punkt_tab",
+          "expected_returncode": 0,
+          "returncode": 0,
+          "seconds": 1.5539222499999998,
+          "log": "/tmp/plato-lighteval-docs-review-artifacts/nltk-provision-owned.log",
+          "sha256": "31faa9f9a8328c2a960d5212ab82f66ddbac7b45feef9387d0005864f0ab6867",
+          "bytes": 523
+        },
+        {
+          "name": "nltk-owned-resolution",
+          "command": "/tmp/plato-lighteval-docs-review-eval-env/bin/python -c 'import nltk; from pathlib import Path; nltk.data.path[:]=[\"/tmp/plato-lighteval-docs-review-artifacts/nltk_data\"]; print({r:str(nltk.data.find(r)) for r in (\"tokenizers/punkt\",\"tokenizers/punkt_tab\")})'",
+          "expected_returncode": 0,
+          "returncode": 0,
+          "seconds": 1.059771208,
+          "log": "/tmp/plato-lighteval-docs-review-artifacts/nltk-owned-resolution.log",
+          "sha256": "e0e2343e32044187e644f9cd5176cfed738992c812a37c64f9433c227a1544df",
+          "bytes": 195
+        },
+        {
+          "name": "reference-help",
+          "command": "uv run --locked --extra llm_eval python plato.py --config configs/HuggingFace/fedavg_smol_smoltalk_smollm2_135m.toml --help",
+          "expected_returncode": 0,
+          "returncode": 0,
+          "seconds": 19.99409275,
+          "log": "/tmp/plato-lighteval-docs-review-artifacts/reference-help.log",
+          "sha256": "ac7c87ef7f253bb1370c124fab32bbdbebab3de9d079b865c3379368d6345593",
+          "bytes": 732
+        },
+        {
+          "name": "optional-collect",
+          "command": "uv run --locked --extra llm_eval --group test python -m pytest tests/llm_eval --test-profile=llm-eval --collect-only -q -ra",
+          "expected_returncode": 0,
+          "returncode": 0,
+          "seconds": 9.131700082999998,
+          "log": "/tmp/plato-lighteval-docs-review-artifacts/optional-collect.log",
+          "sha256": "4c1a3c58dbb622ae52a49fb651656979cf07e5d92af0f5f0dc0aabb10614f597",
+          "bytes": 1486
+        },
+        {
+          "name": "focused-model-config",
+          "command": "uv run --locked --extra llm_eval --group test python -m pytest tests/llm_eval/test_lighteval_runtime.py -k model_config -ra",
+          "expected_returncode": 0,
+          "returncode": 0,
+          "seconds": 6.142367749999998,
+          "log": "/tmp/plato-lighteval-docs-review-artifacts/focused-model-config.log",
+          "sha256": "b9b3be44d0d44bea9ec23766680ae853dd6488c9d36043b1b98c5fd82dc85479",
+          "bytes": 5539
+        },
+        {
+          "name": "filtered-profile-rejection",
+          "command": "uv run --locked --extra llm_eval --group test python -m pytest tests/llm_eval --test-profile=llm-eval -k model_config --collect-only -q",
+          "expected_returncode": 4,
+          "returncode": 4,
+          "seconds": 4.368989333999998,
+          "log": "/tmp/plato-lighteval-docs-review-artifacts/filtered-profile-rejection.log",
+          "sha256": "9627d6e4363224628d719e1e9fcff15e884db23d8f0e5ef5db615ee20a8fd49a",
+          "bytes": 79
+        },
+        {
+          "name": "pyargs-rejection",
+          "command": "uv run --locked --extra llm_eval --group test python -m pytest --pyargs tests.llm_eval --collect-only -q",
+          "expected_returncode": 4,
+          "returncode": 4,
+          "seconds": 4.394126667000002,
+          "log": "/tmp/plato-lighteval-docs-review-artifacts/pyargs-rejection.log",
+          "sha256": "bd5099fd665da67cf95d58c986d4c4505d2ccc62f911f341cd769229976fbc9d",
+          "bytes": 99
+        },
+        {
+          "name": "cross-profile-rejection",
+          "command": "uv run --locked --extra llm_eval --group test python -m pytest tests/llm_eval --test-profile=mandatory --collect-only -q",
+          "expected_returncode": 4,
+          "returncode": 4,
+          "seconds": 4.397525250000001,
+          "log": "/tmp/plato-lighteval-docs-review-artifacts/cross-profile-rejection.log",
+          "sha256": "9413770351bc4ef0e38de7c49e6cea6403d8148f04ae8dfab211ba8be3a4e050",
+          "bytes": 56
+        },
+        {
+          "name": "combined-collect",
+          "command": "uv run --locked --extra llm_eval --group test-model-search python -m pytest tests --test-profile=llm-eval --collect-only -q -ra",
+          "expected_returncode": 0,
+          "returncode": 0,
+          "seconds": 7.512155125,
+          "log": "/tmp/plato-lighteval-docs-review-artifacts/combined-collect.log",
+          "sha256": "44673da8bdb9596aae2fc9528a7f71f98bb9cb21853ace8fda6befb308f5c3d9",
+          "bytes": 184907
+        },
+        {
+          "name": "all-extras-conflict",
+          "command": "uv sync --locked --python 3.13 --all-extras --dry-run",
+          "expected_returncode": 2,
+          "returncode": 2,
+          "seconds": 0.024136624999997025,
+          "log": "/tmp/plato-lighteval-docs-review-artifacts/all-extras-conflict.log",
+          "sha256": "f41b56791d58258ec5fb591d01bd218eeaf1463182aae33694c638ec09c347ec",
+          "bytes": 232
+        }
+      ],
+      "optional_and_combined_collection": [
+        {
+          "name": "optional-collect",
+          "optional_collected": 11,
+          "ledger_identical": true,
+          "missing": [],
+          "extra": [],
+          "native_collected": 0
+        },
+        {
+          "name": "combined-collect",
+          "optional_collected": 11,
+          "ledger_identical": true,
+          "missing": [],
+          "extra": [],
+          "native_collected": 0
+        }
+      ],
+      "combined_collection_total": 1646,
+      "combined_runtime_execution": "Not performed by these two reviews; no full combined runtime pass is asserted here.",
+      "actual_optional_execution": {
+        "command": "uv run --locked --extra llm_eval --group test python -m pytest tests/llm_eval --test-profile=llm-eval -ra --basetemp=/tmp/plato-lighteval-docs-review-artifacts/optional-tmp --junitxml=/tmp/plato-lighteval-docs-review-artifacts/optional.xml",
+        "environment_overrides": {
+          "UV_PROJECT_ENVIRONMENT": "/tmp/plato-lighteval-docs-review-eval-env",
+          "NLTK_DATA": "/tmp/plato-lighteval-docs-review-artifacts/nltk_data",
+          "HF_HUB_OFFLINE": "1",
+          "HF_DATASETS_OFFLINE": "1",
+          "TOKENIZERS_PARALLELISM": "false"
+        },
+        "returncode": 0,
+        "audit": {
+          "count": 11,
+          "inventory_exact": true,
+          "failures": 0,
+          "errors": 0,
+          "skips": 0,
+          "properties_per_case": {
+            "test_real_preset_pipeline_normalizes_metrics_and_refreshes_exports[current-model]": 1,
+            "test_real_preset_pipeline_normalizes_metrics_and_refreshes_exports[configured-local]": 1,
+            "test_real_piqa_prompt_and_preset_task_contract": 0,
+            "test_real_model_config_failure_clears_stale_results_and_exports[False]": 1,
+            "test_real_model_config_failure_clears_stale_results_and_exports[True]": 1,
+            "test_real_missing_primary_metric_is_rejected": 0,
+            "test_real_readonly_local_source_ignores_old_responses[same]": 2,
+            "test_real_readonly_local_source_ignores_old_responses[separate]": 2,
+            "test_failure_after_actual_inference_cleans_local_copies[False]": 1,
+            "test_failure_after_actual_inference_cleans_local_copies[True]": 1,
+            "test_real_hub_style_response_cache_is_per_run": 1
+          },
+          "summary_lines": [
+            "  tests/llm_eval/test_lighteval_runtime.py:84: PytestWarning: record_property is incompatible with junit_family 'xunit2' (use 'legacy' or 'xunit1')",
+            "  tests/llm_eval/test_lighteval_runtime.py:273: PytestWarning: record_property is incompatible with junit_family 'xunit2' (use 'legacy' or 'xunit1')",
+            "  tests/llm_eval/test_lighteval_runtime.py:343: PytestWarning: record_property is incompatible with junit_family 'xunit2' (use 'legacy' or 'xunit1')",
+            "  tests/llm_eval/test_lighteval_runtime.py:460: PytestWarning: record_property is incompatible with junit_family 'xunit2' (use 'legacy' or 'xunit1')",
+            "  tests/llm_eval/test_lighteval_runtime.py:523: PytestWarning: record_property is incompatible with junit_family 'xunit2' (use 'legacy' or 'xunit1')",
+            "test profile: Lighteval complete qualification",
+            "================== 11 passed, 10 warnings in 77.13s (0:01:17) =================="
+          ],
+          "temp_cleanup_warning": false
+        },
+        "warnings": "10 warnings solely from reviewer-added JUnit xunit2 output conflicting with record_property; recorded properties remain present. No rm_rf or temporary cleanup warning in the owned-basetemp full11 run.",
+        "focused_earlier_observation": "The exact documented focused command passed 2 cases and deselected 9. Its default shared pytest basetemp attempted housekeeping of old read-only garbage left before the frozen LR1 correction and emitted 8 warnings. This review did not create those read-only sources. The complete owned-basetemp run of d2ed emitted no cleanup warning."
+      },
+      "missing_resource_preflight": {
+        "method": "Owned compatible interpreter, nltk.data.path cleared in process, pytest.main optional strict collect-only; no repository/environment mutation.",
+        "pytest_exit_code": 4,
+        "wrapper_returncode": 0,
+        "diagnostic": "missing NLTK resource tokenizers/punkt; provision explicitly with python -m nltk.downloader punkt punkt_tab",
+        "optional_runtime_module_imported": false
+      },
+      "profile_and_lr1_checks": [
+        {
+          "name": "installed-policy-compatibility",
+          "exit_code": 0,
+          "passed": 266,
+          "seconds": 66.93
+        },
+        {
+          "name": "absent-policy-compatibility",
+          "exit_code": 0,
+          "passed": 266,
+          "seconds": 63.34
+        },
+        {
+          "name": "actual-llm-eval-profile",
+          "exit_code": 0,
+          "passed": 11,
+          "seconds": 78.71
+        },
+        {
+          "name": "reused-basetemp-readonly-cases",
+          "exit_code": 0,
+          "passed": 2,
+          "seconds": 25.69
+        }
+      ],
+      "profile_runtime_junit_totals": {
+        "tests": 11,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      },
+      "lr1_closure": {
+        "status": "CLOSED",
+        "affected_case_count": 2,
+        "first_combined_run_and_reused_basetemp_repeat_both_passed": true,
+        "source_immutability_oracles_executed_before_permission_teardown": true,
+        "restored_counts": [
+          12,
+          13
+        ],
+        "no_rm_rf_pytest_cleanup_warnings": true,
+        "original_author_post_assertion_injected_failure_receipt_read_and_source_bound": true,
+        "independent_post_assertion_injected_failure_not_repeated": "Original finally implementation inspected; independent combined run plus reused basetemp repeat close the observed housekeeping regression."
+      },
+      "limitations": [
+        "Local Darwin arm64 Python 3.13 qualification only; Linux remains pending.",
+        "Tiny real offline CPU GPT-2/parquet/one-token regression fixtures establish bounded integration/cache/error behavior, not benchmark accuracy or performance, Hub pretrained-model quality, GPU or distributed support.",
+        "The independent docs combined command was collection-only. Separate root full-core/integrated results are not inferred from it.",
+        "Reviewer-added xunit2 JUnit output emitted record_property warnings; the owned-basetemp optional11 run had no temporary cleanup warning."
+      ],
+      "raw_artifacts": "Exact commands, source identities, logs, JUnit and artifact SHA256 values are retained in the two bound independent review reports."
+    }
+  },
+  "artifacts": {
+    "path": "evidence/2026-refresh/reproductions/lighteval-docs-validation.tar.gz",
+    "sha256": "cec8a28c85e2b630ca61ec6a83e728dbd43009dee324db0dac512c01e46201a3",
+    "content": "Exact source checker, command/dependency/link results, dry-run logs and strict build log. No model or dataset downloads."
+  },
+  "factual_boundaries": [
+    "Fresh accepted profile/LR1 and documentation reviewers each executed the actual 11-case optional CPU suite on combined d2ed source; the docs reviewer also verified the focused 2-case command and combined1646 collection. This author rebind reruns none of them and asserts no Linux/global/full-combined-runtime pass. Tiny local GPT-2/parquet/one-token scores remain regression proof, not public benchmark accuracy/performance or Hub/GPU/distributed qualification.",
+    "xxhash compatibility is tied to selecting llm_eval on every syncing evaluator command; direct interpreter/no-sync requires compatible locked provisioning first.",
+    "Exactly punkt and punkt_tab resources are provisioned; no unrelated NLTK corpora or implicit collection downloads prescribed.",
+    "Whole local fallback model/tokenizer directories are independently copied, deduplicating identical source directories. Read-only originals stay unchanged; owned temporary caches/artifacts are cleaned on success and failure; large-checkpoint disk/time costs and lack of atomic concurrent-writer guarantee are explicit.",
+    "Upstream metric semantics are preserved; helper syntax compatibility is not portrayed as a public API defect.",
+    "No runtime/config/metadata/lock/CI/Docker/Netlify/release edits. Native guide, Qwen pinned guide/config, archive originals and existing core/retained commands are preserved.",
+    "Original author dependency dry runs selected compatible xxhash and rejected all-extras. The later docs reviewer independently provisioned compatible owned tooling/resources and executed the bounded commands recorded above; the downloaded SmolLM2 federated-training command was not run."
+  ]
+}

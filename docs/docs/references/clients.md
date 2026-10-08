@@ -128,20 +128,21 @@ overriding legacy hooks. The following patterns provide practical templates:
   (`examples/model_pruning/sub_fedavg/subfedavg_client.py`), and
   `FedSawTrainingStrategy` / `FedSawEdgeTrainingStrategy`
   (`examples/three_layer_fl/fedsaw/`) show how to augment payloads, add logging,
-  or prune updates before transmission. `FlMamlTrainingStrategy`
-  (`examples/outdated/fl_maml/fl_maml_client.py`) illustrates personalised
-  evaluation flows.
-- **Metadata propagation.** NAS and pruning case studies attach algorithm state
-  to reports via strategy overrides (`FedRLNASReportingStrategy`,
-  `PerFedRLNASReportingStrategy`, `FedSCRReportingStrategy`, etc.), eliminating
-  the need to mutate the client directly.
+  or prune updates before transmission.
+- **Metadata propagation.** `FedSCRReportingStrategy`
+  (`examples/model_pruning/fedscr/fedscr_client.py`) attaches pruning state to
+  reports through `build_report`.
 - **Edge coordination.** Cross-silo scenarios extend
-  `EdgeTrainingStrategy`: see `CsMamlEdgeTrainingStrategy` and
-  `FedSawEdgeTrainingStrategy` for examples that add personalisation tests or
-  post-aggregation pruning.
+  `EdgeTrainingStrategy`: see `FedSawEdgeTrainingStrategy`
+  (`examples/three_layer_fl/fedsaw/fedsaw_edge.py`) for post-aggregation pruning.
 
 Copy one of these strategies, tailor the hook you need, then wire it into
 `_configure_composable(...)` on your client subclass.
+
+`FedRLNASReportingStrategy`, `PerFedRLNASReportingStrategy`,
+`FlMamlTrainingStrategy`, and `CsMamlEdgeTrainingStrategy` belong to
+[historical examples](../examples/archived.md). Their preserved code illustrates
+older NAS and personalization flows, but is not a current copy-and-run template.
 
 ## Migration Notes
 

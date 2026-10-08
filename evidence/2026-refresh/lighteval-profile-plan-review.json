@@ -1,0 +1,241 @@
+{
+  "schema_version": 1,
+  "reviewer": "/root/lighteval_design_review",
+  "review_type": "fresh independent bounded design review, no code edits or nested agents",
+  "artifact": {
+    "path": "/tmp/plato-lighteval-profile-plan.json",
+    "sha256": "7d61abae346522ecde23dde6b1c23abd65fa909fc99e989876a5c07fdf2d46ab",
+    "revision": 1
+  },
+  "verdict": "REQUEST_CHANGES",
+  "unresolved_findings": {
+    "critical": 0,
+    "high": 0,
+    "medium": 2,
+    "low": 0
+  },
+  "findings": [
+    {
+      "id": "LP-P1-01",
+      "severity": "medium",
+      "status": "unresolved",
+      "location": "ci.sync_command, ci.env, ci.execution, typing_guard.dependency_present",
+      "problem": "UV_PROJECT_ENVIRONMENT is assigned inline to the uv sync command, absent from ci.env, and absent from subsequent uv run --no-sync commands. A shell command-local assignment does not persist to later commands. Those commands can use the default project .venv rather than the separately provisioned llm_eval environment, invalidating isolated dependency-present qualification and typing or failing on unrelated missing packages.",
+      "evidence": {
+        "probe_workdir": "/tmp/plato-refresh-worktrees/lighteval-runtime",
+        "explicit_command": "UV_PROJECT_ENVIRONMENT=/tmp/plato-lighteval-dependency-checks/eval-env uv run --no-sync --python 3.13 python -c <print sys.prefix>",
+        "explicit_output": "/tmp/plato-lighteval-dependency-checks/eval-env",
+        "omitted_command": "uv run --no-sync --python 3.13 python -c <print sys.prefix>",
+        "omitted_output": "/private/tmp/plato-refresh-worktrees/lighteval-runtime/.venv",
+        "both_exit_codes": 0,
+        "probe_meaning": "Direct installed uv no-sync stdlib-only environment selection proof; no sync, dependency mutation, model loading or qualification was performed."
+      },
+      "required_design_correction": "Specify one persistent step-level UV_PROJECT_ENVIRONMENT for every provisioning, metadata/resource/preflight, pytest, artifact verifier and optional typing command, or explicitly use the exact isolated interpreter everywhere. Add a sys.executable/sys.prefix receipt checked against that owned environment. Preserve llm_eval syncing extra and lock contract."
+    },
+    {
+      "id": "LP-P1-02",
+      "severity": "medium",
+      "status": "unresolved",
+      "location": "validation_matrix.LP03 and real missing-resource evidence contract",
+      "problem": "LP03 proposes real missing NLTK resource checks with isolated NLTK_DATA. NLTK_DATA only prepends search locations and does not remove home, prefix or system fallback paths, so an empty isolated directory can still find both resources. Such a test could miss the actual negative path and falsely claim absence qualification.",
+      "evidence": {
+        "source_path": "/tmp/plato-refresh-worktrees/lighteval-runtime/.venv/lib/python3.13/site-packages/nltk/data.py",
+        "source_sha256": "cda75896c3639541f3c3b811d647354dc5829774c2f201a7c942896f5cb99dc8",
+        "source_lines": "150-169",
+        "installed_interpreter": "/tmp/plato-refresh-worktrees/lighteval-runtime/.venv/bin/python",
+        "probe": "Fresh child creates empty TemporaryDirectory, sets NLTK_DATA to it, imports actual nltk, reports nltk.data.path and actual find results.",
+        "actual_search_paths": [
+          "<fresh-empty-temp>",
+          "/Users/bli/nltk_data",
+          "/tmp/plato-refresh-worktrees/lighteval-runtime/.venv/nltk_data",
+          "/tmp/plato-refresh-worktrees/lighteval-runtime/.venv/share/nltk_data",
+          "/tmp/plato-refresh-worktrees/lighteval-runtime/.venv/lib/nltk_data",
+          "/usr/share/nltk_data",
+          "/usr/local/share/nltk_data",
+          "/usr/lib/nltk_data",
+          "/usr/local/lib/nltk_data"
+        ],
+        "actual_find_results": {
+          "tokenizers/punkt": "/Users/bli/nltk_data/tokenizers/punkt",
+          "tokenizers/punkt_tab": "/Users/bli/nltk_data/tokenizers/punkt_tab"
+        },
+        "exit_code": 0
+      },
+      "required_design_correction": "Run missing-resource probes in isolated children with the real nltk.data.path restricted to explicitly prepared test roots before invoking actual profile preflight; prepare the other required resource, assert the deliberately omitted lookup actually raises LookupError, then verify scoped prerequisite failure occurs before Pipeline/Registry import and download. Record exact effective search paths and absence. Keep this isolation in negative-test harness only; no production global monkeypatch is required."
+    }
+  ],
+  "verified_receipts": [
+    {
+      "group": "authority",
+      "path": "/tmp/plato-mlx-profile-plan.json",
+      "observed_sha256": "81a5a557b1ad018384da9b9290e0648048696af244c486849c653a09f0bea32b",
+      "plan_snapshot_sha256": "81a5a557b1ad018384da9b9290e0648048696af244c486849c653a09f0bea32b",
+      "matches": true,
+      "interpretation": "Immutable authority must match; inspected mutable snapshot may evolve and is explicitly not an implementation base."
+    },
+    {
+      "group": "authority",
+      "path": "/tmp/plato-mlx-profile-plan-review2.json",
+      "observed_sha256": "f7ed47c61715d649c4fe905bf13a1797e42a706c32ead03aa5d7e871d0169c00",
+      "plan_snapshot_sha256": "f7ed47c61715d649c4fe905bf13a1797e42a706c32ead03aa5d7e871d0169c00",
+      "matches": true,
+      "interpretation": "Immutable authority must match; inspected mutable snapshot may evolve and is explicitly not an implementation base."
+    },
+    {
+      "group": "authority",
+      "path": "/tmp/plato-archive-shortlist-plan.json",
+      "observed_sha256": "c66577eac31a2eeaba68f29e2fee53760def2477184521bd1f2536e76507573f",
+      "plan_snapshot_sha256": "c66577eac31a2eeaba68f29e2fee53760def2477184521bd1f2536e76507573f",
+      "matches": true,
+      "interpretation": "Immutable authority must match; inspected mutable snapshot may evolve and is explicitly not an implementation base."
+    },
+    {
+      "group": "authority",
+      "path": "/tmp/plato-archive-shortlist-plan-review3.json",
+      "observed_sha256": "3fbeb6b47b5392515172b574bd9b0d11f427e5d6af4a72ba2c2d3057be8483be",
+      "plan_snapshot_sha256": "3fbeb6b47b5392515172b574bd9b0d11f427e5d6af4a72ba2c2d3057be8483be",
+      "matches": true,
+      "interpretation": "Immutable authority must match; inspected mutable snapshot may evolve and is explicitly not an implementation base."
+    },
+    {
+      "group": "inspected_sources",
+      "path": "/tmp/plato-refresh-worktrees/archive-profile/AGENTS.md",
+      "observed_sha256": "b50f87f31ea3d87076952d8b7d2d8af067132fbf877d80f8780c208fb45527ec",
+      "plan_snapshot_sha256": "b50f87f31ea3d87076952d8b7d2d8af067132fbf877d80f8780c208fb45527ec",
+      "matches": true,
+      "interpretation": "Immutable authority must match; inspected mutable snapshot may evolve and is explicitly not an implementation base."
+    },
+    {
+      "group": "inspected_sources",
+      "path": "/tmp/plato-refresh-worktrees/archive-profile/tests/conftest.py",
+      "observed_sha256": "cf5bbbd976dd977396177892bc4997d7ad84c7e6e2f2163c6852d19c9aa65aee",
+      "plan_snapshot_sha256": "cf5bbbd976dd977396177892bc4997d7ad84c7e6e2f2163c6852d19c9aa65aee",
+      "matches": true,
+      "interpretation": "Immutable authority must match; inspected mutable snapshot may evolve and is explicitly not an implementation base."
+    },
+    {
+      "group": "inspected_sources",
+      "path": "/tmp/plato-refresh-worktrees/archive-profile/pyproject.toml",
+      "observed_sha256": "8aaa7414717fa17841900d377d89851547677ba2ae93963afef79fc5490ba610",
+      "plan_snapshot_sha256": "8aaa7414717fa17841900d377d89851547677ba2ae93963afef79fc5490ba610",
+      "matches": true,
+      "interpretation": "Immutable authority must match; inspected mutable snapshot may evolve and is explicitly not an implementation base."
+    },
+    {
+      "group": "inspected_sources",
+      "path": "/tmp/plato-refresh-worktrees/archive-profile/uv.lock",
+      "observed_sha256": "e2a53aaae9a0dd49f5446b490bb3071e86aa3a9a20d6271c9dd30b4ae2dcbff9",
+      "plan_snapshot_sha256": "e2a53aaae9a0dd49f5446b490bb3071e86aa3a9a20d6271c9dd30b4ae2dcbff9",
+      "matches": true,
+      "interpretation": "Immutable authority must match; inspected mutable snapshot may evolve and is explicitly not an implementation base."
+    },
+    {
+      "group": "inspected_sources",
+      "path": "/tmp/plato-refresh-worktrees/archive-profile/.github/workflows/pytorch_tests.yml",
+      "observed_sha256": "697c6ae0c39fa7fd42766f8161f350944e90108b3dad852148da952acfcc9317",
+      "plan_snapshot_sha256": "9a437109c310734107229a85cb24b3912ed19b7a428c8818e72f4c00945dbc12",
+      "matches": false,
+      "interpretation": "Immutable authority must match; inspected mutable snapshot may evolve and is explicitly not an implementation base."
+    },
+    {
+      "group": "inspected_sources",
+      "path": "/tmp/plato-refresh-worktrees/archive-profile/.github/scripts/stage_ci_artifacts.py",
+      "observed_sha256": "f9142f03c92469aceed4aa06ae5b8bb04699c89042dd156f0b4783392ca85b24",
+      "plan_snapshot_sha256": "f9142f03c92469aceed4aa06ae5b8bb04699c89042dd156f0b4783392ca85b24",
+      "matches": true,
+      "interpretation": "Immutable authority must match; inspected mutable snapshot may evolve and is explicitly not an implementation base."
+    },
+    {
+      "group": "inspected_sources",
+      "path": "/tmp/plato-refresh-worktrees/archive-profile/tests/mlx_native/cases.json",
+      "observed_sha256": "c168dc33a4d4e7ed70079e09c3de70f5b318d543c035ec13de2826b48e1175bb",
+      "plan_snapshot_sha256": "c168dc33a4d4e7ed70079e09c3de70f5b318d543c035ec13de2826b48e1175bb",
+      "matches": true,
+      "interpretation": "Immutable authority must match; inspected mutable snapshot may evolve and is explicitly not an implementation base."
+    },
+    {
+      "group": "inspected_sources",
+      "path": "/tmp/plato-refresh-worktrees/archive-profile/tests/test_mlx_profile_contract.py",
+      "observed_sha256": "c26c766a599d235f6841aafe82f178b7fd8a3ae02d8362420d0d4f7e95dd8088",
+      "plan_snapshot_sha256": "c26c766a599d235f6841aafe82f178b7fd8a3ae02d8362420d0d4f7e95dd8088",
+      "matches": true,
+      "interpretation": "Immutable authority must match; inspected mutable snapshot may evolve and is explicitly not an implementation base."
+    },
+    {
+      "group": "inspected_sources",
+      "path": "/tmp/plato-refresh-worktrees/archive-profile/tests/test_model_search_profile_contract.py",
+      "observed_sha256": "fc8f8b300afab10bf5cc6f97b670aeba0e996b708202e14aeaeee015f5712e92",
+      "plan_snapshot_sha256": "fc8f8b300afab10bf5cc6f97b670aeba0e996b708202e14aeaeee015f5712e92",
+      "matches": true,
+      "interpretation": "Immutable authority must match; inspected mutable snapshot may evolve and is explicitly not an implementation base."
+    },
+    {
+      "group": "inspected_sources",
+      "path": "/tmp/plato-refresh-worktrees/archive-profile/tests/evaluators/test_lighteval.py",
+      "observed_sha256": "950fc311e80cf7e7a9750a5048b590725e6d72cc262e4d4094b3ffd9cd568927",
+      "plan_snapshot_sha256": "950fc311e80cf7e7a9750a5048b590725e6d72cc262e4d4094b3ffd9cd568927",
+      "matches": true,
+      "interpretation": "Immutable authority must match; inspected mutable snapshot may evolve and is explicitly not an implementation base."
+    },
+    {
+      "group": "inspected_sources",
+      "path": "/tmp/plato-refresh-worktrees/archive-profile/tests/mpc/test_round_store_contracts.py",
+      "observed_sha256": "3f443669807fd3ebe6e6d6224ae7d6d1ccf0b7d8696cc29b6c5e496ae5eb23cb",
+      "plan_snapshot_sha256": "3f443669807fd3ebe6e6d6224ae7d6d1ccf0b7d8696cc29b6c5e496ae5eb23cb",
+      "matches": true,
+      "interpretation": "Immutable authority must match; inspected mutable snapshot may evolve and is explicitly not an implementation base."
+    },
+    {
+      "group": "inspected_sources",
+      "path": "/tmp/plato-refresh-worktrees/archive-profile/tests/utils/test_rl_payload_utilities.py",
+      "observed_sha256": "c7542d050edcb30ea370241b13b4efb676988530677d16c192451bbcef415388",
+      "plan_snapshot_sha256": "c7542d050edcb30ea370241b13b4efb676988530677d16c192451bbcef415388",
+      "matches": true,
+      "interpretation": "Immutable authority must match; inspected mutable snapshot may evolve and is explicitly not an implementation base."
+    },
+    {
+      "group": "inspected_sources",
+      "path": "/tmp/plato-refresh-worktrees/lighteval-runtime/tests/llm_eval/test_lighteval_runtime.py",
+      "observed_sha256": "5a857c6556a4b940b5ff8ea9d576013e9152b1687741a519eec38b67bf564f57",
+      "plan_snapshot_sha256": "c1b8844ac97db80eccc4b6ed61973a825255641c74293d55066ada1f8b9920ad",
+      "matches": false,
+      "interpretation": "Immutable authority must match; inspected mutable snapshot may evolve and is explicitly not an implementation base."
+    },
+    {
+      "group": "inspected_sources",
+      "path": "/tmp/plato-refresh-worktrees/lighteval-runtime/tests/llm_eval/helpers.py",
+      "observed_sha256": "0a3c9f230f3de6095791f0930f7e2963aaf2a88a2190f00b8aed01d878614bf1",
+      "plan_snapshot_sha256": "5b4e6c14380039baf547066534d03fc9edb56ed53e42fbc433bb6945c8420f96",
+      "matches": false,
+      "interpretation": "Immutable authority must match; inspected mutable snapshot may evolve and is explicitly not an implementation base."
+    },
+    {
+      "group": "inspected_sources",
+      "path": "/tmp/plato-refresh-worktrees/lighteval-runtime/plato/evaluators/lighteval.py",
+      "observed_sha256": "46eecbeb4d2356b9b438a9d8ebb71c5e69a9a9e3e9dd4156a69fd2beabd64486",
+      "plan_snapshot_sha256": "833a6f6ff50c889edee3cb2e267f2b3d5c688c3d54e10aa11b4c55886fd7fc4d",
+      "matches": false,
+      "interpretation": "Immutable authority must match; inspected mutable snapshot may evolve and is explicitly not an implementation base."
+    },
+    {
+      "group": "inspected_sources",
+      "path": "/tmp/plato-refresh-worktrees/lighteval-runtime/plato/evaluators/runner.py",
+      "observed_sha256": "8df376cd952e4c9b33ec546f3ebec5334fb24e9cc422fad2cdb2d0c88ecdfdf0",
+      "plan_snapshot_sha256": "e08bae291acdcbefee340b8d7c8f41c168a0e00a2d257ff74932514a186985f3",
+      "matches": false,
+      "interpretation": "Immutable authority must match; inspected mutable snapshot may evolve and is explicitly not an implementation base."
+    }
+  ],
+  "assessed_without_additional_findings": [
+    "All four immutable authority receipts match. Evolving workflow/runtime snapshots are correctly labeled observations and intentionally not accepted baselines.",
+    "Default optional directory exclusion is before imports and independent of package presence; named and filesystem-focused routing, pyargs backstop, inert initializers, family conflicts and effective filters are specified.",
+    "Named profiles enforce exact independently reviewed ledger Counters, all parameter IDs and strict collected/setup/call/teardown outcomes; focused and collect-only output do not claim full execution qualification.",
+    "Existing core Config/RNG helpers, core ledgers, native383 ledger and retained19 scope are preserved with serialized shared-file ownership after accepted archive delivery.",
+    "Prerequisites require actual installed imports and NLTK resource checks before upstream Registry side effects; full real CPU runtime proof remains in tests, rather than preflight or mock harness acceptance.",
+    "Dependency cap/lock integration remains root-owned; extra-specific command semantics avoid plain syncing uv run, all-extras and unrelated SSL changes.",
+    "Runtime inventory, precise resource trace, integrated implementation base/lock and Linux timing/count are explicitly deferred to accepted handoffs. No current count or qualification is claimed.",
+    "Scoped CI failure gates, exact artifact validation, fixture exclusion and dependency-present typing are required, with prior archive/native guards preserved."
+  ],
+  "acceptance_boundary": "Do not implement profile from this artifact until both medium design findings are corrected and a fresh independent review accepts the corrected exact artifact. Cache design acceptance in the separate report is independent and unchanged. After plan acceptance, final source/inventory/base/lock receipts and actual Linux CPU implementation qualification remain required.",
+  "work_performed": "Read-only installed source inspection, authority/snapshot hash checks, actual NLTK search-path probe and uv no-sync stdlib environment-selection probes. Only review JSON files under /tmp were written. No reviewed source changes, dependency installation, model runs or nested agents."
+}

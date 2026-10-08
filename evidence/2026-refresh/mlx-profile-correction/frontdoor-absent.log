@@ -1,0 +1,7 @@
+{
+  "mlx_distribution_version": null,
+  "backend_modules_before_explicit_selection": [],
+  "builtin_native_registry_keys_preserved": true,
+  "model_missing_diagnostic": "MLX models require the optional mlx dependency on Apple Silicon.",
+  "algorithm_missing_diagnostic": "MLX is not installed. Install it with `pip install mlx` on Apple Silicon devices. Original import error: No module named 'mlx'"
+}

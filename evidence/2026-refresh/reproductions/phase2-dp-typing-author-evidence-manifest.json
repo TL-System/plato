@@ -1,0 +1,249 @@
+{
+  "candidate": "f342a5a6021cee938e0b880eca5919e09ace1981",
+  "report_sha256": "a03c9f0baa584c1544ad095d145294c1e12e8632719dfd2cf441bf0cb130619d",
+  "archive_sha256": "88feac37c4a77a59f84f4a8337065fe12736ea9dd77ea6e8ebf5be37fd6309bc",
+  "archive_bytes": 31758,
+  "files": [
+    {
+      "original": "/tmp/plato-phase2c-dp-typing-fix/assertion-preservation.json",
+      "member": "assertion-preservation.json",
+      "sha256": "573278471e915d7618dafa614fafd74a129cc9445ebf501b5f5b7997c8300d28",
+      "bytes": 1581
+    },
+    {
+      "original": "/tmp/plato-phase2c-dp-typing-fix/committed-ruff-313.json",
+      "member": "committed-ruff-313.json",
+      "sha256": "5b9c9747433cc2e5e63a9616d1050d7e9ecc304ba25d01dca1f54214802de27b",
+      "bytes": 669
+    },
+    {
+      "original": "/tmp/plato-phase2c-dp-typing-fix/committed-ruff-313.log",
+      "member": "committed-ruff-313.log",
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "bytes": 19
+    },
+    {
+      "original": "/tmp/plato-phase2c-dp-typing-fix/committed-ruff-314.json",
+      "member": "committed-ruff-314.json",
+      "sha256": "7521eef7a90dd8f3a94e6a5bd0e9e6f64cf23b24672e4f822b293cbf68a6ef8d",
+      "bytes": 669
+    },
+    {
+      "original": "/tmp/plato-phase2c-dp-typing-fix/committed-ruff-314.log",
+      "member": "committed-ruff-314.log",
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "bytes": 19
+    },
+    {
+      "original": "/tmp/plato-phase2c-dp-typing-fix/committed-ty-313.json",
+      "member": "committed-ty-313.json",
+      "sha256": "6a498c49574dce49d3bbc730fd1e5ce8ff06abb56c2d33c9e3b96f97ae67b571",
+      "bytes": 717
+    },
+    {
+      "original": "/tmp/plato-phase2c-dp-typing-fix/committed-ty-313.log",
+      "member": "committed-ty-313.log",
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "bytes": 19
+    },
+    {
+      "original": "/tmp/plato-phase2c-dp-typing-fix/committed-ty-314.json",
+      "member": "committed-ty-314.json",
+      "sha256": "bc956b8ea4e69fac0080c0061293d0f4e1c7e81c3fa2c4ddc902e0cfc2549e19",
+      "bytes": 718
+    },
+    {
+      "original": "/tmp/plato-phase2c-dp-typing-fix/committed-ty-314.log",
+      "member": "committed-ty-314.log",
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "bytes": 19
+    },
+    {
+      "original": "/tmp/plato-phase2c-dp-typing-fix/dp-tests-313.json",
+      "member": "dp-tests-313.json",
+      "sha256": "0ca8a8b27301b3bbd8c43ff95b5338b763c70ad02c824f51dc582bd2d15976e5",
+      "bytes": 770
+    },
+    {
+      "original": "/tmp/plato-phase2c-dp-typing-fix/dp-tests-313.log",
+      "member": "dp-tests-313.log",
+      "sha256": "b5d459241dfb8bd86c14f51af0ae90ff652b3601d529bdebe36a761e9c3dbed2",
+      "bytes": 4917
+    },
+    {
+      "original": "/tmp/plato-phase2c-dp-typing-fix/dp-tests-313.xml",
+      "member": "dp-tests-313.xml",
+      "sha256": "97c675cf8bfe7444e7017784d90ad1422ec793a6ebd5fdc1f6e558328a3d6f61",
+      "bytes": 1300
+    },
+    {
+      "original": "/tmp/plato-phase2c-dp-typing-fix/dp-tests-314.json",
+      "member": "dp-tests-314.json",
+      "sha256": "6fa505e9465e2541a078274990955948e5f1ae97d09767eda5a04fb667062029",
+      "bytes": 771
+    },
+    {
+      "original": "/tmp/plato-phase2c-dp-typing-fix/dp-tests-314.log",
+      "member": "dp-tests-314.log",
+      "sha256": "4b183f32f854ea40f30b652b64379d8978f2c08e441c7579917b7c22839b1cf7",
+      "bytes": 4965
+    },
+    {
+      "original": "/tmp/plato-phase2c-dp-typing-fix/dp-tests-314.xml",
+      "member": "dp-tests-314.xml",
+      "sha256": "5fbd3e202dc3b984a59116effc33908ef5bf0b9831518c836ae4ba0b6346522b",
+      "bytes": 1300
+    },
+    {
+      "original": "/tmp/plato-phase2c-dp-typing-fix/draft-ty-313.json",
+      "member": "draft-ty-313.json",
+      "sha256": "b2b1d54d6b7891f16601501906085802735d440d7f8e290fc13d226edaa5c21a",
+      "bytes": 710
+    },
+    {
+      "original": "/tmp/plato-phase2c-dp-typing-fix/draft-ty-313.log",
+      "member": "draft-ty-313.log",
+      "sha256": "ed3a05464565bbc8b37def1bda9c5cbba2623bf7b5291f5516a88f8d9951369d",
+      "bytes": 170
+    },
+    {
+      "original": "/tmp/plato-phase2c-dp-typing-fix/draft-ty-314.json",
+      "member": "draft-ty-314.json",
+      "sha256": "3bb69e18d8748e4c8fab086eba35bcb43172c2ffc42a80ed2b0a0dfe6bf944a7",
+      "bytes": 710
+    },
+    {
+      "original": "/tmp/plato-phase2c-dp-typing-fix/draft-ty-314.log",
+      "member": "draft-ty-314.log",
+      "sha256": "ed3a05464565bbc8b37def1bda9c5cbba2623bf7b5291f5516a88f8d9951369d",
+      "bytes": 170
+    },
+    {
+      "original": "/tmp/plato-phase2c-dp-typing-fix/environment-313.json",
+      "member": "environment-313.json",
+      "sha256": "7512354ee53d15a556024f2318eff3cae435c1a855d3bba9bc8d16ad7d3fc413",
+      "bytes": 466
+    },
+    {
+      "original": "/tmp/plato-phase2c-dp-typing-fix/environment-314.json",
+      "member": "environment-314.json",
+      "sha256": "1bf27b2b6f7edcdbb3690a868a6fd8f6301e6047016c8ce93f32e3446d0424f4",
+      "bytes": 492
+    },
+    {
+      "original": "/tmp/plato-phase2c-dp-typing-fix/final-candidate.json",
+      "member": "final-candidate.json",
+      "sha256": "99a69d0f74298c2d9352e4c3c7c003187d4fef1da3fe6c2a71d0fa4b974b5a73",
+      "bytes": 997
+    },
+    {
+      "original": "/tmp/plato-phase2c-dp-typing-fix/full-correction.diff",
+      "member": "full-correction.diff",
+      "sha256": "d34ef449d25ec6c468a0924e6dfd5d18b9794cc89ea172844d10721b2fbe4450",
+      "bytes": 8895
+    },
+    {
+      "original": "/tmp/plato-phase2c-dp-typing-fix/full-delivery.diff",
+      "member": "full-delivery.diff",
+      "sha256": "d75311cb15e1d32dec8b8951faee884f5af8db3cd4024c2af60c63e8ba073498",
+      "bytes": 58615
+    },
+    {
+      "original": "/tmp/plato-phase2c-dp-typing-fix/green-ruff-313.json",
+      "member": "green-ruff-313.json",
+      "sha256": "14ec02f128536b8f340745da7e6ec1fc7cae82d2f67b1ff3c9f2c93421e43b31",
+      "bytes": 660
+    },
+    {
+      "original": "/tmp/plato-phase2c-dp-typing-fix/green-ruff-313.log",
+      "member": "green-ruff-313.log",
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "bytes": 19
+    },
+    {
+      "original": "/tmp/plato-phase2c-dp-typing-fix/green-ruff-314.json",
+      "member": "green-ruff-314.json",
+      "sha256": "7ce7b0cf86643be2d1b30a88254536270206d6300d5c86a76eed90b381eda248",
+      "bytes": 660
+    },
+    {
+      "original": "/tmp/plato-phase2c-dp-typing-fix/green-ruff-314.log",
+      "member": "green-ruff-314.log",
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "bytes": 19
+    },
+    {
+      "original": "/tmp/plato-phase2c-dp-typing-fix/green-ty-313.json",
+      "member": "green-ty-313.json",
+      "sha256": "7214fab3c4f92ce40e08ed01382d683477729d17c3a98b63530cb5bdec041be7",
+      "bytes": 710
+    },
+    {
+      "original": "/tmp/plato-phase2c-dp-typing-fix/green-ty-313.log",
+      "member": "green-ty-313.log",
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "bytes": 19
+    },
+    {
+      "original": "/tmp/plato-phase2c-dp-typing-fix/green-ty-314.json",
+      "member": "green-ty-314.json",
+      "sha256": "f37a8f28430a5e4e78d9703f1bb524ece3d5efe97dfba610cab7c28abcb01b93",
+      "bytes": 709
+    },
+    {
+      "original": "/tmp/plato-phase2c-dp-typing-fix/green-ty-314.log",
+      "member": "green-ty-314.log",
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "bytes": 19
+    },
+    {
+      "original": "/tmp/plato-phase2c-dp-typing-fix/original-test_dp_data_loader_strategy.py",
+      "member": "original-test_dp_data_loader_strategy.py",
+      "sha256": "97245aa7f8318d7875cafcc3c7c93e2e30047d61684a836efc1ea5e6c47e3c42",
+      "bytes": 12346
+    },
+    {
+      "original": "/tmp/plato-phase2c-dp-typing-fix/red-ty-313.json",
+      "member": "red-ty-313.json",
+      "sha256": "a4b6b0eca40c01ec4ebebdced66336426275363870ff7d3345250c946040e557",
+      "bytes": 705
+    },
+    {
+      "original": "/tmp/plato-phase2c-dp-typing-fix/red-ty-313.log",
+      "member": "red-ty-313.log",
+      "sha256": "d0b8bbc5fe84bbc98268fe02a7d9f6cc22cee0ea8e00e2adebef3bca6d9b6878",
+      "bytes": 3820
+    },
+    {
+      "original": "/tmp/plato-phase2c-dp-typing-fix/red-ty-314.json",
+      "member": "red-ty-314.json",
+      "sha256": "24b3ab9068653016eb7f05205422b997118604eafeda2f402558c6cbef74c8a1",
+      "bytes": 706
+    },
+    {
+      "original": "/tmp/plato-phase2c-dp-typing-fix/red-ty-314.log",
+      "member": "red-ty-314.log",
+      "sha256": "d0b8bbc5fe84bbc98268fe02a7d9f6cc22cee0ea8e00e2adebef3bca6d9b6878",
+      "bytes": 3820
+    },
+    {
+      "original": "/tmp/plato-phase2c-dp-typing-fix/root-ty-full.log",
+      "member": "root-ty-full.log",
+      "sha256": "7a70ffedf89d7805216e8e4c3767248ccfc7226a628e85f18197fc8826ebb8d2",
+      "bytes": 125401
+    },
+    {
+      "original": "/tmp/plato-phase2c-dp-typing-fix/root-typing-owned-gate-failure.json",
+      "member": "root-typing-owned-gate-failure.json",
+      "sha256": "5ff780b0469021554828be80b3a5929b173e4ce245293df679774bb416d7c587",
+      "bytes": 4669
+    },
+    {
+      "original": "/tmp/plato-phase2c-dp-typing-fix/run_checks.py",
+      "member": "run_checks.py",
+      "sha256": "7d6f79468f323a21c824530cce6cae3cca99ccaa015c769ffa313fa3fbaf7111",
+      "bytes": 1407
+    }
+  ],
+  "status": "Author raw correction evidence retained; independent review pending."
+}

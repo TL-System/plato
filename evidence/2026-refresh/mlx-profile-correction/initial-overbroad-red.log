@@ -1,0 +1,1738 @@
+FFFFFFFFFF                                                               [100%]
+=================================== FAILURES ===================================
+_______ test_real_core_collection_does_not_import_or_probe_mlx[target0] ________
+
+tmp_path = PosixPath('/private/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/pytest-of-bli/pytest-206/test_real_core_collection_does0')
+target = []
+
+    @pytest.mark.parametrize("target", [[], ["tests"], ["."], ["--pyargs", "tests"]])
+    def test_real_core_collection_does_not_import_or_probe_mlx(tmp_path, target):
+        record, output = _audit(tmp_path, [*target, "--test-profile=base", "--collect-only"])
+        assert record["exit_status"] == 0, output
+>       assert record["backend_spec_lookups"] == []
+E       AssertionError: assert [{'module': '...: False}, ...] == []
+E
+E         Left contains 29 more items, first extra item: {'module': 'mlx', 'inside_preflight': False}
+E         Use -v to get more diff
+
+tests/test_mlx_import_contract.py:46: AssertionError
+_______ test_real_core_collection_does_not_import_or_probe_mlx[target1] ________
+
+tmp_path = PosixPath('/private/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/pytest-of-bli/pytest-206/test_real_core_collection_does1')
+target = ['tests']
+
+    @pytest.mark.parametrize("target", [[], ["tests"], ["."], ["--pyargs", "tests"]])
+    def test_real_core_collection_does_not_import_or_probe_mlx(tmp_path, target):
+        record, output = _audit(tmp_path, [*target, "--test-profile=base", "--collect-only"])
+        assert record["exit_status"] == 0, output
+>       assert record["backend_spec_lookups"] == []
+E       AssertionError: assert [{'module': '...: False}, ...] == []
+E
+E         Left contains 29 more items, first extra item: {'module': 'mlx', 'inside_preflight': False}
+E         Use -v to get more diff
+
+tests/test_mlx_import_contract.py:46: AssertionError
+_______ test_real_core_collection_does_not_import_or_probe_mlx[target2] ________
+
+tmp_path = PosixPath('/private/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/pytest-of-bli/pytest-206/test_real_core_collection_does2')
+target = ['.']
+
+    @pytest.mark.parametrize("target", [[], ["tests"], ["."], ["--pyargs", "tests"]])
+    def test_real_core_collection_does_not_import_or_probe_mlx(tmp_path, target):
+        record, output = _audit(tmp_path, [*target, "--test-profile=base", "--collect-only"])
+>       assert record["exit_status"] == 0, output
+E       AssertionError: tests/algorithms/test_fedavg_algorithm.py::test_adapter_payload_extract_load_round_trip
+E         tests/algorithms/test_fedavg_algorithm.py::test_load_weights_casts_dtype_and_rounds_non_float_tensors
+E         tests/algorithms/test_fedavg_algorithm.py::test_extract_weights_casts_bfloat16_payloads_for_transport
+E         tests/algorithms/test_fedavg_algorithm.py::test_extract_weights_respects_optional_payload_size_limit
+E         tests/algorithms/test_fedavg_algorithm.py::test_fedavg_full_mode_round_trip_with_large_weights
+E         tests/callbacks/test_handler_contract.py::test_registered_callbacks_are_iterable_in_registration_order
+E         tests/callbacks/test_handler_contract.py::test_callback_body_attribute_error_reaches_caller_unchanged
+E         tests/callbacks/test_handler_contract.py::test_missing_callback_event_keeps_descriptive_error
+E         tests/callbacks/test_server_callback.py::test_log_progress_callback_tolerates_missing_logged_items
+E         tests/callbacks/test_server_callback.py::test_log_progress_callback_expands_csv_for_new_lighteval_metrics
+E         tests/clients/test_checkpoint_cleanup.py::test_disconnect_removes_only_owned_temporary_checkpoints
+E         tests/clients/test_client_lifecycle_variants.py::test_simulated_server_payload_limit_precedes_deserialization
+E         tests/clients/test_client_lifecycle_variants.py::test_base_client_lifecycle_sets_attributes
+E         tests/clients/test_client_lifecycle_variants.py::test_composable_client_handles_payload_roundtrip
+E         tests/clients/test_client_lifecycle_variants.py::test_base_client_handles_missing_datasource
+E         tests/clients/test_client_lifecycle_variants.py::test_composable_client_request_update_orders_callbacks
+E         tests/clients/test_client_lifecycle_variants.py::test_composable_client_chunk_flow_supports_retries
+E         tests/clients/test_client_lifecycle_variants.py::test_split_learning_client_state_management
+E         tests/clients/test_client_lifecycle_variants.py::test_mpc_client_round_store_configuration
+E         tests/clients/test_client_lifecycle_variants.py::test_mpc_training_strategy_records_samples
+E         tests/clients/test_feddf_strategy.py::test_feddf_training_strategy_returns_teacher_logits
+E         tests/clients/test_fednova_strategy.py::test_report_contains_epochs_for_constant_pattern
+E         tests/clients/test_fednova_strategy.py::test_uniform_random_assigns_epochs_and_updates_config
+E         tests/clients/test_payload_limits.py::test_default_client_payload_cleanup_and_retry[valid]
+E         tests/clients/test_payload_limits.py::test_default_client_payload_cleanup_and_retry[oversize]
+E         tests/clients/test_payload_limits.py::test_default_client_payload_cleanup_and_retry[malformed]
+E         tests/clients/test_payload_limits.py::test_default_client_payload_cleanup_and_retry[incomplete]
+E         tests/clients/test_payload_limits.py::test_default_client_payload_cleanup_and_retry[wrong_id]
+E         tests/clients/test_payload_limits.py::test_default_client_payload_cleanup_and_retry[timeout]
+E         tests/clients/test_registry.py::test_registry_preserves_kwargs_for_external_clients
+E         tests/clients/test_simple_client.py::test_simple_client_trains_with_default_strategies
+E         tests/datasources/test_data_loaders.py::test_parallel_data_loader_yields_batches_in_lockstep
+E         tests/datasources/test_data_loaders.py::test_sequential_data_loader_iterates_through_all_batches
+E         tests/datasources/test_download_contracts.py::test_active_extractors_reject_unsafe_paths_before_writes[traversal-base_tar]
+E         tests/datasources/test_download_contracts.py::test_active_extractors_reject_unsafe_paths_before_writes[traversal-base_zip]
+E         tests/datasources/test_download_contracts.py::test_active_extractors_reject_unsafe_paths_before_writes[traversal-purchase]
+E         tests/datasources/test_download_contracts.py::test_active_extractors_reject_unsafe_paths_before_writes[traversal-texas]
+E         tests/datasources/test_download_contracts.py::test_active_extractors_reject_unsafe_paths_before_writes[absolute-base_tar]
+E         tests/datasources/test_download_contracts.py::test_active_extractors_reject_unsafe_paths_before_writes[absolute-base_zip]
+E         tests/datasources/test_download_contracts.py::test_active_extractors_reject_unsafe_paths_before_writes[absolute-purchase]
+E         tests/datasources/test_download_contracts.py::test_active_extractors_reject_unsafe_paths_before_writes[absolute-texas]
+E         tests/datasources/test_download_contracts.py::test_active_extractors_reject_unsafe_paths_before_writes[existing_directory_link-base_tar]
+E         tests/datasources/test_download_contracts.py::test_active_extractors_reject_unsafe_paths_before_writes[existing_directory_link-base_zip]
+E         tests/datasources/test_download_contracts.py::test_active_extractors_reject_unsafe_paths_before_writes[existing_directory_link-purchase]
+E         tests/datasources/test_download_contracts.py::test_active_extractors_reject_unsafe_paths_before_writes[existing_directory_link-texas]
+E         tests/datasources/test_download_contracts.py::test_active_extractors_reject_unsafe_paths_before_writes[existing_file_link-base_tar]
+E         tests/datasources/test_download_contracts.py::test_active_extractors_reject_unsafe_paths_before_writes[existing_file_link-base_zip]
+E         tests/datasources/test_download_contracts.py::test_active_extractors_reject_unsafe_paths_before_writes[existing_file_link-purchase]
+E         tests/datasources/test_download_contracts.py::test_active_extractors_reject_unsafe_paths_before_writes[existing_file_link-texas]
+E         tests/datasources/test_download_contracts.py::test_active_tar_extractors_reject_link_escapes[2-base_tar]
+E         tests/datasources/test_download_contracts.py::test_active_tar_extractors_reject_link_escapes[2-purchase]
+E         tests/datasources/test_download_contracts.py::test_active_tar_extractors_reject_link_escapes[2-texas]
+E         tests/datasources/test_download_contracts.py::test_active_tar_extractors_reject_link_escapes[1-base_tar]
+E         tests/datasources/test_download_contracts.py::test_active_tar_extractors_reject_link_escapes[1-purchase]
+E         tests/datasources/test_download_contracts.py::test_active_tar_extractors_reject_link_escapes[1-texas]
+E         tests/datasources/test_download_contracts.py::test_base_download_safe_archive_and_completion_cache[tar]
+E         tests/datasources/test_download_contracts.py::test_base_download_safe_archive_and_completion_cache[zip]
+E         tests/datasources/test_download_contracts.py::test_download_guard_recovers_after_owner_process_exits
+E         tests/datasources/test_download_contracts.py::test_failed_download_releases_lock_and_never_marks_complete
+E         tests/datasources/test_download_contracts.py::test_unsupported_download_format_raises_useful_error
+E         tests/datasources/test_download_contracts.py::test_download_artifact_symlinks_cannot_write_outside[archive]
+E         tests/datasources/test_download_contracts.py::test_download_artifact_symlinks_cannot_write_outside[completion]
+E         tests/datasources/test_download_contracts.py::test_download_artifact_symlinks_cannot_write_outside[gzip_output]
+E         tests/datasources/test_download_contracts.py::test_http_error_closes_each_response_before_retry
+E         tests/datasources/test_download_contracts.py::test_interrupted_download_retries_closes_and_removes_partial_file
+E         tests/datasources/test_download_contracts.py::test_download_guard_rejects_dangling_lock_symlink
+E         tests/datasources/test_download_contracts.py::test_download_guard_preserves_live_owner_exclusion
+E         tests/datasources/test_download_contracts.py::test_vector_download_archive_symlink_cannot_write_outside[purchase]
+E         tests/datasources/test_download_contracts.py::test_vector_download_archive_symlink_cannot_write_outside[texas]
+E         tests/datasources/test_download_contracts.py::test_vector_download_safe_archive_builds_cache[purchase]
+E         tests/datasources/test_download_contracts.py::test_vector_download_safe_archive_builds_cache[texas]
+E         tests/datasources/test_feature_dataset.py::test_feature_dataset_returns_feature_and_label
+E         tests/datasources/test_feature_dataset.py::test_feature_dataset_defaults_label_for_single_element
+E         tests/datasources/test_feature_dataset.py::test_feature_dataset_defaults_label_for_tensor_sample
+E         tests/datasources/test_feature_dataset.py::test_feature_dataset_handles_multiple_samples
+E         tests/datasources/test_feature_dataset.py::test_feature_dataset_ignores_extra_fields
+E         tests/datasources/test_feature_dataset.py::test_feature_dataset_squeezes_label_dimension
+E         tests/datasources/test_feature_dataset.py::test_feature_dataset_raises_for_empty_sample
+E         tests/datasources/test_feature_datasource.py::test_feature_datasource_expands_batched_features
+E         tests/datasources/test_feature_datasource.py::test_feature_datasource_handles_unbatched_entries
+E         tests/datasources/test_feature_datasource.py::test_feature_datasource_defaults_label_when_missing
+E         tests/datasources/test_feature_datasource.py::test_feature_datasource_ignores_non_tuple_entries
+E         tests/datasources/test_huggingface_datasource.py::test_resolve_validation_split_falls_back_to_test_when_missing
+E         tests/datasources/test_huggingface_datasource.py::test_dataset_cache_path_sanitizes_namespaced_inputs
+E         tests/datasources/test_huggingface_datasource.py::test_preprocess_split_dispatches_by_mode
+E         tests/datasources/test_huggingface_datasource.py::test_huggingface_datasource_keeps_validation_split_for_corpus_mode
+E         tests/datasources/test_huggingface_datasource.py::test_huggingface_datasource_falls_back_to_test_split
+E         tests/datasources/test_huggingface_datasource.py::test_huggingface_datasource_loads_legacy_cache_path_when_present
+E         tests/datasources/test_huggingface_datasource.py::test_huggingface_corpus_mode_keeps_legacy_default_block_size
+E         tests/datasources/test_huggingface_datasource.py::test_chat_sft_preprocesses_messages_without_corpus_concatenation
+E         tests/datasources/test_huggingface_datasource.py::test_chat_sft_masks_non_assistant_tokens_with_minus_100
+E         tests/datasources/test_huggingface_datasource.py::test_chat_sft_honors_max_seq_length_and_messages_field
+E         tests/datasources/test_huggingface_datasource.py::test_chat_sft_normalizes_mapping_chat_template_outputs
+E         tests/datasources/test_local_datasets.py::test_vector_dataset_small_cache_has_real_counts_and_preserves_rng[plato.datasources.purchase]
+E         tests/datasources/test_local_datasets.py::test_vector_dataset_small_cache_has_real_counts_and_preserves_rng[plato.datasources.texas]
+E         tests/datasources/test_local_datasets.py::test_existing_raw_vector_data_is_processed_without_download[plato.datasources.purchase]
+E         tests/datasources/test_local_datasets.py::test_existing_raw_vector_data_is_processed_without_download[plato.datasources.texas]
+E         tests/datasources/test_local_datasets.py::test_vector_splits_preserve_legacy_seed_order_without_global_mutation[plato.datasources.purchase]
+E         tests/datasources/test_local_datasets.py::test_vector_splits_preserve_legacy_seed_order_without_global_mutation[plato.datasources.texas]
+E         tests/datasources/test_local_datasets.py::test_cinic_existing_empty_root_recovers_download
+E         tests/datasources/test_local_datasets.py::test_tiny_imagenet_canonical_validation_labels[False]
+E         tests/datasources/test_local_datasets.py::test_tiny_imagenet_canonical_validation_labels[True]
+E         tests/datasources/test_local_datasets.py::test_tiny_imagenet_preserves_prepared_labeled_test_tree
+E         tests/datasources/test_local_datasets.py::test_prepartitioned_femnist_ids_and_counts
+E         tests/datasources/test_local_datasets.py::test_torchvision_alias_selection_with_real_local_idx_files
+E         tests/datasources/test_local_datasets.py::test_emnist_variant_keeps_distinct_training_and_test_data[None]
+E         tests/datasources/test_local_datasets.py::test_emnist_variant_keeps_distinct_training_and_test_data[digits]
+E         tests/datasources/test_registry.py::test_registry_returns_stub_datasource
+E         tests/datasources/test_registry.py::test_registry_uses_configured_name
+E         tests/datasources/test_registry.py::test_registry_supports_feature_datasource
+E         tests/datasources/test_registry.py::test_registry_does_not_forward_datasource_name
+E         tests/datasources/test_registry.py::test_registry_raises_for_unknown_datasource
+E         tests/datasources/test_review2_regressions.py::test_bad_cache_values_rebuild_from_raw_without_poisoning_future_startup[string_features-plato.datasources.purchase]
+E         tests/datasources/test_review2_regressions.py::test_bad_cache_values_rebuild_from_raw_without_poisoning_future_startup[string_features-plato.datasources.texas]
+E         tests/datasources/test_review2_regressions.py::test_bad_cache_values_rebuild_from_raw_without_poisoning_future_startup[nan_features-plato.datasources.purchase]
+E         tests/datasources/test_review2_regressions.py::test_bad_cache_values_rebuild_from_raw_without_poisoning_future_startup[nan_features-plato.datasources.texas]
+E         tests/datasources/test_review2_regressions.py::test_bad_cache_values_rebuild_from_raw_without_poisoning_future_startup[inf_features-plato.datasources.purchase]
+E         tests/datasources/test_review2_regressions.py::test_bad_cache_values_rebuild_from_raw_without_poisoning_future_startup[inf_features-plato.datasources.texas]
+E         tests/datasources/test_review2_regressions.py::test_bad_cache_values_rebuild_from_raw_without_poisoning_future_startup[overflow_features-plato.datasources.purchase]
+E         tests/datasources/test_review2_regressions.py::test_bad_cache_values_rebuild_from_raw_without_poisoning_future_startup[overflow_features-plato.datasources.texas]
+E         tests/datasources/test_review2_regressions.py::test_bad_cache_values_rebuild_from_raw_without_poisoning_future_startup[complex_features-plato.datasources.purchase]
+E         tests/datasources/test_review2_regressions.py::test_bad_cache_values_rebuild_from_raw_without_poisoning_future_startup[complex_features-plato.datasources.texas]
+E         tests/datasources/test_review2_regressions.py::test_bad_cache_values_rebuild_from_raw_without_poisoning_future_startup[string_labels-plato.datasources.purchase]
+E         tests/datasources/test_review2_regressions.py::test_bad_cache_values_rebuild_from_raw_without_poisoning_future_startup[string_labels-plato.datasources.texas]
+E         tests/datasources/test_review2_regressions.py::test_bad_cache_values_rebuild_from_raw_without_poisoning_future_startup[fractional_labels-plato.datasources.purchase]
+E         tests/datasources/test_review2_regressions.py::test_bad_cache_values_rebuild_from_raw_without_poisoning_future_startup[fractional_labels-plato.datasources.texas]
+E         tests/datasources/test_review2_regressions.py::test_bad_cache_values_rebuild_from_raw_without_poisoning_future_startup[nan_labels-plato.datasources.purchase]
+E         tests/datasources/test_review2_regressions.py::test_bad_cache_values_rebuild_from_raw_without_poisoning_future_startup[nan_labels-plato.datasources.texas]
+E         tests/datasources/test_review2_regressions.py::test_bad_cache_values_rebuild_from_raw_without_poisoning_future_startup[inf_labels-plato.datasources.purchase]
+E         tests/datasources/test_review2_regressions.py::test_bad_cache_values_rebuild_from_raw_without_poisoning_future_startup[inf_labels-plato.datasources.texas]
+E         tests/datasources/test_review2_regressions.py::test_bad_cache_values_rebuild_from_raw_without_poisoning_future_startup[negative_labels-plato.datasources.purchase]
+E         tests/datasources/test_review2_regressions.py::test_bad_cache_values_rebuild_from_raw_without_poisoning_future_startup[negative_labels-plato.datasources.texas]
+E         tests/datasources/test_review2_regressions.py::test_bad_cache_values_rebuild_from_raw_without_poisoning_future_startup[class_overflow-plato.datasources.purchase]
+E         tests/datasources/test_review2_regressions.py::test_bad_cache_values_rebuild_from_raw_without_poisoning_future_startup[class_overflow-plato.datasources.texas]
+E         tests/datasources/test_review2_regressions.py::test_bad_cache_values_rebuild_from_raw_without_poisoning_future_startup[uint64_labels-plato.datasources.purchase]
+E         tests/datasources/test_review2_regressions.py::test_bad_cache_values_rebuild_from_raw_without_poisoning_future_startup[uint64_labels-plato.datasources.texas]
+E         tests/datasources/test_review2_regressions.py::test_bad_cache_values_rebuild_from_raw_without_poisoning_future_startup[complex_labels-plato.datasources.purchase]
+E         tests/datasources/test_review2_regressions.py::test_bad_cache_values_rebuild_from_raw_without_poisoning_future_startup[complex_labels-plato.datasources.texas]
+E         tests/datasources/test_review2_regressions.py::test_compatible_numeric_cache_only_keeps_values_and_original_file[native-plato.datasources.purchase]
+E         tests/datasources/test_review2_regressions.py::test_compatible_numeric_cache_only_keeps_values_and_original_file[native-plato.datasources.texas]
+E         tests/datasources/test_review2_regressions.py::test_compatible_numeric_cache_only_keeps_values_and_original_file[big_endian-plato.datasources.purchase]
+E         tests/datasources/test_review2_regressions.py::test_compatible_numeric_cache_only_keeps_values_and_original_file[big_endian-plato.datasources.texas]
+E         tests/datasources/test_review2_regressions.py::test_compatible_numeric_cache_only_keeps_values_and_original_file[bool-plato.datasources.purchase]
+E         tests/datasources/test_review2_regressions.py::test_compatible_numeric_cache_only_keeps_values_and_original_file[bool-plato.datasources.texas]
+E         tests/datasources/test_review2_regressions.py::test_compatible_numeric_cache_only_keeps_values_and_original_file[boundary-plato.datasources.purchase]
+E         tests/datasources/test_review2_regressions.py::test_compatible_numeric_cache_only_keeps_values_and_original_file[boundary-plato.datasources.texas]
+E         tests/datasources/test_review2_regressions.py::test_downloaded_dataset_recovers_missing_sample_with_marker_still_present[evaluation_image-plato.datasources.cinic10-prepared-False]
+E         tests/datasources/test_review2_regressions.py::test_downloaded_dataset_recovers_missing_sample_with_marker_still_present[evaluation_image-plato.datasources.tiny_imagenet-native-False]
+E         tests/datasources/test_review2_regressions.py::test_downloaded_dataset_recovers_missing_sample_with_marker_still_present[evaluation_image-plato.datasources.tiny_imagenet-native-True]
+E         tests/datasources/test_review2_regressions.py::test_downloaded_dataset_recovers_missing_sample_with_marker_still_present[evaluation_image-plato.datasources.tiny_imagenet-prepared-False]
+E         tests/datasources/test_review2_regressions.py::test_downloaded_dataset_recovers_missing_sample_with_marker_still_present[training_image-plato.datasources.cinic10-prepared-False]
+E         tests/datasources/test_review2_regressions.py::test_downloaded_dataset_recovers_missing_sample_with_marker_still_present[training_image-plato.datasources.tiny_imagenet-native-False]
+E         tests/datasources/test_review2_regressions.py::test_downloaded_dataset_recovers_missing_sample_with_marker_still_present[training_image-plato.datasources.tiny_imagenet-native-True]
+E         tests/datasources/test_review2_regressions.py::test_downloaded_dataset_recovers_missing_sample_with_marker_still_present[training_image-plato.datasources.tiny_imagenet-prepared-False]
+E         tests/datasources/test_review3_regressions.py::test_tiny_failed_recovery_retries_restored_source_and_stays_offline[True]
+E         tests/datasources/test_review3_regressions.py::test_tiny_failed_recovery_retries_restored_source_and_stays_offline[False]
+E         tests/datasources/test_review3_regressions.py::test_tiny_contender_waits_for_paused_recovery_and_reuses_completed_root[True]
+E         tests/datasources/test_review3_regressions.py::test_tiny_contender_waits_for_paused_recovery_and_reuses_completed_root[False]
+E         tests/datasources/test_review3_regressions.py::test_incomplete_manual_native_root_cannot_use_unrelated_recovery_artifact[None]
+E         tests/datasources/test_review3_regressions.py::test_incomplete_manual_native_root_cannot_use_unrelated_recovery_artifact[.download.lock]
+E         tests/datasources/test_review3_regressions.py::test_incomplete_manual_native_root_cannot_use_unrelated_recovery_artifact[unrelated.zip]
+E         tests/datasources/test_review4_regressions.py::test_tiny_download_error_keeps_default_recovery_eligible_with_restored_source[http_503-True]
+E         tests/datasources/test_review4_regressions.py::test_tiny_download_error_keeps_default_recovery_eligible_with_restored_source[http_503-False]
+E         tests/datasources/test_review4_regressions.py::test_tiny_download_error_keeps_default_recovery_eligible_with_restored_source[bad_zip-True]
+E         tests/datasources/test_review4_regressions.py::test_tiny_download_error_keeps_default_recovery_eligible_with_restored_source[bad_zip-False]
+E         tests/datasources/test_review4_regressions.py::test_tiny_download_error_keeps_default_recovery_eligible_with_restored_source[truncated_body-True]
+E         tests/datasources/test_review4_regressions.py::test_tiny_download_error_keeps_default_recovery_eligible_with_restored_source[truncated_body-False]
+E         tests/datasources/test_review4_regressions.py::test_failed_initial_default_download_does_not_publish_an_archive_or_completion[http_503]
+E         tests/datasources/test_review4_regressions.py::test_failed_initial_default_download_does_not_publish_an_archive_or_completion[bad_zip]
+E         tests/datasources/test_review4_regressions.py::test_failed_initial_default_download_does_not_publish_an_archive_or_completion[truncated_body]
+E         tests/datasources/test_review_regressions.py::test_vector_cache_reader_waits_for_real_writer_or_recovers_after_death[False-purchase]
+E         tests/datasources/test_review_regressions.py::test_vector_cache_reader_waits_for_real_writer_or_recovers_after_death[False-texas]
+E         tests/datasources/test_review_regressions.py::test_vector_cache_reader_waits_for_real_writer_or_recovers_after_death[True-purchase]
+E         tests/datasources/test_review_regressions.py::test_vector_cache_reader_waits_for_real_writer_or_recovers_after_death[True-texas]
+E         tests/datasources/test_review_regressions.py::test_invalid_vector_cache_rebuilds_from_complete_raw_data_offline[truncated-plato.datasources.purchase]
+E         tests/datasources/test_review_regressions.py::test_invalid_vector_cache_rebuilds_from_complete_raw_data_offline[truncated-plato.datasources.texas]
+E         tests/datasources/test_review_regressions.py::test_invalid_vector_cache_rebuilds_from_complete_raw_data_offline[missing_labels-plato.datasources.purchase]
+E         tests/datasources/test_review_regressions.py::test_invalid_vector_cache_rebuilds_from_complete_raw_data_offline[missing_labels-plato.datasources.texas]
+E         tests/datasources/test_review_regressions.py::test_invalid_vector_cache_rebuilds_from_complete_raw_data_offline[bad_shape-plato.datasources.purchase]
+E         tests/datasources/test_review_regressions.py::test_invalid_vector_cache_rebuilds_from_complete_raw_data_offline[bad_shape-plato.datasources.texas]
+E         tests/datasources/test_review_regressions.py::test_prepared_evaluation_subset_uses_training_labels_and_metadata[plato.datasources.cinic10]
+E         tests/datasources/test_review_regressions.py::test_prepared_evaluation_subset_uses_training_labels_and_metadata[plato.datasources.tiny_imagenet]
+E         tests/datasources/test_review_regressions.py::test_prepared_evaluation_rejects_unknown_classes[plato.datasources.cinic10]
+E         tests/datasources/test_review_regressions.py::test_prepared_evaluation_rejects_unknown_classes[plato.datasources.tiny_imagenet]
+E         tests/datasources/test_review_regressions.py::test_incomplete_native_tiny_never_fabricates_test_images_class[False]
+E         tests/datasources/test_review_regressions.py::test_incomplete_native_tiny_never_fabricates_test_images_class[True]
+E         tests/datasources/test_review_regressions.py::test_tiny_default_evaluation_is_deterministic_and_training_stays_augmented[False]
+E         tests/datasources/test_review_regressions.py::test_tiny_default_evaluation_is_deterministic_and_training_stays_augmented[True]
+E         tests/datasources/test_review_regressions.py::test_tiny_default_evaluation_normalizes_known_constant_pixels[False]
+E         tests/datasources/test_review_regressions.py::test_tiny_default_evaluation_normalizes_known_constant_pixels[True]
+E         tests/datasources/test_review_regressions.py::test_tiny_explicit_train_and_test_transforms_remain_independent[False]
+E         tests/datasources/test_review_regressions.py::test_tiny_explicit_train_and_test_transforms_remain_independent[True]
+E         tests/datasources/test_review_regressions.py::test_downloaded_image_dataset_recovers_stale_completion_marker[plato.datasources.cinic10-False]
+E         tests/datasources/test_review_regressions.py::test_downloaded_image_dataset_recovers_stale_completion_marker[plato.datasources.tiny_imagenet-False]
+E         tests/datasources/test_review_regressions.py::test_downloaded_image_dataset_recovers_stale_completion_marker[plato.datasources.tiny_imagenet-True]
+E         tests/datasources/test_review_regressions.py::test_download_missing_required_artifacts_never_marks_complete
+E         tests/datasources/test_torchvision_datasource.py::test_torchvision_datasource_supports_named_splits
+E         tests/datasources/test_torchvision_datasource.py::test_torchvision_datasource_supports_boolean_splits_and_kwargs
+E         tests/datasources/test_torchvision_datasource.py::test_torchvision_datasource_supports_deterministic_non_overlapping_subsets
+E         tests/datasources/test_torchvision_datasource.py::test_torchvision_datasource_celeba_defaults
+E         tests/datasources/test_torchvision_datasource.py::test_torchvision_datasource_celeba_respects_config
+E         tests/datasources/test_torchvision_datasource.py::test_torchvision_datasource_celeba_identity_only
+E         tests/evaluators/test_lighteval.py::test_lighteval_registry_resolves_without_importing_optional_backend
+E         tests/evaluators/test_lighteval.py::test_lighteval_fast_preset_contains_expected_tasks
+E         tests/evaluators/test_lighteval.py::test_lighteval_pipeline_task_resolution_maps_arc_aliases
+E         tests/evaluators/test_lighteval.py::test_lighteval_pipeline_matches_supported_api_contract
+E         tests/evaluators/test_lighteval.py::test_lighteval_pipeline_forwards_runtime_overrides
+E         tests/evaluators/test_lighteval.py::test_lighteval_pipeline_uses_trainer_precision_for_default_dtype
+E         tests/evaluators/test_lighteval.py::test_lighteval_pipeline_forwards_max_samples_to_each_task
+E         tests/evaluators/test_lighteval.py::test_lighteval_evaluator_normalizes_metrics
+E         tests/evaluators/test_lighteval.py::test_lighteval_normalizes_versioned_task_keys
+E         tests/evaluators/test_lighteval.py::test_lighteval_evaluator_cleans_up_temp_exports
+E         tests/evaluators/test_lighteval.py::test_lighteval_evaluator_raises_helpful_import_error
+E         tests/evaluators/test_registry_runner.py::test_evaluator_registry_resolves_registered_evaluator
+E         tests/evaluators/test_registry_runner.py::test_evaluator_registry_rejects_unknown_type
+E         tests/evaluators/test_registry_runner.py::test_composable_trainer_runs_registered_evaluator_and_stores_results
+E         tests/evaluators/test_registry_runner.py::test_composable_trainer_replaces_stale_evaluator_payloads
+E         tests/evaluators/test_registry_runner.py::test_composable_trainer_without_evaluator_keeps_legacy_test_behavior
+E         tests/evaluators/test_registry_runner.py::test_composable_trainer_raises_for_unknown_evaluator_config
+E         tests/evaluators/test_registry_runner.py::test_composable_trainer_tolerates_evaluator_runtime_failure_by_default
+E         tests/evaluators/test_registry_runner.py::test_composable_trainer_can_make_evaluator_failures_fatal
+E         tests/evaluators/test_registry_runner.py::test_composable_trainer_restores_grad_mode_after_evaluator_side_effect
+E         tests/integration/test_checkpoint_runtime_agreement.py::test_server_save_resume_restores_round_rng_weights_and_history[lenet5]
+E         tests/integration/test_checkpoint_runtime_agreement.py::test_server_save_resume_restores_round_rng_weights_and_history[org/model]
+E         tests/integration/test_checkpoint_runtime_agreement.py::test_server_save_resume_restores_round_rng_weights_and_history[org_model]
+E         tests/integration/test_checkpoint_runtime_agreement.py::test_server_save_resume_restores_round_rng_weights_and_history[../model]
+E         tests/integration/test_checkpoint_runtime_agreement.py::test_server_save_resume_restores_round_rng_weights_and_history[xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx]
+E         tests/integration/test_checkpoint_runtime_agreement.py::test_server_simulated_writer_to_actual_supplied_filename_reader
+E         tests/integration/test_checkpoint_runtime_agreement.py::test_client_simulated_writers_and_server_reader_do_not_alias_names[False]
+E         tests/integration/test_checkpoint_runtime_agreement.py::test_client_simulated_writers_and_server_reader_do_not_alias_names[True]
+E         tests/integration/test_checkpoint_runtime_agreement.py::test_actual_personalized_outbound_hook_to_local_layer_reader[False]
+E         tests/integration/test_checkpoint_runtime_agreement.py::test_actual_personalized_outbound_hook_to_local_layer_reader[True]
+E         tests/integration/test_checkpoint_runtime_agreement.py::test_urgent_snapshot_numeric_selection_and_owned_cleanup_agree
+E         tests/integration/test_event_loop_startup.py::test_fresh_entrypoint_executes_scheduled_work[client_default-client_body]
+E         tests/integration/test_event_loop_startup.py::test_fresh_entrypoint_executes_scheduled_work[client_custom-client_body]
+E         tests/integration/test_event_loop_startup.py::test_fresh_entrypoint_executes_scheduled_work[ordinary-periodic_body]
+E         tests/integration/test_event_loop_startup.py::test_fresh_entrypoint_executes_scheduled_work[central-periodic_body]
+E         tests/integration/test_event_loop_startup.py::test_fresh_entrypoint_executes_scheduled_work[direct-server_body]
+E         tests/integration/test_event_loop_startup.py::test_fresh_entrypoint_executes_scheduled_work[edge_default-client_body]
+E         tests/integration/test_event_loop_startup.py::test_fresh_entrypoint_executes_scheduled_work[edge_custom-client_body]
+E         tests/integration/test_event_loop_startup.py::test_active_failure_reaches_synchronous_caller[client_custom-client-sentinel]
+E         tests/integration/test_event_loop_startup.py::test_active_failure_reaches_synchronous_caller[ordinary-periodic-sentinel]
+E         tests/integration/test_event_loop_startup.py::test_active_failure_reaches_synchronous_caller[central-periodic-sentinel]
+E         tests/integration/test_event_loop_startup.py::test_active_failure_reaches_synchronous_caller[edge_custom-client-sentinel]
+E         tests/integration/test_event_loop_startup.py::test_preconstructed_borrowed_loop_resources_survive[client_lifecycle-False]
+E         tests/integration/test_event_loop_startup.py::test_preconstructed_borrowed_loop_resources_survive[client_lifecycle-True]
+E         tests/integration/test_event_loop_startup.py::test_preconstructed_borrowed_loop_resources_survive[ordinary-False]
+E         tests/integration/test_event_loop_startup.py::test_preconstructed_borrowed_loop_resources_survive[ordinary-True]
+E         tests/integration/test_event_loop_startup.py::test_owned_client_finalizes_tasks_generators_and_executor[False]
+E         tests/integration/test_event_loop_startup.py::test_owned_client_finalizes_tasks_generators_and_executor[True]
+E         tests/integration/test_event_loop_startup.py::test_repeated_owned_client_entrypoints
+E         tests/integration/test_event_loop_startup.py::test_explicitly_absent_loop_on_server_and_edge[ordinary]
+E         tests/integration/test_event_loop_startup.py::test_explicitly_absent_loop_on_server_and_edge[central]
+E         tests/integration/test_event_loop_startup.py::test_explicitly_absent_loop_on_server_and_edge[edge_default]
+E         tests/integration/test_event_loop_startup.py::test_explicitly_absent_loop_on_server_and_edge[edge_custom]
+E         tests/integration/test_event_loop_startup.py::test_closed_current_client_loop_is_replaced
+E         tests/integration/test_event_loop_startup.py::test_running_loop_rejected_before_entrypoint_resources
+E         tests/integration/test_event_loop_startup.py::test_delegating_server_consumes_same_borrowed_loop
+E         tests/integration/test_event_loop_startup.py::test_owned_server_fallback_finalizes_its_resources[False]
+E         tests/integration/test_event_loop_startup.py::test_owned_server_fallback_finalizes_its_resources[True]
+E         tests/integration/test_event_loop_startup.py::test_cancellation_already_finalizing_is_not_interrupted
+E         tests/integration/test_event_loop_startup.py::test_runner_cleanup_error_keeps_original_client_exception
+E         tests/integration/test_event_loop_startup.py::test_configure_failure_is_preserved_before_main_coroutine
+E         tests/integration/test_event_loop_startup.py::test_missing_external_edge_client_preserves_value_error
+E         tests/integration/test_event_loop_startup.py::test_client_control_flow_keeps_original_exception[interrupt--2-KeyboardInterrupt]
+E         tests/integration/test_event_loop_startup.py::test_client_control_flow_keeps_original_exception[exit-7-SystemExit]
+E         tests/integration/test_event_loop_startup.py::test_active_edge_failure_unwinds_real_aiohttp
+E         tests/integration/test_event_loop_startup.py::test_edge_cancellation_error_keeps_independent_setup_error
+E         tests/integration/test_event_loop_startup.py::test_independent_runtime_error_is_not_mistaken_for_monitor_stop
+E         tests/integration/test_event_loop_startup.py::test_server_error_precedence_and_cooperative_teardown[options0-setup-sentinel]
+E         tests/integration/test_event_loop_startup.py::test_server_error_precedence_and_cooperative_teardown[options1-None]
+E         tests/integration/test_event_loop_startup.py::test_server_error_precedence_and_cooperative_teardown[options2-periodic-sentinel]
+E         tests/integration/test_event_loop_startup.py::test_server_error_precedence_and_cooperative_teardown[options3-start-sentinel]
+E         tests/integration/test_event_loop_startup.py::test_server_error_precedence_and_cooperative_teardown[options4-periodic-finalizer]
+E         tests/integration/test_event_loop_startup.py::test_noncooperative_teardown_is_watchdog_containment[task]
+E         tests/integration/test_event_loop_startup.py::test_noncooperative_teardown_is_watchdog_containment[generator]
+E         tests/integration/test_event_loop_startup.py::test_noncooperative_teardown_is_watchdog_containment[executor]
+E         tests/integration/test_event_loop_startup.py::test_noncooperative_teardown_is_watchdog_containment[aiohttp_task]
+E         tests/integration/test_event_loop_startup.py::test_real_two_client_cpu_socket_round
+E         tests/integration/test_event_loop_startup.py::test_post_launch_failure_keeps_primary_error_and_contains_children
+E         tests/integration/test_event_loop_startup.py::test_stalled_real_client_is_contained_without_round_success
+E         tests/integration/test_feddyn_count_boundaries.py::test_actual_spawn_wrong_first_count_rejected_and_retry[uniform]
+E         tests/integration/test_feddyn_count_boundaries.py::test_actual_spawn_wrong_first_count_rejected_and_retry[sample]
+E         tests/integration/test_feddyn_count_boundaries.py::test_parent_realizes_partition_once_without_using_backing_length[False]
+E         tests/integration/test_feddyn_count_boundaries.py::test_parent_realizes_partition_once_without_using_backing_length[True]
+E         tests/integration/test_feddyn_count_boundaries.py::test_nonzero_history_requires_saved_observed_count[False-1-uniform]
+E         tests/integration/test_feddyn_count_boundaries.py::test_nonzero_history_requires_saved_observed_count[False-1-sample]
+E         tests/integration/test_feddyn_count_boundaries.py::test_nonzero_history_requires_saved_observed_count[False-2-uniform]
+E         tests/integration/test_feddyn_count_boundaries.py::test_nonzero_history_requires_saved_observed_count[False-2-sample]
+E         tests/integration/test_feddyn_count_boundaries.py::test_nonzero_history_requires_saved_observed_count[True-1-uniform]
+E         tests/integration/test_feddyn_count_boundaries.py::test_nonzero_history_requires_saved_observed_count[True-1-sample]
+E         tests/integration/test_feddyn_count_boundaries.py::test_nonzero_history_requires_saved_observed_count[True-2-uniform]
+E         tests/integration/test_feddyn_count_boundaries.py::test_nonzero_history_requires_saved_observed_count[True-2-sample]
+E         tests/integration/test_feddyn_count_boundaries.py::test_inactive_callback_count_types_rejected_before_commit[bool-value-on_weights_received]
+E         tests/integration/test_feddyn_count_boundaries.py::test_inactive_callback_count_types_rejected_before_commit[bool-value-on_weights_aggregated]
+E         tests/integration/test_feddyn_count_boundaries.py::test_inactive_callback_count_types_rejected_before_commit[float-value-on_weights_received]
+E         tests/integration/test_feddyn_count_boundaries.py::test_inactive_callback_count_types_rejected_before_commit[float-value-on_weights_aggregated]
+E         tests/integration/test_feddyn_count_boundaries.py::test_inactive_callback_count_types_rejected_before_commit[numpy-value-on_weights_received]
+E         tests/integration/test_feddyn_count_boundaries.py::test_inactive_callback_count_types_rejected_before_commit[numpy-value-on_weights_aggregated]
+E         tests/integration/test_feddyn_count_boundaries.py::test_inactive_callback_count_types_rejected_before_commit[float-key-on_weights_received]
+E         tests/integration/test_feddyn_count_boundaries.py::test_inactive_callback_count_types_rejected_before_commit[float-key-on_weights_aggregated]
+E         tests/integration/test_feddyn_entrypoint.py::test_actual_shipped_run_resume_matches_four_round_control_and_rng[uniform]
+E         tests/integration/test_feddyn_entrypoint.py::test_actual_shipped_run_resume_matches_four_round_control_and_rng[sample]
+E         tests/integration/test_feddyn_entrypoint.py::test_shipped_mnist_shaped_lenet_spawn_and_real_socket_cloud
+E         tests/integration/test_feddyn_round_flow.py::test_actual_spawned_rejection_retry_and_logical_reuse[exit]
+E         tests/integration/test_feddyn_round_flow.py::test_actual_spawned_rejection_retry_and_logical_reuse[save]
+E         tests/integration/test_feddyn_round_flow.py::test_actual_spawned_rejection_retry_and_logical_reuse[missing]
+E         tests/integration/test_feddyn_round_flow.py::test_actual_spawned_rejection_retry_and_logical_reuse[corrupt]
+E         tests/integration/test_feddyn_round_flow.py::test_actual_spawned_rejection_retry_and_logical_reuse[token]
+E         tests/integration/test_feddyn_round_flow.py::test_actual_spawned_rejection_retry_and_logical_reuse[client]
+E         tests/integration/test_feddyn_round_flow.py::test_actual_spawned_rejection_retry_and_logical_reuse[round]
+E         tests/integration/test_feddyn_round_flow.py::test_actual_spawned_rejection_retry_and_logical_reuse[key]
+E         tests/integration/test_feddyn_round_flow.py::test_actual_spawned_rejection_retry_and_logical_reuse[shape]
+E         tests/integration/test_feddyn_round_flow.py::test_actual_spawned_rejection_retry_and_logical_reuse[nan]
+E         tests/integration/test_feddyn_round_flow.py::test_actual_spawned_rejection_retry_and_logical_reuse[equation]
+E         tests/integration/test_feddyn_round_flow.py::test_actual_spawned_rejection_retry_and_logical_reuse[model]
+E         tests/integration/test_feddyn_round_flow.py::test_actual_spawned_rejection_retry_and_logical_reuse[parent]
+E         tests/integration/test_feddyn_round_flow.py::test_consecutive_same_client_uses_current_cloud_and_dispatched_history[False-uniform-counts0]
+E         tests/integration/test_feddyn_round_flow.py::test_consecutive_same_client_uses_current_cloud_and_dispatched_history[False-sample-counts1]
+E         tests/integration/test_feddyn_round_flow.py::test_consecutive_same_client_uses_current_cloud_and_dispatched_history[True-uniform-counts0]
+E         tests/integration/test_feddyn_round_flow.py::test_consecutive_same_client_uses_current_cloud_and_dispatched_history[True-sample-counts1]
+E         tests/integration/test_feddyn_round_flow.py::test_three_round_actual_partial_participation[False-uniform-counts0]
+E         tests/integration/test_feddyn_round_flow.py::test_three_round_actual_partial_participation[False-sample-counts1]
+E         tests/integration/test_feddyn_round_flow.py::test_three_round_actual_partial_participation[False-sample-counts2]
+E         tests/integration/test_feddyn_round_flow.py::test_three_round_actual_partial_participation[False-uniform-counts3]
+E         tests/integration/test_feddyn_round_flow.py::test_three_round_actual_partial_participation[True-uniform-counts0]
+E         tests/integration/test_feddyn_round_flow.py::test_three_round_actual_partial_participation[True-sample-counts1]
+E         tests/integration/test_feddyn_round_flow.py::test_three_round_actual_partial_participation[True-sample-counts2]
+E         tests/integration/test_feddyn_round_flow.py::test_three_round_actual_partial_participation[True-uniform-counts3]
+E         tests/integration/test_feddyn_round_flow.py::test_multiple_participants_preserve_inactive_history_population_mean[uniform]
+E         tests/integration/test_feddyn_round_flow.py::test_multiple_participants_preserve_inactive_history_population_mean[sample]
+E         tests/integration/test_feddyn_round_flow.py::test_actual_full_participation_first_cloud[uniform]
+E         tests/integration/test_feddyn_round_flow.py::test_actual_full_participation_first_cloud[sample]
+E         tests/integration/test_feddyn_round_flow.py::test_actual_spawn_reused_client_matches_partial_oracle[uniform-counts0]
+E         tests/integration/test_feddyn_round_flow.py::test_actual_spawn_reused_client_matches_partial_oracle[sample-counts1]
+E         tests/integration/test_feddyn_round_flow.py::test_whole_batch_rejection_preserves_every_history_and_retry_identity[0-missing]
+E         tests/integration/test_feddyn_round_flow.py::test_whole_batch_rejection_preserves_every_history_and_retry_identity[0-extra]
+E         tests/integration/test_feddyn_round_flow.py::test_whole_batch_rejection_preserves_every_history_and_retry_identity[0-shape]
+E         tests/integration/test_feddyn_round_flow.py::test_whole_batch_rejection_preserves_every_history_and_retry_identity[0-dtype]
+E         tests/integration/test_feddyn_round_flow.py::test_whole_batch_rejection_preserves_every_history_and_retry_identity[0-nan]
+E         tests/integration/test_feddyn_round_flow.py::test_whole_batch_rejection_preserves_every_history_and_retry_identity[0-inf]
+E         tests/integration/test_feddyn_round_flow.py::test_whole_batch_rejection_preserves_every_history_and_retry_identity[0-non-tensor]
+E         tests/integration/test_feddyn_round_flow.py::test_whole_batch_rejection_preserves_every_history_and_retry_identity[0-token]
+E         tests/integration/test_feddyn_round_flow.py::test_whole_batch_rejection_preserves_every_history_and_retry_identity[0-stale-round]
+E         tests/integration/test_feddyn_round_flow.py::test_whole_batch_rejection_preserves_every_history_and_retry_identity[0-unknown-client]
+E         tests/integration/test_feddyn_round_flow.py::test_whole_batch_rejection_preserves_every_history_and_retry_identity[0-report-id]
+E         tests/integration/test_feddyn_round_flow.py::test_whole_batch_rejection_preserves_every_history_and_retry_identity[0-count]
+E         tests/integration/test_feddyn_round_flow.py::test_whole_batch_rejection_preserves_every_history_and_retry_identity[0-report-count]
+E         tests/integration/test_feddyn_round_flow.py::test_whole_batch_rejection_preserves_every_history_and_retry_identity[0-fractional-count]
+E         tests/integration/test_feddyn_round_flow.py::test_whole_batch_rejection_preserves_every_history_and_retry_identity[0-bool-count]
+E         tests/integration/test_feddyn_round_flow.py::test_whole_batch_rejection_preserves_every_history_and_retry_identity[0-steps]
+E         tests/integration/test_feddyn_round_flow.py::test_whole_batch_rejection_preserves_every_history_and_retry_identity[0-version]
+E         tests/integration/test_feddyn_round_flow.py::test_whole_batch_rejection_preserves_every_history_and_retry_identity[0-duplicate]
+E         tests/integration/test_feddyn_round_flow.py::test_whole_batch_rejection_preserves_every_history_and_retry_identity[0-incomplete]
+E         tests/integration/test_feddyn_round_flow.py::test_whole_batch_rejection_preserves_every_history_and_retry_identity[0-empty]
+E         tests/integration/test_feddyn_round_flow.py::test_whole_batch_rejection_preserves_every_history_and_retry_identity[1-missing]
+E         tests/integration/test_feddyn_round_flow.py::test_whole_batch_rejection_preserves_every_history_and_retry_identity[1-extra]
+E         tests/integration/test_feddyn_round_flow.py::test_whole_batch_rejection_preserves_every_history_and_retry_identity[1-shape]
+E         tests/integration/test_feddyn_round_flow.py::test_whole_batch_rejection_preserves_every_history_and_retry_identity[1-dtype]
+E         tests/integration/test_feddyn_round_flow.py::test_whole_batch_rejection_preserves_every_history_and_retry_identity[1-nan]
+E         tests/integration/test_feddyn_round_flow.py::test_whole_batch_rejection_preserves_every_history_and_retry_identity[1-inf]
+E         tests/integration/test_feddyn_round_flow.py::test_whole_batch_rejection_preserves_every_history_and_retry_identity[1-non-tensor]
+E         tests/integration/test_feddyn_round_flow.py::test_whole_batch_rejection_preserves_every_history_and_retry_identity[1-token]
+E         tests/integration/test_feddyn_round_flow.py::test_whole_batch_rejection_preserves_every_history_and_retry_identity[1-stale-round]
+E         tests/integration/test_feddyn_round_flow.py::test_whole_batch_rejection_preserves_every_history_and_retry_identity[1-unknown-client]
+E         tests/integration/test_feddyn_round_flow.py::test_whole_batch_rejection_preserves_every_history_and_retry_identity[1-report-id]
+E         tests/integration/test_feddyn_round_flow.py::test_whole_batch_rejection_preserves_every_history_and_retry_identity[1-count]
+E         tests/integration/test_feddyn_round_flow.py::test_whole_batch_rejection_preserves_every_history_and_retry_identity[1-report-count]
+E         tests/integration/test_feddyn_round_flow.py::test_whole_batch_rejection_preserves_every_history_and_retry_identity[1-fractional-count]
+E         tests/integration/test_feddyn_round_flow.py::test_whole_batch_rejection_preserves_every_history_and_retry_identity[1-bool-count]
+E         tests/integration/test_feddyn_round_flow.py::test_whole_batch_rejection_preserves_every_history_and_retry_identity[1-steps]
+E         tests/integration/test_feddyn_round_flow.py::test_whole_batch_rejection_preserves_every_history_and_retry_identity[1-version]
+E         tests/integration/test_feddyn_round_flow.py::test_whole_batch_rejection_preserves_every_history_and_retry_identity[1-duplicate]
+E         tests/integration/test_feddyn_round_flow.py::test_whole_batch_rejection_preserves_every_history_and_retry_identity[1-incomplete]
+E         tests/integration/test_feddyn_round_flow.py::test_whole_batch_rejection_preserves_every_history_and_retry_identity[1-empty]
+E         tests/integration/test_feddyn_round_flow.py::test_callback_and_partial_load_boundary[receive-error]
+E         tests/integration/test_feddyn_round_flow.py::test_callback_and_partial_load_boundary[receive-model]
+E         tests/integration/test_feddyn_round_flow.py::test_callback_and_partial_load_boundary[receive-count]
+E         tests/integration/test_feddyn_round_flow.py::test_callback_and_partial_load_boundary[receive-history]
+E         tests/integration/test_feddyn_round_flow.py::test_callback_and_partial_load_boundary[receive-dispatch]
+E         tests/integration/test_feddyn_round_flow.py::test_callback_and_partial_load_boundary[receive-round]
+E         tests/integration/test_feddyn_round_flow.py::test_callback_and_partial_load_boundary[aggregate-error]
+E         tests/integration/test_feddyn_round_flow.py::test_callback_and_partial_load_boundary[aggregate-model]
+E         tests/integration/test_feddyn_round_flow.py::test_callback_and_partial_load_boundary[aggregate-history]
+E         tests/integration/test_feddyn_round_flow.py::test_callback_and_partial_load_boundary[partial-load]
+E         tests/integration/test_feddyn_round_flow.py::test_callback_and_partial_load_boundary[arithmetic]
+E         tests/integration/test_feddyn_round_flow.py::test_callback_and_partial_load_boundary[postcommit]
+E         tests/integration/test_feddyn_round_flow.py::test_accumulated_tail_and_skips_count_only_real_updates[2-3-0-2]
+E         tests/integration/test_feddyn_round_flow.py::test_accumulated_tail_and_skips_count_only_real_updates[2-4-0-2]
+E         tests/integration/test_feddyn_round_flow.py::test_accumulated_tail_and_skips_count_only_real_updates[5-3-0-1]
+E         tests/integration/test_feddyn_round_flow.py::test_accumulated_tail_and_skips_count_only_real_updates[1-2-1-1]
+E         tests/integration/test_feddyn_round_flow.py::test_empty_or_all_skipped_attempt_refuses_outbound_and_valid_retry[False]
+E         tests/integration/test_feddyn_round_flow.py::test_empty_or_all_skipped_attempt_refuses_outbound_and_valid_retry[True]
+E         tests/integration/test_feddyn_round_flow.py::test_actual_local_schema_buffer_and_count_mutation_rolls_back[flag]
+E         tests/integration/test_feddyn_round_flow.py::test_actual_local_schema_buffer_and_count_mutation_rolls_back[shape]
+E         tests/integration/test_feddyn_round_flow.py::test_actual_local_schema_buffer_and_count_mutation_rolls_back[frozen]
+E         tests/integration/test_feddyn_round_flow.py::test_actual_local_schema_buffer_and_count_mutation_rolls_back[floating]
+E         tests/integration/test_feddyn_round_flow.py::test_actual_local_schema_buffer_and_count_mutation_rolls_back[integral]
+E         tests/integration/test_feddyn_round_flow.py::test_actual_local_schema_buffer_and_count_mutation_rolls_back[boolean]
+E         tests/integration/test_feddyn_round_flow.py::test_actual_local_schema_buffer_and_count_mutation_rolls_back[nan-buffer]
+E         tests/integration/test_feddyn_round_flow.py::test_actual_local_schema_buffer_and_count_mutation_rolls_back[count]
+E         tests/integration/test_feddyn_round_flow.py::test_actual_inbound_whole_dispatch_validation_before_mutation[model-key]
+E         tests/integration/test_feddyn_round_flow.py::test_actual_inbound_whole_dispatch_validation_before_mutation[model-extra]
+E         tests/integration/test_feddyn_round_flow.py::test_actual_inbound_whole_dispatch_validation_before_mutation[model-shape]
+E         tests/integration/test_feddyn_round_flow.py::test_actual_inbound_whole_dispatch_validation_before_mutation[model-dtype]
+E         tests/integration/test_feddyn_round_flow.py::test_actual_inbound_whole_dispatch_validation_before_mutation[model-nan]
+E         tests/integration/test_feddyn_round_flow.py::test_actual_inbound_whole_dispatch_validation_before_mutation[model-inf]
+E         tests/integration/test_feddyn_round_flow.py::test_actual_inbound_whole_dispatch_validation_before_mutation[model-type]
+E         tests/integration/test_feddyn_round_flow.py::test_actual_inbound_whole_dispatch_validation_before_mutation[history-key]
+E         tests/integration/test_feddyn_round_flow.py::test_actual_inbound_whole_dispatch_validation_before_mutation[history-extra]
+E         tests/integration/test_feddyn_round_flow.py::test_actual_inbound_whole_dispatch_validation_before_mutation[history-shape]
+E         tests/integration/test_feddyn_round_flow.py::test_actual_inbound_whole_dispatch_validation_before_mutation[history-nan]
+E         tests/integration/test_feddyn_round_flow.py::test_actual_inbound_whole_dispatch_validation_before_mutation[history-dtype]
+E         tests/integration/test_feddyn_round_flow.py::test_actual_inbound_whole_dispatch_validation_before_mutation[version]
+E         tests/integration/test_feddyn_round_flow.py::test_actual_inbound_whole_dispatch_validation_before_mutation[run]
+E         tests/integration/test_feddyn_round_flow.py::test_actual_inbound_whole_dispatch_validation_before_mutation[round]
+E         tests/integration/test_feddyn_round_flow.py::test_actual_inbound_whole_dispatch_validation_before_mutation[client]
+E         tests/integration/test_feddyn_round_flow.py::test_actual_inbound_whole_dispatch_validation_before_mutation[token]
+E         tests/integration/test_feddyn_round_flow.py::test_actual_inbound_whole_dispatch_validation_before_mutation[mode]
+E         tests/integration/test_feddyn_round_flow.py::test_actual_inbound_whole_dispatch_validation_before_mutation[alpha]
+E         tests/integration/test_feddyn_round_flow.py::test_actual_inbound_whole_dispatch_validation_before_mutation[effective]
+E         tests/integration/test_feddyn_round_flow.py::test_actual_inbound_whole_dispatch_validation_before_mutation[count]
+E         tests/integration/test_feddyn_round_flow.py::test_actual_inbound_whole_dispatch_validation_before_mutation[header]
+E         tests/integration/test_feddyn_round_flow.py::test_realized_partition_count_uses_sampler_not_global_backing_data[1]
+E         tests/integration/test_feddyn_round_flow.py::test_realized_partition_count_uses_sampler_not_global_backing_data[3]
+E         tests/integration/test_feddyn_round_flow.py::test_pending_resume_handoff_is_atomic_and_consumed_once[identity]
+E         tests/integration/test_feddyn_round_flow.py::test_pending_resume_handoff_is_atomic_and_consumed_once[schema]
+E         tests/integration/test_feddyn_round_flow.py::test_pending_resume_handoff_is_atomic_and_consumed_once[rng]
+E         tests/integration/test_feddyn_round_flow.py::test_pending_resume_handoff_is_atomic_and_consumed_once[install]
+E         tests/integration/test_feddyn_round_flow.py::test_pending_resume_handoff_is_atomic_and_consumed_once[none]
+E         tests/integration/test_feddyn_round_flow.py::test_optimizer_parameter_identity_and_static_full_state[reverse]
+E         tests/integration/test_feddyn_round_flow.py::test_optimizer_parameter_identity_and_static_full_state[missing]
+E         tests/integration/test_feddyn_round_flow.py::test_optimizer_parameter_identity_and_static_full_state[duplicate]
+E         tests/integration/test_feddyn_round_flow.py::test_optimizer_parameter_identity_and_static_full_state[foreign]
+E         tests/integration/test_feddyn_round_flow.py::test_optimizer_parameter_identity_and_static_full_state[frozen]
+E         tests/integration/test_feddyn_round_flow.py::test_optimizer_parameter_identity_and_static_full_state[adam]
+E         tests/integration/test_feddyn_round_flow.py::test_complete_bundle_round_two_to_three_matches_rational_reference[toy-uniform-counts0]
+E         tests/integration/test_feddyn_round_flow.py::test_complete_bundle_round_two_to_three_matches_rational_reference[toy-sample-counts1]
+E         tests/integration/test_feddyn_round_flow.py::test_complete_bundle_round_two_to_three_matches_rational_reference[org/model-uniform-counts0]
+E         tests/integration/test_feddyn_round_flow.py::test_complete_bundle_round_two_to_three_matches_rational_reference[org/model-sample-counts1]
+E         tests/integration/test_feddyn_round_flow.py::test_complete_bundle_round_two_to_three_matches_rational_reference[xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-uniform-counts0]
+E         tests/integration/test_feddyn_round_flow.py::test_complete_bundle_round_two_to_three_matches_rational_reference[xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-sample-counts1]
+E         tests/integration/test_feddyn_round_flow.py::test_rejected_bundle_preserves_model_history_live_rng_and_previous_pending[version]
+E         tests/integration/test_feddyn_round_flow.py::test_rejected_bundle_preserves_model_history_live_rng_and_previous_pending[run]
+E         tests/integration/test_feddyn_round_flow.py::test_rejected_bundle_preserves_model_history_live_rng_and_previous_pending[round]
+E         tests/integration/test_feddyn_round_flow.py::test_rejected_bundle_preserves_model_history_live_rng_and_previous_pending[config]
+E         tests/integration/test_feddyn_round_flow.py::test_rejected_bundle_preserves_model_history_live_rng_and_previous_pending[schema]
+E         tests/integration/test_feddyn_round_flow.py::test_rejected_bundle_preserves_model_history_live_rng_and_previous_pending[model]
+E         tests/integration/test_feddyn_round_flow.py::test_rejected_bundle_preserves_model_history_live_rng_and_previous_pending[history]
+E         tests/integration/test_feddyn_round_flow.py::test_rejected_bundle_preserves_model_history_live_rng_and_previous_pending[count]
+E         tests/integration/test_feddyn_round_flow.py::test_rejected_bundle_preserves_model_history_live_rng_and_previous_pending[rng-selection]
+E         tests/integration/test_feddyn_round_flow.py::test_rejected_bundle_preserves_model_history_live_rng_and_previous_pending[rng-python]
+E         tests/integration/test_feddyn_round_flow.py::test_rejected_bundle_preserves_model_history_live_rng_and_previous_pending[rng-numpy]
+E         tests/integration/test_feddyn_round_flow.py::test_rejected_bundle_preserves_model_history_live_rng_and_previous_pending[rng-torch]
+E         tests/integration/test_feddyn_round_flow.py::test_rejected_bundle_preserves_model_history_live_rng_and_previous_pending[model-only]
+E         tests/integration/test_feddyn_round_flow.py::test_failed_bundle_serialization_preserves_previous_canonical_bytes
+E         tests/integration/test_huggingface_smollm_smoke.py::test_smollm_smoltalk_config_smoke
+E         tests/integration/test_qwen3_lora.py::test_offline_qwen3_peft_two_client_update_and_checkpoint
+E         tests/integration/test_qwen3_lora.py::test_explicit_peft_state_is_preserved_without_unpinned_embedding_lookup[lora_override0-lm_head.weight]
+E         tests/integration/test_qwen3_lora.py::test_explicit_peft_state_is_preserved_without_unpinned_embedding_lookup[lora_override1-lora_embedding_A]
+E         tests/integration/test_qwen3_lora.py::test_explicit_peft_state_is_preserved_without_unpinned_embedding_lookup[lora_override2-trainable_tokens_delta]
+E         tests/integration/test_qwen3_lora.py::test_adapter_checkpoint_rejects_different_pin_and_preserves_active_model
+E         tests/integration/test_qwen3_lora.py::test_peft_cpu_payload_snapshot_and_adapter_epoch_snapshot_are_independent
+E         tests/integration/test_qwen3_lora.py::test_tokenizer_expansion_retains_embedding_checkpoint_state
+E         tests/integration/test_qwen3_lora.py::test_configured_seed_reproduces_actual_lora_initialization
+E         tests/integration/test_qwen3_lora.py::test_supplied_preexpanded_peft_model_preserves_embedding_snapshots_and_logits
+E         tests/integration/test_scaffold_callback_lifecycle.py::test_actual_report_callbacks_reject_and_clear_before_successful_retry[receive]
+E         tests/integration/test_scaffold_callback_lifecycle.py::test_actual_report_callbacks_reject_and_clear_before_successful_retry[metadata]
+E         tests/integration/test_scaffold_callback_lifecycle.py::test_actual_report_callbacks_reject_and_clear_before_successful_retry[model]
+E         tests/integration/test_scaffold_callback_lifecycle.py::test_actual_report_callbacks_reject_and_clear_before_successful_retry[pending]
+E         tests/integration/test_scaffold_callback_lifecycle.py::test_actual_report_callbacks_reject_and_clear_before_successful_retry[delta]
+E         tests/integration/test_scaffold_callback_lifecycle.py::test_actual_report_callbacks_reject_and_clear_before_successful_retry[committed-control]
+E         tests/integration/test_scaffold_callback_lifecycle.py::test_actual_report_callbacks_reject_and_clear_before_successful_retry[aggregate]
+E         tests/integration/test_scaffold_callback_lifecycle.py::test_actual_report_callbacks_reject_and_clear_before_successful_retry[aggregate-model]
+E         tests/integration/test_scaffold_callback_lifecycle.py::test_actual_report_callbacks_reject_and_clear_before_successful_retry[aggregate-control]
+E         tests/integration/test_scaffold_callback_lifecycle.py::test_actual_report_callbacks_reject_and_clear_before_successful_retry[load]
+E         tests/integration/test_scaffold_callback_lifecycle.py::test_actual_report_callbacks_reject_and_clear_before_successful_retry[arithmetic]
+E         tests/integration/test_scaffold_callback_lifecycle.py::test_actual_report_callbacks_reject_and_clear_before_successful_retry[postcommit]
+E         tests/integration/test_scaffold_callback_lifecycle.py::test_fallible_end_hook_rejects_before_acceptance_and_releases_ownership[False-False-False-train_model]
+E         tests/integration/test_scaffold_callback_lifecycle.py::test_fallible_end_hook_rejects_before_acceptance_and_releases_ownership[False-False-False-train_process]
+E         tests/integration/test_scaffold_callback_lifecycle.py::test_fallible_end_hook_rejects_before_acceptance_and_releases_ownership[False-False-True-train_model]
+E         tests/integration/test_scaffold_callback_lifecycle.py::test_fallible_end_hook_rejects_before_acceptance_and_releases_ownership[False-False-True-train_process]
+E         tests/integration/test_scaffold_callback_lifecycle.py::test_fallible_end_hook_rejects_before_acceptance_and_releases_ownership[False-True-False-train_model]
+E         tests/integration/test_scaffold_callback_lifecycle.py::test_fallible_end_hook_rejects_before_acceptance_and_releases_ownership[False-True-False-train_process]
+E         tests/integration/test_scaffold_callback_lifecycle.py::test_fallible_end_hook_rejects_before_acceptance_and_releases_ownership[False-True-True-train_model]
+E         tests/integration/test_scaffold_callback_lifecycle.py::test_fallible_end_hook_rejects_before_acceptance_and_releases_ownership[False-True-True-train_process]
+E         tests/integration/test_scaffold_callback_lifecycle.py::test_fallible_end_hook_rejects_before_acceptance_and_releases_ownership[True-False-False-train_model]
+E         tests/integration/test_scaffold_callback_lifecycle.py::test_fallible_end_hook_rejects_before_acceptance_and_releases_ownership[True-False-False-train_process]
+E         tests/integration/test_scaffold_callback_lifecycle.py::test_fallible_end_hook_rejects_before_acceptance_and_releases_ownership[True-False-True-train_model]
+E         tests/integration/test_scaffold_callback_lifecycle.py::test_fallible_end_hook_rejects_before_acceptance_and_releases_ownership[True-False-True-train_process]
+E         tests/integration/test_scaffold_callback_lifecycle.py::test_fallible_end_hook_rejects_before_acceptance_and_releases_ownership[True-True-False-train_model]
+E         tests/integration/test_scaffold_callback_lifecycle.py::test_fallible_end_hook_rejects_before_acceptance_and_releases_ownership[True-True-False-train_process]
+E         tests/integration/test_scaffold_callback_lifecycle.py::test_fallible_end_hook_rejects_before_acceptance_and_releases_ownership[True-True-True-train_model]
+E         tests/integration/test_scaffold_callback_lifecycle.py::test_fallible_end_hook_rejects_before_acceptance_and_releases_ownership[True-True-True-train_process]
+E         tests/integration/test_scaffold_callback_lifecycle.py::test_actual_spawned_successful_run_cleanup_rejects_before_parent_acceptance[False]
+E         tests/integration/test_scaffold_callback_lifecycle.py::test_actual_spawned_successful_run_cleanup_rejects_before_parent_acceptance[True]
+E         tests/integration/test_scaffold_round_flow.py::test_shipped_configuration_two_round_independent_rational_oracle
+E         tests/integration/test_scaffold_round_flow.py::test_shipped_spawn_pipeline_parent_control_return_with_deadline
+E         tests/integration/test_scaffold_round_flow.py::test_actual_failed_worker_handoff_refuses_previous_delta[missing]
+E         tests/integration/test_scaffold_round_flow.py::test_actual_failed_worker_handoff_refuses_previous_delta[stale]
+E         tests/integration/test_scaffold_round_flow.py::test_actual_failed_worker_handoff_refuses_previous_delta[model-save]
+E         tests/integration/test_scaffold_round_flow.py::test_actual_failed_worker_handoff_refuses_previous_delta[commit]
+E         tests/integration/test_scaffold_round_flow.py::test_reused_and_reconstructed_clients_match_dedicated_two_round_controls
+E         tests/integration/test_scaffold_round_flow.py::test_actual_shipped_optimizer_lr_and_next_round_rate[0.1]
+E         tests/integration/test_scaffold_round_flow.py::test_actual_shipped_optimizer_lr_and_next_round_rate[0.025]
+E         tests/integration/test_scaffold_round_flow.py::test_config_loads_exact_shipped_toml_before_optimizer_overrides[0.1]
+E         tests/integration/test_scaffold_round_flow.py::test_config_loads_exact_shipped_toml_before_optimizer_overrides[0.025]
+E         tests/integration/test_scaffold_round_flow.py::test_equal_count_model_update_reduces_to_uniform_reference
+E         tests/integration/test_scaffold_round_flow.py::test_unmodified_shipped_momentum_optimizer_composition
+E         tests/integration/test_scaffold_round_flow.py::test_reused_processors_rebind_and_missing_inbound_c_clears_previous_round
+E         tests/integration/test_scaffold_round_flow.py::test_all_server_deltas_validated_before_model_or_control_commit[None]
+E         tests/integration/test_scaffold_round_flow.py::test_all_server_deltas_validated_before_model_or_control_commit[malformed1]
+E         tests/integration/test_scaffold_round_flow.py::test_all_server_deltas_validated_before_model_or_control_commit[malformed2]
+E         tests/integration/test_scaffold_round_flow.py::test_all_server_deltas_validated_before_model_or_control_commit[malformed3]
+E         tests/integration/test_scaffold_round_flow.py::test_all_server_deltas_validated_before_model_or_control_commit[malformed4]
+E         tests/integration/test_scaffold_round_flow.py::test_server_buffer_payloads_keep_inherited_aggregation_policy
+E         tests/integration/test_scaffold_round_flow.py::test_actual_report_path_rejects_every_malformed_model_before_commit[nan-0-0]
+E         tests/integration/test_scaffold_round_flow.py::test_actual_report_path_rejects_every_malformed_model_before_commit[nan-0-1]
+E         tests/integration/test_scaffold_round_flow.py::test_actual_report_path_rejects_every_malformed_model_before_commit[nan-2-0]
+E         tests/integration/test_scaffold_round_flow.py::test_actual_report_path_rejects_every_malformed_model_before_commit[nan-2-1]
+E         tests/integration/test_scaffold_round_flow.py::test_actual_report_path_rejects_every_malformed_model_before_commit[missing-0-0]
+E         tests/integration/test_scaffold_round_flow.py::test_actual_report_path_rejects_every_malformed_model_before_commit[missing-0-1]
+E         tests/integration/test_scaffold_round_flow.py::test_actual_report_path_rejects_every_malformed_model_before_commit[missing-2-0]
+E         tests/integration/test_scaffold_round_flow.py::test_actual_report_path_rejects_every_malformed_model_before_commit[missing-2-1]
+E         tests/integration/test_scaffold_round_flow.py::test_actual_report_path_rejects_every_malformed_model_before_commit[broadcast-0-0]
+E         tests/integration/test_scaffold_round_flow.py::test_actual_report_path_rejects_every_malformed_model_before_commit[broadcast-0-1]
+E         tests/integration/test_scaffold_round_flow.py::test_actual_report_path_rejects_every_malformed_model_before_commit[broadcast-2-0]
+E         tests/integration/test_scaffold_round_flow.py::test_actual_report_path_rejects_every_malformed_model_before_commit[broadcast-2-1]
+E         tests/integration/test_scaffold_round_flow.py::test_actual_report_path_rejects_every_malformed_model_before_commit[unknown-0-0]
+E         tests/integration/test_scaffold_round_flow.py::test_actual_report_path_rejects_every_malformed_model_before_commit[unknown-0-1]
+E         tests/integration/test_scaffold_round_flow.py::test_actual_report_path_rejects_every_malformed_model_before_commit[unknown-2-0]
+E         tests/integration/test_scaffold_round_flow.py::test_actual_report_path_rejects_every_malformed_model_before_commit[unknown-2-1]
+E         tests/integration/test_scaffold_round_flow.py::test_actual_report_path_rejects_every_malformed_model_before_commit[non-tensor-0-0]
+E         tests/integration/test_scaffold_round_flow.py::test_actual_report_path_rejects_every_malformed_model_before_commit[non-tensor-0-1]
+E         tests/integration/test_scaffold_round_flow.py::test_actual_report_path_rejects_every_malformed_model_before_commit[non-tensor-2-0]
+E         tests/integration/test_scaffold_round_flow.py::test_actual_report_path_rejects_every_malformed_model_before_commit[non-tensor-2-1]
+E         tests/integration/test_scaffold_round_flow.py::test_actual_report_path_rejects_every_malformed_model_before_commit[frozen-0-0]
+E         tests/integration/test_scaffold_round_flow.py::test_actual_report_path_rejects_every_malformed_model_before_commit[frozen-0-1]
+E         tests/integration/test_scaffold_round_flow.py::test_actual_report_path_rejects_every_malformed_model_before_commit[frozen-2-0]
+E         tests/integration/test_scaffold_round_flow.py::test_actual_report_path_rejects_every_malformed_model_before_commit[frozen-2-1]
+E         tests/integration/test_scaffold_round_flow.py::test_actual_report_path_rejects_every_malformed_model_before_commit[buffer-0-0]
+E         tests/integration/test_scaffold_round_flow.py::test_actual_report_path_rejects_every_malformed_model_before_commit[buffer-0-1]
+E         tests/integration/test_scaffold_round_flow.py::test_actual_report_path_rejects_every_malformed_model_before_commit[buffer-2-0]
+E         tests/integration/test_scaffold_round_flow.py::test_actual_report_path_rejects_every_malformed_model_before_commit[buffer-2-1]
+E         tests/integration/test_scaffold_round_flow.py::test_actual_report_path_validates_samples_before_control_staging[-1-0]
+E         tests/integration/test_scaffold_round_flow.py::test_actual_report_path_validates_samples_before_control_staging[-1-1]
+E         tests/integration/test_scaffold_round_flow.py::test_actual_report_path_validates_samples_before_control_staging[nan-0]
+E         tests/integration/test_scaffold_round_flow.py::test_actual_report_path_validates_samples_before_control_staging[nan-1]
+E         tests/integration/test_scaffold_round_flow.py::test_actual_report_path_validates_samples_before_control_staging[inf-0]
+E         tests/integration/test_scaffold_round_flow.py::test_actual_report_path_validates_samples_before_control_staging[inf-1]
+E         tests/integration/test_smoke_configs.py::test_fedavg_lenet5_smoke
+E         tests/integration/test_smoke_configs.py::test_split_learning_smoke
+E         tests/integration/test_smoke_configs.py::test_mpc_training_smoke
+E         tests/models/test_model_behaviour.py::test_lenet5_forward_produces_log_probs
+E         tests/models/test_model_behaviour.py::test_lenet5_split_forward_matches_full
+E         tests/models/test_model_behaviour.py::test_resnet_rejects_unknown_variant
+E         tests/models/test_model_behaviour.py::test_resnet_split_roundtrip_matches_full
+E         tests/models/test_model_registry.py::test_model_registry_instantiates_configured_model
+E         tests/models/test_model_registry.py::test_model_registry_passes_kwargs_to_registered_model
+E         tests/models/test_model_registry.py::test_model_registry_derives_type_from_model_name
+E         tests/models/test_model_registry.py::test_model_registry_invokes_factory_getter
+E         tests/models/test_model_registry.py::test_model_registry_raises_for_unknown_model
+E         tests/mpc/test_mpc.py::test_round_info_store_local
+E         tests/mpc/test_mpc.py::test_additive_strategy_end_to_end
+E         tests/mpc/test_mpc.py::test_shamir_strategy_end_to_end
+E         tests/mpc/test_mpc_regressions.py::test_weighted_round_matches_plaintext_reference[additive-clients0-counts0-None]
+E         tests/mpc/test_mpc_regressions.py::test_weighted_round_matches_plaintext_reference[additive-clients1-counts1-None]
+E         tests/mpc/test_mpc_regressions.py::test_weighted_round_matches_plaintext_reference[shamir-clients2-counts2-1]
+E         tests/mpc/test_mpc_regressions.py::test_weighted_round_matches_plaintext_reference[shamir-clients3-counts3-2]
+E         tests/mpc/test_mpc_regressions.py::test_weighted_round_matches_plaintext_reference[shamir-clients4-counts4-4]
+E         tests/mpc/test_mpc_regressions.py::test_malformed_round_fails_without_mutating_baseline[cardinality-additive]
+E         tests/mpc/test_mpc_regressions.py::test_malformed_round_fails_without_mutating_baseline[cardinality-shamir]
+E         tests/mpc/test_mpc_regressions.py::test_malformed_round_fails_without_mutating_baseline[samples-additive]
+E         tests/mpc/test_mpc_regressions.py::test_malformed_round_fails_without_mutating_baseline[samples-shamir]
+E         tests/mpc/test_mpc_regressions.py::test_malformed_round_fails_without_mutating_baseline[duplicate-additive]
+E         tests/mpc/test_mpc_regressions.py::test_malformed_round_fails_without_mutating_baseline[duplicate-shamir]
+E         tests/mpc/test_mpc_regressions.py::test_malformed_round_fails_without_mutating_baseline[stale-additive]
+E         tests/mpc/test_mpc_regressions.py::test_malformed_round_fails_without_mutating_baseline[stale-shamir]
+E         tests/mpc/test_mpc_regressions.py::test_malformed_round_fails_without_mutating_baseline[shape-additive]
+E         tests/mpc/test_mpc_regressions.py::test_malformed_round_fails_without_mutating_baseline[shape-shamir]
+E         tests/mpc/test_mpc_regressions.py::test_malformed_round_fails_without_mutating_baseline[keys-additive]
+E         tests/mpc/test_mpc_regressions.py::test_malformed_round_fails_without_mutating_baseline[keys-shamir]
+E         tests/mpc/test_mpc_regressions.py::test_additive_missing_participant_cannot_bias_aggregate
+E         tests/mpc/test_mpc_regressions.py::test_missing_sample_count_is_rejected_before_storing_shares[additive]
+E         tests/mpc/test_mpc_regressions.py::test_missing_sample_count_is_rejected_before_storing_shares[shamir]
+E         tests/mpc/test_mpc_regressions.py::test_invalid_sample_count_is_not_persisted[-1]
+E         tests/mpc/test_mpc_regressions.py::test_invalid_sample_count_is_not_persisted[nan]
+E         tests/mpc/test_mpc_regressions.py::test_invalid_sample_count_is_not_persisted[inf]
+E         tests/mpc/test_mpc_regressions.py::test_stale_round_writer_cannot_contaminate_next_round
+E         tests/mpc/test_mpc_regressions.py::test_failed_state_save_keeps_last_complete_round
+E         tests/mpc/test_mpc_regressions.py::test_training_records_zero_samples_and_rejects_round_change
+E         tests/mpc/test_mpc_regressions.py::test_configured_shamir_client_lifecycle_matches_server_reconstruction[1-None]
+E         tests/mpc/test_mpc_regressions.py::test_configured_shamir_client_lifecycle_matches_server_reconstruction[2-None]
+E         tests/mpc/test_mpc_regressions.py::test_configured_shamir_client_lifecycle_matches_server_reconstruction[None-None]
+E         tests/mpc/test_mpc_regressions.py::test_configured_shamir_client_lifecycle_matches_server_reconstruction[1-4]
+E         tests/mpc/test_mpc_regressions.py::test_configured_shamir_client_lifecycle_matches_server_reconstruction[None-1]
+E         tests/mpc/test_mpc_regressions.py::test_impossible_shamir_coefficient_pool_is_bounded_before_persistence
+E         tests/mpc/test_round_store_contracts.py::test_lock_timeout_follows_effective_pytest_profile[implicit-mandatory]
+E         tests/mpc/test_round_store_contracts.py::test_lock_timeout_follows_effective_pytest_profile[explicit-mandatory]
+E         tests/mpc/test_round_store_contracts.py::test_lock_timeout_follows_effective_pytest_profile[explicit-base]
+E         tests/mpc/test_round_store_contracts.py::test_lock_timeout_follows_effective_pytest_profile[unprofiled-scoped]
+E         tests/mpc/test_round_store_contracts.py::test_lock_failure_stops_client_and_never_writes
+E         tests/mpc/test_round_store_contracts.py::test_finite_lock_wait_prevents_unlocked_write
+E         tests/mpc/test_round_store_contracts.py::test_s3_read_error_is_not_reported_as_an_uninitialized_round
+E         tests/processors/test_payload_regressions.py::test_bfloat_quantization_preserves_integer_and_boolean_buffers
+E         tests/processors/test_payload_regressions.py::test_qsgd_zero_and_empty_layers_roundtrip[tensor0]
+E         tests/processors/test_payload_regressions.py::test_qsgd_zero_and_empty_layers_roundtrip[tensor1]
+E         tests/processors/test_payload_regressions.py::test_qsgd_zero_and_empty_layers_roundtrip[tensor2]
+E         tests/processors/test_payload_regressions.py::test_qsgd_has_bounded_error_and_respects_random_seed
+E         tests/processors/test_payload_regressions.py::test_qsgd_finite_endpoints_and_error_bound_at_large_scales[3.75-2]
+E         tests/processors/test_payload_regressions.py::test_qsgd_finite_endpoints_and_error_bound_at_large_scales[3.75-16]
+E         tests/processors/test_payload_regressions.py::test_qsgd_finite_endpoints_and_error_bound_at_large_scales[3.75-64]
+E         tests/processors/test_payload_regressions.py::test_qsgd_finite_endpoints_and_error_bound_at_large_scales[3.75-128]
+E         tests/processors/test_payload_regressions.py::test_qsgd_finite_endpoints_and_error_bound_at_large_scales[1e+38-2]
+E         tests/processors/test_payload_regressions.py::test_qsgd_finite_endpoints_and_error_bound_at_large_scales[1e+38-16]
+E         tests/processors/test_payload_regressions.py::test_qsgd_finite_endpoints_and_error_bound_at_large_scales[1e+38-64]
+E         tests/processors/test_payload_regressions.py::test_qsgd_finite_endpoints_and_error_bound_at_large_scales[1e+38-128]
+E         tests/processors/test_payload_regressions.py::test_qsgd_finite_endpoints_and_error_bound_at_large_scales[3e+38-2]
+E         tests/processors/test_payload_regressions.py::test_qsgd_finite_endpoints_and_error_bound_at_large_scales[3e+38-16]
+E         tests/processors/test_payload_regressions.py::test_qsgd_finite_endpoints_and_error_bound_at_large_scales[3e+38-64]
+E         tests/processors/test_payload_regressions.py::test_qsgd_finite_endpoints_and_error_bound_at_large_scales[3e+38-128]
+E         tests/processors/test_payload_regressions.py::test_qsgd_invalid_levels_fail_explicitly[0]
+E         tests/processors/test_payload_regressions.py::test_qsgd_invalid_levels_fail_explicitly[1]
+E         tests/processors/test_payload_regressions.py::test_qsgd_invalid_levels_fail_explicitly[129]
+E         tests/processors/test_payload_regressions.py::test_qsgd_malformed_bytes_fail_explicitly[]
+E         tests/processors/test_payload_regressions.py::test_qsgd_malformed_bytes_fail_explicitly[?\x80\x00\x00\x00\x0fB@\x00\x01\x00\x01]
+E         tests/processors/test_payload_regressions.py::test_qsgd_malformed_bytes_fail_explicitly[?\x80\x00\x00\x00\x00\x00\x01\x00\x00\x01trailing]
+E         tests/processors/test_payload_regressions.py::test_numpy_feature_compression_preserves_empty_target_dtype
+E         tests/processors/test_payload_regressions.py::test_numpy_compression_empty_batch_and_strided_array
+E         tests/processors/test_payload_regressions.py::test_heterogeneous_feature_batches_are_rejected_before_compression
+E         tests/processors/test_payload_regressions.py::test_randomized_response_does_not_modify_source_model
+E         tests/processors/test_payload_regressions.py::test_pruning_uses_replaced_trainer_model
+E         tests/processors/test_payload_regressions.py::test_zero_noise_feature_processor_keeps_cpu_precision_and_targets
+E         tests/processors/test_processing_pipeline.py::test_quantize_then_compress_pipeline_roundtrip
+E         tests/processors/test_processing_pipeline.py::test_structured_pruning_zeroes_all_channels
+E         tests/processors/test_processing_pipeline.py::test_unstructured_pruning_removes_fraction_of_weights
+E         tests/samplers/test_partition_contracts.py::test_dirichlet_realized_count_is_stable_and_matches_loader[uniform]
+E         tests/samplers/test_partition_contracts.py::test_dirichlet_realized_count_is_stable_and_matches_loader[normal]
+E         tests/samplers/test_partition_contracts.py::test_empty_iid_fails_promptly_in_subprocess
+E         tests/samplers/test_partition_contracts.py::test_iid_padding_and_membership_reference
+E         tests/samplers/test_partition_contracts.py::test_seeded_sampler_construction_preserves_caller_rngs[iid]
+E         tests/samplers/test_partition_contracts.py::test_seeded_sampler_construction_preserves_caller_rngs[noniid]
+E         tests/samplers/test_partition_contracts.py::test_seeded_sampler_construction_preserves_caller_rngs[mixed]
+E         tests/samplers/test_partition_contracts.py::test_seeded_sampler_construction_preserves_caller_rngs[orthogonal]
+E         tests/samplers/test_partition_contracts.py::test_seeded_sampler_construction_preserves_caller_rngs[all_inclusive]
+E         tests/samplers/test_partition_contracts.py::test_seeded_sampler_construction_preserves_caller_rngs[distribution_noniid]
+E         tests/samplers/test_partition_contracts.py::test_seeded_sampler_construction_preserves_caller_rngs[label_quantity_noniid]
+E         tests/samplers/test_partition_contracts.py::test_seeded_sampler_construction_preserves_caller_rngs[mixed_label_quantity_noniid]
+E         tests/samplers/test_partition_contracts.py::test_seeded_sampler_construction_preserves_caller_rngs[sample_quantity_noniid]
+E         tests/samplers/test_partition_contracts.py::test_seeded_sampler_construction_preserves_caller_rngs[modality_iid]
+E         tests/samplers/test_partition_contracts.py::test_seeded_sampler_construction_preserves_caller_rngs[modality_quantity_noniid]
+E         tests/samplers/test_partition_contracts.py::test_full_class_partitions_cover_data_once_for_all_client_ids[label_quantity_noniid]
+E         tests/samplers/test_partition_contracts.py::test_full_class_partitions_cover_data_once_for_all_client_ids[mixed_label_quantity_noniid]
+E         tests/samplers/test_partition_contracts.py::test_label_quantity_without_anchors
+E         tests/samplers/test_partition_contracts.py::test_sample_quantity_condition_reports_selected_labels
+E         tests/samplers/test_partition_contracts.py::test_empty_indices_cannot_be_extended
+E         tests/samplers/test_partition_contracts.py::test_orthogonal_rejects_size_exceeding_assigned_classes
+E         tests/samplers/test_partition_contracts.py::test_partition_samplers_reject_out_of_range_ids[0-iid]
+E         tests/samplers/test_partition_contracts.py::test_partition_samplers_reject_out_of_range_ids[0-noniid]
+E         tests/samplers/test_partition_contracts.py::test_partition_samplers_reject_out_of_range_ids[0-mixed]
+E         tests/samplers/test_partition_contracts.py::test_partition_samplers_reject_out_of_range_ids[0-distribution_noniid]
+E         tests/samplers/test_partition_contracts.py::test_partition_samplers_reject_out_of_range_ids[0-label_quantity_noniid]
+E         tests/samplers/test_partition_contracts.py::test_partition_samplers_reject_out_of_range_ids[0-mixed_label_quantity_noniid]
+E         tests/samplers/test_partition_contracts.py::test_partition_samplers_reject_out_of_range_ids[0-sample_quantity_noniid]
+E         tests/samplers/test_partition_contracts.py::test_partition_samplers_reject_out_of_range_ids[3-iid]
+E         tests/samplers/test_partition_contracts.py::test_partition_samplers_reject_out_of_range_ids[3-noniid]
+E         tests/samplers/test_partition_contracts.py::test_partition_samplers_reject_out_of_range_ids[3-mixed]
+E         tests/samplers/test_partition_contracts.py::test_partition_samplers_reject_out_of_range_ids[3-distribution_noniid]
+E         tests/samplers/test_partition_contracts.py::test_partition_samplers_reject_out_of_range_ids[3-label_quantity_noniid]
+E         tests/samplers/test_partition_contracts.py::test_partition_samplers_reject_out_of_range_ids[3-mixed_label_quantity_noniid]
+E         tests/samplers/test_partition_contracts.py::test_partition_samplers_reject_out_of_range_ids[3-sample_quantity_noniid]
+E         tests/samplers/test_partition_contracts.py::test_dirichlet_skew_zero_minimum_is_valid
+E         tests/samplers/test_partition_contracts.py::test_single_dirichlet_partition_can_use_entire_dataset
+E         tests/samplers/test_partition_contracts.py::test_modality_quantity_single_modality_fallback
+E         tests/samplers/test_partition_contracts.py::test_infeasible_dirichlet_minimum_fails_promptly
+E         tests/samplers/test_partition_contracts.py::test_mixed_label_partitions_respect_excluded_anchor_pool
+E         tests/samplers/test_partition_contracts.py::test_infeasible_label_pool_fails_promptly
+E         tests/samplers/test_partition_contracts.py::test_real_cross_silo_configure_accepts_assigned_edge_evaluation_id[4]
+E         tests/samplers/test_partition_contracts.py::test_real_cross_silo_configure_accepts_assigned_edge_evaluation_id[5]
+E         tests/samplers/test_partition_contracts.py::test_dirichlet_rejects_unassigned_edge_or_training_ids[False-8101-3-3-True]
+E         tests/samplers/test_partition_contracts.py::test_dirichlet_rejects_unassigned_edge_or_training_ids[True-None-3-3-True]
+E         tests/samplers/test_partition_contracts.py::test_dirichlet_rejects_unassigned_edge_or_training_ids[True-8101-1-3-True]
+E         tests/samplers/test_partition_contracts.py::test_dirichlet_rejects_unassigned_edge_or_training_ids[True-8101-3-4-True]
+E         tests/samplers/test_partition_contracts.py::test_dirichlet_rejects_unassigned_edge_or_training_ids[True-8101-5-5-True]
+E         tests/samplers/test_partition_contracts.py::test_dirichlet_rejects_unassigned_edge_or_training_ids[True-8101-3-3-False]
+E         tests/samplers/test_registry.py::test_iid_sampler_is_deterministic_per_client
+E         tests/samplers/test_registry.py::test_iid_sampler_assigns_distinct_partitions
+E         tests/samplers/test_registry.py::test_sampler_reports_partition_size
+E         tests/samplers/test_registry.py::test_sampler_registry_accepts_explicit_sampler_type
+E         tests/samplers/test_registry.py::test_sampler_registry_uses_testset_sampler_when_testing
+E         tests/samplers/test_registry.py::test_sampler_registry_raises_for_unknown_sampler
+E         tests/samplers/test_sampling_behaviour.py::test_dirichlet_sampler_is_deterministic_per_client
+E         tests/samplers/test_sampling_behaviour.py::test_dirichlet_sampler_uses_test_targets_when_testing
+E         tests/samplers/test_sampling_behaviour.py::test_orthogonal_sampler_restricts_class_assignments
+E         tests/servers/test_fedavg_gan_aggregation_strategy.py::test_gan_aggregation_strategy_weighted_average
+E         tests/servers/test_fedavg_he_aggregation_strategy.py::test_he_aggregation_strategy_weighted_average_without_encryption
+E         tests/servers/test_fedavg_strategy.py::test_fedavg_aggregation_weighted_mean
+E         tests/servers/test_fedavg_strategy.py::test_fedavg_aggregation_skips_feature_payloads
+E         tests/servers/test_fedavg_strategy.py::test_aggregation_rejects_invalid_weights[-1-False-False]
+E         tests/servers/test_fedavg_strategy.py::test_aggregation_rejects_invalid_weights[-1-False-True]
+E         tests/servers/test_fedavg_strategy.py::test_aggregation_rejects_invalid_weights[-1-True-False]
+E         tests/servers/test_fedavg_strategy.py::test_aggregation_rejects_invalid_weights[-1-True-True]
+E         tests/servers/test_fedavg_strategy.py::test_aggregation_rejects_invalid_weights[nan-False-False]
+E         tests/servers/test_fedavg_strategy.py::test_aggregation_rejects_invalid_weights[nan-False-True]
+E         tests/servers/test_fedavg_strategy.py::test_aggregation_rejects_invalid_weights[nan-True-False]
+E         tests/servers/test_fedavg_strategy.py::test_aggregation_rejects_invalid_weights[nan-True-True]
+E         tests/servers/test_fedavg_strategy.py::test_aggregation_rejects_invalid_weights[inf-False-False]
+E         tests/servers/test_fedavg_strategy.py::test_aggregation_rejects_invalid_weights[inf-False-True]
+E         tests/servers/test_fedavg_strategy.py::test_aggregation_rejects_invalid_weights[inf-True-False]
+E         tests/servers/test_fedavg_strategy.py::test_aggregation_rejects_invalid_weights[inf-True-True]
+E         tests/servers/test_fedavg_strategy.py::test_aggregation_rejects_invalid_weights[-inf-False-False]
+E         tests/servers/test_fedavg_strategy.py::test_aggregation_rejects_invalid_weights[-inf-False-True]
+E         tests/servers/test_fedavg_strategy.py::test_aggregation_rejects_invalid_weights[-inf-True-False]
+E         tests/servers/test_fedavg_strategy.py::test_aggregation_rejects_invalid_weights[-inf-True-True]
+E         tests/servers/test_fedavg_strategy.py::test_aggregation_rejects_cardinality_mismatch[0-False]
+E         tests/servers/test_fedavg_strategy.py::test_aggregation_rejects_cardinality_mismatch[0-True]
+E         tests/servers/test_fedavg_strategy.py::test_aggregation_rejects_cardinality_mismatch[2-False]
+E         tests/servers/test_fedavg_strategy.py::test_aggregation_rejects_cardinality_mismatch[2-True]
+E         tests/servers/test_fedavg_strategy.py::test_server_validates_raw_and_hook_inputs_before_any_dispatch[negative-False-ordinary]
+E         tests/servers/test_fedavg_strategy.py::test_server_validates_raw_and_hook_inputs_before_any_dispatch[negative-False-legacy]
+E         tests/servers/test_fedavg_strategy.py::test_server_validates_raw_and_hook_inputs_before_any_dispatch[negative-False-delta]
+E         tests/servers/test_fedavg_strategy.py::test_server_validates_raw_and_hook_inputs_before_any_dispatch[negative-True-ordinary]
+E         tests/servers/test_fedavg_strategy.py::test_server_validates_raw_and_hook_inputs_before_any_dispatch[negative-True-legacy]
+E         tests/servers/test_fedavg_strategy.py::test_server_validates_raw_and_hook_inputs_before_any_dispatch[negative-True-delta]
+E         tests/servers/test_fedavg_strategy.py::test_server_validates_raw_and_hook_inputs_before_any_dispatch[nonfinite-False-ordinary]
+E         tests/servers/test_fedavg_strategy.py::test_server_validates_raw_and_hook_inputs_before_any_dispatch[nonfinite-False-legacy]
+E         tests/servers/test_fedavg_strategy.py::test_server_validates_raw_and_hook_inputs_before_any_dispatch[nonfinite-False-delta]
+E         tests/servers/test_fedavg_strategy.py::test_server_validates_raw_and_hook_inputs_before_any_dispatch[nonfinite-True-ordinary]
+E         tests/servers/test_fedavg_strategy.py::test_server_validates_raw_and_hook_inputs_before_any_dispatch[nonfinite-True-legacy]
+E         tests/servers/test_fedavg_strategy.py::test_server_validates_raw_and_hook_inputs_before_any_dispatch[nonfinite-True-delta]
+E         tests/servers/test_fedavg_strategy.py::test_server_validates_raw_and_hook_inputs_before_any_dispatch[hook_extra-False-ordinary]
+E         tests/servers/test_fedavg_strategy.py::test_server_validates_raw_and_hook_inputs_before_any_dispatch[hook_extra-False-legacy]
+E         tests/servers/test_fedavg_strategy.py::test_server_validates_raw_and_hook_inputs_before_any_dispatch[hook_extra-False-delta]
+E         tests/servers/test_fedavg_strategy.py::test_server_validates_raw_and_hook_inputs_before_any_dispatch[hook_extra-True-ordinary]
+E         tests/servers/test_fedavg_strategy.py::test_server_validates_raw_and_hook_inputs_before_any_dispatch[hook_extra-True-legacy]
+E         tests/servers/test_fedavg_strategy.py::test_server_validates_raw_and_hook_inputs_before_any_dispatch[hook_extra-True-delta]
+E         tests/servers/test_fedavg_strategy.py::test_server_validates_raw_and_hook_inputs_before_any_dispatch[hook_missing-False-ordinary]
+E         tests/servers/test_fedavg_strategy.py::test_server_validates_raw_and_hook_inputs_before_any_dispatch[hook_missing-False-legacy]
+E         tests/servers/test_fedavg_strategy.py::test_server_validates_raw_and_hook_inputs_before_any_dispatch[hook_missing-False-delta]
+E         tests/servers/test_fedavg_strategy.py::test_server_validates_raw_and_hook_inputs_before_any_dispatch[hook_missing-True-ordinary]
+E         tests/servers/test_fedavg_strategy.py::test_server_validates_raw_and_hook_inputs_before_any_dispatch[hook_missing-True-legacy]
+E         tests/servers/test_fedavg_strategy.py::test_server_validates_raw_and_hook_inputs_before_any_dispatch[hook_missing-True-delta]
+E         tests/servers/test_fedavg_strategy.py::test_server_preserves_fractional_and_zero_sample_dispatch[none-False-ordinary]
+E         tests/servers/test_fedavg_strategy.py::test_server_preserves_fractional_and_zero_sample_dispatch[none-False-legacy]
+E         tests/servers/test_fedavg_strategy.py::test_server_preserves_fractional_and_zero_sample_dispatch[none-False-delta]
+E         tests/servers/test_fedavg_strategy.py::test_server_preserves_fractional_and_zero_sample_dispatch[none-True-ordinary]
+E         tests/servers/test_fedavg_strategy.py::test_server_preserves_fractional_and_zero_sample_dispatch[none-True-legacy]
+E         tests/servers/test_fedavg_strategy.py::test_server_preserves_fractional_and_zero_sample_dispatch[none-True-delta]
+E         tests/servers/test_fedavg_strategy.py::test_server_preserves_fractional_and_zero_sample_dispatch[one-False-ordinary]
+E         tests/servers/test_fedavg_strategy.py::test_server_preserves_fractional_and_zero_sample_dispatch[one-False-legacy]
+E         tests/servers/test_fedavg_strategy.py::test_server_preserves_fractional_and_zero_sample_dispatch[one-False-delta]
+E         tests/servers/test_fedavg_strategy.py::test_server_preserves_fractional_and_zero_sample_dispatch[one-True-ordinary]
+E         tests/servers/test_fedavg_strategy.py::test_server_preserves_fractional_and_zero_sample_dispatch[one-True-legacy]
+E         tests/servers/test_fedavg_strategy.py::test_server_preserves_fractional_and_zero_sample_dispatch[one-True-delta]
+E         tests/servers/test_fedavg_strategy.py::test_server_preserves_fractional_and_zero_sample_dispatch[all-False-ordinary]
+E         tests/servers/test_fedavg_strategy.py::test_server_preserves_fractional_and_zero_sample_dispatch[all-False-legacy]
+E         tests/servers/test_fedavg_strategy.py::test_server_preserves_fractional_and_zero_sample_dispatch[all-False-delta]
+E         tests/servers/test_fedavg_strategy.py::test_server_preserves_fractional_and_zero_sample_dispatch[all-True-ordinary]
+E         tests/servers/test_fedavg_strategy.py::test_server_preserves_fractional_and_zero_sample_dispatch[all-True-legacy]
+E         tests/servers/test_fedavg_strategy.py::test_server_preserves_fractional_and_zero_sample_dispatch[all-True-delta]
+E         tests/servers/test_fedavg_strategy.py::test_feature_samples_do_not_dilute_fractional_weight_reference[False]
+E         tests/servers/test_fedavg_strategy.py::test_feature_samples_do_not_dilute_fractional_weight_reference[True]
+E         tests/servers/test_fedavg_strategy.py::test_fedavg_server_prefers_custom_delta_strategy_over_inherited_weights
+E         tests/servers/test_fedavg_strategy.py::test_fedavg_server_logged_items_flatten_evaluator_metrics
+E         tests/servers/test_fedavg_strategy.py::test_fedavg_server_logged_items_include_detailed_lighteval_metrics
+E         tests/servers/test_fedavg_strategy.py::test_fedavg_server_does_not_persist_evaluator_jsonl_sidecar
+E         tests/servers/test_feddf_server_strategy.py::test_feddf_server_process_reports_distills_global_model
+E         tests/servers/test_feddf_server_strategy.py::test_feddf_teacher_logits_average_uniformly_by_default
+E         tests/servers/test_he_payload_regressions.py::test_real_ckks_weighted_average_matches_plaintext[indices0]
+E         tests/servers/test_he_payload_regressions.py::test_real_ckks_weighted_average_matches_plaintext[indices1]
+E         tests/servers/test_he_payload_regressions.py::test_real_ckks_weighted_average_matches_plaintext[indices2]
+E         tests/servers/test_he_payload_regressions.py::test_invalid_he_payload_fails_before_model_mutation[cardinality]
+E         tests/servers/test_he_payload_regressions.py::test_invalid_he_payload_fails_before_model_mutation[negative]
+E         tests/servers/test_he_payload_regressions.py::test_invalid_he_payload_fails_before_model_mutation[nan]
+E         tests/servers/test_he_payload_regressions.py::test_invalid_he_payload_fails_before_model_mutation[inf]
+E         tests/servers/test_he_payload_regressions.py::test_invalid_he_payload_fails_before_model_mutation[mask]
+E         tests/servers/test_he_payload_regressions.py::test_invalid_he_payload_fails_before_model_mutation[length]
+E         tests/servers/test_he_payload_regressions.py::test_he_zero_sample_round_keeps_baseline
+E         tests/servers/test_he_payload_regressions.py::test_encryption_does_not_reorder_caller_mask
+E         tests/servers/test_he_payload_regressions.py::test_encryption_rejects_ambiguous_mask[indices0]
+E         tests/servers/test_he_payload_regressions.py::test_encryption_rejects_ambiguous_mask[indices1]
+E         tests/servers/test_he_payload_regressions.py::test_encryption_rejects_ambiguous_mask[indices2]
+E         tests/servers/test_he_payload_regressions.py::test_decrypt_rejects_excess_plaintext_instead_of_dropping_it
+E         tests/servers/test_he_payload_regressions.py::test_default_he_processor_wire_pipeline_roundtrip
+E         tests/servers/test_hermes_aggregation_strategy.py::test_hermes_aggregation_strategy_produces_weighted_average
+E         tests/servers/test_lifecycle_contracts.py::test_fedbuff_preserves_uniform_research_weighting
+E         tests/servers/test_lifecycle_contracts.py::test_fedasync_actual_example_preserves_staleness_mixing
+E         tests/servers/test_lifecycle_contracts.py::test_async_periodic_aggregation_respects_minimum_and_round_order
+E         tests/servers/test_lifecycle_contracts.py::test_cross_silo_invalid_hook_output_preserves_trainer_identity
+E         tests/servers/test_lifecycle_contracts.py::test_async_partial_round_replaces_only_idle_workers[False]
+E         tests/servers/test_lifecycle_contracts.py::test_async_partial_round_replaces_only_idle_workers[True]
+E         tests/servers/test_personalized_selection_strategy.py::test_personalized_selection_respects_ratio
+E         tests/servers/test_personalized_selection_strategy.py::test_personalized_selection_ensures_minimum_candidates
+E         tests/servers/test_personalized_selection_strategy.py::test_personalized_selection_uses_all_clients_after_regular_rounds
+E         tests/servers/test_personalized_selection_strategy.py::test_personalized_selection_clamps_ratio
+E         tests/servers/test_pfedgraph_aggregation_strategy.py::test_project_to_simplex_returns_probability_vector
+E         tests/servers/test_pfedgraph_aggregation_strategy.py::test_pfedgraph_aggregation_updates_client_models
+E         tests/servers/test_port_checkpoint_flow.py::test_actual_port_hook_to_stale_similarity_and_aggregation[False]
+E         tests/servers/test_port_checkpoint_flow.py::test_actual_port_hook_to_stale_similarity_and_aggregation[True]
+E         tests/servers/test_runtime_disconnect_recovery.py::test_batched_urgent_loss_recovers_with_completed_reports[False]
+E         tests/servers/test_runtime_disconnect_recovery.py::test_batched_urgent_loss_recovers_with_completed_reports[True]
+E         tests/servers/test_runtime_disconnect_recovery.py::test_default_disconnect_policy_closes_batched_urgent_work[None]
+E         tests/servers/test_runtime_disconnect_recovery.py::test_default_disconnect_policy_closes_batched_urgent_work[True]
+E         tests/servers/test_runtime_disconnect_recovery.py::test_assignment_rejects_unregistered_session_before_mutation
+E         tests/servers/test_runtime_review_regressions.py::test_partial_urgency_preserves_heap_order[3]
+E         tests/servers/test_runtime_review_regressions.py::test_partial_urgency_preserves_heap_order[4]
+E         tests/servers/test_runtime_review_regressions.py::test_earlier_response_never_rewinds_simulated_time
+E         tests/servers/test_runtime_review_regressions.py::test_batched_shared_worker_completes_every_urgent_response
+E         tests/servers/test_runtime_review_regressions.py::test_distinct_workers_remain_concurrent_during_urgency
+E         tests/servers/test_runtime_review_regressions.py::test_distinct_retained_transfers_survive_worker_reuse_and_cleanup
+E         tests/servers/test_runtime_s3_contract.py::test_actual_s3_writer_to_bounded_reader[valid-False-]
+E         tests/servers/test_runtime_s3_contract.py::test_actual_s3_writer_to_bounded_reader[valid-False-prefix]
+E         tests/servers/test_runtime_s3_contract.py::test_actual_s3_writer_to_bounded_reader[valid-False-nested/prefix]
+E         tests/servers/test_runtime_s3_contract.py::test_actual_s3_writer_to_bounded_reader[valid-False-prefix/]
+E         tests/servers/test_runtime_s3_contract.py::test_actual_s3_writer_to_bounded_reader[valid-True-]
+E         tests/servers/test_runtime_s3_contract.py::test_actual_s3_writer_to_bounded_reader[valid-True-prefix]
+E         tests/servers/test_runtime_s3_contract.py::test_actual_s3_writer_to_bounded_reader[valid-True-nested/prefix]
+E         tests/servers/test_runtime_s3_contract.py::test_actual_s3_writer_to_bounded_reader[valid-True-prefix/]
+E         tests/servers/test_runtime_s3_contract.py::test_actual_s3_writer_to_bounded_reader[oversize-False-]
+E         tests/servers/test_runtime_s3_contract.py::test_actual_s3_writer_to_bounded_reader[oversize-False-prefix]
+E         tests/servers/test_runtime_s3_contract.py::test_actual_s3_writer_to_bounded_reader[oversize-False-nested/prefix]
+E         tests/servers/test_runtime_s3_contract.py::test_actual_s3_writer_to_bounded_reader[oversize-False-prefix/]
+E         tests/servers/test_runtime_s3_contract.py::test_actual_s3_writer_to_bounded_reader[oversize-True-]
+E         tests/servers/test_runtime_s3_contract.py::test_actual_s3_writer_to_bounded_reader[oversize-True-prefix]
+E         tests/servers/test_runtime_s3_contract.py::test_actual_s3_writer_to_bounded_reader[oversize-True-nested/prefix]
+E         tests/servers/test_runtime_s3_contract.py::test_actual_s3_writer_to_bounded_reader[oversize-True-prefix/]
+E         tests/servers/test_runtime_s3_contract.py::test_actual_s3_writer_to_bounded_reader[deadline-False-]
+E         tests/servers/test_runtime_s3_contract.py::test_actual_s3_writer_to_bounded_reader[deadline-False-prefix]
+E         tests/servers/test_runtime_s3_contract.py::test_actual_s3_writer_to_bounded_reader[deadline-False-nested/prefix]
+E         tests/servers/test_runtime_s3_contract.py::test_actual_s3_writer_to_bounded_reader[deadline-False-prefix/]
+E         tests/servers/test_runtime_s3_contract.py::test_actual_s3_writer_to_bounded_reader[deadline-True-]
+E         tests/servers/test_runtime_s3_contract.py::test_actual_s3_writer_to_bounded_reader[deadline-True-prefix]
+E         tests/servers/test_runtime_s3_contract.py::test_actual_s3_writer_to_bounded_reader[deadline-True-nested/prefix]
+E         tests/servers/test_runtime_s3_contract.py::test_actual_s3_writer_to_bounded_reader[deadline-True-prefix/]
+E         tests/servers/test_runtime_s3_contract.py::test_actual_s3_client_failure_clears_transfer[oversize-False]
+E         tests/servers/test_runtime_s3_contract.py::test_actual_s3_client_failure_clears_transfer[oversize-True]
+E         tests/servers/test_runtime_s3_contract.py::test_actual_s3_client_failure_clears_transfer[deadline-False]
+E         tests/servers/test_runtime_s3_contract.py::test_actual_s3_client_failure_clears_transfer[deadline-True]
+E         tests/servers/test_runtime_s3_contract.py::test_minimal_s3_adapter_prefixes_exactly_once[False-]
+E         tests/servers/test_runtime_s3_contract.py::test_minimal_s3_adapter_prefixes_exactly_once[False-prefix]
+E         tests/servers/test_runtime_s3_contract.py::test_minimal_s3_adapter_prefixes_exactly_once[False-nested/prefix]
+E         tests/servers/test_runtime_s3_contract.py::test_minimal_s3_adapter_prefixes_exactly_once[False-/prefix/]
+E         tests/servers/test_runtime_s3_contract.py::test_minimal_s3_adapter_prefixes_exactly_once[True-]
+E         tests/servers/test_runtime_s3_contract.py::test_minimal_s3_adapter_prefixes_exactly_once[True-prefix]
+E         tests/servers/test_runtime_s3_contract.py::test_minimal_s3_adapter_prefixes_exactly_once[True-nested/prefix]
+E         tests/servers/test_runtime_s3_contract.py::test_minimal_s3_adapter_prefixes_exactly_once[True-/prefix/]
+E         tests/servers/test_runtime_s3_contract.py::test_client_buffer_cap_applies_below_payload_cap[socket]
+E         tests/servers/test_runtime_s3_contract.py::test_client_buffer_cap_applies_below_payload_cap[s3]
+E         tests/servers/test_runtime_transport.py::test_report_rejects_unassigned_identity_before_parsing[worker-2]
+E         tests/servers/test_runtime_transport.py::test_report_rejects_unassigned_identity_before_parsing[unknown-2]
+E         tests/servers/test_runtime_transport.py::test_report_embedded_identity_cannot_target_another_client
+E         tests/servers/test_runtime_transport.py::test_unknown_or_stale_session_rejected_at_every_payload_stage[chunk-unknown]
+E         tests/servers/test_runtime_transport.py::test_unknown_or_stale_session_rejected_at_every_payload_stage[chunk-stale]
+E         tests/servers/test_runtime_transport.py::test_unknown_or_stale_session_rejected_at_every_payload_stage[part-unknown]
+E         tests/servers/test_runtime_transport.py::test_unknown_or_stale_session_rejected_at_every_payload_stage[part-stale]
+E         tests/servers/test_runtime_transport.py::test_unknown_or_stale_session_rejected_at_every_payload_stage[done-unknown]
+E         tests/servers/test_runtime_transport.py::test_unknown_or_stale_session_rejected_at_every_payload_stage[done-stale]
+E         tests/servers/test_runtime_transport.py::test_unknown_or_stale_session_rejected_at_every_payload_stage[s3-unknown]
+E         tests/servers/test_runtime_transport.py::test_unknown_or_stale_session_rejected_at_every_payload_stage[s3-stale]
+E         tests/servers/test_runtime_transport.py::test_payload_identity_checked_before_parsing_or_s3[part]
+E         tests/servers/test_runtime_transport.py::test_payload_identity_checked_before_parsing_or_s3[done]
+E         tests/servers/test_runtime_transport.py::test_payload_identity_checked_before_parsing_or_s3[s3]
+E         tests/servers/test_runtime_transport.py::test_malformed_part_releases_only_sender_buffers[broken]
+E         tests/servers/test_runtime_transport.py::test_malformed_part_releases_only_sender_buffers[\x80\x04K\x01]
+E         tests/servers/test_runtime_transport.py::test_malformed_part_releases_only_sender_buffers[\x80\x04K\x01.x]
+E         tests/servers/test_runtime_transport.py::test_server_limits_apply_across_parts_and_preserve_other_client[chunk_bytes]
+E         tests/servers/test_runtime_transport.py::test_server_limits_apply_across_parts_and_preserve_other_client[payload_bytes]
+E         tests/servers/test_runtime_transport.py::test_server_limits_apply_across_parts_and_preserve_other_client[chunks]
+E         tests/servers/test_runtime_transport.py::test_server_limits_apply_across_parts_and_preserve_other_client[parts]
+E         tests/servers/test_runtime_transport.py::test_server_limits_apply_across_parts_and_preserve_other_client[buffered]
+E         tests/servers/test_runtime_transport.py::test_report_limit_rejects_before_pickle_parsing
+E         tests/servers/test_runtime_transport.py::test_incomplete_transfer_expires_without_next_message[False]
+E         tests/servers/test_runtime_transport.py::test_incomplete_transfer_expires_without_next_message[True]
+E         tests/servers/test_runtime_transport.py::test_duplicate_report_does_not_replace_active_payload
+E         tests/servers/test_runtime_transport.py::test_s3_reference_cannot_borrow_another_client_key[client_payload_2_ABC123]
+E         tests/servers/test_runtime_transport.py::test_s3_reference_cannot_borrow_another_client_key[client_payload_7_ABC123/extra]
+E         tests/servers/test_runtime_transport.py::test_s3_reference_cannot_borrow_another_client_key[other]
+E         tests/servers/test_runtime_transport.py::test_socket_completion_round_boundaries_and_cleanup[False]
+E         tests/servers/test_runtime_transport.py::test_socket_completion_round_boundaries_and_cleanup[True]
+E         tests/servers/test_runtime_transport.py::test_reused_worker_accepts_only_new_server_issued_assignment
+E         tests/servers/test_runtime_transport.py::test_actual_urgent_request_and_writer_use_requested_logical_client
+E         tests/servers/test_runtime_transport.py::test_all_buffered_stale_clients_receive_urgent_requests
+E         tests/servers/test_runtime_transport.py::test_disconnect_cleans_urgent_assignment_without_touching_other_client
+E         tests/servers/test_runtime_transport.py::test_cross_silo_edge_identity_follows_actual_central_selection
+E         tests/servers/test_runtime_transport.py::test_completed_unaggregated_payloads_still_count_toward_buffer_limit
+E         tests/servers/test_runtime_transport.py::test_s3_ingress_uses_bounded_actual_http_reader[valid]
+E         tests/servers/test_runtime_transport.py::test_s3_ingress_uses_bounded_actual_http_reader[oversized]
+E         tests/servers/test_runtime_transport.py::test_s3_ingress_uses_bounded_actual_http_reader[streamed_oversize]
+E         tests/servers/test_runtime_transport.py::test_s3_ingress_uses_bounded_actual_http_reader[truncated]
+E         tests/servers/test_runtime_transport.py::test_s3_ingress_uses_bounded_actual_http_reader[incomplete]
+E         tests/servers/test_server_resume_rng.py::test_actual_checkpoint_continues_selection_through_run[zero-configured-seed-ordinary]
+E         tests/servers/test_server_resume_rng.py::test_actual_checkpoint_continues_selection_through_run[zero-configured-seed-central]
+E         tests/servers/test_server_resume_rng.py::test_actual_checkpoint_continues_selection_through_run[zero-no-seed-ordinary]
+E         tests/servers/test_server_resume_rng.py::test_actual_checkpoint_continues_selection_through_run[zero-no-seed-central]
+E         tests/servers/test_server_resume_rng.py::test_actual_checkpoint_continues_selection_through_run[one-configured-seed-ordinary]
+E         tests/servers/test_server_resume_rng.py::test_actual_checkpoint_continues_selection_through_run[one-configured-seed-central]
+E         tests/servers/test_server_resume_rng.py::test_actual_checkpoint_continues_selection_through_run[one-no-seed-ordinary]
+E         tests/servers/test_server_resume_rng.py::test_actual_checkpoint_continues_selection_through_run[one-no-seed-central]
+E         tests/servers/test_server_resume_rng.py::test_actual_checkpoint_continues_selection_through_run[many-configured-seed-ordinary]
+E         tests/servers/test_server_resume_rng.py::test_actual_checkpoint_continues_selection_through_run[many-configured-seed-central]
+E         tests/servers/test_server_resume_rng.py::test_actual_checkpoint_continues_selection_through_run[many-no-seed-ordinary]
+E         tests/servers/test_server_resume_rng.py::test_actual_checkpoint_continues_selection_through_run[many-no-seed-central]
+E         tests/servers/test_server_resume_rng.py::test_legacy_global_rng_tuple_remains_readable[ordinary]
+E         tests/servers/test_server_resume_rng.py::test_legacy_global_rng_tuple_remains_readable[central]
+E         tests/servers/test_server_resume_rng.py::test_fresh_run_keeps_configured_seed_or_initial_selection_state[configured-seed-ordinary]
+E         tests/servers/test_server_resume_rng.py::test_fresh_run_keeps_configured_seed_or_initial_selection_state[configured-seed-central]
+E         tests/servers/test_server_resume_rng.py::test_fresh_run_keeps_configured_seed_or_initial_selection_state[no-seed-ordinary]
+E         tests/servers/test_server_resume_rng.py::test_fresh_run_keeps_configured_seed_or_initial_selection_state[no-seed-central]
+E         tests/servers/test_server_resume_rng.py::test_custom_resume_override_owns_selection_state_without_session_flag[ordinary]
+E         tests/servers/test_server_resume_rng.py::test_custom_resume_override_owns_selection_state_without_session_flag[central]
+E         tests/servers/test_server_resume_rng.py::test_malformed_resume_propagates_before_process_or_socket_start[current_round.pkl-UnpicklingError-ordinary]
+E         tests/servers/test_server_resume_rng.py::test_malformed_resume_propagates_before_process_or_socket_start[current_round.pkl-UnpicklingError-central]
+E         tests/servers/test_server_resume_rng.py::test_malformed_resume_propagates_before_process_or_socket_start[numpy_prng_state_2.pkl-UnpicklingError-ordinary]
+E         tests/servers/test_server_resume_rng.py::test_malformed_resume_propagates_before_process_or_socket_start[numpy_prng_state_2.pkl-UnpicklingError-central]
+E         tests/servers/test_server_resume_rng.py::test_malformed_resume_propagates_before_process_or_socket_start[prng_state_2.pkl-UnpicklingError-ordinary]
+E         tests/servers/test_server_resume_rng.py::test_malformed_resume_propagates_before_process_or_socket_start[prng_state_2.pkl-UnpicklingError-central]
+E         tests/servers/test_server_resume_rng.py::test_malformed_resume_propagates_before_process_or_socket_start[checkpoint_lenet5_2.safetensors-SafetensorError-ordinary]
+E         tests/servers/test_server_resume_rng.py::test_malformed_resume_propagates_before_process_or_socket_start[checkpoint_lenet5_2.safetensors-SafetensorError-central]
+E         tests/servers/test_split_learning_selection_strategy.py::test_split_learning_reuses_client_until_release
+E         tests/servers/test_split_learning_selection_strategy.py::test_split_learning_cycles_through_clients
+E         tests/servers/test_split_learning_selection_strategy.py::test_split_learning_rejects_multiple_clients
+E         tests/test_config_loader.py::test_toml_loader_resolves_include_and_overrides
+E         tests/test_config_loader.py::test_toml_loader_handles_none_and_mixed_lists
+E         tests/test_config_loader.py::test_config_node_replace_and_asdict
+E         tests/test_config_loader.py::test_cli_arguments_override_config_values
+E         tests/test_config_loader.py::test_config_base_path_used_without_cli_override
+E         tests/test_config_loader.py::test_config_loads_evaluation_section
+E         tests/test_config_loader.py::test_is_central_server_requires_cross_silo_true
+E         tests/test_config_loader.py::test_toml_loader_allows_shared_includes
+E         tests/test_config_loader.py::test_toml_loader_detects_circular_includes
+E         tests/test_config_loader.py::test_config_reload_discards_optional_sections_in_both_orders
+E         tests/test_config_loader.py::test_speed_simulation_preserves_rng_and_seeded_values
+E         tests/test_config_loader.py::test_nested_include_order_deep_overrides_and_list_concatenation
+E         tests/test_config_loader.py::test_invalid_include_fails_usefully[include = 3]
+E         tests/test_config_loader.py::test_invalid_include_fails_usefully[include = "missing.toml"]
+E         tests/test_config_loader.py::test_environment_config_and_client_cli_overrides
+E         tests/test_huggingface_artifacts.py::test_tokenizer_revision_follows_only_same_model_repository[None-None-model-pin]
+E         tests/test_huggingface_artifacts.py::test_tokenizer_revision_follows_only_same_model_repository[other-tokenizer-None-main]
+E         tests/test_huggingface_artifacts.py::test_tokenizer_revision_follows_only_same_model_repository[other-tokenizer-tokenizer-pin-tokenizer-pin]
+E         tests/test_huggingface_artifacts.py::test_all_hf_loaders_propagate_exact_revisions_with_real_local_artifacts
+E         tests/test_huggingface_artifacts.py::test_pinned_model_loader_failure_never_retries_main
+E         tests/test_huggingface_artifacts.py::test_pinned_tokenizer_failure_never_retries_main
+E         tests/test_huggingface_artifacts.py::test_dataset_cache_identity_includes_revision_local_path_and_content
+E         tests/test_huggingface_artifacts.py::test_pinned_dataset_does_not_accept_legacy_unpinned_cache
+E         tests/test_mlx_import_contract.py::test_real_core_collection_does_not_import_or_probe_mlx[target0]
+E         tests/test_mlx_import_contract.py::test_real_core_collection_does_not_import_or_probe_mlx[target1]
+E         tests/test_mlx_import_contract.py::test_real_core_collection_does_not_import_or_probe_mlx[target2]
+E         tests/test_mlx_import_contract.py::test_real_core_collection_does_not_import_or_probe_mlx[target3]
+E         tests/test_mlx_import_contract.py::test_real_conftest_survives_backend_import_sentinel
+E         tests/test_mlx_import_contract.py::test_real_unsupported_native_routing_never_initializes_backend[canonical]
+E         tests/test_mlx_import_contract.py::test_real_unsupported_native_routing_never_initializes_backend[dotted-alias]
+E         tests/test_mlx_import_contract.py::test_real_unsupported_native_routing_never_initializes_backend[bare-alias]
+E         tests/test_mlx_import_contract.py::test_real_core_pyargs_preserves_import_isolation
+E         tests/test_mlx_import_contract.py::test_real_focused_native_backend_import_starts_in_preflight
+E         tests/test_mlx_profile_contract.py::test_core_scope_excludes_native_before_import[arguments0]
+E         tests/test_mlx_profile_contract.py::test_core_scope_excludes_native_before_import[arguments1]
+E         tests/test_mlx_profile_contract.py::test_core_scope_excludes_native_before_import[arguments2]
+E         tests/test_mlx_profile_contract.py::test_core_scope_excludes_native_before_import[arguments3]
+E         tests/test_mlx_profile_contract.py::test_core_scope_excludes_native_before_import[arguments4]
+E         tests/test_mlx_profile_contract.py::test_core_scope_excludes_native_before_import[arguments5]
+E         tests/test_mlx_profile_contract.py::test_core_scope_excludes_native_before_import[arguments6]
+E         tests/test_mlx_profile_contract.py::test_core_scope_excludes_native_before_import[arguments7]
+E         tests/test_mlx_profile_contract.py::test_explicit_native_conflicts_fail_before_import[base-tests/mlx_native]
+E         tests/test_mlx_profile_contract.py::test_explicit_native_conflicts_fail_before_import[base-tests/mlx_native/test_native.py]
+E         tests/test_mlx_profile_contract.py::test_explicit_native_conflicts_fail_before_import[base-tests/mlx_native/test_native.py::test_native[one]]
+E         tests/test_mlx_profile_contract.py::test_explicit_native_conflicts_fail_before_import[mandatory-tests/mlx_native]
+E         tests/test_mlx_profile_contract.py::test_explicit_native_conflicts_fail_before_import[mandatory-tests/mlx_native/test_native.py]
+E         tests/test_mlx_profile_contract.py::test_explicit_native_conflicts_fail_before_import[mandatory-tests/mlx_native/test_native.py::test_native[one]]
+E         tests/test_mlx_profile_contract.py::test_canonical_native_pyargs_rejected_before_import[options0-tests.mlx_native]
+E         tests/test_mlx_profile_contract.py::test_canonical_native_pyargs_rejected_before_import[options0-tests.mlx_native.test_native]
+E         tests/test_mlx_profile_contract.py::test_canonical_native_pyargs_rejected_before_import[options0-tests.mlx_native.test_native::test_native[one]]
+E         tests/test_mlx_profile_contract.py::test_canonical_native_pyargs_rejected_before_import[options1-tests.mlx_native]
+E         tests/test_mlx_profile_contract.py::test_canonical_native_pyargs_rejected_before_import[options1-tests.mlx_native.test_native]
+E         tests/test_mlx_profile_contract.py::test_canonical_native_pyargs_rejected_before_import[options1-tests.mlx_native.test_native::test_native[one]]
+E         tests/test_mlx_profile_contract.py::test_canonical_native_pyargs_rejected_before_import[options2-tests.mlx_native]
+E         tests/test_mlx_profile_contract.py::test_canonical_native_pyargs_rejected_before_import[options2-tests.mlx_native.test_native]
+E         tests/test_mlx_profile_contract.py::test_canonical_native_pyargs_rejected_before_import[options2-tests.mlx_native.test_native::test_native[one]]
+E         tests/test_mlx_profile_contract.py::test_canonical_native_pyargs_rejected_before_import[options3-tests.mlx_native]
+E         tests/test_mlx_profile_contract.py::test_canonical_native_pyargs_rejected_before_import[options3-tests.mlx_native.test_native]
+E         tests/test_mlx_profile_contract.py::test_canonical_native_pyargs_rejected_before_import[options3-tests.mlx_native.test_native::test_native[one]]
+E         tests/test_mlx_profile_contract.py::test_alternative_pyargs_route_is_guarded_before_collector
+E         tests/test_mlx_profile_contract.py::test_bare_native_module_alias_is_guarded_before_import
+E         tests/test_mlx_profile_contract.py::test_native_filesystem_target_with_pyargs_is_rejected_early
+E         tests/test_mlx_profile_contract.py::test_focused_native_filesystem_preflight_precedes_import[relative]
+E         tests/test_mlx_profile_contract.py::test_focused_native_filesystem_preflight_precedes_import[absolute]
+E         tests/test_mlx_profile_contract.py::test_focused_native_filesystem_preflight_precedes_import[from-tests]
+E         tests/test_mlx_profile_contract.py::test_focused_native_filesystem_preflight_precedes_import[mixed]
+E         tests/test_mlx_profile_contract.py::test_native_qualification_rejects_effective_filters[False-arguments0]
+E         tests/test_mlx_profile_contract.py::test_native_qualification_rejects_effective_filters[False-arguments1]
+E         tests/test_mlx_profile_contract.py::test_native_qualification_rejects_effective_filters[False-arguments2]
+E         tests/test_mlx_profile_contract.py::test_native_qualification_rejects_effective_filters[False-arguments3]
+E         tests/test_mlx_profile_contract.py::test_native_qualification_rejects_effective_filters[False-arguments4]
+E         tests/test_mlx_profile_contract.py::test_native_qualification_rejects_effective_filters[False-arguments5]
+E         tests/test_mlx_profile_contract.py::test_native_qualification_rejects_effective_filters[True-arguments0]
+E         tests/test_mlx_profile_contract.py::test_native_qualification_rejects_effective_filters[True-arguments1]
+E         tests/test_mlx_profile_contract.py::test_native_qualification_rejects_effective_filters[True-arguments2]
+E         tests/test_mlx_profile_contract.py::test_native_qualification_rejects_effective_filters[True-arguments3]
+E         tests/test_mlx_profile_contract.py::test_native_qualification_rejects_effective_filters[True-arguments4]
+E         tests/test_mlx_profile_contract.py::test_native_qualification_rejects_effective_filters[True-arguments5]
+E         tests/test_mlx_profile_contract.py::test_native_qualification_rejects_ini_addopts_filters
+E         tests/test_mlx_profile_contract.py::test_marker_only_native_request_is_diagnostic
+E         tests/test_mlx_profile_contract.py::test_exact_native_ledger_succeeds_with_honest_summary[False]
+E         tests/test_mlx_profile_contract.py::test_exact_native_ledger_succeeds_with_honest_summary[True]
+E         tests/test_mlx_profile_contract.py::test_changed_native_collection_cannot_qualify[missing]
+E         tests/test_mlx_profile_contract.py::test_changed_native_collection_cannot_qualify[extra]
+E         tests/test_mlx_profile_contract.py::test_changed_native_collection_cannot_qualify[parameter]
+E         tests/test_mlx_profile_contract.py::test_changed_native_collection_cannot_qualify[duplicate]
+E         tests/test_mlx_profile_contract.py::test_invalid_native_ledger_fails_clearly[ledger0]
+E         tests/test_mlx_profile_contract.py::test_invalid_native_ledger_fails_clearly[ledger1]
+E         tests/test_mlx_profile_contract.py::test_invalid_native_ledger_fails_clearly[ledger2]
+E         tests/test_mlx_profile_contract.py::test_invalid_native_ledger_fails_clearly[ledger3]
+E         tests/test_mlx_profile_contract.py::test_duplicate_native_ledger_fails_clearly
+E         tests/test_mlx_profile_contract.py::test_native_outcomes_never_disappear_behind_success[False-skip]
+E         tests/test_mlx_profile_contract.py::test_native_outcomes_never_disappear_behind_success[False-collect-skip]
+E         tests/test_mlx_profile_contract.py::test_native_outcomes_never_disappear_behind_success[False-xfail]
+E         tests/test_mlx_profile_contract.py::test_native_outcomes_never_disappear_behind_success[False-strict-xfail]
+E         tests/test_mlx_profile_contract.py::test_native_outcomes_never_disappear_behind_success[False-xpass]
+E         tests/test_mlx_profile_contract.py::test_native_outcomes_never_disappear_behind_success[False-setup-failure]
+E         tests/test_mlx_profile_contract.py::test_native_outcomes_never_disappear_behind_success[False-teardown-failure]
+E         tests/test_mlx_profile_contract.py::test_native_outcomes_never_disappear_behind_success[True-skip]
+E         tests/test_mlx_profile_contract.py::test_native_outcomes_never_disappear_behind_success[True-collect-skip]
+E         tests/test_mlx_profile_contract.py::test_native_outcomes_never_disappear_behind_success[True-xfail]
+E         tests/test_mlx_profile_contract.py::test_native_outcomes_never_disappear_behind_success[True-strict-xfail]
+E         tests/test_mlx_profile_contract.py::test_native_outcomes_never_disappear_behind_success[True-xpass]
+E         tests/test_mlx_profile_contract.py::test_native_outcomes_never_disappear_behind_success[True-setup-failure]
+E         tests/test_mlx_profile_contract.py::test_native_outcomes_never_disappear_behind_success[True-teardown-failure]
+E         tests/test_mlx_profile_contract.py::test_subset_native_profile_requires_entire_ledger
+E         tests/test_mlx_profile_contract.py::test_native_marker_outside_boundary_is_layout_error
+E         tests/test_mlx_profile_contract.py::test_existing_core_runtime_partitions_keep_their_ledger[base-runtime]
+E         tests/test_mlx_profile_contract.py::test_existing_core_runtime_partitions_keep_their_ledger[base-not runtime]
+E         tests/test_mlx_profile_contract.py::test_existing_core_runtime_partitions_keep_their_ledger[mandatory-runtime]
+E         tests/test_mlx_profile_contract.py::test_existing_core_runtime_partitions_keep_their_ledger[mandatory-not runtime]
+E         tests/test_mlx_profile_contract.py::test_existing_core_collection_exclusions_remain_failures
+E         tests/test_mlx_profile_contract.py::test_native_profile_with_core_only_target_cannot_qualify
+E         tests/test_mlx_profile_contract.py::test_native_pyargs_profile_rejects_ordinary_core_target
+E         tests/test_mlx_profile_contract.py::test_native_ledger_invalid_json_is_scoped
+E         tests/test_mlx_profile_contract.py::test_native_profile_duplicate_explicit_file_cannot_qualify
+E         tests/test_mlx_profile_contract.py::test_actual_missing_mlx_guard_rejects_before_module_import
+E         tests/test_mlx_profile_contract.py::test_unpreflighted_file_wrapper_rejects_before_yield
+E         tests/test_mlx_profile_contract.py::test_native_manual_configure_does_not_probe
+E         tests/test_mlx_profile_contract.py::test_native_prerequisite_forces_cpu_and_gpu_and_restores_streams
+E         tests/test_mlx_profile_contract.py::test_native_prerequisite_failures_are_scoped_and_preserve_cause[cpu]
+E         tests/test_mlx_profile_contract.py::test_native_prerequisite_failures_are_scoped_and_preserve_cause[gpu]
+E         tests/test_mlx_profile_contract.py::test_native_prerequisite_failures_are_scoped_and_preserve_cause[metadata]
+E         tests/test_mlx_profile_contract.py::test_native_prerequisite_failures_are_scoped_and_preserve_cause[import]
+E         tests/test_mlx_profile_contract.py::test_native_prerequisite_failures_are_scoped_and_preserve_cause[metal]
+E         tests/test_mlx_profile_contract.py::test_native_prerequisite_failures_are_scoped_and_preserve_cause[version]
+E         tests/test_mlx_profile_contract.py::test_native_prerequisite_failures_are_scoped_and_preserve_cause[nan]
+E         tests/test_mlx_profile_contract.py::test_native_prerequisite_failures_are_scoped_and_preserve_cause[wrong]
+E         tests/test_mlx_profile_contract.py::test_native_selected_platform_failure_does_not_import[Linux-aarch64]
+E         tests/test_mlx_profile_contract.py::test_native_selected_platform_failure_does_not_import[Darwin-x86_64]
+E         tests/test_mlx_profile_contract.py::test_native_prerequisite_preserves_keyboard_interrupt
+E         tests/test_retired_backends.py::test_retired_model_selection_fails_with_archive_guidance[nanochat]
+E         tests/test_retired_backends.py::test_retired_model_selection_fails_with_archive_guidance[smolvla]
+E         tests/test_retired_backends.py::test_retired_trainer_selection_fails_with_archive_guidance[nanochat]
+E         tests/test_retired_backends.py::test_retired_trainer_selection_fails_with_archive_guidance[lerobot]
+E         tests/test_retired_backends.py::test_retired_datasource_selection_fails_with_archive_guidance[False-Nanochat]
+E         tests/test_retired_backends.py::test_retired_datasource_selection_fails_with_archive_guidance[False-LeRobot]
+E         tests/test_retired_backends.py::test_retired_datasource_selection_fails_with_archive_guidance[True-Nanochat]
+E         tests/test_retired_backends.py::test_retired_datasource_selection_fails_with_archive_guidance[True-LeRobot]
+E         tests/test_retired_backends.py::test_retired_evaluator_cannot_silently_disappear[False]
+E         tests/test_retired_backends.py::test_retired_evaluator_cannot_silently_disappear[True]
+E         tests/test_retired_backends.py::test_retired_evaluator_cannot_run_via_override
+E         tests/test_retired_backends.py::test_retirement_archive_preserves_original_bytes[nanochat]
+E         tests/test_retired_backends.py::test_retirement_archive_preserves_original_bytes[lerobot]
+E         tests/test_retired_backends.py::test_nanochat_upstream_archive_preserves_pinned_source_and_notice
+E         tests/test_retired_backends.py::test_retired_runtime_modules_are_unavailable[plato.models.nanochat]
+E         tests/test_retired_backends.py::test_retired_runtime_modules_are_unavailable[plato.models.smolvla]
+E         tests/test_retired_backends.py::test_retired_runtime_modules_are_unavailable[plato.trainers.nanochat]
+E         tests/test_retired_backends.py::test_retired_runtime_modules_are_unavailable[plato.trainers.lerobot]
+E         tests/test_retired_backends.py::test_retired_runtime_modules_are_unavailable[plato.datasources.nanochat]
+E         tests/test_retired_backends.py::test_retired_runtime_modules_are_unavailable[plato.datasources.lerobot]
+E         tests/test_retired_backends.py::test_retired_runtime_modules_are_unavailable[plato.processors.nanochat_tokenizer]
+E         tests/test_retired_backends.py::test_retired_runtime_modules_are_unavailable[plato.evaluators.nanochat_core]
+E         tests/test_retired_backends.py::test_retired_runtime_modules_are_unavailable[plato.utils.third_party]
+E         tests/trainers/strategies/test_base.py::TestTrainingContext::test_initialization
+E         tests/trainers/strategies/test_base.py::TestTrainingContext::test_attribute_assignment
+E         tests/trainers/strategies/test_base.py::TestTrainingContext::test_config_dict
+E         tests/trainers/strategies/test_base.py::TestTrainingContext::test_state_dict
+E         tests/trainers/strategies/test_base.py::TestTrainingContext::test_repr
+E         tests/trainers/strategies/test_base.py::TestStrategyBase::test_strategy_is_abstract
+E         tests/trainers/strategies/test_base.py::TestStrategyBase::test_strategy_lifecycle_methods
+E         tests/trainers/strategies/test_base.py::TestLossCriterionStrategy::test_interface_has_abstract_method
+E         tests/trainers/strategies/test_base.py::TestLossCriterionStrategy::test_concrete_implementation
+E         tests/trainers/strategies/test_base.py::TestOptimizerStrategy::test_interface_has_abstract_method
+E         tests/trainers/strategies/test_base.py::TestOptimizerStrategy::test_concrete_implementation
+E         tests/trainers/strategies/test_base.py::TestOptimizerStrategy::test_on_optimizer_step_hook
+E         tests/trainers/strategies/test_base.py::TestTrainingStepStrategy::test_interface_has_abstract_method
+E         tests/trainers/strategies/test_base.py::TestTrainingStepStrategy::test_concrete_implementation
+E         tests/trainers/strategies/test_base.py::TestLRSchedulerStrategy::test_interface_has_abstract_method
+E         tests/trainers/strategies/test_base.py::TestLRSchedulerStrategy::test_concrete_implementation
+E         tests/trainers/strategies/test_base.py::TestLRSchedulerStrategy::test_step_method
+E         tests/trainers/strategies/test_base.py::TestLRSchedulerStrategy::test_none_scheduler
+E         tests/trainers/strategies/test_base.py::TestModelUpdateStrategy::test_all_methods_optional
+E         tests/trainers/strategies/test_base.py::TestModelUpdateStrategy::test_lifecycle_hooks
+E         tests/trainers/strategies/test_base.py::TestModelUpdateStrategy::test_get_update_payload
+E         tests/trainers/strategies/test_base.py::TestDataLoaderStrategy::test_interface_has_abstract_method
+E         tests/trainers/strategies/test_base.py::TestDataLoaderStrategy::test_concrete_implementation
+E         tests/trainers/strategies/test_base.py::TestStrategyComposition::test_context_sharing_between_strategies
+E         tests/trainers/strategies/test_loss_criterion.py::test_loss_registry_core_loss_does_not_import_lightly
+E         tests/trainers/strategies/test_loss_criterion.py::test_loss_registry_ssl_loss_requires_optional_lightly
+E         tests/trainers/strategies/test_loss_criterion.py::TestCrossEntropyLossStrategy::test_initialization
+E         tests/trainers/strategies/test_loss_criterion.py::TestCrossEntropyLossStrategy::test_setup
+E         tests/trainers/strategies/test_loss_criterion.py::TestCrossEntropyLossStrategy::test_compute_loss
+E         tests/trainers/strategies/test_loss_criterion.py::TestCrossEntropyLossStrategy::test_label_smoothing
+E         tests/trainers/strategies/test_loss_criterion.py::TestCrossEntropyLossStrategy::test_with_weights
+E         tests/trainers/strategies/test_loss_criterion.py::TestMSELossStrategy::test_initialization
+E         tests/trainers/strategies/test_loss_criterion.py::TestMSELossStrategy::test_compute_loss
+E         tests/trainers/strategies/test_loss_criterion.py::TestMSELossStrategy::test_perfect_prediction
+E         tests/trainers/strategies/test_loss_criterion.py::TestBCEWithLogitsLossStrategy::test_initialization
+E         tests/trainers/strategies/test_loss_criterion.py::TestBCEWithLogitsLossStrategy::test_compute_loss
+E         tests/trainers/strategies/test_loss_criterion.py::TestBCEWithLogitsLossStrategy::test_with_pos_weight
+E         tests/trainers/strategies/test_loss_criterion.py::TestNLLLossStrategy::test_initialization
+E         tests/trainers/strategies/test_loss_criterion.py::TestNLLLossStrategy::test_compute_loss
+E         tests/trainers/strategies/test_loss_criterion.py::TestCompositeLossStrategy::test_initialization_with_weights
+E         tests/trainers/strategies/test_loss_criterion.py::TestCompositeLossStrategy::test_initialization_without_weights
+E         tests/trainers/strategies/test_loss_criterion.py::TestCompositeLossStrategy::test_setup_calls_all_strategies
+E         tests/trainers/strategies/test_loss_criterion.py::TestCompositeLossStrategy::test_compute_loss_combines_strategies
+E         tests/trainers/strategies/test_loss_criterion.py::TestCompositeLossStrategy::test_teardown_calls_all_strategies
+E         tests/trainers/strategies/test_loss_criterion.py::TestL2RegularizationStrategy::test_initialization
+E         tests/trainers/strategies/test_loss_criterion.py::TestL2RegularizationStrategy::test_compute_loss
+E         tests/trainers/strategies/test_loss_criterion.py::TestL2RegularizationStrategy::test_zero_parameters
+E         tests/trainers/strategies/test_loss_criterion.py::TestDefaultLossCriterionStrategy::test_with_custom_loss_fn
+E         tests/trainers/strategies/test_loss_criterion.py::TestLossStrategyComposition::test_ce_plus_l2_regularization
+E         tests/trainers/test_apfl_optimizer_ownership.py::test_apfl_returning_client_matches_dedicated_optimizer_reference
+E         tests/trainers/test_checkpoint_path_contract.py::test_default_worker_test_and_cleanup_checkpoint_names[toy]
+E         tests/trainers/test_checkpoint_path_contract.py::test_default_worker_test_and_cleanup_checkpoint_names[org/model]
+E         tests/trainers/test_checkpoint_path_contract.py::test_default_worker_test_and_cleanup_checkpoint_names[org_model]
+E         tests/trainers/test_checkpoint_path_contract.py::test_default_worker_test_and_cleanup_checkpoint_names[../model]
+E         tests/trainers/test_checkpoint_path_contract.py::test_default_worker_test_and_cleanup_checkpoint_names[~6f72672f6d6f64656c]
+E         tests/trainers/test_checkpoint_path_contract.py::test_logical_name_codec_has_no_slash_underscore_or_reserved_collision
+E         tests/trainers/test_checkpoint_path_contract.py::test_long_logical_model_name_default_save_load_stays_in_filename_limit[org/modelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodel]
+E         tests/trainers/test_checkpoint_path_contract.py::test_long_logical_model_name_default_save_load_stays_in_filename_limit[ordinary_modelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodelmodel]
+E         tests/trainers/test_checkpoint_path_contract.py::test_long_logical_model_name_default_save_load_stays_in_filename_limit[xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx]
+E         tests/trainers/test_checkpoint_path_contract.py::test_explicit_location_and_relative_filename_containment
+E         tests/trainers/test_checkpoint_path_contract.py::test_urgent_actual_snapshots_numerical_order_cutoff_architecture_and_state
+E         tests/trainers/test_checkpoint_path_contract.py::test_real_spawned_worker_train_test_and_history_with_slash_name
+E         tests/trainers/test_checkpoint_path_contract.py::test_split_gradient_auxiliary_writer_reader_uses_same_name
+E         tests/trainers/test_checkpoint_path_contract.py::test_history_sidecar_symlinks_are_checked_before_weight_write_or_load
+E         tests/trainers/test_checkpointing.py::test_save_and_load_roundtrip
+E         tests/trainers/test_checkpointing.py::test_save_model_with_custom_filename
+E         tests/trainers/test_composable_trainer.py::TestComposableTrainerBasic::test_initialization_with_defaults
+E         tests/trainers/test_composable_trainer.py::TestComposableTrainerBasic::test_initialization_with_custom_strategies
+E         tests/trainers/test_composable_trainer.py::TestComposableTrainerBasic::test_context_initialization
+E         tests/trainers/test_composable_trainer.py::TestComposableTrainerBasic::test_strategies_are_setup
+E         tests/trainers/test_composable_trainer.py::TestComposableTrainerTraining::test_train_model_executes
+E         tests/trainers/test_composable_trainer.py::TestComposableTrainerTraining::test_loss_decreases_during_training
+E         tests/trainers/test_composable_trainer.py::TestComposableTrainerTraining::test_multiple_epochs
+E         tests/trainers/test_composable_trainer.py::TestComposableTrainerStrategies::test_loss_strategy_is_used
+E         tests/trainers/test_composable_trainer.py::TestComposableTrainerStrategies::test_model_update_strategy_hooks
+E         tests/trainers/test_composable_trainer.py::TestComposableTrainerStrategies::test_optimizer_strategy_creates_optimizer
+E         tests/trainers/test_composable_trainer.py::TestComposableTrainerContext::test_context_shared_between_strategies
+E         tests/trainers/test_composable_trainer.py::TestComposableTrainerContext::test_context_updates_during_training
+E         tests/trainers/test_composable_trainer.py::TestComposableTrainerCallbacks::test_callbacks_are_called
+E         tests/trainers/test_composable_trainer.py::TestComposableTrainerModelOperations::test_save_and_load_model
+E         tests/trainers/test_composable_trainer.py::TestComposableTrainerWithDifferentModels::test_with_callable_model
+E         tests/trainers/test_composable_trainer.py::TestComposableTrainerWithDifferentModels::test_with_model_instance
+E         tests/trainers/test_composable_trainer.py::TestComposableTrainerEdgeCases::test_empty_dataset
+E         tests/trainers/test_composable_trainer.py::TestComposableTrainerEdgeCases::test_single_batch
+E         tests/trainers/test_composable_trainer.py::TestComposableTrainerEdgeCases::test_test_state_roundtrip_persists_evaluation_metadata
+E         tests/trainers/test_composable_trainer.py::TestComposableTrainerEdgeCases::test_test_state_restore_clears_stale_evaluation_metadata
+E         tests/trainers/test_composable_trainer.py::TestComposableTrainerComparison::test_produces_valid_loss
+E         tests/trainers/test_composable_trainer.py::TestComposableTrainerComparison::test_model_parameters_change
+E         tests/trainers/test_dp_data_loader_strategy.py::test_dp_actual_time_snapshot_writer_to_plain_urgent_reader
+E         tests/trainers/test_dp_data_loader_strategy.py::test_actual_spawned_dp_rounds_return_accounting_and_isolate_clients
+E         tests/trainers/test_dp_data_loader_strategy.py::test_dp_strategy_handles_plato_sampler_get
+E         tests/trainers/test_dp_data_loader_strategy.py::test_dp_strategy_handles_torch_sampler_directly
+E         tests/trainers/test_dp_data_loader_strategy.py::test_actual_dp_consecutive_training_exchange_checkpoint_and_accounting
+E         tests/trainers/test_dp_data_loader_strategy.py::test_actual_dp_physical_batches_only_report_real_updates_and_cleanup
+E         tests/trainers/test_dp_data_loader_strategy.py::test_dp_memory_splitting_matches_logical_batch_parameter_reference
+E         tests/trainers/test_feddyn_strategy.py::test_explicit_adaptive_flag_conflicts_with_configuration[uniform-True]
+E         tests/trainers/test_feddyn_strategy.py::test_explicit_adaptive_flag_conflicts_with_configuration[sample-False]
+E         tests/trainers/test_feddyn_strategy.py::test_full_example_rejects_invalid_configuration[algorithm-alpha_coef-0]
+E         tests/trainers/test_feddyn_strategy.py::test_full_example_rejects_invalid_configuration[algorithm-alpha_coef-True]
+E         tests/trainers/test_feddyn_strategy.py::test_full_example_rejects_invalid_configuration[algorithm-alpha_coef-nan]
+E         tests/trainers/test_feddyn_strategy.py::test_full_example_rejects_invalid_configuration[algorithm-feddyn_weighting-unknown]
+E         tests/trainers/test_feddyn_strategy.py::test_full_example_rejects_invalid_configuration[algorithm-feddyn_sample_counts-value4]
+E         tests/trainers/test_feddyn_strategy.py::test_full_example_rejects_invalid_configuration[clients-total_clients-0]
+E         tests/trainers/test_feddyn_strategy.py::test_full_example_rejects_invalid_configuration[clients-total_clients-True]
+E         tests/trainers/test_feddyn_strategy.py::test_full_example_rejects_invalid_configuration[clients-total_clients-1.5]
+E         tests/trainers/test_feddyn_strategy.py::test_full_example_rejects_invalid_configuration[clients-per_round-0]
+E         tests/trainers/test_feddyn_strategy.py::test_full_example_rejects_invalid_configuration[clients-per_round-3]
+E         tests/trainers/test_feddyn_strategy.py::test_full_example_rejects_invalid_configuration[clients-per_round-True]
+E         tests/trainers/test_feddyn_strategy.py::test_full_example_rejects_invalid_configuration[server-synchronous-False]
+E         tests/trainers/test_feddyn_strategy.py::test_full_example_rejects_invalid_configuration[server-request_update-True]
+E         tests/trainers/test_feddyn_strategy.py::test_full_example_rejects_invalid_configuration[algorithm-total_silos-2]
+E         tests/trainers/test_feddyn_strategy.py::test_full_example_rejects_invalid_configuration[trainer-optimizer-Adam]
+E         tests/trainers/test_feddyn_strategy.py::test_full_example_rejects_invalid_configuration[trainer-amp-True]
+E         tests/trainers/test_feddyn_strategy.py::test_full_example_rejects_invalid_configuration[trainer-type-diff_privacy]
+E         tests/trainers/test_feddyn_strategy.py::test_full_example_rejects_invalid_configuration[trainer-max_grad_norm-1]
+E         tests/trainers/test_feddyn_strategy.py::test_full_example_rejects_invalid_configuration[trainer-lr_scheduler-StepLR]
+E         tests/trainers/test_feddyn_strategy.py::test_full_example_rejects_invalid_configuration[trainer-epochs-0]
+E         tests/trainers/test_feddyn_strategy.py::test_full_example_rejects_invalid_configuration[trainer-gradient_accumulation_steps-0]
+E         tests/trainers/test_feddyn_strategy.py::test_full_example_rejects_invalid_configuration[trainer-gradient_accumulation_steps-True]
+E         tests/trainers/test_feddyn_strategy.py::test_full_sample_vector_is_required_and_finite[None]
+E         tests/trainers/test_feddyn_strategy.py::test_full_sample_vector_is_required_and_finite[counts1]
+E         tests/trainers/test_feddyn_strategy.py::test_full_sample_vector_is_required_and_finite[counts2]
+E         tests/trainers/test_feddyn_strategy.py::test_full_sample_vector_is_required_and_finite[counts3]
+E         tests/trainers/test_feddyn_strategy.py::test_full_sample_vector_is_required_and_finite[counts4]
+E         tests/trainers/test_feddyn_strategy.py::test_full_sample_vector_is_required_and_finite[counts5]
+E         tests/trainers/test_feddyn_strategy.py::test_full_sample_vector_is_required_and_finite[counts6]
+E         tests/trainers/test_feddyn_strategy.py::test_full_sample_vector_is_required_and_finite[counts7]
+E         tests/trainers/test_feddyn_strategy.py::test_full_sample_vector_is_required_and_finite[counts8]
+E         tests/trainers/test_feddyn_strategy.py::test_optimizer_configuration_is_not_silently_coerced[momentum-0.9]
+E         tests/trainers/test_feddyn_strategy.py::test_optimizer_configuration_is_not_silently_coerced[weight_decay-0.01]
+E         tests/trainers/test_feddyn_strategy.py::test_optimizer_configuration_is_not_silently_coerced[dampening-0.1]
+E         tests/trainers/test_feddyn_strategy.py::test_optimizer_configuration_is_not_silently_coerced[nesterov-True]
+E         tests/trainers/test_feddyn_strategy.py::test_optimizer_configuration_is_not_silently_coerced[maximize-True]
+E         tests/trainers/test_feddyn_strategy.py::test_optimizer_configuration_is_not_silently_coerced[lr-0]
+E         tests/trainers/test_feddyn_strategy.py::test_optimizer_configuration_is_not_silently_coerced[lr-inf]
+E         tests/trainers/test_feddyn_strategy.py::test_optimizer_configuration_is_not_silently_coerced[lr-True]
+E         tests/trainers/test_feddyn_strategy.py::test_classification_permutation_preserves_full_objective_gradient
+E         tests/trainers/test_feddyn_strategy.py::test_legacy_actual_writer_weight_bias_and_corruption_are_inspection_only
+E         tests/trainers/test_feddyn_strategy.py::test_loss_matches_independent_scalar_equation[2.0-2.0-0.0-0.0-2.0-0.0]
+E         tests/trainers/test_feddyn_strategy.py::test_loss_matches_independent_scalar_equation[1.0-2.0-0.5--0.05-1.005--0.495]
+E         tests/trainers/test_feddyn_strategy.py::test_loss_matches_independent_scalar_equation[3.0-3.0-0.5-0.05-2.995-0.495]
+E         tests/trainers/test_feddyn_strategy.py::test_invalid_alpha_is_an_actionable_error[-1]
+E         tests/trainers/test_feddyn_strategy.py::test_invalid_alpha_is_an_actionable_error[nan]
+E         tests/trainers/test_feddyn_strategy.py::test_invalid_alpha_is_an_actionable_error[inf]
+E         tests/trainers/test_feddyn_strategy.py::test_invalid_alpha_is_an_actionable_error[-inf]
+E         tests/trainers/test_feddyn_strategy.py::test_invalid_alpha_is_an_actionable_error[True]
+E         tests/trainers/test_feddyn_strategy.py::test_invalid_alpha_is_an_actionable_error[0.1]
+E         tests/trainers/test_feddyn_strategy.py::test_zero_alpha_is_exact_task_loss
+E         tests/trainers/test_feddyn_strategy.py::test_sample_alpha_uses_population_counts_never_labels[labels0]
+E         tests/trainers/test_feddyn_strategy.py::test_sample_alpha_uses_population_counts_never_labels[labels1]
+E         tests/trainers/test_feddyn_strategy.py::test_sample_alpha_uses_population_counts_never_labels[labels2]
+E         tests/trainers/test_feddyn_strategy.py::test_sample_alpha_uses_population_counts_never_labels[labels3]
+E         tests/trainers/test_feddyn_strategy.py::test_sample_alpha_uses_population_counts_never_labels[labels4]
+E         tests/trainers/test_feddyn_strategy.py::test_adaptive_alpha_requires_authoritative_metadata
+E         tests/trainers/test_feddyn_strategy.py::test_effective_alpha_overflow_and_underflow_are_rejected[1e+308-counts0]
+E         tests/trainers/test_feddyn_strategy.py::test_effective_alpha_overflow_and_underflow_are_rejected[5e-324-counts1]
+E         tests/trainers/test_fedrep_strategy.py::TestFedRepLayerFreezing::test_regular_round_local_phase
+E         tests/trainers/test_fedrep_strategy.py::TestFedRepLayerFreezing::test_regular_round_global_phase
+E         tests/trainers/test_fedrep_strategy.py::TestFedRepLayerFreezing::test_personalization_phase
+E         tests/trainers/test_fedrep_strategy.py::TestFedRepEpochTransitions::test_epoch_transition_from_local_to_global
+E         tests/trainers/test_fedrep_strategy.py::TestFedRepEpochTransitions::test_multiple_calls_same_epoch_are_idempotent
+E         tests/trainers/test_fedrep_strategy.py::TestFedRepStrategyFromConfig::test_strategy_from_config
+E         tests/trainers/test_gan_runtime.py::test_actual_registered_dcgan_training_changes_both_networks
+E         tests/trainers/test_gan_runtime.py::test_gan_exchange_owns_snapshot_and_preserves_model_device
+E         tests/trainers/test_gan_runtime.py::test_gan_slash_names_and_explicit_paired_checkpoints
+E         tests/trainers/test_gan_runtime.py::test_gan_worker_history_urgent_snapshots_and_scoped_cleanup
+E         tests/trainers/test_gan_runtime.py::test_gan_deltas_and_updates_preserve_bool_and_integer_buffer_contract
+E         tests/trainers/test_gan_runtime.py::test_gan_fid_actual_partition_tail_padding_and_scalar_covariance_reference
+E         tests/trainers/test_gan_runtime.py::test_gan_explicit_normalized_paths_keep_networks_distinct_and_validate_first
+E         tests/trainers/test_huggingface_accumulation.py::test_accumulation_matches_mean_loss_windows[2-True]
+E         tests/trainers/test_huggingface_accumulation.py::test_accumulation_matches_mean_loss_windows[2-False]
+E         tests/trainers/test_huggingface_accumulation.py::test_accumulation_matches_mean_loss_windows[3-True]
+E         tests/trainers/test_huggingface_accumulation.py::test_accumulation_matches_mean_loss_windows[3-False]
+E         tests/trainers/test_huggingface_accumulation.py::test_accumulation_matches_mean_loss_windows[5-True]
+E         tests/trainers/test_huggingface_accumulation.py::test_accumulation_matches_mean_loss_windows[5-False]
+E         tests/trainers/test_huggingface_accumulation.py::test_real_hf_trainer_tail_callbacks_scheduler_and_control_flags[False]
+E         tests/trainers/test_huggingface_accumulation.py::test_real_hf_trainer_tail_callbacks_scheduler_and_control_flags[True]
+E         tests/trainers/test_huggingface_trainer.py::test_huggingface_collate_wrapper_dynamically_pads_variable_length_labels
+E         tests/trainers/test_huggingface_trainer.py::test_huggingface_collate_wrapper_unwraps_nested_batch_encodings
+E         tests/trainers/test_huggingface_trainer.py::test_huggingface_collate_wrapper_requires_tokenizer_at_construction
+E         tests/trainers/test_huggingface_trainer.py::test_huggingface_trainer_defaults_tokenizer_name_to_model_name
+E         tests/trainers/test_huggingface_trainer.py::test_huggingface_trainer_uses_tokenizer_override_and_resizes_embeddings
+E         tests/trainers/test_huggingface_trainer.py::test_huggingface_trainer_applies_gradient_checkpointing_and_precision_flags
+E         tests/trainers/test_lr_scheduler_registry.py::test_step_lr_scheduler_decays_at_step
+E         tests/trainers/test_lr_scheduler_registry.py::test_multi_step_scheduler_applies_milestones
+E         tests/trainers/test_lr_scheduler_registry.py::test_lambda_scheduler_supports_linear_warmup
+E         tests/trainers/test_personalized_state_ownership.py::test_identity_reassignment_isolates_and_reloads_actual_personal_state[toy-ditto]
+E         tests/trainers/test_personalized_state_ownership.py::test_identity_reassignment_isolates_and_reloads_actual_personal_state[toy-apfl]
+E         tests/trainers/test_personalized_state_ownership.py::test_identity_reassignment_isolates_and_reloads_actual_personal_state[toy-feddyn]
+E         tests/trainers/test_personalized_state_ownership.py::test_identity_reassignment_isolates_and_reloads_actual_personal_state[toy-scaffold]
+E         tests/trainers/test_personalized_state_ownership.py::test_identity_reassignment_isolates_and_reloads_actual_personal_state[toy-fedala]
+E         tests/trainers/test_personalized_state_ownership.py::test_identity_reassignment_isolates_and_reloads_actual_personal_state[org/model-ditto]
+E         tests/trainers/test_personalized_state_ownership.py::test_identity_reassignment_isolates_and_reloads_actual_personal_state[org/model-apfl]
+E         tests/trainers/test_personalized_state_ownership.py::test_identity_reassignment_isolates_and_reloads_actual_personal_state[org/model-feddyn]
+E         tests/trainers/test_personalized_state_ownership.py::test_identity_reassignment_isolates_and_reloads_actual_personal_state[org/model-scaffold]
+E         tests/trainers/test_personalized_state_ownership.py::test_identity_reassignment_isolates_and_reloads_actual_personal_state[org/model-fedala]
+E         tests/trainers/test_personalized_state_ownership.py::test_feddyn_exact_legacy_prefix_load_is_same_client_and_canonical_wins
+E         tests/trainers/test_personalized_state_ownership.py::test_actual_spawn_returns_personal_state_and_optimizer_across_rounds[ditto]
+E         tests/trainers/test_personalized_state_ownership.py::test_actual_spawn_returns_personal_state_and_optimizer_across_rounds[apfl]
+E         tests/trainers/test_personalized_state_ownership.py::test_actual_spawn_returns_personal_state_and_optimizer_across_rounds[feddyn]
+E         tests/trainers/test_personalized_state_ownership.py::test_actual_spawn_returns_personal_state_and_optimizer_across_rounds[fedala]
+E         tests/trainers/test_personalized_state_ownership.py::test_apfl_historical_numpy_alpha_reader_and_primitive_writer
+E         tests/trainers/test_pfedgraph_strategy.py::test_pfedgraph_loss_maximizes_similarity
+E         tests/trainers/test_review_training_boundaries.py::test_real_amp_clipping_unscaled_success_and_overflow[False-8.0-2.0-False]
+E         tests/trainers/test_review_training_boundaries.py::test_real_amp_clipping_unscaled_success_and_overflow[False-8.0-2.0-True]
+E         tests/trainers/test_review_training_boundaries.py::test_real_amp_clipping_unscaled_success_and_overflow[False-65536.0-10.0-False]
+E         tests/trainers/test_review_training_boundaries.py::test_real_amp_clipping_unscaled_success_and_overflow[False-65536.0-10.0-True]
+E         tests/trainers/test_review_training_boundaries.py::test_real_amp_clipping_unscaled_success_and_overflow[True-8.0-2.0-False]
+E         tests/trainers/test_review_training_boundaries.py::test_real_amp_clipping_unscaled_success_and_overflow[True-8.0-2.0-True]
+E         tests/trainers/test_review_training_boundaries.py::test_real_amp_clipping_unscaled_success_and_overflow[True-65536.0-10.0-False]
+E         tests/trainers/test_review_training_boundaries.py::test_real_amp_clipping_unscaled_success_and_overflow[True-65536.0-10.0-True]
+E         tests/trainers/test_review_training_boundaries.py::test_actual_worker_cleanup_full_names_and_unrelated_owners[toy]
+E         tests/trainers/test_review_training_boundaries.py::test_actual_worker_cleanup_full_names_and_unrelated_owners[org/model]
+E         tests/trainers/test_review_training_boundaries.py::test_actual_worker_cleanup_full_names_and_unrelated_owners[xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx]
+E         tests/trainers/test_review_training_boundaries.py::test_actual_accepted_b_feddyn_writer_migration[False-False]
+E         tests/trainers/test_review_training_boundaries.py::test_actual_accepted_b_feddyn_writer_migration[False-True]
+E         tests/trainers/test_review_training_boundaries.py::test_actual_accepted_b_feddyn_writer_migration[True-False]
+E         tests/trainers/test_review_training_boundaries.py::test_actual_accepted_b_feddyn_writer_migration[True-True]
+E         tests/trainers/test_review_training_boundaries.py::test_fedala_memory_only_return_matches_dedicated_rounds[False]
+E         tests/trainers/test_review_training_boundaries.py::test_fedala_memory_only_return_matches_dedicated_rounds[True]
+E         tests/trainers/test_scaffold_strategy.py::test_independent_main_equations[gradients0-0.9-0.0-SCAFFOLDUpdateStrategy]
+E         tests/trainers/test_scaffold_strategy.py::test_independent_main_equations[gradients0-0.9-0.0-SCAFFOLDUpdateStrategyV2]
+E         tests/trainers/test_scaffold_strategy.py::test_independent_main_equations[gradients1-0.4-2.0-SCAFFOLDUpdateStrategy]
+E         tests/trainers/test_scaffold_strategy.py::test_independent_main_equations[gradients1-0.4-2.0-SCAFFOLDUpdateStrategyV2]
+E         tests/trainers/test_scaffold_strategy.py::test_real_accumulation_updates_tail_and_empty_round[SCAFFOLDUpdateStrategy-1]
+E         tests/trainers/test_scaffold_strategy.py::test_real_accumulation_updates_tail_and_empty_round[SCAFFOLDUpdateStrategy-3]
+E         tests/trainers/test_scaffold_strategy.py::test_real_accumulation_updates_tail_and_empty_round[SCAFFOLDUpdateStrategy-4]
+E         tests/trainers/test_scaffold_strategy.py::test_real_accumulation_updates_tail_and_empty_round[SCAFFOLDUpdateStrategyV2-1]
+E         tests/trainers/test_scaffold_strategy.py::test_real_accumulation_updates_tail_and_empty_round[SCAFFOLDUpdateStrategyV2-3]
+E         tests/trainers/test_scaffold_strategy.py::test_real_accumulation_updates_tail_and_empty_round[SCAFFOLDUpdateStrategyV2-4]
+E         tests/trainers/test_scaffold_strategy.py::test_skipped_update_is_not_corrected
+E         tests/trainers/test_scaffold_strategy.py::test_invalid_executed_rate_fails_before_update[0.0]
+E         tests/trainers/test_scaffold_strategy.py::test_invalid_executed_rate_fails_before_update[-0.1]
+E         tests/trainers/test_scaffold_strategy.py::test_invalid_executed_rate_fails_before_update[nan]
+E         tests/trainers/test_scaffold_strategy.py::test_invalid_executed_rate_fails_before_update[inf]
+E         tests/trainers/test_scaffold_strategy.py::test_missing_optimizer_and_post_step_rate_capture_then_tail_rejection
+E         tests/trainers/test_scaffold_strategy.py::test_final_tail_denominator_uses_executed_rate_before_post_hook
+E         tests/trainers/test_scaffold_strategy.py::test_parameter_identity_reordered_equal_groups_buffers_and_exclusions
+E         tests/trainers/test_scaffold_strategy.py::test_invalid_controls_fail_before_mutation[bad0]
+E         tests/trainers/test_scaffold_strategy.py::test_invalid_controls_fail_before_mutation[bad1]
+E         tests/trainers/test_scaffold_strategy.py::test_invalid_controls_fail_before_mutation[bad2]
+E         tests/trainers/test_scaffold_strategy.py::test_invalid_controls_fail_before_mutation[bad3]
+E         tests/trainers/test_scaffold_strategy.py::test_generic_optimizer_composition_matches_independent_raw_updates[SCAFFOLDUpdateStrategy-momentum]
+E         tests/trainers/test_scaffold_strategy.py::test_generic_optimizer_composition_matches_independent_raw_updates[SCAFFOLDUpdateStrategy-adam]
+E         tests/trainers/test_scaffold_strategy.py::test_generic_optimizer_composition_matches_independent_raw_updates[SCAFFOLDUpdateStrategyV2-momentum]
+E         tests/trainers/test_scaffold_strategy.py::test_generic_optimizer_composition_matches_independent_raw_updates[SCAFFOLDUpdateStrategyV2-adam]
+E         tests/trainers/test_scaffold_strategy.py::test_exact_legacy_load_canonical_precedence_and_client_zero_isolation[example]
+E         tests/trainers/test_scaffold_strategy.py::test_exact_legacy_load_canonical_precedence_and_client_zero_isolation[prefix]
+E         tests/trainers/test_scaffold_strategy.py::test_exact_legacy_load_canonical_precedence_and_client_zero_isolation[canonical]
+E         tests/trainers/test_scaffold_strategy.py::test_persistence_and_worker_state_failures_cannot_emit_old_delta
+E         tests/trainers/test_scaffold_strategy.py::test_direct_callback_failure_keeps_only_accepted_controls[False]
+E         tests/trainers/test_scaffold_strategy.py::test_direct_callback_failure_keeps_only_accepted_controls[True]
+E         tests/trainers/test_split_learning_testing_strategy.py::test_split_learning_testing_strategy_accepts_custom_sampler
+E         tests/trainers/test_split_learning_testing_strategy.py::test_fresh_public_split_evaluation_and_empty_partition
+E         tests/trainers/test_ssl_personalized_state.py::test_ssl_public_spawn_returns_private_head_and_isolates_identity
+E         tests/trainers/test_ssl_personalized_state.py::test_ssl_personalization_freezes_encoder_buffers_gradients_and_preserves_modes[False]
+E         tests/trainers/test_ssl_personalized_state.py::test_ssl_personalization_freezes_encoder_buffers_gradients_and_preserves_modes[True]
+E         tests/trainers/test_ssl_training_contract.py::test_ssl_model_instance_and_personalization_batch_config
+E         tests/trainers/test_ssl_training_contract.py::test_ssl_knn_reference_set_is_not_indexed_with_test_sampler
+E         tests/trainers/test_ssl_training_contract.py::test_ssl_empty_evaluation_is_consistent_with_basic
+E         tests/trainers/test_training_update_contract.py::test_accumulation_matches_mean_of_microbatch_losses[sizes0-2]
+E         tests/trainers/test_training_update_contract.py::test_accumulation_matches_mean_of_microbatch_losses[sizes1-4]
+E         tests/trainers/test_training_update_contract.py::test_accumulation_matches_mean_of_microbatch_losses[sizes2-2]
+E         tests/trainers/test_training_update_contract.py::test_accumulation_run_epoch_and_exception_cleanup
+E         tests/trainers/test_training_update_contract.py::test_fedprox_origin_and_nonzero_analytical_gradient[0.0-l2]
+E         tests/trainers/test_training_update_contract.py::test_fedprox_origin_and_nonzero_analytical_gradient[0.1-l2]
+E         tests/trainers/test_training_update_contract.py::test_fedprox_origin_and_nonzero_analytical_gradient[0.1-l1]
+E         tests/trainers/test_training_update_contract.py::test_fedprox_rejects_invalid_penalty[-0.1]
+E         tests/trainers/test_training_update_contract.py::test_fedprox_rejects_invalid_penalty[nan]
+E         tests/trainers/test_training_update_contract.py::test_fedprox_rejects_invalid_penalty[inf]
+E         tests/trainers/test_training_update_contract.py::test_fedprox_refreshes_received_weights_each_run[False]
+E         tests/trainers/test_training_update_contract.py::test_fedprox_refreshes_received_weights_each_run[True]
+E         tests/trainers/test_training_update_contract.py::test_timm_real_lr_sequence_epochs_rounds_and_accumulation[False-1-10]
+E         tests/trainers/test_training_update_contract.py::test_timm_real_lr_sequence_epochs_rounds_and_accumulation[False-3-5]
+E         tests/trainers/test_training_update_contract.py::test_timm_real_lr_sequence_epochs_rounds_and_accumulation[True-1-10]
+E         tests/trainers/test_training_update_contract.py::test_timm_real_lr_sequence_epochs_rounds_and_accumulation[True-3-5]
+E         tests/trainers/test_training_update_contract.py::test_real_fedprox_reference_config_activates_proximal_training
+E         tests/trainers/test_training_update_contract.py::test_validation_wrapper_retains_accumulation_and_checks_tail_gradients
+E         tests/trainers/test_training_update_contract.py::test_fedmos_distinct_same_shape_parameters_keep_corresponding_global_reference
+E         tests/trainers/test_training_update_contract.py::test_gradient_clipping_limits_real_updates_including_accumulation_tail
+E         tests/trainers/test_training_update_contract.py::test_loss_metrics_preserve_sample_weighting_without_retaining_batch_graphs
+E         tests/trainers/test_training_update_contract.py::test_personalization_freezes_restore_model_ownership_after_failure[fedper]
+E         tests/trainers/test_training_update_contract.py::test_personalization_freezes_restore_model_ownership_after_failure[fedrep]
+E         tests/trainers/test_training_update_contract.py::test_personalization_freezes_restore_model_ownership_after_failure[lgfedavg]
+E         tests/trainers/test_training_update_contract.py::test_lgfedavg_two_real_updates_dispatch_timm_between_passes
+E         tests/trainers/test_training_update_contract.py::test_real_grad_scaler_overflow_does_not_dispatch_optimizer_update[False]
+E         tests/trainers/test_training_update_contract.py::test_real_grad_scaler_overflow_does_not_dispatch_optimizer_update[True]
+E         tests/trainers/test_training_update_contract.py::test_feddyn_all_zero_labels_leave_zero_origin_regularizer
+E         tests/utils/test_archive.py::test_safe_tar_links_and_dot_directory
+E         tests/utils/test_archive.py::test_unsafe_tar_manifest_is_rejected_before_extraction[members0]
+E         tests/utils/test_archive.py::test_unsafe_tar_manifest_is_rejected_before_extraction[members1]
+E         tests/utils/test_archive.py::test_unsafe_tar_manifest_is_rejected_before_extraction[members2]
+E         tests/utils/test_archive.py::test_unsafe_tar_manifest_is_rejected_before_extraction[members3]
+E         tests/utils/test_archive.py::test_unsafe_tar_manifest_is_rejected_before_extraction[members4]
+E         tests/utils/test_archive.py::test_unsafe_tar_manifest_is_rejected_before_extraction[members5]
+E         tests/utils/test_archive.py::test_zip_symlink_entry_is_rejected
+E         tests/utils/test_cleanup.py::test_symlink_runtime_fallback_never_clears_external_files
+E         tests/utils/test_cleanup.py::test_cleanup_removes_only_runtime_and_pycache
+E         tests/utils/test_rl_payload_utilities.py::test_action_space_follows_effective_pytest_profile[implicit-mandatory]
+E         tests/utils/test_rl_payload_utilities.py::test_action_space_follows_effective_pytest_profile[explicit-mandatory]
+E         tests/utils/test_rl_payload_utilities.py::test_action_space_follows_effective_pytest_profile[explicit-base]
+E         tests/utils/test_rl_payload_utilities.py::test_action_space_follows_effective_pytest_profile[unprofiled-scoped]
+E         tests/utils/test_rl_payload_utilities.py::test_active_policy_finite_update_and_saved_weight_roundtrip[ddpg]
+E         tests/utils/test_rl_payload_utilities.py::test_active_policy_finite_update_and_saved_weight_roundtrip[td3]
+E         tests/utils/test_rl_payload_utilities.py::test_active_policy_finite_update_and_saved_weight_roundtrip[sac]
+E         tests/utils/test_rl_payload_utilities.py::test_active_policy_finite_update_and_saved_weight_roundtrip[td3_rnn]
+E         tests/utils/test_rl_payload_utilities.py::test_active_policy_finite_update_and_saved_weight_roundtrip[sac_deterministic]
+E         tests/utils/test_rl_payload_utilities.py::test_td3_actions_are_independent_of_other_batch_rows
+E         tests/utils/test_rl_payload_utilities.py::test_async_recurrent_policy_accepts_variable_client_sequences[1]
+E         tests/utils/test_rl_payload_utilities.py::test_async_recurrent_policy_accepts_variable_client_sequences[3]
+E         tests/utils/test_rl_payload_utilities.py::test_td3_target_actions_use_every_transition
+E         tests/utils/test_rl_payload_utilities.py::test_async_actor_ignores_padding_and_other_transitions
+E         tests/utils/test_s3.py::test_put_send_receive_list_delete_use_one_namespace[]
+E         tests/utils/test_s3.py::test_put_send_receive_list_delete_use_one_namespace[namespace/rounds]
+E         tests/utils/test_s3.py::test_put_send_receive_list_delete_use_one_namespace[namespace/rounds/]
+E         tests/utils/test_s3.py::test_empty_listing_succeeds_without_contents
+E         tests/utils/test_s3.py::test_all_pages_stay_in_namespace
+E         tests/utils/test_s3.py::test_service_errors_do_not_create_or_overwrite_objects
+E         tests/utils/test_s3.py::test_network_paths_fail_within_deadline[put-stall]
+E         tests/utils/test_s3.py::test_network_paths_fail_within_deadline[put-error]
+E         tests/utils/test_s3.py::test_network_paths_fail_within_deadline[receive-stall]
+E         tests/utils/test_s3.py::test_network_paths_fail_within_deadline[receive-error]
+E         tests/utils/test_s3.py::test_network_paths_fail_within_deadline[list-stall]
+E         tests/utils/test_s3.py::test_network_paths_fail_within_deadline[list-error]
+E         tests/utils/test_s3.py::test_network_paths_fail_within_deadline[delete-stall]
+E         tests/utils/test_s3.py::test_network_paths_fail_within_deadline[delete-error]
+E         tests/utils/test_s3.py::test_network_paths_fail_within_deadline[init-stall]
+E         tests/utils/test_s3.py::test_network_paths_fail_within_deadline[init-error]
+E         tests/utils/test_s3.py::test_truncated_pickle_failure_is_visible
+E         tests/utils/test_s3.py::test_successful_transfer_recovers_after_transient_service_error
+E         tests/utils/test_s3.py::test_missing_object_is_distinct_from_service_failure
+E         tests/utils/test_safetensor_serialization.py::test_serialize_tree_roundtrip_preserves_structure
+E         tests/utils/test_safetensor_serialization.py::test_processors_encode_decode_roundtrip[bytes]
+E         tests/utils/test_safetensor_serialization.py::test_processors_encode_decode_roundtrip[bytearray]
+E         tests/utils/test_safetensor_serialization.py::test_processors_encode_decode_roundtrip[memoryview]
+E         tests/utils/test_safetensor_serialization.py::test_serialize_tree_handles_strings_and_none
+E         tests/utils/test_safetensor_serialization.py::test_serialize_tree_handles_root_level_leaf
+E         tests/utils/test_safetensor_serialization.py::test_serialize_tree_roundtrip_preserves_torch_bfloat16_tensors
+E         tests/utils/test_safetensor_serialization.py::test_ambiguous_tree_is_rejected_before_encoding[tree0]
+E         tests/utils/test_safetensor_serialization.py::test_ambiguous_tree_is_rejected_before_encoding[tree1]
+E         tests/utils/test_safetensor_serialization.py::test_ambiguous_tree_is_rejected_before_encoding[tree2]
+E         tests/utils/test_safetensor_serialization.py::test_ambiguous_tree_is_rejected_before_encoding[tree3]
+E         tests/utils/test_safetensor_serialization.py::test_ambiguous_tree_is_rejected_before_encoding[tree4]
+E         tests/utils/test_safetensor_serialization.py::test_ambiguous_tree_is_rejected_before_encoding[tree5]
+E         tests/utils/test_safetensor_serialization.py::test_ambiguous_tree_is_rejected_before_encoding[tree6]
+E         tests/utils/test_safetensor_serialization.py::test_ambiguous_tree_is_rejected_before_encoding[tree7]
+E         tests/utils/test_safetensor_serialization.py::test_ambiguous_tree_is_rejected_before_encoding[tree8]
+E         tests/utils/test_safetensor_serialization.py::test_dotted_state_dict_and_unambiguous_brackets_remain_compatible
+E         tests/utils/test_safetensor_serialization.py::test_noncontiguous_torch_tree_roundtrip
+E         tests/utils/test_safetensor_serialization.py::test_native_scalar_types_roundtrip_in_hybrid_payload_metadata
+E         tests/utils/test_shared_payload_utilities.py::test_empty_compound_loader_terminates[ParallelDataLoader]
+E         tests/utils/test_shared_payload_utilities.py::test_empty_compound_loader_terminates[SequentialDataLoader]
+E         tests/utils/test_shared_payload_utilities.py::test_parameter_count_utility_import_never_downloads_models
+E         tests/utils/test_shared_payload_utilities.py::test_unary_encoding_large_epsilon_remains_finite[symmetric_unary_encoding]
+E         tests/utils/test_shared_payload_utilities.py::test_unary_encoding_large_epsilon_remains_finite[optimized_unary_encoding]
+E         tests/utils/test_shared_payload_utilities.py::test_csv_extension_preserves_rows_and_quotes
+E         tests/utils/test_shared_payload_utilities.py::test_toml_config_roundtrip_matches_independent_parser
+E         tests/utils/test_shared_payload_utilities.py::test_logging_font_invalid_choice_is_explicit
+E         tests/utils/test_shared_payload_utilities.py::test_toml_nested_array_tables_and_literal_keys_keep_structure
+E         tests/utils/test_shared_payload_utilities.py::test_toml_supplementary_unicode_and_control_escapes_roundtrip[config0]
+E         tests/utils/test_shared_payload_utilities.py::test_toml_supplementary_unicode_and_control_escapes_roundtrip[config1]
+E         tests/utils/test_shared_payload_utilities.py::test_toml_supplementary_unicode_and_control_escapes_roundtrip[config2]
+E         tests/utils/test_shared_payload_utilities.py::test_toml_supplementary_unicode_and_control_escapes_roundtrip[config3]
+E         tests/utils/test_shared_payload_utilities.py::test_toml_supplementary_unicode_and_control_escapes_roundtrip[config4]
+E         tests/utils/test_unary_encoding.py::test_symmetric_encoding_matches_randomised_response
+E         tests/utils/test_unary_encoding.py::test_randomised_response_probability_matches_expectation
+E
+E         ==================================== ERRORS ====================================
+E         ___________ ERROR collecting plato/models/dvit/tests/test_layers.py ____________
+E         ImportError while importing test module '/private/tmp/plato-refresh-worktrees/mlx-profile-correction/plato/models/dvit/tests/test_layers.py'.
+E         Hint: make sure your test modules/packages have valid Python names.
+E         Traceback:
+E         /Users/bli/.local/share/uv/python/cpython-3.13.16-macos-aarch64-none/lib/python3.13/importlib/__init__.py:88: in import_module
+E             return _bootstrap._gcd_import(name[level:], package, level)
+E                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E         E   ModuleNotFoundError: No module named 'tests.test_layers'
+E         ___________ ERROR collecting plato/models/dvit/tests/test_models.py ____________
+E         ImportError while importing test module '/private/tmp/plato-refresh-worktrees/mlx-profile-correction/plato/models/dvit/tests/test_models.py'.
+E         Hint: make sure your test modules/packages have valid Python names.
+E         Traceback:
+E         /Users/bli/.local/share/uv/python/cpython-3.13.16-macos-aarch64-none/lib/python3.13/importlib/__init__.py:88: in import_module
+E             return _bootstrap._gcd_import(name[level:], package, level)
+E                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E         E   ModuleNotFoundError: No module named 'tests.test_models'
+E         ___ ERROR collecting plato/models/dvit/timm/models/layers/test_time_pool.py ____
+E         ImportError while importing test module '/private/tmp/plato-refresh-worktrees/mlx-profile-correction/plato/models/dvit/timm/models/layers/test_time_pool.py'.
+E         Hint: make sure your test modules/packages have valid Python names.
+E         Traceback:
+E         /Users/bli/.local/share/uv/python/cpython-3.13.16-macos-aarch64-none/lib/python3.13/importlib/__init__.py:88: in import_module
+E             return _bootstrap._gcd_import(name[level:], package, level)
+E                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E         E   ModuleNotFoundError: No module named 'timm.models.layers.test_time_pool'
+E         =============================== warnings summary ===============================
+E         ../../../../tmp/plato-mlx-integration/env/lib/python3.13/site-packages/timm/models/layers/__init__.py:49
+E           /tmp/plato-mlx-integration/env/lib/python3.13/site-packages/timm/models/layers/__init__.py:49: FutureWarning: Importing from timm.models.layers is deprecated, please import via timm.layers
+E             warnings.warn(f"Importing from {__name__} is deprecated, please import via timm.layers", FutureWarning)
+E
+E         -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+E         test profile: core scope (native excluded)
+E         =========================== short test summary info ============================
+E         ERROR plato/models/dvit/tests/test_layers.py
+E         ERROR plato/models/dvit/tests/test_models.py
+E         ERROR plato/models/dvit/timm/models/layers/test_time_pool.py
+E         !!!!!!!!!!!!!!!!!!! Interrupted: 3 errors during collection !!!!!!!!!!!!!!!!!!!!
+E         1441 tests collected, 3 errors in 32.67s
+E
+E       assert 2 == 0
+
+tests/test_mlx_import_contract.py:45: AssertionError
+_______ test_real_core_collection_does_not_import_or_probe_mlx[target3] ________
+
+tmp_path = PosixPath('/private/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/pytest-of-bli/pytest-206/test_real_core_collection_does3')
+target = ['--pyargs', 'tests']
+
+    @pytest.mark.parametrize("target", [[], ["tests"], ["."], ["--pyargs", "tests"]])
+    def test_real_core_collection_does_not_import_or_probe_mlx(tmp_path, target):
+        record, output = _audit(tmp_path, [*target, "--test-profile=base", "--collect-only"])
+        assert record["exit_status"] == 0, output
+>       assert record["backend_spec_lookups"] == []
+E       AssertionError: assert [{'module': '...: False}, ...] == []
+E
+E         Left contains 29 more items, first extra item: {'module': 'mlx', 'inside_preflight': False}
+E         Use -v to get more diff
+
+tests/test_mlx_import_contract.py:46: AssertionError
+_____________ test_real_conftest_survives_backend_import_sentinel ______________
+
+tmp_path = PosixPath('/private/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/pytest-of-bli/pytest-206/test_real_conftest_survives_ba0')
+
+    def test_real_conftest_survives_backend_import_sentinel(tmp_path):
+>       record, output = _audit(
+            tmp_path, ["tests", "--test-profile=base", "--collect-only"], mode="block"
+        )
+
+tests/test_mlx_import_contract.py:53:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+tmp_path = PosixPath('/private/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/pytest-of-bli/pytest-206/test_real_conftest_survives_ba0')
+arguments = ['tests', '--test-profile=base', '--collect-only'], mode = 'block'
+directory = ''
+
+    def _audit(tmp_path, arguments, *, mode="observe", directory=""):
+        root = Path(__file__).resolve().parents[1]
+        receipt = tmp_path / "imports.json"
+        environment = os.environ.copy()
+        environment.pop("PYTEST_ADDOPTS", None)
+        environment["PYTEST_DISABLE_PLUGIN_AUTOLOAD"] = "1"
+        environment["PYTHONPATH"] = str(root)
+        result = subprocess.run(
+            [
+                sys.executable,
+                str(root / "tests/mlx_import_audit_runner.py"),
+                str(receipt),
+                mode,
+                *arguments,
+            ],
+            cwd=root / directory,
+            env=environment,
+            text=True,
+            capture_output=True,
+            check=False,
+            timeout=60,
+        )
+        output = result.stdout + result.stderr
+        assert receipt.exists(), output
+        record = json.loads(receipt.read_text())
+>       assert record["production_conftest_loaded"], output
+E       AssertionError: ImportError while loading conftest '/private/tmp/plato-refresh-worktrees/mlx-profile-correction/tests/conftest.py'.
+E         tests/conftest.py:24: in <module>
+E             from tests.test_utils.fakes import (
+E         tests/test_utils/fakes.py:18: in <module>
+E             from plato.clients.strategies.base import (
+E         plato/clients/strategies/__init__.py:17: in <module>
+E             from plato.clients.strategies.defaults import (
+E         plato/clients/strategies/defaults.py:21: in <module>
+E             from plato.algorithms import registry as algorithms_registry
+E         plato/algorithms/registry.py:13: in <module>
+E             from plato.algorithms import (
+E         plato/algorithms/fedavg_personalized.py:11: in <module>
+E             from plato.serialization.safetensor import deserialize_tree, serialize_tree
+E         plato/serialization/safetensor.py:14: in <module>
+E             from plato.utils.tree import TreeMetadata, flatten_tree, unflatten_tree
+E         plato/utils/tree.py:29: in <module>
+E             mx = cast(ModuleType, importlib.import_module("mlx.core"))
+E                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E         tests/mlx_import_audit_runner.py:33: in find_spec
+E             raise RuntimeError("MLX import sentinel reached outside native scope")
+E         E   RuntimeError: MLX import sentinel reached outside native scope
+E
+E       assert False
+
+tests/test_mlx_import_contract.py:37: AssertionError
+__ test_real_unsupported_native_routing_never_initializes_backend[canonical] ___
+
+tmp_path = PosixPath('/private/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/pytest-of-bli/pytest-206/test_real_unsupported_native_r0')
+selector = 'tests.mlx_native.test_phase3_controls', directory = ''
+
+    @pytest.mark.parametrize(
+        "selector,directory",
+        [
+            ("tests.mlx_native.test_phase3_controls", ""),
+            ("mlx_native.test_phase3_controls", "tests"),
+            ("test_phase3_controls", "tests/mlx_native"),
+        ],
+        ids=["canonical", "dotted-alias", "bare-alias"],
+    )
+    def test_real_unsupported_native_routing_never_initializes_backend(
+        tmp_path, selector, directory
+    ):
+        record, output = _audit(tmp_path, ["--pyargs", selector], directory=directory)
+        assert record["exit_status"] != 0
+        assert "mlx-native selector unsupported" in output
+>       assert record["backend_spec_lookups"] == []
+E       AssertionError: assert [{'module': '...: False}, ...] == []
+E
+E         Left contains 29 more items, first extra item: {'module': 'mlx', 'inside_preflight': False}
+E         Use -v to get more diff
+
+tests/test_mlx_import_contract.py:76: AssertionError
+_ test_real_unsupported_native_routing_never_initializes_backend[dotted-alias] _
+
+tmp_path = PosixPath('/private/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/pytest-of-bli/pytest-206/test_real_unsupported_native_r1')
+selector = 'mlx_native.test_phase3_controls', directory = 'tests'
+
+    @pytest.mark.parametrize(
+        "selector,directory",
+        [
+            ("tests.mlx_native.test_phase3_controls", ""),
+            ("mlx_native.test_phase3_controls", "tests"),
+            ("test_phase3_controls", "tests/mlx_native"),
+        ],
+        ids=["canonical", "dotted-alias", "bare-alias"],
+    )
+    def test_real_unsupported_native_routing_never_initializes_backend(
+        tmp_path, selector, directory
+    ):
+        record, output = _audit(tmp_path, ["--pyargs", selector], directory=directory)
+        assert record["exit_status"] != 0
+        assert "mlx-native selector unsupported" in output
+>       assert record["backend_spec_lookups"] == []
+E       AssertionError: assert [{'module': '...: False}, ...] == []
+E
+E         Left contains 29 more items, first extra item: {'module': 'mlx', 'inside_preflight': False}
+E         Use -v to get more diff
+
+tests/test_mlx_import_contract.py:76: AssertionError
+__ test_real_unsupported_native_routing_never_initializes_backend[bare-alias] __
+
+tmp_path = PosixPath('/private/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/pytest-of-bli/pytest-206/test_real_unsupported_native_r2')
+selector = 'test_phase3_controls', directory = 'tests/mlx_native'
+
+    @pytest.mark.parametrize(
+        "selector,directory",
+        [
+            ("tests.mlx_native.test_phase3_controls", ""),
+            ("mlx_native.test_phase3_controls", "tests"),
+            ("test_phase3_controls", "tests/mlx_native"),
+        ],
+        ids=["canonical", "dotted-alias", "bare-alias"],
+    )
+    def test_real_unsupported_native_routing_never_initializes_backend(
+        tmp_path, selector, directory
+    ):
+        record, output = _audit(tmp_path, ["--pyargs", selector], directory=directory)
+        assert record["exit_status"] != 0
+        assert "mlx-native selector unsupported" in output
+>       assert record["backend_spec_lookups"] == []
+E       AssertionError: assert [{'module': '...: False}, ...] == []
+E
+E         Left contains 29 more items, first extra item: {'module': 'mlx', 'inside_preflight': False}
+E         Use -v to get more diff
+
+tests/test_mlx_import_contract.py:76: AssertionError
+_______________ test_real_core_pyargs_preserves_import_isolation _______________
+
+tmp_path = PosixPath('/private/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/pytest-of-bli/pytest-206/test_real_core_pyargs_preserve0')
+
+    def test_real_core_pyargs_preserves_import_isolation(tmp_path):
+        record, output = _audit(tmp_path, ["--pyargs", "tests.test_config_loader"])
+        assert record["exit_status"] == 0, output
+        assert "15 passed" in output
+>       assert record["backend_spec_lookups"] == []
+E       AssertionError: assert [{'module': '...: False}, ...] == []
+E
+E         Left contains 29 more items, first extra item: {'module': 'mlx', 'inside_preflight': False}
+E         Use -v to get more diff
+
+tests/test_mlx_import_contract.py:86: AssertionError
+_________ test_real_focused_native_backend_import_starts_in_preflight __________
+
+tmp_path = PosixPath('/private/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/pytest-of-bli/pytest-206/test_real_focused_native_backe0')
+
+    def test_real_focused_native_backend_import_starts_in_preflight(tmp_path):
+        record, output = _audit(
+            tmp_path,
+            [
+                "tests/mlx_native/test_phase3_tree_contract.py::"
+                "test_extracted_host_weights_own_snapshots",
+                "--collect-only",
+            ],
+        )
+        if record["platform"] == ["Darwin", "arm64"]:
+            assert record["backend_spec_lookups"], output
+>           assert record["backend_spec_lookups"][0]["inside_preflight"]
+E           assert False
+
+tests/test_mlx_import_contract.py:101: AssertionError
+test profile: core scope (native excluded)
+=========================== short test summary info ============================
+FAILED tests/test_mlx_import_contract.py::test_real_core_collection_does_not_import_or_probe_mlx[target0]
+FAILED tests/test_mlx_import_contract.py::test_real_core_collection_does_not_import_or_probe_mlx[target1]
+FAILED tests/test_mlx_import_contract.py::test_real_core_collection_does_not_import_or_probe_mlx[target2]
+FAILED tests/test_mlx_import_contract.py::test_real_core_collection_does_not_import_or_probe_mlx[target3]
+FAILED tests/test_mlx_import_contract.py::test_real_conftest_survives_backend_import_sentinel
+FAILED tests/test_mlx_import_contract.py::test_real_unsupported_native_routing_never_initializes_backend[canonical]
+FAILED tests/test_mlx_import_contract.py::test_real_unsupported_native_routing_never_initializes_backend[dotted-alias]
+FAILED tests/test_mlx_import_contract.py::test_real_unsupported_native_routing_never_initializes_backend[bare-alias]
+FAILED tests/test_mlx_import_contract.py::test_real_core_pyargs_preserves_import_isolation
+FAILED tests/test_mlx_import_contract.py::test_real_focused_native_backend_import_starts_in_preflight
+10 failed in 76.50s (0:01:16)

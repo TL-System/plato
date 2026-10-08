@@ -1,0 +1,220 @@
+{
+  "status": "LOCAL_QUALIFICATION_ACCEPTED_BY_ROOT_PENDING_INDEPENDENT_DELIVERY_GATE_AND_LINUX",
+  "utc": "2026-10-03T22:27:49.465071+00:00",
+  "qualified_source": "6bf8836d06072c7946cdfb5499a09e4bce459805",
+  "history_reconciled_source": "2ed05e88545f1de1ba2ea0d5e55fb86b3117f6df",
+  "qualified_tree": "ec9ec02c54bf6e96809168cf9a9e22cd80876000",
+  "reconciled_tree_identical": true,
+  "merged_parent": "b9a8735f4a604500d3f2bb232d2fe91ab0ce5401",
+  "profiles": {
+    "mandatory": {
+      "profile": "mandatory",
+      "head": "6bf8836d06072c7946cdfb5499a09e4bce459805",
+      "utc": "2026-10-03T21:59:58.479285+00:00",
+      "results": [
+        {
+          "label": "collection",
+          "command": [
+            "/tmp/plato-archive-integration/env/bin/python",
+            "-m",
+            "pytest",
+            "tests",
+            "--test-profile=mandatory",
+            "--collect-only",
+            "-q"
+          ],
+          "returncode": 0,
+          "seconds": 5.820592749863863
+        },
+        {
+          "label": "suite",
+          "command": [
+            "/tmp/plato-archive-integration/env/bin/python",
+            "-m",
+            "pytest",
+            "tests",
+            "--test-profile=mandatory",
+            "-ra",
+            "--basetemp=/tmp/plato-archive-integration/run-mandatory/pytest-tmp",
+            "--junitxml=/tmp/plato-archive-integration/run-mandatory/tests.xml",
+            "--cov=plato",
+            "--cov-report=term",
+            "--cov-report=json:/tmp/plato-archive-integration/run-mandatory/coverage.json"
+          ],
+          "returncode": 0,
+          "seconds": 1511.9380171250086
+        }
+      ],
+      "tracked_source_changes": [],
+      "junit_cases": 1551,
+      "junit_counts": {
+        "failure": 0,
+        "error": 0,
+        "skipped": 0
+      },
+      "passed": 1551,
+      "source_manifest_sha256": "7838f9f63e2a10e84782a060f6e8bc1a4f48821ae084df118b947a3a4d7446c3"
+    },
+    "base": {
+      "profile": "base",
+      "head": "6bf8836d06072c7946cdfb5499a09e4bce459805",
+      "utc": "2026-10-03T22:27:01.766349+00:00",
+      "results": [
+        {
+          "label": "collection",
+          "command": [
+            "/tmp/plato-archive-integration/base-env/bin/python",
+            "-m",
+            "pytest",
+            "tests",
+            "--test-profile=base",
+            "-m",
+            "not runtime",
+            "--collect-only",
+            "-q"
+          ],
+          "returncode": 0,
+          "seconds": 28.890957500087097
+        },
+        {
+          "label": "suite",
+          "command": [
+            "/tmp/plato-archive-integration/base-env/bin/python",
+            "-m",
+            "pytest",
+            "tests",
+            "--test-profile=base",
+            "-m",
+            "not runtime",
+            "-ra",
+            "--basetemp=/tmp/plato-archive-integration/run-base/pytest-tmp",
+            "--junitxml=/tmp/plato-archive-integration/run-base/tests.xml"
+          ],
+          "returncode": 0,
+          "seconds": 1594.016021292191
+        }
+      ],
+      "tracked_source_changes": [],
+      "junit_cases": 1475,
+      "junit_counts": {
+        "failure": 0,
+        "error": 0,
+        "skipped": 1
+      },
+      "passed": 1474,
+      "source_manifest_sha256": "7838f9f63e2a10e84782a060f6e8bc1a4f48821ae084df118b947a3a4d7446c3"
+    },
+    "mlx-native": {
+      "profile": "mlx-native",
+      "head": "6bf8836d06072c7946cdfb5499a09e4bce459805",
+      "utc": "2026-10-03T21:34:13.234424+00:00",
+      "results": [
+        {
+          "label": "collection",
+          "command": [
+            "/tmp/plato-archive-integration/env/bin/python",
+            "-m",
+            "pytest",
+            "tests/mlx_native",
+            "--test-profile=mlx-native",
+            "--collect-only",
+            "-q"
+          ],
+          "returncode": 0,
+          "seconds": 7.758707582950592
+        },
+        {
+          "label": "suite",
+          "command": [
+            "/tmp/plato-archive-integration/env/bin/python",
+            "-m",
+            "pytest",
+            "tests/mlx_native",
+            "--test-profile=mlx-native",
+            "-ra",
+            "--basetemp=/tmp/plato-archive-integration/run-mlx-native/pytest-tmp",
+            "--junitxml=/tmp/plato-archive-integration/run-mlx-native/tests.xml"
+          ],
+          "returncode": 0,
+          "seconds": 42.70482429093681
+        }
+      ],
+      "tracked_source_changes": [],
+      "junit_cases": 383,
+      "junit_counts": {
+        "failure": 0,
+        "error": 0,
+        "skipped": 0
+      },
+      "passed": 383,
+      "source_manifest_sha256": "7838f9f63e2a10e84782a060f6e8bc1a4f48821ae084df118b947a3a4d7446c3"
+    }
+  },
+  "records": [
+    {
+      "path": "evidence/2026-refresh/archive-local-evidence-manifest.json",
+      "sha256": "e9779aacf3211f73b9d3409b0335737563cd15b3796b9bb2428c0f82a363fb11",
+      "bytes": 3112582
+    },
+    {
+      "path": "evidence/2026-refresh/archive-local-qualification.json",
+      "sha256": "0888a956acfa7f6e2681a3fdd45b224b35ff94b7ba9d2c2cdca1f1ae22559a61",
+      "bytes": 14719
+    },
+    {
+      "path": "evidence/2026-refresh/reproductions/archive-local-qualification.tar.gz",
+      "sha256": "847372ec51d1a0ff4008a5c3356b4285e2e5b4f8b3b87b721cc21901494e04a1",
+      "bytes": 18651825
+    },
+    {
+      "path": "evidence/2026-refresh/archive-final-static-checks.json",
+      "sha256": "57a85f9cdbd2d66a6370af0936d4db7c5c6f8a48323a1b7d64eca5a6cfabc4c1",
+      "bytes": 3415
+    },
+    {
+      "path": "evidence/2026-refresh/archive-final-package-docs-checks.json",
+      "sha256": "15b34852d3014a61696bc02f78438e7b4250e3fd361c086890f5f8c87734e948",
+      "bytes": 1100
+    },
+    {
+      "path": "evidence/2026-refresh/archive-final-wheel-import.json",
+      "sha256": "377842035d504cef01dd61485934133f694ff92fe698a9819206264bad37dede",
+      "bytes": 1252
+    },
+    {
+      "path": "evidence/2026-refresh/archive-final-runtime-audit.json",
+      "sha256": "f08f5e18141d199bcd8d1462caf9b2eac0153fd3e0294d048b0e2d6b2ddd7814",
+      "bytes": 127795
+    },
+    {
+      "path": "evidence/2026-refresh/phase3-mlx-worktree-cleanup.json",
+      "sha256": "4f3a60c55771956eda5976a180676a00a2eacbf3495da8b84dd53db8a90619d6",
+      "bytes": 1485
+    },
+    {
+      "path": "evidence/2026-refresh/phase3-mlx-final-linux-acceptance.json",
+      "sha256": "b63ebef59ced2f59515bc93382e542b9f8989bacd6c10b3ea8d843a28eb66200",
+      "bytes": 2028
+    },
+    {
+      "path": "evidence/2026-refresh/phase3-mlx-final-linux-manifest.json",
+      "sha256": "769065137a752b1e99de340709bafb174874420c8b399e5c6f09d58d69bcac69",
+      "bytes": 691037
+    },
+    {
+      "path": "evidence/2026-refresh/reproductions/phase3-mlx-final-linux-qualification.tar.gz",
+      "sha256": "21c6005fbc90adc897552bce2e7ff47e80ea8a3ac331e634f4f3ca8c60176731",
+      "bytes": 3636259
+    }
+  ],
+  "runtime": "55 core process records plus19 retained model-search cases; natural success required by reviewed harness. Recomputed FedAvg/FedDyn payload/RNG oracles and retained event assertions passed.",
+  "typing": "337 historical diagnostics, including2 explicitly allowed existing Hugging Face test assignments; no other diagnostics in workflow-owned paths. Ruff imports and explicit artifact-stager typing pass.",
+  "packaging_scope": "This archive PR excludes retired shortlist payloads. P2 separately found and is repairing older legacy_datalib/legacy_rl_env files in sdist; no claim that all historical archives are absent from this candidate sdist.",
+  "raw_evidence": "Compact committed bundle retains records up to2MiB and hashes every original; large raw checkpoints/fixtures stay intact in /tmp/plato-archive-integration. Complete final Linux runtime artifacts are separate and mandatory before merge.",
+  "limits": [
+    "Independent publication gate pending.",
+    "Exact-source archive Linux CI and artifact audit pending.",
+    "Broader Phase4 family audit, evaluator profile and deployment modernization are separate.",
+    "No new Python3.14 qualification."
+  ]
+}

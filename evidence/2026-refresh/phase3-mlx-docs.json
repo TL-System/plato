@@ -1,0 +1,96 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-03T19:44:57.077734+00:00",
+  "status": "Documentation authored and locally checked; independent review, combined native qualification, integration and publication remain root-owned.",
+  "scope": "Public MLX prose and navigation only; no runtime, config, test, packaging, lock or CI changes.",
+  "source": {
+    "base_commit": "15a3e68c357c60ca7259255db87e2a34e5fea9ca",
+    "docs_commit": "fd280d9aa9f9d6f1c27f4694612f3e42bd0d76e8",
+    "docs_sha256": {
+      "docs/docs/configurations/trainer.md": "de614324e54015b2ebc15f6f39fcdcf13d4fdc9f7befdbf8046e0a86ce5848a6",
+      "docs/docs/development.md": "96ae93b80908f36d27bf8faaed16ac6e70c8966f07ba38155a1cbdad1026e057",
+      "docs/docs/install.md": "8f7e57f4c0c72df67d769af788bcb9ece2d6907f823513fec17692644b21340b",
+      "docs/docs/mlx.md": "d30fddc8ffbbd7dfc59670622fbb2a566a70cf58c145617e73b16cd5e3921c8b",
+      "docs/docs/quickstart.md": "1cd72bfbaf114d44b3c1b177c0d38709c8e7e939d2780f29b040139b713a4d0b",
+      "docs/docs/references/trainers.md": "f9739f2b456c09c0cfe047123a05c2321001f0239be49ccee2d735b04d8b373b",
+      "docs/mkdocs.yml": "7d31abad2fdd2d751ae47bf41000d1c59bb5275d90beb85b7927104efe0be3ed"
+    },
+    "inspected_repository_source_sha256": {
+      "plato/trainers/mlx.py": "bdd405bec5ca7255b585e7a99118699dc52e1dfcb939beef6e5fc0296381cb5e",
+      "plato/algorithms/mlx_fedavg.py": "469021332340cadf9c58b2349b3bb2ab856edb03aba4ab76136e6620066748f3",
+      "plato/models/mlx/lenet5.py": "2c1c27a21b694d665670ec143841bc52190d4618b4d45a8206f681aae1449379",
+      "plato/servers/fedavg.py": "02f3d5da21753ced30edfc5135bd973642087378f0d5d622be24a5e9bd590a45",
+      "plato/servers/strategies/aggregation/fedavg.py": "fa1e2a6bbbc8e3829b72cd0cdd47f10b0a8fffbdabdaa2dfb3efed81872877c1",
+      "configs/MNIST/fedavg_lenet5_mlx.toml": "7d9fe11b19c8487d801d37288f40e6fd959108cfc4085800f60f0bdd9804de56",
+      "plato/config.py": "c96aed26f35e2cbf2e54153dbb7099cd8ba3c8042ff5cf467d2e954cbb95308e",
+      "pyproject.toml": "bd6e032489a67e61e2c8a022de6b4335e600c8f537ff128c3412a39d56dffd24",
+      "tests/conftest.py": "8e458b0925c1a83c32fa3869a4e9f229b27cdb77f10b56a7f66c3f933a9f7739",
+      "tests/mlx_native/test_phase3_controls.py": "9d25d316df0482e3cb705c82b34a06ab8b1b03aa94c985505e38670b595ce633",
+      "evidence/2026-refresh/phase3-mlx-native.json": "f2d7ae7964c7a2d213c6e05ab20d08c07cbd4856f128e2de9f0a609dfe3f4b27"
+    },
+    "inspected_external_artifact_sha256": {
+      "/tmp/plato-mlx-profile-plan.json": "81a5a557b1ad018384da9b9290e0648048696af244c486849c653a09f0bea32b",
+      "/tmp/plato-mlx-profile-contract-clarification.json": "c4f4ba8a69e59aefa3f9ded0aafd3ea91bc42f761a734f9641cfa902202c7add",
+      "/tmp/plato-refresh-worktrees/mlx-native/evidence/2026-refresh/phase3-mlx-selector-correction.json": "45fc7e3a9036d1b1147656c69dfc30a676feda957e6236917e0c5fc33ce301c9",
+      "/tmp/plato-phase3-mlx/env/lib/python3.13/site-packages/mlx/optimizers/optimizers.py": "25a57fe00ff9ae1fe836cd504506e16d0e9d890112daed05cef0e2bcb95f7714"
+    }
+  },
+  "validation": {
+    "interpreter": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+    "tooling_environment": "/tmp/plato-llm-integration/tooling-313 (read only; no dependency mutations)",
+    "versions": {
+      "mkdocs": "1.6.1",
+      "mkdocs-material": "9.7.7"
+    },
+    "mkdocs": {
+      "command": [
+        "/tmp/plato-llm-integration/tooling-313/bin/python",
+        "-m",
+        "mkdocs",
+        "build",
+        "--strict",
+        "--config-file",
+        "docs/mkdocs.yml",
+        "--site-dir",
+        "/tmp/plato-mlx-docs-site"
+      ],
+      "returncode": 0,
+      "log": "\n\u001b[31m \u2502  \u26a0  Warning from the Material for MkDocs team\u001b[0m\n\u001b[31m \u2502\u001b[0m\n\u001b[31m \u2502\u001b[0m  MkDocs 2.0, the underlying framework of Material for MkDocs,\n\u001b[31m \u2502\u001b[0m  will introduce backward-incompatible changes, including:\n\u001b[31m \u2502\u001b[0m\n\u001b[31m \u2502  \u00d7 \u001b[0mAll plugins will stop working \u2013 the plugin system has been removed\n\u001b[31m \u2502  \u00d7 \u001b[0mAll theme overrides will break \u2013 the theming system has been rewritten\n\u001b[31m \u2502  \u00d7 \u001b[0mNo migration path exists \u2013 existing projects cannot be upgraded\n\u001b[31m \u2502  \u00d7 \u001b[0mClosed contribution model \u2013 community members can't report bugs\n\u001b[31m \u2502  \u00d7 \u001b[0mCurrently unlicensed \u2013 unsuitable for production use\n\u001b[31m \u2502\u001b[0m\n\u001b[31m \u2502\u001b[0m  Our full analysis:\n\u001b[31m \u2502\u001b[0m\n\u001b[31m \u2502\u001b[0m  \u001b[4mhttps://squidfunk.github.io/mkdocs-material/blog/2026/02/18/mkdocs-2.0/\u001b[0m\n\u001b[0m\nINFO    -  Cleaning site directory\nINFO    -  Building documentation to directory: /tmp/plato-mlx-docs-site\nINFO    -  The following pages exist in the docs directory, but are not included in the \"nav\" configuration:\n  - examples/case-studies/3. SmolVLA Trainer with LeRobot.md\n  - examples/case-studies/5. Nanochat in Plato.md\nINFO    -  Documentation built in 0.66 seconds\n"
+    },
+    "rendered_links": {
+      "pages": [
+        "mlx/index.html",
+        "install/index.html",
+        "quickstart/index.html",
+        "development/index.html",
+        "configurations/trainer/index.html",
+        "references/trainers/index.html"
+      ],
+      "local_links_checked": 369,
+      "errors": [],
+      "external_links": "Not fetched; no new external links introduced."
+    },
+    "rendered_link_checker": {
+      "sha256": "b4e3e04d1140371efff86bdf2493b67550f37d519dace1a992beeff04203e5d8",
+      "source": "from html.parser import HTMLParser\nfrom pathlib import Path\nfrom urllib.parse import unquote, urlsplit\nimport json\n\nroot = Path('/tmp/plato-mlx-docs-site')\npages = ['mlx/index.html', 'install/index.html', 'quickstart/index.html',\n         'development/index.html', 'configurations/trainer/index.html',\n         'references/trainers/index.html']\nclass Document(HTMLParser):\n    def __init__(self, path):\n        super().__init__()\n        self.links, self.ids = [], set()\n        self.feed(path.read_text())\n    def handle_starttag(self, tag, attrs):\n        attrs = dict(attrs)\n        if attrs.get('id'): self.ids.add(attrs['id'])\n        if tag == 'a' and attrs.get('href'): self.links.append(attrs['href'])\n\nchecked = 0\nerrors = []\nfor page in pages:\n    path = root / page\n    doc = Document(path)\n    for href in doc.links:\n        parsed = urlsplit(href)\n        if parsed.scheme or parsed.netloc: continue\n        if not parsed.path: target = path\n        elif parsed.path.startswith('/'): target = root / unquote(parsed.path).lstrip('/')\n        else: target = path.parent / unquote(parsed.path)\n        target = target.resolve()\n        if target.is_dir(): target /= 'index.html'\n        checked += 1\n        if not target.exists(): errors.append([page, href, 'missing target'])\n        elif parsed.fragment and target.suffix == '.html':\n            if unquote(parsed.fragment) not in Document(target).ids:\n                errors.append([page, href, 'missing anchor'])\nresult = {'pages': pages, 'local_links_checked': checked, 'errors': errors,\n          'external_links': 'Not fetched; no new external links introduced.'}\nprint(json.dumps(result, indent=2))\nPath('/tmp/plato-mlx-docs-validation/links.json').write_text(json.dumps(result, indent=2)+'\\n')\nraise SystemExit(bool(errors))\n"
+    },
+    "diff_check": {
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "returncode": 0
+    },
+    "runtime_tests": "Not rerun for this prose-only change."
+  },
+  "truth_boundaries": [
+    "Native behavior described from source589249b77 and selector correctionaa7983d2; no final combined/current-head delivery claim.",
+    "Native profile command documents accepted strict contract; independent lazy-loading/profile correction owned elsewhere.",
+    "Original E8 timings remain tied to original source; explicitly not current-checkout performance measurements.",
+    "Socket regression uses two physical clients and unequal counts; bounded shipped MNIST entrypoint uses one reused physical worker.",
+    "Python3.13 default/CI; no hosted Mac CI, Python3.14, MLX-LM, broad architecture or full-resume claim.",
+    "Core exclusion is described without claiming zero MLX-related metadata lookups.",
+    "Original object/report reorder rejection is bounded; unlabeled deep-copy semantic correspondence and arbitrary hook side-effect rollback are not promised."
+  ]
+}

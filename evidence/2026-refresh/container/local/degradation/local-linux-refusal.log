@@ -1,0 +1,20 @@
+{"accepted": false, "mode": "linux", "error": "RuntimeError: Actual image checks run only on Linux amd64 CI.", "elapsed_seconds": 0.013}
+Traceback (most recent call last):
+  File "/private/tmp/plato-refresh-worktrees/container-refresh/.github/scripts/check_container.py", line 751, in <module>
+    main()
+    ~~~~^^
+  File "/private/tmp/plato-refresh-worktrees/container-refresh/.github/scripts/check_container.py", line 716, in main
+    checker.qualify()
+    ~~~~~~~~~~~~~~~^^
+  File "/private/tmp/plato-refresh-worktrees/container-refresh/.github/scripts/check_container.py", line 492, in qualify
+    require(
+    ~~~~~~~^
+        platform.system() == "Linux" and platform.machine() == "x86_64",
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        "Actual image checks run only on Linux amd64 CI.",
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/private/tmp/plato-refresh-worktrees/container-refresh/.github/scripts/check_container.py", line 75, in require
+    raise RuntimeError(message)
+RuntimeError: Actual image checks run only on Linux amd64 CI.

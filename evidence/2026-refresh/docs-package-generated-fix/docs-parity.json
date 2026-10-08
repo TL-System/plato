@@ -1,0 +1,9 @@
+{
+  "source_commit": "f1963eb906228c287f9787251f4319339ca7ee78",
+  "requirements_byte_parity": true,
+  "requirements_sha256": "9c33555b3d0cbc983d6dd59f261a242a92d136f2bb1364f300a01824f9eff665",
+  "docs_dependency_count": 29,
+  "runtime_and_project_absent": true,
+  "mkdocs": "1.6.1",
+  "mkdocs-material": "9.7.7"
+}

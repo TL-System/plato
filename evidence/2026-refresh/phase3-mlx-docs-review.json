@@ -1,0 +1,677 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-03T19:58:23.923345+00:00",
+  "kind": "Fresh independent native MLX public documentation review",
+  "decision": "ACCEPTED_FOR_DOCUMENTATION",
+  "scope": "Seven changed prose/navigation files and source-bound docs receipt, reviewed against final combined source. This review is not a native or complete core runtime qualification gate.",
+  "findings": [],
+  "finding_counts": {
+    "blocking": 0,
+    "high": 0,
+    "medium": 0,
+    "low": 0
+  },
+  "identities": {
+    "integrated_final": "0929b5a527c766be59bfff7fb2ea2749c02f3f2e",
+    "integrated_final_tree": "43701aea739e99bccc11e73ef6d874a6a307ed68",
+    "docs_author": "e72f03eecd0ed2b91eae931e36156d9f1246df4b",
+    "docs_author_tree": "c4c03dae82bc11825ae9d6ff20281ae162914247",
+    "integrated_docs_tree": "0f393a345641d9248c32cee6fd0aaf621c25a817",
+    "build_execution_commit": "202fcd631d37c977608c1bb84a16266abb756b1e",
+    "build_execution_docs_tree": "0f393a345641d9248c32cee6fd0aaf621c25a817",
+    "author_status": "",
+    "integrated_status": "",
+    "docs_change_commit": "fd280d9aa9f9d6f1c27f4694612f3e42bd0d76e8",
+    "docs_receipt_commit": "e72f03eecd0ed2b91eae931e36156d9f1246df4b",
+    "docs_base_commit": "15a3e68c357c60ca7259255db87e2a34e5fea9ca",
+    "native_original_source_commit": "589249b77e81b164549ec65e47daccec87794277",
+    "late_selector_source_commit": "aa7983d2fd1d750b2a6ecb176ab96f14e3d9ea80",
+    "lazy_profile_correction_commit": "cadd427138b2c9fb1ca80a90d2a7976aea6481c3",
+    "worktrees": {
+      "docs_author": "/tmp/plato-refresh-worktrees/mlx-docs",
+      "final_integrated": "/tmp/plato-refresh-worktrees/mlx-integration"
+    }
+  },
+  "source_bindings": {
+    "identities": {
+      "integrated_final": "0929b5a527c766be59bfff7fb2ea2749c02f3f2e",
+      "integrated_final_tree": "43701aea739e99bccc11e73ef6d874a6a307ed68",
+      "docs_author": "e72f03eecd0ed2b91eae931e36156d9f1246df4b",
+      "docs_author_tree": "c4c03dae82bc11825ae9d6ff20281ae162914247",
+      "integrated_docs_tree": "0f393a345641d9248c32cee6fd0aaf621c25a817",
+      "build_execution_commit": "202fcd631d37c977608c1bb84a16266abb756b1e",
+      "build_execution_docs_tree": "0f393a345641d9248c32cee6fd0aaf621c25a817",
+      "author_status": "",
+      "integrated_status": ""
+    },
+    "docs": [
+      {
+        "path": "docs/docs/mlx.md",
+        "sha256": "d30fddc8ffbbd7dfc59670622fbb2a566a70cf58c145617e73b16cd5e3921c8b",
+        "blob": "ee795474749b7851a435d2e233a35094a914bf70",
+        "author_sha256": "d30fddc8ffbbd7dfc59670622fbb2a566a70cf58c145617e73b16cd5e3921c8b",
+        "matches_author_source": true,
+        "matches_author_receipt": true
+      },
+      {
+        "path": "docs/docs/install.md",
+        "sha256": "8f7e57f4c0c72df67d769af788bcb9ece2d6907f823513fec17692644b21340b",
+        "blob": "9c58736b49ed1debeb6ac21a7572ff0b2d312e44",
+        "author_sha256": "8f7e57f4c0c72df67d769af788bcb9ece2d6907f823513fec17692644b21340b",
+        "matches_author_source": true,
+        "matches_author_receipt": true
+      },
+      {
+        "path": "docs/docs/quickstart.md",
+        "sha256": "1cd72bfbaf114d44b3c1b177c0d38709c8e7e939d2780f29b040139b713a4d0b",
+        "blob": "165f56548094d9b27419cfc02c8d1072d16e7b8d",
+        "author_sha256": "1cd72bfbaf114d44b3c1b177c0d38709c8e7e939d2780f29b040139b713a4d0b",
+        "matches_author_source": true,
+        "matches_author_receipt": true
+      },
+      {
+        "path": "docs/docs/development.md",
+        "sha256": "96ae93b80908f36d27bf8faaed16ac6e70c8966f07ba38155a1cbdad1026e057",
+        "blob": "743bae96ca262aa033655929296197af58de65cb",
+        "author_sha256": "96ae93b80908f36d27bf8faaed16ac6e70c8966f07ba38155a1cbdad1026e057",
+        "matches_author_source": true,
+        "matches_author_receipt": true
+      },
+      {
+        "path": "docs/docs/configurations/trainer.md",
+        "sha256": "de614324e54015b2ebc15f6f39fcdcf13d4fdc9f7befdbf8046e0a86ce5848a6",
+        "blob": "efdbe7fa6f151d0e3b736ff386f1dacde960d79e",
+        "author_sha256": "de614324e54015b2ebc15f6f39fcdcf13d4fdc9f7befdbf8046e0a86ce5848a6",
+        "matches_author_source": true,
+        "matches_author_receipt": true
+      },
+      {
+        "path": "docs/docs/references/trainers.md",
+        "sha256": "f9739f2b456c09c0cfe047123a05c2321001f0239be49ccee2d735b04d8b373b",
+        "blob": "406c8c466dd805e4bba98127f94d1d9576327a4d",
+        "author_sha256": "f9739f2b456c09c0cfe047123a05c2321001f0239be49ccee2d735b04d8b373b",
+        "matches_author_source": true,
+        "matches_author_receipt": true
+      },
+      {
+        "path": "docs/mkdocs.yml",
+        "sha256": "7d31abad2fdd2d751ae47bf41000d1c59bb5275d90beb85b7927104efe0be3ed",
+        "blob": "a9bd490b3f7df93c0888142d1d5c136e7528cdc9",
+        "author_sha256": "7d31abad2fdd2d751ae47bf41000d1c59bb5275d90beb85b7927104efe0be3ed",
+        "matches_author_source": true,
+        "matches_author_receipt": true
+      }
+    ],
+    "runtime_config_profile_sources": [
+      {
+        "path": "plato/trainers/mlx.py",
+        "sha256": "bdd405bec5ca7255b585e7a99118699dc52e1dfcb939beef6e5fc0296381cb5e",
+        "blob": "4fd48b2ddafa94984db53cf53f66197a11518f20"
+      },
+      {
+        "path": "plato/algorithms/mlx_fedavg.py",
+        "sha256": "469021332340cadf9c58b2349b3bb2ab856edb03aba4ab76136e6620066748f3",
+        "blob": "eb0fff23ead5cdada8341b1e7be62deae77a0777"
+      },
+      {
+        "path": "plato/models/mlx/lenet5.py",
+        "sha256": "2c1c27a21b694d665670ec143841bc52190d4618b4d45a8206f681aae1449379",
+        "blob": "4f4fe8ff947250d14ac13555c9dc5eeddc5eacf9"
+      },
+      {
+        "path": "plato/models/registry.py",
+        "sha256": "21e3eef31c433802aa042f430cdd869571ced0c6f421ac7e48863fd5f2385a8e",
+        "blob": "02c1b0c645c5ebabb24b8588623867b3d9a96b9a"
+      },
+      {
+        "path": "plato/trainers/registry.py",
+        "sha256": "8e2c03428b45e14fc33fb919d1684fff1ed3d57810167f461f697371ee0fb9a1",
+        "blob": "1e7d8a309bd7d4b8c68f5dc364e4eaab7920c9bf"
+      },
+      {
+        "path": "plato/algorithms/registry.py",
+        "sha256": "c28cd649d77b3bffab14e7f7b01e87c2b0b652d0b538ae7d0ad0bab0be5e2d58",
+        "blob": "2226dc6d0f365ddb4fa09f10947d439a2c1de813"
+      },
+      {
+        "path": "plato/servers/fedavg.py",
+        "sha256": "02f3d5da21753ced30edfc5135bd973642087378f0d5d622be24a5e9bd590a45",
+        "blob": "fd32e621b78944905676bce422425bf660ab1889"
+      },
+      {
+        "path": "plato/servers/strategies/aggregation/fedavg.py",
+        "sha256": "fa1e2a6bbbc8e3829b72cd0cdd47f10b0a8fffbdabdaa2dfb3efed81872877c1",
+        "blob": "f4045b7e3a030d67843300f1f1fe1a731d701c66"
+      },
+      {
+        "path": "plato/servers/base.py",
+        "sha256": "80eb69f6af6602747e37264540aed3c989731a6c76c2c4a9bf6cc6692d32b918",
+        "blob": "c62b36f231708d0430f20d947f796de372e5bf20"
+      },
+      {
+        "path": "plato/config.py",
+        "sha256": "c96aed26f35e2cbf2e54153dbb7099cd8ba3c8042ff5cf467d2e954cbb95308e",
+        "blob": "510766b62e544e64920e32e7c03214149adb081f"
+      },
+      {
+        "path": "plato/client.py",
+        "sha256": "81395fb7c485a23e875bd160fff466674badc833a9fbec6d441a5937c421fa3f",
+        "blob": "2232bb1c0e51af0bb9558116388c6006e25698ca"
+      },
+      {
+        "path": "plato/serialization/safetensor.py",
+        "sha256": "965fc9c25d5bd63107fafc68ebc6f35a76f9718205a83229a09fdf0280883f2f",
+        "blob": "460a1196bb59bf84cef360cf5d95e4b6c45497df"
+      },
+      {
+        "path": "plato/processors/safetensor_encode.py",
+        "sha256": "543fbb334ecacbbff012041808320fe797abbb97a0559d2536254bd00364b383",
+        "blob": "d9f8d8fb13a7b03154a892c9987ed2137ed525e4"
+      },
+      {
+        "path": "plato/processors/safetensor_decode.py",
+        "sha256": "767b10a359c7093372fe8a65ae7baa67f883dc0b6d0220e6fe0b856c2247692e",
+        "blob": "326a882b1a053d533e3a9bdb6b2cdf3948662c8f"
+      },
+      {
+        "path": "configs/MNIST/fedavg_lenet5_mlx.toml",
+        "sha256": "7d9fe11b19c8487d801d37288f40e6fd959108cfc4085800f60f0bdd9804de56",
+        "blob": "4d9fb6198c8f95ada3168bd7ebf11805182da802"
+      },
+      {
+        "path": "configs/MNIST/mnist_iid.toml",
+        "sha256": "271c141450994cef4f057acc0624b20874e2e3cc79543dda88417eb6153379d5",
+        "blob": "6c7993a1ee5d41de531d5e4c5efb2dbcbdbade02"
+      },
+      {
+        "path": "tests/conftest.py",
+        "sha256": "8e458b0925c1a83c32fa3869a4e9f229b27cdb77f10b56a7f66c3f933a9f7739",
+        "blob": "469f434a9fdbe5dba1434152f0033b4ac28196ad"
+      },
+      {
+        "path": "tests/mlx_native/cases.json",
+        "sha256": "c168dc33a4d4e7ed70079e09c3de70f5b318d543c035ec13de2826b48e1175bb",
+        "blob": "21dbe0128effb498dc7467a4fc39570291e686cf"
+      },
+      {
+        "path": "tests/mlx_native/test_phase3_controls.py",
+        "sha256": "9d25d316df0482e3cb705c82b34a06ab8b1b03aa94c985505e38670b595ce633",
+        "blob": "bf1ece1686e6c322aad996537299d2b06c59f069"
+      },
+      {
+        "path": "tests/mlx_native/socket_harness.py",
+        "sha256": "1034c4d0b2e9c0f52d61ab2343923d9f019d1ef5d2ce7f949b612cfc0d5ce928",
+        "blob": "e00401f3c9ec8018cf5de5a703b2a785a8e83586"
+      },
+      {
+        "path": "tests/mlx_native/socket_probe.py",
+        "sha256": "c8b071c5e3e69c9014770da0d65295a8598bfde4dde673f420eab0ac9b118209",
+        "blob": "9242c5cc8623bc7c5c72b2acff1df2ec010cfb52"
+      },
+      {
+        "path": "tests/mlx_native/test_phase3_socket.py",
+        "sha256": "e4fcad87330ce9923eba2f7b05e87e6cf3eeb4fbe06ed0089742d0d53d3797a7",
+        "blob": "d4d8299c4b5f9816d43fdeabddb2bd593de79df7"
+      },
+      {
+        "path": "tests/mlx_native/test_phase3_runtime.py",
+        "sha256": "946706274e10bae70aa60fe0b7267366e5f77c95fc610f127661d1f6eefd2a6f",
+        "blob": "c97e5051d74782307299abf4fbbdada245882a3b"
+      },
+      {
+        "path": "tests/mlx_native/test_phase3_dispatch.py",
+        "sha256": "f1a6929ef580c4220c833cb2b1d17a04489266ac5554f23fb20b37fa7165ff88",
+        "blob": "44e258d02204b97aa2d92c08f9cac6e4c4732762"
+      },
+      {
+        "path": "tests/mlx_native/test_phase3_rng.py",
+        "sha256": "9ff37ccf9e97291ea752d25e845cff0a840187e2ef68a4289bdb9442459f4df3",
+        "blob": "aee17558816596074cdf4af5369cc37c35c7a128"
+      },
+      {
+        "path": "tests/mlx_native/seed_probe.py",
+        "sha256": "8b73af203727be6751e4caf7050fce178b1bf232d266fa6235656ca396c4f700",
+        "blob": "c9d885c62ac0884d3bbcf96b14f7246ccc354bd1"
+      },
+      {
+        "path": "pyproject.toml",
+        "sha256": "bd6e032489a67e61e2c8a022de6b4335e600c8f537ff128c3412a39d56dffd24",
+        "blob": "ca09c3eeb7df5697745aff47e0c2d685b0155586"
+      },
+      {
+        "path": "uv.lock",
+        "sha256": "46236f61039c07a844bbddaa185c32582b6f4436203bd719aa8e7dcfdbd26e89",
+        "blob": "1aef3c127d77d3ef96e6757ed791646a0c057557"
+      },
+      {
+        "path": ".python-version",
+        "sha256": "02e735b3dfe1c32833eb550b7ff8ffa17f5f2bc3fa1e7bae61a8f5a3883ce398",
+        "blob": "24ee5b1be9961e38a503c8e764b7385dbb6ba124"
+      },
+      {
+        "path": ".github/workflows/pytorch_tests.yml",
+        "sha256": "9901a1766341a9b9369a31ede1a5f8d94429eaf2e74c66f7a77c2520324e703b",
+        "blob": "50213eaf852cd5c4204597ff37c162301685f716"
+      },
+      {
+        "path": "plato/utils/tree.py",
+        "sha256": "33a02e8fe70eb62daa97b40c7edea19b0fb9fed1b41c2d64b5146242143b0ef6",
+        "blob": "160af457219f9ff10a731b51c4317145ce2e84fd"
+      },
+      {
+        "path": "tests/test_mlx_profile_contract.py",
+        "sha256": "ac8b4b6c8c9ff40a1c0df37a874435e78a6f65e69731d6d3209f91c23f551b8c",
+        "blob": "cc437be1893344c5b737a1c436c4a0b6a00977c2"
+      },
+      {
+        "path": "tests/test_mlx_import_contract.py",
+        "sha256": "6c9eb81ab656a8695f34579fd590a02d51480c85a3353fcc57a33597f972be77",
+        "blob": "b5363c57b0997f498e3484e35610feba53f9b5bd"
+      },
+      {
+        "path": "tests/mlx_import_audit_runner.py",
+        "sha256": "62a6509de2b389d1ab143cc06a526745a132f035f978b18f8b78d183ec80d296",
+        "blob": "21149bbe266e885d75f528785e08990c9fbcd423"
+      }
+    ],
+    "receipts": [
+      {
+        "path": "evidence/2026-refresh/phase3-mlx-docs.json",
+        "sha256": "6900bd7ad7637d74c1be1914b8a875420ffa17d7c2ec212aab0a8c612006711c",
+        "blob": "004e306a0e4fcbd0db93ecce19c667766be31f4b"
+      },
+      {
+        "path": "evidence/2026-refresh/phase3-mlx-native.json",
+        "sha256": "f2d7ae7964c7a2d213c6e05ab20d08c07cbd4856f128e2de9f0a609dfe3f4b27",
+        "blob": "9421a98d2740834b2511bf6fe55d9825f51eec2d"
+      },
+      {
+        "path": "evidence/2026-refresh/phase3-mlx-selector-correction.json",
+        "sha256": "45fc7e3a9036d1b1147656c69dfc30a676feda957e6236917e0c5fc33ce301c9",
+        "blob": "669c4e4ff7a92be3caa2ddb6df65958907f590e2"
+      },
+      {
+        "path": "evidence/2026-refresh/mlx-profile-policy/receipt.json",
+        "sha256": "53205311bb50eb5aa4197bd2592138927c2ab7a6c2e68161a8e9eebcee859eb0",
+        "blob": "cc6c313ad2ea46c82e1daaea8398a14261f3f910"
+      },
+      {
+        "path": "evidence/2026-refresh/mlx-profile-correction/receipt.json",
+        "sha256": "bf2ad7d9096362fba85ef71f41bf9fc3a3ca6498958097f253672ec70fff36f0",
+        "blob": "2244718cc5ada4b01da7a0f1cb4f961808d0447a"
+      },
+      {
+        "path": "evidence/2026-refresh/mlx-profile-correction/contract-clarification.json",
+        "sha256": "c4f4ba8a69e59aefa3f9ded0aafd3ea91bc42f761a734f9641cfa902202c7add",
+        "blob": "f4c57a6f0bdf7b1cc82142d8588e17cb64f5166a"
+      }
+    ],
+    "preserved_pages": [
+      {
+        "path": "docs/docs/examples/case-studies/6. Qwen3 Federated LoRA.md",
+        "sha256": "0e6c10676a580e6135cc65c5708840a97069b2133aac7d4576495786dc5f7dae",
+        "matches_docs_base": true
+      },
+      {
+        "path": "docs/docs/examples/case-studies/3. SmolVLA Trainer with LeRobot.md",
+        "sha256": "31e4e793c8c105bb29154acc3cedda6beb6d44c52153074f233fa1e5f6a1dab5",
+        "matches_docs_base": true
+      },
+      {
+        "path": "docs/docs/examples/case-studies/5. Nanochat in Plato.md",
+        "sha256": "913bb1bed53c51afc4c53b48030029e57cc9b33761d03d063ed9fe2644213ce0",
+        "matches_docs_base": true
+      }
+    ],
+    "external_contracts": [
+      {
+        "path": "/tmp/plato-mlx-profile-plan.json",
+        "sha256": "81a5a557b1ad018384da9b9290e0648048696af244c486849c653a09f0bea32b"
+      },
+      {
+        "path": "/tmp/plato-mlx-profile-contract-clarification.json",
+        "sha256": "c4f4ba8a69e59aefa3f9ded0aafd3ea91bc42f761a734f9641cfa902202c7add"
+      }
+    ],
+    "installed_optimizer_source": {
+      "path": "/tmp/plato-phase3-mlx/env/lib/python3.13/site-packages/mlx/optimizers/optimizers.py",
+      "sha256": "25a57fe00ff9ae1fe836cd504506e16d0e9d890112daed05cef0e2bcb95f7714"
+    },
+    "tooling_environment_versions": {
+      "mkdocs": "1.6.1",
+      "mkdocs-material": "9.7.7"
+    },
+    "missing_source_paths": []
+  },
+  "truth_review": [
+    {
+      "criterion": "Selected support and qualification scope",
+      "result": "pass",
+      "docs": "docs/docs/mlx.md:3 and installation/quickstart/development cross-links",
+      "evidence": "LeNet-5/MNIST sample-weighted FedAvg, float32 Apple CPU/Metal and Python 3.13 are bounded explicitly. .python-version selects 3.13 and Linux PyTorch CI selects 3.13 core profiles. No native Linux/CUDA/Windows, hosted Mac CI, Python 3.14, MLX-LM/LoRA, broad architecture/algorithm parity or mixed-framework conversion claim was found. Packaging >=3.13 is not misrepresented as a qualification matrix."
+    },
+    {
+      "criterion": "Device selection and stream placement",
+      "result": "pass",
+      "docs": "docs/docs/mlx.md:18 and docs/docs/mlx.md:109",
+      "evidence": "_resolve_device gives CPU precedence to --cpu, explicit --mps requires Metal, and otherwise returns mx.default_device. Trainer factory/train/test and validated restoration use the selected stream. The guide states normally Metal and discloses prebuilt lazy work retaining original placement."
+    },
+    {
+      "criterion": "Exact seed scope and legacy omission",
+      "result": "pass",
+      "docs": "docs/docs/mlx.md:57 and docs/docs/configurations/trainer.md:219",
+      "evidence": "model_seed wraps construction without reinitializing caller instances. training_seed derives SHA256-based logical master/client/round/epoch identities, including epoch zero run setup, independent of worker PID/order. Seeded scopes save/restore Python, NumPy, PyTorch CPU and MLX state; no seed yields without restoration, preserving legacy unseeded behavior. Same-environment replay and tolerance-only cross-device comparison are stated. Data partition/server seeds are separately required."
+    },
+    {
+      "criterion": "Clipping, optimizer, loss and scheduler contract",
+      "result": "pass",
+      "docs": "docs/docs/mlx.md:67 through docs/docs/mlx.md:105",
+      "evidence": "Config-driven clipping is optional, finite/nonnegative, zero-valid and applied globally before one update; nonfinite gradients/norms reject before optimizer update. Custom steps retain responsibility. Names lower-case into Adam/AdamW/SGD/momentum/RMSprop/Lion; momentum requires an explicit value. Each option in the table exactly matches installed MLX 0.32.3 constructor source. Arguments pass directly. jit=True is rejected; eager materialization, cross entropy, accuracy and no default scheduler update match source. No PyTorch accumulation/mixed precision/scheduler parity is promised."
+    },
+    {
+      "criterion": "Tree ownership, validation and weighted aggregation",
+      "result": "pass",
+      "docs": "docs/docs/mlx.md:121",
+      "evidence": "Owned host snapshots, exact dict/list/tuple keys/kinds/lengths/shapes and None compatibility match native validation/extraction. Server ingress validates report/payload cardinality and finite nonnegative sample weights, with finite total also enforced by source. Sample-weighted floating results align to reference dtypes and existing zero-total direct/delta fallback leaves weights unchanged."
+    },
+    {
+      "criterion": "Hook positional association and side effects",
+      "result": "pass",
+      "docs": "docs/docs/mlx.md:129",
+      "evidence": "Final server source revalidates after weights_received, on_weights_received and the last on_reports_received selector before aggregation dispatch. Identity-position checks reject observable original payload/update/report reordering and changed labeled client IDs. Guide accurately limits same-schema unlabeled deep copies to the hook author's semantic correspondence responsibility and disclaims rollback of arbitrary hook side effects. It does not overstate rejection as complete hook transaction rollback."
+    },
+    {
+      "criterion": "Mode, dtype, checkpoint and extension limits",
+      "result": "pass",
+      "docs": "docs/docs/mlx.md:115 and docs/docs/mlx.md:139",
+      "evidence": "Training enters train mode; evaluation saves/restores per-module modes in finally. Native BatchNorm/dropout tests are described as focused coverage, not architectural qualification. Float32 training, float16 host-only coverage and explicit bfloat16 host rejection are accurate. save/load persist parameter safetensors and run-history .pkl; optimizers recreated per training run and optimizer/RNG/scheduler/full or mid-training resume remain unsupported. Wall-clock model retrieval raises NotImplementedError."
+    },
+    {
+      "criterion": "Shipped simulation versus actual socket evidence",
+      "result": "pass",
+      "docs": "docs/docs/mlx.md:29 and docs/docs/quickstart.md:80",
+      "evidence": "Shipped config samples 2 logical clients from 10 with max_concurrency=1, defaults comm_simulation=true, and independently requests simulate_wall_time=true. Optional clients.comm_simulation=false opts into payload transport. Actual native socket harness uses two physical clients with 8/24 samples, real entrypoint and Safetensor codec configuration; the historical bounded MNIST entrypoint receipt instead uses one reused worker with bounded dataset/epoch/round overrides. The guide states separate bounded validation and no fleet/multi-worker performance qualification."
+    },
+    {
+      "criterion": "Strict/focused/default test contract",
+      "result": "pass",
+      "docs": "docs/docs/mlx.md:147 through docs/docs/mlx.md:184",
+      "evidence": "Strict native profile requires complete exact ledger, native platform/version/device arithmetic prerequisites and mandatory opacus/kazoo/gymnasium extras; skips/xfails/xpasses or incomplete inventory fail qualification. Focused explicit filesystem selection omits complete-ledger and unrelated mandatory requirements but retains native prerequisite/no-skip enforcement. Filters are rejected for strict native profile; native pyargs and base/mandatory conflict are diagnosed. Default core collection omits native paths before import and installed MLX does not opt in. Collection-only is explicitly distinguished from runtime qualification. Independent public-command checks below agree."
+    },
+    {
+      "criterion": "Historical E8 and current-source claims",
+      "result": "pass",
+      "docs": "docs/docs/mlx.md:186",
+      "evidence": "Historical native/selector/profile receipts preserve original revision-specific timings. Guide explicitly says later validation/import changes mean those times do not measure current checkout, establish no general speedup or ordinary pytest performance threshold, and do not qualify archived research snapshots. No new E8 measurement or current-source performance inference is made by this review."
+    },
+    {
+      "criterion": "Setup options, links/navigation and existing pages",
+      "result": "pass",
+      "docs": "All seven changed files",
+      "evidence": "uv 0.12.22 accepts --python, --extra and --group; extra mlx and test group exist and the test group includes dp/mpc/rl. Locked offline dry-run resolves the setup command successfully without installing dependencies. Native MLX nav/cross-links and all rendered local targets/anchors pass. Qwen3, SmolVLA retirement and Nanochat retirement pages are byte-identical to docs base; Qwen remains active in nav and retired pages remain accessible but absent from nav. PyTorch-only API/settings sections are explicitly scoped."
+    },
+    {
+      "criterion": "Author receipt truth boundaries",
+      "result": "pass",
+      "docs": "evidence/2026-refresh/phase3-mlx-docs.json",
+      "evidence": "All seven author receipt docs SHA256 values match delivered and final integrated files. Receipt correctly claims prose/nav checks, not combined runtime acceptance, and records native behavior, future profile correction ownership, original E8 source binding and hook limits. Historical inspected-source hashes are retained as author-time evidence; this review binds final corrected source separately."
+    }
+  ],
+  "independent_checks": [
+    {
+      "id": "DOCS-01",
+      "result": "pass",
+      "command": "/tmp/plato-llm-integration/tooling-313/bin/python -m mkdocs build --strict --config-file docs/mkdocs.yml --site-dir /tmp/plato-mlx-docs-review-artifacts/site",
+      "returncode": 0,
+      "source_identity": "Build executed at 202fcd631d37c977608c1bb84a16266abb756b1e. Entire docs tree 0f393a345641d9248c32cee6fd0aaf621c25a817 is byte-identical at frozen final0929b5a5; no rebuild needed after runtime-only integration.",
+      "log": "/tmp/plato-mlx-docs-review-artifacts/mkdocs-build.log",
+      "versions": {
+        "mkdocs": "1.6.1",
+        "mkdocs-material": "9.7.7"
+      },
+      "notes": "Two preserved retired case-study pages are informationally absent from nav. Material package banner is external package text, not a MkDocs warning or review claim."
+    },
+    {
+      "id": "DOCS-02",
+      "result": "pass",
+      "command": "/tmp/plato-llm-integration/tooling-313/bin/python /tmp/plato-mlx-docs-review-artifacts/check_rendered_links.py",
+      "returncode": 0,
+      "pages_checked": 44,
+      "local_links_checked": 2470,
+      "errors": [],
+      "external_links": "Not fetched; the change introduces no new external links.",
+      "receipt": "/tmp/plato-mlx-docs-review-artifacts/rendered-links.json"
+    },
+    {
+      "id": "DOCS-03",
+      "result": "pass",
+      "command": "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=/tmp/plato-refresh-worktrees/mlx-integration /tmp/plato-phase3-mlx/env/bin/python -B /tmp/plato-mlx-docs-review-artifacts/default_core_collection.py",
+      "pytest_args": [
+        "tests",
+        "--collect-only",
+        "-q",
+        "-o",
+        "cache_dir=/tmp/plato-mlx-docs-review-artifacts/default-core-cache"
+      ],
+      "returncode": 0,
+      "collected": 1440,
+      "profile_summary": "core scope (native excluded)",
+      "observed": {
+        "returncode": 0,
+        "pytest_file": "/tmp/plato-phase3-mlx/env/lib/python3.13/site-packages/pytest/__init__.py",
+        "cwd": "/private/tmp/plato-refresh-worktrees/mlx-integration",
+        "core_conftest_file": "/private/tmp/plato-refresh-worktrees/mlx-integration/tests/conftest.py",
+        "imported_mlx_modules": [],
+        "imported_native_test_modules": [],
+        "semantics": "Default core collection in environment with mlx/metal installed. Presence-only metadata queries are permitted and not traced here."
+      },
+      "limit": "A post-collection sys.modules observation, not an independent trace of every metadata/device call. Allowed upstream top-level find_spec(mlx) presence queries are not excluded or claimed absent."
+    },
+    {
+      "id": "DOCS-04",
+      "result": "pass",
+      "command": "PYTHONDONTWRITEBYTECODE=1 UV_PROJECT_ENVIRONMENT=/tmp/plato-phase3-mlx/env uv run --no-sync --python 3.13 --extra mlx --group test python -B -m pytest tests/mlx_native --test-profile=mlx-native --collect-only -q -o cache_dir=/tmp/plato-mlx-docs-review-artifacts/native-collection-cache",
+      "returncode": 0,
+      "collected": 383,
+      "profile_summary": "native collection-only validation (no execution qualification)",
+      "log": "/tmp/plato-mlx-docs-review-artifacts/native-strict-collection.log",
+      "limit": "Added --no-sync, no-bytecode and owned cache location protect shared environment/source. This confirms public command routing/prerequisites/inventory; no full native runtime result."
+    },
+    {
+      "id": "DOCS-05",
+      "result": "pass",
+      "command": "PYTHONDONTWRITEBYTECODE=1 UV_PROJECT_ENVIRONMENT=/tmp/plato-phase3-mlx/env uv run --no-sync --python 3.13 --extra mlx --group test python -B -m pytest tests/mlx_native/test_phase3_controls.py -k clipping -ra -o cache_dir=/tmp/plato-mlx-docs-review-artifacts/focused-cache --basetemp=/tmp/plato-mlx-docs-review-artifacts/focused-temp --junitxml=/tmp/plato-mlx-docs-review-artifacts/focused.xml",
+      "returncode": 0,
+      "passed": 11,
+      "deselected": 18,
+      "failed": 0,
+      "skipped": 0,
+      "profile_summary": "native focused execution (not complete qualification)",
+      "log": "/tmp/plato-mlx-docs-review-artifacts/native-focused-clipping.log",
+      "limit": "Exact documented path/filter with environment/output isolation additions; bounded focused checks only."
+    },
+    {
+      "id": "DOCS-06",
+      "result": "pass",
+      "commands": [
+        {
+          "pytest_args": [
+            "tests/mlx_native",
+            "--test-profile=mlx-native",
+            "-k",
+            "clipping"
+          ],
+          "returncode": 4,
+          "diagnostic": "mlx-native qualification does not permit selection or collection filters",
+          "log": "/tmp/plato-mlx-docs-review-artifacts/strict_filter.log"
+        },
+        {
+          "pytest_args": [
+            "tests/mlx_native",
+            "--test-profile=base"
+          ],
+          "returncode": 4,
+          "diagnostic": "mlx-native target conflicts with core-only profile",
+          "log": "/tmp/plato-mlx-docs-review-artifacts/core_profile_conflict.log"
+        },
+        {
+          "pytest_args": [
+            "--pyargs",
+            "tests.mlx_native"
+          ],
+          "returncode": 4,
+          "diagnostic": "mlx-native selector unsupported: --pyargs cannot target native tests",
+          "log": "/tmp/plato-mlx-docs-review-artifacts/native_pyargs.log"
+        }
+      ],
+      "execution": "Each command used /tmp/plato-phase3-mlx/env/bin/python -B -m pytest, PYTHONDONTWRITEBYTECODE=1 and a distinct task-owned cache directory. Harness asserted exit4 and diagnostic."
+    },
+    {
+      "id": "DOCS-07",
+      "result": "pass",
+      "command": "UV_PROJECT_ENVIRONMENT=/tmp/plato-mlx-docs-review-artifacts/sync-dry-run uv sync --dry-run --locked --offline --python 3.13 --extra mlx --group test",
+      "returncode": 0,
+      "interpreter": "CPython 3.13.16",
+      "resolved_packages": 268,
+      "would_install_packages": 95,
+      "log": "/tmp/plato-mlx-docs-review-artifacts/uv-sync-dry-run.log",
+      "limit": "No environment created or dependency installed; no fresh network download/install claim. uv sync/run help and pyproject group/extra definitions separately checked."
+    },
+    {
+      "id": "DOCS-08",
+      "result": "pass",
+      "command": "AST inspection of installed mlx/optimizers/optimizers.py",
+      "mlx_version": "0.32.3",
+      "mlx_metal_version": "0.32.3",
+      "constructors": {
+        "SGD": [
+          "learning_rate",
+          "momentum",
+          "weight_decay",
+          "dampening",
+          "nesterov"
+        ],
+        "RMSprop": [
+          "learning_rate",
+          "alpha",
+          "eps"
+        ],
+        "Adam": [
+          "learning_rate",
+          "betas",
+          "eps",
+          "bias_correction"
+        ],
+        "AdamW": [
+          "learning_rate",
+          "betas",
+          "eps",
+          "weight_decay",
+          "bias_correction"
+        ],
+        "Lion": [
+          "learning_rate",
+          "betas",
+          "weight_decay"
+        ]
+      },
+      "source": {
+        "path": "/tmp/plato-phase3-mlx/env/lib/python3.13/site-packages/mlx/optimizers/optimizers.py",
+        "sha256": "25a57fe00ff9ae1fe836cd504506e16d0e9d890112daed05cef0e2bcb95f7714"
+      }
+    },
+    {
+      "id": "DOCS-09",
+      "result": "pass",
+      "commands": [
+        "git diff --check fd280d9a^ fd280d9a",
+        "git diff --check e72f03ee^ e72f03ee",
+        "git status --short"
+      ],
+      "returncode": 0,
+      "preserved_pages": [
+        {
+          "path": "docs/docs/examples/case-studies/6. Qwen3 Federated LoRA.md",
+          "sha256": "0e6c10676a580e6135cc65c5708840a97069b2133aac7d4576495786dc5f7dae",
+          "matches_docs_base": true
+        },
+        {
+          "path": "docs/docs/examples/case-studies/3. SmolVLA Trainer with LeRobot.md",
+          "sha256": "31e4e793c8c105bb29154acc3cedda6beb6d44c52153074f233fa1e5f6a1dab5",
+          "matches_docs_base": true
+        },
+        {
+          "path": "docs/docs/examples/case-studies/5. Nanochat in Plato.md",
+          "sha256": "913bb1bed53c51afc4c53b48030029e57cc9b33761d03d063ed9fe2644213ce0",
+          "matches_docs_base": true
+        }
+      ],
+      "notes": "Author and final integrated worktrees remained clean. Docs-path diff from15a3e68c contains exactly the seven authorized prose/navigation files."
+    }
+  ],
+  "review_limits": [
+    "Full383 native execution, combined core/native execution, Linux qualification and final integration acceptance remain root-owned and are not claimed here.",
+    "Historical native/selector/profile receipt runtime results were inspected for claim consistency; this docs review did not replay the complete historical archives, MNIST entrypoint, sockets, seeded subprocess matrix or E8.",
+    "No external links were fetched and no web-derived factual claims were introduced.",
+    "Shared tooling/runtime environments were used read-only; dependency sync was dry-run only. All generated logs/site/check scripts/JSON/JUnit/cache/basetemp outputs were task-owned.",
+    "No repository edits, commits, nested agents, PRs, messages to external services or remote actions were performed."
+  ],
+  "artifacts": [
+    {
+      "path": "/tmp/plato-mlx-docs-review-artifacts/mkdocs-build.log",
+      "sha256": "dc120a994097b0e7150e66165d182ddf26fcb7acc843a50a9f0ee2d0fa9c4264"
+    },
+    {
+      "path": "/tmp/plato-mlx-docs-review-artifacts/check_rendered_links.py",
+      "sha256": "e785f85a948948623f578da6c47b1fc3dd91bcd4848e7b7fea433e91fbefa0dd"
+    },
+    {
+      "path": "/tmp/plato-mlx-docs-review-artifacts/rendered-links.json",
+      "sha256": "5c9db811cba65364b8de72e56d09a3e3559eff6e78b41d436b5aca4580acbcd9"
+    },
+    {
+      "path": "/tmp/plato-mlx-docs-review-artifacts/default_core_collection.py",
+      "sha256": "9ae7c14f0dd8cdca95b55b997ea90263fad3eda618fdc3dcc04215e189253e6a"
+    },
+    {
+      "path": "/tmp/plato-mlx-docs-review-artifacts/default-core-collection.log",
+      "sha256": "384b91779775d98671388c415b97efe7ccc6e1d642ee2de86861242a3649e9fb"
+    },
+    {
+      "path": "/tmp/plato-mlx-docs-review-artifacts/default-core-import-observation.json",
+      "sha256": "47dccdef5cb544a59bdb6cef6b1648ba568c96813bd2cd818fecc994434fe595"
+    },
+    {
+      "path": "/tmp/plato-mlx-docs-review-artifacts/native-strict-collection.log",
+      "sha256": "db82d928d4e1365f0b16d0ba9d373938b252ced14ff3ba91f097518fa0200797"
+    },
+    {
+      "path": "/tmp/plato-mlx-docs-review-artifacts/native-focused-clipping.log",
+      "sha256": "903dcc7c4fed4c8864a8d065cfd3d6d5dcff08427b85b3039187a02167850324"
+    },
+    {
+      "path": "/tmp/plato-mlx-docs-review-artifacts/focused.xml",
+      "sha256": "ec151368f331581d6ccdb69ec4bc8448b1c6e0d058d91bd4b1dbacb00acc4c70"
+    },
+    {
+      "path": "/tmp/plato-mlx-docs-review-artifacts/strict_filter.log",
+      "sha256": "9518b7e0ced21b6434b2e0a1af01ac428869e3a97c40c22421d10fa7ac7b4323"
+    },
+    {
+      "path": "/tmp/plato-mlx-docs-review-artifacts/core_profile_conflict.log",
+      "sha256": "43344ceee4ffcc7100835295fc5f3bfdac5f81149289e37e1a042360150769a9"
+    },
+    {
+      "path": "/tmp/plato-mlx-docs-review-artifacts/native_pyargs.log",
+      "sha256": "9f34ec8677def2eb4a9cd2d57292e605fda6abc9b8206e09131886854e535a2a"
+    },
+    {
+      "path": "/tmp/plato-mlx-docs-review-artifacts/uv-sync-dry-run.log",
+      "sha256": "a99a5541c6fdcefc807319e4b15ce4ea6228e935df7ceb9ad4aef08e3cd16969"
+    },
+    {
+      "path": "/tmp/plato-mlx-docs-review-artifacts/provenance.json",
+      "sha256": "2792964fbfa73d1acff142375cbef9255079a36e8f102964e3720523bbb4ff35"
+    }
+  ]
+}

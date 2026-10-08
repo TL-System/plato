@@ -1,0 +1,16 @@
+{
+  "source_commit": "63f0d2000f0370708b9afe1e2e6a2dc8559b72e1",
+  "source_status": " M plato/config.py\n",
+  "source_status_scope": "Tracked files only; sdist bytes must match Git blobs.",
+  "source_files": {
+    "pyproject.toml": "2ff99eef16f4105af2810f58b1778c7ba131fe894f379837d2b65c7729724a7d",
+    "uv.lock": "e2a53aaae9a0dd49f5446b490bb3071e86aa3a9a20d6271c9dd30b4ae2dcbff9",
+    ".python-version": "02e735b3dfe1c32833eb550b7ff8ffa17f5f2bc3fa1e7bae61a8f5a3883ce398",
+    ".github/scripts/check_distribution.py": "1b3ea71a1eef084f602092de35a97ceed04beb4ab47da2074690dc89c5c34c3f",
+    ".github/workflows/docs_package_checks.yml": "3bd50449d468b4f6606648a66edc9d54e8710577ccd7878f291704391057aa64",
+    ".github/workflows/pypi_publish.yml": "44d20d3daa8e953546acf7e5b01ee61cf54d056b96b09b799ad3cfa65b105062"
+  },
+  "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+  "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+  "uv": "uv 0.12.22 (70fe1196a 2026-10-01 aarch64-apple-darwin)"
+}

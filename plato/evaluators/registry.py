@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import Any, Callable
 
 from plato.config import Config
+from plato.utils.retired_backends import raise_if_retired
 
 EvaluatorFactory = Callable[[dict[str, Any] | Any], Any]
 
@@ -55,6 +56,8 @@ def get(config: Any | None = None, *, allow_missing: bool = False):
 
     if not isinstance(evaluator_type, str) or not evaluator_type:
         raise ValueError("Evaluation config must define a non-empty 'type'.")
+
+    raise_if_retired(evaluator_type, category="evaluator")
 
     if evaluator_type not in _registered_evaluators:
         if allow_missing:

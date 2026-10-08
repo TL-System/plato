@@ -1,0 +1,99 @@
+{
+  "status": "Prepared final rerun after two integration test corrections pass review and gate addendum; not yet executed.",
+  "root": "/tmp/plato-refresh-worktrees/phase2-final-validation",
+  "profiles": [
+    {
+      "id": "mandatory-313",
+      "python": "3.13",
+      "environment": "/tmp/plato-phase2-integration/final-mandatory-313",
+      "group": "dev",
+      "pytest_args": [
+        "tests",
+        "-ra"
+      ],
+      "purpose": "Full mandatory profile, including 48 original startup and 3 FedDyn entrypoint cases; 3.13 exercises implicit default."
+    },
+    {
+      "id": "mandatory-314",
+      "python": "3.14",
+      "environment": "/tmp/plato-phase2-integration/final-mandatory-314",
+      "group": "dev",
+      "pytest_args": [
+        "tests",
+        "--test-profile=mandatory",
+        "-ra"
+      ],
+      "purpose": "Full mandatory profile, including 48 original startup and 3 FedDyn entrypoint cases; 3.13 exercises implicit default."
+    },
+    {
+      "id": "base-313",
+      "python": "3.13",
+      "environment": "/tmp/plato-phase2-integration/final-base-313",
+      "group": "test-base",
+      "pytest_args": [
+        "tests",
+        "--test-profile=base",
+        "-m",
+        "not runtime",
+        "-ra"
+      ]
+    },
+    {
+      "id": "base-314",
+      "python": "3.14",
+      "environment": "/tmp/plato-phase2-integration/final-base-314",
+      "group": "test-base",
+      "pytest_args": [
+        "tests",
+        "--test-profile=base",
+        "-m",
+        "not runtime",
+        "-ra"
+      ]
+    }
+  ],
+  "sync": [
+    "uv",
+    "sync",
+    "--locked",
+    "--python",
+    "<profile.python>",
+    "--no-default-groups",
+    "--group",
+    "<profile.group>",
+    "--compile-bytecode"
+  ],
+  "environment_controls": {
+    "UV_PROJECT_ENVIRONMENT": "<profile.environment>",
+    "HF_HUB_OFFLINE": "1",
+    "HF_DATASETS_OFFLINE": "1",
+    "TOKENIZERS_PARALLELISM": "false",
+    "OMP_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1",
+    "OPENBLAS_NUM_THREADS": "1",
+    "VECLIB_MAXIMUM_THREADS": "1",
+    "NUMEXPR_NUM_THREADS": "1",
+    "CUDA_VISIBLE_DEVICES": ""
+  },
+  "execution": "Use unique basetemp, JUnit/log paths; coverage only one mandatory run or distinct COVERAGE_FILE paths. Verify default profile qualifies instead of silently weakening optional fixtures. Capture source/tree/lock and package identities.",
+  "checks": [
+    "All 51 runtime cases per interpreter (48 original startup plus 3 FedDyn entrypoint cases); natural two-client CPU sockets, independent numerical references, watchdog negative distinctions, no survivors.",
+    "Actual current tracked B+D S3 writer/reader cases and all C/F27 direct/spawned/round-flow contracts.",
+    "Fresh base environments allow only documented optional omissions (historically 4); mandatory allows only absent native Nanochat tokenizer in Phase 2. Classify actual warnings, including the 17 historical Opacus notices; no unexpected skips or xfails.",
+    "Ruff imports, scoped/new typing plus classified remaining legacy diagnostics; no blanket clean typing claim.",
+    "uv lock --check, git diff --check, wheel/sdist build and source/artifact identity.",
+    "Fresh Astra medium phase gate before root phase delivery; root combined acceptance and LinuxCI afterpush with exacttree/source attribution."
+  ],
+  "pending_source_specific_adjustments": "Final review-to-criterion mappings accompany the final gate; runtime count is 51 (48 original startup plus 3 FedDyn entrypoint cases). CI timeout-only adjustment accepted at 8d27c5c7a205299537a2835358f1d5e91a7b51c3: base/mandatory 20 minutes, runtime 16 minutes, job 90 minutes. Audit final timings against these limits.",
+  "root_audits": {
+    "PREP-01": "Before/after source blob manifests and tracked diff checks, submodule identities and import origins; reject untracked source shadowing. Existing exact source-archive practice plus root source audit supplies evidence outside the mechanical runner.",
+    "PREP-02": "Supply actual final authorizing phase gate and its reviewed component-to-integrated-source mapping. Audit cases, skips, warnings and separate archive/build/lock/lint/typing/Linux outputs; runner success is not acceptance.",
+    "PREP-03": "Final C criterion-to-node/command mapping required at final gate, including extra worker, actual entrypoint/socket/resume and production D codec cases."
+  },
+  "fresh_environment_policy": "All FOUR final environments use new final-* task-owned paths, including a new3.13 environment after the initial failed2633run. Preserve user/root .venv and initial failed-run environment until delivery. Abort if final target preexists unexpectedly.",
+  "delivery_root": "/Users/bli/Playground/plato",
+  "integrated_source_setup": "After phase gate and integration, create this fresh detached worktree at the exact integrated delivery commit; initialize pinned submodules. Use no preexisting project bytecode, PYTHONDONTWRITEBYTECODE=1, and normal installed-library cache reads. Record before/after source identities/import origins. No validation worktree has been created or suite executed yet.",
+  "library_cache": "Compile installed library bytecode with uv sync --compile-bytecode in the fresh environments. Do not redirect all imports to an empty PYTHONPYCACHEPREFIX: reviewer4 demonstrated repeated cold library imports can cause a harness-only 60-second timeout, while normal read-only library caches pass the unchanged deadline. Source remains a newly created committed worktree with bytecode writes disabled.",
+  "max_parallel_profiles": 2,
+  "parallel_execution": "At most two interpreter profiles concurrently, each with a distinct fresh environment, external basetemp/log/JUnit/coverage paths, thread limits and read-only committed source. Host64GiB/10logicalCPUs. Mandatory pair first, then base pair; do not modify source during either pair. No deadline relaxation; retain and diagnose any failure."
+}

@@ -1,0 +1,3304 @@
+{
+  "schema_version": 1,
+  "review": "Fresh independent supplemental Phase 2B F28 and B-RESUME-01 review",
+  "reviewer": "plato-phase2b-resume-review",
+  "requested_model": "Sol",
+  "requested_reasoning_effort": "xhigh",
+  "completed_at_utc": "2026-10-03T08:11:14.053140+00:00",
+  "decision": "PASS",
+  "decision_basis": [
+    "No critical, high or medium findings in the combined supplement above accepted original B. Both seed guards preserve resume ownership, and the existing Python tuple now persists self.prng_state without mutating live RNG state.",
+    "Independent actual save/inherited run/restore/strategy probes reproduce both defects on exact historical Git archives and pass on the pinned final candidate, with five resumed choices agreeing with saved uninterrupted controls and a separate random.Random reference.",
+    "Both interpreters pass 212 affected runtime cases, 22 fresh startup cases and 40 independent persistence/error cases. All 96 final-author startup records, hashes and durable streams pass the unchanged startup assertions; normal socket success is separated from deliberate containment.",
+    "Candidate and both historical B evidence reports remain unchanged; final combined C checkpoint-codec integration remains root/C ownership."
+  ],
+  "findings": [],
+  "optional_low_observations": [],
+  "severity_counts": {
+    "critical": 0,
+    "high": 0,
+    "medium": 0,
+    "low": 0
+  },
+  "identities": {
+    "accepted_original_b_commit": "00eeb9dcdd2b513e64db9408969356037e09bb8e",
+    "accepted_original_b_tree": "39b6b554e833aeb5e8916e40fbc38a2fa46f6671",
+    "historical_f28_intermediate": "5b1c4a5d9ed2c29e33cdd2d99c28dd83a7ce377b",
+    "historical_f28_tree": "82f60b346bfe88463d715c10325f28bb9bb39e27",
+    "candidate_commit": "a058a2ef8d230ca2e34dbf1c91e6eaac0b0205ac",
+    "candidate_tree": "35098e6ba5f5792052ed6b24a771aec7b2cad9bb",
+    "implementation_commit": "4329158c20f1533301c4d9430393ff282f9cb2be",
+    "implementation_tree": "73c38994943219dd05ec3cc07eeec03db1213ad8",
+    "candidate_worktree": "/private/tmp/plato-refresh-worktrees/runtime-resume-review",
+    "review_scratch": "/tmp/plato-phase2b-resume-review",
+    "candidate_status_before_and_after": "clean",
+    "candidate_all_tracked_regular_files_match_exact_git_objects": 945,
+    "candidate_all_tracked_regular_files_unchanged_through_review": 945,
+    "only_changes_above_accepted_b": [
+      "evidence/2026-refresh/phase2b-resume-validation.json",
+      "evidence/2026-refresh/phase2b-selection-rng-validation.json",
+      "plato/servers/base.py",
+      "tests/servers/test_server_resume_rng.py"
+    ],
+    "candidate_is_evidence_only_direct_child_of_implementation": true,
+    "source_and_test_sha256": {
+      "plato/callbacks/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "plato/callbacks/client.py": "a6915bef16532a19af0cbdac404eeb287b7cc2aa8258f08a759ffa13c4e167c2",
+      "plato/callbacks/handler.py": "d86e707b96f6784cc8548087ec5f226ad1689157311aacadcb224ddcbc9ead67",
+      "plato/callbacks/server.py": "b04a92b3fbef20f8f08630a97a0d57ac952504860a53182ecf96df3460813da8",
+      "plato/callbacks/trainer.py": "6c8ac053150b0d5b68336d40ac8e88b531abab59d21e7a9204ceec828630fc4b",
+      "plato/clients/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "plato/clients/base.py": "a935d2615a33ceecd0c5866ef1a2e3dd49fbee972bad457a740144ac25d2d034",
+      "plato/clients/composable.py": "25de844fe9f9b2c2b7d8e9a633c3ed1fb9831c10fae2a14404dadd5d7670fe53",
+      "plato/clients/edge.py": "b721db2b2267d0cc2c7fba94053bd732d2991b45031558d1445448671bb433e7",
+      "plato/clients/fedavg_personalized.py": "248baf9149c14b46c1ad7604d5edf966c3fc00f32f4c5c5a7164c42d987fda5f",
+      "plato/clients/mpc.py": "41d58e613bee24049306f8365d96dc8c31ff4443b99bd1d6709698f42d5c5a5e",
+      "plato/clients/pfedgraph.py": "d256d55311a937c0db4b7f8cfaefb13dfff8d9a8f1d05e1b27332342bb6c17a6",
+      "plato/clients/registry.py": "3e72da61ce8c48b82ff0faf558b392085c99fb9ebc397d40fff32a5ac1dfadf7",
+      "plato/clients/self_supervised_learning.py": "9a65312295008fffc83d8ac526a064dc876de5de984ee8965ef8cd72d07cd364",
+      "plato/clients/simple.py": "c88220ec85ea614257648cb956a89624d11c03a944357c683aafb333e51b2a2e",
+      "plato/clients/split_learning.py": "7525219d05e04b1734270257ebf7d8d4747680ba30b5bf66e3894e3b49820a33",
+      "plato/clients/strategies/__init__.py": "4133a0c05ee02ee05b937787f39df93f5505c938630dfe49732935c914c9480d",
+      "plato/clients/strategies/base.py": "5372da631786756a2705568ccca4b41cfb1a8ae4aa74147966b226770c2d80c3",
+      "plato/clients/strategies/defaults.py": "7d30f52b05df63c706a3dea20b40a02affa811c508d03ebb43b3b88b09d57c4f",
+      "plato/clients/strategies/edge.py": "60022fa64a88ab72019c2b0564b370b819330e96be1ede3bbceab84e1e566939",
+      "plato/clients/strategies/fedavg_personalized.py": "5d4bb76c54536934921fec353f2f72b848fcae8e50c53059888f76678f645d5b",
+      "plato/clients/strategies/mpc.py": "068a10e424190ea87796a4523566f17c9c6adde8318e5d7c7c5ff440d1670828",
+      "plato/clients/strategies/split_learning.py": "e89831d05359b1d27dba6c742da947571c5bca684e480d5855f88934c9295826",
+      "plato/clients/transport.py": "c6c482ae5557641f03fb9419253c92b6c8c6dc5e028a6a6ea1525e061799df57",
+      "plato/servers/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "plato/servers/base.py": "4ac5bd0561acb56e96620a150877df823171b79be15609ca9ef744c3ab0a4d4a",
+      "plato/servers/evaluation_logging.py": "90fa9f5c1184dbc872e98367dfe2d00deaec9c59ac7cc7f899e4646dadc89d18",
+      "plato/servers/fedavg.py": "f184068a11c5be9e523f08b95e1cce76dff2e20e2fdb4e6426caf95dac0bcee5",
+      "plato/servers/fedavg_cs.py": "6998754dfc6a07732ab58a3fb398679c47390afeb4ce3859c166acae106515e0",
+      "plato/servers/fedavg_gan.py": "691a61357b15c6f62b505a6bc4e2bbe0251544cf6413cc91bc53eee18a185f5e",
+      "plato/servers/fedavg_he.py": "cbb21aaab8ec533105787ee55af614d0c7fca8752c7502a62fdaf083047ead13",
+      "plato/servers/fedavg_mpc_additive.py": "db70cf841e64f334d86511829395e94fd33c494f3a12ffed163c75586586e27e",
+      "plato/servers/fedavg_mpc_shamir.py": "b26dbd427de54582f0ca44a008d391bbdc3b52b8aeb5b64b758cba34f8517380",
+      "plato/servers/fedavg_personalized.py": "fcae2e8611d48f368b960735a5ca69aff3b147ea4275c4a2f58dbcfc3b78caf8",
+      "plato/servers/pfedgraph.py": "b52195d028a8b6962b70c13e6bf9ccd082d71764fcc47054b540e400ffdef12d",
+      "plato/servers/registry.py": "b059187df3d64ce9d977708ed9fe19bf6bd7ce308ce619d7a5f845f0515aa42c",
+      "plato/servers/split_learning.py": "fa4da694a332ce496b75b753bfb9cd91900ccf80db93f1321cbc3c282cae7abc",
+      "plato/servers/strategies/__init__.py": "4b670f70df2d32df3b11d49823ec5ed3b685ee5cad00967082371240dcff3955",
+      "plato/servers/strategies/aggregation/__init__.py": "ea691f8c99afe72375de40a4df9c306bd1561fbcd032502c9c5fc7cb25da82d0",
+      "plato/servers/strategies/aggregation/fedasync.py": "9a570d82bd792b431856b0d1701a62dde85544e71e87080ccb13dad5f9fcf08f",
+      "plato/servers/strategies/aggregation/fedavg.py": "fa1e2a6bbbc8e3829b72cd0cdd47f10b0a8fffbdabdaa2dfb3efed81872877c1",
+      "plato/servers/strategies/aggregation/fedbuff.py": "4121dd068006a83b1e1b2b16ddf9487dac89bb604f46eb9fc1321275f4abb85e",
+      "plato/servers/strategies/aggregation/fednova.py": "72cbc571ce1594e3fab295afce3880b61ecceb8dd6c5feb536fbf3f7f8b4910a",
+      "plato/servers/strategies/aggregation/gan.py": "6b169410ff62c4df227e28414fe861b136cc0d162cff6dfd54aac8914a6d4634",
+      "plato/servers/strategies/aggregation/he.py": "b3916c06f7ad36cc5cd1bb8dba74f8d8e370afa4831039756e10ace45a65f5e4",
+      "plato/servers/strategies/aggregation/hermes.py": "afdf4b6580957c5521f354705e9070d3929694037e0504eaec8fea09cd4774ce",
+      "plato/servers/strategies/aggregation/pfedgraph.py": "a032d601bd4aeffaa7da62de33410ac5833e0e83430c82a12aa14a9ea73fac9c",
+      "plato/servers/strategies/aggregation/port.py": "27dcba80763fce77dee667934840e3d407665463c900b06725bcdf66b3d7e1ac",
+      "plato/servers/strategies/base.py": "9176218cd213f4d32539c04c4c2a7bbd01e0522ed7a37f3d73d596329b5b3b72",
+      "plato/servers/strategies/client_selection/__init__.py": "a4e0793c94405885dfbda6930e4bc00baa9d8879ed6d15a00ecc0f041b8d4dcb",
+      "plato/servers/strategies/client_selection/personalized.py": "456f4e772908d7db741d9ddad25801a82fb9d8aff1255cab749e2e91c9025fd8",
+      "plato/servers/strategies/client_selection/random_selection.py": "952c93808d82f458114526939d28c0879515f0a05dd9fa4fbfbe2986521f4dd7",
+      "plato/servers/strategies/client_selection/split_learning.py": "5522c59604e50d61ed3f22f42f80f363aebcd847ae062bec53e7e96956f5f198",
+      "plato/servers/strategies/mpc.py": "3212ef59c22a1aa5c57ae8ed1a1b3da6a1461a6c3cca52802dabcf9a6a96ecab",
+      "tests/callbacks/test_handler_contract.py": "11bdc22cc6a116b36809b1b22f9411c098565a6c97a85fd515e21c561199d3d6",
+      "tests/callbacks/test_server_callback.py": "be2ef7e05697d9afdb27aeb48f4dab94c64c9a246509ff14df109ce4d50ce54e",
+      "tests/clients/test_checkpoint_cleanup.py": "b94b0c61b517ad6216343e605d23f4acb0baa1c36caf1bbe3e4a5d8989c95799",
+      "tests/clients/test_client_lifecycle_variants.py": "a10f28b4cbc125d67fa63a97c97050828b66c02eb7218c869adfea346f53a9dc",
+      "tests/clients/test_feddf_strategy.py": "00dfde39c13bfbbe7a842266ada0e77419c609ba2d3bf82008d5985f5d08a930",
+      "tests/clients/test_fednova_strategy.py": "b509f750447dab715b77dfa48976dce30436f660e6b3501315db6f5c39b5ca00",
+      "tests/clients/test_payload_limits.py": "07080983b9cc271bafec71477811d532dc8282a588472eb04dafa7a9a76412f8",
+      "tests/clients/test_registry.py": "f21d562dfa393ef2e5e83d8fe4ea466d2dfe3b54e690619fb2136c033d9d3458",
+      "tests/clients/test_simple_client.py": "38ab83e2dc43b7b55602096108837fc072962932736eb48a6938e3746a9a6f02",
+      "tests/integration/startup_harness.py": "988f216f9367b1e9e8156bad62d3c03a813e26d32f919981ae227f5d8754642e",
+      "tests/integration/startup_probe.py": "e6c9bb2bf39616fe3a6745da528690a578e7416837e0914578ec688d2851b34f",
+      "tests/integration/startup_socket.py": "64d04c2ab0e041f35f5e5aca88aa46a436507cb76f54ef4ca3c3df702666720f",
+      "tests/integration/test_event_loop_startup.py": "a92c9ee2347e2113cd65b7949c922ac5bbf1846f4caeca30a128db580c79751e",
+      "tests/servers/test_fedavg_gan_aggregation_strategy.py": "7b6466e18dea13b066f34c936863bd99172151f5a1b288d1a9fcaea590c07fb1",
+      "tests/servers/test_fedavg_he_aggregation_strategy.py": "c2274d43b255ef5182ed3e2f84d8a62aa0db5b17dcb1616cd888f3253d16cb3d",
+      "tests/servers/test_fedavg_strategy.py": "b7b3c406d9acf42233d26a2ee9d4e80861ebb7ea18732402c5a9019532f8cc1f",
+      "tests/servers/test_feddf_server_strategy.py": "41d065daf85092ecb46bdea3a6fe3526d5daeabfcc920e8b63edd035b9408b62",
+      "tests/servers/test_hermes_aggregation_strategy.py": "4ca11e928321b6038ec4ef0d7cc6b11372ebc1463f05f3d145c5148ca04f03b1",
+      "tests/servers/test_lifecycle_contracts.py": "fa8d27a56707c3bbce713aa33554b5c4c77450bd33eec3a5a839e7c63fb2ce03",
+      "tests/servers/test_personalized_selection_strategy.py": "ecf7924e262e65323e03e270deb098911c05720a59c21a906c72793811c495de",
+      "tests/servers/test_pfedgraph_aggregation_strategy.py": "b33aaf20ac55e4db3f2f9c98c75e17414dc522f4d2618b993d0bf8da29d01970",
+      "tests/servers/test_port_checkpoint_flow.py": "046b8b948e977bbaf79d71935f4183da92e1df924fd2f895509f893595ea0664",
+      "tests/servers/test_runtime_disconnect_recovery.py": "daf2102b528782e844c864555d5063045182a3953b7607255f828d40aef3d535",
+      "tests/servers/test_runtime_review_regressions.py": "fc0e5ed312553564e75f22fb210e7949bb63f949fe884f5e471503b4841293ab",
+      "tests/servers/test_runtime_s3_contract.py": "b66dcf24d55867ed85c0cd998db7de513c1fc0cc168d9352e187f47ad3a9a54a",
+      "tests/servers/test_runtime_transport.py": "41237fa504a5751101132f2b7e088e074e9f3237a8569ea85dae85db4fc2ac9e",
+      "tests/servers/test_server_resume_rng.py": "2167ced546dbc8499086a3b0d51598761f428179f5700eb5820645832f5a4ccd",
+      "tests/servers/test_split_learning_selection_strategy.py": "2b973322d376a2e47edce7024f88391785abc0dc78a2d819f8feac514a4293c8"
+    },
+    "original_reports_sha256": {
+      "evidence/2026-refresh/phase2b-validation.json": "21df488a8716dac0214b86d99b04f547635794c4ef9eea387b67a28bc35b55a9",
+      "evidence/2026-refresh/phase2b-resume-validation.json": "9dfc7cf7141476eb1bf90d6e66f1376659ef9f45af378187ef3452f765741821",
+      "evidence/2026-refresh/phase2b-selection-rng-validation.json": "87974e72a4699e48e4757fbdabc7c08e6fe96f27609b37620585dea48c7c5eea"
+    },
+    "authority_sha256": {
+      "/Users/bli/Playground/plato/AGENTS.md": "b50f87f31ea3d87076952d8b7d2d8af067132fbf877d80f8780c208fb45527ec",
+      "/Users/bli/Playground/plato/evidence/2026-refresh/plan.md": "edb9a58cc7915a940854f16d5029fe97434703bf2f75eca0dcb96de2d0f0eb15",
+      "/Users/bli/Playground/plato/evidence/2026-refresh/plan-addendum.json": "5b51b0fb7ed6f68d9fce7176335b3e7be5e5f178a2788590912aa2396a487709",
+      "/Users/bli/Playground/plato/evidence/2026-refresh/plan-addendum-acceptance.json": "5f5d5a8e22e14072b5d031c19a27be14bda9bdbc2a157d14af78845daac6c56b",
+      "/Users/bli/Playground/plato/evidence/2026-refresh/phase2b-acceptance.json": "3be220078302a05189c07c32220a86e966ff919bc4ef11e5d342a6c39135396d",
+      "/Users/bli/Playground/plato/evidence/2026-refresh/phase2b-review-3.json": "83eaf2c44ffb1316e9d6643e23c3ea9b977d5b083bf4427e86a75dcac7720fd6",
+      "/Users/bli/Playground/plato/evidence/2026-refresh/server-resume-rng-probe.json": "40f09d88509f1ebb21c6d05cde97b60ca3322e6a420ad0d71d6bc9a6a45b1c5c",
+      "/Users/bli/Playground/plato/evidence/2026-refresh/plan-review-3.json": "a1bc8bd69f43ea3280872a4c8259b431c4a9c27776ebd42fde658d6d48bd41b6"
+    },
+    "initial_audit": {
+      "path": "/tmp/plato-phase2b-resume-review/initial-audit.json",
+      "sha256": "e060908044261a8c5c38c40dee31aaead7ac3716e3ba7ae08bc851d96a91539f"
+    },
+    "final_audit": {
+      "path": "/tmp/plato-phase2b-resume-review/final-audit.json",
+      "sha256": "e1288611213ad798baad5ba57a33924340ac37070d8aca21587fe161d5de350b"
+    },
+    "accepted_to_candidate_diff": {
+      "path": "/tmp/plato-phase2b-resume-review/accepted-to-candidate.diff",
+      "sha256": "5a6d7718f377d137e0616fbe9e38bc07989bc11635f8104e5b6cdbf9ec233d32"
+    },
+    "f28_to_final_diff": {
+      "path": "/tmp/plato-phase2b-resume-review/f28-to-final.diff",
+      "sha256": "9aa2ac2a36fcf5edee6aa8aa00c4c5f4474935e065f301d4ca88dc32cc4fea67"
+    },
+    "red_source_archives": [
+      {
+        "commit": "00eeb9dcdd2b513e64db9408969356037e09bb8e",
+        "archive": {
+          "path": "/tmp/plato-phase2b-resume-review/accepted.tar",
+          "sha256": "6866cfba33234dc3f321287a655e0fc028e72ee7d455ee9db8b8bb28e098e0e7"
+        },
+        "base_source": {
+          "path": "/tmp/plato-phase2b-resume-review/accepted/plato/servers/base.py",
+          "sha256": "a8d2acec980b6d888b7425ebaec290d8e31d1d32152fd994ca933313f37551f8"
+        }
+      },
+      {
+        "commit": "5b1c4a5d9ed2c29e33cdd2d99c28dd83a7ce377b",
+        "archive": {
+          "path": "/tmp/plato-phase2b-resume-review/f28.tar",
+          "sha256": "b9922597361f4247912fade0c14018896081ce64f3aa8e88cca648a6c815b568"
+        },
+        "base_source": {
+          "path": "/tmp/plato-phase2b-resume-review/f28/plato/servers/base.py",
+          "sha256": "0737a129696bb0766b8de2d08aba6b9dafe9be053c8207b7a861928bf161fd1f"
+        }
+      }
+    ],
+    "no_evolving_c_or_runtime_source_read_or_execution": true,
+    "nested_agents": 0,
+    "source_edits": 0,
+    "commits": 0,
+    "cleanup": 0
+  },
+  "authority_and_evidence_read": [
+    "ROOT AGENTS.md, accepted plan.md and plan-review-3.json, plan-addendum.json and acceptance",
+    "ROOT phase2b-acceptance.json and complete structured phase2b-review-3.json; relevant contract dispositions and commands inspected",
+    "ROOT server-resume-rng-probe.json",
+    "Historical phase2b-resume-validation.json at exact 5b1c4a5d; it still reports the then-unfixed B-RESUME-01",
+    "Final phase2b-selection-rng-validation.json plus author red/green/source/environment manifests, startup summary, all 96 raw result JSONs and associated durable event streams",
+    "Immutable final base.py, real selection strategies/configure/trainer persistence, supplemental tests and unchanged startup harness/probes; exact historical sources from Git archives"
+  ],
+  "contract_disposition": {
+    "F28": {
+      "status": "PASS",
+      "locations": [
+        {
+          "file": "plato/servers/base.py",
+          "line": 351
+        },
+        {
+          "file": "plato/servers/base.py",
+          "line": 378
+        },
+        {
+          "file": "plato/servers/base.py",
+          "line": 395
+        }
+      ],
+      "prior": [
+        [
+          9,
+          7
+        ],
+        [
+          5,
+          6
+        ]
+      ],
+      "independent_red_next_choices": [
+        [
+          9,
+          7
+        ],
+        [
+          5,
+          6
+        ],
+        [
+          5,
+          3
+        ],
+        [
+          9,
+          5
+        ],
+        [
+          2,
+          1
+        ]
+      ],
+      "expected_and_final_next_choices": [
+        [
+          5,
+          3
+        ],
+        [
+          9,
+          5
+        ],
+        [
+          2,
+          1
+        ],
+        [
+          4,
+          7
+        ],
+        [
+          7,
+          5
+        ]
+      ],
+      "proof": "Exact original B save -> inherited run/_resume -> real public choose_clients/RandomSelectionStrategy fails in both startup branches; final candidate preserves model, round, NumPy and selection. Fresh configured and no-seed runs, custom overrides without resumed_session, and all ordinary/central guards pass."
+    },
+    "B-RESUME-01": {
+      "status": "PASS",
+      "locations": [
+        {
+          "file": "plato/servers/base.py",
+          "line": 1636
+        },
+        {
+          "file": "plato/servers/base.py",
+          "line": 846
+        },
+        {
+          "file": "plato/servers/base.py",
+          "line": 1657
+        }
+      ],
+      "independent_red_after_one_draw": [
+        [
+          9,
+          5
+        ],
+        [
+          2,
+          1
+        ],
+        [
+          4,
+          7
+        ],
+        [
+          7,
+          5
+        ],
+        [
+          9,
+          6
+        ]
+      ],
+      "independent_red_after_37_draws": [
+        [
+          1,
+          6
+        ],
+        [
+          1,
+          8
+        ],
+        [
+          6,
+          1
+        ],
+        [
+          7,
+          4
+        ],
+        [
+          2,
+          9
+        ]
+      ],
+      "expected_and_final": [
+        [
+          5,
+          3
+        ],
+        [
+          9,
+          5
+        ],
+        [
+          2,
+          1
+        ],
+        [
+          4,
+          7
+        ],
+        [
+          7,
+          5
+        ]
+      ],
+      "proof": "Eight independent 5b1c continuation cases fail per interpreter after one or 37 intrusive global draws, with genuine model/round/NumPy restore succeeding. Final candidate matches five uninterrupted selections and independent reference for ordinary/central x configured/no-seed x 0/1/37 draws x checkpoint before first choice/after two choices.",
+      "save_effects": "Actual save preserves live global Python, self.prng_state, context, full NumPy state including cached Gaussian, and CPU Torch state; repeated save after another global draw persists the identical selection tuple. Unrelated draws after resume also leave the next selection sequence correct.",
+      "context": "Context can be stale immediately after restore; the unchanged wrapper refreshes prng_state/current_round before actual strategy dispatch and preserves owned/context/global equality after selection.",
+      "format_and_legacy": "Same prng_state_<round>.pkl random-state tuple, pickle writer and reader. Independently generate actual old-writer checkpoint bundles on exact 5b1c, including diverged global state, then load them with final inherited run in both branches. Existing tuple remains readable with its recorded historical continuation."
+    },
+    "checkpoint_errors": {
+      "status": "PASS",
+      "proof": "Eight shipped broken-pickle/Safetensors cases plus ten independent missing-file and semantically invalid valid-pickle RNG cases per interpreter raise before launch, periodic creation or socket start. Existing missing-model OSError remains visible. No atomic generic-restore claim."
+    },
+    "retained_b_runtime": {
+      "status": "PASS",
+      "proof": "Accepted source outside base.py is byte-identical, as are all earlier tests/harnesses. The complete 212-case client/server/callback/smoke subset passes both versions, covering retained transport/session/timeout/recovery/PORT/S3/cleanup/aggregation/selection behavior. This is regression execution, not a new security-clean claim."
+    },
+    "startup": {
+      "status": "PASS",
+      "proof": "Audit all 48 final-author records per interpreter against unchanged source assertions and raw event streams; verify five intended watchdogs and no survivors. Fresh reviewer subset has 22 executions per interpreter, including socket round, post-launch failure, borrowed/absent loops and one deliberate teardown watchdog."
+    }
+  },
+  "runs": {
+    "3.13.16": {
+      "environment": {
+        "python": "3.13.16",
+        "executable": "/tmp/plato-phase2b-runtime/venv313/bin/python",
+        "cwd": "/private/tmp/plato-refresh-worktrees/runtime-resume-review",
+        "plato_source": "/private/tmp/plato-refresh-worktrees/runtime-resume-review/plato/__init__.py",
+        "server_source": "/private/tmp/plato-refresh-worktrees/runtime-resume-review/plato/servers/base.py",
+        "versions": {
+          "torch": "2.14.1",
+          "numpy": "2.5.3",
+          "pytest": "9.1.1",
+          "python-socketio": "5.17.0",
+          "aiohttp": "3.14.3",
+          "safetensors": "0.8.0"
+        }
+      },
+      "focused": {
+        "command": "zsh -lc 'PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=/private/tmp/plato-refresh-worktrees/runtime-resume-review XDG_CACHE_HOME=/tmp/plato-phase2b-resume-review/cache MPLCONFIGDIR=/tmp/plato-phase2b-resume-review/mpl OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2b-runtime/venv313/bin/python -m pytest tests/servers/test_server_resume_rng.py tests/servers/test_personalized_selection_strategy.py tests/servers/test_split_learning_selection_strategy.py -q -p no:cacheprovider --basetemp=/tmp/plato-phase2b-resume-review/focused313 --junitxml=/tmp/plato-phase2b-resume-review/focused313.xml > /tmp/plato-phase2b-resume-review/focused313.log 2>&1'",
+        "cwd": "/private/tmp/plato-refresh-worktrees/runtime-resume-review",
+        "exit_code": 0,
+        "result": {
+          "tests": 35,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": 0.208,
+          "nodeids": [
+            "tests.servers.test_server_resume_rng.test_actual_checkpoint_continues_selection_through_run[zero-configured-seed-ordinary]",
+            "tests.servers.test_server_resume_rng.test_actual_checkpoint_continues_selection_through_run[zero-configured-seed-central]",
+            "tests.servers.test_server_resume_rng.test_actual_checkpoint_continues_selection_through_run[zero-no-seed-ordinary]",
+            "tests.servers.test_server_resume_rng.test_actual_checkpoint_continues_selection_through_run[zero-no-seed-central]",
+            "tests.servers.test_server_resume_rng.test_actual_checkpoint_continues_selection_through_run[one-configured-seed-ordinary]",
+            "tests.servers.test_server_resume_rng.test_actual_checkpoint_continues_selection_through_run[one-configured-seed-central]",
+            "tests.servers.test_server_resume_rng.test_actual_checkpoint_continues_selection_through_run[one-no-seed-ordinary]",
+            "tests.servers.test_server_resume_rng.test_actual_checkpoint_continues_selection_through_run[one-no-seed-central]",
+            "tests.servers.test_server_resume_rng.test_actual_checkpoint_continues_selection_through_run[many-configured-seed-ordinary]",
+            "tests.servers.test_server_resume_rng.test_actual_checkpoint_continues_selection_through_run[many-configured-seed-central]",
+            "tests.servers.test_server_resume_rng.test_actual_checkpoint_continues_selection_through_run[many-no-seed-ordinary]",
+            "tests.servers.test_server_resume_rng.test_actual_checkpoint_continues_selection_through_run[many-no-seed-central]",
+            "tests.servers.test_server_resume_rng.test_legacy_global_rng_tuple_remains_readable[ordinary]",
+            "tests.servers.test_server_resume_rng.test_legacy_global_rng_tuple_remains_readable[central]",
+            "tests.servers.test_server_resume_rng.test_fresh_run_keeps_configured_seed_or_initial_selection_state[configured-seed-ordinary]",
+            "tests.servers.test_server_resume_rng.test_fresh_run_keeps_configured_seed_or_initial_selection_state[configured-seed-central]",
+            "tests.servers.test_server_resume_rng.test_fresh_run_keeps_configured_seed_or_initial_selection_state[no-seed-ordinary]",
+            "tests.servers.test_server_resume_rng.test_fresh_run_keeps_configured_seed_or_initial_selection_state[no-seed-central]",
+            "tests.servers.test_server_resume_rng.test_custom_resume_override_owns_selection_state_without_session_flag[ordinary]",
+            "tests.servers.test_server_resume_rng.test_custom_resume_override_owns_selection_state_without_session_flag[central]",
+            "tests.servers.test_server_resume_rng.test_malformed_resume_propagates_before_process_or_socket_start[current_round.pkl-UnpicklingError-ordinary]",
+            "tests.servers.test_server_resume_rng.test_malformed_resume_propagates_before_process_or_socket_start[current_round.pkl-UnpicklingError-central]",
+            "tests.servers.test_server_resume_rng.test_malformed_resume_propagates_before_process_or_socket_start[numpy_prng_state_2.pkl-UnpicklingError-ordinary]",
+            "tests.servers.test_server_resume_rng.test_malformed_resume_propagates_before_process_or_socket_start[numpy_prng_state_2.pkl-UnpicklingError-central]",
+            "tests.servers.test_server_resume_rng.test_malformed_resume_propagates_before_process_or_socket_start[prng_state_2.pkl-UnpicklingError-ordinary]",
+            "tests.servers.test_server_resume_rng.test_malformed_resume_propagates_before_process_or_socket_start[prng_state_2.pkl-UnpicklingError-central]",
+            "tests.servers.test_server_resume_rng.test_malformed_resume_propagates_before_process_or_socket_start[checkpoint_lenet5_2.safetensors-SafetensorError-ordinary]",
+            "tests.servers.test_server_resume_rng.test_malformed_resume_propagates_before_process_or_socket_start[checkpoint_lenet5_2.safetensors-SafetensorError-central]",
+            "tests.servers.test_personalized_selection_strategy.test_personalized_selection_respects_ratio",
+            "tests.servers.test_personalized_selection_strategy.test_personalized_selection_ensures_minimum_candidates",
+            "tests.servers.test_personalized_selection_strategy.test_personalized_selection_uses_all_clients_after_regular_rounds",
+            "tests.servers.test_personalized_selection_strategy.test_personalized_selection_clamps_ratio",
+            "tests.servers.test_split_learning_selection_strategy.test_split_learning_reuses_client_until_release",
+            "tests.servers.test_split_learning_selection_strategy.test_split_learning_cycles_through_clients",
+            "tests.servers.test_split_learning_selection_strategy.test_split_learning_rejects_multiple_clients"
+          ]
+        },
+        "log": {
+          "path": "/tmp/plato-phase2b-resume-review/focused313.log",
+          "sha256": "6bfbd897005b31aa364b5d45e50150b335fd0fc26c6df9bdb89b95dc00f0f3d5"
+        },
+        "junit": {
+          "path": "/tmp/plato-phase2b-resume-review/focused313.xml",
+          "sha256": "34dd5e648f4f64189f4c59d2cf35e16ad43136ec15cf1cc852bb9945ba88498a"
+        }
+      },
+      "retained_runtime": {
+        "command": "zsh -lc 'PYTHONDONTWRITEBYTECODE=1 XDG_CACHE_HOME=/tmp/plato-phase2b-resume-review/cache MPLCONFIGDIR=/tmp/plato-phase2b-resume-review/mpl OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 PYTHONPATH=/private/tmp/plato-refresh-worktrees/runtime-resume-review /tmp/plato-phase2b-runtime/venv313/bin/python -m pytest tests/clients tests/servers tests/callbacks tests/integration/test_smoke_configs.py --test-profile base -q -p no:cacheprovider --basetemp=/tmp/plato-phase2b-resume-review/runtime313 --junitxml=/tmp/plato-phase2b-resume-review/runtime313.xml > /tmp/plato-phase2b-resume-review/runtime313.log 2>&1'",
+        "cwd": "/private/tmp/plato-refresh-worktrees/runtime-resume-review",
+        "exit_code": 0,
+        "result": {
+          "tests": 212,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": 6.617,
+          "nodeids": [
+            "tests.clients.test_checkpoint_cleanup.test_disconnect_removes_only_owned_temporary_checkpoints",
+            "tests.clients.test_client_lifecycle_variants.test_simulated_server_payload_limit_precedes_deserialization",
+            "tests.clients.test_client_lifecycle_variants.test_base_client_lifecycle_sets_attributes",
+            "tests.clients.test_client_lifecycle_variants.test_composable_client_handles_payload_roundtrip",
+            "tests.clients.test_client_lifecycle_variants.test_base_client_handles_missing_datasource",
+            "tests.clients.test_client_lifecycle_variants.test_composable_client_request_update_orders_callbacks",
+            "tests.clients.test_client_lifecycle_variants.test_composable_client_chunk_flow_supports_retries",
+            "tests.clients.test_client_lifecycle_variants.test_split_learning_client_state_management",
+            "tests.clients.test_client_lifecycle_variants.test_mpc_client_round_store_configuration",
+            "tests.clients.test_client_lifecycle_variants.test_mpc_training_strategy_records_samples",
+            "tests.clients.test_feddf_strategy.test_feddf_training_strategy_returns_teacher_logits",
+            "tests.clients.test_fednova_strategy.test_report_contains_epochs_for_constant_pattern",
+            "tests.clients.test_fednova_strategy.test_uniform_random_assigns_epochs_and_updates_config",
+            "tests.clients.test_payload_limits.test_default_client_payload_cleanup_and_retry[valid]",
+            "tests.clients.test_payload_limits.test_default_client_payload_cleanup_and_retry[oversize]",
+            "tests.clients.test_payload_limits.test_default_client_payload_cleanup_and_retry[malformed]",
+            "tests.clients.test_payload_limits.test_default_client_payload_cleanup_and_retry[incomplete]",
+            "tests.clients.test_payload_limits.test_default_client_payload_cleanup_and_retry[wrong_id]",
+            "tests.clients.test_payload_limits.test_default_client_payload_cleanup_and_retry[timeout]",
+            "tests.clients.test_registry.test_registry_preserves_kwargs_for_external_clients",
+            "tests.clients.test_simple_client.test_simple_client_trains_with_default_strategies",
+            "tests.servers.test_fedavg_gan_aggregation_strategy.test_gan_aggregation_strategy_weighted_average",
+            "tests.servers.test_fedavg_he_aggregation_strategy.test_he_aggregation_strategy_weighted_average_without_encryption",
+            "tests.servers.test_fedavg_strategy.test_fedavg_aggregation_weighted_mean",
+            "tests.servers.test_fedavg_strategy.test_fedavg_aggregation_skips_feature_payloads",
+            "tests.servers.test_fedavg_strategy.test_aggregation_rejects_invalid_weights[-1-False-False]",
+            "tests.servers.test_fedavg_strategy.test_aggregation_rejects_invalid_weights[-1-False-True]",
+            "tests.servers.test_fedavg_strategy.test_aggregation_rejects_invalid_weights[-1-True-False]",
+            "tests.servers.test_fedavg_strategy.test_aggregation_rejects_invalid_weights[-1-True-True]",
+            "tests.servers.test_fedavg_strategy.test_aggregation_rejects_invalid_weights[nan-False-False]",
+            "tests.servers.test_fedavg_strategy.test_aggregation_rejects_invalid_weights[nan-False-True]",
+            "tests.servers.test_fedavg_strategy.test_aggregation_rejects_invalid_weights[nan-True-False]",
+            "tests.servers.test_fedavg_strategy.test_aggregation_rejects_invalid_weights[nan-True-True]",
+            "tests.servers.test_fedavg_strategy.test_aggregation_rejects_invalid_weights[inf-False-False]",
+            "tests.servers.test_fedavg_strategy.test_aggregation_rejects_invalid_weights[inf-False-True]",
+            "tests.servers.test_fedavg_strategy.test_aggregation_rejects_invalid_weights[inf-True-False]",
+            "tests.servers.test_fedavg_strategy.test_aggregation_rejects_invalid_weights[inf-True-True]",
+            "tests.servers.test_fedavg_strategy.test_aggregation_rejects_invalid_weights[-inf-False-False]",
+            "tests.servers.test_fedavg_strategy.test_aggregation_rejects_invalid_weights[-inf-False-True]",
+            "tests.servers.test_fedavg_strategy.test_aggregation_rejects_invalid_weights[-inf-True-False]",
+            "tests.servers.test_fedavg_strategy.test_aggregation_rejects_invalid_weights[-inf-True-True]",
+            "tests.servers.test_fedavg_strategy.test_aggregation_rejects_cardinality_mismatch[0-False]",
+            "tests.servers.test_fedavg_strategy.test_aggregation_rejects_cardinality_mismatch[0-True]",
+            "tests.servers.test_fedavg_strategy.test_aggregation_rejects_cardinality_mismatch[2-False]",
+            "tests.servers.test_fedavg_strategy.test_aggregation_rejects_cardinality_mismatch[2-True]",
+            "tests.servers.test_fedavg_strategy.test_server_validates_raw_and_hook_inputs_before_any_dispatch[negative-False-ordinary]",
+            "tests.servers.test_fedavg_strategy.test_server_validates_raw_and_hook_inputs_before_any_dispatch[negative-False-legacy]",
+            "tests.servers.test_fedavg_strategy.test_server_validates_raw_and_hook_inputs_before_any_dispatch[negative-False-delta]",
+            "tests.servers.test_fedavg_strategy.test_server_validates_raw_and_hook_inputs_before_any_dispatch[negative-True-ordinary]",
+            "tests.servers.test_fedavg_strategy.test_server_validates_raw_and_hook_inputs_before_any_dispatch[negative-True-legacy]",
+            "tests.servers.test_fedavg_strategy.test_server_validates_raw_and_hook_inputs_before_any_dispatch[negative-True-delta]",
+            "tests.servers.test_fedavg_strategy.test_server_validates_raw_and_hook_inputs_before_any_dispatch[nonfinite-False-ordinary]",
+            "tests.servers.test_fedavg_strategy.test_server_validates_raw_and_hook_inputs_before_any_dispatch[nonfinite-False-legacy]",
+            "tests.servers.test_fedavg_strategy.test_server_validates_raw_and_hook_inputs_before_any_dispatch[nonfinite-False-delta]",
+            "tests.servers.test_fedavg_strategy.test_server_validates_raw_and_hook_inputs_before_any_dispatch[nonfinite-True-ordinary]",
+            "tests.servers.test_fedavg_strategy.test_server_validates_raw_and_hook_inputs_before_any_dispatch[nonfinite-True-legacy]",
+            "tests.servers.test_fedavg_strategy.test_server_validates_raw_and_hook_inputs_before_any_dispatch[nonfinite-True-delta]",
+            "tests.servers.test_fedavg_strategy.test_server_validates_raw_and_hook_inputs_before_any_dispatch[hook_extra-False-ordinary]",
+            "tests.servers.test_fedavg_strategy.test_server_validates_raw_and_hook_inputs_before_any_dispatch[hook_extra-False-legacy]",
+            "tests.servers.test_fedavg_strategy.test_server_validates_raw_and_hook_inputs_before_any_dispatch[hook_extra-False-delta]",
+            "tests.servers.test_fedavg_strategy.test_server_validates_raw_and_hook_inputs_before_any_dispatch[hook_extra-True-ordinary]",
+            "tests.servers.test_fedavg_strategy.test_server_validates_raw_and_hook_inputs_before_any_dispatch[hook_extra-True-legacy]",
+            "tests.servers.test_fedavg_strategy.test_server_validates_raw_and_hook_inputs_before_any_dispatch[hook_extra-True-delta]",
+            "tests.servers.test_fedavg_strategy.test_server_validates_raw_and_hook_inputs_before_any_dispatch[hook_missing-False-ordinary]",
+            "tests.servers.test_fedavg_strategy.test_server_validates_raw_and_hook_inputs_before_any_dispatch[hook_missing-False-legacy]",
+            "tests.servers.test_fedavg_strategy.test_server_validates_raw_and_hook_inputs_before_any_dispatch[hook_missing-False-delta]",
+            "tests.servers.test_fedavg_strategy.test_server_validates_raw_and_hook_inputs_before_any_dispatch[hook_missing-True-ordinary]",
+            "tests.servers.test_fedavg_strategy.test_server_validates_raw_and_hook_inputs_before_any_dispatch[hook_missing-True-legacy]",
+            "tests.servers.test_fedavg_strategy.test_server_validates_raw_and_hook_inputs_before_any_dispatch[hook_missing-True-delta]",
+            "tests.servers.test_fedavg_strategy.test_server_preserves_fractional_and_zero_sample_dispatch[none-False-ordinary]",
+            "tests.servers.test_fedavg_strategy.test_server_preserves_fractional_and_zero_sample_dispatch[none-False-legacy]",
+            "tests.servers.test_fedavg_strategy.test_server_preserves_fractional_and_zero_sample_dispatch[none-False-delta]",
+            "tests.servers.test_fedavg_strategy.test_server_preserves_fractional_and_zero_sample_dispatch[none-True-ordinary]",
+            "tests.servers.test_fedavg_strategy.test_server_preserves_fractional_and_zero_sample_dispatch[none-True-legacy]",
+            "tests.servers.test_fedavg_strategy.test_server_preserves_fractional_and_zero_sample_dispatch[none-True-delta]",
+            "tests.servers.test_fedavg_strategy.test_server_preserves_fractional_and_zero_sample_dispatch[one-False-ordinary]",
+            "tests.servers.test_fedavg_strategy.test_server_preserves_fractional_and_zero_sample_dispatch[one-False-legacy]",
+            "tests.servers.test_fedavg_strategy.test_server_preserves_fractional_and_zero_sample_dispatch[one-False-delta]",
+            "tests.servers.test_fedavg_strategy.test_server_preserves_fractional_and_zero_sample_dispatch[one-True-ordinary]",
+            "tests.servers.test_fedavg_strategy.test_server_preserves_fractional_and_zero_sample_dispatch[one-True-legacy]",
+            "tests.servers.test_fedavg_strategy.test_server_preserves_fractional_and_zero_sample_dispatch[one-True-delta]",
+            "tests.servers.test_fedavg_strategy.test_server_preserves_fractional_and_zero_sample_dispatch[all-False-ordinary]",
+            "tests.servers.test_fedavg_strategy.test_server_preserves_fractional_and_zero_sample_dispatch[all-False-legacy]",
+            "tests.servers.test_fedavg_strategy.test_server_preserves_fractional_and_zero_sample_dispatch[all-False-delta]",
+            "tests.servers.test_fedavg_strategy.test_server_preserves_fractional_and_zero_sample_dispatch[all-True-ordinary]",
+            "tests.servers.test_fedavg_strategy.test_server_preserves_fractional_and_zero_sample_dispatch[all-True-legacy]",
+            "tests.servers.test_fedavg_strategy.test_server_preserves_fractional_and_zero_sample_dispatch[all-True-delta]",
+            "tests.servers.test_fedavg_strategy.test_feature_samples_do_not_dilute_fractional_weight_reference[False]",
+            "tests.servers.test_fedavg_strategy.test_feature_samples_do_not_dilute_fractional_weight_reference[True]",
+            "tests.servers.test_fedavg_strategy.test_fedavg_server_prefers_custom_delta_strategy_over_inherited_weights",
+            "tests.servers.test_fedavg_strategy.test_fedavg_server_logged_items_flatten_evaluator_metrics",
+            "tests.servers.test_fedavg_strategy.test_fedavg_server_logged_items_include_detailed_lighteval_metrics",
+            "tests.servers.test_fedavg_strategy.test_fedavg_server_does_not_persist_evaluator_jsonl_sidecar",
+            "tests.servers.test_feddf_server_strategy.test_feddf_server_process_reports_distills_global_model",
+            "tests.servers.test_feddf_server_strategy.test_feddf_teacher_logits_average_uniformly_by_default",
+            "tests.servers.test_hermes_aggregation_strategy.test_hermes_aggregation_strategy_produces_weighted_average",
+            "tests.servers.test_lifecycle_contracts.test_fedbuff_preserves_uniform_research_weighting",
+            "tests.servers.test_lifecycle_contracts.test_fedasync_actual_example_preserves_staleness_mixing",
+            "tests.servers.test_lifecycle_contracts.test_async_periodic_aggregation_respects_minimum_and_round_order",
+            "tests.servers.test_lifecycle_contracts.test_cross_silo_invalid_hook_output_preserves_trainer_identity",
+            "tests.servers.test_lifecycle_contracts.test_async_partial_round_replaces_only_idle_workers[False]",
+            "tests.servers.test_lifecycle_contracts.test_async_partial_round_replaces_only_idle_workers[True]",
+            "tests.servers.test_personalized_selection_strategy.test_personalized_selection_respects_ratio",
+            "tests.servers.test_personalized_selection_strategy.test_personalized_selection_ensures_minimum_candidates",
+            "tests.servers.test_personalized_selection_strategy.test_personalized_selection_uses_all_clients_after_regular_rounds",
+            "tests.servers.test_personalized_selection_strategy.test_personalized_selection_clamps_ratio",
+            "tests.servers.test_pfedgraph_aggregation_strategy.test_project_to_simplex_returns_probability_vector",
+            "tests.servers.test_pfedgraph_aggregation_strategy.test_pfedgraph_aggregation_updates_client_models",
+            "tests.servers.test_port_checkpoint_flow.test_actual_port_hook_to_stale_similarity_and_aggregation[False]",
+            "tests.servers.test_port_checkpoint_flow.test_actual_port_hook_to_stale_similarity_and_aggregation[True]",
+            "tests.servers.test_runtime_disconnect_recovery.test_batched_urgent_loss_recovers_with_completed_reports[False]",
+            "tests.servers.test_runtime_disconnect_recovery.test_batched_urgent_loss_recovers_with_completed_reports[True]",
+            "tests.servers.test_runtime_disconnect_recovery.test_default_disconnect_policy_closes_batched_urgent_work[None]",
+            "tests.servers.test_runtime_disconnect_recovery.test_default_disconnect_policy_closes_batched_urgent_work[True]",
+            "tests.servers.test_runtime_disconnect_recovery.test_assignment_rejects_unregistered_session_before_mutation",
+            "tests.servers.test_runtime_review_regressions.test_partial_urgency_preserves_heap_order[3]",
+            "tests.servers.test_runtime_review_regressions.test_partial_urgency_preserves_heap_order[4]",
+            "tests.servers.test_runtime_review_regressions.test_earlier_response_never_rewinds_simulated_time",
+            "tests.servers.test_runtime_review_regressions.test_batched_shared_worker_completes_every_urgent_response",
+            "tests.servers.test_runtime_review_regressions.test_distinct_workers_remain_concurrent_during_urgency",
+            "tests.servers.test_runtime_review_regressions.test_distinct_retained_transfers_survive_worker_reuse_and_cleanup",
+            "tests.servers.test_runtime_s3_contract.test_minimal_s3_adapter_prefixes_exactly_once[False-]",
+            "tests.servers.test_runtime_s3_contract.test_minimal_s3_adapter_prefixes_exactly_once[False-prefix]",
+            "tests.servers.test_runtime_s3_contract.test_minimal_s3_adapter_prefixes_exactly_once[False-nested/prefix]",
+            "tests.servers.test_runtime_s3_contract.test_minimal_s3_adapter_prefixes_exactly_once[False-/prefix/]",
+            "tests.servers.test_runtime_s3_contract.test_minimal_s3_adapter_prefixes_exactly_once[True-]",
+            "tests.servers.test_runtime_s3_contract.test_minimal_s3_adapter_prefixes_exactly_once[True-prefix]",
+            "tests.servers.test_runtime_s3_contract.test_minimal_s3_adapter_prefixes_exactly_once[True-nested/prefix]",
+            "tests.servers.test_runtime_s3_contract.test_minimal_s3_adapter_prefixes_exactly_once[True-/prefix/]",
+            "tests.servers.test_runtime_s3_contract.test_client_buffer_cap_applies_below_payload_cap[socket]",
+            "tests.servers.test_runtime_s3_contract.test_client_buffer_cap_applies_below_payload_cap[s3]",
+            "tests.servers.test_runtime_transport.test_report_rejects_unassigned_identity_before_parsing[worker-2]",
+            "tests.servers.test_runtime_transport.test_report_rejects_unassigned_identity_before_parsing[unknown-2]",
+            "tests.servers.test_runtime_transport.test_report_embedded_identity_cannot_target_another_client",
+            "tests.servers.test_runtime_transport.test_unknown_or_stale_session_rejected_at_every_payload_stage[chunk-unknown]",
+            "tests.servers.test_runtime_transport.test_unknown_or_stale_session_rejected_at_every_payload_stage[chunk-stale]",
+            "tests.servers.test_runtime_transport.test_unknown_or_stale_session_rejected_at_every_payload_stage[part-unknown]",
+            "tests.servers.test_runtime_transport.test_unknown_or_stale_session_rejected_at_every_payload_stage[part-stale]",
+            "tests.servers.test_runtime_transport.test_unknown_or_stale_session_rejected_at_every_payload_stage[done-unknown]",
+            "tests.servers.test_runtime_transport.test_unknown_or_stale_session_rejected_at_every_payload_stage[done-stale]",
+            "tests.servers.test_runtime_transport.test_unknown_or_stale_session_rejected_at_every_payload_stage[s3-unknown]",
+            "tests.servers.test_runtime_transport.test_unknown_or_stale_session_rejected_at_every_payload_stage[s3-stale]",
+            "tests.servers.test_runtime_transport.test_payload_identity_checked_before_parsing_or_s3[part]",
+            "tests.servers.test_runtime_transport.test_payload_identity_checked_before_parsing_or_s3[done]",
+            "tests.servers.test_runtime_transport.test_payload_identity_checked_before_parsing_or_s3[s3]",
+            "tests.servers.test_runtime_transport.test_malformed_part_releases_only_sender_buffers[broken]",
+            "tests.servers.test_runtime_transport.test_malformed_part_releases_only_sender_buffers[\\x80\\x04K\\x01]",
+            "tests.servers.test_runtime_transport.test_malformed_part_releases_only_sender_buffers[\\x80\\x04K\\x01.x]",
+            "tests.servers.test_runtime_transport.test_server_limits_apply_across_parts_and_preserve_other_client[chunk_bytes]",
+            "tests.servers.test_runtime_transport.test_server_limits_apply_across_parts_and_preserve_other_client[payload_bytes]",
+            "tests.servers.test_runtime_transport.test_server_limits_apply_across_parts_and_preserve_other_client[chunks]",
+            "tests.servers.test_runtime_transport.test_server_limits_apply_across_parts_and_preserve_other_client[parts]",
+            "tests.servers.test_runtime_transport.test_server_limits_apply_across_parts_and_preserve_other_client[buffered]",
+            "tests.servers.test_runtime_transport.test_report_limit_rejects_before_pickle_parsing",
+            "tests.servers.test_runtime_transport.test_incomplete_transfer_expires_without_next_message[False]",
+            "tests.servers.test_runtime_transport.test_incomplete_transfer_expires_without_next_message[True]",
+            "tests.servers.test_runtime_transport.test_duplicate_report_does_not_replace_active_payload",
+            "tests.servers.test_runtime_transport.test_s3_reference_cannot_borrow_another_client_key[client_payload_2_ABC123]",
+            "tests.servers.test_runtime_transport.test_s3_reference_cannot_borrow_another_client_key[client_payload_7_ABC123/extra]",
+            "tests.servers.test_runtime_transport.test_s3_reference_cannot_borrow_another_client_key[other]",
+            "tests.servers.test_runtime_transport.test_socket_completion_round_boundaries_and_cleanup[False]",
+            "tests.servers.test_runtime_transport.test_socket_completion_round_boundaries_and_cleanup[True]",
+            "tests.servers.test_runtime_transport.test_reused_worker_accepts_only_new_server_issued_assignment",
+            "tests.servers.test_runtime_transport.test_actual_urgent_request_and_writer_use_requested_logical_client",
+            "tests.servers.test_runtime_transport.test_all_buffered_stale_clients_receive_urgent_requests",
+            "tests.servers.test_runtime_transport.test_disconnect_cleans_urgent_assignment_without_touching_other_client",
+            "tests.servers.test_runtime_transport.test_cross_silo_edge_identity_follows_actual_central_selection",
+            "tests.servers.test_runtime_transport.test_completed_unaggregated_payloads_still_count_toward_buffer_limit",
+            "tests.servers.test_runtime_transport.test_s3_ingress_uses_bounded_actual_http_reader[valid]",
+            "tests.servers.test_runtime_transport.test_s3_ingress_uses_bounded_actual_http_reader[oversized]",
+            "tests.servers.test_runtime_transport.test_s3_ingress_uses_bounded_actual_http_reader[streamed_oversize]",
+            "tests.servers.test_runtime_transport.test_s3_ingress_uses_bounded_actual_http_reader[truncated]",
+            "tests.servers.test_runtime_transport.test_s3_ingress_uses_bounded_actual_http_reader[incomplete]",
+            "tests.servers.test_server_resume_rng.test_actual_checkpoint_continues_selection_through_run[zero-configured-seed-ordinary]",
+            "tests.servers.test_server_resume_rng.test_actual_checkpoint_continues_selection_through_run[zero-configured-seed-central]",
+            "tests.servers.test_server_resume_rng.test_actual_checkpoint_continues_selection_through_run[zero-no-seed-ordinary]",
+            "tests.servers.test_server_resume_rng.test_actual_checkpoint_continues_selection_through_run[zero-no-seed-central]",
+            "tests.servers.test_server_resume_rng.test_actual_checkpoint_continues_selection_through_run[one-configured-seed-ordinary]",
+            "tests.servers.test_server_resume_rng.test_actual_checkpoint_continues_selection_through_run[one-configured-seed-central]",
+            "tests.servers.test_server_resume_rng.test_actual_checkpoint_continues_selection_through_run[one-no-seed-ordinary]",
+            "tests.servers.test_server_resume_rng.test_actual_checkpoint_continues_selection_through_run[one-no-seed-central]",
+            "tests.servers.test_server_resume_rng.test_actual_checkpoint_continues_selection_through_run[many-configured-seed-ordinary]",
+            "tests.servers.test_server_resume_rng.test_actual_checkpoint_continues_selection_through_run[many-configured-seed-central]",
+            "tests.servers.test_server_resume_rng.test_actual_checkpoint_continues_selection_through_run[many-no-seed-ordinary]",
+            "tests.servers.test_server_resume_rng.test_actual_checkpoint_continues_selection_through_run[many-no-seed-central]",
+            "tests.servers.test_server_resume_rng.test_legacy_global_rng_tuple_remains_readable[ordinary]",
+            "tests.servers.test_server_resume_rng.test_legacy_global_rng_tuple_remains_readable[central]",
+            "tests.servers.test_server_resume_rng.test_fresh_run_keeps_configured_seed_or_initial_selection_state[configured-seed-ordinary]",
+            "tests.servers.test_server_resume_rng.test_fresh_run_keeps_configured_seed_or_initial_selection_state[configured-seed-central]",
+            "tests.servers.test_server_resume_rng.test_fresh_run_keeps_configured_seed_or_initial_selection_state[no-seed-ordinary]",
+            "tests.servers.test_server_resume_rng.test_fresh_run_keeps_configured_seed_or_initial_selection_state[no-seed-central]",
+            "tests.servers.test_server_resume_rng.test_custom_resume_override_owns_selection_state_without_session_flag[ordinary]",
+            "tests.servers.test_server_resume_rng.test_custom_resume_override_owns_selection_state_without_session_flag[central]",
+            "tests.servers.test_server_resume_rng.test_malformed_resume_propagates_before_process_or_socket_start[current_round.pkl-UnpicklingError-ordinary]",
+            "tests.servers.test_server_resume_rng.test_malformed_resume_propagates_before_process_or_socket_start[current_round.pkl-UnpicklingError-central]",
+            "tests.servers.test_server_resume_rng.test_malformed_resume_propagates_before_process_or_socket_start[numpy_prng_state_2.pkl-UnpicklingError-ordinary]",
+            "tests.servers.test_server_resume_rng.test_malformed_resume_propagates_before_process_or_socket_start[numpy_prng_state_2.pkl-UnpicklingError-central]",
+            "tests.servers.test_server_resume_rng.test_malformed_resume_propagates_before_process_or_socket_start[prng_state_2.pkl-UnpicklingError-ordinary]",
+            "tests.servers.test_server_resume_rng.test_malformed_resume_propagates_before_process_or_socket_start[prng_state_2.pkl-UnpicklingError-central]",
+            "tests.servers.test_server_resume_rng.test_malformed_resume_propagates_before_process_or_socket_start[checkpoint_lenet5_2.safetensors-SafetensorError-ordinary]",
+            "tests.servers.test_server_resume_rng.test_malformed_resume_propagates_before_process_or_socket_start[checkpoint_lenet5_2.safetensors-SafetensorError-central]",
+            "tests.servers.test_split_learning_selection_strategy.test_split_learning_reuses_client_until_release",
+            "tests.servers.test_split_learning_selection_strategy.test_split_learning_cycles_through_clients",
+            "tests.servers.test_split_learning_selection_strategy.test_split_learning_rejects_multiple_clients",
+            "tests.callbacks.test_handler_contract.test_registered_callbacks_are_iterable_in_registration_order",
+            "tests.callbacks.test_handler_contract.test_callback_body_attribute_error_reaches_caller_unchanged",
+            "tests.callbacks.test_handler_contract.test_missing_callback_event_keeps_descriptive_error",
+            "tests.callbacks.test_server_callback.test_log_progress_callback_tolerates_missing_logged_items",
+            "tests.callbacks.test_server_callback.test_log_progress_callback_expands_csv_for_new_lighteval_metrics",
+            "tests.integration.test_smoke_configs.test_fedavg_lenet5_smoke",
+            "tests.integration.test_smoke_configs.test_split_learning_smoke",
+            "tests.integration.test_smoke_configs.test_mpc_training_smoke"
+          ]
+        },
+        "log": {
+          "path": "/tmp/plato-phase2b-resume-review/runtime313.log",
+          "sha256": "10f7ecd540203320c2a497ead5b6c98f01812eccf155a5dfe984ccb59549c960"
+        },
+        "junit": {
+          "path": "/tmp/plato-phase2b-resume-review/runtime313.xml",
+          "sha256": "20f137008215178942012c37f3a32e982b60944147efdffae29fba79e079afcc"
+        }
+      },
+      "fresh_startup_subset": {
+        "command": "zsh -lc 'PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=/private/tmp/plato-refresh-worktrees/runtime-resume-review XDG_CACHE_HOME=/tmp/plato-phase2b-resume-review/cache MPLCONFIGDIR=/tmp/plato-phase2b-resume-review/mpl OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2b-runtime/venv313/bin/python -m pytest '\"'\"'tests/integration/test_event_loop_startup.py::test_fresh_entrypoint_executes_scheduled_work'\"'\"' '\"'\"'tests/integration/test_event_loop_startup.py::test_active_failure_reaches_synchronous_caller'\"'\"' '\"'\"'tests/integration/test_event_loop_startup.py::test_preconstructed_borrowed_loop_resources_survive'\"'\"' '\"'\"'tests/integration/test_event_loop_startup.py::test_explicitly_absent_loop_on_server_and_edge'\"'\"' '\"'\"'tests/integration/test_event_loop_startup.py::test_real_two_client_cpu_socket_round'\"'\"' '\"'\"'tests/integration/test_event_loop_startup.py::test_post_launch_failure_keeps_primary_error_and_contains_children'\"'\"' '\"'\"'tests/integration/test_event_loop_startup.py::test_noncooperative_teardown_is_watchdog_containment[task]'\"'\"' -q -p no:cacheprovider --basetemp=/tmp/plato-phase2b-resume-review/startup313 --junitxml=/tmp/plato-phase2b-resume-review/startup313.xml > /tmp/plato-phase2b-resume-review/startup313.log 2>&1'",
+        "cwd": "/private/tmp/plato-refresh-worktrees/runtime-resume-review",
+        "exit_code": 0,
+        "result": {
+          "tests": 22,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": 146.181,
+          "nodeids": [
+            "tests.integration.test_event_loop_startup.test_fresh_entrypoint_executes_scheduled_work[client_default-client_body]",
+            "tests.integration.test_event_loop_startup.test_fresh_entrypoint_executes_scheduled_work[client_custom-client_body]",
+            "tests.integration.test_event_loop_startup.test_fresh_entrypoint_executes_scheduled_work[ordinary-periodic_body]",
+            "tests.integration.test_event_loop_startup.test_fresh_entrypoint_executes_scheduled_work[central-periodic_body]",
+            "tests.integration.test_event_loop_startup.test_fresh_entrypoint_executes_scheduled_work[direct-server_body]",
+            "tests.integration.test_event_loop_startup.test_fresh_entrypoint_executes_scheduled_work[edge_default-client_body]",
+            "tests.integration.test_event_loop_startup.test_fresh_entrypoint_executes_scheduled_work[edge_custom-client_body]",
+            "tests.integration.test_event_loop_startup.test_active_failure_reaches_synchronous_caller[client_custom-client-sentinel]",
+            "tests.integration.test_event_loop_startup.test_active_failure_reaches_synchronous_caller[ordinary-periodic-sentinel]",
+            "tests.integration.test_event_loop_startup.test_active_failure_reaches_synchronous_caller[central-periodic-sentinel]",
+            "tests.integration.test_event_loop_startup.test_active_failure_reaches_synchronous_caller[edge_custom-client-sentinel]",
+            "tests.integration.test_event_loop_startup.test_preconstructed_borrowed_loop_resources_survive[client_lifecycle-False]",
+            "tests.integration.test_event_loop_startup.test_preconstructed_borrowed_loop_resources_survive[client_lifecycle-True]",
+            "tests.integration.test_event_loop_startup.test_preconstructed_borrowed_loop_resources_survive[ordinary-False]",
+            "tests.integration.test_event_loop_startup.test_preconstructed_borrowed_loop_resources_survive[ordinary-True]",
+            "tests.integration.test_event_loop_startup.test_explicitly_absent_loop_on_server_and_edge[ordinary]",
+            "tests.integration.test_event_loop_startup.test_explicitly_absent_loop_on_server_and_edge[central]",
+            "tests.integration.test_event_loop_startup.test_explicitly_absent_loop_on_server_and_edge[edge_default]",
+            "tests.integration.test_event_loop_startup.test_explicitly_absent_loop_on_server_and_edge[edge_custom]",
+            "tests.integration.test_event_loop_startup.test_real_two_client_cpu_socket_round",
+            "tests.integration.test_event_loop_startup.test_post_launch_failure_keeps_primary_error_and_contains_children",
+            "tests.integration.test_event_loop_startup.test_noncooperative_teardown_is_watchdog_containment[task]"
+          ]
+        },
+        "log": {
+          "path": "/tmp/plato-phase2b-resume-review/startup313.log",
+          "sha256": "e538b27173c0fa6ba405f1b8a1902eac3c22d1eaf057b0ead3ad8929a20e8c48"
+        },
+        "junit": {
+          "path": "/tmp/plato-phase2b-resume-review/startup313.xml",
+          "sha256": "bb957cead6439510f990995c392d97ccac5065b1cdc7ac22f17793c2f41b3d2e"
+        },
+        "deliberate_containment_cases": [
+          {
+            "case": "client_lifecycle",
+            "options": {
+              "absent": true,
+              "stall": "task"
+            },
+            "forced": [
+              "TERM"
+            ],
+            "returncode": -15
+          }
+        ],
+        "survivors": []
+      },
+      "independent_expected_red": [
+        {
+          "command": "zsh -lc 'PYTHONDONTWRITEBYTECODE=1 XDG_CACHE_HOME=/tmp/plato-phase2b-resume-review/cache MPLCONFIGDIR=/tmp/plato-phase2b-resume-review/mpl OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 PYTHONPATH=/tmp/plato-phase2b-resume-review/accepted /tmp/plato-phase2b-runtime/venv313/bin/python /tmp/plato-phase2b-resume-review/independent_resume_probe.py --mode=red-f28 --output=/tmp/plato-phase2b-resume-review/red-f28313 > /tmp/plato-phase2b-resume-review/red-f28313.log 2>&1'",
+          "cwd": "/tmp/plato-phase2b-resume-review/accepted",
+          "exit_code": 1,
+          "expected_failures": 2,
+          "source_sha256": "a8d2acec980b6d888b7425ebaec290d8e31d1d32152fd994ca933313f37551f8",
+          "probe_source": {
+            "path": "/tmp/plato-phase2b-resume-review/independent_resume_probe_red_version.py",
+            "sha256": "5836e74516cb4fa69b875ac73582994c1bf7e5329409e40c627114ad19502bca"
+          },
+          "log": {
+            "path": "/tmp/plato-phase2b-resume-review/red-f28313.log",
+            "sha256": "b05ccdd79fe6c3db4641bb8fd78c1b678e8d83d11c2e0c4ac69f6831f2b19a53"
+          },
+          "results": {
+            "path": "/tmp/plato-phase2b-resume-review/red-f28313/results.json",
+            "sha256": "12ea0d3e0c6f1f8d1b1df48a525f69c5a34590d175f95d14ae3f4f23da3f8730"
+          },
+          "expected_vs_actual": [
+            {
+              "name": "checkpoint-False-17-0-2",
+              "prior": [
+                [
+                  9,
+                  7
+                ],
+                [
+                  5,
+                  6
+                ]
+              ],
+              "expected": [
+                [
+                  5,
+                  3
+                ],
+                [
+                  9,
+                  5
+                ],
+                [
+                  2,
+                  1
+                ],
+                [
+                  4,
+                  7
+                ],
+                [
+                  7,
+                  5
+                ]
+              ],
+              "uninterrupted": [
+                [
+                  5,
+                  3
+                ],
+                [
+                  9,
+                  5
+                ],
+                [
+                  2,
+                  1
+                ],
+                [
+                  4,
+                  7
+                ],
+                [
+                  7,
+                  5
+                ]
+              ],
+              "resumed": [
+                [
+                  9,
+                  7
+                ],
+                [
+                  5,
+                  6
+                ],
+                [
+                  5,
+                  3
+                ],
+                [
+                  9,
+                  5
+                ],
+                [
+                  2,
+                  1
+                ]
+              ],
+              "context_stale_before_first_selection": true,
+              "model_round_numpy_restored": true,
+              "launches": 2
+            },
+            {
+              "name": "checkpoint-True-17-0-2",
+              "prior": [
+                [
+                  9,
+                  7
+                ],
+                [
+                  5,
+                  6
+                ]
+              ],
+              "expected": [
+                [
+                  5,
+                  3
+                ],
+                [
+                  9,
+                  5
+                ],
+                [
+                  2,
+                  1
+                ],
+                [
+                  4,
+                  7
+                ],
+                [
+                  7,
+                  5
+                ]
+              ],
+              "uninterrupted": [
+                [
+                  5,
+                  3
+                ],
+                [
+                  9,
+                  5
+                ],
+                [
+                  2,
+                  1
+                ],
+                [
+                  4,
+                  7
+                ],
+                [
+                  7,
+                  5
+                ]
+              ],
+              "resumed": [
+                [
+                  9,
+                  7
+                ],
+                [
+                  5,
+                  6
+                ],
+                [
+                  5,
+                  3
+                ],
+                [
+                  9,
+                  5
+                ],
+                [
+                  2,
+                  1
+                ]
+              ],
+              "context_stale_before_first_selection": true,
+              "model_round_numpy_restored": true,
+              "launches": 2
+            }
+          ]
+        },
+        {
+          "command": "zsh -lc 'PYTHONDONTWRITEBYTECODE=1 XDG_CACHE_HOME=/tmp/plato-phase2b-resume-review/cache MPLCONFIGDIR=/tmp/plato-phase2b-resume-review/mpl OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 PYTHONPATH=/tmp/plato-phase2b-resume-review/f28 /tmp/plato-phase2b-runtime/venv313/bin/python /tmp/plato-phase2b-resume-review/independent_resume_probe.py --mode=red-selection --output=/tmp/plato-phase2b-resume-review/red-selection313 > /tmp/plato-phase2b-resume-review/red-selection313.log 2>&1'",
+          "cwd": "/tmp/plato-phase2b-resume-review/f28",
+          "exit_code": 1,
+          "expected_failures": 8,
+          "source_sha256": "0737a129696bb0766b8de2d08aba6b9dafe9be053c8207b7a861928bf161fd1f",
+          "probe_source": {
+            "path": "/tmp/plato-phase2b-resume-review/independent_resume_probe_red_version.py",
+            "sha256": "5836e74516cb4fa69b875ac73582994c1bf7e5329409e40c627114ad19502bca"
+          },
+          "log": {
+            "path": "/tmp/plato-phase2b-resume-review/red-selection313.log",
+            "sha256": "1cb2316fb80bec2374cc1a5ffe947172f7205acd5effd49fc2b95b32a6bf9d25"
+          },
+          "results": {
+            "path": "/tmp/plato-phase2b-resume-review/red-selection313/results.json",
+            "sha256": "8d5455918853faf444a816c4c78ee3131dc2f725e60e7b2caa3f0d6d9c28a22c"
+          },
+          "expected_vs_actual": [
+            {
+              "name": "checkpoint-False-17-1-2",
+              "prior": [
+                [
+                  9,
+                  7
+                ],
+                [
+                  5,
+                  6
+                ]
+              ],
+              "expected": [
+                [
+                  5,
+                  3
+                ],
+                [
+                  9,
+                  5
+                ],
+                [
+                  2,
+                  1
+                ],
+                [
+                  4,
+                  7
+                ],
+                [
+                  7,
+                  5
+                ]
+              ],
+              "uninterrupted": [
+                [
+                  5,
+                  3
+                ],
+                [
+                  9,
+                  5
+                ],
+                [
+                  2,
+                  1
+                ],
+                [
+                  4,
+                  7
+                ],
+                [
+                  7,
+                  5
+                ]
+              ],
+              "resumed": [
+                [
+                  9,
+                  5
+                ],
+                [
+                  2,
+                  1
+                ],
+                [
+                  4,
+                  7
+                ],
+                [
+                  7,
+                  5
+                ],
+                [
+                  9,
+                  6
+                ]
+              ],
+              "context_stale_before_first_selection": true,
+              "model_round_numpy_restored": true,
+              "launches": 2
+            },
+            {
+              "name": "checkpoint-False-17-37-2",
+              "prior": [
+                [
+                  9,
+                  7
+                ],
+                [
+                  5,
+                  6
+                ]
+              ],
+              "expected": [
+                [
+                  5,
+                  3
+                ],
+                [
+                  9,
+                  5
+                ],
+                [
+                  2,
+                  1
+                ],
+                [
+                  4,
+                  7
+                ],
+                [
+                  7,
+                  5
+                ]
+              ],
+              "uninterrupted": [
+                [
+                  5,
+                  3
+                ],
+                [
+                  9,
+                  5
+                ],
+                [
+                  2,
+                  1
+                ],
+                [
+                  4,
+                  7
+                ],
+                [
+                  7,
+                  5
+                ]
+              ],
+              "resumed": [
+                [
+                  1,
+                  6
+                ],
+                [
+                  1,
+                  8
+                ],
+                [
+                  6,
+                  1
+                ],
+                [
+                  7,
+                  4
+                ],
+                [
+                  2,
+                  9
+                ]
+              ],
+              "context_stale_before_first_selection": true,
+              "model_round_numpy_restored": true,
+              "launches": 2
+            },
+            {
+              "name": "checkpoint-False-None-1-2",
+              "prior": [
+                [
+                  9,
+                  7
+                ],
+                [
+                  5,
+                  6
+                ]
+              ],
+              "expected": [
+                [
+                  5,
+                  3
+                ],
+                [
+                  9,
+                  5
+                ],
+                [
+                  2,
+                  1
+                ],
+                [
+                  4,
+                  7
+                ],
+                [
+                  7,
+                  5
+                ]
+              ],
+              "uninterrupted": [
+                [
+                  5,
+                  3
+                ],
+                [
+                  9,
+                  5
+                ],
+                [
+                  2,
+                  1
+                ],
+                [
+                  4,
+                  7
+                ],
+                [
+                  7,
+                  5
+                ]
+              ],
+              "resumed": [
+                [
+                  9,
+                  5
+                ],
+                [
+                  2,
+                  1
+                ],
+                [
+                  4,
+                  7
+                ],
+                [
+                  7,
+                  5
+                ],
+                [
+                  9,
+                  6
+                ]
+              ],
+              "context_stale_before_first_selection": true,
+              "model_round_numpy_restored": true,
+              "launches": 2
+            },
+            {
+              "name": "checkpoint-False-None-37-2",
+              "prior": [
+                [
+                  9,
+                  7
+                ],
+                [
+                  5,
+                  6
+                ]
+              ],
+              "expected": [
+                [
+                  5,
+                  3
+                ],
+                [
+                  9,
+                  5
+                ],
+                [
+                  2,
+                  1
+                ],
+                [
+                  4,
+                  7
+                ],
+                [
+                  7,
+                  5
+                ]
+              ],
+              "uninterrupted": [
+                [
+                  5,
+                  3
+                ],
+                [
+                  9,
+                  5
+                ],
+                [
+                  2,
+                  1
+                ],
+                [
+                  4,
+                  7
+                ],
+                [
+                  7,
+                  5
+                ]
+              ],
+              "resumed": [
+                [
+                  1,
+                  6
+                ],
+                [
+                  1,
+                  8
+                ],
+                [
+                  6,
+                  1
+                ],
+                [
+                  7,
+                  4
+                ],
+                [
+                  2,
+                  9
+                ]
+              ],
+              "context_stale_before_first_selection": true,
+              "model_round_numpy_restored": true,
+              "launches": 2
+            },
+            {
+              "name": "checkpoint-True-17-1-2",
+              "prior": [
+                [
+                  9,
+                  7
+                ],
+                [
+                  5,
+                  6
+                ]
+              ],
+              "expected": [
+                [
+                  5,
+                  3
+                ],
+                [
+                  9,
+                  5
+                ],
+                [
+                  2,
+                  1
+                ],
+                [
+                  4,
+                  7
+                ],
+                [
+                  7,
+                  5
+                ]
+              ],
+              "uninterrupted": [
+                [
+                  5,
+                  3
+                ],
+                [
+                  9,
+                  5
+                ],
+                [
+                  2,
+                  1
+                ],
+                [
+                  4,
+                  7
+                ],
+                [
+                  7,
+                  5
+                ]
+              ],
+              "resumed": [
+                [
+                  9,
+                  5
+                ],
+                [
+                  2,
+                  1
+                ],
+                [
+                  4,
+                  7
+                ],
+                [
+                  7,
+                  5
+                ],
+                [
+                  9,
+                  6
+                ]
+              ],
+              "context_stale_before_first_selection": true,
+              "model_round_numpy_restored": true,
+              "launches": 2
+            },
+            {
+              "name": "checkpoint-True-17-37-2",
+              "prior": [
+                [
+                  9,
+                  7
+                ],
+                [
+                  5,
+                  6
+                ]
+              ],
+              "expected": [
+                [
+                  5,
+                  3
+                ],
+                [
+                  9,
+                  5
+                ],
+                [
+                  2,
+                  1
+                ],
+                [
+                  4,
+                  7
+                ],
+                [
+                  7,
+                  5
+                ]
+              ],
+              "uninterrupted": [
+                [
+                  5,
+                  3
+                ],
+                [
+                  9,
+                  5
+                ],
+                [
+                  2,
+                  1
+                ],
+                [
+                  4,
+                  7
+                ],
+                [
+                  7,
+                  5
+                ]
+              ],
+              "resumed": [
+                [
+                  1,
+                  6
+                ],
+                [
+                  1,
+                  8
+                ],
+                [
+                  6,
+                  1
+                ],
+                [
+                  7,
+                  4
+                ],
+                [
+                  2,
+                  9
+                ]
+              ],
+              "context_stale_before_first_selection": true,
+              "model_round_numpy_restored": true,
+              "launches": 2
+            },
+            {
+              "name": "checkpoint-True-None-1-2",
+              "prior": [
+                [
+                  9,
+                  7
+                ],
+                [
+                  5,
+                  6
+                ]
+              ],
+              "expected": [
+                [
+                  5,
+                  3
+                ],
+                [
+                  9,
+                  5
+                ],
+                [
+                  2,
+                  1
+                ],
+                [
+                  4,
+                  7
+                ],
+                [
+                  7,
+                  5
+                ]
+              ],
+              "uninterrupted": [
+                [
+                  5,
+                  3
+                ],
+                [
+                  9,
+                  5
+                ],
+                [
+                  2,
+                  1
+                ],
+                [
+                  4,
+                  7
+                ],
+                [
+                  7,
+                  5
+                ]
+              ],
+              "resumed": [
+                [
+                  9,
+                  5
+                ],
+                [
+                  2,
+                  1
+                ],
+                [
+                  4,
+                  7
+                ],
+                [
+                  7,
+                  5
+                ],
+                [
+                  9,
+                  6
+                ]
+              ],
+              "context_stale_before_first_selection": true,
+              "model_round_numpy_restored": true,
+              "launches": 2
+            },
+            {
+              "name": "checkpoint-True-None-37-2",
+              "prior": [
+                [
+                  9,
+                  7
+                ],
+                [
+                  5,
+                  6
+                ]
+              ],
+              "expected": [
+                [
+                  5,
+                  3
+                ],
+                [
+                  9,
+                  5
+                ],
+                [
+                  2,
+                  1
+                ],
+                [
+                  4,
+                  7
+                ],
+                [
+                  7,
+                  5
+                ]
+              ],
+              "uninterrupted": [
+                [
+                  5,
+                  3
+                ],
+                [
+                  9,
+                  5
+                ],
+                [
+                  2,
+                  1
+                ],
+                [
+                  4,
+                  7
+                ],
+                [
+                  7,
+                  5
+                ]
+              ],
+              "resumed": [
+                [
+                  1,
+                  6
+                ],
+                [
+                  1,
+                  8
+                ],
+                [
+                  6,
+                  1
+                ],
+                [
+                  7,
+                  4
+                ],
+                [
+                  2,
+                  9
+                ]
+              ],
+              "context_stale_before_first_selection": true,
+              "model_round_numpy_restored": true,
+              "launches": 2
+            }
+          ]
+        }
+      ],
+      "historical_writer_setup": {
+        "command": "zsh -lc 'PYTHONDONTWRITEBYTECODE=1 XDG_CACHE_HOME=/tmp/plato-phase2b-resume-review/cache MPLCONFIGDIR=/tmp/plato-phase2b-resume-review/mpl OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 PYTHONPATH=/tmp/plato-phase2b-resume-review/f28 /tmp/plato-phase2b-runtime/venv313/bin/python /tmp/plato-phase2b-resume-review/independent_resume_probe.py --mode=legacy-write --output=/tmp/plato-phase2b-resume-review/legacy-write313 --legacy-root=/tmp/plato-phase2b-resume-review/legacy313 > /tmp/plato-phase2b-resume-review/legacy-write313-retry.log 2>&1'",
+        "cwd": "/tmp/plato-phase2b-resume-review/f28",
+        "exit_code": 0,
+        "bundles": 2,
+        "log": {
+          "path": "/tmp/plato-phase2b-resume-review/legacy-write313-retry.log",
+          "sha256": "a745b87374475927d1d2af26d11687d32381d75e4c4dba2b668acdf638b5bbfa"
+        },
+        "results": {
+          "path": "/tmp/plato-phase2b-resume-review/legacy-write313/results.json",
+          "sha256": "ee5895497b293bd862e18d40e5aa8a0cd48851309fc6187067cc316c1e4fd948"
+        }
+      },
+      "independent_final": {
+        "command": "zsh -lc 'PYTHONDONTWRITEBYTECODE=1 XDG_CACHE_HOME=/tmp/plato-phase2b-resume-review/cache MPLCONFIGDIR=/tmp/plato-phase2b-resume-review/mpl OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 PYTHONPATH=/private/tmp/plato-refresh-worktrees/runtime-resume-review /tmp/plato-phase2b-runtime/venv313/bin/python /tmp/plato-phase2b-resume-review/independent_resume_probe.py --mode=green --output=/tmp/plato-phase2b-resume-review/independent-green313 --legacy-root=/tmp/plato-phase2b-resume-review/legacy313 > /tmp/plato-phase2b-resume-review/independent-green313.log 2>&1'",
+        "cwd": "/private/tmp/plato-refresh-worktrees/runtime-resume-review",
+        "exit_code": 0,
+        "passed": 30,
+        "failed": 0,
+        "log": {
+          "path": "/tmp/plato-phase2b-resume-review/independent-green313.log",
+          "sha256": "791486aaebbea05bb065b09ca61e95f49fb735d9f8dc5ad5f6758a6185642e62"
+        },
+        "results": {
+          "path": "/tmp/plato-phase2b-resume-review/independent-green313/results.json",
+          "sha256": "b0fcfa4be107ed7b9be1e978922e57e0dbaa17c05c009674cfc8c172f4a41ecd"
+        }
+      },
+      "independent_negative": {
+        "command": "zsh -lc 'PYTHONDONTWRITEBYTECODE=1 XDG_CACHE_HOME=/tmp/plato-phase2b-resume-review/cache MPLCONFIGDIR=/tmp/plato-phase2b-resume-review/mpl OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 TMPDIR=/tmp/plato-phase2b-resume-review/tmp PYTHONPATH=/private/tmp/plato-refresh-worktrees/runtime-resume-review /tmp/plato-phase2b-runtime/venv313/bin/python /tmp/plato-phase2b-resume-review/independent_negative_probe.py /tmp/plato-phase2b-resume-review/negative-retry313 > /tmp/plato-phase2b-resume-review/negative-retry313.log 2>&1'",
+        "cwd": "/private/tmp/plato-refresh-worktrees/runtime-resume-review",
+        "exit_code": 0,
+        "passed": 10,
+        "failed": 0,
+        "log": {
+          "path": "/tmp/plato-phase2b-resume-review/negative-retry313.log",
+          "sha256": "3570b6261f5ee400dc6679731823930c6fae2f6f6897e8ca65e29f82f484c48f"
+        },
+        "results": {
+          "path": "/tmp/plato-phase2b-resume-review/negative-retry313/results.json",
+          "sha256": "afa7d74666dbeeab872c6f12ad8a60f2417b2c01d12e7aae1f2a85e9002cbeb7"
+        }
+      },
+      "warning_disposition": "Early focused 3.13 has one inherited get_event_loop deprecation warning; focused 3.14 has none. Both later 212-case runtime and 22-case startup suites report no warnings/skips."
+    },
+    "3.14.8": {
+      "environment": {
+        "python": "3.14.8",
+        "executable": "/private/tmp/plato-phase2b-runtime/venv314/bin/python",
+        "cwd": "/private/tmp/plato-refresh-worktrees/runtime-resume-review",
+        "plato_source": "/private/tmp/plato-refresh-worktrees/runtime-resume-review/plato/__init__.py",
+        "server_source": "/private/tmp/plato-refresh-worktrees/runtime-resume-review/plato/servers/base.py",
+        "versions": {
+          "torch": "2.14.1",
+          "numpy": "2.5.3",
+          "pytest": "9.1.1",
+          "python-socketio": "5.17.0",
+          "aiohttp": "3.14.3",
+          "safetensors": "0.8.0"
+        }
+      },
+      "focused": {
+        "command": "zsh -lc 'PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=/private/tmp/plato-refresh-worktrees/runtime-resume-review XDG_CACHE_HOME=/tmp/plato-phase2b-resume-review/cache MPLCONFIGDIR=/tmp/plato-phase2b-resume-review/mpl OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2b-runtime/venv314/bin/python -m pytest tests/servers/test_server_resume_rng.py tests/servers/test_personalized_selection_strategy.py tests/servers/test_split_learning_selection_strategy.py -q -p no:cacheprovider --basetemp=/tmp/plato-phase2b-resume-review/focused314 --junitxml=/tmp/plato-phase2b-resume-review/focused314.xml > /tmp/plato-phase2b-resume-review/focused314.log 2>&1'",
+        "cwd": "/private/tmp/plato-refresh-worktrees/runtime-resume-review",
+        "exit_code": 0,
+        "result": {
+          "tests": 35,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": 0.25,
+          "nodeids": [
+            "tests.servers.test_server_resume_rng.test_actual_checkpoint_continues_selection_through_run[zero-configured-seed-ordinary]",
+            "tests.servers.test_server_resume_rng.test_actual_checkpoint_continues_selection_through_run[zero-configured-seed-central]",
+            "tests.servers.test_server_resume_rng.test_actual_checkpoint_continues_selection_through_run[zero-no-seed-ordinary]",
+            "tests.servers.test_server_resume_rng.test_actual_checkpoint_continues_selection_through_run[zero-no-seed-central]",
+            "tests.servers.test_server_resume_rng.test_actual_checkpoint_continues_selection_through_run[one-configured-seed-ordinary]",
+            "tests.servers.test_server_resume_rng.test_actual_checkpoint_continues_selection_through_run[one-configured-seed-central]",
+            "tests.servers.test_server_resume_rng.test_actual_checkpoint_continues_selection_through_run[one-no-seed-ordinary]",
+            "tests.servers.test_server_resume_rng.test_actual_checkpoint_continues_selection_through_run[one-no-seed-central]",
+            "tests.servers.test_server_resume_rng.test_actual_checkpoint_continues_selection_through_run[many-configured-seed-ordinary]",
+            "tests.servers.test_server_resume_rng.test_actual_checkpoint_continues_selection_through_run[many-configured-seed-central]",
+            "tests.servers.test_server_resume_rng.test_actual_checkpoint_continues_selection_through_run[many-no-seed-ordinary]",
+            "tests.servers.test_server_resume_rng.test_actual_checkpoint_continues_selection_through_run[many-no-seed-central]",
+            "tests.servers.test_server_resume_rng.test_legacy_global_rng_tuple_remains_readable[ordinary]",
+            "tests.servers.test_server_resume_rng.test_legacy_global_rng_tuple_remains_readable[central]",
+            "tests.servers.test_server_resume_rng.test_fresh_run_keeps_configured_seed_or_initial_selection_state[configured-seed-ordinary]",
+            "tests.servers.test_server_resume_rng.test_fresh_run_keeps_configured_seed_or_initial_selection_state[configured-seed-central]",
+            "tests.servers.test_server_resume_rng.test_fresh_run_keeps_configured_seed_or_initial_selection_state[no-seed-ordinary]",
+            "tests.servers.test_server_resume_rng.test_fresh_run_keeps_configured_seed_or_initial_selection_state[no-seed-central]",
+            "tests.servers.test_server_resume_rng.test_custom_resume_override_owns_selection_state_without_session_flag[ordinary]",
+            "tests.servers.test_server_resume_rng.test_custom_resume_override_owns_selection_state_without_session_flag[central]",
+            "tests.servers.test_server_resume_rng.test_malformed_resume_propagates_before_process_or_socket_start[current_round.pkl-UnpicklingError-ordinary]",
+            "tests.servers.test_server_resume_rng.test_malformed_resume_propagates_before_process_or_socket_start[current_round.pkl-UnpicklingError-central]",
+            "tests.servers.test_server_resume_rng.test_malformed_resume_propagates_before_process_or_socket_start[numpy_prng_state_2.pkl-UnpicklingError-ordinary]",
+            "tests.servers.test_server_resume_rng.test_malformed_resume_propagates_before_process_or_socket_start[numpy_prng_state_2.pkl-UnpicklingError-central]",
+            "tests.servers.test_server_resume_rng.test_malformed_resume_propagates_before_process_or_socket_start[prng_state_2.pkl-UnpicklingError-ordinary]",
+            "tests.servers.test_server_resume_rng.test_malformed_resume_propagates_before_process_or_socket_start[prng_state_2.pkl-UnpicklingError-central]",
+            "tests.servers.test_server_resume_rng.test_malformed_resume_propagates_before_process_or_socket_start[checkpoint_lenet5_2.safetensors-SafetensorError-ordinary]",
+            "tests.servers.test_server_resume_rng.test_malformed_resume_propagates_before_process_or_socket_start[checkpoint_lenet5_2.safetensors-SafetensorError-central]",
+            "tests.servers.test_personalized_selection_strategy.test_personalized_selection_respects_ratio",
+            "tests.servers.test_personalized_selection_strategy.test_personalized_selection_ensures_minimum_candidates",
+            "tests.servers.test_personalized_selection_strategy.test_personalized_selection_uses_all_clients_after_regular_rounds",
+            "tests.servers.test_personalized_selection_strategy.test_personalized_selection_clamps_ratio",
+            "tests.servers.test_split_learning_selection_strategy.test_split_learning_reuses_client_until_release",
+            "tests.servers.test_split_learning_selection_strategy.test_split_learning_cycles_through_clients",
+            "tests.servers.test_split_learning_selection_strategy.test_split_learning_rejects_multiple_clients"
+          ]
+        },
+        "log": {
+          "path": "/tmp/plato-phase2b-resume-review/focused314.log",
+          "sha256": "7805cc7f702f4b06458148780b15a8cc3de9d3c85c1412186241d3d338acf8ca"
+        },
+        "junit": {
+          "path": "/tmp/plato-phase2b-resume-review/focused314.xml",
+          "sha256": "e513c44299c9705e78913becb943b18a68485f27f528f11f280e2b4d05f36fb3"
+        }
+      },
+      "retained_runtime": {
+        "command": "zsh -lc 'PYTHONDONTWRITEBYTECODE=1 XDG_CACHE_HOME=/tmp/plato-phase2b-resume-review/cache MPLCONFIGDIR=/tmp/plato-phase2b-resume-review/mpl OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 PYTHONPATH=/private/tmp/plato-refresh-worktrees/runtime-resume-review /tmp/plato-phase2b-runtime/venv314/bin/python -m pytest tests/clients tests/servers tests/callbacks tests/integration/test_smoke_configs.py --test-profile base -q -p no:cacheprovider --basetemp=/tmp/plato-phase2b-resume-review/runtime314 --junitxml=/tmp/plato-phase2b-resume-review/runtime314.xml > /tmp/plato-phase2b-resume-review/runtime314.log 2>&1'",
+        "cwd": "/private/tmp/plato-refresh-worktrees/runtime-resume-review",
+        "exit_code": 0,
+        "result": {
+          "tests": 212,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": 41.588,
+          "nodeids": [
+            "tests.clients.test_checkpoint_cleanup.test_disconnect_removes_only_owned_temporary_checkpoints",
+            "tests.clients.test_client_lifecycle_variants.test_simulated_server_payload_limit_precedes_deserialization",
+            "tests.clients.test_client_lifecycle_variants.test_base_client_lifecycle_sets_attributes",
+            "tests.clients.test_client_lifecycle_variants.test_composable_client_handles_payload_roundtrip",
+            "tests.clients.test_client_lifecycle_variants.test_base_client_handles_missing_datasource",
+            "tests.clients.test_client_lifecycle_variants.test_composable_client_request_update_orders_callbacks",
+            "tests.clients.test_client_lifecycle_variants.test_composable_client_chunk_flow_supports_retries",
+            "tests.clients.test_client_lifecycle_variants.test_split_learning_client_state_management",
+            "tests.clients.test_client_lifecycle_variants.test_mpc_client_round_store_configuration",
+            "tests.clients.test_client_lifecycle_variants.test_mpc_training_strategy_records_samples",
+            "tests.clients.test_feddf_strategy.test_feddf_training_strategy_returns_teacher_logits",
+            "tests.clients.test_fednova_strategy.test_report_contains_epochs_for_constant_pattern",
+            "tests.clients.test_fednova_strategy.test_uniform_random_assigns_epochs_and_updates_config",
+            "tests.clients.test_payload_limits.test_default_client_payload_cleanup_and_retry[valid]",
+            "tests.clients.test_payload_limits.test_default_client_payload_cleanup_and_retry[oversize]",
+            "tests.clients.test_payload_limits.test_default_client_payload_cleanup_and_retry[malformed]",
+            "tests.clients.test_payload_limits.test_default_client_payload_cleanup_and_retry[incomplete]",
+            "tests.clients.test_payload_limits.test_default_client_payload_cleanup_and_retry[wrong_id]",
+            "tests.clients.test_payload_limits.test_default_client_payload_cleanup_and_retry[timeout]",
+            "tests.clients.test_registry.test_registry_preserves_kwargs_for_external_clients",
+            "tests.clients.test_simple_client.test_simple_client_trains_with_default_strategies",
+            "tests.servers.test_fedavg_gan_aggregation_strategy.test_gan_aggregation_strategy_weighted_average",
+            "tests.servers.test_fedavg_he_aggregation_strategy.test_he_aggregation_strategy_weighted_average_without_encryption",
+            "tests.servers.test_fedavg_strategy.test_fedavg_aggregation_weighted_mean",
+            "tests.servers.test_fedavg_strategy.test_fedavg_aggregation_skips_feature_payloads",
+            "tests.servers.test_fedavg_strategy.test_aggregation_rejects_invalid_weights[-1-False-False]",
+            "tests.servers.test_fedavg_strategy.test_aggregation_rejects_invalid_weights[-1-False-True]",
+            "tests.servers.test_fedavg_strategy.test_aggregation_rejects_invalid_weights[-1-True-False]",
+            "tests.servers.test_fedavg_strategy.test_aggregation_rejects_invalid_weights[-1-True-True]",
+            "tests.servers.test_fedavg_strategy.test_aggregation_rejects_invalid_weights[nan-False-False]",
+            "tests.servers.test_fedavg_strategy.test_aggregation_rejects_invalid_weights[nan-False-True]",
+            "tests.servers.test_fedavg_strategy.test_aggregation_rejects_invalid_weights[nan-True-False]",
+            "tests.servers.test_fedavg_strategy.test_aggregation_rejects_invalid_weights[nan-True-True]",
+            "tests.servers.test_fedavg_strategy.test_aggregation_rejects_invalid_weights[inf-False-False]",
+            "tests.servers.test_fedavg_strategy.test_aggregation_rejects_invalid_weights[inf-False-True]",
+            "tests.servers.test_fedavg_strategy.test_aggregation_rejects_invalid_weights[inf-True-False]",
+            "tests.servers.test_fedavg_strategy.test_aggregation_rejects_invalid_weights[inf-True-True]",
+            "tests.servers.test_fedavg_strategy.test_aggregation_rejects_invalid_weights[-inf-False-False]",
+            "tests.servers.test_fedavg_strategy.test_aggregation_rejects_invalid_weights[-inf-False-True]",
+            "tests.servers.test_fedavg_strategy.test_aggregation_rejects_invalid_weights[-inf-True-False]",
+            "tests.servers.test_fedavg_strategy.test_aggregation_rejects_invalid_weights[-inf-True-True]",
+            "tests.servers.test_fedavg_strategy.test_aggregation_rejects_cardinality_mismatch[0-False]",
+            "tests.servers.test_fedavg_strategy.test_aggregation_rejects_cardinality_mismatch[0-True]",
+            "tests.servers.test_fedavg_strategy.test_aggregation_rejects_cardinality_mismatch[2-False]",
+            "tests.servers.test_fedavg_strategy.test_aggregation_rejects_cardinality_mismatch[2-True]",
+            "tests.servers.test_fedavg_strategy.test_server_validates_raw_and_hook_inputs_before_any_dispatch[negative-False-ordinary]",
+            "tests.servers.test_fedavg_strategy.test_server_validates_raw_and_hook_inputs_before_any_dispatch[negative-False-legacy]",
+            "tests.servers.test_fedavg_strategy.test_server_validates_raw_and_hook_inputs_before_any_dispatch[negative-False-delta]",
+            "tests.servers.test_fedavg_strategy.test_server_validates_raw_and_hook_inputs_before_any_dispatch[negative-True-ordinary]",
+            "tests.servers.test_fedavg_strategy.test_server_validates_raw_and_hook_inputs_before_any_dispatch[negative-True-legacy]",
+            "tests.servers.test_fedavg_strategy.test_server_validates_raw_and_hook_inputs_before_any_dispatch[negative-True-delta]",
+            "tests.servers.test_fedavg_strategy.test_server_validates_raw_and_hook_inputs_before_any_dispatch[nonfinite-False-ordinary]",
+            "tests.servers.test_fedavg_strategy.test_server_validates_raw_and_hook_inputs_before_any_dispatch[nonfinite-False-legacy]",
+            "tests.servers.test_fedavg_strategy.test_server_validates_raw_and_hook_inputs_before_any_dispatch[nonfinite-False-delta]",
+            "tests.servers.test_fedavg_strategy.test_server_validates_raw_and_hook_inputs_before_any_dispatch[nonfinite-True-ordinary]",
+            "tests.servers.test_fedavg_strategy.test_server_validates_raw_and_hook_inputs_before_any_dispatch[nonfinite-True-legacy]",
+            "tests.servers.test_fedavg_strategy.test_server_validates_raw_and_hook_inputs_before_any_dispatch[nonfinite-True-delta]",
+            "tests.servers.test_fedavg_strategy.test_server_validates_raw_and_hook_inputs_before_any_dispatch[hook_extra-False-ordinary]",
+            "tests.servers.test_fedavg_strategy.test_server_validates_raw_and_hook_inputs_before_any_dispatch[hook_extra-False-legacy]",
+            "tests.servers.test_fedavg_strategy.test_server_validates_raw_and_hook_inputs_before_any_dispatch[hook_extra-False-delta]",
+            "tests.servers.test_fedavg_strategy.test_server_validates_raw_and_hook_inputs_before_any_dispatch[hook_extra-True-ordinary]",
+            "tests.servers.test_fedavg_strategy.test_server_validates_raw_and_hook_inputs_before_any_dispatch[hook_extra-True-legacy]",
+            "tests.servers.test_fedavg_strategy.test_server_validates_raw_and_hook_inputs_before_any_dispatch[hook_extra-True-delta]",
+            "tests.servers.test_fedavg_strategy.test_server_validates_raw_and_hook_inputs_before_any_dispatch[hook_missing-False-ordinary]",
+            "tests.servers.test_fedavg_strategy.test_server_validates_raw_and_hook_inputs_before_any_dispatch[hook_missing-False-legacy]",
+            "tests.servers.test_fedavg_strategy.test_server_validates_raw_and_hook_inputs_before_any_dispatch[hook_missing-False-delta]",
+            "tests.servers.test_fedavg_strategy.test_server_validates_raw_and_hook_inputs_before_any_dispatch[hook_missing-True-ordinary]",
+            "tests.servers.test_fedavg_strategy.test_server_validates_raw_and_hook_inputs_before_any_dispatch[hook_missing-True-legacy]",
+            "tests.servers.test_fedavg_strategy.test_server_validates_raw_and_hook_inputs_before_any_dispatch[hook_missing-True-delta]",
+            "tests.servers.test_fedavg_strategy.test_server_preserves_fractional_and_zero_sample_dispatch[none-False-ordinary]",
+            "tests.servers.test_fedavg_strategy.test_server_preserves_fractional_and_zero_sample_dispatch[none-False-legacy]",
+            "tests.servers.test_fedavg_strategy.test_server_preserves_fractional_and_zero_sample_dispatch[none-False-delta]",
+            "tests.servers.test_fedavg_strategy.test_server_preserves_fractional_and_zero_sample_dispatch[none-True-ordinary]",
+            "tests.servers.test_fedavg_strategy.test_server_preserves_fractional_and_zero_sample_dispatch[none-True-legacy]",
+            "tests.servers.test_fedavg_strategy.test_server_preserves_fractional_and_zero_sample_dispatch[none-True-delta]",
+            "tests.servers.test_fedavg_strategy.test_server_preserves_fractional_and_zero_sample_dispatch[one-False-ordinary]",
+            "tests.servers.test_fedavg_strategy.test_server_preserves_fractional_and_zero_sample_dispatch[one-False-legacy]",
+            "tests.servers.test_fedavg_strategy.test_server_preserves_fractional_and_zero_sample_dispatch[one-False-delta]",
+            "tests.servers.test_fedavg_strategy.test_server_preserves_fractional_and_zero_sample_dispatch[one-True-ordinary]",
+            "tests.servers.test_fedavg_strategy.test_server_preserves_fractional_and_zero_sample_dispatch[one-True-legacy]",
+            "tests.servers.test_fedavg_strategy.test_server_preserves_fractional_and_zero_sample_dispatch[one-True-delta]",
+            "tests.servers.test_fedavg_strategy.test_server_preserves_fractional_and_zero_sample_dispatch[all-False-ordinary]",
+            "tests.servers.test_fedavg_strategy.test_server_preserves_fractional_and_zero_sample_dispatch[all-False-legacy]",
+            "tests.servers.test_fedavg_strategy.test_server_preserves_fractional_and_zero_sample_dispatch[all-False-delta]",
+            "tests.servers.test_fedavg_strategy.test_server_preserves_fractional_and_zero_sample_dispatch[all-True-ordinary]",
+            "tests.servers.test_fedavg_strategy.test_server_preserves_fractional_and_zero_sample_dispatch[all-True-legacy]",
+            "tests.servers.test_fedavg_strategy.test_server_preserves_fractional_and_zero_sample_dispatch[all-True-delta]",
+            "tests.servers.test_fedavg_strategy.test_feature_samples_do_not_dilute_fractional_weight_reference[False]",
+            "tests.servers.test_fedavg_strategy.test_feature_samples_do_not_dilute_fractional_weight_reference[True]",
+            "tests.servers.test_fedavg_strategy.test_fedavg_server_prefers_custom_delta_strategy_over_inherited_weights",
+            "tests.servers.test_fedavg_strategy.test_fedavg_server_logged_items_flatten_evaluator_metrics",
+            "tests.servers.test_fedavg_strategy.test_fedavg_server_logged_items_include_detailed_lighteval_metrics",
+            "tests.servers.test_fedavg_strategy.test_fedavg_server_does_not_persist_evaluator_jsonl_sidecar",
+            "tests.servers.test_feddf_server_strategy.test_feddf_server_process_reports_distills_global_model",
+            "tests.servers.test_feddf_server_strategy.test_feddf_teacher_logits_average_uniformly_by_default",
+            "tests.servers.test_hermes_aggregation_strategy.test_hermes_aggregation_strategy_produces_weighted_average",
+            "tests.servers.test_lifecycle_contracts.test_fedbuff_preserves_uniform_research_weighting",
+            "tests.servers.test_lifecycle_contracts.test_fedasync_actual_example_preserves_staleness_mixing",
+            "tests.servers.test_lifecycle_contracts.test_async_periodic_aggregation_respects_minimum_and_round_order",
+            "tests.servers.test_lifecycle_contracts.test_cross_silo_invalid_hook_output_preserves_trainer_identity",
+            "tests.servers.test_lifecycle_contracts.test_async_partial_round_replaces_only_idle_workers[False]",
+            "tests.servers.test_lifecycle_contracts.test_async_partial_round_replaces_only_idle_workers[True]",
+            "tests.servers.test_personalized_selection_strategy.test_personalized_selection_respects_ratio",
+            "tests.servers.test_personalized_selection_strategy.test_personalized_selection_ensures_minimum_candidates",
+            "tests.servers.test_personalized_selection_strategy.test_personalized_selection_uses_all_clients_after_regular_rounds",
+            "tests.servers.test_personalized_selection_strategy.test_personalized_selection_clamps_ratio",
+            "tests.servers.test_pfedgraph_aggregation_strategy.test_project_to_simplex_returns_probability_vector",
+            "tests.servers.test_pfedgraph_aggregation_strategy.test_pfedgraph_aggregation_updates_client_models",
+            "tests.servers.test_port_checkpoint_flow.test_actual_port_hook_to_stale_similarity_and_aggregation[False]",
+            "tests.servers.test_port_checkpoint_flow.test_actual_port_hook_to_stale_similarity_and_aggregation[True]",
+            "tests.servers.test_runtime_disconnect_recovery.test_batched_urgent_loss_recovers_with_completed_reports[False]",
+            "tests.servers.test_runtime_disconnect_recovery.test_batched_urgent_loss_recovers_with_completed_reports[True]",
+            "tests.servers.test_runtime_disconnect_recovery.test_default_disconnect_policy_closes_batched_urgent_work[None]",
+            "tests.servers.test_runtime_disconnect_recovery.test_default_disconnect_policy_closes_batched_urgent_work[True]",
+            "tests.servers.test_runtime_disconnect_recovery.test_assignment_rejects_unregistered_session_before_mutation",
+            "tests.servers.test_runtime_review_regressions.test_partial_urgency_preserves_heap_order[3]",
+            "tests.servers.test_runtime_review_regressions.test_partial_urgency_preserves_heap_order[4]",
+            "tests.servers.test_runtime_review_regressions.test_earlier_response_never_rewinds_simulated_time",
+            "tests.servers.test_runtime_review_regressions.test_batched_shared_worker_completes_every_urgent_response",
+            "tests.servers.test_runtime_review_regressions.test_distinct_workers_remain_concurrent_during_urgency",
+            "tests.servers.test_runtime_review_regressions.test_distinct_retained_transfers_survive_worker_reuse_and_cleanup",
+            "tests.servers.test_runtime_s3_contract.test_minimal_s3_adapter_prefixes_exactly_once[False-]",
+            "tests.servers.test_runtime_s3_contract.test_minimal_s3_adapter_prefixes_exactly_once[False-prefix]",
+            "tests.servers.test_runtime_s3_contract.test_minimal_s3_adapter_prefixes_exactly_once[False-nested/prefix]",
+            "tests.servers.test_runtime_s3_contract.test_minimal_s3_adapter_prefixes_exactly_once[False-/prefix/]",
+            "tests.servers.test_runtime_s3_contract.test_minimal_s3_adapter_prefixes_exactly_once[True-]",
+            "tests.servers.test_runtime_s3_contract.test_minimal_s3_adapter_prefixes_exactly_once[True-prefix]",
+            "tests.servers.test_runtime_s3_contract.test_minimal_s3_adapter_prefixes_exactly_once[True-nested/prefix]",
+            "tests.servers.test_runtime_s3_contract.test_minimal_s3_adapter_prefixes_exactly_once[True-/prefix/]",
+            "tests.servers.test_runtime_s3_contract.test_client_buffer_cap_applies_below_payload_cap[socket]",
+            "tests.servers.test_runtime_s3_contract.test_client_buffer_cap_applies_below_payload_cap[s3]",
+            "tests.servers.test_runtime_transport.test_report_rejects_unassigned_identity_before_parsing[worker-2]",
+            "tests.servers.test_runtime_transport.test_report_rejects_unassigned_identity_before_parsing[unknown-2]",
+            "tests.servers.test_runtime_transport.test_report_embedded_identity_cannot_target_another_client",
+            "tests.servers.test_runtime_transport.test_unknown_or_stale_session_rejected_at_every_payload_stage[chunk-unknown]",
+            "tests.servers.test_runtime_transport.test_unknown_or_stale_session_rejected_at_every_payload_stage[chunk-stale]",
+            "tests.servers.test_runtime_transport.test_unknown_or_stale_session_rejected_at_every_payload_stage[part-unknown]",
+            "tests.servers.test_runtime_transport.test_unknown_or_stale_session_rejected_at_every_payload_stage[part-stale]",
+            "tests.servers.test_runtime_transport.test_unknown_or_stale_session_rejected_at_every_payload_stage[done-unknown]",
+            "tests.servers.test_runtime_transport.test_unknown_or_stale_session_rejected_at_every_payload_stage[done-stale]",
+            "tests.servers.test_runtime_transport.test_unknown_or_stale_session_rejected_at_every_payload_stage[s3-unknown]",
+            "tests.servers.test_runtime_transport.test_unknown_or_stale_session_rejected_at_every_payload_stage[s3-stale]",
+            "tests.servers.test_runtime_transport.test_payload_identity_checked_before_parsing_or_s3[part]",
+            "tests.servers.test_runtime_transport.test_payload_identity_checked_before_parsing_or_s3[done]",
+            "tests.servers.test_runtime_transport.test_payload_identity_checked_before_parsing_or_s3[s3]",
+            "tests.servers.test_runtime_transport.test_malformed_part_releases_only_sender_buffers[broken]",
+            "tests.servers.test_runtime_transport.test_malformed_part_releases_only_sender_buffers[\\x80\\x05K\\x01]",
+            "tests.servers.test_runtime_transport.test_malformed_part_releases_only_sender_buffers[\\x80\\x05K\\x01.x]",
+            "tests.servers.test_runtime_transport.test_server_limits_apply_across_parts_and_preserve_other_client[chunk_bytes]",
+            "tests.servers.test_runtime_transport.test_server_limits_apply_across_parts_and_preserve_other_client[payload_bytes]",
+            "tests.servers.test_runtime_transport.test_server_limits_apply_across_parts_and_preserve_other_client[chunks]",
+            "tests.servers.test_runtime_transport.test_server_limits_apply_across_parts_and_preserve_other_client[parts]",
+            "tests.servers.test_runtime_transport.test_server_limits_apply_across_parts_and_preserve_other_client[buffered]",
+            "tests.servers.test_runtime_transport.test_report_limit_rejects_before_pickle_parsing",
+            "tests.servers.test_runtime_transport.test_incomplete_transfer_expires_without_next_message[False]",
+            "tests.servers.test_runtime_transport.test_incomplete_transfer_expires_without_next_message[True]",
+            "tests.servers.test_runtime_transport.test_duplicate_report_does_not_replace_active_payload",
+            "tests.servers.test_runtime_transport.test_s3_reference_cannot_borrow_another_client_key[client_payload_2_ABC123]",
+            "tests.servers.test_runtime_transport.test_s3_reference_cannot_borrow_another_client_key[client_payload_7_ABC123/extra]",
+            "tests.servers.test_runtime_transport.test_s3_reference_cannot_borrow_another_client_key[other]",
+            "tests.servers.test_runtime_transport.test_socket_completion_round_boundaries_and_cleanup[False]",
+            "tests.servers.test_runtime_transport.test_socket_completion_round_boundaries_and_cleanup[True]",
+            "tests.servers.test_runtime_transport.test_reused_worker_accepts_only_new_server_issued_assignment",
+            "tests.servers.test_runtime_transport.test_actual_urgent_request_and_writer_use_requested_logical_client",
+            "tests.servers.test_runtime_transport.test_all_buffered_stale_clients_receive_urgent_requests",
+            "tests.servers.test_runtime_transport.test_disconnect_cleans_urgent_assignment_without_touching_other_client",
+            "tests.servers.test_runtime_transport.test_cross_silo_edge_identity_follows_actual_central_selection",
+            "tests.servers.test_runtime_transport.test_completed_unaggregated_payloads_still_count_toward_buffer_limit",
+            "tests.servers.test_runtime_transport.test_s3_ingress_uses_bounded_actual_http_reader[valid]",
+            "tests.servers.test_runtime_transport.test_s3_ingress_uses_bounded_actual_http_reader[oversized]",
+            "tests.servers.test_runtime_transport.test_s3_ingress_uses_bounded_actual_http_reader[streamed_oversize]",
+            "tests.servers.test_runtime_transport.test_s3_ingress_uses_bounded_actual_http_reader[truncated]",
+            "tests.servers.test_runtime_transport.test_s3_ingress_uses_bounded_actual_http_reader[incomplete]",
+            "tests.servers.test_server_resume_rng.test_actual_checkpoint_continues_selection_through_run[zero-configured-seed-ordinary]",
+            "tests.servers.test_server_resume_rng.test_actual_checkpoint_continues_selection_through_run[zero-configured-seed-central]",
+            "tests.servers.test_server_resume_rng.test_actual_checkpoint_continues_selection_through_run[zero-no-seed-ordinary]",
+            "tests.servers.test_server_resume_rng.test_actual_checkpoint_continues_selection_through_run[zero-no-seed-central]",
+            "tests.servers.test_server_resume_rng.test_actual_checkpoint_continues_selection_through_run[one-configured-seed-ordinary]",
+            "tests.servers.test_server_resume_rng.test_actual_checkpoint_continues_selection_through_run[one-configured-seed-central]",
+            "tests.servers.test_server_resume_rng.test_actual_checkpoint_continues_selection_through_run[one-no-seed-ordinary]",
+            "tests.servers.test_server_resume_rng.test_actual_checkpoint_continues_selection_through_run[one-no-seed-central]",
+            "tests.servers.test_server_resume_rng.test_actual_checkpoint_continues_selection_through_run[many-configured-seed-ordinary]",
+            "tests.servers.test_server_resume_rng.test_actual_checkpoint_continues_selection_through_run[many-configured-seed-central]",
+            "tests.servers.test_server_resume_rng.test_actual_checkpoint_continues_selection_through_run[many-no-seed-ordinary]",
+            "tests.servers.test_server_resume_rng.test_actual_checkpoint_continues_selection_through_run[many-no-seed-central]",
+            "tests.servers.test_server_resume_rng.test_legacy_global_rng_tuple_remains_readable[ordinary]",
+            "tests.servers.test_server_resume_rng.test_legacy_global_rng_tuple_remains_readable[central]",
+            "tests.servers.test_server_resume_rng.test_fresh_run_keeps_configured_seed_or_initial_selection_state[configured-seed-ordinary]",
+            "tests.servers.test_server_resume_rng.test_fresh_run_keeps_configured_seed_or_initial_selection_state[configured-seed-central]",
+            "tests.servers.test_server_resume_rng.test_fresh_run_keeps_configured_seed_or_initial_selection_state[no-seed-ordinary]",
+            "tests.servers.test_server_resume_rng.test_fresh_run_keeps_configured_seed_or_initial_selection_state[no-seed-central]",
+            "tests.servers.test_server_resume_rng.test_custom_resume_override_owns_selection_state_without_session_flag[ordinary]",
+            "tests.servers.test_server_resume_rng.test_custom_resume_override_owns_selection_state_without_session_flag[central]",
+            "tests.servers.test_server_resume_rng.test_malformed_resume_propagates_before_process_or_socket_start[current_round.pkl-UnpicklingError-ordinary]",
+            "tests.servers.test_server_resume_rng.test_malformed_resume_propagates_before_process_or_socket_start[current_round.pkl-UnpicklingError-central]",
+            "tests.servers.test_server_resume_rng.test_malformed_resume_propagates_before_process_or_socket_start[numpy_prng_state_2.pkl-UnpicklingError-ordinary]",
+            "tests.servers.test_server_resume_rng.test_malformed_resume_propagates_before_process_or_socket_start[numpy_prng_state_2.pkl-UnpicklingError-central]",
+            "tests.servers.test_server_resume_rng.test_malformed_resume_propagates_before_process_or_socket_start[prng_state_2.pkl-UnpicklingError-ordinary]",
+            "tests.servers.test_server_resume_rng.test_malformed_resume_propagates_before_process_or_socket_start[prng_state_2.pkl-UnpicklingError-central]",
+            "tests.servers.test_server_resume_rng.test_malformed_resume_propagates_before_process_or_socket_start[checkpoint_lenet5_2.safetensors-SafetensorError-ordinary]",
+            "tests.servers.test_server_resume_rng.test_malformed_resume_propagates_before_process_or_socket_start[checkpoint_lenet5_2.safetensors-SafetensorError-central]",
+            "tests.servers.test_split_learning_selection_strategy.test_split_learning_reuses_client_until_release",
+            "tests.servers.test_split_learning_selection_strategy.test_split_learning_cycles_through_clients",
+            "tests.servers.test_split_learning_selection_strategy.test_split_learning_rejects_multiple_clients",
+            "tests.callbacks.test_handler_contract.test_registered_callbacks_are_iterable_in_registration_order",
+            "tests.callbacks.test_handler_contract.test_callback_body_attribute_error_reaches_caller_unchanged",
+            "tests.callbacks.test_handler_contract.test_missing_callback_event_keeps_descriptive_error",
+            "tests.callbacks.test_server_callback.test_log_progress_callback_tolerates_missing_logged_items",
+            "tests.callbacks.test_server_callback.test_log_progress_callback_expands_csv_for_new_lighteval_metrics",
+            "tests.integration.test_smoke_configs.test_fedavg_lenet5_smoke",
+            "tests.integration.test_smoke_configs.test_split_learning_smoke",
+            "tests.integration.test_smoke_configs.test_mpc_training_smoke"
+          ]
+        },
+        "log": {
+          "path": "/tmp/plato-phase2b-resume-review/runtime314.log",
+          "sha256": "99e5ca0b2905893ca407b77dba7f4d35f9547e1b288aa7566d092a314569f33e"
+        },
+        "junit": {
+          "path": "/tmp/plato-phase2b-resume-review/runtime314.xml",
+          "sha256": "839948954f55a08d8142be86645c33820df56540fcd00712ab48acad2019d095"
+        }
+      },
+      "fresh_startup_subset": {
+        "command": "zsh -lc 'PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=/private/tmp/plato-refresh-worktrees/runtime-resume-review XDG_CACHE_HOME=/tmp/plato-phase2b-resume-review/cache MPLCONFIGDIR=/tmp/plato-phase2b-resume-review/mpl OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2b-runtime/venv314/bin/python -m pytest '\"'\"'tests/integration/test_event_loop_startup.py::test_fresh_entrypoint_executes_scheduled_work'\"'\"' '\"'\"'tests/integration/test_event_loop_startup.py::test_active_failure_reaches_synchronous_caller'\"'\"' '\"'\"'tests/integration/test_event_loop_startup.py::test_preconstructed_borrowed_loop_resources_survive'\"'\"' '\"'\"'tests/integration/test_event_loop_startup.py::test_explicitly_absent_loop_on_server_and_edge'\"'\"' '\"'\"'tests/integration/test_event_loop_startup.py::test_real_two_client_cpu_socket_round'\"'\"' '\"'\"'tests/integration/test_event_loop_startup.py::test_post_launch_failure_keeps_primary_error_and_contains_children'\"'\"' '\"'\"'tests/integration/test_event_loop_startup.py::test_noncooperative_teardown_is_watchdog_containment[task]'\"'\"' -q -p no:cacheprovider --basetemp=/tmp/plato-phase2b-resume-review/startup314 --junitxml=/tmp/plato-phase2b-resume-review/startup314.xml > /tmp/plato-phase2b-resume-review/startup314.log 2>&1'",
+        "cwd": "/private/tmp/plato-refresh-worktrees/runtime-resume-review",
+        "exit_code": 0,
+        "result": {
+          "tests": 22,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": 152.886,
+          "nodeids": [
+            "tests.integration.test_event_loop_startup.test_fresh_entrypoint_executes_scheduled_work[client_default-client_body]",
+            "tests.integration.test_event_loop_startup.test_fresh_entrypoint_executes_scheduled_work[client_custom-client_body]",
+            "tests.integration.test_event_loop_startup.test_fresh_entrypoint_executes_scheduled_work[ordinary-periodic_body]",
+            "tests.integration.test_event_loop_startup.test_fresh_entrypoint_executes_scheduled_work[central-periodic_body]",
+            "tests.integration.test_event_loop_startup.test_fresh_entrypoint_executes_scheduled_work[direct-server_body]",
+            "tests.integration.test_event_loop_startup.test_fresh_entrypoint_executes_scheduled_work[edge_default-client_body]",
+            "tests.integration.test_event_loop_startup.test_fresh_entrypoint_executes_scheduled_work[edge_custom-client_body]",
+            "tests.integration.test_event_loop_startup.test_active_failure_reaches_synchronous_caller[client_custom-client-sentinel]",
+            "tests.integration.test_event_loop_startup.test_active_failure_reaches_synchronous_caller[ordinary-periodic-sentinel]",
+            "tests.integration.test_event_loop_startup.test_active_failure_reaches_synchronous_caller[central-periodic-sentinel]",
+            "tests.integration.test_event_loop_startup.test_active_failure_reaches_synchronous_caller[edge_custom-client-sentinel]",
+            "tests.integration.test_event_loop_startup.test_preconstructed_borrowed_loop_resources_survive[client_lifecycle-False]",
+            "tests.integration.test_event_loop_startup.test_preconstructed_borrowed_loop_resources_survive[client_lifecycle-True]",
+            "tests.integration.test_event_loop_startup.test_preconstructed_borrowed_loop_resources_survive[ordinary-False]",
+            "tests.integration.test_event_loop_startup.test_preconstructed_borrowed_loop_resources_survive[ordinary-True]",
+            "tests.integration.test_event_loop_startup.test_explicitly_absent_loop_on_server_and_edge[ordinary]",
+            "tests.integration.test_event_loop_startup.test_explicitly_absent_loop_on_server_and_edge[central]",
+            "tests.integration.test_event_loop_startup.test_explicitly_absent_loop_on_server_and_edge[edge_default]",
+            "tests.integration.test_event_loop_startup.test_explicitly_absent_loop_on_server_and_edge[edge_custom]",
+            "tests.integration.test_event_loop_startup.test_real_two_client_cpu_socket_round",
+            "tests.integration.test_event_loop_startup.test_post_launch_failure_keeps_primary_error_and_contains_children",
+            "tests.integration.test_event_loop_startup.test_noncooperative_teardown_is_watchdog_containment[task]"
+          ]
+        },
+        "log": {
+          "path": "/tmp/plato-phase2b-resume-review/startup314.log",
+          "sha256": "5b5869fdbd41278ee71d83a1f339a4d2390efb24203373cba88eb56bc97f5617"
+        },
+        "junit": {
+          "path": "/tmp/plato-phase2b-resume-review/startup314.xml",
+          "sha256": "73e1a85c8cd0444d77fc25a079f71eb3998d46b7629d4068bd20dba7ce60e054"
+        },
+        "deliberate_containment_cases": [
+          {
+            "case": "client_lifecycle",
+            "options": {
+              "absent": true,
+              "stall": "task"
+            },
+            "forced": [
+              "TERM"
+            ],
+            "returncode": -15
+          }
+        ],
+        "survivors": []
+      },
+      "independent_expected_red": [
+        {
+          "command": "zsh -lc 'PYTHONDONTWRITEBYTECODE=1 XDG_CACHE_HOME=/tmp/plato-phase2b-resume-review/cache MPLCONFIGDIR=/tmp/plato-phase2b-resume-review/mpl OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 PYTHONPATH=/tmp/plato-phase2b-resume-review/accepted /tmp/plato-phase2b-runtime/venv314/bin/python /tmp/plato-phase2b-resume-review/independent_resume_probe.py --mode=red-f28 --output=/tmp/plato-phase2b-resume-review/red-f28314 > /tmp/plato-phase2b-resume-review/red-f28314.log 2>&1'",
+          "cwd": "/tmp/plato-phase2b-resume-review/accepted",
+          "exit_code": 1,
+          "expected_failures": 2,
+          "source_sha256": "a8d2acec980b6d888b7425ebaec290d8e31d1d32152fd994ca933313f37551f8",
+          "probe_source": {
+            "path": "/tmp/plato-phase2b-resume-review/independent_resume_probe_red_version.py",
+            "sha256": "5836e74516cb4fa69b875ac73582994c1bf7e5329409e40c627114ad19502bca"
+          },
+          "log": {
+            "path": "/tmp/plato-phase2b-resume-review/red-f28314.log",
+            "sha256": "0257983ea1b76c60d5659158583c5c1a4b1a40e22e5eabc72995a2ba8909240e"
+          },
+          "results": {
+            "path": "/tmp/plato-phase2b-resume-review/red-f28314/results.json",
+            "sha256": "1e23625859c242520763f36022a675ac79e848f0268325f3ec274b295f9ebb2c"
+          },
+          "expected_vs_actual": [
+            {
+              "name": "checkpoint-False-17-0-2",
+              "prior": [
+                [
+                  9,
+                  7
+                ],
+                [
+                  5,
+                  6
+                ]
+              ],
+              "expected": [
+                [
+                  5,
+                  3
+                ],
+                [
+                  9,
+                  5
+                ],
+                [
+                  2,
+                  1
+                ],
+                [
+                  4,
+                  7
+                ],
+                [
+                  7,
+                  5
+                ]
+              ],
+              "uninterrupted": [
+                [
+                  5,
+                  3
+                ],
+                [
+                  9,
+                  5
+                ],
+                [
+                  2,
+                  1
+                ],
+                [
+                  4,
+                  7
+                ],
+                [
+                  7,
+                  5
+                ]
+              ],
+              "resumed": [
+                [
+                  9,
+                  7
+                ],
+                [
+                  5,
+                  6
+                ],
+                [
+                  5,
+                  3
+                ],
+                [
+                  9,
+                  5
+                ],
+                [
+                  2,
+                  1
+                ]
+              ],
+              "context_stale_before_first_selection": true,
+              "model_round_numpy_restored": true,
+              "launches": 2
+            },
+            {
+              "name": "checkpoint-True-17-0-2",
+              "prior": [
+                [
+                  9,
+                  7
+                ],
+                [
+                  5,
+                  6
+                ]
+              ],
+              "expected": [
+                [
+                  5,
+                  3
+                ],
+                [
+                  9,
+                  5
+                ],
+                [
+                  2,
+                  1
+                ],
+                [
+                  4,
+                  7
+                ],
+                [
+                  7,
+                  5
+                ]
+              ],
+              "uninterrupted": [
+                [
+                  5,
+                  3
+                ],
+                [
+                  9,
+                  5
+                ],
+                [
+                  2,
+                  1
+                ],
+                [
+                  4,
+                  7
+                ],
+                [
+                  7,
+                  5
+                ]
+              ],
+              "resumed": [
+                [
+                  9,
+                  7
+                ],
+                [
+                  5,
+                  6
+                ],
+                [
+                  5,
+                  3
+                ],
+                [
+                  9,
+                  5
+                ],
+                [
+                  2,
+                  1
+                ]
+              ],
+              "context_stale_before_first_selection": true,
+              "model_round_numpy_restored": true,
+              "launches": 2
+            }
+          ]
+        },
+        {
+          "command": "zsh -lc 'PYTHONDONTWRITEBYTECODE=1 XDG_CACHE_HOME=/tmp/plato-phase2b-resume-review/cache MPLCONFIGDIR=/tmp/plato-phase2b-resume-review/mpl OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 PYTHONPATH=/tmp/plato-phase2b-resume-review/f28 /tmp/plato-phase2b-runtime/venv314/bin/python /tmp/plato-phase2b-resume-review/independent_resume_probe.py --mode=red-selection --output=/tmp/plato-phase2b-resume-review/red-selection314 > /tmp/plato-phase2b-resume-review/red-selection314.log 2>&1'",
+          "cwd": "/tmp/plato-phase2b-resume-review/f28",
+          "exit_code": 1,
+          "expected_failures": 8,
+          "source_sha256": "0737a129696bb0766b8de2d08aba6b9dafe9be053c8207b7a861928bf161fd1f",
+          "probe_source": {
+            "path": "/tmp/plato-phase2b-resume-review/independent_resume_probe_red_version.py",
+            "sha256": "5836e74516cb4fa69b875ac73582994c1bf7e5329409e40c627114ad19502bca"
+          },
+          "log": {
+            "path": "/tmp/plato-phase2b-resume-review/red-selection314.log",
+            "sha256": "a55454b28556650240411f89c6e3aec170ade57640b8c28b07bc4fd21961c57f"
+          },
+          "results": {
+            "path": "/tmp/plato-phase2b-resume-review/red-selection314/results.json",
+            "sha256": "e60bf495f051ddfde5691640399dc727176c3eb1fed961c1f382b47ff3597c1a"
+          },
+          "expected_vs_actual": [
+            {
+              "name": "checkpoint-False-17-1-2",
+              "prior": [
+                [
+                  9,
+                  7
+                ],
+                [
+                  5,
+                  6
+                ]
+              ],
+              "expected": [
+                [
+                  5,
+                  3
+                ],
+                [
+                  9,
+                  5
+                ],
+                [
+                  2,
+                  1
+                ],
+                [
+                  4,
+                  7
+                ],
+                [
+                  7,
+                  5
+                ]
+              ],
+              "uninterrupted": [
+                [
+                  5,
+                  3
+                ],
+                [
+                  9,
+                  5
+                ],
+                [
+                  2,
+                  1
+                ],
+                [
+                  4,
+                  7
+                ],
+                [
+                  7,
+                  5
+                ]
+              ],
+              "resumed": [
+                [
+                  9,
+                  5
+                ],
+                [
+                  2,
+                  1
+                ],
+                [
+                  4,
+                  7
+                ],
+                [
+                  7,
+                  5
+                ],
+                [
+                  9,
+                  6
+                ]
+              ],
+              "context_stale_before_first_selection": true,
+              "model_round_numpy_restored": true,
+              "launches": 2
+            },
+            {
+              "name": "checkpoint-False-17-37-2",
+              "prior": [
+                [
+                  9,
+                  7
+                ],
+                [
+                  5,
+                  6
+                ]
+              ],
+              "expected": [
+                [
+                  5,
+                  3
+                ],
+                [
+                  9,
+                  5
+                ],
+                [
+                  2,
+                  1
+                ],
+                [
+                  4,
+                  7
+                ],
+                [
+                  7,
+                  5
+                ]
+              ],
+              "uninterrupted": [
+                [
+                  5,
+                  3
+                ],
+                [
+                  9,
+                  5
+                ],
+                [
+                  2,
+                  1
+                ],
+                [
+                  4,
+                  7
+                ],
+                [
+                  7,
+                  5
+                ]
+              ],
+              "resumed": [
+                [
+                  1,
+                  6
+                ],
+                [
+                  1,
+                  8
+                ],
+                [
+                  6,
+                  1
+                ],
+                [
+                  7,
+                  4
+                ],
+                [
+                  2,
+                  9
+                ]
+              ],
+              "context_stale_before_first_selection": true,
+              "model_round_numpy_restored": true,
+              "launches": 2
+            },
+            {
+              "name": "checkpoint-False-None-1-2",
+              "prior": [
+                [
+                  9,
+                  7
+                ],
+                [
+                  5,
+                  6
+                ]
+              ],
+              "expected": [
+                [
+                  5,
+                  3
+                ],
+                [
+                  9,
+                  5
+                ],
+                [
+                  2,
+                  1
+                ],
+                [
+                  4,
+                  7
+                ],
+                [
+                  7,
+                  5
+                ]
+              ],
+              "uninterrupted": [
+                [
+                  5,
+                  3
+                ],
+                [
+                  9,
+                  5
+                ],
+                [
+                  2,
+                  1
+                ],
+                [
+                  4,
+                  7
+                ],
+                [
+                  7,
+                  5
+                ]
+              ],
+              "resumed": [
+                [
+                  9,
+                  5
+                ],
+                [
+                  2,
+                  1
+                ],
+                [
+                  4,
+                  7
+                ],
+                [
+                  7,
+                  5
+                ],
+                [
+                  9,
+                  6
+                ]
+              ],
+              "context_stale_before_first_selection": true,
+              "model_round_numpy_restored": true,
+              "launches": 2
+            },
+            {
+              "name": "checkpoint-False-None-37-2",
+              "prior": [
+                [
+                  9,
+                  7
+                ],
+                [
+                  5,
+                  6
+                ]
+              ],
+              "expected": [
+                [
+                  5,
+                  3
+                ],
+                [
+                  9,
+                  5
+                ],
+                [
+                  2,
+                  1
+                ],
+                [
+                  4,
+                  7
+                ],
+                [
+                  7,
+                  5
+                ]
+              ],
+              "uninterrupted": [
+                [
+                  5,
+                  3
+                ],
+                [
+                  9,
+                  5
+                ],
+                [
+                  2,
+                  1
+                ],
+                [
+                  4,
+                  7
+                ],
+                [
+                  7,
+                  5
+                ]
+              ],
+              "resumed": [
+                [
+                  1,
+                  6
+                ],
+                [
+                  1,
+                  8
+                ],
+                [
+                  6,
+                  1
+                ],
+                [
+                  7,
+                  4
+                ],
+                [
+                  2,
+                  9
+                ]
+              ],
+              "context_stale_before_first_selection": true,
+              "model_round_numpy_restored": true,
+              "launches": 2
+            },
+            {
+              "name": "checkpoint-True-17-1-2",
+              "prior": [
+                [
+                  9,
+                  7
+                ],
+                [
+                  5,
+                  6
+                ]
+              ],
+              "expected": [
+                [
+                  5,
+                  3
+                ],
+                [
+                  9,
+                  5
+                ],
+                [
+                  2,
+                  1
+                ],
+                [
+                  4,
+                  7
+                ],
+                [
+                  7,
+                  5
+                ]
+              ],
+              "uninterrupted": [
+                [
+                  5,
+                  3
+                ],
+                [
+                  9,
+                  5
+                ],
+                [
+                  2,
+                  1
+                ],
+                [
+                  4,
+                  7
+                ],
+                [
+                  7,
+                  5
+                ]
+              ],
+              "resumed": [
+                [
+                  9,
+                  5
+                ],
+                [
+                  2,
+                  1
+                ],
+                [
+                  4,
+                  7
+                ],
+                [
+                  7,
+                  5
+                ],
+                [
+                  9,
+                  6
+                ]
+              ],
+              "context_stale_before_first_selection": true,
+              "model_round_numpy_restored": true,
+              "launches": 2
+            },
+            {
+              "name": "checkpoint-True-17-37-2",
+              "prior": [
+                [
+                  9,
+                  7
+                ],
+                [
+                  5,
+                  6
+                ]
+              ],
+              "expected": [
+                [
+                  5,
+                  3
+                ],
+                [
+                  9,
+                  5
+                ],
+                [
+                  2,
+                  1
+                ],
+                [
+                  4,
+                  7
+                ],
+                [
+                  7,
+                  5
+                ]
+              ],
+              "uninterrupted": [
+                [
+                  5,
+                  3
+                ],
+                [
+                  9,
+                  5
+                ],
+                [
+                  2,
+                  1
+                ],
+                [
+                  4,
+                  7
+                ],
+                [
+                  7,
+                  5
+                ]
+              ],
+              "resumed": [
+                [
+                  1,
+                  6
+                ],
+                [
+                  1,
+                  8
+                ],
+                [
+                  6,
+                  1
+                ],
+                [
+                  7,
+                  4
+                ],
+                [
+                  2,
+                  9
+                ]
+              ],
+              "context_stale_before_first_selection": true,
+              "model_round_numpy_restored": true,
+              "launches": 2
+            },
+            {
+              "name": "checkpoint-True-None-1-2",
+              "prior": [
+                [
+                  9,
+                  7
+                ],
+                [
+                  5,
+                  6
+                ]
+              ],
+              "expected": [
+                [
+                  5,
+                  3
+                ],
+                [
+                  9,
+                  5
+                ],
+                [
+                  2,
+                  1
+                ],
+                [
+                  4,
+                  7
+                ],
+                [
+                  7,
+                  5
+                ]
+              ],
+              "uninterrupted": [
+                [
+                  5,
+                  3
+                ],
+                [
+                  9,
+                  5
+                ],
+                [
+                  2,
+                  1
+                ],
+                [
+                  4,
+                  7
+                ],
+                [
+                  7,
+                  5
+                ]
+              ],
+              "resumed": [
+                [
+                  9,
+                  5
+                ],
+                [
+                  2,
+                  1
+                ],
+                [
+                  4,
+                  7
+                ],
+                [
+                  7,
+                  5
+                ],
+                [
+                  9,
+                  6
+                ]
+              ],
+              "context_stale_before_first_selection": true,
+              "model_round_numpy_restored": true,
+              "launches": 2
+            },
+            {
+              "name": "checkpoint-True-None-37-2",
+              "prior": [
+                [
+                  9,
+                  7
+                ],
+                [
+                  5,
+                  6
+                ]
+              ],
+              "expected": [
+                [
+                  5,
+                  3
+                ],
+                [
+                  9,
+                  5
+                ],
+                [
+                  2,
+                  1
+                ],
+                [
+                  4,
+                  7
+                ],
+                [
+                  7,
+                  5
+                ]
+              ],
+              "uninterrupted": [
+                [
+                  5,
+                  3
+                ],
+                [
+                  9,
+                  5
+                ],
+                [
+                  2,
+                  1
+                ],
+                [
+                  4,
+                  7
+                ],
+                [
+                  7,
+                  5
+                ]
+              ],
+              "resumed": [
+                [
+                  1,
+                  6
+                ],
+                [
+                  1,
+                  8
+                ],
+                [
+                  6,
+                  1
+                ],
+                [
+                  7,
+                  4
+                ],
+                [
+                  2,
+                  9
+                ]
+              ],
+              "context_stale_before_first_selection": true,
+              "model_round_numpy_restored": true,
+              "launches": 2
+            }
+          ]
+        }
+      ],
+      "historical_writer_setup": {
+        "command": "zsh -lc 'PYTHONDONTWRITEBYTECODE=1 XDG_CACHE_HOME=/tmp/plato-phase2b-resume-review/cache MPLCONFIGDIR=/tmp/plato-phase2b-resume-review/mpl OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 PYTHONPATH=/tmp/plato-phase2b-resume-review/f28 /tmp/plato-phase2b-runtime/venv314/bin/python /tmp/plato-phase2b-resume-review/independent_resume_probe.py --mode=legacy-write --output=/tmp/plato-phase2b-resume-review/legacy-write314 --legacy-root=/tmp/plato-phase2b-resume-review/legacy314 > /tmp/plato-phase2b-resume-review/legacy-write314-retry.log 2>&1'",
+        "cwd": "/tmp/plato-phase2b-resume-review/f28",
+        "exit_code": 0,
+        "bundles": 2,
+        "log": {
+          "path": "/tmp/plato-phase2b-resume-review/legacy-write314-retry.log",
+          "sha256": "a9c113b4416cec97cdb2b206c71ec65e1ddd5f801678f547884b220b9323ef82"
+        },
+        "results": {
+          "path": "/tmp/plato-phase2b-resume-review/legacy-write314/results.json",
+          "sha256": "b7387a7ebadc6618cd00f21e0bcfd329b931530737135cfd4d4261bc60be975c"
+        }
+      },
+      "independent_final": {
+        "command": "zsh -lc 'PYTHONDONTWRITEBYTECODE=1 XDG_CACHE_HOME=/tmp/plato-phase2b-resume-review/cache MPLCONFIGDIR=/tmp/plato-phase2b-resume-review/mpl OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 PYTHONPATH=/private/tmp/plato-refresh-worktrees/runtime-resume-review /tmp/plato-phase2b-runtime/venv314/bin/python /tmp/plato-phase2b-resume-review/independent_resume_probe.py --mode=green --output=/tmp/plato-phase2b-resume-review/independent-green314 --legacy-root=/tmp/plato-phase2b-resume-review/legacy314 > /tmp/plato-phase2b-resume-review/independent-green314.log 2>&1'",
+        "cwd": "/private/tmp/plato-refresh-worktrees/runtime-resume-review",
+        "exit_code": 0,
+        "passed": 30,
+        "failed": 0,
+        "log": {
+          "path": "/tmp/plato-phase2b-resume-review/independent-green314.log",
+          "sha256": "1a46e309b330819ae829cb2f91f4ff4856728e0adddbe5988fdacccbad4d3b82"
+        },
+        "results": {
+          "path": "/tmp/plato-phase2b-resume-review/independent-green314/results.json",
+          "sha256": "59ca4a124cac296e9e8ba0f200092b1e2e9bbc6fe90c2c2a953bc2991726e1f5"
+        }
+      },
+      "independent_negative": {
+        "command": "zsh -lc 'PYTHONDONTWRITEBYTECODE=1 XDG_CACHE_HOME=/tmp/plato-phase2b-resume-review/cache MPLCONFIGDIR=/tmp/plato-phase2b-resume-review/mpl OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 TMPDIR=/tmp/plato-phase2b-resume-review/tmp PYTHONPATH=/private/tmp/plato-refresh-worktrees/runtime-resume-review /tmp/plato-phase2b-runtime/venv314/bin/python /tmp/plato-phase2b-resume-review/independent_negative_probe.py /tmp/plato-phase2b-resume-review/negative-retry314 > /tmp/plato-phase2b-resume-review/negative-retry314.log 2>&1'",
+        "cwd": "/private/tmp/plato-refresh-worktrees/runtime-resume-review",
+        "exit_code": 0,
+        "passed": 10,
+        "failed": 0,
+        "log": {
+          "path": "/tmp/plato-phase2b-resume-review/negative-retry314.log",
+          "sha256": "0eec4d734f3a5e99cef092437734ce136d80f73367d4ccbabc1629e5ddba9148"
+        },
+        "results": {
+          "path": "/tmp/plato-phase2b-resume-review/negative-retry314/results.json",
+          "sha256": "5c097ce08fd87dfee4f52b45e7bd54776df62a553b73e63716d885d732203c78"
+        }
+      },
+      "warning_disposition": "Early focused 3.13 has one inherited get_event_loop deprecation warning; focused 3.14 has none. Both later 212-case runtime and 22-case startup suites report no warnings/skips."
+    }
+  },
+  "author_evidence_audit": {
+    "verified_report_artifact_receipts": [
+      {
+        "path": "/tmp/plato-phase2b-runtime/resume-supplement/red-behavior313.log",
+        "sha256": "166e3103ad71ffab28f26dff522d7940f0e5f627e061bf686c31e2e2bf8ad204"
+      },
+      {
+        "path": "/tmp/plato-phase2b-runtime/resume-supplement/green-focused313.log",
+        "sha256": "ce733846d71217a4cc25b66252b67e0aa27ac885df3b8ddec441ed4305aecf2b"
+      },
+      {
+        "path": "/tmp/plato-phase2b-runtime/resume-supplement/startup313.log",
+        "sha256": "0464cebaa302a28418d7e5a0b41d4f7b1773b0036e25770dc6290ae1dd8d2731"
+      },
+      {
+        "path": "/tmp/plato-phase2b-runtime/resume-supplement/selection-state313.json",
+        "sha256": "a0fc68b24f382df4399d70bad81d07e699560911f16b2cf245d5027bd7e5364f"
+      },
+      {
+        "path": "/tmp/plato-phase2b-runtime/resume-supplement/red-behavior314.log",
+        "sha256": "8e52ac832fd88042a978d8056f46e1e86a6a3c9551616c0d3004d375b1886e45"
+      },
+      {
+        "path": "/tmp/plato-phase2b-runtime/resume-supplement/green-focused314.log",
+        "sha256": "bc4375117ef9b33bb819c21d4dcc9c6fa72474712ace3da1564eaf5ba5bde34d"
+      },
+      {
+        "path": "/tmp/plato-phase2b-runtime/resume-supplement/startup314.log",
+        "sha256": "afe4a55bb9c27e121847aeaf24cb805860644cbf557ef6e86978e335cc0b918e"
+      },
+      {
+        "path": "/tmp/plato-phase2b-runtime/resume-supplement/selection-state314.json",
+        "sha256": "a0fc68b24f382df4399d70bad81d07e699560911f16b2cf245d5027bd7e5364f"
+      },
+      {
+        "path": "/tmp/plato-phase2b-runtime/resume-supplement/startup-summary.json",
+        "sha256": "0124f825219c71f18adcf94063b0c9535b7bba4871a9aad2b37f353261cb934e"
+      },
+      {
+        "path": "/tmp/plato-phase2b-runtime/resume-supplement/red313.log",
+        "sha256": "09b8adba461be9d6f8ad1dc586c5c1157352ee94d8dad64e9b5cd96da9fc7791"
+      },
+      {
+        "path": "/tmp/plato-phase2b-runtime/resume-supplement/red314.log",
+        "sha256": "1d95b4f30b44975b3c91653a337160fe677db94f523a9d8e85b59fdb58710aa0"
+      },
+      {
+        "path": "/tmp/plato-phase2b-runtime/resume-supplement/selection_state_probe.py",
+        "sha256": "b7fa95fbd4bdb57a158c3afae9055981986de7cc18df3c007af58428e255d943"
+      },
+      {
+        "path": "/tmp/plato-phase2b-runtime/resume-supplement/summarize_startup.py",
+        "sha256": "09702b71f1ae8507b2d430398926a4570abe1e00be3583e167bc3a4ddb4da07a"
+      },
+      {
+        "path": "/tmp/plato-phase2b-runtime/selection-rng/red313.log",
+        "sha256": "2e2d232facef86c88d9139f256a1193a98b4fd986e7180e354422866d5480a3e"
+      },
+      {
+        "path": "/tmp/plato-phase2b-runtime/selection-rng/green313.log",
+        "sha256": "e4cc7764bbc3deee2307279ebac2c129e7d986dd9040745127c2b1be9eeb21e4"
+      },
+      {
+        "path": "/tmp/plato-phase2b-runtime/selection-rng/startup313.log",
+        "sha256": "906dfd7187c1ba6f575ff1da225a9e76f352f004b9e4f680fee870ae5b55fd49"
+      },
+      {
+        "path": "/tmp/plato-phase2b-runtime/selection-rng/red314.log",
+        "sha256": "ef9b3b6e4a14167494484c1f625ca4be26019f2f6fdafc0c85ab38c626da9d90"
+      },
+      {
+        "path": "/tmp/plato-phase2b-runtime/selection-rng/green314.log",
+        "sha256": "dd29040c8988c9ae9094f6702eb36f2787c19a9faa730ec6ca972feac1b825b8"
+      },
+      {
+        "path": "/tmp/plato-phase2b-runtime/selection-rng/startup314.log",
+        "sha256": "e8d12ce1341362d03eb0e4a9877a98255a84fcbefc4cc072b03e98ac39f7fa92"
+      },
+      {
+        "path": "/tmp/plato-phase2b-runtime/selection-rng/startup-summary.json",
+        "sha256": "61788cdd7e1efb995dda5cd4a8cabc2a60182155a9d0bafa20da249ba8764324"
+      },
+      {
+        "path": "/tmp/plato-phase2b-runtime/selection-rng/summarize_startup.py",
+        "sha256": "6d183eed31346c59b0acccdbaca0d27c828a7b9d2ae22a99699f01f4e689a736"
+      }
+    ],
+    "author_scratch_files_byte_identical_before_and_after": 1763,
+    "original_b_report_byte_identical_to_accepted_commit": true,
+    "historical_f28_report_byte_identical_to_5b1c_commit": true,
+    "author_red_source_and_tests": {
+      "original_b_source_sha256": "a8d2acec980b6d888b7425ebaec290d8e31d1d32152fd994ca933313f37551f8",
+      "f28_source_sha256": "0737a129696bb0766b8de2d08aba6b9dafe9be053c8207b7a861928bf161fd1f",
+      "historical_f28_test_sha256": "f6aac62ce183de8c965ace00d1b5813f065e1b09759c552308c94b7582041a1c",
+      "selection_red_test_reconstructed_exact_receipt": {
+        "path": "/tmp/plato-phase2b-resume-review/reconstructed-author-red-regression.py",
+        "sha256": "ce6762f7553ec2e22c74375b4b1e17036172ec1669a37cef89547ef7bfd70413"
+      },
+      "selection_red_green_test_ast_identical": true
+    },
+    "author_logs": "Historical F28: 4 failed/14 passed red, 25 focused green and 48 startup per version. Latest selection persistence: 8 failed/27 passed red, 35 focused green and 48 startup per version. Verified hashed receipts; historical runs are not counted as fresh reviewer execution.",
+    "startup_audits": [
+      {
+        "path": "/tmp/plato-phase2b-resume-review/author-startup-audit313.json",
+        "sha256": "e7a7bfc9f74628928df993638879364fa4eb5795a6e19520313f96704a661687"
+      },
+      {
+        "path": "/tmp/plato-phase2b-resume-review/author-startup-audit314.json",
+        "sha256": "974c3ef3d7fcf009e98317bdbda17cf5f06ed707307fe1714224a85ec90f5d26"
+      }
+    ],
+    "numerics_audit": {
+      "path": "/tmp/plato-phase2b-resume-review/numerics-audit.json",
+      "sha256": "0c4db43436ad43b36ca3a51e2e7f61cdf03eeeb67a4b96a707a5e4e1148c49f7"
+    },
+    "audit_count_policy": "The 48-record assertion replay per version audits retained evidence; it does not execute new startup processes. Replay uses scratch pytest root, producing eight harmless unknown-mark warnings per version. Its late port bind checks current availability, not historical contemporaneous port release; original author execution retains that assertion."
+  },
+  "socket_numerics": [
+    {
+      "owner": "author",
+      "python": "313",
+      "result": {
+        "path": "/tmp/plato-phase2b-runtime/selection-rng/startup313/test_real_two_client_cpu_socke0/round/result.json",
+        "sha256": "903203b5070e3f805812ca84316ffc9fe1223ab9fba0516ee0190dad6ec5981f"
+      },
+      "checkpoint": {
+        "path": "/tmp/plato-phase2b-runtime/selection-rng/startup313/test_real_two_client_cpu_socke0/round/checkpoints/checkpoint_startup_tiny_1.safetensors",
+        "sha256": "a5a3bff8503c83d1f8b64c96494315c337dc682a2cfab1bb0b5c665176ab1632"
+      },
+      "samples": [
+        6,
+        2
+      ],
+      "max_absolute_error": {
+        "linear.weight": 1.4901161193847656e-08,
+        "linear.bias": 2.9103830456733704e-10
+      },
+      "error_if_unweighted_mean": {
+        "linear.weight": 0.008273757994174957,
+        "linear.bias": 0.0011368951527401805
+      },
+      "float64_reference": {
+        "linear.weight": [
+          [
+            0.18379170820116997,
+            -0.0930701196193695
+          ],
+          [
+            -0.2837917059659958,
+            0.39307013899087906
+          ]
+        ],
+        "linear.bias": [
+          -0.005870066175702959,
+          0.005870075256098062
+        ]
+      },
+      "received_equals_trained": true,
+      "checkpoint_equals_aggregate": true,
+      "natural_parent_and_child_return": true,
+      "survivors": []
+    },
+    {
+      "owner": "reviewer",
+      "python": "313",
+      "result": {
+        "path": "/tmp/plato-phase2b-resume-review/startup313/test_real_two_client_cpu_socke0/round/result.json",
+        "sha256": "0305ba7f985cf30fb583c3950992eb156b0671b8013edeea3153e2b765e03696"
+      },
+      "checkpoint": {
+        "path": "/tmp/plato-phase2b-resume-review/startup313/test_real_two_client_cpu_socke0/round/checkpoints/checkpoint_startup_tiny_1.safetensors",
+        "sha256": "a5a3bff8503c83d1f8b64c96494315c337dc682a2cfab1bb0b5c665176ab1632"
+      },
+      "samples": [
+        2,
+        6
+      ],
+      "max_absolute_error": {
+        "linear.weight": 1.4901161193847656e-08,
+        "linear.bias": 2.9103830456733704e-10
+      },
+      "error_if_unweighted_mean": {
+        "linear.weight": 0.008273757994174957,
+        "linear.bias": 0.0011368951527401805
+      },
+      "float64_reference": {
+        "linear.weight": [
+          [
+            0.18379170820116997,
+            -0.0930701196193695
+          ],
+          [
+            -0.2837917059659958,
+            0.39307013899087906
+          ]
+        ],
+        "linear.bias": [
+          -0.005870066175702959,
+          0.005870075256098062
+        ]
+      },
+      "received_equals_trained": true,
+      "checkpoint_equals_aggregate": true,
+      "natural_parent_and_child_return": true,
+      "survivors": []
+    },
+    {
+      "owner": "author",
+      "python": "314",
+      "result": {
+        "path": "/tmp/plato-phase2b-runtime/selection-rng/startup314/test_real_two_client_cpu_socke0/round/result.json",
+        "sha256": "7c21b3baf23166aaddd9362d9b0baaa8e037a37d98273e310310ec1b6b6ef4f8"
+      },
+      "checkpoint": {
+        "path": "/tmp/plato-phase2b-runtime/selection-rng/startup314/test_real_two_client_cpu_socke0/round/checkpoints/checkpoint_startup_tiny_1.safetensors",
+        "sha256": "a5a3bff8503c83d1f8b64c96494315c337dc682a2cfab1bb0b5c665176ab1632"
+      },
+      "samples": [
+        6,
+        2
+      ],
+      "max_absolute_error": {
+        "linear.weight": 1.4901161193847656e-08,
+        "linear.bias": 2.9103830456733704e-10
+      },
+      "error_if_unweighted_mean": {
+        "linear.weight": 0.008273757994174957,
+        "linear.bias": 0.0011368951527401805
+      },
+      "float64_reference": {
+        "linear.weight": [
+          [
+            0.18379170820116997,
+            -0.0930701196193695
+          ],
+          [
+            -0.2837917059659958,
+            0.39307013899087906
+          ]
+        ],
+        "linear.bias": [
+          -0.005870066175702959,
+          0.005870075256098062
+        ]
+      },
+      "received_equals_trained": true,
+      "checkpoint_equals_aggregate": true,
+      "natural_parent_and_child_return": true,
+      "survivors": []
+    },
+    {
+      "owner": "reviewer",
+      "python": "314",
+      "result": {
+        "path": "/tmp/plato-phase2b-resume-review/startup314/test_real_two_client_cpu_socke0/round/result.json",
+        "sha256": "84abdb96d5d5ea66935dd7802ce9a3fad2c493f5cefe4d3f2a3441697ef1579e"
+      },
+      "checkpoint": {
+        "path": "/tmp/plato-phase2b-resume-review/startup314/test_real_two_client_cpu_socke0/round/checkpoints/checkpoint_startup_tiny_1.safetensors",
+        "sha256": "a5a3bff8503c83d1f8b64c96494315c337dc682a2cfab1bb0b5c665176ab1632"
+      },
+      "samples": [
+        2,
+        6
+      ],
+      "max_absolute_error": {
+        "linear.weight": 1.4901161193847656e-08,
+        "linear.bias": 2.9103830456733704e-10
+      },
+      "error_if_unweighted_mean": {
+        "linear.weight": 0.008273757994174957,
+        "linear.bias": 0.0011368951527401805
+      },
+      "float64_reference": {
+        "linear.weight": [
+          [
+            0.18379170820116997,
+            -0.0930701196193695
+          ],
+          [
+            -0.2837917059659958,
+            0.39307013899087906
+          ]
+        ],
+        "linear.bias": [
+          -0.005870066175702959,
+          0.005870075256098062
+        ]
+      },
+      "received_equals_trained": true,
+      "checkpoint_equals_aggregate": true,
+      "natural_parent_and_child_return": true,
+      "survivors": []
+    }
+  ],
+  "count_policy": {
+    "distinct_final_reviewer_cases_per_interpreter": 274,
+    "breakdown": {
+      "tracked_client_server_callback_smoke": 212,
+      "fresh_startup_process_cases": 22,
+      "independent_resume_save_fresh_custom_legacy": 30,
+      "independent_missing_or_invalid_checkpoint": 10
+    },
+    "focused_35": "Separately rerun early; all 35 overlap the later 212-case runtime execution and are not added to the distinct count.",
+    "red": "2 F28 + 8 B-RESUME-01 independent expected failures per interpreter; red cases do not count as green coverage.",
+    "legacy_writer_setup": "2 historical writer operations per interpreter prepare bundles for two of the 30 final independent cases; not added as green candidate cases.",
+    "author_and_replay": "Author 83 green and replay 48 per version are retained/audited evidence, not extra independent execution counts."
+  },
+  "checks": [
+    {
+      "command": "zsh -lc 'git diff --check 00eeb9dcdd2b513e64db9408969356037e09bb8e HEAD'",
+      "cwd": "/private/tmp/plato-refresh-worktrees/runtime-resume-review",
+      "exit_code": 0
+    },
+    {
+      "command": "zsh -lc 'PYTHONDONTWRITEBYTECODE=1 RUFF_CACHE_DIR=/tmp/plato-phase2b-resume-review/ruff /tmp/plato-phase2b-runtime/venv313/bin/ruff check plato/servers/base.py tests/servers/test_server_resume_rng.py --select I'",
+      "cwd": "/private/tmp/plato-refresh-worktrees/runtime-resume-review",
+      "exit_code": 0
+    },
+    {
+      "command": "zsh -lc 'PYTHONDONTWRITEBYTECODE=1 RUFF_CACHE_DIR=/tmp/plato-phase2b-resume-review/ruff /tmp/plato-phase2b-runtime/venv313/bin/ruff format --check tests/servers/test_server_resume_rng.py'",
+      "cwd": "/private/tmp/plato-refresh-worktrees/runtime-resume-review",
+      "exit_code": 0
+    }
+  ],
+  "reviewer_harness_corrections": [
+    "Initial legacy-writer setup omitted parent mkdir, causing two harness FileNotFoundErrors before product execution. Parent creation fixed in owned scratch; original logs retained and successful setup reruns recorded.",
+    "Initial missing-model negative probe expected FileNotFoundError; existing ComposableTrainer correctly raises OSError. Corrected only that expectation; retained initial logs and first script; all ten final negative cases pass each version."
+  ],
+  "limits_and_root_handoff": [
+    "PASS covers this exact supplemental component above original accepted B; root has not thereby accepted or validated a later combined C integration.",
+    "No evolving C/runtime source was read or tested. Root/C must merge the supplemental changes with collision-safe checkpoint codec work at a clean boundary, preserve both seed guards and owned-state persistence, then run combined checkpoint/startup regressions.",
+    "Independent save/resume probes execute actual generic configure, ComposableTrainer save/load, inherited Server.run/_resume_from_checkpoint and production strategy selection. External launch and listener are intercepted; configure_environment creates no loop. Full resumed network training, optimizer continuation, mid-round server restart, accelerator/GPU replay and complete cross-silo replay are not qualified.",
+    "Selection tuple is authoritative; resume still installs it into global Python RNG. No independent continuation guarantee for unrelated global Python randomness. Legacy files remain readable but cannot reconstruct a selection boundary an old writer did not persist.",
+    "Generic NumPy/model/round behavior is preserved. Error propagation is qualified, not atomic whole-bundle rollback. The separate accepted FedDyn local-checkpoint requirement to preserve all global/selection/NumPy/Torch state after complete validation remains a different algorithm contract; this review does not accept that new algorithm.",
+    "Trusted-peer socket/S3/pickle boundaries and prior security disposition remain inherited. Regression passes do not create a fresh blanket security-clean claim, authentication guarantee or new transport protocol.",
+    "The 48-case author startup suite was audited fully; reviewer reran the affected coherent 22-case subset on both versions, not another redundant full48. Four noncooperative teardown cases and stalled-client watchdog evidence remain negative-path containment, not successful rounds.",
+    "Existing author venv313/venv314 were reused with bytecode writing disabled; no sync/install or environment mutation. Durable logs, basetemps, caches, exact historical snapshots and reviewer probes reside in retained review scratch. No implementation edits, merges, commits, publication or task cleanup."
+  ],
+  "owned_resources": {
+    "scratch": "/tmp/plato-phase2b-resume-review",
+    "review_output": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2b-resume-review.json",
+    "retention": "Retain all reviewer scratch and all original author evidence.",
+    "scratch_manifest": {
+      "path": "/tmp/plato-phase2b-resume-review/scratch-manifest.json",
+      "sha256": "ad800429b43856d4f5dd4078bd88cd12cc2dbe32003455346a262f8ec9ec18e5"
+    },
+    "reviewer_probes": [
+      {
+        "path": "/tmp/plato-phase2b-resume-review/independent_resume_probe.py",
+        "sha256": "befd863de0f649fce0e0de804492c5c1f4a62fcf5af706401230ce4eb55fb820"
+      },
+      {
+        "path": "/tmp/plato-phase2b-resume-review/independent_resume_probe_red_version.py",
+        "sha256": "5836e74516cb4fa69b875ac73582994c1bf7e5329409e40c627114ad19502bca"
+      },
+      {
+        "path": "/tmp/plato-phase2b-resume-review/independent_negative_probe.py",
+        "sha256": "2052c9b7cbd92be24222f60305c7036bf7ae1acf2cc5192bd297baeab7a63668"
+      },
+      {
+        "path": "/tmp/plato-phase2b-resume-review/independent_negative_probe_first.py",
+        "sha256": "eeb1be6acfb906b133faa5b7f17834203a18a3eaa06087bb9e228881026e29a8"
+      },
+      {
+        "path": "/tmp/plato-phase2b-resume-review/test_replay_startup_records.py",
+        "sha256": "b19a21e7e5a4ddea40b515d1ad0a66b4db8fe7d16e20773a6e23dab685200458"
+      },
+      {
+        "path": "/tmp/plato-phase2b-resume-review/audit_evidence.py",
+        "sha256": "0da19d432f6c9644b1e548a1e3d5b020728344916ad9113e8e3c1c659894a1cb"
+      },
+      {
+        "path": "/tmp/plato-phase2b-resume-review/audit_numerics.py",
+        "sha256": "965d7a17310dc8cd74c0d4718217bde629c787bff90b82d871341f70626fbb71"
+      },
+      {
+        "path": "/tmp/plato-phase2b-resume-review/build_review.py",
+        "sha256": "a511658b5b578a2a2828e2bad19070c518e5bf52e06b1503923357ea669c63ee"
+      }
+    ]
+  }
+}

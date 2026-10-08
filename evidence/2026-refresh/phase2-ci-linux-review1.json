@@ -1,0 +1,220 @@
+{
+  "schema_version": 1,
+  "written_at_utc": "2026-10-03T16:17:24.481691+00:00",
+  "status": "CHANGES_REQUESTED",
+  "review_role": "Independent fresh read-only CI correction review; no source edits, new commits, PR changes or further agents.",
+  "source": {
+    "head": "0ada82cca599310c40d4a6691aaa16a0e737f2fd",
+    "tree": "cde48a14ca225c666191ca2864a39b838d3edcff",
+    "parent": "9ee92c52307cd3ecdce0c7416708c504bdb52137",
+    "clean_status": ""
+  },
+  "findings": [
+    {
+      "id": "CI-ARTIFACT-FAILURE-01",
+      "severity": "P2",
+      "title": "Make failed evidence collection affect the CI result after successful qualification.",
+      "source": {
+        "path": ".github/scripts/stage_ci_artifacts.py",
+        "line": 241,
+        "related_path": ".github/workflows/pytorch_tests.yml",
+        "related_line": 161
+      },
+      "description": "The CLI prints collection_status, missing_expected_records and read_issues but always returns normally. Thus a selected required record that cannot be read, a missing expected record, or even a missing source directory still yields a successful staging step and an uploadable manifest. If the prior qualification steps succeeded, GitHub reports a green job even though promised evidence is absent. The manifest makes the loss inspectable, but no workflow guard enforces completeness for a successful qualification job.",
+      "reproduction": "Create all EXPECTED_RECORDS as regular files and inject OSError(errno=5) only when opening coverage.json. Execute the exact candidate main(). It returns success, writes STAGED_WITH_READ_ISSUES, reports only coverage.json missing, and leaves no staged coverage.json. Separately, run the unmodified CLI against a nonexistent source: exit 0 with a manifest and no included files.",
+      "evidence": [
+        {
+          "path": "/tmp/plato-ci-internal-review/review_probe.py",
+          "bytes": 7227,
+          "sha256": "78fbade4899592b55bf5c2f524da7e7ec94add2a4b7611e1d09b8adad2e73872"
+        },
+        {
+          "path": "/tmp/plato-ci-internal-review/probe-results.json",
+          "bytes": 2357,
+          "sha256": "ea242b2387d82e07ec91928af4afeda932b3928a2fc9ff3e81a210a5721a4d54"
+        },
+        {
+          "path": "/tmp/plato-ci-internal-review/injected-read-failure-staged/artifact-selection.json",
+          "bytes": 62129,
+          "sha256": "361d11c86e1d70344967c7babfe48a94c6b091c26c989abd6a2cccde8f11c5fb"
+        },
+        {
+          "path": "/tmp/plato-ci-internal-review/missing-source-staged/artifact-selection.json",
+          "bytes": 1543,
+          "sha256": "5a38725b7dadbda12ebe74713a8aa63c077ae242e42d34b99b19ac796072cd3e"
+        }
+      ],
+      "requested_change": "Keep writing the manifest and keep the upload step under always(). Return nonzero for unexpected collection/read failure, and enforce presence of required top-level records when the preceding qualification job status was successful. Partial evidence after already failed or cancelled gates can remain explicitly partial. Expected pytest symlink and reproducible-unit-fixture exclusions must remain non-failing.",
+      "validation_needed": "CLI negative fixtures must exercise exit status for unreadable required evidence and missing required evidence after successful qualification; failed-suite partial evidence must still be uploaded. Confirm prior qualification failure cannot be masked."
+    }
+  ],
+  "accepted_checks": {
+    "exact_candidate_cleanliness": {
+      "head": "0ada82cca599310c40d4a6691aaa16a0e737f2fd",
+      "tree": "cde48a14ca225c666191ca2864a39b838d3edcff",
+      "parent": "9ee92c52307cd3ecdce0c7416708c504bdb52137",
+      "clean_status": ""
+    },
+    "scope": "Only workflow, new artifact helper and evidence receipt changed relative to parent9ee92; production/tests/config/lock/submodules unchanged.",
+    "workflow": {
+      "source": {
+        "head": "0ada82cca599310c40d4a6691aaa16a0e737f2fd",
+        "tree": "cde48a14ca225c666191ca2864a39b838d3edcff",
+        "parent": "9ee92c52307cd3ecdce0c7416708c504bdb52137",
+        "clean_status": ""
+      },
+      "yaml_triggers_and_duplicate_keys": "PASS",
+      "existing_test_commands_assertions_profiles_coverage_runtime_deadlines_pins_permissions_and_environment_preserved": "PASS",
+      "changed_scope_exact_three_files": "PASS",
+      "job_explicit_step_minutes": 101,
+      "job_timeout_minutes": 110,
+      "setup_and_upload_allowance_minutes": 6,
+      "artifact_step_minutes": 2,
+      "linux_followup_receipts_verified": [
+        "/tmp/plato-refresh-worktrees/phase2-ci-budget/.github/workflows/pytorch_tests.yml",
+        "/tmp/plato-refresh-worktrees/phase2-ci-budget/.github/scripts/stage_ci_artifacts.py",
+        "/tmp/plato-refresh-worktrees/phase2-ci-budget/tests/conftest.py",
+        "/tmp/plato-phase2-root/linux-initial-failure-jobs.json",
+        "/tmp/plato-phase2-root/linux-initial-313-job.log",
+        "/tmp/plato-phase2-root/linux-initial-314-job.log",
+        "/tmp/plato-phase2-root/linux-merge-source-equivalence.json",
+        "/tmp/plato-phase2-root/linux-initial-failure-audit.json",
+        "/tmp/plato-phase2-linux/initial-313/commit.txt",
+        "/tmp/plato-phase2-linux/initial-313/base-collection.log",
+        "/tmp/plato-phase2-linux/initial-313/base.log",
+        "/tmp/plato-phase2-linux/initial-313/base.xml",
+        "/tmp/plato-phase2-linux/initial-313/mandatory.log",
+        "/tmp/plato-phase2-linux/initial-313/missing-extra.log",
+        "/tmp/plato-phase2-linux/initial-313/python.txt",
+        "/tmp/plato-phase2-linux/initial-313/lock.txt",
+        "/tmp/plato-phase2-linux/initial-313/submodules.txt",
+        "/tmp/plato-phase2-linux/initial-313/base-packages.txt",
+        "/tmp/plato-phase2-linux/initial-313/mandatory-packages.txt",
+        "/tmp/plato-phase2-linux/initial-313/uv.txt",
+        "/private/tmp/plato-refresh-worktrees/phase2-ci-budget/.github/scripts/stage_ci_artifacts.py",
+        "/tmp/plato-phase2-ci-budget-validation/linux-initial-313-staged-sxfj_yiq/staged/artifact-selection.json",
+        "/tmp/plato-phase2-ci-budget-validation/artifact-selection-proof.json",
+        "/tmp/plato-phase2-ci-budget-validation/test_artifact_selection.py",
+        "/tmp/plato-phase2-ci-budget-validation/validate_linux_adjustment.py"
+      ],
+      "github_initial_failure_evidence_not_new_qualification": true
+    },
+    "artifact_selection": {
+      "helper": {
+        "path": "/tmp/plato-refresh-worktrees/phase2-ci-budget/.github/scripts/stage_ci_artifacts.py",
+        "sha256": "a1d29b5666f0d9e3e6b1286ebe07464c9de47a4a65e96c6a307a09fc0a7c9078"
+      },
+      "complete_fixture": {
+        "exit_code": 0,
+        "seconds": 0.07708299998193979,
+        "summary": {
+          "included_files": 296,
+          "included_bytes": 8412708,
+          "omitted_entries": 6,
+          "omitted_regular_bytes": 1049077,
+          "omitted_reasons": {
+            "not_a_regular_file": 1,
+            "symlink_not_followed": 3,
+            "unit_diagnostic_exceeds_size_limit": 1,
+            "reproducible_unit_fixture": 1
+          }
+        },
+        "actual_prior_runtime_source": "/tmp/plato-phase2c-feddyn-implementation/combined-mandatory-runtime-313",
+        "actual_prior_runtime_regular_files_verified": 271,
+        "all_actual_prior_runtime_records_retained": true,
+        "runtime_large_checkpoint_and_payload_start_received_committed_replay_retained": true,
+        "hash_and_size_checks": true,
+        "unit_bulk_and_aliases_omitted": true
+      },
+      "linux_failure": {
+        "seconds": 1.9807219170033932,
+        "summary": {
+          "included_files": 3650,
+          "included_bytes": 1931284,
+          "omitted_entries": 3708,
+          "omitted_regular_bytes": 968770723,
+          "omitted_reasons": {
+            "reproducible_unit_fixture": 3708
+          }
+        },
+        "missing_expected_records": [
+          "mandatory.xml",
+          "coverage.json",
+          "runtime.log",
+          "runtime.xml",
+          "ruff.log",
+          "ty.log"
+        ],
+        "all_top_level_records_retained": [
+          "base-collection.log",
+          "base-packages.txt",
+          "base.log",
+          "base.xml",
+          "commit.txt",
+          "lock.txt",
+          "mandatory-packages.txt",
+          "mandatory.log",
+          "missing-extra.log",
+          "python.txt",
+          "submodules.txt",
+          "uv.txt"
+        ],
+        "hash_and_size_checks": true
+      },
+      "fault": {
+        "main_exit_code": 0,
+        "collection_status": "STAGED_WITH_READ_ISSUES",
+        "missing_expected_records": [
+          "coverage.json"
+        ],
+        "read_issues": [
+          {
+            "path": "coverage.json",
+            "operation": "open_file_without_following_links",
+            "errno": 5,
+            "error": "Independent deterministic I/O failure"
+          }
+        ],
+        "coverage_payload_absent": true
+      },
+      "missing_source": {
+        "cli_exit_code": 0,
+        "manifest_records_missing_source": true,
+        "included_files": 0
+      }
+    },
+    "author_receipt_integrity": "25 followup path/hash receipts independently checked, including workflow/helper blobs, profile guard, original failed Linux logs/artifacts, fixture proof, fixture script and static-validation script.",
+    "budget_review": "Base25 and mandatory30 are finite conservative planning budgets based on actual Linux base1082s and mandatory timeout1207s; job110 accommodates101 explicit step minutes plus6 setup/upload reserve and3 remaining minutes. Runtime16 and per-case watchdogs unchanged. These are planning inputs, not proof of Linux completion.",
+    "runtime_retention": "271 real regular files from prior macOS3.13 runtime tree, including socket payload/results/checkpoints and replay records, copied to an independent fixture and retained byte-for-byte. Separate checkpoint >1MiB and binary payload/start/received/committed records retained. These prove staging retention, not a new runtime pass.",
+    "linux_failure_staging": "All12 downloaded failed3.13 top-level records plus unit diagnostics retained. All3650 staged hashes/sizes match; staged payload1931284 bytes; bulk968770723 bytes omitted explicitly. Missing mandatory.xml/coverage/runtime/lint records remain declared, as expected from the original timed-out job.",
+    "aliases_and_special_files": "Live pytest directory alias, dangling alias, external file alias and FIFO excluded without following/blocking; unit checkpoint binary and >1MiB unit diagnostic excluded explicitly; no staged symlinks."
+  },
+  "limits": [
+    "No full training suite or new hosted Linux run performed.",
+    "Current candidate still requires exact-source Python3.13 hosted base/mandatory/runtime/quality completion before merge.",
+    "Author script was inspected and its referenced receipts verified; independent scripts supplied static and behavioral judgments.",
+    "No acceptance claim for initial hosted run37129360804, which remains failed."
+  ],
+  "review_evidence": [
+    {
+      "path": "/tmp/plato-ci-internal-review/review_probe.py",
+      "bytes": 7227,
+      "sha256": "78fbade4899592b55bf5c2f524da7e7ec94add2a4b7611e1d09b8adad2e73872"
+    },
+    {
+      "path": "/tmp/plato-ci-internal-review/probe-results.json",
+      "bytes": 2357,
+      "sha256": "ea242b2387d82e07ec91928af4afeda932b3928a2fc9ff3e81a210a5721a4d54"
+    },
+    {
+      "path": "/tmp/plato-ci-internal-review/static_review.py",
+      "bytes": 5105,
+      "sha256": "a6338f3938ca8040d4974f050b22f60c779972e332a14eb145d429ba1e6f19b6"
+    },
+    {
+      "path": "/tmp/plato-ci-internal-review/static-results.json",
+      "bytes": 2348,
+      "sha256": "ee6dcc57eca84e92aa37fd78e34ed2f591ed876d1792075c3111a78d95ac48c4"
+    }
+  ]
+}

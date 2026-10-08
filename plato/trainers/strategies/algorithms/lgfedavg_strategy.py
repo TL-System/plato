@@ -143,6 +143,10 @@ class LGFedAvgStepStrategy(TrainingStepStrategy):
         """
         self._set_requires_grad(model, layer_names, True)
 
+    def optimizer_steps_per_epoch(self, batches: int) -> int:
+        """Each batch performs two updates of the same optimizer."""
+        return 2 * batches
+
     def training_step(
         self,
         model: nn.Module,
@@ -188,32 +192,44 @@ class LGFedAvgStepStrategy(TrainingStepStrategy):
             second_layers = self.local_layer_names
             second_freeze = self.global_layer_names
 
-        # First pass: Train first set of layers
-        self._freeze_layers(model, first_freeze)
-        self._activate_layers(model, first_layers)
+        context.state["optimizer_step_completed"] = False
+        complete_step = context.state.get("complete_optimizer_step")
+        original = {name: parameter.requires_grad
+                    for name, parameter in model.named_parameters()}
+        try:
+            # First pass: Train first set of layers.
+            self._freeze_layers(model, first_freeze)
+            self._activate_layers(model, first_layers)
+            for name, parameter in model.named_parameters():
+                if not original[name]:
+                    parameter.requires_grad_(False)
+            optimizer.zero_grad()
+            outputs = model(examples)
+            loss_first = loss_criterion(outputs, labels)
+            loss_first.backward()
+            optimizer.step()
+            context.state["optimizer_step_completed"] = True
+            if callable(complete_step):
+                complete_step(loss_first)
 
-        optimizer.zero_grad()
-        outputs = model(examples)
-        loss_first = loss_criterion(outputs, labels)
-        loss_first.backward()
-        optimizer.step()
-
-        # Second pass: Train second set of layers
-        self._freeze_layers(model, second_freeze)
-        self._activate_layers(model, second_layers)
-
-        optimizer.zero_grad()
-        outputs = model(examples)
-        loss_second = loss_criterion(outputs, labels)
-        loss_second.backward()
-        optimizer.step()
-
-        # Re-enable all gradients for both layer sets
-        self._activate_layers(model, self.global_layer_names)
-        self._activate_layers(model, self.local_layer_names)
-
-        # Return the second loss for logging
-        return loss_second
+            # Second pass: Train second set of layers.
+            self._freeze_layers(model, second_freeze)
+            self._activate_layers(model, second_layers)
+            for name, parameter in model.named_parameters():
+                if not original[name]:
+                    parameter.requires_grad_(False)
+            optimizer.zero_grad()
+            outputs = model(examples)
+            loss_second = loss_criterion(outputs, labels)
+            loss_second.backward()
+            optimizer.step()
+            context.state["optimizer_step_completed"] = True
+            if callable(complete_step):
+                complete_step(loss_second)
+            return loss_second
+        finally:
+            for name, parameter in model.named_parameters():
+                parameter.requires_grad_(original[name])
 
 
 class LGFedAvgStepStrategyFromConfig(LGFedAvgStepStrategy):

@@ -1,0 +1,100 @@
+{
+  "schema_version": 1,
+  "utc": "2026-10-04T01:39:13.915664+00:00",
+  "reviewer": "independent deployment publication gate",
+  "verdict": "ACCEPT_SCOPED_REMOTE_CORRECTIONS_CONDITIONAL_FINAL_QUALIFICATION",
+  "publication_review_accepted": true,
+  "publication_conditions_pending": true,
+  "merge_accepted": false,
+  "source": {
+    "head": "ff907611b513052bb8301c375ceb0b6b69c8664a",
+    "tree": "687f17e1fd927e3c3645b05dbb0814de1324463e",
+    "changed_source_from079": [
+      ".github/scripts/check_container.py",
+      ".github/workflows/docs_package_checks.yml",
+      "Dockerfile"
+    ],
+    "reviewed_file_hashes_match": true,
+    "verified_evidence_records": 92,
+    "lock_sha256": "66a4e4442d7b1f26d220b44ca73c44ff4f1151a86857bb3f93a594819fd08126",
+    "tracked_changes": "",
+    "untracked_status": "?? ci-artifacts/",
+    "preview_prior_source": "0791c01afcaea96223a925a32ee22882dc437ee2",
+    "preview_receipt_sha256": "73016b1b6f2f809ff2b0fa6a651ca04e14fbd8970ab1182e3003dd4c24c78334",
+    "historical079_local_receipt_sha256": "2c374cad796f8ba51bf8becb2e4be55a7b51b8624fcb0d3c96eed74b4274a3f8"
+  },
+  "prior_gates_preserved": [
+    {
+      "path": "/tmp/plato-deployment-delivery-gate.json",
+      "sha256": "7f721c9946fe524a8f15c3d406b394bb3091b11964fc33f291ec328b00514438"
+    },
+    {
+      "path": "/tmp/plato-deployment-delivery-gate-addendum.json",
+      "sha256": "9068227986e1d93344f336285d296477bcf388f75f1e589ede4f3b4d3f852aea"
+    }
+  ],
+  "review_bindings": [
+    {
+      "path": "/tmp/plato-docs-workflow-context-review.json",
+      "sha256": "ddbe7a853f1785bca73e31abb339f4d261ec61cb344f0a03b51059b8a5157444"
+    },
+    {
+      "path": "/tmp/plato-container-bytecode-cleanup-review.json",
+      "sha256": "fbf7757f22b2deafef1c1d079fb4cde978d9ef9ebe982cda9b3edd9d1228e442"
+    }
+  ],
+  "findings": [],
+  "unresolved_material_findings": 0,
+  "corrections": {
+    "ROOT-P2-M4": {
+      "accepted_source": "8dd6a604712973c6db050082ccd35f154d59ce56",
+      "scope": "Identical PLATO_DOCS_ENVIRONMENT value moved from forbidden job env context into sole consuming docs step env. Reviewed red/green actionlint and actual remote zero-job rejection; release workflow, dependency and action pins unchanged.",
+      "actual_corrected_remote_workflow": "PENDING"
+    },
+    "ROOT-P1-M1": {
+      "accepted_source": "1d26c7926c2f4c0fd83823650612757816ef8142",
+      "scope": "Docker disables bytecode before Python use; probe asserts actual interpreter flag; mount check rejects caches and only writes accepted receipt after ordinary fixture cleanup and absence verification. No privileged cleanup, ownership change or ignored failure.",
+      "actual_corrected_image_qualification": "PENDING",
+      "local_review": "Fresh real Python import red/green and9 independent controls; image transport/ownership denial explicitly simulated. Source-bound unchanged prior static/launcher controls remain accepted."
+    }
+  },
+  "historical_remote_evidence": {
+    "source": "0791c01afcaea96223a925a32ee22882dc437ee2",
+    "docs_run": 37167176060,
+    "docs_status": "FAILED before creating jobs: runner context invalid",
+    "container_run": 37167178271,
+    "container_status": "FAILED host TemporaryDirectory cleanup with root-owned plato/__pycache__; actual image build, CPU/native-library/CLI/mount/argv/exit23/auto-removal succeeded before failure. Earlier accepted mounted receipt preceded failing cleanup and is not final acceptance.",
+    "pytorch_status": "Canceled as superseded; not accepted qualification.",
+    "historical_local_receipt": "0791c01 final default docs/package/static/lockedRuff passed; source-bound historical proof, not current corrected final-HEAD proof."
+  },
+  "publication_conditions": [
+    "After this gate and any evidence-only records are committed, freeze exact final HEAD/tree. Preserve079 ci-artifacts intact through hash-bound reversible relocation so a fresh default output path is available; retain existing docs environment.",
+    "Run actual final-HEAD strict default docs, default full package checker, static container check and locked Ruff. Bind receipts to final source and artifact hashes externally; rebind package proof if evidence commits change packaged bytes.",
+    "Keep PR wording source-specific until corrected checks pass. The reviewed current draft now correctly labels local success as initial published0791c01."
+  ],
+  "mandatory_before_merge": [
+    "Fresh corrected exact-source Linux docs/package workflow actually creates and completes jobs with all source-byte, generated-metadata, exclusions, rebuild/import and strict-docs artifacts verified.",
+    "Fresh corrected actual Linux container image build and full workflow pass. Audit source/image/lock provenance; mounted and unmounted dont_write_bytecode=true; bytecode_paths=[]; fixture_cleanup_complete=true; final accepted=true after cleanup; imports/native CPU/CLI, forwarded args/exit23/removal, host environment preservation and resource records all pass.",
+    "Fresh final-source Linux PyTorch profiles pass and raw inventory/skip/failure/source artifacts are audited. Preserve applicable core51/retained19/native383/evaluator source-bound requirements. Canceled initial run supplies no acceptance.",
+    "Final hosted preview is publicly ready and bound to exact final published commit/deploy ID, with updated installation and quickstart articles matching the final local strict build. Bind committed Netlify configuration and docs/build.sh hashes, and record public response/content evidence."
+  ],
+  "preview_acceptance_policy": {
+    "historical_receipt": "/tmp/plato-deployment-linux/preview0791/source-content-verification.json",
+    "historical_scope": "Public ready deploy6ac1a76ce03dca00086fce6f bound to0791c01 with2 matching articles; must repeat final commit/deploy binding.",
+    "sufficient_final_proof": "Public deploy metadata identifying final commit and ready state, served content parity with final local build, and exact committed Netlify build configuration/script. This satisfies hosted delivery/source/content gate without private logs.",
+    "configuration_inference": "File-based Netlify configuration precedence and script Python3.13 assertion support a clearly labeled inference of effective root/docs-site/command/Python requirements from successful deployment; they do not provide direct private environment inventory.",
+    "access_limit": "Existing private build API401 and empty public site build_settings remain disclosed. No credentials request or privileged build-log access is required solely to discharge this gate; do not claim those logs were inspected."
+  },
+  "pr_description": {
+    "path": "/tmp/plato-deployment-integration/pr-description.md",
+    "sha256": "c4403068f9aadeecf21a2ef2ce05f2836d0f60d4e7b6a3da4781e957faedb822",
+    "assessment": "Both remote failures and bounded real-image progress disclosed; initial local success source0791c01 now explicit."
+  },
+  "limits": [
+    "No repaired-container actual acceptance yet; no GPU/arm64-container/PyPI/registry/production-deployment claim.",
+    "No Phase4 harness or historical archive prose source added.",
+    "Exactly3 source files changed from079; all other tracked production/docs/config source, lock/dependency metadata and pins unchanged.",
+    "No repeated broad training in this audit; source-bound remote reruns remain mandatory."
+  ],
+  "mutations": "Only external gate/audit JSON. Earlier gates, source, environments, old artifacts and PR draft untouched."
+}

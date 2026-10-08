@@ -1,0 +1,781 @@
+{
+  "candidate": "13e38dafce476286db7e673e7f21343d54416b56",
+  "report_sha256": "ecded9d6b645910a5c2b1149181593ab131fd0e404c4bc59a03db18c75cb8d42",
+  "receipt_references_verified": 121,
+  "scope": "Preserved independent reviewer scripts, baseline/final receipts and referenced outputs; no new execution or acceptance claim. Source diffs/manifests retained, no virtual environments or model artifact directories copied.",
+  "files": [
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-3/cleanup_acceptance_probe.py",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-3/cleanup_acceptance_probe.py",
+      "bytes": 4299,
+      "sha256": "b70a501db6c586bab917ac6541afc3d08e016697b210ff099db42a9b6a0399a7"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-3/independent_checks.py",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-3/independent_checks.py",
+      "bytes": 14073,
+      "sha256": "720e78a5cf4e04bf4278f5eb5495bdfe5f1b93b36ab0a8ebe663964f875f1651"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-3/reproduce_cleanup_failure.py",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-3/reproduce_cleanup_failure.py",
+      "bytes": 1470,
+      "sha256": "fc554616f81a72ac11d0f85e9c040481678f4a4c3d5196865fb6e59464f675ea"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/acceptance-matrix.json",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/acceptance-matrix.json",
+      "bytes": 11641,
+      "sha256": "08ed3041ed68c47ea920250dde5c27a7756a74603fa46e7600ec12fde4e33288"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/affected-nodes.json",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/affected-nodes.json",
+      "bytes": 1138,
+      "sha256": "44d235da619202fba4090a513d50ce6a0ffca9deb51a2ad7c6bff686d2965f1b"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/baseline-matrix.json",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/baseline-matrix.json",
+      "bytes": 43131,
+      "sha256": "37196009b986624985252c41fe1560e7b7f3312913b9054cae9517b5aa7c3081"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/baseline-validation.log",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/baseline-validation.log",
+      "bytes": 323,
+      "sha256": "63f07f507a28398c88e02ba20bb7ee5f73602b4171527c0e898048608e576ec5"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/candidate-vs-B-resume.diff",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/candidate-vs-B-resume.diff",
+      "bytes": 1993507,
+      "sha256": "1e599074ca934a0358d36c1d20c5cddee7d397300c686e8ac6893e70c229486d"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/candidate-vs-baseline15e.diff",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/candidate-vs-baseline15e.diff",
+      "bytes": 641967,
+      "sha256": "e2159e0c28a4d45f091212cf2648cc463f05740bcec56fefe2a3a96e63bb9201"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/candidate-vs-general-f977.diff",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/candidate-vs-general-f977.diff",
+      "bytes": 1002368,
+      "sha256": "dd2997e31126e831b9e6fb4f1e5f4f920dc524ad7df6d96b604b6ab0ff0b55a6"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/candidate-vs-implementation7d.diff",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/candidate-vs-implementation7d.diff",
+      "bytes": 78731,
+      "sha256": "ceec90b8d5d5d516c6649bb71176f56f6604a6d7e87f57b6b540f306c1583a8b"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/environment_entry.py",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/environment_entry.py",
+      "bytes": 1360,
+      "sha256": "fc74d60122f46e9b09cac60d71de83593071a6a9b1f4439a0ed6398b51dd0e41"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/final-lifecycle-matrix.json",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-lifecycle-matrix.json",
+      "bytes": 26787,
+      "sha256": "0f87adb0dd04234904f9366a3759b11fa6463f1c038f5974080dbeafcdac4b3b"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/final-matrix-validation.log",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-matrix-validation.log",
+      "bytes": 246,
+      "sha256": "85a359a87899306fa42d3809b9e36070c4b70d5d01941953c16a9d519e5ab884"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/final-qualification-receipt.json",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-qualification-receipt.json",
+      "bytes": 136365,
+      "sha256": "a7413d8b0bca03b2d8817829db9ea389c574ad9c7ff3d10073dc6efd92f7b8e7"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/final-qualification.log",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-qualification.log",
+      "bytes": 197,
+      "sha256": "a93b9bbffac19d6a9b2f87f71855c07c1e8499d0fcedf1ee792c19ff3be66785"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/final-report-receipt.json",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-report-receipt.json",
+      "bytes": 510,
+      "sha256": "06f6044149d798386aa4feec920d800d05bc6a7a23f274eb6e69ba281f8a62c5"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/final-report-write.log",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-report-write.log",
+      "bytes": 510,
+      "sha256": "06f6044149d798386aa4feec920d800d05bc6a7a23f274eb6e69ba281f8a62c5"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/final-runs/affected313-75b889de7776439e992d5c9f1eb8acb8/execution.json",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/affected313-75b889de7776439e992d5c9f1eb8acb8/execution.json",
+      "bytes": 5313,
+      "sha256": "02f9cf17d2215573217a5fe498e3b7e1dfcde898badea3aef0a196029ad9e229"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/final-runs/affected313-75b889de7776439e992d5c9f1eb8acb8/import-origins.json",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/affected313-75b889de7776439e992d5c9f1eb8acb8/import-origins.json",
+      "bytes": 691,
+      "sha256": "3a5d95ee3f86a43cb20ac3b1cc949820da0ffc6918df3c1a57d5aa4f73183d71"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/final-runs/affected313-75b889de7776439e992d5c9f1eb8acb8/junit.xml",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/affected313-75b889de7776439e992d5c9f1eb8acb8/junit.xml",
+      "bytes": 32533,
+      "sha256": "6f63984e36b80e0e2df2dab16838c14e5787303a90b850aa770b8ac52b91bf33"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/final-runs/affected313-75b889de7776439e992d5c9f1eb8acb8/raw.log",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/affected313-75b889de7776439e992d5c9f1eb8acb8/raw.log",
+      "bytes": 760,
+      "sha256": "bee5ffb58e5e189d7492e4eba167e71ae31e0361e6bca5e3f88fd5efe897c648"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/final-runs/affected313-75b889de7776439e992d5c9f1eb8acb8/source-after.json",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/affected313-75b889de7776439e992d5c9f1eb8acb8/source-after.json",
+      "bytes": 181040,
+      "sha256": "5aab0284663d26f9734d75f42acba2e5959b02df4649a931ef0119c38c940ac5"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/final-runs/affected313-75b889de7776439e992d5c9f1eb8acb8/source-before.json",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/affected313-75b889de7776439e992d5c9f1eb8acb8/source-before.json",
+      "bytes": 181040,
+      "sha256": "5aab0284663d26f9734d75f42acba2e5959b02df4649a931ef0119c38c940ac5"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/final-runs/affected314-1a9f14a60aaf4688b6ba89738318d9ba/execution.json",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/affected314-1a9f14a60aaf4688b6ba89738318d9ba/execution.json",
+      "bytes": 5313,
+      "sha256": "cf9f64e070595605c75ddd9668ba375b0365dcfa07013c9e7046cc83637870ce"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/final-runs/affected314-1a9f14a60aaf4688b6ba89738318d9ba/import-origins.json",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/affected314-1a9f14a60aaf4688b6ba89738318d9ba/import-origins.json",
+      "bytes": 691,
+      "sha256": "3a5d95ee3f86a43cb20ac3b1cc949820da0ffc6918df3c1a57d5aa4f73183d71"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/final-runs/affected314-1a9f14a60aaf4688b6ba89738318d9ba/junit.xml",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/affected314-1a9f14a60aaf4688b6ba89738318d9ba/junit.xml",
+      "bytes": 36252,
+      "sha256": "8363cbe971606ced0e8ee44e8b9c9f18b282cdcd6db5e79588fccb219e3bce00"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/final-runs/affected314-1a9f14a60aaf4688b6ba89738318d9ba/raw.log",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/affected314-1a9f14a60aaf4688b6ba89738318d9ba/raw.log",
+      "bytes": 4320,
+      "sha256": "18f3d19b67e884d70c78691702e81d892059d181f9bfc2b4e7f403c255a74fec"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/final-runs/affected314-1a9f14a60aaf4688b6ba89738318d9ba/source-after.json",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/affected314-1a9f14a60aaf4688b6ba89738318d9ba/source-after.json",
+      "bytes": 181040,
+      "sha256": "5aab0284663d26f9734d75f42acba2e5959b02df4649a931ef0119c38c940ac5"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/final-runs/affected314-1a9f14a60aaf4688b6ba89738318d9ba/source-before.json",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/affected314-1a9f14a60aaf4688b6ba89738318d9ba/source-before.json",
+      "bytes": 181040,
+      "sha256": "5aab0284663d26f9734d75f42acba2e5959b02df4649a931ef0119c38c940ac5"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/final-runs/environment313-000130da53d541c0bb262ebac9520a4c/environment.json",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/environment313-000130da53d541c0bb262ebac9520a4c/environment.json",
+      "bytes": 1654,
+      "sha256": "bc6080a82f21b767eb510498febb2c822274896227e7b8a7c7fe6e247e324034"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/final-runs/environment313-000130da53d541c0bb262ebac9520a4c/execution.json",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/environment313-000130da53d541c0bb262ebac9520a4c/execution.json",
+      "bytes": 2404,
+      "sha256": "1a3bc4a87519b3b392c6d736c5ac5e6cdfc3883ae79617040a9495560e51500e"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/final-runs/environment313-000130da53d541c0bb262ebac9520a4c/raw.log",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/environment313-000130da53d541c0bb262ebac9520a4c/raw.log",
+      "bytes": 1654,
+      "sha256": "bc6080a82f21b767eb510498febb2c822274896227e7b8a7c7fe6e247e324034"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/final-runs/environment313-000130da53d541c0bb262ebac9520a4c/source-after.json",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/environment313-000130da53d541c0bb262ebac9520a4c/source-after.json",
+      "bytes": 181040,
+      "sha256": "5aab0284663d26f9734d75f42acba2e5959b02df4649a931ef0119c38c940ac5"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/final-runs/environment313-000130da53d541c0bb262ebac9520a4c/source-before.json",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/environment313-000130da53d541c0bb262ebac9520a4c/source-before.json",
+      "bytes": 181040,
+      "sha256": "5aab0284663d26f9734d75f42acba2e5959b02df4649a931ef0119c38c940ac5"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/final-runs/environment314-84ef4b0c300c4855a37285670564f658/environment.json",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/environment314-84ef4b0c300c4855a37285670564f658/environment.json",
+      "bytes": 1688,
+      "sha256": "74fb3911dba7b8d5392507f2946de565585c4b1712ab5b1ef114bd0ec9aac9e9"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/final-runs/environment314-84ef4b0c300c4855a37285670564f658/execution.json",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/environment314-84ef4b0c300c4855a37285670564f658/execution.json",
+      "bytes": 2404,
+      "sha256": "0683432655ad43b337a1048cf923a569b9bf3bf2eaf0bfe657564980a1012797"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/final-runs/environment314-84ef4b0c300c4855a37285670564f658/raw.log",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/environment314-84ef4b0c300c4855a37285670564f658/raw.log",
+      "bytes": 1688,
+      "sha256": "74fb3911dba7b8d5392507f2946de565585c4b1712ab5b1ef114bd0ec9aac9e9"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/final-runs/environment314-84ef4b0c300c4855a37285670564f658/source-after.json",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/environment314-84ef4b0c300c4855a37285670564f658/source-after.json",
+      "bytes": 181040,
+      "sha256": "5aab0284663d26f9734d75f42acba2e5959b02df4649a931ef0119c38c940ac5"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/final-runs/environment314-84ef4b0c300c4855a37285670564f658/source-before.json",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/environment314-84ef4b0c300c4855a37285670564f658/source-before.json",
+      "bytes": 181040,
+      "sha256": "5aab0284663d26f9734d75f42acba2e5959b02df4649a931ef0119c38c940ac5"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/final-runs/independent313-f0a2ccb285f6409aba794c60fd3960cf/execution.json",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/independent313-f0a2ccb285f6409aba794c60fd3960cf/execution.json",
+      "bytes": 2378,
+      "sha256": "04753a1fd0a032e78542ef3fdf3ee182833c9c8a015acc4904165d82d6803d62"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/final-runs/independent313-f0a2ccb285f6409aba794c60fd3960cf/raw.log",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/independent313-f0a2ccb285f6409aba794c60fd3960cf/raw.log",
+      "bytes": 58572,
+      "sha256": "dac167e1718243ec873fd55103b817f9456ebdda8b12f0d96cb0fb35afa37be0"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/final-runs/independent313-f0a2ccb285f6409aba794c60fd3960cf/source-after.json",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/independent313-f0a2ccb285f6409aba794c60fd3960cf/source-after.json",
+      "bytes": 181040,
+      "sha256": "5aab0284663d26f9734d75f42acba2e5959b02df4649a931ef0119c38c940ac5"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/final-runs/independent313-f0a2ccb285f6409aba794c60fd3960cf/source-before.json",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/independent313-f0a2ccb285f6409aba794c60fd3960cf/source-before.json",
+      "bytes": 181040,
+      "sha256": "5aab0284663d26f9734d75f42acba2e5959b02df4649a931ef0119c38c940ac5"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/final-runs/independent313-f0a2ccb285f6409aba794c60fd3960cf/supplement-results.json",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/independent313-f0a2ccb285f6409aba794c60fd3960cf/supplement-results.json",
+      "bytes": 192638,
+      "sha256": "504ec201f23b1496ec2932bd9155c60ddc389b2ec83307ec6c9c2c7e5e50ee8c"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/final-runs/independent314-f3b43c07e2814b7cbc10383c83dbcd6c/execution.json",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/independent314-f3b43c07e2814b7cbc10383c83dbcd6c/execution.json",
+      "bytes": 2378,
+      "sha256": "0288fc1e9360acf586d9085b08d80d928593d2764de62477e912de846fe4e453"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/final-runs/independent314-f3b43c07e2814b7cbc10383c83dbcd6c/raw.log",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/independent314-f3b43c07e2814b7cbc10383c83dbcd6c/raw.log",
+      "bytes": 58624,
+      "sha256": "7b3f5df7a3155f6be7e5f213c8d363687dc009ad5ac5685956baede5560f9d21"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/final-runs/independent314-f3b43c07e2814b7cbc10383c83dbcd6c/source-after.json",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/independent314-f3b43c07e2814b7cbc10383c83dbcd6c/source-after.json",
+      "bytes": 181040,
+      "sha256": "5aab0284663d26f9734d75f42acba2e5959b02df4649a931ef0119c38c940ac5"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/final-runs/independent314-f3b43c07e2814b7cbc10383c83dbcd6c/source-before.json",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/independent314-f3b43c07e2814b7cbc10383c83dbcd6c/source-before.json",
+      "bytes": 181040,
+      "sha256": "5aab0284663d26f9734d75f42acba2e5959b02df4649a931ef0119c38c940ac5"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/final-runs/independent314-f3b43c07e2814b7cbc10383c83dbcd6c/supplement-results.json",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/independent314-f3b43c07e2814b7cbc10383c83dbcd6c/supplement-results.json",
+      "bytes": 192734,
+      "sha256": "b9b23f88c06c9b35eb00adbc2bb2dfac21aca93478dd2d1384b4dd072376ea18"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/final-runs/isolated-spawn314-a58ea478b390423481f2bc692abf0beb/execution.json",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/isolated-spawn314-a58ea478b390423481f2bc692abf0beb/execution.json",
+      "bytes": 3323,
+      "sha256": "3d6ada8015e1f2400684c0cad3df2924dd1a3f0f4dd65f8673273ed67f6de359"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/final-runs/isolated-spawn314-a58ea478b390423481f2bc692abf0beb/import-origins.json",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/isolated-spawn314-a58ea478b390423481f2bc692abf0beb/import-origins.json",
+      "bytes": 691,
+      "sha256": "3a5d95ee3f86a43cb20ac3b1cc949820da0ffc6918df3c1a57d5aa4f73183d71"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/final-runs/isolated-spawn314-a58ea478b390423481f2bc692abf0beb/junit.xml",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/isolated-spawn314-a58ea478b390423481f2bc692abf0beb/junit.xml",
+      "bytes": 4162,
+      "sha256": "54467e93c130af260bcaf29db83aaa50055315dd6ba6f97d4edd3e52b2902a60"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/final-runs/isolated-spawn314-a58ea478b390423481f2bc692abf0beb/raw.log",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/isolated-spawn314-a58ea478b390423481f2bc692abf0beb/raw.log",
+      "bytes": 4168,
+      "sha256": "f912e7f22261498f09f822aee90a7781304b0c69e6207c99b42885d51a4586be"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/final-runs/isolated-spawn314-a58ea478b390423481f2bc692abf0beb/source-after.json",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/isolated-spawn314-a58ea478b390423481f2bc692abf0beb/source-after.json",
+      "bytes": 181040,
+      "sha256": "5aab0284663d26f9734d75f42acba2e5959b02df4649a931ef0119c38c940ac5"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/final-runs/isolated-spawn314-a58ea478b390423481f2bc692abf0beb/source-before.json",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/isolated-spawn314-a58ea478b390423481f2bc692abf0beb/source-before.json",
+      "bytes": 181040,
+      "sha256": "5aab0284663d26f9734d75f42acba2e5959b02df4649a931ef0119c38c940ac5"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/final-runs/library-cache-spawn314-0e88e359130d48028f1dea158cef3cbc/bytecode-policy.json",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/library-cache-spawn314-0e88e359130d48028f1dea158cef3cbc/bytecode-policy.json",
+      "bytes": 303,
+      "sha256": "151e07dcb3e58d6aac880e47647721e6348a67cc1837dca9d08d99d7601138af"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/final-runs/library-cache-spawn314-0e88e359130d48028f1dea158cef3cbc/execution.json",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/library-cache-spawn314-0e88e359130d48028f1dea158cef3cbc/execution.json",
+      "bytes": 3298,
+      "sha256": "96844972b92c98ed9fd52d270cd68694e246c6231359eb71030da609a908df9e"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/final-runs/library-cache-spawn314-0e88e359130d48028f1dea158cef3cbc/import-origins.json",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/library-cache-spawn314-0e88e359130d48028f1dea158cef3cbc/import-origins.json",
+      "bytes": 691,
+      "sha256": "3a5d95ee3f86a43cb20ac3b1cc949820da0ffc6918df3c1a57d5aa4f73183d71"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/final-runs/library-cache-spawn314-0e88e359130d48028f1dea158cef3cbc/junit.xml",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/library-cache-spawn314-0e88e359130d48028f1dea158cef3cbc/junit.xml",
+      "bytes": 410,
+      "sha256": "adcf172c6d9d6d3a56e61d44394db659d18caa5d67d4798fe3a69ccee885c38b"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/final-runs/library-cache-spawn314-0e88e359130d48028f1dea158cef3cbc/raw.log",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/library-cache-spawn314-0e88e359130d48028f1dea158cef3cbc/raw.log",
+      "bytes": 585,
+      "sha256": "f209693a21be9834e7a3134bc960ca91e01d70132bb8f568f60c8eaa929869f0"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/final-runs/library-cache-spawn314-0e88e359130d48028f1dea158cef3cbc/source-after.json",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/library-cache-spawn314-0e88e359130d48028f1dea158cef3cbc/source-after.json",
+      "bytes": 181040,
+      "sha256": "5aab0284663d26f9734d75f42acba2e5959b02df4649a931ef0119c38c940ac5"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/final-runs/library-cache-spawn314-0e88e359130d48028f1dea158cef3cbc/source-before.json",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/library-cache-spawn314-0e88e359130d48028f1dea158cef3cbc/source-before.json",
+      "bytes": 181040,
+      "sha256": "5aab0284663d26f9734d75f42acba2e5959b02df4649a931ef0119c38c940ac5"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/final-runs/mandatory-guard313-1aae89ee66fa4a0c84058406c623c108/execution.json",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/mandatory-guard313-1aae89ee66fa4a0c84058406c623c108/execution.json",
+      "bytes": 2413,
+      "sha256": "f665c1627c9a84e3c008bdd5768868f7229e83ccc83beab0a361ba6883a31915"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/final-runs/mandatory-guard313-1aae89ee66fa4a0c84058406c623c108/mandatory-guard.json",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/mandatory-guard313-1aae89ee66fa4a0c84058406c623c108/mandatory-guard.json",
+      "bytes": 399,
+      "sha256": "6c0167c78c121d108c8a6e291ac44d7fdddb3fc81a8c2dddf4b9eb29a86fade5"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/final-runs/mandatory-guard313-1aae89ee66fa4a0c84058406c623c108/raw.log",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/mandatory-guard313-1aae89ee66fa4a0c84058406c623c108/raw.log",
+      "bytes": 3826,
+      "sha256": "ae34687ecbd9166f66e0245c77a5d79c5be6997ffc178dd3325c6adc8b551c25"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/final-runs/mandatory-guard313-1aae89ee66fa4a0c84058406c623c108/source-after.json",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/mandatory-guard313-1aae89ee66fa4a0c84058406c623c108/source-after.json",
+      "bytes": 181040,
+      "sha256": "5aab0284663d26f9734d75f42acba2e5959b02df4649a931ef0119c38c940ac5"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/final-runs/mandatory-guard313-1aae89ee66fa4a0c84058406c623c108/source-before.json",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/mandatory-guard313-1aae89ee66fa4a0c84058406c623c108/source-before.json",
+      "bytes": 181040,
+      "sha256": "5aab0284663d26f9734d75f42acba2e5959b02df4649a931ef0119c38c940ac5"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/final-runs/mandatory-guard314-3a41501cca6f41edb1e58acd7d2bb8f0/execution.json",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/mandatory-guard314-3a41501cca6f41edb1e58acd7d2bb8f0/execution.json",
+      "bytes": 2412,
+      "sha256": "3a2570ede492c8b6909f7d75f2948dfb37f4a673edc120e2ba97c02cd9ad44a5"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/final-runs/mandatory-guard314-3a41501cca6f41edb1e58acd7d2bb8f0/mandatory-guard.json",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/mandatory-guard314-3a41501cca6f41edb1e58acd7d2bb8f0/mandatory-guard.json",
+      "bytes": 399,
+      "sha256": "6c0167c78c121d108c8a6e291ac44d7fdddb3fc81a8c2dddf4b9eb29a86fade5"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/final-runs/mandatory-guard314-3a41501cca6f41edb1e58acd7d2bb8f0/raw.log",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/mandatory-guard314-3a41501cca6f41edb1e58acd7d2bb8f0/raw.log",
+      "bytes": 3766,
+      "sha256": "d766d00adb72514dc9cc1af9f8e3b853c71520db8b1b583dff40991f3abbc7c3"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/final-runs/mandatory-guard314-3a41501cca6f41edb1e58acd7d2bb8f0/source-after.json",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/mandatory-guard314-3a41501cca6f41edb1e58acd7d2bb8f0/source-after.json",
+      "bytes": 181040,
+      "sha256": "5aab0284663d26f9734d75f42acba2e5959b02df4649a931ef0119c38c940ac5"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/final-runs/mandatory-guard314-3a41501cca6f41edb1e58acd7d2bb8f0/source-before.json",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/mandatory-guard314-3a41501cca6f41edb1e58acd7d2bb8f0/source-before.json",
+      "bytes": 181040,
+      "sha256": "5aab0284663d26f9734d75f42acba2e5959b02df4649a931ef0119c38c940ac5"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/final-runs/portable313-676f73e248a445069ea3c99813972056/execution.json",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/portable313-676f73e248a445069ea3c99813972056/execution.json",
+      "bytes": 3257,
+      "sha256": "2b8df39ea3a2031ebf65459d00c8f495194f8aa9a8847ca3cc344811f1edfb55"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/final-runs/portable313-676f73e248a445069ea3c99813972056/import-origins.json",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/portable313-676f73e248a445069ea3c99813972056/import-origins.json",
+      "bytes": 724,
+      "sha256": "b2ef134668fbb1445aad4f8acbe234ff2e72adebdbab337c5283915d7c1a49c1"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/final-runs/portable313-676f73e248a445069ea3c99813972056/junit.xml",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/portable313-676f73e248a445069ea3c99813972056/junit.xml",
+      "bytes": 857,
+      "sha256": "b5c303bbcf92285b04d1f73c929846c19b183d4aeebd352aaba6b0eafd7333fa"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/final-runs/portable313-676f73e248a445069ea3c99813972056/raw.log",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/portable313-676f73e248a445069ea3c99813972056/raw.log",
+      "bytes": 586,
+      "sha256": "3a2748a51a687e941f538ac2718fe07f8960d6decfb745141f277d36e1622712"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/final-runs/portable313-676f73e248a445069ea3c99813972056/source-after.json",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/portable313-676f73e248a445069ea3c99813972056/source-after.json",
+      "bytes": 181040,
+      "sha256": "5aab0284663d26f9734d75f42acba2e5959b02df4649a931ef0119c38c940ac5"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/final-runs/portable313-676f73e248a445069ea3c99813972056/source-before.json",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/portable313-676f73e248a445069ea3c99813972056/source-before.json",
+      "bytes": 181040,
+      "sha256": "5aab0284663d26f9734d75f42acba2e5959b02df4649a931ef0119c38c940ac5"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/final-runs/portable314-68c3247de8f740978c00103c4543d0de/execution.json",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/portable314-68c3247de8f740978c00103c4543d0de/execution.json",
+      "bytes": 3259,
+      "sha256": "ad93c76bc54da725552e1211dfd5ec59f46307531310ca37c30c2bfda15188fc"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/final-runs/portable314-68c3247de8f740978c00103c4543d0de/import-origins.json",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/portable314-68c3247de8f740978c00103c4543d0de/import-origins.json",
+      "bytes": 724,
+      "sha256": "b2ef134668fbb1445aad4f8acbe234ff2e72adebdbab337c5283915d7c1a49c1"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/final-runs/portable314-68c3247de8f740978c00103c4543d0de/junit.xml",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/portable314-68c3247de8f740978c00103c4543d0de/junit.xml",
+      "bytes": 857,
+      "sha256": "d87f1172b5f3dfe92cb9fdd79239be8b54c948863889c8d99525286cacefdcfa"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/final-runs/portable314-68c3247de8f740978c00103c4543d0de/raw.log",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/portable314-68c3247de8f740978c00103c4543d0de/raw.log",
+      "bytes": 584,
+      "sha256": "76f831200a3b749c2abdc6f410bdca52b0b62c8aa9162843048be6f420455099"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/final-runs/portable314-68c3247de8f740978c00103c4543d0de/source-after.json",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/portable314-68c3247de8f740978c00103c4543d0de/source-after.json",
+      "bytes": 181040,
+      "sha256": "5aab0284663d26f9734d75f42acba2e5959b02df4649a931ef0119c38c940ac5"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/final-runs/portable314-68c3247de8f740978c00103c4543d0de/source-before.json",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-runs/portable314-68c3247de8f740978c00103c4543d0de/source-before.json",
+      "bytes": 181040,
+      "sha256": "5aab0284663d26f9734d75f42acba2e5959b02df4649a931ef0119c38c940ac5"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/final-source-manifest.json",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-source-manifest.json",
+      "bytes": 181040,
+      "sha256": "5aab0284663d26f9734d75f42acba2e5959b02df4649a931ef0119c38c940ac5"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/final-source-ruff.log",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final-source-ruff.log",
+      "bytes": 19,
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/final_lifecycle_checks.py",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/final_lifecycle_checks.py",
+      "bytes": 13129,
+      "sha256": "fdd32eb8cf188821dc2b6755d751d9bfbfa49bb5ae7569cdbfeaf7be32724127"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/inspect_receipts.py",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/inspect_receipts.py",
+      "bytes": 844,
+      "sha256": "d492c2866e31de601e45daf42ba6d2cbdc852d87861655b57c278c9aae8a398c"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/lifecycle_probe.py",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/lifecycle_probe.py",
+      "bytes": 24198,
+      "sha256": "fc816584f7de493708bd11f5ab3976b7e4e056f9995e9e8590cb4e4a2807b729"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/mandatory_guard_entry.py",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/mandatory_guard_entry.py",
+      "bytes": 958,
+      "sha256": "3d5a641f1ff2eedebe996104efdce396ef0e689b6de81f99e5bb1d73d1ed4146"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/portable-nodes.json",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/portable-nodes.json",
+      "bytes": 106,
+      "sha256": "a164edb3721ca68440e6da8fef82703b01c02538534031f81a2940b76957cc8e"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/portable-source-receipt.json",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/portable-source-receipt.json",
+      "bytes": 376,
+      "sha256": "41f149d39c99d3cb9c0682a9a88aeddf948356f7ee0e87556e6272b327574d4c"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/preparation-receipt.json",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/preparation-receipt.json",
+      "bytes": 13210,
+      "sha256": "332062a1482758e9d28950a8e23de0c94e91d8d0e1a11e7a0e18cf567ad2d538"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/pytest_entry.py",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/pytest_entry.py",
+      "bytes": 709,
+      "sha256": "55a05045bf12164e8bda5133d68d88c7b4a6c155bf8be49b7666380a4cd32bd5"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/pytest_library_cache_entry.py",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/pytest_library_cache_entry.py",
+      "bytes": 1647,
+      "sha256": "4c437fa1d467de8b564502f37e5465209fba1b9512f14433f13c9a21a2eff5f4"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/qualify_receipts.py",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/qualify_receipts.py",
+      "bytes": 8448,
+      "sha256": "82be3487df3be6d9e13ced6bde678bd974e30dc0d7540815c0638f0b51e503bf"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/ruff-check.log",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/ruff-check.log",
+      "bytes": 19,
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/run_final_command.py",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/run_final_command.py",
+      "bytes": 4995,
+      "sha256": "3960f9e0d3e3aeb1828710faadb3fca5e358fcaaeefe8361971aa630f9af62ea"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/run_probe.py",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/run_probe.py",
+      "bytes": 4699,
+      "sha256": "44a33b9db610007c4a04e22efa6a009a7a394bbea443205f11366e08457b8fa7"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-313-20261003T092409Z-7229f56f429e4b0195b350a4dac026c5/acceptance-results.json",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-313-20261003T092409Z-7229f56f429e4b0195b350a4dac026c5/acceptance-results.json",
+      "bytes": 260207,
+      "sha256": "fd98eccec396f6b1a11f94239688392701ad7c9551eedccc60c2b96f09b6d173"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-313-20261003T092409Z-7229f56f429e4b0195b350a4dac026c5/execution.json",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-313-20261003T092409Z-7229f56f429e4b0195b350a4dac026c5/execution.json",
+      "bytes": 2654,
+      "sha256": "ddf944f131d9d53b965a025bc430927890b004ddcf0ea85430c46c5cadbaf7eb"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-313-20261003T092409Z-7229f56f429e4b0195b350a4dac026c5/raw.log",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-313-20261003T092409Z-7229f56f429e4b0195b350a4dac026c5/raw.log",
+      "bytes": 71735,
+      "sha256": "782eaf73fdbd06e78f9454776ed75bd70549cd4556d6f351ce4d66f1ab609cd0"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-313-20261003T092409Z-7229f56f429e4b0195b350a4dac026c5/source-after.json",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-313-20261003T092409Z-7229f56f429e4b0195b350a4dac026c5/source-after.json",
+      "bytes": 232038,
+      "sha256": "cda17ad58db2cb1172f55fec2c2da031f5aeaecb18fa357852d0e8394980dbdd"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-313-20261003T092409Z-7229f56f429e4b0195b350a4dac026c5/source-before.json",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-313-20261003T092409Z-7229f56f429e4b0195b350a4dac026c5/source-before.json",
+      "bytes": 232038,
+      "sha256": "cda17ad58db2cb1172f55fec2c2da031f5aeaecb18fa357852d0e8394980dbdd"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-313-20261003T102614Z-22a32d5bc01b49fbae7612057fec9987/acceptance-results.json",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-313-20261003T102614Z-22a32d5bc01b49fbae7612057fec9987/acceptance-results.json",
+      "bytes": 258731,
+      "sha256": "de3b83a019ea1871c2ad1268efe5ca4e54ecff814ef280f05fc621737d348b79"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-313-20261003T102614Z-22a32d5bc01b49fbae7612057fec9987/execution.json",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-313-20261003T102614Z-22a32d5bc01b49fbae7612057fec9987/execution.json",
+      "bytes": 2668,
+      "sha256": "82ab238dc28c3b6530b0672a9d0f151870fff68224eddf680eee42675d82b6c9"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-313-20261003T102614Z-22a32d5bc01b49fbae7612057fec9987/raw.log",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-313-20261003T102614Z-22a32d5bc01b49fbae7612057fec9987/raw.log",
+      "bytes": 73998,
+      "sha256": "a6176d72016afd4cf0c6f56c5410490adf78596ba8fc70c6883a48fde74106f1"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-313-20261003T102614Z-22a32d5bc01b49fbae7612057fec9987/source-after.json",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-313-20261003T102614Z-22a32d5bc01b49fbae7612057fec9987/source-after.json",
+      "bytes": 181040,
+      "sha256": "5aab0284663d26f9734d75f42acba2e5959b02df4649a931ef0119c38c940ac5"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-313-20261003T102614Z-22a32d5bc01b49fbae7612057fec9987/source-before.json",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-313-20261003T102614Z-22a32d5bc01b49fbae7612057fec9987/source-before.json",
+      "bytes": 181040,
+      "sha256": "5aab0284663d26f9734d75f42acba2e5959b02df4649a931ef0119c38c940ac5"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-314-20261003T092409Z-1cb0cb24556a4c158c66452cdd2bfaa4/acceptance-results.json",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-314-20261003T092409Z-1cb0cb24556a4c158c66452cdd2bfaa4/acceptance-results.json",
+      "bytes": 260467,
+      "sha256": "fbc5aed951b9fd24a9f22fe6a3cfec3cb59d005b4054fc3f389178bf812ddb49"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-314-20261003T092409Z-1cb0cb24556a4c158c66452cdd2bfaa4/execution.json",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-314-20261003T092409Z-1cb0cb24556a4c158c66452cdd2bfaa4/execution.json",
+      "bytes": 2654,
+      "sha256": "3078c9a5918bf9e869a9713f869c21fd5601c46f862ffa8aa490623a21201715"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-314-20261003T092409Z-1cb0cb24556a4c158c66452cdd2bfaa4/raw.log",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-314-20261003T092409Z-1cb0cb24556a4c158c66452cdd2bfaa4/raw.log",
+      "bytes": 71891,
+      "sha256": "67efe8b5555805da1033b9272b827abe4aff325ef83fbe28f8f25271f5b860aa"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-314-20261003T092409Z-1cb0cb24556a4c158c66452cdd2bfaa4/source-after.json",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-314-20261003T092409Z-1cb0cb24556a4c158c66452cdd2bfaa4/source-after.json",
+      "bytes": 232038,
+      "sha256": "cda17ad58db2cb1172f55fec2c2da031f5aeaecb18fa357852d0e8394980dbdd"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-314-20261003T092409Z-1cb0cb24556a4c158c66452cdd2bfaa4/source-before.json",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-314-20261003T092409Z-1cb0cb24556a4c158c66452cdd2bfaa4/source-before.json",
+      "bytes": 232038,
+      "sha256": "cda17ad58db2cb1172f55fec2c2da031f5aeaecb18fa357852d0e8394980dbdd"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-314-20261003T102614Z-5b204c199b3e4af197df4bb638c4fbf9/acceptance-results.json",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-314-20261003T102614Z-5b204c199b3e4af197df4bb638c4fbf9/acceptance-results.json",
+      "bytes": 258991,
+      "sha256": "0dd0f844183de2ebd077381cf2346687c7787eb03742371a3aa41f72bf76cc77"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-314-20261003T102614Z-5b204c199b3e4af197df4bb638c4fbf9/execution.json",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-314-20261003T102614Z-5b204c199b3e4af197df4bb638c4fbf9/execution.json",
+      "bytes": 2667,
+      "sha256": "9d106d75dce965aece3b2a8ff654463735ce46663e065d8007fd9d5f2aadc413"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-314-20261003T102614Z-5b204c199b3e4af197df4bb638c4fbf9/raw.log",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-314-20261003T102614Z-5b204c199b3e4af197df4bb638c4fbf9/raw.log",
+      "bytes": 74154,
+      "sha256": "84a350b75d78f7089e06ee351caa0d318a74611bfbee5725017800e6ee46df9b"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-314-20261003T102614Z-5b204c199b3e4af197df4bb638c4fbf9/source-after.json",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-314-20261003T102614Z-5b204c199b3e4af197df4bb638c4fbf9/source-after.json",
+      "bytes": 181040,
+      "sha256": "5aab0284663d26f9734d75f42acba2e5959b02df4649a931ef0119c38c940ac5"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-314-20261003T102614Z-5b204c199b3e4af197df4bb638c4fbf9/source-before.json",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/runs/plato-phase2c-314-20261003T102614Z-5b204c199b3e4af197df4bb638c4fbf9/source-before.json",
+      "bytes": 181040,
+      "sha256": "5aab0284663d26f9734d75f42acba2e5959b02df4649a931ef0119c38c940ac5"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/source-audit.json",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/source-audit.json",
+      "bytes": 19823,
+      "sha256": "b1696ae90cacfdedbbbe2af179339368adbd0af8b33f58d384b16b0dc66b1bff"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/source_adapter.py",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/source_adapter.py",
+      "bytes": 5655,
+      "sha256": "4b0e6819bc97335861a334160bdcb6d646ba5bdc6e1bbaf3b6886de6c304c11d"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/source_audit.py",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/source_audit.py",
+      "bytes": 8846,
+      "sha256": "05ce5ee8c5501f80c576cd2bce524f6364034e5dd03ca78b518a4f5ea7662aa3"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/spawn-retry-node.json",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/spawn-retry-node.json",
+      "bytes": 119,
+      "sha256": "a9dca2ce1c3f2ae4c80966ecadde4fd767f60bb84faf077d6479c9a420fc9ce9"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/validate_baseline.py",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/validate_baseline.py",
+      "bytes": 8052,
+      "sha256": "b19af9fabebdddc5fad7e9f53975cb7bb8f1875f5cb391465222440d17858cf3"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/validate_final_matrix.py",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/validate_final_matrix.py",
+      "bytes": 3966,
+      "sha256": "ee371e5ea44acad060acdae016e1ea88f7311c974704b7c5ac64fc77734bb6be"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/write_final_report.py",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/write_final_report.py",
+      "bytes": 24611,
+      "sha256": "f953f55d75f92b91acf161d5f2af256adafc4dc680225b1a7c52eef037ff5477"
+    },
+    {
+      "archive_path": "plato-phase2c-scaffold-code-review-4/write_receipt.py",
+      "original_path": "/private/tmp/plato-phase2c-scaffold-code-review-4/write_receipt.py",
+      "bytes": 11733,
+      "sha256": "149e77a742fb2950887063b45bcdfc2518579f770975cfeabac921636ef42dd5"
+    }
+  ],
+  "archive": {
+    "path": "evidence/2026-refresh/reproductions/phase2c-scaffold-review4-evidence.tar.gz",
+    "bytes": 2738591,
+    "sha256": "802491b0da333ef2521b3e1fa35701cb7b4bd2270cb61ef2cf981cba64e0d7fe"
+  }
+}

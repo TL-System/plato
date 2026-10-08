@@ -3,6 +3,7 @@
 import asyncio
 from types import SimpleNamespace
 
+import pytest
 import torch
 
 from plato.servers.strategies.aggregation import FedAvgAggregationStrategy
@@ -198,6 +199,172 @@ class DeltaOnlyStrategy(FedAvgAggregationStrategy):
     async def aggregate_deltas(self, updates, deltas_received, context):
         self.delta_calls += 1
         return await super().aggregate_deltas(updates, deltas_received, context)
+
+
+@pytest.mark.parametrize("direct", [False, True])
+@pytest.mark.parametrize("reverse", [False, True])
+@pytest.mark.parametrize("bad_count", [-1, float("nan"), float("inf"), -float("inf")])
+def test_aggregation_rejects_invalid_weights(temp_config, direct, reverse, bad_count):
+    updates = [
+        SimpleNamespace(report=SimpleNamespace(num_samples=bad_count)),
+        SimpleNamespace(report=SimpleNamespace(num_samples=2)),
+    ]
+    payloads = [{"weight": torch.tensor([1.0])}, {"weight": torch.tensor([4.0])}]
+    if reverse:
+        updates.reverse()
+        payloads.reverse()
+    strategy = FedAvgAggregationStrategy()
+    context = ServerContext()
+    operation = (
+        strategy.aggregate_weights(updates, payloads[0], payloads, context)
+        if direct
+        else strategy.aggregate_deltas(updates, payloads, context)
+    )
+    with pytest.raises(ValueError, match="sample"):
+        asyncio.run(operation)
+    assert all(torch.isfinite(p["weight"]).all() for p in payloads)
+
+
+@pytest.mark.parametrize("direct", [False, True])
+@pytest.mark.parametrize("payload_count", [0, 2])
+def test_aggregation_rejects_cardinality_mismatch(temp_config, direct, payload_count):
+    updates = [SimpleNamespace(report=SimpleNamespace(num_samples=1))]
+    payloads = [{"weight": torch.tensor([1.0])} for _ in range(payload_count)]
+    strategy = FedAvgAggregationStrategy()
+    context = ServerContext()
+    operation = (
+        strategy.aggregate_weights(updates, {}, payloads, context)
+        if direct
+        else strategy.aggregate_deltas(updates, payloads, context)
+    )
+    with pytest.raises(ValueError, match="payload"):
+        asyncio.run(operation)
+
+
+def _dispatch_server(kind):
+    from plato.servers import fedavg
+
+    class InstrumentedServer(fedavg.Server):
+        legacy_calls: int = 0
+
+    class LegacyServer(InstrumentedServer):
+        async def aggregate_weights(self, updates, baseline, weights):
+            self.legacy_calls += 1
+            result = await FedAvgAggregationStrategy().aggregate_weights(
+                updates, baseline, weights, self.context
+            )
+            return baseline if result is None else result
+
+    server = (
+        LegacyServer(aggregation_strategy=DeltaOnlyStrategy())
+        if kind == "legacy"
+        else InstrumentedServer(
+            aggregation_strategy=DeltaOnlyStrategy() if kind == "delta" else None
+        )
+    )
+    server.legacy_calls = 0
+    server.algorithm = DummyAlgorithm({"weight": torch.tensor([10.0])})
+    server.context.algorithm = server.algorithm
+    server.context.server = server
+    setattr(server, "clients_processed", lambda: None)
+    server.updates = [
+        SimpleNamespace(
+            client_id=index,
+            report=SimpleNamespace(
+                num_samples=count,
+                accuracy=accuracy,
+                processing_time=0,
+                training_time=0,
+                comm_time=0,
+            ),
+            payload={"weight": torch.tensor([value])},
+        )
+        for index, count, accuracy, value in [(1, 0.25, 0.2, 1.0), (2, 0.75, 0.8, 4.0)]
+    ]
+    return server
+
+
+@pytest.mark.parametrize("kind", ["ordinary", "legacy", "delta"])
+@pytest.mark.parametrize("reverse", [False, True])
+@pytest.mark.parametrize(
+    "defect", ["negative", "nonfinite", "hook_extra", "hook_missing"]
+)
+def test_server_validates_raw_and_hook_inputs_before_any_dispatch(
+    temp_config, kind, reverse, defect
+):
+    from plato.config import Config
+
+    Config().server.do_test = False
+    server = _dispatch_server(kind)
+    if defect == "negative":
+        server.updates[0].report.num_samples = -1
+    elif defect == "nonfinite":
+        server.updates[0].report.num_samples = float("nan")
+    else:
+        server.weights_received = (
+            (lambda weights: weights + [weights[0]])
+            if defect == "hook_extra"
+            else (lambda weights: weights[:1])
+        )
+    if reverse:
+        server.updates.reverse()
+    before = server.algorithm.extract_weights()
+    selection_state = dict(server.context.state)
+    with pytest.raises(ValueError, match="sample|payload"):
+        asyncio.run(server._process_reports())
+    assert torch.equal(server.algorithm.current["weight"], before["weight"])
+    assert server.context.state == selection_state
+    assert server.legacy_calls == 0
+    if isinstance(server.aggregation_strategy, DeltaOnlyStrategy):
+        assert server.aggregation_strategy.delta_calls == 0
+
+
+@pytest.mark.parametrize("kind", ["ordinary", "legacy", "delta"])
+@pytest.mark.parametrize("reverse", [False, True])
+@pytest.mark.parametrize("zero", ["none", "one", "all"])
+def test_server_preserves_fractional_and_zero_sample_dispatch(
+    temp_config, kind, reverse, zero
+):
+    from plato.config import Config
+
+    Config().server.do_test = False
+    server = _dispatch_server(kind)
+    if zero != "none":
+        server.updates[0].report.num_samples = 0
+    if zero == "all":
+        server.updates[1].report.num_samples = 0
+    if reverse:
+        server.updates.reverse()
+    asyncio.run(server._process_reports())
+    expected = {"none": 3.25, "one": 4.0, "all": 10.0}[zero]
+    assert server.algorithm.current["weight"].item() == pytest.approx(expected)
+    if kind == "legacy":
+        assert server.legacy_calls == 1
+    if kind == "delta":
+        assert server.aggregation_strategy.delta_calls == 1
+
+
+@pytest.mark.parametrize("reverse", [False, True])
+def test_feature_samples_do_not_dilute_fractional_weight_reference(
+    temp_config, reverse
+):
+    updates = [
+        SimpleNamespace(report=SimpleNamespace(num_samples=100, type="features")),
+        SimpleNamespace(report=SimpleNamespace(num_samples=0.25)),
+        SimpleNamespace(report=SimpleNamespace(num_samples=0.75)),
+        SimpleNamespace(report=SimpleNamespace(num_samples=0)),
+    ]
+    payloads = [{}, {"w": torch.tensor([1.0])}, {"w": torch.tensor([4.0])}, {}]
+    if reverse:
+        updates.reverse()
+        payloads.reverse()
+    result = asyncio.run(
+        FedAvgAggregationStrategy().aggregate_weights(
+            updates, {"w": torch.tensor([0.0])}, payloads, ServerContext()
+        )
+    )
+    assert result is not None
+    assert result["w"].item() == pytest.approx(3.25)
 
 
 def test_fedavg_server_prefers_custom_delta_strategy_over_inherited_weights(

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from collections import OrderedDict
-from collections.abc import Mapping, Sequence
+from collections.abc import Mapping, Sequence, Sized
 
 import torch
 import torch.nn.functional as F
@@ -77,6 +77,8 @@ class Algorithm(fedavg.Algorithm):
         shuffle_batches: bool,
     ) -> OrderedDict[str, torch.Tensor]:
         """Distill the server model on proxy inputs using ensemble logits."""
+        if not isinstance(proxy_dataset, Sized):
+            raise TypeError("FedDF requires a sized proxy dataset.")
         if len(proxy_dataset) != len(teacher_logits):
             raise ValueError(
                 "FedDF proxy samples and teacher logits must have matching lengths."

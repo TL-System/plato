@@ -1,0 +1,70 @@
+{
+  "source": "2633f8394c142ec04db13743b54a427e04c2aed7",
+  "wheel_sha256": "0e23952635db8eb9d3f65dd8a4f594ede4b78e4fe3a5cec8f9cc05c0ed9e1313",
+  "vendor_files": 213,
+  "uncompressed_bytes": 10170220,
+  "compressed_bytes": 8251040,
+  "largest": [
+    {
+      "path": "plato/models/dvit/figures/attention_map_visualization.png",
+      "bytes": 3743399,
+      "compressed": 3744517
+    },
+    {
+      "path": "plato/models/t2tvit/images/f1.png",
+      "bytes": 2362201,
+      "compressed": 1837180
+    },
+    {
+      "path": "plato/models/dvit/utils/progress/demo.gif",
+      "bytes": 924334,
+      "compressed": 613764
+    },
+    {
+      "path": "plato/models/t2tvit/images/attention_visualization.png",
+      "bytes": 642198,
+      "compressed": 640962
+    },
+    {
+      "path": "plato/models/t2tvit/images/dog.png",
+      "bytes": 445623,
+      "compressed": 445763
+    },
+    {
+      "path": "plato/models/t2tvit/visualization_resnet.ipynb",
+      "bytes": 230751,
+      "compressed": 159986
+    },
+    {
+      "path": "plato/models/t2tvit/visualization_vit.ipynb",
+      "bytes": 192509,
+      "compressed": 143673
+    },
+    {
+      "path": "plato/models/dvit/lib_deit/.github/deit.png",
+      "bytes": 157538,
+      "compressed": 148123
+    },
+    {
+      "path": "plato/models/t2tvit/images/resnet_conv1.png",
+      "bytes": 83762,
+      "compressed": 83198
+    },
+    {
+      "path": "plato/models/t2tvit/images/vit_block1.png",
+      "bytes": 81496,
+      "compressed": 80905
+    },
+    {
+      "path": "plato/models/dvit/timm/models/efficientnet.py",
+      "bytes": 71184,
+      "compressed": 8167
+    },
+    {
+      "path": "plato/models/dvit/timm/models/resnet.py",
+      "bytes": 54833,
+      "compressed": 8150
+    }
+  ],
+  "phase4_handoff": "The already-authorized ViT archival should remove retired DViT/T2T source and nonruntime PNG/GIF/notebook assets from the active wheel while retaining archives/provenance/licenses and the required MobileNet shared-NAS closure."
+}

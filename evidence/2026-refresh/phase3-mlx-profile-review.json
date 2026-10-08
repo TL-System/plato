@@ -1,0 +1,891 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-03",
+  "decision": "changes_required",
+  "scope": "Independent exact-commit review of native MLX pytest collection/profile policy, regression tests, sole approved marker, and frozen case ledger. This is not an E1-E8 backend qualification or a review approval of later archive handoffs.",
+  "implementation": {
+    "worktree": "/tmp/plato-refresh-worktrees/mlx-profile",
+    "commit": "d3dcf05985d5f7ff8a836d8974dc5346cd10e790",
+    "tree": "25eaaa7b6da0b420b758141d5a835b464c314d8a",
+    "source_unchanged_and_clean": true,
+    "source_hashes": {
+      "tests/conftest.py": "8e458b0925c1a83c32fa3869a4e9f229b27cdb77f10b56a7f66c3f933a9f7739",
+      "tests/test_mlx_profile_contract.py": "ac8b4b6c8c9ff40a1c0df37a874435e78a6f65e69731d6d3209f91c23f551b8c",
+      "tests/mlx_native/cases.json": "e8beb9cc735425ee678b0f11ba6d83747b5766748abf8de40609314b92eaa49f",
+      "pyproject.toml": "bd6e032489a67e61e2c8a022de6b4335e600c8f537ff128c3412a39d56dffd24",
+      "uv.lock": "46236f61039c07a844bbddaa185c32582b6f4436203bd719aa8e7dcfdbd26e89"
+    },
+    "receipt": {
+      "path": "/tmp/plato-refresh-worktrees/mlx-profile/evidence/2026-refresh/mlx-profile-policy/receipt.json",
+      "sha256": "53205311bb50eb5aa4197bd2592138927c2ab7a6c2e68161a8e9eebcee859eb0"
+    }
+  },
+  "accepted_plan": {
+    "path": "/tmp/plato-mlx-profile-plan.json",
+    "sha256": "81a5a557b1ad018384da9b9290e0648048696af244c486849c653a09f0bea32b",
+    "fresh_review_path": "/tmp/plato-mlx-profile-plan-review2.json",
+    "fresh_review_sha256": "f7ed47c61715d649c4fe905bf13a1797e42a706c32ead03aa5d7e871d0169c00"
+  },
+  "findings": [
+    {
+      "id": "MLX-PROFILE-IMPL-01",
+      "severity": "P2",
+      "acceptance_blocking": true,
+      "title": "The production conftest import graph initializes MLX before profile routing and preflight",
+      "location": {
+        "path": "tests/conftest.py",
+        "line": 24
+      },
+      "affected_contracts": [
+        {
+          "plan_field": "decision.default",
+          "quote": "They never import/probe MLX just because it happens to be installed."
+        },
+        {
+          "plan_field": "collection_and_hook_design.package_initializers",
+          "quote": "The profile guard promises no native backend/test-module import before preflight"
+        }
+      ],
+      "observed": "On the exact d3dcf059 source with plugin autoload disabled and actual MLX installed, unprofiled tests --collect-only succeeds with 1431 core cases and no native test modules, but imports 36 mlx backend modules after 29 backend spec lookups. Canonical native --pyargs correctly exits 4 with the scoped selector diagnostic and no native test-module import, after loading those same backend modules. The integrated alternate and bare --pyargs routes likewise prevent test-module import but initialize the backend first.",
+      "cause": "Before pytest_configure can register the profile plugin, tests/conftest.py imports tests.test_utils.fakes. Importing clients.strategies loads its defaults and algorithms.registry. The exact-source trace reaches fedavg_personalized -> serialization.safetensor -> utils.tree:29, which imports mlx.core at module load. algorithms.registry:18 imports mlx_fedavg (which imports the native trainer), and models.registry:26 also eagerly imports the native MLX model. These runtime imports predate this profile commit, but the new accepted profile promise requires their absence from default/preflight-free import paths.",
+      "impact": "The safe directory boundary works for native test modules, but default core collection and deliberately rejected native selectors still initialize the optional native backend outside its prerequisite boundary. An independent backend import sentinel demonstrates that such an import failure aborts ordinary core collection as a conftest import error before the intended policy can act. The current working MLX environment passing core tests does not establish the stronger accepted isolation contract.",
+      "reproduction": {
+        "python": "/tmp/plato-mlx-integration/env/bin/python",
+        "cwd": "/tmp/plato-refresh-worktrees/mlx-profile",
+        "environment": {
+          "PYTHONPATH": "/tmp/plato-refresh-worktrees/mlx-profile",
+          "PYTEST_DISABLE_PLUGIN_AUTOLOAD": "1",
+          "PYTHONDONTWRITEBYTECODE": "1"
+        },
+        "runner": "/tmp/plato-mlx-profile-independent-review/import_audit_runner.py",
+        "default_arguments": [
+          "tests",
+          "--collect-only",
+          "-p",
+          "no:cacheprovider",
+          "-q"
+        ],
+        "canonical_arguments": [
+          "--pyargs",
+          "tests.mlx_native.test_phase3_controls",
+          "-p",
+          "no:cacheprovider",
+          "-q"
+        ]
+      },
+      "evidence": [
+        "/tmp/plato-mlx-profile-independent-review/profile-installed-default-audit.json",
+        "/tmp/plato-mlx-profile-independent-review/profile-installed-default-audit.log",
+        "/tmp/plato-mlx-profile-independent-review/profile-canonical-pyargs-audit.json",
+        "/tmp/plato-mlx-profile-independent-review/profile-canonical-pyargs-audit.log",
+        "/tmp/plato-mlx-profile-independent-review/profile-first-import-trace.log",
+        "/tmp/plato-mlx-profile-independent-review/backend_import_blocker.json",
+        "/tmp/plato-mlx-profile-independent-review/backend_import_blocker.log",
+        "/tmp/plato-mlx-profile-independent-review/actual-alias-pyargs-audit.json",
+        "/tmp/plato-mlx-profile-independent-review/actual-bare-pyargs-audit.json"
+      ],
+      "requested_change": "If retaining the accepted contract, make the MLX frontdoors reached by ordinary shared imports lazy, particularly the shared tree utility and model/algorithm registries, without adding a blanket import suppressor, profile bypass, or general optional-backend framework. Add a regression exercising the complete production conftest/module import graph with MLX present or an import sentinel; copied hooks alone cannot cover this failure. A wording-only adjustment would narrow the accepted default/preflight guarantee and therefore needs an explicit reviewed plan revision; it cannot be silently substituted for the existing promise.",
+      "severity_rationale": "Normal collection and the native-test directory guard work in the current environment; this is a concrete accepted-contract failure and uncovered dependency initialization, not an observed failure of all native tests or a newly introduced generic runtime import regression. P2 is appropriate, and profile acceptance remains gated on correction or an explicitly revised contract."
+    }
+  ],
+  "assessed_without_additional_findings": [
+    "Default/root/testpaths and base/mandatory omit native test modules before collection. The marker is the only pyproject change, and uv.lock is unchanged.",
+    "Native filesystem file/node/parameter targets, non-root invocation, focused keyword/marker selection, and supported core pyargs route correctly; unprofiled focused native paths do not add unrelated mandatory prerequisites.",
+    "Canonical/dotted/bare native pyargs rejection occurs before native test-module collector/import. This is distinct from the backend-import finding.",
+    "Native prerequisite execution itself forces real CPU and Metal arithmetic and preserves caller device, custom stream scopes, and Python/NumPy/Torch/MLX RNG states on success and injected CPU/GPU result rejection; ordinary causes remain chained.",
+    "Frozen ledger validates nonempty unique full node IDs and E1-E7 criteria. Missing/extra/renamed/duplicate collections, subset/core-only profiles, empty ledger, xpass, collection skip, teardown failure, and interruption cannot produce complete qualification.",
+    "Qualification rejects effective keyword/marker/deselection/ignore/pyargs filters before preflight; collect-only gives a distinct no-execution summary. KeyboardInterrupt exit 2 and no-tests exit 5 remain nonzero.",
+    "Core required DP/MPC/smoke inventory, fixed startup inventory, helper configure lifecycle, fixture bodies and runtime partition remain preserved. No archive partition handoff was implemented."
+  ],
+  "independent_validation": {
+    "environment": {
+      "shell": "zsh -lc",
+      "platform": "Darwin arm64",
+      "python": "3.13.16",
+      "pytest": "9.1.1",
+      "readonly_environment_paths": [
+        "/tmp/plato-llm-integration/base-313",
+        "/tmp/plato-llm-integration/mandatory-313",
+        "/tmp/plato-mlx-integration/env"
+      ]
+    },
+    "independent_miniprojects": {
+      "count": 31,
+      "expectations_met": 31,
+      "production_hooks": "AST-selected exact committed functions/class/constants; native prerequisite simulation and mandatory module stand-ins only in task-owned scratch projects. Full core ledger checks retained.",
+      "result_artifacts": [
+        "/tmp/plato-mlx-profile-independent-review/results.json",
+        "/tmp/plato-mlx-profile-independent-review/extra_results.json"
+      ],
+      "coverage": [
+        "Poisoned-preflight defaults/core pyargs",
+        "Automatic focused native marker and keyword filters",
+        "Focused parameter and exact full/combined native ledger",
+        "Canonical, dotted and bare alias pyargs pre-import protection",
+        "Non-root full core runtime/non-runtime routing",
+        "Missing/extra/renamed/duplicated/empty native ledger",
+        "Core-ledger omission in combined native profile",
+        "Collection-only distinction",
+        "Collection skip, nonstrict xpass, teardown failure and KeyboardInterrupt"
+      ]
+    },
+    "author_regression_independently_rerun": {
+      "base": {
+        "passed": 119,
+        "exit_status": 0,
+        "log": "/tmp/plato-mlx-profile-independent-review/author-regression-base.log"
+      },
+      "mandatory": {
+        "passed": 119,
+        "exit_status": 0,
+        "log": "/tmp/plato-mlx-profile-independent-review/author-regression-mandatory.log"
+      },
+      "split": {
+        "policy_cases": 98,
+        "existing_mpc_rl_cases": 21
+      }
+    },
+    "exact_source_core_collection": {
+      "base": {
+        "nodes": 1424,
+        "exit_status": 0,
+        "native_nodes": 0,
+        "startup_nodes": 48,
+        "log": "/tmp/plato-mlx-profile-independent-review/base-core-collection.log"
+      },
+      "mandatory": {
+        "nodes": 1431,
+        "exit_status": 0,
+        "native_nodes": 0,
+        "startup_nodes": 48,
+        "log": "/tmp/plato-mlx-profile-independent-review/mandatory-core-collection.log"
+      },
+      "mandatory_runtime": {
+        "selected_nodes": 51,
+        "exit_status": 0,
+        "startup_nodes": 48,
+        "log": "/tmp/plato-mlx-profile-independent-review/mandatory-runtime-collection.log"
+      },
+      "base_mandatory_delta": [
+        "tests/trainers/test_dp_data_loader_strategy.py::test_actual_dp_consecutive_training_exchange_checkpoint_and_accounting",
+        "tests/trainers/test_dp_data_loader_strategy.py::test_actual_dp_physical_batches_only_report_real_updates_and_cleanup",
+        "tests/trainers/test_dp_data_loader_strategy.py::test_actual_spawned_dp_rounds_return_accounting_and_isolate_clients",
+        "tests/trainers/test_dp_data_loader_strategy.py::test_dp_actual_time_snapshot_writer_to_plain_urgent_reader",
+        "tests/trainers/test_dp_data_loader_strategy.py::test_dp_memory_splitting_matches_logical_batch_parameter_reference",
+        "tests/trainers/test_dp_data_loader_strategy.py::test_dp_strategy_handles_plato_sampler_get",
+        "tests/trainers/test_dp_data_loader_strategy.py::test_dp_strategy_handles_torch_sampler_directly"
+      ],
+      "source_preservation": {
+        "core_constants_exact": true,
+        "fixtures_exact": true,
+        "baseline_commit": "1130ff0250ee26a49328e15cf5596f430c468c9d",
+        "source_sha256": "8e458b0925c1a83c32fa3869a4e9f229b27cdb77f10b56a7f66c3f933a9f7739"
+      },
+      "nonpolicy_test_paths_changed_in_profile_commit": []
+    },
+    "actual_prerequisite_negatives": {
+      "missing_mlx": {
+        "exit_status": 4,
+        "log": "/tmp/plato-mlx-profile-independent-review/actual-missing-mlx.log"
+      },
+      "missing_opacus": {
+        "exit_status": 4,
+        "log": "/tmp/plato-mlx-profile-independent-review/actual-missing-opacus.log"
+      }
+    },
+    "actual_prerequisite_state_probe": {
+      "path": "/tmp/plato-mlx-profile-independent-review/actual_state_probe.json",
+      "success_and_injected_failure_cases": 3,
+      "versions": {
+        "mlx": "0.32.3",
+        "mlx-metal": "0.32.3"
+      },
+      "limits": "Actual real CPU/Metal arithmetic, with simulated rejection of its result on CPU/GPU failure paths. This establishes prerequisite scoping/state behavior only."
+    },
+    "actual_integrated_native_collection": {
+      "worktree": "/tmp/plato-refresh-worktrees/mlx-integration",
+      "commit": "3ad876fbf843f49912a03e76186e07cffc02b690",
+      "conftest_sha256": "8e458b0925c1a83c32fa3869a4e9f229b27cdb77f10b56a7f66c3f933a9f7739",
+      "ledger_sha256": "e8beb9cc735425ee678b0f11ba6d83747b5766748abf8de40609314b92eaa49f",
+      "node_count": 283,
+      "exact_counter_matches_frozen_ledger": true,
+      "native_package_initializers": "Only tests/mlx_native/__init__.py exists and is docstring-only; no child conftest.",
+      "exit_status": 0,
+      "log": "/tmp/plato-mlx-profile-independent-review/integrated-native-collection.log",
+      "handoff_path": "/tmp/plato-phase3-mlx/native-ledger-handoff.json",
+      "handoff_sha256": "5785a7464aa8f66235fe077615a0953c35bf25fffe03bbff2cb2786aaf9ddd6c",
+      "handoff_source_hashes_verified": {
+        "tests/mlx_native/test_phase3_controls.py": true,
+        "tests/mlx_native/test_phase3_rng.py": true,
+        "tests/mlx_native/test_phase3_runtime.py": true,
+        "tests/mlx_native/test_phase3_selection.py": true,
+        "tests/mlx_native/test_phase3_socket.py": true,
+        "tests/mlx_native/test_phase3_tree_contract.py": true
+      },
+      "limits": "Collection and actual preflight only. No full native execution, combined full suite, Linux matrix, E8 measurements or E1-E8 assertion review performed by this reviewer."
+    },
+    "full_production_import_audits": {
+      "exact_profile_default": {
+        "exit_status": 0,
+        "backend_spec_lookups": [
+          "mlx",
+          "mlx.core",
+          "mlx._reprlib_fix",
+          "mlx.__array_api_info",
+          "mlx.nn",
+          "mlx.nn.init",
+          "mlx.nn.losses",
+          "mlx.nn.layers",
+          "mlx.nn.layers.activations",
+          "mlx.nn.layers.base",
+          "mlx.utils",
+          "mlx.nn.layers.containers",
+          "mlx.nn.layers.convolution",
+          "mlx.nn.layers.convolution_transpose",
+          "mlx.nn.layers.distributed",
+          "mlx.nn.layers.linear",
+          "mlx.nn.layers.quantized",
+          "mlx.nn.layers.dropout",
+          "mlx.nn.layers.embedding",
+          "mlx.nn.layers.normalization",
+          "mlx.nn.layers.pooling",
+          "mlx.nn.layers.positional_encoding",
+          "mlx.nn.layers.recurrent",
+          "mlx.nn.layers.transformer",
+          "mlx.nn.utils",
+          "mlx.nn.layers.upsample",
+          "mlx.optimizers",
+          "mlx.optimizers.optimizers",
+          "mlx.optimizers.schedulers"
+        ],
+        "backend_modules": [
+          "mlx",
+          "mlx._reprlib_fix",
+          "mlx.__array_api_info",
+          "mlx.core.metal",
+          "mlx.core.cuda",
+          "mlx.core.random",
+          "mlx.core.fft",
+          "mlx.core.linalg",
+          "mlx.core.fast",
+          "mlx.core.distributed",
+          "mlx.core",
+          "mlx.nn.init",
+          "mlx.nn.losses",
+          "mlx.utils",
+          "mlx.nn.layers.base",
+          "mlx.nn.layers.activations",
+          "mlx.nn.layers.containers",
+          "mlx.nn.layers.convolution",
+          "mlx.nn.layers.convolution_transpose",
+          "mlx.nn.layers.quantized",
+          "mlx.nn.layers.linear",
+          "mlx.nn.layers.distributed",
+          "mlx.nn.layers.dropout",
+          "mlx.nn.layers.embedding",
+          "mlx.nn.layers.normalization",
+          "mlx.nn.layers.pooling",
+          "mlx.nn.layers.positional_encoding",
+          "mlx.nn.layers.recurrent",
+          "mlx.nn.utils",
+          "mlx.nn.layers.transformer",
+          "mlx.nn.layers.upsample",
+          "mlx.nn.layers",
+          "mlx.nn",
+          "mlx.optimizers.optimizers",
+          "mlx.optimizers.schedulers",
+          "mlx.optimizers"
+        ],
+        "native_test_modules": [],
+        "inert_native_packages": []
+      },
+      "exact_profile_canonical_pyargs": {
+        "exit_status": 4,
+        "backend_spec_lookups": [
+          "mlx",
+          "mlx.core",
+          "mlx._reprlib_fix",
+          "mlx.__array_api_info",
+          "mlx.nn",
+          "mlx.nn.init",
+          "mlx.nn.losses",
+          "mlx.nn.layers",
+          "mlx.nn.layers.activations",
+          "mlx.nn.layers.base",
+          "mlx.utils",
+          "mlx.nn.layers.containers",
+          "mlx.nn.layers.convolution",
+          "mlx.nn.layers.convolution_transpose",
+          "mlx.nn.layers.distributed",
+          "mlx.nn.layers.linear",
+          "mlx.nn.layers.quantized",
+          "mlx.nn.layers.dropout",
+          "mlx.nn.layers.embedding",
+          "mlx.nn.layers.normalization",
+          "mlx.nn.layers.pooling",
+          "mlx.nn.layers.positional_encoding",
+          "mlx.nn.layers.recurrent",
+          "mlx.nn.layers.transformer",
+          "mlx.nn.utils",
+          "mlx.nn.layers.upsample",
+          "mlx.optimizers",
+          "mlx.optimizers.optimizers",
+          "mlx.optimizers.schedulers"
+        ],
+        "backend_modules": [
+          "mlx",
+          "mlx._reprlib_fix",
+          "mlx.__array_api_info",
+          "mlx.core.metal",
+          "mlx.core.cuda",
+          "mlx.core.random",
+          "mlx.core.fft",
+          "mlx.core.linalg",
+          "mlx.core.fast",
+          "mlx.core.distributed",
+          "mlx.core",
+          "mlx.nn.init",
+          "mlx.nn.losses",
+          "mlx.utils",
+          "mlx.nn.layers.base",
+          "mlx.nn.layers.activations",
+          "mlx.nn.layers.containers",
+          "mlx.nn.layers.convolution",
+          "mlx.nn.layers.convolution_transpose",
+          "mlx.nn.layers.quantized",
+          "mlx.nn.layers.linear",
+          "mlx.nn.layers.distributed",
+          "mlx.nn.layers.dropout",
+          "mlx.nn.layers.embedding",
+          "mlx.nn.layers.normalization",
+          "mlx.nn.layers.pooling",
+          "mlx.nn.layers.positional_encoding",
+          "mlx.nn.layers.recurrent",
+          "mlx.nn.utils",
+          "mlx.nn.layers.transformer",
+          "mlx.nn.layers.upsample",
+          "mlx.nn.layers",
+          "mlx.nn",
+          "mlx.optimizers.optimizers",
+          "mlx.optimizers.schedulers",
+          "mlx.optimizers"
+        ],
+        "native_test_modules": [],
+        "inert_native_packages": []
+      },
+      "integrated_default": {
+        "exit_status": 0,
+        "backend_spec_lookups": [
+          "mlx",
+          "mlx.core",
+          "mlx._reprlib_fix",
+          "mlx.__array_api_info",
+          "mlx.nn",
+          "mlx.nn.init",
+          "mlx.nn.losses",
+          "mlx.nn.layers",
+          "mlx.nn.layers.activations",
+          "mlx.nn.layers.base",
+          "mlx.utils",
+          "mlx.nn.layers.containers",
+          "mlx.nn.layers.convolution",
+          "mlx.nn.layers.convolution_transpose",
+          "mlx.nn.layers.distributed",
+          "mlx.nn.layers.linear",
+          "mlx.nn.layers.quantized",
+          "mlx.nn.layers.dropout",
+          "mlx.nn.layers.embedding",
+          "mlx.nn.layers.normalization",
+          "mlx.nn.layers.pooling",
+          "mlx.nn.layers.positional_encoding",
+          "mlx.nn.layers.recurrent",
+          "mlx.nn.layers.transformer",
+          "mlx.nn.utils",
+          "mlx.nn.layers.upsample",
+          "mlx.optimizers",
+          "mlx.optimizers.optimizers",
+          "mlx.optimizers.schedulers"
+        ],
+        "backend_modules": [
+          "mlx",
+          "mlx._reprlib_fix",
+          "mlx.__array_api_info",
+          "mlx.core.metal",
+          "mlx.core.cuda",
+          "mlx.core.random",
+          "mlx.core.fft",
+          "mlx.core.linalg",
+          "mlx.core.fast",
+          "mlx.core.distributed",
+          "mlx.core",
+          "mlx.nn.init",
+          "mlx.nn.losses",
+          "mlx.utils",
+          "mlx.nn.layers.base",
+          "mlx.nn.layers.activations",
+          "mlx.nn.layers.containers",
+          "mlx.nn.layers.convolution",
+          "mlx.nn.layers.convolution_transpose",
+          "mlx.nn.layers.quantized",
+          "mlx.nn.layers.linear",
+          "mlx.nn.layers.distributed",
+          "mlx.nn.layers.dropout",
+          "mlx.nn.layers.embedding",
+          "mlx.nn.layers.normalization",
+          "mlx.nn.layers.pooling",
+          "mlx.nn.layers.positional_encoding",
+          "mlx.nn.layers.recurrent",
+          "mlx.nn.utils",
+          "mlx.nn.layers.transformer",
+          "mlx.nn.layers.upsample",
+          "mlx.nn.layers",
+          "mlx.nn",
+          "mlx.optimizers.optimizers",
+          "mlx.optimizers.schedulers",
+          "mlx.optimizers"
+        ],
+        "native_test_modules": [],
+        "inert_native_packages": []
+      },
+      "integrated_alias_pyargs": {
+        "exit_status": 4,
+        "backend_spec_lookups": [
+          "mlx",
+          "mlx.core",
+          "mlx._reprlib_fix",
+          "mlx.__array_api_info",
+          "mlx.nn",
+          "mlx.nn.init",
+          "mlx.nn.losses",
+          "mlx.nn.layers",
+          "mlx.nn.layers.activations",
+          "mlx.nn.layers.base",
+          "mlx.utils",
+          "mlx.nn.layers.containers",
+          "mlx.nn.layers.convolution",
+          "mlx.nn.layers.convolution_transpose",
+          "mlx.nn.layers.distributed",
+          "mlx.nn.layers.linear",
+          "mlx.nn.layers.quantized",
+          "mlx.nn.layers.dropout",
+          "mlx.nn.layers.embedding",
+          "mlx.nn.layers.normalization",
+          "mlx.nn.layers.pooling",
+          "mlx.nn.layers.positional_encoding",
+          "mlx.nn.layers.recurrent",
+          "mlx.nn.layers.transformer",
+          "mlx.nn.utils",
+          "mlx.nn.layers.upsample",
+          "mlx.optimizers",
+          "mlx.optimizers.optimizers",
+          "mlx.optimizers.schedulers"
+        ],
+        "backend_modules": [
+          "mlx",
+          "mlx._reprlib_fix",
+          "mlx.__array_api_info",
+          "mlx.core.metal",
+          "mlx.core.cuda",
+          "mlx.core.random",
+          "mlx.core.fft",
+          "mlx.core.linalg",
+          "mlx.core.fast",
+          "mlx.core.distributed",
+          "mlx.core",
+          "mlx.nn.init",
+          "mlx.nn.losses",
+          "mlx.utils",
+          "mlx.nn.layers.base",
+          "mlx.nn.layers.activations",
+          "mlx.nn.layers.containers",
+          "mlx.nn.layers.convolution",
+          "mlx.nn.layers.convolution_transpose",
+          "mlx.nn.layers.quantized",
+          "mlx.nn.layers.linear",
+          "mlx.nn.layers.distributed",
+          "mlx.nn.layers.dropout",
+          "mlx.nn.layers.embedding",
+          "mlx.nn.layers.normalization",
+          "mlx.nn.layers.pooling",
+          "mlx.nn.layers.positional_encoding",
+          "mlx.nn.layers.recurrent",
+          "mlx.nn.utils",
+          "mlx.nn.layers.transformer",
+          "mlx.nn.layers.upsample",
+          "mlx.nn.layers",
+          "mlx.nn",
+          "mlx.optimizers.optimizers",
+          "mlx.optimizers.schedulers",
+          "mlx.optimizers"
+        ],
+        "native_test_modules": [],
+        "inert_native_packages": [
+          "mlx_native"
+        ]
+      },
+      "integrated_bare_pyargs": {
+        "exit_status": 4,
+        "backend_spec_lookups": [
+          "mlx",
+          "mlx.core",
+          "mlx._reprlib_fix",
+          "mlx.__array_api_info",
+          "mlx.nn",
+          "mlx.nn.init",
+          "mlx.nn.losses",
+          "mlx.nn.layers",
+          "mlx.nn.layers.activations",
+          "mlx.nn.layers.base",
+          "mlx.utils",
+          "mlx.nn.layers.containers",
+          "mlx.nn.layers.convolution",
+          "mlx.nn.layers.convolution_transpose",
+          "mlx.nn.layers.distributed",
+          "mlx.nn.layers.linear",
+          "mlx.nn.layers.quantized",
+          "mlx.nn.layers.dropout",
+          "mlx.nn.layers.embedding",
+          "mlx.nn.layers.normalization",
+          "mlx.nn.layers.pooling",
+          "mlx.nn.layers.positional_encoding",
+          "mlx.nn.layers.recurrent",
+          "mlx.nn.layers.transformer",
+          "mlx.nn.utils",
+          "mlx.nn.layers.upsample",
+          "mlx.optimizers",
+          "mlx.optimizers.optimizers",
+          "mlx.optimizers.schedulers"
+        ],
+        "backend_modules": [
+          "mlx",
+          "mlx._reprlib_fix",
+          "mlx.__array_api_info",
+          "mlx.core.metal",
+          "mlx.core.cuda",
+          "mlx.core.random",
+          "mlx.core.fft",
+          "mlx.core.linalg",
+          "mlx.core.fast",
+          "mlx.core.distributed",
+          "mlx.core",
+          "mlx.nn.init",
+          "mlx.nn.losses",
+          "mlx.utils",
+          "mlx.nn.layers.base",
+          "mlx.nn.layers.activations",
+          "mlx.nn.layers.containers",
+          "mlx.nn.layers.convolution",
+          "mlx.nn.layers.convolution_transpose",
+          "mlx.nn.layers.quantized",
+          "mlx.nn.layers.linear",
+          "mlx.nn.layers.distributed",
+          "mlx.nn.layers.dropout",
+          "mlx.nn.layers.embedding",
+          "mlx.nn.layers.normalization",
+          "mlx.nn.layers.pooling",
+          "mlx.nn.layers.positional_encoding",
+          "mlx.nn.layers.recurrent",
+          "mlx.nn.utils",
+          "mlx.nn.layers.transformer",
+          "mlx.nn.layers.upsample",
+          "mlx.nn.layers",
+          "mlx.nn",
+          "mlx.optimizers.optimizers",
+          "mlx.optimizers.schedulers",
+          "mlx.optimizers"
+        ],
+        "native_test_modules": [],
+        "inert_native_packages": []
+      },
+      "backend_sentinel": {
+        "exit_status": 4,
+        "blocked_backend_lookups": [
+          "mlx.core"
+        ],
+        "scope": "Full exact committed conftest default collection, native backend sentinel substituted by import finder; not an actual broken MLX claim"
+      }
+    }
+  },
+  "source_integrity": {
+    "author_checkout_unchanged": true,
+    "no_author_source_edits": true,
+    "no_environment_installs_or_mutations": true,
+    "no_subagents_or_remote_actions": true,
+    "review_scripts_and_logs_directory": "/tmp/plato-mlx-profile-independent-review",
+    "reviewer_harness_correction": "During development, the miniature runtime generator parameterized count-one startup functions, unlike the frozen core node contract. The scratch generator was corrected and all 31 miniproject probes rerun successfully. This was a reviewer-fixture issue; production assertions and ledgers were unchanged."
+  },
+  "artifacts": [
+    {
+      "path": "/tmp/plato-mlx-profile-independent-review/actual-alias-pyargs-audit.json",
+      "sha256": "86dc5ad96dcc47149750cd16125251a3abe42a574334faf05852a0b8fef3d411"
+    },
+    {
+      "path": "/tmp/plato-mlx-profile-independent-review/actual-alias-pyargs-audit.log",
+      "sha256": "2dfc13bd630cf793f02ae4f7db58166ab6226e08a95a6fe066df1031e75db6f0"
+    },
+    {
+      "path": "/tmp/plato-mlx-profile-independent-review/actual-bare-pyargs-audit.json",
+      "sha256": "8124c17184c630f26df23b35deef050cbfdece444e90d256c5ece6829a46adb3"
+    },
+    {
+      "path": "/tmp/plato-mlx-profile-independent-review/actual-bare-pyargs-audit.log",
+      "sha256": "f05f6aee4a0cb7dd6efae5cf014477af3b7a6148b7da6b0a7abd204c9b99a14d"
+    },
+    {
+      "path": "/tmp/plato-mlx-profile-independent-review/actual-canonical-pyargs-audit.json",
+      "sha256": "8124c17184c630f26df23b35deef050cbfdece444e90d256c5ece6829a46adb3"
+    },
+    {
+      "path": "/tmp/plato-mlx-profile-independent-review/actual-canonical-pyargs-audit.log",
+      "sha256": "f05f6aee4a0cb7dd6efae5cf014477af3b7a6148b7da6b0a7abd204c9b99a14d"
+    },
+    {
+      "path": "/tmp/plato-mlx-profile-independent-review/actual-missing-mlx.log",
+      "sha256": "d5fe08e8c264bc5bd17833bcc3902421a305c030398cd86d32b80deb6cd67e45"
+    },
+    {
+      "path": "/tmp/plato-mlx-profile-independent-review/actual-missing-opacus.log",
+      "sha256": "faa6bbe6f535ed8dc7eff6f1f581fb33f9be69a0d20218c379ea0e6f6f88be74"
+    },
+    {
+      "path": "/tmp/plato-mlx-profile-independent-review/actual_state_probe.json",
+      "sha256": "204a2b263cf25ae3f812692617219633f0953f6a635f0f067866628c5dcad277"
+    },
+    {
+      "path": "/tmp/plato-mlx-profile-independent-review/actual_state_probe.log",
+      "sha256": "204a2b263cf25ae3f812692617219633f0953f6a635f0f067866628c5dcad277"
+    },
+    {
+      "path": "/tmp/plato-mlx-profile-independent-review/actual_state_probe.py",
+      "sha256": "79e6e7be4b48adb57319a8ee2b56aebabdfbcea91462a9d9271a078f24dd9cfd"
+    },
+    {
+      "path": "/tmp/plato-mlx-profile-independent-review/author-regression-base.log",
+      "sha256": "bb46e5658af4c536b7d56765b4118b1cd503417eaa89cc1be3bcf4054d471d8d"
+    },
+    {
+      "path": "/tmp/plato-mlx-profile-independent-review/author-regression-mandatory.log",
+      "sha256": "1135e13f9f2379476a75b629da5c078aefa07cc280adbf6acf3ac081669a28aa"
+    },
+    {
+      "path": "/tmp/plato-mlx-profile-independent-review/backend_import_blocker.json",
+      "sha256": "c4d6341e1737367ff49461aa067385cce74e88e775b816d0081abe1da11087c7"
+    },
+    {
+      "path": "/tmp/plato-mlx-profile-independent-review/backend_import_blocker.log",
+      "sha256": "9728409c2df32f3dfaa4b87e0a513b376419958565da13880658cc7df26cc81e"
+    },
+    {
+      "path": "/tmp/plato-mlx-profile-independent-review/backend_import_blocker.py",
+      "sha256": "5cb9d25f364f6728d48e2bcd4a4e1957e31dd77219edb3263f2d52f76b675fe4"
+    },
+    {
+      "path": "/tmp/plato-mlx-profile-independent-review/bare-alias-pyargs.log",
+      "sha256": "9f34ec8677def2eb4a9cd2d57292e605fda6abc9b8206e09131886854e535a2a"
+    },
+    {
+      "path": "/tmp/plato-mlx-profile-independent-review/base-core-collection.log",
+      "sha256": "0ab90fc038fd5a70a141e8f15b7cc579b5c171e44670292d2224eb6c1e45021a"
+    },
+    {
+      "path": "/tmp/plato-mlx-profile-independent-review/base-core.log",
+      "sha256": "7c02f14e70eeaa0ca8d16c1530f106b9d2163461dca51fe493bc84f64bda2b00"
+    },
+    {
+      "path": "/tmp/plato-mlx-profile-independent-review/canonical-pyargs-node.log",
+      "sha256": "9f34ec8677def2eb4a9cd2d57292e605fda6abc9b8206e09131886854e535a2a"
+    },
+    {
+      "path": "/tmp/plato-mlx-profile-independent-review/core-package-pyargs.log",
+      "sha256": "7c02f14e70eeaa0ca8d16c1530f106b9d2163461dca51fe493bc84f64bda2b00"
+    },
+    {
+      "path": "/tmp/plato-mlx-profile-independent-review/core-pyargs.log",
+      "sha256": "898d405593ec0ecfb669ee655b0ef5bda2572b73dd50bca024c1f7e68e3d721a"
+    },
+    {
+      "path": "/tmp/plato-mlx-profile-independent-review/default-dot.log",
+      "sha256": "e6b059ab02ab730331d7f2dbb1b4d13ca78dcadc932cd8bf11f91df88d713a7a"
+    },
+    {
+      "path": "/tmp/plato-mlx-profile-independent-review/default-testpaths.log",
+      "sha256": "7c02f14e70eeaa0ca8d16c1530f106b9d2163461dca51fe493bc84f64bda2b00"
+    },
+    {
+      "path": "/tmp/plato-mlx-profile-independent-review/default-tests.log",
+      "sha256": "e6b059ab02ab730331d7f2dbb1b4d13ca78dcadc932cd8bf11f91df88d713a7a"
+    },
+    {
+      "path": "/tmp/plato-mlx-profile-independent-review/extra_probes.log",
+      "sha256": "80f9e0752b77a7f98a9755979db99e3ca582e517dc89c4ddb635893b49f5e226"
+    },
+    {
+      "path": "/tmp/plato-mlx-profile-independent-review/extra_probes.py",
+      "sha256": "e822b7d95edd8f412c5b8830210fa60a3aba2a2ee0469de4b29523e666eecfa9"
+    },
+    {
+      "path": "/tmp/plato-mlx-profile-independent-review/extra_results.json",
+      "sha256": "db107a81f3a62126a793db6b4d6da54c74d80dd1e7f7ee46b2d43e0c10c494ff"
+    },
+    {
+      "path": "/tmp/plato-mlx-profile-independent-review/first_import_trace.log",
+      "sha256": "851714ff61101e4402ffa0d2d065c41a1e04a6e2f60ded1f65118cd4f400689b"
+    },
+    {
+      "path": "/tmp/plato-mlx-profile-independent-review/first_import_trace.py",
+      "sha256": "ec7d3e7e089ade668bbb60ba6bdc68bf0508e26845912027de7e0537eb5e57d2"
+    },
+    {
+      "path": "/tmp/plato-mlx-profile-independent-review/focused-collectskip.log",
+      "sha256": "f07ab836590a346addfa73e25b41ffb47b8222fe4fbed660d70c979d04ad00bf"
+    },
+    {
+      "path": "/tmp/plato-mlx-profile-independent-review/focused-native-auto-marker.log",
+      "sha256": "ce1e4b8296dc91148fc3a5b577f6ee3eaf3fe3a42fb8118f3cbaa51f78d484c4"
+    },
+    {
+      "path": "/tmp/plato-mlx-profile-independent-review/focused-native-keyword.log",
+      "sha256": "20c314774cf81f40dcb45463d420a563bc76ba537715572c9057278a54dd64fe"
+    },
+    {
+      "path": "/tmp/plato-mlx-profile-independent-review/focused-native-marker-negation.log",
+      "sha256": "fb5ae2a8bdcf4cd99aa78b6adaaac632a0269c15daa03ce68a7a1d578cb6a515"
+    },
+    {
+      "path": "/tmp/plato-mlx-profile-independent-review/focused-native-runtime-filter.log",
+      "sha256": "ce1e4b8296dc91148fc3a5b577f6ee3eaf3fe3a42fb8118f3cbaa51f78d484c4"
+    },
+    {
+      "path": "/tmp/plato-mlx-profile-independent-review/focused-param-subset.log",
+      "sha256": "ba3bf3ecb863c7b3578240dd35adbed05698db68b8e0aca107788cf1118a142a"
+    },
+    {
+      "path": "/tmp/plato-mlx-profile-independent-review/focused-teardown-failure.log",
+      "sha256": "3848312157219322a14324ac61b21263aa321bacf4d4a1fa125927196bf4519d"
+    },
+    {
+      "path": "/tmp/plato-mlx-profile-independent-review/full-combined-exact.log",
+      "sha256": "67ef25f0cf6c9c0271389e3fe107a3ca4d707ca7bc314a927b47d02bc632fefa"
+    },
+    {
+      "path": "/tmp/plato-mlx-profile-independent-review/full-native-exact.log",
+      "sha256": "526805e4253630745bd72520159186ab75d9924aa49562cbc68979bc7119a798"
+    },
+    {
+      "path": "/tmp/plato-mlx-profile-independent-review/import_audit_runner.py",
+      "sha256": "d63cd1b8219e456ae574bbba2e62af50479618a3ddfb3c17ba453b4691d3a487"
+    },
+    {
+      "path": "/tmp/plato-mlx-profile-independent-review/integrated-native-collection.log",
+      "sha256": "8021d53ec00642396c1f2acf4343fc2af5e3daa4fadca61551286e4082c171a9"
+    },
+    {
+      "path": "/tmp/plato-mlx-profile-independent-review/mandatory-core-collection.log",
+      "sha256": "7bb1e14991bb5e9c55c5b701d76e9558b0f0bcefa27edc55dc3068335016a1a3"
+    },
+    {
+      "path": "/tmp/plato-mlx-profile-independent-review/mandatory-core.log",
+      "sha256": "7c02f14e70eeaa0ca8d16c1530f106b9d2163461dca51fe493bc84f64bda2b00"
+    },
+    {
+      "path": "/tmp/plato-mlx-profile-independent-review/mandatory-runtime-collection.log",
+      "sha256": "3bee7e8c6daf99a3876d0a1fba38fcd31e604ff77cc101b6d5ae04afd27b1e0b"
+    },
+    {
+      "path": "/tmp/plato-mlx-profile-independent-review/native-duplicate-selector.log",
+      "sha256": "96285e6fb80af27b0d3d544ad1e9ee8536498e256327fd94efde3b771703cc49"
+    },
+    {
+      "path": "/tmp/plato-mlx-profile-independent-review/native-installed-default-audit.json",
+      "sha256": "c12efba48c5a534941937e92659f627ab468e4380c920c1fbf1f1285cb0a8370"
+    },
+    {
+      "path": "/tmp/plato-mlx-profile-independent-review/native-installed-default-audit.log",
+      "sha256": "ef180ed100baa255678c702a3c59ddbabe2d711d4790e3a11b78c4cc377f7602"
+    },
+    {
+      "path": "/tmp/plato-mlx-profile-independent-review/nonroot-full-nonruntime-mandatory.log",
+      "sha256": "241d5ae090132fe8c8cc4d8ae586b018df1ec1b5a458339070b6a033f2812aba"
+    },
+    {
+      "path": "/tmp/plato-mlx-profile-independent-review/nonroot-full-runtime-base.log",
+      "sha256": "830786c3af7700b209de3b262d100f19a569de7e20f87461b74f03db7bcc45b9"
+    },
+    {
+      "path": "/tmp/plato-mlx-profile-independent-review/package-alias-pyargs.log",
+      "sha256": "1fcb581fbb8d9d796c60d6d55555e60d2881b2607c1154b6cb55fed050b62aa2"
+    },
+    {
+      "path": "/tmp/plato-mlx-profile-independent-review/probes.log",
+      "sha256": "7275845b3d7bbc73f0ee999a6779e980d1b1fc640428bc148d8e50ffbb87d92e"
+    },
+    {
+      "path": "/tmp/plato-mlx-profile-independent-review/probes.py",
+      "sha256": "4235e503d6c0764f155ddaddef7530e83f9355c660cdab34bddb161aad76bbf3"
+    },
+    {
+      "path": "/tmp/plato-mlx-profile-independent-review/profile-canonical-pyargs-audit.json",
+      "sha256": "8124c17184c630f26df23b35deef050cbfdece444e90d256c5ece6829a46adb3"
+    },
+    {
+      "path": "/tmp/plato-mlx-profile-independent-review/profile-canonical-pyargs-audit.log",
+      "sha256": "f05f6aee4a0cb7dd6efae5cf014477af3b7a6148b7da6b0a7abd204c9b99a14d"
+    },
+    {
+      "path": "/tmp/plato-mlx-profile-independent-review/profile-collect-only.log",
+      "sha256": "302d032f3768b03c992449537a7711525021a9e83b33f1b9f78ca4e2929a8913"
+    },
+    {
+      "path": "/tmp/plato-mlx-profile-independent-review/profile-empty-collection.log",
+      "sha256": "24b29c2a4fbab36cfc3b2f704feba2715bc907d3a004b21a785550c584b3a2fc"
+    },
+    {
+      "path": "/tmp/plato-mlx-profile-independent-review/profile-first-import-trace.log",
+      "sha256": "534903ca6991feb461398bef3a6d0fba3e39aa45d06c0221d713d4f4a3240757"
+    },
+    {
+      "path": "/tmp/plato-mlx-profile-independent-review/profile-installed-default-audit.json",
+      "sha256": "c12efba48c5a534941937e92659f627ab468e4380c920c1fbf1f1285cb0a8370"
+    },
+    {
+      "path": "/tmp/plato-mlx-profile-independent-review/profile-installed-default-audit.log",
+      "sha256": "328e4e539b9bed14a35b9b89fa16a3563780d29d8bf58e88c077d90a5d311b80"
+    },
+    {
+      "path": "/tmp/plato-mlx-profile-independent-review/profile-keyboardinterrupt.log",
+      "sha256": "1f287ef712dc5e358d75f3c2e27984203b927ca7f3752ffd145e35d15c71a975"
+    },
+    {
+      "path": "/tmp/plato-mlx-profile-independent-review/profile-keyword-filter.log",
+      "sha256": "9518b7e0ced21b6434b2e0a1af01ac428869e3a97c40c22421d10fa7ac7b4323"
+    },
+    {
+      "path": "/tmp/plato-mlx-profile-independent-review/profile-param-subset.log",
+      "sha256": "77fcb864558d11d4d14cce7f4be949bd519a5e6704ccb8dd225134b903788977"
+    },
+    {
+      "path": "/tmp/plato-mlx-profile-independent-review/qualified-core-ledger-omission.log",
+      "sha256": "29f8720266666fafb2789bf660887ad2156d3b6faeb1edb7155abf46579918f3"
+    },
+    {
+      "path": "/tmp/plato-mlx-profile-independent-review/qualified-empty-ledger.log",
+      "sha256": "ab3bf40e7b8f803764405d6a263bd6b56cdc01c848b5e9fee9be6e8123bb8a69"
+    },
+    {
+      "path": "/tmp/plato-mlx-profile-independent-review/qualified-nonstrict-xpass.log",
+      "sha256": "dc41190d1586f5c01d2b5e06fe73c7cec1f906a170d23a3335fd65158ee84421"
+    },
+    {
+      "path": "/tmp/plato-mlx-profile-independent-review/qualified-renamed-parameter.log",
+      "sha256": "cbf5e3401d453ba6ae9c5c10e24cc4848caae2db71b440f1bf0abd0b0a8304ad"
+    },
+    {
+      "path": "/tmp/plato-mlx-profile-independent-review/results.json",
+      "sha256": "04b651d5c89d022455b72f02db3dd2b1e347189737b7ca8e4d744883aeb4d77f"
+    },
+    {
+      "path": "/tmp/plato-mlx-profile-independent-review/source-preservation.json",
+      "sha256": "3df89d174b0386a8d700d998bbbf9cfb95bcc7c7c171363cc7f1ef4d53a0438c"
+    }
+  ]
+}

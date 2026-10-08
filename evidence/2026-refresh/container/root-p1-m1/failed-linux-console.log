@@ -1,0 +1,97 @@
+container	Build and qualify the actual Linux amd64 image	﻿2026-10-04T01:10:22.7948821Z ##[group]Run import os
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:10:22.7949172Z ^[[36;1mimport os^[[0m
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:10:22.7949409Z ^[[36;1mimport subprocess^[[0m
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:10:22.7949652Z ^[[36;1mimport sys^[[0m
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:10:22.7949883Z ^[[36;1msubprocess.run([^[[0m
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:10:22.7950576Z ^[[36;1m    sys.executable, ".github/scripts/check_container.py", "linux",^[[0m
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:10:22.7951317Z ^[[36;1m    "--artifacts", os.environ["CONTAINER_ARTIFACTS"],^[[0m
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:10:22.7951659Z ^[[36;1m], check=True)^[[0m
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:10:22.7953618Z shell: /opt/hostedtoolcache/Python/3.13.15/x64/bin/python {0}
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:10:22.7953986Z env:
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:10:22.7954262Z   pythonLocation: /opt/hostedtoolcache/Python/3.13.15/x64
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:10:22.7954718Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.13.15/x64/lib/pkgconfig
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:10:22.7955189Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.13.15/x64
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:10:22.7955587Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.13.15/x64
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:10:22.7956012Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.13.15/x64
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:10:22.7956446Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.13.15/x64/lib
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:10:22.7956900Z   CONTAINER_ARTIFACTS: /home/runner/work/_temp/plato-container-artifacts
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:10:22.7957285Z ##[endgroup]
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:13:19.0292570Z {"accepted": false, "mode": "linux", "error": "PermissionError: [Errno 1] Operation not permitted: '/tmp/plato mounted checkout jc_t92ti/source with spaces/plato/__pycache__'", "elapsed_seconds": 176.142}
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:13:19.1023713Z Traceback (most recent call last):
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:13:19.1036481Z   File "/opt/hostedtoolcache/Python/3.13.15/x64/lib/python3.13/shutil.py", line 696, in _rmtree_safe_fd
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:13:19.1037687Z     os.unlink(entry.name, dir_fd=topfd)
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:13:19.1038226Z     ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:13:19.1038927Z PermissionError: [Errno 13] Permission denied: '__init__.cpython-313.pyc'
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:13:19.1039522Z 
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:13:19.1039871Z During handling of the above exception, another exception occurred:
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:13:19.1040782Z 
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:13:19.1040998Z Traceback (most recent call last):
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:13:19.1041972Z   File "/opt/hostedtoolcache/Python/3.13.15/x64/lib/python3.13/shutil.py", line 700, in _rmtree_safe_fd
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:13:19.1042949Z     onexc(os.unlink, fullname, err)
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:13:19.1043442Z     ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:13:19.1044320Z   File "/opt/hostedtoolcache/Python/3.13.15/x64/lib/python3.13/tempfile.py", line 907, in onexc
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:13:19.1045217Z     _resetperms(_os.path.dirname(path))
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:13:19.1045721Z     ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:13:19.1046630Z   File "/opt/hostedtoolcache/Python/3.13.15/x64/lib/python3.13/tempfile.py", line 283, in _resetperms
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:13:19.1047629Z     _dont_follow_symlinks(_os.chmod, path, 0o700)
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:13:19.1048212Z     ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:13:19.1049253Z   File "/opt/hostedtoolcache/Python/3.13.15/x64/lib/python3.13/tempfile.py", line 274, in _dont_follow_symlinks
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:13:19.1050528Z     func(path, *args)
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:13:19.1050938Z     ~~~~^^^^^^^^^^^^^
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:13:19.1051888Z PermissionError: [Errno 1] Operation not permitted: '/tmp/plato mounted checkout jc_t92ti/source with spaces/plato/__pycache__'
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:13:19.1052876Z 
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:13:19.1053260Z During handling of the above exception, another exception occurred:
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:13:19.1053786Z 
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:13:19.1053966Z Traceback (most recent call last):
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:13:19.1054872Z   File "/home/runner/work/plato/plato/.github/scripts/check_container.py", line 751, in <module>
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:13:19.1055716Z     main()
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:13:19.1055987Z     ~~~~^^
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:13:19.1056604Z   File "/home/runner/work/plato/plato/.github/scripts/check_container.py", line 716, in main
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:13:19.1057298Z     checker.qualify()
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:13:19.1057617Z     ~~~~~~~~~~~~~~~^^
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:13:19.1058790Z   File "/home/runner/work/plato/plato/.github/scripts/check_container.py", line 600, in qualify
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:13:19.1059481Z     self.check_mount(lock_hash)
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:13:19.1059832Z     ~~~~~~~~~~~~~~~~^^^^^^^^^^^
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:13:19.1060907Z   File "/home/runner/work/plato/plato/.github/scripts/check_container.py", line 603, in check_mount
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:13:19.1062186Z     with tempfile.TemporaryDirectory(prefix="plato mounted checkout ") as temporary:
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:13:19.1062918Z          ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:13:19.1063742Z   File "/opt/hostedtoolcache/Python/3.13.15/x64/lib/python3.13/tempfile.py", line 952, in __exit__
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:13:19.1064445Z     self.cleanup()
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:13:19.1064749Z     ~~~~~~~~~~~~^^
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:13:19.1065372Z   File "/opt/hostedtoolcache/Python/3.13.15/x64/lib/python3.13/tempfile.py", line 956, in cleanup
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:13:19.1066239Z     self._rmtree(self.name, ignore_errors=self._ignore_cleanup_errors)
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:13:19.1066864Z     ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:13:19.1067630Z   File "/opt/hostedtoolcache/Python/3.13.15/x64/lib/python3.13/tempfile.py", line 936, in _rmtree
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:13:19.1068328Z     _shutil.rmtree(name, onexc=onexc)
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:13:19.1068722Z     ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:13:19.1069394Z   File "/opt/hostedtoolcache/Python/3.13.15/x64/lib/python3.13/shutil.py", line 763, in rmtree
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:13:19.1070342Z     _rmtree_safe_fd(stack, onexc)
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:13:19.1070736Z     ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:13:19.1071470Z   File "/opt/hostedtoolcache/Python/3.13.15/x64/lib/python3.13/shutil.py", line 707, in _rmtree_safe_fd
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:13:19.1072221Z     onexc(func, path, err)
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:13:19.1072572Z     ~~~~~^^^^^^^^^^^^^^^^^
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:13:19.1073203Z   File "/opt/hostedtoolcache/Python/3.13.15/x64/lib/python3.13/tempfile.py", line 908, in onexc
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:13:19.1073871Z     _resetperms(path)
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:13:19.1074191Z     ~~~~~~~~~~~^^^^^^
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:13:19.1074843Z   File "/opt/hostedtoolcache/Python/3.13.15/x64/lib/python3.13/tempfile.py", line 283, in _resetperms
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:13:19.1075636Z     _dont_follow_symlinks(_os.chmod, path, 0o700)
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:13:19.1076164Z     ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:13:19.1077073Z   File "/opt/hostedtoolcache/Python/3.13.15/x64/lib/python3.13/tempfile.py", line 274, in _dont_follow_symlinks
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:13:19.1077937Z     func(path, *args)
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:13:19.1078293Z     ~~~~^^^^^^^^^^^^^
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:13:19.1079166Z PermissionError: [Errno 1] Operation not permitted: '/tmp/plato mounted checkout jc_t92ti/source with spaces/plato/__pycache__'
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:13:19.1413365Z Traceback (most recent call last):
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:13:19.1449256Z   File "/home/runner/work/_temp/ad21fd92-9c98-4dd5-85cb-170389651210.py", line 4, in <module>
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:13:19.1450385Z     subprocess.run([
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:13:19.1450718Z     ~~~~~~~~~~~~~~^^
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:13:19.1451195Z         sys.executable, ".github/scripts/check_container.py", "linux",
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:13:19.1451767Z         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:13:19.1452330Z         "--artifacts", os.environ["CONTAINER_ARTIFACTS"],
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:13:19.1452756Z         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:13:19.1453097Z     ], check=True)
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:13:19.1453349Z     ^^^^^^^^^^^^^^
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:13:19.1453908Z   File "/opt/hostedtoolcache/Python/3.13.15/x64/lib/python3.13/subprocess.py", line 577, in run
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:13:19.1454581Z     raise CalledProcessError(retcode, process.args,
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:13:19.1455020Z                              output=stdout, stderr=stderr)
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:13:19.1456303Z subprocess.CalledProcessError: Command '['/opt/hostedtoolcache/Python/3.13.15/x64/bin/python', '.github/scripts/check_container.py', 'linux', '--artifacts', '/home/runner/work/_temp/plato-container-artifacts']' returned non-zero exit status 1.
+container	Build and qualify the actual Linux amd64 image	2026-10-04T01:13:19.1551042Z ##[error]Process completed with exit code 1.

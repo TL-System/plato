@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "decision": "accepted_source_integration_pending_full_fast_ci",
+  "scope": "Bounded integration addendum only: ledger reconciliation after already independently accepted retirement, maintained typing and fast CI changes. No new retirement research or full-runtime qualification.",
+  "reviewer": "/root/additional_retirements_implementation_review",
+  "source_binding": {
+    "worktree": "/tmp/plato-refresh-worktrees/phase4-integration",
+    "commit": "21a4bb8b163ff0e796c1ae91e7badb647e09cac9",
+    "tree": "2c1ccd05e6dc132d20b459181cbe6f1b23b05f91",
+    "dirty": "",
+    "accepted_retirement_delivery": "410a3f30003c1b8a2a7f6bef1e0d287c6862e413",
+    "accepted_typing_commit": "dd1cedee6e317af860a5e0ae34ae471774b36743",
+    "accepted_fast_ci_delivery": "8c245cc5",
+    "retirement_review": "/tmp/plato-additional-retirements-review.json",
+    "typing_review_sha256": "1b007075dd9b3c60e21a08f6708fe4d19d1bc30f038b43ae62d647595607585f"
+  },
+  "findings": [],
+  "verification": [
+    "Independently reconstructed live ledger from sealed additional-retirements snapshot. Exact changes are four source SHA256 rows, P4-aggregation revision1->2, P4-unlearning revision2->3, recomputed path_map_sha256, and typing_amendment. Deep equality proves no extra inventory, ownership, family, binding, draft-state, authority or historical-amendment change.",
+    "All390 source inventory hashes independently match current integrated files; all four changed hashes exactly match accepted typing review source_sha256. Config binding digest is unchanged and reproduced.",
+    "typing_amendment prior ledger hash matches sealed snapshot b654540d190c58e69e0a7d223b3fd59ab39d3d0f18b38fa7cffbe599f8e8f458, source commit matches accepted dd1cedee, and review hash matches tracked ty-active-review.json.",
+    "Historical archives and both sealed additional-retirements/FEI ledger snapshots are byte-unchanged from accepted retirement delivery. New adapter/additional retirement/FEI/model-search retirement tests are unchanged after accepted delivery.",
+    "Three reviewer tests passed on current integrated tree: historical additional ledger delta, live current source ledger guard, and historical FEI ledger delta.",
+    "Direct configured ty0.0.84 check of integrated sampler partition tests with --error-on-warning passed with zero diagnostics; all three prior sampler diagnostics are resolved by merged typing changes.",
+    "Root-owned configured ty and Ruff logs both say All checks passed!; root commit.txt binds those checks to21a4bb8b163ff0e796c1ae91e7badb647e09cac9. Reviewed live fast log was still running; no whole-fast pass claimed here."
+  ],
+  "ledger": {
+    "sha256": "a31afa05e94af8646e7d19e02a8364ffdb0a1539edc4adf9be7e4cea8b73f746",
+    "path_map_sha256": "404a1b8a1ef79bcf21c027d263ee93d81870df1b2dba4a80b71ee8c816988e91",
+    "counts": {
+      "tasks": 11,
+      "paths": 390,
+      "families": 57,
+      "config_bindings": 131
+    },
+    "inventory_revision_deltas": {
+      "P4-aggregation": {
+        "before": 1,
+        "after": 2
+      },
+      "P4-unlearning": {
+        "before": 2,
+        "after": 3
+      }
+    }
+  },
+  "artifacts": [
+    "/tmp/plato-retirement-integration-static.py",
+    "/tmp/plato-retirement-integration-static.json",
+    "/tmp/plato-retirement-integration-review.xml",
+    "/tmp/plato-retirement-integration-review.log",
+    "/tmp/plato-retirement-integration-sampler-ty.log",
+    "/tmp/plato-retirement-fast-21a4bb8b/commit.txt",
+    "/tmp/plato-retirement-fast-21a4bb8b/ty.log",
+    "/tmp/plato-retirement-fast-21a4bb8b/ruff.log",
+    "/tmp/plato-retirement-fast-21a4bb8b/mandatory.log"
+  ],
+  "limits": [
+    "Final root-owned exact fast partition must complete successfully before claiming integrated CI validation.",
+    "No duplicate full-fast, retained-model-search, obsolete pretrained-model, Docker or manual runtime experiment was run.",
+    "Retirement acceptance remains bounded by /tmp/plato-additional-retirements-review.json and accepted typing/CI review limits, including nominal FedDF strategy-family compatibility."
+  ]
+}

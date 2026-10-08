@@ -171,7 +171,8 @@ def _configure_subprocess_training(
     preserve_optimizer_state,
 ):
     """Configure parent and spawned child processes to share local artifacts."""
-    model_path = Path(tmp_path) / "models" / "pretrained"
+    # Match the model_path written by configure_environment for spawned workers.
+    model_path = Path(tmp_path) / "models"
     model_path.mkdir(parents=True, exist_ok=True)
     Config.params["model_path"] = str(model_path)
     Config.params["checkpoint_path"] = str(Path(tmp_path) / "checkpoints")

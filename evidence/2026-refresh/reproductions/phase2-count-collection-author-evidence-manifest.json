@@ -1,0 +1,421 @@
+{
+  "candidate": "0fbc1162994c05041105b1860fc8cb02582d21f3",
+  "archive_sha256": "424a0feca788a5dca32bcd8af9b3d0dab1540fc1395aee4d876a9151772b8eff",
+  "archive_bytes": 24918,
+  "files": [
+    {
+      "original": "/tmp/plato-phase2c-count-collection-fix/assertion-preservation.json",
+      "member": "assertion-preservation.json",
+      "bytes": 951,
+      "sha256": "8743edba2c7ff9f28e4ed6a6310ad55fff28b6ae2d6ab2892bc114a72d67c17e"
+    },
+    {
+      "original": "/tmp/plato-phase2c-count-collection-fix/build_evidence.py",
+      "member": "build_evidence.py",
+      "bytes": 8137,
+      "sha256": "e9e64bf371f7db519af0a4d1b15f1109f2493f87e2046d5f6a3636ec5ba16997"
+    },
+    {
+      "original": "/tmp/plato-phase2c-count-collection-fix/collection-import-identities.json",
+      "member": "collection-import-identities.json",
+      "bytes": 438,
+      "sha256": "9745419cc7adc3ac3c45345285ad03a2590f54c6e84e0d0f82801cd20006cbc7"
+    },
+    {
+      "original": "/tmp/plato-phase2c-count-collection-fix/collection_identity_probe.py",
+      "member": "collection_identity_probe.py",
+      "bytes": 642,
+      "sha256": "d9a1b304bfb8bf884ba32be0862d6baf736b0b943d57bbe94e0ddca54ff4b7ff"
+    },
+    {
+      "original": "/tmp/plato-phase2c-count-collection-fix/final-candidate.json",
+      "member": "final-candidate.json",
+      "bytes": 1004,
+      "sha256": "4c0890d1844c208361cb9f5cd3c9940f3317e45edf9b0967f2a3f38aac3b88d1"
+    },
+    {
+      "original": "/tmp/plato-phase2c-count-collection-fix/full-correction.diff",
+      "member": "full-correction.diff",
+      "bytes": 5041,
+      "sha256": "86b5ad477b153573b248a4ed754455089a4d4c38a1a84f8664e767b6e3ad0e74"
+    },
+    {
+      "original": "/tmp/plato-phase2c-count-collection-fix/full-delivery.diff",
+      "member": "full-delivery.diff",
+      "bytes": 44934,
+      "sha256": "69c5de6acaafc0bcc5bc6a9e40b0980fbcbe62e2f685c38df769598047b9bfa5"
+    },
+    {
+      "original": "/tmp/plato-phase2c-count-collection-fix/green-313/test_actual_spawn_returns_pers0/feddyn-result.json",
+      "member": "green-313/test_actual_spawn_returns_pers0/feddyn-result.json",
+      "bytes": 362,
+      "sha256": "c0b96f8cd76387bf4f49157995a000a901063ec44ff2685563bb43bf198fc2d2"
+    },
+    {
+      "original": "/tmp/plato-phase2c-count-collection-fix/green-313/test_actual_spawn_reused_clien0/result.json",
+      "member": "green-313/test_actual_spawn_reused_clien0/result.json",
+      "bytes": 362,
+      "sha256": "c0b96f8cd76387bf4f49157995a000a901063ec44ff2685563bb43bf198fc2d2"
+    },
+    {
+      "original": "/tmp/plato-phase2c-count-collection-fix/green-313/test_actual_spawn_reused_clien1/result.json",
+      "member": "green-313/test_actual_spawn_reused_clien1/result.json",
+      "bytes": 396,
+      "sha256": "05c93b2a1cc8c22b2a86ea305733af32fe6b7ffea04d033c39baaa74b8444c14"
+    },
+    {
+      "original": "/tmp/plato-phase2c-count-collection-fix/green-313/test_actual_spawn_wrong_first_0/result.json",
+      "member": "green-313/test_actual_spawn_wrong_first_0/result.json",
+      "bytes": 233,
+      "sha256": "3a385436813fcc4b96428c1dec58961ffd05dfad8af0765bbe3f30bc28c42c75"
+    },
+    {
+      "original": "/tmp/plato-phase2c-count-collection-fix/green-313/test_actual_spawn_wrong_first_1/result.json",
+      "member": "green-313/test_actual_spawn_wrong_first_1/result.json",
+      "bytes": 233,
+      "sha256": "3a385436813fcc4b96428c1dec58961ffd05dfad8af0765bbe3f30bc28c42c75"
+    },
+    {
+      "original": "/tmp/plato-phase2c-count-collection-fix/green-313/test_actual_spawned_rejection_0/result.json",
+      "member": "green-313/test_actual_spawned_rejection_0/result.json",
+      "bytes": 33,
+      "sha256": "3ba8ba5fe6f1834e281a25983947db7125f121baa01ddf4f1b996b54bb0feb70"
+    },
+    {
+      "original": "/tmp/plato-phase2c-count-collection-fix/green-313/test_actual_spawned_rejection_1/result.json",
+      "member": "green-313/test_actual_spawned_rejection_1/result.json",
+      "bytes": 33,
+      "sha256": "3ba8ba5fe6f1834e281a25983947db7125f121baa01ddf4f1b996b54bb0feb70"
+    },
+    {
+      "original": "/tmp/plato-phase2c-count-collection-fix/green-313/test_actual_spawned_rejection_10/result.json",
+      "member": "green-313/test_actual_spawned_rejection_10/result.json",
+      "bytes": 33,
+      "sha256": "3ba8ba5fe6f1834e281a25983947db7125f121baa01ddf4f1b996b54bb0feb70"
+    },
+    {
+      "original": "/tmp/plato-phase2c-count-collection-fix/green-313/test_actual_spawned_rejection_11/result.json",
+      "member": "green-313/test_actual_spawned_rejection_11/result.json",
+      "bytes": 33,
+      "sha256": "3ba8ba5fe6f1834e281a25983947db7125f121baa01ddf4f1b996b54bb0feb70"
+    },
+    {
+      "original": "/tmp/plato-phase2c-count-collection-fix/green-313/test_actual_spawned_rejection_12/result.json",
+      "member": "green-313/test_actual_spawned_rejection_12/result.json",
+      "bytes": 33,
+      "sha256": "3ba8ba5fe6f1834e281a25983947db7125f121baa01ddf4f1b996b54bb0feb70"
+    },
+    {
+      "original": "/tmp/plato-phase2c-count-collection-fix/green-313/test_actual_spawned_rejection_2/result.json",
+      "member": "green-313/test_actual_spawned_rejection_2/result.json",
+      "bytes": 33,
+      "sha256": "3ba8ba5fe6f1834e281a25983947db7125f121baa01ddf4f1b996b54bb0feb70"
+    },
+    {
+      "original": "/tmp/plato-phase2c-count-collection-fix/green-313/test_actual_spawned_rejection_3/result.json",
+      "member": "green-313/test_actual_spawned_rejection_3/result.json",
+      "bytes": 33,
+      "sha256": "3ba8ba5fe6f1834e281a25983947db7125f121baa01ddf4f1b996b54bb0feb70"
+    },
+    {
+      "original": "/tmp/plato-phase2c-count-collection-fix/green-313/test_actual_spawned_rejection_4/result.json",
+      "member": "green-313/test_actual_spawned_rejection_4/result.json",
+      "bytes": 33,
+      "sha256": "3ba8ba5fe6f1834e281a25983947db7125f121baa01ddf4f1b996b54bb0feb70"
+    },
+    {
+      "original": "/tmp/plato-phase2c-count-collection-fix/green-313/test_actual_spawned_rejection_5/result.json",
+      "member": "green-313/test_actual_spawned_rejection_5/result.json",
+      "bytes": 33,
+      "sha256": "3ba8ba5fe6f1834e281a25983947db7125f121baa01ddf4f1b996b54bb0feb70"
+    },
+    {
+      "original": "/tmp/plato-phase2c-count-collection-fix/green-313/test_actual_spawned_rejection_6/result.json",
+      "member": "green-313/test_actual_spawned_rejection_6/result.json",
+      "bytes": 33,
+      "sha256": "3ba8ba5fe6f1834e281a25983947db7125f121baa01ddf4f1b996b54bb0feb70"
+    },
+    {
+      "original": "/tmp/plato-phase2c-count-collection-fix/green-313/test_actual_spawned_rejection_7/result.json",
+      "member": "green-313/test_actual_spawned_rejection_7/result.json",
+      "bytes": 33,
+      "sha256": "3ba8ba5fe6f1834e281a25983947db7125f121baa01ddf4f1b996b54bb0feb70"
+    },
+    {
+      "original": "/tmp/plato-phase2c-count-collection-fix/green-313/test_actual_spawned_rejection_8/result.json",
+      "member": "green-313/test_actual_spawned_rejection_8/result.json",
+      "bytes": 33,
+      "sha256": "3ba8ba5fe6f1834e281a25983947db7125f121baa01ddf4f1b996b54bb0feb70"
+    },
+    {
+      "original": "/tmp/plato-phase2c-count-collection-fix/green-313/test_actual_spawned_rejection_9/result.json",
+      "member": "green-313/test_actual_spawned_rejection_9/result.json",
+      "bytes": 33,
+      "sha256": "3ba8ba5fe6f1834e281a25983947db7125f121baa01ddf4f1b996b54bb0feb70"
+    },
+    {
+      "original": "/tmp/plato-phase2c-count-collection-fix/green-313/test_parent_realizes_partition1/partition-result.json",
+      "member": "green-313/test_parent_realizes_partition1/partition-result.json",
+      "bytes": 131,
+      "sha256": "4331243847f419bd3dbc8f383e093c8b59688b113d441408b25ed41fe49c7183"
+    },
+    {
+      "original": "/tmp/plato-phase2c-count-collection-fix/green-313/test_parent_realizes_partition1/run/worker-partition.json",
+      "member": "green-313/test_parent_realizes_partition1/run/worker-partition.json",
+      "bytes": 280,
+      "sha256": "ac92fc8dcfa3df9046ce82a6cdc0ae254a951336c56d8e94b913f80ef14aefcc"
+    },
+    {
+      "original": "/tmp/plato-phase2c-count-collection-fix/green-313.json",
+      "member": "green-313.json",
+      "bytes": 887,
+      "sha256": "c55cb89642ec8ac3e8df91b42c1ca76074d703fcf8bbcb0405aef90c99a0214c"
+    },
+    {
+      "original": "/tmp/plato-phase2c-count-collection-fix/green-313.log",
+      "member": "green-313.log",
+      "bytes": 128,
+      "sha256": "44d49bf75f7d0bed9cd8f0d085a2eb98f07da4c0479888419bb0173d77eeeadc"
+    },
+    {
+      "original": "/tmp/plato-phase2c-count-collection-fix/green-313.xml",
+      "member": "green-313.xml",
+      "bytes": 6019,
+      "sha256": "633160f54f2ee95f9cc62cc5e1cf7d106acfeeded03cda976f16628253e41081"
+    },
+    {
+      "original": "/tmp/plato-phase2c-count-collection-fix/green-314/test_actual_spawn_returns_pers0/feddyn-result.json",
+      "member": "green-314/test_actual_spawn_returns_pers0/feddyn-result.json",
+      "bytes": 362,
+      "sha256": "c0b96f8cd76387bf4f49157995a000a901063ec44ff2685563bb43bf198fc2d2"
+    },
+    {
+      "original": "/tmp/plato-phase2c-count-collection-fix/green-314/test_actual_spawn_reused_clien0/result.json",
+      "member": "green-314/test_actual_spawn_reused_clien0/result.json",
+      "bytes": 362,
+      "sha256": "c0b96f8cd76387bf4f49157995a000a901063ec44ff2685563bb43bf198fc2d2"
+    },
+    {
+      "original": "/tmp/plato-phase2c-count-collection-fix/green-314/test_actual_spawn_reused_clien1/result.json",
+      "member": "green-314/test_actual_spawn_reused_clien1/result.json",
+      "bytes": 396,
+      "sha256": "05c93b2a1cc8c22b2a86ea305733af32fe6b7ffea04d033c39baaa74b8444c14"
+    },
+    {
+      "original": "/tmp/plato-phase2c-count-collection-fix/green-314/test_actual_spawn_wrong_first_0/result.json",
+      "member": "green-314/test_actual_spawn_wrong_first_0/result.json",
+      "bytes": 233,
+      "sha256": "3a385436813fcc4b96428c1dec58961ffd05dfad8af0765bbe3f30bc28c42c75"
+    },
+    {
+      "original": "/tmp/plato-phase2c-count-collection-fix/green-314/test_actual_spawn_wrong_first_1/result.json",
+      "member": "green-314/test_actual_spawn_wrong_first_1/result.json",
+      "bytes": 233,
+      "sha256": "3a385436813fcc4b96428c1dec58961ffd05dfad8af0765bbe3f30bc28c42c75"
+    },
+    {
+      "original": "/tmp/plato-phase2c-count-collection-fix/green-314/test_actual_spawned_rejection_0/result.json",
+      "member": "green-314/test_actual_spawned_rejection_0/result.json",
+      "bytes": 33,
+      "sha256": "3ba8ba5fe6f1834e281a25983947db7125f121baa01ddf4f1b996b54bb0feb70"
+    },
+    {
+      "original": "/tmp/plato-phase2c-count-collection-fix/green-314/test_actual_spawned_rejection_1/result.json",
+      "member": "green-314/test_actual_spawned_rejection_1/result.json",
+      "bytes": 33,
+      "sha256": "3ba8ba5fe6f1834e281a25983947db7125f121baa01ddf4f1b996b54bb0feb70"
+    },
+    {
+      "original": "/tmp/plato-phase2c-count-collection-fix/green-314/test_actual_spawned_rejection_10/result.json",
+      "member": "green-314/test_actual_spawned_rejection_10/result.json",
+      "bytes": 33,
+      "sha256": "3ba8ba5fe6f1834e281a25983947db7125f121baa01ddf4f1b996b54bb0feb70"
+    },
+    {
+      "original": "/tmp/plato-phase2c-count-collection-fix/green-314/test_actual_spawned_rejection_11/result.json",
+      "member": "green-314/test_actual_spawned_rejection_11/result.json",
+      "bytes": 33,
+      "sha256": "3ba8ba5fe6f1834e281a25983947db7125f121baa01ddf4f1b996b54bb0feb70"
+    },
+    {
+      "original": "/tmp/plato-phase2c-count-collection-fix/green-314/test_actual_spawned_rejection_12/result.json",
+      "member": "green-314/test_actual_spawned_rejection_12/result.json",
+      "bytes": 33,
+      "sha256": "3ba8ba5fe6f1834e281a25983947db7125f121baa01ddf4f1b996b54bb0feb70"
+    },
+    {
+      "original": "/tmp/plato-phase2c-count-collection-fix/green-314/test_actual_spawned_rejection_2/result.json",
+      "member": "green-314/test_actual_spawned_rejection_2/result.json",
+      "bytes": 33,
+      "sha256": "3ba8ba5fe6f1834e281a25983947db7125f121baa01ddf4f1b996b54bb0feb70"
+    },
+    {
+      "original": "/tmp/plato-phase2c-count-collection-fix/green-314/test_actual_spawned_rejection_3/result.json",
+      "member": "green-314/test_actual_spawned_rejection_3/result.json",
+      "bytes": 33,
+      "sha256": "3ba8ba5fe6f1834e281a25983947db7125f121baa01ddf4f1b996b54bb0feb70"
+    },
+    {
+      "original": "/tmp/plato-phase2c-count-collection-fix/green-314/test_actual_spawned_rejection_4/result.json",
+      "member": "green-314/test_actual_spawned_rejection_4/result.json",
+      "bytes": 33,
+      "sha256": "3ba8ba5fe6f1834e281a25983947db7125f121baa01ddf4f1b996b54bb0feb70"
+    },
+    {
+      "original": "/tmp/plato-phase2c-count-collection-fix/green-314/test_actual_spawned_rejection_5/result.json",
+      "member": "green-314/test_actual_spawned_rejection_5/result.json",
+      "bytes": 33,
+      "sha256": "3ba8ba5fe6f1834e281a25983947db7125f121baa01ddf4f1b996b54bb0feb70"
+    },
+    {
+      "original": "/tmp/plato-phase2c-count-collection-fix/green-314/test_actual_spawned_rejection_6/result.json",
+      "member": "green-314/test_actual_spawned_rejection_6/result.json",
+      "bytes": 33,
+      "sha256": "3ba8ba5fe6f1834e281a25983947db7125f121baa01ddf4f1b996b54bb0feb70"
+    },
+    {
+      "original": "/tmp/plato-phase2c-count-collection-fix/green-314/test_actual_spawned_rejection_7/result.json",
+      "member": "green-314/test_actual_spawned_rejection_7/result.json",
+      "bytes": 33,
+      "sha256": "3ba8ba5fe6f1834e281a25983947db7125f121baa01ddf4f1b996b54bb0feb70"
+    },
+    {
+      "original": "/tmp/plato-phase2c-count-collection-fix/green-314/test_actual_spawned_rejection_8/result.json",
+      "member": "green-314/test_actual_spawned_rejection_8/result.json",
+      "bytes": 33,
+      "sha256": "3ba8ba5fe6f1834e281a25983947db7125f121baa01ddf4f1b996b54bb0feb70"
+    },
+    {
+      "original": "/tmp/plato-phase2c-count-collection-fix/green-314/test_actual_spawned_rejection_9/result.json",
+      "member": "green-314/test_actual_spawned_rejection_9/result.json",
+      "bytes": 33,
+      "sha256": "3ba8ba5fe6f1834e281a25983947db7125f121baa01ddf4f1b996b54bb0feb70"
+    },
+    {
+      "original": "/tmp/plato-phase2c-count-collection-fix/green-314/test_parent_realizes_partition1/partition-result.json",
+      "member": "green-314/test_parent_realizes_partition1/partition-result.json",
+      "bytes": 131,
+      "sha256": "4331243847f419bd3dbc8f383e093c8b59688b113d441408b25ed41fe49c7183"
+    },
+    {
+      "original": "/tmp/plato-phase2c-count-collection-fix/green-314/test_parent_realizes_partition1/run/worker-partition.json",
+      "member": "green-314/test_parent_realizes_partition1/run/worker-partition.json",
+      "bytes": 280,
+      "sha256": "e41afbb256b9013625114b982e8577fff827f977c9283a2e83344137136a935c"
+    },
+    {
+      "original": "/tmp/plato-phase2c-count-collection-fix/green-314.json",
+      "member": "green-314.json",
+      "bytes": 888,
+      "sha256": "c2923bad406a5c7ffd0093898ee95780e8e936842043e31dd239c12a1038f9ff"
+    },
+    {
+      "original": "/tmp/plato-phase2c-count-collection-fix/green-314.log",
+      "member": "green-314.log",
+      "bytes": 128,
+      "sha256": "4d6b6028fb790bde0becfb8e416320cfd08d1d6ba90a34bdfc8dbed32669d313"
+    },
+    {
+      "original": "/tmp/plato-phase2c-count-collection-fix/green-314.xml",
+      "member": "green-314.xml",
+      "bytes": 6019,
+      "sha256": "40fa7a8c9c88cd7e29e481da5ea71c423c327bdb872af52ee2d71432cb4a346b"
+    },
+    {
+      "original": "/tmp/plato-phase2c-count-collection-fix/identity-collection.log",
+      "member": "identity-collection.log",
+      "bytes": 296,
+      "sha256": "ce08019eb482647a44a1b70cd9a8fb79d10994f2796b165a3a3d3d63b8cc18d6"
+    },
+    {
+      "original": "/tmp/plato-phase2c-count-collection-fix/original-test_feddyn_count_boundaries.py",
+      "member": "original-test_feddyn_count_boundaries.py",
+      "bytes": 7232,
+      "sha256": "1102a37c5b739ce9fa50f534d0804b12fecee93302d83841d05c8bd4cf671a3c"
+    },
+    {
+      "original": "/tmp/plato-phase2c-count-collection-fix/red-313.json",
+      "member": "red-313.json",
+      "bytes": 713,
+      "sha256": "2466ba9c335bcaa2e12fe13a42575478dc7026d97e9affab8d550aa6ee178162"
+    },
+    {
+      "original": "/tmp/plato-phase2c-count-collection-fix/red-313.log",
+      "member": "red-313.log",
+      "bytes": 5887,
+      "sha256": "c7a7e90010880ad124cc6328395f87d158a95bb3367e8492320260a04a7f9dba"
+    },
+    {
+      "original": "/tmp/plato-phase2c-count-collection-fix/red-313.xml",
+      "member": "red-313.xml",
+      "bytes": 5396,
+      "sha256": "4fd0c7bc445f196ed738ef9f74442785e66a0e86ffb471235115f388d6c519a6"
+    },
+    {
+      "original": "/tmp/plato-phase2c-count-collection-fix/red-314.json",
+      "member": "red-314.json",
+      "bytes": 713,
+      "sha256": "50e7e9298866d36c67b3dbeb5e44e02cf6839ea322cb4147bbe3ff033681fcab"
+    },
+    {
+      "original": "/tmp/plato-phase2c-count-collection-fix/red-314.log",
+      "member": "red-314.log",
+      "bytes": 6668,
+      "sha256": "5d900f9567dfb6f0ec880692b1213980a597c56f723d62094a496777cfd3cb43"
+    },
+    {
+      "original": "/tmp/plato-phase2c-count-collection-fix/red-314.xml",
+      "member": "red-314.xml",
+      "bytes": 6784,
+      "sha256": "f57cc615a34ac0e0b7056ae3aef1e4877cfb8966f7702c45fad3cb885ed5b6ba"
+    },
+    {
+      "original": "/tmp/plato-phase2c-count-collection-fix/root-count-isolation-313-receipt.json",
+      "member": "root-count-isolation-313-receipt.json",
+      "bytes": 673,
+      "sha256": "0a1bdf20fd3bbcaeb4770e2e9e074c2db6451eb888d94c043407d34dd4407053"
+    },
+    {
+      "original": "/tmp/plato-phase2c-count-collection-fix/root-count-isolation-313.log",
+      "member": "root-count-isolation-313.log",
+      "bytes": 5899,
+      "sha256": "dbb92c431b6de218311ae9e9e31fa95af0e9b1603352813e759a22e281cea077"
+    },
+    {
+      "original": "/tmp/plato-phase2c-count-collection-fix/root-count-isolation-313.xml",
+      "member": "root-count-isolation-313.xml",
+      "bytes": 5402,
+      "sha256": "16840ef45577144b75dcb3dcbdd2c975f99219d71550d1939c7e4a9b68936632"
+    },
+    {
+      "original": "/tmp/plato-phase2c-count-collection-fix/ruff-313.json",
+      "member": "ruff-313.json",
+      "bytes": 618,
+      "sha256": "1a37adc64ae9a7389412a8b6c66252fadc5db15ac1cb6c2bccb2e7dbe9da7038"
+    },
+    {
+      "original": "/tmp/plato-phase2c-count-collection-fix/ruff-313.log",
+      "member": "ruff-313.log",
+      "bytes": 19,
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "original": "/tmp/plato-phase2c-count-collection-fix/ruff-314.json",
+      "member": "ruff-314.json",
+      "bytes": 619,
+      "sha256": "3561015bf2d9cef60af274acb6d1fe014c5351f061e956f4d53d6bb4bb34cfdb"
+    },
+    {
+      "original": "/tmp/plato-phase2c-count-collection-fix/ruff-314.log",
+      "member": "ruff-314.log",
+      "bytes": 19,
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "original": "/tmp/plato-phase2c-count-collection-fix/run_checks.py",
+      "member": "run_checks.py",
+      "bytes": 1616,
+      "sha256": "4d3057edcb750703c530ac10b1f00bc9aa49d3333592b83a513a7e36e4d65979"
+    }
+  ]
+}

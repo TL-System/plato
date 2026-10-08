@@ -1,0 +1,230 @@
+{
+  "source_commit": "f1963eb906228c287f9787251f4319339ca7ee78",
+  "checker_sha256": "281b7cd7ff9b7b5dfb7e499d9e249eb8cf29993e9ce8d7c7bccabc12f7325ee1",
+  "accepted": true,
+  "results": [
+    {
+      "name": "archive_member",
+      "accepted": true,
+      "rejected": true,
+      "reason": "Forbidden distribution payloads: ['archives/legacy/module.py']",
+      "artifact_sha256": "ce795305d06b5933277638593cfe43c752db5c831ff8d6633f868b418950070a"
+    },
+    {
+      "name": "reproduction_member",
+      "accepted": true,
+      "rejected": true,
+      "reason": "Forbidden distribution payloads: ['evidence/2026-refresh/reproductions/probe.json']",
+      "artifact_sha256": "d34143f25d43047d3a594ee5e1e705dcb7aa8cd7d5b85c588bbf66cfa64c95cd"
+    },
+    {
+      "name": "cache_member",
+      "accepted": true,
+      "rejected": true,
+      "reason": "Forbidden distribution payloads: ['__pycache__/probe.pyc']",
+      "artifact_sha256": "430b0ef77522f6b183036933f85467579a83188a6d93d477465a830aa1c6f73f"
+    },
+    {
+      "name": "environment_member",
+      "accepted": true,
+      "rejected": true,
+      "reason": "Forbidden distribution payloads: ['.venv-docs/lib/probe.py']",
+      "artifact_sha256": "59ea3b6c8b0d15bda82977ffe037ac9df3cc37fb0edb58ea548361f3f6596ef4"
+    },
+    {
+      "name": "generated_docs_site_member",
+      "accepted": true,
+      "rejected": true,
+      "reason": "Forbidden distribution payloads: ['docs/site/index.html']",
+      "artifact_sha256": "7061344a471e2c5daebf1d0eae8107dcd31a12447100a6e85f44af24719cb7ee"
+    },
+    {
+      "name": "generated_ci_artifacts_member",
+      "accepted": true,
+      "rejected": true,
+      "reason": "Forbidden distribution payloads: ['ci-artifacts/docs-package/provenance.json']",
+      "artifact_sha256": "98321c69418811ab80c091170e8d00cbca963e2c31f4654d60667ae14b806e89"
+    },
+    {
+      "name": "missing_plato_source",
+      "accepted": true,
+      "rejected": true,
+      "reason": "Missing Plato source files: ['plato/config.py']"
+    },
+    {
+      "name": "wrong_version_metadata",
+      "accepted": true,
+      "rejected": true,
+      "reason": "Version: '0.0.0' != '1.4.3'"
+    },
+    {
+      "name": "wrong_python_metadata",
+      "accepted": true,
+      "rejected": true,
+      "reason": "Requires-Python: '>=3.14' != '>=3.13'"
+    },
+    {
+      "name": "actual_review_default_contamination",
+      "accepted": true,
+      "rejected": true,
+      "reason": "Forbidden distribution payloads: ['ci-artifacts/docs-package/build-constraints.txt', 'ci-artifacts/docs-package/distributions/.gitignore', 'ci-artifacts/docs-package/provenance.json', 'ci-artifacts/docs-package/runtime-constraints.txt', 'ci-artifacts/docs/commit.txt', 'ci-artifacts/docs/docs-environment.json', 'ci-artifacts/docs/python.txt', 'ci-artifacts/docs/source-hashes.txt', 'ci-artifacts/docs/uv.txt', 'docs/site/404.html', 'docs/site/assets/images/favicon.png', 'docs/site/assets/javascripts/bundle.d7400e89.min.js', 'docs/site/assets/javascripts/bundle.d7400e89.min.js.map', 'docs/site/assets/javascripts/lunr/min/lunr.ar.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.da.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.de.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.du.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.el.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.es.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.fi.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.fr.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.he.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.hi.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.hu.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.hy.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.it.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.ja.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.jp.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.kn.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.ko.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.multi.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.nl.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.no.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.pt.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.ro.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.ru.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.sa.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.stemmer.support.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.sv.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.ta.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.te.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.th.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.tr.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.vi.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.zh.min.js', 'docs/site/assets/javascripts/lunr/tinyseg.js', 'docs/site/assets/javascripts/lunr/wordcut.js', 'docs/site/assets/javascripts/workers/search.2c215733.min.js', 'docs/site/assets/javascripts/workers/search.2c215733.min.js.map', 'docs/site/assets/stylesheets/main.ec1eaa64.min.css', 'docs/site/assets/stylesheets/main.ec1eaa64.min.css.map', 'docs/site/assets/stylesheets/palette.ab4e12ef.min.css', 'docs/site/assets/stylesheets/palette.ab4e12ef.min.css.map', 'docs/site/ccdb/index.html', 'docs/site/configurations/algorithm/index.html', 'docs/site/configurations/clients/index.html', 'docs/site/configurations/evaluation/index.html', 'docs/site/configurations/general/index.html', 'docs/site/configurations/overview/index.html', 'docs/site/configurations/parameters/index.html', 'docs/site/configurations/server/index.html', 'docs/site/configurations/trainer/index.html', 'docs/site/deployment/index.html', 'docs/site/development/index.html', 'docs/site/examples/Getting Started/index.html', 'docs/site/examples/algorithms/1. Server Aggregation Algorithms/index.html', 'docs/site/examples/algorithms/10. Algorithms based on Neural Architecture Search and Model Search/index.html', 'docs/site/examples/algorithms/11. Three-layer Federated Learning Algorithms/index.html', 'docs/site/examples/algorithms/12. Poisoning Detection Algorithms/index.html', 'docs/site/examples/algorithms/13. Model Pruning Algorithms/index.html', 'docs/site/examples/algorithms/14. Gradient Leakage Attacks and Defences/index.html', 'docs/site/examples/algorithms/2. Secure Aggregation with Homomorphic Encryption/index.html', 'docs/site/examples/algorithms/3. Asynchronous Federated Learning Algorithms/index.html', 'docs/site/examples/algorithms/4. Federated Unlearning/index.html', 'docs/site/examples/algorithms/5. Algorithms with Customized Client Training Loops/index.html', 'docs/site/examples/algorithms/6. Client Selection Algorithms/index.html', 'docs/site/examples/algorithms/7. Split Learning Algorithms/index.html', 'docs/site/examples/algorithms/8. Personalized Federated Learning Algorithms/index.html', 'docs/site/examples/algorithms/9. Personalized Federated Learning Algorithms based on Self-Supervised Learning/index.html', 'docs/site/examples/archived/index.html', 'docs/site/examples/case-studies/1. LoRA/index.html', 'docs/site/examples/case-studies/2. Composable Trainer/index.html', 'docs/site/examples/case-studies/3. SmolVLA Trainer with LeRobot/index.html', 'docs/site/examples/case-studies/4. Server-side Lighteval for SmolLM2/index.html', 'docs/site/examples/case-studies/5. Nanochat in Plato/index.html', 'docs/site/examples/case-studies/6. Qwen3 Federated LoRA/index.html', 'docs/site/index.html', 'docs/site/install/index.html', 'docs/site/javascripts/katex.js', 'docs/site/misc/index.html', 'docs/site/mlx/index.html', 'docs/site/quickstart/index.html', 'docs/site/references/clients/index.html', 'docs/site/references/evaluators/index.html', 'docs/site/references/servers/index.html', 'docs/site/references/trainers/index.html', 'docs/site/search/search_index.json', 'docs/site/sitemap.xml', 'docs/site/sitemap.xml.gz', 'docs/site/stylesheets/extra.css']",
+      "artifact": "/tmp/plato-p2-independent-review/workflow-source/ci-artifacts/docs-package/distributions/plato_learn-1.4.3.tar.gz",
+      "artifact_sha256": "33fca2948256ec4b7457d75caed1bd56d14594dd63d097fbd63e4fb61e33d4d7"
+    },
+    {
+      "name": "actual_prior_author_docs_contamination",
+      "accepted": true,
+      "rejected": true,
+      "reason": "Forbidden distribution payloads: ['docs/site/404.html', 'docs/site/assets/images/favicon.png', 'docs/site/assets/javascripts/bundle.d7400e89.min.js', 'docs/site/assets/javascripts/bundle.d7400e89.min.js.map', 'docs/site/assets/javascripts/lunr/min/lunr.ar.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.da.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.de.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.du.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.el.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.es.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.fi.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.fr.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.he.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.hi.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.hu.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.hy.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.it.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.ja.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.jp.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.kn.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.ko.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.multi.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.nl.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.no.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.pt.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.ro.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.ru.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.sa.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.stemmer.support.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.sv.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.ta.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.te.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.th.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.tr.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.vi.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.zh.min.js', 'docs/site/assets/javascripts/lunr/tinyseg.js', 'docs/site/assets/javascripts/lunr/wordcut.js', 'docs/site/assets/javascripts/workers/search.2c215733.min.js', 'docs/site/assets/javascripts/workers/search.2c215733.min.js.map', 'docs/site/assets/stylesheets/main.ec1eaa64.min.css', 'docs/site/assets/stylesheets/main.ec1eaa64.min.css.map', 'docs/site/assets/stylesheets/palette.ab4e12ef.min.css', 'docs/site/assets/stylesheets/palette.ab4e12ef.min.css.map', 'docs/site/ccdb/index.html', 'docs/site/configurations/algorithm/index.html', 'docs/site/configurations/clients/index.html', 'docs/site/configurations/evaluation/index.html', 'docs/site/configurations/general/index.html', 'docs/site/configurations/overview/index.html', 'docs/site/configurations/parameters/index.html', 'docs/site/configurations/server/index.html', 'docs/site/configurations/trainer/index.html', 'docs/site/deployment/index.html', 'docs/site/development/index.html', 'docs/site/examples/Getting Started/index.html', 'docs/site/examples/algorithms/1. Server Aggregation Algorithms/index.html', 'docs/site/examples/algorithms/10. Algorithms based on Neural Architecture Search and Model Search/index.html', 'docs/site/examples/algorithms/11. Three-layer Federated Learning Algorithms/index.html', 'docs/site/examples/algorithms/12. Poisoning Detection Algorithms/index.html', 'docs/site/examples/algorithms/13. Model Pruning Algorithms/index.html', 'docs/site/examples/algorithms/14. Gradient Leakage Attacks and Defences/index.html', 'docs/site/examples/algorithms/2. Secure Aggregation with Homomorphic Encryption/index.html', 'docs/site/examples/algorithms/3. Asynchronous Federated Learning Algorithms/index.html', 'docs/site/examples/algorithms/4. Federated Unlearning/index.html', 'docs/site/examples/algorithms/5. Algorithms with Customized Client Training Loops/index.html', 'docs/site/examples/algorithms/6. Client Selection Algorithms/index.html', 'docs/site/examples/algorithms/7. Split Learning Algorithms/index.html', 'docs/site/examples/algorithms/8. Personalized Federated Learning Algorithms/index.html', 'docs/site/examples/algorithms/9. Personalized Federated Learning Algorithms based on Self-Supervised Learning/index.html', 'docs/site/examples/archived/index.html', 'docs/site/examples/case-studies/1. LoRA/index.html', 'docs/site/examples/case-studies/2. Composable Trainer/index.html', 'docs/site/examples/case-studies/3. SmolVLA Trainer with LeRobot/index.html', 'docs/site/examples/case-studies/4. Server-side Lighteval for SmolLM2/index.html', 'docs/site/examples/case-studies/5. Nanochat in Plato/index.html', 'docs/site/examples/case-studies/6. Qwen3 Federated LoRA/index.html', 'docs/site/index.html', 'docs/site/install/index.html', 'docs/site/javascripts/katex.js', 'docs/site/misc/index.html', 'docs/site/mlx/index.html', 'docs/site/quickstart/index.html', 'docs/site/references/clients/index.html', 'docs/site/references/evaluators/index.html', 'docs/site/references/servers/index.html', 'docs/site/references/trainers/index.html', 'docs/site/search/search_index.json', 'docs/site/sitemap.xml', 'docs/site/sitemap.xml.gz', 'docs/site/stylesheets/extra.css']",
+      "artifact": "/tmp/plato-p2-final/package/distributions/plato_learn-1.4.3.tar.gz",
+      "artifact_sha256": "6f2ab2337df11fa481ecc9a360f283e79fbdeff3ccac31d42d84a091158cf1db"
+    },
+    {
+      "name": "actual_pre_fix_archive_payload",
+      "accepted": true,
+      "rejected": true,
+      "reason": "Forbidden distribution payloads: ['archives/legacy_datalib/LICENSE', 'archives/legacy_datalib/README.md', 'archives/legacy_datalib/__init__.py', 'archives/legacy_datalib/audio_extraction_tools.py', 'archives/legacy_datalib/data_utils.py', 'archives/legacy_datalib/flickr30kE_utils.py', 'archives/legacy_datalib/frames_extraction_tools.py', 'archives/legacy_datalib/gym_utils/__init__.py', 'archives/legacy_datalib/gym_utils/gym_trim.py', 'archives/legacy_datalib/modality_data_anntation_tools.py', 'archives/legacy_datalib/modality_extraction_base.py', 'archives/legacy_datalib/parse_datasets.py', 'archives/legacy_datalib/refer_utils/__init__.py', 'archives/legacy_datalib/refer_utils/referitgame_utils.py', 'archives/legacy_datalib/tiny_data_tools.py', 'archives/legacy_datalib/video_transform.py', 'archives/legacy_rl_env/LICENSE', 'archives/legacy_rl_env/README.md', 'archives/legacy_rl_env/rl_env.py', 'docs/site/404.html', 'docs/site/assets/images/favicon.png', 'docs/site/assets/javascripts/bundle.d7400e89.min.js', 'docs/site/assets/javascripts/bundle.d7400e89.min.js.map', 'docs/site/assets/javascripts/lunr/min/lunr.ar.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.da.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.de.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.du.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.el.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.es.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.fi.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.fr.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.he.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.hi.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.hu.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.hy.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.it.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.ja.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.jp.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.kn.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.ko.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.multi.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.nl.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.no.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.pt.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.ro.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.ru.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.sa.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.stemmer.support.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.sv.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.ta.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.te.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.th.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.tr.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.vi.min.js', 'docs/site/assets/javascripts/lunr/min/lunr.zh.min.js', 'docs/site/assets/javascripts/lunr/tinyseg.js', 'docs/site/assets/javascripts/lunr/wordcut.js', 'docs/site/assets/javascripts/workers/search.2c215733.min.js', 'docs/site/assets/javascripts/workers/search.2c215733.min.js.map', 'docs/site/assets/stylesheets/main.ec1eaa64.min.css', 'docs/site/assets/stylesheets/main.ec1eaa64.min.css.map', 'docs/site/assets/stylesheets/palette.ab4e12ef.min.css', 'docs/site/assets/stylesheets/palette.ab4e12ef.min.css.map', 'docs/site/ccdb/index.html', 'docs/site/configurations/algorithm/index.html', 'docs/site/configurations/clients/index.html', 'docs/site/configurations/evaluation/index.html', 'docs/site/configurations/general/index.html', 'docs/site/configurations/overview/index.html', 'docs/site/configurations/parameters/index.html', 'docs/site/configurations/server/index.html', 'docs/site/configurations/trainer/index.html', 'docs/site/deployment/index.html', 'docs/site/development/index.html', 'docs/site/examples/Getting Started/index.html', 'docs/site/examples/algorithms/1. Server Aggregation Algorithms/index.html', 'docs/site/examples/algorithms/10. Algorithms based on Neural Architecture Search and Model Search/index.html', 'docs/site/examples/algorithms/11. Three-layer Federated Learning Algorithms/index.html', 'docs/site/examples/algorithms/12. Poisoning Detection Algorithms/index.html', 'docs/site/examples/algorithms/13. Model Pruning Algorithms/index.html', 'docs/site/examples/algorithms/14. Gradient Leakage Attacks and Defences/index.html', 'docs/site/examples/algorithms/2. Secure Aggregation with Homomorphic Encryption/index.html', 'docs/site/examples/algorithms/3. Asynchronous Federated Learning Algorithms/index.html', 'docs/site/examples/algorithms/4. Federated Unlearning/index.html', 'docs/site/examples/algorithms/5. Algorithms with Customized Client Training Loops/index.html', 'docs/site/examples/algorithms/6. Client Selection Algorithms/index.html', 'docs/site/examples/algorithms/7. Split Learning Algorithms/index.html', 'docs/site/examples/algorithms/8. Personalized Federated Learning Algorithms/index.html', 'docs/site/examples/algorithms/9. Personalized Federated Learning Algorithms based on Self-Supervised Learning/index.html', 'docs/site/examples/archived/index.html', 'docs/site/examples/case-studies/1. LoRA/index.html', 'docs/site/examples/case-studies/2. Composable Trainer/index.html', 'docs/site/examples/case-studies/3. SmolVLA Trainer with LeRobot/index.html', 'docs/site/examples/case-studies/4. Server-side Lighteval for SmolLM2/index.html', 'docs/site/examples/case-studies/5. Nanochat in Plato/index.html', 'docs/site/examples/case-studies/6. Qwen3 Federated LoRA/index.html', 'docs/site/index.html', 'docs/site/install/index.html', 'docs/site/javascripts/katex.js', 'docs/site/misc/index.html', 'docs/site/mlx/index.html', 'docs/site/quickstart/index.html', 'docs/site/references/clients/index.html', 'docs/site/references/evaluators/index.html', 'docs/site/references/servers/index.html', 'docs/site/references/trainers/index.html', 'docs/site/search/search_index.json', 'docs/site/sitemap.xml', 'docs/site/sitemap.xml.gz', 'docs/site/stylesheets/extra.css']",
+      "artifact": "/tmp/plato-p2-preliminary/package-second/distributions/plato_learn-1.4.3.tar.gz",
+      "artifact_sha256": "12b99c494d1fb82ab414ae433827602fb71d5e8f7141cb991281159e0e7c29b2"
+    },
+    {
+      "name": "existing-output-rejected",
+      "exit_code": 1,
+      "command": [
+        "/tmp/plato-p2-generated-fix/workflow-environment/.venv-docs/bin/python",
+        "/private/tmp/plato-refresh-worktrees/docs-package-refresh/.github/scripts/check_distribution.py",
+        "--output-dir",
+        "/tmp/plato-p2-generated-fix/negative/existing-output"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/docs-package-refresh",
+      "path_prefix": null,
+      "log": "/tmp/plato-p2-generated-fix/negative/existing-output-rejected.log",
+      "accepted": true
+    },
+    {
+      "name": "unexcluded-checkout-output-rejected",
+      "exit_code": 1,
+      "command": [
+        "/tmp/plato-p2-generated-fix/workflow-environment/.venv-docs/bin/python",
+        "/private/tmp/plato-refresh-worktrees/docs-package-refresh/.github/scripts/check_distribution.py",
+        "--output-dir",
+        "/private/tmp/plato-refresh-worktrees/docs-package-refresh/arbitrary-generated-output"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/docs-package-refresh",
+      "path_prefix": null,
+      "log": "/tmp/plato-p2-generated-fix/negative/unexcluded-checkout-output-rejected.log",
+      "accepted": true
+    },
+    {
+      "name": "repository-cwd-rejected",
+      "exit_code": 1,
+      "command": [
+        "/tmp/plato-p2-generated-fix/workflow-environment/.venv-docs/bin/python",
+        "-I",
+        "-c",
+        "\nimport hashlib\nimport importlib\nimport importlib.metadata\nimport json\nimport sys\nfrom pathlib import Path\n\nrepository, wheel_manifest, expected_version, receipt_path = sys.argv[1:]\nrepository = Path(repository).resolve()\nprefix = Path(sys.prefix).resolve()\nassert sys.version_info[:2] == (3, 13), sys.version\nassert not Path.cwd().resolve().is_relative_to(repository), Path.cwd()\ndistribution = importlib.metadata.distribution(\"plato-learn\")\nassert distribution.version == expected_version, distribution.version\ninstalled_root = Path(distribution.locate_file(\".\")).resolve()\nassert installed_root.is_relative_to(prefix), installed_root\nassert not installed_root.is_relative_to(repository), installed_root\nmanifest = json.loads(Path(wheel_manifest).read_text())[\"files\"]\nfor name, digest in manifest.items():\n    if not name.endswith(\".dist-info/RECORD\"):\n        installed_file = Path(distribution.locate_file(name)).resolve()\n        assert installed_file.is_relative_to(prefix), installed_file\n        assert hashlib.sha256(installed_file.read_bytes()).hexdigest() == digest, name\nimports = {}\nfor name in (\n    \"plato\", \"plato.config\", \"plato.utils.tree\", \"torch\", \"torchvision\",\n    \"numpy\", \"scipy\", \"aiohttp\", \"socketio\", \"datasets\", \"transformers\",\n):\n    module = importlib.import_module(name)\n    location = Path(module.__file__).resolve()\n    assert location.is_relative_to(prefix), (name, location, prefix)\n    assert not location.is_relative_to(repository), (name, location)\n    imports[name] = str(location)\nassert importlib.import_module(\"plato\").__version__ == expected_version\nimport torch\nimport torchvision\nassert torch.equal(torch.tensor([1, 2]) + 1, torch.tensor([2, 3]))\nkept = torchvision.ops.nms(\n    torch.tensor([[0., 0., 1., 1.], [0., 0., 1., 1.]]),\n    torch.tensor([1., 0.5]), 0.5,\n)\nassert kept.tolist() == [0], kept\npackages = {\n    item.metadata[\"Name\"]: item.version\n    for item in importlib.metadata.distributions()\n}\ndirect_url = json.loads(distribution.read_text(\"direct_url.json\"))\nassert \"archive_info\" in direct_url and \"dir_info\" not in direct_url, direct_url\nreceipt = {\n    \"python\": sys.version, \"executable\": sys.executable, \"prefix\": sys.prefix,\n    \"cwd\": str(Path.cwd()), \"distribution_root\": str(installed_root),\n    \"version\": distribution.version, \"imports\": imports,\n    \"direct_url\": direct_url,\n    \"installed_payload_matches_wheel\": True,\n    \"cpu_tensor_and_torchvision_operation\": True,\n    \"packages\": dict(sorted(packages.items())),\n}\nPath(receipt_path).write_text(json.dumps(receipt, indent=2) + \"\\n\")\nprint(json.dumps(receipt, indent=2))\n",
+        "/private/tmp/plato-refresh-worktrees/docs-package-refresh",
+        "/private/tmp/plato-refresh-worktrees/docs-package-fix-workflow/ci-artifacts/docs-package/wheel-manifest.json",
+        "1.4.3",
+        "/tmp/plato-p2-generated-fix/negative/unexpected-import-receipt.json"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/docs-package-refresh",
+      "path_prefix": null,
+      "log": "/tmp/plato-p2-generated-fix/negative/repository-cwd-rejected.log",
+      "accepted": true
+    },
+    {
+      "name": "application-environment-rejected",
+      "exit_code": 1,
+      "command": [
+        "./docs/build.sh"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/docs-package-fix-negative",
+      "path_prefix": null,
+      "log": "/tmp/plato-p2-generated-fix/negative/application-environment-rejected.log",
+      "accepted": true
+    },
+    {
+      "name": "requirements-parity-rejected",
+      "exit_code": 1,
+      "command": [
+        "./docs/build.sh"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/docs-package-fix-negative",
+      "path_prefix": null,
+      "log": "/tmp/plato-p2-generated-fix/negative/requirements-parity-rejected.log",
+      "accepted": true
+    },
+    {
+      "name": "docs-sync-failure",
+      "exit_code": 37,
+      "command": [
+        "./docs/build.sh"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/docs-package-fix-negative",
+      "path_prefix": "/tmp/plato-p2-generated-fix/negative/failure-stubs",
+      "log": "/tmp/plato-p2-generated-fix/negative/docs-sync-failure.log",
+      "accepted": true
+    },
+    {
+      "name": "strict-docs-build-failure",
+      "exit_code": 41,
+      "command": [
+        "./docs/build.sh"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/docs-package-fix-negative",
+      "path_prefix": "/tmp/plato-p2-generated-fix/negative/failure-stubs",
+      "log": "/tmp/plato-p2-generated-fix/negative/strict-docs-build-failure.log",
+      "accepted": true
+    },
+    {
+      "name": "package-build-failure",
+      "exit_code": 1,
+      "command": [
+        "/tmp/plato-p2-generated-fix/workflow-environment/.venv-docs/bin/python",
+        "/private/tmp/plato-refresh-worktrees/docs-package-fix-negative/.github/scripts/check_distribution.py",
+        "--output-dir",
+        "/private/tmp/plato-refresh-worktrees/docs-package-fix-negative/ci-artifacts/failure-propagation"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/docs-package-fix-negative",
+      "path_prefix": "/tmp/plato-p2-generated-fix/negative/failure-stubs",
+      "log": "/tmp/plato-p2-generated-fix/negative/package-build-failure.log",
+      "accepted": true
+    },
+    {
+      "name": "package-subprocess-failure",
+      "accepted": true,
+      "rejected": true,
+      "reason": "Command failed (29); see /tmp/plato-p2-generated-fix/negative/package-subprocess-failure.log"
+    },
+    {
+      "name": "wrong-uv-version-rejected",
+      "exit_code": 1,
+      "command": [
+        "/tmp/plato-p2-generated-fix/workflow-environment/.venv-docs/bin/python",
+        "/private/tmp/plato-refresh-worktrees/docs-package-refresh/.github/scripts/check_distribution.py",
+        "--output-dir",
+        "/tmp/plato-p2-generated-fix/negative/wrong-uv-output"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/docs-package-refresh",
+      "path_prefix": "/tmp/plato-p2-generated-fix/negative/wrong-uv",
+      "log": "/tmp/plato-p2-generated-fix/negative/wrong-uv-version-rejected.log",
+      "accepted": true
+    },
+    {
+      "name": "actual-strict-mkdocs-missing-nav-page",
+      "accepted": true,
+      "exit_code": 1,
+      "command": [
+        "zsh",
+        "-lc",
+        "./docs/build.sh"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/docs-package-fix-negative",
+      "fixture_mkdocs_sha256": "4966557afc71095d5203ebf834c32beb145fa7bfa6b5b18d8f1dc2510fc802e7",
+      "original_mkdocs_sha256": "d26f6c6e7b91cf8835b4187e3b9e01125801e735122d79e7a148179b31a852ec",
+      "fixture_restored": true,
+      "real_mkdocs_warning_propagated_through_shared_helper": true
+    }
+  ]
+}

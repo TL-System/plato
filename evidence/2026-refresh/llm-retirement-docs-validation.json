@@ -1,0 +1,252 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-03",
+  "status": "PASS_DOCUMENTATION_SCOPE",
+  "source_head": "489b54439e343aa7a22d21c18f2f9bc9c0f1a16b",
+  "source_parent": "9ee92c52307cd3ecdce0c7416708c504bdb52137",
+  "branch": "maintenance/2026-llm-retirement-docs",
+  "changed_files_sha256": {
+    "archives/retired/lerobot/README.md": "6017d10b7717806f79653414b9e59e0445e492ae530bb8f9cbc8c1b5356f79d2",
+    "archives/retired/nanochat/README.md": "e49235c6623a45cf35b069cd4e8d7bd4ab309290a770875c5decf67cfb1f0be3",
+    "docs/docs/configurations/evaluation.md": "1eb66018ff17dbbab6f6105f3b62ed4a0b5531d317b7c0b0307a0df4f9866ba1",
+    "docs/docs/configurations/overview.md": "808d2d6bcbff15d9e99c9d1259fd9188f5db3fbed4d47c2df74bea6b9ad10c7c",
+    "docs/docs/configurations/parameters.md": "fe2890c51b28f4b096f2ccd6806c6653c6230b8cfb728fbf5e2106c1e1932121",
+    "docs/docs/configurations/results.md": "98fd5c33992cd60b74e2919b52cfd68d649ed4769f4546b5cc1e7efb96cc3f4b",
+    "docs/docs/configurations/server.md": "e31e1e612c1a37ef8f97cf6287e17df15c7454ad887785fc499585a56dabe1b2",
+    "docs/docs/configurations/trainer.md": "50c552db89dc0c3983b84c297e6efc8589f4514199b3d5bb9e87872f4d49f3ec",
+    "docs/docs/development.md": "8fa3ea07a7cf2db766363ec989e7c7ab74e188968c650f0d11505eca11572a4e",
+    "docs/docs/examples/Getting Started.md": "9d46e3f6eac6a68b05a83ed55adad503bff806f2061e3f25d2de5d6c9948e187",
+    "docs/docs/examples/case-studies/1. LoRA.md": "10eb7b89e2317918c9436ad449f75b356d5004a5cd4589c45a56a1e5dcb2fc17",
+    "docs/docs/examples/case-studies/3. SmolVLA Trainer with LeRobot.md": "31e4e793c8c105bb29154acc3cedda6beb6d44c52153074f233fa1e5f6a1dab5",
+    "docs/docs/examples/case-studies/5. Nanochat in Plato.md": "913bb1bed53c51afc4c53b48030029e57cc9b33761d03d063ed9fe2644213ce0",
+    "docs/docs/examples/case-studies/6. Qwen3 Federated LoRA.md": "35bf8865666ff4d4548d050245b863d9a807f312ba22ef2dec00f5f784796240",
+    "docs/docs/index.md": "eda5b85b7db199402a40d25085e0cbf33b7936e60f6619555a4e4a624c9cbcf6",
+    "docs/docs/install.md": "ede4b1e58c539b560413222752b8f668aeddab9cd29395be11e2a4a2d5e7c8d1",
+    "docs/docs/quickstart.md": "888f985c636b44bd950ec227c24d7012e0c7f8118991678b2cf1978eaed0d7a5",
+    "docs/docs/references/evaluators.md": "b1285df00132e7e1882dc937ee0c1a9e71f04d9191fe1e2413f24cb0eb09da71",
+    "docs/docs/references/trainers.md": "7e4f0d3dd09e99b739b9932270cdc868007bc1e9b1088387368cd40ad14c4be3",
+    "docs/mkdocs.yml": "00aa4144b2ca32402361f9c784e4de4f8860af3c4e15a40a7c2fa6b13b095c0f",
+    "docs/third_party.md": "66ff76d81de89aa3184e1dc6f8f9a4663ebf32c8b452a8fe48464a172ca7073b"
+  },
+  "environment": {
+    "python": "3.13.16",
+    "isolated_environment": "/tmp/plato-llm-docs-venv",
+    "root_environment_modified": false,
+    "packages": {
+      "mkdocs": "1.6.1",
+      "mkdocs-material": "9.7.7"
+    }
+  },
+  "checks": {
+    "strict_docs_build": {
+      "command": [
+        "/tmp/plato-llm-docs-venv/bin/python",
+        "-m",
+        "mkdocs",
+        "build",
+        "--strict",
+        "--config-file",
+        "docs/mkdocs.yml",
+        "--site-dir",
+        "/tmp/plato-llm-docs-site"
+      ],
+      "exit_code": 0,
+      "log_sha256": "8372a53eeea13a8966daa987e922a4fd645a02ee2ff0314b065549b0e2b098fb",
+      "log_excerpt": [
+        "INFO    -  Cleaning site directory",
+        "INFO    -  Building documentation to directory: /tmp/plato-llm-docs-site",
+        "INFO    -  The following pages exist in the docs directory, but are not included in the \"nav\" configuration:",
+        "INFO    -  Documentation built in 0.47 seconds"
+      ],
+      "note": "Old retired pages intentionally remain built but absent from active case-study navigation."
+    },
+    "rendered_relative_links": {
+      "checked": 1921,
+      "missing": [],
+      "scope": "Every relative rendered anchor href; external URLs and fragments excluded."
+    },
+    "provenance_and_archive_readme_links": {
+      "checked": 14,
+      "resolutions": [
+        {
+          "from": "docs/third_party.md",
+          "target": "tests/fixtures/qwen3/PROVENANCE.txt",
+          "resolved_in": "/tmp/plato-refresh-worktrees/qwen-reference"
+        },
+        {
+          "from": "docs/third_party.md",
+          "target": "docs/docs/examples/case-studies/6. Qwen3 Federated LoRA.md",
+          "resolved_in": "/private/tmp/plato-refresh-worktrees/llm-retirement-docs"
+        },
+        {
+          "from": "docs/third_party.md",
+          "target": "archives/retired/nanochat/README.md",
+          "resolved_in": "/private/tmp/plato-refresh-worktrees/llm-retirement-docs"
+        },
+        {
+          "from": "docs/third_party.md",
+          "target": "archives/retired/lerobot/README.md",
+          "resolved_in": "/private/tmp/plato-refresh-worktrees/llm-retirement-docs"
+        },
+        {
+          "from": "archives/retired/nanochat/README.md",
+          "target": "archives/retired/nanochat/manifest.json",
+          "resolved_in": "/tmp/plato-refresh-worktrees/retire-llm-backends"
+        },
+        {
+          "from": "archives/retired/nanochat/README.md",
+          "target": "archives/retired/nanochat/original/LICENSE",
+          "resolved_in": "/tmp/plato-refresh-worktrees/retire-llm-backends"
+        },
+        {
+          "from": "archives/retired/nanochat/README.md",
+          "target": "archives/retired/nanochat/original/docs/docs/examples/case-studies/5. Nanochat in Plato.md",
+          "resolved_in": "/tmp/plato-refresh-worktrees/retire-llm-backends"
+        },
+        {
+          "from": "archives/retired/nanochat/README.md",
+          "target": "archives/retired/nanochat/upstream-c75fe54aa7c1fa881701c246f9427bcbe4eee5a4.tar.gz",
+          "resolved_in": "/tmp/plato-refresh-worktrees/retire-llm-backends"
+        },
+        {
+          "from": "archives/retired/nanochat/README.md",
+          "target": "archives/retired/nanochat/UPSTREAM_LICENSE",
+          "resolved_in": "/tmp/plato-refresh-worktrees/retire-llm-backends"
+        },
+        {
+          "from": "archives/retired/nanochat/README.md",
+          "target": "docs/docs/examples/case-studies/6. Qwen3 Federated LoRA.md",
+          "resolved_in": "/private/tmp/plato-refresh-worktrees/llm-retirement-docs"
+        },
+        {
+          "from": "archives/retired/lerobot/README.md",
+          "target": "archives/retired/lerobot/manifest.json",
+          "resolved_in": "/tmp/plato-refresh-worktrees/retire-llm-backends"
+        },
+        {
+          "from": "archives/retired/lerobot/README.md",
+          "target": "archives/retired/lerobot/original/LICENSE",
+          "resolved_in": "/tmp/plato-refresh-worktrees/retire-llm-backends"
+        },
+        {
+          "from": "archives/retired/lerobot/README.md",
+          "target": "archives/retired/lerobot/original/docs/docs/examples/case-studies/3. SmolVLA Trainer with LeRobot.md",
+          "resolved_in": "/tmp/plato-refresh-worktrees/retire-llm-backends"
+        },
+        {
+          "from": "archives/retired/lerobot/README.md",
+          "target": "docs/docs/examples/case-studies/6. Qwen3 Federated LoRA.md",
+          "resolved_in": "/private/tmp/plato-refresh-worktrees/llm-retirement-docs"
+        }
+      ],
+      "scope": "Read-only existence checks across own and peer worktrees; integration pending."
+    },
+    "whitespace": {
+      "command": [
+        "git",
+        "diff-tree",
+        "--check",
+        "489b54439e343aa7a22d21c18f2f9bc9c0f1a16b^",
+        "489b54439e343aa7a22d21c18f2f9bc9c0f1a16b"
+      ],
+      "exit_code": 0
+    },
+    "retired_documentation_references": [
+      {
+        "path": "docs/third_party.md",
+        "classification": "Archive provenance"
+      },
+      {
+        "path": "docs/nanochat_integration_checklist.md",
+        "classification": "Baseline checklist; exact archived copy/removal owned by retirement integration branch"
+      },
+      {
+        "path": "docs/docs/examples/case-studies/5. Nanochat in Plato.md",
+        "classification": "Retirement/migration notice"
+      },
+      {
+        "path": "docs/docs/examples/case-studies/3. SmolVLA Trainer with LeRobot.md",
+        "classification": "Retirement notice"
+      }
+    ]
+  },
+  "reviewed_implementation_sources": {
+    "worktree": "/tmp/plato-refresh-worktrees/qwen-reference",
+    "sha256": {
+      "configs/HuggingFace/fedavg_qwen3_06b_lora.toml": "9aa61f81094f49e3ee2b14a25f54e16762013d8561fdf3d084c09f3766d10d1b",
+      "examples/huggingface/qualify_qwen3.py": "2e1d3b6f9fa04ecdf2ddbf5e04957f39a00f7599c6ca4bf14d8f3af7ae8490c8",
+      "tests/test_utils/qwen3.py": "bce8340b4a1d099aade32b20f84841372f5265d575067b340fa1196c6f3b0297",
+      "tests/fixtures/qwen3/PROVENANCE.txt": "aa890d67099e9ec249c14bc22df241a5d040158f9185e3e02636a80585520a3c",
+      "plato/utils/huggingface.py": "91b687453fc318a8fdfc27d75ac432b83a1ac04b1fcbdc67426b820efb683c9b",
+      "plato/trainers/huggingface.py": "b59a7f105c9d75441b0183a5cb88dcab62724c9b3f237381c277e2711b1fd3d5"
+    }
+  },
+  "pretrained_qualification": {
+    "source": "/tmp/plato-qwen-validation/real-pretrained/qualification.json",
+    "sha256": "8d2a489c9eb9196f1e2aad8e8f4469423e8be9ff14f8178a13e494d7d8ec70b3",
+    "repository_receipt": "evidence/2026-refresh/qwen-reference-validation.json",
+    "result": {
+      "model_class": "Qwen3ForCausalLM",
+      "configured_artifacts": {
+        "model_name": "Qwen/Qwen3-0.6B-Base",
+        "model_revision": "da87bfb608c14b7cf20ba1ce41287e8de496c0cd",
+        "tokenizer_name": "Qwen/Qwen3-0.6B-Base",
+        "tokenizer_revision": "da87bfb608c14b7cf20ba1ce41287e8de496c0cd"
+      },
+      "device": "cpu",
+      "dtype": "torch.float32",
+      "seed": 17,
+      "max_length": 64,
+      "trainable_parameters": 573440,
+      "total_parameters": 596623360,
+      "optimizer_updates": 5,
+      "client_sample_counts": [
+        2,
+        3
+      ],
+      "client_train_losses": [
+        5.03812313079834,
+        5.506113529205322
+      ],
+      "before_perplexity": 133.13561616044146,
+      "global_perplexity": 130.02215144060804,
+      "before_adapter_sha256": "ce48664afb003bfea5401d278722bfc828572a0b1a14171497ca4659b9503a76",
+      "after_adapter_sha256": "88442b9ad04213f25ae8e652255be4d03782d11dd81717c6eb5bb9afd66671ad",
+      "frozen_base_sha256": "01a101efc877aa13198937c42a8b136c7c80f4675e9ec5d1f3350bb923eb3199",
+      "frozen_base_unchanged": true,
+      "finite_nonzero_gradients": true,
+      "payloads_independent": true,
+      "adapter_only_checkpoint": true,
+      "reload_logits_match": true,
+      "weighted_oracle_all_tensors": true,
+      "weighted_vs_unweighted_max_difference": 5.005524872103706e-05,
+      "elapsed_seconds": 14.867641290882602,
+      "resolved_model_revision": "da87bfb608c14b7cf20ba1ce41287e8de496c0cd",
+      "resolved_checkpoint_directory": "/private/tmp/plato-qwen-validation/real-pretrained/models/huggingface/models--Qwen--Qwen3-0.6B-Base/snapshots/da87bfb608c14b7cf20ba1ce41287e8de496c0cd",
+      "status": "PASS",
+      "scope": "Real official pretrained Qwen3; serial CPU 2/3-client update, production server aggregation, held-out perplexity, adapter checkpoint/reload.",
+      "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+      "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+      "package_versions": {
+        "torch": "2.14.1",
+        "transformers": "5.18.0",
+        "peft": "0.21.2",
+        "datasets": "5.0.1",
+        "huggingface-hub": "1.33.0",
+        "safetensors": "0.8.0"
+      },
+      "peak_rss_bytes": 4258660352,
+      "peak_rss_scope": "Single qualification process with one shared frozen base, serial logical clients and the production server object."
+    },
+    "independently_rerun_by_docs_author": false
+  },
+  "limitations": [
+    "Documentation-only branch; runtime/test/CI/lock/archive payload integration and whole-repository retired-reference classification remain root-owned.",
+    "Normal plato.py socket/process launch command is source-checked; no completed launch is claimed by this receipt. Root/implementation owner qualify it separately.",
+    "Pretrained qualification uses one shared frozen base and serial logical clients through production server aggregation; it is not two worker processes and does not establish benchmark quality.",
+    "Archive README links resolve against peer archive payloads, and fixture provenance resolves against the Qwen worktree. Recheck after integration.",
+    "External link availability and historical-environment execution were not tested. Archived original documents were not rewritten.",
+    "The active checklist still exists on this baseline branch; retirement branch owns its archived copy and deletion.",
+    "No runtime import, type, lock, packaging or training tests were run by the documentation author."
+  ]
+}

@@ -6,13 +6,42 @@ from __future__ import annotations
 
 import asyncio
 import contextlib
+import copy
 import os
 import sys
 import tempfile
 from pathlib import Path
+from typing import Iterator
 
 from plato.config import Config
 from plato.utils import toml_writer
+
+
+@contextlib.contextmanager
+def isolated_config_state() -> Iterator[None]:
+    """Detach test configuration and restore the caller's class state on exit."""
+
+    def is_state(name, value):
+        return not name.startswith("__") and not (
+            callable(value) or isinstance(value, (classmethod, staticmethod))
+        )
+
+    previous = {
+        name: value for name, value in vars(Config).items() if is_state(name, value)
+    }
+    try:
+        for name in previous:
+            delattr(Config, name)
+        Config._instance = None
+        Config._cli_overrides = {}
+        Config.client_sleep_times = None
+        yield
+    finally:
+        for name, value in list(vars(Config).items()):
+            if is_state(name, value):
+                delattr(Config, name)
+        for name, value in previous.items():
+            setattr(Config, name, value)
 
 
 def build_minimal_config(
@@ -64,47 +93,42 @@ def build_minimal_config(
 
 
 @contextlib.contextmanager
-def configure_environment(config_dict: dict):
+def configure_environment(
+    config_dict: dict, *, runtime_root: Path | None = None
+) -> Iterator[Config]:
     """
     Context manager that writes the config to disk and initialises Config singleton.
     """
-    with tempfile.TemporaryDirectory() as tmp_dir:
-        config_path = Path(tmp_dir) / "config.toml"
-        toml_writer.dump(config_dict, config_path)
-
-        Config._instance = None  # reset singleton
-        Config.params = {}
-
+    with tempfile.TemporaryDirectory() as tmp_dir, isolated_config_state():
+        root = runtime_root if runtime_root is not None else Path(tmp_dir)
+        root = root.resolve()
+        config_path = root / "config.toml"
+        config_data = copy.deepcopy(config_dict)
+        # Absolute paths in input configs must not escape the test runtime root.
+        config_data.setdefault("data", {})["data_path"] = "data"
+        server = config_data.setdefault("server", {})
+        server.update(
+            model_path="models", checkpoint_path="checkpoints", mpc_data_path="mpc"
+        )
+        config_data.setdefault("results", {})["result_path"] = "results"
+        toml_writer.dump(config_data, config_path)
         previous_env = os.environ.get("config_file")
-        previous_argv = sys.argv[:]
+        previous_argv = sys.argv
         os.environ["config_file"] = str(config_path)
-        sys.argv = [previous_argv[0]] if previous_argv else ["pytest"]
+        program = previous_argv[0] if previous_argv else "pytest"
+        sys.argv = [program, "-b", str(root), "--cpu"]
 
         try:
             config = Config()
+            Config.args.id = 0
+            Path(Config.params["data_path"]).mkdir(parents=True, exist_ok=True)
+            yield config
         finally:
             if previous_env is None:
                 os.environ.pop("config_file", None)
             else:
                 os.environ["config_file"] = previous_env
             sys.argv = previous_argv
-
-        Config.args.id = 0
-        model_dir = Path(tmp_dir) / "models"
-        ckpt_dir = Path(tmp_dir) / "checkpoints"
-        results_dir = Path(tmp_dir) / "results"
-
-        for directory in (model_dir, ckpt_dir, results_dir):
-            directory.mkdir(parents=True, exist_ok=True)
-
-        Config.params["base_path"] = tmp_dir
-        Config.params["model_path"] = str(model_dir)
-        Config.params["checkpoint_path"] = str(ckpt_dir)
-        Config.params["result_path"] = str(results_dir)
-
-        yield config
-
-        Config._instance = None
 
 
 @contextlib.contextmanager

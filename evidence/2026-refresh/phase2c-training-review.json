@@ -1,0 +1,2495 @@
+{
+  "review": "Independent phase 2C general runtime/checkpoint/training review",
+  "written_at_utc": "2026-10-03T06:18:31.104472+00:00",
+  "verdict": "CHANGES_REQUIRED",
+  "findings_summary": {
+    "critical": 0,
+    "high": 0,
+    "medium": 4,
+    "medium_new": 3,
+    "medium_root_cross_reference": 1,
+    "low_observations": 2
+  },
+  "conclusion": "Four concrete medium defects remain in the assigned scope on the immutable candidate. Passing focused tests and valid author receipts do not establish phase C acceptance. Root retains reviewed-phase integration authority.",
+  "candidate": {
+    "path": "/private/tmp/plato-refresh-worktrees/training",
+    "requested_path": "/tmp/plato-refresh-worktrees/training",
+    "commit": "62d7b7d8ef75be779149a96f567779c86699edb4",
+    "tree": "bfc18588145c935adaf36850f909f3223b5ad058",
+    "implementation_commit": "0dc34dd1d79d90071a0babfa6aa89f33d72a976f",
+    "implementation_tree": "0345bbeafe814bc33fa9bc2f845edf1043a13b53",
+    "accepted_b": "00eeb9dcdd2b513e64db9408969356037e09bb8e",
+    "accepted_b_is_ancestor_exit_code": 0,
+    "implementation_to_candidate_delta": [
+      "A\tevidence/2026-refresh/phase2c-feddyn-disposition.json",
+      "A\tevidence/2026-refresh/phase2c-scaffold-facts.json",
+      "A\tevidence/2026-refresh/phase2c-validation.json"
+    ],
+    "clean_before": "",
+    "clean_after": ""
+  },
+  "scope": {
+    "included": "All C general runtime/checkpoint/training production changes relative to accepted B, mandatory F07/F08/F14/F20-F26 and all general author additional findings: GAN/DCGAN, SSL, optimizer/wrappers, loss tracking, model exchange, FedMos, personalization, APFL/Ditto/FedALA/FedDyn state ownership, PORT and shared B runtime naming/lifecycle preservation.",
+    "excluded": [
+      "Detailed SCAFFOLD equations and control-state worker protocol assigned to complementary reviewer.",
+      "FedDyn 2C-11 objective/label-alpha primary-source design disposition remains OPEN with root; this review reports only the independent FedDyn filename migration bug and checks the bounded zero-label finite fallback.",
+      "Optional HuggingFace/LeRobot/nanochat/smolVLA integrations and A/D/archive/docs scopes; no dependency/metadata broadening."
+    ],
+    "workspace_discipline": "Read supplied isolated immutable training workspace and author/root logs/environments; all reviewer shell invocations zsh -lc, cwd/PYTHONPATH pinned to candidate for execution. No agents spawned. Wrote only own scratch plus this explicitly requested ROOT report. No source/commits/other worktrees/environment installation edits, cleanup or push."
+  },
+  "findings": [
+    {
+      "id": "ROOT-2C-01",
+      "severity": "medium",
+      "status": "OPEN_CONFIRMED_INDEPENDENTLY",
+      "title": "Public optimizer clipping consumes scaled gradients with fused AMP SGD.",
+      "locations": [
+        {
+          "path": "plato/trainers/strategies/optimizer.py",
+          "line": 414
+        },
+        {
+          "path": "plato/trainers/strategies/training_step.py",
+          "line": 253
+        }
+      ],
+      "trigger": "MixedPrecisionStepStrategy composed with GradientClippingOptimizerStrategy(DefaultOptimizerStrategy), registry SGD fused=True, real CPU torch.amp.GradScaler. Scalar parameter 1, quadratic loss w^2, lr .1, max_norm 1, initial scale 8.",
+      "expected": {
+        "weight": 0.900000049999975,
+        "calculation": "1 - .1 * 2 / (2 + 1e-6), clipping the unscaled gradient 2."
+      },
+      "actual_each_python": {
+        "fused_weight": 0.987500011920929,
+        "nonfused_control": 0.9000000357627869,
+        "optimizer_step_completed": true
+      },
+      "cause_and_impact": "The step prehook clips gradient 16 to about 1. AMP-aware fused SGD then unscales it by 8 inside the optimizer. A finite, completed training update is substantially too small. Nonfused GradScaler unscales before optimizer.step and passes the same numerical reference.",
+      "reproducer": {
+        "source": {
+          "path": "/tmp/plato-phase2c-training-review/review_regressions.py",
+          "sha256": "b987c3f7934a20a392d04033f9e8eea0e5a781720091932569a0fd36ba6651a1"
+        },
+        "pytest_node": "test_amp_clip_uses_unscaled_gradient[True]",
+        "commands": {
+          "313": "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=/private/tmp/plato-refresh-worktrees/training OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 /tmp/plato-phase2c-313/bin/python -m pytest /tmp/plato-phase2c-training-review/review_regressions.py -q -p no:cacheprovider --basetemp /tmp/plato-phase2c-training-review/negative-313",
+          "314": "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=/private/tmp/plato-refresh-worktrees/training OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 /tmp/plato-phase2c-314/bin/python -m pytest /tmp/plato-phase2c-training-review/review_regressions.py -q -p no:cacheprovider --basetemp /tmp/plato-phase2c-training-review/negative-314"
+        },
+        "shell": "zsh -lc",
+        "cwd": "/private/tmp/plato-refresh-worktrees/training",
+        "selection": "Commands run the complete five-case independent negative suite; the named node identifies this failure. No assertions skipped or weakened.",
+        "exit_codes": {
+          "313": 1,
+          "314": 1
+        },
+        "suite_result_each": "4 failed, 1 passed, 2 warnings",
+        "raw": [
+          {
+            "path": "/tmp/plato-phase2c-training-review/negative-313.log",
+            "sha256": "5ca3707ffd65b340724d324378c76aa13ad219e10acfacbc6ec01527649c8c22",
+            "python": "313"
+          },
+          {
+            "path": "/tmp/plato-phase2c-training-review/negative-314.log",
+            "sha256": "0cedc4a041b3cfffcbd10884cc43bde50d77cb7f54c39a9f0026a31a7e8db4ab",
+            "python": "314"
+          }
+        ]
+      },
+      "root_cross_reference": {
+        "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2c-root-amp-clipping-probe.json",
+        "sha256": "7e709b9d783b87948e876f5690da3a27c35aa74a8106a3c27520c6e7dc84cfc4"
+      },
+      "root_default_scale_corrob": "Actual ComposableTrainer, loss 10*w and scale 65536 gives 0.9999984502792358 instead of 0.900000009999999 on both versions. Root source/raw receipts independently hash-checked; reviewer separately constructed scale-8 reference.",
+      "test_gap": "Existing actual fused/nonfused overflow tests exercise skip counting but do not combine a finite AMP update with the public clipping wrapper.",
+      "bounded_acceptance": "Clipping must consume unscaled gradients for actual fused and nonfused AMP. Preserve real overflow skip/update counting and accumulation-tail behavior; numerical parameter-reference regression required.",
+      "limits": "Actual CPU fused/nonfused Torch execution. CPU injection leaves CUDA autocast disabled with the recorded warning; no CUDA execution claim."
+    },
+    {
+      "id": "TRAINING-2C-01",
+      "severity": "medium",
+      "status": "OPEN_CONFIRMED",
+      "title": "Long logical names produce worker files that pause_training does not remove.",
+      "locations": [
+        {
+          "path": "plato/trainers/base.py",
+          "line": 87
+        },
+        {
+          "path": "plato/trainers/base.py",
+          "line": 92
+        },
+        {
+          "path": "plato/utils/checkpoint_paths.py",
+          "line": 32
+        }
+      ],
+      "trigger": "Actual train_process and test_process with max_concurrency=1, model_name=\"x\"*240, client 7 and the actual run PID, followed by pause_training.",
+      "expected": "Remove this worker/client/run model, history and evaluation artifacts, retaining unrelated owners and persistent files.",
+      "actual_each_python": "Accuracy file is removed, but three owned files remain: ~t<tuple_digest>.safetensors, its .pkl history and ~t<tuple_digest>.eval.pkl.",
+      "cause_and_impact": "pause_training encodes a suffixless name and later appends extensions. The writer encodes the complete name with its suffix; suffix length and the 251-byte primary/history limit can change whether the tuple is digested. Cleanup silently leaves potentially large temporary model files and private worker state.",
+      "reproducer": {
+        "source": {
+          "path": "/tmp/plato-phase2c-training-review/review_regressions.py",
+          "sha256": "b987c3f7934a20a392d04033f9e8eea0e5a781720091932569a0fd36ba6651a1"
+        },
+        "pytest_node": "test_long_name_cleanup_matches_actual_writer",
+        "commands": {
+          "313": "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=/private/tmp/plato-refresh-worktrees/training OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 /tmp/plato-phase2c-313/bin/python -m pytest /tmp/plato-phase2c-training-review/review_regressions.py -q -p no:cacheprovider --basetemp /tmp/plato-phase2c-training-review/negative-313",
+          "314": "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=/private/tmp/plato-refresh-worktrees/training OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 /tmp/plato-phase2c-314/bin/python -m pytest /tmp/plato-phase2c-training-review/review_regressions.py -q -p no:cacheprovider --basetemp /tmp/plato-phase2c-training-review/negative-314"
+        },
+        "shell": "zsh -lc",
+        "cwd": "/private/tmp/plato-refresh-worktrees/training",
+        "selection": "Commands run the complete five-case independent negative suite; the named node identifies this failure. No assertions skipped or weakened.",
+        "exit_codes": {
+          "313": 1,
+          "314": 1
+        },
+        "suite_result_each": "4 failed, 1 passed, 2 warnings",
+        "raw": [
+          {
+            "path": "/tmp/plato-phase2c-training-review/negative-313.log",
+            "sha256": "5ca3707ffd65b340724d324378c76aa13ad219e10acfacbc6ec01527649c8c22",
+            "python": "313"
+          },
+          {
+            "path": "/tmp/plato-phase2c-training-review/negative-314.log",
+            "sha256": "0cedc4a041b3cfffcbd10884cc43bde50d77cb7f54c39a9f0026a31a7e8db4ab",
+            "python": "314"
+          }
+        ]
+      },
+      "numerical_raw": {
+        "313": {
+          "name_len": 240,
+          "run_id": 65410,
+          "writer_name": "~t6af88ff5f7c439372fc631666fbd944dd3dfd867bf23c749ae89a192113c4a73.safetensors",
+          "before": [
+            "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx_7_65410.acc",
+            "~t6af88ff5f7c439372fc631666fbd944dd3dfd867bf23c749ae89a192113c4a73.eval.pkl",
+            "~t6af88ff5f7c439372fc631666fbd944dd3dfd867bf23c749ae89a192113c4a73.safetensors",
+            "~t6af88ff5f7c439372fc631666fbd944dd3dfd867bf23c749ae89a192113c4a73.safetensors.pkl"
+          ],
+          "after": [
+            "~t6af88ff5f7c439372fc631666fbd944dd3dfd867bf23c749ae89a192113c4a73.eval.pkl",
+            "~t6af88ff5f7c439372fc631666fbd944dd3dfd867bf23c749ae89a192113c4a73.safetensors",
+            "~t6af88ff5f7c439372fc631666fbd944dd3dfd867bf23c749ae89a192113c4a73.safetensors.pkl"
+          ],
+          "exception": null,
+          "expected_remaining": []
+        },
+        "314": {
+          "name_len": 240,
+          "run_id": 65415,
+          "writer_name": "~t1bba03d04f35daae23b85a4391d27b04596b8a683621f92a2dc2b3243f47e908.safetensors",
+          "before": [
+            "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx_7_65415.acc",
+            "~t1bba03d04f35daae23b85a4391d27b04596b8a683621f92a2dc2b3243f47e908.eval.pkl",
+            "~t1bba03d04f35daae23b85a4391d27b04596b8a683621f92a2dc2b3243f47e908.safetensors",
+            "~t1bba03d04f35daae23b85a4391d27b04596b8a683621f92a2dc2b3243f47e908.safetensors.pkl"
+          ],
+          "after": [
+            "~t1bba03d04f35daae23b85a4391d27b04596b8a683621f92a2dc2b3243f47e908.eval.pkl",
+            "~t1bba03d04f35daae23b85a4391d27b04596b8a683621f92a2dc2b3243f47e908.safetensors",
+            "~t1bba03d04f35daae23b85a4391d27b04596b8a683621f92a2dc2b3243f47e908.safetensors.pkl"
+          ],
+          "exception": null,
+          "expected_remaining": []
+        }
+      },
+      "test_gap": "The long-name default save/load regression verifies successful file creation but does not call actual worker writers and cleanup. Short ordinary/slash-name cleanup passes.",
+      "bounded_acceptance": "Derive each cleanup artifact through the same complete logical-name/suffix contract as its writer; model history follows its actual primary filename. Verify long, ordinary and special names and unrelated-owner preservation. Preserve accepted B F10 cleanup ownership."
+    },
+    {
+      "id": "TRAINING-2C-02",
+      "severity": "medium",
+      "status": "OPEN_CONFIRMED",
+      "title": "FedDyn legacy migration misses the actual accepted B filename.",
+      "locations": [
+        {
+          "path": "plato/trainers/strategies/algorithms/feddyn_strategy.py",
+          "line": 397
+        }
+      ],
+      "accepted_b_writer": {
+        "commit": "00eeb9dcdd2b513e64db9408969356037e09bb8e",
+        "path": "plato/trainers/strategies/algorithms/feddyn_strategy.py",
+        "line": 342,
+        "expression": "f\"{base_path}_feddyn_grad_{context.client_id}.pth\""
+      },
+      "trigger": "Canonical state absent; recognized nonzero-client state written by accepted B exists at root + \"_feddyn_grad_1.pth\", with default or custom save root.",
+      "expected": "Read the same-client accepted B vector, preserve the original, prefer canonical state if present, and never adopt client 0.",
+      "actual_each_python": {
+        "expected_weight_vector": 7.0,
+        "loaded_weight_vector": 0.0,
+        "log": "No previous gradient vector found. Initializing to zero for first round."
+      },
+      "cause_and_impact": "Fallback omits the underscore between root and feddyn_grad, so previously saved cumulative gradients are silently lost when continuing from accepted B. This is a filename/compatibility defect independent of the separately open FedDyn objective design.",
+      "reproducer": {
+        "source": {
+          "path": "/tmp/plato-phase2c-training-review/review_regressions.py",
+          "sha256": "b987c3f7934a20a392d04033f9e8eea0e5a781720091932569a0fd36ba6651a1"
+        },
+        "pytest_node": "test_feddyn_reads_actual_accepted_b_writer",
+        "commands": {
+          "313": "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=/private/tmp/plato-refresh-worktrees/training OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 /tmp/plato-phase2c-313/bin/python -m pytest /tmp/plato-phase2c-training-review/review_regressions.py -q -p no:cacheprovider --basetemp /tmp/plato-phase2c-training-review/negative-313",
+          "314": "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=/private/tmp/plato-refresh-worktrees/training OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 /tmp/plato-phase2c-314/bin/python -m pytest /tmp/plato-phase2c-training-review/review_regressions.py -q -p no:cacheprovider --basetemp /tmp/plato-phase2c-training-review/negative-314"
+        },
+        "shell": "zsh -lc",
+        "cwd": "/private/tmp/plato-refresh-worktrees/training",
+        "selection": "Commands run the complete five-case independent negative suite; the named node identifies this failure. No assertions skipped or weakened.",
+        "exit_codes": {
+          "313": 1,
+          "314": 1
+        },
+        "suite_result_each": "4 failed, 1 passed, 2 warnings",
+        "raw": [
+          {
+            "path": "/tmp/plato-phase2c-training-review/negative-313.log",
+            "sha256": "5ca3707ffd65b340724d324378c76aa13ad219e10acfacbc6ec01527649c8c22",
+            "python": "313"
+          },
+          {
+            "path": "/tmp/plato-phase2c-training-review/negative-314.log",
+            "sha256": "0cedc4a041b3cfffcbd10884cc43bde50d77cb7f54c39a9f0026a31a7e8db4ab",
+            "python": "314"
+          }
+        ]
+      },
+      "reference_independence": "Reproducer obtains the exact accepted B source with git show, executes its writer class in memory, calls actual setup/on_train_start/on_train_end for context client 1, then passes its saved vector to candidate reader. No checkout/source/commit mutation.",
+      "supplemental_raw": {
+        "313": {
+          "legacy_writer_path": "/private/tmp/plato-phase2c-training-review/feddyn-legacy-313/models_feddyn_grad_1.pth",
+          "canonical_path": "/private/tmp/plato-phase2c-training-review/feddyn-legacy-313/models/feddyn_grad_1.pth",
+          "expected": {
+            "weight": [
+              [
+                7.0
+              ]
+            ],
+            "bias": [
+              8.0
+            ]
+          },
+          "actual": {
+            "weight": [
+              [
+                0.0
+              ]
+            ],
+            "bias": [
+              0.0
+            ]
+          },
+          "legacy_still_exists": true
+        },
+        "314": {
+          "legacy_writer_path": "/private/tmp/plato-phase2c-training-review/feddyn-legacy-314/models_feddyn_grad_1.pth",
+          "canonical_path": "/private/tmp/plato-phase2c-training-review/feddyn-legacy-314/models/feddyn_grad_1.pth",
+          "expected": {
+            "weight": [
+              [
+                7.0
+              ]
+            ],
+            "bias": [
+              8.0
+            ]
+          },
+          "actual": {
+            "weight": [
+              [
+                0.0
+              ]
+            ],
+            "bias": [
+              0.0
+            ]
+          },
+          "legacy_still_exists": true
+        }
+      },
+      "test_gap": {
+        "path": "tests/trainers/test_personalized_state_ownership.py",
+        "line": 164,
+        "detail": "Test handcrafts root + \"feddyn_grad_1.pth\", copying the new reader spelling rather than using accepted B writer output."
+      },
+      "bounded_acceptance": "Restore the exact accepted nonzero-client legacy spelling; retain canonical precedence, read-only original preservation, custom save_path and client-0 exclusion. Add actual old-writer/new-reader coverage without changing FedDyn equations."
+    },
+    {
+      "id": "TRAINING-2C-03",
+      "severity": "medium",
+      "status": "OPEN_CONFIRMED",
+      "title": "FedALA loses returning logical-client state when disk persistence is disabled.",
+      "locations": [
+        {
+          "path": "plato/trainers/strategies/algorithms/fedala_strategy.py",
+          "line": 119
+        },
+        {
+          "path": "plato/trainers/strategies/algorithms/fedala_strategy.py",
+          "line": 172
+        },
+        {
+          "path": "plato/trainers/strategies/algorithms/fedala_strategy.py",
+          "line": 209
+        }
+      ],
+      "trigger": "FedALAUpdateStrategy(save_state=False), physical trainer client 1 -> 2 -> 1, with client 1 trained before reassignment. The documented flag controls persistence to disk, not logical in-memory ownership.",
+      "expected": "Returning client 1 continues its own local model, learned ALA weights and start_phase. Given identical incoming model and data, its update matches a dedicated client-1 trainer.",
+      "actual_each_python": {
+        "save_state": false,
+        "expected_returned_local_state": {
+          "weight": [
+            [
+              0.8577587604522705
+            ],
+            [
+              -0.8577587604522705
+            ]
+          ]
+        },
+        "actual_returned_local_state": null,
+        "dedicated_weight": [
+          [
+            0.7175166606903076
+          ],
+          [
+            -0.8015005588531494
+          ]
+        ],
+        "reassigned_weight": [
+          [
+            1.8526185750961304
+          ],
+          [
+            -0.8526185750961304
+          ]
+        ],
+        "max_abs_error": 1.1351019144058228,
+        "dedicated_has_ala_weights": true,
+        "reassigned_has_ala_weights": false
+      },
+      "cause_and_impact": "Identity change clears local_model_state, weights and start_phase with no per-client memory cache; _load_state restores only when save_state=True. Returning client therefore takes first-round initialization, bypasses adaptive aggregation, and changes the next-round weights by up to 1.1351019144058228.",
+      "reproducer": {
+        "source": {
+          "path": "/tmp/plato-phase2c-training-review/review_regressions.py",
+          "sha256": "b987c3f7934a20a392d04033f9e8eea0e5a781720091932569a0fd36ba6651a1"
+        },
+        "pytest_node": "test_fedala_return_matches_dedicated_client_without_disk_state",
+        "commands": {
+          "313": "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=/private/tmp/plato-refresh-worktrees/training OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 /tmp/plato-phase2c-313/bin/python -m pytest /tmp/plato-phase2c-training-review/review_regressions.py -q -p no:cacheprovider --basetemp /tmp/plato-phase2c-training-review/negative-313",
+          "314": "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=/private/tmp/plato-refresh-worktrees/training OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 /tmp/plato-phase2c-314/bin/python -m pytest /tmp/plato-phase2c-training-review/review_regressions.py -q -p no:cacheprovider --basetemp /tmp/plato-phase2c-training-review/negative-314"
+        },
+        "shell": "zsh -lc",
+        "cwd": "/private/tmp/plato-refresh-worktrees/training",
+        "selection": "Commands run the complete five-case independent negative suite; the named node identifies this failure. No assertions skipped or weakened.",
+        "exit_codes": {
+          "313": 1,
+          "314": 1
+        },
+        "suite_result_each": "4 failed, 1 passed, 2 warnings",
+        "raw": [
+          {
+            "path": "/tmp/plato-phase2c-training-review/negative-313.log",
+            "sha256": "5ca3707ffd65b340724d324378c76aa13ad219e10acfacbc6ec01527649c8c22",
+            "python": "313"
+          },
+          {
+            "path": "/tmp/plato-phase2c-training-review/negative-314.log",
+            "sha256": "0cedc4a041b3cfffcbd10884cc43bde50d77cb7f54c39a9f0026a31a7e8db4ab",
+            "python": "314"
+          }
+        ]
+      },
+      "deterministic_fixture": "Two-class linear parameter [[1],[-1]], data x=[[1],[2]], labels=[1,1], SGD lr .1/momentum0, seed17, eta1/rand_percent100/max_ala_epochs2. Next incoming parameter [[2],[-1]] avoids the existing zero-sum ALA guard. All data/model/initialization equal between reused and dedicated references.",
+      "reference_independence": "Compare two actual trainer executions serving the same logical client, varying only intervening physical assignment. No hand-reimplementation of ALA equations.",
+      "test_gap": "Existing save_state=False worker coverage keeps the same client. Existing 1->2->1 FedALA ownership coverage uses default disk persistence, which hides the missing in-memory cache.",
+      "bounded_acceptance": "Keep and restore per-owner in-memory FedALA state when disk persistence is disabled, preserving cross-client isolation and successful worker returns. Dedicated-vs-reassigned numerical continuation must agree."
+    }
+  ],
+  "low_observations": [
+    {
+      "id": "TRAINING-LOW-01",
+      "severity": "low",
+      "status": "RECORDED_AVOIDABLE_WARNING_NO_ACCOUNTING_FAILURE_PROVEN",
+      "title": "Recreating equivalent DP Subsets produces repeated dataset-identity warnings.",
+      "location": {
+        "path": "plato/trainers/diff_privacy.py",
+        "line": 133
+      },
+      "evidence": "3 instances per focused run in consecutive/physical-split tests; own actual reuse probe reproduces same notice. Logical data/partition unchanged, independent parameter and accountant references pass.",
+      "assessment": "Stable equivalent dataset identity could avoid the notice; do not suppress genuinely changed-partition warnings. Recommendation is not elevated to a material accounting bug."
+    },
+    {
+      "id": "TRAINING-LOW-02",
+      "severity": "low",
+      "status": "RECORDED_TEST_DEVICE_WARNING_AND_LIMITATION",
+      "title": "CPU GradScaler regression tests enter CUDA autocast.",
+      "locations": [
+        {
+          "path": "plato/trainers/strategies/training_step.py",
+          "line": 235
+        },
+        {
+          "path": "tests/trainers/test_training_update_contract.py",
+          "line": 512
+        }
+      ],
+      "evidence": "2 instances per focused run, 2 per reviewer negative suite; root fresh base has the same 2 warnings on both versions.",
+      "assessment": "Useful real CPU overflow qualification executes, but the disabled autocast warning is avoidable test/device noise. No CUDA claim; no demonstrated failure of the ordinary auto-detected CPU runtime. A device-aware supported path or explicitly asserted expected warning would clarify coverage without blanket suppression."
+    }
+  ],
+  "warning_audit": {
+    "author_count_each": 19,
+    "reviewer_focused_count_each": 19,
+    "classes": [
+      {
+        "count_each": 5,
+        "message": "Secure RNG turned off",
+        "origin": "opacus/privacy_engine.py:98",
+        "classification": "Intentional experimental policy notice",
+        "assessment": "Real Opacus is executed under its existing secure_mode=False experiment contract. No production privacy/security guarantee and no global security questionnaire introduced."
+      },
+      {
+        "count_each": 3,
+        "message": "Optimal order is the largest alpha",
+        "origin": "opacus/accountants/analysis/rdp.py:332",
+        "classification": "Visible numerical bound limitation",
+        "assessment": "This calibrator may yield a looser bound over its chosen alpha grid. Finite accounting and cumulative step preservation are qualified; optimal/tight epsilon is not claimed."
+      },
+      {
+        "count_each": 4,
+        "message": "Full backward hook firing with respect to outputs because no inputs require gradients",
+        "origin": "plato/trainers/diff_privacy.py:332",
+        "classification": "Expected supported Opacus hook behavior",
+        "assessment": "Training inputs are intentionally non-grad tensors. Actual per-sample gradient and parameter references pass; requiring data gradients just to silence this would alter the contract."
+      },
+      {
+        "count_each": 2,
+        "message": "make_private_with_epsilon with non-zero privacy budget already spent",
+        "origin": "opacus/privacy_engine.py:576",
+        "classification": "Intentional existing per-run calibration boundary",
+        "assessment": "C retains cumulative accountant history while calibrating the existing target per run. Overall repeated-run epsilon is not bounded by that per-run target. Global privacy-policy redesign is outside this review; warning stays visible."
+      },
+      {
+        "count_each": 3,
+        "message": "PrivacyEngine detected new dataset object",
+        "origin": "opacus/privacy_engine.py:156",
+        "classification": "Avoidable runtime identity warning",
+        "low_observation": "TRAINING-LOW-01",
+        "assessment": "The executed reuse cases use the same logical dataset and indices; a fresh equivalent Subset is built each run. This is not evidence of incorrect accounting or a changed partition. Prefer stable logical Subset identity rather than broad suppression."
+      },
+      {
+        "count_each": 2,
+        "message": "CUDA is not available or torch_xla is imported. Disabling autocast.",
+        "origin": "plato/trainers/strategies/training_step.py:235",
+        "classification": "Avoidable CPU test/device warning",
+        "low_observation": "TRAINING-LOW-02",
+        "assessment": "Tests deliberately install a real CPU GradScaler but enter hardcoded CUDA autocast. CPU scaler skip behavior still executes; neither these tests nor this review qualify CUDA autocast. Normal auto-detected CPU path does not enable this strategy."
+      }
+    ],
+    "intentional_or_visible_contract_boundary_count_each": 14,
+    "avoidable_noise_count_each": 5,
+    "other_notices": "Torch elastic import logs that redirects are unsupported on macOS; retained in raw logs, outside pytest warning totals. SCAFFOLD standalone-control/additive-optimizer notices belong to its selected extension contract and complementary review; no detailed protocol acceptance here.",
+    "suppression": "No warning suppression, skipped assertions or altered source fixtures used."
+  },
+  "mandatory_contracts": [
+    {
+      "id": "F07",
+      "status": "PARTIAL_CHANGES_REQUIRED",
+      "assessment": "Shared component codec distinguishes org/model, org_model, literal digest-looking names and ordinary historical names. Actual default/worker/test/server/transport/personal/GAN/split/PORT writer-reader tests, custom roots, explicit normalized relative paths, canonical/recognized legacy precedence, sidecar containment, history roundtrip and device/mode paths executed. Overlong names save/load successfully but cleanup fails (TRAINING-2C-01). Historical FedDyn migration also fails (TRAINING-2C-02). Codec is cryptographic collision-resistant, not a promise of arbitrary-arity underscore tuple injectivity."
+    },
+    {
+      "id": "F08",
+      "status": "SUPPORTED_PATHS_VERIFIED_WITH_OPEN_COMPOSITION",
+      "assessment": "Independent float64 scalar reference for full windows, partial final window and shorter-than-window data; equal weighting of mean microbatch losses retained. Correct final normalization, no extra divisible update, idempotent finalize, fresh run gradients, actual optimizer/scheduler/model-update counts tested. Actual fused/nonfused GradScaler overflow skips tested; finite fused AMP clipping remains wrong (ROOT-2C-01)."
+    },
+    {
+      "id": "F14",
+      "status": "NO_ADDITIONAL_FINDING_IN_TESTED_SCOPE",
+      "assessment": "Actual timm first 10 updates, local/global epoch-round offsets and completion-only counting exercised. Own real CosineLRScheduler matches closed-form .1*(1+cos(pi*u/100))/2 at round1 offsets1..6 and round3 offsets13..18. Actual timm state_dict/load_state_dict next updates7/19 agree. Public reference source checked. This qualifies scheduler counters/library continuation, not a new durable optimizer/RNG restart protocol."
+    },
+    {
+      "id": "F20",
+      "status": "NO_ADDITIONAL_FINDING_IN_TESTED_SCOPE",
+      "assessment": "Accepted unsquared L2 and L1 retained. Own origin gradients finite/zero, mu0 exact base, L2 offset[3,4] gives penalty .25 and gradient[.03,.04], L1 gives .7 and [.1,.1]. Shipped MNIST FedProx TOML actually selects plato.trainers.fedprox.Trainer, SGD and mu .1; two actual synthetic-data LeNet batches yield proximal penalties0/.0001201629638671875 and finite changed parameters. No MNIST download/accuracy benchmark claimed."
+    },
+    {
+      "id": "F21",
+      "status": "NO_ADDITIONAL_MATERIAL_FINDING_IN_TESTED_SCOPE",
+      "assessment": "Actual reusable Opacus runs and injected interruption finish with plain strict model keys, consistent model/context identity and no lingering grad hooks. Real calibrated counts4/8/9, exact save/load and changed training outputs independently checked. Successful spawned client1/1/2 ledgers4/8/4 and return1=8 tested by repository suite. Warnings classified separately; no global/durable killed-worker privacy guarantee."
+    },
+    {
+      "id": "F22",
+      "status": "NO_ADDITIONAL_FINDING_IN_TESTED_SCOPE",
+      "assessment": "Own manual per-sample clipped gradient reference with fixed samples/no noise and actual Opacus: physical caps2/4 both produce [[.3588939309120178],[-.1588939130306244]], exactly2 optimizer/accountant updates, flags[F,T,F,T]/[T,T]. Real calibrated trainer20 physical batches yields9 callbacks/base updates/accountant updates over reusable and interrupted runs. Physical observations remain separate from logical completion."
+    },
+    {
+      "id": "F23",
+      "status": "PARTIAL_CHANGES_REQUIRED",
+      "assessment": "Canonical nonzero-client paths, custom save roots, owner changes and successful child returns exercised for Ditto/APFL/FedDyn/FedALA; shared hook propagation through composite strategies reviewed. Own APFL scalar1->2->1 matches private weights1.74/1.152 and momentum1.3/2.94. SSL private head and DP ledgers isolate owners in tests. Two uncovered negative paths: actual B FedDyn legacy filename and FedALA save_state=False return (TRAINING-2C-02/03). Detailed SCAFFOLD control protocol excluded."
+    },
+    {
+      "id": "F24",
+      "status": "NO_ADDITIONAL_FINDING_IN_TESTED_SCOPE",
+      "assessment": "Own FedProx reference snapshots refresh from each incoming model, remain fixed within the run and give zero finite proximal loss at each new baseline. Actual two-run repository tests confirm the lifecycle."
+    },
+    {
+      "id": "F25",
+      "status": "NO_ADDITIONAL_FINDING_IN_TESTED_SCOPE",
+      "assessment": "Actual public split test path before any train call and empty partition execute in focused suite, including correct 0 result, restored context and retained training feature/gradient behavior."
+    },
+    {
+      "id": "F26",
+      "status": "NO_ADDITIONAL_FINDING_IN_TESTED_SCOPE",
+      "assessment": "Safetensors matching deserialize_tree strips metadata; numeric finish-time then epoch selection, same-client isolation, strict cutoff and no-eligible error exercised against actual ordinary/DP/GAN writers. Own urgent snapshots epochs9/10 with cutoff11 select weight10 on actual MPS:0, preserve eval mode/injected model architecture and leave current model unchanged."
+    },
+    {
+      "id": "B_RUNTIME_PRESERVATION",
+      "status": "NO_ADDITIONAL_FINDING_IN_TESTED_SCOPE",
+      "assessment": "Accepted B merged/ancestor confirmed before C shared-file changes. Client lifecycle/startup harness and profile fixture exact B identities unchanged; handed runtime edits inspected as naming/path coordination. Both PORT example writer and aggregation-strategy reader execute for safe and legacy checkpoints; independent dot-product similarity .6 and sample2/6 weighted delta reference passes without mutating current model/mode. Real socket round rerun each Python: clients1/2, samples2/6, weighted error1.49e-8, exit0/no survivors. Accepted F10 short-name cleanup passes, long-name variant remains open."
+    }
+  ],
+  "additional_author_inventory_audit": [
+    {
+      "id": "2C-01",
+      "subject": "FedMos same-shaped parameter association",
+      "status": "NO_ADDITIONAL_FINDING_IN_TESTED_SCOPE",
+      "assessment": "Source and corresponding focused regression/reference inspected and executed; bounded to the author inventory behavior, not whole research-algorithm certification."
+    },
+    {
+      "id": "2C-02",
+      "subject": "Loss tracker retains autograd graphs",
+      "status": "NO_ADDITIONAL_FINDING_IN_TESTED_SCOPE",
+      "assessment": "Source and corresponding focused regression/reference inspected and executed; bounded to the author inventory behavior, not whole research-algorithm certification."
+    },
+    {
+      "id": "2C-03",
+      "subject": "Gradient clipping after optimizer step",
+      "status": "PARTIAL_CHANGES_REQUIRED",
+      "assessment": "Ordinary/tail clipping reference passes, finite fused AMP composition fails ROOT-2C-01."
+    },
+    {
+      "id": "2C-04",
+      "subject": "Validation wrapper bypasses selected step strategy",
+      "status": "NO_ADDITIONAL_FINDING_IN_TESTED_SCOPE",
+      "assessment": "Source and corresponding focused regression/reference inspected and executed; bounded to the author inventory behavior, not whole research-algorithm certification."
+    },
+    {
+      "id": "2C-05",
+      "subject": "DCGAN public model is not nn.Module",
+      "status": "NO_ADDITIONAL_FINDING_IN_TESTED_SCOPE",
+      "assessment": "Source and corresponding focused regression/reference inspected and executed; bounded to the author inventory behavior, not whole research-algorithm certification."
+    },
+    {
+      "id": "2C-06",
+      "subject": "GAN exchange aliases/moves source and mishandles bool buffers",
+      "status": "NO_ADDITIONAL_FINDING_IN_TESTED_SCOPE",
+      "assessment": "Source and corresponding focused regression/reference inspected and executed; bounded to the author inventory behavior, not whole research-algorithm certification."
+    },
+    {
+      "id": "2C-07",
+      "subject": "GAN auxiliary/worker/time checkpoints disagree",
+      "status": "NO_ADDITIONAL_FINDING_IN_TESTED_SCOPE",
+      "assessment": "Source and corresponding focused regression/reference inspected and executed; bounded to the author inventory behavior, not whole research-algorithm certification."
+    },
+    {
+      "id": "2C-08",
+      "subject": "SSL instance constructor, empty data and KNN sampler mismatch",
+      "status": "NO_ADDITIONAL_FINDING_IN_TESTED_SCOPE",
+      "assessment": "Source and corresponding focused regression/reference inspected and executed; bounded to the author inventory behavior, not whole research-algorithm certification."
+    },
+    {
+      "id": "2C-09",
+      "subject": "Personalization overwrites trainability flags",
+      "status": "NO_ADDITIONAL_FINDING_IN_TESTED_SCOPE",
+      "assessment": "Source and corresponding focused regression/reference inspected and executed; bounded to the author inventory behavior, not whole research-algorithm certification."
+    },
+    {
+      "id": "2C-10",
+      "subject": "LG multi-update callbacks and scheduler",
+      "status": "NO_ADDITIONAL_FINDING_IN_TESTED_SCOPE",
+      "assessment": "Source and corresponding focused regression/reference inspected and executed; bounded to the author inventory behavior, not whole research-algorithm certification."
+    },
+    {
+      "id": "2C-11",
+      "subject": "FedDyn mathematical objective and label-based alpha",
+      "status": "OPEN_ROOT_DESIGN_REVIEW_EXCLUDED",
+      "assessment": "Root owns primary-source FedDyn objective/alpha disposition; not duplicated or accepted here."
+    },
+    {
+      "id": "2C-12",
+      "subject": "Personalization child state lost in parent",
+      "status": "PARTIAL_CHANGES_REQUIRED",
+      "assessment": "Actual successful spawned personalized state comparisons pass. Returning FedALA save_state=False owner is uncovered and fails TRAINING-2C-03."
+    },
+    {
+      "id": "2C-13",
+      "subject": "APFL historical NumPy scalar alpha",
+      "status": "NO_ADDITIONAL_FINDING_IN_TESTED_SCOPE",
+      "assessment": "Source and corresponding focused regression/reference inspected and executed; bounded to the author inventory behavior, not whole research-algorithm certification."
+    },
+    {
+      "id": "2C-14",
+      "subject": "AMP overflow reported as optimizer update",
+      "status": "NO_ADDITIONAL_FINDING_IN_TESTED_SCOPE",
+      "assessment": "Source and corresponding focused regression/reference inspected and executed; bounded to the author inventory behavior, not whole research-algorithm certification."
+    },
+    {
+      "id": "2C-15",
+      "subject": "GAN FID sampling, tail and rectangular pad",
+      "status": "NO_ADDITIONAL_FINDING_IN_TESTED_SCOPE",
+      "assessment": "Source and corresponding focused regression/reference inspected and executed; bounded to the author inventory behavior, not whole research-algorithm certification."
+    },
+    {
+      "id": "2C-16",
+      "subject": "FedDyn all-zero labels produce NaN",
+      "status": "NO_ADDITIONAL_FINDING_IN_TESTED_SCOPE",
+      "assessment": "Source and corresponding focused regression/reference inspected and executed; bounded to the author inventory behavior, not whole research-algorithm certification."
+    },
+    {
+      "id": "2C-17",
+      "subject": "DP successful child accountant discarded",
+      "status": "NO_ADDITIONAL_FINDING_IN_TESTED_SCOPE",
+      "assessment": "Source and corresponding focused regression/reference inspected and executed; bounded to the author inventory behavior, not whole research-algorithm certification."
+    },
+    {
+      "id": "2C-18",
+      "subject": "Long logical checkpoint names exceed sidecar filename limit",
+      "status": "PARTIAL_CHANGES_REQUIRED",
+      "assessment": "Overlong default save/load and history limit pass; actual worker cleanup mismatch TRAINING-2C-01 remains."
+    },
+    {
+      "id": "2C-19",
+      "subject": "SSL private head lost across workers/client identity",
+      "status": "NO_ADDITIONAL_FINDING_IN_TESTED_SCOPE",
+      "assessment": "Source and corresponding focused regression/reference inspected and executed; bounded to the author inventory behavior, not whole research-algorithm certification."
+    },
+    {
+      "id": "2C-20",
+      "subject": "Frozen SSL encoder mutates BN/dropout/grad state",
+      "status": "NO_ADDITIONAL_FINDING_IN_TESTED_SCOPE",
+      "assessment": "Source and corresponding focused regression/reference inspected and executed; bounded to the author inventory behavior, not whole research-algorithm certification."
+    },
+    {
+      "id": "2C-21",
+      "subject": "Returning APFL client loses private momentum",
+      "status": "NO_ADDITIONAL_FINDING_IN_TESTED_SCOPE",
+      "assessment": "Source and corresponding focused regression/reference inspected and executed; bounded to the author inventory behavior, not whole research-algorithm certification."
+    },
+    {
+      "id": "2C-22",
+      "subject": "Explicit GAN paths alias pairs or write before rejection",
+      "status": "NO_ADDITIONAL_FINDING_IN_TESTED_SCOPE",
+      "assessment": "Source and corresponding focused regression/reference inspected and executed; bounded to the author inventory behavior, not whole research-algorithm certification."
+    },
+    {
+      "id": "2C-23",
+      "subject": "Live DP epoch snapshot writes _module keys",
+      "status": "NO_ADDITIONAL_FINDING_IN_TESTED_SCOPE",
+      "assessment": "Source and corresponding focused regression/reference inspected and executed; bounded to the author inventory behavior, not whole research-algorithm certification."
+    },
+    {
+      "id": "2C-24",
+      "subject": "Safe checkpoint primary bypasses history symlink containment",
+      "status": "NO_ADDITIONAL_FINDING_IN_TESTED_SCOPE",
+      "assessment": "Source and corresponding focused regression/reference inspected and executed; bounded to the author inventory behavior, not whole research-algorithm certification."
+    }
+  ],
+  "additional_source_assessment": {
+    "GAN_model_exchange_runtime": "DCGAN nn.Module registration/device/mode APIs and real G/D changes; owned CPU snapshot clones; bool/int delta behavior; combined Safetensors worker/urgent tree and history; existing Torch paired .pth/historical paired .safetensors fallback; normalized explicit companions rejected before writes; FID sampler/tail/rectangular padding and covariance sample boundary tested. Controlled feature/covariance references do not certify pretrained FID quality or full distributed GAN benchmarks.",
+    "SSL": "Instance constructor and explicit empty data preserved; train-reference/test-partition KNN boundaries and missing-reference errors tested. Canonical private-head owner/save/load/successful child return tested. Pure head training freezes encoder gradients/BN/dropout via eval/no_grad and restores per-module modes/flags on success and exceptions; no inference tensors reenter head autograd. Reexecuted actual Lightly multiview author smoke independently on both versions: finite loss .6038040518760681, encoder changed/head unchanged. This is an independent execution of author smoke, not a newly derived SSL loss equation reference.",
+    "personalization_and_optimizer": "FedPer/FedRep/LG previous requires_grad flags restored including exceptions/frozen parameters. LG two actual updates dispatch and follow actual scheduler; independent parameter/LR reference in executed tests. FedMos identity pairing distinguishes same-shaped parameters; retained legacy values5.95/11.45. Tracking records detached numerical weighted averages, no retained graph. Validation wrapper delegates chosen step strategy and validates before real/tail updates. APFL trusted historical NumPy alpha allowlist scoped/new primitive float, in-memory private momentum continuation independently derived. No durable private optimizer momentum restart protocol claimed."
+  },
+  "independent_references": {
+    "primary_library_sources": [
+      {
+        "title": "PyTorch AMP examples: gradient clipping requires unscaling first",
+        "url": "https://docs.pytorch.org/docs/2.14/notes/amp_examples.html",
+        "use": "Independent library contract supporting ROOT-2C-01, not a copied implementation expectation."
+      },
+      {
+        "title": "Opacus BatchMemoryManager API",
+        "url": "https://opacus.ai/api/batch_memory_manager.html",
+        "use": "Physical splits preserve logical updates; checked against actual optimizer/accountant and manual per-sample clipping."
+      },
+      {
+        "title": "Opacus GradSampleModule API",
+        "url": "https://opacus.ai/api/grad_sample_module.html",
+        "use": "Wrapper/hook ownership and supported removal, checked with real consecutive and interrupted runs."
+      },
+      {
+        "title": "Timm upstream training loop",
+        "url": "https://raw.githubusercontent.com/huggingface/pytorch-image-models/main/train.py",
+        "use": "Actual-update and start/resume offset convention. Numerical qualification uses installed timm 1.0.30 and a closed-form cosine reference; current upstream main is not claimed to be that exact package revision."
+      }
+    ],
+    "methods": [
+      "Closed-form scalar SGD accumulation/tail and FedProx norm derivatives.",
+      "Actual old B writer output compared with C reader, rather than copying C filename.",
+      "Dedicated logical-client execution versus physical reassignment; scalar APFL momentum recurrence.",
+      "Manual per-sample clipping averaged over fixed logical samples, actual Opacus optimizer/accountant and alternate physical caps.",
+      "Real timm cosine scheduler compared with closed-form cosine and library saved-state next update.",
+      "Actual process socket results compared numerically with sample-weighted aggregation; no leftover process assertions skipped."
+    ]
+  },
+  "reviewer_executions": [
+    {
+      "label": "focused-313",
+      "command": "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=/private/tmp/plato-refresh-worktrees/training OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2c-313/bin/python -m pytest tests/trainers tests/algorithms tests/models tests/clients tests/servers tests/callbacks tests/integration/test_smoke_configs.py tests/integration/test_checkpoint_runtime_agreement.py --ignore=tests/trainers/test_huggingface_trainer.py --ignore=tests/trainers/test_lerobot_trainer.py --ignore=tests/trainers/test_nanochat_trainer.py --ignore=tests/models/test_smolvla_model.py --ignore=tests/trainers/test_scaffold_strategy.py -q -p no:cacheprovider --basetemp /tmp/plato-phase2c-training-review/pytest-313",
+      "shell": "zsh -lc",
+      "cwd": "/private/tmp/plato-refresh-worktrees/training",
+      "exit_code": 0,
+      "seconds": 92.04660367965698,
+      "log": "/tmp/plato-phase2c-training-review/focused-313.log",
+      "sha256": "6011ac693f5643345454b9431addbcd04dd1ab6cebb50466363d17f1a968bf9c"
+    },
+    {
+      "label": "focused-314",
+      "command": "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=/private/tmp/plato-refresh-worktrees/training OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2c-314/bin/python -m pytest tests/trainers tests/algorithms tests/models tests/clients tests/servers tests/callbacks tests/integration/test_smoke_configs.py tests/integration/test_checkpoint_runtime_agreement.py --ignore=tests/trainers/test_huggingface_trainer.py --ignore=tests/trainers/test_lerobot_trainer.py --ignore=tests/trainers/test_nanochat_trainer.py --ignore=tests/models/test_smolvla_model.py --ignore=tests/trainers/test_scaffold_strategy.py -q -p no:cacheprovider --basetemp /tmp/plato-phase2c-training-review/pytest-314",
+      "shell": "zsh -lc",
+      "cwd": "/private/tmp/plato-refresh-worktrees/training",
+      "exit_code": 0,
+      "seconds": 132.23595213890076,
+      "log": "/tmp/plato-phase2c-training-review/focused-314.log",
+      "sha256": "8b42225d7f9607672f10788ae5b4abf32484b139a25b1f5a083612e5ef0a3473"
+    },
+    {
+      "label": "independent-r2-313",
+      "command": "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=/private/tmp/plato-refresh-worktrees/training OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 /tmp/plato-phase2c-313/bin/python /tmp/plato-phase2c-training-review/independent.py",
+      "shell": "zsh -lc",
+      "cwd": "/private/tmp/plato-refresh-worktrees/training",
+      "exit_code": 0,
+      "seconds": 4.21830415725708,
+      "log": "/tmp/plato-phase2c-training-review/independent-r2-313.log",
+      "sha256": "d8902b4826b39bb3c3ee07249ff2bba66970c7e1eb2beed449c56ffff453e258"
+    },
+    {
+      "label": "independent-r2-314",
+      "command": "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=/private/tmp/plato-refresh-worktrees/training OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 /tmp/plato-phase2c-314/bin/python /tmp/plato-phase2c-training-review/independent.py",
+      "shell": "zsh -lc",
+      "cwd": "/private/tmp/plato-refresh-worktrees/training",
+      "exit_code": 0,
+      "seconds": 4.506254196166992,
+      "log": "/tmp/plato-phase2c-training-review/independent-r2-314.log",
+      "sha256": "c990a0dcf8641f80103340c18bc57cd111ffd851963a15d09c483bf36719e7e3"
+    },
+    {
+      "label": "behavior-r2-313",
+      "command": "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=/private/tmp/plato-refresh-worktrees/training OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 /tmp/plato-phase2c-313/bin/python /tmp/plato-phase2c-training-review/behavior.py r2",
+      "shell": "zsh -lc",
+      "cwd": "/private/tmp/plato-refresh-worktrees/training",
+      "exit_code": 0,
+      "seconds": 6.96909499168396,
+      "log": "/tmp/plato-phase2c-training-review/behavior-r2-313.log",
+      "sha256": "c222ab95d4849d548c949127566cffbf07d12e531790ed40c765276054c1a91a"
+    },
+    {
+      "label": "behavior-r2-314",
+      "command": "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=/private/tmp/plato-refresh-worktrees/training OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 /tmp/plato-phase2c-314/bin/python /tmp/plato-phase2c-training-review/behavior.py r2",
+      "shell": "zsh -lc",
+      "cwd": "/private/tmp/plato-refresh-worktrees/training",
+      "exit_code": 0,
+      "seconds": 7.708080053329468,
+      "log": "/tmp/plato-phase2c-training-review/behavior-r2-314.log",
+      "sha256": "49bf13d5b5d798e9c011db569a9b996eb504148c9bc34eb86fad4dd30d1d8693"
+    },
+    {
+      "label": "negative-313",
+      "command": "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=/private/tmp/plato-refresh-worktrees/training OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 /tmp/plato-phase2c-313/bin/python -m pytest /tmp/plato-phase2c-training-review/review_regressions.py -q -p no:cacheprovider --basetemp /tmp/plato-phase2c-training-review/negative-313",
+      "shell": "zsh -lc",
+      "cwd": "/private/tmp/plato-refresh-worktrees/training",
+      "exit_code": 1,
+      "seconds": 4.994519948959351,
+      "log": "/tmp/plato-phase2c-training-review/negative-313.log",
+      "sha256": "5ca3707ffd65b340724d324378c76aa13ad219e10acfacbc6ec01527649c8c22"
+    },
+    {
+      "label": "negative-314",
+      "command": "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=/private/tmp/plato-refresh-worktrees/training OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 /tmp/plato-phase2c-314/bin/python -m pytest /tmp/plato-phase2c-training-review/review_regressions.py -q -p no:cacheprovider --basetemp /tmp/plato-phase2c-training-review/negative-314",
+      "shell": "zsh -lc",
+      "cwd": "/private/tmp/plato-refresh-worktrees/training",
+      "exit_code": 1,
+      "seconds": 5.304610967636108,
+      "log": "/tmp/plato-phase2c-training-review/negative-314.log",
+      "sha256": "0cedc4a041b3cfffcbd10884cc43bde50d77cb7f54c39a9f0026a31a7e8db4ab"
+    },
+    {
+      "label": "socket-313",
+      "command": "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=/private/tmp/plato-refresh-worktrees/training OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 /tmp/plato-phase2c-313/bin/python -m pytest tests/integration/test_event_loop_startup.py::test_real_two_client_cpu_socket_round -q -p no:cacheprovider --basetemp /tmp/plato-phase2c-training-review/socket-313",
+      "shell": "zsh -lc",
+      "cwd": "/private/tmp/plato-refresh-worktrees/training",
+      "exit_code": 0,
+      "seconds": 20.22758674621582,
+      "log": "/tmp/plato-phase2c-training-review/socket-313.log",
+      "sha256": "a0843069207e7b6249c41a8500f9cd4a76f9a91ec9b4eca990898a85497f08a0"
+    },
+    {
+      "label": "socket-314",
+      "command": "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=/private/tmp/plato-refresh-worktrees/training OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 /tmp/plato-phase2c-314/bin/python -m pytest tests/integration/test_event_loop_startup.py::test_real_two_client_cpu_socket_round -q -p no:cacheprovider --basetemp /tmp/plato-phase2c-training-review/socket-314",
+      "shell": "zsh -lc",
+      "cwd": "/private/tmp/plato-refresh-worktrees/training",
+      "exit_code": 0,
+      "seconds": 20.87912392616272,
+      "log": "/tmp/plato-phase2c-training-review/socket-314.log",
+      "sha256": "b8f5ad6dd25bbc41711e2efe6a42dfd4622b72e80e362b3c6b01bf5808f82737"
+    },
+    {
+      "label": "ssl-313",
+      "command": "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=/private/tmp/plato-refresh-worktrees/training OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 /tmp/plato-phase2c-ssl/bin/python /tmp/plato-phase2c-scratch/ssl_actual_probe.py",
+      "shell": "zsh -lc",
+      "cwd": "/private/tmp/plato-refresh-worktrees/training",
+      "exit_code": 0,
+      "seconds": 7.768425941467285,
+      "log": "/tmp/plato-phase2c-training-review/ssl-313.log",
+      "sha256": "095a04f5474329546ceae24e55c91adb70dfea46ee5be1d3e6b1f16fccd093bc"
+    },
+    {
+      "label": "ssl-314",
+      "command": "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=/private/tmp/plato-refresh-worktrees/training OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 /tmp/plato-phase2c-ssl314/bin/python /tmp/plato-phase2c-scratch/ssl_actual_probe.py",
+      "shell": "zsh -lc",
+      "cwd": "/private/tmp/plato-refresh-worktrees/training",
+      "exit_code": 0,
+      "seconds": 8.025772094726562,
+      "log": "/tmp/plato-phase2c-training-review/ssl-314.log",
+      "sha256": "88a3a154381c05d50b92435250a6b2fe5b9591e11761b675cd68f4ad5f422636"
+    },
+    {
+      "label": "final-evidence-audit-r2",
+      "command": "PYTHONDONTWRITEBYTECODE=1 /tmp/plato-phase2c-313/bin/python /tmp/plato-phase2c-training-review/audit_receipts.py",
+      "shell": "zsh -lc",
+      "cwd": "/private/tmp/plato-refresh-worktrees/training",
+      "exit_code": 0,
+      "seconds": 0.0945889949798584,
+      "log": "/tmp/plato-phase2c-training-review/final-evidence-audit-r2.log",
+      "sha256": "6b7de2bfd4ae2abc1205d98aba6bacae83a147fcef3404439ff2f52138385463"
+    }
+  ],
+  "reviewer_results": {
+    "focused": {
+      "313": "372 passed, 19 warnings in 86.85s",
+      "314": "372 passed, 19 warnings in 126.79s"
+    },
+    "negative": {
+      "313": "4 failed, 1 passed, 2 warnings in 3.89s; exit 1",
+      "314": "4 failed, 1 passed, 2 warnings in 4.11s; exit 1"
+    },
+    "socket": {
+      "313": {
+        "path": "/tmp/plato-phase2c-training-review/socket-313/test_real_two_client_cpu_socke0/round/result.json",
+        "sha256": "80590e711b9ba8ad9acf8b9181346003baf1829a5e250e53d64375928b7228f9",
+        "weighted_error": 1.4901161193847656e-08,
+        "client_ids": [
+          1,
+          2
+        ],
+        "samples": [
+          2,
+          6
+        ],
+        "returncode": 0,
+        "survivors": []
+      },
+      "314": {
+        "path": "/tmp/plato-phase2c-training-review/socket-314/test_real_two_client_cpu_socke0/round/result.json",
+        "sha256": "4b29fee6467c317a06633c0c6a7ea7c34366016aba9e2a740524ef741f60f2a9",
+        "weighted_error": 1.4901161193847656e-08,
+        "client_ids": [
+          1,
+          2
+        ],
+        "samples": [
+          2,
+          6
+        ],
+        "returncode": 0,
+        "survivors": []
+      }
+    },
+    "behavior": {
+      "313": {
+        "dp_manual_per_sample_reference": [
+          {
+            "physical_cap": 2,
+            "expected": [
+              [
+                0.3588939309120178
+              ],
+              [
+                -0.1588939130306244
+              ]
+            ],
+            "actual": [
+              [
+                0.3588939309120178
+              ],
+              [
+                -0.1588939130306244
+              ]
+            ],
+            "flags": [
+              false,
+              true,
+              false,
+              true
+            ],
+            "base_optimizer_updates": 2,
+            "accountant_updates": 2
+          },
+          {
+            "physical_cap": 4,
+            "expected": [
+              [
+                0.3588939309120178
+              ],
+              [
+                -0.1588939130306244
+              ]
+            ],
+            "actual": [
+              [
+                0.3588939309120178
+              ],
+              [
+                -0.1588939130306244
+              ]
+            ],
+            "flags": [
+              true,
+              true
+            ],
+            "base_optimizer_updates": 2,
+            "accountant_updates": 2
+          }
+        ],
+        "dp_real_reuse_and_interrupt": {
+          "counts": [
+            4,
+            8,
+            9
+          ],
+          "physical_batches": 20,
+          "callbacks": 9,
+          "base_updates": 9,
+          "plain_keys": [
+            "weight",
+            "bias"
+          ],
+          "no_hooks": true,
+          "save_load_exact": true
+        },
+        "apfl_1_2_1_scalar_reference": [
+          {
+            "round": 1,
+            "expected_private": 1.74,
+            "actual_private": 1.7400000095367432,
+            "expected_momentum": 1.3,
+            "actual_momentum": 1.2999999523162842
+          },
+          {
+            "round": 2,
+            "expected_private": 1.152,
+            "actual_private": 1.1519999504089355,
+            "expected_momentum": 2.9400000000000004,
+            "actual_momentum": 2.940000057220459
+          }
+        ],
+        "fedala_reassignment_numerical": {
+          "save_state": false,
+          "expected_returned_local_state": {
+            "weight": [
+              [
+                0.8577587604522705
+              ],
+              [
+                -0.8577587604522705
+              ]
+            ]
+          },
+          "actual_returned_local_state": null,
+          "dedicated_weight": [
+            [
+              0.7175166606903076
+            ],
+            [
+              -0.8015005588531494
+            ]
+          ],
+          "reassigned_weight": [
+            [
+              1.8526185750961304
+            ],
+            [
+              -0.8526185750961304
+            ]
+          ],
+          "max_abs_error": 1.1351019144058228,
+          "dedicated_has_ala_weights": true,
+          "reassigned_has_ala_weights": false
+        },
+        "fedprox_actual_reference_toml": {
+          "trainer_class": "plato.trainers.fedprox.Trainer",
+          "optimizer": "SGD",
+          "mu": 0.1,
+          "proximal_penalties": [
+            0.0,
+            0.0001201629638671875
+          ],
+          "model_changed": true,
+          "finite": true
+        },
+        "urgent_mps": {
+          "device": "mps:0",
+          "weight": 10.0,
+          "mode": "eval",
+          "current_model_unchanged": true
+        }
+      },
+      "314": {
+        "dp_manual_per_sample_reference": [
+          {
+            "physical_cap": 2,
+            "expected": [
+              [
+                0.3588939309120178
+              ],
+              [
+                -0.1588939130306244
+              ]
+            ],
+            "actual": [
+              [
+                0.3588939309120178
+              ],
+              [
+                -0.1588939130306244
+              ]
+            ],
+            "flags": [
+              false,
+              true,
+              false,
+              true
+            ],
+            "base_optimizer_updates": 2,
+            "accountant_updates": 2
+          },
+          {
+            "physical_cap": 4,
+            "expected": [
+              [
+                0.3588939309120178
+              ],
+              [
+                -0.1588939130306244
+              ]
+            ],
+            "actual": [
+              [
+                0.3588939309120178
+              ],
+              [
+                -0.1588939130306244
+              ]
+            ],
+            "flags": [
+              true,
+              true
+            ],
+            "base_optimizer_updates": 2,
+            "accountant_updates": 2
+          }
+        ],
+        "dp_real_reuse_and_interrupt": {
+          "counts": [
+            4,
+            8,
+            9
+          ],
+          "physical_batches": 20,
+          "callbacks": 9,
+          "base_updates": 9,
+          "plain_keys": [
+            "weight",
+            "bias"
+          ],
+          "no_hooks": true,
+          "save_load_exact": true
+        },
+        "apfl_1_2_1_scalar_reference": [
+          {
+            "round": 1,
+            "expected_private": 1.74,
+            "actual_private": 1.7400000095367432,
+            "expected_momentum": 1.3,
+            "actual_momentum": 1.2999999523162842
+          },
+          {
+            "round": 2,
+            "expected_private": 1.152,
+            "actual_private": 1.1519999504089355,
+            "expected_momentum": 2.9400000000000004,
+            "actual_momentum": 2.940000057220459
+          }
+        ],
+        "fedala_reassignment_numerical": {
+          "save_state": false,
+          "expected_returned_local_state": {
+            "weight": [
+              [
+                0.8577587604522705
+              ],
+              [
+                -0.8577587604522705
+              ]
+            ]
+          },
+          "actual_returned_local_state": null,
+          "dedicated_weight": [
+            [
+              0.7175166606903076
+            ],
+            [
+              -0.8015005588531494
+            ]
+          ],
+          "reassigned_weight": [
+            [
+              1.8526185750961304
+            ],
+            [
+              -0.8526185750961304
+            ]
+          ],
+          "max_abs_error": 1.1351019144058228,
+          "dedicated_has_ala_weights": true,
+          "reassigned_has_ala_weights": false
+        },
+        "fedprox_actual_reference_toml": {
+          "trainer_class": "plato.trainers.fedprox.Trainer",
+          "optimizer": "SGD",
+          "mu": 0.1,
+          "proximal_penalties": [
+            0.0,
+            0.0001201629638671875
+          ],
+          "model_changed": true,
+          "finite": true
+        },
+        "urgent_mps": {
+          "device": "mps:0",
+          "weight": 10.0,
+          "mode": "eval",
+          "current_model_unchanged": true
+        }
+      }
+    },
+    "independent_numeric": {
+      "313": {
+        "accumulation_analytical": [
+          {
+            "microbatches": [
+              [
+                1.0,
+                2.0
+              ],
+              [
+                3.0,
+                4.0
+              ],
+              [
+                5.0
+              ]
+            ],
+            "window": 2,
+            "expected": 0.425,
+            "actual": 0.425,
+            "flags": [
+              false,
+              true,
+              false
+            ],
+            "tail_update": true
+          },
+          {
+            "microbatches": [
+              [
+                1.0,
+                2.0
+              ],
+              [
+                3.0
+              ]
+            ],
+            "window": 4,
+            "expected": 0.885,
+            "actual": 0.885,
+            "flags": [
+              false,
+              false
+            ],
+            "tail_update": true
+          },
+          {
+            "microbatches": [
+              [
+                1.0
+              ],
+              [
+                2.0
+              ]
+            ],
+            "window": 2,
+            "expected": 0.95,
+            "actual": 0.95,
+            "flags": [
+              false,
+              true
+            ],
+            "tail_update": false
+          }
+        ],
+        "fedprox_analytical": [
+          {
+            "mu": 0.0,
+            "norm": "l2",
+            "initial_loss": 0.0,
+            "nonzero_loss": 0.0,
+            "expected_gradient": [
+              0.0,
+              0.0
+            ],
+            "actual_gradient": [
+              [
+                0.0,
+                0.0
+              ]
+            ]
+          },
+          {
+            "mu": 0.1,
+            "norm": "l2",
+            "initial_loss": 0.0,
+            "nonzero_loss": 0.25,
+            "expected_gradient": [
+              0.030000000000000006,
+              0.04
+            ],
+            "actual_gradient": [
+              [
+                0.03,
+                0.04000000000000001
+              ]
+            ]
+          },
+          {
+            "mu": 0.1,
+            "norm": "l1",
+            "initial_loss": 0.0,
+            "nonzero_loss": 0.7000000000000001,
+            "expected_gradient": [
+              0.1,
+              0.1
+            ],
+            "actual_gradient": [
+              [
+                0.1,
+                0.1
+              ]
+            ]
+          }
+        ],
+        "long_worker_cleanup": {
+          "name_len": 240,
+          "run_id": 65410,
+          "writer_name": "~t6af88ff5f7c439372fc631666fbd944dd3dfd867bf23c749ae89a192113c4a73.safetensors",
+          "before": [
+            "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx_7_65410.acc",
+            "~t6af88ff5f7c439372fc631666fbd944dd3dfd867bf23c749ae89a192113c4a73.eval.pkl",
+            "~t6af88ff5f7c439372fc631666fbd944dd3dfd867bf23c749ae89a192113c4a73.safetensors",
+            "~t6af88ff5f7c439372fc631666fbd944dd3dfd867bf23c749ae89a192113c4a73.safetensors.pkl"
+          ],
+          "after": [
+            "~t6af88ff5f7c439372fc631666fbd944dd3dfd867bf23c749ae89a192113c4a73.eval.pkl",
+            "~t6af88ff5f7c439372fc631666fbd944dd3dfd867bf23c749ae89a192113c4a73.safetensors",
+            "~t6af88ff5f7c439372fc631666fbd944dd3dfd867bf23c749ae89a192113c4a73.safetensors.pkl"
+          ],
+          "exception": null,
+          "expected_remaining": []
+        },
+        "feddyn_legacy_writer_to_reader": {
+          "legacy_writer_path": "/private/tmp/plato-phase2c-training-review/feddyn-legacy-313/models_feddyn_grad_1.pth",
+          "canonical_path": "/private/tmp/plato-phase2c-training-review/feddyn-legacy-313/models/feddyn_grad_1.pth",
+          "expected": {
+            "weight": [
+              [
+                7.0
+              ]
+            ],
+            "bias": [
+              8.0
+            ]
+          },
+          "actual": {
+            "weight": [
+              [
+                0.0
+              ]
+            ],
+            "bias": [
+              0.0
+            ]
+          },
+          "legacy_still_exists": true
+        },
+        "amp_clipping": [
+          {
+            "fused": false,
+            "scale": 8.0,
+            "expected_weight": 0.900000049999975,
+            "actual_weight": 0.9000000357627869,
+            "optimizer_step_completed": true
+          },
+          {
+            "fused": true,
+            "scale": 8.0,
+            "expected_weight": 0.900000049999975,
+            "actual_weight": 0.987500011920929,
+            "optimizer_step_completed": true
+          }
+        ],
+        "fedala_memory_return": {
+          "save_state": false,
+          "expected_local_model_state": {
+            "weight": [
+              [
+                0.2270604819059372
+              ],
+              [
+                0.4354117810726166
+              ]
+            ],
+            "bias": [
+              -0.6596038937568665,
+              0.012485786341130733
+            ]
+          },
+          "actual_local_model_state": null
+        },
+        "timm_analytical": [
+          {
+            "round": 1,
+            "expected_offset": 0,
+            "updates_and_lr": [
+              [
+                1,
+                0.09997532801828658
+              ],
+              [
+                2,
+                0.09990133642141358
+              ],
+              [
+                3,
+                0.099778098230154
+              ],
+              [
+                4,
+                0.0996057350657239
+              ],
+              [
+                5,
+                0.0993844170297569
+              ],
+              [
+                6,
+                0.09911436253643445
+              ]
+            ],
+            "library_resume_next_update": 7
+          },
+          {
+            "round": 3,
+            "expected_offset": 12,
+            "updates_and_lr": [
+              [
+                13,
+                0.09588773128419906
+              ],
+              [
+                14,
+                0.09524135262330098
+              ],
+              [
+                15,
+                0.09455032620941839
+              ],
+              [
+                16,
+                0.09381533400219318
+              ],
+              [
+                17,
+                0.09303710135019719
+              ],
+              [
+                18,
+                0.09221639627510075
+              ]
+            ],
+            "library_resume_next_update": 19
+          }
+        ]
+      },
+      "314": {
+        "accumulation_analytical": [
+          {
+            "microbatches": [
+              [
+                1.0,
+                2.0
+              ],
+              [
+                3.0,
+                4.0
+              ],
+              [
+                5.0
+              ]
+            ],
+            "window": 2,
+            "expected": 0.425,
+            "actual": 0.425,
+            "flags": [
+              false,
+              true,
+              false
+            ],
+            "tail_update": true
+          },
+          {
+            "microbatches": [
+              [
+                1.0,
+                2.0
+              ],
+              [
+                3.0
+              ]
+            ],
+            "window": 4,
+            "expected": 0.885,
+            "actual": 0.885,
+            "flags": [
+              false,
+              false
+            ],
+            "tail_update": true
+          },
+          {
+            "microbatches": [
+              [
+                1.0
+              ],
+              [
+                2.0
+              ]
+            ],
+            "window": 2,
+            "expected": 0.95,
+            "actual": 0.95,
+            "flags": [
+              false,
+              true
+            ],
+            "tail_update": false
+          }
+        ],
+        "fedprox_analytical": [
+          {
+            "mu": 0.0,
+            "norm": "l2",
+            "initial_loss": 0.0,
+            "nonzero_loss": 0.0,
+            "expected_gradient": [
+              0.0,
+              0.0
+            ],
+            "actual_gradient": [
+              [
+                0.0,
+                0.0
+              ]
+            ]
+          },
+          {
+            "mu": 0.1,
+            "norm": "l2",
+            "initial_loss": 0.0,
+            "nonzero_loss": 0.25,
+            "expected_gradient": [
+              0.030000000000000006,
+              0.04
+            ],
+            "actual_gradient": [
+              [
+                0.03,
+                0.04000000000000001
+              ]
+            ]
+          },
+          {
+            "mu": 0.1,
+            "norm": "l1",
+            "initial_loss": 0.0,
+            "nonzero_loss": 0.7000000000000001,
+            "expected_gradient": [
+              0.1,
+              0.1
+            ],
+            "actual_gradient": [
+              [
+                0.1,
+                0.1
+              ]
+            ]
+          }
+        ],
+        "long_worker_cleanup": {
+          "name_len": 240,
+          "run_id": 65415,
+          "writer_name": "~t1bba03d04f35daae23b85a4391d27b04596b8a683621f92a2dc2b3243f47e908.safetensors",
+          "before": [
+            "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx_7_65415.acc",
+            "~t1bba03d04f35daae23b85a4391d27b04596b8a683621f92a2dc2b3243f47e908.eval.pkl",
+            "~t1bba03d04f35daae23b85a4391d27b04596b8a683621f92a2dc2b3243f47e908.safetensors",
+            "~t1bba03d04f35daae23b85a4391d27b04596b8a683621f92a2dc2b3243f47e908.safetensors.pkl"
+          ],
+          "after": [
+            "~t1bba03d04f35daae23b85a4391d27b04596b8a683621f92a2dc2b3243f47e908.eval.pkl",
+            "~t1bba03d04f35daae23b85a4391d27b04596b8a683621f92a2dc2b3243f47e908.safetensors",
+            "~t1bba03d04f35daae23b85a4391d27b04596b8a683621f92a2dc2b3243f47e908.safetensors.pkl"
+          ],
+          "exception": null,
+          "expected_remaining": []
+        },
+        "feddyn_legacy_writer_to_reader": {
+          "legacy_writer_path": "/private/tmp/plato-phase2c-training-review/feddyn-legacy-314/models_feddyn_grad_1.pth",
+          "canonical_path": "/private/tmp/plato-phase2c-training-review/feddyn-legacy-314/models/feddyn_grad_1.pth",
+          "expected": {
+            "weight": [
+              [
+                7.0
+              ]
+            ],
+            "bias": [
+              8.0
+            ]
+          },
+          "actual": {
+            "weight": [
+              [
+                0.0
+              ]
+            ],
+            "bias": [
+              0.0
+            ]
+          },
+          "legacy_still_exists": true
+        },
+        "amp_clipping": [
+          {
+            "fused": false,
+            "scale": 8.0,
+            "expected_weight": 0.900000049999975,
+            "actual_weight": 0.9000000357627869,
+            "optimizer_step_completed": true
+          },
+          {
+            "fused": true,
+            "scale": 8.0,
+            "expected_weight": 0.900000049999975,
+            "actual_weight": 0.987500011920929,
+            "optimizer_step_completed": true
+          }
+        ],
+        "fedala_memory_return": {
+          "save_state": false,
+          "expected_local_model_state": {
+            "weight": [
+              [
+                -0.19970014691352844
+              ],
+              [
+                -0.47212061285972595
+              ]
+            ],
+            "bias": [
+              -0.09460549801588058,
+              -0.4690071940422058
+            ]
+          },
+          "actual_local_model_state": null
+        },
+        "timm_analytical": [
+          {
+            "round": 1,
+            "expected_offset": 0,
+            "updates_and_lr": [
+              [
+                1,
+                0.09997532801828658
+              ],
+              [
+                2,
+                0.09990133642141358
+              ],
+              [
+                3,
+                0.099778098230154
+              ],
+              [
+                4,
+                0.0996057350657239
+              ],
+              [
+                5,
+                0.0993844170297569
+              ],
+              [
+                6,
+                0.09911436253643445
+              ]
+            ],
+            "library_resume_next_update": 7
+          },
+          {
+            "round": 3,
+            "expected_offset": 12,
+            "updates_and_lr": [
+              [
+                13,
+                0.09588773128419906
+              ],
+              [
+                14,
+                0.09524135262330098
+              ],
+              [
+                15,
+                0.09455032620941839
+              ],
+              [
+                16,
+                0.09381533400219318
+              ],
+              [
+                17,
+                0.09303710135019719
+              ],
+              [
+                18,
+                0.09221639627510075
+              ]
+            ],
+            "library_resume_next_update": 19
+          }
+        ]
+      }
+    },
+    "probe_exit_interpretation": "Value-reporting independent.py exits0 while printing observed defects; negative pytest explicitly asserts intended behavior and exits1. run.py outer wrapper itself exits0; execution receipts contain actual inner exit codes, used throughout this report."
+  },
+  "reviewer_harness_construction_attempts": [
+    {
+      "commands": {
+        "313": "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=/private/tmp/plato-refresh-worktrees/training OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 /tmp/plato-phase2c-313/bin/python /tmp/plato-phase2c-training-review/independent.py",
+        "314": "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=/private/tmp/plato-refresh-worktrees/training OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 /tmp/plato-phase2c-314/bin/python /tmp/plato-phase2c-training-review/independent.py"
+      },
+      "exit_each": 1,
+      "cause": "Reviewer first probe forgot to create an isolated runtime_root before configure_environment; FileNotFoundError, not a candidate finding. Fixed scratch only and reran with r2 receipt labels.",
+      "raw": [
+        {
+          "path": "/tmp/plato-phase2c-training-review/independent-313.log",
+          "sha256": "95c75d31f95c3481d3acd64b07e0a863901ec7a22638547662f656a8c184f261"
+        },
+        {
+          "path": "/tmp/plato-phase2c-training-review/independent-314.log",
+          "sha256": "0a930db5b786d50b3ee515081cd5c29304a092f50d3b3e397c1e8cf65e9e8b1f"
+        }
+      ]
+    },
+    {
+      "commands": {
+        "313": "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=/private/tmp/plato-refresh-worktrees/training OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 /tmp/plato-phase2c-313/bin/python /tmp/plato-phase2c-training-review/behavior.py",
+        "314": "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=/private/tmp/plato-refresh-worktrees/training OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 /tmp/plato-phase2c-314/bin/python /tmp/plato-phase2c-training-review/behavior.py"
+      },
+      "exit_each": 1,
+      "cause": "Reviewer symmetric [2,-2] incoming FedALA fixture hit the existing zero-sum ALA guard, so initial numerical-difference assertion was unsuitable. Retained behavior-initial.py; changed only reviewer fixture to [2,-1] and used fresh r2 runtime directories. No production assertion waived.",
+      "original_source": {
+        "path": "/tmp/plato-phase2c-training-review/behavior-initial.py",
+        "sha256": "01cf44870652ab84d6c412a2155fd643ca3eb15f2a82fd31bad8ed0d0a32eda5"
+      },
+      "raw": [
+        {
+          "path": "/tmp/plato-phase2c-training-review/behavior-313.log",
+          "sha256": "8231d19fe3e5fb5d490b45fa54507ca792a21ee6b59522ff4e45edc41cc2de1d"
+        },
+        {
+          "path": "/tmp/plato-phase2c-training-review/behavior-314.log",
+          "sha256": "227f72a70c8d045143bb4cee4d2a3bf53c55f2b37ddbd0efe4ae0a09cd561676"
+        }
+      ]
+    }
+  ],
+  "author_and_root_evidence_audited_not_claimed_as_reviewer_reruns": {
+    "author_combined": [
+      {
+        "implementation_commit": "0dc34dd1d79d90071a0babfa6aa89f33d72a976f",
+        "python_environment": "/tmp/plato-phase2c-313",
+        "command": "OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2c-313/bin/python -m pytest tests/trainers tests/algorithms tests/models tests/clients tests/servers tests/callbacks tests/integration/test_smoke_configs.py tests/integration/test_event_loop_startup.py tests/integration/test_scaffold_round_flow.py tests/integration/test_checkpoint_runtime_agreement.py --ignore=tests/trainers/test_huggingface_trainer.py --ignore=tests/trainers/test_lerobot_trainer.py --ignore=tests/trainers/test_nanochat_trainer.py --ignore=tests/models/test_smolvla_model.py -q --basetemp /tmp/plato-phase2c-qualified-313",
+        "shell": "zsh -lc",
+        "exit_code": 0,
+        "seconds": 566.9423520839773,
+        "log": "/tmp/plato-phase2c-scratch/qualified-validation-313.log",
+        "sha256": "b798f791851a3751c34b67fdb1805c221b8155a1f16bafdef417ed9b47b04c4d",
+        "summary": "468 passed, 19 warnings in 561.83s (0:09:21)",
+        "counts": {
+          "passed": 468,
+          "warnings": 19
+        }
+      },
+      {
+        "implementation_commit": "0dc34dd1d79d90071a0babfa6aa89f33d72a976f",
+        "python_environment": "/tmp/plato-phase2c-314",
+        "command": "OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2c-314/bin/python -m pytest tests/trainers tests/algorithms tests/models tests/clients tests/servers tests/callbacks tests/integration/test_smoke_configs.py tests/integration/test_event_loop_startup.py tests/integration/test_scaffold_round_flow.py tests/integration/test_checkpoint_runtime_agreement.py --ignore=tests/trainers/test_huggingface_trainer.py --ignore=tests/trainers/test_lerobot_trainer.py --ignore=tests/trainers/test_nanochat_trainer.py --ignore=tests/models/test_smolvla_model.py -q --basetemp /tmp/plato-phase2c-qualified-314",
+        "shell": "zsh -lc",
+        "exit_code": 0,
+        "seconds": 622.7091606671456,
+        "log": "/tmp/plato-phase2c-scratch/qualified-validation-314.log",
+        "sha256": "c5c9b29d6f4d500839bd29eb52ff93002891b578de3a26ec94231f248261f91f",
+        "summary": "468 passed, 19 warnings in 617.34s (0:10:17)",
+        "counts": {
+          "passed": 468,
+          "warnings": 19
+        }
+      }
+    ],
+    "author_raw_receipt_audit": {
+      "checked_receipts": 402,
+      "mismatches": 0,
+      "artifact": {
+        "path": "/tmp/plato-phase2c-training-review/all-author-hash-checks.json",
+        "sha256": "174ce809cf22f1f8d4493dfb2e8f762100a8943cc8e016fc6d9fdc2dcd18e957"
+      }
+    },
+    "startup": {
+      "author_results": {
+        "313": {
+          "cases": 48,
+          "natural": 43,
+          "forced": 5,
+          "survivors": [],
+          "socket_weighted_error": 1.4901161193847656e-08,
+          "socket_exit": 0,
+          "socket_counts": [
+            6,
+            2
+          ]
+        },
+        "314": {
+          "cases": 48,
+          "natural": 43,
+          "forced": 5,
+          "survivors": [],
+          "socket_weighted_error": 1.4901161193847656e-08,
+          "socket_exit": 0,
+          "socket_counts": [
+            2,
+            6
+          ]
+        }
+      },
+      "reason_not_rerun_all48_each": "All 48 raw startup cases per Python and hashes audited (43 natural/5 expected forced, no survivors), accepted B startup/harness identities unchanged and C change concerns names/checkpoints. Own actual two-client socket case rerun each version. No skipped startup assertion or broad runtime waiver."
+    },
+    "root_amp": {
+      "id": "ROOT-2C-01",
+      "severity": "medium",
+      "status": "OPEN_CONFIRMED",
+      "candidate": "62d7b7d8ef75be779149a96f567779c86699edb4",
+      "title": "Fused AMP clipping runs before GradScaler unscales gradients, making valid updates too small.",
+      "locations": [
+        {
+          "path": "plato/trainers/strategies/optimizer.py",
+          "line": 414
+        },
+        {
+          "path": "plato/trainers/strategies/training_step.py",
+          "line": 251
+        }
+      ],
+      "trigger": "Actual ComposableTrainer with MixedPrecisionStepStrategy and GradientClippingOptimizerStrategy(DefaultOptimizerStrategy), registry SGD fused=True, real CPU torch.amp.GradScaler scale65536. Single scalar parameter1, loss10*w, lr.1,max_norm1. Same CPU scaler injection as author supported overflow qualification; no CUDA runtime claim.",
+      "expected": "Clip unscaled gradient10 to10/(10+1e-6), producing weight0.900000009999999.",
+      "actual": {
+        "3.13": [
+          {
+            "fused": false,
+            "initial_scale": 65536,
+            "actual": 0.8999999761581421,
+            "expected": 0.900000009999999,
+            "error": 3.384185687238528e-08,
+            "warnings": [
+              "CUDA is not available or torch_xla is imported. Disabling autocast."
+            ]
+          },
+          {
+            "fused": true,
+            "initial_scale": 65536,
+            "actual": 0.9999984502792358,
+            "expected": 0.900000009999999,
+            "error": 0.09999844027923688,
+            "warnings": [
+              "CUDA is not available or torch_xla is imported. Disabling autocast."
+            ]
+          }
+        ],
+        "3.14": [
+          {
+            "fused": false,
+            "initial_scale": 65536,
+            "actual": 0.8999999761581421,
+            "expected": 0.900000009999999,
+            "error": 3.384185687238528e-08,
+            "warnings": [
+              "CUDA is not available or torch_xla is imported. Disabling autocast."
+            ]
+          },
+          {
+            "fused": true,
+            "initial_scale": 65536,
+            "actual": 0.9999984502792358,
+            "expected": 0.900000009999999,
+            "error": 0.09999844027923688,
+            "warnings": [
+              "CUDA is not available or torch_xla is imported. Disabling autocast."
+            ]
+          }
+        ]
+      },
+      "cause": "Public optimizer step prehook sees scaled gradient655360 for AMP-aware fused SGD because GradScaler defers unscaling into optimizer internals. Wrapper clips it to~1, then fusedSGD divides by65536. NonfusedGradScaler unscales before invoking optimizer.step, so its control passes.",
+      "scope": "Composition of newly corrected clipping wrapper and existing real AMP path. Not an objection to research math, optional packages or hardware availability.",
+      "acceptance": "Original author makes public clipping consume unscaled gradients for fused and nonfused AMP, preserves actual overflow skip/count and accumulation-tail semantics, adds actual numerical parameter-reference regression on both versions; no broad warning suppression. Fresh review after fix.",
+      "probe_source": {
+        "path": "/tmp/plato-phase2-root/amp_clipping_probe.py",
+        "sha256": "83b3b80ac4398ca21539c41251c4cfcbbd56ba090b68bbe345dbbfcdf9802629"
+      },
+      "commands": {
+        "3.13": "PYTHONPATH=/tmp/plato-refresh-worktrees/training OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 /tmp/plato-phase2-root/c-base-313/bin/python /tmp/plato-phase2-root/amp_clipping_probe.py",
+        "3.14": "PYTHONPATH=/tmp/plato-refresh-worktrees/training OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 /tmp/plato-phase2-root/c-base-314/bin/python /tmp/plato-phase2-root/amp_clipping_probe.py"
+      },
+      "exit_codes": {
+        "3.13": 0,
+        "3.14": 0
+      },
+      "shell": "zsh -lc",
+      "raw": [
+        {
+          "path": "/tmp/plato-phase2-root/amp-clipping-probe.json",
+          "sha256": "c2fd334c5e7b969de71b0bbdd860a18622cfdfeacb205d485337088fcd0d8d99"
+        },
+        {
+          "path": "/tmp/plato-phase2-root/amp-clipping-probe.stderr",
+          "sha256": "d8c354ba2e1b49174b8d2473c1c24ad443b7e5c5f4513fa8d7989dee330e3e34"
+        },
+        {
+          "path": "/tmp/plato-phase2-root/amp-clipping-probe-314.json",
+          "sha256": "c2fd334c5e7b969de71b0bbdd860a18622cfdfeacb205d485337088fcd0d8d99"
+        },
+        {
+          "path": "/tmp/plato-phase2-root/amp-clipping-probe-314.stderr",
+          "sha256": "be0deaaf19a15edeb1775328fc8f9d8e62da601ee36f0b98858189108d2f8aad"
+        }
+      ],
+      "limitations": "CPU fused and nonfused numerical qualification only; public CUDA autocast disables itself on this host and emits the recorded warning. No CUDA claim. Source candidate remains frozen while independent reviewers run."
+    },
+    "root_base": {
+      "status": "PASS_BASE_PROFILE_ONLY",
+      "candidate": "62d7b7d8ef75be779149a96f567779c86699edb4",
+      "worktree_status_after": "",
+      "environment": "/tmp/plato-phase2-root/c-base-313",
+      "python": "Python 3.13.16",
+      "cwd": "/tmp/plato-refresh-worktrees/training",
+      "shell": "zsh -lc",
+      "sync": "UV_PROJECT_ENVIRONMENT=/tmp/plato-phase2-root/c-base-313 uv sync --locked --python 3.13 --no-default-groups --group test-base",
+      "pytest_command": "PYTHONDONTWRITEBYTECODE=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 HF_HUB_OFFLINE=1 HF_DATASETS_OFFLINE=1 TOKENIZERS_PARALLELISM=false /tmp/plato-phase2-root/c-base-313/bin/python -m pytest tests --test-profile=base -m \"not runtime\" -ra --basetemp=/tmp/plato-phase2-root/c-base-313-pytest --junitxml=/tmp/plato-phase2-root/c-base-313.xml",
+      "exit_code": 0,
+      "suites": [
+        {
+          "name": "pytest",
+          "errors": "0",
+          "failures": "0",
+          "skipped": "4",
+          "tests": "527",
+          "time": "225.420",
+          "timestamp": "2026-10-03T01:57:29.043021-04:00",
+          "hostname": "miami.csl.utoronto.ca"
+        }
+      ],
+      "skips": [
+        {
+          "name": "tests.trainers.test_dp_data_loader_strategy",
+          "reason": "collection skipped"
+        },
+        {
+          "name": "test_nanochat_tokenizer_processor_round_trip",
+          "reason": "base profile omits optional nanochat integration"
+        },
+        {
+          "name": "test_nanochat_trainer_smoke",
+          "reason": "base profile omits optional nanochat integration"
+        },
+        {
+          "name": "test_nanochat_trainer_selects_core_eval_strategy",
+          "reason": "base profile omits optional nanochat integration"
+        }
+      ],
+      "logs": [
+        {
+          "path": "/tmp/plato-phase2-root/c-base-313-sync.log",
+          "sha256": "2faec9b5006abc9ecd9e456f6b8d91cfe429b2818f0a2ca5380c5144be9fb91b"
+        },
+        {
+          "path": "/tmp/plato-phase2-root/c-base-313.log",
+          "sha256": "c1ba330491150e0334570f2d4bfb04b8206da1250f30a8491faaca5eaa9e1610"
+        },
+        {
+          "path": "/tmp/plato-phase2-root/c-base-313.xml",
+          "sha256": "5757516ad761cfb3b8846ae8e27253613963d84438f8116a53dcaea04e8b972c"
+        }
+      ],
+      "limits": "Independent fresh Python3.13 and3.14 base environments only. Candidate includes acceptedB but not A/D/docs. Runtime deselected per base contract. General training and SCAFFOLD reviews, FedDyn2C-11, ROOT-2C-01 and finalcombinedqualification outstanding.",
+      "summary": {
+        "passed": 523,
+        "skipped": 4,
+        "runtime_deselected": 48,
+        "warnings": 2,
+        "seconds": 225.43
+      },
+      "warning_disposition": "Two CPU GradScaler tests enter CUDA autocast and emit CUDA-unavailable warning. Real CPU scaler behavior executes; general reviewer auditing device contract and exact expected-warning handling. No warning-free claim.",
+      "additional_python314_validation": {
+        "environment": "/tmp/plato-phase2-root/c-base-314",
+        "python": "Python 3.14.8",
+        "command": "PYTHONDONTWRITEBYTECODE=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 HF_HUB_OFFLINE=1 HF_DATASETS_OFFLINE=1 TOKENIZERS_PARALLELISM=false /tmp/plato-phase2-root/c-base-314/bin/python -m pytest tests --test-profile=base -m \"not runtime\" -ra --basetemp=/tmp/plato-phase2-root/c-base-314-pytest --junitxml=/tmp/plato-phase2-root/c-base-314.xml",
+        "sync": "UV_PROJECT_ENVIRONMENT=/tmp/plato-phase2-root/c-base-314 uv sync --locked --python 3.14 --no-default-groups --group test-base",
+        "exit_code": 0,
+        "summary": "==== 523 passed, 4 skipped, 48 deselected, 2 warnings in 140.35s (0:02:20) =====",
+        "suites": [
+          {
+            "name": "pytest",
+            "errors": "0",
+            "failures": "0",
+            "skipped": "4",
+            "tests": "527",
+            "time": "140.346",
+            "timestamp": "2026-10-03T02:05:02.861103-04:00",
+            "hostname": "miami.csl.utoronto.ca"
+          }
+        ],
+        "logs": [
+          {
+            "path": "/tmp/plato-phase2-root/c-base-314-sync.log",
+            "sha256": "dcdfc92a25c0dd88427ac8642cf37832193769e38f8683d0b05f11f3f46372e3"
+          },
+          {
+            "path": "/tmp/plato-phase2-root/c-base-314.log",
+            "sha256": "4e085b9c986def7b55e554b74659480498c33354cc3ec31e6603a2a40ac87fca"
+          },
+          {
+            "path": "/tmp/plato-phase2-root/c-base-314.xml",
+            "sha256": "8808e6353671d1e4980148911577e01a4c597b3f35ea6b3b59740aeed13097fb"
+          }
+        ]
+      }
+    },
+    "root_raw_hash_checks": [
+      {
+        "path": "/tmp/plato-phase2-root/amp_clipping_probe.py",
+        "expected": "83b3b80ac4398ca21539c41251c4cfcbbd56ba090b68bbe345dbbfcdf9802629",
+        "actual": "83b3b80ac4398ca21539c41251c4cfcbbd56ba090b68bbe345dbbfcdf9802629",
+        "matches": true
+      },
+      {
+        "path": "/tmp/plato-phase2-root/amp-clipping-probe.json",
+        "expected": "c2fd334c5e7b969de71b0bbdd860a18622cfdfeacb205d485337088fcd0d8d99",
+        "actual": "c2fd334c5e7b969de71b0bbdd860a18622cfdfeacb205d485337088fcd0d8d99",
+        "matches": true
+      },
+      {
+        "path": "/tmp/plato-phase2-root/amp-clipping-probe.stderr",
+        "expected": "d8c354ba2e1b49174b8d2473c1c24ad443b7e5c5f4513fa8d7989dee330e3e34",
+        "actual": "d8c354ba2e1b49174b8d2473c1c24ad443b7e5c5f4513fa8d7989dee330e3e34",
+        "matches": true
+      },
+      {
+        "path": "/tmp/plato-phase2-root/amp-clipping-probe-314.json",
+        "expected": "c2fd334c5e7b969de71b0bbdd860a18622cfdfeacb205d485337088fcd0d8d99",
+        "actual": "c2fd334c5e7b969de71b0bbdd860a18622cfdfeacb205d485337088fcd0d8d99",
+        "matches": true
+      },
+      {
+        "path": "/tmp/plato-phase2-root/amp-clipping-probe-314.stderr",
+        "expected": "be0deaaf19a15edeb1775328fc8f9d8e62da601ee36f0b98858189108d2f8aad",
+        "actual": "be0deaaf19a15edeb1775328fc8f9d8e62da601ee36f0b98858189108d2f8aad",
+        "matches": true
+      },
+      {
+        "path": "/tmp/plato-phase2-root/c-base-313-sync.log",
+        "expected": "2faec9b5006abc9ecd9e456f6b8d91cfe429b2818f0a2ca5380c5144be9fb91b",
+        "actual": "2faec9b5006abc9ecd9e456f6b8d91cfe429b2818f0a2ca5380c5144be9fb91b",
+        "matches": true
+      },
+      {
+        "path": "/tmp/plato-phase2-root/c-base-313.log",
+        "expected": "c1ba330491150e0334570f2d4bfb04b8206da1250f30a8491faaca5eaa9e1610",
+        "actual": "c1ba330491150e0334570f2d4bfb04b8206da1250f30a8491faaca5eaa9e1610",
+        "matches": true
+      },
+      {
+        "path": "/tmp/plato-phase2-root/c-base-313.xml",
+        "expected": "5757516ad761cfb3b8846ae8e27253613963d84438f8116a53dcaea04e8b972c",
+        "actual": "5757516ad761cfb3b8846ae8e27253613963d84438f8116a53dcaea04e8b972c",
+        "matches": true
+      },
+      {
+        "path": "/tmp/plato-phase2-root/c-base-314-sync.log",
+        "expected": "dcdfc92a25c0dd88427ac8642cf37832193769e38f8683d0b05f11f3f46372e3",
+        "actual": "dcdfc92a25c0dd88427ac8642cf37832193769e38f8683d0b05f11f3f46372e3",
+        "matches": true
+      },
+      {
+        "path": "/tmp/plato-phase2-root/c-base-314.log",
+        "expected": "4e085b9c986def7b55e554b74659480498c33354cc3ec31e6603a2a40ac87fca",
+        "actual": "4e085b9c986def7b55e554b74659480498c33354cc3ec31e6603a2a40ac87fca",
+        "matches": true
+      },
+      {
+        "path": "/tmp/plato-phase2-root/c-base-314.xml",
+        "expected": "8808e6353671d1e4980148911577e01a4c597b3f35ea6b3b59740aeed13097fb",
+        "actual": "8808e6353671d1e4980148911577e01a4c597b3f35ea6b3b59740aeed13097fb",
+        "matches": true
+      }
+    ]
+  },
+  "environment_and_limits": {
+    "313": {
+      "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+      "executable": "/tmp/plato-phase2c-313/bin/python",
+      "cwd": "/private/tmp/plato-refresh-worktrees/training",
+      "packages": {
+        "torch": "2.14.1",
+        "opacus": "1.6.0",
+        "pytest": "9.1.1",
+        "timm": "1.0.30",
+        "numpy": "2.5.3"
+      },
+      "source_files": {
+        "/private/tmp/plato-refresh-worktrees/training/plato/trainers/composable.py": "6bc4dab135cd7249346ac3ca23b0e24ea638961cda7806558ab81338dc0496a8",
+        "/private/tmp/plato-refresh-worktrees/training/plato/trainers/strategies/optimizer.py": "ffbeab17d1a2455013871d32f4e82402f5422a6c14fc629d334b2d93c59e7957",
+        "/private/tmp/plato-refresh-worktrees/training/plato/trainers/strategies/training_step.py": "ba912ceea97a1fe592d690cb06c9827cd988d37320a92f1dc72bbb42feea2983",
+        "/private/tmp/plato-refresh-worktrees/training/plato/trainers/strategies/algorithms/feddyn_strategy.py": "93abaa09f8f31018ba8cfe1e6de9f507d4ec4e6abe8170d5919b41c054597d8c"
+      }
+    },
+    "314": {
+      "python": "3.14.8 (main, Sep 30 2026, 17:55:09) [Clang 21.0.0 (clang-2100.3.34.2)]",
+      "executable": "/private/tmp/plato-phase2c-314/bin/python",
+      "cwd": "/private/tmp/plato-refresh-worktrees/training",
+      "packages": {
+        "torch": "2.14.1",
+        "opacus": "1.6.0",
+        "pytest": "9.1.1",
+        "timm": "1.0.30",
+        "numpy": "2.5.3"
+      },
+      "source_files": {
+        "/private/tmp/plato-refresh-worktrees/training/plato/trainers/composable.py": "6bc4dab135cd7249346ac3ca23b0e24ea638961cda7806558ab81338dc0496a8",
+        "/private/tmp/plato-refresh-worktrees/training/plato/trainers/strategies/optimizer.py": "ffbeab17d1a2455013871d32f4e82402f5422a6c14fc629d334b2d93c59e7957",
+        "/private/tmp/plato-refresh-worktrees/training/plato/trainers/strategies/training_step.py": "ba912ceea97a1fe592d690cb06c9827cd988d37320a92f1dc72bbb42feea2983",
+        "/private/tmp/plato-refresh-worktrees/training/plato/trainers/strategies/algorithms/feddyn_strategy.py": "93abaa09f8f31018ba8cfe1e6de9f507d4ec4e6abe8170d5919b41c054597d8c"
+      }
+    },
+    "existing_environments": [
+      "/tmp/plato-phase2c-313",
+      "/tmp/plato-phase2c-314",
+      "/tmp/plato-phase2c-ssl",
+      "/tmp/plato-phase2c-ssl314"
+    ],
+    "optional_execution": "Actual Opacus1.6.0 and Lightly1.5.26 used; no installation/sync/environment modification by reviewer. PYTHONDONTWRITEBYTECODE and no pytest cache, all runtime outputs own scratch.",
+    "platform": "macOS arm64 CPU; actual MPS urgent-reader probe. CUDA unavailable; no CUDA/Linux/multi-host/full mandatory optional-stack execution claim.",
+    "qualification_boundary": "General C behavior and accepted B preservation in focused scope. No full paper-equation certification, global privacy-budget guarantee, durable killed-worker accountant/private optimizer restart, pretrained GAN quality, optional integrations or whole-repository phase acceptance.",
+    "open_complementary_work": "Root FedDyn2C-11 primary-source design remains open; detailed SCAFFOLD/F27 review and standalone prose handled elsewhere. These are not waived or accepted by this report."
+  },
+  "input_hashes": [
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/training/AGENTS.md",
+      "sha256": "b50f87f31ea3d87076952d8b7d2d8af067132fbf877d80f8780c208fb45527ec"
+    },
+    {
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/plan.md",
+      "sha256": "edb9a58cc7915a940854f16d5029fe97434703bf2f75eca0dcb96de2d0f0eb15"
+    },
+    {
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/plan-addendum.json",
+      "sha256": "5b51b0fb7ed6f68d9fce7176335b3e7be5e5f178a2788590912aa2396a487709"
+    },
+    {
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2b-acceptance.json",
+      "sha256": "3be220078302a05189c07c32220a86e966ff919bc4ef11e5d342a6c39135396d"
+    },
+    {
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/dp-reuse-probe.json",
+      "sha256": "5c45ad2903dcb68aabf46d9bc1faad4c46b3c4e5d9c0930b7e3c2f6cead9e91a"
+    },
+    {
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/dp-step-probe.json",
+      "sha256": "a3b354f0a5c73eef000bf940208e30892832617b9133b83b389dea4857888790"
+    },
+    {
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/trainer-lifecycle-probes.json",
+      "sha256": "7e236a1156d139e64ce93f260f6d7968c96b4b604ad85678f4de5ef94777b82b"
+    },
+    {
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2c-root-amp-clipping-probe.json",
+      "sha256": "7e709b9d783b87948e876f5690da3a27c35aa74a8106a3c27520c6e7dc84cfc4"
+    },
+    {
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2c-root-base-validation.json",
+      "sha256": "19e5ff43de43aba819b8966fd7b59011f5451c6e76681946db50f4bd8b4bffe2"
+    },
+    {
+      "path": "/private/tmp/plato-refresh-worktrees/training/evidence/2026-refresh/phase2c-validation.json",
+      "sha256": "5674d9ef3e2ffda63b8041ed3f8c2c13ebaa6062ee967292ac2c459eba387fa8"
+    },
+    {
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/fedprox-gradient-probe.json",
+      "sha256": "b432e646e568d493956b6c56f89a9ccaf2c8cfa75da32c801f3a558a73f321b2"
+    }
+  ],
+  "candidate_changed_files_sha256": [
+    {
+      "path": "configs/MNIST/fedprox_lenet5.toml",
+      "sha256": "45da742c8daa0b616341edb5d03ecd19f9c4d5af1fc3436e1282dc2b9ddab2e8"
+    },
+    {
+      "path": "evidence/2026-refresh/phase2c-feddyn-disposition.json",
+      "sha256": "4622a0f8cf1b07a45514684cd2b6ca104d0d39a97ec7f60cf593ed6e2aedcd36"
+    },
+    {
+      "path": "evidence/2026-refresh/phase2c-scaffold-facts.json",
+      "sha256": "b17bb958fff4862b7c7ef0bff04a6618c40f09155cc5f25e02d5ca4338b7aed9"
+    },
+    {
+      "path": "evidence/2026-refresh/phase2c-validation.json",
+      "sha256": "5674d9ef3e2ffda63b8041ed3f8c2c13ebaa6062ee967292ac2c459eba387fa8"
+    },
+    {
+      "path": "examples/async/port/port_server.py",
+      "sha256": "e369f280d9c704411cf85ba752c2e7fb5cd790d50e5ff313151b2852bc2efdea"
+    },
+    {
+      "path": "examples/customized_client_training/fedprox/fedprox_trainer.py",
+      "sha256": "266e14da78843bfd1130d25d25d306a45817d57baf08e13433c0a9e7941dc7a3"
+    },
+    {
+      "path": "examples/customized_client_training/scaffold/scaffold_MNIST_lenet5.toml",
+      "sha256": "43110532d391896d4080782a4dbace3fbe2bc7813ac9e7baa662074f044f290c"
+    },
+    {
+      "path": "examples/customized_client_training/scaffold/scaffold_callback.py",
+      "sha256": "159a2adbbae5c7982c30896af596c546e601669b0230b841656ee464ee66d39f"
+    },
+    {
+      "path": "examples/customized_client_training/scaffold/scaffold_client.py",
+      "sha256": "01a08e2001ba4f9e4e61c2ff520e3d1b3fcff5d44168a3d5ac002c45b4c48a8b"
+    },
+    {
+      "path": "examples/customized_client_training/scaffold/scaffold_server.py",
+      "sha256": "e2325ee39337489f15711c4073aeb10335e2b47ecc0cc9aefd0406bbbb18c78a"
+    },
+    {
+      "path": "examples/customized_client_training/scaffold/scaffold_trainer.py",
+      "sha256": "405c0d270a4362ab0cc2569899ef1deb9b03a5a235ef44c75261b43fdbaf00de"
+    },
+    {
+      "path": "plato/algorithms/fedavg_gan.py",
+      "sha256": "fc892e85dbb4f5f9f86d966d98366f638e10853e7585b1b2d4c9b1ccdec5284d"
+    },
+    {
+      "path": "plato/algorithms/fedavg_personalized.py",
+      "sha256": "00fc6afc3f81851f10df3f59a00945801c9b7992d5aec551493c6507ac8cce88"
+    },
+    {
+      "path": "plato/clients/base.py",
+      "sha256": "ed510a35fbe31ec89ee4234bbb849ebeb14a51115ac9b7ede6a58a0635a1626e"
+    },
+    {
+      "path": "plato/clients/strategies/defaults.py",
+      "sha256": "6a41108b7878113ed4b7c9555d818b1f59862f55c487524b26052a0f12c3feca"
+    },
+    {
+      "path": "plato/models/dcgan.py",
+      "sha256": "8d01709791ac0d4201bf99f53e5c8a86155b14858965ea23a22a26f4db08d48d"
+    },
+    {
+      "path": "plato/servers/base.py",
+      "sha256": "79355c0184680eaac2ad8646a23ff79d5ef70e5797cea1e313db7948a96488db"
+    },
+    {
+      "path": "plato/servers/strategies/aggregation/port.py",
+      "sha256": "c7e553bede3413780046915c5736b99266b33931ad24ddf85376cf9e754c978f"
+    },
+    {
+      "path": "plato/trainers/base.py",
+      "sha256": "2fb5e25983d1f737acf7b05d7324130458caab187b34d3e835a92d574adb1ec8"
+    },
+    {
+      "path": "plato/trainers/composable.py",
+      "sha256": "6bc4dab135cd7249346ac3ca23b0e24ea638961cda7806558ab81338dc0496a8"
+    },
+    {
+      "path": "plato/trainers/diff_privacy.py",
+      "sha256": "7ef0ba5978fbe30947cefe106923ba2d90e138fb4d788f909893dd9c440ff74a"
+    },
+    {
+      "path": "plato/trainers/fedprox.py",
+      "sha256": "ce299648690455362b601e8fbd009a419b4c5c2317206f9588257899ebc4fb5d"
+    },
+    {
+      "path": "plato/trainers/gan.py",
+      "sha256": "236c8c51be9797d97d9b63fdd1bb870c8a7c64d266dc25e8c44b9f9c3558fdc7"
+    },
+    {
+      "path": "plato/trainers/registry.py",
+      "sha256": "dc17cf3bd8e1c168213173e7d16e5d4e4f12282c41d33a67f241b294afb64fa1"
+    },
+    {
+      "path": "plato/trainers/self_supervised_learning.py",
+      "sha256": "7b9727b6e0a840048f3f8c0d38fec16116e659ecf25fcd352360f3047adaf071"
+    },
+    {
+      "path": "plato/trainers/split_learning.py",
+      "sha256": "b5256e53be61767362d463437e903439bcea65579e4a68378b27ec225e6eaf72"
+    },
+    {
+      "path": "plato/trainers/strategies/algorithms/apfl_strategy.py",
+      "sha256": "cc56941235907603583c16d8388b2566ef3ceb2001f3028accf19f01fd4ea0a5"
+    },
+    {
+      "path": "plato/trainers/strategies/algorithms/ditto_strategy.py",
+      "sha256": "55f3f863d428cd845b8141b43d60642646ccc49dfd28bbfce464deb383bc11c6"
+    },
+    {
+      "path": "plato/trainers/strategies/algorithms/fedala_strategy.py",
+      "sha256": "588d0ac13e23bf21fadc8e60be399afd25e76a26fb1c008d4fe4a3f7eb3ebc4e"
+    },
+    {
+      "path": "plato/trainers/strategies/algorithms/feddyn_strategy.py",
+      "sha256": "93abaa09f8f31018ba8cfe1e6de9f507d4ec4e6abe8170d5919b41c054597d8c"
+    },
+    {
+      "path": "plato/trainers/strategies/algorithms/fedmos_strategy.py",
+      "sha256": "a4da28637abdf2b15a374283e9df83db190ec0a1e9b9fbb4745fac3f5d3cb521"
+    },
+    {
+      "path": "plato/trainers/strategies/algorithms/fedprox_strategy.py",
+      "sha256": "6041f84186d710a48740a39eac0bf93562562554168991e347a7e71a81216221"
+    },
+    {
+      "path": "plato/trainers/strategies/algorithms/lgfedavg_strategy.py",
+      "sha256": "2bf3ab77a930e2f8f6eced3a110278a6f63cd506adb749605387f1ff5901638a"
+    },
+    {
+      "path": "plato/trainers/strategies/algorithms/personalized_fl_strategy.py",
+      "sha256": "f4a55389650c7e050ad773a0a3beb5d81382e783a454c37341ee14f8586cd32c"
+    },
+    {
+      "path": "plato/trainers/strategies/algorithms/scaffold_strategy.py",
+      "sha256": "2b6e2953f8b93f7919d95d70f598c2f4d33c9cbaff129352387f248c004d4ff6"
+    },
+    {
+      "path": "plato/trainers/strategies/base.py",
+      "sha256": "905261bbaf05f8024110f9b0be2c29886bdc39a91c6be18aa9e83bb4868ec0d3"
+    },
+    {
+      "path": "plato/trainers/strategies/loss_criterion.py",
+      "sha256": "189ed60fc473d149ac54de8472e36d311d309f3827453b23882c7d91f7c8c2c2"
+    },
+    {
+      "path": "plato/trainers/strategies/lr_scheduler.py",
+      "sha256": "4b9118641555640083fce2417774fe7cd2e96ec9975885cfaf8023b1d92f8a41"
+    },
+    {
+      "path": "plato/trainers/strategies/model_update.py",
+      "sha256": "3a16a643de9d9b531bc1b2bab9e7c5606cb0c4e6b38e079f204d9ce9976fa782"
+    },
+    {
+      "path": "plato/trainers/strategies/optimizer.py",
+      "sha256": "ffbeab17d1a2455013871d32f4e82402f5422a6c14fc629d334b2d93c59e7957"
+    },
+    {
+      "path": "plato/trainers/strategies/training_step.py",
+      "sha256": "ba912ceea97a1fe592d690cb06c9827cd988d37320a92f1dc72bbb42feea2983"
+    },
+    {
+      "path": "plato/trainers/tracking.py",
+      "sha256": "ca52a12d7c181e2c03d2fb67f5d788aabed0c5dbae8797e80280ed8c2f360332"
+    },
+    {
+      "path": "plato/utils/checkpoint_paths.py",
+      "sha256": "7f530a13e9dac30d4c8a6bb7c05de2ff242d12f203dbf3e4c45495442c789dfd"
+    },
+    {
+      "path": "tests/integration/scaffold_round_worker.py",
+      "sha256": "5bf3ca3c59f0b28d76528ebf7ffb5410eb11b05269b962b6080977e97e64c64e"
+    },
+    {
+      "path": "tests/integration/test_checkpoint_runtime_agreement.py",
+      "sha256": "6414ef651d44042616c8bce772333584643b3c2e6b0596d69f3b04ff849b9e3e"
+    },
+    {
+      "path": "tests/integration/test_scaffold_round_flow.py",
+      "sha256": "5477fbc57455ebbc3ded0a10181fa9b6433edf1b0c1bf200710e51995b21f128"
+    },
+    {
+      "path": "tests/trainers/test_apfl_optimizer_ownership.py",
+      "sha256": "a42b571b4542d408f523ca5ae0b0cba157309380e1484856c8538312b03b113c"
+    },
+    {
+      "path": "tests/trainers/test_checkpoint_path_contract.py",
+      "sha256": "92bdf6b20221139ae3c0e3e8c64cdc884ed473ae212710bcbf90a12ad33831cf"
+    },
+    {
+      "path": "tests/trainers/test_dp_data_loader_strategy.py",
+      "sha256": "97245aa7f8318d7875cafcc3c7c93e2e30047d61684a836efc1ea5e6c47e3c42"
+    },
+    {
+      "path": "tests/trainers/test_gan_runtime.py",
+      "sha256": "3d16413dabb7d8eeda56f0444d66e445fb0356d47bd2db7a64a5b49ade876d43"
+    },
+    {
+      "path": "tests/trainers/test_personalized_state_ownership.py",
+      "sha256": "f2a808dd1c6763164283f02b8801bee7b211327570d152a91b32fb74c9d9f233"
+    },
+    {
+      "path": "tests/trainers/test_scaffold_strategy.py",
+      "sha256": "7419ab4ea2088f7825bc8008be99c2d99a18f139dab50188a3c06a6eefd9c02e"
+    },
+    {
+      "path": "tests/trainers/test_split_learning_testing_strategy.py",
+      "sha256": "54d2da6ba1574873736ab7aa6278e7f341cf53bf0a63350e6a34e0a0a6ce3943"
+    },
+    {
+      "path": "tests/trainers/test_ssl_personalized_state.py",
+      "sha256": "887c7e100ca3fc69e5a26c399fd4990ed9ad15df74ef52041953dea6c17e706a"
+    },
+    {
+      "path": "tests/trainers/test_ssl_training_contract.py",
+      "sha256": "66f1f40fcfbe86b3abe2a983fd281e364f080c98718e2b0e42c26e369bb5cd9e"
+    },
+    {
+      "path": "tests/trainers/test_training_update_contract.py",
+      "sha256": "87059fc3f336d6a9e319d372577d30ed7066fd9e1bd1f7fe3d0efb6fda92f676"
+    }
+  ],
+  "accepted_b_unchanged_source_hashes": {
+    "head": "62d7b7d8ef75be779149a96f567779c86699edb4",
+    "tree": "bfc18588145c935adaf36850f909f3223b5ad058",
+    "status_porcelain": "",
+    "implementation_delta": "A\tevidence/2026-refresh/phase2c-feddyn-disposition.json\nA\tevidence/2026-refresh/phase2c-scaffold-facts.json\nA\tevidence/2026-refresh/phase2c-validation.json\n",
+    "b_is_ancestor_exit": 0,
+    "tests/integration/test_event_loop_startup.py": {
+      "b_sha256": "a92c9ee2347e2113cd65b7949c922ac5bbf1846f4caeca30a128db580c79751e",
+      "candidate_sha256": "a92c9ee2347e2113cd65b7949c922ac5bbf1846f4caeca30a128db580c79751e",
+      "same": true
+    },
+    "tests/integration/startup_harness.py": {
+      "b_sha256": "988f216f9367b1e9e8156bad62d3c03a813e26d32f919981ae227f5d8754642e",
+      "candidate_sha256": "988f216f9367b1e9e8156bad62d3c03a813e26d32f919981ae227f5d8754642e",
+      "same": true
+    },
+    "tests/integration/startup_probe.py": {
+      "b_sha256": "e6c9bb2bf39616fe3a6745da528690a578e7416837e0914578ec688d2851b34f",
+      "candidate_sha256": "e6c9bb2bf39616fe3a6745da528690a578e7416837e0914578ec688d2851b34f",
+      "same": true
+    },
+    "plato/client.py": {
+      "b_sha256": "81395fb7c485a23e875bd160fff466674badc833a9fbec6d441a5937c421fa3f",
+      "candidate_sha256": "81395fb7c485a23e875bd160fff466674badc833a9fbec6d441a5937c421fa3f",
+      "same": true
+    },
+    "plato/clients/composable.py": {
+      "b_sha256": "25de844fe9f9b2c2b7d8e9a633c3ed1fb9831c10fae2a14404dadd5d7670fe53",
+      "candidate_sha256": "25de844fe9f9b2c2b7d8e9a633c3ed1fb9831c10fae2a14404dadd5d7670fe53",
+      "same": true
+    },
+    "tests/conftest.py": {
+      "b_sha256": "3eb55a1fa7c0fd5428c296c1bcd7300b23b0ade3d276f5c687af3b9bd78304c7",
+      "candidate_sha256": "3eb55a1fa7c0fd5428c296c1bcd7300b23b0ade3d276f5c687af3b9bd78304c7",
+      "same": true
+    }
+  },
+  "retained_scratch": "/tmp/plato-phase2c-training-review",
+  "retained_review_artifacts": [
+    {
+      "path": "/tmp/plato-phase2c-training-review/review_regressions.py",
+      "sha256": "b987c3f7934a20a392d04033f9e8eea0e5a781720091932569a0fd36ba6651a1"
+    },
+    {
+      "path": "/tmp/plato-phase2c-training-review/independent.py",
+      "sha256": "d4ea2215318dd2ca2ca843530f83682fcbb81ae09ad8c0c7e7cb26eae1e2f584"
+    },
+    {
+      "path": "/tmp/plato-phase2c-training-review/behavior.py",
+      "sha256": "960f01b8cc50aa14b16281fd06af61d650d836cbc3a562289493212337c2bdc2"
+    },
+    {
+      "path": "/tmp/plato-phase2c-training-review/audit_receipts.py",
+      "sha256": "4adbaea98475639737d32c6d385b211f82a2e5418f2b366149bfcfe2c6a375ca"
+    },
+    {
+      "path": "/tmp/plato-phase2c-training-review/run.py",
+      "sha256": "875610cf50e53642a629fcdca07fb942bbd55b2a626588a525851e3eac51b3cc"
+    },
+    {
+      "path": "/tmp/plato-phase2c-training-review/candidate-vs-b.diff",
+      "sha256": "e8a0d88a9b1346e307516209d552d8af9919298b1874b4e81a1a767743da8b40"
+    },
+    {
+      "path": "/tmp/plato-phase2c-training-review/receipt-checks.json",
+      "sha256": "ece0334ab45217532bcd911c21097ac52a40e8e71e29d0c8dea0816093673e51"
+    },
+    {
+      "path": "/tmp/plato-phase2c-training-review/final-evidence-details.json",
+      "sha256": "b544b6de62649ce58db58de7af9c7034692e582fc97c076c39e9c65b1a1e979e"
+    },
+    {
+      "path": "/tmp/plato-phase2c-training-review/startup-evidence-audit.json",
+      "sha256": "067f777ab0b8a03aad2008790aa4f69fc0938aa288dfc20cfab372463515cf0b"
+    },
+    {
+      "path": "/tmp/plato-phase2c-training-review/independent-313.json",
+      "sha256": "db939bb2ae4ac2be8faccdceebe50471ecda7173183b91a7753f1ac091f51c2e"
+    },
+    {
+      "path": "/tmp/plato-phase2c-training-review/independent-314.json",
+      "sha256": "8301aa2792b51c0628e063021c026ec13a9db6d941079323ea3053d3ec7ddc5a"
+    },
+    {
+      "path": "/tmp/plato-phase2c-training-review/behavior-313-r2.json",
+      "sha256": "2b39af959a82bcc4b417d8717bf9829c06a4ce180999cd4898f216f26614263e"
+    },
+    {
+      "path": "/tmp/plato-phase2c-training-review/behavior-314-r2.json",
+      "sha256": "2b39af959a82bcc4b417d8717bf9829c06a4ce180999cd4898f216f26614263e"
+    }
+  ]
+}

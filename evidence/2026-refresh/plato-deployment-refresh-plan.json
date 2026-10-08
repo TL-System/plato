@@ -1,0 +1,339 @@
+{
+  "schema_version": 1,
+  "status": "Proposed implementation plan; fresh independent Sol review required; no acceptance or deployment claim",
+  "source": {
+    "commit": "6bf8836d06072c7946cdfb5499a09e4bce459805",
+    "worktree": "/tmp/plato-refresh-worktrees/archive-integration",
+    "policy": "Read-only source inspection. Do not edit or sync this worktree or its environment while root qualification is active.",
+    "evidence": "/tmp/plato-deployment-source-evidence.json",
+    "findings": "/tmp/plato-post-archive-deployment-findings.json",
+    "lighteval_command_evidence": "/tmp/plato-lighteval-dependency-checks/command-semantics.json",
+    "evidence_sha256": "c0d213f97e059d51a997f804e87087ac31d2071d25449021a37fc4fd1a211893",
+    "file_sha256": {
+      "AGENTS.md": "b50f87f31ea3d87076952d8b7d2d8af067132fbf877d80f8780c208fb45527ec",
+      "Dockerfile": "386f360c795b1c06b34aef8ccaef750b6156c23f8c9535d26c2ef271c9bd2ae2",
+      "dockerrun.sh": "7e03c34aba60fd178b0ffd4492b4e399867a8c807a746e884a992b5f9267f690",
+      "dockerrun_gpu.sh": "63e94eda781bc8b53cd2a5735374bed98c523200097f194163bbede29305b51f",
+      "netlify.toml": "9b3382524f2fb5973b9fc1c186741a920e3dc52a6c4962739b8209df3a692a3c",
+      "docs/requirements.txt": "b648383d0fa36ceccb3fce7c76e0aa36df591c817b7e5ce46ee61c0c92f29b04",
+      ".github/workflows/pypi_publish.yml": "776b5fa1ac911ab3af9d01c6eb15414676066e1f4dab299b181c5ca3c840fbae",
+      ".github/workflows/pytorch_tests.yml": "697c6ae0c39fa7fd42766f8161f350944e90108b3dad852148da952acfcc9317",
+      "pyproject.toml": "8aaa7414717fa17841900d377d89851547677ba2ae93963afef79fc5490ba610",
+      "uv.lock": "e2a53aaae9a0dd49f5446b490bb3071e86aa3a9a20d6271c9dd30b4ae2dcbff9",
+      ".python-version": "02e735b3dfe1c32833eb550b7ff8ffa17f5f2bc3fa1e7bae61a8f5a3883ce398",
+      "docs/docs/install.md": "8f7e57f4c0c72df67d769af788bcb9ece2d6907f823513fec17692644b21340b",
+      "docs/docs/quickstart.md": "1cd72bfbaf114d44b3c1b177c0d38709c8e7e939d2780f29b040139b713a4d0b",
+      "docs/mkdocs.yml": "d26f6c6e7b91cf8835b4187e3b9e01125801e735122d79e7a148179b31a852ec"
+    }
+  },
+  "constraints": [
+    "Python 3.13 is the sole default and active CI interpreter; no 3.14 matrix.",
+    "Retain root native 383/core 51/retained 19 qualification gates without weakening or replacing them.",
+    "No Docker/Colima installation, daemon/service changes, or container execution on the user host. Actual image builds and execution occur on GitHub Linux runners.",
+    "No release creation, package publication, registry image publication, or manual Netlify production publication during validation.",
+    "Preserve the existing release-created publishing trigger and token-based publishing intent.",
+    "Keep all existing supported runtime and launch paths; no runtime dependency refresh, registry redesign, or archive resurrection.",
+    "Do not edit .github/workflows/pytorch_tests.yml; optional Lighteval CI belongs to /root/mlx_profile_author after final evaluator runtime inventory."
+  ],
+  "observations": [
+    {
+      "id": "container-environment",
+      "paths": [
+        "Dockerfile",
+        "dockerrun.sh",
+        "dockerrun_gpu.sh"
+      ],
+      "fact": "Dockerfile has no Python/project installation; both scripts bind $PWD onto /root/plato. A future environment inside that directory would be hidden by the host mount. Scripts do not quote $PWD, always allocate a TTY, omit --rm, and GPU script lacks a shebang."
+    },
+    {
+      "id": "container-context",
+      "fact": "No .dockerignore, no .gitmodules, and no gitlink entries at the pinned source. Archives occupy about 17 MB and evidence about 110 MB in this worktree. Hatch excludes archives/retired and evidence/2026-refresh/reproductions from package builds, but that does not affect Docker COPY."
+    },
+    {
+      "id": "docs-setup",
+      "fact": "Install guide says uv sync imports global packages, labels extras as groups, suggests impossible --all-extras despite ssl/llm_eval conflict, and implies every example has package metadata. Quickstart claims a preconfigured environment not built by Dockerfile."
+    },
+    {
+      "id": "docs-netlify",
+      "fact": "Netlify uses docs as base, Python 3.11, unpinned pip MkDocs dependencies and duplicate non-strict context commands; root already has locked docs group."
+    },
+    {
+      "id": "pypi",
+      "fact": "Release workflow uses old mutable action versions and uv latest; test workflow pins verified checkout v7.0.1, setup-python v7.0.0, setup-uv v10.2.0, upload-artifact v7.0.1, and uv 0.12.22."
+    }
+  ],
+  "decisions": {
+    "container": {
+      "selected": "Single development image based on nvidia/cuda:13.0.3-devel-ubuntu24.04@sha256:b7ae301dea2c162444795462ce17a05f6a516e5a75944b57af5b88540a1a2266; uv 0.12.22 binary copied from official digest; uv-managed Python 3.13; root base profile installed with --locked --no-default-groups into /opt/plato/.venv.",
+      "cuda_rationale": "Refresh 13.0.1 to current patch in the wheel's toolkit line. Official torch 2.14.1 metadata requires cuda-toolkit==13.0.3; lock records 13.0.3.0, cudart13.0.96 and cublas13.1.1.3. CUDA13.0 Update3 official release notes and image manifests are available. Latest overall NVIDIA tag observed is13.4.2, but changing toolkit minor would diverge from locked torch's13.0.3 bundle with no demonstrated runtime need.",
+      "cudnn_rationale": "Select devel without OS cuDNN: locked torch supplies nvidia-cudnn-cu13==9.24.0.43, whereas the13.0.3-cudnn-devel image embeds older9.14.0.64. Keep nvcc/development tools and cuDNN functionality via wheel dependencies; avoid a second older cuDNN provider. NVIDIA base still has other system CUDA libraries, so inspection must record actual loaded libraries and relevant versions.",
+      "uv_image": "ghcr.io/astral-sh/uv:0.12.22@sha256:f513a91fc62fe7c17567eee97230dd198e43edb8a9fbecca843714a4358fe1bc",
+      "layout": [
+        "Keep WORKDIR /root/plato and editable project installation, so checkout bind mounts preserve the existing development workflow.",
+        "Set UV_PROJECT_ENVIRONMENT=/opt/plato/.venv and PATH with that bin directory first. Set UV_NO_DEFAULT_GROUPS=1 so ordinary uv run does not unexpectedly install dev tools; remove misleading UV_SYSTEM_PYTHON.",
+        "Install managed Python 3.13 explicitly before project sync; use an explicit stable managed installation location outside source mount. Record patch/build in image provenance.",
+        "Copy all retained workspace-member manifests and code before a final uv sync --locked --python 3.13 --no-default-groups. Minimal single sync is preferred initially; avoid metadata-only --locked sync that cannot see workspace members.",
+        "Use apt --no-install-recommends for actual needed OS libraries/certificates and remove apt lists. Pin uv via image copy, avoiding curl installer."
+      ],
+      "context": [
+        "Add .dockerignore excluding .git, .venv and .venv-* recursively, caches, __pycache__, runtime/data/model/checkpoint/result outputs, build/dist/site artifacts, archives/, evidence/, source-cache/source-caches and reproduction bundles.",
+        "Keep pyproject.toml, uv.lock, .python-version, README, LICENSE, plato/, plato.py, configs/, active examples and their workspace metadata; tests can be excluded and CI smoke probes mounted separately.",
+        "Check local data fixtures required by active examples before excluding paths; never use a global *.json/*.toml/data/* exclusion that removes tracked fixtures.",
+        "Final archive refs/payloads stay out of container context regardless of package exclusions."
+      ],
+      "scripts": [
+        "Preserve ./dockerrun.sh and ./dockerrun_gpu.sh entrypoints and image name plato; add shebang to GPU launcher, quote mount source, set -eu and exec docker.",
+        "Preserve Linux host networking and shared-memory behavior unless concrete Linux proof supports a replacement; document these scripts as Linux launch helpers.",
+        "Add --rm; retain interactive terminal for no-argument use, but allow supplied commands and choose TTY flags only when terminal appropriate so CI can execute a command without a TTY.",
+        "Forward command arguments exactly, with --gpus all only on GPU launcher. Keep host source mount and explicitly describe that dependencies must match image lock or be synced inside the container.",
+        "Do not silently switch to an immutable/no-mount launcher or add automatic host installations."
+      ],
+      "rejected_options": [
+        {
+          "option": "Retain CUDA13.0.1 unchanged",
+          "reason": "A newer13.0.3 patch is available and matches locked torch metadata."
+        },
+        {
+          "option": "Use latest13.4.2-cudnn-devel",
+          "reason": "Newer overall toolkit is not the wheel toolkit; OS cuDNN9.26 also differs from locked9.24. CPU-only evidence cannot establish those GPU combinations."
+        },
+        {
+          "option": "CPU-only image or slim Python base",
+          "reason": "Would remove existing CUDA development capability from the sole supplied image."
+        },
+        {
+          "option": "Separate CPU/GPU image families, Compose or deployment framework",
+          "reason": "Unnecessary scope expansion for the broken existing development image."
+        }
+      ],
+      "claim_limit": "Linux amd64 image build, Python environment, CPU imports/operations, CLI startup and mount behavior only. No GPU compute, driver, Metal, or Linux arm64 acceptance."
+    },
+    "docs_build": {
+      "selected": "Use root lockfile docs-only environment for Netlify and CI; preserve docs/requirements.txt as a generated locked docs-only export for existing pip consumers.",
+      "netlify": [
+        "Set build base to repository root (or remove docs base), publish docs/site, PYTHON_VERSION=3.13.",
+        "Use one shared build command inherited by production/preview/branch contexts: bootstrap uv==0.12.22 with the selected Python then uv sync --locked --python 3.13 --only-group docs; uv run --no-sync mkdocs build --strict -f docs/mkdocs.yml.",
+        "Prefer a short docs/build.sh if quoting/bootstrap needs a helper; one actual command implementation is reused by CI and Netlify. Do not assume uv is preinstalled on Netlify; official software list does not list it.",
+        "Use a dedicated .venv-docs environment to avoid changing application environments. `--only-group docs` must omit project/runtime/dev dependencies.",
+        "Generate docs/requirements.txt with uv export --locked --only-group docs --no-emit-project; verify byte parity in CI using identical generation flags. No independently hand-pinned dependency list.",
+        "Remove redundant per-context command copies; preserve automatic Netlify context behavior."
+      ],
+      "gates": [
+        "Fresh Python 3.13 docs-only sync, dependency inventory and strict MkDocs build to docs/site.",
+        "Assert torch, lighteval and plato-learn are absent from docs-only environment and mkdocs/material match uv.lock.",
+        "Verify Netlify effective root working directory and publish path using a real Deploy Preview once the integrated PR exists; Linux command success alone is not a Netlify-hosted deployment claim.",
+        "Fix actual strict-build warnings only in owned/serialized docs files; do not suppress warnings to get green."
+      ]
+    },
+    "package": {
+      "selected": "Align release action and uv pins with tested workflow, keep release-created publication intent, and validate the same build on PRs in a separate docs-package workflow with no publish step.",
+      "build": [
+        "Use Python 3.13 and uv0.12.22 with existing verified action SHAs.",
+        "Export locked build group to an ephemeral constraints file; run uv build --no-sources --build-constraints <file> --python 3.13 --out-dir <clean-output>. Do not claim uv build is lock-constrained without this explicit bridge.",
+        "Inspect wheel/sdist names, metadata, Requires-Python and file manifests; reject archived/reproduction/cache/environment payloads.",
+        "Build wheel from generated sdist in a clean temporary directory to expose missing source files; use same constraints and Python.",
+        "Install produced wheel in isolated Python 3.13 environment with runtime dependencies constrained from locked base export, then run import/version probes from outside the source checkout; assert __file__/metadata originate from installed wheel, not repository cwd.",
+        "Upload distributions, hashes, manifests and logs from PR build; publishing remains exclusively in unchanged release-event publishing path after successful build validation."
+      ]
+    }
+  },
+  "work_packages": [
+    {
+      "id": "P0-review-plan",
+      "owner": "Fresh Sol reviewer selected by root",
+      "paths": [
+        "/tmp/plato-deployment-refresh-plan.json",
+        "/tmp/plato-deployment-source-evidence.json"
+      ],
+      "depends": [],
+      "deliverable": "Independent review of bounded scope, current CUDA reasoning, mount behavior, executable validation and ownership. Report issues before implementation; no self-approval."
+    },
+    {
+      "id": "P1-container",
+      "owner": "Sol implementation author, then a different fresh Sol reviewer",
+      "owned_paths": [
+        "Dockerfile",
+        ".dockerignore",
+        "dockerrun.sh",
+        "dockerrun_gpu.sh",
+        ".github/workflows/container_checks.yml",
+        ".github/scripts/check_container.py"
+      ],
+      "depends": [
+        "P0-review-plan",
+        "Root supplies frozen current integration commit; implement in separate worktree"
+      ],
+      "deliverable": "Single runnable locked development image plus Linux CI smoke/provenance; no docs/profiles/package edits."
+    },
+    {
+      "id": "P2-docs-package-build",
+      "owner": "Sol implementation author, then a different fresh Sol reviewer",
+      "owned_paths": [
+        "netlify.toml",
+        "docs/requirements.txt",
+        "docs/build.sh",
+        ".github/workflows/pypi_publish.yml",
+        ".github/workflows/docs_package_checks.yml",
+        ".github/scripts/check_distribution.py"
+      ],
+      "depends": [
+        "P0-review-plan",
+        "Root supplies frozen integration commit"
+      ],
+      "deliverable": "Locked3.13 strict docs path and consistent package validation/release build. No pytorch_tests.yml, pyproject.toml or uv.lock changes without explicit coordination."
+    },
+    {
+      "id": "P3-general-prose",
+      "owner": "Astra prose author, then fresh Sol command reviewer",
+      "owned_paths": [
+        "docs/docs/install.md",
+        "docs/docs/quickstart.md"
+      ],
+      "depends": [
+        "P1-container final behavior and artifacts",
+        "P2-docs-package final commands",
+        "Evaluator code frozen and exact command/resource inventory handed over"
+      ],
+      "deliverable": "Repair global-packages/extras claims, show selected compatible extras and explicit3.13 commands, correct container environment/mount/runtime behavior, replace global docker rm-all instructions with --rm, link current NVIDIA setup guide instead of stale copied1.17.8 installation recipe, align build/docs/tooling commands with lock."
+    },
+    {
+      "id": "P4-evaluator-prose-boundary",
+      "owner": "Future Astra evaluator documentation author, fresh Sol reviewer",
+      "owned_paths": [
+        "docs/docs/configurations/evaluation.md",
+        "docs/docs/examples/case-studies/4. Server-side Lighteval for SmolLM2.md",
+        "docs/docs/references/evaluators.md"
+      ],
+      "depends": [
+        "Final evaluator code and runtime inventory"
+      ],
+      "handoff": "Author supplies exact install.md/quickstart.md evaluator sections to P3 owner, or owns those files only in a later serialized commit. Every syncing Lighteval run uses --extra llm_eval; --no-sync only after documented compatible locked provisioning. Resource/download/runtime claims require final actual pipeline receipts."
+    },
+    {
+      "id": "P5-integrate-qualify",
+      "owner": "Root",
+      "owned_paths": [
+        "Integration receipts and PR description"
+      ],
+      "depends": [
+        "Independent reviews P1/P2/P3/P4",
+        "Optional Lighteval CI finalized by existing workflow owner"
+      ],
+      "deliverable": "Merge disjoint commits onto frozen runtime result, execute actual remote Linux workflows on final integrated SHA, review all artifacts and final diff; preserve all pre-existing quality gates and user-authorized PR/merge flow."
+    }
+  ],
+  "validation": {
+    "container_required": [
+      "Run actual docker build --pull --progress=plain --iidfile <artifact>/image-id.txt -t plato . on GitHub ubuntu-24.04 amd64 with enough disk, no registry push. Retain build output including context bytes and elapsed build/resource use.",
+      "Before build write distinctive dummy files into excluded archive/evidence/host-venv/cache paths in the disposable CI checkout; confirm final image lacks them and source ignore rules exclude those paths. Never create these in root's qualified worktree.",
+      "Save docker image inspect JSON, docker history, base/uv manifest digests, final image ID, source commit, lock and deployment-file SHA256, Python 3.13 patch, uv version, OS info, nvcc version, package freeze and image size.",
+      "Run unmounted image with network disabled and normal entrypoint: python imports torch/torchvision/plato plus representative mandatory base imports; perform CPU tensor operation and torchvision native CPU op; run python plato.py --help. Use python or uv run --no-sync to prove preinstalled dependencies.",
+      "Assert sys.executable and sys.prefix resolve into /opt/plato/.venv; verify torch version/CUDA build value, import paths, dist-info versions and direct_url origin, lock hash and `uv pip check`. Record relevant loaded CUDA/cuDNN libraries from /proc/self/maps after version probes; check torch.backends.cudnn.version() against installed wheel metadata rather than old OS library.",
+      "Exercise actual ./dockerrun.sh command forwarding non-interactively from a checkout path containing spaces, with a deliberately invalid host .venv present; ensure mounted-source execution uses /opt Python, does not modify/use host .venv and preserves exit code. Assert container auto-removal.",
+      "Test launcher argument assembly with a recording docker stub for GPU flag and quoting; that is only script validation. Real --gpus all qualification requires NVIDIA hardware and is not claimed by this plan.",
+      "Store CPU import/CLI/mount receipts with explicit pass/fail assertions; do not equate registry manifest inspection or Dockerfile text inspection with an actual build.",
+      "Artifact image proof means locally loaded image tested in job, identified by image ID and inspect/history artifacts. Full docker-save upload is optional only if runner disk/artifact budget permits; registry publication is out of scope."
+    ],
+    "docs_package_required": [
+      "Parse workflows/TOML and run shell syntax checks before remote execution; preserve zsh -lc command convention (install zsh on GitHub runner using same bootstrap as existing tests).",
+      "Fresh docs-only locked environment, strict build and generated requirements parity; use independent temporary environment on host only if authorized and never shared qualified environment.",
+      "Clean wheel/sdist build using locked build constraints; rebuild from sdist; inspect absence of archives and reproduction payloads.",
+      "Installed-wheel provenance/import proof outside checkout under3.13; ordinary source import is insufficient package proof.",
+      "No package publish or release dispatch during tests. Release workflow remains gated by original release.created event.",
+      "Obtain real Netlify Deploy Preview evidence on final integration if available; report hosted validation limitation honestly if service access is unavailable."
+    ],
+    "integration_required": [
+      "Preserve native383/core51/retained19 gates; root determines necessary reruns from final source/runtime changes, and labels receipts by actual source SHA.",
+      "Python 3.13 only in all new active workflows. Pytorch workflow ownership remains serialized.",
+      "Fresh reviewers verify actual logs/artifacts, not author's success summary; require failure propagation and no continue-on-error disguising missing evidence.",
+      "Final report differentiates implemented changes, executed container CPU proof, executed package/docs checks, hosted preview evidence and untested GPU behavior."
+    ],
+    "resource_limits": "NVIDIA13.0.3-devel has about3.97 GB compressed base layers before Python wheels, and old cudnn-devel variant about4.33 GB; PyTorch CUDA wheels add substantial disk usage. Record df before/after, set a bounded job timeout (e.g.60min) and select a sufficiently sized hosted Linux runner. Avoid exporting a multi-GB tar by default or silently replacing CUDA withCPU to fit disk; if disk fails, use supported larger runner or an evidence-based leaner build with fresh review."
+  },
+  "primary_sources": [
+    {
+      "url": "https://pypi.org/pypi/torch/2.14.1/json",
+      "verified": "Live project-owned package metadata: Linux toolkit==13.0.3 and cuDNN==9.24.0.43."
+    },
+    {
+      "url": "https://docs.nvidia.com/cuda/archive/13.0.3/cuda-toolkit-release-notes/index.html",
+      "verified": "Official CUDA13.0 Update3 release notes available."
+    },
+    {
+      "url": "https://hub.docker.com/v2/repositories/nvidia/cuda/tags?page_size=30&name=cudnn-devel-ubuntu24.04&ordering=last_updated",
+      "verified": "Live NVIDIA repository tags include13.0.3 and latest observed13.4.2; queried via urllib because web page adapter errored."
+    },
+    {
+      "url": "https://docs.nvidia.com/deploy/cuda-compatibility/minor-version-compatibility.html",
+      "verified": "Driver compatibility has conditions; toolkit major/minor alone is not GPU qualification."
+    },
+    {
+      "url": "https://docs.astral.sh/uv/guides/integration/docker/",
+      "verified": "Versioned uv image copy, project sync and platform-specific venv/mount guidance. Inference: /opt env preserves this repository's source bind mount."
+    },
+    {
+      "url": "https://docs.docker.com/build/concepts/context/",
+      "verified": "Docker context ignores are independent from Python packaging excludes."
+    },
+    {
+      "url": "https://docs.netlify.com/build/configure-builds/manage-dependencies/",
+      "verified": "PYTHON_VERSION configuration; base-directory requirements auto-install."
+    },
+    {
+      "url": "https://docs.netlify.com/build/configure-builds/available-software-at-build-time/",
+      "verified": "Current build Ubuntu24.04; Python selectable; uv not listed as installed tool."
+    },
+    {
+      "url": "https://docs.astral.sh/uv/guides/package/",
+      "verified": "Build wheels/sdists and validate --no-sources for published metadata."
+    },
+    {
+      "url": "https://docs.astral.sh/uv/concepts/projects/sync/",
+      "verified": "Group/extras selection and automatic run synchronization."
+    },
+    {
+      "url": "https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html",
+      "verified": "Current toolkit recipe now1.20.1-1, unlike copied1.17.8 docs; link guidance to avoid stale duplicate instructions."
+    },
+    {
+      "url": "https://github.com/actions/checkout/releases/tag/v7.0.1",
+      "verified": "Release and full tag SHA match existing CI via GitHub API."
+    },
+    {
+      "url": "https://github.com/actions/setup-python/releases/tag/v7.0.0",
+      "verified": "Release and full tag SHA match existing CI via GitHub API."
+    },
+    {
+      "url": "https://github.com/astral-sh/setup-uv/releases/tag/v10.2.0",
+      "verified": "Release and full tag SHA match existing CI via GitHub API."
+    },
+    {
+      "url": "https://github.com/astral-sh/uv/releases/tag/0.12.22",
+      "verified": "Existing repository uv version exists; keep consistent version rather than unrelated latest upgrade."
+    }
+  ],
+  "executed_during_planning": [
+    "Read AGENTS.md, supplied findings/command-semantics, pinned Docker/Netlify/release/docs/package/lock/workflow/launcher files.",
+    "Confirmed clean pinned source HEAD, missing dockerignore/gitmodules and absence of gitlinks; read filesystem sizes.",
+    "Read-only uv build --help and uv sync --help; no environment sync or build executed.",
+    "Browsed official primary documentation and verified public registry manifests/configs plus action refs and torch PyPI metadata; raw results and source hashes in companion evidence."
+  ],
+  "not_executed": [
+    "Repository code edits",
+    "Environment sync",
+    "Docker build or launch",
+    "Package build/install",
+    "MkDocs build",
+    "Netlify preview/deploy",
+    "GPU workload",
+    "Release/publication",
+    "Fresh independent review"
+  ],
+  "open_validation_items": [
+    "Image library loading and CPU startup must be proved by actual Linux build; matched toolkit metadata is a design rationale, not acceptance.",
+    "Resolve actual GitHub runner disk capacity before claiming container gate availability.",
+    "Final evaluator docs/profiles await code/runtime inventory; avoid editing same files/workflows concurrently.",
+    "Generated docs requirements flag ordering/parity and Netlify root publish semantics must be tested by implementation owner."
+  ],
+  "next_action": "Root assigns fresh Sol plan review. After issues are resolved, assign disjoint P1/P2 authors; serialize prose only after final code and exact commands freeze."
+}

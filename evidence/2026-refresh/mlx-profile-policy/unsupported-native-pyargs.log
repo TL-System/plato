@@ -1,0 +1,1 @@
+ERROR: mlx-native selector unsupported: --pyargs cannot target native tests; use filesystem paths, e.g. tests/mlx_native --test-profile=mlx-native

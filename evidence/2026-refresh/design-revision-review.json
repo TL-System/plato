@@ -1,0 +1,709 @@
+{
+  "schema_version": 1,
+  "review_date": "2026-10-02",
+  "reviewer": "Fresh delta reviewer of startup, MLX and independent Phase 1C designs",
+  "requested_reviewer_profile": {
+    "model": "gpt-6.1-sol",
+    "reasoning_effort": "xhigh"
+  },
+  "profile_provenance": "The requested profile is recorded. Available tools do not expose runtime model/reasoning attestation or an in-place model selector; no nested agent or model-switch claim is made.",
+  "baseline_commit": "5b8359bd40bbe65c7753e71f6627c490f9aa144f",
+  "review_kind": "Design delta review for the first two artifacts; fresh first review for the independent Phase 1C artifact. PASS resolves design findings only; implementation and support qualification remain pending.",
+  "summary": "PASS separately for startup-design.json, mlx-roadmap.json and test-ci-design.json. All seven prior findings are resolved at design level, including the low advisory. No new concrete medium-or-higher finding. Caller-loop compatibility, teardown exception precedence, explicit containment limits, MLX ingress validation/device/ownership boundaries, collection policy, fixture restoration, typing inventory and bounded CI are adequately specified.",
+  "provenance": {
+    "end_user_authority": {
+      "source": "Current user instructions, the Phase 1C review addendum and the subsequent explicit ViT archival instruction.",
+      "authorized": [
+        "Read-only focused review and necessary in-memory API checks.",
+        "Write only evidence/2026-refresh/design-revision-review.json.",
+        "Retain Python 3.13; necessary optimizations and evidence-based archival of obsolete components are authorized."
+      ],
+      "approved_plan": "The user identifies plan.md as approved and requires it to remain unchanged.",
+      "revised_design_approval": "This review request does not constitute end-user approval of all revised design details or selection of optional roadmap features.",
+      "explicit_vit_scope": "The user specifically selects archival of the ViT example rather than an upgrade/fix. Root will inventory/archive ViT-specific examples/configs and retire associated adapters/vendor integration as appropriate. F19 is to be documented as archived, not fixed. Later owned cleanup coordinates affected manifests/lock; no ViT migration acceptance is added to Phase 1C, and startup/MLX decisions are unaffected."
+    },
+    "orchestrator_decisions": {
+      "source": "The user explicitly relays root's selections; revised artifacts record the associated handoffs.",
+      "selections": [
+        "Python 3.13 default; useful Python 3.14 core forward checks.",
+        "Existing MLX correctness plus clipping, mode, device and proportionate reproducibility repairs.",
+        "Narrow MLX validation handoff in shared FedAvg server after 2B.",
+        "Compilation adoption only after measured benefit and correctness checks."
+      ],
+      "unselected": [
+        "General resume and arbitrary microbatch recovery.",
+        "Broad model conversion and new models.",
+        "General lifecycle/task/process supervision."
+      ],
+      "acceptance_distinction": "Artifact statements that prior findings were accepted refer to orchestrator acceptance of findings/scope. They are not evidence of end-user approval of revised artifacts. This review supplies reviewer design acceptance, not implementation acceptance or a new authorization grant.",
+      "plan_reconciliation": "Latest explicit user/root steering supersedes stale default-promotion/archive wording. Later plan reconciliation remains with its owner; no amendment was made here."
+    },
+    "phase_1a_candidate": {
+      "commit": "7304703905189baf771032f1cd923a37f66ed97f",
+      "directory": "/tmp/plato-refresh-worktrees/dependencies",
+      "head_matches_requested": true,
+      "tracked_worktree_clean": true,
+      "pyproject_sha256": "fecc507660f280019ccc6869bde5bd886f26685cfa2361fdab7f4ee60d7f4dfa",
+      "uv_lock_sha256": "a7d30a4f7f2f824d656cf934b148d315fc1380817d3dd93e5070057b6cee58f6",
+      "status": "Read-only candidate inspection, not a claim of Phase 1A acceptance or qualification in this review."
+    }
+  },
+  "inputs": {
+    "startup-design.json": {
+      "sha256": "0a5e2c57102fa4beae7f4b4ceb6e091fd61e8af49b966f023bc57dfa6714ae47",
+      "expected_sha256": "0a5e2c57102fa4beae7f4b4ceb6e091fd61e8af49b966f023bc57dfa6714ae47",
+      "matches": true
+    },
+    "mlx-roadmap.json": {
+      "sha256": "76093b75c76e304117bd32f59d0eabf59bf726a2aaff051d82aa429761945ea9",
+      "expected_sha256": "76093b75c76e304117bd32f59d0eabf59bf726a2aaff051d82aa429761945ea9",
+      "matches": true
+    },
+    "test-ci-design.json": {
+      "sha256": "13f3d272e921d05afd2b3457ff977374528ea4653ff1ca8c238b5b945f5b9ef2",
+      "expected_canonical_sha256": "13f3d272e921d05afd2b3457ff977374528ea4653ff1ca8c238b5b945f5b9ef2",
+      "matches": true,
+      "supplied_noncanonical_sha256": "13f3d272e921d05afd2b3457ff977374528ea4653ff1ca8c238b5b945f5b945f5b9ef2",
+      "resolution": "The first supplied string repeats a segment. The explicitly identified canonical root hash matches the actual bytes."
+    },
+    "startup-design-review.json": {
+      "sha256": "697071e23864656339b2cf4dfbef5b5c982bbf2809b7b0666f9e77def4ec94f9",
+      "reviewed_original_sha256": "f807adc5806fd5ac382176c60a8208e6516c3333ce4561bc61be6f44d0f58876"
+    },
+    "mlx-roadmap-review.json": {
+      "sha256": "a6861265a4a8e2235fa43e511034503e490e2e39c18fdb1c5c5979a56306be40",
+      "reviewed_original_sha256": "9599cf4031b98f2c8b638826ca17cfb05d36b2220f6a0a30c06edaa26ae1c2a8"
+    },
+    "plan.md": {
+      "sha256": "edb9a58cc7915a940854f16d5029fe97434703bf2f75eca0dcb96de2d0f0eb15",
+      "approved": true,
+      "preserved": true
+    },
+    "core-type-triage.json": {
+      "sha256": "2b4848f39865e52488c50fb1b5a6979ee7536cd8656640b21aa60f76e319f7d7"
+    }
+  },
+  "artifact_reviews": [
+    {
+      "path": "evidence/2026-refresh/startup-design.json",
+      "sha256": "0a5e2c57102fa4beae7f4b4ceb6e091fd61e8af49b966f023bc57dfa6714ae47",
+      "decision": "PASS",
+      "result": "pass",
+      "summary": "The revised public loop acquisition/borrowing rule preserves demonstrated synchronous extension compatibility. Cancellation-aware local monitoring has a concrete mechanism and precedence. Explicit cooperative-cleanup limitations and bounded test containment resolve the shutdown finding without a production lifecycle framework.",
+      "prior_findings": [
+        {
+          "id": "SDR-01",
+          "prior_severity": "high",
+          "status": "resolved",
+          "resolution_scope": "design",
+          "implementation_validation_pending": true,
+          "locations": [
+            "/design/ownership_rule",
+            "/design/ordinary_client",
+            "/design/server_run_start",
+            "/design/close_ownership",
+            "/tests/green/0",
+            "/tests/green/1"
+          ],
+          "basis": "An open non-running current loop is reused before factories/configure; ordinary clients borrow it without Runner ownership or unrelated cancellation. External server overrides preserve it, while base.start retains aiohttp's existing consume/close contract. Registration restoration and closed-loop handling are explicit. Separate raw-fresh and caller-loop tests prevent one from substituting for the other.",
+          "baseline_evidence": [
+            {
+              "path": "plato/client.py",
+              "line": 73
+            },
+            {
+              "path": "plato/client.py",
+              "line": 87
+            },
+            {
+              "path": "plato/client.py",
+              "line": 89
+            },
+            {
+              "path": "plato/servers/base.py",
+              "line": 328
+            },
+            {
+              "path": "plato/servers/base.py",
+              "line": 384
+            }
+          ],
+          "checks": [
+            "D02",
+            "D04"
+          ],
+          "acceptance_remaining": "Implement and execute actual revised client/server/edge entrypoints, success/error and post-configure ContextVars on both interpreters, including preconstructed resources and unrelated caller work."
+        },
+        {
+          "id": "SDR-02",
+          "prior_severity": "medium",
+          "status": "resolved",
+          "resolution_scope": "design",
+          "implementation_validation_pending": true,
+          "locations": [
+            "/design/scheduled_failures",
+            "/design/exception_precedence",
+            "/design/close_ownership",
+            "/tests/green/3"
+          ],
+          "basis": "The done callback checks public Task.cancelling() after retrieving a completed exception, so cancellation converted into a finalizer error does not stop aiohttp's internal cleanup. Local cleanup disarms monitoring, avoids repeated cancellation, and preserves independent setup errors ahead of active failures and teardown diagnostics.",
+          "baseline_evidence": [
+            {
+              "path": "plato/servers/base.py",
+              "line": 403
+            }
+          ],
+          "checks": [
+            "D03",
+            "D04"
+          ],
+          "acceptance_remaining": "Execute the mixed setup/finalizer/sibling case through the patched entrypoints, plus active periodic/edge failure and cleanup-only paths; replace only the specific loop-stopped error attributable to the monitor."
+        },
+        {
+          "id": "SDR-03",
+          "prior_severity": "medium",
+          "status": "resolved",
+          "resolution_scope": "explicit limitation and containment design",
+          "implementation_validation_pending": true,
+          "locations": [
+            "/design/cleanup_limits",
+            "/tests/execution",
+            "/tests/teardown_containment",
+            "/tests/real_socket_smoke/3",
+            "/tests/real_socket_smoke/4"
+          ],
+          "basis": "The revision expressly states that Runner/aiohttp cancellation gathers and async-generator cleanup can stall, and that executor wait limits cannot kill threads. The harness owns 30+5+5 second bootstrap containment and 90+5+5 second round containment, records original-error/stage markers, terminates only owned processes and distinguishes forced containment from graceful completion or caller delivery.",
+          "checks": [
+            "D04"
+          ],
+          "acceptance_remaining": "Implement stage-marked task/async-generator/executor stall variants and verify owned-process disappearance. Ordinary successful tests must return naturally. Hypothetical noncooperation is not a design blocker under the user's explicit scope."
+        }
+      ],
+      "new_medium_or_higher_findings": [],
+      "complexity_assessment": "Proportionate. Two F01 task handles, public current-loop registration and local cleanup variables suffice; the revised design removes the prior ContextVar sharing layer and excludes AppRunner replacement or a generic supervisor.",
+      "regression_assessment": "No concrete new design regression found. Preserve synchronous dispatch, edge's absence of a periodic task, child-launch/seed ordering, existing os._exit and aiohttp ownership. A fresh 3.13 policy-created loop is deliberately treated as borrowed and released by the harness, not misreported as entrypoint-owned cleanup.",
+      "implementation_gate": "Design PASS only. Phase 1A acceptance and actual startup/real-round regressions remain prerequisites."
+    },
+    {
+      "path": "evidence/2026-refresh/mlx-roadmap.json",
+      "sha256": "76093b75c76e304117bd32f59d0eabf59bf726a2aaff051d82aa429761945ea9",
+      "decision": "PASS",
+      "result": "pass",
+      "summary": "The supported-path scope now guards all aggregation dispatches before arithmetic, preserves the no-flag Metal/caller default, and defines borrowed host-array ownership. Resume remains a narrowly specified unselected proposal. Selected clipping/mode/device/RNG repairs and conditional optimization are proportionate.",
+      "prior_findings": [
+        {
+          "id": "MR-01",
+          "prior_severity": "high",
+          "status": "resolved",
+          "resolution_scope": "design",
+          "implementation_validation_pending": true,
+          "locations": [
+            "/approved_work/0",
+            "/pre_aggregation_contract",
+            "/acceptance_experiments/E1",
+            "/acceptance_experiments/E2",
+            "/implementation_handoff/sequence/0"
+          ],
+          "basis": "An owned baseline is captured before received-weight hooks. Every eligible raw tree is validated, including zero-weight trees; transformed effective trees and report/payload alignment are checked again before strategy aggregate_weights, legacy aggregate_weights or delta computation. Both arrival orders and malformed-last cases require failure before arithmetic/global load. The shared server integration has an explicit narrow 3A-after-2B handoff.",
+          "baseline_evidence": [
+            {
+              "path": "plato/servers/fedavg.py",
+              "line": 177
+            },
+            {
+              "path": "plato/servers/fedavg.py",
+              "line": 191
+            },
+            {
+              "path": "plato/servers/fedavg.py",
+              "line": 209
+            },
+            {
+              "path": "plato/servers/fedavg.py",
+              "line": 224
+            },
+            {
+              "path": "plato/servers/strategies/aggregation/fedavg.py",
+              "line": 153
+            },
+            {
+              "path": "plato/servers/strategies/aggregation/fedavg.py",
+              "line": 178
+            }
+          ],
+          "checks": [
+            "D05",
+            "D08"
+          ],
+          "acceptance_remaining": "Implement shared ingress and algorithm/trainer preflight together; demonstrate no partial mutation, hook-induced malformation rejection and valid independently trained 8/24 weighted results on all dispatches."
+        },
+        {
+          "id": "MR-02",
+          "prior_severity": "medium",
+          "status": "resolved",
+          "resolution_scope": "design",
+          "implementation_validation_pending": true,
+          "locations": [
+            "/device_and_mode_contract",
+            "/acceptance_experiments/E5"
+          ],
+          "basis": "No flags preserve mx.default_device() and caller stream choices, rather than Config.device()'s generic cpu fallback. Explicit cpu/mps flags retain CPU precedence. Factory initialization, numerical graph construction/execution and restoration receive exception-safe scopes. Prebuilt lazy-graph placement is expressly excluded from migration claims.",
+          "baseline_evidence": [
+            {
+              "path": "plato/config.py",
+              "line": 511
+            },
+            {
+              "path": "plato/trainers/mlx.py",
+              "line": 771
+            },
+            {
+              "path": "docs/docs/quickstart.md",
+              "line": 93
+            }
+          ],
+          "checks": [
+            "D05"
+          ],
+          "acceptance_remaining": "Verify actual operation placement and restored caller defaults on no-flag/CPU/Metal/custom-stream success and failures; preserve mixed submodule modes and evaluation statistics."
+        },
+        {
+          "id": "MR-03",
+          "prior_severity": "medium",
+          "status": "resolved",
+          "resolution_scope": "unselected proposal contract",
+          "implementation_validation_pending": false,
+          "locations": [
+            "/optional_proposals/2",
+            "/acceptance_experiments/E9",
+            "/current_selection/not_selected"
+          ],
+          "basis": "P4/E9 now define a committed step as a completed optimizer update with bookkeeping and an empty accumulation window. Mid-window checkpoint requests must defer or reject, never drop gradients or force early updates. A batch-independent accumulation oracle is separate from stochastic resume. Existing weight-only checkpoints retain their promise.",
+          "baseline_evidence": [
+            {
+              "path": "plato/trainers/mlx.py",
+              "line": 1023
+            },
+            {
+              "path": "plato/trainers/mlx.py",
+              "line": 1094
+            }
+          ],
+          "acceptance_remaining": "No resume implementation is required for A1/A2. A separately selected future feature must pass E9, including mid-window requests and a committed partial tail."
+        },
+        {
+          "id": "MR-04",
+          "prior_severity": "low",
+          "status": "resolved",
+          "resolution_scope": "advisory ownership documentation and acceptance",
+          "implementation_validation_pending": true,
+          "locations": [
+            "/host_array_ownership",
+            "/acceptance_experiments/E1",
+            "/acceptance_experiments/E3"
+          ],
+          "basis": "Extraction is documented as borrowed/read-only by contract. Retained baselines, delayed observations and malformed fixtures must recursively own copies; aggregation must not mutate borrowed inputs. Snapshot isolation is tested without promising universal extraction copies or adding hot-path copies without measurement.",
+          "baseline_evidence": [
+            {
+              "path": "plato/trainers/mlx.py",
+              "line": 109
+            },
+            {
+              "path": "plato/algorithms/mlx_fedavg.py",
+              "line": 115
+            }
+          ],
+          "checks": [
+            "D05"
+          ],
+          "acceptance_remaining": "Apply snapshots at the specified consumers and verify baseline retention across training, with independent negative fixtures."
+        }
+      ],
+      "new_medium_or_higher_findings": [],
+      "scope_assessment": "A1/A2 and selected P1 are existing-path repairs. E8 is bounded qualification evidence; compile adoption requires reproducible benefit plus numerical/state/callback parity and remains default-eager. General resume, conversion, new models and broad scheduler/accumulation parity remain proposals. No blanket backend parity, new protocol, Torch-free packaging or lifecycle expansion is authorized.",
+      "regression_assessment": "E5 protects the documented no-flag command and caller device/modes; E6 protects disabled clipping and rejects invalid/nonfinite clipping inputs; E7 uses stable logical client/round identities, covers reused workers and leaves existing selection/partition and unseeded semantics intact. No concrete new design regression found.",
+      "implementation_gate": "Native Python 3.13 MLX profile still must be provisioned/accepted by its owner; absent MLX is not a passing required skip. E1-E8 and real transport qualification remain unexecuted here."
+    },
+    {
+      "path": "evidence/2026-refresh/test-ci-design.json",
+      "sha256": "13f3d272e921d05afd2b3457ff977374528ea4653ff1ca8c238b5b945f5b9ef2",
+      "decision": "PASS",
+      "result": "pass",
+      "prior_findings": [],
+      "summary": "Base and mandatory collection have practical concrete fixes and explicit prerequisites. Genuine optional native-tokenizer absence is distinct from mandatory Nanochat/DP omissions. Fixture restoration and the 59-location/60-message typing ledger are sound. Bounded CPU CI reuses the meaningful 1B runtime harness.",
+      "new_medium_or_higher_findings": [],
+      "assessments": {
+        "collection": {
+          "locations": [
+            "/owned_changes/1",
+            "/owned_changes/4",
+            "/owned_changes/5",
+            "/profiles/base",
+            "/profiles/mandatory",
+            "/profiles/enforcement"
+          ],
+          "basis": "The candidate already separates test/dev groups and requires DP/MPC/RL/Nanochat for the full suite. A test-base group plus one profile switch is a small extension. Guarding absent Opacus before importing diff_privacy fixes the demonstrated base collection problem without swallowing arbitrary import errors. Base retains fake adapter/local MPC tests. Mandatory requires actual synthetic Nanochat trainer nodes and pinned source rather than accepting namespace discovery or missing-source skips.",
+          "baseline_evidence": [
+            {
+              "path": "tests/trainers/test_dp_data_loader_strategy.py",
+              "line": 4
+            },
+            {
+              "path": "tests/test_nanochat_integration.py",
+              "line": 15
+            },
+            {
+              "path": "tests/test_nanochat_integration.py",
+              "line": 40
+            },
+            {
+              "path": "plato/utils/third_party.py",
+              "line": 28
+            }
+          ],
+          "limits": "No fresh base environment was installed and no pytest collection/suite was run. Candidate group changes, actual collection and prerequisite negatives remain implementation acceptance."
+        },
+        "optional_skips": {
+          "basis": "The mandatory native tokenizer omission is capability-bound to callable rustbpe.Tokenizer, not find_spec alone. Missing/incompatible mandatory packages or synthetic source must fail. The base omissions name only the genuine optional DP module and real Nanochat integration nodes; fake optional-backend tests stay active.",
+          "complexity_guardrail": "Keep the policy to the two fixed profiles, explicit prerequisites and qualification-run assertions. Use a small skip/xfail audit; do not build a configurable profile engine, discovery catalog or general reporting layer. Full-suite required-node assertions belong to the full qualification invocation, not ordinary focused developer runs or the separate runtime subset. The written design permits this narrow implementation, so there is no present overengineering blocker."
+        },
+        "fixtures": {
+          "locations": [
+            "/owned_changes/2",
+            "/owned_changes/3",
+            "/isolation_gaps"
+          ],
+          "basis": "The baseline temp_config mutates shared Config state and redirects paths after construction. configure_environment restores env/argv before yield, discards prior params and lacks exception-safe post-yield restoration. Proposed snapshots, temporary-root arguments before construction, lifetime-correct env/argv and finally restoration address real defects. FedDF loader/Nanochat path scopes and Python/NumPy/CPU Torch RNG restoration are targeted; they do not require accelerator initialization or an event-loop fixture.",
+          "baseline_evidence": [
+            {
+              "path": "tests/conftest.py",
+                "line": 60
+            },
+            {
+              "path": "tests/integration/utils.py",
+                "line": 75
+            },
+            {
+              "path": "tests/integration/utils.py",
+              "line": 89
+            },
+            {
+              "path": "tests/integration/utils.py",
+                "line": 105
+            },
+            {
+              "path": "tests/clients/test_feddf_strategy.py",
+              "line": 21
+            },
+            {
+              "path": "tests/servers/test_feddf_server_strategy.py",
+              "line": 22
+            }
+          ],
+          "acceptance_remaining": "Nested contexts and setup/body exceptions must restore prior mutable values and registration, not merely reset the singleton. Reverse-order checks must preserve imports and helper functionality. F13 stays a production test within one fixture lifetime; fixture isolation cannot close it."
+        },
+        "typing": {
+          "locations": [
+            "/typing",
+            "/acceptance/4"
+          ],
+          "fresh_exit_code": 1,
+          "fresh_total_messages": 384,
+          "fresh_first_party_messages": 60,
+          "fresh_first_party_unique_locations": 59,
+          "unique_location_breakdown": {
+            "core": 38,
+            "examples": 11,
+            "tests": 10
+          },
+          "message_breakdown": {
+            "core": 38,
+            "examples": 12,
+            "tests": 10
+          },
+          "vendor_messages": 324,
+          "duplicated_location": "examples/unlearning/knot/knot_server.py:403:17 invalid-argument-type, ndarray and NumPy-scalar variants.",
+          "assignment_coverage": "All 59 live first-party (file,line,column,code) locations exactly match the design's assignments plus its referenced core triage entries; KNOT explicitly accounts for both messages.",
+          "basis": "The 38+11+10 breakdown is unique locations; the 60 emitted messages include 12 example messages. The design's historical-count caveat is accurate. Preserve nonzero ty output and scoped dispositions; intentional abstract-class negative tests retain their TypeError assertions and may use documented line-specific ignores.",
+          "checks": [
+            "D06"
+          ]
+        },
+        "ci": {
+          "locations": [
+            "/linux_cpu_ci",
+            "/fork_warnings"
+          ],
+          "basis": "A two-version ubuntu CPU matrix, separate locked base/mandatory environments, 25-minute job limit and finite provisioning/test steps replace unlocked all-extras and five unbounded download-heavy runs. ssl/llm_eval conflict in the candidate makes blanket all-extras unsuitable. Runtime tests retain real two-client parameter changes, actual socket/processor payloads, numerical weighting and owned-process containment. Python 3.14 is explicitly core forward evidence; robotics/MLX remain separately provisioned support checks.",
+          "baseline_evidence": [
+            {
+              "path": ".github/workflows/pytorch_tests.yml",
+              "line": 27
+            },
+            {
+              "path": "tests/datasources/test_huggingface_datasource.py",
+                "line": 264
+            },
+            {
+              "path": "plato/datasources/huggingface.py",
+              "line": 238
+            }
+          ],
+          "complexity_guardrail": "Use the delivered 1B harness and ordinary pytest/JUnit/runner artifacts. Avoid a second subprocess supervisor, new timeout plugin or durable process-reporting subsystem. Use workflow timeouts as outer bounds; regular success still requires the harness's natural exit and no-survivor checks.",
+          "acceptance_remaining": "Coordinate runtime markers/paths with 1B and group/lock changes with 1A. Run actual Linux CPU jobs and retain counts, warnings and comparable coverage; the proposed deadlines are finite budgets, not measured Linux execution evidence."
+        }
+      },
+      "archival_scope_addendum": "The user's subsequent ViT instruction supersedes any upgrade/fix interpretation of ViT-related typing assignments. Assign those records to root's later archive inventory/cleanup; record F19 as archived, not repaired. Do not require ViT migration or initialization repair for Phase 1C. Archive moves and affected manifest/lock changes belong to their later owner.",
+      "complexity_assessment": "No medium-or-higher complexity defect in the design as written. The skip-audit implementation is the main pressure point: fixed-profile checks and qualification-only required nodes are proportionate; a universal test-profile policy framework would exceed this approval.",
+      "implementation_gate": "PASS is for the Phase 1C design. Actual base collection, mandatory node execution, fixture regressions, fork-warning removal and CI execution remain required; support cannot be inferred from historical 248/3/8 or stub smoke results."
+    }
+  ],
+  "checks_performed": [
+    {
+      "id": "D01",
+      "kind": "identity_and_baseline",
+      "result": "Verified exact artifact/prior-review/plan hashes, baseline HEAD and clean tracked worktree/index; read complete three design artifacts and prior SDR/MR findings. No original design bytes were reconstructed: superseded identities are taken from immutable prior reviews."
+    },
+    {
+      "id": "D02",
+      "kind": "actual_baseline_supplied_client_compatibility",
+      "execution": "zsh -lc; existing interpreters -B; in-memory Config and minimal supplied clients, subprocess timeout 20 seconds.",
+      "results": [
+        {
+          "interpreter": ".venv/bin/python",
+          "probe": "borrowed_supplied_client",
+          "exit_code": 0,
+          "stdout": {
+            "same_loop": true,
+            "sentinel_preserved": true,
+            "caller_loop_open_current": true,
+            "caller_future_untouched": true
+          },
+          "stderr": "",
+          "timeout_seconds": 20
+        },
+        {
+          "interpreter": "/tmp/plato-python314-env/bin/python",
+          "probe": "borrowed_supplied_client",
+          "exit_code": 0,
+          "stdout": {
+            "same_loop": true,
+            "sentinel_preserved": true,
+            "caller_loop_open_current": true,
+            "caller_future_untouched": true
+          },
+          "stderr": "",
+          "timeout_seconds": 20
+        }
+      ],
+      "limit": "Actual unchanged plato.client.run; not the unimplemented revised entrypoint or raw-fresh startup qualification."
+    },
+    {
+      "id": "D03",
+      "kind": "revised_cancellation_guard_api_interaction",
+      "execution": "zsh -lc; real web.run_app, setup sentinel, cancellation-finalizer sentinel and awaiting sibling; 20-second subprocess timeout.",
+      "results": [
+        {
+          "interpreter": ".venv/bin/python",
+          "probe": "cancelling_guard_real_run_app",
+          "exit_code": 0,
+          "stdout": {
+            "original_setup_error": true,
+            "sibling_finalized": true,
+            "loop_closed": true,
+            "stop_requests": 0,
+            "managed_observations": [
+              {
+                "error": "finalizer-sentinel",
+                "cancelling": 1
+              }
+            ],
+            "secondary_diagnostics": [
+              "finalizer-sentinel"
+            ]
+          },
+          "stderr": "",
+          "timeout_seconds": 20
+        },
+        {
+          "interpreter": "/tmp/plato-python314-env/bin/python",
+          "probe": "cancelling_guard_real_run_app",
+          "exit_code": 0,
+          "stdout": {
+            "original_setup_error": true,
+            "sibling_finalized": true,
+            "loop_closed": true,
+            "stop_requests": 0,
+            "managed_observations": [
+              {
+                "error": "finalizer-sentinel",
+                "cancelling": 1
+              }
+            ],
+            "secondary_diagnostics": [
+              "finalizer-sentinel"
+            ]
+          },
+          "stderr": "",
+          "timeout_seconds": 20
+        }
+      ],
+      "limit": "The proposed public done-callback guard is modeled in memory. This verifies its mechanism, not patched Plato green tests or a training round."
+    },
+    {
+      "id": "D04",
+      "kind": "installed_asyncio_aiohttp_review",
+      "environments": [
+        {
+          "interpreter": ".venv/bin/python",
+          "python": "3.13.16",
+          "packages": {
+            "aiohttp": "3.14.3",
+            "mlx": null,
+            "mlx-metal": null,
+            "pytest": "9.1.1",
+            "pytest-cov": null,
+            "opacus": "1.6.0",
+            "kazoo": "2.11.0",
+            "gymnasium": "1.3.0",
+            "tiktoken": "0.14.0",
+            "ty": "0.0.84"
+          },
+          "run_app_function_sha256": "4a70706234546281916480949fe4ad51bc314278264872831556011dfd4701f3",
+          "aiohttp_closes_supplied_loop": true,
+          "stderr": ""
+        },
+        {
+          "interpreter": "/tmp/plato-python314-env/bin/python",
+          "python": "3.14.8",
+          "packages": {
+            "aiohttp": "3.14.3",
+            "mlx": "0.32.3",
+            "mlx-metal": "0.32.3",
+            "pytest": "9.1.1",
+            "pytest-cov": null,
+            "opacus": "1.6.0",
+            "kazoo": "2.11.0",
+            "gymnasium": "1.3.0",
+            "tiktoken": "0.14.0",
+            "ty": "0.0.84"
+          },
+          "run_app_function_sha256": "4a70706234546281916480949fe4ad51bc314278264872831556011dfd4701f3",
+          "aiohttp_closes_supplied_loop": true,
+          "stderr": ""
+        }
+      ],
+      "result": "Inspected installed Runner.close, cancellation gathering and run_app cleanup. aiohttp closes even supplied loops; Runner cancellation gather and async-generator shutdown have no general wall-clock deadline. The revision truthfully limits natural cleanup and places hard containment with the harness.",
+      "limit": "Prior noncooperative timeout probes were reviewed, not rerun. No new production shutdown guarantee is claimed.",
+      "documentation": [
+        "https://docs.python.org/3.14/library/asyncio-task.html#asyncio.Task.cancelling"
+      ]
+    },
+    {
+      "id": "D05",
+      "kind": "mlx_source_and_cpu_api_checks",
+      "execution": "/tmp/plato-python314-env/bin/python -B; in-memory arrays/models, CPU stream, no checkpoint or training-entrypoint writes.",
+      "result": {
+        "mlx": "0.32.3",
+        "initial_device": "Device(gpu, 0)",
+        "metal_available": true,
+        "caller_device_stream_restored": true,
+        "mode_api_recursive": true,
+        "extraction_borrowed_alias": true,
+        "owned_snapshot_independent": true,
+        "clipped_norm": 5,
+        "clipped_values": [
+          1.1999998092651367,
+          1.5999996662139893
+        ],
+        "RMSprop_available": true,
+        "RMSProp_available": false,
+        "Momentum_available": false,
+        "cpu_api_probe_only": true
+      },
+      "source_assessment": "Reviewed baseline MLX tree map/load/extraction, trainer initialization/modes/clipping, shared FedAvg dispatch and accumulation. Public APIs support the narrowed repair mechanisms.",
+      "limit": "Only CPU API interaction; Metal availability/default observation is not Metal training qualification or Python 3.13 MLX support.",
+      "documentation": [
+        "https://ml-explore.github.io/mlx/build/html/python/_autosummary/mlx.core.stream.html"
+      ],
+      "documentation_limit": "Tagged GitHub module page open returned an internal error; conclusions use installed 0.32.3 behavior and local baseline, not a claim that the failed page was verified."
+    },
+    {
+      "id": "D06",
+      "kind": "typing_inventory",
+      "command": ".venv/bin/ty check --output-format concise",
+      "tool_version": "ty 0.0.84",
+      "exit_code": 1,
+      "raw_output_sha256": "8d70ec0159d4827d5b341b9f4450a895599d3ed4b2077c25e79d0a2df74b113c",
+      "total_messages": 384,
+      "first_party_messages": 60,
+      "first_party_unique_locations": 59,
+      "vendor_messages": 324,
+      "assignment_location_match": true,
+      "method": "Parsed concise diagnostics as (file,line,column,code), preserved both KNOT messages, and compared all unique first-party locations with Phase 1C assignments/referenced core triage.",
+      "parser_correction": "An initial read-only scan parser expected a colon after the diagnostic code and matched zero entries. Corrected the parser and repeated the scan; the zero-count parse was discarded."
+    },
+    {
+      "id": "D07",
+      "kind": "phase_1c_source_review",
+      "result": "Reviewed conftest, configure_environment, Nanochat optional imports/source helper, both FedDF loaders, DP collection import, Config runtime paths and current CPU workflow. Practical fixes are tied to demonstrated source behavior. No suite run or fixture implementation was performed."
+    },
+    {
+      "id": "D08",
+      "kind": "phase_1a_candidate_manifest_review",
+      "commit": "7304703905189baf771032f1cd923a37f66ed97f",
+      "result": "Requested candidate HEAD, clean status, both manifest/lock hashes and retained 3.13 verified. test includes pytest/pytest-cov and plato-learn[dp,mpc,rl,nanochat]; dev includes test/ruff/ty. test-base is a proposed coordinated metadata change, not claimed to exist. ssl and llm_eval conflict is explicit."
+    }
+  ],
+  "integrity": {
+    "sole_reviewer_write": "evidence/2026-refresh/design-revision-review.json",
+    "shell": "/bin/zsh -lc (exec_command shell=/bin/zsh, login=true)",
+    "nested_agents": 0,
+    "package_installs": 0,
+    "code_or_design_edits": 0,
+    "plan_edits": 0,
+    "commits": 0,
+    "probe_files_created": 0,
+    "python_bytecode_disabled": true,
+    "tracked_regular_files_compared": 883,
+    "tracked_files_unchanged_before_write": true,
+    "all_six_design_review_plan_inputs_unchanged_before_write": true,
+    "concurrent_unrelated_evidence_changes": [
+      {
+        "kind": "evidence",
+        "path": "evidence/2026-refresh/aggregation-input-probes.json",
+        "before_sha256": "5a5136a176f0136db137837ff77b960822e6951ebfaac5d0da4cd8f38adf5585",
+        "after_sha256": "3415944b801a8737f9e8cfab13e7b38740334517dd9a2372820f27613364ea4e"
+      },
+      {
+        "kind": "evidence",
+        "path": "evidence/2026-refresh/vit-initialization-probe.json",
+        "before_sha256": null,
+        "after_sha256": "9f26846e6439d66360f2e220031c8a2e0f941448ec60c12dd969db735ef2445c"
+      }
+    ],
+    "concurrency_note": "Other shared-workspace work changed the listed unrelated evidence during this review. This reviewer did not write those files; they were not used to decide these artifacts. Do not claim the entire evidence directory was immutable.",
+    "inspected_source_sha256": {
+      "AGENTS.md": "b50f87f31ea3d87076952d8b7d2d8af067132fbf877d80f8780c208fb45527ec",
+      "plato/client.py": "65e8d4659084232aeb191883b3db61fdcf2a6e34c9ba8844912d60307956bd1e",
+      "plato/servers/base.py": "4682ff21c227a86f0ab9e6a6a279f4f4f8500110296aedeff50421c291f4fd15",
+      "plato/servers/fedavg.py": "610005f1648e1aac8c57763ae2a2876350ac78a2d65a76a5a49aba16d399c016",
+      "plato/servers/strategies/aggregation/fedavg.py": "8ea8d4dda63bd3070220613bda7fcadec5adcc785a8ee587acc7447d8517fbf0",
+      "plato/algorithms/mlx_fedavg.py": "b98706edb45cf761990e9cd7bd38a81749ff967445f090c940b12ba3a46458b4",
+      "plato/trainers/mlx.py": "d0e2db3ac4180fd62218a7c2a95af0569734fdd7da76d42f645ec63f25d56cb0",
+      "plato/config.py": "8bbe0146a6c112f484efb1ef267c54cda1b48df79935789aaa5febe116bc41a4",
+      "tests/conftest.py": "53d61fb0890d3fedece2d3c18281fc1d36371cd41d0d010889e98652fd6839c9",
+      "tests/integration/utils.py": "677414d3ded15337e9990806858fbd76c30f13975cc816074f2b0ef881a25bd2",
+      "tests/test_nanochat_integration.py": "741461699c6ee384f5d221beae68a50d9c1bf144c176fca6afc2769fd92761c5",
+      "tests/trainers/test_dp_data_loader_strategy.py": "be765ecd8ac2708a50362388421f29361cef3a66b20c19b2a86d9799c2ea53ba",
+      ".github/workflows/pytorch_tests.yml": "44f5af6e9d08b99158dee7b7aaff4a4030e9f132facb114118cc7e2d62129045"
+    }
+  },
+  "limitations": [
+    "No design or runtime implementation was changed; resolved means the prior design finding is addressed, not that F01/F17 or selected MLX controls have passed implementation regressions.",
+    "No pytest suite, fresh base collection, full real socket training round, CI run, benchmark or revised containment campaign was executed.",
+    "The existing Python 3.13 probe environment lacks MLX and both probe environments lack pytest-cov; they are not the accepted Phase 1A test/backend profiles. No missing package was installed.",
+    "The user has explicitly selected ViT archival; this reviewer performs no archive move or repair. Root's later owned cleanup must inventory affected references/manifests/lock and document F19 as archived rather than fixed. No ViT migration acceptance is introduced for Phase 1C.",
+    "Python 3.14 default promotion, optional robotics support, broad MLX parity and a general lifecycle framework are not implied by these PASS decisions."
+  ]
+}

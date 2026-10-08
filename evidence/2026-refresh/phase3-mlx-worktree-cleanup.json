@@ -1,0 +1,31 @@
+{
+  "status": "COMPLETE_OWNED_MERGED_MLX_LOCAL_CLEANUP",
+  "merged_main": "b9a8735f4a604500d3f2bb232d2fe91ab0ce5401",
+  "inventory_sha256": "3e0f519b20097307fa35e3082692b2c566a7e6919c4216c0fa499fdd171a2504",
+  "removed_worktrees": [
+    "/tmp/plato-refresh-worktrees/mlx-docs",
+    "/tmp/plato-refresh-worktrees/mlx-final",
+    "/tmp/plato-refresh-worktrees/mlx-integration",
+    "/tmp/plato-refresh-worktrees/mlx-native",
+    "/tmp/plato-refresh-worktrees/mlx-profile",
+    "/tmp/plato-refresh-worktrees/mlx-profile-correction",
+    "/tmp/plato-mlx-native-review-source"
+  ],
+  "removed_local_branches": [
+    "maintenance/2026-mlx-docs",
+    "maintenance/2026-mlx-final",
+    "maintenance/2026-mlx-integration",
+    "maintenance/2026-mlx-native",
+    "maintenance/2026-mlx-profile",
+    "maintenance/2026-mlx-profile-correction"
+  ],
+  "removed_idle_task_environments": [
+    "/tmp/plato-mlx-final/env",
+    "/tmp/plato-mlx-integration/env"
+  ],
+  "user_root_environment_unchanged": true,
+  "raw_scratch_reports_and_shared_caches_preserved": true,
+  "active_archive_and_evaluator_worktrees_preserved": true,
+  "removed_remote_branch": "maintenance/2026-mlx-final",
+  "submodule_worktree_handling": "Initial ordinary remove deleted mlx-docs, then refused mlx-final because it contained submodules. Remaining merged worktrees were verified clean with --ignore-submodules=none and removed using Git worktree remove --force; no source changes or submodule deinitialization were used."
+}

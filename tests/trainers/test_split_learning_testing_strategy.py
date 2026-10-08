@@ -7,6 +7,7 @@ from torch.utils.data import TensorDataset
 
 from plato.trainers.split_learning import SplitLearningTestingStrategy
 from plato.trainers.strategies.base import TrainingContext
+from tests.integration.utils import build_minimal_config, configure_environment
 
 
 class DummySampler:
@@ -40,3 +41,23 @@ def test_split_learning_testing_strategy_accepts_custom_sampler():
 
     assert isinstance(accuracy, float)
     assert 0.0 <= accuracy <= 1.0
+
+
+def test_fresh_public_split_evaluation_and_empty_partition(tmp_path):
+    """Evaluation does not depend on installing a training-only callback."""
+    from plato.trainers.split_learning import Trainer
+
+    config = build_minimal_config(trainer_type="split_learning")
+    config["trainer"]["batch_size"] = 2
+    with configure_environment(config, runtime_root=tmp_path):
+        model = torch.nn.Linear(2, 2, bias=False)
+        with torch.no_grad():
+            model.weight.copy_(torch.eye(2))
+        trainer = Trainer(model=model)
+        trainer.device = "cpu"
+        trainer.context.device = torch.device("cpu")
+        assert trainer.model is not None
+        dataset = TensorDataset(torch.eye(2), torch.tensor([0, 1]))
+        assert trainer.test(dataset) == 1.0
+        empty = TensorDataset(torch.empty(0, 2), torch.empty(0, dtype=torch.long))
+        assert trainer.test(empty) == 0.0

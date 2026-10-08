@@ -12,6 +12,8 @@ import tomllib
 from pathlib import Path
 from typing import Any, Optional
 
+from plato.utils.retired_backends import raise_if_retired_config
+
 _CLI_ARG_NOT_SUPPLIED = object()
 
 import numpy as np
@@ -165,8 +167,22 @@ class Config:
     params: dict[str, Any]
     client_sleep_times: np.ndarray | None = None
 
+    @classmethod
+    def reset(cls) -> None:
+        """Discard loaded configuration, CLI state and simulated client speeds."""
+        for name in cls.__annotations__:
+            if name in vars(cls) and name not in {
+                "_cli_overrides", "client_sleep_times"
+            }:
+                delattr(cls, name)
+        cls._instance = None
+        cls._cli_overrides = {}
+        cls.client_sleep_times = None
+
     def __new__(cls):
         if cls._instance is None:
+            # Also isolate historical callers which invalidate _instance directly.
+            cls.reset()
             parser = argparse.ArgumentParser()
             if not parser.prog.startswith("uv run "):
                 parser.prog = f"uv run {parser.prog}"
@@ -280,6 +296,7 @@ class Config:
                 raw_config = loader.load()
                 config = ConfigNode.from_object(raw_config)
             else:
+                raise_if_retired_config(filename)
                 usage = parser.format_usage().strip()
                 raise SystemExit(
                     "Please provide a configuration file using the '-c' option.\n"
@@ -318,7 +335,7 @@ class Config:
                 Config.simulate_client_speed()
 
             # Customizable dictionary of global parameters
-            Config.params: dict[str, Any] = {}
+            Config.params = {}
 
             # A run ID is unique to each client in an experiment
             Config.params["run_id"] = os.getpid()
@@ -434,9 +451,9 @@ class Config:
         # a random seed must be supplied to make sure that all the clients generate
         # the same set of sleep times per epoch across the board
         if hasattr(Config.clients, "random_seed"):
-            np.random.seed(Config.clients.random_seed)
+            rng = np.random.RandomState(Config.clients.random_seed)
         else:
-            np.random.seed(1)
+            rng = np.random.RandomState(1)
 
         # Limit the simulated sleep time by the threshold 'max_sleep_time'
         max_sleep_time = 60
@@ -454,26 +471,26 @@ class Config:
 
         if distribution is None:
             # By default, use Pareto distribution with a parameter of 1.0
-            sleep_times = np.random.pareto(1.0, size=total_clients)
+            sleep_times = rng.pareto(1.0, size=total_clients)
         else:
             dist_name = getattr(distribution, "distribution", "")
             dist_name = dist_name.lower() if isinstance(dist_name, str) else ""
             if dist_name == "normal":
                 mean = getattr(distribution, "mean", 0.0)
                 sd = getattr(distribution, "sd", 1.0)
-                sleep_times = np.random.normal(mean, sd, size=total_clients)
+                sleep_times = rng.normal(mean, sd, size=total_clients)
             elif dist_name == "pareto":
                 alpha = getattr(distribution, "alpha", 1.0)
-                sleep_times = np.random.pareto(alpha, size=total_clients)
+                sleep_times = rng.pareto(alpha, size=total_clients)
             elif dist_name == "zipf":
                 exponent = getattr(distribution, "s", 2.0)
-                sleep_times = np.random.zipf(exponent, size=total_clients)
+                sleep_times = rng.zipf(exponent, size=total_clients)
             elif dist_name == "uniform":
                 low = getattr(distribution, "low", 0.0)
                 high = getattr(distribution, "high", max_sleep_time)
-                sleep_times = np.random.uniform(low, high, size=total_clients)
+                sleep_times = rng.uniform(low, high, size=total_clients)
             else:
-                sleep_times = np.random.pareto(1.0, size=total_clients)
+                sleep_times = rng.pareto(1.0, size=total_clients)
 
         Config.client_sleep_times = np.minimum(
             sleep_times, np.repeat(max_sleep_time, total_clients)

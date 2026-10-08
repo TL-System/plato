@@ -1,0 +1,351 @@
+{
+  "schema_version": 1,
+  "written_at_utc": "2026-10-03T12:24:29.027312+00:00",
+  "role": "Fresh independent Sol xhigh reviewer2; source-bound bounded final writing verification, no prose authoring or nested agents",
+  "verdict": "PASS_BOUNDED_FINAL_SOURCE_BOUND_DOCUMENTATION",
+  "summary": "Exact c199 prose is bound to corrected C 8b01. Production/tests/configs match C, the public delta consists of two explicit CPU qualification additions, and unchanged count/transaction/resume/migration claims remain accurate. DOC-L01 and DOC-L02 are closed. Strict MkDocs remains a deferred failure on two unchanged Nanochat links, not a PASS.",
+  "candidate": {
+    "path": "/private/tmp/plato-refresh-worktrees/algorithm-docs-count-review",
+    "commit": "c199ebe02831a47351a10026e64721f77c9dfe9b",
+    "tree": "98bb9b178c65d39618e057a5cc5079f7ac7fe62e",
+    "dependency_merge": "d4a000c9d4cfbd475936cf1efc275955de94c10d",
+    "prior_prose": "69d7d8a7841589205283f13f0e07771fb1e325bd"
+  },
+  "corrected_C": {
+    "path": "/private/tmp/plato-refresh-worktrees/feddyn-count-review",
+    "commit": "8b01bf47ca8bdf9232bffeb4e50f78d4f00c9e3b",
+    "tree": "1cb086b9db386128ba6a965c198e8c07400ab9be"
+  },
+  "material_findings": [],
+  "low_findings": [],
+  "finding_counts": {
+    "critical": 0,
+    "high": 0,
+    "medium": 0,
+    "low": 0
+  },
+  "prior_writing_review": {
+    "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2c-algorithm-docs-review.json",
+    "bytes": 49380,
+    "sha256": "add5e422b2be3799e857ce10fc52402a5b5bc50fa21a91b74da6ce97c7823076"
+  },
+  "prior_writing_source": {
+    "docs_commit": "69d7d8a7841589205283f13f0e07771fb1e325bd",
+    "source_commit": "13e38dafce476286db7e673e7f21343d54416b56",
+    "interpretation": "Preserved prior bounded PASS; final source-binding is independently checked here, not silently inherited."
+  },
+  "writer_reconciliation": {
+    "path": "/private/tmp/plato-refresh-worktrees/algorithm-docs-count-review/evidence/2026-refresh/phase2c-algorithm-docs-count-reconciliation.json",
+    "bytes": 19111,
+    "sha256": "a6b5d33f4ba888474d8b458f0278a8e68cf5061a8501bdb11c6f713b4a001353"
+  },
+  "source_preservation": {
+    "all_production_tests_configs_manifests_and_gitlinks_match_C": true,
+    "preserved_tracked_C_paths": 1010,
+    "exact_source_receipts": {
+      "examples/customized_client_training/feddyn/feddyn_trainer.py": {
+        "path": "/private/tmp/plato-refresh-worktrees/algorithm-docs-count-review/examples/customized_client_training/feddyn/feddyn_trainer.py",
+        "bytes": 10743,
+        "sha256": "179f71f7e9e3cc3c777a0cc7b41b870a9865b0727d65046b212b5a2435a2e652"
+      },
+      "examples/customized_client_training/feddyn/feddyn_server.py": {
+        "path": "/private/tmp/plato-refresh-worktrees/algorithm-docs-count-review/examples/customized_client_training/feddyn/feddyn_server.py",
+        "bytes": 30427,
+        "sha256": "fdeaf4167729a38e3f824e9be47d559e163fbcbb89ad52b24f3057811817318f"
+      },
+      "plato/trainers/strategies/algorithms/feddyn_strategy.py": {
+        "path": "/private/tmp/plato-refresh-worktrees/algorithm-docs-count-review/plato/trainers/strategies/algorithms/feddyn_strategy.py",
+        "bytes": 30571,
+        "sha256": "9bca1a11d68ca01388f2089005c409fbd6e8fa3db5d646ac399d750fe319f90d"
+      },
+      "plato/trainers/strategies/algorithms/__init__.py": {
+        "path": "/private/tmp/plato-refresh-worktrees/algorithm-docs-count-review/plato/trainers/strategies/algorithms/__init__.py",
+        "bytes": 5838,
+        "sha256": "41856d8db80f9b13881bd52cd6438b6baf5f371c3eee42c31bf0c3ed5bb92fbb"
+      }
+    },
+    "prior_scaffold_prose_and_unrelated_sections_unchanged": true,
+    "no_production_tests_configs_or_doc_source_edits_by_reviewer": true,
+    "git_heads_trees_and_clean_tracked_bytes_verified": true,
+    "preexisting_ignored_bytecode_files_preserved": 131,
+    "cache_note": "Docs handoff was tracked-clean with preexisting ignored caches. All received cache hashes remain unchanged. No project module imports or new bytecode were needed for this prose check; C review source remains cache-free."
+  },
+  "public_delta": {
+    "files": {
+      "docs/docs/examples/algorithms/5. Algorithms with Customized Client Training Loops.md": {
+        "path": "/private/tmp/plato-refresh-worktrees/algorithm-docs-count-review/docs/docs/examples/algorithms/5. Algorithms with Customized Client Training Loops.md",
+        "bytes": 18149,
+        "sha256": "4083e29d1d4797b005e9deb1f1fce4d516e4a997da92cc78983a17f15b9e743d"
+      },
+      "examples/customized_client_training/feddyn/README.md": {
+        "path": "/private/tmp/plato-refresh-worktrees/algorithm-docs-count-review/examples/customized_client_training/feddyn/README.md",
+        "bytes": 8886,
+        "sha256": "0263463af5fa076a2a3cb2a76629b1ed4568e514e34e81203de3c69ab75b828a"
+      },
+      "examples/customized_client_training/scaffold/README.md": {
+        "path": "/private/tmp/plato-refresh-worktrees/algorithm-docs-count-review/examples/customized_client_training/scaffold/README.md",
+        "bytes": 6881,
+        "sha256": "7019ecd7181901e54e60e62efd9a785018c7c198143db923d82ed515ca4b95f8"
+      }
+    },
+    "diff": {
+      "path": "/private/tmp/plato-phase2c-feddyn-code-review-2/final-public-docs.diff",
+      "bytes": 1912,
+      "sha256": "38491e3685983a779f08bc4e519fad92e1c657b2a768594471859bf5528acfaf"
+    },
+    "exact_replacement_check": "README adds 'Qualification covers CPU float32/float64 execution.' and separates the following implementation-requirement sentence. The public guide adds the same CPU qualification before its existing support paragraph. No other public bytes change from 69d.",
+    "unchanged": "Both SCAFFOLD locations, all FedDyn equations, coefficients/denominators, primary links, commands, configured defaults, callback commit boundaries, complete CPU RNG continuation and read-only legacy migration remain unchanged."
+  },
+  "manual_reconciliation": [
+    {
+      "claim": "Actual partition counts and parent worker acceptance",
+      "prose": [
+        "examples/customized_client_training/feddyn/README.md:71",
+        "docs/docs/examples/algorithms/5. Algorithms with Customized Client Training Loops.md:165"
+      ],
+      "source": [
+        "examples/customized_client_training/feddyn/feddyn_trainer.py:35",
+        "examples/customized_client_training/feddyn/feddyn_trainer.py:234",
+        "plato/trainers/strategies/algorithms/feddyn_strategy.py:629"
+      ],
+      "result": "PASS",
+      "assessment": "Unchanged count wording is now independently supported by one parent get(), same actual Sized partition passed to the worker, sidecar/current-count comparison, no backing dataset fallback and unchanged sample-mode fixed-count contract."
+    },
+    {
+      "claim": "Checkpoint consistency and limits",
+      "prose": [
+        "examples/customized_client_training/feddyn/README.md:134",
+        "docs/docs/examples/algorithms/5. Algorithms with Customized Client Training Loops.md:190"
+      ],
+      "source": [
+        "examples/customized_client_training/feddyn/feddyn_server.py:617",
+        "examples/customized_client_training/feddyn/feddyn_server.py:631",
+        "examples/customized_client_training/feddyn/feddyn_server.py:653"
+      ],
+      "result": "PASS",
+      "assessment": "Complete version1 saved bundle and compatible partition/settings descriptions match nonzero-history/count coherence before live/pending installation. No claim of comprehensive deleted-count detection when histories are all zero, new ledger or inflight/GPU RNG replay."
+    },
+    {
+      "claim": "Receive/aggregation callback boundary",
+      "prose": [
+        "examples/customized_client_training/feddyn/README.md:116",
+        "docs/docs/examples/algorithms/5. Algorithms with Customized Client Training Loops.md:181"
+      ],
+      "source": [
+        "examples/customized_client_training/feddyn/feddyn_server.py:359",
+        "examples/customized_client_training/feddyn/feddyn_server.py:440"
+      ],
+      "result": "PASS",
+      "assessment": "Type-sensitive count-map keys/values now validate at both hooks. Existing owned model/history/count/token rollback and postcommit evaluation semantics are preserved; external callback side effects remain excluded."
+    },
+    {
+      "claim": "CPU qualification and implemented constraints",
+      "prose": [
+        "examples/customized_client_training/feddyn/README.md:94",
+        "docs/docs/examples/algorithms/5. Algorithms with Customized Client Training Loops.md:172"
+      ],
+      "result": "PASS",
+      "assessment": "Explicit CPU float32/float64 qualification matches independent scalar float64 and real MNIST-shaped LeNet float32 execution. It is distinct from device-neutral dtype/SGD checks; no all-GPU rejection, GPU qualification or new support feature is stated."
+    },
+    {
+      "claim": "Accepted algebra, portable migration and CPU RNG handoff",
+      "result": "PASS_PRESERVED_AND_SOURCE_BOUND",
+      "assessment": "Numerical/config/transport/RNG definitions and prose are preserved. Exact C independent code review supplies the changed-boundary, real socket/run/--resume, scalar oracle and read-only legacy evidence; no training suite rerun for this prose delta."
+    }
+  ],
+  "low_dispositions": [
+    {
+      "id": "DOC-L01",
+      "disposition": "CLOSED",
+      "reason": "Explicit CPU float32/float64 qualification appears and renders in both support paragraphs."
+    },
+    {
+      "id": "DOC-L02",
+      "disposition": "CLOSED",
+      "reason": "Authorized C dependency carries OptionII compatibility subclass wording in algorithms/__init__.py; executable AST/imports remain identical."
+    }
+  ],
+  "validation": {
+    "source_and_scope": {
+      "path": "/private/tmp/plato-phase2c-feddyn-code-review-2/final-docs-verification.json",
+      "bytes": 339574,
+      "sha256": "81ad5c1f12f3430d85f29a18ef611dd6c2e807f699f96d70fd63763678ffd742"
+    },
+    "source_and_scope_script": {
+      "path": "/private/tmp/plato-phase2c-feddyn-code-review-2/verify_final_docs.py",
+      "bytes": 10097,
+      "sha256": "ad2f30d0ac6168752d4b812250d049a2be5538c5f34e940c0f1f3f62ec0397d7"
+    },
+    "source_and_scope_log": {
+      "path": "/private/tmp/plato-phase2c-feddyn-code-review-2/final-docs-verification.log",
+      "bytes": 33202,
+      "sha256": "449c536f44af07af7323fd6469d5334a97d6f61abae38035090c57a526c46f01"
+    },
+    "source_and_scope_command": "zsh -lc 'PYTHONDONTWRITEBYTECODE=1 /tmp/plato-phase2c-313/bin/python verify_final_docs.py'",
+    "source_and_scope_cwd": "/private/tmp/plato-phase2c-feddyn-code-review-2",
+    "rendering": {
+      "status": "PASS",
+      "source": "c199ebe02831a47351a10026e64721f77c9dfe9b",
+      "rows": [
+        {
+          "label": "feddyn-readme",
+          "results": [
+            {
+              "phase": "prior",
+              "html": {
+                "path": "/private/tmp/plato-phase2c-feddyn-code-review-2/final-feddyn-readme-prior.html",
+                "bytes": 10449,
+                "sha256": "d4fd7e71c91a00075f8c4511fb70c15c348a3c63535adaa90da255ac19ffd1c5"
+              },
+              "math_count": 14,
+              "links": [
+                "https://arxiv.org/pdf/2111.04263v1",
+                "https://github.com/alpemreacar/FedDyn/blob/48a19fac440ef079ce563da8e0c2896f8256fef9/utils_methods.py#L286-L402",
+                "https://github.com/alpemreacar/FedDyn/blob/48a19fac440ef079ce563da8e0c2896f8256fef9/utils_general.py#L185-L227"
+              ],
+              "CPU_qualification_rendered": false
+            },
+            {
+              "phase": "candidate",
+              "html": {
+                "path": "/private/tmp/plato-phase2c-feddyn-code-review-2/final-feddyn-readme-candidate.html",
+                "bytes": 10517,
+                "sha256": "0f52db1f52e41d5260f70af32837d8f5f2af40c8ef7ea783e2262252a4b4d557"
+              },
+              "math_count": 14,
+              "links": [
+                "https://arxiv.org/pdf/2111.04263v1",
+                "https://github.com/alpemreacar/FedDyn/blob/48a19fac440ef079ce563da8e0c2896f8256fef9/utils_methods.py#L286-L402",
+                "https://github.com/alpemreacar/FedDyn/blob/48a19fac440ef079ce563da8e0c2896f8256fef9/utils_general.py#L185-L227"
+              ],
+              "CPU_qualification_rendered": true
+            }
+          ],
+          "primary_links_and_equation_render_counts_preserved": true
+        },
+        {
+          "label": "feddyn-public",
+          "results": [
+            {
+              "phase": "prior",
+              "html": {
+                "path": "/private/tmp/plato-phase2c-feddyn-code-review-2/final-feddyn-public-prior.html",
+                "bytes": 7079,
+                "sha256": "14a5d3953e22112ebbbf7fbb989611a185a0df5ab4a4e589e5a9184114935a2e"
+              },
+              "math_count": 12,
+              "links": [
+                "https://arxiv.org/pdf/2111.04263v1",
+                "https://github.com/alpemreacar/FedDyn/blob/48a19fac440ef079ce563da8e0c2896f8256fef9/utils_methods.py#L286-L402"
+              ],
+              "CPU_qualification_rendered": false
+            },
+            {
+              "phase": "candidate",
+              "html": {
+                "path": "/private/tmp/plato-phase2c-feddyn-code-review-2/final-feddyn-public-candidate.html",
+                "bytes": 7131,
+                "sha256": "71bc03f18fcad0ee5ab084ab274a14bd2fc2da0e7acbe3dd84fb3b261eb0b735"
+              },
+              "math_count": 12,
+              "links": [
+                "https://arxiv.org/pdf/2111.04263v1",
+                "https://github.com/alpemreacar/FedDyn/blob/48a19fac440ef079ce563da8e0c2896f8256fef9/utils_methods.py#L286-L402"
+              ],
+              "CPU_qualification_rendered": true
+            }
+          ],
+          "primary_links_and_equation_render_counts_preserved": true
+        }
+      ],
+      "environment": {
+        "executable": "/tmp/plato-phase2c-scaffold-docs/final-13e/venv/bin/python",
+        "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+        "markdown": "3.11",
+        "pymdown_extensions": "12.1"
+      },
+      "script": {
+        "path": "/private/tmp/plato-phase2c-feddyn-code-review-2/render_final_docs.py",
+        "bytes": 3182,
+        "sha256": "bbe47e9c5100f04fbc773863079a231f398e27f60b44328c51224a25692020c3"
+      },
+      "limits": "Local HTML/project math-admonition-code extension verification; no browser/CDN/KaTeX runtime validation or strict MkDocs PASS claimed."
+    },
+    "render_script": {
+      "path": "/private/tmp/plato-phase2c-feddyn-code-review-2/render_final_docs.py",
+      "bytes": 3182,
+      "sha256": "bbe47e9c5100f04fbc773863079a231f398e27f60b44328c51224a25692020c3"
+    },
+    "render_log": {
+      "path": "/private/tmp/plato-phase2c-feddyn-code-review-2/final-docs-rendering.log",
+      "bytes": 2796,
+      "sha256": "83f6e53c587dac3c7aa8c57546fc2909a26fed1daed1d16b561e65385e798c81"
+    },
+    "render_command": "zsh -lc 'PYTHONDONTWRITEBYTECODE=1 /tmp/plato-phase2c-scaffold-docs/final-13e/venv/bin/python render_final_docs.py'",
+    "strict_mkdocs": {
+      "status": "FAIL_DEFERRED_PHASE5",
+      "baseline_exit": 1,
+      "candidate_exit": 1,
+      "warnings": [
+        "WARNING -  Doc file 'configurations/evaluation.md' contains a link 'examples/case-studies/5. Nanochat in Plato.md', but the target 'configurations/examples/case-studies/5. Nanochat in Plato.md' is not found among documentation files.",
+        "WARNING -  Doc file 'references/evaluators.md' contains a link 'examples/case-studies/5. Nanochat in Plato.md', but the target 'references/examples/case-studies/5. Nanochat in Plato.md' is not found among documentation files."
+      ],
+      "strict_pass_claimed": false,
+      "raw": [
+        {
+          "path": "/tmp/plato-phase2c-scaffold-docs/count-8b01/mkdocs-baseline.log",
+          "bytes": 1462,
+          "sha256": "520beec4267f0609e6604bde12b18edc41fc0810583a818e86eedb0b64f2e132"
+        },
+        {
+          "path": "/tmp/plato-phase2c-scaffold-docs/count-8b01/mkdocs-candidate.log",
+          "bytes": 1463,
+          "sha256": "5740b4de6f6c9555e66027e12297aeb3ed84524d2f9e825a9b3b3bf859fb2814"
+        }
+      ]
+    },
+    "strict_build_pass_claimed": false,
+    "strict_build_new_execution_by_reviewer": false,
+    "strict_interpretation": "Writer differential strict builds both exited 1 with the same two Nanochat relative-link warnings. Raw hashes verified; exact unchanged links/config/other prose establish no new scope regression. Deferred Phase 5 failure remains visible.",
+    "no_full_training_suite_rerun_for_prose": true
+  },
+  "code_evidence": {
+    "implementation_verdict_archive": {
+      "path": "/private/tmp/plato-phase2c-feddyn-code-review-2/phase2c-feddyn-code-review-2.implementation-only.json",
+      "bytes": 1848897,
+      "sha256": "57ca81ab1d4fed8d11015224e3a282da7073ab05fd99c2ab6b523cc38ca9a571"
+    },
+    "corrected_source_commit": "8b01bf47ca8bdf9232bffeb4e50f78d4f00c9e3b",
+    "corrected_source_tree": "1cb086b9db386128ba6a965c198e8c07400ab9be",
+    "unique_pytest_cases_each_version": 63,
+    "independent_script_cases_each_version": 21,
+    "actual_socket_process_groups_each_version": 7,
+    "relationship": "Same production/tests/config bytes in docs candidate; code verdict remains in assigned phase2c-feddyn-code-review-2.json."
+  },
+  "harness_limit": {
+    "initial_docs_audit": "An initial scratch assertion assumed cache-free docs source and failed on preexisting ignored bytecode. Docs handoff promised tracked-clean source; revised audit preserves and verifies all existing cache bytes. No production/prose defect inferred.",
+    "original_script": {
+      "path": "/private/tmp/plato-phase2c-feddyn-code-review-2/verify_final_docs.v1.py",
+      "bytes": 9854,
+      "sha256": "ca28f4c66f9258cf00e0b3cf18fadbc3079e7a3d6b6444be802def37dbd0cdf2"
+    },
+    "original_log": {
+      "path": "/private/tmp/plato-phase2c-feddyn-code-review-2/final-docs-verification.v1.log",
+      "bytes": 286,
+      "sha256": "343ca0f51d776e38f99a9ebd8afa7c1b95a5b2f2c2e6b78986e6c045d5cd1f11"
+    }
+  },
+  "limits": [
+    "Bounded final prose PASS and corrected C CPU implementation verification; no whole C/Phase2, root merged profiles, hosted Linux CI or production acceptance.",
+    "Strict MkDocs remains FAIL_DEFERRED_PHASE5 for two unchanged Nanochat links.",
+    "Local generated HTML/math/admonition/code/link verification only; no live browser/CDN/KaTeX runtime validation.",
+    "No GPU/inflight replay/convergence/MNIST accuracy/optional-stack/new provisioning claim.",
+    "No comprehensive missing-count detection for histories that are all zero, and no arbitrary external callback transaction."
+  ],
+  "workflow": {
+    "nested_agents": false,
+    "source_prose_authoring": false,
+    "commits_pushes_installs": false,
+    "writes": "Own reviewer2 scratch and the two explicitly assigned root review reports only."
+  }
+}

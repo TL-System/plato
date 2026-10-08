@@ -1,0 +1,178 @@
+{
+  "schema_version": 1,
+  "reviewer": "/root/container_bytecode_cleanup_review",
+  "reviewed_at_utc": "2026-10-04T01:34:44.407571+00:00",
+  "verdict": "ACCEPT_LOCAL_STATIC_REPAIR",
+  "accepted": true,
+  "acceptance_scope": "Narrow P1 ROOT-P1-M1 source correction, exact committed author evidence, and independent local regression review. This accepts no repaired image build or container runtime; fresh source-bound actual Linux qualification remains mandatory.",
+  "finding_under_review": "ROOT-P1-M1",
+  "finding_status": "SOURCE_CORRECTION_ACCEPTED_ACTUAL_REQUALIFICATION_PENDING",
+  "source": {
+    "worktree": "/private/tmp/plato-refresh-worktrees/container-refresh",
+    "repair_parent": "7fa254c5b944c4bfb65563fc77ee4a33704aa52a",
+    "code_commit": "1d26c7926c2f4c0fd83823650612757816ef8142",
+    "evidence_commit": "5e6b1a2b363e7fba81301bcd9a220ee59f48c341",
+    "clean_tracked_and_untracked_worktree": true,
+    "changed_code_paths": [
+      "Dockerfile",
+      ".github/scripts/check_container.py"
+    ],
+    "changed_code_paths_match_narrow_ownership": true,
+    "evidence_commit_changes_evidence_only": true,
+    "file_sha256": {
+      "Dockerfile": "a88e26b636ec341bcb69b1894a388c5db0f71bc86e7357d2b789a49ed90e78f1",
+      ".dockerignore": "b90144eaa006aa9954e2f878fcfcbc6d1fa369027582e6f51f4b0500d23ce5da",
+      "dockerrun.sh": "6bbcb5530e5343b0fcb0fd675235f72081efa5fdcfd5fc464e1b28f3eedefee4",
+      "dockerrun_gpu.sh": "2f7ac611428cb0a4d3e36a6b040af4f461cfca8e09252ba0c65fbe105a6a6761",
+      ".github/scripts/check_container.py": "33254721a4a9e4795aac9c3d7e4523f8c17c1afb8da4bc732742e4a75bcc88ee",
+      ".github/workflows/container_checks.yml": "58b24307efa3414c0747e23982ca84822942e62952be886409fd2e3650d3b3e7"
+    },
+    "dependency_profile_lock_and_training_workflow_hashes_unchanged": true,
+    "prior_accepted_review": {
+      "path": "/tmp/plato-container-review.json",
+      "bytes": 12617,
+      "sha256": "9239f4fc003134f47c21b8defecc533b3f796319200ca94120b861b3e82fd974"
+    }
+  },
+  "author_evidence_verification": {
+    "qualification_root": "/private/tmp/plato-refresh-worktrees/container-refresh/evidence/2026-refresh/container/root-p1-m1",
+    "repair_json": {
+      "path": "/private/tmp/plato-refresh-worktrees/container-refresh/evidence/2026-refresh/container/root-p1-m1/repair.json",
+      "bytes": 4925,
+      "sha256": "9437e69960dead60e49d6068345bc82af7da89d977b4a4dc9efa0787aa975a74"
+    },
+    "artifact_manifest": {
+      "path": "/private/tmp/plato-refresh-worktrees/container-refresh/evidence/2026-refresh/container/root-p1-m1/artifact-manifest.json",
+      "bytes": 9051,
+      "sha256": "2d5e9906fe4db643ec73fdfc82baeac11984752cd296931bf8714c4ad2149d28"
+    },
+    "verified_committed_artifact_count": 58,
+    "verified_raw_baseline_artifact_count": 36,
+    "verified_p1_source_hash_count": 6,
+    "all_artifact_bytes_sizes_and_hashes_match": true,
+    "all_artifacts_match_exact_evidence_commit": true,
+    "all_source_hashes_match_current_files_and_exact_code_commit": true,
+    "author_validation_receipts_bound_to_exact_code_commit": true
+  },
+  "actual_failed_baseline": {
+    "pull_request": 422,
+    "run_id": "37167178271",
+    "candidate_source": "0791c01afcaea96223a925a32ee22882dc437ee2",
+    "tested_ci_merge_source": "65a88bdfdf3e2418e356971c7d3e225b48c1d3da",
+    "image_id": "sha256:62c091ebdaa09ad106eb6efd744baa63888126f76eb37357820d9f5fe7e3de92",
+    "baseline_p1_bytes_match_pre_repair_accepted_source": true,
+    "all_23_command_exit_statuses_match_expectations": true,
+    "image_build_unmounted_and_mounted_cpu_native_cli_forwarding_exit23_and_removal_passed": true,
+    "final_accepted": false,
+    "failure": "PermissionError: [Errno 1] Operation not permitted: '/tmp/plato mounted checkout jc_t92ti/source with spaces/plato/__pycache__'",
+    "earlier_failure_masked": false,
+    "old_mounted_accepted_receipt_preceded_failing_cleanup": true,
+    "repaired_source_qualified_by_this_run": false
+  },
+  "findings": [],
+  "critical_findings": 0,
+  "high_findings": 0,
+  "medium_findings": 0,
+  "unresolved_material_findings": 0,
+  "area_conclusions": [
+    {
+      "area": "Interpreter bytecode behavior",
+      "result": "Pass locally; actual image gate remains required",
+      "evidence": "Docker ENV sets PYTHONDONTWRITEBYTECODE=1 before Python use. inside_probe asserts the running interpreter's sys.dont_write_bytecode before imports and records that flag. Fresh real Python 3.13 imports of the copied Plato package produced pyc in the red control and no cache/pyc with the Docker ENV value."
+    },
+    {
+      "area": "Owned mount fixture and cleanup acceptance",
+      "result": "Pass",
+      "evidence": "check_mount ignores inherited cache directories when creating its owned checkout, rejects any __pycache__ produced in that checkout, uses ordinary TemporaryDirectory cleanup with error propagation, verifies the fixture is absent, then saves the accepted mounted receipt with fixture_cleanup_complete=true. Independent observation confirmed serialization occurs only after fixture disappearance; a cleanup no-op was rejected and simulated PermissionError propagated with no accepted mount receipt and final accepted=false."
+    },
+    {
+      "area": "Scope and preserved execution contract",
+      "result": "Pass",
+      "evidence": "Exactly Dockerfile and check_container.py changed. Launchers, Docker ignores, workflow, dependency versions, lock/profile files and training workflow retain accepted bytes. No USER change, privileged deletion, chown, UID workaround or cleanup-error suppression was added. Writable mounts, intentional persistent root-owned user outputs, exit forwarding and --rm remain the documented contract."
+    },
+    {
+      "area": "Existing static and launcher validation",
+      "result": "Pass",
+      "evidence": "Fresh static check passed 12 workspace manifests, 645 required source entries and 6 CPU/GPU recording-stub launcher cases. Fresh Ruff E/F/I, formatting, actionlint and repair diff whitespace checks passed. Broad unchanged training checks were not repeated."
+    }
+  ],
+  "independently_executed": [
+    "Verified exact source/evidence commits and clean worktree, two-file ownership boundary, six P1 source hashes, four unchanged sensitive paths, all 58 author manifest members against current and committed bytes, all 36 retained raw baseline artifacts, and all 23 baseline command exit statuses.",
+    "Nine independent checks: fresh real Plato import red/green; actual inside_probe flag-gate red/green with image preconditions isolated; real check_mount import red/green with simulated Docker transport; receipt serialization observed after ordinary cleanup; silent cleanup no-op rejection; top-level propagated cleanup PermissionError producing final accepted=false and no mounted receipt.",
+    "Fresh static context and six launcher recording-stub checks.",
+    "Fresh Ruff E/F/I and format checks, actionlint workflow validation and git diff --check for the exact repair."
+  ],
+  "independent_review_artifacts": [
+    {
+      "path": "/tmp/plato-container-bytecode-cleanup-review-checks.py",
+      "bytes": 13655,
+      "sha256": "ffdba56585e93d4ac324174056f247572cccb8a9ec46df65f46101412cd49377"
+    },
+    {
+      "path": "/private/tmp/plato-container-bytecode-cleanup-review-checks/source-and-evidence-binding.json",
+      "bytes": 547,
+      "sha256": "676c0e75502698d407c473832c7a342e644a4ecacaab9825952550b7533b368e"
+    },
+    {
+      "path": "/private/tmp/plato-container-bytecode-cleanup-review-checks/independent-regressions.json",
+      "bytes": 3757,
+      "sha256": "16959f26f262a5985b8eed7b1565c01f41cb336d92faa5a29a4502083fd15c04"
+    },
+    {
+      "path": "/private/tmp/plato-container-bytecode-cleanup-review-checks/static/static-acceptance.json",
+      "bytes": 3364,
+      "sha256": "b42fd0819bf4f9edcd103518bc79324480f97912b5d52e72bc835bdf05061857"
+    },
+    {
+      "path": "/private/tmp/plato-container-bytecode-cleanup-review-checks/static/source.json",
+      "bytes": 1300,
+      "sha256": "20f2d7113417a5eaa5fbd0a184edee6c648edd1886d75a8859e856607120a4ca"
+    },
+    {
+      "path": "/private/tmp/plato-container-bytecode-cleanup-review-checks/cleanup-denial-cli/linux-acceptance.json",
+      "bytes": 171,
+      "sha256": "2abf785f97b68a7f53b28e9769ed801b0511ea792caafa92dbad185d2573c273"
+    },
+    {
+      "path": "/private/tmp/plato-container-bytecode-cleanup-review-checks/observed-order/mounted-cpu.json",
+      "bytes": 779,
+      "sha256": "8de954f46187253b450d0e0019797bdb166d7de92eeab801a6bbd0bb696a5c25"
+    }
+  ],
+  "validation_commands": [
+    {
+      "command": "zsh -lc '/Users/bli/Playground/plato/.venv/bin/python -B /tmp/plato-container-bytecode-cleanup-review-checks.py'",
+      "exit_code": 0
+    },
+    {
+      "command": "zsh -lc '/Users/bli/Playground/plato/.venv/bin/python -B .github/scripts/check_container.py static --artifacts /tmp/plato-container-bytecode-cleanup-review-checks/static'",
+      "exit_code": 0
+    },
+    {
+      "command": "zsh -lc 'uvx --offline --python 3.13 ruff==0.16.10 check .github/scripts/check_container.py --select E,F,I'",
+      "exit_code": 0
+    },
+    {
+      "command": "zsh -lc 'uvx --offline --python 3.13 ruff==0.16.10 format --check .github/scripts/check_container.py'",
+      "exit_code": 0
+    },
+    {
+      "command": "zsh -lc '/tmp/plato-container-local-checks/actionlint -oneline .github/workflows/container_checks.yml'",
+      "exit_code": 0
+    },
+    {
+      "command": "zsh -lc 'git diff 7fa254c5..1d26c792 --check'",
+      "exit_code": 0
+    }
+  ],
+  "actual_image_build_executed_for_repair": false,
+  "actual_container_executed_for_repair": false,
+  "gpu_compute_tested": false,
+  "limits_and_pending_required_checks": [
+    "No Docker CLI/daemon on this review host; no Docker install, host/user service changes, host/user cache cleanup, ownership changes, privilege changes, source edits, user output removal, dependency sync, ML training, push, publication or nested agents occurred.",
+    "Local child imports exercise actual Python startup behavior; Docker transport and root-ownership denial were explicitly simulated. Actual corrected image environment, mounted root identity and host-runner cleanup still need Linux CI proof.",
+    "Root must integrate this accepted source correction and run the actual container workflow on the revised integrated source. Review final source/image provenance and all existing gates, including both sys.dont_write_bytecode records, bytecode_paths=[], fixture_cleanup_complete=true, complete final accepted=true, existing imports/native CPU/CLI/argv/exit23/auto-removal and resource records.",
+    "Persistent intentional user outputs remain root-owned under writable bind mounts and survive --rm; this repair only prevents routine import caches in the qualification fixture."
+  ],
+  "next_action": "Integrate the narrowly accepted correction; obtain and inspect fresh actual source-bound Linux workflow qualification before claiming repaired image acceptance."
+}

@@ -2,7 +2,6 @@
 A simple federated learning server using federated averaging.
 """
 
-import asyncio
 import logging
 import os
 
@@ -13,6 +12,7 @@ from plato.processors import registry as processor_registry
 from plato.samplers import all_inclusive
 from plato.servers import base, evaluation_logging
 from plato.servers.strategies.aggregation import FedAvgAggregationStrategy
+from plato.servers.strategies.aggregation.fedavg import validate_aggregation_inputs
 from plato.trainers import registry as trainers_registry
 from plato.utils import csv_processor, fonts
 
@@ -204,12 +204,44 @@ class Server(base.Server):
         elif self.algorithm is None and self.custom_algorithm is not None:
             self.algorithm = self.custom_algorithm(trainer=self.trainer)
 
+    def _validate_aggregation_inputs(
+        self, updates: list, payloads: list, baseline_weights=None
+    ) -> None:
+        """Validate ingress before dispatch; backends may extend tree validation."""
+        validate_aggregation_inputs(updates, payloads)
+        algorithm = self.algorithm
+        validator = getattr(algorithm, "validate_weights", None)
+        if algorithm is not None and callable(validator):
+            baseline = (
+                algorithm.extract_weights()
+                if baseline_weights is None else baseline_weights
+            )
+            for update, payload in zip(updates, payloads, strict=True):
+                if getattr(update.report, "type", "weights") != "features":
+                    validator(payload, baseline, client_id=update.client_id)
+
+    def _validate_original_positions(
+        self, original: tuple, current: list, description: str
+    ) -> None:
+        """Reject observable reassociation within the positional hook contract."""
+        positions = {}
+        for index, item in enumerate(original):
+            positions.setdefault(id(item), set()).add(index)
+        for index, item in enumerate(current):
+            original_positions = positions.get(id(item))
+            if original_positions is not None and index not in original_positions:
+                raise ValueError(
+                    f"client {self.updates[index].client_id}: {description} "
+                    "reordered the original client association."
+                )
+
     async def aggregate_deltas(self, updates, deltas_received):
         """Aggregate weight updates from the clients using federated averaging.
 
         This method now delegates to the aggregation_strategy for extensibility.
         Subclasses can still override this method for backward compatibility.
         """
+        self._validate_aggregation_inputs(updates, deltas_received)
         # Delegate to aggregation strategy
         self.context.updates = updates
         self.context.current_round = self.current_round
@@ -226,18 +258,61 @@ class Server(base.Server):
     async def _process_reports(self):
         """Process the client reports by aggregating their weights."""
         weights_received = [update.payload for update in self.updates]
+        algorithm = self.require_algorithm()
+        baseline_weights = (
+            algorithm.extract_weights()
+            if callable(getattr(algorithm, "validate_weights", None)) else None
+        )
+        self._validate_aggregation_inputs(
+            self.updates, weights_received, baseline_weights
+        )
+        received_order = tuple(weights_received)
+        if baseline_weights is not None:
+            received_updates = tuple(self.updates)
+            received_reports = tuple(update.report for update in self.updates)
+            received_clients = tuple(update.client_id for update in self.updates)
 
         weights_received = self.weights_received(weights_received)
         self.callback_handler.call_event("on_weights_received", self, weights_received)
+        self._validate_aggregation_inputs(
+            self.updates, weights_received, baseline_weights
+        )
+        if baseline_weights is not None:
+            self._validate_original_positions(
+                received_order, weights_received, "transformed weights"
+            )
 
         # Notify client selection strategy about received reports
         self.context.updates = self.updates
         self.context.current_round = self.current_round
         self.client_selection_strategy.on_reports_received(self.updates, self.context)
 
+        if baseline_weights is not None:
+            # The selector is the last mutable hook before aggregation dispatch.
+            self._validate_aggregation_inputs(
+                self.updates, weights_received, baseline_weights
+            )
+            self._validate_original_positions(
+                received_order, weights_received, "transformed weights"
+            )
+            self._validate_original_positions(
+                received_updates, self.updates, "received reports"
+            )
+            self._validate_original_positions(
+                received_reports,
+                [update.report for update in self.updates],
+                "received reports",
+            )
+            for update, client_id in zip(self.updates, received_clients, strict=True):
+                if update.client_id != client_id:
+                    raise ValueError(
+                        f"client {update.client_id}: report association changed "
+                        f"from original client {client_id}."
+                    )
+
         # Extract the current model weights as the baseline
-        algorithm = self.require_algorithm()
-        baseline_weights = algorithm.extract_weights()
+        if baseline_weights is None:
+            baseline_weights = algorithm.extract_weights()
 
         # Check if we should aggregate weights directly or use deltas
         # Try strategy's aggregate_weights first, fall back to aggregate_deltas
@@ -308,27 +383,7 @@ class Server(base.Server):
             trainer = self.require_trainer()
             self.accuracy = trainer.test(self.testset, self.testset_sampler)
 
-            # Extract CORE evaluation results if available (Nanochat CORE evaluation)
-            if (
-                hasattr(trainer, "context")
-                and "nanochat_core_results" in trainer.context.state
-            ):
-                core_results = trainer.context.state["nanochat_core_results"]
-                self._core_metric = core_results.get("core_metric", self.accuracy)
-
-        # If CORE benchmark was run via a Nanochat testing strategy, report the specialized CORE metric instead of the generic 'Global model accuracy' label.
-        core_metric = getattr(self, "_core_metric", None)
-
-        if core_metric is not None:
-            logging.info(
-                fonts.colourize(
-                    f"[{self}] Average Centered CORE benchmark metric: {100 * core_metric:.2f}%\n"
-                )
-            )
-        elif hasattr(Config().trainer, "target_perplexity"):
-            self._log_global_metric(self.accuracy)
-        else:
-            self._log_global_metric(self.accuracy)
+        self._log_global_metric(self.accuracy)
 
         self.clients_processed()
         self.callback_handler.call_event("on_clients_processed", self)
@@ -369,7 +424,6 @@ class Server(base.Server):
         logged = {
             "round": self.current_round,
             "accuracy": self.accuracy,
-            "core_metric": getattr(self, "_core_metric", None),
             "accuracy_std": self.accuracy_std,
             "elapsed_time": self.wall_time - self.initial_wall_time,
             "processing_time": max(
@@ -403,10 +457,6 @@ class Server(base.Server):
             else:
                 logged["train_loss"] = None
 
-        # Add core_metric if Nanochat CORE evaluation was performed
-        if hasattr(self, "_core_metric"):
-            logged["core_metric"] = self._core_metric
-
         metric_name = self._primary_metric_name()
         if metric_name != "accuracy":
             logged[metric_name] = self.accuracy
@@ -421,6 +471,8 @@ class Server(base.Server):
         """Compute the accuracy mean and standard deviation across clients."""
         # Get total number of samples
         total_samples = sum(update.report.num_samples for update in updates)
+        if total_samples == 0:
+            return 0.0, 0.0
 
         # Perform weighted averaging
         updates_accuracy = [update.report.accuracy for update in updates]

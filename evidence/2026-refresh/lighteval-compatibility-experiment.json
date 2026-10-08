@@ -1,0 +1,817 @@
+{
+  "status": "Experiment only; user dependency-policy choice pending.",
+  "baseline": "5b8359bd40bbe65c7753e71f6627c490f9aa144f",
+  "date": "2026-10-02",
+  "python": "3.14.8",
+  "versions": {
+    "lighteval": "0.13.0",
+    "nltk": "3.10.3"
+  },
+  "environment": "/tmp/plato-lighteval-compat",
+  "install": "uv pip install --python /tmp/plato-lighteval-compat/bin/python lighteval==0.13.0 --overrides /tmp/plato-nltk-overrides.txt",
+  "checks": [
+    {
+      "check": "Import Lighteval BLEU and ROUGE",
+      "result": "pass"
+    },
+    {
+      "check": "Actual BLEU(1)._bleu_score with identical reference/prediction",
+      "result": "pass",
+      "score": 1.0
+    },
+    {
+      "check": "Actual ROUGE.compute with identical Doc and ModelResponse",
+      "result": "pass",
+      "scores": {
+        "rouge1": 1.0,
+        "rouge2": 1.0,
+        "rougeL": 1.0
+      }
+    },
+    {
+      "check": "uv pip check",
+      "result": "expected declared-metadata conflict",
+      "detail": "Lighteval requires nltk==3.9.1; installed 3.10.3. Runtime smoke success does not satisfy the upstream pin."
+    },
+    {
+      "check": "NLTK punkt_tab download",
+      "result": "pass in private user cache",
+      "detail": "New NLTK security policy rejected /tmp because an ancestor is world-writable. Download succeeded in /Users/bli/.cache/plato-refresh-nltk with mode 0700."
+    },
+    {
+      "check": "Import actual Pipeline, PipelineParameters, TransformersModelConfig and inspect signatures against Plato wrapper",
+      "result": "pass",
+      "detail": "Current wrapper keyword names are present in installed Lighteval 0.13.0 constructors. No model/dataset benchmark was executed."
+    },
+    {
+      "check": "Full BLEU.compute using real NLTK tokenizer resources and private NLTK_DATA",
+      "result": "pass",
+      "score": 1.0
+    },
+    {
+      "check": "Import actual Plato custom Lighteval task and format PIQA sample",
+      "result": "pass",
+      "task": "piqa_hf",
+      "gold": [
+        "A"
+      ],
+      "detail": "Installed the previously built baseline Plato wheel and its core dependencies in the isolated environment first. Initial missing munch was an incomplete experimental environment, not a Plato bug."
+    }
+  ],
+  "limitations": [
+    "These metric checks do not validate complete Lighteval benchmark/model orchestration.",
+    "No root manifest, lock, or dependency policy was changed by this experiment."
+  ],
+  "security_scan_command": "uvx pip-audit --path /tmp/plato-lighteval-compat/lib/python3.14/site-packages --skip-editable --progress-spinner off --format json",
+  "security_scan": {
+    "dependencies": [
+      {
+        "name": "absl-py",
+        "version": "2.5.0",
+        "vulns": []
+      },
+      {
+        "name": "accelerate",
+        "version": "1.15.0",
+        "vulns": []
+      },
+      {
+        "name": "aenum",
+        "version": "3.1.15",
+        "vulns": []
+      },
+      {
+        "name": "agent-client-protocol",
+        "version": "0.12.1",
+        "vulns": []
+      },
+      {
+        "name": "aiobotocore",
+        "version": "3.9.2",
+        "vulns": []
+      },
+      {
+        "name": "aiohappyeyeballs",
+        "version": "2.7.1",
+        "vulns": []
+      },
+      {
+        "name": "aiohttp",
+        "version": "3.14.3",
+        "vulns": []
+      },
+      {
+        "name": "aioitertools",
+        "version": "0.13.0",
+        "vulns": []
+      },
+      {
+        "name": "aiosignal",
+        "version": "1.4.0",
+        "vulns": []
+      },
+      {
+        "name": "annotated-doc",
+        "version": "0.0.5",
+        "vulns": []
+      },
+      {
+        "name": "annotated-types",
+        "version": "0.8.0",
+        "vulns": []
+      },
+      {
+        "name": "antlr4-python3-runtime",
+        "version": "4.13.2",
+        "vulns": []
+      },
+      {
+        "name": "anyio",
+        "version": "4.15.1",
+        "vulns": []
+      },
+      {
+        "name": "attrs",
+        "version": "26.1.0",
+        "vulns": []
+      },
+      {
+        "name": "beautifulsoup4",
+        "version": "4.15.0",
+        "vulns": []
+      },
+      {
+        "name": "boto3",
+        "version": "1.43.106",
+        "vulns": []
+      },
+      {
+        "name": "botocore",
+        "version": "1.43.106",
+        "vulns": []
+      },
+      {
+        "name": "certifi",
+        "version": "2026.7.22",
+        "vulns": []
+      },
+      {
+        "name": "chardet",
+        "version": "6.0.0.post1",
+        "vulns": []
+      },
+      {
+        "name": "charset-normalizer",
+        "version": "3.5.2",
+        "vulns": []
+      },
+      {
+        "name": "click",
+        "version": "8.5.0",
+        "vulns": []
+      },
+      {
+        "name": "cloudpickle",
+        "version": "3.1.2",
+        "vulns": []
+      },
+      {
+        "name": "colorama",
+        "version": "0.4.6",
+        "vulns": []
+      },
+      {
+        "name": "colorlog",
+        "version": "6.12.0",
+        "vulns": []
+      },
+      {
+        "name": "dataproperty",
+        "version": "1.1.1",
+        "vulns": []
+      },
+      {
+        "name": "datasets",
+        "version": "5.0.1",
+        "vulns": []
+      },
+      {
+        "name": "debugpy",
+        "version": "1.8.22",
+        "vulns": []
+      },
+      {
+        "name": "defusedxml",
+        "version": "0.7.1",
+        "vulns": []
+      },
+      {
+        "name": "dill",
+        "version": "0.4.1",
+        "vulns": []
+      },
+      {
+        "name": "docstring-parser",
+        "version": "0.18.0",
+        "vulns": []
+      },
+      {
+        "name": "fastapi",
+        "version": "0.142.2",
+        "vulns": []
+      },
+      {
+        "name": "filelock",
+        "version": "4.0.9",
+        "vulns": []
+      },
+      {
+        "name": "frozenlist",
+        "version": "1.8.0",
+        "vulns": []
+      },
+      {
+        "name": "fsspec",
+        "version": "2026.6.0",
+        "vulns": []
+      },
+      {
+        "name": "gitdb",
+        "version": "4.0.12",
+        "vulns": []
+      },
+      {
+        "name": "gitpython",
+        "version": "3.2.0",
+        "vulns": []
+      },
+      {
+        "name": "h11",
+        "version": "0.16.0",
+        "vulns": []
+      },
+      {
+        "name": "hf-xet",
+        "version": "1.6.0",
+        "vulns": []
+      },
+      {
+        "name": "httpcore",
+        "version": "1.0.9",
+        "vulns": []
+      },
+      {
+        "name": "httpcore2",
+        "version": "2.13.1",
+        "vulns": []
+      },
+      {
+        "name": "httpx",
+        "version": "0.28.1",
+        "vulns": []
+      },
+      {
+        "name": "httpx2",
+        "version": "2.13.1",
+        "vulns": []
+      },
+      {
+        "name": "huggingface-hub",
+        "version": "1.33.0",
+        "vulns": []
+      },
+      {
+        "name": "idna",
+        "version": "3.20",
+        "vulns": []
+      },
+      {
+        "name": "ijson",
+        "version": "3.5.1",
+        "vulns": []
+      },
+      {
+        "name": "inspect-ai",
+        "version": "0.3.275",
+        "vulns": []
+      },
+      {
+        "name": "jinja2",
+        "version": "3.1.6",
+        "vulns": []
+      },
+      {
+        "name": "jiter",
+        "version": "0.17.0",
+        "vulns": []
+      },
+      {
+        "name": "jmespath",
+        "version": "1.1.0",
+        "vulns": []
+      },
+      {
+        "name": "joblib",
+        "version": "1.6.0",
+        "vulns": []
+      },
+      {
+        "name": "jsonlines",
+        "version": "4.0.0",
+        "vulns": []
+      },
+      {
+        "name": "jsonpatch",
+        "version": "1.33",
+        "vulns": []
+      },
+      {
+        "name": "jsonpath-ng",
+        "version": "1.8.0",
+        "vulns": []
+      },
+      {
+        "name": "jsonpointer",
+        "version": "3.1.1",
+        "vulns": []
+      },
+      {
+        "name": "jsonref",
+        "version": "1.1.0",
+        "vulns": []
+      },
+      {
+        "name": "jsonschema",
+        "version": "4.26.0",
+        "vulns": []
+      },
+      {
+        "name": "jsonschema-specifications",
+        "version": "2025.9.1",
+        "vulns": []
+      },
+      {
+        "name": "langcodes",
+        "version": "3.5.1",
+        "vulns": []
+      },
+      {
+        "name": "latex2sympy2-extended",
+        "version": "1.0.6",
+        "vulns": []
+      },
+      {
+        "name": "lighteval",
+        "version": "0.13.0",
+        "vulns": []
+      },
+      {
+        "name": "linkify-it-py",
+        "version": "2.2.0",
+        "vulns": []
+      },
+      {
+        "name": "lxml",
+        "version": "6.1.3",
+        "vulns": []
+      },
+      {
+        "name": "markdown-it-py",
+        "version": "4.2.0",
+        "vulns": []
+      },
+      {
+        "name": "markupsafe",
+        "version": "3.0.3",
+        "vulns": []
+      },
+      {
+        "name": "mbstrdecoder",
+        "version": "1.1.5",
+        "vulns": []
+      },
+      {
+        "name": "mdit-py-plugins",
+        "version": "0.6.1",
+        "vulns": []
+      },
+      {
+        "name": "mdurl",
+        "version": "0.1.2",
+        "vulns": []
+      },
+      {
+        "name": "mmh3",
+        "version": "5.3.1",
+        "vulns": []
+      },
+      {
+        "name": "mpmath",
+        "version": "1.3.0",
+        "vulns": []
+      },
+      {
+        "name": "multidict",
+        "version": "6.9.1",
+        "vulns": []
+      },
+      {
+        "name": "multiprocess",
+        "version": "0.70.19",
+        "vulns": []
+      },
+      {
+        "name": "narwhals",
+        "version": "2.26.0",
+        "vulns": []
+      },
+      {
+        "name": "nest-asyncio2",
+        "version": "1.7.3",
+        "vulns": []
+      },
+      {
+        "name": "networkx",
+        "version": "3.7",
+        "vulns": []
+      },
+      {
+        "name": "nltk",
+        "version": "3.10.3",
+        "vulns": [
+          {
+            "id": "PYSEC-2026-3740",
+            "fix_versions": [],
+            "aliases": [
+              "CVE-2026-81726",
+              "GHSA-8mgp-746c-j5xp"
+            ],
+            "description": "### Summary  Several model-artifact APIs still treat caller-controlled model paths as ordinary filenames even when NLTK path security is enforced. The same outside-root paths are rejected by guarded helpers, but these public read and write flows still use raw file APIs.  ### Details  - **Vulnerability type:** File sandbox bypass - **Affected component:** `TransitionParser.train`, `TransitionParser.parse`, `AveragedPerceptron.save`, `AveragedPerceptron.load`, `PerceptronTagger.save_to_json`, `save_maxent_params` - **Affected versions:** Published `3.9.4` and current source `v3.10.0-rc2` both reproduced. - **Patched versions:** Not yet patched - **Root cause:** Model import and export helpers use built-in `open()` on caller-controlled paths instead of pathsec-aware helpers.  `TransitionParser.train()` writes outside allowed roots, `TransitionParser.parse()` reads outside allowed roots, `AveragedPerceptron` bypasses the sandbox in both directions, and adjacent read-side helpers in the same family already show the intended guarded behavior. I confirmed outside-root reads and writes while `pathsec.open()` or the guarded sibling helpers rejected the same paths.  ### PoC  **Preconditions** - The application enables `pathsec` enforcement and lets untrusted workflows choose model import or export paths.  **Steps** 1. Enable `pathsec.ENFORCE=True` and restrict allowed roots to a dedicated sandbox directory. 2. Use public model import or export APIs with paths that point outside that root. 3. Observe the same paths are rejected by negative-control guarded helpers such as `pathsec.open()`, `PerceptronTagger.load_from_json()`, or `load_maxent_params()`. 4. Observe the vulnerable APIs still read or write outside-root files successfully.  **Minimal reproducible excerpt**  ```text transition_train_exists True transition_parse_loader_read_bytes 13 averaged_load_keys ['bias'] maxent_save wrote ['alwayson.tab', 'labels.txt'] ```  ### Impact  Consumers that rely on `pathsec` for local containment can be tricked into reading or overwriting files outside approved roots through normal model persistence and loading APIs.  ### Remediation  Route all model-path file access through `nltk.pathsec.open()` or existing pathsec-aware helpers, and add regression tests that pair each vulnerable API with a negative control on the same path."
+          }
+        ]
+      },
+      {
+        "name": "numpy",
+        "version": "2.5.3",
+        "vulns": []
+      },
+      {
+        "name": "openai",
+        "version": "3.23.0",
+        "vulns": []
+      },
+      {
+        "name": "opentelemetry-api",
+        "version": "1.45.0",
+        "vulns": []
+      },
+      {
+        "name": "packaging",
+        "version": "26.3",
+        "vulns": []
+      },
+      {
+        "name": "pandas",
+        "version": "3.0.6",
+        "vulns": []
+      },
+      {
+        "name": "pathlib-abc",
+        "version": "0.5.2",
+        "vulns": []
+      },
+      {
+        "name": "pathvalidate",
+        "version": "3.3.1",
+        "vulns": []
+      },
+      {
+        "name": "platformdirs",
+        "version": "4.12.2",
+        "vulns": []
+      },
+      {
+        "name": "portalocker",
+        "version": "4.4.0",
+        "vulns": []
+      },
+      {
+        "name": "propcache",
+        "version": "0.5.4",
+        "vulns": []
+      },
+      {
+        "name": "protobuf",
+        "version": "7.36.2",
+        "vulns": []
+      },
+      {
+        "name": "psutil",
+        "version": "7.2.2",
+        "vulns": []
+      },
+      {
+        "name": "pyarrow",
+        "version": "25.0.1",
+        "vulns": []
+      },
+      {
+        "name": "pycountry",
+        "version": "26.2.16",
+        "vulns": []
+      },
+      {
+        "name": "pydantic",
+        "version": "2.13.5",
+        "vulns": []
+      },
+      {
+        "name": "pydantic-core",
+        "version": "2.46.5",
+        "vulns": []
+      },
+      {
+        "name": "pygments",
+        "version": "2.21.0",
+        "vulns": []
+      },
+      {
+        "name": "pytablewriter",
+        "version": "1.2.1",
+        "vulns": []
+      },
+      {
+        "name": "python-dateutil",
+        "version": "2.9.0.post0",
+        "vulns": []
+      },
+      {
+        "name": "python-dotenv",
+        "version": "1.2.4",
+        "vulns": []
+      },
+      {
+        "name": "pytz",
+        "version": "2026.4",
+        "vulns": []
+      },
+      {
+        "name": "pyyaml",
+        "version": "6.0.3",
+        "vulns": []
+      },
+      {
+        "name": "referencing",
+        "version": "0.37.0",
+        "vulns": []
+      },
+      {
+        "name": "regex",
+        "version": "2026.9.29",
+        "vulns": []
+      },
+      {
+        "name": "requests",
+        "version": "2.34.2",
+        "vulns": []
+      },
+      {
+        "name": "rich",
+        "version": "15.0.0",
+        "vulns": []
+      },
+      {
+        "name": "rouge-score",
+        "version": "0.1.2",
+        "vulns": []
+      },
+      {
+        "name": "rpds-py",
+        "version": "2026.6.3",
+        "vulns": []
+      },
+      {
+        "name": "s3fs",
+        "version": "2026.6.0",
+        "vulns": []
+      },
+      {
+        "name": "s3transfer",
+        "version": "0.19.2",
+        "vulns": []
+      },
+      {
+        "name": "sacrebleu",
+        "version": "2.6.0",
+        "vulns": []
+      },
+      {
+        "name": "safetensors",
+        "version": "0.8.0",
+        "vulns": []
+      },
+      {
+        "name": "scikit-learn",
+        "version": "1.9.1",
+        "vulns": []
+      },
+      {
+        "name": "scipy",
+        "version": "1.18.1",
+        "vulns": []
+      },
+      {
+        "name": "semver",
+        "version": "3.1.0",
+        "vulns": []
+      },
+      {
+        "name": "sentencepiece",
+        "version": "0.2.2",
+        "vulns": []
+      },
+      {
+        "name": "setuptools",
+        "version": "84.0.0",
+        "vulns": []
+      },
+      {
+        "name": "shellingham",
+        "version": "1.5.4",
+        "vulns": []
+      },
+      {
+        "name": "shortuuid",
+        "version": "1.0.13",
+        "vulns": []
+      },
+      {
+        "name": "six",
+        "version": "1.17.0",
+        "vulns": []
+      },
+      {
+        "name": "smmap",
+        "version": "5.0.3",
+        "vulns": []
+      },
+      {
+        "name": "sniffio",
+        "version": "1.3.1",
+        "vulns": []
+      },
+      {
+        "name": "soupsieve",
+        "version": "2.10",
+        "vulns": []
+      },
+      {
+        "name": "starlette",
+        "version": "1.7.0",
+        "vulns": []
+      },
+      {
+        "name": "sympy",
+        "version": "1.14.0",
+        "vulns": []
+      },
+      {
+        "name": "tabledata",
+        "version": "1.3.5",
+        "vulns": []
+      },
+      {
+        "name": "tabulate",
+        "version": "0.10.0",
+        "vulns": []
+      },
+      {
+        "name": "tcolorpy",
+        "version": "0.1.7",
+        "vulns": []
+      },
+      {
+        "name": "tenacity",
+        "version": "9.1.4",
+        "vulns": []
+      },
+      {
+        "name": "termcolor",
+        "version": "2.3.0",
+        "vulns": []
+      },
+      {
+        "name": "textual",
+        "version": "8.2.8",
+        "vulns": []
+      },
+      {
+        "name": "threadpoolctl",
+        "version": "3.7.0",
+        "vulns": []
+      },
+      {
+        "name": "tiktoken",
+        "version": "0.14.0",
+        "vulns": []
+      },
+      {
+        "name": "tokenizers",
+        "version": "0.23.2",
+        "vulns": []
+      },
+      {
+        "name": "torch",
+        "version": "2.14.1",
+        "vulns": []
+      },
+      {
+        "name": "tqdm",
+        "version": "4.70.1",
+        "vulns": []
+      },
+      {
+        "name": "transformers",
+        "version": "5.18.0",
+        "vulns": []
+      },
+      {
+        "name": "truststore",
+        "version": "0.10.4",
+        "vulns": []
+      },
+      {
+        "name": "typepy",
+        "version": "1.3.5",
+        "vulns": []
+      },
+      {
+        "name": "typer",
+        "version": "0.27.2",
+        "vulns": []
+      },
+      {
+        "name": "typing-extensions",
+        "version": "4.16.0",
+        "vulns": []
+      },
+      {
+        "name": "typing-inspection",
+        "version": "0.4.4",
+        "vulns": []
+      },
+      {
+        "name": "universal-pathlib",
+        "version": "0.3.10",
+        "vulns": []
+      },
+      {
+        "name": "urllib3",
+        "version": "2.8.0",
+        "vulns": []
+      },
+      {
+        "name": "uvicorn",
+        "version": "0.54.0",
+        "vulns": []
+      },
+      {
+        "name": "wrapt",
+        "version": "2.5.0",
+        "vulns": []
+      },
+      {
+        "name": "xxhash",
+        "version": "4.0.1",
+        "vulns": []
+      },
+      {
+        "name": "yarl",
+        "version": "1.25.1",
+        "vulns": []
+      },
+      {
+        "name": "zipp",
+        "version": "4.1.0",
+        "vulns": []
+      },
+      {
+        "name": "zstandard",
+        "version": "0.25.0",
+        "vulns": []
+      }
+    ],
+    "fixes": []
+  },
+  "security_disposition": "One known NLTK advisory remains without a published fix. Applicability to Plato metric-only use needs review; no zero-advisory claim.",
+  "sources": [
+    "https://github.com/huggingface/lighteval/blob/main/pyproject.toml",
+    "https://github.com/advisories/GHSA-8mgp-746c-j5xp"
+  ],
+  "security_applicability": {
+    "inspection": "Searched Plato, examples and installed Lighteval Python sources for the advisory affected model-persistence APIs.",
+    "result": "No calls to TransitionParser, AveragedPerceptron, PerceptronTagger model persistence or save_maxent_params observed in the evaluation adapter/metric implementation.",
+    "limits": "Static search does not prove absence of every transitive or custom-task path; the package advisory remains in the scan. NLTK POS tagging and tokenizer usage exist in benchmark tasks."
+  },
+  "security_scan_scope": "Scan ran before installing baseline Plato wheel and 17 additional core dependencies. Its 145-package scope is retained exactly; it does not certify the expanded experimental environment."
+}

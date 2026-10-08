@@ -1,0 +1,4388 @@
+{
+  "schema_version": 1,
+  "review_date": "2026-10-02",
+  "phase": "1B / F01",
+  "reviewer": "Fresh independent reviewer; single reviewer, no delegation",
+  "decision": "PASS",
+  "summary": "The exact candidate preserves the accepted startup design and is proportionate to F01. No concrete critical, high, or medium finding. Independent macOS CPU acceptance passed 43 cooperative cases on Python 3.13.16 and 3.14.8, and all five required containment cases on 3.14. Both real 2/6-sample socket rounds trained separate clients, matched actual received payloads, satisfied the numerical weighted reference, and ended naturally without watchdog intervention. The candidate remains subject to root integration and the existing Phase 1C handoff.",
+  "candidate": {
+    "commit": "213b321c3cfb31d0f82c0b315efe50dcbf7dee20",
+    "tree": "77d6110e57346f6f01b427f418a9bb24ad79a2a9",
+    "accepted_base_commit": "7304703905189baf771032f1cd923a37f66ed97f",
+    "accepted_base_tree": "862fed283336f488cb284dc2b0f47bd987946095",
+    "parent_is_accepted_base": true,
+    "head_matches_candidate": true,
+    "worktree": "/private/tmp/plato-refresh-worktrees/startup",
+    "diff_command": "git diff --binary --full-index --no-ext-diff 7304703905189baf771032f1cd923a37f66ed97f 213b321c3cfb31d0f82c0b315efe50dcbf7dee20",
+    "diff_sha256": "8802b3261ca377b581986ce0b4a3a8f2e3f3b57973aa0577778ae59b9d850047",
+    "runtime_diff_command": "git diff --binary --full-index --no-ext-diff 7304703905189baf771032f1cd923a37f66ed97f 213b321c3cfb31d0f82c0b315efe50dcbf7dee20 -- plato/client.py plato/servers/base.py",
+    "runtime_diff_sha256": "0d94b063729c0c055a52e151d0f71e602be78f15a20e135bd0ca458779ad32d2",
+    "changed_file_sha256": {
+      "evidence/2026-refresh/startup-validation.json": "2dac190af80f522f9709502d1dc6b8e3f445ff4060d8f06f200a7768f5373b07",
+      "plato/client.py": "81395fb7c485a23e875bd160fff466674badc833a9fbec6d441a5937c421fa3f",
+      "plato/servers/base.py": "51d2353b0c928e04416c73c08fc24ac926bc8ed81ae7d95e9ee1181b377973fb",
+      "tests/integration/startup_harness.py": "988f216f9367b1e9e8156bad62d3c03a813e26d32f919981ae227f5d8754642e",
+      "tests/integration/startup_probe.py": "e6c9bb2bf39616fe3a6745da528690a578e7416837e0914578ec688d2851b34f",
+      "tests/integration/startup_socket.py": "64d04c2ab0e041f35f5e5aca88aa46a436507cb76f54ef4ca3c3df702666720f",
+      "tests/integration/test_event_loop_startup.py": "0f4df0cf6d971f8cbe9a461f6b26408e911800aeba12533b95ccd454707171a6"
+    },
+    "unchanged_profile_sha256": {
+      "pyproject.toml": "fecc507660f280019ccc6869bde5bd886f26685cfa2361fdab7f4ee60d7f4dfa",
+      "uv.lock": "a7d30a4f7f2f824d656cf934b148d315fc1380817d3dd93e5070057b6cee58f6",
+      ".python-version": "02e735b3dfe1c32833eb550b7ff8ffa17f5f2bc3fa1e7bae61a8f5a3883ce398"
+    },
+    "production_scope": "Only plato/client.py and base server imports/run/start changed: 326 additions and 124 deletions. Remaining additions are four test helpers/suite and the validation artifact. No manifest, lock, algorithm, training, transport, os._exit, or spawn-policy changes."
+  },
+  "required_inputs": {
+    "sha256": {
+      "/Users/bli/Playground/plato/AGENTS.md": "b50f87f31ea3d87076952d8b7d2d8af067132fbf877d80f8780c208fb45527ec",
+      "/Users/bli/Playground/plato/evidence/2026-refresh/startup-design.json": "0a5e2c57102fa4beae7f4b4ceb6e091fd61e8af49b966f023bc57dfa6714ae47",
+      "/Users/bli/Playground/plato/evidence/2026-refresh/design-revision-review.json": "0535b3ccbac91a264317bd8fb9314465a0379155bc7113de99a27a9b66b7be39",
+      "/Users/bli/Playground/plato/evidence/2026-refresh/plan.md": "edb9a58cc7915a940854f16d5029fe97434703bf2f75eca0dcb96de2d0f0eb15",
+      "/Users/bli/Playground/plato/evidence/2026-refresh/plan-addendum.json": "5b51b0fb7ed6f68d9fce7176335b3e7be5e5f178a2788590912aa2396a487709"
+    },
+    "candidate_validation_path": "/private/tmp/plato-refresh-worktrees/startup/evidence/2026-refresh/startup-validation.json",
+    "candidate_validation_sha256": "2dac190af80f522f9709502d1dc6b8e3f445ff4060d8f06f200a7768f5373b07",
+    "plan_section": "plan.md:220, Phase 1B; read alongside the accepted startup design and overriding plan addendum",
+    "unchanged_at_final_check": true
+  },
+  "inspected": {
+    "production": [
+      "plato/client.py (complete)",
+      "plato/servers/base.py (complete exact diff; run/start, spawn, periodic, disconnect and close context)"
+    ],
+    "tests": [
+      "tests/integration/startup_harness.py (complete)",
+      "tests/integration/startup_probe.py (complete)",
+      "tests/integration/startup_socket.py (complete)",
+      "tests/integration/test_event_loop_startup.py (complete)",
+      "tests/conftest.py and test fakes for collection/write isolation"
+    ],
+    "installed_api": "Inspected the installed asyncio Runner initialization/run/close and aiohttp run_app/cancellation implementation. These local installed sources are direct evidence of the versions tested.",
+    "installed_run_app_function_sha256": "4a70706234546281916480949fe4ad51bc314278264872831556011dfd4701f3",
+    "retained_implementer_evidence": {
+      "result_files_checked": 116,
+      "result_hash_mismatches": [],
+      "missing_result_files": [],
+      "log_junit_pairs_checked": 8,
+      "log_junit_hash_mismatches": [],
+      "baseline_red": "Reviewed seven retained fresh 3.14 bootstrap failures with exact missing-current-loop sites, seven 3.13 controls, active-failure RED evidence, and the corrected precedence regression. These RED subprocesses were not independently rerun.",
+      "existing_suites": "Verified retained logs/JUnit hashes: each interpreter has 248 existing tests passed, three explicitly unqualified Nanochat skips and eight existing fork warnings. Did not repeat the entire existing suite.",
+      "final_startup_campaign": "Verified 43 cooperative, four teardown, and positive/stalled socket partitions per interpreter. The positive socket repeat is not counted as another unique case; final coverage is 48 unique cases. Historical failed development runs are explicitly separate."
+    }
+  },
+  "assessments": [
+    {
+      "topic": "Production minimality",
+      "result": "PASS",
+      "locations": [
+        "plato/client.py:17",
+        "plato/client.py:88",
+        "plato/client.py:120",
+        "plato/servers/base.py:333"
+      ],
+      "basis": "Local loop/task context managers serve only the existing startup call sites. Monitoring retains the periodic/edge task and a borrowed client's main task. No global exception handler, task factory, child supervisor, AppRunner rewrite, or new configuration/API framework."
+    },
+    {
+      "topic": "Public ownership and borrowing",
+      "result": "PASS",
+      "locations": [
+        "plato/client.py:17",
+        "plato/client.py:88",
+        "plato/client.py:206",
+        "plato/client.py:275"
+      ],
+      "basis": "get_running_loop rejects nested entry before entrypoint factories/configure/coroutines; get_event_loop conservatively borrows an open current loop. A missing or closed registration selects fresh ownership. Runner is initialized before ordinary-client construction/configure only on the owned path. Borrowed clients and returning/raising server overrides leave current registration, pending caller resources and executor usable. Fresh 3.13 policy-provided loops are deliberately borrowed rather than inferred to be owned."
+    },
+    {
+      "topic": "Existing synchronous extension dispatch",
+      "result": "PASS",
+      "locations": [
+        "plato/servers/base.py:333",
+        "plato/servers/base.py:362",
+        "plato/servers/base.py:389",
+        "plato/client.py:219"
+      ],
+      "basis": "Server configure and self.start() remain synchronous with unchanged dispatch/signatures. Central/ordinary launch, seed order and spawn policy are preserved. Edge factories, trainer factory and port dispatch remain synchronous; edge uses the shared loop and still adds no server.run periodic task. Real base.start consumes even a supplied loop through aiohttp's existing close contract."
+    },
+    {
+      "topic": "Configuration context and running-loop rejection",
+      "result": "PASS",
+      "locations": [
+        "plato/client.py:206",
+        "plato/client.py:275",
+        "plato/client.py:278"
+      ],
+      "basis": "The actual coroutine receives the post-configure ContextVar values through copy_context on the Runner path and normal task context on the borrowed path. Real entrypoint tests reject client.run, Server.run and Server.start inside a running loop before factory/configure/Socket.IO creation. No fresh-start test installs an open loop to make raw bootstrap pass; explicit absent, closed and borrowed registrations are separate compatibility cases."
+    },
+    {
+      "topic": "Primary-error precedence and control flow",
+      "result": "PASS",
+      "locations": [
+        "plato/client.py:103",
+        "plato/client.py:152",
+        "plato/client.py:168"
+      ],
+      "basis": "Independent configure/start/on_startup/bind errors take precedence over managed active failures and teardown diagnostics. Only the recorded monitor stop plus the actual BaseEventLoop.run_until_complete stop-check traceback replaces the specific loop-stopped RuntimeError; an independent same-text RuntimeError survives. Secondary failures include task identity and notes where applicable. KeyboardInterrupt/SystemExit retain control-flow identity and exit behavior."
+    },
+    {
+      "topic": "Background failures and cancelling guard",
+      "result": "PASS",
+      "locations": [
+        "plato/client.py:130",
+        "plato/client.py:140",
+        "plato/client.py:157",
+        "plato/client.py:159"
+      ],
+      "basis": "Completed task exceptions are retrieved. Positive public Task.cancelling() classifies cancellation-finalizer exceptions as teardown without stopping aiohttp cleanup. Local cleanup disarms the monitor and does not issue another cancellation to an already-awaiting finalizer. Real aiohttp periodic and edge active failures reach the synchronous caller; mixed setup/finalizer/sibling cases preserve setup failure while the sibling finishes."
+    },
+    {
+      "topic": "Cleanup and ownership leaks",
+      "result": "PASS",
+      "locations": [
+        "plato/client.py:48",
+        "plato/client.py:106",
+        "plato/client.py:117",
+        "plato/client.py:154"
+      ],
+      "basis": "Full fallback cancellation/generator/executor cleanup is limited to an explicitly created open loop. Borrowed scopes join only their retained startup task. Closed aiohttp loops are not finalized again; closed registrations are not restored. Owned Runner and server fallback tests demonstrate cooperative task/generator/executor finalization on success/error, including repeat invocation. Independent final inspection found no live recorded process identity and successfully bound/listened on every recorded port."
+    },
+    {
+      "topic": "Real CPU socket acceptance",
+      "result": "PASS",
+      "locations": [
+        "tests/integration/startup_socket.py:29",
+        "tests/integration/startup_socket.py:43",
+        "tests/integration/startup_socket.py:132",
+        "tests/integration/test_event_loop_startup.py:310"
+      ],
+      "basis": "Actual FedAvg server.run spawns two real simple clients with real basic/composable SGD, separate 2/6-sample TensorDatasets, comm_simulation=false, normal processors/serialization/socket chunks and unmodified aggregation. Callback observations own copies before later model mutation and match actual logical IDs, including reassignment. Both clients change parameters, actual decoded payloads equal independently trained weights, and both clients return naturally."
+    },
+    {
+      "topic": "Watchdog honesty and bounded acceptance",
+      "result": "PASS",
+      "locations": [
+        "tests/integration/startup_harness.py:92",
+        "tests/integration/startup_harness.py:118",
+        "tests/integration/startup_harness.py:138",
+        "tests/integration/test_event_loop_startup.py:277",
+        "tests/integration/test_event_loop_startup.py:369"
+      ],
+      "basis": "Dedicated subprocess sessions, PID/create-time identities, durable child-start observations, output draining and bounded TERM/KILL/reaping distinguish natural success from containment. All five repeated negative cases are explicitly timed out and forced, with no survivors. Stalled-client parent exit code zero does not pass a round: no aggregate exists, only one payload is processed, and the child requires TERM. No forced termination is counted as successful runtime cleanup or primary-error delivery."
+    }
+  ],
+  "independent_acceptance": {
+    "shell": "/bin/zsh -lc",
+    "environments": {
+      "313": {
+        "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+        "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+        "packages": {
+          "aiohttp": "3.14.3",
+          "pytest": "9.1.1",
+          "torch": "2.14.1",
+          "numpy": "2.5.3",
+          "psutil": "7.2.2",
+          "python-socketio": "5.17.0",
+          "python-engineio": "4.14.0"
+        },
+        "plato_import": "/private/tmp/plato-refresh-worktrees/startup/plato/__init__.py"
+      },
+      "314": {
+        "python": "3.14.8 (main, Sep 30 2026, 17:55:09) [Clang 21.0.0 (clang-2100.3.34.2)]",
+        "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+        "packages": {
+          "aiohttp": "3.14.3",
+          "pytest": "9.1.1",
+          "torch": "2.14.1",
+          "numpy": "2.5.3",
+          "psutil": "7.2.2",
+          "python-socketio": "5.17.0",
+          "python-engineio": "4.14.0"
+        },
+        "plato_import": "/private/tmp/plato-refresh-worktrees/startup/plato/__init__.py"
+      }
+    },
+    "reused_environments": [
+      "/tmp/plato-phase1b-startup/py313",
+      "/tmp/plato-phase1b-startup/py314"
+    ],
+    "package_install_or_sync": false,
+    "scratch": "/tmp/plato-phase1b-review",
+    "subprocess_limits_seconds": {
+      "bootstrap": 30,
+      "round": 90,
+      "term": 5,
+      "kill_reap": 5
+    },
+    "checks": [
+      {
+        "group": "runtime313",
+        "tests": 43,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "elapsed_seconds": 214.619,
+        "junit_path": "/tmp/plato-phase1b-review/runtime313.xml",
+        "junit_sha256": "b7035dc2f7b9a76468c638aa0870ae055ffe9273ab64c31ba8563275a4ff4982",
+        "log_path": "/tmp/plato-phase1b-review/runtime313.log",
+        "log_sha256": "a072b90e8908556e98f0808202851fbb5a411f968b39d278c46c0ad0834f959c",
+        "records": [
+          {
+            "case": "edge_custom",
+            "options": {
+              "absent": true,
+              "real": true,
+              "fail": true
+            },
+            "result_path": "/tmp/plato-phase1b-review/runtime313/test_active_edge_failure_unwin0/edge/result.json",
+            "result_sha256": "d1de39f589c5580f8ab500e40670b9366fd1ddb1128c4f081e2c85497e1e7781",
+            "elapsed_seconds": 4.463853958062828,
+            "returncode": 1,
+            "deadline_exceeded": false,
+            "watchdog_actions": [],
+            "live_survivors": [],
+            "markers": {
+              "fresh_process": 1,
+              "server_construct": 1,
+              "server_configure": 1,
+              "client_configure": 1,
+              "server_start": 1,
+              "configure_queued_work": 1,
+              "client_body": 1,
+              "server_body": 1,
+              "caller_error": 1,
+              "loop_after": 1
+            },
+            "caller_errors": [
+              {
+                "event": "caller_error",
+                "pid": 15681,
+                "type": "SentinelError",
+                "message": "client-sentinel",
+                "notes": []
+              }
+            ],
+            "loops_after": [
+              {
+                "event": "loop_after",
+                "pid": 15681,
+                "closed": true
+              }
+            ],
+            "entered_stages": [],
+            "original_failures": []
+          },
+          {
+            "case": "client_custom",
+            "options": {
+              "fail": true
+            },
+            "result_path": "/tmp/plato-phase1b-review/runtime313/test_active_failure_reaches_sy0/client_custom/result.json",
+            "result_sha256": "b0eaea9f1ae5fd862f1379211b737ab3f9ca6e29af06a8dfdb47d6c6dbcd4094",
+            "elapsed_seconds": 4.555807625176385,
+            "returncode": 1,
+            "deadline_exceeded": false,
+            "watchdog_actions": [],
+            "live_survivors": [],
+            "markers": {
+              "fresh_process": 1,
+              "client_configure": 1,
+              "client_body": 1,
+              "caller_error": 1,
+              "loop_after": 1
+            },
+            "caller_errors": [
+              {
+                "event": "caller_error",
+                "pid": 15586,
+                "type": "SentinelError",
+                "message": "client-sentinel",
+                "notes": []
+              }
+            ],
+            "loops_after": [
+              {
+                "event": "loop_after",
+                "pid": 15586,
+                "closed": false
+              }
+            ],
+            "entered_stages": [],
+            "original_failures": []
+          },
+          {
+            "case": "ordinary",
+            "options": {
+              "fail": true
+            },
+            "result_path": "/tmp/plato-phase1b-review/runtime313/test_active_failure_reaches_sy1/ordinary/result.json",
+            "result_sha256": "43aeb5b44c590c0dd38b8b9c73282f7f8cce90a9eeed030500d9bb8c57efd699",
+            "elapsed_seconds": 4.4659114591777325,
+            "returncode": 1,
+            "deadline_exceeded": false,
+            "watchdog_actions": [],
+            "live_survivors": [],
+            "markers": {
+              "fresh_process": 1,
+              "server_construct": 1,
+              "server_configure": 1,
+              "server_start": 1,
+              "server_work": 1,
+              "configure_queued_work": 1,
+              "periodic_body": 1,
+              "caller_error": 1,
+              "loop_after": 1
+            },
+            "caller_errors": [
+              {
+                "event": "caller_error",
+                "pid": 15589,
+                "type": "SentinelError",
+                "message": "periodic-sentinel",
+                "notes": []
+              }
+            ],
+            "loops_after": [
+              {
+                "event": "loop_after",
+                "pid": 15589,
+                "closed": false
+              }
+            ],
+            "entered_stages": [],
+            "original_failures": []
+          },
+          {
+            "case": "central",
+            "options": {
+              "fail": true
+            },
+            "result_path": "/tmp/plato-phase1b-review/runtime313/test_active_failure_reaches_sy2/central/result.json",
+            "result_sha256": "d5af6c5f341b843f693ead980c520fbd135f0896881aab5a28a72cf8d7a54a85",
+            "elapsed_seconds": 4.432752917055041,
+            "returncode": 1,
+            "deadline_exceeded": false,
+            "watchdog_actions": [],
+            "live_survivors": [],
+            "markers": {
+              "fresh_process": 1,
+              "server_construct": 1,
+              "server_configure": 1,
+              "launch": 1,
+              "server_start": 1,
+              "server_work": 1,
+              "configure_queued_work": 1,
+              "periodic_body": 1,
+              "caller_error": 1,
+              "loop_after": 1
+            },
+            "caller_errors": [
+              {
+                "event": "caller_error",
+                "pid": 15591,
+                "type": "SentinelError",
+                "message": "periodic-sentinel",
+                "notes": []
+              }
+            ],
+            "loops_after": [
+              {
+                "event": "loop_after",
+                "pid": 15591,
+                "closed": false
+              }
+            ],
+            "entered_stages": [],
+            "original_failures": []
+          },
+          {
+            "case": "edge_custom",
+            "options": {
+              "fail": true
+            },
+            "result_path": "/tmp/plato-phase1b-review/runtime313/test_active_failure_reaches_sy3/edge_custom/result.json",
+            "result_sha256": "1c3aa1ed16e9bf7f9519625e2a3cb202c98a1ad026f8dabe7fb4c0f9699a49bd",
+            "elapsed_seconds": 4.481753166997805,
+            "returncode": 1,
+            "deadline_exceeded": false,
+            "watchdog_actions": [],
+            "live_survivors": [],
+            "markers": {
+              "fresh_process": 1,
+              "server_construct": 1,
+              "server_configure": 1,
+              "client_configure": 1,
+              "server_start": 1,
+              "server_work": 1,
+              "configure_queued_work": 1,
+              "client_body": 1,
+              "caller_error": 1,
+              "loop_after": 1
+            },
+            "caller_errors": [
+              {
+                "event": "caller_error",
+                "pid": 15593,
+                "type": "SentinelError",
+                "message": "client-sentinel",
+                "notes": []
+              }
+            ],
+            "loops_after": [
+              {
+                "event": "loop_after",
+                "pid": 15593,
+                "closed": false
+              }
+            ],
+            "entered_stages": [],
+            "original_failures": []
+          },
+          {
+            "case": "ordinary",
+            "options": {
+              "absent": true,
+              "self_cancel": true
+            },
+            "result_path": "/tmp/plato-phase1b-review/runtime313/test_cancellation_already_fina0/cancelling/result.json",
+            "result_sha256": "6aefc6b76a50f0c1ec8c6943263aa4886c933d7b2fed197b9b12bc1c13b08480",
+            "elapsed_seconds": 4.531094915932044,
+            "returncode": 0,
+            "deadline_exceeded": false,
+            "watchdog_actions": [],
+            "live_survivors": [],
+            "markers": {
+              "fresh_process": 1,
+              "server_construct": 1,
+              "server_configure": 1,
+              "server_start": 1,
+              "server_work": 1,
+              "configure_queued_work": 1,
+              "periodic_body": 1,
+              "task_finalizer_entered": 1,
+              "task_finalized": 1,
+              "returned": 1,
+              "loop_after": 1
+            },
+            "caller_errors": [],
+            "loops_after": [
+              {
+                "event": "loop_after",
+                "pid": 15639,
+                "closed": true
+              }
+            ],
+            "entered_stages": [
+              "task_finalizer_entered"
+            ],
+            "original_failures": []
+          },
+          {
+            "case": "client_lifecycle",
+            "options": {
+              "absent": true,
+              "control": "interrupt"
+            },
+            "result_path": "/tmp/plato-phase1b-review/runtime313/test_client_control_flow_keeps0/interrupt/result.json",
+            "result_sha256": "e12ad638ddc71cdc53695d9f18ca0ad934ee0ed0a035d9dc5ee0df21926770ec",
+            "elapsed_seconds": 4.610103375045583,
+            "returncode": -2,
+            "deadline_exceeded": false,
+            "watchdog_actions": [],
+            "live_survivors": [],
+            "markers": {
+              "fresh_process": 1,
+              "client_configure": 1,
+              "client_body": 1,
+              "executor_entered": 1,
+              "task_finalizer_entered": 1,
+              "executor_finished": 1,
+              "task_finalized": 1,
+              "generator_finalizer_entered": 1,
+              "generator_finalized": 1,
+              "caller_error": 1,
+              "loop_after": 1
+            },
+            "caller_errors": [
+              {
+                "event": "caller_error",
+                "pid": 15677,
+                "type": "KeyboardInterrupt",
+                "message": "",
+                "notes": []
+              }
+            ],
+            "loops_after": [
+              {
+                "event": "loop_after",
+                "pid": 15677,
+                "closed": true
+              }
+            ],
+            "entered_stages": [
+              "executor_entered",
+              "task_finalizer_entered",
+              "generator_finalizer_entered"
+            ],
+            "original_failures": []
+          },
+          {
+            "case": "client_lifecycle",
+            "options": {
+              "absent": true,
+              "control": "exit"
+            },
+            "result_path": "/tmp/plato-phase1b-review/runtime313/test_client_control_flow_keeps1/exit/result.json",
+            "result_sha256": "561a968ed3c5cef7dfc8de5ab0307892a1dc7608439e2b88f4a1e96b5191e3e8",
+            "elapsed_seconds": 4.531131000025198,
+            "returncode": 7,
+            "deadline_exceeded": false,
+            "watchdog_actions": [],
+            "live_survivors": [],
+            "markers": {
+              "fresh_process": 1,
+              "client_configure": 1,
+              "client_body": 1,
+              "executor_entered": 1,
+              "task_finalizer_entered": 1,
+              "executor_finished": 1,
+              "task_finalized": 1,
+              "generator_finalizer_entered": 1,
+              "generator_finalized": 1,
+              "caller_error": 1,
+              "loop_after": 1
+            },
+            "caller_errors": [
+              {
+                "event": "caller_error",
+                "pid": 15679,
+                "type": "SystemExit",
+                "message": "7",
+                "notes": []
+              }
+            ],
+            "loops_after": [
+              {
+                "event": "loop_after",
+                "pid": 15679,
+                "closed": true
+              }
+            ],
+            "entered_stages": [
+              "executor_entered",
+              "task_finalizer_entered",
+              "generator_finalizer_entered"
+            ],
+            "original_failures": []
+          },
+          {
+            "case": "client_custom",
+            "options": {
+              "closed": true
+            },
+            "result_path": "/tmp/plato-phase1b-review/runtime313/test_closed_current_client_loo0/closed/result.json",
+            "result_sha256": "93e09e2b042174778731777ca6d3d38521e6cabbb63f683cef6200d87283b877",
+            "elapsed_seconds": 4.419712249888107,
+            "returncode": 0,
+            "deadline_exceeded": false,
+            "watchdog_actions": [],
+            "live_survivors": [],
+            "markers": {
+              "fresh_process": 1,
+              "client_configure": 1,
+              "client_body": 1,
+              "returned": 1,
+              "loop_after": 1
+            },
+            "caller_errors": [],
+            "loops_after": [
+              {
+                "event": "loop_after",
+                "pid": 15622,
+                "closed": true
+              }
+            ],
+            "entered_stages": [],
+            "original_failures": []
+          },
+          {
+            "case": "client_lifecycle",
+            "options": {
+              "absent": true,
+              "configure_fail": true
+            },
+            "result_path": "/tmp/plato-phase1b-review/runtime313/test_configure_failure_is_pres0/configure/result.json",
+            "result_sha256": "41d7dde30cdca20a27784852ab700da0fb1422ab6ac2a13a49050d9adf4aac2a",
+            "elapsed_seconds": 4.692656375002116,
+            "returncode": 1,
+            "deadline_exceeded": false,
+            "watchdog_actions": [],
+            "live_survivors": [],
+            "markers": {
+              "fresh_process": 1,
+              "client_configure": 1,
+              "caller_error": 1,
+              "loop_after": 1
+            },
+            "caller_errors": [
+              {
+                "event": "caller_error",
+                "pid": 15647,
+                "type": "SentinelError",
+                "message": "configure-sentinel",
+                "notes": []
+              }
+            ],
+            "loops_after": [
+              {
+                "event": "loop_after",
+                "pid": 15647,
+                "closed": true
+              }
+            ],
+            "entered_stages": [],
+            "original_failures": []
+          },
+          {
+            "case": "ordinary",
+            "options": {
+              "borrowed": true,
+              "real": true
+            },
+            "result_path": "/tmp/plato-phase1b-review/runtime313/test_delegating_server_consume0/delegated/result.json",
+            "result_sha256": "2c8a2b86861d48cd017f69934ecd3a12cb83ce908ab45fda71952750531ced64",
+            "elapsed_seconds": 4.548820750089362,
+            "returncode": 0,
+            "deadline_exceeded": false,
+            "watchdog_actions": [],
+            "live_survivors": [],
+            "markers": {
+              "fresh_process": 1,
+              "server_construct": 1,
+              "server_configure": 1,
+              "server_start": 1,
+              "configure_queued_work": 1,
+              "periodic_body": 1,
+              "server_body": 1,
+              "borrowed_consumed": 1,
+              "returned": 1,
+              "loop_after": 1
+            },
+            "caller_errors": [],
+            "loops_after": [
+              {
+                "event": "loop_after",
+                "pid": 15626,
+                "closed": true
+              }
+            ],
+            "entered_stages": [],
+            "original_failures": []
+          },
+          {
+            "case": "edge_custom",
+            "options": {
+              "absent": true,
+              "real": true,
+              "startup_fail": true,
+              "secondary": true
+            },
+            "result_path": "/tmp/plato-phase1b-review/runtime313/test_edge_cancellation_error_k0/edge/result.json",
+            "result_sha256": "8157bb72569524fbd05a9a62662dcb223dd81d2b2d8b236fdf9c5df862806604",
+            "elapsed_seconds": 4.570934166898951,
+            "returncode": 1,
+            "deadline_exceeded": false,
+            "watchdog_actions": [],
+            "live_survivors": [],
+            "markers": {
+              "fresh_process": 1,
+              "server_construct": 1,
+              "server_configure": 1,
+              "client_configure": 1,
+              "server_start": 1,
+              "configure_queued_work": 1,
+              "client_body": 1,
+              "server_body": 1,
+              "original_failure": 1,
+              "secondary_failure": 1,
+              "task_finalizer_entered": 1,
+              "task_finalized": 1,
+              "caller_error": 1,
+              "loop_after": 1
+            },
+            "caller_errors": [
+              {
+                "event": "caller_error",
+                "pid": 15682,
+                "type": "SentinelError",
+                "message": "setup-sentinel",
+                "notes": [
+                  "Plato startup also failed (Task-2): SentinelError('client-finalizer')"
+                ]
+              }
+            ],
+            "loops_after": [
+              {
+                "event": "loop_after",
+                "pid": 15682,
+                "closed": true
+              }
+            ],
+            "entered_stages": [
+              "task_finalizer_entered"
+            ],
+            "original_failures": [
+              {
+                "event": "original_failure",
+                "pid": 15682,
+                "message": "setup-sentinel"
+              }
+            ]
+          },
+          {
+            "case": "ordinary",
+            "options": {
+              "absent": true
+            },
+            "result_path": "/tmp/plato-phase1b-review/runtime313/test_explicitly_absent_loop_on0/ordinary/result.json",
+            "result_sha256": "f70e338bf4622b693def5bc6d448808b65f0c42a3737cb138c9209743154c25f",
+            "elapsed_seconds": 4.449917833087966,
+            "returncode": 0,
+            "deadline_exceeded": false,
+            "watchdog_actions": [],
+            "live_survivors": [],
+            "markers": {
+              "fresh_process": 1,
+              "server_construct": 1,
+              "server_configure": 1,
+              "server_start": 1,
+              "server_work": 1,
+              "configure_queued_work": 1,
+              "periodic_body": 1,
+              "returned": 1,
+              "loop_after": 1
+            },
+            "caller_errors": [],
+            "loops_after": [
+              {
+                "event": "loop_after",
+                "pid": 15613,
+                "closed": true
+              }
+            ],
+            "entered_stages": [],
+            "original_failures": []
+          },
+          {
+            "case": "central",
+            "options": {
+              "absent": true
+            },
+            "result_path": "/tmp/plato-phase1b-review/runtime313/test_explicitly_absent_loop_on1/central/result.json",
+            "result_sha256": "f901f4896bf598adb781ab6cfd281c475b844817cea7a14d7ab41214925f99d2",
+            "elapsed_seconds": 4.484141708118841,
+            "returncode": 0,
+            "deadline_exceeded": false,
+            "watchdog_actions": [],
+            "live_survivors": [],
+            "markers": {
+              "fresh_process": 1,
+              "server_construct": 1,
+              "server_configure": 1,
+              "launch": 1,
+              "server_start": 1,
+              "server_work": 1,
+              "configure_queued_work": 1,
+              "periodic_body": 1,
+              "returned": 1,
+              "loop_after": 1
+            },
+            "caller_errors": [],
+            "loops_after": [
+              {
+                "event": "loop_after",
+                "pid": 15615,
+                "closed": true
+              }
+            ],
+            "entered_stages": [],
+            "original_failures": []
+          },
+          {
+            "case": "edge_default",
+            "options": {
+              "absent": true
+            },
+            "result_path": "/tmp/plato-phase1b-review/runtime313/test_explicitly_absent_loop_on2/edge_default/result.json",
+            "result_sha256": "f0807535e4d12c14ac4711f02600c756a3849f1fc71d2b4f68521cabb62257db",
+            "elapsed_seconds": 4.6365774581208825,
+            "returncode": 0,
+            "deadline_exceeded": false,
+            "watchdog_actions": [],
+            "live_survivors": [],
+            "markers": {
+              "fresh_process": 1,
+              "server_construct": 1,
+              "server_configure": 1,
+              "client_configure": 1,
+              "server_start": 1,
+              "server_work": 1,
+              "configure_queued_work": 1,
+              "client_body": 1,
+              "returned": 1,
+              "loop_after": 1
+            },
+            "caller_errors": [],
+            "loops_after": [
+              {
+                "event": "loop_after",
+                "pid": 15617,
+                "closed": true
+              }
+            ],
+            "entered_stages": [],
+            "original_failures": []
+          },
+          {
+            "case": "edge_custom",
+            "options": {
+              "absent": true
+            },
+            "result_path": "/tmp/plato-phase1b-review/runtime313/test_explicitly_absent_loop_on3/edge_custom/result.json",
+            "result_sha256": "7933715bcaf148be0e46dc41642a96947790411691482337bdf016f489a4505c",
+            "elapsed_seconds": 4.468235000036657,
+            "returncode": 0,
+            "deadline_exceeded": false,
+            "watchdog_actions": [],
+            "live_survivors": [],
+            "markers": {
+              "fresh_process": 1,
+              "server_construct": 1,
+              "server_configure": 1,
+              "client_configure": 1,
+              "server_start": 1,
+              "server_work": 1,
+              "configure_queued_work": 1,
+              "client_body": 1,
+              "returned": 1,
+              "loop_after": 1
+            },
+            "caller_errors": [],
+            "loops_after": [
+              {
+                "event": "loop_after",
+                "pid": 15620,
+                "closed": true
+              }
+            ],
+            "entered_stages": [],
+            "original_failures": []
+          },
+          {
+            "case": "client_default",
+            "options": {},
+            "result_path": "/tmp/plato-phase1b-review/runtime313/test_fresh_entrypoint_executes0/client_default/result.json",
+            "result_sha256": "bc4f7b12ae1344738295b1d31757c45679770e20733e5d7dea58f5f53c492ac8",
+            "elapsed_seconds": 4.667631082935259,
+            "returncode": 0,
+            "deadline_exceeded": false,
+            "watchdog_actions": [],
+            "live_survivors": [],
+            "markers": {
+              "fresh_process": 1,
+              "client_configure": 1,
+              "client_body": 1,
+              "returned": 1,
+              "loop_after": 1
+            },
+            "caller_errors": [],
+            "loops_after": [
+              {
+                "event": "loop_after",
+                "pid": 15564,
+                "closed": false
+              }
+            ],
+            "entered_stages": [],
+            "original_failures": []
+          },
+          {
+            "case": "client_custom",
+            "options": {},
+            "result_path": "/tmp/plato-phase1b-review/runtime313/test_fresh_entrypoint_executes1/client_custom/result.json",
+            "result_sha256": "206402a5513582b087c313cd807acfd9c4c8507c31ee846c507e703f11bfd656",
+            "elapsed_seconds": 4.4654985829256475,
+            "returncode": 0,
+            "deadline_exceeded": false,
+            "watchdog_actions": [],
+            "live_survivors": [],
+            "markers": {
+              "fresh_process": 1,
+              "client_configure": 1,
+              "client_body": 1,
+              "returned": 1,
+              "loop_after": 1
+            },
+            "caller_errors": [],
+            "loops_after": [
+              {
+                "event": "loop_after",
+                "pid": 15567,
+                "closed": false
+              }
+            ],
+            "entered_stages": [],
+            "original_failures": []
+          },
+          {
+            "case": "ordinary",
+            "options": {},
+            "result_path": "/tmp/plato-phase1b-review/runtime313/test_fresh_entrypoint_executes2/ordinary/result.json",
+            "result_sha256": "c720702a526c5d222de472f596d10d0f810c2cb85e6892cf4ef7298dc2d9a72b",
+            "elapsed_seconds": 4.460761958034709,
+            "returncode": 0,
+            "deadline_exceeded": false,
+            "watchdog_actions": [],
+            "live_survivors": [],
+            "markers": {
+              "fresh_process": 1,
+              "server_construct": 1,
+              "server_configure": 1,
+              "server_start": 1,
+              "server_work": 1,
+              "configure_queued_work": 1,
+              "periodic_body": 1,
+              "returned": 1,
+              "loop_after": 1
+            },
+            "caller_errors": [],
+            "loops_after": [
+              {
+                "event": "loop_after",
+                "pid": 15569,
+                "closed": false
+              }
+            ],
+            "entered_stages": [],
+            "original_failures": []
+          },
+          {
+            "case": "central",
+            "options": {},
+            "result_path": "/tmp/plato-phase1b-review/runtime313/test_fresh_entrypoint_executes3/central/result.json",
+            "result_sha256": "2cc83bbd4fc823d792a93b44cd1a3e3168fb4caeddb077a085f240b593b6db6d",
+            "elapsed_seconds": 4.496333499904722,
+            "returncode": 0,
+            "deadline_exceeded": false,
+            "watchdog_actions": [],
+            "live_survivors": [],
+            "markers": {
+              "fresh_process": 1,
+              "server_construct": 1,
+              "server_configure": 1,
+              "launch": 1,
+              "server_start": 1,
+              "server_work": 1,
+              "configure_queued_work": 1,
+              "periodic_body": 1,
+              "returned": 1,
+              "loop_after": 1
+            },
+            "caller_errors": [],
+            "loops_after": [
+              {
+                "event": "loop_after",
+                "pid": 15571,
+                "closed": false
+              }
+            ],
+            "entered_stages": [],
+            "original_failures": []
+          },
+          {
+            "case": "direct",
+            "options": {},
+            "result_path": "/tmp/plato-phase1b-review/runtime313/test_fresh_entrypoint_executes4/direct/result.json",
+            "result_sha256": "1a16dd5aa18459df1c14a629157a30f1888e94207c65448f6aa0bf481d8fd8fe",
+            "elapsed_seconds": 4.514416000107303,
+            "returncode": 0,
+            "deadline_exceeded": false,
+            "watchdog_actions": [],
+            "live_survivors": [],
+            "markers": {
+              "fresh_process": 1,
+              "server_construct": 1,
+              "server_start": 1,
+              "server_body": 1,
+              "returned": 1,
+              "loop_after": 1
+            },
+            "caller_errors": [],
+            "loops_after": [
+              {
+                "event": "loop_after",
+                "pid": 15579,
+                "closed": true
+              }
+            ],
+            "entered_stages": [],
+            "original_failures": []
+          },
+          {
+            "case": "edge_default",
+            "options": {},
+            "result_path": "/tmp/plato-phase1b-review/runtime313/test_fresh_entrypoint_executes5/edge_default/result.json",
+            "result_sha256": "b16a343a833b81ef7f5911705988ca0650264b86b4504ec20a218344503c80ed",
+            "elapsed_seconds": 4.4538039590697736,
+            "returncode": 0,
+            "deadline_exceeded": false,
+            "watchdog_actions": [],
+            "live_survivors": [],
+            "markers": {
+              "fresh_process": 1,
+              "server_construct": 1,
+              "server_configure": 1,
+              "client_configure": 1,
+              "server_start": 1,
+              "server_work": 1,
+              "configure_queued_work": 1,
+              "client_body": 1,
+              "returned": 1,
+              "loop_after": 1
+            },
+            "caller_errors": [],
+            "loops_after": [
+              {
+                "event": "loop_after",
+                "pid": 15581,
+                "closed": false
+              }
+            ],
+            "entered_stages": [],
+            "original_failures": []
+          },
+          {
+            "case": "edge_custom",
+            "options": {},
+            "result_path": "/tmp/plato-phase1b-review/runtime313/test_fresh_entrypoint_executes6/edge_custom/result.json",
+            "result_sha256": "a1e745aaa81df67026274f322a9905db6c1edbb79f971785f086e65edbe598ae",
+            "elapsed_seconds": 4.496038458077237,
+            "returncode": 0,
+            "deadline_exceeded": false,
+            "watchdog_actions": [],
+            "live_survivors": [],
+            "markers": {
+              "fresh_process": 1,
+              "server_construct": 1,
+              "server_configure": 1,
+              "client_configure": 1,
+              "server_start": 1,
+              "server_work": 1,
+              "configure_queued_work": 1,
+              "client_body": 1,
+              "returned": 1,
+              "loop_after": 1
+            },
+            "caller_errors": [],
+            "loops_after": [
+              {
+                "event": "loop_after",
+                "pid": 15583,
+                "closed": false
+              }
+            ],
+            "entered_stages": [],
+            "original_failures": []
+          },
+          {
+            "case": "ordinary",
+            "options": {
+              "absent": true,
+              "fail": true,
+              "same_message_error": true
+            },
+            "result_path": "/tmp/plato-phase1b-review/runtime313/test_independent_runtime_error0/independent/result.json",
+            "result_sha256": "f337c4ca9b782f1aebab771b11a3b3164481563f2aaf35679c269c42ff9f82e0",
+            "elapsed_seconds": 4.450622333912179,
+            "returncode": 1,
+            "deadline_exceeded": false,
+            "watchdog_actions": [],
+            "live_survivors": [],
+            "markers": {
+              "fresh_process": 1,
+              "server_construct": 1,
+              "server_configure": 1,
+              "server_start": 1,
+              "server_work": 1,
+              "configure_queued_work": 1,
+              "periodic_body": 1,
+              "caller_error": 1,
+              "loop_after": 1
+            },
+            "caller_errors": [
+              {
+                "event": "caller_error",
+                "pid": 15686,
+                "type": "RuntimeError",
+                "message": "Event loop stopped before Future completed.",
+                "notes": [
+                  "Plato startup also failed (Task-1): SentinelError('periodic-sentinel')"
+                ]
+              }
+            ],
+            "loops_after": [
+              {
+                "event": "loop_after",
+                "pid": 15686,
+                "closed": true
+              }
+            ],
+            "entered_stages": [],
+            "original_failures": []
+          },
+          {
+            "case": "edge_custom",
+            "options": {
+              "absent": true,
+              "missing_client": true
+            },
+            "result_path": "/tmp/plato-phase1b-review/runtime313/test_missing_external_edge_cli0/edge/result.json",
+            "result_sha256": "c557f6d20b25dac4d7adc8d51b63e7c288065b162dec6eafaf434fec45860743",
+            "elapsed_seconds": 4.947100165998563,
+            "returncode": 1,
+            "deadline_exceeded": false,
+            "watchdog_actions": [],
+            "live_survivors": [],
+            "markers": {
+              "fresh_process": 1,
+              "server_construct": 1,
+              "caller_error": 1
+            },
+            "caller_errors": [
+              {
+                "event": "caller_error",
+                "pid": 15668,
+                "type": "ValueError",
+                "message": "edge_client must be provided when edge_server is set.",
+                "notes": []
+              }
+            ],
+            "loops_after": [],
+            "entered_stages": [],
+            "original_failures": []
+          },
+          {
+            "case": "client_lifecycle",
+            "options": {
+              "absent": true,
+              "fail": false
+            },
+            "result_path": "/tmp/plato-phase1b-review/runtime313/test_owned_client_finalizes_ta0/client/result.json",
+            "result_sha256": "76b9ecd670e1785f2de224018e39967ca535d204e7361014c8091d025fceef0d",
+            "elapsed_seconds": 4.474644958041608,
+            "returncode": 0,
+            "deadline_exceeded": false,
+            "watchdog_actions": [],
+            "live_survivors": [],
+            "markers": {
+              "fresh_process": 1,
+              "client_configure": 1,
+              "client_body": 1,
+              "executor_entered": 1,
+              "task_finalizer_entered": 1,
+              "executor_finished": 1,
+              "task_finalized": 1,
+              "generator_finalizer_entered": 1,
+              "generator_finalized": 1,
+              "returned": 1,
+              "loop_after": 1
+            },
+            "caller_errors": [],
+            "loops_after": [
+              {
+                "event": "loop_after",
+                "pid": 15608,
+                "closed": true
+              }
+            ],
+            "entered_stages": [
+              "executor_entered",
+              "task_finalizer_entered",
+              "generator_finalizer_entered"
+            ],
+            "original_failures": []
+          },
+          {
+            "case": "client_lifecycle",
+            "options": {
+              "absent": true,
+              "fail": true
+            },
+            "result_path": "/tmp/plato-phase1b-review/runtime313/test_owned_client_finalizes_ta1/client/result.json",
+            "result_sha256": "7ab85b0ab330dfafee90f4657935d46a6a6aa25bc5c01b1ef177721d9765a465",
+            "elapsed_seconds": 4.472686500055715,
+            "returncode": 1,
+            "deadline_exceeded": false,
+            "watchdog_actions": [],
+            "live_survivors": [],
+            "markers": {
+              "fresh_process": 1,
+              "client_configure": 1,
+              "client_body": 1,
+              "executor_entered": 1,
+              "original_failure": 1,
+              "task_finalizer_entered": 1,
+              "task_finalized": 1,
+              "generator_finalizer_entered": 1,
+              "executor_finished": 1,
+              "generator_finalized": 1,
+              "caller_error": 1,
+              "loop_after": 1
+            },
+            "caller_errors": [
+              {
+                "event": "caller_error",
+                "pid": 15609,
+                "type": "SentinelError",
+                "message": "client-sentinel",
+                "notes": []
+              }
+            ],
+            "loops_after": [
+              {
+                "event": "loop_after",
+                "pid": 15609,
+                "closed": true
+              }
+            ],
+            "entered_stages": [
+              "executor_entered",
+              "task_finalizer_entered",
+              "generator_finalizer_entered"
+            ],
+            "original_failures": [
+              {
+                "event": "original_failure",
+                "pid": 15609,
+                "message": "client-sentinel"
+              }
+            ]
+          },
+          {
+            "case": "ordinary",
+            "options": {
+              "absent": true,
+              "fallback_resources": true,
+              "start_fail": false
+            },
+            "result_path": "/tmp/plato-phase1b-review/runtime313/test_owned_server_fallback_fin0/fallback/result.json",
+            "result_sha256": "330d7de6307324cd438070624ae5a08732a3ee29edf4f3b5337508b0cb848bb5",
+            "elapsed_seconds": 4.540852791862562,
+            "returncode": 0,
+            "deadline_exceeded": false,
+            "watchdog_actions": [],
+            "live_survivors": [],
+            "markers": {
+              "fresh_process": 1,
+              "server_construct": 1,
+              "server_configure": 1,
+              "executor_entered": 1,
+              "server_start": 1,
+              "server_work": 1,
+              "configure_queued_work": 1,
+              "periodic_body": 1,
+              "task_finalizer_entered": 1,
+              "task_finalized": 1,
+              "generator_finalizer_entered": 1,
+              "executor_finished": 1,
+              "generator_finalized": 1,
+              "returned": 1,
+              "loop_after": 1
+            },
+            "caller_errors": [],
+            "loops_after": [
+              {
+                "event": "loop_after",
+                "pid": 15635,
+                "closed": true
+              }
+            ],
+            "entered_stages": [
+              "executor_entered",
+              "task_finalizer_entered",
+              "generator_finalizer_entered"
+            ],
+            "original_failures": []
+          },
+          {
+            "case": "ordinary",
+            "options": {
+              "absent": true,
+              "fallback_resources": true,
+              "start_fail": true
+            },
+            "result_path": "/tmp/plato-phase1b-review/runtime313/test_owned_server_fallback_fin1/fallback/result.json",
+            "result_sha256": "e1fd6cf258545d3af095f9a9fc646917219462c78bb80805ace47526986ddd63",
+            "elapsed_seconds": 4.497716165846214,
+            "returncode": 1,
+            "deadline_exceeded": false,
+            "watchdog_actions": [],
+            "live_survivors": [],
+            "markers": {
+              "fresh_process": 1,
+              "server_construct": 1,
+              "server_configure": 1,
+              "executor_entered": 1,
+              "server_start": 1,
+              "server_work": 1,
+              "configure_queued_work": 1,
+              "periodic_body": 1,
+              "task_finalizer_entered": 1,
+              "task_finalized": 1,
+              "generator_finalizer_entered": 1,
+              "executor_finished": 1,
+              "generator_finalized": 1,
+              "caller_error": 1,
+              "loop_after": 1
+            },
+            "caller_errors": [
+              {
+                "event": "caller_error",
+                "pid": 15637,
+                "type": "SentinelError",
+                "message": "start-sentinel",
+                "notes": []
+              }
+            ],
+            "loops_after": [
+              {
+                "event": "loop_after",
+                "pid": 15637,
+                "closed": true
+              }
+            ],
+            "entered_stages": [
+              "executor_entered",
+              "task_finalizer_entered",
+              "generator_finalizer_entered"
+            ],
+            "original_failures": []
+          },
+          {
+            "case": "socket_failure",
+            "options": {},
+            "result_path": "/tmp/plato-phase1b-review/runtime313/test_post_launch_failure_keeps0/failure/result.json",
+            "result_sha256": "3d6a8584bcd2606d724cfb1981dbac5be59ac50ec59c7af162bf810df44fe7d0",
+            "elapsed_seconds": 14.245169334113598,
+            "returncode": 1,
+            "deadline_exceeded": false,
+            "watchdog_actions": [],
+            "live_survivors": [],
+            "markers": {
+              "fresh_process": 1,
+              "child_started": 2,
+              "original_failure": 1,
+              "caller_error": 1,
+              "child_error": 2
+            },
+            "caller_errors": [
+              {
+                "event": "caller_error",
+                "pid": 15720,
+                "type": "SentinelError",
+                "message": "post-launch-sentinel",
+                "notes": []
+              }
+            ],
+            "loops_after": [],
+            "entered_stages": [],
+            "original_failures": [
+              {
+                "event": "original_failure",
+                "pid": 15720,
+                "message": "post-launch-sentinel"
+              }
+            ]
+          },
+          {
+            "case": "client_lifecycle",
+            "options": {
+              "borrowed": true,
+              "fail": false
+            },
+            "result_path": "/tmp/plato-phase1b-review/runtime313/test_preconstructed_borrowed_l0/client_lifecycle/result.json",
+            "result_sha256": "8c0f1d0410375fa604545d36e5966786930a0f1cb79c01d7d714817c9396d5ec",
+            "elapsed_seconds": 4.479854000033811,
+            "returncode": 0,
+            "deadline_exceeded": false,
+            "watchdog_actions": [],
+            "live_survivors": [],
+            "markers": {
+              "fresh_process": 1,
+              "client_configure": 1,
+              "client_body": 1,
+              "executor_entered": 1,
+              "borrowed_preserved": 1,
+              "task_finalizer_entered": 1,
+              "task_finalized": 1,
+              "generator_finalizer_entered": 1,
+              "executor_finished": 1,
+              "generator_finalized": 1,
+              "returned": 1,
+              "loop_after": 1
+            },
+            "caller_errors": [],
+            "loops_after": [
+              {
+                "event": "loop_after",
+                "pid": 15599,
+                "closed": false
+              }
+            ],
+            "entered_stages": [
+              "executor_entered",
+              "task_finalizer_entered",
+              "generator_finalizer_entered"
+            ],
+            "original_failures": []
+          },
+          {
+            "case": "client_lifecycle",
+            "options": {
+              "borrowed": true,
+              "fail": true
+            },
+            "result_path": "/tmp/plato-phase1b-review/runtime313/test_preconstructed_borrowed_l1/client_lifecycle/result.json",
+            "result_sha256": "907d5bf9c367925fd162a8356a702dd3d05987c8ca9da2efb55670b4338c5d2c",
+            "elapsed_seconds": 4.467009125044569,
+            "returncode": 1,
+            "deadline_exceeded": false,
+            "watchdog_actions": [],
+            "live_survivors": [],
+            "markers": {
+              "fresh_process": 1,
+              "client_configure": 1,
+              "client_body": 1,
+              "executor_entered": 1,
+              "original_failure": 1,
+              "borrowed_preserved": 1,
+              "task_finalizer_entered": 1,
+              "task_finalized": 1,
+              "generator_finalizer_entered": 1,
+              "executor_finished": 1,
+              "generator_finalized": 1,
+              "caller_error": 1,
+              "loop_after": 1
+            },
+            "caller_errors": [
+              {
+                "event": "caller_error",
+                "pid": 15601,
+                "type": "SentinelError",
+                "message": "client-sentinel",
+                "notes": []
+              }
+            ],
+            "loops_after": [
+              {
+                "event": "loop_after",
+                "pid": 15601,
+                "closed": false
+              }
+            ],
+            "entered_stages": [
+              "executor_entered",
+              "task_finalizer_entered",
+              "generator_finalizer_entered"
+            ],
+            "original_failures": [
+              {
+                "event": "original_failure",
+                "pid": 15601,
+                "message": "client-sentinel"
+              }
+            ]
+          },
+          {
+            "case": "ordinary",
+            "options": {
+              "borrowed": true,
+              "start_fail": false
+            },
+            "result_path": "/tmp/plato-phase1b-review/runtime313/test_preconstructed_borrowed_l2/ordinary/result.json",
+            "result_sha256": "61ea3e5864638fb0182bdbadec465a43ed89fa532bc0a785f88a07251a117b0e",
+            "elapsed_seconds": 4.578549499856308,
+            "returncode": 0,
+            "deadline_exceeded": false,
+            "watchdog_actions": [],
+            "live_survivors": [],
+            "markers": {
+              "fresh_process": 1,
+              "server_construct": 1,
+              "server_configure": 1,
+              "server_start": 1,
+              "server_work": 1,
+              "configure_queued_work": 1,
+              "periodic_body": 1,
+              "borrowed_preserved": 1,
+              "returned": 1,
+              "loop_after": 1
+            },
+            "caller_errors": [],
+            "loops_after": [
+              {
+                "event": "loop_after",
+                "pid": 15603,
+                "closed": false
+              }
+            ],
+            "entered_stages": [],
+            "original_failures": []
+          },
+          {
+            "case": "ordinary",
+            "options": {
+              "borrowed": true,
+              "start_fail": true
+            },
+            "result_path": "/tmp/plato-phase1b-review/runtime313/test_preconstructed_borrowed_l3/ordinary/result.json",
+            "result_sha256": "f800611d37e1bbdf298d7d0cbdf1c1eff8c2224bc63a1ae2aa2109464e9d0e6d",
+            "elapsed_seconds": 4.5491876672022045,
+            "returncode": 1,
+            "deadline_exceeded": false,
+            "watchdog_actions": [],
+            "live_survivors": [],
+            "markers": {
+              "fresh_process": 1,
+              "server_construct": 1,
+              "server_configure": 1,
+              "server_start": 1,
+              "server_work": 1,
+              "configure_queued_work": 1,
+              "periodic_body": 1,
+              "borrowed_preserved": 1,
+              "caller_error": 1,
+              "loop_after": 1
+            },
+            "caller_errors": [
+              {
+                "event": "caller_error",
+                "pid": 15606,
+                "type": "SentinelError",
+                "message": "start-sentinel",
+                "notes": []
+              }
+            ],
+            "loops_after": [
+              {
+                "event": "loop_after",
+                "pid": 15606,
+                "closed": false
+              }
+            ],
+            "entered_stages": [],
+            "original_failures": []
+          },
+          {
+            "case": "socket_round",
+            "options": {},
+            "result_path": "/tmp/plato-phase1b-review/runtime313/test_real_two_client_cpu_socke0/round/result.json",
+            "result_sha256": "495a5dbf1a26546ef574f62645af03039ad2d225823cda88df4733304d259e50",
+            "elapsed_seconds": 14.650030415970832,
+            "returncode": 0,
+            "deadline_exceeded": false,
+            "watchdog_actions": [],
+            "live_survivors": [],
+            "markers": {
+              "fresh_process": 1,
+              "child_started": 2,
+              "server_baseline": 1,
+              "server_received": 2,
+              "server_aggregate": 1,
+              "server_close_started": 1,
+              "local_data": 2,
+              "client_baseline": 2,
+              "client_trained": 2,
+              "child_returned": 2
+            },
+            "caller_errors": [],
+            "loops_after": [],
+            "entered_stages": [],
+            "original_failures": []
+          },
+          {
+            "case": "client_lifecycle",
+            "options": {
+              "absent": true,
+              "repeat": true
+            },
+            "result_path": "/tmp/plato-phase1b-review/runtime313/test_repeated_owned_client_ent0/client/result.json",
+            "result_sha256": "fba810e4f15635692425a56ed0be9e88de8d05accb76d0abf6679a9c93abf764",
+            "elapsed_seconds": 4.533441415987909,
+            "returncode": 0,
+            "deadline_exceeded": false,
+            "watchdog_actions": [],
+            "live_survivors": [],
+            "markers": {
+              "fresh_process": 1,
+              "client_configure": 2,
+              "client_body": 2,
+              "executor_entered": 2,
+              "task_finalizer_entered": 2,
+              "executor_finished": 2,
+              "task_finalized": 2,
+              "generator_finalizer_entered": 2,
+              "generator_finalized": 2,
+              "returned": 1,
+              "loop_after": 2
+            },
+            "caller_errors": [],
+            "loops_after": [
+              {
+                "event": "loop_after",
+                "pid": 15611,
+                "closed": true
+              },
+              {
+                "event": "loop_after",
+                "pid": 15611,
+                "closed": true
+              }
+            ],
+            "entered_stages": [
+              "executor_entered",
+              "task_finalizer_entered",
+              "generator_finalizer_entered",
+              "executor_entered",
+              "task_finalizer_entered",
+              "generator_finalizer_entered"
+            ],
+            "original_failures": []
+          },
+          {
+            "case": "client_lifecycle",
+            "options": {
+              "absent": true,
+              "fail": true,
+              "cleanup_fail": true
+            },
+            "result_path": "/tmp/plato-phase1b-review/runtime313/test_runner_cleanup_error_keep0/cleanup/result.json",
+            "result_sha256": "74a799b5a6963a11714666138f713253da5ee20f01caa43ce3184898fe8ea868",
+            "elapsed_seconds": 4.64622591692023,
+            "returncode": 1,
+            "deadline_exceeded": false,
+            "watchdog_actions": [],
+            "live_survivors": [],
+            "markers": {
+              "fresh_process": 1,
+              "client_configure": 1,
+              "client_body": 1,
+              "executor_entered": 1,
+              "original_failure": 1,
+              "task_finalizer_entered": 1,
+              "task_finalized": 1,
+              "executor_finished": 1,
+              "caller_error": 1,
+              "loop_after": 1
+            },
+            "caller_errors": [
+              {
+                "event": "caller_error",
+                "pid": 15642,
+                "type": "SentinelError",
+                "message": "client-sentinel",
+                "notes": [
+                  "Plato startup also failed (loop): SentinelError('runner-cleanup-sentinel')"
+                ]
+              }
+            ],
+            "loops_after": [
+              {
+                "event": "loop_after",
+                "pid": 15642,
+                "closed": true
+              }
+            ],
+            "entered_stages": [
+              "executor_entered",
+              "task_finalizer_entered"
+            ],
+            "original_failures": [
+              {
+                "event": "original_failure",
+                "pid": 15642,
+                "message": "client-sentinel"
+              }
+            ]
+          },
+          {
+            "case": "running",
+            "options": {},
+            "result_path": "/tmp/plato-phase1b-review/runtime313/test_running_loop_rejected_bef0/running/result.json",
+            "result_sha256": "a455ae18063c6dd6f64aab0c882858dc3a56f90c5f90ef2e798010b6dc4f239a",
+            "elapsed_seconds": 4.4871718341019005,
+            "returncode": 0,
+            "deadline_exceeded": false,
+            "watchdog_actions": [],
+            "live_survivors": [],
+            "markers": {
+              "fresh_process": 1,
+              "running_rejected": 3,
+              "returned": 1
+            },
+            "caller_errors": [],
+            "loops_after": [],
+            "entered_stages": [],
+            "original_failures": []
+          },
+          {
+            "case": "ordinary",
+            "options": {
+              "absent": true,
+              "real": true,
+              "startup_fail": true,
+              "secondary": true
+            },
+            "result_path": "/tmp/plato-phase1b-review/runtime313/test_server_error_precedence_a0/server/result.json",
+            "result_sha256": "6ecf8e27b64ab9c5157af619134c3b47629b3a40bcae038d404d951b3dbf45df",
+            "elapsed_seconds": 4.534335832810029,
+            "returncode": 1,
+            "deadline_exceeded": false,
+            "watchdog_actions": [],
+            "live_survivors": [],
+            "markers": {
+              "fresh_process": 1,
+              "server_construct": 1,
+              "server_configure": 1,
+              "server_start": 1,
+              "configure_queued_work": 1,
+              "periodic_body": 1,
+              "server_body": 1,
+              "original_failure": 1,
+              "secondary_failure": 1,
+              "task_finalizer_entered": 1,
+              "task_finalized": 1,
+              "caller_error": 1,
+              "loop_after": 1
+            },
+            "caller_errors": [
+              {
+                "event": "caller_error",
+                "pid": 15688,
+                "type": "SentinelError",
+                "message": "setup-sentinel",
+                "notes": [
+                  "Plato startup also failed (Task-2): SentinelError('periodic-finalizer')"
+                ]
+              }
+            ],
+            "loops_after": [
+              {
+                "event": "loop_after",
+                "pid": 15688,
+                "closed": true
+              }
+            ],
+            "entered_stages": [
+              "task_finalizer_entered"
+            ],
+            "original_failures": [
+              {
+                "event": "original_failure",
+                "pid": 15688,
+                "message": "setup-sentinel"
+              }
+            ]
+          },
+          {
+            "case": "ordinary",
+            "options": {
+              "absent": true,
+              "real": true,
+              "bind": true,
+              "secondary": true
+            },
+            "result_path": "/tmp/plato-phase1b-review/runtime313/test_server_error_precedence_a1/server/result.json",
+            "result_sha256": "128521122ba8687766b44befa57d6e9fb7ce3e92166bbe81a2e4ef904affb881",
+            "elapsed_seconds": 4.50870595802553,
+            "returncode": 1,
+            "deadline_exceeded": false,
+            "watchdog_actions": [],
+            "live_survivors": [],
+            "markers": {
+              "fresh_process": 1,
+              "server_construct": 1,
+              "server_configure": 1,
+              "server_start": 1,
+              "configure_queued_work": 1,
+              "periodic_body": 1,
+              "server_body": 1,
+              "secondary_failure": 1,
+              "task_finalizer_entered": 1,
+              "task_finalized": 1,
+              "caller_error": 1,
+              "loop_after": 1
+            },
+            "caller_errors": [
+              {
+                "event": "caller_error",
+                "pid": 15690,
+                "type": "OSError",
+                "message": "[Errno 48] error while attempting to bind on address ('127.0.0.1', 62333): [errno 48] address already in use",
+                "notes": [
+                  "Plato startup also failed (Task-2): SentinelError('periodic-finalizer')"
+                ]
+              }
+            ],
+            "loops_after": [
+              {
+                "event": "loop_after",
+                "pid": 15690,
+                "closed": true
+              }
+            ],
+            "entered_stages": [
+              "task_finalizer_entered"
+            ],
+            "original_failures": []
+          },
+          {
+            "case": "ordinary",
+            "options": {
+              "absent": true,
+              "real": true,
+              "fail": true
+            },
+            "result_path": "/tmp/plato-phase1b-review/runtime313/test_server_error_precedence_a2/server/result.json",
+            "result_sha256": "5b17f2d6514910c84c7ad3489fbb36f7e832479443e3e72061e62c8b0d48bd5a",
+            "elapsed_seconds": 4.470808499958366,
+            "returncode": 1,
+            "deadline_exceeded": false,
+            "watchdog_actions": [],
+            "live_survivors": [],
+            "markers": {
+              "fresh_process": 1,
+              "server_construct": 1,
+              "server_configure": 1,
+              "server_start": 1,
+              "configure_queued_work": 1,
+              "periodic_body": 1,
+              "server_body": 1,
+              "caller_error": 1,
+              "loop_after": 1
+            },
+            "caller_errors": [
+              {
+                "event": "caller_error",
+                "pid": 15692,
+                "type": "SentinelError",
+                "message": "periodic-sentinel",
+                "notes": []
+              }
+            ],
+            "loops_after": [
+              {
+                "event": "loop_after",
+                "pid": 15692,
+                "closed": true
+              }
+            ],
+            "entered_stages": [],
+            "original_failures": []
+          },
+          {
+            "case": "ordinary",
+            "options": {
+              "absent": true,
+              "start_fail": true,
+              "fail": true
+            },
+            "result_path": "/tmp/plato-phase1b-review/runtime313/test_server_error_precedence_a3/server/result.json",
+            "result_sha256": "db7ac8ccd116c3c9188717ce388b08b8bea52faa5c02bb2b73b08c1a61c04a1b",
+            "elapsed_seconds": 4.468275875085965,
+            "returncode": 1,
+            "deadline_exceeded": false,
+            "watchdog_actions": [],
+            "live_survivors": [],
+            "markers": {
+              "fresh_process": 1,
+              "server_construct": 1,
+              "server_configure": 1,
+              "server_start": 1,
+              "server_work": 1,
+              "configure_queued_work": 1,
+              "periodic_body": 1,
+              "caller_error": 1,
+              "loop_after": 1
+            },
+            "caller_errors": [
+              {
+                "event": "caller_error",
+                "pid": 15694,
+                "type": "SentinelError",
+                "message": "start-sentinel",
+                "notes": [
+                  "Plato startup also failed (Task-1): SentinelError('periodic-sentinel')"
+                ]
+              }
+            ],
+            "loops_after": [
+              {
+                "event": "loop_after",
+                "pid": 15694,
+                "closed": true
+              }
+            ],
+            "entered_stages": [],
+            "original_failures": []
+          },
+          {
+            "case": "ordinary",
+            "options": {
+              "absent": true,
+              "real": true,
+              "secondary": true
+            },
+            "result_path": "/tmp/plato-phase1b-review/runtime313/test_server_error_precedence_a4/server/result.json",
+            "result_sha256": "a074c462f9786df2174e746e61cc07d4c733b6f3b446a368f276159506ee8bdf",
+            "elapsed_seconds": 4.541073374915868,
+            "returncode": 1,
+            "deadline_exceeded": false,
+            "watchdog_actions": [],
+            "live_survivors": [],
+            "markers": {
+              "fresh_process": 1,
+              "server_construct": 1,
+              "server_configure": 1,
+              "server_start": 1,
+              "configure_queued_work": 1,
+              "periodic_body": 1,
+              "server_body": 1,
+              "secondary_failure": 1,
+              "task_finalizer_entered": 1,
+              "task_finalized": 1,
+              "caller_error": 1,
+              "loop_after": 1
+            },
+            "caller_errors": [
+              {
+                "event": "caller_error",
+                "pid": 15696,
+                "type": "SentinelError",
+                "message": "periodic-finalizer",
+                "notes": []
+              }
+            ],
+            "loops_after": [
+              {
+                "event": "loop_after",
+                "pid": 15696,
+                "closed": true
+              }
+            ],
+            "entered_stages": [
+              "task_finalizer_entered"
+            ],
+            "original_failures": []
+          }
+        ],
+        "command": "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=/private/tmp/plato-refresh-worktrees/startup OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 /tmp/plato-phase1b-startup/py313/bin/python -B -m pytest -q -p no:cacheprovider -c /private/tmp/plato-refresh-worktrees/startup/pyproject.toml /private/tmp/plato-refresh-worktrees/startup/tests/integration/test_event_loop_startup.py -k 'not noncooperative and not stalled_real' --basetemp=/tmp/plato-phase1b-review/runtime313 --junitxml=/tmp/plato-phase1b-review/runtime313.xml > /tmp/plato-phase1b-review/runtime313.log 2>&1",
+        "cwd": "/tmp/plato-phase1b-review",
+        "exit_code": 0
+      },
+      {
+        "group": "runtime314",
+        "tests": 43,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "elapsed_seconds": 227.537,
+        "junit_path": "/tmp/plato-phase1b-review/runtime314.xml",
+        "junit_sha256": "7e35355fc61b72400bc410f043de1ee03bb8da010a19044827e584042520590f",
+        "log_path": "/tmp/plato-phase1b-review/runtime314.log",
+        "log_sha256": "6c03c4e14123358a821cfc79d8f88e0764cd0282623731e7f01e7a3c494e31d3",
+        "records": [
+          {
+            "case": "edge_custom",
+            "options": {
+              "absent": true,
+              "real": true,
+              "fail": true
+            },
+            "result_path": "/tmp/plato-phase1b-review/runtime314/test_active_edge_failure_unwin0/edge/result.json",
+            "result_sha256": "e63f90ffcd856a78c1addad7da86eec5758efe2dab2c65f9e6d92baa6180d679",
+            "elapsed_seconds": 4.745557084213942,
+            "returncode": 1,
+            "deadline_exceeded": false,
+            "watchdog_actions": [],
+            "live_survivors": [],
+            "markers": {
+              "fresh_process": 1,
+              "server_construct": 1,
+              "server_configure": 1,
+              "client_configure": 1,
+              "server_start": 1,
+              "configure_queued_work": 1,
+              "client_body": 1,
+              "server_body": 1,
+              "caller_error": 1,
+              "loop_after": 1
+            },
+            "caller_errors": [
+              {
+                "event": "caller_error",
+                "pid": 15687,
+                "type": "SentinelError",
+                "message": "client-sentinel",
+                "notes": []
+              }
+            ],
+            "loops_after": [
+              {
+                "event": "loop_after",
+                "pid": 15687,
+                "closed": true
+              }
+            ],
+            "entered_stages": [],
+            "original_failures": []
+          },
+          {
+            "case": "client_custom",
+            "options": {
+              "fail": true
+            },
+            "result_path": "/tmp/plato-phase1b-review/runtime314/test_active_failure_reaches_sy0/client_custom/result.json",
+            "result_sha256": "bd135767c0c4a9b075139fc2a922a614e7f1f333045b709d714d10b838a59e4b",
+            "elapsed_seconds": 4.766675458056852,
+            "returncode": 1,
+            "deadline_exceeded": false,
+            "watchdog_actions": [],
+            "live_survivors": [],
+            "markers": {
+              "fresh_process": 1,
+              "client_configure": 1,
+              "client_body": 1,
+              "caller_error": 1,
+              "loop_after": 1
+            },
+            "caller_errors": [
+              {
+                "event": "caller_error",
+                "pid": 15587,
+                "type": "SentinelError",
+                "message": "client-sentinel",
+                "notes": []
+              }
+            ],
+            "loops_after": [
+              {
+                "event": "loop_after",
+                "pid": 15587,
+                "closed": true
+              }
+            ],
+            "entered_stages": [],
+            "original_failures": []
+          },
+          {
+            "case": "ordinary",
+            "options": {
+              "fail": true
+            },
+            "result_path": "/tmp/plato-phase1b-review/runtime314/test_active_failure_reaches_sy1/ordinary/result.json",
+            "result_sha256": "ae32274e3c5b4e4f8bbd24931bd69519858c8296cf7897709321120d5107a30b",
+            "elapsed_seconds": 4.728382665896788,
+            "returncode": 1,
+            "deadline_exceeded": false,
+            "watchdog_actions": [],
+            "live_survivors": [],
+            "markers": {
+              "fresh_process": 1,
+              "server_construct": 1,
+              "server_configure": 1,
+              "server_start": 1,
+              "server_work": 1,
+              "configure_queued_work": 1,
+              "periodic_body": 1,
+              "caller_error": 1,
+              "loop_after": 1
+            },
+            "caller_errors": [
+              {
+                "event": "caller_error",
+                "pid": 15590,
+                "type": "SentinelError",
+                "message": "periodic-sentinel",
+                "notes": []
+              }
+            ],
+            "loops_after": [
+              {
+                "event": "loop_after",
+                "pid": 15590,
+                "closed": true
+              }
+            ],
+            "entered_stages": [],
+            "original_failures": []
+          },
+          {
+            "case": "central",
+            "options": {
+              "fail": true
+            },
+            "result_path": "/tmp/plato-phase1b-review/runtime314/test_active_failure_reaches_sy2/central/result.json",
+            "result_sha256": "c4905a4dc662c24dce6236274c1444a6b43eeaa4bc0733f3db7df9dd600258c1",
+            "elapsed_seconds": 4.737294542137533,
+            "returncode": 1,
+            "deadline_exceeded": false,
+            "watchdog_actions": [],
+            "live_survivors": [],
+            "markers": {
+              "fresh_process": 1,
+              "server_construct": 1,
+              "server_configure": 1,
+              "launch": 1,
+              "server_start": 1,
+              "server_work": 1,
+              "configure_queued_work": 1,
+              "periodic_body": 1,
+              "caller_error": 1,
+              "loop_after": 1
+            },
+            "caller_errors": [
+              {
+                "event": "caller_error",
+                "pid": 15592,
+                "type": "SentinelError",
+                "message": "periodic-sentinel",
+                "notes": []
+              }
+            ],
+            "loops_after": [
+              {
+                "event": "loop_after",
+                "pid": 15592,
+                "closed": true
+              }
+            ],
+            "entered_stages": [],
+            "original_failures": []
+          },
+          {
+            "case": "edge_custom",
+            "options": {
+              "fail": true
+            },
+            "result_path": "/tmp/plato-phase1b-review/runtime314/test_active_failure_reaches_sy3/edge_custom/result.json",
+            "result_sha256": "0da28067cb64981eabc5b6841320dd1fb68cdc3479b0977b4a52b27b56a5e0a8",
+            "elapsed_seconds": 4.721917500020936,
+            "returncode": 1,
+            "deadline_exceeded": false,
+            "watchdog_actions": [],
+            "live_survivors": [],
+            "markers": {
+              "fresh_process": 1,
+              "server_construct": 1,
+              "server_configure": 1,
+              "client_configure": 1,
+              "server_start": 1,
+              "server_work": 1,
+              "configure_queued_work": 1,
+              "client_body": 1,
+              "caller_error": 1,
+              "loop_after": 1
+            },
+            "caller_errors": [
+              {
+                "event": "caller_error",
+                "pid": 15598,
+                "type": "SentinelError",
+                "message": "client-sentinel",
+                "notes": []
+              }
+            ],
+            "loops_after": [
+              {
+                "event": "loop_after",
+                "pid": 15598,
+                "closed": true
+              }
+            ],
+            "entered_stages": [],
+            "original_failures": []
+          },
+          {
+            "case": "ordinary",
+            "options": {
+              "absent": true,
+              "self_cancel": true
+            },
+            "result_path": "/tmp/plato-phase1b-review/runtime314/test_cancellation_already_fina0/cancelling/result.json",
+            "result_sha256": "b5055b9635367a8aa99c7ce79808d7ea8b5b7f7b3ccc857ecc6b427f350f82e8",
+            "elapsed_seconds": 4.925442125182599,
+            "returncode": 0,
+            "deadline_exceeded": false,
+            "watchdog_actions": [],
+            "live_survivors": [],
+            "markers": {
+              "fresh_process": 1,
+              "server_construct": 1,
+              "server_configure": 1,
+              "server_start": 1,
+              "server_work": 1,
+              "configure_queued_work": 1,
+              "periodic_body": 1,
+              "task_finalizer_entered": 1,
+              "task_finalized": 1,
+              "returned": 1,
+              "loop_after": 1
+            },
+            "caller_errors": [],
+            "loops_after": [
+              {
+                "event": "loop_after",
+                "pid": 15646,
+                "closed": true
+              }
+            ],
+            "entered_stages": [
+              "task_finalizer_entered"
+            ],
+            "original_failures": []
+          },
+          {
+            "case": "client_lifecycle",
+            "options": {
+              "absent": true,
+              "control": "interrupt"
+            },
+            "result_path": "/tmp/plato-phase1b-review/runtime314/test_client_control_flow_keeps0/interrupt/result.json",
+            "result_sha256": "90523aa01a6a22cbc20193a23d15f41403dd5075278aa59ac1ea160ddf1852b6",
+            "elapsed_seconds": 4.755212750053033,
+            "returncode": -2,
+            "deadline_exceeded": false,
+            "watchdog_actions": [],
+            "live_survivors": [],
+            "markers": {
+              "fresh_process": 1,
+              "client_configure": 1,
+              "client_body": 1,
+              "executor_entered": 1,
+              "task_finalizer_entered": 1,
+              "task_finalized": 1,
+              "executor_finished": 1,
+              "generator_finalizer_entered": 1,
+              "generator_finalized": 1,
+              "caller_error": 1,
+              "loop_after": 1
+            },
+            "caller_errors": [
+              {
+                "event": "caller_error",
+                "pid": 15680,
+                "type": "KeyboardInterrupt",
+                "message": "",
+                "notes": []
+              }
+            ],
+            "loops_after": [
+              {
+                "event": "loop_after",
+                "pid": 15680,
+                "closed": true
+              }
+            ],
+            "entered_stages": [
+              "executor_entered",
+              "task_finalizer_entered",
+              "generator_finalizer_entered"
+            ],
+            "original_failures": []
+          },
+          {
+            "case": "client_lifecycle",
+            "options": {
+              "absent": true,
+              "control": "exit"
+            },
+            "result_path": "/tmp/plato-phase1b-review/runtime314/test_client_control_flow_keeps1/exit/result.json",
+            "result_sha256": "459593cdeea2bc2d687a20c2de40099077c7b679e758ac699873765e90cf2082",
+            "elapsed_seconds": 4.782466874923557,
+            "returncode": 7,
+            "deadline_exceeded": false,
+            "watchdog_actions": [],
+            "live_survivors": [],
+            "markers": {
+              "fresh_process": 1,
+              "client_configure": 1,
+              "client_body": 1,
+              "executor_entered": 1,
+              "task_finalizer_entered": 1,
+              "task_finalized": 1,
+              "generator_finalizer_entered": 1,
+              "executor_finished": 1,
+              "generator_finalized": 1,
+              "caller_error": 1,
+              "loop_after": 1
+            },
+            "caller_errors": [
+              {
+                "event": "caller_error",
+                "pid": 15683,
+                "type": "SystemExit",
+                "message": "7",
+                "notes": []
+              }
+            ],
+            "loops_after": [
+              {
+                "event": "loop_after",
+                "pid": 15683,
+                "closed": true
+              }
+            ],
+            "entered_stages": [
+              "executor_entered",
+              "task_finalizer_entered",
+              "generator_finalizer_entered"
+            ],
+            "original_failures": []
+          },
+          {
+            "case": "client_custom",
+            "options": {
+              "closed": true
+            },
+            "result_path": "/tmp/plato-phase1b-review/runtime314/test_closed_current_client_loo0/closed/result.json",
+            "result_sha256": "1b37ab49cedcc2f002b8c8089a4c207b70b57ab2c7abee30463435d233600ce8",
+            "elapsed_seconds": 4.7471812919247895,
+            "returncode": 0,
+            "deadline_exceeded": false,
+            "watchdog_actions": [],
+            "live_survivors": [],
+            "markers": {
+              "fresh_process": 1,
+              "client_configure": 1,
+              "client_body": 1,
+              "returned": 1,
+              "loop_after": 1
+            },
+            "caller_errors": [],
+            "loops_after": [
+              {
+                "event": "loop_after",
+                "pid": 15625,
+                "closed": true
+              }
+            ],
+            "entered_stages": [],
+            "original_failures": []
+          },
+          {
+            "case": "client_lifecycle",
+            "options": {
+              "absent": true,
+              "configure_fail": true
+            },
+            "result_path": "/tmp/plato-phase1b-review/runtime314/test_configure_failure_is_pres0/configure/result.json",
+            "result_sha256": "cb1632f5c38b93ca04667164af1ca60824391dc4f549cd55c9803bb79382809b",
+            "elapsed_seconds": 4.961555290967226,
+            "returncode": 1,
+            "deadline_exceeded": false,
+            "watchdog_actions": [],
+            "live_survivors": [],
+            "markers": {
+              "fresh_process": 1,
+              "client_configure": 1,
+              "caller_error": 1,
+              "loop_after": 1
+            },
+            "caller_errors": [
+              {
+                "event": "caller_error",
+                "pid": 15676,
+                "type": "SentinelError",
+                "message": "configure-sentinel",
+                "notes": []
+              }
+            ],
+            "loops_after": [
+              {
+                "event": "loop_after",
+                "pid": 15676,
+                "closed": true
+              }
+            ],
+            "entered_stages": [],
+            "original_failures": []
+          },
+          {
+            "case": "ordinary",
+            "options": {
+              "borrowed": true,
+              "real": true
+            },
+            "result_path": "/tmp/plato-phase1b-review/runtime314/test_delegating_server_consume0/delegated/result.json",
+            "result_sha256": "c8480d6ccfa39de211513c19f8f23d1e861b5189ada0ee0379023097d741d82c",
+            "elapsed_seconds": 4.828602583147585,
+            "returncode": 0,
+            "deadline_exceeded": false,
+            "watchdog_actions": [],
+            "live_survivors": [],
+            "markers": {
+              "fresh_process": 1,
+              "server_construct": 1,
+              "server_configure": 1,
+              "server_start": 1,
+              "configure_queued_work": 1,
+              "periodic_body": 1,
+              "server_body": 1,
+              "borrowed_consumed": 1,
+              "returned": 1,
+              "loop_after": 1
+            },
+            "caller_errors": [],
+            "loops_after": [
+              {
+                "event": "loop_after",
+                "pid": 15636,
+                "closed": true
+              }
+            ],
+            "entered_stages": [],
+            "original_failures": []
+          },
+          {
+            "case": "edge_custom",
+            "options": {
+              "absent": true,
+              "real": true,
+              "startup_fail": true,
+              "secondary": true
+            },
+            "result_path": "/tmp/plato-phase1b-review/runtime314/test_edge_cancellation_error_k0/edge/result.json",
+            "result_sha256": "d80d112422d0081fe736352202dd2a77b6c2134aa7e132c3e3c953d74254d3ca",
+            "elapsed_seconds": 4.787357416935265,
+            "returncode": 1,
+            "deadline_exceeded": false,
+            "watchdog_actions": [],
+            "live_survivors": [],
+            "markers": {
+              "fresh_process": 1,
+              "server_construct": 1,
+              "server_configure": 1,
+              "client_configure": 1,
+              "server_start": 1,
+              "configure_queued_work": 1,
+              "client_body": 1,
+              "server_body": 1,
+              "original_failure": 1,
+              "task_finalizer_entered": 1,
+              "secondary_failure": 1,
+              "task_finalized": 1,
+              "caller_error": 1,
+              "loop_after": 1
+            },
+            "caller_errors": [
+              {
+                "event": "caller_error",
+                "pid": 15689,
+                "type": "SentinelError",
+                "message": "setup-sentinel",
+                "notes": [
+                  "Plato startup also failed (Task-2): SentinelError('client-finalizer')"
+                ]
+              }
+            ],
+            "loops_after": [
+              {
+                "event": "loop_after",
+                "pid": 15689,
+                "closed": true
+              }
+            ],
+            "entered_stages": [
+              "task_finalizer_entered"
+            ],
+            "original_failures": [
+              {
+                "event": "original_failure",
+                "pid": 15689,
+                "message": "setup-sentinel"
+              }
+            ]
+          },
+          {
+            "case": "ordinary",
+            "options": {
+              "absent": true
+            },
+            "result_path": "/tmp/plato-phase1b-review/runtime314/test_explicitly_absent_loop_on0/ordinary/result.json",
+            "result_sha256": "ce63de61f8195c8edd87a45200ca0eeff4affeeab52c7fe3b63d231b143fa3f7",
+            "elapsed_seconds": 4.792555999942124,
+            "returncode": 0,
+            "deadline_exceeded": false,
+            "watchdog_actions": [],
+            "live_survivors": [],
+            "markers": {
+              "fresh_process": 1,
+              "server_construct": 1,
+              "server_configure": 1,
+              "server_start": 1,
+              "server_work": 1,
+              "configure_queued_work": 1,
+              "periodic_body": 1,
+              "returned": 1,
+              "loop_after": 1
+            },
+            "caller_errors": [],
+            "loops_after": [
+              {
+                "event": "loop_after",
+                "pid": 15616,
+                "closed": true
+              }
+            ],
+            "entered_stages": [],
+            "original_failures": []
+          },
+          {
+            "case": "central",
+            "options": {
+              "absent": true
+            },
+            "result_path": "/tmp/plato-phase1b-review/runtime314/test_explicitly_absent_loop_on1/central/result.json",
+            "result_sha256": "f9d45697422147550db9ecb1eb46b165c5eed7aae5f50cf5ef00ac7e3a0cbd87",
+            "elapsed_seconds": 4.812836625147611,
+            "returncode": 0,
+            "deadline_exceeded": false,
+            "watchdog_actions": [],
+            "live_survivors": [],
+            "markers": {
+              "fresh_process": 1,
+              "server_construct": 1,
+              "server_configure": 1,
+              "launch": 1,
+              "server_start": 1,
+              "server_work": 1,
+              "configure_queued_work": 1,
+              "periodic_body": 1,
+              "returned": 1,
+              "loop_after": 1
+            },
+            "caller_errors": [],
+            "loops_after": [
+              {
+                "event": "loop_after",
+                "pid": 15619,
+                "closed": true
+              }
+            ],
+            "entered_stages": [],
+            "original_failures": []
+          },
+          {
+            "case": "edge_default",
+            "options": {
+              "absent": true
+            },
+            "result_path": "/tmp/plato-phase1b-review/runtime314/test_explicitly_absent_loop_on2/edge_default/result.json",
+            "result_sha256": "b8b90c9958bf9ab6897c5b359c9fb90a6827a4d5bb40d2ebdf3341eaeeaf0a91",
+            "elapsed_seconds": 4.753125541843474,
+            "returncode": 0,
+            "deadline_exceeded": false,
+            "watchdog_actions": [],
+            "live_survivors": [],
+            "markers": {
+              "fresh_process": 1,
+              "server_construct": 1,
+              "server_configure": 1,
+              "client_configure": 1,
+              "server_start": 1,
+              "server_work": 1,
+              "configure_queued_work": 1,
+              "client_body": 1,
+              "returned": 1,
+              "loop_after": 1
+            },
+            "caller_errors": [],
+            "loops_after": [
+              {
+                "event": "loop_after",
+                "pid": 15621,
+                "closed": true
+              }
+            ],
+            "entered_stages": [],
+            "original_failures": []
+          },
+          {
+            "case": "edge_custom",
+            "options": {
+              "absent": true
+            },
+            "result_path": "/tmp/plato-phase1b-review/runtime314/test_explicitly_absent_loop_on3/edge_custom/result.json",
+            "result_sha256": "fb05c61aff50db3dc21495208d086d5af53b2ece6682a069123871fc9ef3bad7",
+            "elapsed_seconds": 4.759926707949489,
+            "returncode": 0,
+            "deadline_exceeded": false,
+            "watchdog_actions": [],
+            "live_survivors": [],
+            "markers": {
+              "fresh_process": 1,
+              "server_construct": 1,
+              "server_configure": 1,
+              "client_configure": 1,
+              "server_start": 1,
+              "server_work": 1,
+              "configure_queued_work": 1,
+              "client_body": 1,
+              "returned": 1,
+              "loop_after": 1
+            },
+            "caller_errors": [],
+            "loops_after": [
+              {
+                "event": "loop_after",
+                "pid": 15623,
+                "closed": true
+              }
+            ],
+            "entered_stages": [],
+            "original_failures": []
+          },
+          {
+            "case": "client_default",
+            "options": {},
+            "result_path": "/tmp/plato-phase1b-review/runtime314/test_fresh_entrypoint_executes0/client_default/result.json",
+            "result_sha256": "0df719896131389c373b5cd6c62b4a276fc141a11a4f2b8d8b29ffd7b8eefbec",
+            "elapsed_seconds": 5.005659916903824,
+            "returncode": 0,
+            "deadline_exceeded": false,
+            "watchdog_actions": [],
+            "live_survivors": [],
+            "markers": {
+              "fresh_process": 1,
+              "client_configure": 1,
+              "client_body": 1,
+              "returned": 1,
+              "loop_after": 1
+            },
+            "caller_errors": [],
+            "loops_after": [
+              {
+                "event": "loop_after",
+                "pid": 15566,
+                "closed": true
+              }
+            ],
+            "entered_stages": [],
+            "original_failures": []
+          },
+          {
+            "case": "client_custom",
+            "options": {},
+            "result_path": "/tmp/plato-phase1b-review/runtime314/test_fresh_entrypoint_executes1/client_custom/result.json",
+            "result_sha256": "a7a8f1493a2ffb9488f761209a5fa3a4c1c81570a2c0706691bb8510b3062aeb",
+            "elapsed_seconds": 4.7282682079821825,
+            "returncode": 0,
+            "deadline_exceeded": false,
+            "watchdog_actions": [],
+            "live_survivors": [],
+            "markers": {
+              "fresh_process": 1,
+              "client_configure": 1,
+              "client_body": 1,
+              "returned": 1,
+              "loop_after": 1
+            },
+            "caller_errors": [],
+            "loops_after": [
+              {
+                "event": "loop_after",
+                "pid": 15568,
+                "closed": true
+              }
+            ],
+            "entered_stages": [],
+            "original_failures": []
+          },
+          {
+            "case": "ordinary",
+            "options": {},
+            "result_path": "/tmp/plato-phase1b-review/runtime314/test_fresh_entrypoint_executes2/ordinary/result.json",
+            "result_sha256": "8abd320905b3d7c2206d13f708acdb70cb86e58e8a2b09df68f01afb8256b173",
+            "elapsed_seconds": 4.738077332964167,
+            "returncode": 0,
+            "deadline_exceeded": false,
+            "watchdog_actions": [],
+            "live_survivors": [],
+            "markers": {
+              "fresh_process": 1,
+              "server_construct": 1,
+              "server_configure": 1,
+              "server_start": 1,
+              "server_work": 1,
+              "configure_queued_work": 1,
+              "periodic_body": 1,
+              "returned": 1,
+              "loop_after": 1
+            },
+            "caller_errors": [],
+            "loops_after": [
+              {
+                "event": "loop_after",
+                "pid": 15570,
+                "closed": true
+              }
+            ],
+            "entered_stages": [],
+            "original_failures": []
+          },
+          {
+            "case": "central",
+            "options": {},
+            "result_path": "/tmp/plato-phase1b-review/runtime314/test_fresh_entrypoint_executes3/central/result.json",
+            "result_sha256": "50a12ff2980b30ad296e6de5849b81d40bfee5e6fbf9f33d45ba604cabdc7eb9",
+            "elapsed_seconds": 4.749983625020832,
+            "returncode": 0,
+            "deadline_exceeded": false,
+            "watchdog_actions": [],
+            "live_survivors": [],
+            "markers": {
+              "fresh_process": 1,
+              "server_construct": 1,
+              "server_configure": 1,
+              "launch": 1,
+              "server_start": 1,
+              "server_work": 1,
+              "configure_queued_work": 1,
+              "periodic_body": 1,
+              "returned": 1,
+              "loop_after": 1
+            },
+            "caller_errors": [],
+            "loops_after": [
+              {
+                "event": "loop_after",
+                "pid": 15578,
+                "closed": true
+              }
+            ],
+            "entered_stages": [],
+            "original_failures": []
+          },
+          {
+            "case": "direct",
+            "options": {},
+            "result_path": "/tmp/plato-phase1b-review/runtime314/test_fresh_entrypoint_executes4/direct/result.json",
+            "result_sha256": "7d6bc9a07476048eb015fa67df11ca8ab06fa2f213646e61ab790f9e3fc056b5",
+            "elapsed_seconds": 4.80282241711393,
+            "returncode": 0,
+            "deadline_exceeded": false,
+            "watchdog_actions": [],
+            "live_survivors": [],
+            "markers": {
+              "fresh_process": 1,
+              "server_construct": 1,
+              "server_start": 1,
+              "server_body": 1,
+              "returned": 1,
+              "loop_after": 1
+            },
+            "caller_errors": [],
+            "loops_after": [
+              {
+                "event": "loop_after",
+                "pid": 15580,
+                "closed": true
+              }
+            ],
+            "entered_stages": [],
+            "original_failures": []
+          },
+          {
+            "case": "edge_default",
+            "options": {},
+            "result_path": "/tmp/plato-phase1b-review/runtime314/test_fresh_entrypoint_executes5/edge_default/result.json",
+            "result_sha256": "e6ad07354b069f42e4959cfc41f917cdadb809b8fa26ffd2c2e9e0bc7ab68c71",
+            "elapsed_seconds": 4.75877020903863,
+            "returncode": 0,
+            "deadline_exceeded": false,
+            "watchdog_actions": [],
+            "live_survivors": [],
+            "markers": {
+              "fresh_process": 1,
+              "server_construct": 1,
+              "server_configure": 1,
+              "client_configure": 1,
+              "server_start": 1,
+              "server_work": 1,
+              "configure_queued_work": 1,
+              "client_body": 1,
+              "returned": 1,
+              "loop_after": 1
+            },
+            "caller_errors": [],
+            "loops_after": [
+              {
+                "event": "loop_after",
+                "pid": 15582,
+                "closed": true
+              }
+            ],
+            "entered_stages": [],
+            "original_failures": []
+          },
+          {
+            "case": "edge_custom",
+            "options": {},
+            "result_path": "/tmp/plato-phase1b-review/runtime314/test_fresh_entrypoint_executes6/edge_custom/result.json",
+            "result_sha256": "00d01a02eee60542d433e5a00463b04399493b437b287dd9c08e8e3d946bd763",
+            "elapsed_seconds": 4.870557166868821,
+            "returncode": 0,
+            "deadline_exceeded": false,
+            "watchdog_actions": [],
+            "live_survivors": [],
+            "markers": {
+              "fresh_process": 1,
+              "server_construct": 1,
+              "server_configure": 1,
+              "client_configure": 1,
+              "server_start": 1,
+              "server_work": 1,
+              "configure_queued_work": 1,
+              "client_body": 1,
+              "returned": 1,
+              "loop_after": 1
+            },
+            "caller_errors": [],
+            "loops_after": [
+              {
+                "event": "loop_after",
+                "pid": 15584,
+                "closed": true
+              }
+            ],
+            "entered_stages": [],
+            "original_failures": []
+          },
+          {
+            "case": "ordinary",
+            "options": {
+              "absent": true,
+              "fail": true,
+              "same_message_error": true
+            },
+            "result_path": "/tmp/plato-phase1b-review/runtime314/test_independent_runtime_error0/independent/result.json",
+            "result_sha256": "353488cf9a6d2eb6951526eac136a82491af2e79dd5c9f0021dafbfac75f45f6",
+            "elapsed_seconds": 4.751126792049035,
+            "returncode": 1,
+            "deadline_exceeded": false,
+            "watchdog_actions": [],
+            "live_survivors": [],
+            "markers": {
+              "fresh_process": 1,
+              "server_construct": 1,
+              "server_configure": 1,
+              "server_start": 1,
+              "server_work": 1,
+              "configure_queued_work": 1,
+              "periodic_body": 1,
+              "caller_error": 1,
+              "loop_after": 1
+            },
+            "caller_errors": [
+              {
+                "event": "caller_error",
+                "pid": 15691,
+                "type": "RuntimeError",
+                "message": "Event loop stopped before Future completed.",
+                "notes": [
+                  "Plato startup also failed (Task-1): SentinelError('periodic-sentinel')"
+                ]
+              }
+            ],
+            "loops_after": [
+              {
+                "event": "loop_after",
+                "pid": 15691,
+                "closed": true
+              }
+            ],
+            "entered_stages": [],
+            "original_failures": []
+          },
+          {
+            "case": "edge_custom",
+            "options": {
+              "absent": true,
+              "missing_client": true
+            },
+            "result_path": "/tmp/plato-phase1b-review/runtime314/test_missing_external_edge_cli0/edge/result.json",
+            "result_sha256": "2f9d8c5ba0bb08fada40c3ee6d07b0a32782c1cd22f414839bde5edabd6e5d80",
+            "elapsed_seconds": 4.811391249997541,
+            "returncode": 1,
+            "deadline_exceeded": false,
+            "watchdog_actions": [],
+            "live_survivors": [],
+            "markers": {
+              "fresh_process": 1,
+              "server_construct": 1,
+              "caller_error": 1
+            },
+            "caller_errors": [
+              {
+                "event": "caller_error",
+                "pid": 15678,
+                "type": "ValueError",
+                "message": "edge_client must be provided when edge_server is set.",
+                "notes": []
+              }
+            ],
+            "loops_after": [],
+            "entered_stages": [],
+            "original_failures": []
+          },
+          {
+            "case": "client_lifecycle",
+            "options": {
+              "absent": true,
+              "fail": false
+            },
+            "result_path": "/tmp/plato-phase1b-review/runtime314/test_owned_client_finalizes_ta0/client/result.json",
+            "result_sha256": "b354429a0088403ca92f5fbbb9e8a5f201c9a8561b61f7a597b53f07e094bd34",
+            "elapsed_seconds": 4.761155207874253,
+            "returncode": 0,
+            "deadline_exceeded": false,
+            "watchdog_actions": [],
+            "live_survivors": [],
+            "markers": {
+              "fresh_process": 1,
+              "client_configure": 1,
+              "client_body": 1,
+              "executor_entered": 1,
+              "task_finalizer_entered": 1,
+              "task_finalized": 1,
+              "generator_finalizer_entered": 1,
+              "executor_finished": 1,
+              "generator_finalized": 1,
+              "returned": 1,
+              "loop_after": 1
+            },
+            "caller_errors": [],
+            "loops_after": [
+              {
+                "event": "loop_after",
+                "pid": 15610,
+                "closed": true
+              }
+            ],
+            "entered_stages": [
+              "executor_entered",
+              "task_finalizer_entered",
+              "generator_finalizer_entered"
+            ],
+            "original_failures": []
+          },
+          {
+            "case": "client_lifecycle",
+            "options": {
+              "absent": true,
+              "fail": true
+            },
+            "result_path": "/tmp/plato-phase1b-review/runtime314/test_owned_client_finalizes_ta1/client/result.json",
+            "result_sha256": "780c907fcd149c45993a0edb29b41d1842a7253f970ab083ce2d2fde282160f8",
+            "elapsed_seconds": 4.749675458064303,
+            "returncode": 1,
+            "deadline_exceeded": false,
+            "watchdog_actions": [],
+            "live_survivors": [],
+            "markers": {
+              "fresh_process": 1,
+              "client_configure": 1,
+              "client_body": 1,
+              "executor_entered": 1,
+              "original_failure": 1,
+              "task_finalizer_entered": 1,
+              "task_finalized": 1,
+              "generator_finalizer_entered": 1,
+              "executor_finished": 1,
+              "generator_finalized": 1,
+              "caller_error": 1,
+              "loop_after": 1
+            },
+            "caller_errors": [
+              {
+                "event": "caller_error",
+                "pid": 15612,
+                "type": "SentinelError",
+                "message": "client-sentinel",
+                "notes": []
+              }
+            ],
+            "loops_after": [
+              {
+                "event": "loop_after",
+                "pid": 15612,
+                "closed": true
+              }
+            ],
+            "entered_stages": [
+              "executor_entered",
+              "task_finalizer_entered",
+              "generator_finalizer_entered"
+            ],
+            "original_failures": [
+              {
+                "event": "original_failure",
+                "pid": 15612,
+                "message": "client-sentinel"
+              }
+            ]
+          },
+          {
+            "case": "ordinary",
+            "options": {
+              "absent": true,
+              "fallback_resources": true,
+              "start_fail": false
+            },
+            "result_path": "/tmp/plato-phase1b-review/runtime314/test_owned_server_fallback_fin0/fallback/result.json",
+            "result_sha256": "c5b6b20a68a130463546528e35cbace82232c3f60005553ff13f015886263476",
+            "elapsed_seconds": 4.768636333057657,
+            "returncode": 0,
+            "deadline_exceeded": false,
+            "watchdog_actions": [],
+            "live_survivors": [],
+            "markers": {
+              "fresh_process": 1,
+              "server_construct": 1,
+              "server_configure": 1,
+              "executor_entered": 1,
+              "server_start": 1,
+              "server_work": 1,
+              "configure_queued_work": 1,
+              "periodic_body": 1,
+              "task_finalizer_entered": 1,
+              "task_finalized": 1,
+              "generator_finalizer_entered": 1,
+              "executor_finished": 1,
+              "generator_finalized": 1,
+              "returned": 1,
+              "loop_after": 1
+            },
+            "caller_errors": [],
+            "loops_after": [
+              {
+                "event": "loop_after",
+                "pid": 15638,
+                "closed": true
+              }
+            ],
+            "entered_stages": [
+              "executor_entered",
+              "task_finalizer_entered",
+              "generator_finalizer_entered"
+            ],
+            "original_failures": []
+          },
+          {
+            "case": "ordinary",
+            "options": {
+              "absent": true,
+              "fallback_resources": true,
+              "start_fail": true
+            },
+            "result_path": "/tmp/plato-phase1b-review/runtime314/test_owned_server_fallback_fin1/fallback/result.json",
+            "result_sha256": "aaa57d6b8f809e5180e5eb6608638b307925469459494bee9ced20bdb414889a",
+            "elapsed_seconds": 4.955500999931246,
+            "returncode": 1,
+            "deadline_exceeded": false,
+            "watchdog_actions": [],
+            "live_survivors": [],
+            "markers": {
+              "fresh_process": 1,
+              "server_construct": 1,
+              "server_configure": 1,
+              "executor_entered": 1,
+              "server_start": 1,
+              "server_work": 1,
+              "configure_queued_work": 1,
+              "periodic_body": 1,
+              "task_finalizer_entered": 1,
+              "task_finalized": 1,
+              "generator_finalizer_entered": 1,
+              "executor_finished": 1,
+              "generator_finalized": 1,
+              "caller_error": 1,
+              "loop_after": 1
+            },
+            "caller_errors": [
+              {
+                "event": "caller_error",
+                "pid": 15640,
+                "type": "SentinelError",
+                "message": "start-sentinel",
+                "notes": []
+              }
+            ],
+            "loops_after": [
+              {
+                "event": "loop_after",
+                "pid": 15640,
+                "closed": true
+              }
+            ],
+            "entered_stages": [
+              "executor_entered",
+              "task_finalizer_entered",
+              "generator_finalizer_entered"
+            ],
+            "original_failures": []
+          },
+          {
+            "case": "socket_failure",
+            "options": {},
+            "result_path": "/tmp/plato-phase1b-review/runtime314/test_post_launch_failure_keeps0/failure/result.json",
+            "result_sha256": "4a223839f0f4167409b8fbfb4ff14107129f2766cc5d7ef8dfe871b1a795c8c2",
+            "elapsed_seconds": 14.714802791830152,
+            "returncode": 1,
+            "deadline_exceeded": false,
+            "watchdog_actions": [],
+            "live_survivors": [],
+            "markers": {
+              "fresh_process": 1,
+              "child_started": 2,
+              "original_failure": 1,
+              "caller_error": 1,
+              "child_error": 2
+            },
+            "caller_errors": [
+              {
+                "event": "caller_error",
+                "pid": 15727,
+                "type": "SentinelError",
+                "message": "post-launch-sentinel",
+                "notes": []
+              }
+            ],
+            "loops_after": [],
+            "entered_stages": [],
+            "original_failures": [
+              {
+                "event": "original_failure",
+                "pid": 15727,
+                "message": "post-launch-sentinel"
+              }
+            ]
+          },
+          {
+            "case": "client_lifecycle",
+            "options": {
+              "borrowed": true,
+              "fail": false
+            },
+            "result_path": "/tmp/plato-phase1b-review/runtime314/test_preconstructed_borrowed_l0/client_lifecycle/result.json",
+            "result_sha256": "139091fcdfa45b488ebb53cf68d2a4c12cb48288f0573e7bc0217fd3397125bb",
+            "elapsed_seconds": 4.752620124956593,
+            "returncode": 0,
+            "deadline_exceeded": false,
+            "watchdog_actions": [],
+            "live_survivors": [],
+            "markers": {
+              "fresh_process": 1,
+              "client_configure": 1,
+              "client_body": 1,
+              "executor_entered": 1,
+              "borrowed_preserved": 1,
+              "task_finalizer_entered": 1,
+              "task_finalized": 1,
+              "generator_finalizer_entered": 1,
+              "executor_finished": 1,
+              "generator_finalized": 1,
+              "returned": 1,
+              "loop_after": 1
+            },
+            "caller_errors": [],
+            "loops_after": [
+              {
+                "event": "loop_after",
+                "pid": 15600,
+                "closed": false
+              }
+            ],
+            "entered_stages": [
+              "executor_entered",
+              "task_finalizer_entered",
+              "generator_finalizer_entered"
+            ],
+            "original_failures": []
+          },
+          {
+            "case": "client_lifecycle",
+            "options": {
+              "borrowed": true,
+              "fail": true
+            },
+            "result_path": "/tmp/plato-phase1b-review/runtime314/test_preconstructed_borrowed_l1/client_lifecycle/result.json",
+            "result_sha256": "e2704a542e3874a7801f9d9bd3d3403765de47c73d0864345f88d652c9a7d529",
+            "elapsed_seconds": 4.85523858317174,
+            "returncode": 1,
+            "deadline_exceeded": false,
+            "watchdog_actions": [],
+            "live_survivors": [],
+            "markers": {
+              "fresh_process": 1,
+              "client_configure": 1,
+              "client_body": 1,
+              "executor_entered": 1,
+              "original_failure": 1,
+              "borrowed_preserved": 1,
+              "task_finalizer_entered": 1,
+              "task_finalized": 1,
+              "generator_finalizer_entered": 1,
+              "executor_finished": 1,
+              "generator_finalized": 1,
+              "caller_error": 1,
+              "loop_after": 1
+            },
+            "caller_errors": [
+              {
+                "event": "caller_error",
+                "pid": 15602,
+                "type": "SentinelError",
+                "message": "client-sentinel",
+                "notes": []
+              }
+            ],
+            "loops_after": [
+              {
+                "event": "loop_after",
+                "pid": 15602,
+                "closed": false
+              }
+            ],
+            "entered_stages": [
+              "executor_entered",
+              "task_finalizer_entered",
+              "generator_finalizer_entered"
+            ],
+            "original_failures": [
+              {
+                "event": "original_failure",
+                "pid": 15602,
+                "message": "client-sentinel"
+              }
+            ]
+          },
+          {
+            "case": "ordinary",
+            "options": {
+              "borrowed": true,
+              "start_fail": false
+            },
+            "result_path": "/tmp/plato-phase1b-review/runtime314/test_preconstructed_borrowed_l2/ordinary/result.json",
+            "result_sha256": "03f1db136442fd18bccb17ef3741aafa3a860a10aeac19c0833aa1dcade780b6",
+            "elapsed_seconds": 4.897997084073722,
+            "returncode": 0,
+            "deadline_exceeded": false,
+            "watchdog_actions": [],
+            "live_survivors": [],
+            "markers": {
+              "fresh_process": 1,
+              "server_construct": 1,
+              "server_configure": 1,
+              "server_start": 1,
+              "server_work": 1,
+              "configure_queued_work": 1,
+              "periodic_body": 1,
+              "borrowed_preserved": 1,
+              "returned": 1,
+              "loop_after": 1
+            },
+            "caller_errors": [],
+            "loops_after": [
+              {
+                "event": "loop_after",
+                "pid": 15605,
+                "closed": false
+              }
+            ],
+            "entered_stages": [],
+            "original_failures": []
+          },
+          {
+            "case": "ordinary",
+            "options": {
+              "borrowed": true,
+              "start_fail": true
+            },
+            "result_path": "/tmp/plato-phase1b-review/runtime314/test_preconstructed_borrowed_l3/ordinary/result.json",
+            "result_sha256": "f184e8478dd4c70f36908ff003ff134ec4c38b6cc74f79c629229fcf3908a1a1",
+            "elapsed_seconds": 4.820869999937713,
+            "returncode": 1,
+            "deadline_exceeded": false,
+            "watchdog_actions": [],
+            "live_survivors": [],
+            "markers": {
+              "fresh_process": 1,
+              "server_construct": 1,
+              "server_configure": 1,
+              "server_start": 1,
+              "server_work": 1,
+              "configure_queued_work": 1,
+              "periodic_body": 1,
+              "borrowed_preserved": 1,
+              "caller_error": 1,
+              "loop_after": 1
+            },
+            "caller_errors": [
+              {
+                "event": "caller_error",
+                "pid": 15607,
+                "type": "SentinelError",
+                "message": "start-sentinel",
+                "notes": []
+              }
+            ],
+            "loops_after": [
+              {
+                "event": "loop_after",
+                "pid": 15607,
+                "closed": false
+              }
+            ],
+            "entered_stages": [],
+            "original_failures": []
+          },
+          {
+            "case": "socket_round",
+            "options": {},
+            "result_path": "/tmp/plato-phase1b-review/runtime314/test_real_two_client_cpu_socke0/round/result.json",
+            "result_sha256": "d0b6c7953c6630346410542b7f2f81158fa7acaf93917f87f43529cf6f9eb453",
+            "elapsed_seconds": 15.059836499858648,
+            "returncode": 0,
+            "deadline_exceeded": false,
+            "watchdog_actions": [],
+            "live_survivors": [],
+            "markers": {
+              "fresh_process": 1,
+              "child_started": 2,
+              "server_baseline": 1,
+              "server_received": 2,
+              "server_aggregate": 1,
+              "server_close_started": 1,
+              "local_data": 2,
+              "client_baseline": 2,
+              "client_trained": 2,
+              "child_returned": 2
+            },
+            "caller_errors": [],
+            "loops_after": [],
+            "entered_stages": [],
+            "original_failures": []
+          },
+          {
+            "case": "client_lifecycle",
+            "options": {
+              "absent": true,
+              "repeat": true
+            },
+            "result_path": "/tmp/plato-phase1b-review/runtime314/test_repeated_owned_client_ent0/client/result.json",
+            "result_sha256": "a22ef5c57babb71936d854f927802b50175cd51c99906dffd2819a66b24e8f59",
+            "elapsed_seconds": 4.788110167020932,
+            "returncode": 0,
+            "deadline_exceeded": false,
+            "watchdog_actions": [],
+            "live_survivors": [],
+            "markers": {
+              "fresh_process": 1,
+              "client_configure": 2,
+              "client_body": 2,
+              "executor_entered": 2,
+              "task_finalizer_entered": 2,
+              "task_finalized": 2,
+              "generator_finalizer_entered": 2,
+              "executor_finished": 2,
+              "generator_finalized": 2,
+              "returned": 1,
+              "loop_after": 2
+            },
+            "caller_errors": [],
+            "loops_after": [
+              {
+                "event": "loop_after",
+                "pid": 15614,
+                "closed": true
+              },
+              {
+                "event": "loop_after",
+                "pid": 15614,
+                "closed": true
+              }
+            ],
+            "entered_stages": [
+              "executor_entered",
+              "task_finalizer_entered",
+              "generator_finalizer_entered",
+              "executor_entered",
+              "task_finalizer_entered",
+              "generator_finalizer_entered"
+            ],
+            "original_failures": []
+          },
+          {
+            "case": "client_lifecycle",
+            "options": {
+              "absent": true,
+              "fail": true,
+              "cleanup_fail": true
+            },
+            "result_path": "/tmp/plato-phase1b-review/runtime314/test_runner_cleanup_error_keep0/cleanup/result.json",
+            "result_sha256": "d4ac0e177ae1c7d9f318eeb4e1f19f9eadaacf4a1e00fb40e79289eea0d46961",
+            "elapsed_seconds": 5.177637834101915,
+            "returncode": 1,
+            "deadline_exceeded": false,
+            "watchdog_actions": [],
+            "live_survivors": [],
+            "markers": {
+              "fresh_process": 1,
+              "client_configure": 1,
+              "client_body": 1,
+              "executor_entered": 1,
+              "original_failure": 1,
+              "task_finalizer_entered": 1,
+              "task_finalized": 1,
+              "caller_error": 1,
+              "loop_after": 1,
+              "executor_finished": 1
+            },
+            "caller_errors": [
+              {
+                "event": "caller_error",
+                "pid": 15654,
+                "type": "SentinelError",
+                "message": "client-sentinel",
+                "notes": [
+                  "Plato startup also failed (loop): SentinelError('runner-cleanup-sentinel')"
+                ]
+              }
+            ],
+            "loops_after": [
+              {
+                "event": "loop_after",
+                "pid": 15654,
+                "closed": true
+              }
+            ],
+            "entered_stages": [
+              "executor_entered",
+              "task_finalizer_entered"
+            ],
+            "original_failures": [
+              {
+                "event": "original_failure",
+                "pid": 15654,
+                "message": "client-sentinel"
+              }
+            ]
+          },
+          {
+            "case": "running",
+            "options": {},
+            "result_path": "/tmp/plato-phase1b-review/runtime314/test_running_loop_rejected_bef0/running/result.json",
+            "result_sha256": "5041c37e70e2a6a83ac75276ad61dbf7d4af8a957a21c461e7fddb7af8037ab0",
+            "elapsed_seconds": 4.720200625015423,
+            "returncode": 0,
+            "deadline_exceeded": false,
+            "watchdog_actions": [],
+            "live_survivors": [],
+            "markers": {
+              "fresh_process": 1,
+              "running_rejected": 3,
+              "returned": 1
+            },
+            "caller_errors": [],
+            "loops_after": [],
+            "entered_stages": [],
+            "original_failures": []
+          },
+          {
+            "case": "ordinary",
+            "options": {
+              "absent": true,
+              "real": true,
+              "startup_fail": true,
+              "secondary": true
+            },
+            "result_path": "/tmp/plato-phase1b-review/runtime314/test_server_error_precedence_a0/server/result.json",
+            "result_sha256": "b94e091cc94a04ed1c00e5fd33e2568fdf4ecba4554f7852fddb07db273de649",
+            "elapsed_seconds": 4.81339224986732,
+            "returncode": 1,
+            "deadline_exceeded": false,
+            "watchdog_actions": [],
+            "live_survivors": [],
+            "markers": {
+              "fresh_process": 1,
+              "server_construct": 1,
+              "server_configure": 1,
+              "server_start": 1,
+              "configure_queued_work": 1,
+              "periodic_body": 1,
+              "server_body": 1,
+              "original_failure": 1,
+              "task_finalizer_entered": 1,
+              "secondary_failure": 1,
+              "task_finalized": 1,
+              "caller_error": 1,
+              "loop_after": 1
+            },
+            "caller_errors": [
+              {
+                "event": "caller_error",
+                "pid": 15693,
+                "type": "SentinelError",
+                "message": "setup-sentinel",
+                "notes": [
+                  "Plato startup also failed (Task-2): SentinelError('periodic-finalizer')"
+                ]
+              }
+            ],
+            "loops_after": [
+              {
+                "event": "loop_after",
+                "pid": 15693,
+                "closed": true
+              }
+            ],
+            "entered_stages": [
+              "task_finalizer_entered"
+            ],
+            "original_failures": [
+              {
+                "event": "original_failure",
+                "pid": 15693,
+                "message": "setup-sentinel"
+              }
+            ]
+          },
+          {
+            "case": "ordinary",
+            "options": {
+              "absent": true,
+              "real": true,
+              "bind": true,
+              "secondary": true
+            },
+            "result_path": "/tmp/plato-phase1b-review/runtime314/test_server_error_precedence_a1/server/result.json",
+            "result_sha256": "95105793bd3965f93b42e3cc683a1deebd08f4e6c6e7c510e0b2a953a1d7187b",
+            "elapsed_seconds": 4.801963832927868,
+            "returncode": 1,
+            "deadline_exceeded": false,
+            "watchdog_actions": [],
+            "live_survivors": [],
+            "markers": {
+              "fresh_process": 1,
+              "server_construct": 1,
+              "server_configure": 1,
+              "server_start": 1,
+              "configure_queued_work": 1,
+              "periodic_body": 1,
+              "server_body": 1,
+              "task_finalizer_entered": 1,
+              "secondary_failure": 1,
+              "task_finalized": 1,
+              "caller_error": 1,
+              "loop_after": 1
+            },
+            "caller_errors": [
+              {
+                "event": "caller_error",
+                "pid": 15695,
+                "type": "OSError",
+                "message": "[Errno 48] error while attempting to bind on address ('127.0.0.1', 62349): [errno 48] address already in use",
+                "notes": [
+                  "Plato startup also failed (Task-2): SentinelError('periodic-finalizer')"
+                ]
+              }
+            ],
+            "loops_after": [
+              {
+                "event": "loop_after",
+                "pid": 15695,
+                "closed": true
+              }
+            ],
+            "entered_stages": [
+              "task_finalizer_entered"
+            ],
+            "original_failures": []
+          },
+          {
+            "case": "ordinary",
+            "options": {
+              "absent": true,
+              "real": true,
+              "fail": true
+            },
+            "result_path": "/tmp/plato-phase1b-review/runtime314/test_server_error_precedence_a2/server/result.json",
+            "result_sha256": "64df77833cff01230a17274b9af610989dec86f5b04df394ccd38bb221f88181",
+            "elapsed_seconds": 4.773943166946992,
+            "returncode": 1,
+            "deadline_exceeded": false,
+            "watchdog_actions": [],
+            "live_survivors": [],
+            "markers": {
+              "fresh_process": 1,
+              "server_construct": 1,
+              "server_configure": 1,
+              "server_start": 1,
+              "configure_queued_work": 1,
+              "periodic_body": 1,
+              "server_body": 1,
+              "caller_error": 1,
+              "loop_after": 1
+            },
+            "caller_errors": [
+              {
+                "event": "caller_error",
+                "pid": 15697,
+                "type": "SentinelError",
+                "message": "periodic-sentinel",
+                "notes": []
+              }
+            ],
+            "loops_after": [
+              {
+                "event": "loop_after",
+                "pid": 15697,
+                "closed": true
+              }
+            ],
+            "entered_stages": [],
+            "original_failures": []
+          },
+          {
+            "case": "ordinary",
+            "options": {
+              "absent": true,
+              "start_fail": true,
+              "fail": true
+            },
+            "result_path": "/tmp/plato-phase1b-review/runtime314/test_server_error_precedence_a3/server/result.json",
+            "result_sha256": "5e05b2ee5c1bc5a598b7ecf18d23f18618d6f430ba90759bb07142d79511a01e",
+            "elapsed_seconds": 4.818649041932076,
+            "returncode": 1,
+            "deadline_exceeded": false,
+            "watchdog_actions": [],
+            "live_survivors": [],
+            "markers": {
+              "fresh_process": 1,
+              "server_construct": 1,
+              "server_configure": 1,
+              "server_start": 1,
+              "server_work": 1,
+              "configure_queued_work": 1,
+              "periodic_body": 1,
+              "caller_error": 1,
+              "loop_after": 1
+            },
+            "caller_errors": [
+              {
+                "event": "caller_error",
+                "pid": 15699,
+                "type": "SentinelError",
+                "message": "start-sentinel",
+                "notes": [
+                  "Plato startup also failed (Task-1): SentinelError('periodic-sentinel')"
+                ]
+              }
+            ],
+            "loops_after": [
+              {
+                "event": "loop_after",
+                "pid": 15699,
+                "closed": true
+              }
+            ],
+            "entered_stages": [],
+            "original_failures": []
+          },
+          {
+            "case": "ordinary",
+            "options": {
+              "absent": true,
+              "real": true,
+              "secondary": true
+            },
+            "result_path": "/tmp/plato-phase1b-review/runtime314/test_server_error_precedence_a4/server/result.json",
+            "result_sha256": "12ac5cdec635a1c84f1f5166c623b7ab6e61e66ca598c82baf3d6ae6511e712c",
+            "elapsed_seconds": 5.321164125110954,
+            "returncode": 1,
+            "deadline_exceeded": false,
+            "watchdog_actions": [],
+            "live_survivors": [],
+            "markers": {
+              "fresh_process": 1,
+              "server_construct": 1,
+              "server_configure": 1,
+              "server_start": 1,
+              "configure_queued_work": 1,
+              "periodic_body": 1,
+              "server_body": 1,
+              "task_finalizer_entered": 1,
+              "secondary_failure": 1,
+              "task_finalized": 1,
+              "caller_error": 1,
+              "loop_after": 1
+            },
+            "caller_errors": [
+              {
+                "event": "caller_error",
+                "pid": 15703,
+                "type": "SentinelError",
+                "message": "periodic-finalizer",
+                "notes": []
+              }
+            ],
+            "loops_after": [
+              {
+                "event": "loop_after",
+                "pid": 15703,
+                "closed": true
+              }
+            ],
+            "entered_stages": [
+              "task_finalizer_entered"
+            ],
+            "original_failures": []
+          }
+        ],
+        "command": "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=/private/tmp/plato-refresh-worktrees/startup OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 /tmp/plato-phase1b-startup/py314/bin/python -B -m pytest -q -p no:cacheprovider -c /private/tmp/plato-refresh-worktrees/startup/pyproject.toml /private/tmp/plato-refresh-worktrees/startup/tests/integration/test_event_loop_startup.py -k 'not noncooperative and not stalled_real' --basetemp=/tmp/plato-phase1b-review/runtime314 --junitxml=/tmp/plato-phase1b-review/runtime314.xml > /tmp/plato-phase1b-review/runtime314.log 2>&1",
+        "cwd": "/tmp/plato-phase1b-review",
+        "exit_code": 0
+      },
+      {
+        "group": "containment314",
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "elapsed_seconds": 215.192,
+        "junit_path": "/tmp/plato-phase1b-review/containment314.xml",
+        "junit_sha256": "1b42dc791c798885d3bccc40352d29cf01704f4e223da3ff866e2e0368e488a5",
+        "log_path": "/tmp/plato-phase1b-review/containment314.log",
+        "log_sha256": "d32ab0e733c71273b4f74401490ec2444416252ddddc6c361cdbf5687583bd3a",
+        "records": [
+          {
+            "case": "client_lifecycle",
+            "options": {
+              "absent": true,
+              "stall": "task"
+            },
+            "result_path": "/tmp/plato-phase1b-review/containment314/test_noncooperative_teardown_i0/task/result.json",
+            "result_sha256": "5c6af66702dea98d6c4e73489acec14748dd1b7eb07b194bca43d25b286e2397",
+            "elapsed_seconds": 30.02659950009547,
+            "returncode": -15,
+            "deadline_exceeded": true,
+            "watchdog_actions": [
+              "TERM"
+            ],
+            "live_survivors": [],
+            "markers": {
+              "fresh_process": 1,
+              "client_configure": 1,
+              "client_body": 1,
+              "executor_entered": 1,
+              "original_failure": 1,
+              "task_finalizer_entered": 1,
+              "executor_finished": 1
+            },
+            "caller_errors": [],
+            "loops_after": [],
+            "entered_stages": [
+              "executor_entered",
+              "task_finalizer_entered"
+            ],
+            "original_failures": [
+              {
+                "event": "original_failure",
+                "pid": 15565,
+                "message": "client-sentinel"
+              }
+            ]
+          },
+          {
+            "case": "client_lifecycle",
+            "options": {
+              "absent": true,
+              "stall": "generator"
+            },
+            "result_path": "/tmp/plato-phase1b-review/containment314/test_noncooperative_teardown_i1/generator/result.json",
+            "result_sha256": "b3f0d38c1428bffad29442d3a5702724ffb2ed2d0b4d8c3725fda56e3b66e81a",
+            "elapsed_seconds": 30.023776333080605,
+            "returncode": -15,
+            "deadline_exceeded": true,
+            "watchdog_actions": [
+              "TERM"
+            ],
+            "live_survivors": [],
+            "markers": {
+              "fresh_process": 1,
+              "client_configure": 1,
+              "client_body": 1,
+              "executor_entered": 1,
+              "original_failure": 1,
+              "task_finalizer_entered": 1,
+              "task_finalized": 1,
+              "generator_finalizer_entered": 1,
+              "executor_finished": 1
+            },
+            "caller_errors": [],
+            "loops_after": [],
+            "entered_stages": [
+              "executor_entered",
+              "task_finalizer_entered",
+              "generator_finalizer_entered"
+            ],
+            "original_failures": [
+              {
+                "event": "original_failure",
+                "pid": 15585,
+                "message": "client-sentinel"
+              }
+            ]
+          },
+          {
+            "case": "client_lifecycle",
+            "options": {
+              "absent": true,
+              "stall": "executor"
+            },
+            "result_path": "/tmp/plato-phase1b-review/containment314/test_noncooperative_teardown_i2/executor/result.json",
+            "result_sha256": "306e60c729faeb064e40d54924b8fba952d3847e68890784ad295d0b915f0606",
+            "elapsed_seconds": 30.028993166983128,
+            "returncode": -15,
+            "deadline_exceeded": true,
+            "watchdog_actions": [
+              "TERM"
+            ],
+            "live_survivors": [],
+            "markers": {
+              "fresh_process": 1,
+              "client_configure": 1,
+              "client_body": 1,
+              "executor_entered": 1,
+              "original_failure": 1,
+              "task_finalizer_entered": 1,
+              "task_finalized": 1,
+              "generator_finalizer_entered": 1,
+              "generator_finalized": 1
+            },
+            "caller_errors": [],
+            "loops_after": [],
+            "entered_stages": [
+              "executor_entered",
+              "task_finalizer_entered",
+              "generator_finalizer_entered"
+            ],
+            "original_failures": [
+              {
+                "event": "original_failure",
+                "pid": 15604,
+                "message": "client-sentinel"
+              }
+            ]
+          },
+          {
+            "case": "ordinary",
+            "options": {
+              "absent": true,
+              "real": true,
+              "startup_fail": true,
+              "secondary": true,
+              "stall": "task"
+            },
+            "result_path": "/tmp/plato-phase1b-review/containment314/test_noncooperative_teardown_i3/aiohttp_task/result.json",
+            "result_sha256": "b5253c0f4934ce1df3d1f08e33c482d0e18a5fe824e0346fc3a4eabaae4c5bd3",
+            "elapsed_seconds": 35.02974866703153,
+            "returncode": -9,
+            "deadline_exceeded": true,
+            "watchdog_actions": [
+              "TERM",
+              "KILL"
+            ],
+            "live_survivors": [],
+            "markers": {
+              "fresh_process": 1,
+              "server_construct": 1,
+              "server_configure": 1,
+              "server_start": 1,
+              "configure_queued_work": 1,
+              "periodic_body": 1,
+              "server_body": 1,
+              "original_failure": 1,
+              "task_finalizer_entered": 1,
+              "secondary_failure": 1
+            },
+            "caller_errors": [],
+            "loops_after": [],
+            "entered_stages": [
+              "task_finalizer_entered"
+            ],
+            "original_failures": [
+              {
+                "event": "original_failure",
+                "pid": 15618,
+                "message": "setup-sentinel"
+              }
+            ]
+          },
+          {
+            "case": "socket_stall",
+            "options": {},
+            "result_path": "/tmp/plato-phase1b-review/containment314/test_stalled_real_client_is_co0/stalled/result.json",
+            "result_sha256": "cf950df498dbe191a60473bbe11634bf77ec0d58a5ef5b0034a1081b39805282",
+            "elapsed_seconds": 90.04761183308437,
+            "returncode": 0,
+            "deadline_exceeded": true,
+            "watchdog_actions": [
+              "TERM"
+            ],
+            "live_survivors": [],
+            "markers": {
+              "fresh_process": 1,
+              "child_started": 2,
+              "server_baseline": 1,
+              "server_payload_processed": 1,
+              "server_close_started": 2,
+              "local_data": 2,
+              "client_baseline": 2,
+              "client_trained": 2,
+              "client_stall_entered": 1
+            },
+            "caller_errors": [],
+            "loops_after": [],
+            "entered_stages": [
+              "client_stall_entered"
+            ],
+            "original_failures": []
+          }
+        ],
+        "command": "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=/private/tmp/plato-refresh-worktrees/startup OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 /tmp/plato-phase1b-startup/py314/bin/python -B -m pytest -q -p no:cacheprovider -c /private/tmp/plato-refresh-worktrees/startup/pyproject.toml /private/tmp/plato-refresh-worktrees/startup/tests/integration/test_event_loop_startup.py -k 'noncooperative or stalled_real' --basetemp=/tmp/plato-phase1b-review/containment314 --junitxml=/tmp/plato-phase1b-review/containment314.xml > /tmp/plato-phase1b-review/containment314.log 2>&1",
+        "cwd": "/tmp/plato-phase1b-review",
+        "exit_code": 0
+      }
+    ],
+    "total_independent_test_invocations": 91,
+    "python313": "43 cooperative cases passed, no skips.",
+    "python314": "43 cooperative and all five containment cases passed, no skips.",
+    "socket_rounds": [
+      {
+        "group": "runtime313",
+        "result_path": "/tmp/plato-phase1b-review/runtime313/test_real_two_client_cpu_socke0/round/result.json",
+        "result_sha256": "495a5dbf1a26546ef574f62645af03039ad2d225823cda88df4733304d259e50",
+        "elapsed_seconds": 14.650030415970832,
+        "port": 62360,
+        "process_identities": {
+          "15698": 1790969055.9635,
+          "15700": 1790969059.784142,
+          "15701": 1790969059.794062,
+          "15702": 1790969059.798924
+        },
+        "baseline": {
+          "linear.weight": [
+            [
+              0.20000000298023224,
+              -0.10000000149011612
+            ],
+            [
+              -0.30000001192092896,
+              0.4000000059604645
+            ]
+          ],
+          "linear.bias": [
+            0,
+            0
+          ]
+        },
+        "independently_trained": [
+          {
+            "event": "client_trained",
+            "pid": 15701,
+            "client_id": 2,
+            "samples": 2,
+            "device": "cpu",
+            "weights": {
+              "linear.weight": [
+                [
+                  0.20861299335956573,
+                  -0.1127939447760582
+                ],
+                [
+                  -0.30861300230026245,
+                  0.41279396414756775
+                ]
+              ],
+              "linear.bias": [
+                -0.0024593861307948828,
+                0.0024593889247626066
+              ]
+            }
+          },
+          {
+            "event": "client_trained",
+            "pid": 15702,
+            "client_id": 1,
+            "samples": 6,
+            "device": "cpu",
+            "weights": {
+              "linear.weight": [
+                [
+                  0.1755179464817047,
+                  -0.08649551123380661
+                ],
+                [
+                  -0.27551794052124023,
+                  0.38649553060531616
+                ]
+              ],
+              "linear.bias": [
+                -0.0070069595240056515,
+                0.007006970699876547
+              ]
+            }
+          }
+        ],
+        "actual_received": [
+          {
+            "event": "server_received",
+            "pid": 15698,
+            "client_id": 2,
+            "samples": 2,
+            "weights": {
+              "linear.weight": [
+                [
+                  0.20861299335956573,
+                  -0.1127939447760582
+                ],
+                [
+                  -0.30861300230026245,
+                  0.41279396414756775
+                ]
+              ],
+              "linear.bias": [
+                -0.0024593861307948828,
+                0.0024593889247626066
+              ]
+            }
+          },
+          {
+            "event": "server_received",
+            "pid": 15698,
+            "client_id": 1,
+            "samples": 6,
+            "weights": {
+              "linear.weight": [
+                [
+                  0.1755179464817047,
+                  -0.08649551123380661
+                ],
+                [
+                  -0.27551794052124023,
+                  0.38649553060531616
+                ]
+              ],
+              "linear.bias": [
+                -0.0070069595240056515,
+                0.007006970699876547
+              ]
+            }
+          }
+        ],
+        "aggregate": {
+          "linear.weight": [
+            [
+              0.18379171192646027,
+              -0.0930701196193695
+            ],
+            [
+              -0.283791720867157,
+              0.39307013154029846
+            ]
+          ],
+          "linear.bias": [
+            -0.005870066117495298,
+            0.005870074965059757
+          ]
+        },
+        "weighted_reference": {
+          "linear.weight": {
+            "flattened_reference": [
+              0.18379170820116997,
+              -0.0930701196193695,
+              -0.2837917059659958,
+              0.39307013899087906
+            ],
+            "max_absolute_error": 1.4901161193847656e-8
+          },
+          "linear.bias": {
+            "flattened_reference": [
+              -0.005870066175702959,
+              0.005870075256098062
+            ],
+            "max_absolute_error": 2.9103830456733704e-10
+          }
+        },
+        "max_absolute_error": 1.4901161193847656e-8,
+        "child_returns": [
+          {
+            "event": "child_returned",
+            "pid": 15701,
+            "process_client_id": 1
+          },
+          {
+            "event": "child_returned",
+            "pid": 15702,
+            "process_client_id": 2
+          }
+        ],
+        "normal_exit": true,
+        "watchdog_actions": [],
+        "port_released": true
+      },
+      {
+        "group": "runtime314",
+        "result_path": "/tmp/plato-phase1b-review/runtime314/test_real_two_client_cpu_socke0/round/result.json",
+        "result_sha256": "d0b6c7953c6630346410542b7f2f81158fa7acaf93917f87f43529cf6f9eb453",
+        "elapsed_seconds": 15.059836499858648,
+        "port": 62379,
+        "process_identities": {
+          "15718": 1790969068.218509,
+          "15721": 1790969072.187954,
+          "15722": 1790969072.198577,
+          "15723": 1790969072.203602
+        },
+        "baseline": {
+          "linear.weight": [
+            [
+              0.20000000298023224,
+              -0.10000000149011612
+            ],
+            [
+              -0.30000001192092896,
+              0.4000000059604645
+            ]
+          ],
+          "linear.bias": [
+            0,
+            0
+          ]
+        },
+        "independently_trained": [
+          {
+            "event": "client_trained",
+            "pid": 15722,
+            "client_id": 2,
+            "samples": 2,
+            "device": "cpu",
+            "weights": {
+              "linear.weight": [
+                [
+                  0.20861299335956573,
+                  -0.1127939447760582
+                ],
+                [
+                  -0.30861300230026245,
+                  0.41279396414756775
+                ]
+              ],
+              "linear.bias": [
+                -0.0024593861307948828,
+                0.0024593889247626066
+              ]
+            }
+          },
+          {
+            "event": "client_trained",
+            "pid": 15723,
+            "client_id": 1,
+            "samples": 6,
+            "device": "cpu",
+            "weights": {
+              "linear.weight": [
+                [
+                  0.1755179464817047,
+                  -0.08649551123380661
+                ],
+                [
+                  -0.27551794052124023,
+                  0.38649553060531616
+                ]
+              ],
+              "linear.bias": [
+                -0.0070069595240056515,
+                0.007006970699876547
+              ]
+            }
+          }
+        ],
+        "actual_received": [
+          {
+            "event": "server_received",
+            "pid": 15718,
+            "client_id": 2,
+            "samples": 2,
+            "weights": {
+              "linear.weight": [
+                [
+                  0.20861299335956573,
+                  -0.1127939447760582
+                ],
+                [
+                  -0.30861300230026245,
+                  0.41279396414756775
+                ]
+              ],
+              "linear.bias": [
+                -0.0024593861307948828,
+                0.0024593889247626066
+              ]
+            }
+          },
+          {
+            "event": "server_received",
+            "pid": 15718,
+            "client_id": 1,
+            "samples": 6,
+            "weights": {
+              "linear.weight": [
+                [
+                  0.1755179464817047,
+                  -0.08649551123380661
+                ],
+                [
+                  -0.27551794052124023,
+                  0.38649553060531616
+                ]
+              ],
+              "linear.bias": [
+                -0.0070069595240056515,
+                0.007006970699876547
+              ]
+            }
+          }
+        ],
+        "aggregate": {
+          "linear.weight": [
+            [
+              0.18379171192646027,
+              -0.0930701196193695
+            ],
+            [
+              -0.283791720867157,
+              0.39307013154029846
+            ]
+          ],
+          "linear.bias": [
+            -0.005870066117495298,
+            0.005870074965059757
+          ]
+        },
+        "weighted_reference": {
+          "linear.weight": {
+            "flattened_reference": [
+              0.18379170820116997,
+              -0.0930701196193695,
+              -0.2837917059659958,
+              0.39307013899087906
+            ],
+            "max_absolute_error": 1.4901161193847656e-8
+          },
+          "linear.bias": {
+            "flattened_reference": [
+              -0.005870066175702959,
+              0.005870075256098062
+            ],
+            "max_absolute_error": 2.9103830456733704e-10
+          }
+        },
+        "max_absolute_error": 1.4901161193847656e-8,
+        "child_returns": [
+          {
+            "event": "child_returned",
+            "pid": 15722,
+            "process_client_id": 1
+          },
+          {
+            "event": "child_returned",
+            "pid": 15723,
+            "process_client_id": 2
+          }
+        ],
+        "normal_exit": true,
+        "watchdog_actions": [],
+        "port_released": true
+      }
+    ],
+    "independent_numerical_method": "Recomputed every floating parameter from independently read result.json using ordinary Python floats and math.fsum: W0 + sum(n_i * (W_i - W0))/sum(n_i). Matched trained/received/logical IDs, baselines and sample counts; verified separate trained PIDs and both natural child returns. Maximum absolute error was 1.4901161193847656e-08 for both interpreters.",
+    "final_process_identity_audit": {
+      "live_survivors": [],
+      "method": "Rechecked PID/create-time against psutil after all runs; exited zombie descendants are not live survivors."
+    },
+    "final_port_audit": {
+      "successful_bind_listen_checks": 91,
+      "method": "SO_REUSEADDR loopback bind/listen for every completed result, including error and containment cases; TCP TIME_WAIT allowed."
+    },
+    "static_checks": [
+      {
+        "command": "git diff --check 7304703905189baf771032f1cd923a37f66ed97f 213b321c3cfb31d0f82c0b315efe50dcbf7dee20",
+        "exit_code": 0
+      },
+      {
+        "command": "/tmp/plato-phase1b-startup/py313/bin/ruff check --no-cache --select I plato/client.py plato/servers/base.py tests/integration/startup_harness.py tests/integration/startup_probe.py tests/integration/startup_socket.py tests/integration/test_event_loop_startup.py",
+        "exit_code": 0
+      }
+    ]
+  },
+  "findings": [],
+  "finding_counts": {
+    "critical": 0,
+    "high": 0,
+    "medium": 0
+  },
+  "low_notes": [],
+  "limitations": [
+    "Natural cleanup remains cooperative. Runner/aiohttp cancellation gathers and async-generator finalizers can stall; Runner executor shutdown can wait up to 300 seconds. The five-second fallback executor timeout bounds waiting and does not kill a running thread. This is the accepted design limitation, not a new production supervision requirement.",
+    "The four teardown negatives and stalled-client negative prove watchdog containment only. They do not prove graceful cleanup or delivery of the original exception to the caller.",
+    "Production os._exit on the successful real round proves transport/training/aggregation and natural process disappearance, not Python finally execution; separate cooperative tests cover finalization.",
+    "The independent reviewer repeated containment only on 3.14, and reviewed the implementer's hash-verified 3.13 containment records. The existing 248-test suites were inspected, not independently rerun.",
+    "Three existing Nanochat skips remain unqualified until Phase 1C initializes source/prerequisites. Eight existing fork warnings and runtime/containment marker registration and Linux CI duration qualification remain with Phase 1C; no unrelated repair or dependency reopening is required here.",
+    "Python 3.13 remains the selected default. Python 3.14 evidence is core startup/CPU forward compatibility on this macOS host, not optional robotics, MLX, Nanochat, or Linux support qualification."
+  ],
+  "integrity": {
+    "durable_write": "/Users/bli/Playground/plato/evidence/2026-refresh/phase1b-review.json",
+    "test_generated_files": "Only own scratch /tmp/plato-phase1b-review; no new source/probe files.",
+    "worktree_read_only": true,
+    "tracked_regular_files": 891,
+    "tracked_content_fingerprint_method": "SHA256 of compact sorted Python json.dumps mapping git ls-files regular paths to each file SHA256.",
+    "tracked_content_sha256_before": "688f84e82fbed1e47e7fcc4a09dd7c159fd8afcfe4b52e75ee5ad1a6bf14566f",
+    "tracked_content_sha256_after": "688f84e82fbed1e47e7fcc4a09dd7c159fd8afcfe4b52e75ee5ad1a6bf14566f",
+    "worktree_status_before": "",
+    "worktree_status_after": "",
+    "required_root_inputs_unchanged": true,
+    "bytecode_disabled": true,
+    "pytest_cache_disabled": true,
+    "ruff_cache_disabled": true,
+    "code_manifest_lock_design_edits": 0,
+    "installs": 0,
+    "nested_agents": 0,
+    "commits": 0,
+    "pushes": 0,
+    "scope": "Runtime correctness only; no security expansion or security questions."
+  }
+}

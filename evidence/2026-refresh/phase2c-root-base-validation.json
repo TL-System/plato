@@ -1,0 +1,99 @@
+{
+  "status": "PASS_BASE_PROFILE_ONLY",
+  "candidate": "62d7b7d8ef75be779149a96f567779c86699edb4",
+  "worktree_status_after": "",
+  "environment": "/tmp/plato-phase2-root/c-base-313",
+  "python": "Python 3.13.16",
+  "cwd": "/tmp/plato-refresh-worktrees/training",
+  "shell": "zsh -lc",
+  "sync": "UV_PROJECT_ENVIRONMENT=/tmp/plato-phase2-root/c-base-313 uv sync --locked --python 3.13 --no-default-groups --group test-base",
+  "pytest_command": "PYTHONDONTWRITEBYTECODE=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 HF_HUB_OFFLINE=1 HF_DATASETS_OFFLINE=1 TOKENIZERS_PARALLELISM=false /tmp/plato-phase2-root/c-base-313/bin/python -m pytest tests --test-profile=base -m \"not runtime\" -ra --basetemp=/tmp/plato-phase2-root/c-base-313-pytest --junitxml=/tmp/plato-phase2-root/c-base-313.xml",
+  "exit_code": 0,
+  "suites": [
+    {
+      "name": "pytest",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "4",
+      "tests": "527",
+      "time": "225.420",
+      "timestamp": "2026-10-03T01:57:29.043021-04:00",
+      "hostname": "miami.csl.utoronto.ca"
+    }
+  ],
+  "skips": [
+    {
+      "name": "tests.trainers.test_dp_data_loader_strategy",
+      "reason": "collection skipped"
+    },
+    {
+      "name": "test_nanochat_tokenizer_processor_round_trip",
+      "reason": "base profile omits optional nanochat integration"
+    },
+    {
+      "name": "test_nanochat_trainer_smoke",
+      "reason": "base profile omits optional nanochat integration"
+    },
+    {
+      "name": "test_nanochat_trainer_selects_core_eval_strategy",
+      "reason": "base profile omits optional nanochat integration"
+    }
+  ],
+  "logs": [
+    {
+      "path": "/tmp/plato-phase2-root/c-base-313-sync.log",
+      "sha256": "2faec9b5006abc9ecd9e456f6b8d91cfe429b2818f0a2ca5380c5144be9fb91b"
+    },
+    {
+      "path": "/tmp/plato-phase2-root/c-base-313.log",
+      "sha256": "c1ba330491150e0334570f2d4bfb04b8206da1250f30a8491faaca5eaa9e1610"
+    },
+    {
+      "path": "/tmp/plato-phase2-root/c-base-313.xml",
+      "sha256": "5757516ad761cfb3b8846ae8e27253613963d84438f8116a53dcaea04e8b972c"
+    }
+  ],
+  "limits": "Independent fresh Python3.13 and3.14 base environments only. Candidate includes acceptedB but not A/D/docs. Runtime deselected per base contract. General training and SCAFFOLD reviews, FedDyn2C-11, ROOT-2C-01 and finalcombinedqualification outstanding.",
+  "summary": {
+    "passed": 523,
+    "skipped": 4,
+    "runtime_deselected": 48,
+    "warnings": 2,
+    "seconds": 225.43
+  },
+  "warning_disposition": "Two CPU GradScaler tests enter CUDA autocast and emit CUDA-unavailable warning. Real CPU scaler behavior executes; general reviewer auditing device contract and exact expected-warning handling. No warning-free claim.",
+  "additional_python314_validation": {
+    "environment": "/tmp/plato-phase2-root/c-base-314",
+    "python": "Python 3.14.8",
+    "command": "PYTHONDONTWRITEBYTECODE=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 HF_HUB_OFFLINE=1 HF_DATASETS_OFFLINE=1 TOKENIZERS_PARALLELISM=false /tmp/plato-phase2-root/c-base-314/bin/python -m pytest tests --test-profile=base -m \"not runtime\" -ra --basetemp=/tmp/plato-phase2-root/c-base-314-pytest --junitxml=/tmp/plato-phase2-root/c-base-314.xml",
+    "sync": "UV_PROJECT_ENVIRONMENT=/tmp/plato-phase2-root/c-base-314 uv sync --locked --python 3.14 --no-default-groups --group test-base",
+    "exit_code": 0,
+    "summary": "==== 523 passed, 4 skipped, 48 deselected, 2 warnings in 140.35s (0:02:20) =====",
+    "suites": [
+      {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "4",
+        "tests": "527",
+        "time": "140.346",
+        "timestamp": "2026-10-03T02:05:02.861103-04:00",
+        "hostname": "miami.csl.utoronto.ca"
+      }
+    ],
+    "logs": [
+      {
+        "path": "/tmp/plato-phase2-root/c-base-314-sync.log",
+        "sha256": "dcdfc92a25c0dd88427ac8642cf37832193769e38f8683d0b05f11f3f46372e3"
+      },
+      {
+        "path": "/tmp/plato-phase2-root/c-base-314.log",
+        "sha256": "4e085b9c986def7b55e554b74659480498c33354cc3ec31e6603a2a40ac87fca"
+      },
+      {
+        "path": "/tmp/plato-phase2-root/c-base-314.xml",
+        "sha256": "8808e6353671d1e4980148911577e01a4c597b3f35ea6b3b59740aeed13097fb"
+      }
+    ]
+  }
+}

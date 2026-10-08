@@ -1,0 +1,81 @@
+{
+  "status": "ACCEPTED_SOURCE_BYTES_INTEGRATED_PENDING_FINAL_BUILD_AND_PHASE_GATE",
+  "head_before_receipt": "2e5a8119d2c36aef3f49873f7c31fcf2eb9f6cce",
+  "source_files": {
+    "AGENTS.md": {
+      "source_commit": "87ca5bb7098d62c0a1aebde1999e7155a975d336",
+      "sha256": "6e90438d39c96ac8906cc3d834e17d7f2f1638c85682d98df1b48ba2d6bafdbc"
+    },
+    "docs/README.md": {
+      "source_commit": "87ca5bb7098d62c0a1aebde1999e7155a975d336",
+      "sha256": "097157e4156372a6fe7b449720355e094e5b50d2e68af0f24a968c86674eb17e"
+    },
+    "docs/docs/ccdb.md": {
+      "source_commit": "87ca5bb7098d62c0a1aebde1999e7155a975d336",
+      "sha256": "c843a5626a08864ebafac8878e1524aa4e6412fad17bd83f4fc038c8f2fddf6d"
+    },
+    "docs/docs/configurations/server.md": {
+      "source_commit": "87ca5bb7098d62c0a1aebde1999e7155a975d336",
+      "sha256": "392505c133a23aa97f93f9261fed662695a5b0073d9b905c49f5fb5987cd482e"
+    },
+    "docs/docs/configurations/trainer.md": {
+      "source_commit": "87ca5bb7098d62c0a1aebde1999e7155a975d336",
+      "sha256": "f2f59461e3987c909f243533f39f14ac2b79058a66d7d25794dbf055ac3c5a0f"
+    },
+    "docs/docs/development.md": {
+      "source_commit": "87ca5bb7098d62c0a1aebde1999e7155a975d336",
+      "sha256": "5e7983f94a1fe6e4516d1148985960074834629cb6b6402a94962d3e09e6b862"
+    },
+    "docs/docs/examples/Getting Started.md": {
+      "source_commit": "87ca5bb7098d62c0a1aebde1999e7155a975d336",
+      "sha256": "736689288c791f3e0913eb35549f18413478468a62caff5d7e8755acad192bb1"
+    },
+    "docs/docs/examples/algorithms/1. Server Aggregation Algorithms.md": {
+      "source_commit": "87ca5bb7098d62c0a1aebde1999e7155a975d336",
+      "sha256": "83d3eed11013db4aacdb63d7e38a53a0a5867d54a16eeda25b58d3cb7034f73d"
+    },
+    "docs/docs/index.md": {
+      "source_commit": "87ca5bb7098d62c0a1aebde1999e7155a975d336",
+      "sha256": "e3a0b876519936cd31baee48730b80edf571c08b3968f25300444376e7409970"
+    },
+    "docs/docs/misc.md": {
+      "source_commit": "87ca5bb7098d62c0a1aebde1999e7155a975d336",
+      "sha256": "f115a2f879ff4f5f70de81505b6cb5958ad633a18f04f7cd9c4f3e84f26ac2b0"
+    },
+    "docs/docs/examples/algorithms/5. Algorithms with Customized Client Training Loops.md": {
+      "source_commit": "c172c6160893ced74179481110495e5920e8b7ab",
+      "sha256": "18ffa471f5fe1fa4a396631bc37edf2e12f624aacf75c75127a8d4dbd26e7487"
+    },
+    "docs/mkdocs.yml": {
+      "source_commit": "c172c6160893ced74179481110495e5920e8b7ab",
+      "sha256": "e957896c9f3f62d1932fa0ba0c76d8f33fa193751d727a707006a6a33d1dcbb2"
+    }
+  },
+  "review_artifacts": [
+    {
+      "file": "remaining-docs-plan.json",
+      "sha256": "a2b52a4a471870e24d87e06b3045fa737a5d90a9ec392dbcd73ccc911b22b60c"
+    },
+    {
+      "file": "remaining-docs-plan-review-v2.json",
+      "sha256": "04802455c581e1f8fccab86277f9a5ae885acaf6646bcf9d517e1a5adcd56276"
+    },
+    {
+      "file": "remaining-docs-prose-review.json",
+      "sha256": "8ae1e7d37666acfcc3d567850aed98e30d02ac4648cdd11023b417d7ae38691d"
+    },
+    {
+      "file": "remaining-docs-katex-review.json",
+      "sha256": "8aff7152121540c2f5d32e551ade6e498e4874e5fe15dcd3a81046d576ae6b14"
+    },
+    {
+      "file": "remaining-docs-plan-v1.json",
+      "sha256": "c64d803ae6447e108bc4ac8648ecbce6c4aa25936b9ecbd708b8eddeda46c4ca"
+    },
+    {
+      "file": "remaining-docs-plan-review-v1.json",
+      "sha256": "714155b6cb2b26b65e6a15b864bf57153b2e3980ef255cb75bade31031eaf460"
+    }
+  ],
+  "scope": "D1+D2 prose and D3 exactpins/TeXsyntax only; historicalarchive already accepted; FEI production/testsource not yet integrated. Frozen FEI inventory remains unchanged."
+}

@@ -95,8 +95,8 @@ def test_preprocess_split_dispatches_by_mode(temp_config):
 
     datasource = DataSource.__new__(DataSource)
     datasource.preprocessing_mode = "corpus_lm"
-    datasource.preprocess_corpus_lm = lambda split: "corpus-result"
-    datasource.preprocess_chat_sft = lambda split: "chat-result"
+    setattr(datasource, "preprocess_corpus_lm", lambda split: "corpus-result")
+    setattr(datasource, "preprocess_chat_sft", lambda split: "chat-result")
 
     assert datasource.preprocess_split(object()) == "corpus-result"
 
@@ -274,6 +274,8 @@ def test_huggingface_corpus_mode_keeps_legacy_default_block_size(
     cfg.data.dataset_name = "dummy"
     cfg.data.text_field = "text"
     cfg.data.preprocessing_mode = "corpus_lm"
+    # Datasets 5 uses a process pool even for num_proc=1; None maps in-process.
+    cfg.data.preprocessing_num_proc = None
     cfg.data.train_split = "train"
     cfg.data.validation_split = "validation"
     if "block_size" in cfg.data:

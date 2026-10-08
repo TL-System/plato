@@ -1,223 +1,173 @@
-## Installation
+# Digital Research Alliance of Canada
 
-SSH into a cluster on Digital Research Alliance of Canada. Here we take [Narval](https://docs.alliancecan.ca/wiki/Narval) as an example, while [Rorqual](https://docs.alliancecan.ca/wiki/Rorqual/en) is also available.
+## Prepare a checkout
+
+This is a preparation and Slurm job template for Python 3.13. Adapt the cluster
+hostname, allocation account, storage paths, module stack, and requested
+resources to your site. Consult the Alliance [available software](https://docs.alliancecan.ca/wiki/Available_software),
+[Python](https://docs.alliancecan.ca/wiki/Python), and
+[running jobs](https://docs.alliancecan.ca/wiki/Running_jobs) documentation.
+Site references include [Narval](https://docs.alliancecan.ca/wiki/Narval) and
+[Rorqual](https://docs.alliancecan.ca/wiki/Rorqual/en); check the destination
+and resource instructions for your allocation.
+
+Current module availability, Plato package/wheel and CUDA compatibility, offline
+assets, allocation policy, and actual cluster execution have not been verified
+for this template. Direct retrieval of those official pages during this refresh
+returned BotStopper Access Denied; this guide does not infer a current site-wide
+installation procedure or compute-node networking policy from them.
+
+Use your existing [CCDB account](https://ccdb.computecanada.ca/) and an approved
+project or scratch location. Replace every angle-bracket placeholder before
+running the following commands:
 
 ```bash
-ssh <CCDB username>@narval.computecanada.ca
-cd projects/def-baochun/<CCDB username>
+ssh <username>@<cluster-hostname>
+cd <approved-project-directory>
+git clone https://github.com/TL-System/plato.git
+cd plato
 ```
 
-!!! note "Note"
-    You could also use `/scratch/<CCDB username>` to store temporary files using next command.
-    ```bash
-    cd /scratch/<CCDB username>
-    ```
+## Prepare Python and dependencies before submission
 
-Then clone the *Plato* repository to your own directory:
-```
-git clone https://github.com/TL-System/plato
-```
-
-Your CCDB username can be located after signing into the [CCDB portal](https://ccdb.computecanada.ca/). Contact Baochun Li (`bli@ece.toronto.edu`) for a new account on Digital Research Alliance of Canada.
-
-## Preparing the Python Runtime Environment
-
-First, load version 3.12 of the Python programming language:
-
-To discover the versions of Python available:
+Discover the Python modules available on the target cluster:
 
 ```bash
 module avail python
+module spider python
 ```
 
-Load version 3.12 of the Python programming language:
+Select an available Python 3.13 module and any prerequisite modules required by
+the site. Use the same module stack when preparing the environment and running
+the job; no fixed module name is assumed here.
 
 ```bash
-module load python/3.12
+module load <site-python-3.13-module>
+python -c 'import sys; assert sys.version_info[:2] == (3, 13), sys.version'
 ```
 
-You can then create your own Python virtual environment (for example, one called .federated):
-```bash
-virtualenv --no-download ~/.federated # creating your own virtual environment
-source ~/.federated/bin/activate
-```
-
-Then install uv if it's not already available:
+Make uv 0.12.22 available using the site's approved installation procedure.
+Provision the locked environment on a site-approved preparation host before
+submission, from the checkout root:
 
 ```bash
-curl -LsSf https://astral.sh/uv/install.sh | sh
-source $HOME/.local/bin/env
+uv --version
+PLATO_CLUSTER_PYTHON="$(command -v python)"
+UV_PYTHON_DOWNLOADS=never uv sync --locked --python "$PLATO_CLUSTER_PYTHON"
+.venv/bin/python -c 'import sys; assert sys.version_info[:2] == (3, 13), sys.version'
 ```
 
-Now you can run Plato with `uv run`:
+The final interpreter check catches an existing environment with the wrong
+Python version. Use a dedicated checkout/environment for a different module
+stack or dependency selection. Confirm package and accelerator compatibility
+on the target system before committing substantial resources.
+
+The base command above selects the default dependencies. Follow
+[Installation](install.md) for extras and workspace members; provision the
+workload's selected dependencies before submission. For example, Lighteval
+requires the locked `llm_eval` extra and NLTK resources, and `ssl` uses a
+separate environment.
+
+## Prepare datasets and model assets
+
+Provision datasets, model weights, tokenizers, and other required assets on a
+site-approved host with the needed access, before submitting the training job.
+Use the family recipe's explicit preparation steps and point the config at the
+prepared paths. Keep those paths accessible from the allocated compute node.
+
+The [Qwen3 reference](examples/case-studies/6. Qwen3 Federated LoRA.md) describes
+its pinned model and local data. The
+[Lighteval installation steps](install.md#optional-server-side-llm-evaluation-with-lighteval)
+and [runtime qualification](references/evaluators.md#optional-runtime-qualification)
+describe its resources and bounded checks. These guides do not establish
+Alliance cluster compatibility or a complete offline Hugging Face workflow.
+
+For the illustrative MNIST job below, prepare MNIST under the configured data
+path before submission. Check the selected config's data and output paths
+against your storage allocation. Running training on a login node and
+interrupting it is not an asset-preparation recipe.
+
+## Create a batch script
+
+Save the following as `plato_job.sh`, replacing the module, account, and
+absolute checkout path. The CPU MNIST command is illustrative; adjust time,
+memory, CPU/GPU requests, config, and device flags to the workload and site
+policy. CUDA jobs need a compatible module/package stack and site-specific GPU
+resource requests; consult the official job documentation.
 
 ```bash
-uv run --active plato.py -c configs/MNIST/fedavg_lenet5.toml
-```
-
-In case you wish to exit your Python virtual environment, run the command:
-```bash
-deactivate
-```
-
-!!! note "Note"
-    Use alias to save trouble for future running *Plato*.
-
-    ```
-    vim ~/.bashrc
-    ```
-
-    Then add
-
-    ```
-    alias plato='cd ~/projects/def-baochun/<CCDB username>/plato/; module load python/3.12; source ~/.federated/bin/activate'
-    ```
-
-    After saving this change and exiting `vim`:
-
-    ```
-    source ~/.bashrc
-    ```
-
-    Next time, after you SSH into this cluster, just type `plato`:)
-
-## Running Plato
-
-To start a federated learning training workload with *Plato*, create a job script:
-
-```bash
-vi <job script file name>.sh
-```
-
-For exmaple:
-
-```bash
-cd ~/projects/def-baochun/<CCDB username>/plato
-vi cifar_wideresnet.sh
-```
-
-Then add your configuration parameters in the job script. The following is an example:
-
-```
 #!/bin/bash
-#SBATCH --time=3:00:00
+#SBATCH --time=01:00:00
 #SBATCH --nodes=1
-#SBATCH --gres=gpu:1
-#SBATCH --mem=128G
-#SBATCH --account=def-baochun
-#SBATCH --output=cifar_wideresnet.out
+#SBATCH --cpus-per-task=2
+#SBATCH --mem=8G
+#SBATCH --account=<allocation-account>
+#SBATCH --output=plato-%j.out
 
-module load python/3.12
-source ~/.federated/bin/activate
-
-curl -LsSf https://astral.sh/uv/install.sh | sh
-source $HOME/.local/bin/env
-
-uv run --active plato.py -c configs/CIFAR10/fedavg_wideresnet.toml
+set -euo pipefail
+module load <site-python-3.13-module>
+cd <absolute-path-to-plato-checkout>
+.venv/bin/python -c 'import sys; assert sys.version_info[:2] == (3, 13), sys.version'
+exec .venv/bin/python plato.py --config configs/MNIST/fedavg_lenet5.toml --cpu
 ```
 
-Submit the job:
+The batch command uses the already provisioned environment directly. Dependency
+resolution, package installation, and asset preparation belong before
+submission. The selected workload must also be configured to use its prepared
+assets; calling the interpreter directly does not prevent a data source from
+attempting downloads when assets are missing.
+
+## Manage the job
+
+After completing preparation and adapting the script, submit it and retain its
+job ID:
 
 ```bash
-sbatch <job script file name>.sh
+sbatch plato_job.sh
 ```
 
-For example:
+Use the specific ID returned by Slurm to inspect status and output:
 
 ```bash
-sbatch cifar_wideresnet.sh
+squeue --jobs=<job-id>
+sacct --jobs=<job-id>
+tail -f plato-<job-id>.out
 ```
 
-To check the status of a submitted job, use the `sq` command. Refer to the [official Computer Canada documentation](https://docs.alliancecan.ca/wiki/Running_jobs#Use_squeue_or_sq_to_list_jobs) for more details.
-
-To monitor the output as it is generated live, use the command:
+Stop output monitoring with `Ctrl-C`. To cancel that training job:
 
 ```bash
-watch -n 1 tail -n 50 ./cifar_wideresnet.out
+scancel <job-id>
 ```
 
-where `./cifar_wideresnet.out` is the output file that needs to be monitored, and the `-n` parameter for `watch` specifies the monitoring frequency in seconds (the default value is 2 seconds), and the `-n` parameter for `tail` specifies the number of lines at the end of the file to be shown. Type `Control + C` to exit the `watch` session.
+See the Alliance [job-management material](https://docs.alliancecan.ca/mediawiki/images/7/77/Managing_jobs.pdf)
+for the roles of these commands. Submission and cancellation are shown as user
+instructions; neither was executed to validate this guide.
 
-!!! note "Tip"
-    Make sure you use different `port` numbers under `server` in different jobs' configuration files before submitting your jobs if you plan to run them at the same time. This is because they may be allocated to the same node, which is especially common when you use the `Narval` cluster. In that case, if the `port` and `address` under `server` in your configuration files of the jobs are the same, you will get `OSError: [Errno 48] error while attempting to bind on address: address already in use`.
+For interactive debugging, consult the site's
+[interactive job instructions](https://docs.alliancecan.ca/wiki/Running_jobs#Interactive_jobs)
+and obtain an allocation with the required resources. On the allocated compute
+node, load the same modules, enter the checkout, and use the prepared
+`.venv/bin/python` command. Release the allocation when finished.
 
-If there is a need to start an interactive session (for debugging purposes, for example), it is also supported by Digital Research Alliance of Canada using the `salloc` command:
+!!! tip "Concurrent sessions"
+    Use distinct `server.port` values for concurrent sessions that may share a
+    node. Matching bind addresses and ports can cause an address-in-use error.
 
-```bash
-salloc --time=2:00:00 --gres=gpu:1 --mem=64G --account=def-baochun
-```
+## Troubleshooting
 
-The job will then be queued and waiting for resources:
+!!! tip "Out of CUDA memory"
+    Decrease `trainer.max_concurrency` in the selected configuration and inspect
+    the failed session's logs and allocated resources.
 
-```
-salloc: Pending job allocation 53923456
-salloc: job 53923456 queued and waiting for resources
-```
+!!! tip "An earlier session is still running"
+    Stop the identified interactive training session with `Ctrl-C`, or cancel
+    its specific scheduler job ID with `scancel`. Verify that the session has
+    released its resources before restarting.
 
-As soon as your job gets resources, you get the following prompts:
-
-```
-salloc: job 53923456 has been allocated resources
-salloc: Granted job allocation 53923456
-```
-
-Then you can run *Plato*:
-
-```bash
-uv run --active plato.py -c configs/CIFAR10/fedavg_wideresnet.toml
-```
-
-After the job is done, use `exit` at the command to relinquish the job allocation.
-
-!!! note "Note"
-    On the Digital Research Alliance of Canada, if there are issues in the code that prevent it from running to completion, the potential issues could be:
-
-    !!! tip "Out of CUDA memory."
-        Potential solutions: Decrease the `max_concurrency` value in the `trainer` section in your configuration file.
-
-    !!! tip "Running processes have not been terminated from previous runs."
-        Potential solutions: Use the command `pkill python` to terminate them so that there will not be CUDA errors in the upcoming run.
-
-    !!! tip "The time that a client waits for the server to respond before disconnecting is too short."
-        This could happen when training with large neural network models. If you get an `AssertionError` saying that there are not enough launched clients for the server to select, this could be the reason. But make sure you first check if it is due to the *out of CUDA memory* error.
-
-        Potential solutions: Add `ping_timeout` in the `server` section in your configuration file. The default value for `ping_timeout` is 360 (seconds).
-
-
-### Running jobs of HuggingFace
-
-Running a job of HuggingFace requires connecting to the Internet to download the dataset and the model. However, Digital Research Alliance of Canada doesn't allow Internet connections inside sbatch/salloc. Therefore, they need to be pre-downloaded via the following steps:
-
-1. Run the command first outside sbatch/salloc, for example, `uv run --active plato.py -c <your configuration file>`, and use `control + C` to terminate the program right after the first client starts training. After this step, the dataset and the model should be automatically downloaded.
-
-2. Switch to running it inside sbatch/salloc, and add `TRANSFORMERS_OFFLINE=1` before the command. The below is a sample job script:
-
-```
-#!/bin/bash
-#SBATCH --time=4:00:00
-#SBATCH --nodes=1
-#SBATCH --gres=gpu:1
-#SBATCH --mem=498G
-#SBATCH --account=def-baochun
-#SBATCH --output=test.out
-
-# Limit OpenBLAS threads
-export OPENBLAS_NUM_THREADS=1
-export OMP_NUM_THREADS=1
-export MKL_NUM_THREADS=1
-
-module load python/3.12
-source ~/.federated/bin/activate
-
-# Running the test.sh under examples/async/fedbuff
-TRANSFORMERS_OFFLINE=1 uv run --active fedbuff.py -c fedbuff_cifar10.toml
-```
-
-
-### Removing the Python virtual environment
-
-To remove the environment after experiments are completed, just delete the directory:
-
-```bash
-rm -rf ~/.federated
-```
+!!! tip "Client timeout"
+    Check for failed or memory-constrained clients before attributing a missing
+    client to a slow server response. The default `server.ping_timeout` is
+    3600 seconds. Measure delays in the affected session before choosing an
+    override in the `server` configuration section. See
+    [Miscellaneous Notes](misc.md#potential-runtime-errors) for related guidance.

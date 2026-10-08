@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "status": "ORIGINAL_AUTHOR_DESIGN_CORRECTION_PENDING_FRESH_REVIEW",
+  "original": {
+    "path": "/tmp/plato-lighteval-profile-plan.v1.json",
+    "sha256": "7d61abae346522ecde23dde6b1c23abd65fa909fc99e989876a5c07fdf2d46ab"
+  },
+  "review": {
+    "path": "/tmp/plato-lighteval-profile-plan-review.json",
+    "sha256": "7f5a0d599b8b4ee65519cc329723f994f6a49d121abdb523992ce1daa259f342"
+  },
+  "corrected": {
+    "path": "/tmp/plato-lighteval-profile-plan.json",
+    "revision": 2,
+    "sha256": "8a457832ca649ba39e7ba4f39175aec35e111e00e8856068641ac324ce4015fe"
+  },
+  "findings": [
+    {
+      "id": "LP-P1-01",
+      "design_resolution": "Persistent same step-level environment covers all optional CI phases; explicit interpreter check/receipt, artifact requirement and actual uv identity regression prevent wrong-default-environment green."
+    },
+    {
+      "id": "LP-P1-02",
+      "design_resolution": "Actual child nltk.data.path restricted to owned roots; other resource real/prepared, actual omitted LookupError asserted before actual preflight; pipeline/import/download sentinels and effective path receipts."
+    }
+  ],
+  "changed_top_level_keys": [
+    "artifact_guard",
+    "ci",
+    "correction_source_bindings",
+    "planning_validation",
+    "prerequisites",
+    "revision",
+    "revision_history",
+    "status",
+    "typing_guard",
+    "validation_matrix"
+  ],
+  "new_source_binding": {
+    "path": "/tmp/plato-refresh-worktrees/lighteval-runtime/.venv/lib/python3.13/site-packages/nltk/data.py",
+    "sha256": "cda75896c3639541f3c3b811d647354dc5829774c2f201a7c942896f5cb99dc8"
+  },
+  "preservation": {
+    "revision1_byte_identical": true,
+    "cache_plan_untouched": true,
+    "repo_edits": false,
+    "tests_or_dependency_commands_executed": false,
+    "final_runtime_inventory_and_accepted_archive_base_still_deferred": true
+  }
+}

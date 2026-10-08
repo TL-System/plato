@@ -1,0 +1,22 @@
+[
+  {
+    "fused": false,
+    "initial_scale": 65536,
+    "actual": 0.8999999761581421,
+    "expected": 0.900000009999999,
+    "error": 3.384185687238528e-08,
+    "warnings": [
+      "CUDA is not available or torch_xla is imported. Disabling autocast."
+    ]
+  },
+  {
+    "fused": true,
+    "initial_scale": 65536,
+    "actual": 0.9999984502792358,
+    "expected": 0.900000009999999,
+    "error": 0.09999844027923688,
+    "warnings": [
+      "CUDA is not available or torch_xla is imported. Disabling autocast."
+    ]
+  }
+]

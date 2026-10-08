@@ -1,0 +1,2027 @@
+{
+  "schema_version": 1,
+  "reviewed_at_utc": "2026-10-03T05:21:52.091893+00:00",
+  "review_role": "Fresh independent Phase 2D reviewer 3; no nested agents.",
+  "requested_profile": {
+    "model": "gpt-6.1-sol",
+    "reasoning_effort": "xhigh",
+    "note": "Requested execution profile recorded; no runtime model identity API is available to this reviewer."
+  },
+  "decision": "PASS",
+  "candidate_local_acceptance": true,
+  "phase_integration_acceptance": "PENDING_ROOT_FINAL_COMBINED_PHASE_QUALIFICATION",
+  "summary": "2D-R05 is resolved on Python 3.13 and 3.14. Effective implicit and explicit mandatory fixtures use actual Kazoo and Gymnasium; clean base and unprofiled scoped contracts remain meaningful. No critical/high/medium findings remain. Previously accepted production and durable S3/lifecycle regressions are byte-identical.",
+  "identity": {
+    "worktree": "/private/tmp/plato-refresh-worktrees/payloads",
+    "requested_worktree": "/tmp/plato-refresh-worktrees/payloads",
+    "base_commit": "fda60becedfa6236c11d415b87a868b52789a41e",
+    "base_tree": "11a5f04acd220db9ba6b7da4971d07895846c05e",
+    "candidate_commit": "96323afa094a37584844275cc04bf1e1eedfaa0d",
+    "candidate_tree": "ffe7a04d67dca75c4f05745ee043db3cdcd6d579",
+    "previous_reviewed_candidate": "09b9b941bc4a816b62d8ed33ad993455f6f05da5",
+    "previous_candidate_tree": "5bb90f8f97aba8085a54ff3c534d9424705a6867",
+    "latest_source_commit": "65e71329da1b4e1aa4f445991f4aaa38db119d3e",
+    "latest_source_tree": "046c05979e92a07e72f7bd4231cca1c81abcb773",
+    "candidate_changes_from_latest_source": [
+      "evidence/2026-refresh/phase2d-validation.json"
+    ],
+    "changes_since_review2": [
+      "evidence/2026-refresh/phase2d-validation.json",
+      "tests/mpc/test_round_store_contracts.py",
+      "tests/utils/test_rl_payload_utilities.py"
+    ],
+    "accepted_B_commit": "00eeb9dcdd2b513e64db9408969356037e09bb8e",
+    "B_D_merge_commit": "ccb310177273f5cfa2ce7f1c0203f55ddaa68397",
+    "merge_parents": [
+      "f8aa0e9815b702f9d414ebe85a85eb48f9a982a1",
+      "00eeb9dcdd2b513e64db9408969356037e09bb8e"
+    ],
+    "ancestry_checks": {
+      "fda60becedfa6236c11d415b87a868b52789a41e": true,
+      "09b9b941bc4a816b62d8ed33ad993455f6f05da5": true,
+      "65e71329": true,
+      "00eeb9dc": true,
+      "f8aa0e98": true,
+      "ccb31017": true
+    },
+    "initial_clean": true,
+    "final_clean": true,
+    "immutability": {
+      "head": "96323afa094a37584844275cc04bf1e1eedfaa0d",
+      "tree": "ffe7a04d67dca75c4f05745ee043db3cdcd6d579",
+      "status": "",
+      "changed_tracked_file_hashes": [],
+      "checked_files": 953,
+      "base_tree": "11a5f04acd220db9ba6b7da4971d07895846c05e",
+      "latest_source_tree": "046c05979e92a07e72f7bd4231cca1c81abcb773",
+      "previous_candidate_tree": "5bb90f8f97aba8085a54ff3c534d9424705a6867"
+    },
+    "initial_manifest": {
+      "path": "/tmp/plato-phase2d-review-3/initial-identity.json",
+      "sha256": "d4287896153715a6afaa115fc94a23205f831917283000daf185a66ff8ab253b"
+    },
+    "final_verification": {
+      "path": "/tmp/plato-phase2d-review-3/final-immutability.json",
+      "sha256": "52124612388842c81f0b74a08bec8885e3e10759364f41da53d92ab38dec09ab"
+    }
+  },
+  "review_inputs": {
+    "AGENTS_md": {
+      "path": "/private/tmp/plato-refresh-worktrees/payloads/AGENTS.md",
+      "sha256": "b50f87f31ea3d87076952d8b7d2d8af067132fbf877d80f8780c208fb45527ec"
+    },
+    "plan_sha256": "edb9a58cc7915a940854f16d5029fe97434703bf2f75eca0dcb96de2d0f0eb15",
+    "accepted_addendum_sha256": "5b51b0fb7ed6f68d9fce7176335b3e7be5e5f178a2788590912aa2396a487709",
+    "reports_and_evidence_read": {
+      "phase2d-review.json": "89392d0c32f73a44abb7deba7c9bdc98f407d4a3c10fb2e38647aee07f7fa5a9",
+      "phase2d-root-base-probe.json": "298b647370bba7ec38865f11c43755b49c8f4d9ca6f2c5b93aee615d0693d25d",
+      "phase2d-review-2.json": "3870a624db39120121f601d915e29361cb57e67a18eb41ae01517ddfbe7c4243",
+      "phase2b-acceptance.json": "3be220078302a05189c07c32220a86e966ff919bc4ef11e5d342a6c39135396d",
+      "phase2bd-root-source-validation.json": "8b9929b3defa2f8b85d42e10a8c123d1c5987a5f2d2db1364b1670bcdd8b70e3",
+      "phase2b-review-3.json": "83eaf2c44ffb1316e9d6643e23c3ea9b977d5b083bf4427e86a75dcac7720fd6",
+      "plan-addendum-acceptance.json": "5f5d5a8e22e14072b5d031c19a27be14bda9bdbc2a157d14af78845daac6c56b",
+      "phase2d-validation.json": "6e8d8e796636973c99b7fb64951eb8c13c44a1648c05d576223127210b7ef6bf"
+    },
+    "accepted_B_review_hash_verified": true,
+    "accepted_addendum_hash_matches_ROOT_acceptance": true
+  },
+  "findings": [],
+  "low_or_cosmetic_observations": [],
+  "resolved_2D_R05": {
+    "locations": [
+      {
+        "path": "tests/mpc/test_round_store_contracts.py",
+        "line": 18
+      },
+      {
+        "path": "tests/utils/test_rl_payload_utilities.py",
+        "line": 18
+      }
+    ],
+    "correction": "Both fixtures read the authoritative registered plato-profile-checks object and use actual library types for qualify=True, base=False. Shared scope/filter/default policy is unchanged and is not duplicated in the fixtures.",
+    "real_configuration_probe": "pytest.Config.fromdictargs parses the current project, Config._do_configure executes real hooks, registered profile state is inspected, and pytest_sessionstart executes all existing mandatory prerequisites. Session.perform_collect selects two bounded behavioral items for this reviewer probe; actual pytest_runtest_protocol executes their fixture setup, call, and teardown. No full-suite/session-finish qualification is claimed for these limited probes.",
+    "actual_implicit_execution": "In both mandatory interpreters, raw test_profile=None, full=True, qualify=True, base=False yields kazoo.exceptions.LockTimeout and gymnasium.spaces.box.Box; both actual behavioral item calls and teardowns pass.",
+    "missing_extra_behavior": "Both clean base interpreters lack Kazoo/Gymnasium/Opacus/Tiktoken. Implicit and explicit mandatory direct fixture calls raise ModuleNotFoundError for their actual libraries, and real sessionstart raises UsageError for missing Opacus. No base substitution, broad skip, or weakened prerequisite occurs in mandatory.",
+    "optional_behavior": "Explicit base and unprofiled scoped configurations use builtins.TimeoutError and types.SimpleNamespace even when actual libraries are installed. The additional unprofiled full-but-filtered probe follows authoritative qualify=False state.",
+    "original_contracts": "All eight original test function ASTs, including parametrization, are unchanged and still represent 13 cases. Three RoundInfoStore error/cleanup cases and ten actual RL numerical/training/persistence cases execute in all four targeted environments.",
+    "new_regressions": "Two new functions each have four selection cases: implicit mandatory, explicit mandatory, explicit base, and scoped unprofiled; eight cases total. Optional-library absence is asserted as an import failure, not skipped.",
+    "profiles": [
+      {
+        "environment": "base313",
+        "cases": [
+          {
+            "case": "implicit-mandatory",
+            "raw_option": null,
+            "full": true,
+            "qualify": true,
+            "base": false,
+            "registration_count": 1,
+            "lock": "ModuleNotFoundError:kazoo",
+            "space": "ModuleNotFoundError:gymnasium",
+            "sessionstart": "mandatory prerequisite failed: No module named 'opacus'"
+          },
+          {
+            "case": "explicit-mandatory",
+            "raw_option": "mandatory",
+            "full": true,
+            "qualify": true,
+            "base": false,
+            "registration_count": 1,
+            "lock": "ModuleNotFoundError:kazoo",
+            "space": "ModuleNotFoundError:gymnasium",
+            "sessionstart": "mandatory prerequisite failed: No module named 'opacus'"
+          },
+          {
+            "case": "explicit-base",
+            "raw_option": "base",
+            "full": true,
+            "qualify": true,
+            "base": true,
+            "registration_count": 1,
+            "lock": "builtins.TimeoutError",
+            "space": "types.SimpleNamespace",
+            "sessionstart": "passed",
+            "actual_pytest_fixture_execution": {
+              "lock_timeout_type": "builtins.TimeoutError",
+              "action_space": "types.SimpleNamespace"
+            },
+            "targeted_behavioral_reports": [
+              [
+                "setup",
+                "passed"
+              ],
+              [
+                "call",
+                "passed"
+              ],
+              [
+                "teardown",
+                "passed"
+              ],
+              [
+                "setup",
+                "passed"
+              ],
+              [
+                "call",
+                "passed"
+              ],
+              [
+                "teardown",
+                "passed"
+              ]
+            ]
+          },
+          {
+            "case": "unprofiled-scoped",
+            "raw_option": null,
+            "full": false,
+            "qualify": false,
+            "base": false,
+            "registration_count": 1,
+            "lock": "builtins.TimeoutError",
+            "space": "types.SimpleNamespace",
+            "sessionstart": "passed",
+            "actual_pytest_fixture_execution": {
+              "lock_timeout_type": "builtins.TimeoutError",
+              "action_space": "types.SimpleNamespace"
+            },
+            "targeted_behavioral_reports": [
+              [
+                "setup",
+                "passed"
+              ],
+              [
+                "call",
+                "passed"
+              ],
+              [
+                "teardown",
+                "passed"
+              ],
+              [
+                "setup",
+                "passed"
+              ],
+              [
+                "call",
+                "passed"
+              ],
+              [
+                "teardown",
+                "passed"
+              ]
+            ]
+          },
+          {
+            "case": "filtered-full-unprofiled",
+            "raw_option": null,
+            "full": true,
+            "qualify": false,
+            "base": false,
+            "registration_count": 1,
+            "lock": "builtins.TimeoutError",
+            "space": "types.SimpleNamespace",
+            "sessionstart": "passed",
+            "actual_pytest_fixture_execution": {
+              "lock_timeout_type": "builtins.TimeoutError",
+              "action_space": "types.SimpleNamespace"
+            },
+            "targeted_behavioral_reports": [
+              [
+                "setup",
+                "passed"
+              ],
+              [
+                "call",
+                "passed"
+              ],
+              [
+                "teardown",
+                "passed"
+              ],
+              [
+                "setup",
+                "passed"
+              ],
+              [
+                "call",
+                "passed"
+              ],
+              [
+                "teardown",
+                "passed"
+              ]
+            ]
+          }
+        ],
+        "artifact": {
+          "path": "/tmp/plato-phase2d-review-3/base313-profiles-v2.log",
+          "sha256": "9d0efd6d8027bd3a9da4c201c63555d03a70f4fc8cdb4a09694c42019e291c71"
+        }
+      },
+      {
+        "environment": "base314",
+        "cases": [
+          {
+            "case": "implicit-mandatory",
+            "raw_option": null,
+            "full": true,
+            "qualify": true,
+            "base": false,
+            "registration_count": 1,
+            "lock": "ModuleNotFoundError:kazoo",
+            "space": "ModuleNotFoundError:gymnasium",
+            "sessionstart": "mandatory prerequisite failed: No module named 'opacus'"
+          },
+          {
+            "case": "explicit-mandatory",
+            "raw_option": "mandatory",
+            "full": true,
+            "qualify": true,
+            "base": false,
+            "registration_count": 1,
+            "lock": "ModuleNotFoundError:kazoo",
+            "space": "ModuleNotFoundError:gymnasium",
+            "sessionstart": "mandatory prerequisite failed: No module named 'opacus'"
+          },
+          {
+            "case": "explicit-base",
+            "raw_option": "base",
+            "full": true,
+            "qualify": true,
+            "base": true,
+            "registration_count": 1,
+            "lock": "builtins.TimeoutError",
+            "space": "types.SimpleNamespace",
+            "sessionstart": "passed",
+            "actual_pytest_fixture_execution": {
+              "lock_timeout_type": "builtins.TimeoutError",
+              "action_space": "types.SimpleNamespace"
+            },
+            "targeted_behavioral_reports": [
+              [
+                "setup",
+                "passed"
+              ],
+              [
+                "call",
+                "passed"
+              ],
+              [
+                "teardown",
+                "passed"
+              ],
+              [
+                "setup",
+                "passed"
+              ],
+              [
+                "call",
+                "passed"
+              ],
+              [
+                "teardown",
+                "passed"
+              ]
+            ]
+          },
+          {
+            "case": "unprofiled-scoped",
+            "raw_option": null,
+            "full": false,
+            "qualify": false,
+            "base": false,
+            "registration_count": 1,
+            "lock": "builtins.TimeoutError",
+            "space": "types.SimpleNamespace",
+            "sessionstart": "passed",
+            "actual_pytest_fixture_execution": {
+              "lock_timeout_type": "builtins.TimeoutError",
+              "action_space": "types.SimpleNamespace"
+            },
+            "targeted_behavioral_reports": [
+              [
+                "setup",
+                "passed"
+              ],
+              [
+                "call",
+                "passed"
+              ],
+              [
+                "teardown",
+                "passed"
+              ],
+              [
+                "setup",
+                "passed"
+              ],
+              [
+                "call",
+                "passed"
+              ],
+              [
+                "teardown",
+                "passed"
+              ]
+            ]
+          },
+          {
+            "case": "filtered-full-unprofiled",
+            "raw_option": null,
+            "full": true,
+            "qualify": false,
+            "base": false,
+            "registration_count": 1,
+            "lock": "builtins.TimeoutError",
+            "space": "types.SimpleNamespace",
+            "sessionstart": "passed",
+            "actual_pytest_fixture_execution": {
+              "lock_timeout_type": "builtins.TimeoutError",
+              "action_space": "types.SimpleNamespace"
+            },
+            "targeted_behavioral_reports": [
+              [
+                "setup",
+                "passed"
+              ],
+              [
+                "call",
+                "passed"
+              ],
+              [
+                "teardown",
+                "passed"
+              ],
+              [
+                "setup",
+                "passed"
+              ],
+              [
+                "call",
+                "passed"
+              ],
+              [
+                "teardown",
+                "passed"
+              ]
+            ]
+          }
+        ],
+        "artifact": {
+          "path": "/tmp/plato-phase2d-review-3/base314-profiles-v2.log",
+          "sha256": "64ef4193afcd4c807318abef8747107b550ec0ec08c7fa3a6ecd0468244cff0a"
+        }
+      },
+      {
+        "environment": "mandatory313",
+        "cases": [
+          {
+            "case": "implicit-mandatory",
+            "raw_option": null,
+            "full": true,
+            "qualify": true,
+            "base": false,
+            "registration_count": 1,
+            "lock": "kazoo.exceptions.LockTimeout",
+            "space": "gymnasium.spaces.box.Box",
+            "sessionstart": "passed",
+            "actual_pytest_fixture_execution": {
+              "lock_timeout_type": "kazoo.exceptions.LockTimeout",
+              "action_space": "gymnasium.spaces.box.Box"
+            },
+            "targeted_behavioral_reports": [
+              [
+                "setup",
+                "passed"
+              ],
+              [
+                "call",
+                "passed"
+              ],
+              [
+                "teardown",
+                "passed"
+              ],
+              [
+                "setup",
+                "passed"
+              ],
+              [
+                "call",
+                "passed"
+              ],
+              [
+                "teardown",
+                "passed"
+              ]
+            ]
+          },
+          {
+            "case": "explicit-mandatory",
+            "raw_option": "mandatory",
+            "full": true,
+            "qualify": true,
+            "base": false,
+            "registration_count": 1,
+            "lock": "kazoo.exceptions.LockTimeout",
+            "space": "gymnasium.spaces.box.Box",
+            "sessionstart": "passed",
+            "actual_pytest_fixture_execution": {
+              "lock_timeout_type": "kazoo.exceptions.LockTimeout",
+              "action_space": "gymnasium.spaces.box.Box"
+            },
+            "targeted_behavioral_reports": [
+              [
+                "setup",
+                "passed"
+              ],
+              [
+                "call",
+                "passed"
+              ],
+              [
+                "teardown",
+                "passed"
+              ],
+              [
+                "setup",
+                "passed"
+              ],
+              [
+                "call",
+                "passed"
+              ],
+              [
+                "teardown",
+                "passed"
+              ]
+            ]
+          },
+          {
+            "case": "explicit-base",
+            "raw_option": "base",
+            "full": true,
+            "qualify": true,
+            "base": true,
+            "registration_count": 1,
+            "lock": "builtins.TimeoutError",
+            "space": "types.SimpleNamespace",
+            "sessionstart": "passed",
+            "actual_pytest_fixture_execution": {
+              "lock_timeout_type": "builtins.TimeoutError",
+              "action_space": "types.SimpleNamespace"
+            },
+            "targeted_behavioral_reports": [
+              [
+                "setup",
+                "passed"
+              ],
+              [
+                "call",
+                "passed"
+              ],
+              [
+                "teardown",
+                "passed"
+              ],
+              [
+                "setup",
+                "passed"
+              ],
+              [
+                "call",
+                "passed"
+              ],
+              [
+                "teardown",
+                "passed"
+              ]
+            ]
+          },
+          {
+            "case": "unprofiled-scoped",
+            "raw_option": null,
+            "full": false,
+            "qualify": false,
+            "base": false,
+            "registration_count": 1,
+            "lock": "builtins.TimeoutError",
+            "space": "types.SimpleNamespace",
+            "sessionstart": "passed",
+            "actual_pytest_fixture_execution": {
+              "lock_timeout_type": "builtins.TimeoutError",
+              "action_space": "types.SimpleNamespace"
+            },
+            "targeted_behavioral_reports": [
+              [
+                "setup",
+                "passed"
+              ],
+              [
+                "call",
+                "passed"
+              ],
+              [
+                "teardown",
+                "passed"
+              ],
+              [
+                "setup",
+                "passed"
+              ],
+              [
+                "call",
+                "passed"
+              ],
+              [
+                "teardown",
+                "passed"
+              ]
+            ]
+          },
+          {
+            "case": "filtered-full-unprofiled",
+            "raw_option": null,
+            "full": true,
+            "qualify": false,
+            "base": false,
+            "registration_count": 1,
+            "lock": "builtins.TimeoutError",
+            "space": "types.SimpleNamespace",
+            "sessionstart": "passed",
+            "actual_pytest_fixture_execution": {
+              "lock_timeout_type": "builtins.TimeoutError",
+              "action_space": "types.SimpleNamespace"
+            },
+            "targeted_behavioral_reports": [
+              [
+                "setup",
+                "passed"
+              ],
+              [
+                "call",
+                "passed"
+              ],
+              [
+                "teardown",
+                "passed"
+              ],
+              [
+                "setup",
+                "passed"
+              ],
+              [
+                "call",
+                "passed"
+              ],
+              [
+                "teardown",
+                "passed"
+              ]
+            ]
+          }
+        ],
+        "artifact": {
+          "path": "/tmp/plato-phase2d-review-3/mandatory313-profiles-v2.log",
+          "sha256": "b83702725903c31ee6584526806e2f0909156c27eaf3a9251119681256659625"
+        }
+      },
+      {
+        "environment": "mandatory314",
+        "cases": [
+          {
+            "case": "implicit-mandatory",
+            "raw_option": null,
+            "full": true,
+            "qualify": true,
+            "base": false,
+            "registration_count": 1,
+            "lock": "kazoo.exceptions.LockTimeout",
+            "space": "gymnasium.spaces.box.Box",
+            "sessionstart": "passed",
+            "actual_pytest_fixture_execution": {
+              "lock_timeout_type": "kazoo.exceptions.LockTimeout",
+              "action_space": "gymnasium.spaces.box.Box"
+            },
+            "targeted_behavioral_reports": [
+              [
+                "setup",
+                "passed"
+              ],
+              [
+                "call",
+                "passed"
+              ],
+              [
+                "teardown",
+                "passed"
+              ],
+              [
+                "setup",
+                "passed"
+              ],
+              [
+                "call",
+                "passed"
+              ],
+              [
+                "teardown",
+                "passed"
+              ]
+            ]
+          },
+          {
+            "case": "explicit-mandatory",
+            "raw_option": "mandatory",
+            "full": true,
+            "qualify": true,
+            "base": false,
+            "registration_count": 1,
+            "lock": "kazoo.exceptions.LockTimeout",
+            "space": "gymnasium.spaces.box.Box",
+            "sessionstart": "passed",
+            "actual_pytest_fixture_execution": {
+              "lock_timeout_type": "kazoo.exceptions.LockTimeout",
+              "action_space": "gymnasium.spaces.box.Box"
+            },
+            "targeted_behavioral_reports": [
+              [
+                "setup",
+                "passed"
+              ],
+              [
+                "call",
+                "passed"
+              ],
+              [
+                "teardown",
+                "passed"
+              ],
+              [
+                "setup",
+                "passed"
+              ],
+              [
+                "call",
+                "passed"
+              ],
+              [
+                "teardown",
+                "passed"
+              ]
+            ]
+          },
+          {
+            "case": "explicit-base",
+            "raw_option": "base",
+            "full": true,
+            "qualify": true,
+            "base": true,
+            "registration_count": 1,
+            "lock": "builtins.TimeoutError",
+            "space": "types.SimpleNamespace",
+            "sessionstart": "passed",
+            "actual_pytest_fixture_execution": {
+              "lock_timeout_type": "builtins.TimeoutError",
+              "action_space": "types.SimpleNamespace"
+            },
+            "targeted_behavioral_reports": [
+              [
+                "setup",
+                "passed"
+              ],
+              [
+                "call",
+                "passed"
+              ],
+              [
+                "teardown",
+                "passed"
+              ],
+              [
+                "setup",
+                "passed"
+              ],
+              [
+                "call",
+                "passed"
+              ],
+              [
+                "teardown",
+                "passed"
+              ]
+            ]
+          },
+          {
+            "case": "unprofiled-scoped",
+            "raw_option": null,
+            "full": false,
+            "qualify": false,
+            "base": false,
+            "registration_count": 1,
+            "lock": "builtins.TimeoutError",
+            "space": "types.SimpleNamespace",
+            "sessionstart": "passed",
+            "actual_pytest_fixture_execution": {
+              "lock_timeout_type": "builtins.TimeoutError",
+              "action_space": "types.SimpleNamespace"
+            },
+            "targeted_behavioral_reports": [
+              [
+                "setup",
+                "passed"
+              ],
+              [
+                "call",
+                "passed"
+              ],
+              [
+                "teardown",
+                "passed"
+              ],
+              [
+                "setup",
+                "passed"
+              ],
+              [
+                "call",
+                "passed"
+              ],
+              [
+                "teardown",
+                "passed"
+              ]
+            ]
+          },
+          {
+            "case": "filtered-full-unprofiled",
+            "raw_option": null,
+            "full": true,
+            "qualify": false,
+            "base": false,
+            "registration_count": 1,
+            "lock": "builtins.TimeoutError",
+            "space": "types.SimpleNamespace",
+            "sessionstart": "passed",
+            "actual_pytest_fixture_execution": {
+              "lock_timeout_type": "builtins.TimeoutError",
+              "action_space": "types.SimpleNamespace"
+            },
+            "targeted_behavioral_reports": [
+              [
+                "setup",
+                "passed"
+              ],
+              [
+                "call",
+                "passed"
+              ],
+              [
+                "teardown",
+                "passed"
+              ],
+              [
+                "setup",
+                "passed"
+              ],
+              [
+                "call",
+                "passed"
+              ],
+              [
+                "teardown",
+                "passed"
+              ]
+            ]
+          }
+        ],
+        "artifact": {
+          "path": "/tmp/plato-phase2d-review-3/mandatory314-profiles-v2.log",
+          "sha256": "a5e189c43dd7b6ae6e3a49c31b1b2ffdfa1808a7e81ee75c2a85a6a5b1547377"
+        }
+      }
+    ]
+  },
+  "isolation_and_import_effects": {
+    "runs": [
+      {
+        "environment": "base313",
+        "details": {
+          "path": "/tmp/plato-phase2d-review-3/isolation-base313.json",
+          "sha256": "9ac2338ba90a3fa6115f0e1284b66df25364fb8ce3279bd5a6f9c713b96e82bc"
+        },
+        "command_and_result": {
+          "label": "base313-isolation-v2",
+          "command": [
+            "zsh",
+            "-lc",
+            "/tmp/plato-phase2b-review-3/base313/bin/python -B -m pytest tests/mpc/test_round_store_contracts.py tests/utils/test_rl_payload_utilities.py --test-profile=base -q -p no:cacheprovider -p isolation_probe -W error::UserWarning --basetemp=/tmp/plato-phase2d-review-3/base313-isolation-pytest"
+          ],
+          "cwd": "/private/tmp/plato-refresh-worktrees/payloads",
+          "exit_code": 0,
+          "seconds": 10.573,
+          "log": {
+            "path": "/tmp/plato-phase2d-review-3/base313-isolation-v2.log",
+            "sha256": "63c2baad081bdf6e153f19a4be75063c712ed74b431c0e54c221e100cd29b921"
+          },
+          "summary": ".....................                                                    [100%]\n21 passed in 0.29s\n"
+        },
+        "regressions_observed": 8,
+        "actual_behavioral_fixture_types": [
+          {
+            "nodeid": "tests/mpc/test_round_store_contracts.py::test_lock_failure_stops_client_and_never_writes",
+            "actual_fixture_types": {
+              "lock_timeout_type": "builtins.TimeoutError"
+            }
+          },
+          {
+            "nodeid": "tests/utils/test_rl_payload_utilities.py::test_active_policy_finite_update_and_saved_weight_roundtrip[ddpg]",
+            "actual_fixture_types": {
+              "action_space": "types.SimpleNamespace"
+            }
+          },
+          {
+            "nodeid": "tests/utils/test_rl_payload_utilities.py::test_active_policy_finite_update_and_saved_weight_roundtrip[td3]",
+            "actual_fixture_types": {
+              "action_space": "types.SimpleNamespace"
+            }
+          },
+          {
+            "nodeid": "tests/utils/test_rl_payload_utilities.py::test_active_policy_finite_update_and_saved_weight_roundtrip[sac]",
+            "actual_fixture_types": {
+              "action_space": "types.SimpleNamespace"
+            }
+          },
+          {
+            "nodeid": "tests/utils/test_rl_payload_utilities.py::test_active_policy_finite_update_and_saved_weight_roundtrip[td3_rnn]",
+            "actual_fixture_types": {
+              "action_space": "types.SimpleNamespace"
+            }
+          },
+          {
+            "nodeid": "tests/utils/test_rl_payload_utilities.py::test_active_policy_finite_update_and_saved_weight_roundtrip[sac_deterministic]",
+            "actual_fixture_types": {
+              "action_space": "types.SimpleNamespace"
+            }
+          }
+        ]
+      },
+      {
+        "environment": "mandatory313",
+        "details": {
+          "path": "/tmp/plato-phase2d-review-3/isolation-venv313.json",
+          "sha256": "de92701c415a85b971350ef906ffc3fbf7fa0fd08b92c86fec22c417b08fa49b"
+        },
+        "command_and_result": {
+          "label": "mandatory313-isolation-v2",
+          "command": [
+            "zsh",
+            "-lc",
+            "/tmp/plato-phase2d-review/venv313/bin/python -B -m pytest tests/mpc/test_round_store_contracts.py tests/utils/test_rl_payload_utilities.py --test-profile=mandatory -q -p no:cacheprovider -p isolation_probe -W error::UserWarning --basetemp=/tmp/plato-phase2d-review-3/mandatory313-isolation-pytest"
+          ],
+          "cwd": "/private/tmp/plato-refresh-worktrees/payloads",
+          "exit_code": 0,
+          "seconds": 14.092,
+          "log": {
+            "path": "/tmp/plato-phase2d-review-3/mandatory313-isolation-v2.log",
+            "sha256": "72b1cafedf2e939bd27ef14c557f421c005a1fb0ac6ab2fca73243e0305bb0e0"
+          },
+          "summary": "W1003 01:12:49.431000 61420 /private/tmp/plato-phase2d-review/venv313/lib/python3.13/site-packages/torch/distributed/elastic/multiprocessing/redirects.py:35] NOTE: Redirects are currently not supported in MacOs.\n.....................                                                    [100%]\n21 passed in 0.29s\n"
+        },
+        "regressions_observed": 8,
+        "actual_behavioral_fixture_types": [
+          {
+            "nodeid": "tests/mpc/test_round_store_contracts.py::test_lock_failure_stops_client_and_never_writes",
+            "actual_fixture_types": {
+              "lock_timeout_type": "kazoo.exceptions.LockTimeout"
+            }
+          },
+          {
+            "nodeid": "tests/utils/test_rl_payload_utilities.py::test_active_policy_finite_update_and_saved_weight_roundtrip[ddpg]",
+            "actual_fixture_types": {
+              "action_space": "gymnasium.spaces.box.Box"
+            }
+          },
+          {
+            "nodeid": "tests/utils/test_rl_payload_utilities.py::test_active_policy_finite_update_and_saved_weight_roundtrip[td3]",
+            "actual_fixture_types": {
+              "action_space": "gymnasium.spaces.box.Box"
+            }
+          },
+          {
+            "nodeid": "tests/utils/test_rl_payload_utilities.py::test_active_policy_finite_update_and_saved_weight_roundtrip[sac]",
+            "actual_fixture_types": {
+              "action_space": "gymnasium.spaces.box.Box"
+            }
+          },
+          {
+            "nodeid": "tests/utils/test_rl_payload_utilities.py::test_active_policy_finite_update_and_saved_weight_roundtrip[td3_rnn]",
+            "actual_fixture_types": {
+              "action_space": "gymnasium.spaces.box.Box"
+            }
+          },
+          {
+            "nodeid": "tests/utils/test_rl_payload_utilities.py::test_active_policy_finite_update_and_saved_weight_roundtrip[sac_deterministic]",
+            "actual_fixture_types": {
+              "action_space": "gymnasium.spaces.box.Box"
+            }
+          }
+        ]
+      },
+      {
+        "environment": "base314",
+        "details": {
+          "path": "/tmp/plato-phase2d-review-3/isolation-base314.json",
+          "sha256": "2b4da2af394ecdb2090a95dd0437231c5eb84389518ab6c374ad7e743af1a223"
+        },
+        "command_and_result": {
+          "label": "base314-isolation-v3",
+          "command": [
+            "zsh",
+            "-lc",
+            "/private/tmp/plato-phase2b-review-3/base314/bin/python -B -m pytest tests/mpc/test_round_store_contracts.py tests/utils/test_rl_payload_utilities.py --test-profile=base -q -p no:cacheprovider -p isolation_probe -W error::UserWarning --basetemp=/tmp/plato-phase2d-review-3/base314-isolation-pytest"
+          ],
+          "cwd": "/private/tmp/plato-refresh-worktrees/payloads",
+          "exit_code": 0,
+          "seconds": 11.509,
+          "log": {
+            "path": "/tmp/plato-phase2d-review-3/base314-isolation-v3.log",
+            "sha256": "6295008c8b7beaea9b2025d2abf3f32d42338da79404a6974a7a95c54c9180a8"
+          },
+          "summary": ".....................                                                    [100%]\n21 passed in 0.42s\n"
+        },
+        "regressions_observed": 8,
+        "actual_behavioral_fixture_types": [
+          {
+            "nodeid": "tests/mpc/test_round_store_contracts.py::test_lock_failure_stops_client_and_never_writes",
+            "actual_fixture_types": {
+              "lock_timeout_type": "builtins.TimeoutError"
+            }
+          },
+          {
+            "nodeid": "tests/utils/test_rl_payload_utilities.py::test_active_policy_finite_update_and_saved_weight_roundtrip[ddpg]",
+            "actual_fixture_types": {
+              "action_space": "types.SimpleNamespace"
+            }
+          },
+          {
+            "nodeid": "tests/utils/test_rl_payload_utilities.py::test_active_policy_finite_update_and_saved_weight_roundtrip[td3]",
+            "actual_fixture_types": {
+              "action_space": "types.SimpleNamespace"
+            }
+          },
+          {
+            "nodeid": "tests/utils/test_rl_payload_utilities.py::test_active_policy_finite_update_and_saved_weight_roundtrip[sac]",
+            "actual_fixture_types": {
+              "action_space": "types.SimpleNamespace"
+            }
+          },
+          {
+            "nodeid": "tests/utils/test_rl_payload_utilities.py::test_active_policy_finite_update_and_saved_weight_roundtrip[td3_rnn]",
+            "actual_fixture_types": {
+              "action_space": "types.SimpleNamespace"
+            }
+          },
+          {
+            "nodeid": "tests/utils/test_rl_payload_utilities.py::test_active_policy_finite_update_and_saved_weight_roundtrip[sac_deterministic]",
+            "actual_fixture_types": {
+              "action_space": "types.SimpleNamespace"
+            }
+          }
+        ]
+      },
+      {
+        "environment": "mandatory314",
+        "details": {
+          "path": "/tmp/plato-phase2d-review-3/isolation-venv314.json",
+          "sha256": "cf3c7b90a1629955965aa059f2d46396d25576b9caafbc5030d4cd686f6c54f3"
+        },
+        "command_and_result": {
+          "label": "mandatory314-isolation-v3",
+          "command": [
+            "zsh",
+            "-lc",
+            "/private/tmp/plato-phase2d-review/venv314/bin/python -B -m pytest tests/mpc/test_round_store_contracts.py tests/utils/test_rl_payload_utilities.py --test-profile=mandatory -q -p no:cacheprovider -p isolation_probe -W error::UserWarning --basetemp=/tmp/plato-phase2d-review-3/mandatory314-isolation-pytest"
+          ],
+          "cwd": "/private/tmp/plato-refresh-worktrees/payloads",
+          "exit_code": 0,
+          "seconds": 15.278,
+          "log": {
+            "path": "/tmp/plato-phase2d-review-3/mandatory314-isolation-v3.log",
+            "sha256": "d2308a833dd21ef975473aca451201242825682cce4786794c91fe9e913e127d"
+          },
+          "summary": "W1003 01:13:58.716000 61504 torch/distributed/elastic/multiprocessing/redirects.py:35] NOTE: Redirects are currently not supported in MacOs.\n.....................                                                    [100%]\n21 passed in 0.29s\n"
+        },
+        "regressions_observed": 8,
+        "actual_behavioral_fixture_types": [
+          {
+            "nodeid": "tests/mpc/test_round_store_contracts.py::test_lock_failure_stops_client_and_never_writes",
+            "actual_fixture_types": {
+              "lock_timeout_type": "kazoo.exceptions.LockTimeout"
+            }
+          },
+          {
+            "nodeid": "tests/utils/test_rl_payload_utilities.py::test_active_policy_finite_update_and_saved_weight_roundtrip[ddpg]",
+            "actual_fixture_types": {
+              "action_space": "gymnasium.spaces.box.Box"
+            }
+          },
+          {
+            "nodeid": "tests/utils/test_rl_payload_utilities.py::test_active_policy_finite_update_and_saved_weight_roundtrip[td3]",
+            "actual_fixture_types": {
+              "action_space": "gymnasium.spaces.box.Box"
+            }
+          },
+          {
+            "nodeid": "tests/utils/test_rl_payload_utilities.py::test_active_policy_finite_update_and_saved_weight_roundtrip[sac]",
+            "actual_fixture_types": {
+              "action_space": "gymnasium.spaces.box.Box"
+            }
+          },
+          {
+            "nodeid": "tests/utils/test_rl_payload_utilities.py::test_active_policy_finite_update_and_saved_weight_roundtrip[td3_rnn]",
+            "actual_fixture_types": {
+              "action_space": "gymnasium.spaces.box.Box"
+            }
+          },
+          {
+            "nodeid": "tests/utils/test_rl_payload_utilities.py::test_active_policy_finite_update_and_saved_weight_roundtrip[sac_deterministic]",
+            "actual_fixture_types": {
+              "action_space": "gymnasium.spaces.box.Box"
+            }
+          }
+        ]
+      }
+    ],
+    "result": "All eight regression cases retain outer profile identity/state, cwd, environment, Config class state, Python/NumPy/Torch RNGs, warning filters, assertion/import hooks, and preexisting module identities. No module substitution/removal or additional imports were observed in the new regression bodies in these four environments.",
+    "path_observation": "The first protocol snapshot observes pytest prepending the repository root before the autouse fixture begins; the instrumented Python 3.14 setup snapshots exactly equal final paths. This is normal outer pytest setup/import processing, not a leaked nested-config mutation. The other seven regression protocols have no path change. Shared isolate_test_state continues restoring the path captured at fixture setup.",
+    "configuration_cleanup": "New configs disable cacheprovider and use _ensure_unconfigure in finally. Parsed configs may share already-imported real modules; no replacement/fake optional library is installed into sys.modules."
+  },
+  "production_and_test_preservation": {
+    "root_recorded_40_production_paths_rechecked": {
+      "accepted_B": {
+        "examples/async/port/port_server.py": true,
+        "plato/callbacks/handler.py": true,
+        "plato/clients/base.py": true,
+        "plato/clients/composable.py": true,
+        "plato/clients/strategies/defaults.py": true,
+        "plato/clients/transport.py": true,
+        "plato/servers/base.py": true,
+        "plato/servers/fedavg.py": true,
+        "plato/servers/fedavg_cs.py": true,
+        "plato/servers/strategies/aggregation/fedavg.py": true,
+        "plato/servers/strategies/aggregation/port.py": true
+      },
+      "corrected_D": {
+        "cleanup.py": true,
+        "plato/clients/strategies/mpc.py": true,
+        "plato/mpc/round_store.py": true,
+        "plato/processors/compress.py": true,
+        "plato/processors/decompress.py": true,
+        "plato/processors/feature.py": true,
+        "plato/processors/model_dequantize.py": true,
+        "plato/processors/model_dequantize_qsgd.py": true,
+        "plato/processors/model_quantize.py": true,
+        "plato/processors/model_quantize_qsgd.py": true,
+        "plato/processors/model_randomized_response.py": true,
+        "plato/processors/mpc_model_encrypt_additive.py": true,
+        "plato/processors/mpc_model_encrypt_shamir.py": true,
+        "plato/processors/unstructured_pruning.py": true,
+        "plato/serialization/safetensor.py": true,
+        "plato/servers/fedavg_he.py": true,
+        "plato/servers/strategies/aggregation/he.py": true,
+        "plato/servers/strategies/mpc.py": true,
+        "plato/utils/count_parameters.py": true,
+        "plato/utils/data_loaders.py": true,
+        "plato/utils/homo_enc.py": true,
+        "plato/utils/reinforcement_learning/policies/base.py": true,
+        "plato/utils/reinforcement_learning/policies/ddpg.py": true,
+        "plato/utils/reinforcement_learning/policies/sac.py": true,
+        "plato/utils/reinforcement_learning/policies/td3.py": true,
+        "plato/utils/s3.py": true,
+        "plato/utils/toml_writer.py": true,
+        "plato/utils/tree.py": true,
+        "plato/utils/unary_encoding.py": true
+      }
+    },
+    "all_production_since_review2_unchanged": true,
+    "S3_lifecycle_shared_policy_and_metadata": {
+      "tests/servers/test_runtime_s3_contract.py": true,
+      "tests/clients/test_client_lifecycle_variants.py": true,
+      "tests/conftest.py": true,
+      "tests/integration/utils.py": true,
+      "pyproject.toml": true,
+      "uv.lock": true
+    },
+    "changed_test_source": {
+      "tests/mpc/test_round_store_contracts.py": {
+        "unchanged_original_test_AST": {
+          "test_lock_failure_stops_client_and_never_writes": true,
+          "test_finite_lock_wait_prevents_unlocked_write": true,
+          "test_s3_read_error_is_not_reported_as_an_uninitialized_round": true
+        },
+        "added_functions": [
+          "test_lock_timeout_follows_effective_pytest_profile"
+        ],
+        "blob": "aecae718d67bd62f3cebce4c02a92a3e830bb889",
+        "sha256": "3f443669807fd3ebe6e6d6224ae7d6d1ccf0b7d8696cc29b6c5e496ae5eb23cb"
+      },
+      "tests/utils/test_rl_payload_utilities.py": {
+        "unchanged_original_test_AST": {
+          "test_active_policy_finite_update_and_saved_weight_roundtrip": true,
+          "test_td3_actions_are_independent_of_other_batch_rows": true,
+          "test_async_recurrent_policy_accepts_variable_client_sequences": true,
+          "test_td3_target_actions_use_every_transition": true,
+          "test_async_actor_ignores_padding_and_other_transitions": true
+        },
+        "added_functions": [
+          "test_action_space_follows_effective_pytest_profile"
+        ],
+        "blob": "6979685f775e806fda50e401459116f3eddf7cf0",
+        "sha256": "c7542d050edcb30ea370241b13b4efb676988530677d16c192451bbcef415388"
+      }
+    },
+    "archive_rl_env_matches_phase_base_bytes": true,
+    "durable_S3_test_sha256": "e09c7ed694713815463b3be34939b9f4873b2b1b5930600f9c8f47b85d84c3e0",
+    "durable_S3_assessment": "Tracked test imports current plato.utils.s3.S3, plato.clients.transport.receive_s3_payload and actual DefaultPayloadStrategy. The 24 localhost writer/reader valid/oversize/total-deadline cases cover four prefixes and native/minimal adapters with actual botocore writer/presigner; four actual-client failure cases assert cleanup before test finally. Prior eight minimal-prefix and two buffer-cap cases remain. No absolute scratch production imports. These unchanged 38 cases retain review2 passing evidence on both interpreters and are not mechanically rerun.",
+    "merged_lifecycle_assessment": "The nine-case lifecycle module, including accepted B payload-size rejection and D persisted-MPC sample accounting, is byte-identical to review2."
+  },
+  "retained_prior_contracts": {
+    "original_four_findings": [
+      {
+        "id": "2D-R01",
+        "status": "RESOLVED",
+        "path": "plato/clients/strategies/mpc.py",
+        "line": 49,
+        "source_review": "Authoritative server.mpc_shamir_threshold is assigned into registry kwargs, including None default, after merging protocol fields. Direct constructor threshold is unchanged.",
+        "independent_execution": "Six reviewer cases on each interpreter use actual Config -> server wrapper/from_config store -> MPCLifecycleStrategy.configure -> registry Shamir/Safetensors -> server strategy. Thresholds 1/2/None, local overrides 1/4, unrelated same-processor server_id/review_marker and unrelated processor kwargs, five clients with [.5,0,2.5,1,3], seed807, reversed arrivals, independently summed float64 plaintext reference at absolute 2e-6. Explicit direct Processor(threshold=4) stays 4. Only general FedAvg parent initialization is isolated; no MPC production method is copied."
+      },
+      {
+        "id": "2D-R02",
+        "status": "RESOLVED",
+        "path": "plato/processors/model_dequantize_qsgd.py",
+        "line": 81,
+        "source_review": "Bounded code division precedes multiplication by header scale; existing sign/magnitude wire and max-norm equation remain.",
+        "independent_execution": "Four reviewer cases per interpreter cover levels 2/16/64/128, seeds0/49/2026, +/-3e38 endpoints and intermediate extreme magnitudes, finite results, exact endpoints and float64 quantization-bound calculation. Zero/empty and invalid source/header scales are exercised. Full base also executes all twelve shipped ordinary/1e38/3e38 level combinations and existing malformed contracts."
+      },
+      {
+        "id": "2D-R03",
+        "status": "RESOLVED",
+        "path": "plato/utils/toml_writer.py",
+        "line": 136,
+        "source_review": "Keys and values share scalar-preserving non-ASCII string quoting with explicit DEL escape.",
+        "independent_execution": "Five reviewer cases per interpreter use rocket, supplementary CJK, U+10FFFF, DEL and mixed supplementary/DEL strings as keys and values, nested array tables and literal-dot names. dumps, UTF-8 dump/read and stdlib tomllib.loads/load reconstruct the independent input exactly."
+      },
+      {
+        "id": "2D-R04",
+        "status": "RESOLVED",
+        "path": "plato/processors/mpc_model_encrypt_shamir.py",
+        "line": 72,
+        "source_review": "Coefficient-pool capacity is checked before bounded sampling without replacement. The 1..999 pool excludes integer secret10; threshold1000 cannot request999 coefficients from998 available.",
+        "independent_execution": "One subprocess case per interpreter executes real public process with 1000 selected participants, threshold1000 and tensor0.000010, requires coefficient-pool ValueError within one second after entering process, and compares all store bytes/files unchanged. Child containment is twelve seconds. Normal threshold reconstruction is covered by reviewer R01 and full base tests.",
+        "historical_red": "Retained review-red-bound313/314 logs contain entered public process then TimeoutExpired at12s and contained -9 child, not an import/startup timeout. Hashes verified. No finite-field or cryptographic redesign."
+      }
+    ],
+    "attribution": "Source and retained logs/manifests verified in this review; the numerical probes below were independently executed by review2, not rerun or reattributed to review3.",
+    "R01": "Configured threshold is authoritative through real lifecycle/registry/server wiring; review2 five-client fractional weights [.5,0,2.5,1,3], thresholds 1/2/default and override cases match independent plaintext references within 2e-6.",
+    "R02": "Decoder normalizes QSGD codes before finite float32 scaling. Retained levels 2/16/64/128 and +/-3e38 probes and shipped malformed/zero/empty contracts pass.",
+    "R03": "Scalar-preserving Unicode quoting and explicit DEL escaping retained; stdlib TOML roundtrips non-BMP keys/values and nested array tables, including U+10FFFF.",
+    "R04": "Distinct coefficient pool capacity validation precedes bounded sampling; retained public threshold1000 probe fails promptly before pairwise store mutation, with unchanged store bytes.",
+    "F02_F05": "Exactly-once S3 keys, omitted Contents handling, complete paginator consumption, and finite default 5/30-second inactivity limits with three attempts retain prior actual localhost HTTP/botocore/Requests evidence. Runtime reader separately enforces a total deadline.",
+    "F12_bf16": "Tree path collisions and reserved metadata reject before overwrite/encoding; ordinary dotted keys and normal Torch bfloat16 transport retain prior passed tests and unchanged source.",
+    "HE_MPC_RL_processors_cleanup": "Touched HE/MPC, processors, active RL utilities and cleanup retain review2 accepted source/evidence. No cryptographic protocol or research-equation redesign."
+  },
+  "independent_validation": {
+    "environments": [
+      {
+        "label": "base313",
+        "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+        "executable": "/tmp/plato-phase2b-review-3/base313/bin/python",
+        "prefix": "/tmp/plato-phase2b-review-3/base313",
+        "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+        "distribution_count": 85,
+        "distribution_fingerprint": "b35e3a06274f5dcc707377d887244d5215bc465d45b0b42109c8e323640fc30d",
+        "fingerprint_definition": "SHA256 of sorted distribution Name==version lines, each ending in newline.",
+        "optional_presence": {
+          "kazoo": false,
+          "gymnasium": false,
+          "opacus": false,
+          "tiktoken": false
+        },
+        "uv_lock_sha256": "573b10c2ba1a2317e02f9e40c6181359cafab6f6e0a0f9be12bb256cb276fe1d",
+        "relevant_versions": {
+          "pytest": "9.1.1",
+          "numpy": "2.5.3",
+          "torch": "2.14.1",
+          "boto3": "1.43.106",
+          "botocore": "1.43.106",
+          "requests": "2.34.2",
+          "safetensors": "0.8.0"
+        },
+        "all_imported_Plato_and_test_source_origins_are_current_candidate": true,
+        "inventory_and_origins": {
+          "path": "/tmp/plato-phase2d-review-3/base313-environment.log",
+          "sha256": "a853bdcc49adbc524990dcad1a9b5cdddae4a4b962c44357400bb6ab88626415"
+        },
+        "reuse": "Existing locked reviewer environment borrowed read-only; no install, sync, reconfiguration, or deletion."
+      },
+      {
+        "label": "base314",
+        "python": "3.14.8 (main, Sep 30 2026, 17:55:09) [Clang 21.0.0 (clang-2100.3.34.2)]",
+        "executable": "/private/tmp/plato-phase2b-review-3/base314/bin/python",
+        "prefix": "/private/tmp/plato-phase2b-review-3/base314",
+        "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+        "distribution_count": 85,
+        "distribution_fingerprint": "b35e3a06274f5dcc707377d887244d5215bc465d45b0b42109c8e323640fc30d",
+        "fingerprint_definition": "SHA256 of sorted distribution Name==version lines, each ending in newline.",
+        "optional_presence": {
+          "kazoo": false,
+          "gymnasium": false,
+          "opacus": false,
+          "tiktoken": false
+        },
+        "uv_lock_sha256": "573b10c2ba1a2317e02f9e40c6181359cafab6f6e0a0f9be12bb256cb276fe1d",
+        "relevant_versions": {
+          "pytest": "9.1.1",
+          "numpy": "2.5.3",
+          "torch": "2.14.1",
+          "boto3": "1.43.106",
+          "botocore": "1.43.106",
+          "requests": "2.34.2",
+          "safetensors": "0.8.0"
+        },
+        "all_imported_Plato_and_test_source_origins_are_current_candidate": true,
+        "inventory_and_origins": {
+          "path": "/tmp/plato-phase2d-review-3/base314-environment.log",
+          "sha256": "241018c6b47f3bdd0e742b315682e2e7c5a04720ce6a346e194594b3abc221eb"
+        },
+        "reuse": "Existing locked reviewer environment borrowed read-only; no install, sync, reconfiguration, or deletion."
+      },
+      {
+        "label": "mandatory313",
+        "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+        "executable": "/tmp/plato-phase2d-review/venv313/bin/python",
+        "prefix": "/tmp/plato-phase2d-review/venv313",
+        "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+        "distribution_count": 109,
+        "distribution_fingerprint": "5c6bd54ed1156a26ee2d83425a8ec111598978e0927d72271ac8baaaef39bfcb",
+        "fingerprint_definition": "SHA256 of sorted distribution Name==version lines, each ending in newline.",
+        "optional_presence": {
+          "kazoo": true,
+          "gymnasium": true,
+          "opacus": true,
+          "tiktoken": true
+        },
+        "uv_lock_sha256": "573b10c2ba1a2317e02f9e40c6181359cafab6f6e0a0f9be12bb256cb276fe1d",
+        "relevant_versions": {
+          "pytest": "9.1.1",
+          "numpy": "2.5.3",
+          "torch": "2.14.1",
+          "boto3": "1.43.106",
+          "botocore": "1.43.106",
+          "requests": "2.34.2",
+          "safetensors": "0.8.0",
+          "kazoo": "2.11.0",
+          "gymnasium": "1.3.0",
+          "opacus": "1.6.0",
+          "tiktoken": "0.14.0"
+        },
+        "all_imported_Plato_and_test_source_origins_are_current_candidate": true,
+        "inventory_and_origins": {
+          "path": "/tmp/plato-phase2d-review-3/mandatory313-environment.log",
+          "sha256": "e3422a7520b6d8c128ceadfffb22847483a74705c765aa7ebe7c60cc145d2add"
+        },
+        "reuse": "Existing locked reviewer environment borrowed read-only; no install, sync, reconfiguration, or deletion."
+      },
+      {
+        "label": "mandatory314",
+        "python": "3.14.8 (main, Sep 30 2026, 17:55:09) [Clang 21.0.0 (clang-2100.3.34.2)]",
+        "executable": "/private/tmp/plato-phase2d-review/venv314/bin/python",
+        "prefix": "/private/tmp/plato-phase2d-review/venv314",
+        "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+        "distribution_count": 109,
+        "distribution_fingerprint": "5c6bd54ed1156a26ee2d83425a8ec111598978e0927d72271ac8baaaef39bfcb",
+        "fingerprint_definition": "SHA256 of sorted distribution Name==version lines, each ending in newline.",
+        "optional_presence": {
+          "kazoo": true,
+          "gymnasium": true,
+          "opacus": true,
+          "tiktoken": true
+        },
+        "uv_lock_sha256": "573b10c2ba1a2317e02f9e40c6181359cafab6f6e0a0f9be12bb256cb276fe1d",
+        "relevant_versions": {
+          "pytest": "9.1.1",
+          "numpy": "2.5.3",
+          "torch": "2.14.1",
+          "boto3": "1.43.106",
+          "botocore": "1.43.106",
+          "requests": "2.34.2",
+          "safetensors": "0.8.0",
+          "kazoo": "2.11.0",
+          "gymnasium": "1.3.0",
+          "opacus": "1.6.0",
+          "tiktoken": "0.14.0"
+        },
+        "all_imported_Plato_and_test_source_origins_are_current_candidate": true,
+        "inventory_and_origins": {
+          "path": "/tmp/plato-phase2d-review-3/mandatory314-environment.log",
+          "sha256": "e761e6501f548b38bf81bf9bbb59f892753062022da1d8af14c38e9db1228902"
+        },
+        "reuse": "Existing locked reviewer environment borrowed read-only; no install, sync, reconfiguration, or deletion."
+      }
+    ],
+    "commands_and_results": [
+      {
+        "label": "base313-targeted",
+        "command": [
+          "zsh",
+          "-lc",
+          "/tmp/plato-phase2b-review-3/base313/bin/python -B -m pytest tests/mpc/test_round_store_contracts.py tests/utils/test_rl_payload_utilities.py --test-profile=base -q -W error::UserWarning -p no:cacheprovider --basetemp=/tmp/plato-phase2d-review-3/base313-pytest --junitxml=/tmp/plato-phase2d-review-3/base313-targeted.xml"
+        ],
+        "cwd": "/private/tmp/plato-refresh-worktrees/payloads",
+        "exit_code": 0,
+        "seconds": 13.395,
+        "log": {
+          "path": "/tmp/plato-phase2d-review-3/base313-targeted.log",
+          "sha256": "ca4107189e93a4540eff826fa53f36e97642e7afe98dc27b4a27e4e1dfcb83d8"
+        },
+        "summary": ".....................                                                    [100%]\n21 passed in 0.31s\n",
+        "junit": {
+          "tests": 21,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "junit_artifact": {
+          "path": "/tmp/plato-phase2d-review-3/base313-targeted.xml",
+          "sha256": "3afe1b9bc1bf37d5cf6af86a185e0f5f85c1c44c8a77769fd2dd01397f4e505c"
+        },
+        "source_commit": "96323afa094a37584844275cc04bf1e1eedfaa0d"
+      },
+      {
+        "label": "base313-profiles-v2",
+        "command": [
+          "zsh",
+          "-lc",
+          "/tmp/plato-phase2b-review-3/base313/bin/python -B /tmp/plato-phase2d-review-3/profile_probe.py"
+        ],
+        "cwd": "/private/tmp/plato-refresh-worktrees/payloads",
+        "exit_code": 0,
+        "seconds": 11.327,
+        "log": {
+          "path": "/tmp/plato-phase2d-review-3/base313-profiles-v2.log",
+          "sha256": "9d0efd6d8027bd3a9da4c201c63555d03a70f4fc8cdb4a09694c42019e291c71"
+        },
+        "summary": "_timeout_type\": \"builtins.TimeoutError\",\n        \"action_space\": \"types.SimpleNamespace\"\n      },\n      \"targeted_behavioral_reports\": [\n        [\n          \"setup\",\n          \"passed\"\n        ],\n        [\n          \"call\",\n          \"passed\"\n        ],\n        [\n          \"teardown\",\n          \"passed\"\n        ],\n        [\n          \"setup\",\n          \"passed\"\n        ],\n        [\n          \"call\",\n          \"passed\"\n        ],\n        [\n          \"teardown\",\n          \"passed\"\n        ]\n      ]\n    },\n    {\n      \"case\": \"unprofiled-scoped\",\n      \"raw_option\": null,\n      \"full\": false,\n      \"qualify\": false,\n      \"base\": false,\n      \"registration_count\": 1,\n      \"lock\": \"builtins.TimeoutError\",\n      \"space\": \"types.SimpleNamespace\",\n      \"sessionstart\": \"passed\",\n      \"actual_pytest_fixture_execution\": {\n        \"lock_timeout_type\": \"builtins.TimeoutError\",\n        \"action_space\": \"types.SimpleNamespace\"\n      },\n      \"targeted_behavioral_reports\": [\n        [\n          \"setup\",\n          \"passed\"\n        ],\n        [\n          \"call\",\n          \"passed\"\n        ],\n        [\n          \"teardown\",\n          \"passed\"\n        ],\n        [\n          \"setup\",\n          \"passed\"\n        ],\n        [\n          \"call\",\n          \"passed\"\n        ],\n        [\n          \"teardown\",\n          \"passed\"\n        ]\n      ]\n    },\n    {\n      \"case\": \"filtered-full-unprofiled\",\n      \"raw_option\": null,\n      \"full\": true,\n      \"qualify\": false,\n      \"base\": false,\n      \"registration_count\": 1,\n      \"lock\": \"builtins.TimeoutError\",\n      \"space\": \"types.SimpleNamespace\",\n      \"sessionstart\": \"passed\",\n      \"actual_pytest_fixture_execution\": {\n        \"lock_timeout_type\": \"builtins.TimeoutError\",\n        \"action_space\": \"types.SimpleNamespace\"\n      },\n      \"targeted_behavioral_reports\": [\n        [\n          \"setup\",\n          \"passed\"\n        ],\n        [\n          \"call\",\n          \"passed\"\n        ],\n        [\n          \"teardown\",\n          \"passed\"\n        ],\n        [\n          \"setup\",\n          \"passed\"\n        ],\n        [\n          \"call\",\n          \"passed\"\n        ],\n        [\n          \"teardown\",\n          \"passed\"\n        ]\n      ]\n    }\n  ]\n}\n"
+      },
+      {
+        "label": "base313-environment",
+        "command": [
+          "zsh",
+          "-lc",
+          "/tmp/plato-phase2b-review-3/base313/bin/python -B /tmp/plato-phase2d-review-3/environment_probe.py"
+        ],
+        "cwd": "/private/tmp/plato-refresh-worktrees/payloads",
+        "exit_code": 0,
+        "seconds": 9.805,
+        "log": {
+          "path": "/tmp/plato-phase2d-review-3/base313-environment.log",
+          "sha256": "a853bdcc49adbc524990dcad1a9b5cdddae4a4b962c44357400bb6ab88626415"
+        },
+        "summary": "to-refresh-worktrees/payloads/plato/servers/strategies/client_selection/personalized.py\",\n    \"plato.servers.strategies.client_selection.split_learning\": \"/private/tmp/plato-refresh-worktrees/payloads/plato/servers/strategies/client_selection/split_learning.py\",\n    \"plato.servers.strategies.client_selection\": \"/private/tmp/plato-refresh-worktrees/payloads/plato/servers/strategies/client_selection/__init__.py\",\n    \"plato.servers.strategies.mpc\": \"/private/tmp/plato-refresh-worktrees/payloads/plato/servers/strategies/mpc.py\",\n    \"plato.servers.strategies\": \"/private/tmp/plato-refresh-worktrees/payloads/plato/servers/strategies/__init__.py\",\n    \"tests.test_utils.fakes\": \"/private/tmp/plato-refresh-worktrees/payloads/tests/test_utils/fakes.py\",\n    \"tests.conftest\": \"/private/tmp/plato-refresh-worktrees/payloads/tests/conftest.py\",\n    \"tests.mpc.test_round_store_contracts\": \"/private/tmp/plato-refresh-worktrees/payloads/tests/mpc/test_round_store_contracts.py\",\n    \"plato.utils.reinforcement_learning\": \"/private/tmp/plato-refresh-worktrees/payloads/plato/utils/reinforcement_learning/__init__.py\",\n    \"plato.utils.reinforcement_learning.policies\": \"/private/tmp/plato-refresh-worktrees/payloads/plato/utils/reinforcement_learning/policies/__init__.py\",\n    \"plato.utils.reinforcement_learning.policies.base\": \"/private/tmp/plato-refresh-worktrees/payloads/plato/utils/reinforcement_learning/policies/base.py\",\n    \"plato.utils.reinforcement_learning.policies.ddpg\": \"/private/tmp/plato-refresh-worktrees/payloads/plato/utils/reinforcement_learning/policies/ddpg.py\",\n    \"plato.utils.reinforcement_learning.policies.sac\": \"/private/tmp/plato-refresh-worktrees/payloads/plato/utils/reinforcement_learning/policies/sac.py\",\n    \"plato.utils.reinforcement_learning.policies.td3\": \"/private/tmp/plato-refresh-worktrees/payloads/plato/utils/reinforcement_learning/policies/td3.py\",\n    \"tests.utils.test_rl_payload_utilities\": \"/private/tmp/plato-refresh-worktrees/payloads/tests/utils/test_rl_payload_utilities.py\",\n    \"plato.clients.strategies.mpc\": \"/private/tmp/plato-refresh-worktrees/payloads/plato/clients/strategies/mpc.py\"\n  },\n  \"all_source_origins_current_candidate\": true\n}\n"
+      },
+      {
+        "label": "base314-targeted",
+        "command": [
+          "zsh",
+          "-lc",
+          "/private/tmp/plato-phase2b-review-3/base314/bin/python -B -m pytest tests/mpc/test_round_store_contracts.py tests/utils/test_rl_payload_utilities.py --test-profile=base -q -W error::UserWarning -p no:cacheprovider --basetemp=/tmp/plato-phase2d-review-3/base314-pytest --junitxml=/tmp/plato-phase2d-review-3/base314-targeted.xml"
+        ],
+        "cwd": "/private/tmp/plato-refresh-worktrees/payloads",
+        "exit_code": 0,
+        "seconds": 14.627,
+        "log": {
+          "path": "/tmp/plato-phase2d-review-3/base314-targeted.log",
+          "sha256": "ca4107189e93a4540eff826fa53f36e97642e7afe98dc27b4a27e4e1dfcb83d8"
+        },
+        "summary": ".....................                                                    [100%]\n21 passed in 0.31s\n",
+        "junit": {
+          "tests": 21,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "junit_artifact": {
+          "path": "/tmp/plato-phase2d-review-3/base314-targeted.xml",
+          "sha256": "50b19408218ba56ae87068cdd1bc91615cb646e584669026cc11272c359ca6bc"
+        },
+        "source_commit": "96323afa094a37584844275cc04bf1e1eedfaa0d"
+      },
+      {
+        "label": "base314-profiles-v2",
+        "command": [
+          "zsh",
+          "-lc",
+          "/private/tmp/plato-phase2b-review-3/base314/bin/python -B /tmp/plato-phase2d-review-3/profile_probe.py"
+        ],
+        "cwd": "/private/tmp/plato-refresh-worktrees/payloads",
+        "exit_code": 0,
+        "seconds": 12.509,
+        "log": {
+          "path": "/tmp/plato-phase2d-review-3/base314-profiles-v2.log",
+          "sha256": "64ef4193afcd4c807318abef8747107b550ec0ec08c7fa3a6ecd0468244cff0a"
+        },
+        "summary": "_timeout_type\": \"builtins.TimeoutError\",\n        \"action_space\": \"types.SimpleNamespace\"\n      },\n      \"targeted_behavioral_reports\": [\n        [\n          \"setup\",\n          \"passed\"\n        ],\n        [\n          \"call\",\n          \"passed\"\n        ],\n        [\n          \"teardown\",\n          \"passed\"\n        ],\n        [\n          \"setup\",\n          \"passed\"\n        ],\n        [\n          \"call\",\n          \"passed\"\n        ],\n        [\n          \"teardown\",\n          \"passed\"\n        ]\n      ]\n    },\n    {\n      \"case\": \"unprofiled-scoped\",\n      \"raw_option\": null,\n      \"full\": false,\n      \"qualify\": false,\n      \"base\": false,\n      \"registration_count\": 1,\n      \"lock\": \"builtins.TimeoutError\",\n      \"space\": \"types.SimpleNamespace\",\n      \"sessionstart\": \"passed\",\n      \"actual_pytest_fixture_execution\": {\n        \"lock_timeout_type\": \"builtins.TimeoutError\",\n        \"action_space\": \"types.SimpleNamespace\"\n      },\n      \"targeted_behavioral_reports\": [\n        [\n          \"setup\",\n          \"passed\"\n        ],\n        [\n          \"call\",\n          \"passed\"\n        ],\n        [\n          \"teardown\",\n          \"passed\"\n        ],\n        [\n          \"setup\",\n          \"passed\"\n        ],\n        [\n          \"call\",\n          \"passed\"\n        ],\n        [\n          \"teardown\",\n          \"passed\"\n        ]\n      ]\n    },\n    {\n      \"case\": \"filtered-full-unprofiled\",\n      \"raw_option\": null,\n      \"full\": true,\n      \"qualify\": false,\n      \"base\": false,\n      \"registration_count\": 1,\n      \"lock\": \"builtins.TimeoutError\",\n      \"space\": \"types.SimpleNamespace\",\n      \"sessionstart\": \"passed\",\n      \"actual_pytest_fixture_execution\": {\n        \"lock_timeout_type\": \"builtins.TimeoutError\",\n        \"action_space\": \"types.SimpleNamespace\"\n      },\n      \"targeted_behavioral_reports\": [\n        [\n          \"setup\",\n          \"passed\"\n        ],\n        [\n          \"call\",\n          \"passed\"\n        ],\n        [\n          \"teardown\",\n          \"passed\"\n        ],\n        [\n          \"setup\",\n          \"passed\"\n        ],\n        [\n          \"call\",\n          \"passed\"\n        ],\n        [\n          \"teardown\",\n          \"passed\"\n        ]\n      ]\n    }\n  ]\n}\n"
+      },
+      {
+        "label": "base314-environment",
+        "command": [
+          "zsh",
+          "-lc",
+          "/private/tmp/plato-phase2b-review-3/base314/bin/python -B /tmp/plato-phase2d-review-3/environment_probe.py"
+        ],
+        "cwd": "/private/tmp/plato-refresh-worktrees/payloads",
+        "exit_code": 0,
+        "seconds": 11.111,
+        "log": {
+          "path": "/tmp/plato-phase2d-review-3/base314-environment.log",
+          "sha256": "241018c6b47f3bdd0e742b315682e2e7c5a04720ce6a346e194594b3abc221eb"
+        },
+        "summary": "to-refresh-worktrees/payloads/plato/servers/strategies/client_selection/personalized.py\",\n    \"plato.servers.strategies.client_selection.split_learning\": \"/private/tmp/plato-refresh-worktrees/payloads/plato/servers/strategies/client_selection/split_learning.py\",\n    \"plato.servers.strategies.client_selection\": \"/private/tmp/plato-refresh-worktrees/payloads/plato/servers/strategies/client_selection/__init__.py\",\n    \"plato.servers.strategies.mpc\": \"/private/tmp/plato-refresh-worktrees/payloads/plato/servers/strategies/mpc.py\",\n    \"plato.servers.strategies\": \"/private/tmp/plato-refresh-worktrees/payloads/plato/servers/strategies/__init__.py\",\n    \"tests.test_utils.fakes\": \"/private/tmp/plato-refresh-worktrees/payloads/tests/test_utils/fakes.py\",\n    \"tests.conftest\": \"/private/tmp/plato-refresh-worktrees/payloads/tests/conftest.py\",\n    \"tests.mpc.test_round_store_contracts\": \"/private/tmp/plato-refresh-worktrees/payloads/tests/mpc/test_round_store_contracts.py\",\n    \"plato.utils.reinforcement_learning\": \"/private/tmp/plato-refresh-worktrees/payloads/plato/utils/reinforcement_learning/__init__.py\",\n    \"plato.utils.reinforcement_learning.policies\": \"/private/tmp/plato-refresh-worktrees/payloads/plato/utils/reinforcement_learning/policies/__init__.py\",\n    \"plato.utils.reinforcement_learning.policies.base\": \"/private/tmp/plato-refresh-worktrees/payloads/plato/utils/reinforcement_learning/policies/base.py\",\n    \"plato.utils.reinforcement_learning.policies.ddpg\": \"/private/tmp/plato-refresh-worktrees/payloads/plato/utils/reinforcement_learning/policies/ddpg.py\",\n    \"plato.utils.reinforcement_learning.policies.sac\": \"/private/tmp/plato-refresh-worktrees/payloads/plato/utils/reinforcement_learning/policies/sac.py\",\n    \"plato.utils.reinforcement_learning.policies.td3\": \"/private/tmp/plato-refresh-worktrees/payloads/plato/utils/reinforcement_learning/policies/td3.py\",\n    \"tests.utils.test_rl_payload_utilities\": \"/private/tmp/plato-refresh-worktrees/payloads/tests/utils/test_rl_payload_utilities.py\",\n    \"plato.clients.strategies.mpc\": \"/private/tmp/plato-refresh-worktrees/payloads/plato/clients/strategies/mpc.py\"\n  },\n  \"all_source_origins_current_candidate\": true\n}\n"
+      },
+      {
+        "label": "mandatory313-targeted",
+        "command": [
+          "zsh",
+          "-lc",
+          "/tmp/plato-phase2d-review/venv313/bin/python -B -m pytest tests/mpc/test_round_store_contracts.py tests/utils/test_rl_payload_utilities.py --test-profile=mandatory -q -W error::UserWarning -p no:cacheprovider --basetemp=/tmp/plato-phase2d-review-3/mandatory313-pytest --junitxml=/tmp/plato-phase2d-review-3/mandatory313-targeted.xml"
+        ],
+        "cwd": "/private/tmp/plato-refresh-worktrees/payloads",
+        "exit_code": 0,
+        "seconds": 14.316,
+        "log": {
+          "path": "/tmp/plato-phase2d-review-3/mandatory313-targeted.log",
+          "sha256": "dd1f9014a4b3496b8ed84dcae614eabb2d7e0aacb61da8388822d36f77629879"
+        },
+        "summary": "W1003 01:11:25.168000 61157 /private/tmp/plato-phase2d-review/venv313/lib/python3.13/site-packages/torch/distributed/elastic/multiprocessing/redirects.py:35] NOTE: Redirects are currently not supported in MacOs.\n.....................                                                    [100%]\n21 passed in 0.30s\n",
+        "junit": {
+          "tests": 21,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "junit_artifact": {
+          "path": "/tmp/plato-phase2d-review-3/mandatory313-targeted.xml",
+          "sha256": "f3bf7f740d3f3f5037037948363af4cf46d917af41bd6d2f38786ff1eb290901"
+        },
+        "source_commit": "96323afa094a37584844275cc04bf1e1eedfaa0d"
+      },
+      {
+        "label": "mandatory313-profiles-v2",
+        "command": [
+          "zsh",
+          "-lc",
+          "/tmp/plato-phase2d-review/venv313/bin/python -B /tmp/plato-phase2d-review-3/profile_probe.py"
+        ],
+        "cwd": "/private/tmp/plato-refresh-worktrees/payloads",
+        "exit_code": 0,
+        "seconds": 15.628,
+        "log": {
+          "path": "/tmp/plato-phase2d-review-3/mandatory313-profiles-v2.log",
+          "sha256": "b83702725903c31ee6584526806e2f0909156c27eaf3a9251119681256659625"
+        },
+        "summary": "_timeout_type\": \"builtins.TimeoutError\",\n        \"action_space\": \"types.SimpleNamespace\"\n      },\n      \"targeted_behavioral_reports\": [\n        [\n          \"setup\",\n          \"passed\"\n        ],\n        [\n          \"call\",\n          \"passed\"\n        ],\n        [\n          \"teardown\",\n          \"passed\"\n        ],\n        [\n          \"setup\",\n          \"passed\"\n        ],\n        [\n          \"call\",\n          \"passed\"\n        ],\n        [\n          \"teardown\",\n          \"passed\"\n        ]\n      ]\n    },\n    {\n      \"case\": \"unprofiled-scoped\",\n      \"raw_option\": null,\n      \"full\": false,\n      \"qualify\": false,\n      \"base\": false,\n      \"registration_count\": 1,\n      \"lock\": \"builtins.TimeoutError\",\n      \"space\": \"types.SimpleNamespace\",\n      \"sessionstart\": \"passed\",\n      \"actual_pytest_fixture_execution\": {\n        \"lock_timeout_type\": \"builtins.TimeoutError\",\n        \"action_space\": \"types.SimpleNamespace\"\n      },\n      \"targeted_behavioral_reports\": [\n        [\n          \"setup\",\n          \"passed\"\n        ],\n        [\n          \"call\",\n          \"passed\"\n        ],\n        [\n          \"teardown\",\n          \"passed\"\n        ],\n        [\n          \"setup\",\n          \"passed\"\n        ],\n        [\n          \"call\",\n          \"passed\"\n        ],\n        [\n          \"teardown\",\n          \"passed\"\n        ]\n      ]\n    },\n    {\n      \"case\": \"filtered-full-unprofiled\",\n      \"raw_option\": null,\n      \"full\": true,\n      \"qualify\": false,\n      \"base\": false,\n      \"registration_count\": 1,\n      \"lock\": \"builtins.TimeoutError\",\n      \"space\": \"types.SimpleNamespace\",\n      \"sessionstart\": \"passed\",\n      \"actual_pytest_fixture_execution\": {\n        \"lock_timeout_type\": \"builtins.TimeoutError\",\n        \"action_space\": \"types.SimpleNamespace\"\n      },\n      \"targeted_behavioral_reports\": [\n        [\n          \"setup\",\n          \"passed\"\n        ],\n        [\n          \"call\",\n          \"passed\"\n        ],\n        [\n          \"teardown\",\n          \"passed\"\n        ],\n        [\n          \"setup\",\n          \"passed\"\n        ],\n        [\n          \"call\",\n          \"passed\"\n        ],\n        [\n          \"teardown\",\n          \"passed\"\n        ]\n      ]\n    }\n  ]\n}\n"
+      },
+      {
+        "label": "mandatory313-environment",
+        "command": [
+          "zsh",
+          "-lc",
+          "/tmp/plato-phase2d-review/venv313/bin/python -B /tmp/plato-phase2d-review-3/environment_probe.py"
+        ],
+        "cwd": "/private/tmp/plato-refresh-worktrees/payloads",
+        "exit_code": 0,
+        "seconds": 10.711,
+        "log": {
+          "path": "/tmp/plato-phase2d-review-3/mandatory313-environment.log",
+          "sha256": "e3422a7520b6d8c128ceadfffb22847483a74705c765aa7ebe7c60cc145d2add"
+        },
+        "summary": "to-refresh-worktrees/payloads/plato/servers/strategies/client_selection/personalized.py\",\n    \"plato.servers.strategies.client_selection.split_learning\": \"/private/tmp/plato-refresh-worktrees/payloads/plato/servers/strategies/client_selection/split_learning.py\",\n    \"plato.servers.strategies.client_selection\": \"/private/tmp/plato-refresh-worktrees/payloads/plato/servers/strategies/client_selection/__init__.py\",\n    \"plato.servers.strategies.mpc\": \"/private/tmp/plato-refresh-worktrees/payloads/plato/servers/strategies/mpc.py\",\n    \"plato.servers.strategies\": \"/private/tmp/plato-refresh-worktrees/payloads/plato/servers/strategies/__init__.py\",\n    \"tests.test_utils.fakes\": \"/private/tmp/plato-refresh-worktrees/payloads/tests/test_utils/fakes.py\",\n    \"tests.conftest\": \"/private/tmp/plato-refresh-worktrees/payloads/tests/conftest.py\",\n    \"tests.mpc.test_round_store_contracts\": \"/private/tmp/plato-refresh-worktrees/payloads/tests/mpc/test_round_store_contracts.py\",\n    \"plato.utils.reinforcement_learning\": \"/private/tmp/plato-refresh-worktrees/payloads/plato/utils/reinforcement_learning/__init__.py\",\n    \"plato.utils.reinforcement_learning.policies\": \"/private/tmp/plato-refresh-worktrees/payloads/plato/utils/reinforcement_learning/policies/__init__.py\",\n    \"plato.utils.reinforcement_learning.policies.base\": \"/private/tmp/plato-refresh-worktrees/payloads/plato/utils/reinforcement_learning/policies/base.py\",\n    \"plato.utils.reinforcement_learning.policies.ddpg\": \"/private/tmp/plato-refresh-worktrees/payloads/plato/utils/reinforcement_learning/policies/ddpg.py\",\n    \"plato.utils.reinforcement_learning.policies.sac\": \"/private/tmp/plato-refresh-worktrees/payloads/plato/utils/reinforcement_learning/policies/sac.py\",\n    \"plato.utils.reinforcement_learning.policies.td3\": \"/private/tmp/plato-refresh-worktrees/payloads/plato/utils/reinforcement_learning/policies/td3.py\",\n    \"tests.utils.test_rl_payload_utilities\": \"/private/tmp/plato-refresh-worktrees/payloads/tests/utils/test_rl_payload_utilities.py\",\n    \"plato.clients.strategies.mpc\": \"/private/tmp/plato-refresh-worktrees/payloads/plato/clients/strategies/mpc.py\"\n  },\n  \"all_source_origins_current_candidate\": true\n}\n"
+      },
+      {
+        "label": "mandatory314-targeted",
+        "command": [
+          "zsh",
+          "-lc",
+          "/private/tmp/plato-phase2d-review/venv314/bin/python -B -m pytest tests/mpc/test_round_store_contracts.py tests/utils/test_rl_payload_utilities.py --test-profile=mandatory -q -W error::UserWarning -p no:cacheprovider --basetemp=/tmp/plato-phase2d-review-3/mandatory314-pytest --junitxml=/tmp/plato-phase2d-review-3/mandatory314-targeted.xml"
+        ],
+        "cwd": "/private/tmp/plato-refresh-worktrees/payloads",
+        "exit_code": 0,
+        "seconds": 16.275,
+        "log": {
+          "path": "/tmp/plato-phase2d-review-3/mandatory314-targeted.log",
+          "sha256": "3756171924616f7d18314af8a5ceda9033a35232e8ff243d906765f1ca6f73e4"
+        },
+        "summary": "W1003 01:11:26.617000 61155 torch/distributed/elastic/multiprocessing/redirects.py:35] NOTE: Redirects are currently not supported in MacOs.\n.....................                                                    [100%]\n21 passed in 0.33s\n",
+        "junit": {
+          "tests": 21,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "junit_artifact": {
+          "path": "/tmp/plato-phase2d-review-3/mandatory314-targeted.xml",
+          "sha256": "0b5e378db54ab0998ee006d4a5c691416473fe94552eb643b2535ccfb6958bb7"
+        },
+        "source_commit": "96323afa094a37584844275cc04bf1e1eedfaa0d"
+      },
+      {
+        "label": "mandatory314-profiles-v2",
+        "command": [
+          "zsh",
+          "-lc",
+          "/private/tmp/plato-phase2d-review/venv314/bin/python -B /tmp/plato-phase2d-review-3/profile_probe.py"
+        ],
+        "cwd": "/private/tmp/plato-refresh-worktrees/payloads",
+        "exit_code": 0,
+        "seconds": 17.0,
+        "log": {
+          "path": "/tmp/plato-phase2d-review-3/mandatory314-profiles-v2.log",
+          "sha256": "a5e189c43dd7b6ae6e3a49c31b1b2ffdfa1808a7e81ee75c2a85a6a5b1547377"
+        },
+        "summary": "_timeout_type\": \"builtins.TimeoutError\",\n        \"action_space\": \"types.SimpleNamespace\"\n      },\n      \"targeted_behavioral_reports\": [\n        [\n          \"setup\",\n          \"passed\"\n        ],\n        [\n          \"call\",\n          \"passed\"\n        ],\n        [\n          \"teardown\",\n          \"passed\"\n        ],\n        [\n          \"setup\",\n          \"passed\"\n        ],\n        [\n          \"call\",\n          \"passed\"\n        ],\n        [\n          \"teardown\",\n          \"passed\"\n        ]\n      ]\n    },\n    {\n      \"case\": \"unprofiled-scoped\",\n      \"raw_option\": null,\n      \"full\": false,\n      \"qualify\": false,\n      \"base\": false,\n      \"registration_count\": 1,\n      \"lock\": \"builtins.TimeoutError\",\n      \"space\": \"types.SimpleNamespace\",\n      \"sessionstart\": \"passed\",\n      \"actual_pytest_fixture_execution\": {\n        \"lock_timeout_type\": \"builtins.TimeoutError\",\n        \"action_space\": \"types.SimpleNamespace\"\n      },\n      \"targeted_behavioral_reports\": [\n        [\n          \"setup\",\n          \"passed\"\n        ],\n        [\n          \"call\",\n          \"passed\"\n        ],\n        [\n          \"teardown\",\n          \"passed\"\n        ],\n        [\n          \"setup\",\n          \"passed\"\n        ],\n        [\n          \"call\",\n          \"passed\"\n        ],\n        [\n          \"teardown\",\n          \"passed\"\n        ]\n      ]\n    },\n    {\n      \"case\": \"filtered-full-unprofiled\",\n      \"raw_option\": null,\n      \"full\": true,\n      \"qualify\": false,\n      \"base\": false,\n      \"registration_count\": 1,\n      \"lock\": \"builtins.TimeoutError\",\n      \"space\": \"types.SimpleNamespace\",\n      \"sessionstart\": \"passed\",\n      \"actual_pytest_fixture_execution\": {\n        \"lock_timeout_type\": \"builtins.TimeoutError\",\n        \"action_space\": \"types.SimpleNamespace\"\n      },\n      \"targeted_behavioral_reports\": [\n        [\n          \"setup\",\n          \"passed\"\n        ],\n        [\n          \"call\",\n          \"passed\"\n        ],\n        [\n          \"teardown\",\n          \"passed\"\n        ],\n        [\n          \"setup\",\n          \"passed\"\n        ],\n        [\n          \"call\",\n          \"passed\"\n        ],\n        [\n          \"teardown\",\n          \"passed\"\n        ]\n      ]\n    }\n  ]\n}\n"
+      },
+      {
+        "label": "mandatory314-environment",
+        "command": [
+          "zsh",
+          "-lc",
+          "/private/tmp/plato-phase2d-review/venv314/bin/python -B /tmp/plato-phase2d-review-3/environment_probe.py"
+        ],
+        "cwd": "/private/tmp/plato-refresh-worktrees/payloads",
+        "exit_code": 0,
+        "seconds": 12.105,
+        "log": {
+          "path": "/tmp/plato-phase2d-review-3/mandatory314-environment.log",
+          "sha256": "e761e6501f548b38bf81bf9bbb59f892753062022da1d8af14c38e9db1228902"
+        },
+        "summary": "to-refresh-worktrees/payloads/plato/servers/strategies/client_selection/personalized.py\",\n    \"plato.servers.strategies.client_selection.split_learning\": \"/private/tmp/plato-refresh-worktrees/payloads/plato/servers/strategies/client_selection/split_learning.py\",\n    \"plato.servers.strategies.client_selection\": \"/private/tmp/plato-refresh-worktrees/payloads/plato/servers/strategies/client_selection/__init__.py\",\n    \"plato.servers.strategies.mpc\": \"/private/tmp/plato-refresh-worktrees/payloads/plato/servers/strategies/mpc.py\",\n    \"plato.servers.strategies\": \"/private/tmp/plato-refresh-worktrees/payloads/plato/servers/strategies/__init__.py\",\n    \"tests.test_utils.fakes\": \"/private/tmp/plato-refresh-worktrees/payloads/tests/test_utils/fakes.py\",\n    \"tests.conftest\": \"/private/tmp/plato-refresh-worktrees/payloads/tests/conftest.py\",\n    \"tests.mpc.test_round_store_contracts\": \"/private/tmp/plato-refresh-worktrees/payloads/tests/mpc/test_round_store_contracts.py\",\n    \"plato.utils.reinforcement_learning\": \"/private/tmp/plato-refresh-worktrees/payloads/plato/utils/reinforcement_learning/__init__.py\",\n    \"plato.utils.reinforcement_learning.policies\": \"/private/tmp/plato-refresh-worktrees/payloads/plato/utils/reinforcement_learning/policies/__init__.py\",\n    \"plato.utils.reinforcement_learning.policies.base\": \"/private/tmp/plato-refresh-worktrees/payloads/plato/utils/reinforcement_learning/policies/base.py\",\n    \"plato.utils.reinforcement_learning.policies.ddpg\": \"/private/tmp/plato-refresh-worktrees/payloads/plato/utils/reinforcement_learning/policies/ddpg.py\",\n    \"plato.utils.reinforcement_learning.policies.sac\": \"/private/tmp/plato-refresh-worktrees/payloads/plato/utils/reinforcement_learning/policies/sac.py\",\n    \"plato.utils.reinforcement_learning.policies.td3\": \"/private/tmp/plato-refresh-worktrees/payloads/plato/utils/reinforcement_learning/policies/td3.py\",\n    \"tests.utils.test_rl_payload_utilities\": \"/private/tmp/plato-refresh-worktrees/payloads/tests/utils/test_rl_payload_utilities.py\",\n    \"plato.clients.strategies.mpc\": \"/private/tmp/plato-refresh-worktrees/payloads/plato/clients/strategies/mpc.py\"\n  },\n  \"all_source_origins_current_candidate\": true\n}\n"
+      },
+      {
+        "label": "base313-collection",
+        "command": [
+          "zsh",
+          "-lc",
+          "/tmp/plato-phase2b-review-3/base313/bin/python -B -m pytest tests --collect-only --test-profile=base -m 'not runtime' -q -p no:cacheprovider"
+        ],
+        "cwd": "/private/tmp/plato-refresh-worktrees/payloads",
+        "exit_code": 0,
+        "seconds": 10.727,
+        "log": {
+          "path": "/tmp/plato-phase2d-review-3/base313-collection.log",
+          "sha256": "620bf81628c41331e5b08390bf7650220ed3c462a68ad4b08c7ecdb6f2a248d6"
+        },
+        "summary": "jected_before_encoding[tree7]\ntests/utils/test_safetensor_serialization.py::test_ambiguous_tree_is_rejected_before_encoding[tree8]\ntests/utils/test_safetensor_serialization.py::test_dotted_state_dict_and_unambiguous_brackets_remain_compatible\ntests/utils/test_safetensor_serialization.py::test_noncontiguous_torch_tree_roundtrip\ntests/utils/test_safetensor_serialization.py::test_native_scalar_types_roundtrip_in_hybrid_payload_metadata\ntests/utils/test_shared_payload_utilities.py::test_empty_compound_loader_terminates[ParallelDataLoader]\ntests/utils/test_shared_payload_utilities.py::test_empty_compound_loader_terminates[SequentialDataLoader]\ntests/utils/test_shared_payload_utilities.py::test_parameter_count_utility_import_never_downloads_models\ntests/utils/test_shared_payload_utilities.py::test_unary_encoding_large_epsilon_remains_finite[symmetric_unary_encoding]\ntests/utils/test_shared_payload_utilities.py::test_unary_encoding_large_epsilon_remains_finite[optimized_unary_encoding]\ntests/utils/test_shared_payload_utilities.py::test_csv_extension_preserves_rows_and_quotes\ntests/utils/test_shared_payload_utilities.py::test_toml_config_roundtrip_matches_independent_parser\ntests/utils/test_shared_payload_utilities.py::test_logging_font_invalid_choice_is_explicit\ntests/utils/test_shared_payload_utilities.py::test_toml_nested_array_tables_and_literal_keys_keep_structure\ntests/utils/test_shared_payload_utilities.py::test_toml_supplementary_unicode_and_control_escapes_roundtrip[config0]\ntests/utils/test_shared_payload_utilities.py::test_toml_supplementary_unicode_and_control_escapes_roundtrip[config1]\ntests/utils/test_shared_payload_utilities.py::test_toml_supplementary_unicode_and_control_escapes_roundtrip[config2]\ntests/utils/test_shared_payload_utilities.py::test_toml_supplementary_unicode_and_control_escapes_roundtrip[config3]\ntests/utils/test_shared_payload_utilities.py::test_toml_supplementary_unicode_and_control_escapes_roundtrip[config4]\ntests/utils/test_unary_encoding.py::test_symmetric_encoding_matches_randomised_response\ntests/utils/test_unary_encoding.py::test_randomised_response_probability_matches_expectation\n\n568/616 tests collected (48 deselected) in 0.41s\n",
+        "result": "568/616 collected, 48 runtime cases deselected; no collection errors.",
+        "source_commit": "96323afa094a37584844275cc04bf1e1eedfaa0d"
+      },
+      {
+        "label": "base314-collection",
+        "command": [
+          "zsh",
+          "-lc",
+          "/private/tmp/plato-phase2b-review-3/base314/bin/python -B -m pytest tests --collect-only --test-profile=base -m 'not runtime' -q -p no:cacheprovider"
+        ],
+        "cwd": "/private/tmp/plato-refresh-worktrees/payloads",
+        "exit_code": 0,
+        "seconds": 11.988,
+        "log": {
+          "path": "/tmp/plato-phase2d-review-3/base314-collection.log",
+          "sha256": "76730e3a88ef1d1eab8d23cfd48b0308d66f8e77e44916f16c70ae2c26a47bc1"
+        },
+        "summary": "jected_before_encoding[tree7]\ntests/utils/test_safetensor_serialization.py::test_ambiguous_tree_is_rejected_before_encoding[tree8]\ntests/utils/test_safetensor_serialization.py::test_dotted_state_dict_and_unambiguous_brackets_remain_compatible\ntests/utils/test_safetensor_serialization.py::test_noncontiguous_torch_tree_roundtrip\ntests/utils/test_safetensor_serialization.py::test_native_scalar_types_roundtrip_in_hybrid_payload_metadata\ntests/utils/test_shared_payload_utilities.py::test_empty_compound_loader_terminates[ParallelDataLoader]\ntests/utils/test_shared_payload_utilities.py::test_empty_compound_loader_terminates[SequentialDataLoader]\ntests/utils/test_shared_payload_utilities.py::test_parameter_count_utility_import_never_downloads_models\ntests/utils/test_shared_payload_utilities.py::test_unary_encoding_large_epsilon_remains_finite[symmetric_unary_encoding]\ntests/utils/test_shared_payload_utilities.py::test_unary_encoding_large_epsilon_remains_finite[optimized_unary_encoding]\ntests/utils/test_shared_payload_utilities.py::test_csv_extension_preserves_rows_and_quotes\ntests/utils/test_shared_payload_utilities.py::test_toml_config_roundtrip_matches_independent_parser\ntests/utils/test_shared_payload_utilities.py::test_logging_font_invalid_choice_is_explicit\ntests/utils/test_shared_payload_utilities.py::test_toml_nested_array_tables_and_literal_keys_keep_structure\ntests/utils/test_shared_payload_utilities.py::test_toml_supplementary_unicode_and_control_escapes_roundtrip[config0]\ntests/utils/test_shared_payload_utilities.py::test_toml_supplementary_unicode_and_control_escapes_roundtrip[config1]\ntests/utils/test_shared_payload_utilities.py::test_toml_supplementary_unicode_and_control_escapes_roundtrip[config2]\ntests/utils/test_shared_payload_utilities.py::test_toml_supplementary_unicode_and_control_escapes_roundtrip[config3]\ntests/utils/test_shared_payload_utilities.py::test_toml_supplementary_unicode_and_control_escapes_roundtrip[config4]\ntests/utils/test_unary_encoding.py::test_symmetric_encoding_matches_randomised_response\ntests/utils/test_unary_encoding.py::test_randomised_response_probability_matches_expectation\n\n568/616 tests collected (48 deselected) in 0.42s\n",
+        "result": "568/616 collected, 48 runtime cases deselected; no collection errors.",
+        "source_commit": "96323afa094a37584844275cc04bf1e1eedfaa0d"
+      },
+      {
+        "label": "ruff-final",
+        "command": [
+          "zsh",
+          "-lc",
+          "/tmp/plato-phase2d-review/venv313/bin/ruff check tests/mpc/test_round_store_contracts.py tests/utils/test_rl_payload_utilities.py --select I"
+        ],
+        "cwd": "/private/tmp/plato-refresh-worktrees/payloads",
+        "exit_code": 0,
+        "seconds": 0.016,
+        "log": {
+          "path": "/tmp/plato-phase2d-review-3/ruff-final.log",
+          "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+        },
+        "summary": "All checks passed!\n"
+      },
+      {
+        "label": "diff-check-final",
+        "command": [
+          "zsh",
+          "-lc",
+          "git diff --check fda60becedfa6236c11d415b87a868b52789a41e 96323afa094a37584844275cc04bf1e1eedfaa0d"
+        ],
+        "cwd": "/private/tmp/plato-refresh-worktrees/payloads",
+        "exit_code": 0,
+        "seconds": 0.026,
+        "log": {
+          "path": "/tmp/plato-phase2d-review-3/diff-check-final.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "summary": ""
+      }
+    ],
+    "environment_policy": "All shell commands use zsh -lc. Candidate selected by cwd and PYTHONPATH; actual source origins checked. Bytecode/cache writes disabled or directed to reviewer scratch. HF offline and CPU thread limits enabled; UserWarning treated as errors for targeted runs. Normal pytest plugin autoload retained.",
+    "environment_overrides": {
+      "PYTHONDONTWRITEBYTECODE": "1",
+      "PYTHONPATH": "/private/tmp/plato-refresh-worktrees/payloads:/tmp/plato-phase2d-review-3",
+      "TMPDIR": "/tmp/plato-phase2d-review-3/tmp",
+      "HF_HUB_OFFLINE": "1",
+      "HF_DATASETS_OFFLINE": "1",
+      "TOKENIZERS_PARALLELISM": "false",
+      "OMP_NUM_THREADS": "1",
+      "OPENBLAS_NUM_THREADS": "1",
+      "MKL_NUM_THREADS": "1",
+      "VECLIB_MAXIMUM_THREADS": "1",
+      "MPLCONFIGDIR": "/tmp/plato-phase2d-review-3/matplotlib",
+      "XDG_CACHE_HOME": "/tmp/plato-phase2d-review-3/cache"
+    },
+    "warning_disposition": "Mandatory session prerequisite imports emit Torch MacOS elastic redirect informational messages; targeted runs otherwise pass with UserWarning as errors.",
+    "probe_limits": "Profile probes run actual sessionstart and two actual behavioral items per successful parsed mode, not an unfiltered whole suite or final phase gate. No plugin prerequisite/selection policy is edited.",
+    "exploratory_harness_results": {
+      "profiles_v1": "Both reviewer probes exited 1 because direct setupstate teardown omitted the pytest tmp_path report bookkeeping. Replaced with actual runtest protocol in v2; both interpreters and both profiles pass. This was a reviewer harness defect, not a candidate finding; original logs retained.",
+      "isolation_v1": "An overly strict pre-setup sys.path assertion caused reviewer-plugin exit 3. Detailed v2/v3 snapshots identify the first prepend before autouse setup, with no nested-test state leakage; final instrumented runs pass. Original log retained.",
+      "historical_descriptor_audit": "Two old reports reference historical phase2d-validation.json hashes at the reused worktree path. Verified them against exact a4a4733 and 09b9b941 blobs; current file is correctly different. No artifact discrepancy remains."
+    }
+  },
+  "retained_evidence_audit": {
+    "artifact_descriptors_verified": 229,
+    "artifact_hash_mismatches": [],
+    "historical_source_manifest_entries_verified": 22,
+    "red_snapshot_verification": [
+      {
+        "path": "tests/mpc/test_round_store_contracts.py",
+        "snapshot_hash_matches": true,
+        "original_blob_matches": true,
+        "all_original_functions_AST_match_prior_candidate": true,
+        "added_regression_AST_matches_candidate": true
+      },
+      {
+        "path": "tests/utils/test_rl_payload_utilities.py",
+        "snapshot_hash_matches": true,
+        "original_blob_matches": true,
+        "all_original_functions_AST_match_prior_candidate": true,
+        "added_regression_AST_matches_candidate": true
+      }
+    ],
+    "historical_JUnit_counts": [
+      {
+        "section": "base_profile_correction",
+        "key": "green_base_non_runtime",
+        "path": "/tmp/plato-phase2d.G3jkGH/base-green-suite313.xml",
+        "source_commit": "15c79d0c81ffd0e5e4873db869a2863f97fe8279",
+        "counts": {
+          "tests": 387,
+          "failed": 0,
+          "errors": 0,
+          "skipped": 4,
+          "passed": 383
+        }
+      },
+      {
+        "section": "base_profile_correction",
+        "key": "green_base_non_runtime",
+        "path": "/tmp/plato-phase2d.G3jkGH/base-green-suite314.xml",
+        "source_commit": "15c79d0c81ffd0e5e4873db869a2863f97fe8279",
+        "counts": {
+          "tests": 387,
+          "failed": 0,
+          "errors": 0,
+          "skipped": 4,
+          "passed": 383
+        }
+      },
+      {
+        "section": "combined_b_d_validation",
+        "key": "green_full_base_non_runtime",
+        "path": "/tmp/plato-phase2d.G3jkGH/combined-final-base313.xml",
+        "source_commit": "53aa72c3c578b1a32d8f83d64a98d6a543cdfb9a",
+        "counts": {
+          "tests": 561,
+          "failed": 0,
+          "errors": 0,
+          "skipped": 4,
+          "passed": 557
+        }
+      },
+      {
+        "section": "combined_b_d_validation",
+        "key": "green_full_base_non_runtime",
+        "path": "/tmp/plato-phase2d.G3jkGH/combined-final-base314.xml",
+        "source_commit": "53aa72c3c578b1a32d8f83d64a98d6a543cdfb9a",
+        "counts": {
+          "tests": 561,
+          "failed": 0,
+          "errors": 0,
+          "skipped": 4,
+          "passed": 557
+        }
+      },
+      {
+        "section": "combined_b_d_validation",
+        "key": "green_mandatory_affected",
+        "path": "/tmp/plato-phase2d.G3jkGH/combined-final-mandatory313.xml",
+        "source_commit": "53aa72c3c578b1a32d8f83d64a98d6a543cdfb9a",
+        "counts": {
+          "tests": 60,
+          "failed": 0,
+          "errors": 0,
+          "skipped": 0,
+          "passed": 60
+        }
+      },
+      {
+        "section": "combined_b_d_validation",
+        "key": "green_mandatory_affected",
+        "path": "/tmp/plato-phase2d.G3jkGH/combined-final-mandatory314.xml",
+        "source_commit": "53aa72c3c578b1a32d8f83d64a98d6a543cdfb9a",
+        "counts": {
+          "tests": 60,
+          "failed": 0,
+          "errors": 0,
+          "skipped": 0,
+          "passed": 60
+        }
+      },
+      {
+        "section": "review2_test_policy_correction",
+        "key": "red",
+        "path": "/tmp/plato-phase2d.G3jkGH/profile-red-clean313.xml",
+        "source_commit": "09b9b941bc4a816b62d8ed33ad993455f6f05da5",
+        "counts": {
+          "tests": 21,
+          "failed": 2,
+          "errors": 0,
+          "skipped": 0,
+          "passed": 19
+        }
+      },
+      {
+        "section": "review2_test_policy_correction",
+        "key": "red",
+        "path": "/tmp/plato-phase2d.G3jkGH/profile-red-clean314.xml",
+        "source_commit": "09b9b941bc4a816b62d8ed33ad993455f6f05da5",
+        "counts": {
+          "tests": 21,
+          "failed": 2,
+          "errors": 0,
+          "skipped": 0,
+          "passed": 19
+        }
+      },
+      {
+        "section": "review2_test_policy_correction",
+        "key": "red",
+        "path": "/tmp/plato-phase2d.G3jkGH/profile-base-red-clean313.xml",
+        "source_commit": "09b9b941bc4a816b62d8ed33ad993455f6f05da5",
+        "counts": {
+          "tests": 21,
+          "failed": 2,
+          "errors": 0,
+          "skipped": 0,
+          "passed": 19
+        }
+      },
+      {
+        "section": "review2_test_policy_correction",
+        "key": "red",
+        "path": "/tmp/plato-phase2d.G3jkGH/profile-base-red-clean314.xml",
+        "source_commit": "09b9b941bc4a816b62d8ed33ad993455f6f05da5",
+        "counts": {
+          "tests": 21,
+          "failed": 2,
+          "errors": 0,
+          "skipped": 0,
+          "passed": 19
+        }
+      },
+      {
+        "section": "review2_test_policy_correction",
+        "key": "green_affected_with_new_regressions",
+        "path": "/tmp/plato-phase2d.G3jkGH/profile-green-mandatory313.xml",
+        "source_commit": "65e71329da1b4e1aa4f445991f4aaa38db119d3e",
+        "counts": {
+          "tests": 21,
+          "failed": 0,
+          "errors": 0,
+          "skipped": 0,
+          "passed": 21
+        }
+      },
+      {
+        "section": "review2_test_policy_correction",
+        "key": "green_affected_with_new_regressions",
+        "path": "/tmp/plato-phase2d.G3jkGH/profile-green-mandatory314.xml",
+        "source_commit": "65e71329da1b4e1aa4f445991f4aaa38db119d3e",
+        "counts": {
+          "tests": 21,
+          "failed": 0,
+          "errors": 0,
+          "skipped": 0,
+          "passed": 21
+        }
+      },
+      {
+        "section": "review2_test_policy_correction",
+        "key": "green_affected_with_new_regressions",
+        "path": "/tmp/plato-phase2d.G3jkGH/profile-green-base313.xml",
+        "source_commit": "65e71329da1b4e1aa4f445991f4aaa38db119d3e",
+        "counts": {
+          "tests": 21,
+          "failed": 0,
+          "errors": 0,
+          "skipped": 0,
+          "passed": 21
+        }
+      },
+      {
+        "section": "review2_test_policy_correction",
+        "key": "green_affected_with_new_regressions",
+        "path": "/tmp/plato-phase2d.G3jkGH/profile-green-base314.xml",
+        "source_commit": "65e71329da1b4e1aa4f445991f4aaa38db119d3e",
+        "counts": {
+          "tests": 21,
+          "failed": 0,
+          "errors": 0,
+          "skipped": 0,
+          "passed": 21
+        }
+      },
+      {
+        "section": "initial_corrected_full",
+        "path": "/tmp/plato-phase2d.G3jkGH/final-full313.xml",
+        "source_commit": "e7c0d595",
+        "counts": {
+          "tests": 413,
+          "failed": 0,
+          "errors": 0,
+          "skipped": 1,
+          "passed": 412
+        }
+      },
+      {
+        "section": "initial_corrected_full",
+        "path": "/tmp/plato-phase2d.G3jkGH/final-full314.xml",
+        "source_commit": "e7c0d595",
+        "counts": {
+          "tests": 413,
+          "failed": 0,
+          "errors": 0,
+          "skipped": 1,
+          "passed": 412
+        }
+      },
+      {
+        "section": "production_corrections",
+        "path": "/tmp/plato-phase2d.G3jkGH/review-green313.xml",
+        "source_commit": "639ca69b",
+        "counts": {
+          "tests": 95,
+          "failed": 0,
+          "errors": 0,
+          "skipped": 0,
+          "passed": 95
+        }
+      },
+      {
+        "section": "production_corrections",
+        "path": "/tmp/plato-phase2d.G3jkGH/review-green314.xml",
+        "source_commit": "639ca69b",
+        "counts": {
+          "tests": 95,
+          "failed": 0,
+          "errors": 0,
+          "skipped": 0,
+          "passed": 95
+        }
+      }
+    ],
+    "historical_attribution": [
+      {
+        "source_commit": "e7c0d59571d88efd7eb1fdbf4fc63ac2a7b81395",
+        "result_each_interpreter": "412 passed, one permitted native-tokenizer skip.",
+        "attribution": "Original D implementation after its lifecycle-test correction; not current candidate validation."
+      },
+      {
+        "source_commit": "639ca69bf4eaeff868462d0b30a5fcc72218f061",
+        "result_each_interpreter": "95 production-correction cases passed; no skips."
+      },
+      {
+        "source_commit": "15c79d0c81ffd0e5e4873db869a2863f97fe8279",
+        "result_each_interpreter": "383 base cases passed, four permitted skips; 13 explicit mandatory affected cases passed."
+      },
+      {
+        "source_commit": "53aa72c3c578b1a32d8f83d64a98d6a543cdfb9a",
+        "result_each_interpreter": "60 affected explicit mandatory cases passed; 557 base cases passed with four permitted skips; 48 startup/runtime cases deselected from base non-runtime runs.",
+        "attribution": "Combined B+D source, unchanged production/S3/lifecycle bodies; retained, not newly rerun."
+      },
+      {
+        "source_commit": "09b9b941bc4a816b62d8ed33ad993455f6f05da5",
+        "result_each_of_four_environments": "Two failed / 19 passed.",
+        "attribution": "Author added the eight current regressions to exact prior fixtures and unchanged original behaviors. Red snapshots independently match original function ASTs and blobs; added regression ASTs match current source."
+      },
+      {
+        "source_commit": "65e71329da1b4e1aa4f445991f4aaa38db119d3e",
+        "result_each_of_four_environments": "21 passed; clean base collection on both interpreters collected 568/616, 48 deselected.",
+        "attribution": "Latest author source validation. Candidate 96323afa adds only evidence."
+      }
+    ],
+    "count_policy": "All counts overlap. Do not sum historical suites, targeted/profile/isolation repeats, or interpreters into new coverage totals. Current reviewer 21-case results belong to exact 96323afa source; author latest 21-case/collection evidence stays at 65e71329.",
+    "audit_artifact": {
+      "path": "/tmp/plato-phase2d-review-3/source-evidence-audit.json",
+      "sha256": "83a13471e0c1a69c8a941c7a00d5042e5e9464762cd162d1327b219cdde19f2d"
+    }
+  },
+  "handoffs_and_practical_limits": [
+    "PASS is local acceptance of this exact D candidate; root retains the final combined Phase 2 gate and complete local/Linux validation.",
+    "No unchanged eight-minute startup matrix or all source-identical passing production/S3 suites were rerun. Prior full 48-startup evidence remains at its historical D/accepted B source.",
+    "C checkpoint/F26/training/SCAFFOLD integration remains assigned elsewhere; Phase 3 native MLX/HF/LeRobot/Nanochat and Phase 4 FEI zero-norm/constructor fixes are not new D failures.",
+    "No live cloud S3, ZooKeeper cluster, full distributed HE/MPC deployment, native MLX/GPU, cryptographic proof, benchmark, or whole-stack Python 3.14 qualification is claimed.",
+    "Synchronous S3 utility timeouts bound inactivity/retries, not total duration of an indefinitely trickling body; bounded runtime ingress supplies its distinct total deadline. Existing trusted-peer/storage pickle contract is retained.",
+    "No candidate edits, commits, pushes, shared metadata/fixture changes, security questions, or nested agents. Only requested ROOT report and reviewer scratch written; all resources retained."
+  ],
+  "resources": {
+    "report": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2d-review-3.json",
+    "scratch": "/tmp/plato-phase2d-review-3",
+    "retained": true,
+    "runner": {
+      "path": "/tmp/plato-phase2d-review-3/run_review.py",
+      "sha256": "de52c23709a0cb5e6e88879457cbace959eb93356c8e528ac9b89389f8a79636"
+    },
+    "profile_probe": {
+      "path": "/tmp/plato-phase2d-review-3/profile_probe.py",
+      "sha256": "67783f547121b01ab0687be00a91820c16fef68ef87ded43bc3d8d7944d35304"
+    },
+    "isolation_probe": {
+      "path": "/tmp/plato-phase2d-review-3/isolation_probe.py",
+      "sha256": "e24c1b5d758f2716d822cc66c5e711bc6026791571ad0acda165dcd08d69ea59"
+    },
+    "source_auditor": {
+      "path": "/tmp/plato-phase2d-review-3/source_audit.py",
+      "sha256": "3b99f9a9aae76a5aa86f99f903f588e739f1582c124e8b5d5f0d6a820e7e93b4"
+    },
+    "borrowed_environments": [
+      "/tmp/plato-phase2b-review-3/base313",
+      "/private/tmp/plato-phase2b-review-3/base314",
+      "/tmp/plato-phase2d-review/venv313",
+      "/private/tmp/plato-phase2d-review/venv314"
+    ]
+  }
+}

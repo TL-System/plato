@@ -10,11 +10,8 @@ The evaluation path is:
 
 1. `TestingStrategy.test_model(...)` computes the trainer's scalar test metric.
 2. `plato.evaluators.runner.run_configured_evaluation(...)` reads `Config().evaluation`.
-3. The evaluator is resolved in one of two ways:
-   - For `lighteval` (and any custom registered evaluator), the evaluator registry
-     looks up the factory by name and instantiates it.
-   - For `nanochat_core`, the nanochat trainer pre-builds a `NanochatCoreEvaluator`
-     and passes it as `evaluator_override`; the registry is bypassed entirely.
+3. The evaluator registry resolves the configured factory by name, unless a
+   matching evaluator instance was supplied through `evaluator_override`.
 4. The evaluator returns an `EvaluationResult`.
 5. Plato stores the serialized payload in `TrainingContext.state` under:
    - `evaluation_results`
@@ -71,23 +68,6 @@ def evaluate(self, request: EvaluationInput) -> EvaluationResult:
 | Name | Class | Registration | Notes |
 | --- | --- | --- | --- |
 | `lighteval` | `plato.evaluators.lighteval.LightevalEvaluator` | Auto-registered via `registry.register` | Server-side LLM evaluation through Hugging Face Lighteval. |
-| `nanochat_core` | `plato.evaluators.nanochat_core.NanochatCoreEvaluator` | **Not** registry-registered; wired by the nanochat trainer only | Nanochat CORE benchmark integration. Requires `trainer.type = "nanochat"`. |
-
-!!! note "nanochat_core availability"
-    `nanochat_core` is **not** registered in the evaluator registry. Plato's nanochat
-    trainer (`plato/trainers/nanochat.py`) creates a `NanochatCoreEvaluator` directly
-    and supplies it as an override when `[evaluation] type = "nanochat_core"` is set.
-    Using this evaluator type with any other trainer (e.g., `HuggingFace`, `basic`,
-    or `composable`) produces no evaluation output and no error — the runner silently
-    skips it.
-
-!!! note "nanochat_core tokenizer prerequisite"
-    In addition to `uv sync --extra nanochat`, this evaluator requires a trained
-    Nanochat tokenizer under `~/.cache/nanochat/tokenizer/`. Plato can auto-download
-    the CORE bundle, but it does **not** auto-create the tokenizer.
-
-    See [Nanochat in Plato](examples/case-studies/5. Nanochat in Plato.md) for the
-    end-to-end setup.
 
 ## Evaluator registry
 
@@ -135,7 +115,9 @@ type = "token_count"
 - If `evaluation.fail_on_error = false` or omitted, Plato logs the exception and continues without structured evaluation metrics.
 - If `evaluation.fail_on_error = true`, the exception is raised and the run stops.
 
-This is useful for keeping long training runs alive when the evaluator stack is optional.
+These settings govern exceptions raised while evaluating. Unknown or retired
+evaluator selections fail during resolution so a misspelled or unsupported
+backend cannot silently produce an unevaluated run.
 
 ## Lighteval-specific behaviour
 
@@ -164,6 +146,60 @@ Plato's Lighteval adapter adds several integration details on top of upstream Li
 - when `trainer.max_concurrency` spawns a subprocess for testing, Plato persists evaluator state so the parent server process still logs the structured metrics.
 
 The adapter also exposes the preset `smollm_round_fast`, used by the SmolLM2 server-side evaluation example.
+
+Task scoring follows upstream Lighteval metric definitions. Plato maps those
+outputs to stable summary names and detailed CSV columns; normalization does
+not change the upstream scoring rules.
+
+Current-model exports and configured local fallbacks receive fresh response
+caches per evaluation. Local fallback directories are independent full copies,
+with cleanup on success and failure; source artifacts remain untouched. See
+[model artifacts and response caches](../configurations/evaluation.md#model-artifacts-and-response-caches)
+for storage costs and concurrent-writer limits.
+
+## Optional runtime qualification
+
+Provision the locked extra, test dependencies, and the exact required NLTK
+resources before running the complete optional suite:
+
+```bash
+uv sync --locked --python 3.13 --extra llm_eval --group test
+uv run --locked --extra llm_eval python -m nltk.downloader punkt punkt_tab
+uv run --locked --extra llm_eval --group test python -m pytest tests/llm_eval --test-profile=llm-eval -ra
+```
+
+The strict profile requires its complete reviewed case inventory and successful
+execution, with no skips, xfails, or xpasses. Missing dependencies or resources
+fail during preflight; preflight does not download models or resources.
+`--collect-only` checks prerequisites and inventory, not runtime behavior.
+Filters such as `-k`, `-m`, and collection exclusions are incompatible with
+complete qualification. Use an explicit filesystem path without the profile
+for a focused run:
+
+```bash
+uv run --locked --extra llm_eval --group test python -m pytest tests/llm_eval/test_lighteval_runtime.py -k model_config -ra
+```
+
+Focused runs retain prerequisite and strict outcome checks but do not qualify
+the full inventory. Native MLX and Lighteval optional tests run separately;
+optional `--pyargs` selection and cross-profile targets are unsupported.
+
+For combined core and Lighteval qualification, the retained model-search tests
+also need the `test-model-search` group, which includes `test` and `ptflops`:
+
+```bash
+uv run --locked --extra llm_eval --group test-model-search python -m pytest tests --test-profile=llm-eval -ra
+```
+
+Ordinary core, `base`, `mandatory`, and `mlx-native` requests exclude `tests/llm_eval` before importing its modules.
+Existing unit tests in `tests/evaluators` remain core tests and do not establish
+actual Lighteval runtime qualification.
+
+The real runtime regression fixtures use a tiny local GPT-2 model, local parquet
+tasks, and controlled one-token generation on CPU with Python 3.13. They exercise
+the actual registry, runner, Pipeline, metrics, cache freshness, and cleanup.
+Their scores demonstrate regression behavior, not public benchmark accuracy,
+performance, downloaded Hub-model quality, GPU, or distributed qualification.
 
 ## Server logging contract
 

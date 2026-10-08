@@ -1,0 +1,306 @@
+{
+  "schema_version": 1,
+  "recorded_at_utc": "2026-10-04T00:22:50.731979+00:00",
+  "status": "PROSE_AND_STATIC_DOCUMENTATION_CHECKS_COMPLETE_PENDING_FRESH_REVIEW",
+  "scope": {
+    "owned_paths": [
+      "docs/docs/examples/archived.md",
+      "evidence/2026-refresh/historical-archive-docs.json"
+    ],
+    "historical_inventory_rows": 20,
+    "families": 4,
+    "action": "Documentation and read-only source inspection only. No restoration, deletion, reclassification, new retirement, algorithm/source fix or historical dependency installation."
+  },
+  "source": {
+    "base_commit": "d29773793d59bbaecdb650f408f116920b037bdb",
+    "prose_commit": "cbe6cce325cec88a056ba7af222171b533eb24b3",
+    "prose_tree": "5e06cbee5e7e486782ab4600981a264d2f2e5f5e",
+    "page_before_sha256": "4e6bda781e3e29a15e3e5f56708b5fa5f8a10e360b8e5752de4c5236b7334bb6",
+    "page_after_sha256": "aa41340081e9f8d60a20457206094522d5e0c0f8edc3e1848b184760239e01b5",
+    "modern_section_prefix_sha256": "a9515ebe52ba395ddd6a9ede4cc0976e9603add3b830611b301a496c7dbe0ee8",
+    "modern_section_byte_identical": true,
+    "context_source_sha256": {
+      "plato/servers/base.py": "80eb69f6af6602747e37264540aed3c989731a6c76c2c4a9bf6cc6692d32b918",
+      "plato/servers/fedavg.py": "dc7deda9e07d758fd7e9b81b6bb59cbf43e3f3d5197b2b550273b163f450e087",
+      "plato/trainers/basic.py": "4f5749e4f5784ea0ce6e98183c1a7bc25ce0c5c44be751665c054f8fdbbd2c2e",
+      "archives/legacy_datalib/README.md": "6a5e002446780ad2e25337ab8f48434f25ce106e420b7e47dde1a5d3b9bc8cd7",
+      "archives/legacy_rl_env/README.md": "648f74dbdb2b577069a6f4363de407b2cd4d2b4ca8d6e9462f69be442bfd7a93",
+      "archives/legacy_rl_env/rl_env.py": "557fec876520d089a69c18484bcc73465eb1f52ac332442acc35427d57c7a40c",
+      "docs/mkdocs.yml": "d26f6c6e7b91cf8835b4187e3b9e01125801e735122d79e7a148179b31a852ec",
+      "pyproject.toml": "5240593eca9a66c6238177bda7367331def53d054a86b6ef83163567eb3e1dab",
+      "uv.lock": "66a4e4442d7b1f26d220b44ca73c44ff4f1151a86857bb3f93a594819fd08126"
+    },
+    "inventory": [
+      {
+        "family": "norm_bounding",
+        "path": "examples/outdated/norm_bounding/norm_bounding.py",
+        "sha256": "06dec2a78140e70a8cc1eff028710c77e1c2e0952f0b326def87e2760dede1b6",
+        "role": "Experiment entrypoint.",
+        "url": "https://github.com/TL-System/plato/blob/main/examples/outdated/norm_bounding/norm_bounding.py"
+      },
+      {
+        "family": "norm_bounding",
+        "path": "examples/outdated/norm_bounding/norm_bounding_MNIST_lenet5.toml",
+        "sha256": "4ea5851ae75450d63b23431a3a36841bc96781ba031ab932611cb05022870cb4",
+        "role": "MNIST/LeNet-5 configuration; threshold set to 5.",
+        "url": "https://github.com/TL-System/plato/blob/main/examples/outdated/norm_bounding/norm_bounding_MNIST_lenet5.toml"
+      },
+      {
+        "family": "norm_bounding",
+        "path": "examples/outdated/norm_bounding/norm_bounding_server.py",
+        "sha256": "d6c8589149505d3f48511bc367b5f1e7a175231b270e6669fa18f585d592a81f",
+        "role": "Update norm calculation and clipped-update aggregation.",
+        "url": "https://github.com/TL-System/plato/blob/main/examples/outdated/norm_bounding/norm_bounding_server.py"
+      },
+      {
+        "family": "fjord",
+        "path": "examples/outdated/model_search/fjord/fjord.py",
+        "sha256": "a18a8162b92a0f9f87855e35a318b8d0dc083c1de72c0bf1e7124a299ec60a24",
+        "role": "Entrypoint selecting a local ResNet or ViT model.",
+        "url": "https://github.com/TL-System/plato/blob/main/examples/outdated/model_search/fjord/fjord.py"
+      },
+      {
+        "family": "fjord",
+        "path": "examples/outdated/model_search/fjord/fjord_algorithm.py",
+        "sha256": "c929db7f5735a979b6df65ab76fdf1874a88a913c7f2f55e8c2d1accccd0fcca",
+        "role": "Width selection, parameter slicing and aggregation.",
+        "url": "https://github.com/TL-System/plato/blob/main/examples/outdated/model_search/fjord/fjord_algorithm.py"
+      },
+      {
+        "family": "fjord",
+        "path": "examples/outdated/model_search/fjord/fjord_client.py",
+        "sha256": "fd1d84bc537d2de13ffc6fbc15180d26791d556c4be641a050cf515072aefc7d",
+        "role": "Client lifecycle handling for the server-selected width.",
+        "url": "https://github.com/TL-System/plato/blob/main/examples/outdated/model_search/fjord/fjord_client.py"
+      },
+      {
+        "family": "fjord",
+        "path": "examples/outdated/model_search/fjord/fjord_resnet18_dynamic.toml",
+        "sha256": "e2714e100645b9d0a675ddd3f776accb20ce7011892a96087f030839daa9e9db",
+        "role": "CIFAR-10/ResNet-18 configuration; resource limits disabled.",
+        "url": "https://github.com/TL-System/plato/blob/main/examples/outdated/model_search/fjord/fjord_resnet18_dynamic.toml"
+      },
+      {
+        "family": "fjord",
+        "path": "examples/outdated/model_search/fjord/fjord_server.py",
+        "sha256": "222e9bfcb6027d178e9b85dbdfc41dc998a61a626863376a36ccfdbf250694bb",
+        "role": "Per-client width responses and aggregation dispatch.",
+        "url": "https://github.com/TL-System/plato/blob/main/examples/outdated/model_search/fjord/fjord_server.py"
+      },
+      {
+        "family": "fjord",
+        "path": "examples/outdated/model_search/fjord/fjord_trainer.py",
+        "sha256": "987aa475a1df0b149f3d7ea369e52bb1101c5cabe0a83c4a556eab43755bdf22",
+        "role": "Server model construction and client subnet training.",
+        "url": "https://github.com/TL-System/plato/blob/main/examples/outdated/model_search/fjord/fjord_trainer.py"
+      },
+      {
+        "family": "fjord",
+        "path": "examples/outdated/model_search/fjord/resnet.py",
+        "sha256": "1295a4c45add3f5701b3c41900e7217cad118496e948e82951f310766ab7de31",
+        "role": "Local variable-width ResNet model definitions.",
+        "url": "https://github.com/TL-System/plato/blob/main/examples/outdated/model_search/fjord/resnet.py"
+      },
+      {
+        "family": "fjord",
+        "path": "examples/outdated/model_search/fjord/vit.py",
+        "sha256": "8b7fdd72f4bf96de879b300081a1a5be09cc011475deac3d140211c8310b22cb",
+        "role": "Local variable-width ViT model definition.",
+        "url": "https://github.com/TL-System/plato/blob/main/examples/outdated/model_search/fjord/vit.py"
+      },
+      {
+        "family": "fl_maml",
+        "path": "examples/outdated/fl_maml/fl_maml.py",
+        "sha256": "02a09377aae549d301456b61b3c033d7701fa644c6852b539cb6b2db7ad04834",
+        "role": "Experiment entrypoint wiring client, server and trainer.",
+        "url": "https://github.com/TL-System/plato/blob/main/examples/outdated/fl_maml/fl_maml.py"
+      },
+      {
+        "family": "fl_maml",
+        "path": "examples/outdated/fl_maml/fl_maml_MNIST_lenet5.toml",
+        "sha256": "1633deba7db6085a6dcb6c850368758ccb86184aad15297682f4f858afc594e7",
+        "role": "MNIST/LeNet-5 configuration and meta learning rate.",
+        "url": "https://github.com/TL-System/plato/blob/main/examples/outdated/fl_maml/fl_maml_MNIST_lenet5.toml"
+      },
+      {
+        "family": "fl_maml",
+        "path": "examples/outdated/fl_maml/fl_maml_client.py",
+        "sha256": "c3f2937b19b9d60c5f88be3253c248afefc9350f279d78a75672eb63bf1be4f2",
+        "role": "Personalization request handling and accuracy reporting.",
+        "url": "https://github.com/TL-System/plato/blob/main/examples/outdated/fl_maml/fl_maml_client.py"
+      },
+      {
+        "family": "fl_maml",
+        "path": "examples/outdated/fl_maml/fl_maml_server.py",
+        "sha256": "5a40e1bf7ae9cf771ce2b93dc1a6ea973917484c5624b6b021e2e455e0f71956",
+        "role": "Training/personalization round and report coordination.",
+        "url": "https://github.com/TL-System/plato/blob/main/examples/outdated/fl_maml/fl_maml_server.py"
+      },
+      {
+        "family": "fl_maml",
+        "path": "examples/outdated/fl_maml/fl_maml_trainer.py",
+        "sha256": "19297031c138e13b501ac3acfe3ee63deb78e735db63e887271503da6f84f3a9",
+        "role": "Two-stage training, personalization and testing loops.",
+        "url": "https://github.com/TL-System/plato/blob/main/examples/outdated/fl_maml/fl_maml_trainer.py"
+      },
+      {
+        "family": "cs_maml",
+        "path": "examples/outdated/cs_maml/cs_maml.py",
+        "sha256": "ab2c94989ed4d8807cc524015c4e60a9dca2a73bc1ba3bd29588a9827c06b511",
+        "role": "Cross-silo entrypoint importing sibling FL-MAML modules.",
+        "url": "https://github.com/TL-System/plato/blob/main/examples/outdated/cs_maml/cs_maml.py"
+      },
+      {
+        "family": "cs_maml",
+        "path": "examples/outdated/cs_maml/cs_maml_MNIST_lenet5.toml",
+        "sha256": "71cf11ca3b040579c90987b17c0c29c0c07cbd7ea42d28bbcf6d207f133f696f",
+        "role": "MNIST/LeNet-5 configuration with one edge silo.",
+        "url": "https://github.com/TL-System/plato/blob/main/examples/outdated/cs_maml/cs_maml_MNIST_lenet5.toml"
+      },
+      {
+        "family": "cs_maml",
+        "path": "examples/outdated/cs_maml/cs_maml_edge.py",
+        "sha256": "14369de9c527863286b6f5bdce9b650d503b6e6064a012de444d0d39333f8840",
+        "role": "Edge-client personalization strategy and event waiting.",
+        "url": "https://github.com/TL-System/plato/blob/main/examples/outdated/cs_maml/cs_maml_edge.py"
+      },
+      {
+        "family": "cs_maml",
+        "path": "examples/outdated/cs_maml/cs_maml_server.py",
+        "sha256": "1d7a04d3aea581ff0a01c4d5304c9498fa407720406d8ef113059d7674b30f87",
+        "role": "Central/edge round, report and personalization coordination.",
+        "url": "https://github.com/TL-System/plato/blob/main/examples/outdated/cs_maml/cs_maml_server.py"
+      }
+    ],
+    "all_twenty_inventory_hashes_match_accepted_plan_and_remain_unchanged": true,
+    "only_page_differs_from_base": true
+  },
+  "authority": [
+    {
+      "path": "/tmp/plato-phase4-family-plan.json",
+      "sha256": "07d90034e89b83283c9b592550ebe17a1ea3a28a9fa2fbc292cc328db4977e4b",
+      "bytes": 543551
+    },
+    {
+      "path": "/tmp/plato-phase4-family-plan-review.json",
+      "sha256": "1fb78cdc19f530f9e17258d5e8481e54703f846b1aa8b7160112a9af18e477aa",
+      "bytes": 24400
+    }
+  ],
+  "public_content": {
+    "grouping": "Norm bounding 3 files; FjORD 8; FL-MAML 5; CS-MAML 4. Each file has exactly one linked table row and a role. The separate utility paragraph does not portray individual dataset/Gym helpers as maintained experiment entrypoints.",
+    "dependencies": "Observed source imports/config selections only: NumPy/PyTorch/Torchvision, FjORD ptflops and local einops ViT, FL-MAML custom trainer and CS-MAML sibling import. No invented historical package versions, pinned working environments or upstream revision claims.",
+    "estimates": {
+      "norm_bounding": "1\u20132 focused implementation/review sessions plus numerical/device checks",
+      "fjord": "3\u20135 sessions for ResNet; local ViT restoration excluded and separately scoped",
+      "fl_maml": "3\u20135 sessions including two-stage gradient, personalization isolation and checkpoint checks",
+      "cs_maml": "2\u20133 additional sessions after FL-MAML, including a real central/edge numerical round"
+    },
+    "estimate_limits": "Planning estimates for bounded local regression fixtures, not commitments or execution promises. Environment recovery, research semantics, external assets and paper-scale reproduction may add work."
+  },
+  "qualified_plan_shorthand": [
+    {
+      "family": "norm_bounding",
+      "plan_wording": "Old aggregate_deltas override",
+      "source_facts": "The current fedavg.Server.aggregate_deltas method explicitly permits subclass overrides. The historical code retains the None threshold fallback, np.array(weight) conversion, and a sum of clipped deltas without sample weighting/final averaging.",
+      "public_boundary": "Describe those static assumptions and numerical/device questions; do not claim the hook was removed or that current runtime execution passed."
+    },
+    {
+      "family": "fjord",
+      "plan_wording": "Legacy ViT dependencies intentionally retired",
+      "source_facts": "fjord.py eagerly imports local vit.py, and that file directly uses torch/einops. It does not import the separately retired plato.models.vit factory. ptflops is directly imported by fjord_algorithm.py.",
+      "public_boundary": "Do not claim an absent dependency or a retired-factory import. Model/trainer/slicing/distillation/aggregation and optional resource checks remain unqualified."
+    },
+    {
+      "family": "cs_maml",
+      "plan_wording": "Legacy positional server.run API",
+      "source_facts": "The four positional arguments in cs_maml.py match current base.Server.run(client=None, edge_server=None, edge_client=None, trainer=None).",
+      "public_boundary": "No demonstrated signature break is claimed; dependency on FL-MAML and actual cross-silo construction/reports/events still require qualification."
+    }
+  ],
+  "static_claim_oracles": {
+    "fl_maml_stage_required_positional_without_self": 10,
+    "fl_maml_stage_supplied_counts": [
+      9,
+      9
+    ],
+    "cs_maml_run_signature_still_matches": true,
+    "norm_bounding_hook_still_exists": true,
+    "fjord_uses_local_vit_torch_einops": true,
+    "fl_maml_optimizer_fields_differ_from_config_location": true
+  },
+  "validation": {
+    "environment": {
+      "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+      "executable": "/tmp/plato-historical-archive-docs/docs-env/bin/python",
+      "versions": {
+        "mkdocs": "1.6.1",
+        "mkdocs-material": "9.7.7"
+      },
+      "runtime_absent": true
+    },
+    "provision": {
+      "command": "UV_PROJECT_ENVIRONMENT=/tmp/plato-historical-archive-docs/docs-env uv sync --locked --python 3.13 --only-group docs --no-install-project",
+      "returncode": 0,
+      "log": {
+        "path": "/tmp/plato-historical-archive-docs/artifacts/docs-sync.log",
+        "sha256": "5cfb373786f9a63c1af1d8cd783c94a2c4db0bfa54aff69ca7bae874a690a439",
+        "bytes": 769
+      }
+    },
+    "strict_mkdocs": {
+      "command": "/tmp/plato-historical-archive-docs/docs-env/bin/python -m mkdocs build --strict --config-file docs/mkdocs.yml --site-dir /tmp/plato-historical-archive-docs/site",
+      "returncode": 0,
+      "log": {
+        "path": "/tmp/plato-historical-archive-docs/artifacts/docs-build.log",
+        "sha256": "4993e36497d17f15fbf9944c5ad8dbce7dd13dcd597fe6a9fd4f8d6a77f322fa",
+        "bytes": 1210
+      },
+      "scope": "Built the final prose bytes before the prose commit; no content changed afterward. Existing Material advisory and informational retired-page notices did not fail strict build."
+    },
+    "source_and_links": {
+      "command": "/tmp/plato-historical-archive-docs/docs-env/bin/python /tmp/plato-historical-archive-docs/artifacts/audit.py",
+      "returncode": 0,
+      "row_count": 20,
+      "family_counts": {
+        "norm_bounding": 3,
+        "fjord": 8,
+        "fl_maml": 5,
+        "cs_maml": 4
+      },
+      "rendered_local_links_and_anchors": 67,
+      "repository_link_targets": 32,
+      "errors": [],
+      "evidence": {
+        "path": "/tmp/plato-historical-archive-docs/artifacts/source-link-audit.json",
+        "sha256": "589d5938373b539074bc318c00c465550161fa42427fcf434a971dc91a1bf158",
+        "bytes": 34563
+      },
+      "source_checker": {
+        "path": "/tmp/plato-historical-archive-docs/artifacts/audit.py",
+        "sha256": "89a68254a326c82ef4a4ce39c31c251366f22ff736629910ccc646bb9b418fcf",
+        "bytes": 5798
+      },
+      "method": "Check exact plan hashes and one docs link per inventory row, parse all 16 Python files with ast and 4 TOMLs with tomllib without imports, compare current hook/signature and documented static inconsistencies, verify rendered page targets/fragments and GitHub repository paths against local retained files. External URL availability is not asserted."
+    },
+    "git_diff_check": {
+      "returncode": 0
+    },
+    "historical_runtime_execution": false,
+    "historical_dependencies_installed": false,
+    "existing_environments_mutated": false
+  },
+  "limits": [
+    "No historical training run, model import, numerical oracle, GPU/device test or restoration occurred. Python 3.13 qualifies only the docs tooling and static audit here, not these historical experiments.",
+    "Existing modern retirement table, source/provenance links, retained ResNet/generic Hugging Face/Torchvision distinctions, Qwen reference and robotics limits remain byte-identical.",
+    "Neither hook existence nor positional-signature compatibility proves end-to-end historical behavior.",
+    "No current package/CI/global qualification is inferred from locally accepted P2 archive exclusions; the page adds no package-delivery claim.",
+    "Fresh independent documentation review and root integration remain pending. No push, PR, workflow dispatch, publication or nested agents."
+  ],
+  "review_gate": {
+    "ready_for_fresh_review": true,
+    "fresh_review_accepted": false,
+    "publication_ready": false
+  },
+  "artifacts_root": "/tmp/plato-historical-archive-docs"
+}

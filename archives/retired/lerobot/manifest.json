@@ -1,0 +1,222 @@
+{
+  "schema_version": 1,
+  "backend": "lerobot",
+  "retired_at": "2026-10-03",
+  "pre_retirement_plato_commit": "9ee92c52307cd3ecdce0c7416708c504bdb52137",
+  "files": [
+    {
+      "original_path": "LICENSE",
+      "archive_path": "archives/retired/lerobot/original/LICENSE",
+      "disposition": "historical_snapshot",
+      "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+      "bytes": 11357,
+      "git_mode": "100644",
+      "git_blob": "261eeb9e9f8b2b4b0d119366dda99c6fd7d35c64"
+    },
+    {
+      "original_path": "configs/LeRobot/lerobot_datasource_base.toml",
+      "archive_path": "archives/retired/lerobot/original/configs/LeRobot/lerobot_datasource_base.toml",
+      "disposition": "moved",
+      "sha256": "01acba088dbfcf153abf035dc283863dd83091028cbe7cd7853319da0e95c514",
+      "bytes": 257,
+      "git_mode": "100644",
+      "git_blob": "7228f4848a31a891048048ff3f2b84344a1a445f"
+    },
+    {
+      "original_path": "configs/LeRobot/smolvla_fedavg_two_client_smoke.toml",
+      "archive_path": "archives/retired/lerobot/original/configs/LeRobot/smolvla_fedavg_two_client_smoke.toml",
+      "disposition": "moved",
+      "sha256": "06860652a1c2d989fb46f2b6933842de9c0bd6a3e89a2e2f3ef51865a211aa37",
+      "bytes": 1298,
+      "git_mode": "100644",
+      "git_blob": "45db563b98936471941643cabc6da8aaea82d30d"
+    },
+    {
+      "original_path": "configs/LeRobot/smolvla_full_finetune.toml",
+      "archive_path": "archives/retired/lerobot/original/configs/LeRobot/smolvla_full_finetune.toml",
+      "disposition": "moved",
+      "sha256": "769fe7e03c579bf4866315c1f8c1e1d0d7bc0fb834d8015da4cf9ffaf880532d",
+      "bytes": 1443,
+      "git_mode": "100644",
+      "git_blob": "89c83b6f606e869699f4378d474db8db7a3b0ad1"
+    },
+    {
+      "original_path": "configs/LeRobot/smolvla_single_client_smoke.toml",
+      "archive_path": "archives/retired/lerobot/original/configs/LeRobot/smolvla_single_client_smoke.toml",
+      "disposition": "moved",
+      "sha256": "b25188870533826549161ac1b50c6b7d3855024edb1f0b10f7d065e7e2766824",
+      "bytes": 1290,
+      "git_mode": "100644",
+      "git_blob": "0c48f00f5baeb22b8305bdca20fb3bc71e038d8b"
+    },
+    {
+      "original_path": "docs/docs/examples/case-studies/3. SmolVLA Trainer with LeRobot.md",
+      "archive_path": "archives/retired/lerobot/original/docs/docs/examples/case-studies/3. SmolVLA Trainer with LeRobot.md",
+      "disposition": "replaced_by_retirement_notice",
+      "sha256": "2ceb580399deebd0ca3491644103b716046604aad3ed01880c130be088fd13db",
+      "bytes": 7091,
+      "git_mode": "100644",
+      "git_blob": "e325ed78f1d9a4568d71def630a7ae0736b8310f"
+    },
+    {
+      "original_path": "plato/datasources/lerobot.py",
+      "archive_path": "archives/retired/lerobot/original/plato/datasources/lerobot.py",
+      "disposition": "moved",
+      "sha256": "fb6399418c5174415d0ba02a51fcfbcd5d04b555bd5190924fc228a605edc95d",
+      "bytes": 24469,
+      "git_mode": "100644",
+      "git_blob": "ef2cd6654bebca1efe5175f31a68a7ba7d6e99c8"
+    },
+    {
+      "original_path": "plato/datasources/registry.py",
+      "archive_path": "archives/retired/lerobot/original/plato/datasources/registry.py",
+      "disposition": "historical_snapshot",
+      "sha256": "38a76f407edd6f46ccbdf56e231ac93d18e379971a5dbf007f15c22f5da602b6",
+      "bytes": 3819,
+      "git_mode": "100644",
+      "git_blob": "0a609d5e5442e5400ecf74684962fcae6d06d7cb"
+    },
+    {
+      "original_path": "plato/models/registry.py",
+      "archive_path": "archives/retired/lerobot/original/plato/models/registry.py",
+      "disposition": "historical_snapshot",
+      "sha256": "8f499c870ec4a31d0323b8e8cf27c9cea6e9aaedc0d3b98dd397989c26958aa8",
+      "bytes": 4451,
+      "git_mode": "100644",
+      "git_blob": "1dbda56cf4bd851a69a8f5e0362810feeefd7cac"
+    },
+    {
+      "original_path": "plato/models/smolvla.py",
+      "archive_path": "archives/retired/lerobot/original/plato/models/smolvla.py",
+      "disposition": "moved",
+      "sha256": "6a082410a12b839e6064e4829568a55af54ce194a3f190c75f109772f83c35e1",
+      "bytes": 9654,
+      "git_mode": "100644",
+      "git_blob": "ec0865aaec54dfec003fb617bc28896bb79219c2"
+    },
+    {
+      "original_path": "plato/trainers/lerobot.py",
+      "archive_path": "archives/retired/lerobot/original/plato/trainers/lerobot.py",
+      "disposition": "moved",
+      "sha256": "1f647426a85df75df3ff2e9a7a90a8e8bb96d93e93d39f79729b7ff9d2f31ba8",
+      "bytes": 24919,
+      "git_mode": "100644",
+      "git_blob": "051733e470f7baf0ce5f16b1335be7c1b9a63f22"
+    },
+    {
+      "original_path": "plato/trainers/registry.py",
+      "archive_path": "archives/retired/lerobot/original/plato/trainers/registry.py",
+      "disposition": "historical_snapshot",
+      "sha256": "dc17cf3bd8e1c168213173e7d16e5d4e4f12282c41d33a67f241b294afb64fa1",
+      "bytes": 2420,
+      "git_mode": "100644",
+      "git_blob": "c08c5b46db1eaae48171c195a418450a3bcac794"
+    },
+    {
+      "original_path": "pyproject.toml",
+      "archive_path": "archives/retired/lerobot/original/pyproject.toml",
+      "disposition": "historical_snapshot",
+      "sha256": "799bd7ba1865b097fdc8ca84a7b70337794e338de4aa9a6a13f6a4c1b9156246",
+      "bytes": 4079,
+      "git_mode": "100644",
+      "git_blob": "28803a3d78188ee508c9e572bd8ac7eff406fedc"
+    },
+    {
+      "original_path": "tests/algorithms/test_fedavg_algorithm.py",
+      "archive_path": "archives/retired/lerobot/original/tests/algorithms/test_fedavg_algorithm.py",
+      "disposition": "historical_snapshot",
+      "sha256": "61ef08d248c464655ed9b9894c0c212d917a101b4a48ddce5a14571e55ea2028",
+      "bytes": 5504,
+      "git_mode": "100644",
+      "git_blob": "1ccdd8399de057b6183370ca3bb6d3f9e0a33c45"
+    },
+    {
+      "original_path": "tests/datasources/test_lerobot_datasource.py",
+      "archive_path": "archives/retired/lerobot/original/tests/datasources/test_lerobot_datasource.py",
+      "disposition": "moved",
+      "sha256": "e75e9443328356f981036a43aab54a53d7999c14f73ff9f0f33f96bca14156e1",
+      "bytes": 3480,
+      "git_mode": "100644",
+      "git_blob": "61dc2e81b61c31d5c016b03b8811956415b5bb11"
+    },
+    {
+      "original_path": "tests/integration/test_lerobot_smolvla_smoke.py",
+      "archive_path": "archives/retired/lerobot/original/tests/integration/test_lerobot_smolvla_smoke.py",
+      "disposition": "moved",
+      "sha256": "b7719295cc7ed036dff590a9d30ebdd0bcdc49a2220cfd476b0d8f4754932e85",
+      "bytes": 3827,
+      "git_mode": "100644",
+      "git_blob": "c51370f1c69f00d979513f10809de8c05ecbda3c"
+    },
+    {
+      "original_path": "tests/models/test_smolvla_model.py",
+      "archive_path": "archives/retired/lerobot/original/tests/models/test_smolvla_model.py",
+      "disposition": "moved",
+      "sha256": "2b34362cf27409903d3ab55b425c67dad011fdae578bb3a3959ef275cfea24d8",
+      "bytes": 2055,
+      "git_mode": "100644",
+      "git_blob": "4c477fa6deb4f5e2ce771816825a2eaf62de4364"
+    },
+    {
+      "original_path": "tests/test_config_loader.py",
+      "archive_path": "archives/retired/lerobot/original/tests/test_config_loader.py",
+      "disposition": "historical_snapshot",
+      "sha256": "b79285e4822273311cc09cbd5bc5160c3026716754dbbf50bef190c8f8613c1d",
+      "bytes": 16348,
+      "git_mode": "100644",
+      "git_blob": "6b3998c33e7028d0ced4150637177112bea4e5d4"
+    },
+    {
+      "original_path": "tests/test_utils/lerobot_stubs.py",
+      "archive_path": "archives/retired/lerobot/original/tests/test_utils/lerobot_stubs.py",
+      "disposition": "moved",
+      "sha256": "08977f6cc155faabf24cb30b48f91e8568a3a6bf2a944236b7068231c67d973d",
+      "bytes": 5155,
+      "git_mode": "100644",
+      "git_blob": "2272e4b779d36cb8ea6dad3564eee289888ad72e"
+    },
+    {
+      "original_path": "tests/trainers/test_lerobot_trainer.py",
+      "archive_path": "archives/retired/lerobot/original/tests/trainers/test_lerobot_trainer.py",
+      "disposition": "moved",
+      "sha256": "c4ebc5e2d83bd356357c287572d14d2210caa3af8280a2ad3a4f5ef8525710ff",
+      "bytes": 6574,
+      "git_mode": "100644",
+      "git_blob": "1d1316aff3ea373286ee692a3136804e4874cabe"
+    },
+    {
+      "original_path": "uv.lock",
+      "archive_path": "archives/retired/lerobot/original/uv.lock",
+      "disposition": "historical_snapshot",
+      "sha256": "573b10c2ba1a2317e02f9e40c6181359cafab6f6e0a0f9be12bb256cb276fe1d",
+      "bytes": 739161,
+      "git_mode": "100644",
+      "git_blob": "31729888535c7f0eae277b2fe0133ad9814cc4d4"
+    }
+  ],
+  "runtime_support": "Retired; historical environments are unverified on the refreshed stack.",
+  "historical_commands_source": [
+    "archives/retired/lerobot/original/docs/docs/examples/case-studies/3. SmolVLA Trainer with LeRobot.md"
+  ],
+  "environment": {
+    "requires_python": ">=3.13",
+    "active_qualification_python": "3.13.16",
+    "uv_version": "0.12.22",
+    "pyproject_sha256": "799bd7ba1865b097fdc8ca84a7b70337794e338de4aa9a6a13f6a4c1b9156246",
+    "uv_lock_sha256": "573b10c2ba1a2317e02f9e40c6181359cafab6f6e0a0f9be12bb256cb276fe1d"
+  },
+  "upstream": {
+    "source_url": "https://github.com/huggingface/lerobot",
+    "source_license_reference": "https://github.com/huggingface/lerobot/blob/main/LICENSE",
+    "integration_imports": [
+      "lerobot.datasets.lerobot_dataset.LeRobotDataset",
+      "lerobot.datasets.lerobot_dataset.LeRobotDatasetMetadata",
+      "lerobot.policies.smolvla.modeling_smolvla.SmolVLAPolicy",
+      "lerobot.policies.factory.make_pre_post_processors"
+    ],
+    "policy_repo_id": "lerobot/smolvla_base",
+    "dataset_repo_id": "lerobot/pusht_image",
+    "policy_and_dataset_revisions": "Not pinned in the original integration.",
+    "vendored_material": "Plato integration only; no upstream LeRobot source, model weights or datasets vendored."
+  }
+}

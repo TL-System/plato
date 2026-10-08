@@ -1,0 +1,1147 @@
+{
+  "schema_version": 1,
+  "reviewed_at_utc": "2026-10-03T04:42:09.964713+00:00",
+  "review_role": "Fresh independent Phase 2D correction/integration reviewer; no nested agents.",
+  "requested_profile": "gpt-6.1-sol xhigh, separate herdr workspace",
+  "decision": "CHANGES_REQUESTED",
+  "candidate_local_acceptance": false,
+  "phase_integration_acceptance": false,
+  "summary": "All four original production findings are independently resolved, clean base collection/execution is restored, and actual durable B+D S3 integration passes on both interpreters. One medium test-qualification gap remains: the implicit mandatory profile selects base adapters in the two ROOT-2D-01 fixture corrections.",
+  "identity": {
+    "base_commit": "fda60becedfa6236c11d415b87a868b52789a41e",
+    "candidate_commit": "09b9b941bc4a816b62d8ed33ad993455f6f05da5",
+    "candidate_tree": "5bb90f8f97aba8085a54ff3c534d9424705a6867",
+    "worktree": "/private/tmp/plato-refresh-worktrees/payloads",
+    "initial_clean": true,
+    "final_clean": true,
+    "immutability": {
+      "head": "09b9b941bc4a816b62d8ed33ad993455f6f05da5",
+      "tree": "5bb90f8f97aba8085a54ff3c534d9424705a6867",
+      "tracked_and_untracked_status": "",
+      "all_initial_source_hashes_unchanged": true,
+      "checked_source_files": 782,
+      "preserved_B_other_test_blobs": {
+        "tests/callbacks/test_handler_contract.py": true,
+        "tests/clients/test_checkpoint_cleanup.py": true,
+        "tests/clients/test_payload_limits.py": true,
+        "tests/servers/test_fedavg_strategy.py": true,
+        "tests/servers/test_lifecycle_contracts.py": true,
+        "tests/servers/test_port_checkpoint_flow.py": true,
+        "tests/servers/test_runtime_disconnect_recovery.py": true,
+        "tests/servers/test_runtime_review_regressions.py": true,
+        "tests/servers/test_runtime_transport.py": true
+      },
+      "overlap_tests": [
+        "tests/clients/test_client_lifecycle_variants.py"
+      ]
+    },
+    "ancestry": "Verified base -> initial reviewed a4a4733 -> production correction 639ca69 -> evidence aa232791 -> test-only 15c79d0 -> evidence f8aa0e98; ccb31017 merges exactly f8aa0e98 and accepted B 00eeb9dc; test-only 926346bf and 53aa72c3 precede current evidence-only 09b9b941.",
+    "accepted_b_candidate": "00eeb9dcdd2b513e64db9408969356037e09bb8e",
+    "accepted_b_tree": "39b6b554e833aeb5e8916e40fbc38a2fa46f6671",
+    "premerge_d": "f8aa0e9815b702f9d414ebe85a85eb48f9a982a1",
+    "merge_commit": "ccb310177273f5cfa2ce7f1c0203f55ddaa68397",
+    "merge_parents": [
+      "f8aa0e9815b702f9d414ebe85a85eb48f9a982a1",
+      "00eeb9dcdd2b513e64db9408969356037e09bb8e"
+    ],
+    "final_tested_implementation": "53aa72c3c578b1a32d8f83d64a98d6a543cdfb9a",
+    "final_tested_implementation_tree": "ee4edd25a6b762591c6bd1680dfb818d0e5c4e7a",
+    "candidate_vs_tested_source": "Only evidence/2026-refresh/phase2d-validation.json changes between 53aa72c3 and 09b9b941.",
+    "manifest": {
+      "path": "/tmp/plato-phase2d-review-2/initial-identity.json",
+      "sha256": "a1ba6b9d3df3a2e855ef0d9afa2b888531fa7cf691faa7276c533bc9c4f3b6d2"
+    },
+    "final_verification": {
+      "path": "/tmp/plato-phase2d-review-2/final-immutability.json",
+      "sha256": "27da7aba04b6c6d618b3970fe598c78802d3fd6ac782f16cb0206a6a815ff2f8"
+    }
+  },
+  "scope": {
+    "reviewed": [
+      "Exact D production corrections and their config/registry/server wiring, valid and invalid numerical boundaries.",
+      "Retained F02-F05/F12 behavior and touched HE/MPC/RL/processors/utilities/archive risks.",
+      "ROOT-2D-01 base/mandatory optional test contracts, fixture lifecycle cleanup and actual RL updates.",
+      "Exact accepted B dependency preservation and both lifecycle test changes.",
+      "Durable current S3 writer/presigner -> current bounded reader and actual client failure owner cleanup.",
+      "Expanded validation identities, counts, raw logs, artifact/source hashes and original versus current attribution."
+    ],
+    "accepted_b_policy": "B production is already accepted. This review verifies equality and D integration/touched risks, without reopening unrelated B runtime behavior.",
+    "writes": "Only this ROOT report and /tmp/plato-phase2d-review-2. No candidate edits, commits/push, shared metadata/fixture changes, questions or nested agents.",
+    "sources_read": [
+      {
+        "path": "/Users/bli/Playground/plato/evidence/2026-refresh/plan.md",
+        "sha256": "edb9a58cc7915a940854f16d5029fe97434703bf2f75eca0dcb96de2d0f0eb15"
+      },
+      {
+        "path": "/Users/bli/Playground/plato/evidence/2026-refresh/plan-review-3.json",
+        "sha256": "a1bc8bd69f43ea3280872a4c8259b431c4a9c27776ebd42fde658d6d48bd41b6"
+      },
+      {
+        "path": "/Users/bli/Playground/plato/evidence/2026-refresh/plan-addendum.json",
+        "sha256": "5b51b0fb7ed6f68d9fce7176335b3e7be5e5f178a2788590912aa2396a487709"
+      },
+      {
+        "path": "/Users/bli/Playground/plato/evidence/2026-refresh/plan-addendum-acceptance.json",
+        "sha256": "5f5d5a8e22e14072b5d031c19a27be14bda9bdbc2a157d14af78845daac6c56b"
+      },
+      {
+        "path": "/Users/bli/Playground/plato/evidence/2026-refresh/design-acceptance.json",
+        "sha256": "ff4d6acde0d0312b49b9767be5210b55fb4db0e8fb5727203c148b63d123693a"
+      },
+      {
+        "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2d-review.json",
+        "sha256": "89392d0c32f73a44abb7deba7c9bdc98f407d4a3c10fb2e38647aee07f7fa5a9"
+      },
+      {
+        "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2d-root-base-probe.json",
+        "sha256": "298b647370bba7ec38865f11c43755b49c8f4d9ca6f2c5b93aee615d0693d25d"
+      },
+      {
+        "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2b-review-3.json",
+        "sha256": "83eaf2c44ffb1316e9d6643e23c3ea9b977d5b083bf4427e86a75dcac7720fd6"
+      },
+      {
+        "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2b-acceptance.json",
+        "sha256": "3be220078302a05189c07c32220a86e966ff919bc4ef11e5d342a6c39135396d"
+      },
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/payloads/AGENTS.md",
+        "sha256": "b50f87f31ea3d87076952d8b7d2d8af067132fbf877d80f8780c208fb45527ec"
+      },
+      {
+        "path": "/private/tmp/plato-refresh-worktrees/payloads/evidence/2026-refresh/phase2d-validation.json",
+        "sha256": "7ceb2c40f029e63cd42a07186a9713f6a7b5f34894868e6ba6d80bcc91ab0677"
+      }
+    ]
+  },
+  "source_preservation": {
+    "D_changed_production_files": 29,
+    "B_changed_production_files": 11,
+    "production_blobs_match_owning_candidates": true,
+    "D_entire_trees_equal_premerge": [
+      "plato/processors",
+      "plato/serialization",
+      "plato/mpc",
+      "plato/utils"
+    ],
+    "S3": "Current utility blob 926ce3af7973d0f93f2442886e457d36d7612414 and SHA-256 a26d306daa6a4accd4d67c9f26dea9f9ad153e74353fe8698643987cb6f25c03 are unchanged since initial D.",
+    "after_merge": "No production changes after ccb31017. 926346bf and 53aa72c3 change only tests/servers/test_runtime_s3_contract.py; 09b9b941 is evidence-only.",
+    "metadata_and_fixtures": "pyproject.toml, uv.lock, tests/conftest.py and tests/integration/utils.py equal phase base.",
+    "B_original_S3_test_functions_AST_unchanged": {
+      "test_minimal_s3_adapter_prefixes_exactly_once": true,
+      "test_client_buffer_cap_applies_below_payload_cap": true
+    },
+    "lifecycle_merge": {
+      "B_size_negative": true,
+      "D_persisted_mpc": true
+    },
+    "other_B_test_blobs_preserved": {
+      "tests/callbacks/test_handler_contract.py": true,
+      "tests/clients/test_checkpoint_cleanup.py": true,
+      "tests/clients/test_payload_limits.py": true,
+      "tests/servers/test_fedavg_strategy.py": true,
+      "tests/servers/test_lifecycle_contracts.py": true,
+      "tests/servers/test_port_checkpoint_flow.py": true,
+      "tests/servers/test_runtime_disconnect_recovery.py": true,
+      "tests/servers/test_runtime_review_regressions.py": true,
+      "tests/servers/test_runtime_transport.py": true
+    }
+  },
+  "findings": [
+    {
+      "id": "2D-R05",
+      "severity": "MEDIUM",
+      "path": "tests/mpc/test_round_store_contracts.py",
+      "line": 16,
+      "related_locations": [
+        {
+          "path": "tests/utils/test_rl_payload_utilities.py",
+          "line": 16
+        },
+        {
+          "path": "tests/conftest.py",
+          "line": 98
+        },
+        {
+          "path": "tests/conftest.py",
+          "line": 115
+        }
+      ],
+      "title": "The implicit mandatory test profile silently selects the base optional-library adapters.",
+      "scope_basis": "ROOT-2D-01 requires independent base behavioral contracts and actual Kazoo LockTimeout/Gymnasium Box qualification in the mandatory profile. The accepted existing conftest explicitly defaults an unfiltered full suite to mandatory.",
+      "description": "Both new fixtures select the actual library only when the raw test_profile option equals the string mandatory. For the standard unfiltered pytest tests invocation, that option is None, while _ProfileChecks.full=True, qualify=True and base=False enforce mandatory prerequisites. Despite installed/importable Kazoo and Gymnasium, lock_timeout_type returns builtins.TimeoutError and action_space returns types.SimpleNamespace. This silently removes actual-library fixture qualification from the default mandatory entrypoint. Explicit --test-profile=mandatory and the clean base correction both work; this is a narrow remaining test-policy gap, not a production arithmetic or S3 defect.",
+      "reproduction": {
+        "probe": {
+          "path": "/tmp/plato-phase2d-review-2/probe_default_profile.py",
+          "sha256": "706ebf3e37daf17a867cc55d99aed1f54e4e85f0df5d3c78d0e0712992ec10ce"
+        },
+        "commands": [
+          "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=/private/tmp/plato-refresh-worktrees/payloads TMPDIR=/tmp/plato-phase2d-review-2/tmp PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 /tmp/plato-phase2d-review/venv313/bin/python -B /tmp/plato-phase2d-review-2/probe_default_profile.py",
+          "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=/private/tmp/plato-refresh-worktrees/payloads TMPDIR=/tmp/plato-phase2d-review-2/tmp PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 /tmp/plato-phase2d-review/venv314/bin/python -B /tmp/plato-phase2d-review-2/probe_default_profile.py"
+        ],
+        "logs": [
+          {
+            "path": "/tmp/plato-phase2d-review-2/default-profile313.log",
+            "sha256": "0be5bd0722f65181f022200ec2dce8daea656d0b0b84bc2d229a3d33a21c6b03"
+          },
+          {
+            "path": "/tmp/plato-phase2d-review-2/default-profile314.log",
+            "sha256": "0be5bd0722f65181f022200ec2dce8daea656d0b0b84bc2d229a3d33a21c6b03"
+          }
+        ],
+        "exit_codes": [
+          1,
+          1
+        ],
+        "actual": {
+          "implicit_mandatory": {
+            "raw_option": null,
+            "full": true,
+            "qualification_enabled": true,
+            "base": false,
+            "lock_timeout": "builtins.TimeoutError",
+            "action_space": "types.SimpleNamespace"
+          },
+          "explicit_mandatory": {
+            "real_kazoo": true,
+            "real_gymnasium": true
+          },
+          "explicit_base": {
+            "real_kazoo": false,
+            "real_gymnasium": false
+          }
+        },
+        "method": "Real pytest.Config.fromdictargs configurations for unfiltered tests, explicit mandatory, and explicit base; current _ProfileChecks and both current fixture bodies execute. The full implicit suite/startup matrix is not run. Probe ends with a failing assertion for the implicit mandatory case."
+      },
+      "required_fix": "Have these two owned test fixtures honor the effective profile, including the existing implicit mandatory mode, while continuing to run independent contracts in clean base. Add a focused regression for implicit/explicit mandatory and explicit base selection. Preserve the existing shared conftest, metadata, mandatory prerequisites, skips and negative assertions; no production or dependency change is needed.",
+      "acceptance": "On both interpreters, default unfiltered mandatory configuration and explicit mandatory select the real LockTimeout/Box; explicit base still executes all 13 affected cases without Kazoo/Gymnasium. Retain the currently passing 60 actual combined cases and base suite. Original author corrects this test-only gap followed by fresh independent review."
+    }
+  ],
+  "resolved_original_findings": [
+    {
+      "id": "2D-R01",
+      "status": "RESOLVED",
+      "path": "plato/clients/strategies/mpc.py",
+      "line": 49,
+      "source_review": "Authoritative server.mpc_shamir_threshold is assigned into registry kwargs, including None default, after merging protocol fields. Direct constructor threshold is unchanged.",
+      "independent_execution": "Six reviewer cases on each interpreter use actual Config -> server wrapper/from_config store -> MPCLifecycleStrategy.configure -> registry Shamir/Safetensors -> server strategy. Thresholds 1/2/None, local overrides 1/4, unrelated same-processor server_id/review_marker and unrelated processor kwargs, five clients with [.5,0,2.5,1,3], seed807, reversed arrivals, independently summed float64 plaintext reference at absolute 2e-6. Explicit direct Processor(threshold=4) stays 4. Only general FedAvg parent initialization is isolated; no MPC production method is copied."
+    },
+    {
+      "id": "2D-R02",
+      "status": "RESOLVED",
+      "path": "plato/processors/model_dequantize_qsgd.py",
+      "line": 81,
+      "source_review": "Bounded code division precedes multiplication by header scale; existing sign/magnitude wire and max-norm equation remain.",
+      "independent_execution": "Four reviewer cases per interpreter cover levels 2/16/64/128, seeds0/49/2026, +/-3e38 endpoints and intermediate extreme magnitudes, finite results, exact endpoints and float64 quantization-bound calculation. Zero/empty and invalid source/header scales are exercised. Full base also executes all twelve shipped ordinary/1e38/3e38 level combinations and existing malformed contracts."
+    },
+    {
+      "id": "2D-R03",
+      "status": "RESOLVED",
+      "path": "plato/utils/toml_writer.py",
+      "line": 136,
+      "source_review": "Keys and values share scalar-preserving non-ASCII string quoting with explicit DEL escape.",
+      "independent_execution": "Five reviewer cases per interpreter use rocket, supplementary CJK, U+10FFFF, DEL and mixed supplementary/DEL strings as keys and values, nested array tables and literal-dot names. dumps, UTF-8 dump/read and stdlib tomllib.loads/load reconstruct the independent input exactly."
+    },
+    {
+      "id": "2D-R04",
+      "status": "RESOLVED",
+      "path": "plato/processors/mpc_model_encrypt_shamir.py",
+      "line": 72,
+      "source_review": "Coefficient-pool capacity is checked before bounded sampling without replacement. The 1..999 pool excludes integer secret10; threshold1000 cannot request999 coefficients from998 available.",
+      "independent_execution": "One subprocess case per interpreter executes real public process with 1000 selected participants, threshold1000 and tensor0.000010, requires coefficient-pool ValueError within one second after entering process, and compares all store bytes/files unchanged. Child containment is twelve seconds. Normal threshold reconstruction is covered by reviewer R01 and full base tests.",
+      "historical_red": "Retained review-red-bound313/314 logs contain entered public process then TimeoutExpired at12s and contained -9 child, not an import/startup timeout. Hashes verified. No finite-field or cryptographic redesign."
+    }
+  ],
+  "ROOT_2D_01": {
+    "base_collection_and_behavior": "RESOLVED: both locked base environments have Kazoo/Gymnasium/Opacus/tiktoken absent; all 13 affected MPC/RL cases collect and execute within the 557-pass full non-runtime base suite.",
+    "cleanup": "Remote-store fixture patches both KazooClient and Lock before construction, addressing the original both-absent branch. Exception/false acquisition stops the client, never releases an unacquired lock and never writes; acquired-lock service failure releases and stops without treating the error as uninitialized state.",
+    "explicit_mandatory": "PASS: current 3 round-store and 10 RL cases execute with actual LockTimeout/Box, including finite actor updates, critic/target reloads, recurrent/padding/batch and every-target-row assertions.",
+    "implicit_mandatory": "CHANGES_REQUESTED under new 2D-R05. No new skip, dependency addition or conftest weakening was found."
+  },
+  "mandatory_acceptance": {
+    "F02": "PASS: actual public namespace put/send/receive/list/delete and durable bounded ingress cases use the same once-prefixed physical key for empty, nested and trailing prefixes.",
+    "F03": "PASS: empty pages without Contents return []; missing versus service failures remain distinct.",
+    "F04": "PASS: actual local XML paginator consumes five namespace objects over three pages, excludes namespace-other/elsewhere objects and applies namespace/ on every page.",
+    "F05": "PASS: source default connect/read inactivity 5/30s and total attempts3; Requests retry pool total2, bounded backoff and Retry-After disabled. Full base executes actual shortened-timeout stalls/service errors over init/PUT/GET/list/delete, transient recovery and useful errors. Runtime ingress separately has total deadline.",
+    "F12": "PASS: ambiguous dotted/bracketed/nested paths, coercion/empty paths and reserved _tree_metadata rejected before transmission. Ordinary literal state_dict keys, structure and Torch dtypes preserved. Reviewer directly checks transposed float64 and bfloat16, float32 bf16 wire with torch.bfloat16 metadata, exact restoration and nonaliasing."
+  },
+  "durable_B_D_integration": {
+    "status": "Executed provisional source combination and durable regression PASS; root final phase qualification remains pending.",
+    "path": "tests/servers/test_runtime_s3_contract.py",
+    "sha256": "e09c7ed694713815463b3be34939b9f4873b2b1b5930600f9c8f47b85d84c3e0",
+    "production_imports": [
+      "plato.utils.s3.S3",
+      "plato.clients.transport.receive_s3_payload",
+      "plato.clients.strategies.defaults.DefaultPayloadStrategy"
+    ],
+    "no_source_copies": "Tracked tests import real current modules; no immutable scratch module, absolute /tmp dependency or copied production implementation. Independent import-origin probe requires current worktree paths.",
+    "cases": {
+      "actual_writer_reader": 24,
+      "actual_client_failure_cleanup": 4,
+      "preserved_B_original": 10,
+      "S3_module_total": 38,
+      "client_lifecycle": 9,
+      "optional_contracts": 13,
+      "mandatory_affected_total": 60
+    },
+    "writer_reader_matrix": "empty/ordinary/nested/trailing prefix x native S3/minimal fields adapter retaining actual botocore presigner x valid/oversize/total deadline.",
+    "assertions": "Real constructor bucket HEAD, unused-key object HEAD, serialized HTTP PUT and presigned GET agree on the independently computed physical key. Input equals decoded payload and counted bytes equal stored bytes. Oversize advertised length rejects before reservation with byte_count0. Continuous trickling expires total deadline after multiple bytes, bounded remaining reservation and release.",
+    "client_owner": "Four cases call real finalise_inbound_payload, checking removal of inbound_transfer, cleared chunks/server_payload, closed transfer, canceled timer and no other asyncio tasks before test teardown.",
+    "timing_and_cleanup": "One-second total payload deadline with bytes every50ms; independent five-second outer watchdog expires as a test failure, with deadline completion below two seconds. Reader closes aiohttp session/response. Caller closes transfer; fixture stop event terminates trickling, GET completion event waits at most2s, server shutdown/server_close and serve thread join2s with liveness assertion. All 38 cases pass in both base and actual-library mandatory executions; no Python ResourceWarning/UserWarning in strict mandatory runs."
+  },
+  "independent_validation": {
+    "environments": [
+      {
+        "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+        "executable": "/tmp/plato-phase2b-review-3/base313/bin/python",
+        "prefix": "/tmp/plato-phase2b-review-3/base313",
+        "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+        "distribution_count": 85,
+        "distribution_fingerprint": "b65dad64ed7503196fd9ee0e5b481d14bcb83e94d78d78569aa118821b63ac4e",
+        "optional_presence": {
+          "kazoo": false,
+          "gymnasium": false,
+          "opacus": false,
+          "tiktoken": false
+        },
+        "uv_lock_sha256": "573b10c2ba1a2317e02f9e40c6181359cafab6f6e0a0f9be12bb256cb276fe1d",
+        "label": "base313",
+        "relevant_distributions": {
+          "torch": "2.14.1",
+          "numpy": "2.5.3",
+          "safetensors": "0.8.0",
+          "boto3": "1.43.106",
+          "botocore": "1.43.106",
+          "requests": "2.34.2",
+          "urllib3": "2.8.0",
+          "tenseal": "0.3.18",
+          "pytest": "9.1.1"
+        },
+        "full_inventory": {
+          "path": "/tmp/plato-phase2d-review-2/environment-base313.json",
+          "sha256": "9fa6fbcfbf532b18678ee112a72a6e0bec3c8c106e98716e82bc07f31cb4a20b"
+        },
+        "reuse": "Borrowed prior independent reviewer environment read-only; no install, sync, deletion, or reconfiguration. Candidate source selected through cwd/PYTHONPATH; bytecode writes disabled."
+      },
+      {
+        "python": "3.14.8 (main, Sep 30 2026, 17:55:09) [Clang 21.0.0 (clang-2100.3.34.2)]",
+        "executable": "/private/tmp/plato-phase2b-review-3/base314/bin/python",
+        "prefix": "/private/tmp/plato-phase2b-review-3/base314",
+        "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+        "distribution_count": 85,
+        "distribution_fingerprint": "b65dad64ed7503196fd9ee0e5b481d14bcb83e94d78d78569aa118821b63ac4e",
+        "optional_presence": {
+          "kazoo": false,
+          "gymnasium": false,
+          "opacus": false,
+          "tiktoken": false
+        },
+        "uv_lock_sha256": "573b10c2ba1a2317e02f9e40c6181359cafab6f6e0a0f9be12bb256cb276fe1d",
+        "label": "base314",
+        "relevant_distributions": {
+          "torch": "2.14.1",
+          "numpy": "2.5.3",
+          "safetensors": "0.8.0",
+          "boto3": "1.43.106",
+          "botocore": "1.43.106",
+          "requests": "2.34.2",
+          "urllib3": "2.8.0",
+          "tenseal": "0.3.18",
+          "pytest": "9.1.1"
+        },
+        "full_inventory": {
+          "path": "/tmp/plato-phase2d-review-2/environment-base314.json",
+          "sha256": "b3fd402c6147e218985e3882b167ff500b7439cbcbde55fa8032e16a85d8fa64"
+        },
+        "reuse": "Borrowed prior independent reviewer environment read-only; no install, sync, deletion, or reconfiguration. Candidate source selected through cwd/PYTHONPATH; bytecode writes disabled."
+      },
+      {
+        "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+        "executable": "/tmp/plato-phase2d-review/venv313/bin/python",
+        "prefix": "/tmp/plato-phase2d-review/venv313",
+        "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+        "distribution_count": 109,
+        "distribution_fingerprint": "08f08098c99e5c0212f97ea196f07ddfab61f1eec5cc7d688b80020548b8ff81",
+        "optional_presence": {
+          "kazoo": true,
+          "gymnasium": true,
+          "opacus": true,
+          "tiktoken": true
+        },
+        "uv_lock_sha256": "573b10c2ba1a2317e02f9e40c6181359cafab6f6e0a0f9be12bb256cb276fe1d",
+        "label": "mandatory313",
+        "relevant_distributions": {
+          "torch": "2.14.1",
+          "numpy": "2.5.3",
+          "safetensors": "0.8.0",
+          "boto3": "1.43.106",
+          "botocore": "1.43.106",
+          "requests": "2.34.2",
+          "urllib3": "2.8.0",
+          "tenseal": "0.3.18",
+          "kazoo": "2.11.0",
+          "gymnasium": "1.3.0",
+          "pytest": "9.1.1",
+          "ruff": "0.16.10"
+        },
+        "full_inventory": {
+          "path": "/tmp/plato-phase2d-review-2/environment-mandatory313.json",
+          "sha256": "36495c30c4251f2342f3cb0a626aa0bd09d15eaa42843d124bf15dc8b358f717"
+        },
+        "reuse": "Borrowed prior independent reviewer environment read-only; no install, sync, deletion, or reconfiguration. Candidate source selected through cwd/PYTHONPATH; bytecode writes disabled."
+      },
+      {
+        "python": "3.14.8 (main, Sep 30 2026, 17:55:09) [Clang 21.0.0 (clang-2100.3.34.2)]",
+        "executable": "/private/tmp/plato-phase2d-review/venv314/bin/python",
+        "prefix": "/private/tmp/plato-phase2d-review/venv314",
+        "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+        "distribution_count": 109,
+        "distribution_fingerprint": "08f08098c99e5c0212f97ea196f07ddfab61f1eec5cc7d688b80020548b8ff81",
+        "optional_presence": {
+          "kazoo": true,
+          "gymnasium": true,
+          "opacus": true,
+          "tiktoken": true
+        },
+        "uv_lock_sha256": "573b10c2ba1a2317e02f9e40c6181359cafab6f6e0a0f9be12bb256cb276fe1d",
+        "label": "mandatory314",
+        "relevant_distributions": {
+          "torch": "2.14.1",
+          "numpy": "2.5.3",
+          "safetensors": "0.8.0",
+          "boto3": "1.43.106",
+          "botocore": "1.43.106",
+          "requests": "2.34.2",
+          "urllib3": "2.8.0",
+          "tenseal": "0.3.18",
+          "kazoo": "2.11.0",
+          "gymnasium": "1.3.0",
+          "pytest": "9.1.1",
+          "ruff": "0.16.10"
+        },
+        "full_inventory": {
+          "path": "/tmp/plato-phase2d-review-2/environment-mandatory314.json",
+          "sha256": "9e2a756be0fcac6ecac863a6ea1dfdf40750c09af5e59835481487b8442c9883"
+        },
+        "reuse": "Borrowed prior independent reviewer environment read-only; no install, sync, deletion, or reconfiguration. Candidate source selected through cwd/PYTHONPATH; bytecode writes disabled."
+      }
+    ],
+    "runs": [
+      {
+        "label": "base313",
+        "command": [
+          "/tmp/plato-phase2b-review-3/base313/bin/python",
+          "-B",
+          "-m",
+          "pytest",
+          "tests",
+          "--test-profile=base",
+          "-m",
+          "not runtime",
+          "-q",
+          "-ra",
+          "-p",
+          "no:cacheprovider",
+          "--basetemp=/tmp/plato-phase2d-review-2/pytest-base313",
+          "--junitxml=/tmp/plato-phase2d-review-2/base313.xml"
+        ],
+        "cwd": "/private/tmp/plato-refresh-worktrees/payloads",
+        "environment": {
+          "PYTHONDONTWRITEBYTECODE": "1",
+          "PYTHONPATH": "/private/tmp/plato-refresh-worktrees/payloads",
+          "TMPDIR": "/tmp/plato-phase2d-review-2/tmp",
+          "HF_HUB_OFFLINE": "1",
+          "HF_DATASETS_OFFLINE": "1",
+          "TOKENIZERS_PARALLELISM": "false",
+          "OMP_NUM_THREADS": "1",
+          "OPENBLAS_NUM_THREADS": "1",
+          "MKL_NUM_THREADS": "1",
+          "VECLIB_MAXIMUM_THREADS": "1",
+          "XDG_CACHE_HOME": "/tmp/plato-phase2d-review-2/cache",
+          "PYTEST_DISABLE_PLUGIN_AUTOLOAD": "1"
+        },
+        "exit_code": 0,
+        "seconds": 66.37124075018801,
+        "log_sha256": "ae3018646f28aafafbb1f55dac22aab93595a65b14741471c9e56f42c268ff2f",
+        "testcases": 561,
+        "passed": 557,
+        "skipped": [
+          {
+            "node": {
+              "classname": "",
+              "name": "tests.trainers.test_dp_data_loader_strategy",
+              "time": "0.000"
+            },
+            "reason": {
+              "message": "collection skipped"
+            }
+          },
+          {
+            "node": {
+              "classname": "tests.test_nanochat_integration",
+              "name": "test_nanochat_tokenizer_processor_round_trip",
+              "time": "0.001"
+            },
+            "reason": {
+              "type": "pytest.skip",
+              "message": "base profile omits optional nanochat integration"
+            }
+          },
+          {
+            "node": {
+              "classname": "tests.test_nanochat_integration",
+              "name": "test_nanochat_trainer_smoke",
+              "time": "0.000"
+            },
+            "reason": {
+              "type": "pytest.skip",
+              "message": "base profile omits optional nanochat integration"
+            }
+          },
+          {
+            "node": {
+              "classname": "tests.test_nanochat_integration",
+              "name": "test_nanochat_trainer_selects_core_eval_strategy",
+              "time": "0.000"
+            },
+            "reason": {
+              "type": "pytest.skip",
+              "message": "base profile omits optional nanochat integration"
+            }
+          }
+        ],
+        "failures": [],
+        "log": {
+          "path": "/tmp/plato-phase2d-review-2/base313.log",
+          "sha256": "ae3018646f28aafafbb1f55dac22aab93595a65b14741471c9e56f42c268ff2f"
+        },
+        "junit": {
+          "path": "/tmp/plato-phase2d-review-2/base313.xml",
+          "sha256": "3c4a0262bffd53eed8ea9c4c20e40e4c5bef15f7659413635d0d82488275f883"
+        },
+        "record": {
+          "path": "/tmp/plato-phase2d-review-2/base313.json",
+          "sha256": "5f3257f26f05e918fdbe935197e10228dadea94ce6f12578f4df83e9cdd1f490"
+        }
+      },
+      {
+        "label": "mandatory313",
+        "command": [
+          "/tmp/plato-phase2d-review/venv313/bin/python",
+          "-B",
+          "-m",
+          "pytest",
+          "tests/servers/test_runtime_s3_contract.py",
+          "tests/clients/test_client_lifecycle_variants.py",
+          "tests/mpc/test_round_store_contracts.py",
+          "tests/utils/test_rl_payload_utilities.py",
+          "--test-profile=mandatory",
+          "-m",
+          "not runtime",
+          "-q",
+          "-ra",
+          "-p",
+          "no:cacheprovider",
+          "--basetemp=/tmp/plato-phase2d-review-2/pytest-mandatory313",
+          "--junitxml=/tmp/plato-phase2d-review-2/mandatory313.xml",
+          "-W",
+          "error::UserWarning",
+          "-W",
+          "error::ResourceWarning"
+        ],
+        "cwd": "/private/tmp/plato-refresh-worktrees/payloads",
+        "environment": {
+          "PYTHONDONTWRITEBYTECODE": "1",
+          "PYTHONPATH": "/private/tmp/plato-refresh-worktrees/payloads",
+          "TMPDIR": "/tmp/plato-phase2d-review-2/tmp",
+          "HF_HUB_OFFLINE": "1",
+          "HF_DATASETS_OFFLINE": "1",
+          "TOKENIZERS_PARALLELISM": "false",
+          "OMP_NUM_THREADS": "1",
+          "OPENBLAS_NUM_THREADS": "1",
+          "MKL_NUM_THREADS": "1",
+          "VECLIB_MAXIMUM_THREADS": "1",
+          "XDG_CACHE_HOME": "/tmp/plato-phase2d-review-2/cache",
+          "PYTEST_DISABLE_PLUGIN_AUTOLOAD": "1"
+        },
+        "exit_code": 0,
+        "seconds": 49.85610375017859,
+        "log_sha256": "1c5b2f511c6d3df429093d3566913fbce83d394ced74fd3bab8b62baddc89c0f",
+        "testcases": 60,
+        "passed": 60,
+        "skipped": [],
+        "failures": [],
+        "log": {
+          "path": "/tmp/plato-phase2d-review-2/mandatory313.log",
+          "sha256": "1c5b2f511c6d3df429093d3566913fbce83d394ced74fd3bab8b62baddc89c0f"
+        },
+        "junit": {
+          "path": "/tmp/plato-phase2d-review-2/mandatory313.xml",
+          "sha256": "26cfe7d570569b69d962c7b3025dcd9d2c18f1fd1588607758aabd64bc980326"
+        },
+        "record": {
+          "path": "/tmp/plato-phase2d-review-2/mandatory313.json",
+          "sha256": "7ac86cd95a1fdcf62be4b107501f76d2d1ce94cdc5c2fea34d887941f7c51e20"
+        }
+      },
+      {
+        "label": "independent313",
+        "command": [
+          "/tmp/plato-phase2d-review/venv313/bin/python",
+          "-B",
+          "-m",
+          "pytest",
+          "/tmp/plato-phase2d-review-2/test_independent_contracts.py",
+          "--test-profile=mandatory",
+          "-m",
+          "not runtime",
+          "-q",
+          "-ra",
+          "-p",
+          "no:cacheprovider",
+          "--basetemp=/tmp/plato-phase2d-review-2/pytest-independent313",
+          "--junitxml=/tmp/plato-phase2d-review-2/independent313.xml",
+          "-p",
+          "tests.conftest",
+          "-W",
+          "error::UserWarning",
+          "-W",
+          "error::ResourceWarning"
+        ],
+        "cwd": "/private/tmp/plato-refresh-worktrees/payloads",
+        "environment": {
+          "PYTHONDONTWRITEBYTECODE": "1",
+          "PYTHONPATH": "/private/tmp/plato-refresh-worktrees/payloads",
+          "TMPDIR": "/tmp/plato-phase2d-review-2/tmp",
+          "HF_HUB_OFFLINE": "1",
+          "HF_DATASETS_OFFLINE": "1",
+          "TOKENIZERS_PARALLELISM": "false",
+          "OMP_NUM_THREADS": "1",
+          "OPENBLAS_NUM_THREADS": "1",
+          "MKL_NUM_THREADS": "1",
+          "VECLIB_MAXIMUM_THREADS": "1",
+          "XDG_CACHE_HOME": "/tmp/plato-phase2d-review-2/cache",
+          "PYTEST_DISABLE_PLUGIN_AUTOLOAD": "1"
+        },
+        "exit_code": 0,
+        "seconds": 17.237067207926884,
+        "log_sha256": "1e43a8c4e065489d7851b59a592652123c4a28523f9c3debd0319a88b7f6ce12",
+        "testcases": 28,
+        "passed": 28,
+        "skipped": [],
+        "failures": [],
+        "log": {
+          "path": "/tmp/plato-phase2d-review-2/independent313.log",
+          "sha256": "1e43a8c4e065489d7851b59a592652123c4a28523f9c3debd0319a88b7f6ce12"
+        },
+        "junit": {
+          "path": "/tmp/plato-phase2d-review-2/independent313.xml",
+          "sha256": "9e07521ad596465c7eed0f6f180d5ee33a05cb0df478506b4743b74a37dc617f"
+        },
+        "record": {
+          "path": "/tmp/plato-phase2d-review-2/independent313.json",
+          "sha256": "f8de6b9c77bf8eb8d2baa3fe8150abcfb4aabd08422ceffb6c08a7d645539e1e"
+        }
+      },
+      {
+        "label": "base314",
+        "command": [
+          "/tmp/plato-phase2b-review-3/base314/bin/python",
+          "-B",
+          "-m",
+          "pytest",
+          "tests",
+          "--test-profile=base",
+          "-m",
+          "not runtime",
+          "-q",
+          "-ra",
+          "-p",
+          "no:cacheprovider",
+          "--basetemp=/tmp/plato-phase2d-review-2/pytest-base314",
+          "--junitxml=/tmp/plato-phase2d-review-2/base314.xml"
+        ],
+        "cwd": "/private/tmp/plato-refresh-worktrees/payloads",
+        "environment": {
+          "PYTHONDONTWRITEBYTECODE": "1",
+          "PYTHONPATH": "/private/tmp/plato-refresh-worktrees/payloads",
+          "TMPDIR": "/tmp/plato-phase2d-review-2/tmp",
+          "HF_HUB_OFFLINE": "1",
+          "HF_DATASETS_OFFLINE": "1",
+          "TOKENIZERS_PARALLELISM": "false",
+          "OMP_NUM_THREADS": "1",
+          "OPENBLAS_NUM_THREADS": "1",
+          "MKL_NUM_THREADS": "1",
+          "VECLIB_MAXIMUM_THREADS": "1",
+          "XDG_CACHE_HOME": "/tmp/plato-phase2d-review-2/cache",
+          "PYTEST_DISABLE_PLUGIN_AUTOLOAD": "1"
+        },
+        "exit_code": 0,
+        "seconds": 102.76481212489307,
+        "log_sha256": "978fdec58ffb31557b8da54e67b786e759764b49c6b4dc1f9002eb778edb3d63",
+        "testcases": 561,
+        "passed": 557,
+        "skipped": [
+          {
+            "node": {
+              "classname": "",
+              "name": "tests.trainers.test_dp_data_loader_strategy",
+              "time": "0.000"
+            },
+            "reason": {
+              "message": "collection skipped"
+            }
+          },
+          {
+            "node": {
+              "classname": "tests.test_nanochat_integration",
+              "name": "test_nanochat_tokenizer_processor_round_trip",
+              "time": "0.000"
+            },
+            "reason": {
+              "type": "pytest.skip",
+              "message": "base profile omits optional nanochat integration"
+            }
+          },
+          {
+            "node": {
+              "classname": "tests.test_nanochat_integration",
+              "name": "test_nanochat_trainer_smoke",
+              "time": "0.000"
+            },
+            "reason": {
+              "type": "pytest.skip",
+              "message": "base profile omits optional nanochat integration"
+            }
+          },
+          {
+            "node": {
+              "classname": "tests.test_nanochat_integration",
+              "name": "test_nanochat_trainer_selects_core_eval_strategy",
+              "time": "0.000"
+            },
+            "reason": {
+              "type": "pytest.skip",
+              "message": "base profile omits optional nanochat integration"
+            }
+          }
+        ],
+        "failures": [],
+        "log": {
+          "path": "/tmp/plato-phase2d-review-2/base314.log",
+          "sha256": "978fdec58ffb31557b8da54e67b786e759764b49c6b4dc1f9002eb778edb3d63"
+        },
+        "junit": {
+          "path": "/tmp/plato-phase2d-review-2/base314.xml",
+          "sha256": "d186eec7b9258cdcb964744bb000e84f726d2edea51a6d6d52fa6c158a8dcc66"
+        },
+        "record": {
+          "path": "/tmp/plato-phase2d-review-2/base314.json",
+          "sha256": "4a07c3edbe19c73984ce8c7acf0304c2f7f260371cb132cf897278be260e1a11"
+        }
+      },
+      {
+        "label": "mandatory314",
+        "command": [
+          "/tmp/plato-phase2d-review/venv314/bin/python",
+          "-B",
+          "-m",
+          "pytest",
+          "tests/servers/test_runtime_s3_contract.py",
+          "tests/clients/test_client_lifecycle_variants.py",
+          "tests/mpc/test_round_store_contracts.py",
+          "tests/utils/test_rl_payload_utilities.py",
+          "--test-profile=mandatory",
+          "-m",
+          "not runtime",
+          "-q",
+          "-ra",
+          "-p",
+          "no:cacheprovider",
+          "--basetemp=/tmp/plato-phase2d-review-2/pytest-mandatory314",
+          "--junitxml=/tmp/plato-phase2d-review-2/mandatory314.xml",
+          "-W",
+          "error::UserWarning",
+          "-W",
+          "error::ResourceWarning"
+        ],
+        "cwd": "/private/tmp/plato-refresh-worktrees/payloads",
+        "environment": {
+          "PYTHONDONTWRITEBYTECODE": "1",
+          "PYTHONPATH": "/private/tmp/plato-refresh-worktrees/payloads",
+          "TMPDIR": "/tmp/plato-phase2d-review-2/tmp",
+          "HF_HUB_OFFLINE": "1",
+          "HF_DATASETS_OFFLINE": "1",
+          "TOKENIZERS_PARALLELISM": "false",
+          "OMP_NUM_THREADS": "1",
+          "OPENBLAS_NUM_THREADS": "1",
+          "MKL_NUM_THREADS": "1",
+          "VECLIB_MAXIMUM_THREADS": "1",
+          "XDG_CACHE_HOME": "/tmp/plato-phase2d-review-2/cache",
+          "PYTEST_DISABLE_PLUGIN_AUTOLOAD": "1"
+        },
+        "exit_code": 0,
+        "seconds": 85.02118879090995,
+        "log_sha256": "953c4a8284a794e796f14e42576426c4b2d6b089cf30f3d01a47888899a1512c",
+        "testcases": 60,
+        "passed": 60,
+        "skipped": [],
+        "failures": [],
+        "log": {
+          "path": "/tmp/plato-phase2d-review-2/mandatory314.log",
+          "sha256": "953c4a8284a794e796f14e42576426c4b2d6b089cf30f3d01a47888899a1512c"
+        },
+        "junit": {
+          "path": "/tmp/plato-phase2d-review-2/mandatory314.xml",
+          "sha256": "31661aea1f32a7d173b6ef6b69dc62531696eff76b957fe7760bba5d9e43fefc"
+        },
+        "record": {
+          "path": "/tmp/plato-phase2d-review-2/mandatory314.json",
+          "sha256": "5e9bf6c716080d590739c8ca2b20cc991636eb63fb678f2fd139fab6cb7f0b64"
+        }
+      },
+      {
+        "label": "independent314",
+        "command": [
+          "/tmp/plato-phase2d-review/venv314/bin/python",
+          "-B",
+          "-m",
+          "pytest",
+          "/tmp/plato-phase2d-review-2/test_independent_contracts.py",
+          "--test-profile=mandatory",
+          "-m",
+          "not runtime",
+          "-q",
+          "-ra",
+          "-p",
+          "no:cacheprovider",
+          "--basetemp=/tmp/plato-phase2d-review-2/pytest-independent314",
+          "--junitxml=/tmp/plato-phase2d-review-2/independent314.xml",
+          "-p",
+          "tests.conftest",
+          "-W",
+          "error::UserWarning",
+          "-W",
+          "error::ResourceWarning"
+        ],
+        "cwd": "/private/tmp/plato-refresh-worktrees/payloads",
+        "environment": {
+          "PYTHONDONTWRITEBYTECODE": "1",
+          "PYTHONPATH": "/private/tmp/plato-refresh-worktrees/payloads",
+          "TMPDIR": "/tmp/plato-phase2d-review-2/tmp",
+          "HF_HUB_OFFLINE": "1",
+          "HF_DATASETS_OFFLINE": "1",
+          "TOKENIZERS_PARALLELISM": "false",
+          "OMP_NUM_THREADS": "1",
+          "OPENBLAS_NUM_THREADS": "1",
+          "MKL_NUM_THREADS": "1",
+          "VECLIB_MAXIMUM_THREADS": "1",
+          "XDG_CACHE_HOME": "/tmp/plato-phase2d-review-2/cache",
+          "PYTEST_DISABLE_PLUGIN_AUTOLOAD": "1"
+        },
+        "exit_code": 0,
+        "seconds": 19.684398791985586,
+        "log_sha256": "c338fdf57e5a309b4d619824bc9ebc9d3a3a0a3cea85318d2643878693929f92",
+        "testcases": 28,
+        "passed": 28,
+        "skipped": [],
+        "failures": [],
+        "log": {
+          "path": "/tmp/plato-phase2d-review-2/independent314.log",
+          "sha256": "c338fdf57e5a309b4d619824bc9ebc9d3a3a0a3cea85318d2643878693929f92"
+        },
+        "junit": {
+          "path": "/tmp/plato-phase2d-review-2/independent314.xml",
+          "sha256": "f067338f3a7f76f9e98f099928679838f3fc51ca5cd60383a43313cefd1b015e"
+        },
+        "record": {
+          "path": "/tmp/plato-phase2d-review-2/independent314.json",
+          "sha256": "083d7194e831faea92fd161c55eba169084387056eb23cfdbda1e07c64cfab81"
+        }
+      }
+    ],
+    "reviewer_probe": {
+      "path": "/tmp/plato-phase2d-review-2/test_independent_contracts.py",
+      "sha256": "91c20d120ceb51721df0fe5d58a7c208389f5e08ea8425574e2fc9fd08b35298"
+    },
+    "runner": {
+      "path": "/tmp/plato-phase2d-review-2/run_checks.py",
+      "sha256": "f5d50300cefe2ff2d30510712508386fa2c68d7c69089ea4171f4d6e7ca4eb5e"
+    },
+    "counts": "Per interpreter:557 tracked non-runtime base passes plus4 existing allowed skips;60 affected nodes repeat a subset of those tests with actual optional libraries;28 distinct reviewer-written execution nodes pass. Do not add the60 to557 as unique coverage. Explicit mandatory nodes have38 S3+9 lifecycle+3 store+10 RL. Separate profile-policy probe fails the implicit mandatory assertion on both interpreters.",
+    "collection": "Both independent base collect-only commands pass:560/608 item nodes,48 runtime deselected. JUnit execution561 includes the single module-level absent-Opacus skip in addition to560 selected item nodes;3 Nanochat item skips complete the four allowances.",
+    "collection_logs": [
+      {
+        "path": "/tmp/plato-phase2d-review-2/collection313.log",
+        "sha256": "7aadce3caf36d4762d72b672fee741438bc41b5bc96dfe87376ad862388b3f1f"
+      },
+      {
+        "path": "/tmp/plato-phase2d-review-2/collection314.log",
+        "sha256": "c3a4d9dc0cdcddee6d75c855be848af926f83dd91dacec7cab63565937664779"
+      }
+    ],
+    "static": [
+      {
+        "command": "/tmp/plato-phase2d-review/venv313/bin/ruff check . --select I --no-cache",
+        "exit_code": 0,
+        "log": {
+          "path": "/tmp/plato-phase2d-review-2/ruff.log",
+          "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+        }
+      },
+      {
+        "command": "git diff --check fda60becedfa6236c11d415b87a868b52789a41e 09b9b941bc4a816b62d8ed33ad993455f6f05da5",
+        "exit_code": 0,
+        "log": {
+          "path": "/tmp/plato-phase2d-review-2/diff-check.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    ],
+    "shell_and_process": "Initial exec calls selected /bin/zsh with login=true. Final collection/static/profile/report calls use explicit zsh -lc wrappers. Python subprocess test commands use argument vectors without shell. All test/fixture temp/cache output directed into owned scratch; bytecode and pytest cache writes disabled.",
+    "harness_history": "The first scratch-only reviewer run supplied name inside processor_kwargs, conflicting with the registry-owned name argument. Six MPC harness cases failed with duplicate keyword TypeError on each interpreter;22 other cases passed. Replaced this invalid reserved keyword with review_marker/server_id, kept logs/XML as independent-harness313/314, and reran all28 successfully. This is excluded from production findings."
+  },
+  "retained_evidence_audit": {
+    "audit": {
+      "path": "/tmp/plato-phase2d-review-2/evidence-audit.json",
+      "sha256": "e08416612fff4350173bf8395d1d150ac8bad1c1b62515e817c4a090eedb15b8"
+    },
+    "artifact_descriptors_checked": 97,
+    "artifact_hash_mismatches": [],
+    "historical_and_current_source_manifest_entries_checked": 20,
+    "source_hash_or_blob_mismatches": [],
+    "accepted_plan_sha256": "edb9a58cc7915a940854f16d5029fe97434703bf2f75eca0dcb96de2d0f0eb15",
+    "accepted_addendum_hash_verified": true,
+    "accepted_B_review_hash_verified": true,
+    "attribution": [
+      {
+        "source": "e7c0d59571d88efd7eb1fdbf4fc63ac2a7b81395",
+        "result": "412 passed +1 allowed native Nanochat skip per interpreter, including48 startup; historical initial implementation only."
+      },
+      {
+        "source": "639ca69bf4eaeff868462d0b30a5fcc72218f061",
+        "result": "95 scoped production-correction cases per interpreter."
+      },
+      {
+        "source": "15c79d0c81ffd0e5e4873db869a2863f97fe8279",
+        "result": "383 base pass +4 allowed skips, and13 explicit mandatory affected pass per interpreter."
+      },
+      {
+        "source": "53aa72c3c578b1a32d8f83d64a98d6a543cdfb9a",
+        "result": "557 base pass +4 allowed skips,48 runtime deselected;60 explicit mandatory affected pass per interpreter. This source equals current candidate outside evidence."
+      }
+    ],
+    "raw_xml_counts": [
+      {
+        "source_label": "historical-e7",
+        "version": "313",
+        "path": "/tmp/plato-phase2d.G3jkGH/final-full313.xml",
+        "sha256": "81bc07b0eee889c9b29e5cacb3f7bde8301d4adc219047e803f4002855da4eb1",
+        "tests": 413,
+        "passed": 412,
+        "skipped": 1,
+        "failures": 0,
+        "affected_counts": {
+          "tests.clients.test_client_lifecycle_variants": 8,
+          "tests.mpc.test_round_store_contracts": 3,
+          "tests.utils.test_rl_payload_utilities": 10
+        }
+      },
+      {
+        "source_label": "historical-e7",
+        "version": "314",
+        "path": "/tmp/plato-phase2d.G3jkGH/final-full314.xml",
+        "sha256": "32040e43b9a86e75d7cad79965b9fb38a46a4d5c606fb836fd1b80f76ee4ff35",
+        "tests": 413,
+        "passed": 412,
+        "skipped": 1,
+        "failures": 0,
+        "affected_counts": {
+          "tests.clients.test_client_lifecycle_variants": 8,
+          "tests.mpc.test_round_store_contracts": 3,
+          "tests.utils.test_rl_payload_utilities": 10
+        }
+      },
+      {
+        "source_label": "correction-639",
+        "version": "313",
+        "path": "/tmp/plato-phase2d.G3jkGH/review-green313.xml",
+        "sha256": "6c4f2742b0741714bc160ca47c6cd96e7f86a5a8b272f06f9e847a0e45707f5b",
+        "tests": 95,
+        "passed": 95,
+        "skipped": 0,
+        "failures": 0,
+        "affected_counts": {
+          "tests.mpc.test_round_store_contracts": 3,
+          "tests.clients.test_client_lifecycle_variants": 8
+        }
+      },
+      {
+        "source_label": "correction-639",
+        "version": "314",
+        "path": "/tmp/plato-phase2d.G3jkGH/review-green314.xml",
+        "sha256": "c2b0631d3a863b033dfdec64887b995039b92dab7d702d2db9f8321a025afbb2",
+        "tests": 95,
+        "passed": 95,
+        "skipped": 0,
+        "failures": 0,
+        "affected_counts": {
+          "tests.mpc.test_round_store_contracts": 3,
+          "tests.clients.test_client_lifecycle_variants": 8
+        }
+      },
+      {
+        "source_label": "base-15",
+        "version": "313",
+        "path": "/tmp/plato-phase2d.G3jkGH/base-green-suite313.xml",
+        "sha256": "6d2847f8a0b8961d0b09b2440e36e75ce4b862e74e02017067b3696a3dc8568f",
+        "tests": 387,
+        "passed": 383,
+        "skipped": 4,
+        "failures": 0,
+        "affected_counts": {
+          "tests.clients.test_client_lifecycle_variants": 8,
+          "tests.mpc.test_round_store_contracts": 3,
+          "tests.utils.test_rl_payload_utilities": 10
+        }
+      },
+      {
+        "source_label": "base-15",
+        "version": "314",
+        "path": "/tmp/plato-phase2d.G3jkGH/base-green-suite314.xml",
+        "sha256": "e6e296884360da62017644d5abf84f52054d4ff3770e47c3aaeb4125cb80421b",
+        "tests": 387,
+        "passed": 383,
+        "skipped": 4,
+        "failures": 0,
+        "affected_counts": {
+          "tests.clients.test_client_lifecycle_variants": 8,
+          "tests.mpc.test_round_store_contracts": 3,
+          "tests.utils.test_rl_payload_utilities": 10
+        }
+      },
+      {
+        "source_label": "mandatory-15",
+        "version": "313",
+        "path": "/tmp/plato-phase2d.G3jkGH/base-correction-mandatory313.xml",
+        "sha256": "cde21825cec40b2672e32160320821c50d29acc2bdb87930d0e9025a1ba1819e",
+        "tests": 13,
+        "passed": 13,
+        "skipped": 0,
+        "failures": 0,
+        "affected_counts": {
+          "tests.mpc.test_round_store_contracts": 3,
+          "tests.utils.test_rl_payload_utilities": 10
+        }
+      },
+      {
+        "source_label": "mandatory-15",
+        "version": "314",
+        "path": "/tmp/plato-phase2d.G3jkGH/base-correction-mandatory314.xml",
+        "sha256": "b6d1dfb2abc8df1a41af71cb599705df6a7d0ae3097b42d13568d1e10f94da29",
+        "tests": 13,
+        "passed": 13,
+        "skipped": 0,
+        "failures": 0,
+        "affected_counts": {
+          "tests.mpc.test_round_store_contracts": 3,
+          "tests.utils.test_rl_payload_utilities": 10
+        }
+      },
+      {
+        "source_label": "combined-base-53",
+        "version": "313",
+        "path": "/tmp/plato-phase2d.G3jkGH/combined-final-base313.xml",
+        "sha256": "2e31d83e7c7d8cc56fcec29f6becb76d8b41223f942d5c39e37fc1a3db287ea4",
+        "tests": 561,
+        "passed": 557,
+        "skipped": 4,
+        "failures": 0,
+        "affected_counts": {
+          "tests.clients.test_client_lifecycle_variants": 9,
+          "tests.mpc.test_round_store_contracts": 3,
+          "tests.servers.test_runtime_s3_contract": 38,
+          "tests.utils.test_rl_payload_utilities": 10
+        }
+      },
+      {
+        "source_label": "combined-base-53",
+        "version": "314",
+        "path": "/tmp/plato-phase2d.G3jkGH/combined-final-base314.xml",
+        "sha256": "3603b612659eb0a93cf270c7d12f3cf54c8b43b4080d47fcb6783ec6fe8f9124",
+        "tests": 561,
+        "passed": 557,
+        "skipped": 4,
+        "failures": 0,
+        "affected_counts": {
+          "tests.clients.test_client_lifecycle_variants": 9,
+          "tests.mpc.test_round_store_contracts": 3,
+          "tests.servers.test_runtime_s3_contract": 38,
+          "tests.utils.test_rl_payload_utilities": 10
+        }
+      },
+      {
+        "source_label": "combined-mandatory-53",
+        "version": "313",
+        "path": "/tmp/plato-phase2d.G3jkGH/combined-final-mandatory313.xml",
+        "sha256": "421345f25e5a791b0392a642a64b840f173f011243310d57e3683628fe2ffb15",
+        "tests": 60,
+        "passed": 60,
+        "skipped": 0,
+        "failures": 0,
+        "affected_counts": {
+          "tests.servers.test_runtime_s3_contract": 38,
+          "tests.clients.test_client_lifecycle_variants": 9,
+          "tests.mpc.test_round_store_contracts": 3,
+          "tests.utils.test_rl_payload_utilities": 10
+        }
+      },
+      {
+        "source_label": "combined-mandatory-53",
+        "version": "314",
+        "path": "/tmp/plato-phase2d.G3jkGH/combined-final-mandatory314.xml",
+        "sha256": "b8686951eeaf0b90cce609ec25eb1e0b28ea3f109da2cf4d02093fdbcec906ec",
+        "tests": 60,
+        "passed": 60,
+        "skipped": 0,
+        "failures": 0,
+        "affected_counts": {
+          "tests.servers.test_runtime_s3_contract": 38,
+          "tests.clients.test_client_lifecycle_variants": 9,
+          "tests.mpc.test_round_store_contracts": 3,
+          "tests.utils.test_rl_payload_utilities": 10
+        }
+      }
+    ],
+    "raw_combined_directory": "/tmp/plato-phase2d.G3jkGH/combined",
+    "historical_claims_preserved": true
+  },
+  "research_and_touched_risk_review": {
+    "HE_MPC": "Reviewed changed real methods, round/share accounting, positive/zero/fractional counts, sender/recipient orientation, exact-range integer interpolation, store atomic-save/round fences and HE pre-publication validation. Full base executes shipped HE/MPC negatives; reviewer native CKKS no/partial/full masks with fractional [.5,0,2.5] and reversed arrivals matches independent weighted reference at2e-5. Existing equations/prototype preserved.",
+    "RL": "Reviewed replay reward/done shapes, TD3 per-row actions and target evaluation, recurrent padding/length masks and loaded target snapshots. Full base and explicit mandatory execute all five active policy variants, finite actor updates, asynchronous lengths/batch1/3, input immutability and target-row isolation. Three reviewer cases additionally require critic parameter changes and restored critic/actor targets; native Gymnasium action space used in explicit mandatory.",
+    "processors_utilities": "Reviewed float/bool/int buffer preservation, QSGD validation/wire, feature homogeneous header/strided/empty behavior, CPU feature precision, randomized-response copy, replacement-model pruning, empty compound loaders, unary stable epsilon, guarded parameter-count imports and cleanup symlink containment. Full base executes actual shipped contracts; utility/FEI standalone raw logs and instrumentation read with limitations retained.",
+    "archive": {
+      "original_bytes_equal": true,
+      "source_sha256": "557fec876520d089a69c18484bcc73465eb1f52ac332442acc35427d57c7a40c",
+      "license_equal": true,
+      "license_sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+      "path": "archives/legacy_rl_env",
+      "tracked_import_config_search": "rg rl_env over plato/examples/configs/docs/pyproject.toml finds no active references. Original module bytes and root Apache-2.0 license copied exactly; README contains baseline/last-source SHA, known four-value-step/shape/loop/wait limitations and historical checkout context. Active reinforcement_learning and FEI stay present."
+    }
+  },
+  "handoffs_and_limits": [
+    "2D-R05 is the sole remaining medium finding in this review scope. Original author corrects the owned test fixtures, then a fresh independent review is required before D component acceptance.",
+    "Root final combined phase merge validation/gate remains pending despite successful current provisional B+D execution. This report does not reopen accepted B production or qualify the whole phase.",
+    "No repeated8-minute48-startup matrix. Its unchanged historical D and exact accepted B evidence remains attributed to those sources; current base runs deselect48. Root runs final combined qualification.",
+    "F07/F26 checkpoint/trainer/DP/SCAFFOLD and shared checkpoint integration belong to now-authorized C; they are not new D findings. Native MLX qualification remains3A.",
+    "Phase4 FEI2D-15 zero-norm NaN and2D-16 constructor dependency forwarding remain concrete tracked future internal fixes, not resolved or external blockers.",
+    "No live cloud S3, real ZooKeeper cluster, full distributed HE/MPC/FEI deployment, GPU/Metal/native MLX result, or cryptographic proof is claimed. Localhost contract servers and ephemeral native CKKS CPU contexts only.",
+    "S3 synchronous utility bounds inactivity/retries, not indefinitely trickling total duration; runtime reader separately has total deadline. Pickles remain trusted-peer/storage/local-file contracts. No speculative security/protocol redesign.",
+    "Profile-finding reproduction executes real parsed configurations/current fixture bodies in isolation. It does not claim an executed complete implicit mandatory suite or repeat startup containment."
+  ],
+  "resources": {
+    "owned_scratch": "/tmp/plato-phase2d-review-2",
+    "retention": "Retain all owned evidence/probes/test outputs and borrowed environments through root integration; nothing deleted or reconfigured.",
+    "write_scope": "Only /Users/bli/Playground/plato/evidence/2026-refresh/phase2d-review-2.json and /tmp/plato-phase2d-review-2."
+  }
+}

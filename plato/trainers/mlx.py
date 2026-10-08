@@ -9,7 +9,9 @@ modifying higher-level orchestration.
 
 from __future__ import annotations
 
+import hashlib
 import logging
+import math
 import os
 import pickle
 import random
@@ -18,14 +20,10 @@ import types
 from abc import ABC, abstractmethod
 from collections.abc import Callable, Iterable, Iterator, Sequence
 from collections.abc import Iterable as ABCIterable
+from contextlib import contextmanager
 from dataclasses import dataclass, field
 from typing import (
     Any,
-    Dict,
-    List,
-    Optional,
-    Tuple,
-    Union,
     cast,
 )
 
@@ -96,19 +94,19 @@ def _tree_leaves(tree: Any) -> Iterator[Any]:
 
 
 def _to_host_array(value: Any) -> Any:
-    """Convert MLX arrays to numpy arrays for serialization."""
+    """Convert leaves into owned host snapshots; bfloat16 is unsupported."""
     if value is None:
         return None
     if torch is not None and isinstance(value, torch.Tensor):
-        return value.detach().cpu().numpy()
+        return value.detach().cpu().numpy().copy()
+    if isinstance(value, np.ndarray):
+        return value.copy()
     if mx is not None and isinstance(value, mx.array):
-        if hasattr(mx, "to_numpy"):
-            return mx.to_numpy(value)
-        if hasattr(value, "to_numpy"):
-            return value.to_numpy()
-        if hasattr(value, "__array__"):
-            return np.asarray(value)
-        return np.array(value)
+        if value.dtype == mx.bfloat16:
+            raise ValueError(
+                "MLX bfloat16 host transport is unsupported; no cast applied."
+            )
+        return np.array(value, copy=True)
     if hasattr(value, "to_host"):
         return value.to_host()
     if hasattr(value, "to_numpy"):
@@ -162,22 +160,103 @@ def _ensure_nhwc_layout(array: Any) -> Any:
     return array
 
 
-def _resolve_device(device_hint: str | None) -> Any | None:
-    """Resolve a device string from configuration into an MLX device."""
-    if mx is None:
-        return None
+def _validate_parameter_tree(tree: Any, reference: Any, path: str = "weights") -> None:
+    """Preflight an entire tree before arithmetic, conversion or model mutation."""
+    if isinstance(reference, (dict, list, tuple)):
+        if type(tree) is not type(reference):
+            raise ValueError(f"{path}: expected {type(reference).__name__} container.")
+        if isinstance(reference, dict):
+            missing = reference.keys() - tree.keys()
+            extra = tree.keys() - reference.keys()
+            if missing or extra:
+                raise ValueError(f"{path}: missing keys {missing}; extra keys {extra}.")
+            for key in reference:
+                _validate_parameter_tree(tree[key], reference[key], f"{path}.{key}")
+        else:
+            if len(tree) != len(reference):
+                raise ValueError(
+                    f"{path}: expected length {len(reference)}, got {len(tree)}."
+                )
+            for index, (leaf, baseline) in enumerate(zip(tree, reference, strict=True)):
+                _validate_parameter_tree(leaf, baseline, f"{path}[{index}]")
+        return
+    if reference is None:
+        if tree is not None:
+            raise ValueError(f"{path}: expected None.")
+        return
+    array_types = (np.ndarray, mx.array) if mx is not None else (np.ndarray,)
+    if not isinstance(reference, array_types) or not isinstance(tree, array_types):
+        raise ValueError(f"{path}: expected an array leaf matching the model.")
+    if tree.shape != reference.shape:
+        raise ValueError(f"{path}: expected shape {reference.shape}, got {tree.shape}.")
+    if isinstance(tree, np.ndarray) and tree.dtype.kind not in "biufc":
+        raise ValueError(f"{path}: unsupported host array dtype {tree.dtype}.")
+    if mx is not None and isinstance(tree, mx.array) and tree.dtype == mx.bfloat16:
+        raise ValueError(f"{path}: MLX bfloat16 host transport is unsupported.")
 
-    if device_hint is None:
-        return mx.default_device()
 
-    hint = device_hint.lower()
-    if hint.startswith("cuda") or hint == "mps" or hint.startswith("gpu"):
-        try:
-            return mx.gpu
-        except AttributeError:
-            return mx.default_device()
+def _resolve_device(device_hint: str | None = None) -> Any:
+    """Respect explicit CLI flags, otherwise preserve the caller's native default."""
+    _ensure_mlx_available()
 
-    return mx.cpu if hasattr(mx, "cpu") else mx.default_device()
+    args = Config.args
+    if getattr(args, "cpu", False) or device_hint == "cpu":
+        return mx.cpu
+    if getattr(args, "mps", False) or device_hint in ("mps", "gpu"):
+        if not mx.metal.is_available():
+            raise RuntimeError("MLX Metal was requested but is unavailable.")
+        return mx.gpu
+    return mx.default_device()
+
+
+def _apply_parameters(model: Any, state_tree: Any, stream: Any) -> None:
+    """Restore validated native parameters after complete conversion succeeds."""
+    _ensure_mlx_available()
+    if not isinstance(model, mx_nn.Module):
+        raise TypeError("MLX weight restoration requires a native mlx.nn.Module.")
+    _validate_parameter_tree(state_tree, model.parameters())
+    with mx.stream(stream):
+        restored = _tree_map(_to_mx_array, state_tree)
+        mx.eval(restored)
+        model.update(restored)
+        mx.eval(model.state)
+
+
+def _logical_seed(master_seed: int, client_id: int, round_id: int, epoch: int) -> int:
+    """Derive a stable stream without process IDs or Python's randomized hash."""
+    identity = f"plato-mlx:{master_seed}:{client_id}:{round_id}:{epoch}".encode()
+    return int.from_bytes(hashlib.sha256(identity).digest()[:4], "big")
+
+
+def _seed_rngs(seed: int) -> None:
+    random.seed(seed)
+    np.random.seed(seed % (2**32))
+    mx.random.seed(seed)
+    if torch is not None:
+        torch.random.default_generator.manual_seed(seed)
+
+
+@contextmanager
+def _rng_scope(seed: int | None):
+    """Seed scoped work in four RNG domains; unseeded work keeps legacy behavior."""
+    if seed is None:
+        yield
+        return
+    python_state = random.getstate()
+    numpy_state = np.random.get_state()
+    torch_state = torch.get_rng_state() if torch is not None else None
+    # MLX 0.32.3 exposes a read-only key pair, also the uint64 seed encoding.
+    key = np.array(cast(Any, mx.random.state)[0], copy=True)
+    saved_seed = (int(key[0]) << 32) | int(key[1])
+    try:
+        _seed_rngs(seed)
+        yield
+    finally:
+        random.setstate(python_state)
+        np.random.set_state(numpy_state)
+        if torch_state is not None:
+            torch.set_rng_state(torch_state)
+        mx.random.seed(saved_seed)
 
 
 @dataclass
@@ -196,7 +275,8 @@ class MLXTrainingContext:
     """
 
     model: mx_nn.Module | None = None
-    device: Any | None = None
+    device: Any = None
+    stream: Any = None
     client_id: int = 0
     current_epoch: int = 0
     current_round: int = 0
@@ -413,8 +493,8 @@ class DefaultMLXOptimizerStrategy(MLXOptimizerStrategy):
             "adam": getattr(mx_optim, "Adam", None),
             "adamw": getattr(mx_optim, "AdamW", None),
             "sgd": getattr(mx_optim, "SGD", None),
-            "momentum": getattr(mx_optim, "Momentum", None),
-            "rmsprop": getattr(mx_optim, "RMSProp", None),
+            "momentum": getattr(mx_optim, "SGD", None),
+            "rmsprop": getattr(mx_optim, "RMSprop", None),
             "lion": getattr(mx_optim, "Lion", None),
         }.items()
         if optimizer is not None
@@ -447,6 +527,8 @@ class DefaultMLXOptimizerStrategy(MLXOptimizerStrategy):
         params = dict(self.optimizer_kwargs)
         if not params and hasattr(Config().parameters, "optimizer"):
             params = Config().parameters.optimizer._asdict()
+        if name == "momentum" and "momentum" not in params:
+            raise ValueError("MLX momentum requires an explicit momentum parameter.")
 
         return optimizer_cls(**params)
 
@@ -461,7 +543,18 @@ class DefaultMLXTrainingStepStrategy(MLXTrainingStepStrategy):
 
     def setup(self, context: MLXTrainingContext) -> None:
         _ensure_mlx_available()
+        if self.jit:
+            raise ValueError(
+                "MLX jit is not qualified; use the default eager strategy."
+            )
+        self._validate_clipping()
         self._value_and_grad = nn_utils.value_and_grad
+
+    def _validate_clipping(self) -> None:
+        if self.clip_grad_norm is not None and (
+            not math.isfinite(self.clip_grad_norm) or self.clip_grad_norm < 0
+        ):
+            raise ValueError("MLX clip_grad_norm must be finite and nonnegative.")
 
     def _require_value_and_grad(self):
         if self._value_and_grad is None:
@@ -480,6 +573,7 @@ class DefaultMLXTrainingStepStrategy(MLXTrainingStepStrategy):
         context: MLXTrainingContext,
     ) -> mx.array:
         _ensure_mlx_available()
+        self._validate_clipping()
 
         if labels is None:
 
@@ -499,23 +593,16 @@ class DefaultMLXTrainingStepStrategy(MLXTrainingStepStrategy):
             loss, grads = value_and_grad(model, inner_loss)(examples, labels)
 
         if self.clip_grad_norm is not None:
-            logging.warning(
-                "Gradient clipping is requested but not implemented for MLX yet."
-            )
+            if any(
+                not bool(mx.all(mx.isfinite(g)).item()) for g in _tree_leaves(grads)
+            ):
+                raise ValueError("MLX clipping requires finite gradients.")
+            grads, norm = mx_optim.clip_grad_norm(grads, self.clip_grad_norm)
+            if not bool(mx.isfinite(norm).item()):
+                raise ValueError("MLX clipping requires a finite gradient norm.")
+            context.state["grad_norm"] = float(norm.item())
         optimizer.update(model, grads)
-        if hasattr(mx, "eval"):
-            state = getattr(optimizer, "state", None)
-            try:
-                if state is not None:
-                    mx.eval(model.parameters(), state)
-                else:
-                    mx.eval(model.parameters())
-            except TypeError:
-                params_tuple = tuple(model.parameters())
-                if state is not None:
-                    mx.eval(params_tuple, state)
-                else:
-                    mx.eval(params_tuple)
+        mx.eval(loss, model.state, optimizer.state)
         return loss
 
 
@@ -768,24 +855,38 @@ class ComposableMLXTrainer(base.Trainer):
         super().__init__()
 
         self.context = MLXTrainingContext()
-        self.context.device = _resolve_device(Config().device())
+        self.context.device = _resolve_device()
+        self.device = self.context.device
+        self.context.stream = mx.default_stream(self.context.device)
         self.context.client_id = self.client_id
 
-        if model is None:
-            self.model = models_registry.get()
-        elif isinstance(model, mx_nn.Module):
-            self.model = model
-        elif callable(model):
-            self.model = model()
-        else:
-            raise TypeError("MLX trainers require an nn.Module or factory callable.")
+        with (
+            mx.stream(self.context.stream),
+            _rng_scope(getattr(Config().trainer, "model_seed", None)),
+        ):
+            if model is None:
+                self.model = models_registry.get()
+            elif isinstance(model, mx_nn.Module):
+                self.model = model
+            elif callable(model):
+                self.model = model()
+            else:
+                raise TypeError(
+                    "MLX trainers require an nn.Module or factory callable."
+                )
+            if not isinstance(self.model, mx_nn.Module):
+                raise TypeError("MLX trainers require a native mlx.nn.Module model.")
+            mx.eval(self.model.state)
 
         self.context.model = self.model
 
         self.loss_strategy = loss_strategy or DefaultMLXLossStrategy()
         self.optimizer_strategy = optimizer_strategy or DefaultMLXOptimizerStrategy()
         self.training_step_strategy = (
-            training_step_strategy or DefaultMLXTrainingStepStrategy()
+            training_step_strategy
+            or DefaultMLXTrainingStepStrategy(
+                clip_grad_norm=getattr(Config().trainer, "clip_grad_norm", None)
+            )
         )
         self.lr_scheduler_strategy = lr_scheduler_strategy or MLXLRSchedulerStrategy()
         self.model_update_strategy = model_update_strategy or MLXModelUpdateStrategy()
@@ -852,7 +953,8 @@ class ComposableMLXTrainer(base.Trainer):
     def zeros(self, shape: int | Sequence[int]) -> mx.array:
         _ensure_mlx_available()
         assert self.client_id == 0
-        return mx.zeros(shape)
+        with mx.stream(self.context.stream):
+            return mx.zeros(shape)
 
     # ---------------------------------------------------------------------
     # Model persistence
@@ -951,28 +1053,25 @@ class ComposableMLXTrainer(base.Trainer):
         return _tree_map(_to_host_array, parameters)
 
     def _apply_model_state(self, state_tree: Any) -> None:
-        restored = _tree_map(_to_mx_array, state_tree)
-        model = self._require_model()
-        if hasattr(model, "update"):
-            model.update(restored)
-        else:
-            raise RuntimeError(
-                "The configured MLX model does not support parameter updates."
-            )
-        if mx is not None:
-            leaves = [
-                leaf
-                for leaf in _tree_leaves(model.parameters())
-                if isinstance(leaf, mx.array)
-            ]
-            if leaves:
-                mx.eval(*leaves)
+        _apply_parameters(self._require_model(), state_tree, self.context.stream)
 
     # ---------------------------------------------------------------------
     # Training loop
     # ---------------------------------------------------------------------
 
     def train_model(self, config, trainset, sampler, **kwargs):
+        """Train eagerly; training_seed scopes logical client/round/epoch RNGs."""
+        master_seed = config.get("training_seed")
+        seed = (
+            None
+            if master_seed is None
+            else _logical_seed(master_seed, self.client_id, self.current_round, 0)
+        )
+        with mx.stream(self.context.stream), _rng_scope(seed):
+            self._require_model().train()
+            return self._train_model(config, trainset, sampler, **kwargs)
+
+    def _train_model(self, config, trainset, sampler, **kwargs):
         batch_size = config["batch_size"]
         self.trainset = trainset
         self.sampler = sampler
@@ -1018,6 +1117,15 @@ class ComposableMLXTrainer(base.Trainer):
         training_stop_requested = False
 
         for self.current_epoch in range(1, total_epochs + 1):
+            if config.get("training_seed") is not None:
+                _seed_rngs(
+                    _logical_seed(
+                        config["training_seed"],
+                        self.client_id,
+                        self.current_round,
+                        self.current_epoch,
+                    )
+                )
             self.context.current_epoch = self.current_epoch
             self._loss_tracker.reset()
             self.context.state["grad_accum_counter"] = 0
@@ -1075,7 +1183,9 @@ class ComposableMLXTrainer(base.Trainer):
                     context=self.context,
                 )
 
-                loss_value = float(loss.item() if hasattr(loss, "item") else loss)
+                loss_value = float(
+                    cast(Any, loss.item() if hasattr(loss, "item") else loss)
+                )
                 batch_size_effective = self._batch_size(labels, examples)
                 self._loss_tracker.update(loss_value, batch_size_effective)
                 self.context.state["last_loss"] = loss_value
@@ -1180,9 +1290,17 @@ class ComposableMLXTrainer(base.Trainer):
         return accuracy
 
     def test_model(self, config, testset, sampler=None, **kwargs):
-        accuracy = self.testing_strategy.test_model(
-            self.model, config, testset, sampler, self.context
-        )
+        model = self._require_model()
+        modes = [(module, module.training) for module in model.modules()]
+        try:
+            with mx.stream(self.context.stream):
+                model.eval()
+                accuracy = self.testing_strategy.test_model(
+                    self.model, config, testset, sampler, self.context
+                )
+        finally:
+            for module, mode in modes:
+                module.train(mode)
         self.accuracy = accuracy
         return accuracy
 

@@ -159,9 +159,6 @@ docs/_build/
 # Homomorphic encryption
 .ckks_context/
 
-# uv
-uv.lock
-
 # multi-party computation data
 mpc_data
 

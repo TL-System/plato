@@ -1,0 +1,806 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-03",
+  "written_at_utc": "2026-10-03T06:51:46.700329+00:00",
+  "role": "Fresh independent SCAFFOLD documentation reviewer; no nested agents.",
+  "review_type": "Provisional exact-committed-snapshot writing review, not C implementation acceptance.",
+  "decision": "PASS",
+  "acceptance": "PROVISIONAL_WRITING_PASS_ONLY",
+  "final_documentation_acceptance": false,
+  "finding": "F27",
+  "summary": "No critical/high/medium writing findings in candidate 95c7218fc9801099cd7ffa3afc1be227384d8500. The public prose accurately describes the reviewed successful paths and bounded failure behavior of code base 0dc34dd1d79d90071a0babfa6aa89f33d72a976f, whose code/tests match immutable C 62d7b7d8ef75be779149a96f567779c86699edb4. This PASS does not accept C, close F27 or authorize final documentation integration before final-source reconciliation and required review.",
+  "finding_counts": {
+    "critical": 0,
+    "high": 0,
+    "medium": 0,
+    "low": 0
+  },
+  "findings": [],
+  "identities": {
+    "candidate_commit": "95c7218fc9801099cd7ffa3afc1be227384d8500",
+    "candidate_tree": "525080ae1f36c218a9510becd9c1cd30b2db87fd",
+    "base_commit": "0dc34dd1d79d90071a0babfa6aa89f33d72a976f",
+    "base_tree": "0345bbeafe814bc33fa9bc2f845edf1043a13b53",
+    "immutable_C_commit": "62d7b7d8ef75be779149a96f567779c86699edb4",
+    "immutable_C_tree": "bfc18588145c935adaf36850f909f3223b5ad058",
+    "accepted_B_commit": "00eeb9dcdd2b513e64db9408969356037e09bb8e"
+  },
+  "scope": {
+    "worktree": "/private/tmp/plato-refresh-worktrees/scaffold-docs",
+    "allowed_changed_paths": [
+      "docs/docs/examples/algorithms/5. Algorithms with Customized Client Training Loops.md",
+      "evidence/2026-refresh/phase2c-scaffold-docs-validation.json",
+      "examples/customized_client_training/scaffold/README.md"
+    ],
+    "exactly_three_changed_paths": true,
+    "public_doc_change_is_only_scaffold_section": true,
+    "all_other_algorithm_sections": {
+      "byte_identical": true,
+      "bytes": 8964,
+      "sha256": "d90223b36bb3433975dc1f2f127287867c42e683a903b874245e3af4be3a6359"
+    },
+    "config_bytes_unchanged_since_writer_base": true,
+    "config_values_equal_accepted_B": true,
+    "all_other_production_and_tests_unchanged": true,
+    "clean_candidate_before_and_after": true,
+    "diff": {
+      "path": "/tmp/plato-phase2c-scaffold-docs-review/candidate-docs.diff",
+      "sha256": "afb03d0b0569706bf32ae023fc9b155198aa05a6eccf10432de6100c0a2a6712",
+      "bytes": 27495
+    },
+    "code_base_to_immutable_C_changed_paths": [
+      "evidence/2026-refresh/phase2c-feddyn-disposition.json",
+      "evidence/2026-refresh/phase2c-scaffold-facts.json",
+      "evidence/2026-refresh/phase2c-validation.json"
+    ]
+  },
+  "inputs": [
+    {
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2c-scaffold-design.json",
+      "sha256": "f323f3aa9d824df44a1043b2d6aff9c8a963c42964f6e6685108c59b25fc3a89"
+    },
+    {
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2c-scaffold-design-review.json",
+      "sha256": "8eb83f21091827d03534db1b8c4e23a6f239b5df4f82363b4c9ead5a60b3258d"
+    },
+    {
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2c-scaffold-acceptance.json",
+      "sha256": "40b202708a4cfdbe6f299e75249c1a19921e410ec4ab7b5e3c6323f536ca8d37"
+    },
+    {
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2c-scaffold-code-review.json",
+      "sha256": "455f6467dd6986a1de751f0a9dea6bfef4d9ca4c16746ce38239b2b77a3bb7d7"
+    },
+    {
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2c-training-review.json",
+      "sha256": "efa4427422c1d0c12d1020e22f7fc8dd9afc1c25f0e5369fa0d4f5a2df44eea1"
+    },
+    {
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2c-scaffold-docs-source-reconciliation.json",
+      "sha256": "7be5dc3ac17b2db35c5a84dff77ee70b6d124ee3513e3ea078bac473bc705b48"
+    }
+  ],
+  "root_evidence_retained_copy_directory": "/tmp/plato-phase2c-scaffold-docs-review/root-inputs",
+  "candidate_validation": {
+    "path": "evidence/2026-refresh/phase2c-scaffold-docs-validation.json",
+    "sha256": "b181289763d67d47a7cd0b72425448f9ebd2d4feddbf2ea394be8c924c9a3967",
+    "read": "Full candidate JSON; all listed documentation/source hashes independently matched to committed bytes.",
+    "honest_execution_boundary": "Writer ran docs-only locked sync, strict builds and static command/render checks. Writer explicitly ran no C tests or MNIST training and did not claim a full training installation.",
+    "historical_status_boundary": "Pending-C-execution/review wording describes the writer handoff at its authored snapshot. Updated root code reviews are COMPLETE and request changes; neither those reviews nor their successful-path results are pending or accepted by this writing PASS. Final corrected-C execution, source reconciliation and acceptance still remain root-owned."
+  },
+  "implementation_author_evidence": [
+    {
+      "path": "evidence/2026-refresh/phase2c-scaffold-facts.json",
+      "revision": "62d7b7d8ef75be779149a96f567779c86699edb4",
+      "git_blob": "58e975abdb84edb3f805faae0ca66b5450e8a536",
+      "sha256": "b17bb958fff4862b7c7ef0bff04a6618c40f09155cc5f25e02d5ca4338b7aed9",
+      "retained": "/tmp/plato-phase2c-scaffold-docs-review/phase2c-scaffold-facts.json"
+    },
+    {
+      "path": "evidence/2026-refresh/phase2c-validation.json",
+      "revision": "62d7b7d8ef75be779149a96f567779c86699edb4",
+      "git_blob": "6a3b73ba2739f953a5a1fc2955df211f6fadd492",
+      "sha256": "5674d9ef3e2ffda63b8041ed3f8c2c13ebaa6062ee967292ac2c459eba387fa8",
+      "retained": "/tmp/plato-phase2c-scaffold-docs-review/phase2c-validation.json"
+    }
+  ],
+  "implementation_author_evidence_interpretation": "Read immutable facts and validation at 62d. Their reported qualification is author evidence, not reviewer reruns or proof that open C findings are corrected. Facts/test inventories do not override actual code or the completed independent reviews.",
+  "source_manifest": [
+    {
+      "path": "AGENTS.md",
+      "candidate_git_blob": "60d8b0793a25bfa3ad11b0a278e5be2a375543a6",
+      "candidate_sha256": "b50f87f31ea3d87076952d8b7d2d8af067132fbf877d80f8780c208fb45527ec",
+      "base_git_blob": "60d8b0793a25bfa3ad11b0a278e5be2a375543a6",
+      "base_sha256": "b50f87f31ea3d87076952d8b7d2d8af067132fbf877d80f8780c208fb45527ec",
+      "immutable_C_git_blob": "60d8b0793a25bfa3ad11b0a278e5be2a375543a6",
+      "immutable_C_sha256": "b50f87f31ea3d87076952d8b7d2d8af067132fbf877d80f8780c208fb45527ec"
+    },
+    {
+      "path": "docs/docs/examples/algorithms/5. Algorithms with Customized Client Training Loops.md",
+      "candidate_git_blob": "0bbc049a30cd8d117b0a5cef415e1122f7e3476f",
+      "candidate_sha256": "c5f0a8602461a4b26b73245350e7537eee5679fb1f965df2fc7e26f90a714ea9",
+      "base_git_blob": "94ab100e18dcf0e4e2b63e9c3c0af9f91859d1e2",
+      "base_sha256": "aaf8cc3b4ef22a19356c2e0d6f2e1ef1fee2a741ab195959754b0c18e76b1d60",
+      "immutable_C_git_blob": "94ab100e18dcf0e4e2b63e9c3c0af9f91859d1e2",
+      "immutable_C_sha256": "aaf8cc3b4ef22a19356c2e0d6f2e1ef1fee2a741ab195959754b0c18e76b1d60"
+    },
+    {
+      "path": "docs/mkdocs.yml",
+      "candidate_git_blob": "fa5bc99083b2cdb3e9aa1b46bd75ec5937ebf9ba",
+      "candidate_sha256": "a3954634249d84cefd8cab51fd14f48f618c7eddf1439b5f45c501e1c015b056",
+      "base_git_blob": "fa5bc99083b2cdb3e9aa1b46bd75ec5937ebf9ba",
+      "base_sha256": "a3954634249d84cefd8cab51fd14f48f618c7eddf1439b5f45c501e1c015b056",
+      "immutable_C_git_blob": "fa5bc99083b2cdb3e9aa1b46bd75ec5937ebf9ba",
+      "immutable_C_sha256": "a3954634249d84cefd8cab51fd14f48f618c7eddf1439b5f45c501e1c015b056"
+    },
+    {
+      "path": "docs/requirements.txt",
+      "candidate_git_blob": "4c8f017dd10698b94101394ee676e0c36a249af2",
+      "candidate_sha256": "b648383d0fa36ceccb3fce7c76e0aa36df591c817b7e5ce46ee61c0c92f29b04",
+      "base_git_blob": "4c8f017dd10698b94101394ee676e0c36a249af2",
+      "base_sha256": "b648383d0fa36ceccb3fce7c76e0aa36df591c817b7e5ce46ee61c0c92f29b04",
+      "immutable_C_git_blob": "4c8f017dd10698b94101394ee676e0c36a249af2",
+      "immutable_C_sha256": "b648383d0fa36ceccb3fce7c76e0aa36df591c817b7e5ce46ee61c0c92f29b04"
+    },
+    {
+      "path": "evidence/2026-refresh/phase2c-scaffold-docs-validation.json",
+      "candidate_git_blob": "f4a298e5e4ca7d3c21e01766f699a23ab97b6c94",
+      "candidate_sha256": "b181289763d67d47a7cd0b72425448f9ebd2d4feddbf2ea394be8c924c9a3967"
+    },
+    {
+      "path": "examples/customized_client_training/scaffold/README.md",
+      "candidate_git_blob": "fd8a47a0fe457cb6562f8f350fbc6a5fc3d4a94d",
+      "candidate_sha256": "37bbceefde3864b39475ba1ef1bb0d73e7aca935bbb5a5f157e29e564e230911"
+    },
+    {
+      "path": "examples/customized_client_training/scaffold/scaffold.py",
+      "candidate_git_blob": "c1ca95a3fdbfe5b9c2337af19e2d45abe4d86858",
+      "candidate_sha256": "37587214941e1532d5552b7477249b18b5fadf905739ac94735d17df9886ac3a",
+      "base_git_blob": "c1ca95a3fdbfe5b9c2337af19e2d45abe4d86858",
+      "base_sha256": "37587214941e1532d5552b7477249b18b5fadf905739ac94735d17df9886ac3a",
+      "immutable_C_git_blob": "c1ca95a3fdbfe5b9c2337af19e2d45abe4d86858",
+      "immutable_C_sha256": "37587214941e1532d5552b7477249b18b5fadf905739ac94735d17df9886ac3a"
+    },
+    {
+      "path": "examples/customized_client_training/scaffold/scaffold_MNIST_lenet5.toml",
+      "candidate_git_blob": "9aafd58d71daf12d9d2a62e5c4a39434c501ba5e",
+      "candidate_sha256": "43110532d391896d4080782a4dbace3fbe2bc7813ac9e7baa662074f044f290c",
+      "base_git_blob": "9aafd58d71daf12d9d2a62e5c4a39434c501ba5e",
+      "base_sha256": "43110532d391896d4080782a4dbace3fbe2bc7813ac9e7baa662074f044f290c",
+      "immutable_C_git_blob": "9aafd58d71daf12d9d2a62e5c4a39434c501ba5e",
+      "immutable_C_sha256": "43110532d391896d4080782a4dbace3fbe2bc7813ac9e7baa662074f044f290c"
+    },
+    {
+      "path": "examples/customized_client_training/scaffold/scaffold_callback.py",
+      "candidate_git_blob": "4a1d394f106069d2f4f6de96db26be77d5f037f8",
+      "candidate_sha256": "159a2adbbae5c7982c30896af596c546e601669b0230b841656ee464ee66d39f",
+      "base_git_blob": "4a1d394f106069d2f4f6de96db26be77d5f037f8",
+      "base_sha256": "159a2adbbae5c7982c30896af596c546e601669b0230b841656ee464ee66d39f",
+      "immutable_C_git_blob": "4a1d394f106069d2f4f6de96db26be77d5f037f8",
+      "immutable_C_sha256": "159a2adbbae5c7982c30896af596c546e601669b0230b841656ee464ee66d39f"
+    },
+    {
+      "path": "examples/customized_client_training/scaffold/scaffold_client.py",
+      "candidate_git_blob": "8cb18af10397d6f74765d6ed2c762094cc5007ef",
+      "candidate_sha256": "01a08e2001ba4f9e4e61c2ff520e3d1b3fcff5d44168a3d5ac002c45b4c48a8b",
+      "base_git_blob": "8cb18af10397d6f74765d6ed2c762094cc5007ef",
+      "base_sha256": "01a08e2001ba4f9e4e61c2ff520e3d1b3fcff5d44168a3d5ac002c45b4c48a8b",
+      "immutable_C_git_blob": "8cb18af10397d6f74765d6ed2c762094cc5007ef",
+      "immutable_C_sha256": "01a08e2001ba4f9e4e61c2ff520e3d1b3fcff5d44168a3d5ac002c45b4c48a8b"
+    },
+    {
+      "path": "examples/customized_client_training/scaffold/scaffold_server.py",
+      "candidate_git_blob": "3be797b1179b236ebea6814a7e79d7c17a246f26",
+      "candidate_sha256": "e2325ee39337489f15711c4073aeb10335e2b47ecc0cc9aefd0406bbbb18c78a",
+      "base_git_blob": "3be797b1179b236ebea6814a7e79d7c17a246f26",
+      "base_sha256": "e2325ee39337489f15711c4073aeb10335e2b47ecc0cc9aefd0406bbbb18c78a",
+      "immutable_C_git_blob": "3be797b1179b236ebea6814a7e79d7c17a246f26",
+      "immutable_C_sha256": "e2325ee39337489f15711c4073aeb10335e2b47ecc0cc9aefd0406bbbb18c78a"
+    },
+    {
+      "path": "examples/customized_client_training/scaffold/scaffold_trainer.py",
+      "candidate_git_blob": "1a5448a14b8d5357ec3f85800a9d4ffacbb13f3c",
+      "candidate_sha256": "405c0d270a4362ab0cc2569899ef1deb9b03a5a235ef44c75261b43fdbaf00de",
+      "base_git_blob": "1a5448a14b8d5357ec3f85800a9d4ffacbb13f3c",
+      "base_sha256": "405c0d270a4362ab0cc2569899ef1deb9b03a5a235ef44c75261b43fdbaf00de",
+      "immutable_C_git_blob": "1a5448a14b8d5357ec3f85800a9d4ffacbb13f3c",
+      "immutable_C_sha256": "405c0d270a4362ab0cc2569899ef1deb9b03a5a235ef44c75261b43fdbaf00de"
+    },
+    {
+      "path": "plato/clients/strategies/defaults.py",
+      "candidate_git_blob": "9cdb321a613b47d5f1d7c45150538c47721d53e5",
+      "candidate_sha256": "6a41108b7878113ed4b7c9555d818b1f59862f55c487524b26052a0f12c3feca",
+      "base_git_blob": "9cdb321a613b47d5f1d7c45150538c47721d53e5",
+      "base_sha256": "6a41108b7878113ed4b7c9555d818b1f59862f55c487524b26052a0f12c3feca",
+      "immutable_C_git_blob": "9cdb321a613b47d5f1d7c45150538c47721d53e5",
+      "immutable_C_sha256": "6a41108b7878113ed4b7c9555d818b1f59862f55c487524b26052a0f12c3feca"
+    },
+    {
+      "path": "plato/config.py",
+      "candidate_git_blob": "e1f62cbc77f950fe89bda12c65b09d1daf6f39d4",
+      "candidate_sha256": "8bbe0146a6c112f484efb1ef267c54cda1b48df79935789aaa5febe116bc41a4",
+      "base_git_blob": "e1f62cbc77f950fe89bda12c65b09d1daf6f39d4",
+      "base_sha256": "8bbe0146a6c112f484efb1ef267c54cda1b48df79935789aaa5febe116bc41a4",
+      "immutable_C_git_blob": "e1f62cbc77f950fe89bda12c65b09d1daf6f39d4",
+      "immutable_C_sha256": "8bbe0146a6c112f484efb1ef267c54cda1b48df79935789aaa5febe116bc41a4"
+    },
+    {
+      "path": "plato/servers/fedavg.py",
+      "candidate_git_blob": "10cd1a9cd8940ba5f7245824cd6b53a703d60a6c",
+      "candidate_sha256": "f184068a11c5be9e523f08b95e1cce76dff2e20e2fdb4e6426caf95dac0bcee5",
+      "base_git_blob": "10cd1a9cd8940ba5f7245824cd6b53a703d60a6c",
+      "base_sha256": "f184068a11c5be9e523f08b95e1cce76dff2e20e2fdb4e6426caf95dac0bcee5",
+      "immutable_C_git_blob": "10cd1a9cd8940ba5f7245824cd6b53a703d60a6c",
+      "immutable_C_sha256": "f184068a11c5be9e523f08b95e1cce76dff2e20e2fdb4e6426caf95dac0bcee5"
+    },
+    {
+      "path": "plato/servers/strategies/aggregation/fedavg.py",
+      "candidate_git_blob": "f4045b7e3a030d67843300f1f1fe1a731d701c66",
+      "candidate_sha256": "fa1e2a6bbbc8e3829b72cd0cdd47f10b0a8fffbdabdaa2dfb3efed81872877c1",
+      "base_git_blob": "f4045b7e3a030d67843300f1f1fe1a731d701c66",
+      "base_sha256": "fa1e2a6bbbc8e3829b72cd0cdd47f10b0a8fffbdabdaa2dfb3efed81872877c1",
+      "immutable_C_git_blob": "f4045b7e3a030d67843300f1f1fe1a731d701c66",
+      "immutable_C_sha256": "fa1e2a6bbbc8e3829b72cd0cdd47f10b0a8fffbdabdaa2dfb3efed81872877c1"
+    },
+    {
+      "path": "plato/trainers/base.py",
+      "candidate_git_blob": "d20a646779bd56dade3aaddc4a1e33f756e4b5cb",
+      "candidate_sha256": "2fb5e25983d1f737acf7b05d7324130458caab187b34d3e835a92d574adb1ec8",
+      "base_git_blob": "d20a646779bd56dade3aaddc4a1e33f756e4b5cb",
+      "base_sha256": "2fb5e25983d1f737acf7b05d7324130458caab187b34d3e835a92d574adb1ec8",
+      "immutable_C_git_blob": "d20a646779bd56dade3aaddc4a1e33f756e4b5cb",
+      "immutable_C_sha256": "2fb5e25983d1f737acf7b05d7324130458caab187b34d3e835a92d574adb1ec8"
+    },
+    {
+      "path": "plato/trainers/composable.py",
+      "candidate_git_blob": "37447fe69e33a1631d671e03e56beb07d2b01183",
+      "candidate_sha256": "6bc4dab135cd7249346ac3ca23b0e24ea638961cda7806558ab81338dc0496a8",
+      "base_git_blob": "37447fe69e33a1631d671e03e56beb07d2b01183",
+      "base_sha256": "6bc4dab135cd7249346ac3ca23b0e24ea638961cda7806558ab81338dc0496a8",
+      "immutable_C_git_blob": "37447fe69e33a1631d671e03e56beb07d2b01183",
+      "immutable_C_sha256": "6bc4dab135cd7249346ac3ca23b0e24ea638961cda7806558ab81338dc0496a8"
+    },
+    {
+      "path": "plato/trainers/optimizers.py",
+      "candidate_git_blob": "2b16546c5439a52487a5ca476c91dc197f84aff4",
+      "candidate_sha256": "da613c5d2975a7cf124619233645ba8b02e6ad32218f08dd508b9b410da06e34",
+      "base_git_blob": "2b16546c5439a52487a5ca476c91dc197f84aff4",
+      "base_sha256": "da613c5d2975a7cf124619233645ba8b02e6ad32218f08dd508b9b410da06e34",
+      "immutable_C_git_blob": "2b16546c5439a52487a5ca476c91dc197f84aff4",
+      "immutable_C_sha256": "da613c5d2975a7cf124619233645ba8b02e6ad32218f08dd508b9b410da06e34"
+    },
+    {
+      "path": "plato/trainers/strategies/algorithms/__init__.py",
+      "candidate_git_blob": "004e3a80473123468ee353813be2ccc9f43829cc",
+      "candidate_sha256": "77e08b64ff22c49ce2747f1f7e60255ff152293484bfdf6c863cf9c31e4be20c",
+      "base_git_blob": "004e3a80473123468ee353813be2ccc9f43829cc",
+      "base_sha256": "77e08b64ff22c49ce2747f1f7e60255ff152293484bfdf6c863cf9c31e4be20c",
+      "immutable_C_git_blob": "004e3a80473123468ee353813be2ccc9f43829cc",
+      "immutable_C_sha256": "77e08b64ff22c49ce2747f1f7e60255ff152293484bfdf6c863cf9c31e4be20c"
+    },
+    {
+      "path": "plato/trainers/strategies/algorithms/scaffold_strategy.py",
+      "candidate_git_blob": "1df364920400b9507b7266efa92ff0327cd1ea99",
+      "candidate_sha256": "2b6e2953f8b93f7919d95d70f598c2f4d33c9cbaff129352387f248c004d4ff6",
+      "base_git_blob": "1df364920400b9507b7266efa92ff0327cd1ea99",
+      "base_sha256": "2b6e2953f8b93f7919d95d70f598c2f4d33c9cbaff129352387f248c004d4ff6",
+      "immutable_C_git_blob": "1df364920400b9507b7266efa92ff0327cd1ea99",
+      "immutable_C_sha256": "2b6e2953f8b93f7919d95d70f598c2f4d33c9cbaff129352387f248c004d4ff6"
+    },
+    {
+      "path": "plato/trainers/strategies/base.py",
+      "candidate_git_blob": "00ec17b82105377c27063f74ae630b28bdc3af87",
+      "candidate_sha256": "905261bbaf05f8024110f9b0be2c29886bdc39a91c6be18aa9e83bb4868ec0d3",
+      "base_git_blob": "00ec17b82105377c27063f74ae630b28bdc3af87",
+      "base_sha256": "905261bbaf05f8024110f9b0be2c29886bdc39a91c6be18aa9e83bb4868ec0d3",
+      "immutable_C_git_blob": "00ec17b82105377c27063f74ae630b28bdc3af87",
+      "immutable_C_sha256": "905261bbaf05f8024110f9b0be2c29886bdc39a91c6be18aa9e83bb4868ec0d3"
+    },
+    {
+      "path": "plato/trainers/strategies/optimizer.py",
+      "candidate_git_blob": "c2c981e54d86afba1c0142f1f9c9efd9c93f3d37",
+      "candidate_sha256": "ffbeab17d1a2455013871d32f4e82402f5422a6c14fc629d334b2d93c59e7957",
+      "base_git_blob": "c2c981e54d86afba1c0142f1f9c9efd9c93f3d37",
+      "base_sha256": "ffbeab17d1a2455013871d32f4e82402f5422a6c14fc629d334b2d93c59e7957",
+      "immutable_C_git_blob": "c2c981e54d86afba1c0142f1f9c9efd9c93f3d37",
+      "immutable_C_sha256": "ffbeab17d1a2455013871d32f4e82402f5422a6c14fc629d334b2d93c59e7957"
+    },
+    {
+      "path": "plato/trainers/strategies/training_step.py",
+      "candidate_git_blob": "095deef721bb66a8702f6d49f89bfeeb41345f9a",
+      "candidate_sha256": "ba912ceea97a1fe592d690cb06c9827cd988d37320a92f1dc72bbb42feea2983",
+      "base_git_blob": "095deef721bb66a8702f6d49f89bfeeb41345f9a",
+      "base_sha256": "ba912ceea97a1fe592d690cb06c9827cd988d37320a92f1dc72bbb42feea2983",
+      "immutable_C_git_blob": "095deef721bb66a8702f6d49f89bfeeb41345f9a",
+      "immutable_C_sha256": "ba912ceea97a1fe592d690cb06c9827cd988d37320a92f1dc72bbb42feea2983"
+    },
+    {
+      "path": "plato/utils/checkpoint_paths.py",
+      "candidate_git_blob": "24f0c3f71061d6bbcb4d312bc2d32329be3b29e6",
+      "candidate_sha256": "7f530a13e9dac30d4c8a6bb7c05de2ff242d12f203dbf3e4c45495442c789dfd",
+      "base_git_blob": "24f0c3f71061d6bbcb4d312bc2d32329be3b29e6",
+      "base_sha256": "7f530a13e9dac30d4c8a6bb7c05de2ff242d12f203dbf3e4c45495442c789dfd",
+      "immutable_C_git_blob": "24f0c3f71061d6bbcb4d312bc2d32329be3b29e6",
+      "immutable_C_sha256": "7f530a13e9dac30d4c8a6bb7c05de2ff242d12f203dbf3e4c45495442c789dfd"
+    },
+    {
+      "path": "pyproject.toml",
+      "candidate_git_blob": "28803a3d78188ee508c9e572bd8ac7eff406fedc",
+      "candidate_sha256": "799bd7ba1865b097fdc8ca84a7b70337794e338de4aa9a6a13f6a4c1b9156246",
+      "base_git_blob": "28803a3d78188ee508c9e572bd8ac7eff406fedc",
+      "base_sha256": "799bd7ba1865b097fdc8ca84a7b70337794e338de4aa9a6a13f6a4c1b9156246",
+      "immutable_C_git_blob": "28803a3d78188ee508c9e572bd8ac7eff406fedc",
+      "immutable_C_sha256": "799bd7ba1865b097fdc8ca84a7b70337794e338de4aa9a6a13f6a4c1b9156246"
+    },
+    {
+      "path": "tests/integration/scaffold_round_worker.py",
+      "candidate_git_blob": "ed9710ab47ad2d7c2c6a9fc0ce30244a432aead1",
+      "candidate_sha256": "5bf3ca3c59f0b28d76528ebf7ffb5410eb11b05269b962b6080977e97e64c64e",
+      "base_git_blob": "ed9710ab47ad2d7c2c6a9fc0ce30244a432aead1",
+      "base_sha256": "5bf3ca3c59f0b28d76528ebf7ffb5410eb11b05269b962b6080977e97e64c64e",
+      "immutable_C_git_blob": "ed9710ab47ad2d7c2c6a9fc0ce30244a432aead1",
+      "immutable_C_sha256": "5bf3ca3c59f0b28d76528ebf7ffb5410eb11b05269b962b6080977e97e64c64e"
+    },
+    {
+      "path": "tests/integration/test_scaffold_round_flow.py",
+      "candidate_git_blob": "a8151891b9e00a5259298a89299d1e8202c2a3e3",
+      "candidate_sha256": "5477fbc57455ebbc3ded0a10181fa9b6433edf1b0c1bf200710e51995b21f128",
+      "base_git_blob": "a8151891b9e00a5259298a89299d1e8202c2a3e3",
+      "base_sha256": "5477fbc57455ebbc3ded0a10181fa9b6433edf1b0c1bf200710e51995b21f128",
+      "immutable_C_git_blob": "a8151891b9e00a5259298a89299d1e8202c2a3e3",
+      "immutable_C_sha256": "5477fbc57455ebbc3ded0a10181fa9b6433edf1b0c1bf200710e51995b21f128"
+    },
+    {
+      "path": "tests/trainers/test_scaffold_strategy.py",
+      "candidate_git_blob": "18a7b3a57dc06b64a3640f73031841a4cfa0c5cd",
+      "candidate_sha256": "7419ab4ea2088f7825bc8008be99c2d99a18f139dab50188a3c06a6eefd9c02e",
+      "base_git_blob": "18a7b3a57dc06b64a3640f73031841a4cfa0c5cd",
+      "base_sha256": "7419ab4ea2088f7825bc8008be99c2d99a18f139dab50188a3c06a6eefd9c02e",
+      "immutable_C_git_blob": "18a7b3a57dc06b64a3640f73031841a4cfa0c5cd",
+      "immutable_C_sha256": "7419ab4ea2088f7825bc8008be99c2d99a18f139dab50188a3c06a6eefd9c02e"
+    },
+    {
+      "path": "uv.lock",
+      "candidate_git_blob": "31729888535c7f0eae277b2fe0133ad9814cc4d4",
+      "candidate_sha256": "573b10c2ba1a2317e02f9e40c6181359cafab6f6e0a0f9be12bb256cb276fe1d",
+      "base_git_blob": "31729888535c7f0eae277b2fe0133ad9814cc4d4",
+      "base_sha256": "573b10c2ba1a2317e02f9e40c6181359cafab6f6e0a0f9be12bb256cb276fe1d",
+      "immutable_C_git_blob": "31729888535c7f0eae277b2fe0133ad9814cc4d4",
+      "immutable_C_sha256": "573b10c2ba1a2317e02f9e40c6181359cafab6f6e0a0f9be12bb256cb276fe1d"
+    },
+    {
+      "path": "plato/models/registry.py",
+      "candidate_git_blob": "1dbda56cf4bd851a69a8f5e0362810feeefd7cac",
+      "candidate_sha256": "8f499c870ec4a31d0323b8e8cf27c9cea6e9aaedc0d3b98dd397989c26958aa8",
+      "base_git_blob": "1dbda56cf4bd851a69a8f5e0362810feeefd7cac",
+      "base_sha256": "8f499c870ec4a31d0323b8e8cf27c9cea6e9aaedc0d3b98dd397989c26958aa8",
+      "immutable_C_git_blob": "1dbda56cf4bd851a69a8f5e0362810feeefd7cac",
+      "immutable_C_sha256": "8f499c870ec4a31d0323b8e8cf27c9cea6e9aaedc0d3b98dd397989c26958aa8"
+    },
+    {
+      "path": "plato/models/lenet5.py",
+      "candidate_git_blob": "342246f315dad3005ca9e9252843d5f8c3b1c2f0",
+      "candidate_sha256": "76ed3d42f18fc8b06a245f3327293fb0ddcb1b8fb8afd8aa6bc6093c31a36db5",
+      "base_git_blob": "342246f315dad3005ca9e9252843d5f8c3b1c2f0",
+      "base_sha256": "76ed3d42f18fc8b06a245f3327293fb0ddcb1b8fb8afd8aa6bc6093c31a36db5",
+      "immutable_C_git_blob": "342246f315dad3005ca9e9252843d5f8c3b1c2f0",
+      "immutable_C_sha256": "76ed3d42f18fc8b06a245f3327293fb0ddcb1b8fb8afd8aa6bc6093c31a36db5"
+    },
+    {
+      "path": "plato/datasources/registry.py",
+      "candidate_git_blob": "0a609d5e5442e5400ecf74684962fcae6d06d7cb",
+      "candidate_sha256": "38a76f407edd6f46ccbdf56e231ac93d18e379971a5dbf007f15c22f5da602b6",
+      "base_git_blob": "0a609d5e5442e5400ecf74684962fcae6d06d7cb",
+      "base_sha256": "38a76f407edd6f46ccbdf56e231ac93d18e379971a5dbf007f15c22f5da602b6",
+      "immutable_C_git_blob": "0a609d5e5442e5400ecf74684962fcae6d06d7cb",
+      "immutable_C_sha256": "38a76f407edd6f46ccbdf56e231ac93d18e379971a5dbf007f15c22f5da602b6"
+    },
+    {
+      "path": "plato/datasources/torchvision.py",
+      "candidate_git_blob": "64f2c2dccf0b2ba4144848c9c3bb8f0224e18429",
+      "candidate_sha256": "b32cd3b95272680034db305ad8a16703a0ad78fe7916ba027506cfe9bb3abdff",
+      "base_git_blob": "64f2c2dccf0b2ba4144848c9c3bb8f0224e18429",
+      "base_sha256": "b32cd3b95272680034db305ad8a16703a0ad78fe7916ba027506cfe9bb3abdff",
+      "immutable_C_git_blob": "64f2c2dccf0b2ba4144848c9c3bb8f0224e18429",
+      "immutable_C_sha256": "b32cd3b95272680034db305ad8a16703a0ad78fe7916ba027506cfe9bb3abdff"
+    }
+  ],
+  "historical_sources": [
+    {
+      "revision": "00eeb9dcdd2b513e64db9408969356037e09bb8e",
+      "path": "examples/customized_client_training/scaffold/scaffold_client.py",
+      "git_blob": "11467b07b272eed531577cb74c8c8420dce6648a",
+      "sha256": "08b7180f15531a5379ab4d245c63281b02920b65c96ece717077bca3e5efea6f",
+      "use": "Exact historical example model_name/client filename and pickle loader."
+    },
+    {
+      "revision": "df1d763b487634ab3708f75f8f055af6f2789941",
+      "path": "examples/customized_client_training/scaffold/scaffold_trainer.py",
+      "git_blob": "d62c6e55f2a9fbd2b5bf90b0c675892c8964871f",
+      "sha256": "482273923be3713bbb2fbafbaf44fa10c26faf9e74c1548800f1fb36df67302f",
+      "use": "Actual historical pickle writer and old equations; documents numerical discontinuity."
+    }
+  ],
+  "primary_source": {
+    "title": "Karimireddy et al., SCAFFOLD: Stochastic Controlled Averaging for Federated Learning, ICML 2020",
+    "url": "https://arxiv.org/pdf/1910.06378v4",
+    "revision": "v4, 9 April 2021",
+    "read": [
+      "Algorithm 1 and Eq. (3), PDF page 4",
+      "Eqs. (4)-(5) and Option I additional-gradient-pass description, PDF page 5",
+      "Appendix E Eq. (19), PDF page 26"
+    ],
+    "verification": "Primary PDF opened with web tool and independently downloaded. Main-algorithm signs take precedence over appendix Eq. (19). The mean-gradient identity and sign counterexample are independent reviewer algebraic inferences, not convergence claims.",
+    "equations": {
+      "local": "y_next=y-eta*(g-ci+c)",
+      "post_optimizer": "y=raw_optimizer_result-eta*(c-ci)",
+      "option_II": "ci_new=ci-c+(x-y)/(K*eta)",
+      "delta": "ci_new-ci",
+      "population_control": "c_new=c+sum(delta_ci)/N",
+      "paper_model": "x_new=x+eta_global*sum(y_i-x)/len(S)"
+    },
+    "retained_pdf": {
+      "path": "/tmp/plato-phase2c-scaffold-docs-review/1910.06378v4.pdf",
+      "sha256": "efe06c86acc7a06116e372a7ab6386c300f4d0dc9c7ba2dd5c82e95111a1d694"
+    },
+    "independent_math": {
+      "path": "/tmp/plato-phase2c-scaffold-docs-review/independent-math.json",
+      "sha256": "35a38f326a9386e85597a63170e26b1dc9779ab8350f4eb5b363d5e4950eb60b",
+      "result": "PASS_EXACT_ARITHMETIC"
+    },
+    "screenshot_limit": "Three web PDF screenshot requests failed with content-type/screenshot-disabled errors; extracted primary text and retained PDF provided the equations. No successful screenshot inspection is claimed."
+  },
+  "claim_assessment": [
+    {
+      "subject": "Main-algorithm local sign, corrected Option II, V2 and theory scope",
+      "result": "PASS",
+      "docs": [
+        {
+          "path": "examples/customized_client_training/scaffold/README.md",
+          "line": 24
+        },
+        {
+          "path": "docs/docs/examples/algorithms/5. Algorithms with Customized Client Training Loops.md",
+          "line": 25
+        }
+      ],
+      "basis": "Source strategy:254-308 and V2:373-379 match main Algorithm 1/Eqs. 3-5. The constant-rate vanilla gradient-average identity follows by telescoping. No true Option I or more-accurate V2 claim. Momentum .9 and other non-vanilla optimizer composition are expressly extensions, with no paper convergence guarantee."
+    },
+    {
+      "subject": "Actual rate, completed K, accumulation tail, zero/skipped updates and parameter scope",
+      "result": "PASS",
+      "docs": [
+        {
+          "path": "examples/customized_client_training/scaffold/README.md",
+          "line": 49
+        },
+        {
+          "path": "docs/docs/examples/algorithms/5. Algorithms with Customized Client Training Loops.md",
+          "line": 37
+        }
+      ],
+      "basis": "Actual optimizer publication and step prehook capture finite positive equal scalar rates for participating trainable groups, reject within-round changes before the affected update, and reset next round. Post-step changes do not replace the executed rate. Composable completion/finalize paths and accumulation normalization support one correction per actual update, including the partial tail; K=0 avoids division and produces fresh zero delta. Identity-based included/no-gradient and excluded/frozen/buffer descriptions match code. Delivered assertions were read, not executed."
+    },
+    {
+      "subject": "Population controls versus sample-weighted model averaging",
+      "result": "PASS",
+      "docs": [
+        {
+          "path": "examples/customized_client_training/scaffold/README.md",
+          "line": 72
+        },
+        {
+          "path": "docs/docs/examples/algorithms/5. Algorithms with Customized Client Training Loops.md",
+          "line": 46
+        }
+      ],
+      "basis": "Server stages unweighted sum(delta_ci)/clients.total_clients. Inherited positive-total-sample FedAvg model averaging is separately and correctly described. Unequal counts are scoped as a framework extension; no uniform-paper/weighted-objective convergence promise."
+    },
+    {
+      "subject": "Logical client, canonical and exact historical state",
+      "result": "PASS",
+      "docs": [
+        {
+          "path": "examples/customized_client_training/scaffold/README.md",
+          "line": 88
+        },
+        {
+          "path": "docs/docs/examples/algorithms/5. Algorithms with Customized Client Training Loops.md",
+          "line": 55
+        }
+      ],
+      "basis": "Strategy setup/load/client-ID hooks match canonical scaffold_cv_ID.pkl under model_path or explicit save_path, then contained exact same-client model_name_ID_control_variate.pth, then exact prefix-concatenated same-client .pkl. No client-0 substitution or broad search. Canonical load failure does not fall back. Finite floating trainable controls/shapes are checked; known historical buffers/frozen entries projected and unknown keys rejected. Distinct legacy files are preserved. Actual historical pickle writer/loader corroborated."
+    },
+    {
+      "subject": "Current payload, direct/spawn flow and bounded failure statement",
+      "result": "PASS",
+      "docs": [
+        {
+          "path": "examples/customized_client_training/scaffold/README.md",
+          "line": 64
+        },
+        {
+          "path": "docs/docs/examples/algorithms/5. Algorithms with Customized Client Training Loops.md",
+          "line": 66
+        }
+      ],
+      "basis": "Current inbound processor clears stale controls/delta and installs current validated c in active context. Direct state remains in-process; spawn uses the current token/client envelope to return ci/delta/K/rate after saved-model loading. Missing/stale handoff rejects successful outbound delta. This wording does not promise durable checkpoint rollback after failure or validation of malformed model halves; known C defects remain open."
+    },
+    {
+      "subject": "Legacy numerical discontinuity and practical fresh-run advice",
+      "result": "PASS",
+      "docs": [
+        {
+          "path": "examples/customized_client_training/scaffold/README.md",
+          "line": 110
+        },
+        {
+          "path": "docs/docs/examples/algorithms/5. Algorithms with Customized Client Training Loops.md",
+          "line": 69
+        }
+      ],
+      "basis": "Separate -b run directory produces fresh client control files; server initializes controls to zero. Advice calls for consistently initialized server and all client controls. Structurally loadable old state is not promised numerically equivalent. No coordinated full server/optimizer/RNG/privacy restart promise."
+    },
+    {
+      "subject": "Standalone usefulness, paths, flags and unchanged settings",
+      "result": "PASS",
+      "basis": "README provides complete root-relative installation/run commands, settings, processor behavior, supported rate constraints and practical state guidance. The public page supplies its own root/cd command and key limitations. Exact entrypoint/config paths and local module wiring checked statically; actual Config help and both documented relative TOML paths loaded through uv in reviewer-owned docs/config environment. Shipped values are preserved; no training environment or entrypoint training success claim."
+    }
+  ],
+  "known_implementation_dependencies_not_new_writing_findings": [
+    {
+      "id": "F27-R01",
+      "severity_in_code_review": "high",
+      "status": "OPEN_IN_REVIEWED_SNAPSHOT; assigned to original C author",
+      "path": "examples/customized_client_training/scaffold/scaffold_server.py",
+      "line": 68,
+      "precise_gap": "Control halves validate, but malformed model halves can commit model/control state. Reviewed prose does not claim full model-half validation or whole-round rollback on arbitrary malformed payloads. Do not treat the accepted design or tests for invalid controls as implementation of that stronger contract.",
+      "required_before_final_acceptance": "C correction and fresh code validation/review, then root reconciliation of server/aggregation hashes and all related writing/evidence claims."
+    },
+    {
+      "id": "F27-R02",
+      "severity_in_code_review": "medium",
+      "status": "OPEN_IN_REVIEWED_SNAPSHOT; assigned to original C author",
+      "path": "plato/trainers/strategies/algorithms/scaffold_strategy.py",
+      "line": 304,
+      "precise_gap": "Child writes canonical ci before current handoff acceptance. Missing/stale handoff refuses outbound but advanced persisted controls can be adopted on reuse/reconstruction. Reviewed prose promises outbound refusal, not durable rollback or successful-retry numerical consistency after such a failure.",
+      "required_before_final_acceptance": "C stages controls or restores prior canonical state on rejected handoff; root reconciles strategy/composable/test hashes and any changed persistence/handoff prose. Fresh writing review if claims change."
+    },
+    {
+      "ids": [
+        "ROOT-2C-01",
+        "TRAINING-2C-01",
+        "TRAINING-2C-02",
+        "TRAINING-2C-03"
+      ],
+      "status": "Separate general C review findings; read from root evidence, not evolving worktree.",
+      "writing_disposition": "No new writing finding for this scoped SCAFFOLD prose. Final C changes affecting shared optimizer, cleanup, checkpoint or ownership paths still require hash/claim reconciliation. This review does not close those findings."
+    }
+  ],
+  "executed_checks": [
+    {
+      "command": "UV_CACHE_DIR=/tmp/plato-phase2c-scaffold-docs-review/uv-cache UV_PROJECT_ENVIRONMENT=/tmp/plato-phase2c-scaffold-docs-review/venv uv sync --locked --only-group docs --no-install-project --python /tmp/plato-phase2c-scaffold-docs/venv/bin/python",
+      "shell": [
+        "zsh",
+        "-lc"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/scaffold-docs",
+      "exit_code": 0,
+      "log": "/tmp/plato-phase2c-scaffold-docs-review/docs-sync.log",
+      "log_sha256": "ad4b1090fadf4ecd9c833c2ac88a251a6c97d21ff6eb19992102c27c02813bde",
+      "boundary": "Only reviewer-owned docs environment installed; external writer interpreter read, writer environment not mutated."
+    },
+    {
+      "command": "UV_CACHE_DIR=/tmp/plato-phase2c-scaffold-docs-review/uv-cache uv pip install --python /tmp/plato-phase2c-scaffold-docs-review/venv/bin/python numpy==2.5.3 munch==4.0.0",
+      "shell": [
+        "zsh",
+        "-lc"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/scaffold-docs",
+      "exit_code": 0,
+      "log": "/tmp/plato-phase2c-scaffold-docs-review/config-deps.log",
+      "log_sha256": "adb468fc6719d7e12601f594650006ad6503b58912b29b87d6b170cccddb0fa0",
+      "boundary": "Added only Config imports at locked versions to reviewer-owned environment; no full training installation."
+    },
+    {
+      "command": "PYTHONDONTWRITEBYTECODE=1 /tmp/plato-phase2c-scaffold-docs-review/venv/bin/python /tmp/plato-phase2c-scaffold-docs-review/review_checks.py",
+      "shell": [
+        "zsh",
+        "-lc"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/scaffold-docs",
+      "exit_code": 0,
+      "result": "Exact diff/suffix/config/source/evidence hashes, static commands, repo-extension Markdown rendering, primary PDF hash and actual Config probes verified. Strict-build failures attributed and retained.",
+      "script_sha256": "e822579b942971a01dd813cde255e3673b6d76967a130d0daec57dd22ae84bb3",
+      "log": "/tmp/plato-phase2c-scaffold-docs-review/check-run.log",
+      "log_sha256": "14ae44c9576524ad1a3feb3adfcba49081f59deec49a517da25f99d45d18dc60",
+      "results": "/tmp/plato-phase2c-scaffold-docs-review/checks.json",
+      "results_sha256": "d67c9df744760b2de15bd8288e47adf1a34b1a87751bef90a3df8a56b3e90f37"
+    },
+    {
+      "label": "mkdocs-base",
+      "command": "env PYTHONDONTWRITEBYTECODE=1 XDG_CACHE_HOME=/tmp/plato-phase2c-scaffold-docs-review/xdg-cache /tmp/plato-phase2c-scaffold-docs-review/venv/bin/python -m mkdocs build --strict -f /tmp/plato-phase2c-scaffold-docs-review/base/docs/mkdocs.yml -d /tmp/plato-phase2c-scaffold-docs-review/base-site",
+      "shell": [
+        "zsh",
+        "-lc"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/scaffold-docs",
+      "exit_code": 1,
+      "duration_seconds": 1.086,
+      "log": "/tmp/plato-phase2c-scaffold-docs-review/mkdocs-base.log",
+      "log_sha256": "2559519158ac137f85ec8f1d83a7b099544152910dc9eb057ae61fa30d847a41"
+    },
+    {
+      "label": "mkdocs-candidate",
+      "command": "env PYTHONDONTWRITEBYTECODE=1 XDG_CACHE_HOME=/tmp/plato-phase2c-scaffold-docs-review/xdg-cache /tmp/plato-phase2c-scaffold-docs-review/venv/bin/python -m mkdocs build --strict -f /tmp/plato-phase2c-scaffold-docs-review/candidate/docs/mkdocs.yml -d /tmp/plato-phase2c-scaffold-docs-review/candidate-site",
+      "shell": [
+        "zsh",
+        "-lc"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/scaffold-docs",
+      "exit_code": 1,
+      "duration_seconds": 0.809,
+      "log": "/tmp/plato-phase2c-scaffold-docs-review/mkdocs-candidate.log",
+      "log_sha256": "58910ae364fefd5884df76f01ab27e33f1a3dd421b8ac151e9c1a4b2181fae57"
+    },
+    {
+      "label": "config-help",
+      "command": "env PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=/private/tmp/plato-refresh-worktrees/scaffold-docs UV_PROJECT_ENVIRONMENT=/tmp/plato-phase2c-scaffold-docs-review/venv UV_CACHE_DIR=/tmp/plato-phase2c-scaffold-docs-review/uv-cache uv run --no-sync python /tmp/plato-phase2c-scaffold-docs-review/config_probe.py --help",
+      "shell": [
+        "zsh",
+        "-lc"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/scaffold-docs",
+      "exit_code": 0,
+      "duration_seconds": 0.386,
+      "log": "/tmp/plato-phase2c-scaffold-docs-review/config-help.log",
+      "log_sha256": "a2f7871e0de4f0d475ab309bdf19df28b5409d66e6138b7fd970ae0148e08b22"
+    },
+    {
+      "label": "config-root",
+      "command": "env PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=/private/tmp/plato-refresh-worktrees/scaffold-docs UV_PROJECT_ENVIRONMENT=/tmp/plato-phase2c-scaffold-docs-review/venv UV_CACHE_DIR=/tmp/plato-phase2c-scaffold-docs-review/uv-cache uv run --no-sync python /tmp/plato-phase2c-scaffold-docs-review/config_probe.py -c examples/customized_client_training/scaffold/scaffold_MNIST_lenet5.toml --cpu -b /tmp/plato-phase2c-scaffold-docs-review/config-runtime-root",
+      "shell": [
+        "zsh",
+        "-lc"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/scaffold-docs",
+      "exit_code": 0,
+      "duration_seconds": 0.203,
+      "log": "/tmp/plato-phase2c-scaffold-docs-review/config-root.log",
+      "log_sha256": "608a5786369895f5901893f81fc9b605b7cae1621d7ebcb15991d72b5c062e82"
+    },
+    {
+      "label": "config-examples",
+      "command": "env PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=/private/tmp/plato-refresh-worktrees/scaffold-docs UV_PROJECT_ENVIRONMENT=/tmp/plato-phase2c-scaffold-docs-review/venv UV_CACHE_DIR=/tmp/plato-phase2c-scaffold-docs-review/uv-cache uv run --no-sync python /tmp/plato-phase2c-scaffold-docs-review/config_probe.py -c scaffold/scaffold_MNIST_lenet5.toml --cpu -b /tmp/plato-phase2c-scaffold-docs-review/config-runtime-examples",
+      "shell": [
+        "zsh",
+        "-lc"
+      ],
+      "cwd": "/private/tmp/plato-refresh-worktrees/scaffold-docs/examples/customized_client_training",
+      "exit_code": 0,
+      "duration_seconds": 0.2,
+      "log": "/tmp/plato-phase2c-scaffold-docs-review/config-examples.log",
+      "log_sha256": "d94ce60d2805d9d67b2cefbe646023371d3185325c14affe78bc4653fe615c22"
+    }
+  ],
+  "mkdocs_attribution": {
+    "strict_pass": false,
+    "base_and_candidate_fail_identically": true,
+    "results": [
+      {
+        "revision": "0dc34dd1d79d90071a0babfa6aa89f33d72a976f",
+        "exit_code": 1,
+        "warnings": [
+          "WARNING -  Doc file 'configurations/evaluation.md' contains a link 'examples/case-studies/5. Nanochat in Plato.md', but the target 'configurations/examples/case-studies/5. Nanochat in Plato.md' is not found among documentation files.",
+          "WARNING -  Doc file 'references/evaluators.md' contains a link 'examples/case-studies/5. Nanochat in Plato.md', but the target 'references/examples/case-studies/5. Nanochat in Plato.md' is not found among documentation files."
+        ]
+      },
+      {
+        "revision": "95c7218fc9801099cd7ffa3afc1be227384d8500",
+        "exit_code": 1,
+        "warnings": [
+          "WARNING -  Doc file 'configurations/evaluation.md' contains a link 'examples/case-studies/5. Nanochat in Plato.md', but the target 'configurations/examples/case-studies/5. Nanochat in Plato.md' is not found among documentation files.",
+          "WARNING -  Doc file 'references/evaluators.md' contains a link 'examples/case-studies/5. Nanochat in Plato.md', but the target 'references/examples/case-studies/5. Nanochat in Plato.md' is not found among documentation files."
+        ]
+      }
+    ],
+    "new_scaffold_warnings": 0,
+    "disposition": "The same two Nanochat relative-link warnings are preexisting and assigned Phase 5. They were neither repaired nor counted as writing blockers. Material emits the same informational banner in both runs; the strict abort is exactly two MkDocs link warnings."
+  },
+  "static_command_checks": [
+    {
+      "document": "examples/customized_client_training/scaffold/README.md",
+      "cwd": "/private/tmp/plato-refresh-worktrees/scaffold-docs",
+      "argv": [
+        "uv",
+        "sync"
+      ],
+      "result": "PASS_STATIC"
+    },
+    {
+      "document": "examples/customized_client_training/scaffold/README.md",
+      "cwd": "/private/tmp/plato-refresh-worktrees/scaffold-docs",
+      "argv": [
+        "uv",
+        "run",
+        "python",
+        "examples/customized_client_training/scaffold/scaffold.py",
+        "-c",
+        "examples/customized_client_training/scaffold/scaffold_MNIST_lenet5.toml"
+      ],
+      "result": "PASS_STATIC"
+    },
+    {
+      "document": "docs/docs/examples/algorithms/5. Algorithms with Customized Client Training Loops.md",
+      "cwd": "/private/tmp/plato-refresh-worktrees/scaffold-docs",
+      "argv": [
+        "uv",
+        "sync"
+      ],
+      "result": "PASS_STATIC"
+    },
+    {
+      "document": "docs/docs/examples/algorithms/5. Algorithms with Customized Client Training Loops.md",
+      "cwd": "/private/tmp/plato-refresh-worktrees/scaffold-docs/examples/customized_client_training",
+      "argv": [
+        "cd",
+        "examples/customized_client_training"
+      ],
+      "result": "PASS_STATIC"
+    },
+    {
+      "document": "docs/docs/examples/algorithms/5. Algorithms with Customized Client Training Loops.md",
+      "cwd": "/private/tmp/plato-refresh-worktrees/scaffold-docs/examples/customized_client_training",
+      "argv": [
+        "uv",
+        "run",
+        "python",
+        "scaffold/scaffold.py",
+        "-c",
+        "scaffold/scaffold_MNIST_lenet5.toml"
+      ],
+      "result": "PASS_STATIC"
+    }
+  ],
+  "render_checks": [
+    {
+      "artifact": "/tmp/plato-phase2c-scaffold-docs-review/readme.html",
+      "sha256": "e4bcecf753c0c1930b2d62a47d0c7a3b8f8ce19810e95acc2e935bea6a606895",
+      "result": "PASS"
+    },
+    {
+      "artifact": "/tmp/plato-phase2c-scaffold-docs-review/scaffold-section.html",
+      "sha256": "c7fbd9020a9ae8375cd326c0fb6283d359dd5af1882702367873c8ecdef9cfda",
+      "result": "PASS"
+    }
+  ],
+  "environment": {
+    "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+    "mkdocs": "1.6.1",
+    "mkdocs_material": "9.7.7",
+    "numpy": "2.5.3",
+    "munch": "4.0.0",
+    "uv": "0.12.22",
+    "environment_path": "/tmp/plato-phase2c-scaffold-docs-review/venv",
+    "profile": "Reviewer-owned docs/config-only environment; not full training dependency qualification."
+  },
+  "practical_limits": [
+    "No C strategy/runtime test suite, synthetic training pipeline, MNIST training, corpus download, GPU/MPS, benchmark or convergence run executed by this reviewer. Config help/load probes and pure rational equation arithmetic are the only non-build executions beyond source/hash/static inspection.",
+    "Delivered code/tests and immutable author execution records were read as evidence; their presence does not establish a reviewer passing run. Two independent C code reviews are complete and request corrections, not pending or accepted.",
+    "Full training uv sync and actual scaffold.py entrypoint execution were not run. Paths/wiring are static checks, complemented by actual Config argument/path loading through uv --no-sync in the owned environment.",
+    "Markdown math wrappers, links, fenced code and admonition render using repository extensions. No browser/KaTeX visual inspection or full-site external link crawl; primary paper link fetched successfully.",
+    "Strict MkDocs is not passing: both exact archived trees fail only the same two Phase 5 Nanochat relative links. Unrelated FedProx/other algorithm sections were not reviewed for correctness and remain byte-identical.",
+    "Review is provisional to exact immutable base/candidate/C identities above. Root must reconcile all relevant code/test hashes against corrected final C, update validation/status claims where needed, obtain corrections and fresh review for changed claims, and complete C execution/acceptance before final documentation integration."
+  ],
+  "write_and_resource_scope": {
+    "only_root_write": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2c-scaffold-docs-review.json",
+    "scratch": "/tmp/plato-phase2c-scaffold-docs-review",
+    "candidate_edits": 0,
+    "production_config_changes": 0,
+    "commits": 0,
+    "pushes": 0,
+    "nested_agents": 0,
+    "unrelated_docs_changes": 0,
+    "resources_retained": true
+  }
+}

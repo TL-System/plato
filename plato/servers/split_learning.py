@@ -99,22 +99,7 @@ class Server(fedavg.Server):
 
             self.test_accuracy = trainer.test(self.testset, self.testset_sampler)
 
-            if (
-                hasattr(trainer, "context")
-                and "nanochat_core_results" in trainer.context.state
-            ):
-                core_results = trainer.context.state["nanochat_core_results"]
-                core_metric = core_results.get("core_metric", None)
-                if core_metric is not None:
-                    logging.warning(
-                        fonts.colourize(
-                            f"[{self}] Average Centered CORE benchmark metric: {100 * core_metric:.2f}%\n"
-                        )
-                    )
-                else:
-                    self._log_global_metric(self.test_accuracy)
-            else:
-                self._log_global_metric(self.test_accuracy)
+            self._log_global_metric(self.test_accuracy)
             self.phase = "prompt"
             # Change client in next round
             self.next_client = True

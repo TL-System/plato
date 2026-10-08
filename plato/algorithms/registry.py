@@ -8,26 +8,36 @@ based on a configuration at run-time.
 from __future__ import annotations
 
 import logging
-from typing import Any, Dict, Optional, Type
+from collections.abc import Callable
+from typing import Any
 
 from plato.algorithms import (
     fedavg,
     fedavg_gan,
     fedavg_personalized,
     lora,
-    mlx_fedavg,
     pfedgraph,
     split_learning,
 )
 from plato.algorithms.base import Algorithm as AlgorithmBase
 from plato.config import Config
 
-registered_algorithms: dict[str, type[AlgorithmBase]] = {
+
+def _mlx_fedavg(trainer: Any) -> AlgorithmBase:
+    """Resolve the native constructor only when its registry entry is called."""
+    from plato.algorithms.mlx_fedavg import Algorithm
+
+    if registered_algorithms.get("mlx_fedavg") is _mlx_fedavg:
+        registered_algorithms["mlx_fedavg"] = Algorithm
+    return Algorithm(trainer)
+
+
+registered_algorithms: dict[str, Callable[[Any], AlgorithmBase]] = {
     "fedavg": fedavg.Algorithm,
     "fedavg_gan": fedavg_gan.Algorithm,
     "fedavg_personalized": fedavg_personalized.Algorithm,
     "fedavg_lora": lora.Algorithm,
-    "mlx_fedavg": mlx_fedavg.Algorithm,
+    "mlx_fedavg": _mlx_fedavg,
     "pfedgraph": pfedgraph.Algorithm,
     "split_learning": split_learning.Algorithm,
 }
@@ -40,6 +50,12 @@ def _resolve_algorithm_type(algorithm_config: Any) -> str:
 
     framework_obj: Any | None = getattr(algorithm_config, "framework", "")
     framework = framework_obj if isinstance(framework_obj, str) else ""
+    if (framework.lower() == "mlx" and algo_type not in (None, "mlx_fedavg")) or (
+        algo_type == "mlx_fedavg" and framework and framework.lower() != "mlx"
+    ):
+        raise ValueError(
+            "MLX algorithm type and framework must select the same backend."
+        )
 
     if not algo_type and framework:
         if framework.lower() == "mlx":
@@ -54,6 +70,12 @@ def get(trainer: Any | None = None) -> AlgorithmBase:
     """Get the algorithm with the provided type."""
     algorithm_config = Config().algorithm
     algorithm_type = _resolve_algorithm_type(algorithm_config)
+    if algorithm_type == "mlx_fedavg":
+        from plato.trainers.mlx import ComposableMLXTrainer, _ensure_mlx_available
+
+        _ensure_mlx_available()
+        if not isinstance(trainer, ComposableMLXTrainer):
+            raise TypeError("MLX FedAvg requires a native MLX trainer.")
 
     if algorithm_type in registered_algorithms:
         logging.info("Algorithm: %s", algorithm_type)

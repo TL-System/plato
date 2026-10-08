@@ -1,0 +1,200 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-03",
+  "tested_commit": "237c5ce8c91c31d3ec2174dec7f95773edbcc964",
+  "tested_adapter_sha256": "ef7054f80022d0cbbfaab1721c6386a0fbecdf9734373ca1d919c33ffe353b76",
+  "uv_lock_sha256": "6d0c35d74f9d275ac3d7952c14d62838179bcaac1bec08e6eda699771ab7d7ca",
+  "command": "PYTHONPATH=. config_file=tests/config.toml .venv/bin/python -u /tmp/plato-lighteval-cache-probe.py",
+  "script": "import hashlib\nimport json\nimport os\nimport tempfile\nfrom pathlib import Path\n\nos.environ['HF_HUB_OFFLINE'] = '1'\nos.environ['HF_DATASETS_OFFLINE'] = '1'\nos.environ['TOKENIZERS_PARALLELISM'] = 'false'\nos.environ['ACCELERATE_USE_CPU'] = 'true'\n\nfrom plato.config import Config, ConfigNode\nfrom plato.evaluators.runner import run_configured_evaluation\nfrom plato.trainers.strategies.base import TrainingContext\nfrom tests.llm_eval.helpers import make_model_and_tokenizer, make_offline_tasks, prefer_token\n\ndef main():\n    with tempfile.TemporaryDirectory(prefix='plato-lighteval-cache-probe-') as temp:\n        root = Path(temp)\n        for original, local in make_offline_tasks(root / 'datasets'):\n            for attribute in ('hf_repo', 'hf_subset', 'hf_revision', 'hf_avail_splits', 'evaluation_splits', 'few_shots_split', 'few_shots_select', 'generation_size'):\n                setattr(original, attribute, getattr(local, attribute))\n        model, tokenizer = make_model_and_tokenizer()\n        model_dir = root / 'persistent-model'\n        Config().trainer.model_name = str(model_dir)\n        Config().trainer.tokenizer_name = str(model_dir)\n        Config().evaluation = ConfigNode.from_object({'type':'lighteval','device':'cpu','dtype':'float32','max_length':64,'show_progress':False,'fail_on_error':True})\n        records = []\n        for token in (0,1):\n            prefer_token(model, token)\n            model.save_pretrained(model_dir)\n            tokenizer.save_pretrained(model_dir)\n            weights_hash = hashlib.sha256((model_dir / 'model.safetensors').read_bytes()).hexdigest()\n            result = run_configured_evaluation(model=object(), context=TrainingContext())\n            assert result is not None\n            records.append({'preferred_token':token, 'weights_sha256':weights_hash, 'result':result.to_dict(), 'cache_files':[str(path.relative_to(model_dir)) for path in model_dir.rglob('*.parquet')]})\n        print('CACHE_PROBE_JSON ' + json.dumps(records))\n        assert records[0]['weights_sha256'] != records[1]['weights_sha256']\n        assert records[0]['result']['primary_value'] == 2/3\n        assert records[1]['result']['primary_value'] == 1/3, 'Stale responses were reused after configured local model weights changed'\n\nif __name__ == \"__main__\":\n    main()\n",
+  "log": "\nCreating parquet from Arrow format:   0%|          | 0/1 [00:00<?, ?ba/s]\nCreating parquet from Arrow format: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 1463.98ba/s]\n\nCreating parquet from Arrow format:   0%|          | 0/1 [00:00<?, ?ba/s]\nCreating parquet from Arrow format: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 4100.00ba/s]\n\nCreating parquet from Arrow format:   0%|          | 0/1 [00:00<?, ?ba/s]\nCreating parquet from Arrow format: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 6288.31ba/s]\n\nCreating parquet from Arrow format:   0%|          | 0/1 [00:00<?, ?ba/s]\nCreating parquet from Arrow format: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 7639.90ba/s]\n\nCreating parquet from Arrow format:   0%|          | 0/1 [00:00<?, ?ba/s]\nCreating parquet from Arrow format: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 8208.03ba/s]\n\nWriting model shards:   0%|          | 0/1 [00:00<?, ?it/s]\nWriting model shards: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 1078.78it/s]\n[INFO][17:09:54]: [Lighteval] Preparing model reference (1/5).\n[INFO][17:09:54]: [Lighteval] Initializing Lighteval for 5 task(s) (2/5).\n[INFO][17:09:54]: --- INIT SEEDS ---\n[INFO][17:09:54]: --- LOADING TASKS ---\n/private/tmp/plato-refresh-worktrees/lighteval-runtime/.venv/lib/python3.13/site-packages/huggingface_hub/utils/_deprecation.py:100: FutureWarning: Deprecated argument(s) used in 'list_models': model_name. Will not be supported from version '2.0'.\n\nUse `search` instead.\n  warnings.warn(message, FutureWarning)\n[INFO][17:09:54]: Loaded 647 task configs in 0.1 seconds\n[WARNING][17:09:54]: Careful, the task ifeval is using evaluation data to build the few shot examples.\n[WARNING][17:09:54]: Careful, the task arc:easy is using evaluation data to build the few shot examples.\n[WARNING][17:09:54]: Careful, the task piqa_hf is using evaluation data to build the few shot examples.\n[WARNING][17:09:54]: Careful, the task arc:challenge is using evaluation data to build the few shot examples.\n[WARNING][17:09:54]: Careful, the task hellaswag is using evaluation data to build the few shot examples.\n\nGenerating validation split: 0 examples [00:00, ? examples/s]\nGenerating validation split: 3 examples [00:00, 1145.46 examples/s]\n\nGenerating validation split: 0 examples [00:00, ? examples/s]\nGenerating validation split: 3 examples [00:00, 2234.98 examples/s]\n\nGenerating validation split: 0 examples [00:00, ? examples/s]\nGenerating validation split: 3 examples [00:00, 2017.79 examples/s]\n\nGenerating validation split: 0 examples [00:00, ? examples/s]\nGenerating validation split: 3 examples [00:00, 1294.14 examples/s]\n\nGenerating validation split: 0 examples [00:00, ? examples/s]\nGenerating validation split: 3 examples [00:00, 1207.23 examples/s]\n[INFO][17:09:55]: Test gather tensor\n[INFO][17:09:55]: gathered_tensor tensor([0]), should be [0]\n[INFO][17:09:55]: --- LOADING MODEL ---\n[INFO][17:09:55]: Tokenizer truncation and padding size set to the left side.\n[INFO][17:09:55]: Model parallel was set to False, max memory set to None and device map to None\n[transformers] `torch_dtype` is deprecated! Use `dtype` instead!\n\nLoading weights:   0%|          | 0/16 [00:00<?, ?it/s]\nLoading weights: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 16/16 [00:00<00:00, 13500.07it/s]\n[INFO][17:09:55]: Using Data Parallelism, putting model on device cpu\n[INFO][17:09:55]: [CACHING] Initializing data cache\n[INFO][17:09:55]: [Lighteval] Running benchmark tasks (3/5).\n[INFO][17:09:55]: --- RUNNING MODEL ---\n[INFO][17:09:55]: Running SamplingMethod.GENERATIVE requests\n[INFO][17:09:55]: Cache: Starting to process 9/9 samples (not found in cache) for tasks piqa_hf|0 (59b0c3d1e86c9a6c, GENERATIVE),ifeval|0 (e31a77059228824f, GENERATIVE),hellaswag|0 (607f43b0d877ecb6, GENERATIVE)\n[WARNING][17:09:55]: You cannot select the number of dataset splits for a generative evaluation at the moment. Automatically inferring.\n\nSplits:   0%|          | 0/2 [00:00<?, ?it/s]\n\nGreedy generation:   0%|          | 0/3 [00:00<?, ?it/s]\u001b[A[transformers] The following generation flags are not valid and may be ignored: ['temperature']. Set `TRANSFORMERS_VERBOSITY=info` for more details.\n\n\n                                                        \u001b[A\n\nGreedy generation:   0%|          | 0/6 [00:00<?, ?it/s]\u001b[A\n\n                                                        \u001b[A\nSplits: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 2/2 [00:00<00:00, 77.33it/s]\n\nCreating parquet from Arrow format:   0%|          | 0/1 [00:00<?, ?ba/s]\nCreating parquet from Arrow format: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 3344.74ba/s]\n[INFO][17:09:55]: Cached 3 samples of piqa_hf|0 (59b0c3d1e86c9a6c, GENERATIVE) at /var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-cache-probe-2k1xv2w3/persistent-model/3f13c36d93dd529a/piqa_hf|0/59b0c3d1e86c9a6c/GENERATIVE.parquet.\n\nCreating parquet from Arrow format:   0%|          | 0/1 [00:00<?, ?ba/s]\nCreating parquet from Arrow format: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 4036.87ba/s]\n[INFO][17:09:55]: Cached 3 samples of ifeval|0 (e31a77059228824f, GENERATIVE) at /var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-cache-probe-2k1xv2w3/persistent-model/3f13c36d93dd529a/ifeval|0/e31a77059228824f/GENERATIVE.parquet.\n\nCreating parquet from Arrow format:   0%|          | 0/1 [00:00<?, ?ba/s]\nCreating parquet from Arrow format: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 3833.92ba/s]\n[INFO][17:09:55]: Cached 3 samples of hellaswag|0 (607f43b0d877ecb6, GENERATIVE) at /var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-cache-probe-2k1xv2w3/persistent-model/3f13c36d93dd529a/hellaswag|0/607f43b0d877ecb6/GENERATIVE.parquet.\n\nGenerating train split: 0 examples [00:00, ? examples/s]\nGenerating train split: 3 examples [00:00, 1141.51 examples/s]\n\nGenerating train split: 0 examples [00:00, ? examples/s]\nGenerating train split: 3 examples [00:00, 1437.55 examples/s]\n\nGenerating train split: 0 examples [00:00, ? examples/s]\nGenerating train split: 3 examples [00:00, 1217.98 examples/s]\n[INFO][17:09:55]: Running SamplingMethod.LOGPROBS requests\n[INFO][17:09:55]: Cache: Starting to process 6/6 samples (not found in cache) for tasks arc:challenge|0 (2dc2a148e433a8c1, LOGPROBS),arc:easy|0 (4312c9df5fbafcca, LOGPROBS)\n\n0it [00:00, ?it/s][WARNING][17:09:55]: batch size is set to 1 (it should be understood as '1 times the maximum number of choices per sample, 2')\n\n\n  0%|          | 0/6 [00:00<?, ?it/s]\u001b[A\n100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 6/6 [00:00<00:00, 846.02it/s]\n\n1it [00:00, 131.15it/s]\n\nCreating parquet from Arrow format:   0%|          | 0/1 [00:00<?, ?ba/s]\nCreating parquet from Arrow format: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 3423.92ba/s]\n[INFO][17:09:55]: Cached 3 samples of arc:challenge|0 (2dc2a148e433a8c1, LOGPROBS) at /var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-cache-probe-2k1xv2w3/persistent-model/3f13c36d93dd529a/arc:challenge|0/2dc2a148e433a8c1/LOGPROBS.parquet.\n\nCreating parquet from Arrow format:   0%|          | 0/1 [00:00<?, ?ba/s]\nCreating parquet from Arrow format: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 3744.91ba/s]\n[INFO][17:09:55]: Cached 3 samples of arc:easy|0 (4312c9df5fbafcca, LOGPROBS) at /var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-cache-probe-2k1xv2w3/persistent-model/3f13c36d93dd529a/arc:easy|0/4312c9df5fbafcca/LOGPROBS.parquet.\n\nGenerating train split: 0 examples [00:00, ? examples/s]\nGenerating train split: 3 examples [00:00, 1741.10 examples/s]\n\nGenerating train split: 0 examples [00:00, ? examples/s]\nGenerating train split: 3 examples [00:00, 1936.73 examples/s]\n[INFO][17:09:55]: --- POST-PROCESSING MODEL RESPONSES ---\n[INFO][17:09:55]: --- COMPUTING METRICS ---\n[INFO][17:09:55]: Bootstrapping agg_inst_level_acc's stderr with 1 seeds.\n\nSampling bootstrap iterations:   0%|          | 0/1000 [00:00<?, ?it/s]\nSampling bootstrap iterations: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1000/1000 [00:00<00:00, 1486287.74it/s]\n[INFO][17:10:06]: Bootstrapping agg_inst_level_acc's stderr with 1 seeds.\n\nSampling bootstrap iterations:   0%|          | 0/1000 [00:00<?, ?it/s]\nSampling bootstrap iterations: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1000/1000 [00:00<00:00, 593757.64it/s]\n[INFO][17:10:17]: [Lighteval] Collecting evaluation metrics (4/5).\n[INFO][17:10:17]: [Lighteval] Normalizing evaluation metrics (5/5).\n\nWriting model shards:   0%|          | 0/1 [00:00<?, ?it/s]\nWriting model shards: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 1362.67it/s]\n[INFO][17:10:17]: [Lighteval] Preparing model reference (1/5).\n[INFO][17:10:17]: [Lighteval] Initializing Lighteval for 5 task(s) (2/5).\n[INFO][17:10:17]: --- INIT SEEDS ---\n[INFO][17:10:17]: --- LOADING TASKS ---\n[INFO][17:10:17]: Loaded 647 task configs in 0.0 seconds\n[WARNING][17:10:17]: Careful, the task ifeval is using evaluation data to build the few shot examples.\n[WARNING][17:10:17]: Careful, the task arc:easy is using evaluation data to build the few shot examples.\n[WARNING][17:10:17]: Careful, the task piqa_hf is using evaluation data to build the few shot examples.\n[WARNING][17:10:17]: Careful, the task arc:challenge is using evaluation data to build the few shot examples.\n[WARNING][17:10:17]: Careful, the task hellaswag is using evaluation data to build the few shot examples.\n[INFO][17:10:17]: Test gather tensor\n[INFO][17:10:17]: gathered_tensor tensor([0]), should be [0]\n[INFO][17:10:17]: --- LOADING MODEL ---\n[INFO][17:10:17]: Tokenizer truncation and padding size set to the left side.\n[INFO][17:10:17]: Model parallel was set to False, max memory set to None and device map to None\n\nLoading weights:   0%|          | 0/16 [00:00<?, ?it/s]\nLoading weights: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 16/16 [00:00<00:00, 16047.07it/s]\n[INFO][17:10:17]: Using Data Parallelism, putting model on device cpu\n[INFO][17:10:17]: [CACHING] Initializing data cache\n[INFO][17:10:17]: [CACHING] Loaded 3 cached indices for task 'ifeval|0 (e31a77059228824f, GENERATIVE) from /var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-cache-probe-2k1xv2w3/persistent-model/3f13c36d93dd529a/ifeval|0/e31a77059228824f/GENERATIVE.parquet\n[INFO][17:10:17]: [CACHING] Loaded 3 cached indices for task 'piqa_hf|0 (59b0c3d1e86c9a6c, GENERATIVE) from /var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-cache-probe-2k1xv2w3/persistent-model/3f13c36d93dd529a/piqa_hf|0/59b0c3d1e86c9a6c/GENERATIVE.parquet\n[INFO][17:10:17]: [CACHING] Loaded 3 cached indices for task 'hellaswag|0 (607f43b0d877ecb6, GENERATIVE) from /var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-cache-probe-2k1xv2w3/persistent-model/3f13c36d93dd529a/hellaswag|0/607f43b0d877ecb6/GENERATIVE.parquet\n[INFO][17:10:17]: [CACHING] Loaded 3 cached indices for task 'arc:easy|0 (4312c9df5fbafcca, LOGPROBS) from /var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-cache-probe-2k1xv2w3/persistent-model/3f13c36d93dd529a/arc:easy|0/4312c9df5fbafcca/LOGPROBS.parquet\n[INFO][17:10:17]: [CACHING] Loaded 3 cached indices for task 'arc:challenge|0 (2dc2a148e433a8c1, LOGPROBS) from /var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-lighteval-cache-probe-2k1xv2w3/persistent-model/3f13c36d93dd529a/arc:challenge|0/2dc2a148e433a8c1/LOGPROBS.parquet\n[INFO][17:10:17]: [Lighteval] Running benchmark tasks (3/5).\n[INFO][17:10:17]: --- RUNNING MODEL ---\n[INFO][17:10:17]: Running SamplingMethod.GENERATIVE requests\n[INFO][17:10:17]: Cache: 9/9 samples are cached for tasks piqa_hf|0, ifeval|0, hellaswag|0\n[INFO][17:10:17]: Running SamplingMethod.LOGPROBS requests\n[INFO][17:10:17]: Cache: 6/6 samples are cached for tasks arc:challenge|0, arc:easy|0\n[INFO][17:10:17]: --- POST-PROCESSING MODEL RESPONSES ---\n[INFO][17:10:17]: --- COMPUTING METRICS ---\n[INFO][17:10:17]: Bootstrapping agg_inst_level_acc's stderr with 1 seeds.\n\nSampling bootstrap iterations:   0%|          | 0/1000 [00:00<?, ?it/s]\nSampling bootstrap iterations: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1000/1000 [00:00<00:00, 799981.69it/s]\n[INFO][17:10:27]: Bootstrapping agg_inst_level_acc's stderr with 1 seeds.\n\nSampling bootstrap iterations:   0%|          | 0/1000 [00:00<?, ?it/s]\nSampling bootstrap iterations: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1000/1000 [00:00<00:00, 394498.12it/s]\n[INFO][17:10:35]: [Lighteval] Collecting evaluation metrics (4/5).\n[INFO][17:10:35]: [Lighteval] Normalizing evaluation metrics (5/5).\nCACHE_PROBE_JSON [{\"preferred_token\": 0, \"weights_sha256\": \"abc309e357ddd8ffcd4acbc4f4dd0c77871ecfe26542ec81c31e48d2b5e456e3\", \"result\": {\"evaluator\": \"lighteval\", \"primary_metric\": \"ifeval_avg\", \"metrics\": {\"ifeval_avg\": 0.6666666666666666, \"hellaswag\": 0.6666666666666666, \"arc_easy\": 0.6666666666666666, \"arc_challenge\": 0.6666666666666666, \"piqa\": 0.6666666666666666, \"arc_avg\": 0.6666666666666666}, \"higher_is_better\": {\"ifeval_avg\": true, \"hellaswag\": true, \"arc_easy\": true, \"arc_challenge\": true, \"piqa\": true, \"arc_avg\": true}, \"metadata\": {\"preset\": \"smollm_round_fast\", \"tasks\": [\"ifeval\", \"hellaswag\", \"arc_easy\", \"arc_challenge\", \"piqa\"], \"backend\": \"transformers\", \"raw_metrics\": {\"ifeval:0\": {\"prompt_level_strict_acc\": 0.6666666666666666, \"prompt_level_strict_acc_stderr\": 0.33333333333333337, \"inst_level_strict_acc\": 0.6666666666666666, \"inst_level_strict_acc_stderr\": 0.008657241865953338, \"prompt_level_loose_acc\": 0.6666666666666666, \"prompt_level_loose_acc_stderr\": 0.33333333333333337, \"inst_level_loose_acc\": 0.6666666666666666, \"inst_level_loose_acc_stderr\": 0.008657241865953338}, \"piqa_hf:0\": {\"em\": 0.6666666666666666, \"em_stderr\": 0.33333333333333337}, \"hellaswag:0\": {\"em\": 0.6666666666666666, \"em_stderr\": 0.33333333333333337}, \"arc:easy:0\": {\"acc\": 0.6666666666666666, \"acc_stderr\": 0.33333333333333337}, \"arc:challenge:0\": {\"acc\": 0.6666666666666666, \"acc_stderr\": 0.33333333333333337}, \"arc:_average:0\": {\"acc\": 0.6666666666666666, \"acc_stderr\": 0.33333333333333337}, \"all\": {\"prompt_level_strict_acc\": 0.6666666666666666, \"prompt_level_strict_acc_stderr\": 0.33333333333333337, \"inst_level_strict_acc\": 0.6666666666666666, \"inst_level_strict_acc_stderr\": 0.008657241865953338, \"prompt_level_loose_acc\": 0.6666666666666666, \"prompt_level_loose_acc_stderr\": 0.33333333333333337, \"inst_level_loose_acc\": 0.6666666666666666, \"inst_level_loose_acc_stderr\": 0.008657241865953338, \"em\": 0.6666666666666666, \"em_stderr\": 0.33333333333333337, \"acc\": 0.6666666666666666, \"acc_stderr\": 0.33333333333333337}}}, \"artifacts\": {}, \"primary_value\": 0.6666666666666666}, \"cache_files\": [\"3f13c36d93dd529a/ifeval|0/e31a77059228824f/GENERATIVE.parquet\", \"3f13c36d93dd529a/piqa_hf|0/59b0c3d1e86c9a6c/GENERATIVE.parquet\", \"3f13c36d93dd529a/hellaswag|0/607f43b0d877ecb6/GENERATIVE.parquet\", \"3f13c36d93dd529a/arc:easy|0/4312c9df5fbafcca/LOGPROBS.parquet\", \"3f13c36d93dd529a/arc:challenge|0/2dc2a148e433a8c1/LOGPROBS.parquet\"]}, {\"preferred_token\": 1, \"weights_sha256\": \"fceb0b5a78863e467bcfe009095245771bae8d21f25347ad657305d55172888d\", \"result\": {\"evaluator\": \"lighteval\", \"primary_metric\": \"ifeval_avg\", \"metrics\": {\"ifeval_avg\": 0.6666666666666666, \"hellaswag\": 0.6666666666666666, \"arc_easy\": 0.6666666666666666, \"arc_challenge\": 0.6666666666666666, \"piqa\": 0.6666666666666666, \"arc_avg\": 0.6666666666666666}, \"higher_is_better\": {\"ifeval_avg\": true, \"hellaswag\": true, \"arc_easy\": true, \"arc_challenge\": true, \"piqa\": true, \"arc_avg\": true}, \"metadata\": {\"preset\": \"smollm_round_fast\", \"tasks\": [\"ifeval\", \"hellaswag\", \"arc_easy\", \"arc_challenge\", \"piqa\"], \"backend\": \"transformers\", \"raw_metrics\": {\"ifeval:0\": {\"prompt_level_strict_acc\": 0.6666666666666666, \"prompt_level_strict_acc_stderr\": 0.33333333333333337, \"inst_level_strict_acc\": 0.6666666666666666, \"inst_level_strict_acc_stderr\": 0.008657241865953338, \"prompt_level_loose_acc\": 0.6666666666666666, \"prompt_level_loose_acc_stderr\": 0.33333333333333337, \"inst_level_loose_acc\": 0.6666666666666666, \"inst_level_loose_acc_stderr\": 0.008657241865953338}, \"piqa_hf:0\": {\"em\": 0.6666666666666666, \"em_stderr\": 0.33333333333333337}, \"hellaswag:0\": {\"em\": 0.6666666666666666, \"em_stderr\": 0.33333333333333337}, \"arc:easy:0\": {\"acc\": 0.6666666666666666, \"acc_stderr\": 0.33333333333333337}, \"arc:challenge:0\": {\"acc\": 0.6666666666666666, \"acc_stderr\": 0.33333333333333337}, \"arc:_average:0\": {\"acc\": 0.6666666666666666, \"acc_stderr\": 0.33333333333333337}, \"all\": {\"prompt_level_strict_acc\": 0.6666666666666666, \"prompt_level_strict_acc_stderr\": 0.33333333333333337, \"inst_level_strict_acc\": 0.6666666666666666, \"inst_level_strict_acc_stderr\": 0.008657241865953338, \"prompt_level_loose_acc\": 0.6666666666666666, \"prompt_level_loose_acc_stderr\": 0.33333333333333337, \"inst_level_loose_acc\": 0.6666666666666666, \"inst_level_loose_acc_stderr\": 0.008657241865953338, \"em\": 0.6666666666666666, \"em_stderr\": 0.33333333333333337, \"acc\": 0.6666666666666666, \"acc_stderr\": 0.33333333333333337}}}, \"artifacts\": {}, \"primary_value\": 0.6666666666666666}, \"cache_files\": [\"3f13c36d93dd529a/ifeval|0/e31a77059228824f/GENERATIVE.parquet\", \"3f13c36d93dd529a/piqa_hf|0/59b0c3d1e86c9a6c/GENERATIVE.parquet\", \"3f13c36d93dd529a/hellaswag|0/607f43b0d877ecb6/GENERATIVE.parquet\", \"3f13c36d93dd529a/arc:easy|0/4312c9df5fbafcca/LOGPROBS.parquet\", \"3f13c36d93dd529a/arc:challenge|0/2dc2a148e433a8c1/LOGPROBS.parquet\"]}]\nTraceback (most recent call last):\n  File \"/tmp/plato-lighteval-cache-probe.py\", line 43, in <module>\n    main()\n    ~~~~^^\n  File \"/tmp/plato-lighteval-cache-probe.py\", line 40, in main\n    assert records[1]['result']['primary_value'] == 1/3, 'Stale responses were reused after configured local model weights changed'\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: Stale responses were reused after configured local model weights changed\n",
+  "records": [
+    {
+      "preferred_token": 0,
+      "weights_sha256": "abc309e357ddd8ffcd4acbc4f4dd0c77871ecfe26542ec81c31e48d2b5e456e3",
+      "result": {
+        "evaluator": "lighteval",
+        "primary_metric": "ifeval_avg",
+        "metrics": {
+          "ifeval_avg": 0.6666666666666666,
+          "hellaswag": 0.6666666666666666,
+          "arc_easy": 0.6666666666666666,
+          "arc_challenge": 0.6666666666666666,
+          "piqa": 0.6666666666666666,
+          "arc_avg": 0.6666666666666666
+        },
+        "higher_is_better": {
+          "ifeval_avg": true,
+          "hellaswag": true,
+          "arc_easy": true,
+          "arc_challenge": true,
+          "piqa": true,
+          "arc_avg": true
+        },
+        "metadata": {
+          "preset": "smollm_round_fast",
+          "tasks": [
+            "ifeval",
+            "hellaswag",
+            "arc_easy",
+            "arc_challenge",
+            "piqa"
+          ],
+          "backend": "transformers",
+          "raw_metrics": {
+            "ifeval:0": {
+              "prompt_level_strict_acc": 0.6666666666666666,
+              "prompt_level_strict_acc_stderr": 0.33333333333333337,
+              "inst_level_strict_acc": 0.6666666666666666,
+              "inst_level_strict_acc_stderr": 0.008657241865953338,
+              "prompt_level_loose_acc": 0.6666666666666666,
+              "prompt_level_loose_acc_stderr": 0.33333333333333337,
+              "inst_level_loose_acc": 0.6666666666666666,
+              "inst_level_loose_acc_stderr": 0.008657241865953338
+            },
+            "piqa_hf:0": {
+              "em": 0.6666666666666666,
+              "em_stderr": 0.33333333333333337
+            },
+            "hellaswag:0": {
+              "em": 0.6666666666666666,
+              "em_stderr": 0.33333333333333337
+            },
+            "arc:easy:0": {
+              "acc": 0.6666666666666666,
+              "acc_stderr": 0.33333333333333337
+            },
+            "arc:challenge:0": {
+              "acc": 0.6666666666666666,
+              "acc_stderr": 0.33333333333333337
+            },
+            "arc:_average:0": {
+              "acc": 0.6666666666666666,
+              "acc_stderr": 0.33333333333333337
+            },
+            "all": {
+              "prompt_level_strict_acc": 0.6666666666666666,
+              "prompt_level_strict_acc_stderr": 0.33333333333333337,
+              "inst_level_strict_acc": 0.6666666666666666,
+              "inst_level_strict_acc_stderr": 0.008657241865953338,
+              "prompt_level_loose_acc": 0.6666666666666666,
+              "prompt_level_loose_acc_stderr": 0.33333333333333337,
+              "inst_level_loose_acc": 0.6666666666666666,
+              "inst_level_loose_acc_stderr": 0.008657241865953338,
+              "em": 0.6666666666666666,
+              "em_stderr": 0.33333333333333337,
+              "acc": 0.6666666666666666,
+              "acc_stderr": 0.33333333333333337
+            }
+          }
+        },
+        "artifacts": {},
+        "primary_value": 0.6666666666666666
+      },
+      "cache_files": [
+        "3f13c36d93dd529a/ifeval|0/e31a77059228824f/GENERATIVE.parquet",
+        "3f13c36d93dd529a/piqa_hf|0/59b0c3d1e86c9a6c/GENERATIVE.parquet",
+        "3f13c36d93dd529a/hellaswag|0/607f43b0d877ecb6/GENERATIVE.parquet",
+        "3f13c36d93dd529a/arc:easy|0/4312c9df5fbafcca/LOGPROBS.parquet",
+        "3f13c36d93dd529a/arc:challenge|0/2dc2a148e433a8c1/LOGPROBS.parquet"
+      ]
+    },
+    {
+      "preferred_token": 1,
+      "weights_sha256": "fceb0b5a78863e467bcfe009095245771bae8d21f25347ad657305d55172888d",
+      "result": {
+        "evaluator": "lighteval",
+        "primary_metric": "ifeval_avg",
+        "metrics": {
+          "ifeval_avg": 0.6666666666666666,
+          "hellaswag": 0.6666666666666666,
+          "arc_easy": 0.6666666666666666,
+          "arc_challenge": 0.6666666666666666,
+          "piqa": 0.6666666666666666,
+          "arc_avg": 0.6666666666666666
+        },
+        "higher_is_better": {
+          "ifeval_avg": true,
+          "hellaswag": true,
+          "arc_easy": true,
+          "arc_challenge": true,
+          "piqa": true,
+          "arc_avg": true
+        },
+        "metadata": {
+          "preset": "smollm_round_fast",
+          "tasks": [
+            "ifeval",
+            "hellaswag",
+            "arc_easy",
+            "arc_challenge",
+            "piqa"
+          ],
+          "backend": "transformers",
+          "raw_metrics": {
+            "ifeval:0": {
+              "prompt_level_strict_acc": 0.6666666666666666,
+              "prompt_level_strict_acc_stderr": 0.33333333333333337,
+              "inst_level_strict_acc": 0.6666666666666666,
+              "inst_level_strict_acc_stderr": 0.008657241865953338,
+              "prompt_level_loose_acc": 0.6666666666666666,
+              "prompt_level_loose_acc_stderr": 0.33333333333333337,
+              "inst_level_loose_acc": 0.6666666666666666,
+              "inst_level_loose_acc_stderr": 0.008657241865953338
+            },
+            "piqa_hf:0": {
+              "em": 0.6666666666666666,
+              "em_stderr": 0.33333333333333337
+            },
+            "hellaswag:0": {
+              "em": 0.6666666666666666,
+              "em_stderr": 0.33333333333333337
+            },
+            "arc:easy:0": {
+              "acc": 0.6666666666666666,
+              "acc_stderr": 0.33333333333333337
+            },
+            "arc:challenge:0": {
+              "acc": 0.6666666666666666,
+              "acc_stderr": 0.33333333333333337
+            },
+            "arc:_average:0": {
+              "acc": 0.6666666666666666,
+              "acc_stderr": 0.33333333333333337
+            },
+            "all": {
+              "prompt_level_strict_acc": 0.6666666666666666,
+              "prompt_level_strict_acc_stderr": 0.33333333333333337,
+              "inst_level_strict_acc": 0.6666666666666666,
+              "inst_level_strict_acc_stderr": 0.008657241865953338,
+              "prompt_level_loose_acc": 0.6666666666666666,
+              "prompt_level_loose_acc_stderr": 0.33333333333333337,
+              "inst_level_loose_acc": 0.6666666666666666,
+              "inst_level_loose_acc_stderr": 0.008657241865953338,
+              "em": 0.6666666666666666,
+              "em_stderr": 0.33333333333333337,
+              "acc": 0.6666666666666666,
+              "acc_stderr": 0.33333333333333337
+            }
+          }
+        },
+        "artifacts": {},
+        "primary_value": 0.6666666666666666
+      },
+      "cache_files": [
+        "3f13c36d93dd529a/ifeval|0/e31a77059228824f/GENERATIVE.parquet",
+        "3f13c36d93dd529a/piqa_hf|0/59b0c3d1e86c9a6c/GENERATIVE.parquet",
+        "3f13c36d93dd529a/hellaswag|0/607f43b0d877ecb6/GENERATIVE.parquet",
+        "3f13c36d93dd529a/arc:easy|0/4312c9df5fbafcca/LOGPROBS.parquet",
+        "3f13c36d93dd529a/arc:challenge|0/2dc2a148e433a8c1/LOGPROBS.parquet"
+      ]
+    }
+  ],
+  "exit_code": 1,
+  "observed": "The public configured evaluator runner evaluates the same persistent local model path twice. Safetensors bytes change from a model preferring A to one preferring B, but the second evaluation reuses all 15 cached responses and returns 2/3 rather than 1/3 for every normalized metric and the primary value.",
+  "upstream_cause": "SampleCache derives its cache location from cache_dir/model_name/config_hash. An absolute model_name discards cache_dir, and config_hash excludes the weight content.",
+  "repair_status": "Root bounded design review requested; no cache repair implemented yet.",
+  "harness_note": "An earlier scratch script lacked a main guard and hit upstream bootstrap multiprocessing import recursion. Its process and only its owned descendants were terminated, and the guarded script above reproduced the actual stale-metric assertion independently. That earlier harness failure is not qualification evidence.",
+  "limits": [
+    "Controlled offline rows establish cache freshness and metric integration only, not public benchmark accuracy or performance."
+  ]
+}

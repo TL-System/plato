@@ -9,7 +9,7 @@ from lighteval.tasks.lighteval_task import LightevalTaskConfig
 from lighteval.tasks.requests import Doc
 
 
-def piqa_hf_prompt(line, task_name: str | None = None):
+def piqa_hf_prompt(line, task_name: str | None = None) -> Doc:
     """Prompt formatter for a parquet-backed PIQA mirror on the Hugging Face Hub."""
     letters = list(ascii_uppercase)[:2]
     query = "The following are multiple choice questions (with answers) about common sense.\n"
@@ -23,7 +23,7 @@ def piqa_hf_prompt(line, task_name: str | None = None):
     query += "Answer: "
 
     return Doc(
-        task_name=task_name,
+        task_name=task_name or "",
         query=query,
         choices=letters,
         gold_index=int(line["label"]),

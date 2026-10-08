@@ -1,0 +1,13 @@
+{
+  "status": "DELIVERED_PHASE2",
+  "utc": "2026-10-03T17:49:01.764696+00:00",
+  "qualified_published_head": "7beda2a8257e5c1e2a7aeef45314f01f143fd6b4",
+  "merge_commit": "dcf787c012e30bcd7680a4398d54f946fde958e5",
+  "merged_at": "2026-10-03T17:45:36Z",
+  "pr": "https://github.com/TL-System/plato/pull/417",
+  "source_equivalence": "Merged main tree equals the audited published head exactly.",
+  "linux_receipt": "phase2-final-linux-acceptance.json",
+  "linux_bundle": "reproductions/phase2-final-linux-qualification.tar.gz",
+  "ci": "All Python3.13 functional qualification stages passed; aggregate CodeQL alerts remain explicitly deferred, not dismissed.",
+  "cleanup": "Twenty worktrees and six local task branches removed; one clean source worktree temporarily retained for active Qwen reviewer editable environment."
+}

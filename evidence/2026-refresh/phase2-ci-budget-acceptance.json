@@ -1,0 +1,10 @@
+{
+  "decision": "ACCEPTED_BOUNDED_CI_TIMEOUT_ADJUSTMENT",
+  "candidate": "8d27c5c7a205299537a2835358f1d5e91a7b51c3",
+  "tree": "fa85f0b6ddc104e4fd1a2bd11a17c32619a1cc8a",
+  "review": "phase2-ci-budget-review.json",
+  "review_sha256": "2f5e3fc368f84c7ddec47cfa342b8c125fc3cdcbc92af26d2e241f6bde28f964",
+  "changes": "Exactly four finite timeout values: base and mandatory from 12 to 20 minutes, runtime from 12 to 16 minutes, job from 45 to 90 minutes. Commands, profiles, guards, permissions, action pins and matrix are preserved.",
+  "validation": "Fresh independent YAML, byte, scope, source and receipt checks PASS. Measured author macOS core runs of 760\u2013836 seconds and runtime runs of 660\u2013681 seconds justify the adjustment; the job includes 84 minutes of step budgets plus six minutes for setup and upload.",
+  "limits": "No hosted Linux execution claimed. Root final source qualification and Linux CI still required; compare fresh final timing after count-fix tests to these finite budgets."
+}
