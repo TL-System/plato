@@ -9,7 +9,9 @@ import torch
 from plato.processors import (
     model_compress,
     model_decompress,
+    model_dequantize_int4,
     model_quantize,
+    model_quantize_int4,
     pipeline,
     structured_pruning,
     unstructured_pruning,
@@ -38,6 +40,30 @@ def test_quantize_then_compress_pipeline_roundtrip():
         roundtrip["weight"].to(torch.float32), state["weight"], atol=1e-2
     )
     assert torch.equal(roundtrip["bias"], state["bias"])
+
+
+def test_int4_processor_pipeline_roundtrip():
+    """INT4 quantization and dequantization pipeline roundtrip."""
+    torch.manual_seed(42)
+    state = OrderedDict(
+        {
+            "weight": torch.randn(4, 8, dtype=torch.float32),
+            "bias": torch.zeros(4, dtype=torch.int64),
+        }
+    )
+
+    quant = model_quantize_int4.Processor(name="quantize_int4", client_id=1)
+    dequant = model_dequantize_int4.Processor(name="dequantize_int4", server_id=1)
+
+    quantized = quant.process(state)
+    assert isinstance(quantized["weight"], bytes)
+    assert torch.equal(quantized["bias"], state["bias"])
+
+    restored = dequant.process(quantized)
+    assert restored["weight"].shape == state["weight"].shape
+    assert torch.equal(restored["bias"], state["bias"])
+    assert torch.mean((restored["weight"] - state["weight"]) ** 2).item() < 0.05
+
 
 
 def test_structured_pruning_zeroes_all_channels():
