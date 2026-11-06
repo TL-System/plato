@@ -14,8 +14,10 @@ from plato.processors import (
     decompress,
     feature_additive_noise,
     model_dequantize,
+    model_dequantize_int4,
     model_dequantize_qsgd,
     model_quantize,
+    model_quantize_int4,
     model_quantize_qsgd,
     model_randomized_response,
     unstructured_pruning,
@@ -40,6 +42,37 @@ def test_qsgd_zero_and_empty_layers_roundtrip(tensor):
     restored = model_dequantize_qsgd.Processor(client_id=1).process(encoded)
     assert restored["w"].shape == tensor.shape
     assert torch.equal(restored["w"], tensor)
+
+
+@pytest.mark.parametrize(
+    "tensor", [torch.zeros(3), torch.empty(0, 2), torch.tensor(0.0), torch.randn(64)]
+)
+def test_int4_zero_empty_and_normal_layers_roundtrip(tensor):
+    encoded = model_quantize_int4.Processor(client_id=1).process({"w": tensor})
+    restored = model_dequantize_int4.Processor(client_id=1).process(encoded)
+    assert restored["w"].shape == tensor.shape
+    if tensor.numel() > 0 and torch.max(torch.abs(tensor)) > 1e-6:
+        assert torch.mean((restored["w"] - tensor) ** 2).item() < 0.05
+    else:
+        assert torch.equal(restored["w"], tensor)
+
+
+def test_int4_small_updates_retained():
+    small_val = 1e-9
+    tensor = torch.full((64,), small_val, dtype=torch.float32)
+    encoded = model_quantize_int4.Processor(client_id=1).process({"w": tensor})
+    restored = model_dequantize_int4.Processor(client_id=1).process(encoded)
+    assert torch.allclose(restored["w"], tensor, atol=1e-12)
+
+
+def test_int4_non_finite_rejected():
+    nan_tensor = torch.tensor([float("nan"), 1.0], dtype=torch.float32)
+    with pytest.raises(ValueError):
+        model_quantize_int4.Processor(client_id=1).process({"w": nan_tensor})
+
+    inf_tensor = torch.tensor([float("inf"), 1.0], dtype=torch.float32)
+    with pytest.raises(ValueError):
+        model_quantize_int4.Processor(client_id=1).process({"w": inf_tensor})
 
 
 def test_qsgd_has_bounded_error_and_respects_random_seed():
