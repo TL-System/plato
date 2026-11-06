@@ -25,6 +25,9 @@ class Processor(model.Processor):
             raise ValueError("Truncated INT4 header.")
 
         max_v, numel, dims = unpack("!fIh", layer[:10])
+        if not np.isfinite(max_v):
+            raise ValueError("Non-finite scale in INT4 header.")
+
         offset = 10
         shape = []
         for _ in range(dims):
@@ -33,6 +36,9 @@ class Processor(model.Processor):
 
         if numel == 0:
             return torch.empty(shape, dtype=torch.float32)
+
+        if max_v == 0.0:
+            return torch.zeros(shape, dtype=torch.float32)
 
         body = layer[offset:]
         expected_bytes = (numel + 1) // 2
@@ -46,7 +52,9 @@ class Processor(model.Processor):
         low = packed_t & 0x0F
         unpacked = torch.stack([high, low], dim=1).flatten()[:numel]
 
-        scale = max_v / 7.0 if max_v > 1e-8 else 1.0
+        scale = max_v / 7.0
         restored = (unpacked.float() - 8.0) * scale
+        if not torch.isfinite(restored).all():
+            raise ValueError("Decoded non-finite values in INT4 dequantization.")
 
         return restored.reshape(shape)

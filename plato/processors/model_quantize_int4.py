@@ -24,6 +24,9 @@ class Processor(model.Processor):
         if not isinstance(layer, torch.Tensor) or not layer.is_floating_point():
             return layer
 
+        if not torch.isfinite(layer).all():
+            raise ValueError("Cannot quantize layer containing NaN or Inf values.")
+
         numel = layer.numel()
         dims = len(layer.shape)
 
@@ -39,14 +42,20 @@ class Processor(model.Processor):
             header += pack("!h", d)
 
         flat = layer.detach().flatten().float()
-        scale = max_v / 7.0 if max_v > 1e-8 else 1.0
-        quantized = torch.clamp(torch.round(flat / scale), -8, 7).to(torch.int32)
+        if max_v == 0.0:
+            quantized = torch.zeros_like(flat, dtype=torch.int32)
+        else:
+            scale = max_v / 7.0
+            quantized = torch.clamp(torch.round(flat / scale), -8, 7).to(torch.int32)
+
         nibbles = (quantized + 8).to(torch.uint8)
 
         if nibbles.numel() % 2 != 0:
             nibbles = torch.nn.functional.pad(nibbles, (0, 1), value=8)
 
         paired = nibbles.view(-1, 2)
-        packed = ((paired[:, 0] << 4) | (paired[:, 1] & 0x0F)).cpu().numpy().astype(np.uint8)
+        packed = (
+            ((paired[:, 0] << 4) | (paired[:, 1] & 0x0F)).cpu().numpy().astype(np.uint8)
+        )
 
         return header + packed.tobytes()

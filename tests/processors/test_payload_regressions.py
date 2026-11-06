@@ -57,6 +57,23 @@ def test_int4_zero_empty_and_normal_layers_roundtrip(tensor):
         assert torch.equal(restored["w"], tensor)
 
 
+def test_int4_small_updates_retained():
+    small_val = 1e-9
+    tensor = torch.full((64,), small_val, dtype=torch.float32)
+    encoded = model_quantize_int4.Processor(client_id=1).process({"w": tensor})
+    restored = model_dequantize_int4.Processor(client_id=1).process(encoded)
+    assert torch.allclose(restored["w"], tensor, atol=1e-12)
+
+
+def test_int4_non_finite_rejected():
+    nan_tensor = torch.tensor([float("nan"), 1.0], dtype=torch.float32)
+    with pytest.raises(ValueError):
+        model_quantize_int4.Processor(client_id=1).process({"w": nan_tensor})
+
+    inf_tensor = torch.tensor([float("inf"), 1.0], dtype=torch.float32)
+    with pytest.raises(ValueError):
+        model_quantize_int4.Processor(client_id=1).process({"w": inf_tensor})
+
 
 def test_qsgd_has_bounded_error_and_respects_random_seed():
     tensor = torch.tensor([[-3.2, -0.04, 0, 1.2], [2.0, -1.1, 0.75, 3.2]]).T
